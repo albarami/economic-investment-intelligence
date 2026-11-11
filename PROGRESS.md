@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Ledger current to task S0-T01, 2026-11-11 |
+| Status | Ledger current to task S0-T01, 2026-11-12 |
 | Date | 2026-11-11 |
 | Owner | albarami |
 | Purpose | Record only completed work with evidence, and reserve later rows for evidence not yet available. |
@@ -159,6 +159,203 @@ Commit:    1f54d7f9c674aba7b172c47e1e4bae4a2bc52782
 Command:   cmp AGENTS.md CLAUDE.md
 Exit code: 0
 Date:      2026-11-11
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     REV-27: the two files are byte-identical.
+```
+
+#### Corrections to three entries above (commit `1f54d7f9c674aba7b172c47e1e4bae4a2bc52782`)
+
+The review of round 1 found that the scope entry above records a description instead of the exact command (TST-170). The two entries about the tree before the task have the same weakness. None of the three is edited (TST-171); each correction below names the entry it corrects, gives the exact command and the result of running it again on the same commit.
+
+```text
+Commit:    1f54d7f9c674aba7b172c47e1e4bae4a2bc52782
+Command:   python3 -c "import re,subprocess,sys; p=subprocess.run(['git','diff','--name-only','a81f69337bd7384c11823eab5e6f7977bdccf1f5...1f54d7f9c674aba7b172c47e1e4bae4a2bc52782'],check=True,capture_output=True,text=True).stdout.splitlines(); a=re.compile(r'(contracts|core|custodian|product|web|gateway|infra)/README\.md|\.env\.example|\.gitignore|scripts/check_tree\.py|scripts/tests/test_check_tree\.py|README\.md|AGENTS\.md|CLAUDE\.md'); o=[x for x in p if not a.fullmatch(x)]; print(len(p),o); sys.exit(1 if o or len(p)!=14 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "14 []"
+Seed:      none
+Notes:     Corrects the entry above whose Command line begins "scope assertion of the plan". The command compares the paths changed between the base commit and this commit with the fourteen paths of the task and exits 1 on any other path or count.
+```
+
+```text
+Commit:    1f54d7f9c674aba7b172c47e1e4bae4a2bc52782
+Command:   base=$(mktemp -d) && git worktree add -q --detach "$base" a81f69337bd7384c11823eab5e6f7977bdccf1f5 && rc=0; python3 scripts/check_tree.py --root "$base" >/dev/null || rc=$?; git worktree remove --force "$base"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     Corrects the entry above whose Command line begins "python3 scripts/check_tree.py --root <a linked worktree". The line succeeds only if the new check exits 1 on the tree as it was before the task (TST-161).
+```
+
+```text
+Commit:    1f54d7f9c674aba7b172c47e1e4bae4a2bc52782
+Command:   copy=$(mktemp -d) && cp -r scripts "$copy/" && rm "$copy/scripts/check_tree.py" && rc=0; (cd "$copy" && python3 -m unittest discover -s scripts/tests -p 'test_*.py' >/dev/null 2>&1) || rc=$?; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    the suite fails; counts are not meaningful without the implementation
+Seed:      none
+Notes:     Corrects the entry above whose Command line ends "(in a copy of scripts/ without check_tree.py)". The line succeeds only if the tests exit 1 when the implementation is absent (TST-161).
+```
+
+#### Independent review, round 1: REJECTED
+
+Reviewed commit `b7dfbb7097fb0d473cd00fbd2fe08ebde0008bcf`, the head of pull request 1 at that time, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43101841385 ). Reviewer: OpenAI GPT-5.6 Sol, through the Cursor command-line tool, read-only. The verdict is copied unchanged (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S0-T01
+COMMIT: b7dfbb7097fb0d473cd00fbd2fe08ebde0008bcf
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 PASS All three acceptance criteria map to `python3 scripts/check_tree.py`, exit 0; the recorded scope and folder checks cover ARC-01, PLN-22 and TST-163.
+  REV-11 FAIL The 31 tests passed with no skips, but the staged-state guarantee lacks a planted index/work-tree mismatch and the guard can pass falsely; see F1.
+  REV-12 PASS The builder changed the 14 planned files and the ledger commit changed only PROGRESS.md and OPEN_ITEMS.md; no data file or unrelated change appears.
+  REV-13 PASS The empty packages are explicitly the required scaffolding deliverable; no placeholder stands in for product behaviour.
+  REV-14 PASS No secret, `.env`, key file or real custodian data appears; the documentation token scan exited 0 and gitleaks belongs to S0-T06.
+  REV-15 PASS No existing assertion, threshold, test, CI check or security rule was weakened, skipped or deleted.
+  REV-16 FAIL `check_tree.py` violates the approved plan’s staged-state contract by validating the work-tree `.env.example`; see F1.
+  REV-17 FAIL A PROGRESS.md evidence entry records a description instead of the exact command required by TST-170; see F2.
+  REV-18 FAIL The false pass in the environment-file guard can approve a staged non-empty value or symlink while inspecting different work-tree content; see F1.
+  REV-19 PASS The commit follows the S0 cut order and reopens no settled component decision.
+  REV-20 N/A This commit adds no displayed figure or fact requiring provenance or lineage.
+  REV-21 N/A This commit adds no screen, claim template or rendered numeral.
+  REV-22 N/A This commit changes no privacy rule, parameter, treatment, release or attack.
+  REV-23 N/A No product or custodian package exists yet; the import-boundary test belongs to S0-T10.
+  REV-24 N/A This commit adds no English or Arabic application view.
+  REV-25 PASS The changed public files contain no private path, personal identity, e-mail address, realistic identifier, prohibited digit run, comparison or secret; the documentation check exited 0.
+  REV-26 PASS The changed files make no prohibited product, custodian-data, privacy, endorsement, forecast or lookup claim.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exited 0 on the reviewed head.
+  REV-28 N/A This commit creates no synthetic records or identifiers.
+  REV-29 N/A This commit assigns no attribute or simulated fact to a real place or business.
+  REV-38 PASS The gateway remains scaffolding only; no serving package, runtime call or runtime settings read exists.
+FINDINGS:
+  F1 (REV-11)
+    File: scripts/check_tree.py
+    Line: 266-284
+    Wrong: The `env-example` rule reads `.env.example` from the work tree although the check promises to judge the staged index. A staged non-empty value can be hidden by restoring the work-tree file without staging, causing exit 0 for a commit that violates ARC-98. A staged symlink can likewise cause an outside target to be read. The tests never plant this mismatch, breaking REV-11/TST-04, REV-16 and REV-18.
+    Fix: Read and UTF-8-decode the `.env.example` blob from the index through git, never through `Path.read_text`; validate those indexed bytes. Add a black-box test that stages a non-empty value, restores the clean work-tree file without staging, and requires exit 1 with the exact `env-example` failure. Run the 31 existing tests plus the new test, `python3 scripts/check_tree.py`, and `python3 scripts/check_docs.py`, all with exit 0.
+  F2 (REV-17)
+    File: PROGRESS.md
+    Line: 125-132
+    Wrong: `Command: scope assertion of the plan, run in Python...` is a description, not the exact invocation required by TST-170. The recorded `changed=14 outside=[]` result therefore cannot be reproduced from the ledger.
+    Fix: Append a correction entry, without editing the existing entry, that names it and records the complete failure-sensitive Python invocation comparing the base and work commits against the 14 allowed paths, plus the full commit hashes, real exit code, date, runner, counts and seed. Re-run that command and `python3 scripts/check_docs.py` and record their real results.
+```
+
+Both findings were accepted. F1 was fixed by the builder (Devin local, `swe-2-high`, Cognition) from the exact fix list: the `env-example` rule now reads the staged content and mode of `.env.example` from git's index, and four tests plant the mismatch between index and work tree. F2 is answered by the corrections above and by the exact commands in the entries below.
+
+#### Evidence for the corrected work commit `777eb9ceefbd153aab522640e3c272962f126f95`
+
+This commit directly follows the reviewed head `b7dfbb7097fb0d473cd00fbd2fe08ebde0008bcf` and changes only `scripts/check_tree.py` and `scripts/tests/test_check_tree.py`.
+
+```text
+Commit:    777eb9ceefbd153aab522640e3c272962f126f95
+Command:   python3 -c "import subprocess,sys; p=sorted(subprocess.run(['git','diff','--name-only','b7dfbb7097fb0d473cd00fbd2fe08ebde0008bcf..777eb9ceefbd153aab522640e3c272962f126f95'],check=True,capture_output=True,text=True).stdout.splitlines()); print(p); sys.exit(0 if p==['scripts/check_tree.py','scripts/tests/test_check_tree.py'] else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "['scripts/check_tree.py', 'scripts/tests/test_check_tree.py']"
+Seed:      none
+Notes:     The fix commit changes exactly the two files of finding F1.
+```
+
+```text
+Commit:    777eb9ceefbd153aab522640e3c272962f126f95
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The three acceptance criteria and ARC-01 on the corrected commit.
+```
+
+```text
+Commit:    777eb9ceefbd153aab522640e3c272962f126f95
+Command:   python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    35 passed, 0 failed, 0 skipped (ran 35 tests)
+Seed:      none
+Notes:     Includes the four tests added for finding F1: a staged value hidden by a clean work-tree file, an unstaged edit, a staged symbolic link, and a file deleted from the work tree only.
+```
+
+```text
+Commit:    777eb9ceefbd153aab522640e3c272962f126f95
+Command:   base=$(mktemp -d) && git worktree add -q --detach "$base" a81f69337bd7384c11823eab5e6f7977bdccf1f5 && rc=0; python3 scripts/check_tree.py --root "$base" >/dev/null || rc=$?; git worktree remove --force "$base"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     The line succeeds only if the check exits 1 on the tree as it was before the task (TST-161).
+```
+
+```text
+Commit:    777eb9ceefbd153aab522640e3c272962f126f95
+Command:   copy=$(mktemp -d) && cp -r scripts "$copy/" && rm "$copy/scripts/check_tree.py" && rc=0; (cd "$copy" && python3 -m unittest discover -s scripts/tests -p 'test_*.py' >/dev/null 2>&1) || rc=$?; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    the suite fails; counts are not meaningful without the implementation
+Seed:      none
+Notes:     The line succeeds only if the tests exit 1 when the implementation is absent (TST-161).
+```
+
+```text
+Commit:    777eb9ceefbd153aab522640e3c272962f126f95
+Command:   test -f core/README.md -a -f custodian/README.md -a -f product/README.md -a -f web/README.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     ARC-01: the pinned plane folders exist with their notes.
+```
+
+```text
+Commit:    777eb9ceefbd153aab522640e3c272962f126f95
+Command:   python3 -c "import re,subprocess,sys; p=subprocess.run(['git','diff','--name-only','a81f69337bd7384c11823eab5e6f7977bdccf1f5...777eb9ceefbd153aab522640e3c272962f126f95'],check=True,capture_output=True,text=True).stdout.splitlines(); a=re.compile(r'(contracts|core|custodian|product|web|gateway|infra)/README\.md|\.env\.example|\.gitignore|scripts/check_tree\.py|scripts/tests/test_check_tree\.py|README\.md|AGENTS\.md|CLAUDE\.md|PROGRESS\.md|OPEN_ITEMS\.md'); o=[x for x in p if not a.fullmatch(x)]; print(len(p),o); sys.exit(1 if o or len(p)!=16 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "16 []"
+Seed:      none
+Notes:     TST-163 and PLN-22: the branch changes the fourteen paths of the task and the two ledger files, and nothing else.
+```
+
+```text
+Commit:    777eb9ceefbd153aab522640e3c272962f126f95
+Command:   tracked=$(git ls-files -- data); test -z "$tracked"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     ARC-99: nothing under `data/` is tracked.
+```
+
+```text
+Commit:    777eb9ceefbd153aab522640e3c272962f126f95
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 55 text files, 46 Markdown files: OK"
+Seed:      none
+Notes:     TST-140.
+```
+
+```text
+Commit:    777eb9ceefbd153aab522640e3c272962f126f95
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
 Run by:    lead (local)
 Counts:    not a test suite
 Seed:      none
