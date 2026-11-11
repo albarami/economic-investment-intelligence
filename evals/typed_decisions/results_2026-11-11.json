@@ -1,0 +1,321 @@
+{
+ "date": "2026-11-11",
+ "what": "Bounded qualification probe of typed-decision models on jobs the EII product could give them. Public licence activity names (CC BY) with UN ISIC Rev.4 class titles, and invented sentences, in English and Arabic. 260 labelled cases; labels written by one model and confirmed blind by a second on all 260.",
+ "route": "the owner's existing subscription to an independent gateway; every response reported a jev-1.14 model identifier",
+ "caveats": [
+  "Labels were written and checked by models from the same family as the small-model baseline, which favours that baseline.",
+  "The small-model baseline answered in batches without an API call, so its latency was not measured.",
+  "The keyword router was written in minutes without seeing the questions; a larger rule set would do better.",
+  "260 cases is a small sample; intervals are wide.",
+  "Results hold for this model version, these prompts and these languages only.",
+  "The injection sample is three items; an independent paper reports a much lower score for this model on a public prompt-injection set.",
+  "The official provider route was not tested.",
+  "Four other typed-decision models scored lower on this set; their figures are not published in this repository."
+ ],
+ "cases": {
+  "total": 260,
+  "A_match": 100,
+  "A_choice": 30,
+  "B_route": 50,
+  "C_qc": 60,
+  "D_parity": 20
+ },
+ "arms": {
+  "small general model (blind, batch; same model family as the label authors)": {
+   "attempted": 260,
+   "answered": 260,
+   "correct": 258,
+   "accuracy_of_answered": "99.2%",
+   "ci95": [
+    97.2,
+    99.8
+   ],
+   "must_decline": {
+    "n": 12,
+    "caught": 12
+   },
+   "legacy_traps": {
+    "n": 20,
+    "caught": 20
+   },
+   "by_test": {
+    "A_choice": {
+     "correct": 29,
+     "n": 30,
+     "accuracy": "96.7%"
+    },
+    "A_match": {
+     "correct": 100,
+     "n": 100,
+     "accuracy": "100.0%"
+    },
+    "B_route": {
+     "correct": 50,
+     "n": 50,
+     "accuracy": "100.0%"
+    },
+    "C_qc": {
+     "correct": 60,
+     "n": 60,
+     "accuracy": "100.0%"
+    },
+    "D_parity": {
+     "correct": 19,
+     "n": 20,
+     "accuracy": "95.0%"
+    }
+   },
+   "by_test_and_language": {
+    "A_choice / mixed": {
+     "correct": 29,
+     "n": 30,
+     "accuracy": "96.7%"
+    },
+    "A_match / mixed": {
+     "correct": 100,
+     "n": 100,
+     "accuracy": "100.0%"
+    },
+    "B_route / ar": {
+     "correct": 25,
+     "n": 25,
+     "accuracy": "100.0%"
+    },
+    "B_route / en": {
+     "correct": 25,
+     "n": 25,
+     "accuracy": "100.0%"
+    },
+    "C_qc / ar": {
+     "correct": 30,
+     "n": 30,
+     "accuracy": "100.0%"
+    },
+    "C_qc / en": {
+     "correct": 30,
+     "n": 30,
+     "accuracy": "100.0%"
+    },
+    "D_parity / mixed": {
+     "correct": 19,
+     "n": 20,
+     "accuracy": "95.0%"
+    }
+   }
+  },
+  "code-prefix rule (A_match only)": {
+   "attempted": 100,
+   "answered": 100,
+   "correct": 80,
+   "accuracy_of_answered": "80.0%",
+   "ci95": [
+    71.1,
+    86.7
+   ],
+   "must_decline": {
+    "n": 0,
+    "caught": 0
+   },
+   "legacy_traps": {
+    "n": 20,
+    "caught": 0
+   },
+   "by_test": {
+    "A_match": {
+     "correct": 80,
+     "n": 100,
+     "accuracy": "80.0%"
+    }
+   },
+   "by_test_and_language": {
+    "A_match / mixed": {
+     "correct": 80,
+     "n": 100,
+     "accuracy": "80.0%"
+    }
+   }
+  },
+  "jev-1.14.0 (typed-decision provider)": {
+   "attempted": 260,
+   "answered": 260,
+   "correct": 248,
+   "accuracy_of_answered": "95.4%",
+   "ci95": [
+    92.1,
+    97.3
+   ],
+   "latency_ms": {
+    "p50": 527.5,
+    "p95": 790.5,
+    "max": 1540.0
+   },
+   "must_decline": {
+    "n": 12,
+    "caught": 12
+   },
+   "legacy_traps": {
+    "n": 20,
+    "caught": 20
+   },
+   "wrong_with_extreme_confidence": 1,
+   "tokens_mean_per_call": 371.4,
+   "by_test": {
+    "A_choice": {
+     "correct": 28,
+     "n": 30,
+     "accuracy": "93.3%"
+    },
+    "A_match": {
+     "correct": 94,
+     "n": 100,
+     "accuracy": "94.0%"
+    },
+    "B_route": {
+     "correct": 50,
+     "n": 50,
+     "accuracy": "100.0%"
+    },
+    "C_qc": {
+     "correct": 57,
+     "n": 60,
+     "accuracy": "95.0%"
+    },
+    "D_parity": {
+     "correct": 19,
+     "n": 20,
+     "accuracy": "95.0%"
+    }
+   },
+   "by_test_and_language": {
+    "A_choice / mixed": {
+     "correct": 28,
+     "n": 30,
+     "accuracy": "93.3%"
+    },
+    "A_match / mixed": {
+     "correct": 94,
+     "n": 100,
+     "accuracy": "94.0%"
+    },
+    "B_route / ar": {
+     "correct": 25,
+     "n": 25,
+     "accuracy": "100.0%"
+    },
+    "B_route / en": {
+     "correct": 25,
+     "n": 25,
+     "accuracy": "100.0%"
+    },
+    "C_qc / ar": {
+     "correct": 27,
+     "n": 30,
+     "accuracy": "90.0%"
+    },
+    "C_qc / en": {
+     "correct": 30,
+     "n": 30,
+     "accuracy": "100.0%"
+    },
+    "D_parity / mixed": {
+     "correct": 19,
+     "n": 20,
+     "accuracy": "95.0%"
+    }
+   }
+  }
+ },
+ "keyword_router_B_route": {
+  "correct": 34,
+  "n": 50,
+  "must_decline_caught": 6,
+  "must_decline_n": 12,
+  "false_declines": 0
+ },
+ "must_decline_missed_by_rules_declined_by_provider": [
+  "B-34",
+  "B-35",
+  "B-38",
+  "B-40",
+  "B-41",
+  "B-43"
+ ],
+ "repeatability": {
+  "runs": 3,
+  "calls": 780,
+  "http_200": 780,
+  "cases_whose_answer_changed": 3,
+  "of": 260,
+  "changed_while_confident": 0,
+  "score_spread_median": 0.01,
+  "score_spread_p95": 0.07,
+  "accuracy_per_run": [
+   248,
+   248,
+   250
+  ],
+  "latency_ms": {
+   "p50": 546.7,
+   "p95": 808.6,
+   "p99": 1171.4,
+   "max": 3100.8
+  }
+ },
+ "selective_answering": {
+  "band_0.1_0.9": {
+   "confident": 173,
+   "of": 260,
+   "correct_when_confident": 172
+  },
+  "band_0.05_0.95": {
+   "confident": 126,
+   "of": 260,
+   "correct_when_confident": 126
+  },
+  "band_0.2_0.8": {
+   "confident": 212,
+   "of": 260,
+   "correct_when_confident": 208
+  }
+ },
+ "tokens": {
+  "mean_input_tokens_per_decision": 371.4
+ },
+ "label_doubts_recorded_by_the_authors": {
+  "activity": [
+   "A-M-020: the answer is yes because ISIC 4210 explicitly includes bridges and tunnels, but a reader who sees only the class title 'roads and railways' may hesitate.",
+   "A-M-048: printing newspapers vs 5813 publishing. The answer is no under ISIC (publishing excludes printing), but a reader who is not careful may treat the two as one.",
+   "A-M-047: cardboard boxes vs 1701 (paperboard making). The word 'paperboard' in the title is a deliberate near-match. ISIC places containers in 1702.",
+   "A-M-008: coffee roasting is in ISIC 1079 only through the explanatory notes; the class title just says 'n.e.c.'.",
+   "A-C-014: tour organising (7912) vs travel agency (7911). ISIC separates them clearly, but in everyday Arabic usage the two overlap.",
+   "A-C-020: buying and selling foreign currency is placed in 6612 through the ISIC 'bureaux de change' note. The title (security and commodity brokerage) does not show it.",
+   "A-C-018: a satellite TV channel goes to 6020. I swapped satellite telecom (6130) for wired telecom (6110) to keep the answer unambiguous."
+  ],
+  "language": [
+   "B-03 and B-08: pay of people near a site is routed to site_check according to the journey definition, but a reader might lean towards staffing_and_pay.",
+   "B-18, B-22 and B-31: break-even questions are labelled costs_and_suppliers. A strict reader could see 'how much must we sell' as close to a revenue forecast.",
+   "C-36: names a person and gives a district statistic for her occupation. Labelled no because her pay is not stated, but some readers may see it as implied.",
+   "C-37 and C-42: a named company's pay is given relative to the median or the market, with no amount. Labelled yes because a pay level is still stated.",
+   "C-08: conditional next steps ('If you decide to proceed') are labelled as not a recommendation.",
+   "C-13: 'we see nothing preventing signing, and encourage you to proceed' is labelled a go recommendation; the second clause makes this firm."
+  ]
+ },
+ "two_option_orders": {
+  "protocol": "every pick-one question asked in the original and in the reversed option order, on the pinned model version",
+  "B_route": {
+   "cases": 50,
+   "same_answer_in_both_orders": 50,
+   "correct_when_both_agree": 50,
+   "both_orders_confident_at_0.90": 44,
+   "correct_when_both_confident": 44
+  },
+  "A_choice": {
+   "cases": 30,
+   "same_answer_in_both_orders": 29,
+   "correct_when_both_agree": 28,
+   "both_orders_confident_at_0.90": 21,
+   "correct_when_both_confident": 21
+  },
+  "note": "The yes/no classes are not affected by option order. A human-labelled rerun under this protocol is still required (open item OI-15)."
+ }
+}

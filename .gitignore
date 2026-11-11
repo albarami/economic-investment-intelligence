@@ -1,0 +1,36 @@
+# Windows download markers
+*Zone.Identifier
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Data is fetched or generated, never committed
+data/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.hypothesis/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+playwright-report/
+test-results/
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json

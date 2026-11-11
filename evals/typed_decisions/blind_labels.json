@@ -1,0 +1,2086 @@
+{
+ "small_model_baseline": {
+  "A-M-001": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-002": {
+   "answer": "yes",
+   "confidence": "medium"
+  },
+  "A-M-003": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-004": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-005": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-006": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-007": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-008": {
+   "answer": "yes",
+   "confidence": "medium"
+  },
+  "A-M-009": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-010": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-011": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-012": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-013": {
+   "answer": "yes",
+   "confidence": "medium"
+  },
+  "A-M-014": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-015": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-016": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-017": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-018": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-019": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-020": {
+   "answer": "yes",
+   "confidence": "medium"
+  },
+  "A-M-021": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-022": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-023": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-024": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-025": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-026": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-027": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-028": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-029": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-030": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-031": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-032": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-033": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-034": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-035": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-036": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-037": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-038": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-039": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-040": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-041": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-042": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-043": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-044": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-045": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-046": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-047": {
+   "answer": "no",
+   "confidence": "medium"
+  },
+  "A-M-048": {
+   "answer": "no",
+   "confidence": "medium"
+  },
+  "A-M-049": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-050": {
+   "answer": "no",
+   "confidence": "medium"
+  },
+  "A-M-051": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-052": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-053": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-054": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-055": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-056": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-057": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-058": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-059": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-060": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-061": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-062": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-063": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-064": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-065": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-066": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-067": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-068": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-069": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-070": {
+   "answer": "no",
+   "confidence": "medium"
+  },
+  "A-M-071": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-072": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-073": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-074": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-075": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-076": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-077": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-078": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-079": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-080": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-081": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-082": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-083": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-084": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-085": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-086": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-087": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-088": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-089": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-090": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-091": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-092": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-093": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-094": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-095": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-096": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-097": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-098": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-099": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-100": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-C-001": {
+   "answer": "1050",
+   "confidence": "high"
+  },
+  "A-C-002": {
+   "answer": "1073",
+   "confidence": "medium"
+  },
+  "A-C-003": {
+   "answer": "1392",
+   "confidence": "high"
+  },
+  "A-C-004": {
+   "answer": "2420",
+   "confidence": "high"
+  },
+  "A-C-005": {
+   "answer": "2511",
+   "confidence": "high"
+  },
+  "A-C-006": {
+   "answer": "2920",
+   "confidence": "high"
+  },
+  "A-C-007": {
+   "answer": "3100",
+   "confidence": "high"
+  },
+  "A-C-008": {
+   "answer": "3314",
+   "confidence": "medium"
+  },
+  "A-C-009": {
+   "answer": "4290",
+   "confidence": "medium"
+  },
+  "A-C-010": {
+   "answer": "4322",
+   "confidence": "high"
+  },
+  "A-C-011": {
+   "answer": "4540",
+   "confidence": "high"
+  },
+  "A-C-012": {
+   "answer": "5012",
+   "confidence": "high"
+  },
+  "A-C-013": {
+   "answer": "5221",
+   "confidence": "medium"
+  },
+  "A-C-014": {
+   "answer": "7912",
+   "confidence": "medium"
+  },
+  "A-C-015": {
+   "answer": "5610",
+   "confidence": "high"
+  },
+  "A-C-016": {
+   "answer": "5630",
+   "confidence": "high"
+  },
+  "A-C-017": {
+   "answer": "5911",
+   "confidence": "high"
+  },
+  "A-C-018": {
+   "answer": "6020",
+   "confidence": "high"
+  },
+  "A-C-019": {
+   "answer": "6311",
+   "confidence": "high"
+  },
+  "A-C-020": {
+   "answer": "6419",
+   "confidence": "high"
+  },
+  "A-C-021": {
+   "answer": "6512",
+   "confidence": "high"
+  },
+  "A-C-022": {
+   "answer": "6820",
+   "confidence": "high"
+  },
+  "A-C-023": {
+   "answer": "6920",
+   "confidence": "high"
+  },
+  "A-C-024": {
+   "answer": "7310",
+   "confidence": "high"
+  },
+  "A-C-025": {
+   "answer": "8129",
+   "confidence": "medium"
+  },
+  "A-C-026": {
+   "answer": "2100",
+   "confidence": "high"
+  },
+  "A-C-027": {
+   "answer": "8620",
+   "confidence": "high"
+  },
+  "A-C-028": {
+   "answer": "9321",
+   "confidence": "high"
+  },
+  "A-C-029": {
+   "answer": "9529",
+   "confidence": "medium"
+  },
+  "A-C-030": {
+   "answer": "9523",
+   "confidence": "high"
+  },
+  "B-01": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-02": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-03": {
+   "answer": "site_check",
+   "confidence": "medium"
+  },
+  "B-04": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-05": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-06": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-07": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-08": {
+   "answer": "site_check",
+   "confidence": "medium"
+  },
+  "B-09": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-10": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-11": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-12": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-13": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-14": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-15": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-16": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-17": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-18": {
+   "answer": "costs_and_suppliers",
+   "confidence": "medium"
+  },
+  "B-19": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-20": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-21": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-22": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-23": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-24": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-25": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-26": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-27": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-28": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-29": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-30": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-31": {
+   "answer": "costs_and_suppliers",
+   "confidence": "medium"
+  },
+  "B-32": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-33": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-34": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-35": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-36": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-37": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-38": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-39": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-40": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-41": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-42": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-43": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-44": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-45": {
+   "answer": "out_of_scope",
+   "confidence": "high"
+  },
+  "B-46": {
+   "answer": "out_of_scope",
+   "confidence": "high"
+  },
+  "B-47": {
+   "answer": "out_of_scope",
+   "confidence": "high"
+  },
+  "B-48": {
+   "answer": "out_of_scope",
+   "confidence": "high"
+  },
+  "B-49": {
+   "answer": "out_of_scope",
+   "confidence": "high"
+  },
+  "B-50": {
+   "answer": "out_of_scope",
+   "confidence": "high"
+  },
+  "C-01": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-02": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-03": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-04": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-05": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-06": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-07": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-08": {
+   "answer": "no",
+   "confidence": "medium"
+  },
+  "C-09": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-10": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-11": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-12": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-13": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-14": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-15": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-16": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-17": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-18": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-19": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-20": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-21": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-22": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-23": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-24": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-25": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-26": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-27": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-28": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-29": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-30": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-31": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-32": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-33": {
+   "answer": "yes",
+   "confidence": "medium"
+  },
+  "C-34": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-35": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-36": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-37": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-38": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-39": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-40": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-41": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-42": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-43": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-44": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-45": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-46": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-47": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-48": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-49": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-50": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-51": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-52": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-53": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-54": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-55": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-56": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-57": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-58": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-59": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-60": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-01": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-02": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-03": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-04": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-05": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-06": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-07": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-08": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-09": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-10": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-11": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-12": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-13": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-14": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-15": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-16": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-17": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-18": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-19": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-20": {
+   "answer": "no",
+   "confidence": "high"
+  }
+ },
+ "strong_model_label_check": {
+  "A-M-001": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-002": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-003": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-004": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-005": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-006": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-007": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-008": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-009": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-010": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-011": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-012": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-013": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-014": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-015": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-016": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-017": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-018": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-019": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-020": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-021": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-022": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-023": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-024": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-025": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-026": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-027": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-028": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-029": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-030": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-031": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-032": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-033": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-034": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-035": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-036": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-037": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-038": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-039": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-040": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "A-M-041": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-042": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-043": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-044": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-045": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-046": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-047": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-048": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-049": {
+   "answer": "no",
+   "confidence": "medium"
+  },
+  "A-M-050": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-051": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-052": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-053": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-054": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-055": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-056": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-057": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-058": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-059": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-060": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-061": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-062": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-063": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-064": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-065": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-066": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-067": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-068": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-069": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-070": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-071": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-072": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-073": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-074": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-075": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-076": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-077": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-078": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-079": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-080": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-081": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-082": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-083": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-084": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-085": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-086": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-087": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-088": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-089": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-090": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-091": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-092": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-093": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-094": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-095": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-096": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-097": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-098": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-099": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-M-100": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "A-C-001": {
+   "answer": "1050",
+   "confidence": "high"
+  },
+  "A-C-002": {
+   "answer": "1073",
+   "confidence": "medium"
+  },
+  "A-C-003": {
+   "answer": "1392",
+   "confidence": "high"
+  },
+  "A-C-004": {
+   "answer": "2420",
+   "confidence": "high"
+  },
+  "A-C-005": {
+   "answer": "2511",
+   "confidence": "high"
+  },
+  "A-C-006": {
+   "answer": "2920",
+   "confidence": "high"
+  },
+  "A-C-007": {
+   "answer": "3100",
+   "confidence": "high"
+  },
+  "A-C-008": {
+   "answer": "3314",
+   "confidence": "high"
+  },
+  "A-C-009": {
+   "answer": "4290",
+   "confidence": "high"
+  },
+  "A-C-010": {
+   "answer": "4322",
+   "confidence": "high"
+  },
+  "A-C-011": {
+   "answer": "4540",
+   "confidence": "high"
+  },
+  "A-C-012": {
+   "answer": "5012",
+   "confidence": "high"
+  },
+  "A-C-013": {
+   "answer": "5221",
+   "confidence": "high"
+  },
+  "A-C-014": {
+   "answer": "7912",
+   "confidence": "high"
+  },
+  "A-C-015": {
+   "answer": "5610",
+   "confidence": "high"
+  },
+  "A-C-016": {
+   "answer": "5630",
+   "confidence": "high"
+  },
+  "A-C-017": {
+   "answer": "5911",
+   "confidence": "high"
+  },
+  "A-C-018": {
+   "answer": "6020",
+   "confidence": "high"
+  },
+  "A-C-019": {
+   "answer": "6311",
+   "confidence": "high"
+  },
+  "A-C-020": {
+   "answer": "6612",
+   "confidence": "medium"
+  },
+  "A-C-021": {
+   "answer": "6512",
+   "confidence": "high"
+  },
+  "A-C-022": {
+   "answer": "6820",
+   "confidence": "high"
+  },
+  "A-C-023": {
+   "answer": "6920",
+   "confidence": "high"
+  },
+  "A-C-024": {
+   "answer": "7310",
+   "confidence": "high"
+  },
+  "A-C-025": {
+   "answer": "8129",
+   "confidence": "high"
+  },
+  "A-C-026": {
+   "answer": "2100",
+   "confidence": "high"
+  },
+  "A-C-027": {
+   "answer": "8620",
+   "confidence": "high"
+  },
+  "A-C-028": {
+   "answer": "9321",
+   "confidence": "high"
+  },
+  "A-C-029": {
+   "answer": "9529",
+   "confidence": "high"
+  },
+  "A-C-030": {
+   "answer": "9523",
+   "confidence": "high"
+  },
+  "B-01": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-02": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-03": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-04": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-05": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-06": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-07": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-08": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-09": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-10": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-11": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-12": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-13": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-14": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-15": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-16": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-17": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-18": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-19": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-20": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-21": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-22": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-23": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-24": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-25": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-26": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-27": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-28": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-29": {
+   "answer": "site_check",
+   "confidence": "high"
+  },
+  "B-30": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-31": {
+   "answer": "costs_and_suppliers",
+   "confidence": "high"
+  },
+  "B-32": {
+   "answer": "staffing_and_pay",
+   "confidence": "high"
+  },
+  "B-33": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-34": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-35": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-36": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-37": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-38": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-39": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-40": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-41": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-42": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-43": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-44": {
+   "answer": "must_decline",
+   "confidence": "high"
+  },
+  "B-45": {
+   "answer": "out_of_scope",
+   "confidence": "high"
+  },
+  "B-46": {
+   "answer": "out_of_scope",
+   "confidence": "high"
+  },
+  "B-47": {
+   "answer": "out_of_scope",
+   "confidence": "high"
+  },
+  "B-48": {
+   "answer": "out_of_scope",
+   "confidence": "high"
+  },
+  "B-49": {
+   "answer": "out_of_scope",
+   "confidence": "high"
+  },
+  "B-50": {
+   "answer": "out_of_scope",
+   "confidence": "high"
+  },
+  "C-01": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-02": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-03": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-04": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-05": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-06": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-07": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-08": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-09": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-10": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-11": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-12": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-13": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-14": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-15": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-16": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-17": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-18": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-19": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-20": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-21": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-22": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-23": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-24": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-25": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-26": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-27": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-28": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-29": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-30": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-31": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-32": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-33": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-34": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-35": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-36": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-37": {
+   "answer": "yes",
+   "confidence": "medium"
+  },
+  "C-38": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-39": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-40": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-41": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-42": {
+   "answer": "yes",
+   "confidence": "medium"
+  },
+  "C-43": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-44": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-45": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-46": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-47": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-48": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-49": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-50": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-51": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-52": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-53": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-54": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-55": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-56": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-57": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "C-58": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-59": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "C-60": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-01": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-02": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-03": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-04": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-05": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-06": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-07": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-08": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-09": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-10": {
+   "answer": "yes",
+   "confidence": "high"
+  },
+  "D-11": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-12": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-13": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-14": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-15": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-16": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-17": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-18": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-19": {
+   "answer": "no",
+   "confidence": "high"
+  },
+  "D-20": {
+   "answer": "no",
+   "confidence": "high"
+  }
+ }
+}
