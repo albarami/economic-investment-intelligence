@@ -374,6 +374,59 @@ class CheckTreeTests(unittest.TestCase):
                 "FAIL env-example: .env.example: cannot be read as UTF-8",
                 done.stdout.splitlines())
 
+    def test_env_example_staged_value_hidden_by_work_tree_fails(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = make_fixture(folder)
+            path = root / ".env.example"
+            clean = path.read_text(encoding="utf-8")
+            number = clean.splitlines().index("EII_STORE=") + 1
+            path.write_text(
+                clean.replace("EII_STORE=\n", "EII_STORE=postgres\n"),
+                encoding="utf-8")
+            git(root, "add", ".env.example")
+            path.write_text(clean, encoding="utf-8")
+            done = run_check(root)
+            self.assertEqual(done.returncode, 1)
+            self.assertEqual(done.stdout.splitlines(), [
+                f"FAIL env-example: .env.example:{number}: "
+                "not a name with an empty value",
+                "FAIL env-example: .env.example: names differ from the pinned list",
+                "checked 8 rules: 2 failure(s)",
+            ])
+
+    def test_env_example_unstaged_edit_is_not_judged(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = make_fixture(folder)
+            path = root / ".env.example"
+            text = path.read_text(encoding="utf-8")
+            path.write_text(
+                text.replace("EII_STORE=\n", "EII_STORE=postgres\n"),
+                encoding="utf-8")
+            self.assert_clean(run_check(root))
+
+    def test_env_example_staged_symbolic_link_fails(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = make_fixture(folder)
+            outside = Path(folder) / "outside"
+            outside.mkdir()
+            target = outside / ".env.example"
+            shutil.copyfile(root / ".env.example", target)
+            (root / ".env.example").unlink()
+            os.symlink(target, root / ".env.example")
+            git(root, "add", ".env.example")
+            done = run_check(root)
+            self.assertEqual(done.returncode, 1)
+            self.assertEqual(done.stdout.splitlines(), [
+                "FAIL env-example: .env.example: not a regular file in the index",
+                "checked 8 rules: 1 failure(s)",
+            ])
+
+    def test_env_example_deleted_in_work_tree_is_judged_from_the_index(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = make_fixture(folder)
+            (root / ".env.example").unlink()
+            self.assert_clean(run_check(root))
+
     def test_force_tracked_secret_fails(self):
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)

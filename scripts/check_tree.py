@@ -33,8 +33,10 @@ Rules, in order:
 5. secrets-ignored: every secret probe is ignored by a committed rule.
 6. generated-ignored: every generated-artefact probe is ignored by a
    committed rule.
-7. env-example: ``.env.example`` is tracked, not ignored, and holds exactly
-   the pinned variable names, each with an empty value.
+7. env-example: the staged ``.env.example`` is a regular file, is not
+   ignored, and holds exactly the pinned variable names, each with an
+   empty value. Its content is read from git's index, never from the
+   work tree.
 8. tracked-ignored: no tracked path is ignored by a committed rule.
 
 "Committed rule" means a pattern from a relative path whose last component
@@ -255,19 +257,30 @@ def probes_ignored(check: Checker, failures: list,
 
 
 def env_example(check: Checker, failures: list) -> None:
-    if ENV_EXAMPLE not in check.tracked:
+    tracked = ENV_EXAMPLE in check.tracked
+    if not tracked:
         failures.append(f"FAIL env-example: {ENV_EXAMPLE}: not tracked")
     record = check.matches.get(ENV_EXAMPLE)
     if record is not None and not record[2].startswith("!"):
         failures.append(
             f"FAIL env-example: {ENV_EXAMPLE}: "
             f"ignored by {record[0]}:{record[1]}")
-    path = check.root / ENV_EXAMPLE
-    if not path.is_file():
+    if not tracked:
         return
+    done = git(check.root, "ls-files", "-s", "-z", "--", ENV_EXAMPLE)
+    if done.returncode != 0:
+        raise CheckError("git ls-files failed")
+    if done.stdout.split(b" ", 1)[0] not in (b"100644", b"100755"):
+        failures.append(
+            f"FAIL env-example: {ENV_EXAMPLE}: "
+            "not a regular file in the index")
+        return
+    done = git(check.root, "cat-file", "blob", f":{ENV_EXAMPLE}")
+    if done.returncode != 0:
+        raise CheckError("git cat-file failed")
     try:
-        lines = path.read_text(encoding="utf-8").splitlines()
-    except (OSError, UnicodeDecodeError):
+        lines = done.stdout.decode("utf-8").splitlines()
+    except UnicodeDecodeError:
         failures.append(
             f"FAIL env-example: {ENV_EXAMPLE}: cannot be read as UTF-8")
         return
