@@ -117,7 +117,8 @@ def tree_snapshot(root: Path) -> dict:
     return snapshot
 
 
-class CheckTreeTests(unittest.TestCase):
+class CheckTreeCase(unittest.TestCase):
+    """Assertions shared by the tree-check test modules. It holds no test."""
 
     def assert_clean(self, done: subprocess.CompletedProcess) -> None:
         self.assertEqual(done.returncode, 0, done.stderr + done.stdout)
@@ -129,14 +130,17 @@ class CheckTreeTests(unittest.TestCase):
             any(line.startswith(prefix) for line in lines),
             f"no line starting {prefix!r} in output: {done.stdout!r}")
 
-    def test_real_repository_passes(self):
+
+class CheckTreeTests(CheckTreeCase):
+
+    def test_real_repository_passes(self) -> None:
         self.assert_clean(run_check(REPO_ROOT))
 
-    def test_clean_fixture_passes(self):
+    def test_clean_fixture_passes(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             self.assert_clean(run_check(make_fixture(folder)))
 
-    def test_missing_pinned_folder_fails(self):
+    def test_missing_pinned_folder_fails(self) -> None:
         for name in PINNED_FOLDERS:
             with self.subTest(name=name), tempfile.TemporaryDirectory() as folder:
                 root = make_fixture(folder)
@@ -146,7 +150,7 @@ class CheckTreeTests(unittest.TestCase):
                 self.assertEqual(done.returncode, 1)
                 self.assert_line_starting(done, f"FAIL committed-folder: {name}:")
 
-    def test_pinned_folder_with_no_tracked_file_fails(self):
+    def test_pinned_folder_with_no_tracked_file_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             git(root, "rm", "-q", "--cached", "core/README.md")
@@ -156,7 +160,7 @@ class CheckTreeTests(unittest.TestCase):
                 "FAIL committed-folder: core: no tracked file",
                 done.stdout.splitlines())
 
-    def test_unexpected_top_level_folder_fails(self):
+    def test_unexpected_top_level_folder_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             (root / "extras").mkdir()
@@ -166,7 +170,7 @@ class CheckTreeTests(unittest.TestCase):
             self.assertEqual(done.returncode, 1)
             self.assert_line_starting(done, "FAIL top-level-folder: extras:")
 
-    def test_github_folder_is_allowed(self):
+    def test_github_folder_is_allowed(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             workflows = root / ".github" / "workflows"
@@ -175,7 +179,7 @@ class CheckTreeTests(unittest.TestCase):
             git(root, "add", ".github/workflows/x.yml")
             self.assert_clean(run_check(root))
 
-    def test_tracked_file_under_data_fails(self):
+    def test_tracked_file_under_data_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             (root / "data").mkdir()
@@ -185,7 +189,7 @@ class CheckTreeTests(unittest.TestCase):
             self.assertEqual(done.returncode, 1)
             self.assert_line_starting(done, "FAIL data-untracked: data/a.txt:")
 
-    def test_tracked_path_named_data_fails(self):
+    def test_tracked_path_named_data_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             (root / "data").write_text("x\n", encoding="utf-8")
@@ -194,7 +198,7 @@ class CheckTreeTests(unittest.TestCase):
             self.assertEqual(done.returncode, 1)
             self.assert_line_starting(done, "FAIL data-untracked: data:")
 
-    def test_data_as_symbolic_link_fails(self):
+    def test_data_as_symbolic_link_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             target = Path(folder) / "target"
@@ -206,7 +210,7 @@ class CheckTreeTests(unittest.TestCase):
                 "FAIL data-untracked: data: not a real directory",
                 done.stdout.splitlines())
 
-    def test_probes_beyond_a_symbolic_link_count_as_not_ignored(self):
+    def test_probes_beyond_a_symbolic_link_count_as_not_ignored(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             target = Path(folder) / "target"
@@ -225,11 +229,11 @@ class CheckTreeTests(unittest.TestCase):
                 "checked 8 rules: 7 failure(s)",
             ])
 
-    def test_data_folder_absent_passes(self):
+    def test_data_folder_absent_passes(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             self.assert_clean(run_check(make_fixture(folder)))
 
-    def test_data_folder_present_and_ignored_passes(self):
+    def test_data_folder_present_and_ignored_passes(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             (root / "data" / "public_cache").mkdir(parents=True)
@@ -237,7 +241,7 @@ class CheckTreeTests(unittest.TestCase):
             git(root, "add", "-A")
             self.assert_clean(run_check(root))
 
-    def test_required_ignore_pattern_missing_fails(self):
+    def test_required_ignore_pattern_missing_fails(self) -> None:
         for pattern, rule in PATTERN_RULES:
             with self.subTest(pattern=pattern), tempfile.TemporaryDirectory() as folder:
                 root = make_fixture(folder)
@@ -247,7 +251,7 @@ class CheckTreeTests(unittest.TestCase):
                 self.assertEqual(done.returncode, 1)
                 self.assert_line_starting(done, f"FAIL {rule}:")
 
-    def test_rule_only_in_local_exclude_fails(self):
+    def test_rule_only_in_local_exclude_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             drop_gitignore_line(root, "data/")
@@ -259,7 +263,7 @@ class CheckTreeTests(unittest.TestCase):
             self.assertEqual(done.returncode, 1)
             self.assert_line_starting(done, "FAIL data-ignored:")
 
-    def test_untracked_gitignore_fails(self):
+    def test_untracked_gitignore_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             git(root, "rm", "-q", "--cached", ".gitignore")
@@ -268,7 +272,7 @@ class CheckTreeTests(unittest.TestCase):
             self.assert_line_starting(done, "FAIL data-ignored:")
             self.assert_line_starting(done, "FAIL secrets-ignored:")
 
-    def test_rule_only_in_untracked_nested_gitignore_fails(self):
+    def test_rule_only_in_untracked_nested_gitignore_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             drop_gitignore_line(root, "dist/")
@@ -280,7 +284,7 @@ class CheckTreeTests(unittest.TestCase):
                 "FAIL generated-ignored: web/dist/x: not ignored by a committed rule",
                 done.stdout.splitlines())
 
-    def test_unstaged_gitignore_edit_does_not_count(self):
+    def test_unstaged_gitignore_edit_does_not_count(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             original = (root / ".gitignore").read_text(encoding="utf-8")
@@ -291,7 +295,7 @@ class CheckTreeTests(unittest.TestCase):
             self.assertEqual(done.returncode, 1)
             self.assert_line_starting(done, "FAIL data-ignored:")
 
-    def test_personal_ignore_file_does_not_count(self):
+    def test_personal_ignore_file_does_not_count(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             drop_gitignore_line(root, "data/")
@@ -303,7 +307,7 @@ class CheckTreeTests(unittest.TestCase):
             self.assertEqual(done.returncode, 1)
             self.assert_line_starting(done, "FAIL data-ignored:")
 
-    def test_env_example_ignored_fails(self):
+    def test_env_example_ignored_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             drop_gitignore_line(root, "!.env.example")
@@ -313,7 +317,7 @@ class CheckTreeTests(unittest.TestCase):
             self.assert_line_starting(
                 done, "FAIL env-example: .env.example: ignored by")
 
-    def test_env_example_missing_fails(self):
+    def test_env_example_missing_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             git(root, "rm", "-q", "--cached", ".env.example")
@@ -324,7 +328,7 @@ class CheckTreeTests(unittest.TestCase):
                 "FAIL env-example: .env.example: not tracked",
                 done.stdout.splitlines())
 
-    def test_env_example_with_a_value_fails(self):
+    def test_env_example_with_a_value_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             path = root / ".env.example"
@@ -340,7 +344,7 @@ class CheckTreeTests(unittest.TestCase):
                 and line.endswith("not a name with an empty value")
                 for line in done.stdout.splitlines()))
 
-    def test_env_example_names_differ_fails(self):
+    def test_env_example_names_differ_fails(self) -> None:
         edits = (
             ("removed name", lambda text: text.replace("EII_STORE=\n", "")),
             ("extra name", lambda text: text + "EXTRA_NAME=\n"),
@@ -363,7 +367,7 @@ class CheckTreeTests(unittest.TestCase):
                     "FAIL env-example: .env.example: names differ from the pinned list",
                     done.stdout.splitlines())
 
-    def test_env_example_not_utf8_fails(self):
+    def test_env_example_not_utf8_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             (root / ".env.example").write_bytes(bytes([255, 254]))
@@ -374,60 +378,7 @@ class CheckTreeTests(unittest.TestCase):
                 "FAIL env-example: .env.example: cannot be read as UTF-8",
                 done.stdout.splitlines())
 
-    def test_env_example_staged_value_hidden_by_work_tree_fails(self):
-        with tempfile.TemporaryDirectory() as folder:
-            root = make_fixture(folder)
-            path = root / ".env.example"
-            clean = path.read_text(encoding="utf-8")
-            number = clean.splitlines().index("EII_STORE=") + 1
-            path.write_text(
-                clean.replace("EII_STORE=\n", "EII_STORE=postgres\n"),
-                encoding="utf-8")
-            git(root, "add", ".env.example")
-            path.write_text(clean, encoding="utf-8")
-            done = run_check(root)
-            self.assertEqual(done.returncode, 1)
-            self.assertEqual(done.stdout.splitlines(), [
-                f"FAIL env-example: .env.example:{number}: "
-                "not a name with an empty value",
-                "FAIL env-example: .env.example: names differ from the pinned list",
-                "checked 8 rules: 2 failure(s)",
-            ])
-
-    def test_env_example_unstaged_edit_is_not_judged(self):
-        with tempfile.TemporaryDirectory() as folder:
-            root = make_fixture(folder)
-            path = root / ".env.example"
-            text = path.read_text(encoding="utf-8")
-            path.write_text(
-                text.replace("EII_STORE=\n", "EII_STORE=postgres\n"),
-                encoding="utf-8")
-            self.assert_clean(run_check(root))
-
-    def test_env_example_staged_symbolic_link_fails(self):
-        with tempfile.TemporaryDirectory() as folder:
-            root = make_fixture(folder)
-            outside = Path(folder) / "outside"
-            outside.mkdir()
-            target = outside / ".env.example"
-            shutil.copyfile(root / ".env.example", target)
-            (root / ".env.example").unlink()
-            os.symlink(target, root / ".env.example")
-            git(root, "add", ".env.example")
-            done = run_check(root)
-            self.assertEqual(done.returncode, 1)
-            self.assertEqual(done.stdout.splitlines(), [
-                "FAIL env-example: .env.example: not a regular file in the index",
-                "checked 8 rules: 1 failure(s)",
-            ])
-
-    def test_env_example_deleted_in_work_tree_is_judged_from_the_index(self):
-        with tempfile.TemporaryDirectory() as folder:
-            root = make_fixture(folder)
-            (root / ".env.example").unlink()
-            self.assert_clean(run_check(root))
-
-    def test_force_tracked_secret_fails(self):
+    def test_force_tracked_secret_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             (root / ".env").write_text("X=\n", encoding="utf-8")
@@ -436,7 +387,7 @@ class CheckTreeTests(unittest.TestCase):
             self.assertEqual(done.returncode, 1)
             self.assert_line_starting(done, "FAIL tracked-ignored: .env:")
 
-    def test_force_tracked_generated_file_fails(self):
+    def test_force_tracked_generated_file_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             (root / "web" / "dist").mkdir()
@@ -446,20 +397,20 @@ class CheckTreeTests(unittest.TestCase):
             self.assertEqual(done.returncode, 1)
             self.assert_line_starting(done, "FAIL tracked-ignored: web/dist/a.js:")
 
-    def test_not_a_git_work_tree_exits_2(self):
+    def test_not_a_git_work_tree_exits_2(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             plain = Path(folder) / "plain"
             plain.mkdir()
             done = run_check(plain)
             self.assertEqual(done.returncode, 2)
 
-    def test_subdirectory_of_work_tree_exits_2(self):
+    def test_subdirectory_of_work_tree_exits_2(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             done = run_check(root / "scripts")
             self.assertEqual(done.returncode, 2)
 
-    def test_linked_worktree_passes(self):
+    def test_linked_worktree_passes(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             identity = {
@@ -475,11 +426,11 @@ class CheckTreeTests(unittest.TestCase):
                 str(linked / "wt"), "HEAD")
             self.assert_clean(run_check(linked / "wt"))
 
-    def test_unknown_option_exits_2(self):
+    def test_unknown_option_exits_2(self) -> None:
         done = run_check(args=("--nope",))
         self.assertEqual(done.returncode, 2)
 
-    def test_output_format(self):
+    def test_output_format(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             (root / "extras").mkdir()
@@ -496,7 +447,7 @@ class CheckTreeTests(unittest.TestCase):
             self.assertTrue(all(FAIL_LINE.match(line) for line in body))
             self.assertEqual(summary, f"checked 8 rules: {len(body)} failure(s)")
 
-    def test_check_changes_nothing(self):
+    def test_check_changes_nothing(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = make_fixture(folder)
             before = tree_snapshot(root)
