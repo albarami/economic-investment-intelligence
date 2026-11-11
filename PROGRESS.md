@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Ledger current to the first commit, 2026-11-11 |
+| Status | Ledger current to task S0-T01, 2026-11-11 |
 | Date | 2026-11-11 |
 | Owner | albarami |
 | Purpose | Record only completed work with evidence, and reserve later rows for evidence not yet available. |
@@ -10,7 +10,7 @@
 
 ## In brief
 
-- This ledger claims no application code, product capability, test result or slice approval. Nothing is built yet.
+- This ledger claims no application code, product capability or slice approval. Slice S0 has begun: the entries under "Task and gate evidence" record the repository scaffolding and its checks, and nothing else is built.
 - The documentation pack was drafted, reviewed by models of other makers, and corrected on 2026-11-11. Every first review ended in REJECTED; the corrections are listed below with who made them.
 - The privacy document was reviewed four times by three makers. Its last ten corrections were made by the lead and have not been reviewed by another maker (open item OI-37, a precondition of slice S5).
 - One objection of two reviewers stands unresolved by design: layout signals are outside the acceptance model of the privacy audit (open item OI-36).
@@ -43,7 +43,7 @@
 | 2026-11-11 | Final read-through of the whole pack by two makers | Both REJECTED with local defects: 2 blocker and 4 major findings on the data and privacy documents; 2 blocker, 14 major and 1 minor findings on the product, methods and plan documents. None reopened a design decision | Grok `grok-4.7-high`; Kimi `kimi-k3-1-pro-high` |
 | 2026-11-11 | All 23 findings of the final read-through applied; the lead changed one remedy that could not be built (the run-time outbound scanner holds no canary value; the comparison with canary pay values is a test) | The corrected files. NOT yet confirmed by another maker: open item OI-38 | GPT `gpt-5.6-sol-high`; rulings by the lead |
 | 2026-11-11 | Documentation check on the files of the first commit | `python3 scripts/check_docs.py`, exit code 0, output "checked 46 text files, 39 Markdown files: OK" | Lead |
-| PENDING | Continuous-integration run of the first commit | PENDING: the run link and the commit hash, to be recorded through a pull request by the next session | PENDING |
+| 2026-11-11 | Continuous-integration run of the first commit (reserved as PENDING in the first commit) | Commit `a81f69337bd7384c11823eab5e6f7977bdccf1f5`; workflow `docs`, job `check-docs`, triggered by the push: success; run https://github.com/albarami/economic-investment-intelligence/actions/runs/43078142075 | CI (GitHub Actions); recorded by the lead |
 | PENDING | Review of the lead's last ten corrections to the privacy document by another maker (open item OI-37) | PENDING: maker, model, verdict | PENDING |
 | PENDING | Confirmation by another maker that the 23 findings of the final read-through are resolved (open item OI-38) | PENDING: maker, model, verdict | PENDING |
 
@@ -55,6 +55,115 @@
 4. Never turn PENDING into a date or a pass without evidence. Never estimate an exit code.
 5. Record new or unresolved work in [OPEN_ITEMS.md](OPEN_ITEMS.md), not as progress.
 6. Keep personal names, attendee details and quotations out of this public ledger.
+7. An evidence entry names the tested work commit. It is added by a ledger commit on the same branch that changes only ledger files (PROGRESS.md, OPEN_ITEMS.md and the status lines of TASKS.md), so the pull-request head differs from the tested commit by ledger text alone, and the checks are run again on that head. The reviewer's verdict and the merge record of a task are entered by the next pull request. Confirmed by the owner on 2026-11-11.
+8. A continuous-integration run is cited by its full link, never by a bare run number.
+
+## Task and gate evidence
+
+Entries follow section 6.3 of [12_TESTING_AND_QUALITY.md](docs/12_TESTING_AND_QUALITY.md) and are append-only. Each block records one command.
+
+### S0-T01 — Repository scaffolding and tool configuration
+
+Plan: lead (Claude, Anthropic); approved in its second review round by Gemini 4 Carbon (Google). Builder: Devin local, model `swe-2-high` (Cognition), two build rounds. Environment of the lead's runs: Ubuntu under WSL2, Python 3.14.4, git version 2.53.0. The checks judge git's staged state; here they ran on the committed tree.
+
+```text
+Commit:    1f54d7f9c674aba7b172c47e1e4bae4a2bc52782
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-11
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Proves the three acceptance criteria and ARC-01 on this commit. `./eii test` (TST-162) does not exist before S0-T05 and S0-T09. The data-folder convention (nothing under `data/` is ever committed; the check passes when the folder is absent) and the ledger convention (rule 7 above) were confirmed by the owner on 2026-11-11. The pull-request head is the ledger commit that adds these entries; it differs from this commit only in PROGRESS.md and OPEN_ITEMS.md.
+```
+
+```text
+Commit:    1f54d7f9c674aba7b172c47e1e4bae4a2bc52782
+Command:   python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-11
+Run by:    lead (local)
+Counts:    31 passed, 0 failed, 0 skipped (ran 31)
+Seed:      none
+Notes:     Every rule of the tree check and every ignore pattern it relies on has a planted violation (TST-04).
+```
+
+```text
+Commit:    1f54d7f9c674aba7b172c47e1e4bae4a2bc52782
+Command:   python3 scripts/check_tree.py --root <a linked worktree of the base branch at a81f69337bd7384c11823eab5e6f7977bdccf1f5>
+Exit code: 1
+Date:      2026-11-11
+Run by:    lead (local)
+Counts:    not a test suite; 14 FAIL lines, 7 of them for missing pinned folders
+Seed:      none
+Notes:     Exit 1 is the expected result: the new check fails on the tree as it was before this task (TST-161).
+```
+
+```text
+Commit:    1f54d7f9c674aba7b172c47e1e4bae4a2bc52782
+Command:   python3 -m unittest discover -s scripts/tests -p 'test_*.py'  (in a copy of scripts/ without check_tree.py)
+Exit code: 1
+Date:      2026-11-11
+Run by:    lead (local)
+Counts:    the suite fails; counts are not meaningful without the implementation
+Seed:      none
+Notes:     Exit 1 is the expected result: the tests fail before the implementation exists (TST-161).
+```
+
+```text
+Commit:    1f54d7f9c674aba7b172c47e1e4bae4a2bc52782
+Command:   test -f core/README.md -a -f custodian/README.md -a -f product/README.md -a -f web/README.md
+Exit code: 0
+Date:      2026-11-11
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     ARC-01: the pinned plane folders exist with their notes.
+```
+
+```text
+Commit:    1f54d7f9c674aba7b172c47e1e4bae4a2bc52782
+Command:   scope assertion of the plan, run in Python with check=True over git diff --name-only main...HEAD
+Exit code: 0
+Date:      2026-11-11
+Run by:    lead (local)
+Counts:    not a test suite; changed=14 outside=[]
+Seed:      none
+Notes:     TST-163 and PLN-22: every changed path is one of the task's files; the task changes structure and root configuration only.
+```
+
+```text
+Commit:    1f54d7f9c674aba7b172c47e1e4bae4a2bc52782
+Command:   tracked=$(git ls-files -- data); test -z "$tracked"
+Exit code: 0
+Date:      2026-11-11
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     ARC-99: nothing under `data/` is tracked.
+```
+
+```text
+Commit:    1f54d7f9c674aba7b172c47e1e4bae4a2bc52782
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-11
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 55 text files, 46 Markdown files: OK"
+Seed:      none
+Notes:     TST-140.
+```
+
+```text
+Commit:    1f54d7f9c674aba7b172c47e1e4bae4a2bc52782
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-11
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     REV-27: the two files are byte-identical.
+```
 
 ## Open questions and assumptions
 
