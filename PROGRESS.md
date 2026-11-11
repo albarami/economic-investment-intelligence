@@ -362,6 +362,191 @@ Seed:      none
 Notes:     REV-27: the two files are byte-identical.
 ```
 
+#### Independent review, round 2: REJECTED
+
+Reviewed commit `da18804fdf32e010a50cb0295ed74744149d5cb7`, the head of pull request 1 at that time, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43103134472 ). Reviewer: OpenAI GPT-5.6 Sol, through the Cursor command-line tool, read-only. The verdict is copied unchanged (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S0-T01
+COMMIT: da18804fdf32e010a50cb0295ed74744149d5cb7
+REVIEWER: OpenAI GPT-5.6 Sol
+ROUND-1 FINDINGS:
+  F1 FIXED The rule now reads the staged mode and blob; four regression tests cover index/work-tree mismatches.
+  F2 FIXED PROGRESS.md appends the exact scope command and two related corrections with real results.
+CHECKS:
+  REV-10 PASS All three acceptance criteria map to the recorded tree check, exit 0; scope and folder checks cover ARC-01, PLN-22 and TST-163.
+  REV-11 PASS The lead recorded 35 passed, 0 failed and 0 skipped on the head; every guard has a planted violation, and head CI succeeded.
+  REV-12 PASS The diff contains the fourteen task paths and two permitted ledger files; nothing under data/ or unrelated scope changed.
+  REV-13 PASS The folder notes are the required scaffolding; no placeholder substitutes for product behaviour.
+  REV-14 PASS No secret value, .env, key file or real custodian data appears; the token scan exited 0, while gitleaks belongs to S0-T06.
+  REV-15 PASS No assertion, threshold, test or CI check was weakened, skipped or deleted.
+  REV-16 FAIL The implementation follows the approved design, but the test file violates two binding code standards; see F3 and F4.
+  REV-17 PASS Affected documents and ledgers are updated; the documentation check exited 0.
+  REV-18 PASS The corrected environment guard reads only the staged regular-file blob and rejects staged symlinks and non-empty values.
+  REV-19 PASS The commit follows the S0 cut order and reopens no settled decision.
+  REV-20 N/A This commit adds no displayed figure or fact requiring provenance or lineage.
+  REV-21 N/A This commit adds no screen, claim template or rendered numeral.
+  REV-22 N/A This commit changes no privacy rule, parameter, treatment, release or attack.
+  REV-23 N/A No product or custodian package exists yet; the import-boundary test belongs to S0-T10.
+  REV-24 N/A This commit adds no English or Arabic application view.
+  REV-25 PASS The changed public files contain no private path, personal identity, e-mail address, realistic identifier, prohibited digit run, comparison or secret.
+  REV-26 PASS The changed files make no prohibited product, custodian-data, privacy, endorsement, forecast or lookup claim.
+  REV-27 PASS The lead recorded cmp AGENTS.md CLAUDE.md exiting 0 on the head.
+  REV-28 N/A This commit creates no synthetic records or identifiers.
+  REV-29 N/A This commit assigns no attribute or simulated fact to a real place or business.
+  REV-38 PASS Gateway content remains scaffolding only, with no serving-plane import, settings read or run-time call.
+FINDINGS:
+  F3 (REV-16)
+    File: scripts/tests/test_check_tree.py
+    Line: 1-511
+    Wrong: The file is 511 lines, exceeding the binding maximum of 500 lines per code file.
+    Fix: Move the four index/work-tree regression tests into scripts/tests/test_check_tree_index.py, reuse the existing fixture helpers, add that path to the scope evidence, and run the unittest discovery, tree check and documentation check with exit 0.
+  F4 (REV-16)
+    File: scripts/tests/test_check_tree.py
+    Line: 133-508
+    Wrong: The test methods omit return type annotations, breaking the binding requirement that every Python function signature be typed.
+    Fix: Add -> None to every test method in both tree-check test modules and run the full unittest discovery with exit 0.
+```
+
+The two findings of round 1 are confirmed fixed. The two new findings were applied as written, by a builder of another maker than the reviewer (Cursor command-line tool, `grok-4.7-high`, xAI): the four tests that plant a difference between git's index and the work tree moved to `scripts/tests/test_check_tree_index.py`, which takes the fixture helpers and the shared assertions from the first test module; every test method now has a return annotation. No test was added, removed, renamed or weakened: the two modules hold the same 35 test methods, 31 and 4.
+
+#### Evidence for the corrected work commit `8bbdff8f8d3f932ba2ae83f54277e09de030e63b`
+
+This commit directly follows the reviewed head `da18804fdf32e010a50cb0295ed74744149d5cb7` and changes only the two test modules.
+
+```text
+Commit:    8bbdff8f8d3f932ba2ae83f54277e09de030e63b
+Command:   python3 -c "import subprocess,sys; p=sorted(subprocess.run(['git','diff','--name-only','da18804fdf32e010a50cb0295ed74744149d5cb7..8bbdff8f8d3f932ba2ae83f54277e09de030e63b'],check=True,capture_output=True,text=True).stdout.splitlines()); print(p); sys.exit(0 if p==['scripts/tests/test_check_tree.py','scripts/tests/test_check_tree_index.py'] else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "['scripts/tests/test_check_tree.py', 'scripts/tests/test_check_tree_index.py']"
+Seed:      none
+Notes:     The fix commit changes exactly the test module of findings F3 and F4 and the new test module.
+```
+
+```text
+Commit:    8bbdff8f8d3f932ba2ae83f54277e09de030e63b
+Command:   python3 -c "import sys; n={p:len(open(p,encoding='utf-8').read().splitlines()) for p in ['scripts/check_tree.py','scripts/tests/test_check_tree.py','scripts/tests/test_check_tree_index.py']}; print(n); sys.exit(0 if max(n.values())<=500 else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "{'scripts/check_tree.py': 351, 'scripts/tests/test_check_tree.py': 462, 'scripts/tests/test_check_tree_index.py': 82}"
+Seed:      none
+Notes:     Finding F3: none of the three Python files of the task is longer than 500 lines.
+```
+
+```text
+Commit:    8bbdff8f8d3f932ba2ae83f54277e09de030e63b
+Command:   python3 -c "import ast,sys; bad=[(p,n.name) for p in ['scripts/check_tree.py','scripts/tests/test_check_tree.py','scripts/tests/test_check_tree_index.py'] for n in ast.walk(ast.parse(open(p,encoding='utf-8').read())) if isinstance(n,(ast.FunctionDef,ast.AsyncFunctionDef)) and (n.returns is None or any(a.annotation is None and a.arg!='self' for a in n.args.posonlyargs+n.args.args+n.args.kwonlyargs+[x for x in (n.args.vararg,n.args.kwarg) if x]))]; print(len(bad),bad[:3]); sys.exit(1 if bad else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "0 []"
+Seed:      none
+Notes:     Finding F4: in the three Python files of the task every function and method has a return annotation and an annotation on every parameter other than `self`; the output is the number of functions that have not.
+```
+
+```text
+Commit:    8bbdff8f8d3f932ba2ae83f54277e09de030e63b
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The three acceptance criteria and ARC-01 on the corrected commit.
+```
+
+```text
+Commit:    8bbdff8f8d3f932ba2ae83f54277e09de030e63b
+Command:   python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    35 passed, 0 failed, 0 skipped (ran 35 tests)
+Seed:      none
+Notes:     Both test modules are discovered: 31 tests in `test_check_tree` and 4 in `test_check_tree_index`.
+```
+
+```text
+Commit:    8bbdff8f8d3f932ba2ae83f54277e09de030e63b
+Command:   base=$(mktemp -d) && git worktree add -q --detach "$base" a81f69337bd7384c11823eab5e6f7977bdccf1f5 && rc=0; python3 scripts/check_tree.py --root "$base" >/dev/null || rc=$?; git worktree remove --force "$base"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     The line succeeds only if the check exits 1 on the tree as it was before the task (TST-161).
+```
+
+```text
+Commit:    8bbdff8f8d3f932ba2ae83f54277e09de030e63b
+Command:   copy=$(mktemp -d) && cp -r scripts "$copy/" && rm "$copy/scripts/check_tree.py" && rc=0; (cd "$copy" && python3 -m unittest discover -s scripts/tests -p 'test_*.py' >/dev/null 2>&1) || rc=$?; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    the suite fails; counts are not meaningful without the implementation
+Seed:      none
+Notes:     The line succeeds only if the tests exit 1 when the implementation is absent (TST-161).
+```
+
+```text
+Commit:    8bbdff8f8d3f932ba2ae83f54277e09de030e63b
+Command:   test -f core/README.md -a -f custodian/README.md -a -f product/README.md -a -f web/README.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     ARC-01: the pinned plane folders exist with their notes.
+```
+
+```text
+Commit:    8bbdff8f8d3f932ba2ae83f54277e09de030e63b
+Command:   python3 -c "import re,subprocess,sys; p=subprocess.run(['git','diff','--name-only','a81f69337bd7384c11823eab5e6f7977bdccf1f5...8bbdff8f8d3f932ba2ae83f54277e09de030e63b'],check=True,capture_output=True,text=True).stdout.splitlines(); a=re.compile(r'(contracts|core|custodian|product|web|gateway|infra)/README\.md|\.env\.example|\.gitignore|scripts/check_tree\.py|scripts/tests/test_check_tree\.py|scripts/tests/test_check_tree_index\.py|README\.md|AGENTS\.md|CLAUDE\.md|PROGRESS\.md|OPEN_ITEMS\.md'); o=[x for x in p if not a.fullmatch(x)]; print(len(p),o); sys.exit(1 if o or len(p)!=17 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "17 []"
+Seed:      none
+Notes:     TST-163 and PLN-22: the branch changes the fourteen paths of the task, the test module added by review round 2 and the two ledger files, and nothing else.
+```
+
+```text
+Commit:    8bbdff8f8d3f932ba2ae83f54277e09de030e63b
+Command:   tracked=$(git ls-files -- data); test -z "$tracked"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     ARC-99: nothing under `data/` is tracked.
+```
+
+```text
+Commit:    8bbdff8f8d3f932ba2ae83f54277e09de030e63b
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 56 text files, 46 Markdown files: OK"
+Seed:      none
+Notes:     TST-140.
+```
+
+```text
+Commit:    8bbdff8f8d3f932ba2ae83f54277e09de030e63b
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     REV-27: the two files are byte-identical.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
