@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -16,11 +17,26 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # UV_NO_CONFIG=1 also ignores uv settings in a pyproject.toml [tool.uv] table;
 # a task that adds such a setting revisits this (OI-40).
 
-UV = shutil.which("uv")
-SYNC_OFFLINE = ("sync", "--all-packages", "--locked", "--no-editable", "--offline")
+_uv = shutil.which("uv")
+if _uv is None:
+    raise RuntimeError("uv not found")
+UV: str = _uv
+SYNC_OFFLINE = (
+    "sync",
+    "--all-packages",
+    "--locked",
+    "--no-editable",
+    "--no-dev",
+    "--offline",
+)
+DEPENDENCY_GROUPS_TABLE = r"(?ms)^\[dependency-groups\]\n.*?(?=^\[|\Z)"
 FROM_PARENT = (
-    "PATH", "HOME", "LANG", "LC_ALL",
-    "XDG_DATA_HOME", "UV_PYTHON_INSTALL_DIR",
+    "PATH",
+    "HOME",
+    "LANG",
+    "LC_ALL",
+    "XDG_DATA_HOME",
+    "UV_PYTHON_INSTALL_DIR",
 )
 
 ALONE: dict[str, tuple[int, str]] = {
@@ -67,7 +83,9 @@ def with_process_tmp(env: dict[str, str], cache: Path) -> dict[str, str]:
 
 
 def run(
-    args: list[str], cwd: Path, env: dict[str, str],
+    args: list[str],
+    cwd: Path,
+    env: dict[str, str],
 ) -> subprocess.CompletedProcess[str]:
     """Run a command and capture output."""
     return subprocess.run(
@@ -141,11 +159,10 @@ class CleanEnvironment(unittest.TestCase):
     cache: Path
     work: Path
     env: Path
+    _tmp: tempfile.TemporaryDirectory[str]
 
     @classmethod
     def setUpClass(cls) -> None:
-        if UV is None:
-            raise AssertionError("uv not found")
         cls._tmp = tempfile.TemporaryDirectory()
         cls.addClassCleanup(cls._tmp.cleanup)
         base = Path(cls._tmp.name)
@@ -180,6 +197,12 @@ class CleanEnvironment(unittest.TestCase):
         cache.mkdir()
         ws.mkdir()
         copy_workspace(ws)
+        root_toml = (ws / "pyproject.toml").read_text(encoding="utf-8")
+        stripped, removed = re.subn(DEPENDENCY_GROUPS_TABLE, "", root_toml)
+        self.assertEqual(removed, 1)
+        (ws / "pyproject.toml").write_text(stripped, encoding="utf-8")
+        regen = run([UV, "lock", "--offline"], ws, child_env(cache))
+        self.assertEqual(regen.returncode, 0, regen.stderr)
         text = (ws / "core/pyproject.toml").read_text(encoding="utf-8")
         replaced = text.replace('version = "0.0.0"', 'version = "0.0.1"', 1)
         self.assertNotEqual(text, replaced)
@@ -283,7 +306,15 @@ class CleanEnvironment(unittest.TestCase):
         hostile = root / "hostile"
         env2 = root / "env2"
         for path in (
-            cache, cache2, cache3, ws, ws3, work, badenv, elsewhere, hostile,
+            cache,
+            cache2,
+            cache3,
+            ws,
+            ws3,
+            work,
+            badenv,
+            elsewhere,
+            hostile,
         ):
             path.mkdir(parents=True)
         copy_workspace(ws)
@@ -364,6 +395,12 @@ class CleanEnvironment(unittest.TestCase):
             self.assertIn("cannot be used with `UV_FROZEN`", tooth2.stderr)
 
         self.assertEqual(dict(os.environ), snapshot)
+        alone_text = (ws3 / "pyproject.toml").read_text(encoding="utf-8")
+        alone_text, removed_groups = re.subn(DEPENDENCY_GROUPS_TABLE, "", alone_text)
+        self.assertEqual(removed_groups, 1)
+        (ws3 / "pyproject.toml").write_text(alone_text, encoding="utf-8")
+        regen = run([UV, "lock", "--offline"], ws3, child_env(cache3))
+        self.assertEqual(regen.returncode, 0, regen.stderr)
         alone_count = 0
         for name, (want, fragment) in ALONE.items():
             with self.subTest(var=name):

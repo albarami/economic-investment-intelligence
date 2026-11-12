@@ -4,11 +4,7 @@ import http from 'node:http';
 import net from 'node:net';
 import path from 'node:path';
 
-const PARENT_ENV_NAMES = [
-  'PATH',
-  'TMPDIR',
-  'LANG',
-];
+const PARENT_ENV_NAMES = ['PATH', 'TMPDIR', 'LANG'];
 const STOP_WAIT_MS = 5000;
 const ESCAPE_CHARACTER = String.fromCharCode(27);
 const ANSI_ESCAPE = new RegExp(`${ESCAPE_CHARACTER}\\[[0-9;]*m`, 'g');
@@ -24,14 +20,19 @@ export function resolveViteBin(dir) {
   let text;
   try {
     const info = fs.statSync(pkgPath);
-    if (!info.isFile()) throw ruleError('node_modules/vite/package.json: cannot be read (EISDIR)');
+    if (!info.isFile())
+      throw ruleError(
+        'node_modules/vite/package.json: cannot be read (EISDIR)',
+      );
     text = fs.readFileSync(pkgPath, 'utf8');
   } catch (error) {
     if (error.rule) throw error;
     if (error.code === 'ENOENT' || error.code === 'ENOTDIR') {
       throw ruleError('node_modules/vite/package.json: missing');
     }
-    throw ruleError(`node_modules/vite/package.json: cannot be read (${error.code || error.name})`);
+    throw ruleError(
+      `node_modules/vite/package.json: cannot be read (${error.code || error.name})`,
+    );
   }
   let data;
   try {
@@ -40,7 +41,8 @@ export function resolveViteBin(dir) {
     throw ruleError('node_modules/vite/package.json: not valid JSON');
   }
   let relativeBin = null;
-  if (typeof data.bin === 'string' && data.bin.length > 0) relativeBin = data.bin;
+  if (typeof data.bin === 'string' && data.bin.length > 0)
+    relativeBin = data.bin;
   else if (
     data.bin &&
     typeof data.bin === 'object' &&
@@ -50,7 +52,9 @@ export function resolveViteBin(dir) {
     relativeBin = data.bin.vite;
   }
   if (relativeBin === null) {
-    throw ruleError('node_modules/vite/package.json: bin field is absent or has no entry named vite');
+    throw ruleError(
+      'node_modules/vite/package.json: bin field is absent or has no entry named vite',
+    );
   }
   const target = path.join(dir, 'node_modules', 'vite', relativeBin);
   let isFile;
@@ -100,7 +104,9 @@ export function probePort(port) {
     };
     const timer = setTimeout(() => finish('other'), 1000);
     socket.once('connect', () => finish('open'));
-    socket.once('error', (error) => finish(error.code === 'ECONNREFUSED' ? 'free' : 'other'));
+    socket.once('error', (error) =>
+      finish(error.code === 'ECONNREFUSED' ? 'free' : 'other'),
+    );
   });
 }
 

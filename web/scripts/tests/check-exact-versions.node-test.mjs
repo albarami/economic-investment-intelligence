@@ -27,7 +27,13 @@ const REQUIRED = [
   ['devDependencies', 'typescript'],
   ['devDependencies', '@vitejs/plugin-react'],
 ];
-const LIFECYCLE = ['preinstall', 'install', 'postinstall', 'prepare', 'prepublish'];
+const LIFECYCLE = [
+  'preinstall',
+  'install',
+  'postinstall',
+  'prepare',
+  'prepublish',
+];
 const SAMPLES = [
   '^19.3.1',
   '~19.3.1',
@@ -53,7 +59,9 @@ const SAMPLES = [
   null,
 ];
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-test-check-exact-versions-'));
+const root = fs.mkdtempSync(
+  path.join(os.tmpdir(), 'eii-test-check-exact-versions-'),
+);
 const currentTest = new AsyncLocalStorage();
 after(() => fs.rmSync(root, { recursive: true, force: true }));
 
@@ -64,10 +72,11 @@ function bindTest(t) {
       fn = options;
       options = undefined;
     }
-    const wrapped = (sub) => currentTest.run(sub, () => {
-      bindTest(sub);
-      return fn(sub);
-    });
+    const wrapped = (sub) =>
+      currentTest.run(sub, () => {
+        bindTest(sub);
+        return fn(sub);
+      });
     if (options === undefined) return own(name, wrapped);
     return own(name, options, wrapped);
   };
@@ -78,17 +87,20 @@ function test(name, options, fn) {
     fn = options;
     options = undefined;
   }
-  const wrapped = (t) => currentTest.run(t, () => {
-    bindTest(t);
-    return fn(t);
-  });
+  const wrapped = (t) =>
+    currentTest.run(t, () => {
+      bindTest(t);
+      return fn(t);
+    });
   if (options === undefined) return declareTest(name, wrapped);
   return declareTest(name, options, wrapped);
 }
 
 function tempDir(prefix) {
   const dir = fs.mkdtempSync(path.join(root, prefix));
-  currentTest.getStore().after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  currentTest
+    .getStore()
+    .after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
 
@@ -101,7 +113,14 @@ function childTemp(home) {
 function cleanEnv(extra) {
   const home = tempDir('eii-env-');
   const tmp = childTemp(home);
-  const base = { PATH: process.env.PATH, HOME: home, TMPDIR: tmp, TMP: tmp, TEMP: tmp, LANG: 'C' };
+  const base = {
+    PATH: process.env.PATH,
+    HOME: home,
+    TMPDIR: tmp,
+    TMP: tmp,
+    TEMP: tmp,
+    LANG: 'C',
+  };
   return { ...base, ...extra };
 }
 
@@ -133,9 +152,14 @@ function lockFor(pkg, version = 3) {
   ]) {
     if (pkg[section] !== undefined) root[section] = pkg[section];
   }
-  for (const section of ['dependencies', 'devDependencies', 'optionalDependencies']) {
+  for (const section of [
+    'dependencies',
+    'devDependencies',
+    'optionalDependencies',
+  ]) {
     const block = pkg[section];
-    if (block === undefined || typeof block !== 'object' || block === null) continue;
+    if (block === undefined || typeof block !== 'object' || block === null)
+      continue;
     for (const [name, spec] of Object.entries(block)) {
       const pinned = typeof spec === 'string' ? spec : '0.0.0';
       packages[`node_modules/${name}`] = { version: pinned.split('\n')[0] };
@@ -146,10 +170,16 @@ function lockFor(pkg, version = 3) {
 
 function writeRoot(pkg, lock) {
   const root = tempDir('eii-ver-');
-  fs.writeFileSync(path.join(root, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`);
+  fs.writeFileSync(
+    path.join(root, 'package.json'),
+    `${JSON.stringify(pkg, null, 2)}\n`,
+  );
   if (lock !== null) {
     const body = lock === undefined ? lockFor(pkg) : lock;
-    fs.writeFileSync(path.join(root, 'package-lock.json'), `${JSON.stringify(body, null, 2)}\n`);
+    fs.writeFileSync(
+      path.join(root, 'package-lock.json'),
+      `${JSON.stringify(body, null, 2)}\n`,
+    );
   }
   return root;
 }
@@ -165,7 +195,9 @@ function snapshot(root) {
   for (const name of fs.readdirSync(root).sort()) {
     const full = path.join(root, name);
     const info = fs.lstatSync(full);
-    const digest = createHash('sha256').update(fs.readFileSync(full)).digest('hex');
+    const digest = createHash('sha256')
+      .update(fs.readFileSync(full))
+      .digest('hex');
     rows.push(`${name} ${info.size} ${digest}`);
   }
   return rows.join('\n');
@@ -198,7 +230,10 @@ test('clean package and lock', () => {
 test('real web passes', () => {
   const result = run(['--root', WEB]);
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  assert.match(result.stdout.trim().split('\n').at(-1), /^checked \d+ specifiers: OK$/);
+  assert.match(
+    result.stdout.trim().split('\n').at(-1),
+    /^checked \d+ specifiers: OK$/,
+  );
 });
 
 test('sample specifiers are not exact', async (t) => {
@@ -227,13 +262,19 @@ test('bad value in overrides, optional and peer sections', async (t) => {
     const pkg = basePackage();
     pkg.optionalDependencies = { sample: '^1.0.0' };
     const root = writeRoot(pkg);
-    assertFail(run(['--root', root]), 'FAIL not-exact: optionalDependencies.sample');
+    assertFail(
+      run(['--root', root]),
+      'FAIL not-exact: optionalDependencies.sample',
+    );
   });
   await t.test('peerDependencies', () => {
     const pkg = basePackage();
     pkg.peerDependencies = { sample: '^1.0.0' };
     const root = writeRoot(pkg);
-    assertFail(run(['--root', root]), 'FAIL not-exact: peerDependencies.sample');
+    assertFail(
+      run(['--root', root]),
+      'FAIL not-exact: peerDependencies.sample',
+    );
   });
 });
 
@@ -241,22 +282,34 @@ test('engines', async (t) => {
   await t.test('removed', () => {
     const pkg = basePackage();
     delete pkg.engines;
-    assertFail(run(['--root', writeRoot(pkg)]), 'FAIL engines-missing: engines.node');
+    assertFail(
+      run(['--root', writeRoot(pkg)]),
+      'FAIL engines-missing: engines.node',
+    );
   });
   await t.test('string', () => {
     const pkg = basePackage();
     pkg.engines = '>=22.12.0 <23';
-    assertFail(run(['--root', writeRoot(pkg)]), 'FAIL engines-missing: engines.node');
+    assertFail(
+      run(['--root', writeRoot(pkg)]),
+      'FAIL engines-missing: engines.node',
+    );
   });
   await t.test('node is a number', () => {
     const pkg = basePackage();
     pkg.engines = { node: 22 };
-    assertFail(run(['--root', writeRoot(pkg)]), 'FAIL engines-missing: engines.node');
+    assertFail(
+      run(['--root', writeRoot(pkg)]),
+      'FAIL engines-missing: engines.node',
+    );
   });
   await t.test('node is empty', () => {
     const pkg = basePackage();
     pkg.engines = { node: '' };
-    assertFail(run(['--root', writeRoot(pkg)]), 'FAIL engines-missing: engines.node');
+    assertFail(
+      run(['--root', writeRoot(pkg)]),
+      'FAIL engines-missing: engines.node',
+    );
   });
 });
 
@@ -265,7 +318,10 @@ test('required packages', async (t) => {
     await t.test(`${section}.${name}`, () => {
       const pkg = basePackage();
       delete pkg[section][name];
-      assertFail(run(['--root', writeRoot(pkg)]), `FAIL required-package: ${section}.${name}`);
+      assertFail(
+        run(['--root', writeRoot(pkg)]),
+        `FAIL required-package: ${section}.${name}`,
+      );
     });
   }
 });
@@ -275,7 +331,10 @@ test('lifecycle keys', async (t) => {
     await t.test(key, () => {
       const pkg = basePackage();
       pkg.scripts[key] = 'node -e 0';
-      assertFail(run(['--root', writeRoot(pkg)]), `FAIL lifecycle-script: scripts.${key}`);
+      assertFail(
+        run(['--root', writeRoot(pkg)]),
+        `FAIL lifecycle-script: scripts.${key}`,
+      );
     });
   }
 });
@@ -307,7 +366,10 @@ test('package.json shape', async (t) => {
   await t.test('dependencies a string', () => {
     const pkg = basePackage();
     pkg.dependencies = 'react';
-    assertFail(run(['--root', writeRoot(pkg)]), 'FAIL package-json: package.json');
+    assertFail(
+      run(['--root', writeRoot(pkg)]),
+      'FAIL package-json: package.json',
+    );
   });
   await t.test('overrides a string', () => {
     const pkg = basePackage();
@@ -319,13 +381,23 @@ test('package.json shape', async (t) => {
   await t.test('scripts a string', () => {
     const pkg = basePackage();
     pkg.scripts = 'build';
-    assertFail(run(['--root', writeRoot(pkg)]), 'FAIL package-json: package.json');
+    assertFail(
+      run(['--root', writeRoot(pkg)]),
+      'FAIL package-json: package.json',
+    );
   });
-  for (const section of ['devDependencies', 'optionalDependencies', 'peerDependencies']) {
+  for (const section of [
+    'devDependencies',
+    'optionalDependencies',
+    'peerDependencies',
+  ]) {
     await t.test(`${section} a string`, () => {
       const pkg = basePackage();
       pkg[section] = 'sample';
-      assertFail(run(['--root', writeRoot(pkg)]), 'FAIL package-json: package.json');
+      assertFail(
+        run(['--root', writeRoot(pkg)]),
+        'FAIL package-json: package.json',
+      );
     });
   }
 });
@@ -347,7 +419,10 @@ test('internal error', () => {
   const longName = path.join(root, 'n'.repeat(LONG_NAME_LENGTH));
   const result = run(['--root', longName]);
   assert.equal(result.status, 1);
-  assert.equal(result.stdout, 'FAIL internal-error: ENAMETOOLONG: name too long, stat\n');
+  assert.equal(
+    result.stdout,
+    'FAIL internal-error: ENAMETOOLONG: name too long, stat\n',
+  );
   assert.equal(`${result.stdout}${result.stderr}`.includes('    at '), false);
 });
 

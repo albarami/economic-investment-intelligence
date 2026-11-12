@@ -62,7 +62,9 @@ const FAKE_SERVER = [
   '',
 ].join('\n');
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-test-check-dev-server-surroundings-'));
+const root = fs.mkdtempSync(
+  path.join(os.tmpdir(), 'eii-test-check-dev-server-surroundings-'),
+);
 const currentTest = new AsyncLocalStorage();
 after(() => fs.rmSync(root, { recursive: true, force: true }));
 
@@ -73,10 +75,11 @@ function bindTest(t) {
       fn = options;
       options = undefined;
     }
-    const wrapped = (sub) => currentTest.run(sub, () => {
-      bindTest(sub);
-      return fn(sub);
-    });
+    const wrapped = (sub) =>
+      currentTest.run(sub, () => {
+        bindTest(sub);
+        return fn(sub);
+      });
     if (options === undefined) return own(name, wrapped);
     return own(name, options, wrapped);
   };
@@ -87,17 +90,20 @@ function test(name, options, fn) {
     fn = options;
     options = undefined;
   }
-  const wrapped = (t) => currentTest.run(t, () => {
-    bindTest(t);
-    return fn(t);
-  });
+  const wrapped = (t) =>
+    currentTest.run(t, () => {
+      bindTest(t);
+      return fn(t);
+    });
   if (options === undefined) return declareTest(name, wrapped);
   return declareTest(name, options, wrapped);
 }
 
 function tempDir(prefix) {
   const dir = fs.mkdtempSync(path.join(root, prefix));
-  currentTest.getStore().after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  currentTest
+    .getStore()
+    .after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
 
@@ -110,7 +116,14 @@ function childTemp(home) {
 function cleanEnv(extra) {
   const home = tempDir('eii-env-');
   const tmp = childTemp(home);
-  const base = { PATH: process.env.PATH, HOME: home, TMPDIR: tmp, TMP: tmp, TEMP: tmp, LANG: 'C' };
+  const base = {
+    PATH: process.env.PATH,
+    HOME: home,
+    TMPDIR: tmp,
+    TMP: tmp,
+    TEMP: tmp,
+    LANG: 'C',
+  };
   return { ...base, ...extra };
 }
 
@@ -178,7 +191,10 @@ function prepare() {
     path.join(root, 'package.json'),
     '{"scripts":{"dev":"vite --host 127.0.0.1 --strictPort --clearScreen false"}}\n',
   );
-  fs.writeFileSync(path.join(root, 'index.html'), '<script type="module" src="/main.js"></script>\n');
+  fs.writeFileSync(
+    path.join(root, 'index.html'),
+    '<script type="module" src="/main.js"></script>\n',
+  );
   fs.writeFileSync(path.join(root, 'main.js'), 'export {}\n');
   return { root, dir, bin: path.join(dir, 'server.mjs') };
 }
@@ -196,11 +212,18 @@ function assertFail(result, prefix) {
 test('child environment', () => {
   const { root, dir, bin } = prepare();
   const parent = cleanEnv();
-  const env = cleanEnv({ ...hostileVars(parent.HOME), HOME: parent.HOME, TMPDIR: parent.TMPDIR });
+  const env = cleanEnv({
+    ...hostileVars(parent.HOME),
+    HOME: parent.HOME,
+    TMPDIR: parent.TMPDIR,
+  });
   const result = run(['--root', root, '--vite-bin', bin], env);
   remember(dir);
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
+  assert.match(
+    result.stdout.trim().split('\n').at(-1),
+    /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/,
+  );
   const childEnv = recordedEnv(dir);
   assert.deepEqual(Object.keys(childEnv).sort(), ALLOWED);
   assert.equal(childEnv.BROWSER, 'none');
@@ -214,24 +237,41 @@ test('child environment, a name absent in the parent', () => {
   const result = run(['--root', root, '--vite-bin', bin], env);
   remember(dir);
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
-  assert.deepEqual(Object.keys(recordedEnv(dir)).sort(), ['BROWSER', 'HOME', 'PATH', 'TMPDIR']);
+  assert.match(
+    result.stdout.trim().split('\n').at(-1),
+    /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/,
+  );
+  assert.deepEqual(Object.keys(recordedEnv(dir)).sort(), [
+    'BROWSER',
+    'HOME',
+    'PATH',
+    'TMPDIR',
+  ]);
 });
 
 test('hostile surroundings', { timeout: 180000 }, () => {
   const clean = run(['--root', WEB], cleanEnv());
   assert.equal(clean.status, 0, clean.stdout + clean.stderr);
-  assert.match(clean.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
+  assert.match(
+    clean.stdout.trim().split('\n').at(-1),
+    /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/,
+  );
   const parent = cleanEnv();
   const hostile = cleanEnv(hostileVars(parent.HOME));
   const again = run(['--root', WEB], hostile);
   assert.equal(again.status, 0, again.stdout + again.stderr);
-  assert.match(again.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
+  assert.match(
+    again.stdout.trim().split('\n').at(-1),
+    /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/,
+  );
   const { root, dir, bin } = prepare();
   const fake = run(['--root', root, '--vite-bin', bin], hostile);
   remember(dir);
   assert.equal(fake.status, 0, fake.stdout + fake.stderr);
-  assert.match(fake.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
+  assert.match(
+    fake.stdout.trim().split('\n').at(-1),
+    /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/,
+  );
   const names = Object.keys(recordedEnv(dir));
   for (const name of LEAKED) assert.equal(names.includes(name), false, name);
 });
@@ -271,9 +311,15 @@ test('port busy by an HTTP server', { timeout: 30000 }, async () => {
 
 test('port busy, nothing started', { timeout: 30000 }, async () => {
   const root = tempDir('eii-busy-');
-  fs.writeFileSync(path.join(root, 'index.html'), '<script type="module" src="/main.js"></script>\n');
+  fs.writeFileSync(
+    path.join(root, 'index.html'),
+    '<script type="module" src="/main.js"></script>\n',
+  );
   const writer = path.join(root, 'writer.mjs');
-  fs.writeFileSync(writer, "import fs from 'node:fs';\nfs.writeFileSync('started', '1');\n");
+  fs.writeFileSync(
+    writer,
+    "import fs from 'node:fs';\nfs.writeFileSync('started', '1');\n",
+  );
   const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('busy');
@@ -281,7 +327,14 @@ test('port busy, nothing started', { timeout: 30000 }, async () => {
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const port = server.address().port;
   try {
-    const result = run(['--root', root, '--port', String(port), '--vite-bin', writer]);
+    const result = run([
+      '--root',
+      root,
+      '--port',
+      String(port),
+      '--vite-bin',
+      writer,
+    ]);
     assertFail(result, 'FAIL start-failed: port');
     assert.equal(fs.existsSync(path.join(root, 'started')), false);
   } finally {

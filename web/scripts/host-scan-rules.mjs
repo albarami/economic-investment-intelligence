@@ -9,16 +9,26 @@ const INERT_HOSTS = [
   'github.com',
 ];
 
-const PROTOCOL_PRECEDING = [
+const PROTOCOL_PRECEDING = ['"', "'", '`', '(', '=', ','];
+
+const HOST_STOP = new Set([
+  '/',
+  '\\',
+  '?',
+  '#',
+  ':',
   '"',
   "'",
   '`',
-  '(',
-  '=',
+  '<',
+  '>',
   ',',
-];
-
-const HOST_STOP = new Set(['/', '\\', '?', '#', ':', '"', "'", '`', '<', '>', ',', ')', ' ', '\t', '\n', '\r']);
+  ')',
+  ' ',
+  '\t',
+  '\n',
+  '\r',
+]);
 
 function lineAt(text, index) {
   let line = 1;
@@ -50,7 +60,9 @@ function schemeHits(text, builtScript) {
         INERT_HOSTS.includes(host);
       if (!allowed) {
         const rule = builtScript ? 'absolute-url-js' : 'absolute-url';
-        const detail = builtScript ? `${scheme} URL, host ${host}` : `${scheme} URL`;
+        const detail = builtScript
+          ? `${scheme} URL, host ${host}`
+          : `${scheme} URL`;
         hits.push({ rule, line: lineAt(text, match.index), detail });
       }
     }
@@ -61,8 +73,13 @@ function schemeHits(text, builtScript) {
 
 function protocolHits(text) {
   const hits = [];
-  const escaped = PROTOCOL_PRECEDING.map((character) => character.replace(/[\\^\]-]/g, '\\$&')).join('');
-  const pattern = new RegExp(`([${escaped}])(\\s*)([/\\\\]{2,})([^\\s/\\\\?#:'"\`<>,)]+)`, 'g');
+  const escaped = PROTOCOL_PRECEDING.map((character) =>
+    character.replace(/[\\^\]-]/g, '\\$&'),
+  ).join('');
+  const pattern = new RegExp(
+    `([${escaped}])(\\s*)([/\\\\]{2,})([^\\s/\\\\?#:'"\`<>,)]+)`,
+    'g',
+  );
   let match = pattern.exec(text);
   while (match) {
     const host = match[4];
@@ -112,7 +129,7 @@ export function scanTags(html) {
           index += 1;
           continue;
         }
-        if (html[index] === '/' ) {
+        if (html[index] === '/') {
           index += 1;
           continue;
         }

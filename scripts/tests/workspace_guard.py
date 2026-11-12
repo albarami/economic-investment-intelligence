@@ -7,7 +7,8 @@ from pathlib import Path
 from typing import Any
 
 import workspace_toml
-from workspace_toml import dump_toml
+
+dump_toml = workspace_toml.dump_toml
 
 ROOT_DIST = "eii-workspace"
 MEMBER_ROWS: tuple[tuple[str, str, str], ...] = (
@@ -73,7 +74,8 @@ SCANNED_PYPROJECT_FIELDS: tuple[str, ...] = (
     "tool.uv.no-sources-package",
     "tool.uv.reinstall-package",
     "tool.uv.upgrade-package",
-) + tuple(f"tool.uv.pip.{k}" for k in PIPScan_KEYS)
+    *tuple(f"tool.uv.pip.{k}" for k in PIPScan_KEYS),
+)
 
 WORKSPACE_WIDE_LOCK_FIELDS: tuple[str, ...] = (
     "manifest.constraints",
@@ -221,7 +223,7 @@ def _rule_package_layout(root: Path) -> list[str]:
 def _rule_workspace_source(root: Path) -> list[str]:
     miss = "eii-core is not taken from the workspace"
     lines: list[str] = []
-    for mdir, dist, _module in MEMBER_ROWS:
+    for mdir, _dist, _module in MEMBER_ROWS:
         if mdir not in ("custodian", "product"):
             continue
         rel = f"{mdir}/pyproject.toml"
@@ -409,7 +411,7 @@ def _rule_lock_paths(data: dict[str, Any] | None) -> list[str]:
     ]
 
 
-def check_lock_data(data: dict[str, Any]) -> list[str]:
+def check_lock_data(data: dict[str, Any] | None) -> list[str]:
     """Apply ``lock`` and ``lock-paths`` rules to parsed lock data."""
     lines = _rule_lock(data)
     lines.extend(_rule_lock_paths(data))

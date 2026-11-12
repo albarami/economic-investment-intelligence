@@ -60,8 +60,11 @@ def stage_bracket_pair_as_symlink(root: Path, bracketed: str, plain: str) -> Non
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(HARMLESS_IGNORE_PATTERN)
     base.git(root, "--literal-pathspecs", "add", "--", bracketed, plain)
-    blob = base.git(
-        root, "hash-object", "-w", "--", bracketed).stdout.decode("utf-8").strip()
+    blob = (
+        base.git(root, "hash-object", "-w", "--", bracketed)
+        .stdout.decode("utf-8")
+        .strip()
+    )
     base.git(root, "update-index", "--cacheinfo", f"120000,{blob},{bracketed}")
 
 
@@ -72,7 +75,6 @@ def rewrite_as_crlf(path: Path) -> None:
 
 
 class CheckTreeIndexTests(base.CheckTreeCase):
-
     def test_env_example_staged_value_hidden_by_work_tree_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = base.make_fixture(folder)
@@ -80,18 +82,21 @@ class CheckTreeIndexTests(base.CheckTreeCase):
             clean = path.read_text(encoding="utf-8")
             number = clean.splitlines().index("EII_STORE=") + 1
             path.write_text(
-                clean.replace("EII_STORE=\n", "EII_STORE=postgres\n"),
-                encoding="utf-8")
+                clean.replace("EII_STORE=\n", "EII_STORE=postgres\n"), encoding="utf-8"
+            )
             base.git(root, "add", ".env.example")
             path.write_text(clean, encoding="utf-8")
             done = base.run_check(root)
             self.assertEqual(done.returncode, 1)
-            self.assertEqual(done.stdout.splitlines(), [
-                f"FAIL env-example: .env.example:{number}: "
-                "not a name with an empty value",
-                "FAIL env-example: .env.example: names differ from the pinned list",
-                "checked 8 rules: 2 failure(s)",
-            ])
+            self.assertEqual(
+                done.stdout.splitlines(),
+                [
+                    f"FAIL env-example: .env.example:{number}: "
+                    "not a name with an empty value",
+                    "FAIL env-example: .env.example: names differ from the pinned list",
+                    "checked 8 rules: 2 failure(s)",
+                ],
+            )
 
     def test_env_example_unstaged_edit_is_not_judged(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -99,8 +104,8 @@ class CheckTreeIndexTests(base.CheckTreeCase):
             path = root / ".env.example"
             text = path.read_text(encoding="utf-8")
             path.write_text(
-                text.replace("EII_STORE=\n", "EII_STORE=postgres\n"),
-                encoding="utf-8")
+                text.replace("EII_STORE=\n", "EII_STORE=postgres\n"), encoding="utf-8"
+            )
             self.assert_clean(base.run_check(root))
 
     def test_env_example_staged_symbolic_link_fails(self) -> None:
@@ -115,10 +120,13 @@ class CheckTreeIndexTests(base.CheckTreeCase):
             base.git(root, "add", ".env.example")
             done = base.run_check(root)
             self.assertEqual(done.returncode, 1)
-            self.assertEqual(done.stdout.splitlines(), [
-                "FAIL env-example: .env.example: not a regular file in the index",
-                "checked 8 rules: 1 failure(s)",
-            ])
+            self.assertEqual(
+                done.stdout.splitlines(),
+                [
+                    "FAIL env-example: .env.example: not a regular file in the index",
+                    "checked 8 rules: 1 failure(s)",
+                ],
+            )
 
     def test_env_example_deleted_in_work_tree_is_judged_from_the_index(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -168,11 +176,12 @@ class CheckTreeIndexTests(base.CheckTreeCase):
     def test_index_symlink_gitignore_is_not_the_staged_file(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = base.make_fixture(folder)
-            blob = base.git(
-                root, "hash-object", "-w", ".gitignore").stdout.decode("utf-8").strip()
-            base.git(
-                root, "update-index", "--cacheinfo",
-                f"120000,{blob},.gitignore")
+            blob = (
+                base.git(root, "hash-object", "-w", ".gitignore")
+                .stdout.decode("utf-8")
+                .strip()
+            )
+            base.git(root, "update-index", "--cacheinfo", f"120000,{blob},.gitignore")
             done = base.run_check(root)
             self.assertEqual(done.returncode, 1, done.stdout + done.stderr)
             self.assertIn(ROOT_GITIGNORE_DIFFERENT, done.stdout.splitlines())
@@ -188,11 +197,12 @@ class CheckTreeIndexTests(base.CheckTreeCase):
             self.assertEqual(done.returncode, 1, done.stdout + done.stderr)
             lines = done.stdout.splitlines()
             self.assertIn(
-                "FAIL secrets-ignored: web/.env: not ignored by a committed rule",
-                lines)
+                "FAIL secrets-ignored: web/.env: not ignored by a committed rule", lines
+            )
             self.assertIn(
                 "FAIL tracked-ignored: web/.gitignore: differs from its staged content",
-                lines)
+                lines,
+            )
             self.assertNotIn(ENV_EXAMPLE_UNJUDGED, lines)
             for line in lines:
                 if not line.startswith("FAIL "):
@@ -216,10 +226,13 @@ class CheckTreeIndexTests(base.CheckTreeCase):
             nested.write_text("# comment\n", encoding="utf-8")
             done = base.run_check(root)
             self.assertEqual(done.returncode, 1, done.stdout + done.stderr)
-            self.assertEqual(done.stdout.splitlines(), [
-                "FAIL tracked-ignored: docs/.gitignore: differs from its staged content",
-                "checked 8 rules: 1 failure(s)",
-            ])
+            self.assertEqual(
+                done.stdout.splitlines(),
+                [
+                    "FAIL tracked-ignored: docs/.gitignore: differs from its staged content",
+                    "checked 8 rules: 1 failure(s)",
+                ],
+            )
 
     def test_uppercase_bracket_symlink_index_is_unsynced(self) -> None:
         bracketed = "docs/a[B]/.gitignore"
@@ -258,8 +271,7 @@ class CheckTreeIndexTests(base.CheckTreeCase):
             config = Path(folder) / "user.gitconfig"
             config.write_text(GLOBAL_AUTOCRLF, encoding="utf-8")
             rewrite_as_crlf(root / ".gitignore")
-            done = base.run_check(
-                root, env_extra={"GIT_CONFIG_GLOBAL": str(config)})
+            done = base.run_check(root, env_extra={"GIT_CONFIG_GLOBAL": str(config)})
             self.assert_clean(done)
 
     def test_crlf_gitignore_differs_without_autocrlf(self) -> None:
@@ -280,14 +292,12 @@ class CheckTreeIndexTests(base.CheckTreeCase):
                 path = root / rel
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_bytes(HARMLESS_IGNORE_PATTERN)
-            base.git(
-                root, "--literal-pathspecs", "add", "--", bracketed, plain)
+            base.git(root, "--literal-pathspecs", "add", "--", bracketed, plain)
             self.assert_clean(base.run_check(root))
 
     def test_literal_index_record_refuses_another_path(self) -> None:
         """A folder name is refused when the only record has another path."""
-        spec = importlib.util.spec_from_file_location(
-            "check_tree", base.SCRIPT)
+        spec = importlib.util.spec_from_file_location("check_tree", base.SCRIPT)
         if spec is None or spec.loader is None:
             raise AssertionError("check_tree could not be loaded")
         module = importlib.util.module_from_spec(spec)
@@ -299,12 +309,19 @@ class CheckTreeIndexTests(base.CheckTreeCase):
             nested.write_bytes(HARMLESS_IGNORE_PATTERN)
             base.git(root, "add", "--", "docs/aB/.gitignore")
             self.assertIsNone(module.literal_index_record(root, "docs/aB"))
-            object_id = base.git(
-                root, "rev-parse", ":docs/aB/.gitignore",
-            ).stdout.decode("utf-8").strip()
+            object_id = (
+                base.git(
+                    root,
+                    "rev-parse",
+                    ":docs/aB/.gitignore",
+                )
+                .stdout.decode("utf-8")
+                .strip()
+            )
             self.assertEqual(
                 module.literal_index_record(root, "docs/aB/.gitignore"),
-                (b"100644", object_id))
+                (b"100644", object_id),
+            )
 
     def test_tracked_colon_dot_env_passes(self) -> None:
         """A tracked top-level file named :.env passes the check."""
@@ -320,9 +337,7 @@ class CheckTreeIndexTests(base.CheckTreeCase):
             root = base.make_fixture(folder)
             for name in (":!x", ":(exclude)y"):
                 (root / name).write_text("x\n", encoding="utf-8")
-            base.git(
-                root, "--literal-pathspecs", "add", "--",
-                ":!x", ":(exclude)y")
+            base.git(root, "--literal-pathspecs", "add", "--", ":!x", ":(exclude)y")
             self.assert_clean(base.run_check(root))
 
 

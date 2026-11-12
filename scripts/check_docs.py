@@ -83,18 +83,51 @@ SKIP_DIRS = {
 }
 
 TEXT_SUFFIXES = {
-    ".md", ".txt", ".py", ".toml", ".yml", ".yaml", ".json", ".ts", ".tsx",
-    ".js", ".jsx", ".css", ".html", ".sql", ".sh", ".cfg", ".ini", ".env",
+    ".md",
+    ".txt",
+    ".py",
+    ".toml",
+    ".yml",
+    ".yaml",
+    ".json",
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".css",
+    ".html",
+    ".sql",
+    ".sh",
+    ".cfg",
+    ".ini",
+    ".env",
 }
 TEXT_NAMES = {"LICENSE", "eii", ".gitignore", ".gitattributes", "Makefile"}
 
 REQUIREMENT_PREFIXES = (
-    "BRF", "ARC", "DAT", "PUB", "SYN", "PRV", "MTH", "BE", "AI", "FE", "DES",
-    "TST", "OPS", "PLN", "REV", "RUN",
+    "BRF",
+    "ARC",
+    "DAT",
+    "PUB",
+    "SYN",
+    "PRV",
+    "MTH",
+    "BE",
+    "AI",
+    "FE",
+    "DES",
+    "TST",
+    "OPS",
+    "PLN",
+    "REV",
+    "RUN",
 )
-ID_RE = re.compile(r"(?<![A-Za-z0-9-])(?:%s)-\d{2,3}(?![A-Za-z0-9])" % "|".join(REQUIREMENT_PREFIXES))
+PREFIX_ALTERNATION = "|".join(REQUIREMENT_PREFIXES)
+ID_RE = re.compile(
+    rf"(?<![A-Za-z0-9-])(?:{PREFIX_ALTERNATION})-\d{{2,3}}(?![A-Za-z0-9])"
+)
 # A definition is the first cell of a table row.
-DEF_RE = re.compile(r"^\|\s*((?:%s)-\d{2,3})\s*\|" % "|".join(REQUIREMENT_PREFIXES))
+DEF_RE = re.compile(rf"^\|\s*((?:{PREFIX_ALTERNATION})-\d{{2,3}})\s*\|")
 
 LINK_RE = re.compile(r"(?<!\!)\[[^\]\n]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 FENCE_RE = re.compile(r"^\s*(```|~~~)")
@@ -104,16 +137,33 @@ NUMBERED_DOC_RE = re.compile(r"^docs/\d{2}_[A-Z0-9_]+\.md$")
 
 # Forbidden patterns. Each entry: (check name, compiled pattern, explanation).
 FORBIDDEN = [
-    ("local-path", re.compile(r"/home/[a-z_][a-z0-9_-]*/|/Users/[A-Za-z]|[A-Za-z]:\\\\Users\\\\|\\\\\\\\wsl"),
-     "absolute local path"),
-    ("email", re.compile(r"(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+"),
-     "e-mail address"),
-    ("secret", re.compile(
-        r"sk-ant-[A-Za-z0-9_-]{8,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|"
-        r"AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----"),
-     "secret-shaped token"),
-    ("identifier-number", re.compile(r"(?<![0-9A-Za-z,.:/_#-])(?:\d{8}|\d{11})(?![0-9A-Za-z,_-]|\.\d)"),
-     "identifier-shaped number (exactly 8 or 11 digits)"),
+    (
+        "local-path",
+        re.compile(
+            r"/home/[a-z_][a-z0-9_-]*/|/Users/[A-Za-z]|[A-Za-z]:\\\\Users\\\\|\\\\\\\\wsl"
+        ),
+        "absolute local path",
+    ),
+    (
+        "email",
+        re.compile(
+            r"(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+"
+        ),
+        "e-mail address",
+    ),
+    (
+        "secret",
+        re.compile(
+            r"sk-ant-[A-Za-z0-9_-]{8,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|"
+            r"AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----"
+        ),
+        "secret-shaped token",
+    ),
+    (
+        "identifier-number",
+        re.compile(r"(?<![0-9A-Za-z,.:/_#-])(?:\d{8}|\d{11})(?![0-9A-Za-z,_-]|\.\d)"),
+        "identifier-shaped number (exactly 8 or 11 digits)",
+    ),
 ]
 
 # E-mail-shaped strings that are allowed (none are personal addresses).
@@ -127,18 +177,28 @@ def git_listed_files() -> list[Path] | None:
     try:
         done = subprocess.run(
             ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
-            cwd=ROOT, capture_output=True, check=True)
+            cwd=ROOT,
+            capture_output=True,
+            check=True,
+        )
     except (OSError, subprocess.CalledProcessError):
         return None
-    names = [name for name in done.stdout.decode("utf-8", errors="replace").split("\0") if name]
+    names = [
+        name
+        for name in done.stdout.decode("utf-8", errors="replace").split("\0")
+        if name
+    ]
     return [ROOT / name for name in names]
 
 
 def iter_text_files() -> list[Path]:
     listed = git_listed_files()
     if listed is None:
-        candidates = [path for path in ROOT.rglob("*")
-                      if not any(part in SKIP_DIRS for part in path.relative_to(ROOT).parts)]
+        candidates = [
+            path
+            for path in ROOT.rglob("*")
+            if not any(part in SKIP_DIRS for part in path.relative_to(ROOT).parts)
+        ]
     else:
         candidates = listed
     files: list[Path] = []
@@ -159,11 +219,19 @@ def load_extra_patterns() -> list[tuple[str, re.Pattern[str], str]]:
     name = os.environ.get("EII_FORBIDDEN_PATTERNS_FILE", "")
     extra = Path(name) if name else None
     if extra is not None and extra.is_file():
-        for number, line in enumerate(extra.read_text(encoding="utf-8").splitlines(), 1):
+        for number, line in enumerate(
+            extra.read_text(encoding="utf-8").splitlines(), 1
+        ):
             line = line.strip()
             if not line or line.startswith("#"):
                 continue
-            patterns.append((f"extra-{number}", re.compile(line, re.IGNORECASE), "extra forbidden pattern"))
+            patterns.append(
+                (
+                    f"extra-{number}",
+                    re.compile(line, re.IGNORECASE),
+                    "extra forbidden pattern",
+                )
+            )
     return patterns
 
 
@@ -178,7 +246,11 @@ def check_required(failures: list[str]) -> None:
 
 def check_agent_files(failures: list[str]) -> None:
     agents, claude = ROOT / "AGENTS.md", ROOT / "CLAUDE.md"
-    if agents.is_file() and claude.is_file() and agents.read_bytes() != claude.read_bytes():
+    if (
+        agents.is_file()
+        and claude.is_file()
+        and agents.read_bytes() != claude.read_bytes()
+    ):
         failures.append("FAIL agent-files: AGENTS.md and CLAUDE.md differ")
 
 
@@ -201,10 +273,14 @@ def check_links(path: Path, lines: list[str], failures: list[str]) -> None:
             try:
                 resolved.relative_to(ROOT)
             except ValueError:
-                failures.append(f"FAIL link: {rel}:{number}: points outside the repository: {target}")
+                failures.append(
+                    f"FAIL link: {rel}:{number}: points outside the repository: {target}"
+                )
                 continue
             if not resolved.exists():
-                failures.append(f"FAIL link: {rel}:{number}: target does not exist: {target}")
+                failures.append(
+                    f"FAIL link: {rel}:{number}: target does not exist: {target}"
+                )
 
 
 def check_header(path: Path, text: str, failures: list[str]) -> None:
@@ -213,13 +289,22 @@ def check_header(path: Path, text: str, failures: list[str]) -> None:
         return
     head = "\n".join(text.splitlines()[:25])
     if not text.startswith("# "):
-        failures.append(f"FAIL header: {rel}:1: document must start with a level-one title")
+        failures.append(
+            f"FAIL header: {rel}:1: document must start with a level-one title"
+        )
     for row in HEADER_ROWS:
         if row not in head:
-            failures.append(f"FAIL header: {rel}: header block is missing the row '{row}'")
+            failures.append(
+                f"FAIL header: {rel}: header block is missing the row '{row}'"
+            )
 
 
-def check_forbidden(path: Path, lines: list[str], patterns, failures: list[str]) -> None:
+def check_forbidden(
+    path: Path,
+    lines: list[str],
+    patterns: list[tuple[str, re.Pattern[str], str]],
+    failures: list[str],
+) -> None:
     rel = path.relative_to(ROOT)
     if rel.as_posix() == "scripts/check_docs.py":
         return
@@ -249,7 +334,8 @@ def check_requirement_ids(markdown: dict[Path, list[str]], failures: list[str]) 
             req = match.group(1)
             if req in defined:
                 failures.append(
-                    f"FAIL requirement-id: {rel}:{number}: {req} is already defined at {defined[req]}")
+                    f"FAIL requirement-id: {rel}:{number}: {req} is already defined at {defined[req]}"
+                )
             else:
                 defined[req] = f"{rel}:{number}"
     for path, lines in markdown.items():
@@ -258,7 +344,8 @@ def check_requirement_ids(markdown: dict[Path, list[str]], failures: list[str]) 
             for req in ID_RE.findall(line):
                 if req not in defined:
                     failures.append(
-                        f"FAIL requirement-id: {rel}:{number}: {req} is referenced but defined nowhere")
+                        f"FAIL requirement-id: {rel}:{number}: {req} is referenced but defined nowhere"
+                    )
 
 
 def main() -> int:
@@ -283,8 +370,10 @@ def main() -> int:
     check_requirement_ids(markdown, failures)
     for failure in failures:
         print(failure)
-    print(f"checked {len(files)} text files, {len(markdown)} Markdown files: "
-          f"{'OK' if not failures else str(len(failures)) + ' failure(s)'}")
+    print(
+        f"checked {len(files)} text files, {len(markdown)} Markdown files: "
+        f"{'OK' if not failures else str(len(failures)) + ' failure(s)'}"
+    )
     return 0 if not failures else 1
 
 

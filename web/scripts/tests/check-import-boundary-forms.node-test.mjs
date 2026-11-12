@@ -19,7 +19,9 @@ const BT = String.fromCharCode(96);
 const SPEC = '../../../core/x';
 const STYLE_EXTENSIONS = ['.css', '.scss', '.sass', '.less', '.styl', '.pcss'];
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-test-check-import-boundary-forms-'));
+const root = fs.mkdtempSync(
+  path.join(os.tmpdir(), 'eii-test-check-import-boundary-forms-'),
+);
 const currentTest = new AsyncLocalStorage();
 after(() => fs.rmSync(root, { recursive: true, force: true }));
 
@@ -30,10 +32,11 @@ function bindTest(t) {
       fn = options;
       options = undefined;
     }
-    const wrapped = (sub) => currentTest.run(sub, () => {
-      bindTest(sub);
-      return fn(sub);
-    });
+    const wrapped = (sub) =>
+      currentTest.run(sub, () => {
+        bindTest(sub);
+        return fn(sub);
+      });
     if (options === undefined) return own(name, wrapped);
     return own(name, options, wrapped);
   };
@@ -44,17 +47,20 @@ function test(name, options, fn) {
     fn = options;
     options = undefined;
   }
-  const wrapped = (t) => currentTest.run(t, () => {
-    bindTest(t);
-    return fn(t);
-  });
+  const wrapped = (t) =>
+    currentTest.run(t, () => {
+      bindTest(t);
+      return fn(t);
+    });
   if (options === undefined) return declareTest(name, wrapped);
   return declareTest(name, options, wrapped);
 }
 
 function tempDir(prefix) {
   const dir = fs.mkdtempSync(path.join(root, prefix));
-  currentTest.getStore().after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  currentTest
+    .getStore()
+    .after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
 
@@ -67,7 +73,14 @@ function childTemp(home) {
 function cleanEnv(extra) {
   const home = tempDir('eii-env-');
   const tmp = childTemp(home);
-  const base = { PATH: process.env.PATH, HOME: home, TMPDIR: tmp, TMP: tmp, TEMP: tmp, LANG: 'C' };
+  const base = {
+    PATH: process.env.PATH,
+    HOME: home,
+    TMPDIR: tmp,
+    TMP: tmp,
+    TEMP: tmp,
+    LANG: 'C',
+  };
   return { ...base, ...extra };
 }
 
@@ -117,23 +130,53 @@ function addQuoted(name, build, options) {
   }
 }
 
-addQuoted('import from', (quote) => `${IMP} x ${FROM} ${quoted(SPEC, quote)};\n`);
-addQuoted('import type from', (quote) => `${IMP} type { T } ${FROM} ${quoted(SPEC, quote)};\n`);
-addQuoted('export from', (quote) => `export { y } ${FROM} ${quoted(SPEC, quote)};\n`);
-addQuoted('export star from', (quote) => `export * ${FROM} ${quoted(SPEC, quote)};\n`);
-addQuoted('export star as from', (quote) => `export * as n ${FROM} ${quoted(SPEC, quote)};\n`);
-addQuoted('multiline from', (quote) => `${IMP} {\n  // don't\n  a\n} ${FROM} ${quoted(SPEC, quote)};\n`);
-addQuoted('block comment from', (quote) => `${IMP} a /* don't */ ${FROM} ${quoted(SPEC, quote)};\n`);
+addQuoted(
+  'import from',
+  (quote) => `${IMP} x ${FROM} ${quoted(SPEC, quote)};\n`,
+);
+addQuoted(
+  'import type from',
+  (quote) => `${IMP} type { T } ${FROM} ${quoted(SPEC, quote)};\n`,
+);
+addQuoted(
+  'export from',
+  (quote) => `export { y } ${FROM} ${quoted(SPEC, quote)};\n`,
+);
+addQuoted(
+  'export star from',
+  (quote) => `export * ${FROM} ${quoted(SPEC, quote)};\n`,
+);
+addQuoted(
+  'export star as from',
+  (quote) => `export * as n ${FROM} ${quoted(SPEC, quote)};\n`,
+);
+addQuoted(
+  'multiline from',
+  (quote) => `${IMP} {\n  // don't\n  a\n} ${FROM} ${quoted(SPEC, quote)};\n`,
+);
+addQuoted(
+  'block comment from',
+  (quote) => `${IMP} a /* don't */ ${FROM} ${quoted(SPEC, quote)};\n`,
+);
 addQuoted(
   'string binding from',
   (quote) => `${IMP} { 'a-b' as c } ${FROM} ${quoted(SPEC, quote)};\n`,
 );
-addQuoted('comment before string', (quote) => `export * ${FROM} /* x */ ${quoted(SPEC, quote)};\n`);
+addQuoted(
+  'comment before string',
+  (quote) => `export * ${FROM} /* x */ ${quoted(SPEC, quote)};\n`,
+);
 addQuoted('side effect', (quote) => `${IMP} ${quoted(SPEC, quote)};\n`);
-addQuoted('import equals require', (quote) => `${IMP} x = ${REQ}(${quoted(SPEC, quote)});\n`);
+addQuoted(
+  'import equals require',
+  (quote) => `${IMP} x = ${REQ}(${quoted(SPEC, quote)});\n`,
+);
 addQuoted('require call', (quote) => `${REQ}(${quoted(SPEC, quote)});\n`);
 addQuoted('dynamic import', (quote) => `${IMP}(${quoted(SPEC, quote)});\n`);
-addQuoted('typeof dynamic import', (quote) => `typeof ${IMP}(${quoted(SPEC, quote)});\n`);
+addQuoted(
+  'typeof dynamic import',
+  (quote) => `typeof ${IMP}(${quoted(SPEC, quote)});\n`,
+);
 addQuoted(
   'dynamic import with options',
   (quote) => `${IMP}(${quoted(SPEC, quote)}, { with: { type: 'json' } });\n`,
@@ -152,51 +195,75 @@ addQuoted(
 );
 addQuoted(
   'new URL multiline',
-  (quote) => `new ${URLW}(\n  ${quoted(SPEC, quote)},\n  ${IMP}.${META}.url,\n);\n`,
+  (quote) =>
+    `new ${URLW}(\n  ${quoted(SPEC, quote)},\n  ${IMP}.${META}.url,\n);\n`,
 );
-addQuoted('glob string', (quote) => `${IMP}.${META}.${GLOB}(${quoted(SPEC, quote)});\n`);
+addQuoted(
+  'glob string',
+  (quote) => `${IMP}.${META}.${GLOB}(${quoted(SPEC, quote)});\n`,
+);
 addQuoted(
   'glob array',
   (quote) => `${IMP}.${META}.${GLOB}(['./ok.ts', ${quoted(SPEC, quote)}]);\n`,
 );
 addQuoted(
   'glob array trailing comma',
-  (quote) => `${IMP}.${META}.${GLOB}([\n  './ok.ts',\n  ${quoted(SPEC, quote)},\n]);\n`,
+  (quote) =>
+    `${IMP}.${META}.${GLOB}([\n  './ok.ts',\n  ${quoted(SPEC, quote)},\n]);\n`,
 );
 add('backtick import()', `${IMP}(${BT}${SPEC}${BT});\n`);
-add('backtick new URL', `new ${URLW}(${BT}${SPEC}${BT}, ${IMP}.${META}.url);\n`);
+add(
+  'backtick new URL',
+  `new ${URLW}(${BT}${SPEC}${BT}, ${IMP}.${META}.url);\n`,
+);
 add('backtick glob', `${IMP}.${META}.${GLOB}(${BT}${SPEC}${BT});\n`);
 add('backtick require', `${REQ}(${BT}${SPEC}${BT});\n`);
 addQuoted(
   'reference path',
   (quote) => `/// <reference path=${quoted(SPEC, quote)} />\n`,
 );
-add(
-  'reference types single',
-  '/// <reference types="custodian" />\n',
-  { rule: 'forbidden-package', needle: 'custodian' },
-);
-add(
-  'reference types double',
-  "/// <reference types='custodian' />\n",
-  { rule: 'forbidden-package', needle: 'custodian' },
-);
+add('reference types single', '/// <reference types="custodian" />\n', {
+  rule: 'forbidden-package',
+  needle: 'custodian',
+});
+add('reference types double', "/// <reference types='custodian' />\n", {
+  rule: 'forbidden-package',
+  needle: 'custodian',
+});
 
 for (const ext of STYLE_EXTENSIONS) {
   const file = `src/app/s${ext}`;
   for (const quote of ["'", '"']) {
-    add(`style import ${ext} ${quote}`, `@${IMP} ${quoted(SPEC, quote)};\n`, { file });
-    add(`style import url ${ext} ${quote}`, `@${IMP} url(${quoted(SPEC, quote)});\n`, { file });
-    add(`style url ${ext} ${quote}`, `a { background: url(${quoted(SPEC, quote)}); }\n`, { file });
+    add(`style import ${ext} ${quote}`, `@${IMP} ${quoted(SPEC, quote)};\n`, {
+      file,
+    });
+    add(
+      `style import url ${ext} ${quote}`,
+      `@${IMP} url(${quoted(SPEC, quote)});\n`,
+      { file },
+    );
+    add(
+      `style url ${ext} ${quote}`,
+      `a { background: url(${quoted(SPEC, quote)}); }\n`,
+      { file },
+    );
   }
-  add(`style relative a ${ext}`, 'a { background: url(a/../../../../x.png); }\n', {
-    file,
-    needle: 'a/../../../../x.png',
-  });
-  add(`style relative dots ${ext}`, 'a { background: url(../../../x.png); }\n', {
-    file,
-    needle: '../../../x.png',
-  });
+  add(
+    `style relative a ${ext}`,
+    'a { background: url(a/../../../../x.png); }\n',
+    {
+      file,
+      needle: 'a/../../../../x.png',
+    },
+  );
+  add(
+    `style relative dots ${ext}`,
+    'a { background: url(../../../x.png); }\n',
+    {
+      file,
+      needle: '../../../x.png',
+    },
+  );
 }
 add(
   'style data and fragment pass',
@@ -213,11 +280,15 @@ add('non literal require template', `${REQ}(${BT}\${name}${BT});\n`, {
   needle: null,
   form: `${REQ}()`,
 });
-add('non literal URL template', `new ${URLW}(${BT}\${name}${BT}, ${IMP}.${META}.url);\n`, {
-  rule: 'non-literal-import',
-  needle: null,
-  form: `new ${URLW}()`,
-});
+add(
+  'non literal URL template',
+  `new ${URLW}(${BT}\${name}${BT}, ${IMP}.${META}.url);\n`,
+  {
+    rule: 'non-literal-import',
+    needle: null,
+    form: `new ${URLW}()`,
+  },
+);
 add('non literal import name', `${IMP}(name);\n`, {
   rule: 'non-literal-import',
   needle: null,
@@ -228,13 +299,26 @@ add('non literal require name', `${REQ}(name);\n`, {
   needle: null,
   form: `${REQ}()`,
 });
-add('comment line', `// ${IMP} x ${FROM} '${SPEC}';\n`, { rule: null, needle: null });
-add('comment block', `/* ${IMP} x ${FROM} '${SPEC}'; */\n`, { rule: null, needle: null });
-add('two-slash reference', `// <reference path="${SPEC}">\n`, { rule: null, needle: null });
+add('comment line', `// ${IMP} x ${FROM} '${SPEC}';\n`, {
+  rule: null,
+  needle: null,
+});
+add('comment block', `/* ${IMP} x ${FROM} '${SPEC}'; */\n`, {
+  rule: null,
+  needle: null,
+});
+add('two-slash reference', `// <reference path="${SPEC}">\n`, {
+  rule: null,
+  needle: null,
+});
 add('string then import', `const a = "//"; ${IMP} x ${FROM} '${SPEC}';\n`);
 add(
   'template substitution then import',
-  `const t = ${BT}` + '${"' + "'{}" + '"}' + `${BT};\n${IMP} x ${FROM} '${SPEC}';\n`,
+  `const t = ${BT}` +
+    '${"' +
+    "'{}" +
+    '"}' +
+    `${BT};\n${IMP} x ${FROM} '${SPEC}';\n`,
 );
 add(
   'unterminated string then import',
@@ -245,10 +329,14 @@ add(
   `new ${'Wor' + 'ker'}('${SPEC}');\nnew ${URLW}(name, ${IMP}.${META}.url);\n`,
   { rule: null, needle: null },
 );
-add('regex hides the rest of the line', `const r = /'/; ${IMP} x ${FROM} '${SPEC}';\n`, {
-  rule: null,
-  needle: null,
-});
+add(
+  'regex hides the rest of the line',
+  `const r = /'/; ${IMP} x ${FROM} '${SPEC}';\n`,
+  {
+    rule: null,
+    needle: null,
+  },
+);
 
 test('glob array string that looks like a closing bracket', () => {
   const root = makeRoot();
@@ -266,7 +354,10 @@ test('side-effect import of a dot is collected', () => {
   fs.writeFileSync(path.join(root, 'src', 'app', 'case.ts'), `${IMP} '.';\n`);
   const result = run(root);
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
-  assert.match(result.stdout.trim().split('\n').at(-1), /^checked 1 references in 1 files: OK$/);
+  assert.match(
+    result.stdout.trim().split('\n').at(-1),
+    /^checked 1 references in 1 files: OK$/,
+  );
 });
 
 test('side-effect import of an opening parenthesis is collected', () => {
@@ -274,7 +365,10 @@ test('side-effect import of an opening parenthesis is collected', () => {
   fs.writeFileSync(path.join(root, 'src', 'app', 'case.ts'), `${IMP} '(';\n`);
   const result = run(root);
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
-  assert.match(result.stdout.trim().split('\n').at(-1), /^checked 1 references in 1 files: OK$/);
+  assert.match(
+    result.stdout.trim().split('\n').at(-1),
+    /^checked 1 references in 1 files: OK$/,
+  );
 });
 
 test('reference forms', async (t) => {
@@ -290,15 +384,22 @@ test('reference forms', async (t) => {
         assert.match(result.stdout.trim().split('\n').at(-1), /OK$/);
         return;
       }
-      assert.equal(result.status, 1, `${item.name}\n${result.stdout}\n${result.stderr}`);
+      assert.equal(
+        result.status,
+        1,
+        `${item.name}\n${result.stdout}\n${result.stderr}`,
+      );
       const line = item.needle === null ? null : lineOf(item.text, item.needle);
       const prefix =
         line === null
           ? `FAIL ${item.rule}: ${item.file}`
           : `FAIL ${item.rule}: ${item.file}:${line}`;
-      const hit = result.stdout.split('\n').some((row) => row.startsWith(prefix));
+      const hit = result.stdout
+        .split('\n')
+        .some((row) => row.startsWith(prefix));
       assert.equal(hit, true, `${prefix}\n${result.stdout}`);
-      if (item.form !== null) assert.ok(result.stdout.includes(item.form), result.stdout);
+      if (item.form !== null)
+        assert.ok(result.stdout.includes(item.form), result.stdout);
     });
   }
 });

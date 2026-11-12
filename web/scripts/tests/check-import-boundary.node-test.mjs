@@ -16,7 +16,16 @@ const IMP = 'imp' + 'ort';
 const FROM = 'fr' + 'om';
 const OUTSIDE = '../../../core/x';
 
-const SCRIPT_EXTENSIONS = ['.ts', '.tsx', '.mts', '.cts', '.js', '.jsx', '.mjs', '.cjs'];
+const SCRIPT_EXTENSIONS = [
+  '.ts',
+  '.tsx',
+  '.mts',
+  '.cts',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.cjs',
+];
 const STYLE_EXTENSIONS = ['.css', '.scss', '.sass', '.less', '.styl', '.pcss'];
 const FORBIDDEN = [
   'custodian/x',
@@ -44,7 +53,9 @@ const ABSOLUTE = [
   '/../x',
 ];
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-test-check-import-boundary-'));
+const root = fs.mkdtempSync(
+  path.join(os.tmpdir(), 'eii-test-check-import-boundary-'),
+);
 const currentTest = new AsyncLocalStorage();
 after(() => fs.rmSync(root, { recursive: true, force: true }));
 
@@ -55,10 +66,11 @@ function bindTest(t) {
       fn = options;
       options = undefined;
     }
-    const wrapped = (sub) => currentTest.run(sub, () => {
-      bindTest(sub);
-      return fn(sub);
-    });
+    const wrapped = (sub) =>
+      currentTest.run(sub, () => {
+        bindTest(sub);
+        return fn(sub);
+      });
     if (options === undefined) return own(name, wrapped);
     return own(name, options, wrapped);
   };
@@ -69,17 +81,20 @@ function test(name, options, fn) {
     fn = options;
     options = undefined;
   }
-  const wrapped = (t) => currentTest.run(t, () => {
-    bindTest(t);
-    return fn(t);
-  });
+  const wrapped = (t) =>
+    currentTest.run(t, () => {
+      bindTest(t);
+      return fn(t);
+    });
   if (options === undefined) return declareTest(name, wrapped);
   return declareTest(name, options, wrapped);
 }
 
 function tempDir(prefix) {
   const dir = fs.mkdtempSync(path.join(root, prefix));
-  currentTest.getStore().after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  currentTest
+    .getStore()
+    .after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
 
@@ -92,7 +107,14 @@ function childTemp(home) {
 function cleanEnv(extra) {
   const home = tempDir('eii-env-');
   const tmp = childTemp(home);
-  const base = { PATH: process.env.PATH, HOME: home, TMPDIR: tmp, TMP: tmp, TEMP: tmp, LANG: 'C' };
+  const base = {
+    PATH: process.env.PATH,
+    HOME: home,
+    TMPDIR: tmp,
+    TMP: tmp,
+    TEMP: tmp,
+    LANG: 'C',
+  };
   return { ...base, ...extra };
 }
 
@@ -145,7 +167,9 @@ function snapshot(root) {
         rows.push(`dir ${rel}`);
         walk(full);
       } else {
-        const digest = createHash('sha256').update(fs.readFileSync(full)).digest('hex');
+        const digest = createHash('sha256')
+          .update(fs.readFileSync(full))
+          .digest('hex');
         rows.push(`file ${rel} ${info.size} ${digest}`);
       }
     }
@@ -173,7 +197,11 @@ function hostileEnv() {
 
 test('clean src', () => {
   const root = makeRoot();
-  plant(root, 'src/app/inside.ts', `${fromLine('./local')}${fromLine('../../package.json')}`);
+  plant(
+    root,
+    'src/app/inside.ts',
+    `${fromLine('./local')}${fromLine('../../package.json')}`,
+  );
   const result = run(['--root', root]);
   assert.equal(result.status, 0, result.stdout + result.stderr);
   assert.match(result.stdout.trim().split('\n').at(-1), /OK$/);
@@ -219,7 +247,10 @@ test('tsconfig.json shape', async (t) => {
 
 test('unreadable file in src', () => {
   const root = makeRoot();
-  fs.symlinkSync(path.join(root, 'missing-target'), path.join(root, 'src', 'x.ts'));
+  fs.symlinkSync(
+    path.join(root, 'missing-target'),
+    path.join(root, 'src', 'x.ts'),
+  );
   assertFail(run(['--root', root]), 'FAIL unreadable-file: src/x.ts');
 });
 
@@ -302,7 +333,10 @@ test('depth is counted from the file', async (t) => {
 test('symbolic link out', () => {
   const root = makeRoot();
   const outside = tempDir('eii-out-');
-  fs.writeFileSync(path.join(outside, 'secret.ts'), 'export const value = 1;\n');
+  fs.writeFileSync(
+    path.join(outside, 'secret.ts'),
+    'export const value = 1;\n',
+  );
   fs.symlinkSync(outside, path.join(root, 'src', 'linked'));
   plant(root, 'src/app/use.ts', fromLine('../linked/secret.ts'));
   assertFail(run(['--root', root]), 'FAIL outside-web');
@@ -358,15 +392,27 @@ test('tsconfig outside', async (t) => {
     ['extends string', { include: ['src'], extends: '../core' }],
     ['extends array', { include: ['src'], extends: ['../core'] }],
     ['references', { include: ['src'], references: [{ path: '../core' }] }],
-    ['rootDirs', { include: ['src'], compilerOptions: { rootDirs: ['../core'] } }],
-    ['typeRoots', { include: ['src'], compilerOptions: { typeRoots: ['../core'] } }],
-    ['paths', { include: ['src'], compilerOptions: { paths: { a: ['../core/x'] } } }],
+    [
+      'rootDirs',
+      { include: ['src'], compilerOptions: { rootDirs: ['../core'] } },
+    ],
+    [
+      'typeRoots',
+      { include: ['src'], compilerOptions: { typeRoots: ['../core'] } },
+    ],
+    [
+      'paths',
+      { include: ['src'], compilerOptions: { paths: { a: ['../core/x'] } } },
+    ],
     ['baseUrl', { include: ['src'], compilerOptions: { baseUrl: '..' } }],
   ];
   for (const [name, body] of cases) {
     await t.test(name, () => {
       const root = makeRoot();
-      fs.writeFileSync(path.join(root, 'tsconfig.json'), `${JSON.stringify(body)}\n`);
+      fs.writeFileSync(
+        path.join(root, 'tsconfig.json'),
+        `${JSON.stringify(body)}\n`,
+      );
       assertFail(run(['--root', root]), 'FAIL tsconfig-outside');
     });
   }
@@ -403,7 +449,10 @@ test('internal error', () => {
   const longName = path.join(root, 'n'.repeat(LONG_NAME_LENGTH));
   const result = run(['--root', longName]);
   assert.equal(result.status, 1);
-  assert.equal(result.stdout, 'FAIL internal-error: ENAMETOOLONG: name too long, stat\n');
+  assert.equal(
+    result.stdout,
+    'FAIL internal-error: ENAMETOOLONG: name too long, stat\n',
+  );
   assert.equal(`${result.stdout}${result.stderr}`.includes('    at '), false);
 });
 
