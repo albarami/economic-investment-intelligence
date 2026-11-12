@@ -2916,6 +2916,252 @@ Seed:      none
 Notes:     The scope (TST-163): the work commit changes exactly the 34 files of the plan.
 ```
 
+### S0-T10 — Import-boundary test: task log
+
+- Builder persona: senior backend and database engineer
+- Reviewer persona: principal backend security reviewer
+- Planner maker and model: Anthropic: versions 1 and 2 by Claude Sonnet agents; a correction after approval by Claude Sonnet agents; the one refresh of 2026-11-12, against the merged tree and the owner's notes of that day, by a Claude Sonnet editor; each checked by the lead
+- Plan reviewer maker and model: Antigravity command-line tool, `gemini-4-carbon-high` (Google), read-only plan mode: round 1 REJECTED, round 2 APPROVED; the correction after approval and the refresh of 2026-11-12 were not seen by an external plan reviewer
+- Builder maker and model: Cursor command-line tool, `composer-2.5` (Cursor)
+- Reviewer maker and model: Devin command-line tool, `glm-5-3-high` (Zhipu AI), read-only
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, strict-reviewer, verification-before-completion and github-flow; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first, a planted violation for every check, the three Python checks of S0-T04 passing without any suppression, nothing built beyond the acceptance criteria as hardening (owner's note of 2026-11-12), file length and house style as warnings only, a short pass that breaks each condition once and runs only the covering test module, no leftover file, and a report of only the results it saw
+- Branch: `task/S0-T10-import-boundary`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/8
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit (the build round: commands 2 to 8; command 1 follows after S0-T05 merges); the lead-run blocks go into the evidence file that the external reviewer receives
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4; git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8
+- Build round 1: Cursor command-line tool, `composer-2.5` (Cursor): the nine files of part A, tests first, on main after S0-T04 merged (the owner's throughput rule of 2026-11-12: S0-T10 depends only on S0-T02)
+- Build round 2: the same builder: the package parts passed to the judge as the plan defines them, [package, *folders], with relative-escape when the level exceeds their number, and a test that pins that rule to importlib.util.resolve_name; a break pass over the four support modules
+- Build round 3: the same builder, after the lead re-ran every surviving break against all five test modules: the plan's output order (path, line as an integer, text) with a test; a test for a requested forbidden module that was not loaded; a harness sub-case; redundant and unreachable branches deleted
+
+#### Evidence for the work commit `a16d88f265900a9a768f2a84983a16aad5eeea0a` (build round)
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    128 passed, 0 failed, 0 skipped (ran 128 tests, OK)
+Seed:      none
+Notes:     The suite command of rule 44, which runs the guard tests under unittest: test_metadata_guard_is_wired and the four S0-T02 tests on package metadata (criterion 2), and the 33 tests of the nine files of this task (the plan's 30 and three added by the fix rounds); ARC-06, BE-01, TST-60. The project's own ./eii test (TST-162) follows in the later round, after S0-T05 merges.
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 11 packages in 1ms"
+Seed:      none
+Notes:     The lock file is current for the workspace.
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 92 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check (TST-140).
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical (REV-27).
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   copy=$(mktemp -d) && git ls-files -z | xargs -0 cp --parents -t "$copy" && rc=0 && ctl=0 && : >"$copy/red.log"; (cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py' >"$copy/ctl.log" 2>&1) || ctl=$?; (printf '\ncheck_imports = lambda root: ([], [])\n' >> "$copy/scripts/tests/import_boundary_guard.py" && cd "$copy/scripts/tests" && python3 -B -c "import import_boundary_guard as g, sys; sys.exit(0 if g.check_imports.__name__ == '<lambda>' else 3)" && cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py' -v >"$copy/red.log" 2>&1) || rc=$?; miss=0; for t in test_every_edge_every_mechanism test_local_placements test_fullwidth_spelling_is_judged test_non_literal_dynamic_is_a_note test_relative_imports test_missing_source_tree test_unparsable_and_unreadable test_symbolic_links_fail test_pycache_is_scanned test_environment_names test_output_order test_fresh_function_local_is_static_only; do grep -q "^FAIL: $t " "$copy/red.log" || miss=1; done; if grep -q '_FailedTest' "$copy/red.log"; then miss=1; fi; if [ "$miss" -ne 0 ]; then rc=9; fi; if [ "$ctl" -ne 0 ]; then rc=8; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The line succeeds only if the import-boundary tests named in it fail when the static guard does nothing (TST-161).
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','c930e3bc18452ef48033f641206848be2e8f6976...a16d88f265900a9a768f2a84983a16aad5eeea0a'],check=True,capture_output=True,text=True).stdout.splitlines(); a={'scripts/tests/import_boundary_judge.py','scripts/tests/import_boundary_guard.py','scripts/tests/import_boundary_child.py','scripts/tests/import_boundary_cases.py','scripts/tests/test_import_boundary_forms.py','scripts/tests/test_import_boundary_files.py','scripts/tests/test_import_boundary_fresh.py','scripts/tests/test_import_boundary_surroundings.py','scripts/tests/test_import_boundary_real.py'}; o=[x for x in p if x not in a]; print(len(p),o); sys.exit(1 if o or len(p)!=9 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "9 []"
+Seed:      none
+Notes:     Part-A form of the scope command: the work commit changes exactly the nine files of part A (TST-163, PLN-22); OPEN_ITEMS.md is part B, made after the open pull requests that edit it have merged.
+```
+
+#### S0-T10: independent review, round 1: REJECTED
+
+Reviewed commit `5952dbd04288f98d07c3a0316efa85ffed5caa62`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/8, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43199499615 ). Reviewer: Zhipu AI GLM-5.3 High, through the Devin command-line tool, read-only; a full review. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request. The reviewer's working notes before the verdict, which are not part of it, say that it ran one directory listing in its read-only workspace although the brief asked for no shell command; the workspace was unchanged afterwards.
+
+```text
+VERDICT: REJECTED
+TASK: S0-T10
+COMMIT: 5952dbd04288f98d07c3a0316efa85ffed5caa62
+REVIEWER: Devin command-line tool, glm-5-3-high (Zhipu AI)
+CHECKS:
+  REV-10 PASS All three criteria map to recorded evidence at the work commit a16d88f265900a9a768f2a84983a16aad5eeea0a, re-run on the head. Criterion 1: T01 (7 edges x 30 mechanisms), T03, T06, T15, T16, T17 plus MUTANTS M1 to M25 and command 7 (tests fail when `check_imports` does nothing) in EVIDENCE.md. Criterion 2: `test_metadata_guard_is_wired` plus the four S0-T02 metadata tests in the same 128-test suite ("own passed 33 metadata passed 4") and `uv lock --check` exit 0. Criterion 3: T02, T24, T25, T26, T22. Entries follow docs/12 section 6.3 in PROGRESS.md.
+  REV-11 PASS `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` exit 0, run by lead (local) at the work commit (128 passed, 0 failed, 0 skipped) and again on the head (128 tests, OK); `python3 scripts/check_docs.py` exit 0. `./eii test` does not exist on main yet (S0-T05 is pull request 7); the plan records command 1 for the later round and rule 44's suite command stands in, as the brief's note 1 states. CI green on the head: https://github.com/albarami/economic-investment-intelligence/actions/runs/43199499615 . Every new guard has its planted violation (MUTANTS all caught; command 7's twelve named tests fail under the neutralised guard).
+  REV-12 PASS Command 8 and block SCOPE: the work commit changes exactly the nine files under `scripts/tests/`; block HEAD-DIFF: the ledger commit changes only `PROGRESS.md` and `TASKS.md` (the plan's ledger files); nothing under `data/`; no unrelated reformatting in the full diff.
+  REV-13 PASS No TODO, FIXME, NotImplementedError, empty body or fixed return value in the nine files; the builder's step-1 stubs were replaced by real implementations; `CHILD` is a real harness, not a stand-in.
+  REV-14 PASS No secret, `.env` or key file in the diff; the only environment-variable names present are the two the rule itself forbids; no real custodian record, field, file name or count anywhere.
+  REV-15 PASS All nine files are new; no lowered threshold, loosened assertion, skip, expected-failure, lint or type suppression, `continue-on-error` or retry anywhere in the diff; tests compare exact whole lists and count their sub-cases.
+  REV-16 FAIL Two deviations from the approved plan: the fresh-interpreter guard returns its failure lines globally sorted instead of the plan's group order (F1), and all five test modules carry an `if __name__ == "__main__"` block although the plan's approach 1 says no file has one (F2). Pinned names, edges, tables, constants, failure-line texts and commands are otherwise used exactly; the three added tests, the 33-test count and the T19/M12 form were asserted as later-round forms by the lead in EVIDENCE.md.
+  REV-17 PASS `PROGRESS.md` carries the task log and the seven build-round entries (commands 2 to 8) in section 6.3 form at the work commit, appended without rewriting earlier rows; `TASKS.md` status updated to in review; `OPEN_ITEMS.md` deferred to part B by the approved plan (open pull requests 6 and 7 edit it); `python3 scripts/check_docs.py` exit 0 on the head.
+  REV-18 PASS Test-only change; no secrets (the child environment is built from `{}` plus `SYSTEMROOT`, pinned by T23); no SQL, no application role, no record-level data in logs; generators untouched.
+  REV-19 PASS Nothing on the dropped or later lists is built; the seven forbidden edges follow ARC-06 exactly; no component decision in docs/ or docs/decisions/ is removed or replaced.
+  REV-20 N/A The task adds no facts, figures or displayed numbers; it is guard and test infrastructure, and the numerals in the nine files are test-internal line numbers, table sizes and hashes.
+  REV-21 N/A No screen, card, template or prose is added; the nine files are test modules and never render.
+  REV-22 PASS Nothing in the diff touches the partition, the two parameter sets, treatment, exports or any privacy audit or test.
+  REV-23 PASS The import-boundary test passes on the real tree, static and fresh, on the head, and the metadata guard is wired and passing. I traced every judged form (S1 to S6, D1 to D24, rule C including starred and keyword shapes, relative escapes pinned to `resolve_name`, fullwidth spelling, `__pycache__` scanning, symlinked files, folders, tree roots and ancestors, env names, hostile `PYTHONPATH`, venv `.pth`, user site and shadowed stdlib) and found no unplanned form, path or environment by which the product could reach the custodian or the gateway, or the custodian the product, without the guard failing. The routes neither guard sees are exactly the plan's documented not-judged table (NJ1 to NJ9, OI-51) and are deliberate-evasion forms, which the amended rules put outside the verdict (see proposed items).
+  REV-24 N/A No English or Arabic screen strings are added by this task.
+  REV-25 PASS No absolute local path, personal name, e-mail address, real custodian identifier, named existing product in a comparison, or run of exactly eight or eleven digits in the committed files (the digit-run rule passes); the new files follow the existing `scripts/tests/` convention under the root `LICENSE`; `check_docs.py` checked 92 text files, OK.
+  REV-26 PASS No string, docstring or document in the diff makes or implies any prohibited claim.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exit 0 on the head (evidence command 6) and the documentation check reports no agent-file failure.
+  REV-28 PASS No synthetic entity identifiers are introduced; the fixture package names are the plan's pinned plane names and no identifier imitates a real registration (no bare eight- or eleven-digit run).
+  REV-29 N/A No real named place or business appears anywhere in the change.
+  REV-38 PASS Edges to `eii_gateway` are enforced on all three planes and the env-name rule forbids `EII_DECISION_PROVIDER` and `JEV_PRO_API_KEY` in the source trees (T13, real-tree pass); the gateway exists only as a stub fixture inside temporary folders, never in the repository; the web clause belongs to S0-T03's existing check, outside this diff.
+FINDINGS:
+  F1 (REV-16)
+    File: scripts/tests/import_boundary_child.py
+    Line: 135-160 (the return at 160)
+    Wrong: The plan's "Fresh-interpreter guard" section specifies the failure lines "in this order (`<p>` the package; each group sorted by module name)": already-loaded, then loaded, then attempted, then import errors. `run_fresh` appends the groups in that order but returns `sorted(out)`, a global lexicographic sort, so the groups interleave: an "attempted" line sorts before a "loaded" line, and "was already loaded before the import" lines sort by module name among "could not be imported" lines. No test pins the specified order — `test_fresh_requested_while_other_forbidden_loaded` (scripts/tests/test_import_boundary_fresh.py, lines 2785-2814 of the diff) sorts both sides before comparing, and the fix rounds added an order test only for the static guard (`test_output_order_within_rule`). This breaks REV-16 (the work must follow the approved plan).
+    Fix: In `run_fresh`, sort each group by module name and concatenate the groups in the plan's table order (build the four lists, extend `out` in table order, return `out` instead of `sorted(out)`). Prove it by changing `test_fresh_requested_while_other_forbidden_loaded` to compare the unsorted result against the exact plan-ordered list `[loaded line, attempted line]`, or by adding a child order test that plants a fixture producing one line of each group and asserts the full ordered list; then re-run the suite command of rule 44 (exit 0).
+  F2 (REV-16)
+    File: scripts/tests/test_import_boundary_forms.py, scripts/tests/test_import_boundary_files.py, scripts/tests/test_import_boundary_fresh.py, scripts/tests/test_import_boundary_real.py, scripts/tests/test_import_boundary_surroundings.py
+    Line: 426-427; 573-574; 253-254; 141-142; 279-280 (the trailing block of each file)
+    Wrong: The plan's approach 1 states "No file has an `if __name__ == "__main__"` block" for the nine files of this task, and every one of the five test modules ends with `if __name__ == "__main__": unittest.main()`. The blocks are dead code under every documented command (unittest discovery and, later, pytest) and create an undocumented direct-run mode that rule 44's command list does not name; the four support modules follow the plan, the five test modules do not. This breaks REV-16 (the work must follow the approved plan).
+    Fix: Delete the trailing two lines (`if __name__ == "__main__":` and `unittest.main()`) from each of the five test modules. Prove it with a scan of the nine files for `__main__` returning no match (for example `grep -n '__main__' scripts/tests/import_boundary_*.py`, or the same check added to the lead's SCOPE block), then re-run the suite command of rule 44 and the three Python checks of S0-T04 (all must stay green).
+PROPOSED OPEN ITEMS:
+  P1 (REV-23) hardening: document 17 — the plan's not-judged forms (alias by assignment, `getattr` routes, `exec`/`eval`/`compile`, `spec_from_file_location`/`runpy`/`ctypes`/subprocess file-path loading, sourceless `.pyc` in a folder without `__init__.py`) let a deliberate evader import a forbidden plane with neither guard failing; T08 and T30 pin the gaps; already planned as OI-51 (part B).
+  P2 (REV-23) the gateway as a dependency in a plane's `pyproject.toml` is not judged by S0-T02's metadata guard (its planted violation covers `eii-custodian` only); planned as OI-52 (part B) by the plan's "Not taken" section; part B must land it before the slice gate.
+  P3 (REV-23) hardening: document 17 — copying another plane's code into a source tree under an allowed name (vendoring) is not detected: the guard judges import names, not module contents (plan approach 6 states this consciously).
+```
+
+The lead judged F1 and F2 valid; build round 4 fixes both. Proposed items: P1 is OI-51 of part B and, as hardening, goes to document 17; P3 (a copy of another plane's code under an allowed name) is hardening for document 17; both are entered with part B, since document 17 arrives with pull request 6. P2 is OI-52 of part B, which lands before the slice gate.
+
+#### Addition to the task log of S0-T10
+
+- Build round 4: the same builder, after review round 1: F1, `run_fresh` returns the four groups of failure lines in the plan's order, each sorted by module name, with a new test of the exact order of all four groups and the exact list in `test_fresh_requested_while_other_forbidden_loaded` (the lead saw both fail on the old global sort and pass on the fix); F2, the `__main__` blocks of the five test modules deleted; 129 Python tests, 34 of them in the nine files
+
+#### Evidence for the work commit of fix round 1 `7fa0a9ddd71d50707b721c5db7c7e0ee567c6d03`
+
+Commands 2 to 8 of the plan at the commit that follows fix round 1; command 8 in its round-2 form; command 1 follows in the later round, after S0-T05 merges.
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    7fa0a9ddd71d50707b721c5db7c7e0ee567c6d03
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    129 passed, 0 failed, 0 skipped (ran 129 tests, OK)
+Seed:      none
+Notes:     The suite command of rule 44, which runs the guard tests under unittest: test_metadata_guard_is_wired and the four S0-T02 tests on package metadata (criterion 2), and the 34 tests of the nine files of this task (the plan's 30 and four added by the fix rounds); ARC-06, BE-01, TST-60. The project's own ./eii test (TST-162) follows in the later round, after S0-T05 merges.
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    7fa0a9ddd71d50707b721c5db7c7e0ee567c6d03
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 11 packages in 0.89ms"
+Seed:      none
+Notes:     The lock file is current for the workspace.
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    7fa0a9ddd71d50707b721c5db7c7e0ee567c6d03
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 92 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check (TST-140).
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    7fa0a9ddd71d50707b721c5db7c7e0ee567c6d03
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    7fa0a9ddd71d50707b721c5db7c7e0ee567c6d03
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical (REV-27).
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    7fa0a9ddd71d50707b721c5db7c7e0ee567c6d03
+Command:   copy=$(mktemp -d) && git ls-files -z | xargs -0 cp --parents -t "$copy" && rc=0 && ctl=0 && : >"$copy/red.log"; (cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py' >"$copy/ctl.log" 2>&1) || ctl=$?; (printf '\ncheck_imports = lambda root: ([], [])\n' >> "$copy/scripts/tests/import_boundary_guard.py" && cd "$copy/scripts/tests" && python3 -B -c "import import_boundary_guard as g, sys; sys.exit(0 if g.check_imports.__name__ == '<lambda>' else 3)" && cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py' -v >"$copy/red.log" 2>&1) || rc=$?; miss=0; for t in test_every_edge_every_mechanism test_local_placements test_fullwidth_spelling_is_judged test_non_literal_dynamic_is_a_note test_relative_imports test_missing_source_tree test_unparsable_and_unreadable test_symbolic_links_fail test_pycache_is_scanned test_environment_names test_output_order test_fresh_function_local_is_static_only; do grep -q "^FAIL: $t " "$copy/red.log" || miss=1; done; if grep -q '_FailedTest' "$copy/red.log"; then miss=1; fi; if [ "$miss" -ne 0 ]; then rc=9; fi; if [ "$ctl" -ne 0 ]; then rc=8; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The line succeeds only if the import-boundary tests named in it fail when the static guard does nothing (TST-161).
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    7fa0a9ddd71d50707b721c5db7c7e0ee567c6d03
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','c930e3bc18452ef48033f641206848be2e8f6976...7fa0a9ddd71d50707b721c5db7c7e0ee567c6d03'],check=True,capture_output=True,text=True).stdout.splitlines(); a={'scripts/tests/import_boundary_judge.py','scripts/tests/import_boundary_guard.py','scripts/tests/import_boundary_child.py','scripts/tests/import_boundary_cases.py','scripts/tests/test_import_boundary_forms.py','scripts/tests/test_import_boundary_files.py','scripts/tests/test_import_boundary_fresh.py','scripts/tests/test_import_boundary_surroundings.py','scripts/tests/test_import_boundary_real.py','PROGRESS.md','TASKS.md'}; o=[x for x in p if x not in a]; print(len(p),o); sys.exit(1 if o or len(p)!=11 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "11 []"
+Seed:      none
+Notes:     Round-2 form of the scope command (TST-163, PLN-22): the nine files of part A and the two ledger files of the round-1 ledger commit, which lies inside the range; OPEN_ITEMS.md is part B, made after the open pull requests that edit it have merged.
+```
+
 #### S0-T05: independent review, round 1: APPROVED (two parts)
 
 Reviewed commit `ffe25f6d6095fab322e121084ef6cda86766f678`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/7, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43200844173 ). Reviewer: Zhipu AI GLM-5.3 High, through the Devin command-line tool, read-only; a full review in two parts by component (part 1: the runner, the launcher, the bootstrap and configuration, the package tests, the documents and the ledger; part 2: the Python and web tests and the web test configuration). Each verdict is copied unchanged from its first line (REV-09); both are also posted on the pull request.
