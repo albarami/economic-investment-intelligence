@@ -1198,6 +1198,145 @@ PROPOSED OPEN ITEMS:
 - CI on the merge commit: workflow `docs`, job `check-docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43156277564 .
 - The task log of S0-T01 above is complete with this record: verdict APPROVED in the second confirmation review after round 3.
 
+### S0-T03 — Web application skeleton: task log
+
+- Builder persona: senior bilingual product engineer
+- Reviewer persona: principal design, accessibility and data-visualisation reviewer
+- Planner maker and model: Anthropic: versions 1 to 3 by a Claude Sonnet subagent; version 4 by the lead; version 5 corrected after a dry run by the lead with Claude subagents
+- Plan reviewer maker and model: Devin command-line tool, `glm-5-3-high` (Zhipu AI), read-only: round 1 REJECTED (five findings), round 2 REJECTED (one finding), round 3 APPROVED; the corrections of version 5 were not seen by an external plan reviewer: on 2026-11-12 the owner decided that this task gets no further plan review
+- Builder maker and model: Cursor command-line tool, `grok-4.7-medium` (xAI)
+- Reviewer maker and model: Antigravity command-line tool, `gemini-4-carbon-high` (Google), review only
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, verification-before-completion, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first with a recorded red run, a planted violation for every check, standard Node modules only in the checks, no placeholder, no file outside `web/`, no weakened check, temporary folders created and removed by each test inside the run's temporary folder, and a report of only the results it saw
+- Branch: `task/S0-T03-web-skeleton`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/3
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md. The work is split in two parts: PART A (everything under `web/`) is recorded here at its tested commit, commands 1 to 6 and 9 to 12 of the plan; commands 7 and 8 (the commands of S0-T02, which need S0-T02 merged) and 13 (the scope of all fifty-three paths, which needs PART B) are recorded, with all thirteen again, at the PART B commit, after S0-T02 merges
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4; git 2.53.0; Node 22.22.3; npm 10.9.8
+- Build round 1: Cursor command-line tool, `grok-4.7-medium` (xAI): PART A, the forty-nine paths under `web/`, tests first (a red run with 541 of 542 tests failing), built ahead on the pushed head of pull request 1 and rebased onto the base branch after S0-T01 merged
+- Build round 2: the same builder: every test makes its own temporary folder inside the run's temporary folder and removes it when done (owner's note of 2026-11-12)
+
+#### Evidence for the PART A commit `4afd91b003508f21ab84ef7a65e36894fbd1062f`
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cd web && npm ci
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "found 0 vulnerabilities"
+Seed:      none
+Notes:     The lock file and `package.json` agree (`npm ci` refuses otherwise); FE-01.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cd web && npm run build
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "✓ built in 97ms"
+Seed:      none
+Notes:     The production build, acceptance criterion 2.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cd web && npm run check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 18 files: OK"
+Seed:      none
+Notes:     Layout, exact versions, import boundary and host scan of the sources (FE-01, FE-05, FE-07, DES-24).
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cd web && npm run check:hosts:dist
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 20 files: OK"
+Seed:      none
+Notes:     The host scan of the build output (criterion 3).
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cd web && npm run check:dev
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "PASS dev-server http://127.0.0.1:33099/"
+Seed:      none
+Notes:     The development server starts, is answered by the server the check started, and is stopped (criterion 1); the proof that no process is left is the DEV-GONE block, in the evidence file.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cd web && npm run test:checks
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    598 passed, 0 failed, 0 skipped (tests 598, cancelled 0, todo 0)
+Seed:      none
+Notes:     The whole web check suite; `./eii test` does not exist before S0-T05 and S0-T09, so this is the only runner; the counts are those the run printed.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 64 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   copy=$(mktemp -d); git ls-files -z web | xargs -0 cp --parents -t "$copy"; ln -s "$PWD/web/node_modules" "$copy/web/node_modules"; ctl=0; (cd "$copy/web" && node --test "scripts/tests/*.node-test.mjs" >"$copy/ctl.log" 2>&1) || ctl=$?; rm -f "$copy"/web/scripts/*.mjs; rc=0; (cd "$copy/web" && node --test --test-reporter=tap "scripts/tests/*.node-test.mjs" >"$copy/red.log" 2>&1) || rc=$?; miss=0; grep -q '^# fail [1-9]' "$copy/red.log" || miss=1; for f in "$copy"/web/scripts/tests/check-*.node-test.mjs; do ok=0; (cd "$copy/web" && node --test "scripts/tests/$(basename "$f")" >/dev/null 2>&1) || ok=1; test "$ok" -eq 1 || miss=1; done; rm -rf "$copy"; test "$ctl" -eq 0 && test "$rc" -ne 0 && test "$miss" -eq 0
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The line succeeds only if the control passes (the full copy passes the suite), the copy without the scripts fails the suite, and each check's test files fail on their own (TST-161).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

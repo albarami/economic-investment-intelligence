@@ -63,7 +63,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: `web/`, web package and TypeScript configuration.
 - Depends: S0-T01.
 - Requirements: FE-01, FE-05, FE-07, DES-24.
-- Delivery: routine; personas Frontend; status queued.
+- Delivery: routine; personas Frontend; status in review (pull request 3; PART B after S0-T02 merges).
 ### S0-T04 — Lint, format and type checks
 - Goal: Make Python and web linting, formatting and type checks reproducible.
 - Acceptance criteria: [ ] each check has one documented command; [ ] planted violations fail; [ ] clean scaffolding passes.
