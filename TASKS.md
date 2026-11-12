@@ -101,11 +101,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: routine; personas Platform; status done (pull request 21, merged 2026-11-13).
 ### S0-T08 — Compose and store preflight
 - Goal: Add the portable database service and probes that select a store without starting or stopping it.
-- Acceptance criteria: [ ] Compose defines the pinned database and PostGIS line; [ ] probes time out as specified; [ ] absent PostgreSQL selects embedded with a warning; [ ] with `EII_RELEASE_DIR` unset, foundation preflight exits zero, reports `WARN not_configured` for release, load-receipt, embedded-reader and recorded-replay checks, and keeps every other check's normal severity; [ ] `up` still refuses without a configured complete release.
+- Acceptance criteria: [x] Compose defines the pinned database and PostGIS line; [x] probes time out as specified; [x] absent PostgreSQL selects embedded with a warning; [x] with `EII_RELEASE_DIR` unset, foundation preflight exits zero, reports `WARN not_configured` for release, load-receipt, embedded-reader and recorded-replay checks, and keeps every other check's normal severity; [x] `up` still refuses without a configured complete release.
 - Scope: `infra/compose.yaml`, preflight probe modules and probe tests.
 - Depends: S0-T01, S0-T02.
 - Requirements: OPS-06, OPS-09, OPS-17, BE-87.
-- Delivery: hard; personas Platform; status in review (parts A and B merged in pull requests 10 and 22 on 2026-11-12; part C in pull request 24).
+- Delivery: hard; personas Platform; status done (part A, pull request 10, and part B, pull request 22, merged 2026-11-12; part C, pull request 24, merged 2026-11-13).
 ### S0-T09 — `./eii` command skeleton and database commands
 - Goal: Create every pinned command entry point, including `db-up` and `db-down`, with safe placeholder dispatch.
 - Acceptance criteria: [x] usage lists every pinned command; [x] `preflight` only probes; [x] `db-up` and `db-down` alone start and stop the database; [x] `up` never starts it.
@@ -143,18 +143,18 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: routine; personas Platform; status done (pull requests 13 and 16, merged 2026-11-12).
 ### S0-T14 — GitHub repository settings
 - Goal: Enable secret scanning, push protection and branch protection under OI-13.
-- Acceptance criteria: [ ] each setting is queried after change; [ ] evidence records the result; [ ] no repository file or git setting is changed by the task.
+- Acceptance criteria: [x] each setting is queried after change; [x] evidence records the result; [x] no repository file or git setting is changed by the task.
 - Scope: GitHub repository settings only; repository files are read-only.
 - Depends: S0-T07.
 - Requirements: TST-141, PLN-06, PLN-12.
-- Delivery: routine; personas Platform; status in review (pull request 23).
+- Delivery: routine; personas Platform; status done (pull request 23, merged 2026-11-13).
 ### S0-T15 — Review follow-up for slice S0
 - Goal: Close every proposed open item that the reviews of slice S0 entered in `OPEN_ITEMS.md`, before the slice S0 gate.
 - Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
 - Scope: the files the closures change, and `OPEN_ITEMS.md`.
 - Depends: every other task of slice S0.
 - Requirements: REV-41, TST-168.
-- Delivery: routine; personas as the items require; status in review (part A, pull request 20; part B follows before the slice gate).
+- Delivery: routine; personas as the items require; status in review (part A merged in pull request 20 on 2026-11-12; part B in pull request 25).
 
 ## slice S1 — Technical spike
 
