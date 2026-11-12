@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
+| Status | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12 |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Fix the planes, components, trust boundaries, release format, store layer and technology stack that every other document and every build task must follow. |
@@ -550,7 +550,7 @@ Pins are the versions found by the stack and architecture research on 2026-11-11
 | Data layers | deck.gl through `@deck.gl/maplibre`, interleaved, WebGL2 and not WebGPU | 9 (9.4.1) | 9.3.12 with `@deck.gl/mapbox` | Hexagons under labels in one canvas | deck.gl release notes, the MapLibre module overview and the performance guide |
 | Basemap | PMTiles extract of Qatar; self-hosted glyphs with an Arabic font | `pmtiles` 4.5.0; `@protomaps/basemaps` 5.7.2 | None | One file, offline, no key | PMTiles and Protomaps basemap documentation |
 | Model | Claude API | `claude-opus-5-5`; SDK pinned at slice S1 | Template writer and recorded provider | Bilingual planning and narration | [09_AI_ASSISTANT.md](09_AI_ASSISTANT.md); the current Claude API documentation |
-| Typed decisions | Provider-neutral gateway; first provider Jev | `jev-1.14.0` | Provider `none`; a recorded provider in tests | A second reader from another maker, usable before the main model key exists | [decision 0014](decisions/0014-typed-decision-gateway.md) |
+| Typed decisions | Provider-neutral gateway; first provider Jev | `jev-1.14.0` | Provider `none`; a recorded provider in tests | A second reader from another maker, usable while the main model key is not in use | [decision 0014](decisions/0014-typed-decision-gateway.md) |
 | Sandbox | bubblewrap | Version recorded at slice S1 (0.11.1 was installed on the build machine on 2026-11-11) | An equivalent mount-namespace and network-namespace sandbox enforcing the same mounts and passing the same sentinel tests, recorded as a decision; otherwise the build fails | Proof at operating-system level | The bubblewrap manual |
 | Packaging | Docker Compose for CI and deployment; native PostgreSQL service on the stage path | Image pinned by digest at slice S1 | Native service | The same start on every machine | [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md) |
 | Tests | pytest, Hypothesis, Vitest, Playwright | Pinned at slice S0 | None | See the testing document | [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md) |

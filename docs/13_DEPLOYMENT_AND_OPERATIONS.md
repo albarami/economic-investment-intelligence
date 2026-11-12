@@ -59,8 +59,8 @@ Configuration (names pinned in [02_ARCHITECTURE.md](02_ARCHITECTURE.md); values 
 | `EII_RELEASE_DIR` | `data/releases/<release_id>` | `.env` | Must match the frozen release on stage |
 | `EII_LANG_DEFAULT` | `en` or `ar` | `.env` | Language of the opening scene |
 | `EII_PRESENTER` | `0` or `1` | `.env` | `1` on the stage machine only; enables the presenter console and its controls |
-| `EII_DECISION_PROVIDER` | `none` or `jev`, default `none` | Build/evaluation environment | The build, continuous integration and build-time evaluation use `none`; `jev` is reserved for an offline run after the build that a separate owner decision allows, never at stage or run time ([decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12) |
-| `JEV_PRO_API_KEY` | key or absent | Owner, only for an offline run after the build that a separate owner decision allows | Absent during the build, continuous integration and build-time evaluation; never required by `up`, preflight, freeze or any gate; never printed |
+| `EII_DECISION_PROVIDER` | `none` or `jev`, default `none` | Build/evaluation environment | No stage or run-time use in v1 |
+| `JEV_PRO_API_KEY` | key or absent | Owner, build/evaluation only | Never required by `up`, preflight, freeze or any gate; never printed |
 
 ## 3. Prerequisites and how each is checked
 
@@ -381,7 +381,7 @@ The research checked provider pages on 2026-11-11. They describe what the provid
 | Compute on the build machine | Negligible at test scale: about 32 MB idle for PostgreSQL; queries of 0.4 to 3 ms (measured 2026-11-11). Not a constraint. |
 | Disk | Per release: about 576 MB in PostgreSQL, 35 MB Parquet, 90 MB embedded file (measured on the 7.54 million-row test release). One selected release online plus the bundle and one saved image: estimate under 3 GB, excluding the basemap tiles, whose size is fixed when the extract is cut in slice S1. This estimate predates the hourly presence and traffic tables, the monthly periods and the public additions of decisions 0016 and 0017; the release size is measured again when the slices that build them run (open question below). |
 | Container image | The 18-3.7 image measured 245 MB compressed and 980.7 MB unpacked; the 3.6 image size is not measured. |
-| Model API | Estimate by the feasibility judge from the provider's price table: roughly USD 0.05 to 0.15 per answer and a few hundred dollars over the whole project. To be measured once the key exists (OI-01). |
+| Model API | Estimate by the feasibility judge from the provider's price table: roughly USD 0.05 to 0.15 per answer and a few hundred dollars over the whole project. To be measured at go-live, when the owner switches the live adapter on (OI-01: the key is supplied for go-live and is not used during the build). |
 | Managed database in country | Not estimated. To be priced with the custodian. |
 | Continuous integration | Not estimated; depends on the repository's GitHub plan. |
 

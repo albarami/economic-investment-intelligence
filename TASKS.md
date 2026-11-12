@@ -215,7 +215,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Requirements: ARC-88, SYN-53, SYN-54, DES-50, TST-132, SYN-79, MTH-88, MTH-89, MTH-90, PRV-124, TST-213.
 - Delivery: hard; personas Simulation; status queued.
 ### S1-T08 — Typed-decision requalification and pin ruling
-- Goal: Re-run `evals/typed_decisions/` in both fixed option orders, compare the stated intervals and confirm exact and retreat pins. During the build the run uses the recorded provider, with no key and no network ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12); a live re-run against the provider waits for an offline run after the build that a separate owner decision allows (OI-18).
+- Goal: Re-run `evals/typed_decisions/` in both fixed option orders, compare the stated intervals and confirm exact and retreat pins.
 - Acceptance criteria: [ ] the full set runs; [ ] the admitted measurement is reproduced within its stated intervals; [ ] every choice case runs in both hash-derived option orders and is accepted only when both agree; [ ] results and route identity are recorded; [ ] drift triggers requalification; [ ] any accepted alternative has a decision record.
 - Scope: `evals/typed_decisions/`, slice S1 spike report and dependency pin decision.
 - Depends: S1-T02, S1-T03, S1-T04, S1-T05, S1-T06, S1-T07, S1-T11.

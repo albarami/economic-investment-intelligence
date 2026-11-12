@@ -72,7 +72,7 @@
 
 ## E
 
-- **Egress record**: The append-only record of an attempted outbound model request, including exact payload bytes and hash, written before response content is used.
+- **Egress record**: The append-only record of an attempted outbound model request, written before response content is used: the exact payload bytes and their hash for a request that is sent, and only the hash of the proposed payload, with no payload bytes, for a request that the egress scan blocks (AI-77, AI-82).
 - **Employer group**: Establishments rolled up through legal entity to a hidden group used for dominance tests. It never leaves the vault.
 - **Estimated people present**: Simulated people present inside an area, hour by hour, for each dial situation, the summer switch and the three event days, shown as an estimated count with a range and split into workers, residents and visitors. It is released only at release-unit grain under the panel minimum, complementary suppression and rounding of document 06, and apportioned to a drawn shape in the product plane. The wording is "estimated people around this location", never "footfall of" a named building or business. It replaces the presence index (decision 0016).
 - **Event day**: One of three simulated day types, National Day, a day in Ramadan and a major match at a stadium, each with its own hour-by-hour profile of estimated people present; Simulated (decision 0016).

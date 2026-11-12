@@ -199,11 +199,11 @@
 
 - ID: OI-18
 - TYPE: OPEN
-- NEEDED: Owner confirmation of the project token cap and a key rotation date, but only before a separately owner-approved offline provider run after the build.
-- WHY: Offline provider use still needs a hard cost limit and credential hygiene. No key is used during the build ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12), so slice S1 gateway qualification uses provider `none` and recorded fixtures, without a key or network.
+- NEEDED: Owner confirmation of the project token cap and a key rotation date, and of whether the gateway's provider key may be used during the build: the owner's note of 2026-11-12 keeps the API keys of the uncommitted `.env` file for go-live and does not name this key ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12).
+- WHY: Offline provider use still needs a hard cost limit and credential hygiene.
 - DONE SO FAR: Default cap is 5 million tokens in total; no agent may purchase, upgrade or renew.
-- OPTIONS: **Recommendation:** confirm or tighten the default and record rotation before any offline provider run after the build; agents never change the subscription.
-- NEEDED BY: the first offline provider run after the build, if the owner approves one; not needed by slice S1 gateway qualification.
+- OPTIONS: **Recommendation:** confirm or tighten the default and record rotation before provider use; agents never change the subscription. No keyed provider run is made before the owner answers.
+- NEEDED BY: slice S1 gateway qualification and every later provider run.
 
 ## OI-19 — Independent documentation review and corrections
 
@@ -366,7 +366,7 @@
 - WHY: Route approval, permitted data classes, decision classes and permitted effects are separate boundaries; none may be inferred from another.
 - DONE SO FAR: The current route is limited to offline use with `public`, `synthetic`, scanned `project_text` and `team_question` inputs, the five closed decision classes and their documented human-review effects. Run-time use remains disabled.
 - OPTIONS: **Recommendation:** confirm exactly that closed scope and keep provider `none` as the default. Any new data class, decision class, route, run-time use or effect needs a new owner decision and, where material, a decision record.
-- NEEDED BY: the first offline provider run after the build, if the owner approves one; not needed by slice S1 gateway qualification, which uses provider `none` and recorded fixtures without a key or network ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12); any proposed run-time use remains subject to OI-14.
+- NEEDED BY: slice S1 gateway qualification and every later provider run; any proposed run-time use remains subject to OI-14.
 
 ## OI-35 — Exported privacy parameter set
 

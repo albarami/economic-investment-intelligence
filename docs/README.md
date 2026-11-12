@@ -33,11 +33,11 @@
 | Document | Purpose | Status on 2026-11-12 |
 |---|---|---|
 | [01_PROJECT_BRIEF.md](01_PROJECT_BRIEF.md) | Audience, scope, version 1, journeys and prohibited claims | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [02_ARCHITECTURE.md](02_ARCHITECTURE.md) | Planes, trust boundaries, release, stores and stack | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
+| [02_ARCHITECTURE.md](02_ARCHITECTURE.md) | Planes, trust boundaries, release, stores and stack | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12 |
 | [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) | Feed, release, fact, graph and application contracts | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
 | [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) | Public sources, licences, frame, spine and places | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
 | [05_SYNTHETIC_WORLD_AND_SIMULATION.md](05_SYNTHETIC_WORLD_AND_SIMULATION.md) | Synthetic generation, simulation and sealed evaluation | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) | Partitions, one selected export, one treatment per window, attacks, receipts and limits | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12; the last ten corrections of 2026-11-11 still await review by another maker (OI-37) |
+| [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) | Partitions, one selected export, one treatment per window, attacks, receipts and limits | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12; the last ten corrections of 2026-11-11 still await review by another maker (OI-37) |
 | [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md) | Deterministic methods and worked public examples | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
 | [08_BACKEND.md](08_BACKEND.md) | Stores, loader, tools, playbooks, API and seats | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
 | [09_AI_ASSISTANT.md](09_AI_ASSISTANT.md) | Governed composition, catalogues, fallback and evaluation | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |

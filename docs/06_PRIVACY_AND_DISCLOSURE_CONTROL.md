@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12; the last ten corrections of 2026-11-11 still await review by another maker (OI-37) |
+| Status | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12; the last ten corrections of 2026-11-11 still await review by another maker (OI-37) |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Specify the privacy engine: what may be released from linked custodian-type records, how it is treated, audited and attacked, and what is not claimed. |
@@ -1357,8 +1357,10 @@ Each ASSUMPTION is the simplest safe choice where the master design is silent.
 
 Open items from the master design that touch this document: OI-11 (every value here is a proposal);
 OI-35 (which parameter set is exported; default A);
-OI-08 (distinct-organisation minimum, PRV-66); OI-09 (Arabic reason sentences); OI-01 (assistant
-attacks run against a recorded provider until the key exists); OI-07 (closed by decision 0016:
+OI-08 (distinct-organisation minimum, PRV-66); OI-09 (Arabic reason sentences); OI-01 (the main
+model key is supplied for go-live and is not used during the build, so assistant attacks run
+against a recorded provider and the template writer throughout the build,
+[decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12); OI-07 (closed by decision 0016:
 named synthetic firm lists reopen the firm channel under PRV-125); OI-03 (a public wage row is marked
 `unreconciled_source` only after a deterministic non-applicability finding; any applicable unresolved
 row fails the build); OI-04 (only a Public source with its required licence and scope mapping may be

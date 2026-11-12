@@ -266,7 +266,7 @@ OI-02 remains open, so the estimates must not be converted to a demonstration da
 - S1-T06 — Prove sandbox enforcement with no fallback.
 - S1-T07 — Build the offline typed-decision gateway contract, providers, records, policy and boundaries.
 - S1-T11 — Assign one hourly origin-destination fixture to the routing graph with one fixed volume-delay rule, and animate the hourly link speeds on the map.
-- S1-T08 — Requalify `evals/typed_decisions/`, reproduce the admitted measurement within its stated intervals, run every choice case in both fixed option orders, confirm pins and record any accepted alternative. During the build the run uses the recorded provider, with no key and no network ([decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12); a live re-run waits for an offline run after the build that a separate owner decision allows (OI-18).
+- S1-T08 — Requalify `evals/typed_decisions/`, reproduce the admitted measurement within its stated intervals, run every choice case in both fixed option orders, confirm pins and record any accepted alternative.
 - S1-T09 — Fix `export_parameter_set` = `A` and the presence and flow parameters of PRV-59 in the rules configuration before the first world build, and record the number of monthly periods shown first.
 - S1-T10 — Close every proposed open item of the slice's reviews before the gate (REV-41).
 

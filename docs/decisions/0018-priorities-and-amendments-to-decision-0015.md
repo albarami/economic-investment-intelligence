@@ -36,7 +36,7 @@
 
 ### The main model key
 
-12. **OI-01 stays open, updated.** The product's main model key is supplied for go-live and is not used during the build: no model, research or review service is called through any key during the build, and the assistant stays in template mode (BRF-23). The key stays in the environment only and is never printed, logged, committed or copied (AGENTS.md rule 14).
+12. **OI-01 stays open, updated.** The product's main model key is supplied for go-live and is not used during the build. It is one of the API keys that the owner's note of 2026-11-12 covers, held in the uncommitted `.env` file: none of those keys is used during the build, for anything, so no model, research or review service is called through any of them, and the assistant stays in template mode (BRF-23). The keys stay in the environment only and are never printed, logged, committed or copied (AGENTS.md rule 14). The note does not name the provider key of the typed-decision gateway, which is not one of those keys: [decision 0014](0014-typed-decision-gateway.md) and OI-18 govern its use unchanged.
 
 ### Extra reviewers
 
