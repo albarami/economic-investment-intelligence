@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Slice S0 (foundation) in progress; no application code yet |
+| Status | Slice S0 (foundation) in progress; no feature code yet |
 | Date | 2026-11-11 |
 | Owner | albarami |
 | Purpose | Introduce a fully synthetic, public proof-of-concept design and its reading path. |
@@ -20,7 +20,7 @@ Only figures marked Public describe Qatar. Synthetic and Simulated figures demon
 
 ## Current status
 
-This repository contains a documentation pack, the [typed-decision qualification set](evals/typed_decisions/README.md) under `evals/`, the scaffolding of the pinned repository layout (slice S0, task S0-T01) and one `uv` workspace with three package skeletons, `eii_core`, `eii_custodian` and `eii_product` (slice S0, task S0-T02). Each skeleton holds a version string and nothing else. There is no application code yet, and no product, release, privacy engine, assistant or interface is claimed to work.
+This repository contains a documentation pack, the [typed-decision qualification set](evals/typed_decisions/README.md) under `evals/`, the scaffolding of the pinned repository layout (slice S0, task S0-T01) and one `uv` workspace with three package skeletons, `eii_core`, `eii_custodian` and `eii_product` (slice S0, task S0-T02). Each skeleton holds a version string and nothing else. There is no feature code yet, and no product, release, privacy engine, assistant or interface is claimed to work.
 
 Five project commands run today: the documentation check, the tree check, the lock check, the tests and, only after a change to a `pyproject.toml`, the command that rewrites the lock file. Python 3.14 and `uv` are needed for the last three.
 
@@ -30,6 +30,19 @@ python3 scripts/check_tree.py
 uv lock --check
 uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
 uv lock
+```
+
+`web/` also holds an application shell built with React, TypeScript and Vite. It has no feature UI, and nothing is claimed to work beyond the checks listed in [web/README.md](web/README.md). In addition to the commands above, six commands run from `web/` (not from the repository root), and a seventh, `npm install --package-lock-only`, only after a change to `web/package.json`. `npm ci` and that seventh command need the network:
+
+```sh
+cd web
+npm ci
+npm run build
+npm run check
+npm run check:hosts:dist
+npm run check:dev
+npm run test:checks
+npm install --package-lock-only
 ```
 
 The `./eii` commands described in the architecture are being built in slice S0; they are not available now. The [implementation plan](docs/14_IMPLEMENTATION_PLAN.md) and [task ledger](TASKS.md) are drafts.
@@ -55,7 +68,7 @@ Accuracy is enforced by three code mechanisms: no model calculates, no fact is a
 
 ## Planned repository layout
 
-The architecture pins this layout. `docs/`, `evals/` and `scripts/` hold the documentation pack, the qualification set and the repository checks. `contracts/`, `web/`, `gateway/` and `infra/` exist as scaffolding, each with a short note and no application code yet. `core/`, `custodian/` and `product/` each hold one package skeleton, a version string and nothing else. Nothing under `data/` is ever committed (ARC-99), so a fresh clone has no `data/` folder:
+The architecture pins this layout. `docs/`, `evals/` and `scripts/` hold the documentation pack, the qualification set and the repository checks. `contracts/`, `gateway/` and `infra/` exist as scaffolding, each with a short note and no feature code yet. `web/` holds the application shell, which has no feature UI yet. `core/`, `custodian/` and `product/` each hold one package skeleton, a version string and nothing else. Nothing under `data/` is ever committed (ARC-99), so a fresh clone has no `data/` folder:
 
 ```text
 contracts/    source and release contracts
