@@ -215,6 +215,50 @@ PROPOSED OPEN ITEMS:
   none
 ```
 
+#### Decision record 0015: confirmation review: APPROVED
+
+Reviewed commit `4cf7344f9e2c4a08ac231cd0ebe30ecc8292c214`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/2, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43157731061 ). Reviewer: OpenAI GPT-5.6 Sol, through the Cursor command-line tool, read-only; the finding of round 3 was fixed by a builder of another maker. The verdict is copied unchanged (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: decision record 0015 (documentation-only pull request 2)
+COMMIT: 4cf7344f9e2c4a08ac231cd0ebe30ecc8292c214
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 to F8 STILL FIXED
+  F9 FIXED Decision item 3 at line 22 now includes the owner's S0-T01 sentence.
+CHECKS:
+  REV-10 PASS Decision record 0015 records owner points 1 to 8, the required tracked texts are corrected, and the pull request remains documentation-only.
+  REV-11 PASS .overnight/EVIDENCE.md records the lead's `python3 scripts/check_docs.py` exit 0 on the exact head and successful `check-docs` CI on that commit.
+  REV-12 PASS The prior review confirmed the pull-request scope; since then only the decision record and PROGRESS.md changed.
+  REV-13 N/A This documentation-only pull request delivers no code, release tables or mock implementation.
+  REV-14 PASS The reviewed material contains no secret or real custodian data.
+  REV-15 PASS No test, assertion, threshold, CI configuration or technical safety guard is weakened.
+  REV-16 PASS The F9 correction reproduces the owner's sentence exactly and the amended texts follow the approved standards.
+  REV-17 PASS The decision record and PROGRESS.md are current, and the documentation check exited 0 on the head.
+  REV-18 N/A This documentation-only pull request changes no security or data-handling implementation.
+  REV-19 PASS Decision 0015 records the owner-approved amendment without reopening an unrelated settled decision.
+  REV-20 N/A No fact object, displayed figure, provenance or lineage implementation changes.
+  REV-21 N/A No screen, template, numeral or Fact-chip implementation changes.
+  REV-22 N/A No privacy partition, parameter, treatment or audit implementation changes.
+  REV-23 N/A No product or custodian package implementation changes.
+  REV-24 N/A No English or Arabic application view changes.
+  REV-25 PASS The reviewed material contains no private path, personal name, e-mail address, secret, realistic identifier or prohibited comparison.
+  REV-26 PASS The changed text makes none of the prohibited product, privacy, endorsement, forecast or lookup claims.
+  REV-27 PASS AGENTS.md and CLAUDE.md remain unchanged from their recorded equal state, and the head documentation check passed.
+  REV-28 N/A No synthetic identifier is added or changed.
+  REV-29 N/A No attribute or fact about a real named place or business is added.
+  REV-38 N/A No serving-plane or typed-decision gateway implementation changes.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision record 0015: merge record
+
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/2 was squash-merged on 2026-11-12 at the approved head `4cf7344f9e2c4a08ac231cd0ebe30ecc8292c214`; merge commit `452a7fd9cf0fa1f6928446d64261640ae9ec2494` on main.
+- CI on the merge commit: workflow `docs`, job `check-docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43158212445 .
+
 ## Evidence rules for later entries
 
 1. Record the exact command, its real exit code, the full commit hash, the date and who ran it.
@@ -1197,6 +1241,443 @@ PROPOSED OPEN ITEMS:
 - Pull request https://github.com/albarami/economic-investment-intelligence/pull/1 was squash-merged on 2026-11-12 at the approved head `c58afdc50202d6db3dc9cca28f5a5410a16f4f68`; merge commit `8edf1023926345b57bcf549cae1079c09c75e55d` on main.
 - CI on the merge commit: workflow `docs`, job `check-docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43156277564 .
 - The task log of S0-T01 above is complete with this record: verdict APPROVED in the second confirmation review after round 3.
+
+### S0-T02 — Python workspace and three packages: task log
+
+- Builder persona: senior platform engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic: versions 1 to 3 by a Claude Sonnet subagent with edits by the lead; version 4 by Claude Opus; versions 5 and 6 corrected after two dry runs by Claude Opus subagents for the lead; refreshed once by the lead against the built tree (two helper modules, twenty-two paths, 81 tests)
+- Plan reviewer maker and model: Cursor command-line tool, `gpt-5.6-sol-high` (OpenAI), read-only: round 1 REJECTED (two findings), round 2 REJECTED (four findings), round 3 REJECTED (one finding, applied by the lead under the owner's rule); versions 5 and 6 were not seen by an external plan reviewer: on 2026-11-12 the owner decided that this task gets no further plan review
+- Builder maker and model: Cursor command-line tool, `composer-2.5` (Cursor)
+- Reviewer maker and model: Devin command-line tool, `glm-5-3-high` (Zhipu AI), read-only
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, verification-before-completion, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first, a planted violation for every guard, no placeholder, no file outside the scope, no weakened check, temporary files inside the work tree, and a report of only the results it saw
+- Branch: `task/S0-T02-python-workspace`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/4
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4 (system) and the workspace's CPython 3.14.6 through uv; git 2.53.0; uv 0.11.31 (x86_64-unknown-linux-gnu)
+- Build round 1: Cursor command-line tool, `composer-2.5` (Cursor): the twenty paths of the plan, built ahead on the pushed head of pull request 1 and rebased onto the base branch after S0-T01 merged (a first start ended with no output and was run again with the same brief)
+- Build round 2: the same builder, after the lead's own check: each of the four Python files at most 470 lines with no line over 88 columns (two helper modules split off, every name imported back), every child process given a temporary folder below its test's own folder, and a mutation pass over the guard
+- Build round 3: the same builder: an exit hook that deleted lock files the tests had not created was removed, and sub-cases were added for three surviving mutants
+- Build round 4: the same builder: a redundant second skip of an unreadable member file was removed; 116 mutants of the guard, every one failing a test
+
+#### Evidence for the work commit `04e0ba86e583165e7555159b6081dd8f86c38808`
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    04e0ba86e583165e7555159b6081dd8f86c38808
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    81 passed, 0 failed, 0 skipped (ran 81 tests)
+Seed:      none
+Notes:     The suite includes the 52 tests of S0-T01, the 22 tests of `test_workspace_metadata.py` and the 7 of `test_clean_environment.py`; `./eii test` does not exist before S0-T05 and S0-T09, so the listed suite command is the only runner; Python as uv ran it: the workspace interpreter (uv printed no version line); uv 0.11.31 (x86_64-unknown-linux-gnu); ARC-01, BE-01, TST-60 (metadata clause). The AST, function-local, importlib and fresh-interpreter clauses of TST-60 belong to S0-T10 and do not exist yet.
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    04e0ba86e583165e7555159b6081dd8f86c38808
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 4 packages in 0.83ms"
+Seed:      none
+Notes:     The lock file is current for the workspace (criterion 1); the authoritative proof is `test_lock_is_current`, which runs isolated.
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    04e0ba86e583165e7555159b6081dd8f86c38808
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 70 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    04e0ba86e583165e7555159b6081dd8f86c38808
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check (ARC-01).
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    04e0ba86e583165e7555159b6081dd8f86c38808
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    04e0ba86e583165e7555159b6081dd8f86c38808
+Command:   rc=0; git check-ignore -q --no-index uv.lock || rc=$?; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The lock file is not ignored by any ignore rule (that it is tracked is shown by command 8, which requires `uv.lock` among the twenty-two changed paths).
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    04e0ba86e583165e7555159b6081dd8f86c38808
+Command:   copy=$(mktemp -d) && git ls-files -z | xargs -0 cp --parents -t "$copy" && ctl=0 && rc=0 && ab=0 && miss=0; (cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_workspace_metadata.py' >"$copy/ctl.log" 2>&1) || ctl=$?; (printf '\ncheck_workspace = lambda root: []\ncheck_lock_data = lambda data: []\n' >> "$copy/scripts/tests/workspace_guard.py" && cd "$copy/scripts/tests" && python3 -B -c "import workspace_guard as g, sys; sys.exit(0 if g.check_workspace.__name__ == '<lambda>' and g.check_lock_data.__name__ == '<lambda>' else 3)" && cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_workspace_metadata.py' -v >"$copy/red.log" 2>&1) || rc=$?; for t in test_forbidden_edge_in_every_place test_forbidden_edge_spelling_variants test_root_naming_a_member_fails test_root_name_and_package_flag_fail test_missing_workspace_source_fails test_member_list_wrong_fails test_layout_fails test_missing_and_unparsable_pyproject_fail test_forbidden_edge_in_lock test_expected_edge_missing_in_lock test_package_missing_in_lock test_lock_members_list_wrong_fails test_member_name_in_workspace_wide_lock_field test_absolute_path_in_lock_fails test_missing_and_unparsable_lock_fail test_output_order; do grep -q "^FAIL: $t " "$copy/red.log" || miss=1; done; if grep -q -E '^ERROR: |_FailedTest' "$copy/red.log"; then miss=1; fi; git ls-files -z | xargs -0 cp --parents -t "$copy"; rm -rf "$copy/pyproject.toml" "$copy/uv.lock" "$copy/.python-version" "$copy/core" "$copy/custodian" "$copy/product"; (cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_workspace_metadata.py' -v >"$copy/abs.log" 2>&1) || ab=$?; grep -q '^FAIL: test_real_workspace_passes ' "$copy/abs.log" || miss=1; grep -q -F 'FAIL members: pyproject.toml: missing or not valid TOML' "$copy/abs.log" || miss=1; if [ "$ab" -ne 1 ]; then miss=1; fi; if [ "$miss" -ne 0 ]; then rc=9; fi; if [ "$ctl" -ne 0 ]; then rc=8; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The line succeeds only if the control passes, the named guard tests fail when the guard does nothing, and the real-workspace test fails when the workspace files are absent (TST-161).
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    04e0ba86e583165e7555159b6081dd8f86c38808
+Command:   python3 -c "import subprocess,sys; p=[x for x in subprocess.run(['git','diff','--name-only','--no-renames','-z','452a7fd9cf0fa1f6928446d64261640ae9ec2494...04e0ba86e583165e7555159b6081dd8f86c38808'],check=True,capture_output=True,text=True).stdout.split(chr(0)) if x]; a={'pyproject.toml','.python-version','uv.lock','core/pyproject.toml','custodian/pyproject.toml','product/pyproject.toml','core/src/eii_core/__init__.py','custodian/src/eii_custodian/__init__.py','product/src/eii_product/__init__.py','core/README.md','custodian/README.md','product/README.md','scripts/tests/workspace_guard.py','scripts/tests/workspace_fields.py','scripts/tests/workspace_toml.py','scripts/tests/workspace_fields_tables.py','scripts/tests/test_workspace_metadata.py','scripts/tests/test_clean_environment.py','README.md','AGENTS.md','CLAUDE.md','OPEN_ITEMS.md'}; o=[x for x in p if x not in a]; m=sorted(a-set(p)); print(len(p),o,m); sys.exit(1 if o or m or len(p)!=22 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "22 [] []"
+Seed:      none
+Notes:     The branch changes exactly the twenty-two paths of the task (TST-163).
+```
+
+#### Independent review, round 1: REJECTED
+
+Reviewed commit `046ee0fd5fcca1b790ce6f6f88be0b71f4c1775a`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/4, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43159797661 ). Reviewer: Zhipu AI GLM-5.3 High, through the Devin command-line tool, read-only; a full review. The verdict is copied unchanged (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S0-T02
+COMMIT: 046ee0fd5fcca1b790ce6f6f88be0b71f4c1775a
+REVIEWER: Devin command-line tool, GLM-5.3 High (Zhipu AI)
+CHECKS:
+  REV-10 PASS All three criteria map to tests and recorded runs: criterion 1 by `uv lock --check` exit 0 (WORK and head) and `test_lock_is_current`, `test_sync_all_packages_locked_keeps_lock`, `test_uv_pip_list_names_the_three_packages`; criterion 2 by `test_each_package_imports_from_clean_environment` (non-editable install, isolated interpreter, empty cache, offline); criterion 3 by `test_real_workspace_passes` with the 176 pyproject and 80 lock forbidden-edge sub-cases and `test_member_name_in_workspace_wide_lock_field`; suite 81 passed, 0 failed, 0 skipped at WORK and again on the head (EVIDENCE.md, section 6.3 entries, plan block P11).
+  REV-11 PASS Lead's own runs on this exact head: suite `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` exit 0 (81 passed, 0 skipped) and `python3 scripts/check_docs.py` exit 0 (EVIDENCE.md, "Recorded commands 1 to 5 again on the head"); CI workflow `docs` success on the head (run link); `./eii test` does not exist before S0-T05/S0-T09 so the rule-44 suite command is the runner (brief note 2); every new guard has its planted violation: recorded command 7 exit 0 proves the sixteen failure-expecting tests fail under a stubbed guard and `test_real_workspace_passes` fails when the workspace files are absent; no skips.
+  REV-12 PASS Recorded command 8 asserts the branch changes exactly the twenty-two plan-named paths (output "22 [] []"); block HEAD-DIFF shows the ledger commit changes only PROGRESS.md and TASKS.md; nothing under `data/`; no unrelated reformatting.
+  REV-13 PASS The diff holds no TODO, FIXME, NotImplementedError, empty body or fixed return value standing in for real work; the three packages are skeletons by the task's own goal, each holding exactly `__version__ = "0.0.0"`, read by the import test; no hand-written release tables or invented figures.
+  REV-14 PASS gitleaks does not exist yet (arrives with S0-T06; brief note 6); the substitutes are the right ones for a code-only skeleton diff and ran: `python3 scripts/check_docs.py` (which scans secret-shaped tokens) exit 0 on the head and the owner's local hooks refused nothing; my own line-by-line read of the full diff found no secret, `.env`, key file or real custodian record, field, file name or count.
+  REV-15 FAIL F1: the "utf16" sub-case plants eight ASCII bytes instead of the two bytes `ff fe`, so the not-UTF-8 branch is never exercised; F3: rule `lock` skips registry-sourced rows and a test block asserts that a forbidden edge on a member-named registry row is not reported, weakening the lock guard below the plan's name-based rule. F4 weakens no check that runs today.
+  REV-16 FAIL F1 and F3 deviate from the plan's test table, rule table and count list (the lock test table names two sub-cases; rule `lock` defines membership by name with only the self-edge exception); F2 breaks the plan's guard contract "Never raises on a missing or unparsable file"; F4 breaks the plan's house style for the test-side files. All pinned names, file texts and the twenty-two-path scope otherwise match.
+  REV-17 PASS README.md, AGENTS.md and CLAUDE.md (rule 44 only, identical), OPEN_ITEMS.md (OI-39, OI-40, the two "In brief" lines), the three member READMEs, PROGRESS.md and TASKS.md are updated in the same pull request; `python3 scripts/check_docs.py` exit 0 on the head; the task's choices are recorded as OI-39/OI-40 instead of made silently.
+  REV-18 PASS No secrets in code, no SQL or query text, no generators, no record-level logging; the clean-environment tests build an allow-listed child environment and prove hostile parent settings cannot change the result or leak into a child.
+  REV-19 PASS The two edges to `eii-core` are permitted (not required) by ARC-06 and BE-01 to BE-03 and are put to the owner as OI-39; `gateway/` stays scaffolding and not a member; nothing on the dropped or later lists is built and no component decision is removed or replaced.
+  REV-20 N/A This commit adds no fact object, displayed figure, provenance or lineage code; the packages hold only a version string.
+  REV-21 N/A No screen, template, numeral or Fact-chip implementation changes.
+  REV-22 N/A No privacy partition, parameter set, treatment or audit implementation changes.
+  REV-23 PASS For what exists at this task: `product/pyproject.toml` names only `eii-core`, and the guard's dependency-edge and lock rules with their planted sub-cases prove no `eii-custodian` edge in product metadata or in `uv.lock`; the import-boundary test itself is task S0-T10 and no product code exists yet (brief note 7).
+  REV-24 N/A No English or Arabic application view and no new Arabic strings exist in this diff.
+  REV-25 PASS `python3 scripts/check_docs.py` exit 0 on the head; the diff holds no private path, personal name, e-mail, secret or real custodian data; the 11-digit CI run ids in the PROGRESS.md ledger stand after "runs/" and fall outside the checker's identifier-number pattern (its lookbehind excludes a preceding "/"), matching the already-merged ledger text.
+  REV-26 PASS The changed text claims skeletons only ("a version string and nothing else ... no product, release, privacy engine, assistant or interface is claimed to work") and makes none of the prohibited claims.
+  REV-27 PASS AGENTS.md and CLAUDE.md carry the same rule-44 edit in the diff and `cmp AGENTS.md CLAUDE.md` exit 0 on the head.
+  REV-28 N/A No synthetic identifier of the five `SYN-` forms and no identifier digit run is added; the packages hold only a version string.
+  REV-29 N/A No attribute or fact about a real named place or business is added.
+  REV-38 N/A No serving-plane or run-time code changes; nothing reads `EII_DECISION_PROVIDER` or `JEV_PRO_API_KEY`; `gateway/` is untouched and not a workspace member.
+FINDINGS:
+  F1 (REV-15, REV-16)
+    File: scripts/tests/test_workspace_metadata.py
+    Line: 384
+    Wrong: The "utf16" sub-case of `test_missing_and_unparsable_lock_fail` writes `b"\\xff\\xfe"` — the eight ASCII characters `\xff\xfe` — where the plan's test table requires "replaced by the two bytes `ff fe` (not UTF-8)". The planted file is valid UTF-8 and fails only TOML parsing, so the not-UTF-8 input the plan names is never exercised, the sub-case cannot fail for its intended reason, and it hides F2 (the guard raises on the real bytes).
+    Fix: Change the plant to `(r / "uv.lock").write_bytes(b"\xff\xfe")` together with the F2 fix, keeping the expected list exactly `["FAIL lock: uv.lock: missing or not valid TOML"]`; prove with `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` (exit 0, 81 tests, the sub-case green with the real bytes and no exception).
+  F2 (REV-16)
+    File: scripts/tests/workspace_toml.py
+    Line: 15-18
+    Wrong: `load_toml` catches only `tomllib.TOMLDecodeError`, but `path.read_text(encoding="utf-8")` raises `UnicodeDecodeError` on a file that is not valid UTF-8, so `check_workspace` raises instead of returning the failure line — breaking the plan's contract "Never raises on a missing or unparsable file" for `uv.lock` (rule `lock`) and for a member `pyproject.toml` (rule `package-layout`); the promised line `FAIL lock: uv.lock: missing or not valid TOML` is never produced for such a file.
+    Fix: Catch both, for example `except (UnicodeDecodeError, tomllib.TOMLDecodeError): return None`; prove with the F1 plant (the suite stays green) and add one sub-case planting `b"\xff\xfe"` into a member `pyproject.toml` expecting exactly `["FAIL package-layout: <dir>/pyproject.toml: missing or not valid TOML"]`.
+  F3 (REV-15, REV-16)
+    File: scripts/tests/workspace_guard.py
+    Line: 341-343
+    Wrong: `_rule_lock` skips any package entry whose `source` table holds a "registry" key, so a lock row named like a workspace member but registry-sourced escapes the forbidden-edge check; the plan's rule table defines rule `lock` by name only ("the set of edges whose source and whose target are each `eii-workspace` or one of the three members ... a package naming itself is ignored") with no source-type exception. The third block of `test_lock_ignores_self_and_third_party_edges` (scripts/tests/test_workspace_metadata.py lines 423-426, `plant_registry_forbidden_edge`) asserts the weakened behaviour — a registry-sourced `eii-core` row with an edge to `eii-custodian` produces no "edge ... is not allowed" line — and the plan's test table for that test names only two sub-cases (self-edges; a third-party `requests` package), both expecting `[]`.
+    Fix: Delete the registry skip (lines 341-343) so member-named rows are judged by name whatever their source; change the third block to expect exactly `["FAIL lock: uv.lock: edge eii-core -> eii-custodian is not allowed"]` for `plant_registry_forbidden_edge` (the `requests` sub-case stays green through the name filter, and `test_real_workspace_passes` is unaffected because the real lock holds no registry source); prove with the suite command of F1 (exit 0, 81 tests).
+  F4 (REV-16)
+    File: scripts/tests/workspace_fields_tables.py
+    Line: 21, 25, 260, 287, 307, 359 (and scripts/tests/test_clean_environment.py line 34)
+    Wrong: Seven public functions (`write_toml`, `read_toml`, `invalid_pyproject_cases`, `plant_output_order_a`, `plant_output_order_b`, `plant_output_order_c` in workspace_fields_tables.py; `child_tmp` in test_clean_environment.py) carry no docstring, breaking the plan's house style for the test-side files: "every public function, method and class that is not a test has a Google-style docstring".
+    Fix: Add a one-line Google-style docstring to each of the seven functions (for example `"""Rewrite one TOML file through the guard's writer."""` for `write_toml`); prove with the suite command of F1 (exit 0, 81 tests) and a search showing each of the seven definitions is followed by a docstring.
+PROPOSED OPEN ITEMS:
+  P1 (REV-16) The work must follow the plan and its count list: `test_member_list_wrong_fails` runs 8 sub-cases (plan: 7; the extra "members and package" row of `MEMBER_LIST_CASES`), `test_missing_and_unparsable_lock_fail` counts 4 (plan: 3; the extra direct `guard.check_lock_data(None)` check), `test_lock_ignores_self_and_third_party_edges` runs three manual blocks with no count assertion (plan: 2; see F3) and `test_output_order` asserts no count (plan: 3); the ledger records only that "sub-cases were added" in build round 3. Correct the plan record (or annotate the additions) so the plan stays a true statement of the delivered tests for later rounds.
+  P2 (REV-15) No check that runs today is weakened, but suppression comments anticipate checks that do not exist yet: scripts/tests/workspace_fields.py line 464 carries `# noqa: E402` for the bottom import the circular split needs, and test_workspace_metadata.py carries several `# type: ignore[...]` comments; S0-T04 should confirm its ruff selection accepts that import without the suppression and that the type-ignore markers match its type checker.
+```
+
+All four findings were judged valid by the lead and applied as written by the same builder, of another maker than the reviewer. The two proposed open items are entered in OPEN_ITEMS.md as PO-S0-01 and PO-S0-02, for the slice S0 follow-up task (REV-41).
+
+#### Addition to the task log of S0-T02
+
+- Build round 5: Cursor command-line tool, `composer-2.5` (Cursor): the four findings of review round 1 as written: the not-UTF-8 plant writes the two bytes ff fe; the TOML loader returns nothing for a file that is not valid UTF-8, with one more sub-case on a member file; the lock rule judges member-named rows by name whatever their source; seven docstrings. 114 mutants of the guard, every one failing a test.
+
+#### Evidence for the corrected work commit `51c1651420c495eafa57d11c42aecb497725e04a`
+
+This commit directly follows the reviewed head `046ee0fd5fcca1b790ce6f6f88be0b71f4c1775a` and changes only the six Python files under `scripts/tests/` that the findings name.
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    51c1651420c495eafa57d11c42aecb497725e04a
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    81 passed, 0 failed, 0 skipped (ran 81 tests)
+Seed:      none
+Notes:     The suite includes the 52 tests of S0-T01, the 22 tests of `test_workspace_metadata.py` and the 7 of `test_clean_environment.py`, after the four fixes of review round 1; `./eii test` does not exist before S0-T05 and S0-T09; Python as uv ran it: the workspace interpreter (uv printed no version line); uv 0.11.31 (x86_64-unknown-linux-gnu); ARC-01, BE-01, TST-60 (metadata clause).
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    51c1651420c495eafa57d11c42aecb497725e04a
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 4 packages in 0.80ms"
+Seed:      none
+Notes:     The lock file is current for the workspace (criterion 1); the authoritative proof is `test_lock_is_current`, which runs isolated.
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    51c1651420c495eafa57d11c42aecb497725e04a
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 70 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    51c1651420c495eafa57d11c42aecb497725e04a
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check (ARC-01).
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    51c1651420c495eafa57d11c42aecb497725e04a
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    51c1651420c495eafa57d11c42aecb497725e04a
+Command:   rc=0; git check-ignore -q --no-index uv.lock || rc=$?; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The lock file is not ignored by any ignore rule.
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    51c1651420c495eafa57d11c42aecb497725e04a
+Command:   copy=$(mktemp -d) && git ls-files -z | xargs -0 cp --parents -t "$copy" && ctl=0 && rc=0 && ab=0 && miss=0; (cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_workspace_metadata.py' >"$copy/ctl.log" 2>&1) || ctl=$?; (printf '\ncheck_workspace = lambda root: []\ncheck_lock_data = lambda data: []\n' >> "$copy/scripts/tests/workspace_guard.py" && cd "$copy/scripts/tests" && python3 -B -c "import workspace_guard as g, sys; sys.exit(0 if g.check_workspace.__name__ == '<lambda>' and g.check_lock_data.__name__ == '<lambda>' else 3)" && cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_workspace_metadata.py' -v >"$copy/red.log" 2>&1) || rc=$?; for t in test_forbidden_edge_in_every_place test_forbidden_edge_spelling_variants test_root_naming_a_member_fails test_root_name_and_package_flag_fail test_missing_workspace_source_fails test_member_list_wrong_fails test_layout_fails test_missing_and_unparsable_pyproject_fail test_forbidden_edge_in_lock test_expected_edge_missing_in_lock test_package_missing_in_lock test_lock_members_list_wrong_fails test_member_name_in_workspace_wide_lock_field test_absolute_path_in_lock_fails test_missing_and_unparsable_lock_fail test_output_order; do grep -q "^FAIL: $t " "$copy/red.log" || miss=1; done; if grep -q -E '^ERROR: |_FailedTest' "$copy/red.log"; then miss=1; fi; git ls-files -z | xargs -0 cp --parents -t "$copy"; rm -rf "$copy/pyproject.toml" "$copy/uv.lock" "$copy/.python-version" "$copy/core" "$copy/custodian" "$copy/product"; (cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_workspace_metadata.py' -v >"$copy/abs.log" 2>&1) || ab=$?; grep -q '^FAIL: test_real_workspace_passes ' "$copy/abs.log" || miss=1; grep -q -F 'FAIL members: pyproject.toml: missing or not valid TOML' "$copy/abs.log" || miss=1; if [ "$ab" -ne 1 ]; then miss=1; fi; if [ "$miss" -ne 0 ]; then rc=9; fi; if [ "$ctl" -ne 0 ]; then rc=8; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The line succeeds only if the control passes, the named guard tests fail when the guard does nothing, and the real-workspace test fails when the workspace files are absent (TST-161).
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    51c1651420c495eafa57d11c42aecb497725e04a
+Command:   python3 -c "import subprocess,sys; p=[x for x in subprocess.run(['git','diff','--name-only','--no-renames','-z','452a7fd9cf0fa1f6928446d64261640ae9ec2494...51c1651420c495eafa57d11c42aecb497725e04a'],check=True,capture_output=True,text=True).stdout.split(chr(0)) if x]; a={'pyproject.toml','.python-version','uv.lock','core/pyproject.toml','custodian/pyproject.toml','product/pyproject.toml','core/src/eii_core/__init__.py','custodian/src/eii_custodian/__init__.py','product/src/eii_product/__init__.py','core/README.md','custodian/README.md','product/README.md','scripts/tests/workspace_guard.py','scripts/tests/workspace_fields.py','scripts/tests/workspace_toml.py','scripts/tests/workspace_fields_tables.py','scripts/tests/test_workspace_metadata.py','scripts/tests/test_clean_environment.py','README.md','AGENTS.md','CLAUDE.md','OPEN_ITEMS.md','PROGRESS.md','TASKS.md'}; o=[x for x in p if x not in a]; m=sorted(a-set(p)); print(len(p),o,m); sys.exit(1 if o or m or len(p)!=24 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "24 [] []"
+Seed:      none
+Notes:     Later-round form of the scope command: the branch changes exactly the twenty-two paths of the task and the two ledger files of its first ledger commit, twenty-four in all (TST-163).
+```
+
+#### Independent review, round 2: REJECTED
+
+Reviewed commit `fbe708e755b8eb72024516a08a8bfb284f9e4111`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/4, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43161774522 ). Reviewer: Zhipu AI GLM-5.3 High, through the Devin command-line tool, read-only; a later round under REV-39. The verdict is copied unchanged (REV-09) except for one run number, which the reviewer wrote as a bare eleven-digit number that the documentation check forbids (AGENTS.md rule 9); it is written here as the run's full link. The unchanged verdict is posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S0-T02
+COMMIT: fbe708e755b8eb72024516a08a8bfb284f9e4111
+REVIEWER: Devin command-line tool, GLM-5.3 High (Zhipu AI)
+EARLIER FINDINGS:
+  F1 FIXED scripts/tests/test_workspace_metadata.py line 384 now writes the real two bytes `b"\xff\xfe"` into uv.lock; with the F2 fix the suite is green (81 passed at the fix commit 51c1651 and again on this head), so the not-UTF-8 input is exercised without an exception.
+  F2 FIXED scripts/tests/workspace_toml.py line 17 catches `(UnicodeDecodeError, tomllib.TOMLDecodeError)` and returns None, so `check_workspace` returns `FAIL lock: uv.lock: missing or not valid TOML` for such a file and `FAIL package-layout: core/pyproject.toml: missing or not valid TOML` through the new "core utf16" sub-case (workspace_fields_tables.py lines 287-291, COUNT_PYPROJECT_CASES raised to 9).
+  F3 FIXED the registry skip is deleted from `_rule_lock` (scripts/tests/workspace_guard.py lines 337-345 now judge member-named rows by name only), and the third block of `test_lock_ignores_self_and_third_party_edges` (scripts/tests/test_workspace_metadata.py lines 423-427) expects exactly `["FAIL lock: uv.lock: edge eii-core -> eii-custodian is not allowed"]`.
+  F4 FIXED all seven functions carry a one-line Google-style docstring: `child_tmp` (test_clean_environment.py line 35), `write_toml` (22), `read_toml` (27), `invalid_pyproject_cases` (265), `plant_output_order_a` (296), `plant_output_order_b` (317) and `plant_output_order_c` (370) in workspace_fields_tables.py.
+CHECKS:
+  REV-10 PASS The three acceptance criteria still map to the round-1 tests and recorded runs; the fixes touch only the six guard/test files the findings named; suite 81 passed, 0 failed, 0 skipped at 51c1651 and again on this head (EVIDENCE.md, the eight ledger entries, head re-runs).
+  REV-11 PASS Lead's own runs on this exact head: `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` exit 0 (81 passed, 0 skipped) and `python3 scripts/check_docs.py` exit 0 (EVIDENCE.md, "Recorded commands 1 to 5 again on the head"); CI green on the head (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43161774522 ); planted violations re-proven at 51c1651 by recorded command 7 (the sixteen guard tests fail under a stubbed guard, `test_real_workspace_passes` fails when the workspace files are absent), and the two not-UTF-8 sub-cases now fail without the F2 fix; no skips.
+  REV-12 PASS The fix commit changes only the six Python files under scripts/tests/ that the findings name; the second ledger commit changes only OPEN_ITEMS.md and PROGRESS.md (HEAD-DIFF block); the later-round scope command at 51c1651 exits 0 with output "24 [] []" (the twenty-two task paths plus the two ledger files of the first ledger commit); nothing under data/.
+  REV-13 PASS The changed lines add docstrings, one sub-case and one count constant; no TODO, FIXME, NotImplementedError, empty body or fixed return value standing in for real work.
+  REV-14 PASS No secret, `.env`, key file or real custodian record, field, file name or count in the diff; `python3 scripts/check_docs.py` (which scans secret-shaped tokens) exit 0 on the head; my line-by-line read of DIFF.patch found none.
+  REV-15 PASS The fixes only strengthen: the registry skip is deleted from `_rule_lock`, the real two bytes ff fe are planted on uv.lock and on a member pyproject.toml, and COUNT_PYPROJECT_CASES rises 8 to 9 matching the added sub-case; the later-round form of the scope command keeps the exact-set assertion and is disclosed in EVIDENCE.md and the eight ledger entries.
+  REV-16 FAIL F5 and F6: two docstrings in the changed test tables misdescribe the delivered behaviour (one still documents the deleted registry skip; one misdescribes its own sub-cases). All pinned names, file texts, the six-file fix scope and the twenty-four-path branch scope otherwise match.
+  REV-17 PASS PROGRESS.md holds the round-1 verdict copied unchanged (compared line by line with EARLIER_VERDICT.md), build round 5 and the eight evidence entries for 51c1651; OPEN_ITEMS.md enters PO-S0-01 and PO-S0-02 with CLOSED BY S0-T15, and TASKS.md lists S0-T15 with its acceptance criteria; `python3 scripts/check_docs.py` exit 0 on the head.
+  REV-18 PASS No secrets in code, no SQL or query text, no generators, no record-level logging; the only clean-environment change is a docstring.
+  REV-19 PASS Nothing on the dropped or later lists is built; the fixes apply the round-1 corrections as written under decision 0015; no component decision is removed or replaced.
+  REV-20 N/A This diff adds no fact object, displayed figure, provenance or lineage code; the changed lines are test code and ledger text.
+  REV-21 N/A No screen, template, numeral or Fact-chip implementation changes.
+  REV-22 N/A No privacy partition, parameter set, treatment or audit implementation changes.
+  REV-23 PASS Unchanged by this diff for what exists: product/pyproject.toml still names only eii-core, and the dependency-edge rules plus the strengthened lock rule (now also judging registry-sourced member-named rows) prove no eii-custodian edge in product metadata or in uv.lock.
+  REV-24 N/A No English or Arabic application view and no new Arabic strings exist in this diff.
+  REV-25 PASS `python3 scripts/check_docs.py` exit 0 on the head; the new ledger lines hold no private path, personal name, e-mail, secret or real custodian data; the 11-digit CI run id stands after "runs/" as in the already-merged ledger text, outside the checker's identifier-number pattern.
+  REV-26 PASS The new text records the review, the fixes and the evidence only and makes none of the prohibited claims.
+  REV-27 PASS AGENTS.md and CLAUDE.md are untouched by this diff and `cmp AGENTS.md CLAUDE.md` exits 0 on the head.
+  REV-28 N/A No synthetic identifier of the five `SYN-` forms and no identifier digit run is added.
+  REV-29 N/A No attribute or fact about a real named place or business is added.
+  REV-38 N/A No serving-plane or run-time code changes; nothing reads EII_DECISION_PROVIDER or JEV_PRO_API_KEY; `gateway/` is untouched and not a workspace member.
+FINDINGS:
+  F5 (REV-16; kind b)
+    File: scripts/tests/workspace_fields_tables.py
+    Line: 328
+    Wrong: The docstring of `plant_registry_forbidden_edge` still reads "Registry-sourced workspace row with a forbidden edge (ignored by guard)". That was true before the fix and is false after it: the patch deleted the registry skip in `_rule_lock` (scripts/tests/workspace_guard.py lines 337-345), the guard now judges member-named rows by name whatever their source, and the test asserts exactly `["FAIL lock: uv.lock: edge eii-core -> eii-custodian is not allowed"]` for this plant (scripts/tests/test_workspace_metadata.py lines 423-427). The helper's own documentation contradicts the corrected rule and the assertion it feeds — a defect caused by the changed guard lines, breaking the plan's rule table and house style for the test-side files.
+    Fix: Rewrite the docstring to the delivered behaviour, for example `"""Registry-sourced workspace row with a forbidden edge (judged by name)."""`; prove with `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` (exit 0, 81 tests) and a read of the file showing no remaining claim that the guard ignores registry-sourced rows.
+  F6 (REV-16; kind b)
+    File: scripts/tests/workspace_fields_tables.py
+    Line: 265
+    Wrong: The docstring added by the F4 fix reads "Build sub-cases for missing or unparsable member pyproject.toml files", but the first two sub-cases the function returns ("root deleted", "root bad") plant the root `pyproject.toml`, and "member" is a pinned term in this suite (MEMBERS = core, custodian, product) that excludes the root; the docstring misdescribes 2 of the 9 sub-cases, breaking the plan's house style that public functions of the test-side files carry an accurate Google-style docstring.
+    Fix: Drop the wrong word, for example `"""Build sub-cases for missing or unparsable workspace pyproject.toml files."""` (or "... root and member pyproject.toml files"); prove with the suite command of F5 (exit 0, 81 tests).
+PROPOSED OPEN ITEMS:
+  none
+```
+
+The lead judged every new finding valid; it was applied as written by the same builder, of another maker than the reviewer.
+
+#### Addition to the task log of S0-T02
+
+- Build round 6: Cursor command-line tool, `composer-2.5` (Cursor): the two findings of review round 2 as written: the docstring of the registry plant says the row is judged by name, and the docstring of the invalid-file cases names the root and member files (its first wording, one column over the house limit, was shortened in a second short pass).
+
+#### Evidence for the corrected work commit `f6a297512cddae0fd9527db2bd630f8d41b340b2`
+
+This commit directly follows the reviewed head `fbe708e755b8eb72024516a08a8bfb284f9e4111` and changes only the lines the findings name.
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    f6a297512cddae0fd9527db2bd630f8d41b340b2
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    81 passed, 0 failed, 0 skipped (ran 81 tests)
+Seed:      none
+Notes:     The suite includes the 52 tests of S0-T01, the 22 tests of `test_workspace_metadata.py` and the 7 of `test_clean_environment.py`, after the fixes of the review rounds so far; `./eii test` does not exist before S0-T05 and S0-T09; Python as uv ran it: the workspace interpreter (uv printed no version line); uv 0.11.31 (x86_64-unknown-linux-gnu); ARC-01, BE-01, TST-60 (metadata clause).
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    f6a297512cddae0fd9527db2bd630f8d41b340b2
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 4 packages in 0.94ms"
+Seed:      none
+Notes:     The lock file is current for the workspace (criterion 1); the authoritative proof is `test_lock_is_current`, which runs isolated.
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    f6a297512cddae0fd9527db2bd630f8d41b340b2
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 70 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    f6a297512cddae0fd9527db2bd630f8d41b340b2
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check (ARC-01).
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    f6a297512cddae0fd9527db2bd630f8d41b340b2
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    f6a297512cddae0fd9527db2bd630f8d41b340b2
+Command:   rc=0; git check-ignore -q --no-index uv.lock || rc=$?; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The lock file is not ignored by any ignore rule.
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    f6a297512cddae0fd9527db2bd630f8d41b340b2
+Command:   copy=$(mktemp -d) && git ls-files -z | xargs -0 cp --parents -t "$copy" && ctl=0 && rc=0 && ab=0 && miss=0; (cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_workspace_metadata.py' >"$copy/ctl.log" 2>&1) || ctl=$?; (printf '\ncheck_workspace = lambda root: []\ncheck_lock_data = lambda data: []\n' >> "$copy/scripts/tests/workspace_guard.py" && cd "$copy/scripts/tests" && python3 -B -c "import workspace_guard as g, sys; sys.exit(0 if g.check_workspace.__name__ == '<lambda>' and g.check_lock_data.__name__ == '<lambda>' else 3)" && cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_workspace_metadata.py' -v >"$copy/red.log" 2>&1) || rc=$?; for t in test_forbidden_edge_in_every_place test_forbidden_edge_spelling_variants test_root_naming_a_member_fails test_root_name_and_package_flag_fail test_missing_workspace_source_fails test_member_list_wrong_fails test_layout_fails test_missing_and_unparsable_pyproject_fail test_forbidden_edge_in_lock test_expected_edge_missing_in_lock test_package_missing_in_lock test_lock_members_list_wrong_fails test_member_name_in_workspace_wide_lock_field test_absolute_path_in_lock_fails test_missing_and_unparsable_lock_fail test_output_order; do grep -q "^FAIL: $t " "$copy/red.log" || miss=1; done; if grep -q -E '^ERROR: |_FailedTest' "$copy/red.log"; then miss=1; fi; git ls-files -z | xargs -0 cp --parents -t "$copy"; rm -rf "$copy/pyproject.toml" "$copy/uv.lock" "$copy/.python-version" "$copy/core" "$copy/custodian" "$copy/product"; (cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_workspace_metadata.py' -v >"$copy/abs.log" 2>&1) || ab=$?; grep -q '^FAIL: test_real_workspace_passes ' "$copy/abs.log" || miss=1; grep -q -F 'FAIL members: pyproject.toml: missing or not valid TOML' "$copy/abs.log" || miss=1; if [ "$ab" -ne 1 ]; then miss=1; fi; if [ "$miss" -ne 0 ]; then rc=9; fi; if [ "$ctl" -ne 0 ]; then rc=8; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The line succeeds only if the control passes, the named guard tests fail when the guard does nothing, and the real-workspace test fails when the workspace files are absent (TST-161).
+```
+
+```text
+### S0-T02 — Python workspace and three packages
+Commit:    f6a297512cddae0fd9527db2bd630f8d41b340b2
+Command:   python3 -c "import subprocess,sys; p=[x for x in subprocess.run(['git','diff','--name-only','--no-renames','-z','452a7fd9cf0fa1f6928446d64261640ae9ec2494...f6a297512cddae0fd9527db2bd630f8d41b340b2'],check=True,capture_output=True,text=True).stdout.split(chr(0)) if x]; a={'pyproject.toml','.python-version','uv.lock','core/pyproject.toml','custodian/pyproject.toml','product/pyproject.toml','core/src/eii_core/__init__.py','custodian/src/eii_custodian/__init__.py','product/src/eii_product/__init__.py','core/README.md','custodian/README.md','product/README.md','scripts/tests/workspace_guard.py','scripts/tests/workspace_fields.py','scripts/tests/workspace_toml.py','scripts/tests/workspace_fields_tables.py','scripts/tests/test_workspace_metadata.py','scripts/tests/test_clean_environment.py','README.md','AGENTS.md','CLAUDE.md','OPEN_ITEMS.md','PROGRESS.md','TASKS.md'}; o=[x for x in p if x not in a]; m=sorted(a-set(p)); print(len(p),o,m); sys.exit(1 if o or m or len(p)!=24 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "24 [] []"
+Seed:      none
+Notes:     Later-round form of the scope command: the branch changes exactly the twenty-two paths of the task and the two ledger files of its first ledger commit, twenty-four in all (TST-163).
+```
 
 ### S0-T03 — Web application skeleton: task log
 

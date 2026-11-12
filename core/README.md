@@ -7,6 +7,6 @@ This folder will hold `eii_core`, the Python library shared by the custodian pla
 - `eii_core` imports neither `eii_custodian` nor `eii_product` (ARC-06, BE-01).
 - Every displayed number comes from deterministic, tested code. No model calculates.
 
-Status: scaffolding only (task S0-T01). This folder holds no code yet.
+Status: package skeleton (task S0-T02). The package holds a version string and nothing else. Source: core/src/eii_core/. Dependencies: none.
 
 Read: [02_ARCHITECTURE.md](../docs/02_ARCHITECTURE.md), [08_BACKEND.md](../docs/08_BACKEND.md)

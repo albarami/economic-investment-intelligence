@@ -45,18 +45,18 @@ slice S0 begins with the environment, repository structure and dependencies.
 
 ### S0-T01 — Repository scaffolding and tool configuration
 - Goal: Create the pinned repository layout and root configuration without implementing product behaviour.
-- Acceptance criteria: [ ] every pinned top-level folder exists; [ ] ignores exclude generated data and secrets; [ ] the tree check passes.
+- Acceptance criteria: [x] every pinned top-level folder exists; [x] ignores exclude generated data and secrets; [x] the tree check passes.
 - Scope: root configuration, `contracts/`, `core/`, `custodian/`, `product/`, `web/`, `evals/`, `gateway/`, `infra/`, `scripts/`, `data/`.
 - Depends: none.
 - Requirements: ARC-01, PLN-22, TST-163.
-- Delivery: routine; personas Platform; status queued.
+- Delivery: routine; personas Platform; status done (pull request 1, merged 2026-11-12).
 ### S0-T02 — Python workspace and three packages
 - Goal: Create one `uv` workspace containing `eii_core`, `eii_custodian` and `eii_product`.
 - Acceptance criteria: [ ] Python resolves all three packages; [ ] each package imports in a clean environment; [ ] workspace metadata names no forbidden dependency edge.
 - Scope: root Python workspace files, `core/`, `custodian/`, `product/`.
 - Depends: S0-T01.
 - Requirements: ARC-01, BE-01, TST-60.
-- Delivery: routine; personas Platform; status queued.
+- Delivery: routine; personas Platform; status in review (pull request 4).
 ### S0-T03 — Web application skeleton
 - Goal: Create the React, TypeScript and Vite application shell with no feature UI.
 - Acceptance criteria: [ ] development build starts; [ ] production build succeeds; [ ] no run-time asset uses a third-party host.
