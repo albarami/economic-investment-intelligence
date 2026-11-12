@@ -73,18 +73,18 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: routine; personas Frontend; status done (pull request 3, merged 2026-11-12).
 ### S0-T04 — Lint, format and type checks
 - Goal: Make Python and web linting, formatting and type checks reproducible.
-- Acceptance criteria: [ ] each check has one documented command; [ ] planted violations fail; [ ] clean scaffolding passes.
+- Acceptance criteria: [x] each check has one documented command; [x] planted violations fail; [x] clean scaffolding passes.
 - Scope: lint, formatter and type-checker configuration; check scripts only.
 - Depends: S0-T02, S0-T03.
 - Requirements: PLN-07, TST-161, TST-162, FE-11.
-- Delivery: routine; personas Platform; status in review (pull request 5, round 2).
+- Delivery: routine; personas Platform; status done (pull request 5, merged 2026-11-12).
 ### S0-T05 — Test runners
 - Goal: Make `./eii test` run every network-free Python and web pull-request suite.
-- Acceptance criteria: [ ] suite counts are printed; [ ] a failing fixture makes the command non-zero; [ ] clean suites exit zero.
+- Acceptance criteria: [x] suite counts are printed; [x] a failing fixture makes the command non-zero; [x] clean suites exit zero.
 - Scope: test configuration, test bootstrap files, `scripts/` test runner.
 - Depends: S0-T02, S0-T03.
-- Requirements: TST-15, TST-01, PLN-14.
-- Delivery: routine; personas Platform; status queued.
+- Requirements: TST-15, TST-01, PLN-14, FE-95.
+- Delivery: routine; personas Platform; status done (pull request 7, merged 2026-11-12).
 ### S0-T06 — Pre-commit hooks
 - Goal: Run formatting, lint, documentation, secret and identifier checks before commits.
 - Acceptance criteria: [ ] hooks install from repository configuration; [ ] generated forbidden tokens are caught; [ ] a commit guard refuses any staged value equal to a non-empty local secret without printing the value; [ ] clean staged files pass.
@@ -105,7 +105,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: `infra/compose.yaml`, preflight probe modules and probe tests.
 - Depends: S0-T01, S0-T02.
 - Requirements: OPS-06, OPS-09, OPS-17, BE-87.
-- Delivery: hard; personas Platform; status queued.
+- Delivery: hard; personas Platform; status in review (part A merged in pull request 10 on 2026-11-12; part B follows; part C after S0-T07 and S0-T11 merge).
 ### S0-T09 — `./eii` command skeleton and database commands
 - Goal: Create every pinned command entry point, including `db-up` and `db-down`, with safe placeholder dispatch.
 - Acceptance criteria: [ ] usage lists every pinned command; [ ] `preflight` only probes; [ ] `db-up` and `db-down` alone start and stop the database; [ ] `up` never starts it.
@@ -119,7 +119,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: boundary test module and planted fixtures only.
 - Depends: S0-T02.
 - Requirements: ARC-06, BE-01, TST-60.
-- Delivery: hard; personas Backend; status queued.
+- Delivery: hard; personas Backend; status done (pull requests 8 and 11, merged 2026-11-12).
 ### S0-T11 — Generator sandbox test
 - Goal: Prove locally and on the hosted CI runner that the `build-world` and `build-release` sandbox profiles cannot read outside their allowed mounts or open the network.
 - Acceptance criteria: [ ] both prohibited operations fail under both profiles locally and on the hosted runner; [ ] the read tooth succeeds outside; [ ] CI never skips the test; [ ] a runner restriction on unprivileged user namespaces is handled by a per-binary bubblewrap AppArmor profile or fails the job; [ ] engine extensions are fetched before sandbox entry into a project-local folder mounted read-only and load with the network off.
@@ -132,8 +132,8 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Acceptance criteria: [ ] lock files resolve; [ ] exact and retreat pins are labelled; [ ] unsupported version drift fails a check.
 - Scope: lock files, version files and dependency constraints.
 - Depends: S0-T02, S0-T03.
-- Requirements: FE-03, TST-153, PLN-15.
-- Delivery: hard; personas Platform; status queued.
+- Requirements: FE-03, TST-153, PLN-15, TST-43, BE-13.
+- Delivery: hard; personas Platform; status in review (part A merged in pull request 9 on 2026-11-12; part B in pull request 12).
 ### S0-T13 — New-library reference notes
 - Goal: Give agents verified official-reference notes for libraries newer than most model training data.
 - Acceptance criteria: [ ] each named newer library has an official-documentation pointer; [ ] no API behaviour is asserted from memory; [ ] slice S1 confirmation fields exist.

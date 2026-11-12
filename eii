@@ -1,0 +1,24 @@
+#!/bin/sh
+# EII command launcher. This version knows one command: test.
+# Exit status: 0 success, 1 a check or step failed, 2 usage error
+# (docs/13_DEPLOYMENT_AND_OPERATIONS.md section 6).
+set -eu
+
+if [ "$#" -lt 1 ] || [ "$1" != "test" ]; then
+  echo 'eii: usage error: unknown command or flag. Usage: ./eii test [--seed N]' >&2
+  exit 2
+fi
+shift
+
+case "$0" in
+  */*) here=${0%/*} ;;
+  *) here=. ;;
+esac
+cd "$here"
+
+if ! command -v uv >/dev/null 2>&1; then
+  echo 'FAIL tools: uv: not found on PATH; install uv, then run ./eii test again' >&2
+  exit 1
+fi
+
+exec uv run --locked python -I scripts/run_tests.py "$@"

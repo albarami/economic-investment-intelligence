@@ -8,6 +8,6 @@ This folder will hold `eii_product`, the read-only serving plane: the store, the
 - `eii_product` never imports the typed-decision gateway and never reads its settings (BE-102).
 - Only a verified release crosses from the custodian plane to this plane.
 
-Status: package skeleton (task S0-T02). The package holds a version string and nothing else. Source: product/src/eii_product/. Dependencies: eii_core only.
+Status: package skeleton (task S0-T02). The package holds a version string and two small tests under `tests/`. Source: product/src/eii_product/. Dependencies: eii_core only.
 
 Read: [02_ARCHITECTURE.md](../docs/02_ARCHITECTURE.md), [08_BACKEND.md](../docs/08_BACKEND.md)
