@@ -98,7 +98,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: `infra/compose.yaml`, preflight probe modules and probe tests.
 - Depends: S0-T01, S0-T02.
 - Requirements: OPS-06, OPS-09, OPS-17, BE-87.
-- Delivery: hard; personas Platform; status in review (pull request 10, round 3, part A; part B after the open documentation pull request merges; part C after S0-T07, S0-T11 and S0-T12 merge).
+- Delivery: hard; personas Platform; status in review (part A merged in pull request 10 on 2026-11-12; part B follows; part C after S0-T07 and S0-T11 merge).
 ### S0-T09 — `./eii` command skeleton and database commands
 - Goal: Create every pinned command entry point, including `db-up` and `db-down`, with safe placeholder dispatch.
 - Acceptance criteria: [ ] usage lists every pinned command; [ ] `preflight` only probes; [ ] `db-up` and `db-down` alone start and stop the database; [ ] `up` never starts it.
@@ -112,7 +112,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: boundary test module and planted fixtures only.
 - Depends: S0-T02.
 - Requirements: ARC-06, BE-01, TST-60.
-- Delivery: hard; personas Backend; status in review (pull request 8, round 2; part B after pull requests 6 and 7 merge).
+- Delivery: hard; personas Backend; status in review (part A merged in pull request 8 on 2026-11-12; part B in pull request 11).
 ### S0-T11 — Generator sandbox test
 - Goal: Prove locally and on the hosted CI runner that the `build-world` and `build-release` sandbox profiles cannot read outside their allowed mounts or open the network.
 - Acceptance criteria: [ ] both prohibited operations fail under both profiles locally and on the hosted runner; [ ] the read tooth succeeds outside; [ ] CI never skips the test; [ ] a runner restriction on unprivileged user namespaces is handled by a per-binary bubblewrap AppArmor profile or fails the job; [ ] engine extensions are fetched before sandbox entry into a project-local folder mounted read-only and load with the network off.
@@ -126,7 +126,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: lock files, version files and dependency constraints.
 - Depends: S0-T02, S0-T03.
 - Requirements: FE-03, TST-153, PLN-15, TST-43, BE-13.
-- Delivery: hard; personas Platform; status in review (pull request 9, round 2; part B after the open documentation pull requests merge).
+- Delivery: hard; personas Platform; status in review (part A merged in pull request 9 on 2026-11-12; part B follows pull request 11).
 ### S0-T13 — New-library reference notes
 - Goal: Give agents verified official-reference notes for libraries newer than most model training data.
 - Acceptance criteria: [ ] each named newer library has an official-documentation pointer; [ ] no API behaviour is asserted from memory; [ ] slice S1 confirmation fields exist.
