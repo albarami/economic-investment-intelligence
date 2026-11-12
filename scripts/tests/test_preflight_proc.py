@@ -9,6 +9,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -49,13 +50,17 @@ class ChildRunner(unittest.TestCase):
                 pid_file=pid_file,
             )
             env = {"PATH": str(folder)}
-            proc.run_child(
+            start = time.monotonic()
+            result = proc.run_child(
                 str(program),
                 ["-h", "h", "-p", "1", "-t", "5"],
                 env,
                 folder,
                 limit=0.5,
             )
+            elapsed = time.monotonic() - start
+            self.assertTrue(result.timed_out)
+            self.assertLess(elapsed, 2.0)
             pid = int(pid_file.read_text(encoding="utf-8"))
             deadline = time.monotonic() + 2.0
             while time.monotonic() < deadline:
@@ -124,7 +129,16 @@ class ChildRunner(unittest.TestCase):
             folder = Path(tmp)
             program = stubs.write_stub(folder, "pg_isready", echo=True)
             env = {"PATH": str(folder), "LANG": "C"}
-            proc.run_child(str(program), ["-h", "h", "-p", "1", "-t", "5"], env, folder)
+            parent_patch = {
+                "PGPASSWORD": "x",
+                "PGHOST": "x",
+                "LD_PRELOAD": "",
+                "PYTHONPATH": "x",
+            }
+            with mock.patch.dict(os.environ, parent_patch):
+                proc.run_child(
+                    str(program), ["-h", "h", "-p", "1", "-t", "5"], env, folder
+                )
             recorded = stubs.calls(folder)[0]["env"]
             self.assertEqual(recorded, env)
 

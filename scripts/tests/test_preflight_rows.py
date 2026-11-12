@@ -12,6 +12,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from typing import Any
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -67,6 +68,7 @@ class Rows(unittest.TestCase):
             "uv_timeout",
             "npm_stderr",
             "both_fail",
+            "uv_status0_stdout",
         ]
         pass_line = (
             "PASS locked-dependencies: uv.lock and web/package-lock.json match "
@@ -85,22 +87,28 @@ class Rows(unittest.TestCase):
                     scratch.mkdir()
                     stub_dir = Path(tmp) / "stubs"
                     stub_dir.mkdir()
-                    if label != "uv_missing":
+                    if label == "uv_status0_stdout":
+                        stubs.write_stub(stub_dir, "uv", status=0, stdout="x\n")
+                    elif label != "uv_missing":
                         stubs.write_stub(
                             stub_dir,
                             "uv",
                             status=0 if label not in ("uv_fail", "both_fail") else 1,
                         )
-                    if label not in (
-                        "npm_missing",
-                        "no_package_json",
-                        "no_package_lock",
-                    ):
+                    if label != "npm_missing":
+                        npm_status = 0
+                        npm_stdout = ""
+                        npm_stderr = ""
+                        if label in ("npm_fail", "both_fail"):
+                            npm_status = 1
+                        elif label == "npm_stderr":
+                            npm_stderr = "warn\n"
                         stubs.write_stub(
                             stub_dir,
                             "npm",
-                            status=0 if label not in ("npm_fail", "both_fail") else 1,
-                            stderr="" if label != "npm_stderr" else "warn\n",
+                            status=npm_status,
+                            stdout=npm_stdout,
+                            stderr=npm_stderr,
                         )
                     if label == "uv_timeout":
                         (stub_dir / "uv").unlink()
@@ -131,12 +139,22 @@ class Rows(unittest.TestCase):
                             "web/package-lock.json (exit status 1)",
                         )
                     elif label == "both_fail":
-                        self.assertIn("uv.lock does not match", line.text())
-                        self.assertIn("npm ls reported a problem", line.text())
+                        self.assertEqual(
+                            line.text(),
+                            "FAIL locked-dependencies: uv.lock does not match the manifests "
+                            "without the network (uv lock --check exit status 1); "
+                            "npm ls reported a problem with web/package-lock.json (exit status 1)",
+                        )
                     elif label == "uv_missing":
-                        self.assertIn("uv not found on PATH", line.text())
+                        self.assertEqual(
+                            line.text(),
+                            "FAIL locked-dependencies: uv not found on PATH",
+                        )
                     elif label == "npm_missing":
-                        self.assertIn("npm not found on PATH", line.text())
+                        self.assertEqual(
+                            line.text(),
+                            "FAIL locked-dependencies: npm not found on PATH",
+                        )
                     elif label == "no_package_json":
                         self.assertEqual(
                             line.text(),
@@ -150,48 +168,69 @@ class Rows(unittest.TestCase):
                             line.text(),
                             "FAIL locked-dependencies: web/package-lock.json is missing",
                         )
+                        self.assertFalse(
+                            any(c["program"] == "npm" for c in stubs.calls(stub_dir))
+                        )
                     elif label == "uv_timeout":
-                        self.assertIn("uv gave no answer within 0.5 s", line.text())
+                        self.assertEqual(
+                            line.text(),
+                            "FAIL locked-dependencies: uv gave no answer within 0.5 s",
+                        )
                     elif label == "npm_stderr":
-                        self.assertEqual(line.text(), pass_line)
-                    if label in (
-                        "both_ok",
-                        "uv_fail",
-                        "npm_fail",
-                        "both_fail",
-                        "npm_stderr",
-                    ):
-                        recorded = stubs.calls(stub_dir)
-                        uv_calls = [c for c in recorded if c["program"] == "uv"]
-                        npm_calls = [c for c in recorded if c["program"] == "npm"]
-                        if uv_calls:
-                            self.assertEqual(uv_calls[0]["cwd"], str(root))
-                            uv_env = uv_calls[0]["env"]
-                            self.assertEqual(
-                                set(uv_env.keys()),
-                                {"PATH", "LANG", "LC_ALL", "UV_NO_CONFIG"},
-                            )
-                        if npm_calls:
-                            self.assertEqual(npm_calls[0]["cwd"], str(root / "web"))
-                            npm_env = npm_calls[0]["env"]
-                            self.assertEqual(
-                                set(npm_env.keys()),
-                                {
-                                    "PATH",
-                                    "LANG",
-                                    "LC_ALL",
-                                    "npm_config_userconfig",
-                                    "npm_config_globalconfig",
-                                    "npm_config_update_notifier",
-                                    "npm_config_cache",
-                                    "TMPDIR",
-                                },
-                            )
-                            user = npm_env["npm_config_userconfig"]
-                            glob = npm_env["npm_config_globalconfig"]
-                            self.assertNotEqual(user, glob)
-                            self.assertFalse(Path(user).exists())
-                            self.assertFalse(Path(glob).exists())
+                        self.assertEqual(
+                            line.text(),
+                            "FAIL locked-dependencies: npm output not understood (exit status 0)",
+                        )
+                    elif label == "uv_status0_stdout":
+                        self.assertEqual(
+                            line.text(),
+                            "FAIL locked-dependencies: uv output not understood (exit status 0)",
+                        )
+                    uv_argv = [
+                        str(stub_dir / "uv"),
+                        "lock",
+                        "--check",
+                        "--offline",
+                    ]
+                    npm_argv = [
+                        str(stub_dir / "npm"),
+                        "ls",
+                        "--package-lock-only",
+                        "--offline",
+                        "--logs-max=0",
+                    ]
+                    want_uv_env = {
+                        "PATH": str(stub_dir),
+                        "LANG": "C",
+                        "LC_ALL": "C",
+                        "UV_NO_CONFIG": "1",
+                    }
+                    want_npm_env = {
+                        "PATH": str(stub_dir),
+                        "LANG": "C",
+                        "LC_ALL": "C",
+                        "npm_config_userconfig": str(scratch / "absent-user"),
+                        "npm_config_globalconfig": str(scratch / "absent-global"),
+                        "npm_config_update_notifier": "false",
+                        "npm_config_cache": str(scratch / "npm-cache"),
+                        "TMPDIR": str(scratch),
+                    }
+                    recorded = stubs.calls(stub_dir)
+                    uv_calls = [c for c in recorded if c["program"] == "uv"]
+                    npm_calls = [c for c in recorded if c["program"] == "npm"]
+                    if uv_calls:
+                        self.assertEqual(uv_calls[0]["argv"], uv_argv)
+                        self.assertEqual(uv_calls[0]["cwd"], str(root))
+                        self.assertEqual(uv_calls[0]["env"], want_uv_env)
+                    if npm_calls:
+                        self.assertEqual(npm_calls[0]["argv"], npm_argv)
+                        self.assertEqual(npm_calls[0]["cwd"], str(root / "web"))
+                        self.assertEqual(npm_calls[0]["env"], want_npm_env)
+                        user = npm_calls[0]["env"]["npm_config_userconfig"]
+                        glob = npm_calls[0]["env"]["npm_config_globalconfig"]
+                        self.assertNotEqual(user, glob)
+                        self.assertFalse(Path(user).exists())
+                        self.assertFalse(Path(glob).exists())
         self.assertEqual(ran, labels)
 
     def test_foundation_rows(self) -> None:
@@ -316,6 +355,7 @@ class Rows(unittest.TestCase):
                 elif label == "free":
                     sock = stubs.loopback_socket()
                     port = sock.getsockname()[1]
+                    sock.listen(5)
                     sock.close()
                     line = rows.api_port_row(port)
                     self.assertEqual(
@@ -428,7 +468,120 @@ class Rows(unittest.TestCase):
                                 line.text(),
                                 "FAIL env-not-tracked: .env is tracked by git",
                             )
+        stub_labels = [
+            "status1_other_stderr",
+            "git_env",
+            "untracked_short_stderr",
+            "status1_with_stdout",
+            "git_enoexec",
+            "git_timeout",
+        ]
+        stub_ran: list[str] = []
+        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+            base = Path(tmp)
+            for label in stub_labels:
+                with self.subTest(label=label):
+                    stub_ran.append(label)
+                    repo = base / label
+                    repo.mkdir()
+                    stubs.untracked_repo(repo)
+                    (repo / ".env").write_text("x\n", encoding="utf-8")
+                    stub_dir = base / f"{label}_stubs"
+                    stub_dir.mkdir()
+                    if label == "git_enoexec":
+                        bad = stub_dir / "git"
+                        bad.write_text("x", encoding="utf-8")
+                        bad.chmod(bad.stat().st_mode | stat.S_IXUSR)
+                        limit = 5.0
+                    elif label == "git_timeout":
+                        stubs.write_stub(stub_dir, "git", sleep=60.0)
+                        limit = 0.5
+                    elif label == "status1_other_stderr":
+                        stubs.write_stub(
+                            stub_dir,
+                            "git",
+                            status=1,
+                            stdout="",
+                            stderr="fatal: other\n",
+                        )
+                        limit = 5.0
+                    elif label == "git_env":
+                        stubs.write_stub(
+                            stub_dir,
+                            "git",
+                            status=1,
+                            stdout="",
+                            stderr=rows.GIT_UNTRACKED[0],
+                        )
+                        limit = 5.0
+                    elif label == "untracked_short_stderr":
+                        stubs.write_stub(
+                            stub_dir,
+                            "git",
+                            status=1,
+                            stdout="",
+                            stderr=rows.GIT_UNTRACKED[0],
+                        )
+                        limit = 5.0
+                    else:
+                        stubs.write_stub(
+                            stub_dir,
+                            "git",
+                            status=1,
+                            stdout="x\n",
+                            stderr=rows.GIT_UNTRACKED[1],
+                        )
+                        limit = 5.0
+                    env = {"PATH": str(stub_dir)}
+                    line = rows.env_tracked_row(repo, env, limit)
+                    if label == "status1_other_stderr":
+                        self.assertEqual(
+                            line.text(),
+                            "FAIL env-not-tracked: git output not understood (exit status 1)",
+                        )
+                    elif label == "git_env":
+                        self.assertEqual(
+                            line.text(),
+                            "PASS env-not-tracked: .env is not tracked by git",
+                        )
+                        call = stubs.calls(stub_dir)[0]
+                        self.assertEqual(
+                            call["env"],
+                            {
+                                "PATH": str(stub_dir),
+                                "LANG": "C",
+                                "LC_ALL": "C",
+                                "GIT_CONFIG_NOSYSTEM": "1",
+                                "GIT_CONFIG_GLOBAL": os.devnull,
+                                "GIT_CEILING_DIRECTORIES": str(repo.parent),
+                            },
+                        )
+                        self.assertEqual(
+                            call["argv"][1:],
+                            ["ls-files", "--error-unmatch", ".env"],
+                        )
+                    elif label == "untracked_short_stderr":
+                        self.assertEqual(
+                            line.text(),
+                            "PASS env-not-tracked: .env is not tracked by git",
+                        )
+                    elif label == "status1_with_stdout":
+                        self.assertEqual(
+                            line.text(),
+                            "FAIL env-not-tracked: git output not understood (exit status 1)",
+                        )
+                    elif label == "git_enoexec":
+                        self.assertEqual(
+                            line.text(),
+                            "FAIL env-not-tracked: git could not be started (ENOEXEC)",
+                        )
+                    else:
+                        self.assertEqual(
+                            line.text(),
+                            "FAIL env-not-tracked: git gave no answer within 0.5 s",
+                        )
         self.assertEqual(ran, labels)
+        self.assertEqual(stub_ran, stub_labels)
 
     def test_wsl_row(self) -> None:
         """R09: cmd.exe /c ver outcomes."""
@@ -454,7 +607,7 @@ class Rows(unittest.TestCase):
                         stubs.write_stub(
                             stub_dir,
                             "cmd.exe",
-                            stdout="Microsoft Windows [Version 10.0.26100.1]\r\n",
+                            stdout="\r\nMicrosoft Windows [Version 10.0.26100.1]\r\n",
                             stderr="warning\n",
                         )
                         env = {"PATH": str(stub_dir)}
@@ -474,8 +627,9 @@ class Rows(unittest.TestCase):
                         bad.write_text("x", encoding="utf-8")
                         bad.chmod(bad.stat().st_mode | stat.S_IXUSR)
                         line = rows.wsl_row(root, {"PATH": str(stub_dir)}, 5.0)
-                        self.assertIn(
-                            "cmd.exe could not be started (ENOEXEC)", line.text()
+                        self.assertEqual(
+                            line.text(),
+                            "WARN wsl-interop: cmd.exe could not be started (ENOEXEC); see OPS-43",
                         )
                     elif label == "timeout":
                         stubs.write_stub(stub_dir, "cmd.exe", sleep=60.0)
@@ -502,34 +656,140 @@ class Rows(unittest.TestCase):
     def test_rows_never_echo_child_output(self) -> None:
         """R10: failing rows do not leak child stdout/stderr."""
         marker = stubs.dummy("MARK")
+        labels = [
+            "r03_uv_fail",
+            "r03_npm_fail",
+            "r03_uv_timeout",
+            "r03_npm_stderr",
+            "r08_status0_tracked",
+            "r08_status1_marker",
+            "r08_status128",
+            "r09_status1",
+            "r09_bad_output",
+        ]
+        ran: list[str] = []
         with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
-            root = Path(tmp) / "root"
-            scratch = Path(tmp) / "scratch"
-            stub_dir = Path(tmp) / "stubs"
-            root.mkdir()
-            scratch.mkdir()
-            stub_dir.mkdir()
-            _deps_root(root)
-            stubs.write_stub(
-                stub_dir, "uv", status=1, echo=True, stdout=marker, stderr=marker
-            )
-            stubs.write_stub(
-                stub_dir, "npm", status=1, echo=True, stdout=marker, stderr=marker
-            )
-            stubs.write_stub(
-                stub_dir, "git", status=9, echo=True, stdout=marker, stderr=marker
-            )
-            stubs.write_stub(
-                stub_dir, "cmd.exe", status=9, echo=True, stdout=marker, stderr=marker
-            )
-            env = {"PATH": str(stub_dir), "ANTHROPIC_API_KEY": marker}
-            for func, args in (
-                (rows.locked_dependencies_row, (root, env, scratch, 5.0)),
-                (rows.env_tracked_row, (root, env, 5.0)),
-                (rows.wsl_row, (root, env, 5.0)),
-            ):
-                line = func(*args)
-                self.assertNotIn(marker, line.text())
+            base = Path(tmp)
+            for label in labels:
+                with self.subTest(label=label):
+                    ran.append(label)
+                    root = base / label / "root"
+                    scratch = base / label / "scratch"
+                    stub_dir = base / label / "stubs"
+                    root.mkdir(parents=True)
+                    scratch.mkdir()
+                    stub_dir.mkdir()
+                    stubs.untracked_repo(root)
+                    (root / ".env").write_text("x\n", encoding="utf-8")
+                    env = {"PATH": str(stub_dir), "ANTHROPIC_API_KEY": marker}
+                    limit = 5.0
+                    func: Any = rows.locked_dependencies_row
+                    args: tuple[object, ...] = (root, env, scratch, limit)
+                    if label.startswith("r03"):
+                        _deps_root(root)
+                        if label == "r03_uv_fail":
+                            stubs.write_stub(
+                                stub_dir,
+                                "uv",
+                                status=1,
+                                echo=True,
+                                stdout=marker,
+                                stderr=marker,
+                            )
+                            stubs.write_stub(stub_dir, "npm", status=0)
+                        elif label == "r03_npm_fail":
+                            stubs.write_stub(stub_dir, "uv", status=0)
+                            stubs.write_stub(
+                                stub_dir,
+                                "npm",
+                                status=1,
+                                echo=True,
+                                stdout=marker,
+                                stderr=marker,
+                            )
+                        elif label == "r03_uv_timeout":
+                            stubs.write_stub(
+                                stub_dir,
+                                "uv",
+                                sleep=60.0,
+                                echo=True,
+                                stdout=marker,
+                                stderr=marker,
+                            )
+                            stubs.write_stub(stub_dir, "npm", status=0)
+                            limit = 0.5
+                        else:
+                            stubs.write_stub(stub_dir, "uv", status=0)
+                            stubs.write_stub(
+                                stub_dir,
+                                "npm",
+                                status=0,
+                                echo=True,
+                                stdout=marker,
+                                stderr=marker,
+                            )
+                        args = (root, env, scratch, limit)
+                    elif label.startswith("r08"):
+                        func = rows.env_tracked_row
+                        args = (root, env, limit)
+                        if label == "r08_status0_tracked":
+                            stubs.write_stub(
+                                stub_dir,
+                                "git",
+                                status=0,
+                                stdout=".env\n",
+                                echo=True,
+                                stderr=marker,
+                            )
+                        elif label == "r08_status1_marker":
+                            stubs.write_stub(
+                                stub_dir,
+                                "git",
+                                status=1,
+                                echo=True,
+                                stdout=marker,
+                                stderr=marker,
+                            )
+                        else:
+                            stubs.write_stub(
+                                stub_dir,
+                                "git",
+                                status=128,
+                                echo=True,
+                                stdout=marker,
+                                stderr=marker,
+                            )
+                    else:
+                        func = rows.wsl_row
+                        args = (root, env, limit)
+                        if label == "r09_status1":
+                            stubs.write_stub(
+                                stub_dir,
+                                "cmd.exe",
+                                status=1,
+                                echo=True,
+                                stdout=marker,
+                                stderr=marker,
+                            )
+                        else:
+                            stubs.write_stub(
+                                stub_dir,
+                                "cmd.exe",
+                                status=0,
+                                stdout="x\r\n",
+                                echo=True,
+                                stderr=marker,
+                            )
+                    line = func(*args)
+                    text = line.text()
+                    self.assertNotIn(marker, text)
+                    skip_env = frozenset({"C", "1", "false", os.devnull})
+                    for call in stubs.calls(stub_dir):
+                        for value in call["env"].values():
+                            if value in skip_env or len(value) <= 1:
+                                continue
+                            self.assertNotIn(value, text)
+        self.assertEqual(ran, labels)
 
     def test_locked_dependencies_with_real_npm(self) -> None:
         """R11: real npm ls with uv stub."""

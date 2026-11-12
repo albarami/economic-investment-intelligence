@@ -19,7 +19,7 @@ POSTGIS_LINE = (3, 6)
 SCHEMES = ("postgresql", "postgres")
 LOOPBACK = "127.0.0.1"
 COMPOSE_PORT_NAME = "EII_COMPOSE_DB_PORT"
-FACTS_RE = re.compile(r"(\d{5,6})\|([0-9A-Za-z.]*)\n")
+FACTS_RE = re.compile(r"(\d{5,6})\|([0-9A-Za-z.]*)")
 VERSION_RE = re.compile(r"[0-9]+(\.[0-9]+)+([-+~.][0-9A-Za-z.+~-]*)?")
 POSTGIS_RE = re.compile(r"(\d+)\.(\d+)")
 READY_RE = {
@@ -49,27 +49,16 @@ class DbTarget:
 
 def parse_database_url(value: str) -> DbTarget | str:
     """Parse a database URL or return a fixed reason string."""
-    if re.search(r"%(?![0-9A-Fa-f]{2})", value):
-        return "cannot be parsed"
     try:
         parts = urlsplit(value)
     except ValueError:
         return "cannot be parsed"
-    if "%" in value:
-        try:
-            unquote(parts.netloc)
-            if parts.path:
-                unquote(parts.path)
-        except ValueError:
-            return "cannot be parsed"
     scheme = parts.scheme.lower()
     if scheme not in SCHEMES:
         return "scheme is not postgresql or postgres"
     if parts.query or parts.fragment:
         return "query or fragment not allowed"
     netloc = parts.netloc
-    if "@" not in netloc:
-        return "no host"
     if "," in netloc:
         return "more than one host"
     hostname = parts.hostname
@@ -178,10 +167,7 @@ def _run_pg_isready(
         "-t",
         proc.PG_ISREADY_WAIT,
     )
-    try:
-        result = proc.run_child(program, args, env, scratch, limit=limit)
-    except proc.CommandRefused:
-        raise
+    result = proc.run_child(program, args, env, scratch, limit=limit)
     if result.start_error is not None:
         return store.PgOutcome(
             "fail",
@@ -258,10 +244,7 @@ def _run_psql(
         extra["PGPASSWORD"] = target.password
     env = proc.child_env("psql", environ, extra)
     args = ("-X", "-w", "-q", "-t", "-A", "-F", "|", "-c", proc.CHECK_QUERY)
-    try:
-        result = proc.run_child(program, args, env, scratch, limit=limit)
-    except proc.CommandRefused:
-        raise
+    result = proc.run_child(program, args, env, scratch, limit=limit)
     if result.start_error is not None:
         return store.PgOutcome(
             "fail",
@@ -289,7 +272,7 @@ def _run_psql(
             "fail",
             f"PostgreSQL answers on {where}, but the check query output is not understood",
         )
-    m = FACTS_RE.fullmatch(result.stdout)
+    m = FACTS_RE.fullmatch(result.stdout[:-1])
     if m is None:
         return store.PgOutcome(
             "fail",
@@ -313,7 +296,13 @@ def probe_postgres(
             "fail",
             f"EII_DATABASE_URL is not a valid connection string ({parsed})",
         )
-    return _run_pg_isready(parsed, environ, scratch, limit)
+    try:
+        return _run_pg_isready(parsed, environ, scratch, limit)
+    except proc.CommandRefused:
+        return store.PgOutcome(
+            "fail",
+            "a command outside the closed list was refused",
+        )
 
 
 def probe_docker(
@@ -328,10 +317,7 @@ def probe_docker(
         return store.DockerOutcome("not_found", "")
     env = proc.child_env("docker", environ, {})
     args = ("info", "--format", "{{.ServerVersion}}")
-    try:
-        result = proc.run_child(program, args, env, scratch, limit=limit)
-    except proc.CommandRefused:
-        raise
+    result = proc.run_child(program, args, env, scratch, limit=limit)
     if result.start_error is not None:
         return store.DockerOutcome("not_started", result.start_error)
     if result.timed_out:

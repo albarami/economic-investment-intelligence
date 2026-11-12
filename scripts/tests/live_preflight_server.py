@@ -33,15 +33,19 @@ class LiveServer(unittest.TestCase):
                 "EII_DATABASE_URL is unset; start the eii-poc Compose service and "
                 "export EII_DATABASE_URL (see plan Docker section)",
             )
-        parts = urlsplit(raw)
-        host = parts.hostname or ""
-        port = parts.port or 0
-        if host != "127.0.0.1":
-            msg = f"EII_DATABASE_URL host must be 127.0.0.1, got {host!r}"
-            raise AssertionError(msg)
-        if port in stubs.BANNED_PORTS:
-            msg = f"EII_DATABASE_URL port {port} is banned for tests"
-            raise AssertionError(msg)
+        parsed = database.parse_database_url(raw)
+        if isinstance(parsed, str):
+            raise AssertionError(
+                f"EII_DATABASE_URL is not a valid connection string ({parsed})",
+            )
+        if parsed.host != "127.0.0.1":
+            raise AssertionError(
+                f"EII_DATABASE_URL host must be 127.0.0.1, got {parsed.host!r}",
+            )
+        if parsed.port in stubs.BANNED_PORTS:
+            raise AssertionError(
+                f"EII_DATABASE_URL port {parsed.port} is banned for tests",
+            )
         if shutil.which("pg_isready") is None or shutil.which("psql") is None:
             raise AssertionError("pg_isready and psql must be on PATH for live probes")
 

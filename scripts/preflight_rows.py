@@ -20,7 +20,7 @@ NOT_CONFIGURED = "not_configured (EII_RELEASE_DIR is not set)"
 NOT_BUILT = (
     "not_built (EII_RELEASE_DIR is set, and this check is not built in slice S0)"
 )
-WINDOWS_RE = re.compile(r"Microsoft Windows \[Version [0-9.]+\]\r?\n?")
+WINDOWS_RE = re.compile(r"Microsoft Windows \[Version [0-9.]+\]\r?")
 GIT_UNTRACKED = (
     "error: pathspec '.env' did not match any file(s) known to git\n",
     "error: pathspec '.env' did not match any file(s) known to git\n"
@@ -211,7 +211,9 @@ def wsl_row(root: Path, environ: Mapping[str, str], limit: float) -> store.Line:
         )
     if result.timed_out:
         return store.Line("WARN", "wsl-interop", f"cmd.exe gave no answer within {t} s")
-    if result.status == 0 and WINDOWS_RE.fullmatch(result.stdout):
+    if result.status == 0 and any(
+        WINDOWS_RE.fullmatch(text) for text in result.stdout.split("\n")
+    ):
         return store.Line("PASS", "wsl-interop", "cmd.exe printed a Windows version")
     if result.status != 0:
         return store.Line("WARN", "wsl-interop", f"cmd.exe exit status {result.status}")
@@ -305,7 +307,7 @@ def locked_dependencies_row(
                 )
             elif npm_result.timed_out:
                 problems.append(f"npm gave no answer within {t} s")
-            elif npm_result.status == 0:
+            elif npm_result.status == 0 and not npm_result.stderr:
                 pass
             elif npm_result.status == 1:
                 problems.append(

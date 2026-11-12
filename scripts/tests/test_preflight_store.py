@@ -211,6 +211,12 @@ class StoreSelection(unittest.TestCase):
                         )
                     elif label == "rejecting":
                         self.assertEqual(sel.store, "none")
+                        assert sel.line is not None
+                        self.assertEqual(
+                            sel.line.text(),
+                            f"FAIL postgresql: PostgreSQL on 127.0.0.1:{port} rejects "
+                            "connections (pg_isready exit status 1)",
+                        )
                         self.assertFalse(
                             any(c["program"] == "docker" for c in calls_after)
                         )
@@ -222,7 +228,12 @@ class StoreSelection(unittest.TestCase):
                         self.assertEqual(len(docker_calls), 1)
                     elif label == "status_2_no_docker":
                         assert sel.line is not None
-                        self.assertIn("Docker not probed", sel.line.text())
+                        self.assertEqual(sel.store, "embedded")
+                        self.assertEqual(
+                            sel.line.text(),
+                            f"WARN postgresql: no answer on 127.0.0.1:{port} "
+                            "(pg_isready exit status 2); store embedded; Docker not probed",
+                        )
                         self.assertFalse(
                             any(c["program"] == "docker" for c in calls_after)
                         )

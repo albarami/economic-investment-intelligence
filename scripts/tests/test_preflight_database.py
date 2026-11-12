@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import stat
 import sys
@@ -15,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import preflight_stubs as stubs
 
 import preflight_database as database
+import preflight_proc as proc
 
 
 def _host() -> str:
@@ -42,6 +44,8 @@ class DatabaseProbe(unittest.TestCase):
 
     def test_valid_urls(self) -> None:
         """D01: parse_database_url accepts six URL forms."""
+        pw_plain = stubs.dummy("p")
+        enc_ud_pw = stubs.dummy("p")
         labels = [
             "plain",
             "encoded_password",
@@ -49,11 +53,13 @@ class DatabaseProbe(unittest.TestCase):
             "upper_scheme",
             "ipv6",
             "no_password",
+            "lone_percent_password",
+            "encoded_user_database",
         ]
         cases: list[tuple[str, database.DbTarget, str]] = [
             (
-                stubs.database_url(None, 55440),
-                database.DbTarget("127.0.0.1", 55440, "eii_app", None, "eii"),
+                stubs.database_url(pw_plain, 55440),
+                database.DbTarget("127.0.0.1", 55440, "eii_app", pw_plain, "eii"),
                 "127.0.0.1:55440",
             ),
             (
@@ -83,6 +89,16 @@ class DatabaseProbe(unittest.TestCase):
                 stubs.database_url(None, 55445, user="eii_app", database="eii"),
                 database.DbTarget("127.0.0.1", 55445, "eii_app", None, "eii"),
                 "127.0.0.1:55445",
+            ),
+            (
+                "postgresql://eii_app:p%" + ("@" + _host()) + ":55446/eii",
+                database.DbTarget("127.0.0.1", 55446, "eii_app", "p%", "eii"),
+                "127.0.0.1:55446",
+            ),
+            (
+                "postgresql://a%40b:" + enc_ud_pw + ("@" + _host()) + ":55447/d%62",
+                database.DbTarget("127.0.0.1", 55447, "a@b", enc_ud_pw, "db"),
+                "127.0.0.1:55447",
             ),
         ]
         ran: list[str] = []
@@ -115,7 +131,11 @@ class DatabaseProbe(unittest.TestCase):
             "no_user",
             "no_database",
             "database_slash",
+            "no_at_sign",
             "bad_parse",
+            "mysql_percent",
+            "no_user_no_at",
+            "two_hosts_no_at",
         ]
         dummy = stubs.dummy("z")
         reasons = [
@@ -131,7 +151,11 @@ class DatabaseProbe(unittest.TestCase):
             "no user",
             "no database name",
             "no database name",
+            "port is not a number from 1 to 65535",
             "cannot be parsed",
+            "scheme is not postgresql or postgres",
+            "no user",
+            "more than one host",
         ]
         h = _host()
         at = "@" + h
@@ -140,7 +164,7 @@ class DatabaseProbe(unittest.TestCase):
             _pg_url("eii_app", 1, "eii") + "?host=evil",
             _pg_url("eii_app", 1, "eii") + "#frag",
             _pg_url("eii_app", 1, "eii", host="h1,h2"),
-            f"postgresql://eii_app:{dummy}",
+            "postgresql://eii_app@:1/eii",
             f"postgresql://eii_app{at}:notaport/eii",
             _pg_url("eii_app", 0, "eii"),
             _pg_url("eii_app", 99999, "eii"),
@@ -148,7 +172,11 @@ class DatabaseProbe(unittest.TestCase):
             f"postgresql://{at}:1/eii",
             f"postgresql://eii_app{at}:1/",
             f"postgresql://eii_app{at}:1/a/b",
-            f"postgresql://eii_app:{dummy}%%",
+            f"postgresql://eii_app:{dummy}",
+            "postgresql://[::1/eii",
+            "mysql://u:p%@" + "h:1/db",
+            f"postgresql://{h}:1/eii",
+            "postgresql://h1:1,h2:2/eii",
         ]
         ran: list[str] = []
         for label, url, reason in zip(labels, urls, reasons, strict=True):
@@ -188,9 +216,10 @@ class DatabaseProbe(unittest.TestCase):
                     env = {"EII_DATABASE_URL": "mysql://x"}
                     with self.assertRaises(ValueError) as ctx:
                         database.compose_port_env(env)
-                    self.assertIn(
-                        "EII_DATABASE_URL is not a valid connection string",
+                    self.assertEqual(
                         str(ctx.exception),
+                        "EII_DATABASE_URL is not a valid connection string "
+                        "(scheme is not postgresql or postgres)",
                     )
                 else:
                     env = {
@@ -219,6 +248,9 @@ class DatabaseProbe(unittest.TestCase):
             "accepting_stderr",
             "status_7",
             "status_2_garbage",
+            "host_refused",
+            "status_2_stderr",
+            "unset_url",
         ]
         ran: list[str] = []
         with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
@@ -233,8 +265,20 @@ class DatabaseProbe(unittest.TestCase):
                     ran.append(label)
                     case_dir = folder / label
                     case_dir.mkdir()
-                    env = dict(base_env)
                     where = f"127.0.0.1:{port}"
+                    if label == "unset_url":
+                        env = {"PATH": str(case_dir)}
+                    elif label == "host_refused":
+                        env = {
+                            "PATH": str(case_dir),
+                            "EII_DATABASE_URL": "postgresql://eii_app@" + "-x:1/eii",
+                        }
+                        stubs.write_stub(case_dir, "pg_isready")
+                        stubs.write_stub(case_dir, "psql")
+                    else:
+                        env = dict(base_env)
+                    if label != "unset_url" and label != "host_refused":
+                        stubs.write_stub(case_dir, "psql")
                     if label == "not_found":
                         env["PATH"] = str(case_dir)
                     elif label == "enoexec":
@@ -245,14 +289,22 @@ class DatabaseProbe(unittest.TestCase):
                     elif label == "timeout":
                         stubs.write_stub(case_dir, "pg_isready", sleep=60.0)
                         env["PATH"] = str(case_dir)
-                        outcome = database.probe_postgres(env, case_dir, 0.5)
-                        self.assertEqual(outcome.kind, "absent")
-                        self.assertEqual(
-                            outcome.reason, f"no answer on {where} within 0.5 s"
+                    elif label == "status_2_stderr":
+                        stubs.write_stub(
+                            case_dir,
+                            "pg_isready",
+                            status=2,
+                            stdout=f"{where} - no response\n",
+                            stderr="e\n",
                         )
-                        continue
-                    else:
-                        stubs.write_stub(case_dir, "psql")
+                        env["PATH"] = str(case_dir)
+                    elif label not in (
+                        "unset_url",
+                        "host_refused",
+                        "not_found",
+                        "enoexec",
+                        "timeout",
+                    ):
                         if label == "status_2":
                             stubs.write_stub(
                                 case_dir,
@@ -294,15 +346,24 @@ class DatabaseProbe(unittest.TestCase):
                                 stdout="x\n",
                             )
                         env["PATH"] = str(case_dir)
-                    outcome = database.probe_postgres(
-                        env,
-                        case_dir,
-                        0.5 if label == "enoexec" else 5.0,
-                    )
+                    outcome = database.probe_postgres(env, case_dir, 0.5)
+                    if label == "unset_url":
+                        self.assertEqual(outcome.kind, "absent")
+                        self.assertEqual(outcome.reason, "EII_DATABASE_URL is not set")
+                        self.assertEqual(stubs.calls(case_dir), [])
+                        continue
                     psql_called = any(
                         c["program"] == "psql" for c in stubs.calls(case_dir)
                     )
                     self.assertFalse(psql_called, label)
+                    if label == "host_refused":
+                        self.assertEqual(outcome.kind, "fail")
+                        self.assertEqual(
+                            outcome.reason,
+                            "a command outside the closed list was refused",
+                        )
+                        self.assertEqual(stubs.calls(case_dir), [])
+                        continue
                     if label == "not_found":
                         self.assertEqual(outcome.kind, "absent")
                         self.assertEqual(
@@ -314,6 +375,17 @@ class DatabaseProbe(unittest.TestCase):
                         self.assertEqual(
                             outcome.reason,
                             "pg_isready could not be started (ENOEXEC)",
+                        )
+                    elif label == "timeout":
+                        self.assertEqual(outcome.kind, "absent")
+                        self.assertEqual(
+                            outcome.reason, f"no answer on {where} within 0.5 s"
+                        )
+                    elif label == "status_2_stderr":
+                        self.assertEqual(outcome.kind, "fail")
+                        self.assertEqual(
+                            outcome.reason,
+                            "pg_isready output not understood (exit status 2)",
                         )
                     elif label == "status_2":
                         self.assertEqual(outcome.kind, "absent")
@@ -365,6 +437,7 @@ class DatabaseProbe(unittest.TestCase):
             "status_2",
             "stderr",
             "two_lines",
+            "garbage",
         ]
         ran: list[str] = []
         with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
@@ -395,12 +468,9 @@ class DatabaseProbe(unittest.TestCase):
                     elif label == "timeout":
                         stubs.write_stub(case_dir, "psql", sleep=60.0)
                         env = {"PATH": str(case_dir), "EII_DATABASE_URL": url}
-                        outcome = database.probe_postgres(env, case_dir, 0.5)
-                        self.assertEqual(
-                            outcome.reason,
-                            f"PostgreSQL answers on {where}, but the check query gave no result within 0.5 s",
-                        )
-                        continue
+                    elif label == "garbage":
+                        stubs.write_stub(case_dir, "psql", status=0, stdout="garbage\n")
+                        env = {"PATH": str(case_dir), "EII_DATABASE_URL": url}
                     else:
                         if label == "status_2":
                             stubs.write_stub(case_dir, "psql", status=2)
@@ -420,7 +490,7 @@ class DatabaseProbe(unittest.TestCase):
                                 stdout="180006|3.6.4\n\n",
                             )
                         env = {"PATH": str(case_dir), "EII_DATABASE_URL": url}
-                    outcome = database.probe_postgres(env, case_dir, 5.0)
+                    outcome = database.probe_postgres(env, case_dir, 0.5)
                     self.assertEqual(outcome.kind, "fail")
                     if label == "missing":
                         self.assertEqual(
@@ -429,8 +499,14 @@ class DatabaseProbe(unittest.TestCase):
                             "so its version and PostGIS cannot be checked",
                         )
                     elif label == "enoexec":
-                        self.assertIn(
-                            "psql could not be started (ENOEXEC)", outcome.reason
+                        self.assertEqual(
+                            outcome.reason,
+                            f"PostgreSQL answers on {where}, but psql could not be started (ENOEXEC)",
+                        )
+                    elif label == "timeout":
+                        self.assertEqual(
+                            outcome.reason,
+                            f"PostgreSQL answers on {where}, but the check query gave no result within 0.5 s",
                         )
                     elif label == "status_2":
                         self.assertEqual(
@@ -454,6 +530,10 @@ class DatabaseProbe(unittest.TestCase):
             "postgis_37",
             "postgis_310",
             "postgis_x",
+            "server_19",
+            "postgis_46",
+            "postgis_v",
+            "two_reasons",
         ]
         outputs = [
             "180006|3.6.4\n",
@@ -463,41 +543,70 @@ class DatabaseProbe(unittest.TestCase):
             "180006|3.7.0\n",
             "180006|3.10.0\n",
             "180006|x\n",
+            "190001|3.6.4\n",
+            "180006|4.6.0\n",
+            "180006|v3.6.0\n",
+            "170005|\n",
         ]
-        target = database.DbTarget("127.0.0.1", 55440, "eii_app", None, "eii")
-        where = target.where()
         ran: list[str] = []
-        for label, stdout in zip(labels, outputs, strict=True):
-            with self.subTest(label=label):
-                ran.append(label)
-                match = database.FACTS_RE.fullmatch(stdout)
-                assert match is not None
-                outcome = database.judge_server_facts(match, target)
-                if label == "good":
-                    self.assertEqual(outcome.kind, "ok")
-                    self.assertEqual(
-                        outcome.reason,
-                        f"PostgreSQL 18.6 with PostGIS 3.6.4 answers on {where}",
+        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+            folder = Path(tmp)
+            sock = stubs.loopback_socket()
+            port = sock.getsockname()[1]
+            sock.close()
+            where = f"127.0.0.1:{port}"
+            url = stubs.database_url(None, port)
+            for label, stdout in zip(labels, outputs, strict=True):
+                with self.subTest(label=label):
+                    ran.append(label)
+                    case_dir = folder / label
+                    case_dir.mkdir()
+                    stubs.write_stub(
+                        case_dir,
+                        "pg_isready",
+                        status=0,
+                        stdout=f"{where} - accepting connections\n",
                     )
-                elif label == "minor_ok":
-                    self.assertEqual(outcome.kind, "ok")
-                else:
-                    self.assertEqual(outcome.kind, "fail")
-                    if label == "major":
-                        self.assertIn("server version 17.5 is not 18.x", outcome.reason)
-                    elif label == "no_postgis":
-                        self.assertIn(
-                            "PostGIS is not installed in database eii",
+                    stubs.write_stub(case_dir, "psql", status=0, stdout=stdout)
+                    env = {"PATH": str(case_dir), "EII_DATABASE_URL": url}
+                    outcome = database.probe_postgres(env, case_dir, 5.0)
+                    if label == "good":
+                        self.assertEqual(outcome.kind, "ok")
+                        self.assertEqual(
                             outcome.reason,
+                            f"PostgreSQL 18.6 with PostGIS 3.6.4 answers on {where}",
                         )
-                    elif label == "postgis_37":
-                        self.assertIn("PostGIS 3.7.0 is not 3.6.x", outcome.reason)
-                    elif label == "postgis_310":
-                        self.assertIn("PostGIS 3.10.0 is not 3.6.x", outcome.reason)
+                    elif label == "minor_ok":
+                        self.assertEqual(outcome.kind, "ok")
+                        self.assertEqual(
+                            outcome.reason,
+                            f"PostgreSQL 18.10 with PostGIS 3.6.4 answers on {where}",
+                        )
                     else:
-                        self.assertIn(
-                            "PostGIS version x not understood", outcome.reason
-                        )
+                        self.assertEqual(outcome.kind, "fail")
+                        prefix = f"PostgreSQL on {where} fails its checks: "
+                        if label == "major":
+                            want = prefix + "server version 17.5 is not 18.x"
+                        elif label == "no_postgis":
+                            want = prefix + "PostGIS is not installed in database eii"
+                        elif label == "postgis_37":
+                            want = prefix + "PostGIS 3.7.0 is not 3.6.x"
+                        elif label == "postgis_310":
+                            want = prefix + "PostGIS 3.10.0 is not 3.6.x"
+                        elif label == "postgis_x":
+                            want = prefix + "PostGIS version x not understood"
+                        elif label == "server_19":
+                            want = prefix + "server version 19.1 is not 18.x"
+                        elif label == "postgis_46":
+                            want = prefix + "PostGIS 4.6.0 is not 3.6.x"
+                        elif label == "postgis_v":
+                            want = prefix + "PostGIS version v3.6.0 not understood"
+                        else:
+                            want = (
+                                prefix + "server version 17.5 is not 18.x; "
+                                "PostGIS is not installed in database eii"
+                            )
+                        self.assertEqual(outcome.reason, want)
         self.assertEqual(ran, labels)
 
     def test_postgres_child_environments(self) -> None:
@@ -553,29 +662,49 @@ class DatabaseProbe(unittest.TestCase):
                     psql_call = next(c for c in calls if c["program"] == "psql")
                     passfile = str(case_dir / "absent")
                     self.assertEqual(
-                        set(is_ready["env"].keys()),
-                        {"PATH", "LANG", "LC_ALL", "PGPASSFILE"},
+                        is_ready["env"],
+                        {
+                            "PATH": str(case_dir),
+                            "LANG": "C",
+                            "LC_ALL": "C",
+                            "PGPASSFILE": passfile,
+                        },
                     )
-                    self.assertEqual(is_ready["env"]["PGPASSFILE"], passfile)
-                    want_psql = {
-                        "PATH",
-                        "LANG",
-                        "LC_ALL",
-                        "PGHOST",
-                        "PGPORT",
-                        "PGUSER",
-                        "PGDATABASE",
-                        "PGCONNECT_TIMEOUT",
-                        "PGPASSFILE",
+                    want_psql: dict[str, str] = {
+                        "PATH": str(case_dir),
+                        "LANG": "C",
+                        "LC_ALL": "C",
+                        "PGHOST": "127.0.0.1",
+                        "PGPORT": str(port),
+                        "PGUSER": "eii_app",
+                        "PGDATABASE": "eii",
+                        "PGCONNECT_TIMEOUT": "5",
+                        "PGPASSFILE": passfile,
                     }
                     if label == "with_password":
-                        want_psql.add("PGPASSWORD")
-                    self.assertEqual(set(psql_call["env"].keys()), want_psql)
-                    if label == "with_password":
-                        self.assertEqual(psql_call["env"]["PGPASSWORD"], password)
-                    self.assertEqual(psql_call["env"]["PGHOST"], "127.0.0.1")
-                    self.assertEqual(psql_call["env"]["PGPORT"], str(port))
-                    self.assertNotIn(password, " ".join(psql_call["argv"]))
+                        want_psql["PGPASSWORD"] = password
+                    self.assertEqual(psql_call["env"], want_psql)
+                    self.assertFalse(Path(passfile).exists())
+                    self.assertEqual(
+                        is_ready["argv"][1:],
+                        ["-h", "127.0.0.1", "-p", str(port), "-t", "5"],
+                    )
+                    self.assertEqual(
+                        psql_call["argv"][1:],
+                        [
+                            "-X",
+                            "-w",
+                            "-q",
+                            "-t",
+                            "-A",
+                            "-F",
+                            "|",
+                            "-c",
+                            proc.CHECK_QUERY,
+                        ],
+                    )
+                    self.assertNotIn(password, json.dumps(is_ready["argv"]))
+                    self.assertNotIn(password, json.dumps(psql_call["argv"]))
         self.assertEqual(ran, labels)
 
     def test_docker_outcomes(self) -> None:
@@ -672,18 +801,22 @@ class DatabaseProbe(unittest.TestCase):
                         environ["PATH"] = str(folder)
                     database.probe_docker(environ, folder, 5.0)
                     recorded = stubs.calls(folder)[-1]["env"]
-                    want = {"PATH", "LANG", "LC_ALL"}
+                    want: dict[str, str] = {
+                        "PATH": str(folder),
+                        "LANG": "C",
+                        "LC_ALL": "C",
+                    }
                     if label == "all_present":
                         want.update(
                             {
-                                "HOME",
-                                "WSL_DISTRO_NAME",
-                                "DOCKER_HOST",
-                                "DOCKER_CONTEXT",
-                                "DOCKER_CONFIG",
+                                "HOME": home,
+                                "WSL_DISTRO_NAME": "Ubuntu",
+                                "DOCKER_HOST": "unix:///var/run/docker.sock",
+                                "DOCKER_CONTEXT": "default",
+                                "DOCKER_CONFIG": docker_cfg,
                             },
                         )
-                    self.assertEqual(set(recorded.keys()), want)
+                    self.assertEqual(recorded, want)
         self.assertEqual(ran, labels)
 
     def test_silent_listener_gets_no_answer(self) -> None:

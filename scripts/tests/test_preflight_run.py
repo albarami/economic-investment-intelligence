@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import urllib.parse
 from pathlib import Path
 from unittest import mock
 
@@ -74,7 +75,7 @@ def _env0(
         stub_dir,
         "cmd.exe",
         status=0,
-        stdout="Microsoft Windows [Version 10.0.26100.1]\r\n",
+        stdout=WIN_LINE,
     )
     stubs.write_stub(stub_dir, "uv", status=0)
     stubs.write_stub(stub_dir, "npm", status=0)
@@ -150,8 +151,11 @@ class Preflight(unittest.TestCase):
                     env, root, api_port, db_port = _env0(case)
                     stub_dir = case / "stubs"
                     holder: socket.socket | None = None
+                    freeze_line = (
+                        "FAIL tiles-glyphs-fonts: freeze bundle found (1 freeze.json under "
+                        "data/freeze), and the tile, glyph and font hash check is not built in slice S0"
+                    )
                     if label == "uv_fail":
-                        (stub_dir / "uv").unlink()
                         stubs.write_stub(stub_dir, "uv", status=1)
                     elif label == "pg_reject":
                         stubs.write_stub(
@@ -164,7 +168,7 @@ class Preflight(unittest.TestCase):
                         bundle = root / "data" / "freeze" / "x"
                         bundle.mkdir(parents=True)
                         (bundle / "freeze.json").write_text("{}", encoding="utf-8")
-                    if label == "port_held":
+                    elif label == "port_held":
                         holder = stubs.loopback_socket()
                         held_port = holder.getsockname()[1]
                         holder.listen(5)
@@ -178,48 +182,47 @@ class Preflight(unittest.TestCase):
                             status=2,
                             stdout=f"127.0.0.1:{db_port} - no response\n",
                         )
-                    else:
+                    elif label == "cmd_missing":
                         (stub_dir / "cmd.exe").unlink()
                     report = preflight_mod.run_preflight(root, env, api_port=api_port)
+                    want = self._u01_lines(api_port)
                     if label == "uv_fail":
-                        self.assertIn(
-                            "FAIL locked-dependencies: uv.lock does not match",
-                            report.text_lines()[0],
+                        want[0] = (
+                            "FAIL locked-dependencies: uv.lock does not match the manifests "
+                            "without the network (uv lock --check exit status 1)"
                         )
-                        self.assertEqual(report.status, 1)
                     elif label == "pg_reject":
-                        self.assertIn("rejects connections", report.text_lines()[1])
-                        self.assertEqual(report.text_lines()[-1], "store: none")
-                        self.assertEqual(report.status, 1)
+                        want[1] = (
+                            f"FAIL postgresql: PostgreSQL on 127.0.0.1:{db_port} rejects "
+                            "connections (pg_isready exit status 1)"
+                        )
+                        want[-1] = "store: none"
                     elif label == "freeze":
-                        self.assertIn("freeze bundle found", report.text_lines()[5])
-                        self.assertEqual(report.status, 1)
+                        want[5] = freeze_line
                     elif label == "port_held":
-                        self.assertIn(
-                            f"FAIL api-port: 127.0.0.1:{api_port} is in use",
-                            report.text_lines(),
-                        )
-                        self.assertEqual(report.status, 1)
-                        if holder is not None:
-                            holder.close()
+                        want[7] = f"FAIL api-port: 127.0.0.1:{api_port} is in use"
                     elif label == "env_staged":
-                        self.assertIn(
-                            "FAIL env-not-tracked: .env is tracked by git",
-                            report.text_lines(),
-                        )
-                        self.assertEqual(report.status, 1)
+                        want[9] = "FAIL env-not-tracked: .env is tracked by git"
                     elif label == "pg_no_answer":
-                        self.assertIn("no answer on", report.text_lines()[1])
-                        self.assertEqual(report.status, 0)
-                    else:
-                        self.assertIn(
-                            "cmd.exe not found on PATH", report.text_lines()[-2]
+                        want[1] = (
+                            f"WARN postgresql: no answer on 127.0.0.1:{db_port} "
+                            "(pg_isready exit status 2); store embedded; Docker not reachable"
                         )
+                    elif label == "cmd_missing":
+                        want[10] = "WARN wsl-interop: cmd.exe not found on PATH"
+                    self.assertEqual(report.text_lines(), want)
+                    if label in (
+                        "uv_fail",
+                        "pg_reject",
+                        "freeze",
+                        "port_held",
+                        "env_staged",
+                    ):
+                        self.assertEqual(report.status, 1)
+                    else:
                         self.assertEqual(report.status, 0)
-                    base_lines = self._u01_lines(api_port)
-                    for line in report.text_lines():
-                        if "not_configured" in line:
-                            self.assertIn(line, base_lines)
+                    if holder is not None:
+                        holder.close()
         self.assertEqual(ran, labels)
 
     def test_configured_release_mode(self) -> None:
@@ -246,6 +249,9 @@ class Preflight(unittest.TestCase):
             "api_and_other",
             "all_ok",
             "unset_ok",
+            "load_receipt_only",
+            "embedded_reader_only",
+            "two_release_rows",
         ]
         not_built = "not_built (EII_RELEASE_DIR is set, and this check is not built in slice S0)"
         ran: list[str] = []
@@ -262,6 +268,23 @@ class Preflight(unittest.TestCase):
                 if label == "release_fail":
                     lines = (
                         store.Line("FAIL", "release", not_built),
+                        store.Line("PASS", "api-port", "127.0.0.1:1 is free"),
+                    )
+                elif label == "load_receipt_only":
+                    lines = (
+                        store.Line("FAIL", "load-receipt", not_built),
+                        store.Line("PASS", "api-port", "127.0.0.1:1 is free"),
+                    )
+                elif label == "embedded_reader_only":
+                    lines = (
+                        store.Line("FAIL", "embedded-reader", not_built),
+                        store.Line("PASS", "api-port", "127.0.0.1:1 is free"),
+                    )
+                elif label == "two_release_rows":
+                    lines = (
+                        store.Line("FAIL", "release", not_built),
+                        store.Line("FAIL", "load-receipt", not_built),
+                        store.Line("FAIL", "embedded-reader", not_built),
                         store.Line("PASS", "api-port", "127.0.0.1:1 is free"),
                     )
                 elif label == "api_only":
@@ -294,6 +317,31 @@ class Preflight(unittest.TestCase):
                     self.assertEqual(
                         (code, msg),
                         (4, "release missing, incomplete or not verified: release"),
+                    )
+                elif label == "load_receipt_only":
+                    self.assertEqual(
+                        (code, msg),
+                        (
+                            4,
+                            "release missing, incomplete or not verified: load-receipt",
+                        ),
+                    )
+                elif label == "embedded_reader_only":
+                    self.assertEqual(
+                        (code, msg),
+                        (
+                            4,
+                            "release missing, incomplete or not verified: embedded-reader",
+                        ),
+                    )
+                elif label == "two_release_rows":
+                    self.assertEqual(
+                        (code, msg),
+                        (
+                            4,
+                            "release missing, incomplete or not verified: "
+                            "release, load-receipt, embedded-reader",
+                        ),
                     )
                 elif label == "api_only":
                     self.assertEqual((code, msg), (5, "API port already in use"))
@@ -342,27 +390,132 @@ class Preflight(unittest.TestCase):
                         self.assertEqual(report.text_lines()[-1], "store: embedded")
                     else:
                         self.assertFalse(any(n == "docker" for n in names))
-                        self.assertIn("Docker not probed", report.text_lines()[1])
+                        self.assertEqual(
+                            report.text_lines()[1],
+                            f"WARN postgresql: no answer on 127.0.0.1:{db_port} "
+                            "(pg_isready exit status 2); store embedded; Docker not probed",
+                        )
                         self.assertEqual(report.text_lines()[-1], "store: embedded")
         self.assertEqual(ran, labels)
 
     def test_only_closed_commands_started(self) -> None:
         """U06: every child matches command_allowed."""
+        u01_set = frozenset({"uv", "npm", "docker", "git", "cmd.exe"})
+        scenarios: list[tuple[str, frozenset[str], dict[str, object] | None]] = [
+            ("u01", u01_set, None),
+            (
+                "uv_fail",
+                u01_set,
+                {"uv_status": 1},
+            ),
+            ("freeze", u01_set, {"freeze": True}),
+            ("port_held", u01_set, {"port_held": True}),
+            ("env_staged", u01_set, {"env_staged": True}),
+            (
+                "pg_reject",
+                frozenset({"uv", "npm", "pg_isready", "git", "cmd.exe"}),
+                {"pg_reject": True},
+            ),
+            (
+                "pg_no_answer",
+                frozenset({"uv", "npm", "pg_isready", "docker", "git", "cmd.exe"}),
+                {"pg_no_answer": True},
+            ),
+            (
+                "cmd_missing",
+                frozenset({"uv", "npm", "docker", "git"}),
+                {"cmd_missing": True},
+            ),
+            (
+                "d06_two_lines",
+                frozenset({"uv", "npm", "pg_isready", "psql", "git", "cmd.exe"}),
+                {"psql_two_lines": True},
+            ),
+        ]
+        ran: list[str] = []
+        real = proc.run_child
+        recorded: list[tuple[str, tuple[str, ...]]] = []
         with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
-            env, root, api_port, db_port = _env0(Path(tmp))
-            stub_dir = Path(tmp) / "stubs"
-            stubs.write_stub(
-                stub_dir,
-                "pg_isready",
-                status=0,
-                stdout=f"127.0.0.1:{db_port} - accepting connections\n",
-            )
-            stubs.write_stub(stub_dir, "psql", status=0, stdout="x\n\n")
-            preflight_mod.run_preflight(root, env, api_port=api_port)
-            for call in stubs.calls(stub_dir):
-                prog = call["program"]
-                args = call["argv"][1:]
-                self.assertTrue(proc.command_allowed(prog, args), call)
+            base = Path(tmp)
+            for label, expect_names, opts in scenarios:
+                with self.subTest(label=label):
+                    recorded.clear()
+                    ran.append(label)
+                    case = base / label
+                    case.mkdir()
+                    env, root, api_port, db_port = _env0(case)
+                    stub_dir = case / "stubs"
+                    holder: socket.socket | None = None
+                    if opts:
+                        if opts.get("uv_status"):
+                            stubs.write_stub(stub_dir, "uv", status=1)
+                        if opts.get("freeze"):
+                            bundle = root / "data" / "freeze" / "x"
+                            bundle.mkdir(parents=True)
+                            (bundle / "freeze.json").write_text("{}", encoding="utf-8")
+                        if opts.get("port_held"):
+                            holder = stubs.loopback_socket()
+                            api_port = holder.getsockname()[1]
+                            holder.listen(5)
+                        if opts.get("env_staged"):
+                            subprocess.run(["git", "add", ".env"], cwd=root, check=True)
+                        if opts.get("pg_reject"):
+                            stubs.write_stub(
+                                stub_dir,
+                                "pg_isready",
+                                status=1,
+                                stdout=f"127.0.0.1:{db_port} - rejecting connections\n",
+                            )
+                        if opts.get("pg_no_answer"):
+                            stubs.write_stub(
+                                stub_dir,
+                                "pg_isready",
+                                status=2,
+                                stdout=f"127.0.0.1:{db_port} - no response\n",
+                            )
+                        if opts.get("cmd_missing"):
+                            (stub_dir / "cmd.exe").unlink()
+                        if opts.get("psql_two_lines"):
+                            stubs.write_stub(
+                                stub_dir,
+                                "pg_isready",
+                                status=0,
+                                stdout=f"127.0.0.1:{db_port} - accepting connections\n",
+                            )
+                            stubs.write_stub(
+                                stub_dir,
+                                "psql",
+                                status=0,
+                                stdout="180006|3.6.4\n\n",
+                            )
+
+                    def spy(
+                        program: str,
+                        args: object,
+                        env_arg: object,
+                        cwd: Path,
+                        *,
+                        limit: float = proc.PROBE_TIMEOUT_S,
+                    ) -> proc.ChildResult:
+                        from collections.abc import Mapping, Sequence
+
+                        assert isinstance(args, Sequence)
+                        assert isinstance(env_arg, Mapping)
+                        recorded.append((Path(program).name, tuple(args)))
+                        return real(program, args, env_arg, cwd, limit=limit)
+
+                    with mock.patch("preflight_proc.run_child", side_effect=spy):
+                        preflight_mod.run_preflight(root, env, api_port=api_port)
+                    names = {name for name, _ in recorded}
+                    self.assertEqual(names, set(expect_names))
+                    for name, args in recorded:
+                        self.assertTrue(proc.command_allowed(name, args))
+                    if holder is not None:
+                        holder.close()
+        self.assertEqual(
+            ran,
+            [s[0] for s in scenarios],
+        )
 
     def test_no_secret_in_any_line(self) -> None:
         """U07: secrets stay in env, not in lines or argv."""
@@ -437,8 +590,8 @@ class Preflight(unittest.TestCase):
                             stdout=f"127.0.0.1:{db_port} - accepting connections\n",
                         )
                         stubs.write_stub(stub_dir, "psql", sleep=60.0)
-                    for name in ("docker", "cmd.exe", "uv", "npm", "git"):
-                        if label != "good" or name != "pg_isready":
+                    if label != "good":
+                        for name in ("docker", "cmd.exe", "uv", "npm", "git"):
                             path = stub_dir / name
                             if path.exists():
                                 path.unlink()
@@ -449,17 +602,32 @@ class Preflight(unittest.TestCase):
                     blob = "\n".join(report.text_lines())
                     self.assertNotIn(key, blob)
                     self.assertNotIn(password, blob)
-                    enc = password.replace("@", "%40")
-                    self.assertNotIn(enc, blob)
+                    self.assertNotIn(env["EII_DATABASE_URL"], blob)
+                    quoted_pw = urllib.parse.quote(password, safe="")
+                    self.assertNotIn(quoted_pw, blob)
                     for call in stubs.calls(stub_dir):
-                        self.assertNotIn(password, " ".join(call["argv"]))
-                        if call["program"] == "psql" and password in call["env"].get(
-                            "PGPASSWORD",
-                            "",
-                        ):
-                            pass
-                        else:
-                            self.assertNotIn(key, json.dumps(call["env"]))
+                        self.assertNotIn(password, json.dumps(call["argv"]))
+                        self.assertNotIn(key, json.dumps(call["env"]))
+                        others = {
+                            k: v
+                            for k, v in call["env"].items()
+                            if not (call["program"] == "psql" and k == "PGPASSWORD")
+                        }
+                        self.assertNotIn(password, json.dumps(others))
+                        if call["program"] == "psql" and "PGPASSWORD" in call["env"]:
+                            self.assertEqual(call["env"]["PGPASSWORD"], password)
+                    main_out = io.StringIO()
+                    with (
+                        mock.patch.object(preflight_mod, "ROOT", root),
+                        mock.patch.dict(os.environ, env, clear=True),
+                        mock.patch("sys.stdout", main_out),
+                    ):
+                        preflight_mod.main([])
+                    main_blob = main_out.getvalue()
+                    self.assertNotIn(key, main_blob)
+                    self.assertNotIn(password, main_blob)
+                    self.assertNotIn(quoted_pw, main_blob)
+                    self.assertNotIn(env["EII_DATABASE_URL"], main_blob)
         self.assertEqual(ran, labels)
 
     def test_main(self) -> None:
@@ -479,9 +647,9 @@ class Preflight(unittest.TestCase):
                     )
                 else:
                     fixed = preflight_mod.Report(
-                        (store.Line("PASS", "model-key", "absent"),),
+                        (store.Line("FAIL", "model-key", "absent"),),
                         "embedded",
-                        0,
+                        1,
                     )
                     out = io.StringIO()
                     with (
@@ -489,18 +657,33 @@ class Preflight(unittest.TestCase):
                             preflight_mod,
                             "run_preflight",
                             return_value=fixed,
-                        ),
+                        ) as run_mock,
                         mock.patch("sys.stdout", out),
                     ):
                         code = preflight_mod.main([])
                     self.assertEqual(
-                        out.getvalue(), "PASS model-key: absent\nstore: embedded\n"
+                        out.getvalue(), "FAIL model-key: absent\nstore: embedded\n"
                     )
-                    self.assertEqual(code, 0)
+                    self.assertEqual(code, 1)
+                    run_mock.assert_called_once_with(preflight_mod.ROOT, os.environ)
         self.assertEqual(ran, labels)
 
     def test_check_names_and_order(self) -> None:
         """U09: CHECKS order matches report lines."""
+        literal = (
+            "locked-dependencies",
+            "postgresql",
+            "release",
+            "load-receipt",
+            "embedded-reader",
+            "tiles-glyphs-fonts",
+            "recorded-replays",
+            "api-port",
+            "model-key",
+            "env-not-tracked",
+            "wsl-interop",
+        )
+        self.assertEqual(preflight_mod.CHECKS, literal)
         with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
             env, root, api_port, _ = _env0(Path(tmp))
             report = preflight_mod.run_preflight(root, env, api_port=api_port)
@@ -514,6 +697,10 @@ class Preflight(unittest.TestCase):
         self.assertEqual(rows.API_PORT, 8000)
         self.assertEqual(database.SERVER_MAJOR, 18)
         self.assertEqual(database.POSTGIS_LINE, (3, 6))
+        self.assertEqual(
+            database.FACTS_RE.pattern,
+            r"(\d{5,6})\|([0-9A-Za-z.]*)",
+        )
         self.assertEqual(len(proc.COMMANDS), 7)
         self.assertEqual(
             tuple(proc.PASS_THROUGH.keys()),
