@@ -12,7 +12,12 @@ import textwrap
 from pathlib import Path
 from typing import Any
 
-BANNED_PORTS = (55432, 18710, 18711)
+import preflight_rows as rows
+import preflight_store as store
+import sandbox_check
+
+# The canonical list lives in scripts/sandbox_check.py.
+BANNED_PORTS = sandbox_check.BANNED_PORTS
 
 
 def write_stub(
@@ -115,6 +120,28 @@ def dummy(prefix: str) -> str:
     return prefix + secrets.token_hex(16)
 
 
+def fake_tools(*, failing: str = "") -> rows.ToolChecks:
+    """Return deterministic deferred rows, with one optional planted failure."""
+
+    def line(check: str, reason: str) -> store.Line:
+        if check == failing:
+            return store.Line("FAIL", check, "planted")
+        return store.Line("PASS", check, reason)
+
+    return rows.ToolChecks(
+        python=lambda: line("python", "Python and uv match pins.toml"),
+        node_npm=lambda: line("node-npm", "Node and npm match pins.toml"),
+        extensions=lambda: line(
+            "duckdb-extensions",
+            "spatial and h3 load from the local folder with network access disabled",
+        ),
+        bubblewrap=lambda: line(
+            "bubblewrap-sandbox",
+            "bubblewrap is present and the sandbox test passes",
+        ),
+    )
+
+
 def database_url(
     password: str | None,
     port: int,
@@ -152,7 +179,7 @@ def loopback_socket(*, reuse: bool = False) -> socket.socket:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind(("127.0.0.1", 0))
         port = sock.getsockname()[1]
-        if port in BANNED_PORTS:
+        if port in sandbox_check.BANNED_PORTS:
             sock.close()
             continue
         return sock

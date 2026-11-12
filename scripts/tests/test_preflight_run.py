@@ -13,6 +13,7 @@ import tempfile
 import unittest
 import urllib.parse
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -100,10 +101,25 @@ def _env0(
 class Preflight(unittest.TestCase):
     """run_preflight, up_decision and main."""
 
+    def setUp(self) -> None:
+        """Use deterministic deferred rows unless a test proves their wiring."""
+        self.real_default_tools = rows.default_tools
+        self.default_tools_patch = mock.patch.object(
+            rows,
+            "default_tools",
+            return_value=stubs.fake_tools(),
+        )
+        self.default_tools_patch.start()
+        self.addCleanup(self.default_tools_patch.stop)
+
     def _u01_lines(self, api_port: int) -> list[str]:
         return [
+            "PASS python: Python and uv match pins.toml",
+            "PASS node-npm: Node and npm match pins.toml",
             "PASS locked-dependencies: uv.lock and web/package-lock.json match "
             "their manifests with network access disabled",
+            "PASS duckdb-extensions: spatial and h3 load from the local folder "
+            "with network access disabled",
             "WARN postgresql: pg_isready not found on PATH, so PostgreSQL cannot answer here; "
             "store embedded; Docker not reachable",
             "WARN release: not_configured (EII_RELEASE_DIR is not set)",
@@ -112,6 +128,7 @@ class Preflight(unittest.TestCase):
             "WARN tiles-glyphs-fonts: no_freeze_bundle (no freeze.json under data/freeze; "
             "checked with full severity once a freeze bundle exists)",
             "WARN recorded-replays: not_configured (EII_RELEASE_DIR is not set)",
+            "PASS bubblewrap-sandbox: bubblewrap is present and the sandbox test passes",
             f"PASS api-port: 127.0.0.1:{api_port} is free",
             "PASS model-key: absent",
             "PASS env-not-tracked: .env is not tracked by git",
@@ -132,9 +149,13 @@ class Preflight(unittest.TestCase):
     def test_foundation_keeps_other_severities(self) -> None:
         """U02: one fault per label; first five status 1, last two 0."""
         labels = [
+            "python",
+            "node-npm",
             "uv_fail",
+            "duckdb-extensions",
             "pg_reject",
             "freeze",
+            "bubblewrap-sandbox",
             "port_held",
             "env_staged",
             "pg_no_answer",
@@ -184,37 +205,55 @@ class Preflight(unittest.TestCase):
                         )
                     elif label == "cmd_missing":
                         (stub_dir / "cmd.exe").unlink()
-                    report = preflight_mod.run_preflight(root, env, api_port=api_port)
+                    tools = stubs.fake_tools(failing=label)
+                    report = preflight_mod.run_preflight(
+                        root,
+                        env,
+                        api_port=api_port,
+                        tools=tools,
+                    )
                     want = self._u01_lines(api_port)
-                    if label == "uv_fail":
-                        want[0] = (
+                    if label == "python":
+                        want[0] = "FAIL python: planted"
+                    elif label == "node-npm":
+                        want[1] = "FAIL node-npm: planted"
+                    elif label == "uv_fail":
+                        want[2] = (
                             "FAIL locked-dependencies: uv.lock does not match the manifests "
                             "without the network (uv lock --check exit status 1)"
                         )
+                    elif label == "duckdb-extensions":
+                        want[3] = "FAIL duckdb-extensions: planted"
                     elif label == "pg_reject":
-                        want[1] = (
+                        want[4] = (
                             f"FAIL postgresql: PostgreSQL on 127.0.0.1:{db_port} rejects "
                             "connections (pg_isready exit status 1)"
                         )
                         want[-1] = "store: none"
                     elif label == "freeze":
-                        want[5] = freeze_line
+                        want[8] = freeze_line
+                    elif label == "bubblewrap-sandbox":
+                        want[10] = "FAIL bubblewrap-sandbox: planted"
                     elif label == "port_held":
-                        want[7] = f"FAIL api-port: 127.0.0.1:{api_port} is in use"
+                        want[11] = f"FAIL api-port: 127.0.0.1:{api_port} is in use"
                     elif label == "env_staged":
-                        want[9] = "FAIL env-not-tracked: .env is tracked by git"
+                        want[13] = "FAIL env-not-tracked: .env is tracked by git"
                     elif label == "pg_no_answer":
-                        want[1] = (
+                        want[4] = (
                             f"WARN postgresql: no answer on 127.0.0.1:{db_port} "
                             "(pg_isready exit status 2); store embedded; Docker not reachable"
                         )
                     elif label == "cmd_missing":
-                        want[10] = "WARN wsl-interop: cmd.exe not found on PATH"
+                        want[14] = "WARN wsl-interop: cmd.exe not found on PATH"
                     self.assertEqual(report.text_lines(), want)
                     if label in (
+                        "python",
+                        "node-npm",
                         "uv_fail",
+                        "duckdb-extensions",
                         "pg_reject",
                         "freeze",
+                        "bubblewrap-sandbox",
                         "port_held",
                         "env_staged",
                     ):
@@ -233,10 +272,10 @@ class Preflight(unittest.TestCase):
             env["EII_RELEASE_DIR"] = "data/releases/x"
             report = preflight_mod.run_preflight(root, env, api_port=api_port)
             texts = report.text_lines()
-            self.assertEqual(texts[2], f"FAIL release: {not_built}")
-            self.assertEqual(texts[3], f"FAIL load-receipt: {not_built}")
-            self.assertEqual(texts[4], f"FAIL embedded-reader: {not_built}")
-            self.assertEqual(texts[6], f"WARN recorded-replays: {not_built}")
+            self.assertEqual(texts[5], f"FAIL release: {not_built}")
+            self.assertEqual(texts[6], f"FAIL load-receipt: {not_built}")
+            self.assertEqual(texts[7], f"FAIL embedded-reader: {not_built}")
+            self.assertEqual(texts[9], f"WARN recorded-replays: {not_built}")
             self.assertEqual(report.status, 1)
 
     def test_up_decision(self) -> None:
@@ -391,7 +430,7 @@ class Preflight(unittest.TestCase):
                     else:
                         self.assertFalse(any(n == "docker" for n in names))
                         self.assertEqual(
-                            report.text_lines()[1],
+                            report.text_lines()[4],
                             f"WARN postgresql: no answer on 127.0.0.1:{db_port} "
                             "(pg_isready exit status 2); store embedded; Docker not probed",
                         )
@@ -671,13 +710,17 @@ class Preflight(unittest.TestCase):
     def test_check_names_and_order(self) -> None:
         """U09: CHECKS order matches report lines."""
         literal = (
+            "python",
+            "node-npm",
             "locked-dependencies",
+            "duckdb-extensions",
             "postgresql",
             "release",
             "load-receipt",
             "embedded-reader",
             "tiles-glyphs-fonts",
             "recorded-replays",
+            "bubblewrap-sandbox",
             "api-port",
             "model-key",
             "env-not-tracked",
@@ -701,10 +744,10 @@ class Preflight(unittest.TestCase):
             database.FACTS_RE.pattern,
             r"(\d{5,6})\|([0-9A-Za-z.]*)",
         )
-        self.assertEqual(len(proc.COMMANDS), 7)
+        self.assertEqual(len(proc.COMMANDS), 9)
         self.assertEqual(
             tuple(proc.PASS_THROUGH.keys()),
-            tuple(name for name, _ in proc.COMMANDS),
+            tuple(dict.fromkeys(name for name, _ in proc.COMMANDS)),
         )
 
     def test_every_probe_gets_the_limit(self) -> None:
@@ -719,6 +762,7 @@ class Preflight(unittest.TestCase):
                 stdout=f"127.0.0.1:{db_port} - no response\n",
             )
             limits: list[tuple[str, float]] = []
+            sandbox_args: list[tuple[str, ...]] = []
             real = proc.run_child
 
             def spy(
@@ -729,21 +773,66 @@ class Preflight(unittest.TestCase):
                 *,
                 limit: float = proc.PROBE_TIMEOUT_S,
             ) -> proc.ChildResult:
-                limits.append((Path(program).name, limit))
+                name = Path(program).name
+                limits.append((name, limit))
                 from collections.abc import Mapping, Sequence
 
                 assert isinstance(args, Sequence)
                 assert isinstance(env_arg, Mapping)
+                if name == proc.INTERPRETER:
+                    sandbox_args.append(tuple(args))
+                    return proc.ChildResult(0, "ignored", "ignored", False, None)
                 return real(program, args, env_arg, cwd, limit=limit)
 
-            with mock.patch("preflight_proc.run_child", side_effect=spy):
+            components = [
+                SimpleNamespace(name=name, kind="toolchain")
+                for name in ("python", "uv", "node", "npm")
+            ]
+            with (
+                mock.patch.object(
+                    rows,
+                    "default_tools",
+                    side_effect=self.real_default_tools,
+                ),
+                mock.patch.object(
+                    rows.versions_record,
+                    "load_record",
+                    return_value=(components, [], len(components)),
+                ),
+                mock.patch.object(
+                    rows.versions_tools,
+                    "check_toolchain",
+                    return_value=[],
+                ) as toolchain,
+                mock.patch("preflight_proc.run_child", side_effect=spy),
+            ):
                 preflight_mod.run_preflight(root, env, api_port=api_port)
             programs = [name for name, _ in limits]
             self.assertEqual(
                 sorted(programs),
-                sorted(["pg_isready", "docker", "uv", "npm", "git", "cmd.exe"]),
+                sorted(
+                    [
+                        "pg_isready",
+                        "docker",
+                        "uv",
+                        "npm",
+                        "git",
+                        "cmd.exe",
+                        proc.INTERPRETER,
+                        proc.INTERPRETER,
+                    ]
+                ),
             )
             self.assertTrue(all(limit == proc.PROBE_TIMEOUT_S for _, limit in limits))
+            toolchain.assert_called_once()
+            self.assertEqual(toolchain.call_args.args[-1], proc.PROBE_TIMEOUT_S)
+            self.assertEqual(
+                sandbox_args,
+                [
+                    (proc.SANDBOX_CHECK, "check-extensions"),
+                    (proc.SANDBOX_CHECK, "check"),
+                ],
+            )
 
 
 if __name__ == "__main__":

@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import preflight_stubs as stubs
 
 import preflight_database as database
+import sandbox_check
 
 CLOSED_PORT = 29441
 
@@ -42,9 +43,14 @@ class LiveServer(unittest.TestCase):
             raise AssertionError(
                 f"EII_DATABASE_URL host must be 127.0.0.1, got {parsed.host!r}",
             )
-        if parsed.port in stubs.BANNED_PORTS:
+        banned = sandbox_check.BANNED_PORTS
+        if parsed.port in banned:
             raise AssertionError(
                 f"EII_DATABASE_URL port {parsed.port} is banned for tests",
+            )
+        if CLOSED_PORT in banned:
+            raise AssertionError(
+                f"closed-port fixture {CLOSED_PORT} is banned for tests"
             )
         if shutil.which("pg_isready") is None or shutil.which("psql") is None:
             raise AssertionError("pg_isready and psql must be on PATH for live probes")

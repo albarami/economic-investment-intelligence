@@ -261,8 +261,29 @@ class ChildRunner(unittest.TestCase):
                     self.assertFalse((folder / "calls.jsonl").exists())
         self.assertEqual(ran, labels)
 
+    def test_sandbox_command_identity_and_environment(self) -> None:
+        """P11: the real interpreter admits only the exact sandbox calls."""
+        interpreter = Path(sys.executable).name
+        self.assertEqual(proc.INTERPRETER, interpreter)
+        self.assertEqual(proc.SANDBOX_CHECK, "scripts/sandbox_check.py")
+        for command in ("check-extensions", "check"):
+            with self.subTest(command=command):
+                self.assertTrue(
+                    proc.command_allowed(
+                        interpreter, ("scripts/sandbox_check.py", command)
+                    )
+                )
+        self.assertEqual(
+            proc.child_env(
+                interpreter,
+                {"PATH": "stub-bin", "PYTHONPATH": "unwanted", "HOME": "unwanted"},
+                {},
+            ),
+            {"PATH": "stub-bin", "LANG": "C", "LC_ALL": "C"},
+        )
+
     def test_command_table_placeholders(self) -> None:
-        """P10: HOST and PORT placeholders accept or refuse sample values."""
+        """P10: placeholders and exact sandbox commands are closed."""
         labels = [
             "pg_isready_ok",
             "psql_ok",
@@ -271,6 +292,9 @@ class ChildRunner(unittest.TestCase):
             "cmd_ok",
             "uv_ok",
             "npm_ok",
+            "extensions_ok",
+            "sandbox_ok",
+            "sandbox_other_refused",
             "port_zero",
             "port_65536",
             "port_0123",
@@ -301,6 +325,9 @@ class ChildRunner(unittest.TestCase):
             ("cmd.exe", ["/c", "ver"], True),
             ("uv", ["lock", "--check", "--offline"], True),
             ("npm", ["ls", "--package-lock-only", "--offline", "--logs-max=0"], True),
+            (proc.INTERPRETER, [proc.SANDBOX_CHECK, "check-extensions"], True),
+            (proc.INTERPRETER, [proc.SANDBOX_CHECK, "check"], True),
+            (proc.INTERPRETER, [proc.SANDBOX_CHECK, "other"], False),
             ("pg_isready", ["-h", "h", "-p", "0", "-t", "5"], False),
             ("pg_isready", ["-h", "h", "-p", "65536", "-t", "5"], False),
             ("pg_isready", ["-h", "h", "-p", "0123", "-t", "5"], False),
