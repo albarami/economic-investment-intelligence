@@ -26,7 +26,7 @@ Only figures marked Public describe Qatar. Synthetic and Simulated figures demon
 
 This repository contains a documentation pack, the [typed-decision qualification set](evals/typed_decisions/README.md) under `evals/`, the scaffolding of the pinned repository layout (slice S0, task S0-T01) and one `uv` workspace with three package skeletons, `eii_core`, `eii_custodian` and `eii_product` (slice S0, task S0-T02). Each skeleton holds a version string and a small test of its own. There is no feature code yet, and no product, release, privacy engine, assistant or interface is claimed to work.
 
-Twenty-four project commands run from the repository root today: `./eii test`, `./eii preflight`, `./eii up`, the documentation check, the tree check, the lock check, the guard tests on their own, the three Python checks (lint, format and type), the version check, the reference-notes check, the seven sandbox and engine-extension commands (environment, fetch, verify, two launcher checks, the runner facts and the proof of the sandbox tests), the three commit-hook commands (fetch and verify the secret scanner, validate the hook configuration), the formatter in write mode and, only after a change to a `pyproject.toml`, the command that rewrites the lock file. Python 3.14 and `uv` are needed for all but the documentation check and the tree check. Two commands change files and are run only to apply the formatter: `uv run --locked ruff format .` here and `npm run format` in `web/`; the lint, format-check and type-check commands only read.
+Twenty-six project commands run from the repository root today: `./eii test`, `./eii preflight`, `./eii up`, the documentation check, the tree check, the lock check, the guard tests on their own, the three Python checks (lint, format and type), the version check, the reference-notes check, the seven sandbox and engine-extension commands (environment, fetch, verify, two launcher checks, the runner facts and the proof of the sandbox tests), the three commit-hook commands (fetch and verify the secret scanner, validate the hook configuration), the two continuous-integration commands (the full-history secret scan and the planted-failure harness), the formatter in write mode and, only after a change to a `pyproject.toml`, the command that rewrites the lock file. Python 3.14 and `uv` are needed for all but the documentation check and the tree check. Two commands change files and are run only to apply the formatter: `uv run --locked ruff format .` here and `npm run format` in `web/`; the lint, format-check and type-check commands only read.
 
 ```sh
 ./eii test
@@ -51,6 +51,8 @@ uv run --locked python scripts/ci_sandbox.py prove
 uv run --locked python scripts/hooks_gitleaks.py fetch
 uv run --locked python scripts/hooks_gitleaks.py verify
 uv run --locked pre-commit validate-config .pre-commit-config.yaml
+uv run --locked python scripts/ci_history_scan.py scan
+uv run --locked python scripts/ci_plants.py run
 uv run --locked ruff format .
 uv lock
 ```
@@ -93,6 +95,12 @@ The scanner binary is downloaded once from the GitHub release page of gitleaks, 
 The commit guard reads `.env` at the repository root and the process environment for the non-empty values of `ANTHROPIC_API_KEY`, `JEV_PRO_API_KEY` and the password inside `EII_DATABASE_URL`, and refuses a commit whose staged content or staged path, read from git's index, holds one of them. It prints the variable name, and the path only when the path holds no value, never a value; a path holding eight or more consecutive characters of a value is not printed either. It reads `.env` without a byte order mark, with quotes and with a trailing comment, and refuses a line for a listed name that it cannot read, such as a double-quoted value that holds a backslash. A value shorter than 12 characters (for the database URL, the password as written or percent-decoded), or a database URL that it cannot read as a PostgreSQL URL with a host and, when a port is written, a numeric one, or whose query string names `password` or `passfile`, cannot be checked, so the guard refuses until it is fixed or removed. It does not see a value split over lines, reversed or encoded, the other database role credentials, or a variable outside the closed list.
 
 Gitleaks runs on the staged changes. It does not scan binary files, does not flag a database URL, skips the paths on its own built-in list (images, fonts, documents, lock files, vendored and package folders and others), and a git attribute that marks a path binary hides that path from it. The documentation check reads only text suffixes of a closed list and misses an eight- or eleven-digit run that has a hyphen, colon or slash beside it (OI-93 in OPEN_ITEMS.md).
+
+## Continuous integration
+
+Three workflow files run on every pull request. `docs.yml` provides the required `check-docs` check. `ci.yml` provides `static-checks`, `tests`, `secret-scan` and `planted-failures`. `sandbox.yml` provides the hosted `sandbox proof`. The complete test job prepares the pinned scanner, engine group, engine extensions, web dependencies and hosted-runner namespace profile before `./eii test`; the scanner job checks the full history of the branch; the planted-failure job makes temporary copies and requires one violation per listed guard to be blocked. No workflow skips or retries a failed check.
+
+The two CI helper commands are read-only with respect to this checkout. `uv run --locked python scripts/ci_history_scan.py scan` requires the pinned scanner fetched by the commit-hook command and a complete git history; it leaves out findings on ledger lines it knows by exact content (today one line, recorded twice: an earlier recorded command with two dummy values) and fails on every other finding. `uv run --locked python scripts/ci_plants.py run` uses temporary scratch repositories and the already installed package caches; it uses no network.
 
 ## How to read the documentation
 

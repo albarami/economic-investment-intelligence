@@ -789,6 +789,66 @@
 - OPTIONS: **Recommendation:** keep. Alternatives: the framework's gitleaks hook (a Go toolchain and a 329 MB cache at first use); a package-manager install (a global install, not wanted); more platforms (each needs its own pinned digest).
 - NEEDED BY: slice S0 gate.
 
+## OI-95 — Required CI check names and workflow split
+
+- ID: OI-95
+- TYPE: ASSUMPTION
+- NEEDED: Owner confirmation that the six required check names are `check-docs`, `static-checks`, `tests`, `secret-scan`, `planted-failures` and `sandbox proof`, split across `docs.yml`, `ci.yml` and `sandbox.yml`.
+- WHY: The pack fixes the stages but not every workflow file name or required-check label.
+- DONE SO FAR: Task S0-T07 uses the six names above. The repository-settings task may require exactly these names without changing their commands.
+- OPTIONS: **Recommendation:** keep the names stable.
+- NEEDED BY: S0-T14 and the slice S0 gate.
+
+## OI-104 — Full-history scanner count evidence
+
+- ID: OI-104
+- TYPE: ASSUMPTION
+- NEEDED: Owner confirmation that a clean full-history scan must print one positive scanned-commit count within the git-derived bounds, with no scanner error line.
+- WHY: The scanner can exit zero for an invalid revision or outside a repository.
+- DONE SO FAR: `scripts/ci_history_scan.py` judges status, error lines, finding text and the count.
+- OPTIONS: **Recommendation:** keep.
+- NEEDED BY: the slice S0 gate.
+
+## OI-105 — Planted-failure CI scope
+
+- ID: OI-105
+- TYPE: ASSUMPTION
+- NEEDED: Owner confirmation that one planted case per CI guard listed by S0-T07 is sufficient at the foundation gate.
+- WHY: Existing checks have their own detailed teeth; this job proves that the CI wiring blocks one violation of each listed guard.
+- DONE SO FAR: The closed table has twelve cases and no mutant inventory.
+- OPTIONS: **Recommendation:** keep the closed table and add a case only when CI adds a new guard.
+- NEEDED BY: every later task that adds a CI guard.
+
+## OI-106 — Complete test job repeats hosted sandbox setup
+
+- ID: OI-106
+- TYPE: ASSUMPTION
+- NEEDED: Owner confirmation that the `tests` job repeats the hosted namespace setup because `./eii test` includes unskipped sandbox tests, while `sandbox proof` remains a separate required check.
+- WHY: Removing sandbox tests from `./eii test` or skipping them would break TST-15 and TST-62.
+- DONE SO FAR: Both jobs use the same existing setup commands; `sandbox.yml` is unchanged.
+- OPTIONS: **Recommendation:** keep until the suite structure changes by an approved task.
+- NEEDED BY: the slice S0 gate.
+
+## OI-107 — Scanner git-attribute exposure
+
+- ID: OI-107
+- TYPE: ASSUMPTION
+- NEEDED: Owner confirmation that S0-T07's full-history scan has the same git-attribute exposure as the S0-T06 staged scan.
+- WHY: Neutralising local and repository git attributes is hardening beyond the two tasks' acceptance criteria.
+- DONE SO FAR: The plan records the limit and sends the hardening item to the later deployment-hardening register through S0-T15.
+- OPTIONS: **Recommendation:** keep the simple scan for the proof of concept.
+- NEEDED BY: S0-T15 and any real-record deployment.
+
+## OI-108 — Known ledger lines in the full-history scan
+
+- ID: OI-108
+- TYPE: ASSUMPTION
+- NEEDED: Owner confirmation that the history scan leaves out findings on ledger lines it knows by exact content.
+- WHY: the recorded command of S0-T05 in PROGRESS.md plants two dummy values, the scanner's general rule reports them, the history of the base branch is never rewritten and TST-141 requires the scan over the full history, which the foundation commit must pass.
+- DONE SO FAR: `scripts/ci_history_scan.py` holds a closed `KNOWN_LINES` table with one entry keyed by file, rule and SHA-256 of the line text; the judge reads a temporary JSON report, leaves out only findings that match that line at the reported commit, prints counts when all findings are known and fails on every other finding; four tests plant the violations named in the task brief; no ignore file and no allow-list in the scanner's configuration; tests that plant a shaped token build the value at run time so a new ledger line would be judged like any other.
+- OPTIONS: **Recommendation:** keep. Alternatives: an ignore file with commit fingerprints (the commit hook would honour it too, and it does not hold in a scratch copy); an allow-list in the scanner's configuration (the hook configuration of S0-T06 keeps none); scanning only the commits of the pull request (weaker than TST-141).
+- NEEDED BY: slice S0 gate.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
