@@ -1,4 +1,4 @@
-"""Exact judging of every started program. No sandbox is started."""
+"""Exact judging of commands that decide the proof. No sandbox is started."""
 
 from __future__ import annotations
 
@@ -200,7 +200,7 @@ class OutputRules(unittest.TestCase):
         self.assertEqual(len(seen), 5)
         self.assertEqual(len(labels), 4)
 
-    def test_runner_steps_judge_every_command_exactly(self) -> None:
+    def test_runner_steps_judge_deciding_commands_exactly(self) -> None:
         labels: list[str] = []
         for kind in ("status", "stderr", "twice", "extra"):
             labels.append(f"version-{kind}")
@@ -238,16 +238,10 @@ class OutputRules(unittest.TestCase):
                     ci_sandbox.PROBE_ARGV,
                     ci_sandbox.INSTALL_ARGV,
                     ci_sandbox.PARSER_ARGV,
-                    ci_sandbox.LISTING_ARGV,
                     ci_sandbox.PROBE_ARGV,
                 ],
             )
-        for kind in ("status", "stderr"):
-            labels.append(f"listing-{kind}")
-            self._grammar("aa-status --json", kind, support.LISTING_OK.stdout)
-            labels.append(f"label-{kind}")
-            self._grammar("label read", kind, support.LABEL_OK.stdout)
-        self.assertEqual(len(labels), 28)
+        self.assertEqual(len(labels), 24)
 
     def _facts(
         self, what: str, good: str, kind: str, expected: list[sandbox_check.Expected]
@@ -288,18 +282,17 @@ class OutputRules(unittest.TestCase):
         queued = self._queue(what, fault)
         runner = support.FakeRunner(queued)
         files = support.FakeFiles(
-            support.PINNED_BYTES, None, support.PINNED_BYTES, runner
+            support.PROFILE_BYTES, None, support.PROFILE_BYTES, runner
         )
         text = io.StringIO()
-        with support.pinned_profile():
-            status = ci_sandbox.install_profile(
-                ci_sandbox.HOSTED_RUNNER,
-                runner,
-                files,
-                lambda path: setting if path == ci_sandbox.SYSCTL else _missing(path),
-                text,
-                io.StringIO(),
-            )
+        status = ci_sandbox.install_profile(
+            ci_sandbox.HOSTED_RUNNER,
+            runner,
+            files,
+            lambda path: setting if path == ci_sandbox.SYSCTL else _missing(path),
+            text,
+            io.StringIO(),
+        )
         self.assertEqual(status, 1)
         fails = [
             line for line in text.getvalue().splitlines() if line.startswith("FAIL ")
@@ -323,59 +316,12 @@ class OutputRules(unittest.TestCase):
         if what == "probe":
             return [fault]
         if what == "install":
-            return [support.OK, fault]
+            return [ci_sandbox.CommandResult(1, "", "denied\n"), fault]
         if what == "apparmor_parser -r":
-            return [support.OK, support.OK, fault]
-        return [support.OK, support.OK, support.OK, support.LISTING_OK, fault]
-
-    def _grammar(self, what: str, kind: str, good: str) -> None:
-        if kind == "status":
-            fault = ci_sandbox.CommandResult(1, good, "")
-        else:
-            fault = ci_sandbox.CommandResult(0, good, "x\n")
-        if what == "aa-status --json":
-            queued = [support.OK, support.OK, support.OK, fault]
-            calls = [
-                ci_sandbox.PROBE_ARGV,
-                ci_sandbox.INSTALL_ARGV,
-                ci_sandbox.PARSER_ARGV,
-                ci_sandbox.LISTING_ARGV,
-            ]
-        else:
-            queued = [
-                support.OK,
-                support.OK,
-                support.OK,
-                support.LISTING_OK,
-                support.OK,
-                fault,
-            ]
-            calls = [
-                ci_sandbox.PROBE_ARGV,
-                ci_sandbox.INSTALL_ARGV,
-                ci_sandbox.PARSER_ARGV,
-                ci_sandbox.LISTING_ARGV,
-                ci_sandbox.PROBE_ARGV,
-                ci_sandbox.LABEL_ARGV,
-            ]
-        runner = support.FakeRunner(queued)
-        files = support.FakeFiles(
-            support.PINNED_BYTES, None, support.PINNED_BYTES, runner
-        )
-        text = io.StringIO()
-        with support.pinned_profile():
-            status = ci_sandbox.install_profile(
-                ci_sandbox.HOSTED_RUNNER,
-                runner,
-                files,
-                lambda path: "1\n" if path == ci_sandbox.SYSCTL else _missing(path),
-                text,
-                io.StringIO(),
-            )
-        self.assertEqual(status, 1)
-        fails = [
-            line for line in text.getvalue().splitlines() if line.startswith("FAIL ")
+            return [ci_sandbox.CommandResult(1, "", "denied\n"), support.OK, fault]
+        return [
+            ci_sandbox.CommandResult(1, "", "denied\n"),
+            support.OK,
+            support.OK,
+            fault,
         ]
-        self.assertEqual(len(fails), 1)
-        self.assertTrue(fails[0].startswith(f"FAIL {what}: "))
-        self.assertEqual(runner.calls, calls)

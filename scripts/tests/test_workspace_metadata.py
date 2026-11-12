@@ -11,6 +11,7 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import workspace_fields as fields
+import workspace_fields_tables as tables
 import workspace_guard as guard
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -249,31 +250,31 @@ class WorkspaceMetadata(unittest.TestCase):
             path.write_text(guard.dump_toml(data), encoding="utf-8")
         root_data = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
         fields._put(root_data, "dependency-groups", {"dev": ["requests"]})
-        fields.write_toml(root / "pyproject.toml", root_data)
+        tables.write_toml(root / "pyproject.toml", root_data)
         self.assertEqual(guard.check_workspace(root), [])
 
     def test_root_naming_a_member_fails(self) -> None:
-        n = self.check_cases(list(fields.ROOT_NAMING_CASES))
+        n = self.check_cases(list(tables.ROOT_NAMING_CASES))
         self.assertEqual(n, 6)
 
     def test_root_name_and_package_flag_fail(self) -> None:
-        n = self.check_cases(list(fields.ROOT_FLAG_CASES))
+        n = self.check_cases(list(tables.ROOT_FLAG_CASES))
         self.assertEqual(n, 4)
 
     def test_missing_workspace_source_fails(self) -> None:
-        n = self.check_cases(list(fields.SOURCE_CASES))
+        n = self.check_cases(list(tables.SOURCE_CASES))
         self.assertEqual(n, 10)
 
     def test_member_list_wrong_fails(self) -> None:
-        n = self.check_cases(list(fields.MEMBER_LIST_CASES))
+        n = self.check_cases(list(tables.MEMBER_LIST_CASES))
         self.assertEqual(n, 8)
 
     def test_layout_fails(self) -> None:
-        n = self.check_cases(list(fields.LAYOUT_CASES))
+        n = self.check_cases(list(tables.LAYOUT_CASES))
         self.assertEqual(n, 7)
 
     def test_missing_and_unparsable_pyproject_fail(self) -> None:
-        n = self.check_cases(fields.invalid_pyproject_cases())
+        n = self.check_cases(tables.invalid_pyproject_cases())
         self.assertEqual(n, fields.COUNT_PYPROJECT_CASES)
 
     def test_forbidden_edge_in_lock(self) -> None:
@@ -347,7 +348,7 @@ class WorkspaceMetadata(unittest.TestCase):
         self.assertEqual(n, 4)
 
     def test_lock_members_list_wrong_fails(self) -> None:
-        n = self.check_cases(list(fields.LOCK_MEMBER_CASES), on_lock=True)
+        n = self.check_cases(list(tables.LOCK_MEMBER_CASES), on_lock=True)
         self.assertEqual(n, 4)
 
     def test_member_name_in_workspace_wide_lock_field(self) -> None:
@@ -471,7 +472,7 @@ class WorkspaceMetadata(unittest.TestCase):
             ],
             [],
         )
-        data = mutated_lock(fields.plant_registry_forbidden_edge)
+        data = mutated_lock(tables.plant_registry_forbidden_edge)
         self.assertEqual(
             guard.check_lock_data(data),
             ["FAIL lock: uv.lock: edge eii-core -> eii-custodian is not allowed"],
@@ -479,15 +480,15 @@ class WorkspaceMetadata(unittest.TestCase):
 
     def test_output_order(self) -> None:
         root = self.fresh()
-        fields.plant_output_order_a(root)
-        self.assertEqual(guard.check_workspace(root), fields.OUTPUT_ORDER_A)
+        tables.plant_output_order_a(root)
+        self.assertEqual(guard.check_workspace(root), tables.OUTPUT_ORDER_A)
 
-        data = mutated_lock(fields.plant_output_order_b)
-        self.assertEqual(guard.check_lock_data(data), fields.OUTPUT_ORDER_B)
+        data = mutated_lock(tables.plant_output_order_b)
+        self.assertEqual(guard.check_lock_data(data), tables.OUTPUT_ORDER_B)
 
         root = self.fresh()
-        fields.plant_output_order_c(root)
-        self.assertEqual(guard.check_workspace(root), fields.OUTPUT_ORDER_C)
+        tables.plant_output_order_c(root)
+        self.assertEqual(guard.check_workspace(root), tables.OUTPUT_ORDER_C)
 
 
 if __name__ == "__main__":

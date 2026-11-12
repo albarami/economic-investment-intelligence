@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import io
 import sys
 import unittest
@@ -21,6 +22,9 @@ import sandbox_profiles as tables
 ROOT = support.ROOT
 HOSTED = dict(ci_sandbox.HOSTED_RUNNER)
 USAGE = "ci_sandbox: usage: facts | install-profile | prove\n"
+DENIED = ci_sandbox.CommandResult(
+    1, "", "bwrap: setting up uid map: Permission denied\n"
+)
 REFUSAL = "ci_sandbox: install-profile runs only on a GitHub-hosted runner; nothing was changed\n"
 
 
@@ -159,17 +163,32 @@ class RunnerRules(unittest.TestCase):
                 ],
             )
 
+    def test_restriction_on_with_passing_probe_installs_nothing(self) -> None:
+        runner = support.FakeRunner([support.OK])
+        out = io.StringIO()
+        status = ci_sandbox.install_profile(
+            HOSTED, runner, _missing, lambda _path: "1\n", out, io.StringIO()
+        )
+        self.assertEqual(status, 0)
+        self.assertEqual(runner.calls, [ci_sandbox.PROBE_ARGV])
+        self.assertEqual(
+            out.getvalue().splitlines(),
+            [
+                "restriction: 1",
+                "probe before: exit 0, standard error ''",
+                "namespace creation works; nothing to install",
+            ],
+        )
+
     def test_restriction_on_installs_the_profile_then_probes(self) -> None:
         text, calls = self._success(
-            (support.PINNED_BYTES, None, support.PINNED_BYTES),
+            (support.PROFILE_BYTES, None, support.PROFILE_BYTES),
             [
-                ci_sandbox.CommandResult(
-                    1, "", "bwrap: setting up uid map: Permission denied\n"
-                ),
+                DENIED,
+                support.OK,
                 support.OK,
                 support.OK,
                 support.LISTING_OK,
-                support.OK,
                 support.LABEL_OK,
             ],
         )
@@ -179,55 +198,86 @@ class RunnerRules(unittest.TestCase):
                 ci_sandbox.PROBE_ARGV,
                 ci_sandbox.INSTALL_ARGV,
                 ci_sandbox.PARSER_ARGV,
-                ci_sandbox.LISTING_ARGV,
                 ci_sandbox.PROBE_ARGV,
+                ci_sandbox.LISTING_ARGV,
                 ci_sandbox.LABEL_ARGV,
             ],
         )
         self._assert_force(text, calls)
 
     def test_profile_already_present_is_reloaded_not_copied(self) -> None:
-        _text_out, calls = self._success(
-            (support.PINNED_BYTES, support.PINNED_BYTES, None),
-            [
-                ci_sandbox.CommandResult(
-                    1, "", "bwrap: setting up uid map: Permission denied\n"
-                ),
-                support.OK,
-                support.LISTING_OK,
-                support.OK,
-                support.LABEL_OK,
-            ],
+        source, target = b"new distribution profile\n", b"existing different profile\n"
+        text, calls = self._success(
+            (source, target, None),
+            [DENIED, support.OK, support.OK, support.LISTING_OK, support.LABEL_OK],
         )
         self.assertEqual(
             calls,
             [
                 ci_sandbox.PROBE_ARGV,
                 ci_sandbox.PARSER_ARGV,
-                ci_sandbox.LISTING_ARGV,
                 ci_sandbox.PROBE_ARGV,
+                ci_sandbox.LISTING_ARGV,
                 ci_sandbox.LABEL_ARGV,
             ],
         )
+        for path, data in (
+            (ci_sandbox.PROFILE_SOURCE, source),
+            (ci_sandbox.PROFILE_TARGET, target),
+        ):
+            self.assertIn(
+                f"profile file {path}: {len(data)} bytes, SHA-256 "
+                f"{hashlib.sha256(data).hexdigest()}",
+                text,
+            )
+
+    def test_record_commands_never_decide_the_result(self) -> None:
+        for record in ("listing", "label"):
+            for fault in (
+                ci_sandbox.CommandResult(4, "", "record denied\n"),
+                ci_sandbox.CommandResult(0, "not parseable\nextra\n", ""),
+                ci_sandbox.CommandResult(0, "", "warning\n"),
+            ):
+                with self.subTest(record=record, fault=fault):
+                    listing = fault if record == "listing" else support.LISTING_OK
+                    label = fault if record == "label" else support.LABEL_OK
+                    text, calls = self._success(
+                        (support.PROFILE_BYTES, None, support.PROFILE_BYTES),
+                        [DENIED, support.OK, support.OK, support.OK, listing, label],
+                    )
+                    self.assertEqual(
+                        calls,
+                        [
+                            ci_sandbox.PROBE_ARGV,
+                            ci_sandbox.INSTALL_ARGV,
+                            ci_sandbox.PARSER_ARGV,
+                            ci_sandbox.PROBE_ARGV,
+                            ci_sandbox.LISTING_ARGV,
+                            ci_sandbox.LABEL_ARGV,
+                        ],
+                    )
+                    name = "aa-status --json" if record == "listing" else "label"
+                    self.assertIn(f"{name} raw: exit {fault.returncode}", text)
+                    self.assertIn(f"{name} raw stdout: {fault.stdout!r}", text)
+                    self.assertIn(f"{name} raw stderr: {fault.stderr!r}", text)
+                    self.assertNotIn("FAIL ", text)
 
     def test_failures_fail_the_job(self) -> None:
-        denied = "bwrap: setting up uid map: Permission denied\n"
+        files = (support.PROFILE_BYTES, None, support.PROFILE_BYTES)
         plants = [
             (
-                "a",
-                "1\n",
+                "source missing",
+                "1",
                 (None, None, None),
-                [support.OK],
+                [DENIED],
                 [ci_sandbox.PROBE_ARGV],
-                [
-                    f"FAIL profile file not found: {ci_sandbox.PROFILE_SOURCE}",
-                ],
+                [f"FAIL profile file not found: {ci_sandbox.PROFILE_SOURCE}"],
             ),
             (
-                "b",
-                "1\n",
-                (support.PINNED_BYTES, None, support.PINNED_BYTES),
-                [support.OK, ci_sandbox.CommandResult(1, "", "denied\n")],
+                "install fails",
+                "1",
+                files,
+                [DENIED, ci_sandbox.CommandResult(1, "", "denied\n")],
                 [ci_sandbox.PROBE_ARGV, ci_sandbox.INSTALL_ARGV],
                 [
                     "FAIL install: exit status 1, expected 0",
@@ -235,14 +285,10 @@ class RunnerRules(unittest.TestCase):
                 ],
             ),
             (
-                "c",
-                "1\n",
-                (support.PINNED_BYTES, None, support.PINNED_BYTES),
-                [
-                    support.OK,
-                    support.OK,
-                    ci_sandbox.CommandResult(1, "", "syntax error\n"),
-                ],
+                "parser fails",
+                "1",
+                files,
+                [DENIED, support.OK, ci_sandbox.CommandResult(1, "", "syntax error\n")],
                 [
                     ci_sandbox.PROBE_ARGV,
                     ci_sandbox.INSTALL_ARGV,
@@ -254,125 +300,73 @@ class RunnerRules(unittest.TestCase):
                 ],
             ),
             (
-                "d",
-                "1\n",
-                (support.PINNED_BYTES, None, None),
-                [support.OK, support.OK],
+                "installed file missing",
+                "1",
+                (support.PROFILE_BYTES, None, None),
+                [DENIED, support.OK],
                 [ci_sandbox.PROBE_ARGV, ci_sandbox.INSTALL_ARGV],
                 [
-                    f"FAIL profile file not found after the install: {ci_sandbox.PROFILE_TARGET}",
+                    f"FAIL profile file not found after the install: {ci_sandbox.PROFILE_TARGET}"
                 ],
             ),
             (
-                "e",
-                "1\n",
-                (support.PINNED_BYTES, None, support.PINNED_BYTES),
-                [
-                    support.OK,
-                    support.OK,
-                    support.OK,
-                    ci_sandbox.CommandResult(
-                        4, "", "aa-status: not enough privileges\n"
-                    ),
-                ],
+                "probe after fails",
+                "1",
+                files,
+                [DENIED, support.OK, support.OK, DENIED],
                 [
                     ci_sandbox.PROBE_ARGV,
                     ci_sandbox.INSTALL_ARGV,
                     ci_sandbox.PARSER_ARGV,
-                    ci_sandbox.LISTING_ARGV,
-                ],
-                [
-                    "FAIL aa-status --json: exit status 4, expected 0",
-                    "FAIL aa-status --json: standard error is not empty: 'aa-status: not enough privileges\\n'",
-                    "FAIL aa-status --json printed no JSON object with unique keys "
-                    "(Expecting value: line 1 column 1 (char 0))",
-                ],
-            ),
-            (
-                "f",
-                "1\n",
-                (support.PINNED_BYTES, None, support.PINNED_BYTES),
-                [
-                    support.OK,
-                    support.OK,
-                    support.OK,
-                    support.LISTING_OK,
-                    ci_sandbox.CommandResult(1, "", "bwrap: uid map\n"),
-                ],
-                [
-                    ci_sandbox.PROBE_ARGV,
-                    ci_sandbox.INSTALL_ARGV,
-                    ci_sandbox.PARSER_ARGV,
-                    ci_sandbox.LISTING_ARGV,
                     ci_sandbox.PROBE_ARGV,
                 ],
                 [
                     "FAIL probe after: exit status 1, expected 0",
-                    "FAIL probe after: standard error is not empty: 'bwrap: uid map\\n'",
-                ],
-            ),
-            (
-                "g",
-                "0\n",
-                (support.PINNED_BYTES, None, support.PINNED_BYTES),
-                [ci_sandbox.CommandResult(1, "", "bwrap: x\n")],
-                [ci_sandbox.PROBE_ARGV],
-                [
-                    "FAIL probe: exit status 1, expected 0",
-                    "FAIL probe: standard error is not empty: 'bwrap: x\\n'",
-                    "FAIL namespace creation fails while the restriction reads 0; this step handles only the AppArmor restriction",
-                ],
-            ),
-            (
-                "h",
-                "absent",
-                (support.PINNED_BYTES, None, support.PINNED_BYTES),
-                [ci_sandbox.CommandResult(1, "", "bwrap: x\n")],
-                [ci_sandbox.PROBE_ARGV],
-                [
-                    "FAIL probe: exit status 1, expected 0",
-                    "FAIL probe: standard error is not empty: 'bwrap: x\\n'",
-                    "FAIL namespace creation fails while the restriction reads absent; this step handles only the AppArmor restriction",
-                ],
-            ),
-            (
-                "i",
-                "0\n",
-                (support.PINNED_BYTES, None, support.PINNED_BYTES),
-                [ci_sandbox.CommandResult(0, "x\n", "")],
-                [ci_sandbox.PROBE_ARGV],
-                [
-                    "FAIL probe: standard output ['x'], expected []",
-                    "FAIL namespace creation fails while the restriction reads 0; this step handles only the AppArmor restriction",
+                    f"FAIL probe after: standard error is not empty: {DENIED.stderr!r}",
                 ],
             ),
         ]
-        del denied
-        labels = []
-        with support.pinned_profile():
-            for name, setting, files, results, calls, fails in plants:
-                labels.append(name)
+        for setting, result in (
+            ("0", DENIED),
+            ("absent", DENIED),
+            ("0", ci_sandbox.CommandResult(0, "x\n", "")),
+        ):
+            problems = sandbox_check.output_problems(
+                "probe", result.returncode, result.stdout, result.stderr, []
+            )
+            plants.append(
+                (
+                    f"probe fails with {setting}",
+                    setting,
+                    files,
+                    [result],
+                    [ci_sandbox.PROBE_ARGV],
+                    [
+                        *[f"FAIL {problem}" for problem in problems],
+                        "FAIL namespace creation fails while the restriction reads "
+                        f"{setting}; this step handles only the AppArmor restriction",
+                    ],
+                )
+            )
+        for name, setting, data, results, calls, fails in plants:
+            with self.subTest(rule=name):
                 runner = support.FakeRunner(results)
                 out = io.StringIO()
                 read = (
                     _missing
                     if setting == "absent"
-                    else (
-                        lambda path, setting=setting: (
-                            setting if path == ci_sandbox.SYSCTL else _missing(path)
-                        )
-                    )
+                    else lambda _path, setting=setting: setting
                 )
                 status = ci_sandbox.install_profile(
                     HOSTED,
                     runner,
-                    support.FakeFiles(*files, runner),
+                    support.FakeFiles(*data, runner),
                     read,
                     out,
                     io.StringIO(),
                 )
-                self.assertEqual(status, 1, name)
-                self.assertEqual(runner.calls, calls, name)
+                self.assertEqual(status, 1)
+                self.assertEqual(runner.calls, calls)
                 self.assertEqual(
                     [
                         line
@@ -380,19 +374,32 @@ class RunnerRules(unittest.TestCase):
                         if line.startswith("FAIL ")
                     ],
                     fails,
-                    name,
                 )
-                if name == "i":
-                    self.assertIn("restriction: 0", out.getvalue().splitlines())
-        self.assertEqual(labels, list("abcdefghi"))
+
+    def test_first_probe_requires_exact_success(self) -> None:
+        for result in (
+            ci_sandbox.CommandResult(0, "unexpected\n", ""),
+            ci_sandbox.CommandResult(0, "", "warning\n"),
+        ):
+            with self.subTest(result=result):
+                _text_out, calls = self._success(
+                    (support.PROFILE_BYTES, None, support.PROFILE_BYTES),
+                    [
+                        result,
+                        support.OK,
+                        support.OK,
+                        support.OK,
+                        support.LISTING_OK,
+                        support.LABEL_OK,
+                    ],
+                )
+                self.assertIn(ci_sandbox.INSTALL_ARGV, calls)
 
     def test_no_system_wide_switch_anywhere(self) -> None:
         ci = _text(ROOT / "scripts/ci_sandbox.py")
-        apparmor = _text(ROOT / "scripts/ci_apparmor.py")
         junit = _text(ROOT / "scripts/ci_junit.py")
         job = _text(ROOT / ".github/workflows/sandbox.yml")
         self.assertEqual(workflow.check_ci_module(ci), [])
-        self.assertEqual(workflow.check_ci_module(apparmor), [])
         self.assertEqual(workflow.check_ci_module(junit), [])
         self.assertEqual(workflow.check_no_switch(job), [])
         labels = []
@@ -466,7 +473,6 @@ class RunnerRules(unittest.TestCase):
                 line.startswith(workflow.SETTING_LINE_START) for line in ci.splitlines()
             )
         )
-        self.assertNotIn(workflow.SETTING_WORD, apparmor)
         self.assertNotIn(workflow.SETTING_WORD, junit)
 
     def test_workflow_rules(self) -> None:
@@ -621,15 +627,14 @@ class RunnerRules(unittest.TestCase):
     ) -> tuple[str, list[list[str]]]:
         runner = support.FakeRunner(results)
         out = io.StringIO()
-        with support.pinned_profile():
-            status = ci_sandbox.install_profile(
-                HOSTED,
-                runner,
-                support.FakeFiles(*files, runner),
-                lambda path: "1\n" if path == ci_sandbox.SYSCTL else _missing(path),
-                out,
-                io.StringIO(),
-            )
+        status = ci_sandbox.install_profile(
+            HOSTED,
+            runner,
+            support.FakeFiles(*files, runner),
+            lambda path: "1\n" if path == ci_sandbox.SYSCTL else _missing(path),
+            out,
+            io.StringIO(),
+        )
         self.assertEqual(status, 0)
         return out.getvalue(), runner.calls
 
@@ -640,8 +645,16 @@ class RunnerRules(unittest.TestCase):
             lines[1],
             "probe before: exit 1, standard error 'bwrap: setting up uid map: Permission denied\\n'",
         )
+        for index, path in enumerate(
+            (ci_sandbox.PROFILE_SOURCE, ci_sandbox.PROFILE_TARGET), start=2
+        ):
+            self.assertEqual(
+                lines[index],
+                f"profile file {path}: {len(support.PROFILE_BYTES)} bytes, SHA-256 "
+                f"{hashlib.sha256(support.PROFILE_BYTES).hexdigest()}",
+            )
         self.assertEqual(
-            lines[2:8],
+            lines[4:10],
             [
                 "aa-status --json raw: exit 0",
                 f"aa-status --json raw stdout: {support.LISTING_OK.stdout!r}",
@@ -652,7 +665,7 @@ class RunnerRules(unittest.TestCase):
             ],
         )
         self.assertEqual(
-            lines[-1], "namespace creation works with the per-binary profile in force"
+            lines[-1], "namespace creation works after loading the per-binary profile"
         )
         sudo = [call for call in calls if call and call[0] == "sudo"]
         allowed = [

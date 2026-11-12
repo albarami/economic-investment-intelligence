@@ -623,9 +623,9 @@
 
 - ID: OI-63
 - TYPE: ASSUMPTION
-- NEEDED: The owner to confirm that this task adds exactly one workflow file, `.github/workflows/sandbox.yml`; that it runs on `ubuntu-24.04` and not on `ubuntu-latest`; that it runs the sandbox-marked tests through `scripts/ci_sandbox.py prove` and not `./eii test`; that `docs/13_DEPLOYMENT_AND_OPERATIONS.md` lists the two workflow files that exist, `docs.yml` and `sandbox.yml`, in one sentence of section 4.5 in this pull request, task S0-T07 listing the further ones; that the profile of the bubblewrap binary is installed from the distribution package and not committed; and that its file is pinned by size and SHA-256, so that a package update that changes the file fails the job until a person reviews the new file and updates the pin.
+- NEEDED: The owner confirmed in the notes of 2026-11-12 that the hosted sandbox proof decides by behaviour: with the restriction set to 1 and the first probe failing, the job installs and loads the per-binary distribution profile and requires the same probe to pass; the sandbox tests require both prohibited operations to fail under both profiles and are never skipped (TASKS.md, task S0-T11). A passing first probe installs nothing. The exact listing, profile size and SHA-256 pin, and stacked label are printed records only, registered in docs/17_DEPLOYMENT_HARDENING.md, section "Hardening register". The hosted evidence of the behaviour proof is the sandbox workflow on the pull request head of task S0-T15, recorded in PROGRESS.md.
 - WHY: TST-62 requires the sandbox test in CI, never skipped, with a per-binary AppArmor profile preferred over a system-wide switch (docs/12_TESTING_AND_QUALITY.md). The scope of task S0-T11 names "hosted-runner namespace setup" and the criteria of S0-T07 name "the hosted-runner sandbox proof" (TASKS.md, tasks S0-T11 and S0-T07); both cite TST-61 and TST-62. The pack says only "GitHub Actions on an Ubuntu runner" (docs/13_DEPLOYMENT_AND_OPERATIONS.md, section "Environments", row "Continuous integration") and that workflow file names "are chosen in slice S0 and listed" in document 13 (docs/12_TESTING_AND_QUALITY.md, section "The CI pipeline"). The owner decided the method on 2026-11-11 and the lead assigned the requirement to this task; task S0-T07 lists the further files.
-- DONE SO FAR: The job installs a pinned `uv` and a uv-managed Python 3.14, syncs the locked environment, installs `bubblewrap` and `apparmor-profiles`, prints the runner facts, runs `ci_sandbox.py install-profile`, fetches the extensions and runs `ci_sandbox.py prove`, which requires each of the 19 sandbox test cases named in `scripts/ci_junit.py` exactly once and passed and no other test case, and fails when one is missing, repeated, failed or skipped, when another case appears, or when the test run wrote to standard error. `install-profile` reads the setting `kernel.apparmor_restrict_unprivileged_userns` and never writes it; when it reads 1, it compares the file `bwrap-userns-restrict` of the package with the pinned size and SHA-256 in `scripts/ci_apparmor.py` (the file of `apparmor-profiles` 4.0.1really4.0.1-0ubuntu0.24.04.9, 1936 bytes), installs it into `/etc/apparmor.d/` when it is absent there (a file that is already there must equal the pin and is never replaced), loads it with `apparmor_parser -r`, requires `aa-status --json` to list the profiles `bwrap` and `unpriv_bwrap` by their exact names in enforce mode, runs the probe again, and requires a program started by `/usr/bin/bwrap` to read the label `bwrap//&unpriv_bwrap (enforce)` from `/proc/self/attr/apparmor/current`; it prints the raw output of `aa-status --json` and of the label read before judging them. Every program it starts must exit 0 with nothing on standard error and print exactly what is expected. A package update that changes the profile file fails the job until a person reviews the new file and updates the pin; a format of `aa-status --json` or of the label that the first hosted run shows to differ is corrected in the grammar of `scripts/ci_apparmor.py` and its tests in one commit, never by accepting what cannot be parsed. The profile text is not committed because it carries no licence header (the package copyright is GPL-2+). The package also carries 20 profiles for other programs under `/etc/apparmor.d`; whether installing it loads them is unverified by a run. One sentence appended to the paragraph on continuous integration in section 4.5 of document 13 names `docs.yml` (the documentation check) and `sandbox.yml` (the sandbox-marked tests through `ci_sandbox.py prove` on `ubuntu-24.04`) and says that task S0-T07 lists the further files; no line of the document moves. Nothing in this item was run on a hosted runner when it was written: the runner image has no bubblewrap in its published list, the restriction state of the image, the output of `aa-status --json` there, the label and the kernel message are unverified. Proved by the tests whose names start `test_restriction_`, `test_failures_fail_the_job`, `test_no_system_wide_switch_anywhere` and `test_workflow_rules` in `scripts/tests/test_sandbox_userns.py`, by `test_case_judgement`, `test_prove_runs` and `test_required_cases_match_the_marker_modules` in `scripts/tests/test_sandbox_prove.py`, by `test_profile_file_is_the_pinned_file`, `test_aa_status_listing_grammar`, `test_label_grammar` and `test_install_profile_fails_unless_the_profile_is_in_force` in `scripts/tests/test_sandbox_apparmor.py`, by `test_runner_steps_judge_every_command_exactly` in `scripts/tests/test_sandbox_output.py`, by the sentence in `docs/13_DEPLOYMENT_AND_OPERATIONS.md` itself, and by the first run of the job. Correction after the hosted runs of 2026-11-12, which replaces the statement above that nothing was run on a hosted runner: three runs were made. The first failed in the status judge, because `aa-status --json` prints one JSON object whose closing brace stands on a second line; the judge now reads the whole output as one JSON document. The second passed that step and 18 of the 19 test cases; the one failure was the extension-folder defect recorded in OI-61. The third, on the commit that seals the extension folder, is green: https://github.com/albarami/economic-investment-intelligence/actions/runs/43249261738 . Its log shows Ubuntu 24.04.5 LTS with kernel 7.0.0-1017-azure; the restriction setting reads 1 and AppArmor is enabled; the packages are `bubblewrap` 0.9.0-1ubuntu0.3 and `apparmor-profiles` 4.0.1really4.0.1-0ubuntu0.24.04.9; before the profile is installed the probe exits 1 with "bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted"; the listing names `bwrap` and `unpriv_bwrap` in enforce mode; the label read is `bwrap//&unpriv_bwrap (enforce)`; the probe then passes; the two extensions are fetched with their pinned sizes and hashes; and the 19 test cases pass.
+- DONE SO FAR: The job installs a pinned `uv` and a uv-managed Python 3.14, syncs the locked environment, installs `bubblewrap` and `apparmor-profiles`, prints the runner facts, runs `ci_sandbox.py install-profile`, fetches the extensions and runs `ci_sandbox.py prove`, which requires each of the 19 sandbox test cases named in `scripts/ci_junit.py` exactly once and passed and no other test case, and fails when one is missing, repeated, failed or skipped, when another case appears, or when the test run wrote to standard error. Task S0-T15 implements the owner's notes of 2026-11-12: `install-profile` reads the restriction without writing it and prints the first probe result. Exact success returns without installing anything, including when the restriction reads 1. Otherwise, when the restriction reads 1, the source profile must exist; its size and SHA-256 are printed without comparison. The profile is installed only when the target is absent; an existing file that differs is never replaced. The target size and SHA-256 are printed and `apparmor_parser -r` loads it. Installation, loading and the probe after loading still require exit 0, empty standard error and exactly the expected standard output; failure fails the job. After the probe passes, `aa-status --json` and the label read each print their raw exit status, standard output and standard error; neither the status nor the content decides the result. When the restriction is absent or not 1, a failing first probe fails the job. No kernel setting is written. The obsolete pin, listing and label judges and their test module are removed. The workflow and the 19-case proof are unchanged. Stub-runner evidence is in `scripts/tests/test_sandbox_userns.py` (call order, missing source, parser and probe failures, record-only commands, early return and no system-wide switch) and `scripts/tests/test_sandbox_output.py` (exact command judging); `scripts/tests/test_sandbox_prove.py` retains the case-identity proof. The README names none of the three demoted checks and is unchanged. Hosted evidence for this follow-up remains with the lead. Historical note: the initial S0-T11 entry said no hosted run had yet been made; the following correction is retained as history, not evidence for S0-T15. Correction after the hosted runs of 2026-11-12, which replaces the statement above that nothing was run on a hosted runner: three runs were made. The first failed in the status judge, because `aa-status --json` prints one JSON object whose closing brace stands on a second line; the judge now reads the whole output as one JSON document. The second passed that step and 18 of the 19 test cases; the one failure was the extension-folder defect recorded in OI-61. The third, on the commit that seals the extension folder, is green: https://github.com/albarami/economic-investment-intelligence/actions/runs/43249261738 . Its log shows Ubuntu 24.04.5 LTS with kernel 7.0.0-1017-azure; the restriction setting reads 1 and AppArmor is enabled; the packages are `bubblewrap` 0.9.0-1ubuntu0.3 and `apparmor-profiles` 4.0.1really4.0.1-0ubuntu0.24.04.9; before the profile is installed the probe exits 1 with "bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted"; the listing names `bwrap` and `unpriv_bwrap` in enforce mode; the label read is `bwrap//&unpriv_bwrap (enforce)`; the probe then passes; the two extensions are fetched with their pinned sizes and hashes; and the 19 test cases pass.
 - OPTIONS: **Recommendation:** keep; task S0-T07 lists the further workflow files in document 13, may move the job and never drops it. Alternatives: put the sandbox step into the workflow of S0-T07 and build that task first (this pull request is built before the CI task by the lead's order of work); leave document 13 unchanged and let task S0-T07 list both files (the sentence of docs/12_TESTING_AND_QUALITY.md, section "The CI pipeline", would then not be true of this pull request, and REV-17 asks that every affected document be updated).
 - NEEDED BY: before task S0-T07 is planned; slice S0 gate.
 
@@ -645,7 +645,7 @@
 - TYPE: ASSUMPTION
 - NEEDED: Owner confirmation that a command whose body is not built exits 1 and never 0, and that a failure prints `FAIL <command>: <detail>` followed by `eii: exit <code>: <meaning>` using the meaning text in the operations document.
 - WHY: OPS-26 requires one code from that table and the meaning on failure. The pack has no code for work that is not built, and it does not give the print format. A code outside 0 to 7 is an internal fault and becomes exit 1.
-- DONE SO FAR: Placeholders, including `down`, exit 1. `build-public` names S2-T01, `load-release` names S3-T02, and `freeze` names S11-T01 and S11-T06. The serving body of `up`, and the bodies of `down`, `build-world` and `build-release`, say `not_built (not built yet)` and name no task. `./eii test` keeps the usage line it already prints. On success, `db-down` prints `PASS db-down: database service stopped`, parallel to the success line stated for `db-up`.
+- DONE SO FAR: Placeholders, including `down`, exit 1. `build-public` names S2-T01, `load-release` names S3-T02, and `freeze` names S11-T01 and S11-T06. The serving body of `up`, and the bodies of `down`, `build-world` and `build-release`, say `not_built (not built yet)` and name no task. `./eii test` keeps the usage line it already prints. On success, `db-down` prints `PASS db-down: database service stopped`, parallel to the success line stated for `db-up`. Two exit-1 paths delivered by S0-T05 print no meaning line and keep their own lines: the launcher when `uv` is not found, and `./eii test` when a suite fails.
 - OPTIONS: **Recommendation:** keep. Alternative: exit 0 for `down` when no API is running, and print no success line for `db-down`.
 - NEEDED BY: the owner, before the slice S0 gate.
 
@@ -840,72 +840,79 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 ### PO-S0-02 — Suppression comments ahead of the checks of S0-T04
 
 - ID: PO-S0-02
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: independent review round 1 of S0-T02 (Zhipu AI GLM-5.3 High), 2026-11-12, proposed item P2
 - CONCERNS: REV-15 (no check weakened)
 - EVIDENCE: `scripts/tests/workspace_fields.py` carries `# noqa: E402` for the bottom import that the split into two modules needs, and `scripts/tests/test_workspace_metadata.py` carries several `# type: ignore[...]` comments; no check that runs today is weakened.
 - NEEDED: S0-T04 confirms that its ruff selection accepts that import without the suppression and that each type-ignore marker matches its type checker, or removes them.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-12, by S0-T15: the bottom re-export and its `# noqa: E402` are removed from `scripts/tests/workspace_fields.py`; case tables stay in `scripts/tests/workspace_fields_tables.py` and `scripts/tests/test_workspace_metadata.py` imports them there, so ruff needs no suppression and `__all__` lists no undefined names; proved by `uv run --locked ruff check .` and the workspace metadata tests. `scripts/tests/test_workspace_metadata.py` holds 0 `type: ignore` comments; the item's "several" is stale.
 
 ### PO-S0-03 — A file write that the next statement overwrites in the test of the Hypothesis profile
 
 - ID: PO-S0-03
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: independent review round 1 of S0-T05, part 1 (Zhipu AI GLM-5.3 High), 2026-11-12, proposed item P1
 - CONCERNS: REV-13, as the reviewer names it (a statement with no effect, left from an edit)
 - EVIDENCE: `test_profile_is_eii_and_survives_a_ci_variable` in `scripts/tests/test_test_bootstrap.py` writes `fx/profile/test_profile.py` twice in a row; the second write replaces the file before anything reads it, so the first has no effect. No behaviour is wrong.
 - NEEDED: the first write is deleted, and the test still passes.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-12, by S0-T15: the first of the two writes of `fx/profile/test_profile.py` in `test_profile_is_eii_and_survives_a_ci_variable` is deleted; proved by the unchanged `test_profile_is_eii_and_survives_a_ci_variable` in `scripts/tests/test_test_bootstrap.py`.
 
 ### PO-S0-04 — The test support of the Python checks makes a folder that no ignore rule covers
 
 - ID: PO-S0-04
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the lead, 2026-11-12, while checking S0-T12; not a reviewer's item
 - CONCERNS: rule 13 of [AGENTS.md](AGENTS.md) (tests use only their documented repository, cache and temporary paths); REV-42 (the same result on a fresh clone)
 - EVIDENCE: `home_tmpdir()` in `scripts/tests/pychecks_support.py`, delivered by S0-T04, creates the folder `.overnight/tmp` under the repository root, and the tests of the Python checks make their temporary folders in it. No rule of `.gitignore` covers that folder, so on a fresh clone the tests leave an untracked folder behind. The cause was the wording of the build brief on temporary folders. No verdict so far depends on it.
 - NEEDED: the support takes its temporary folders from `tempfile` under the environment's settings, and the tests leave nothing behind in the checkout.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-12, by S0-T15: `home_tmpdir()` in `scripts/tests/pychecks_support.py` returns `Path(tempfile.gettempdir())` and creates nothing under the repository root; every test that takes a folder from it removes it by `addCleanup`. Proved by the new test `test_home_tmpdir_is_the_system_temp` in `scripts/tests/test_pychecks_config.py`, which fails on the old support.
 
 ### PO-S0-05 — A dead assignment in a test of the extension files
 
 - ID: PO-S0-05
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: independent review round 1 of S0-T11, part 1 (Zhipu AI GLM-5.3 High), 2026-11-12, proposed item P1
 - CONCERNS: REV-16 (house style: a target, never a verdict finding)
 - EVIDENCE: `test_launcher_binds_the_checked_files` in `scripts/tests/test_sandbox_extensions.py` assigns `binaries` from the files with an empty suffix and assigns it again in the next statement from the files whose name ends in `.duckdb_extension`; the first assignment has no effect.
 - NEEDED: the first assignment is removed, and the tests still pass.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-12, by S0-T15: the dead first `binaries` assignment and its comment are removed from `test_launcher_binds_the_checked_files` in `scripts/tests/test_sandbox_extensions.py`; proved by the unchanged `test_launcher_binds_the_checked_files`.
 
 ### PO-S0-06 — Two exit-1 paths of the test command print no meaning line
 
 - ID: PO-S0-06
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: independent review round 1 of S0-T09 (Google Gemini 4 Carbon), 2026-11-12, proposed item P2
 - CONCERNS: OPS-26 (one exit code of the table and its meaning on failure); OI-80
 - EVIDENCE: every command under `scripts/commands/` prints `eii: exit <code>: <meaning>` on failure. The launcher `eii` exits 1 when `uv` is not found, and `scripts/run_tests.py` exits 1 when a suite of `./eii test` fails; neither prints that line, and OI-80 names only the usage line of `./eii test`. Both paths were delivered by S0-T05 and were outside the scope of S0-T09.
 - NEEDED: OI-80 names the two paths, or they print the meaning line.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-12, by S0-T15: OI-80's DONE SO FAR now names the two exit-1 paths that print no meaning line and keep their own lines (the launcher when `uv` is not found, and `./eii test` when a suite fails).
 
 ### PO-S0-07 — Planted bad anchors only in one table of the notes fixture
 
 - ID: PO-S0-07
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: independent review of S0-T13 part B (Zhipu AI GLM-5.3 High), 2026-11-12, proposed item P1
 - CONCERNS: REV-15; TST-01 (planted violations of the rule `pack-cite`)
 - EVIDENCE: every planted bad anchor of `test_pack_cites` in `scripts/tests/test_reference_notes_rows.py` sits in one row of the Statements table. The earlier planted cases in the confirmation table and in the coverage table, and the missing-file case, were removed with the line form. The anchor check is called for both tables and the real notes pass through it, but a change that dropped the call for one of them would fail no planted test.
 - NEEDED: one planted bad anchor in the confirmation table, one in the coverage table, and one anchor into a missing file, each proved by the notes test modules.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-12, by S0-T15: `test_pack_cites` in `scripts/tests/test_reference_notes_rows.py` gained three sub-cases (a8 a bad anchor in the Slice S1 confirmation table, a9 a bad anchor in the coverage table, a10 an anchor into a missing file), each expecting the exact `pack-cite` FAIL line; each is proved by removing the `check_cite` call for its table, which leaves that line unreported.
 
 ### PO-S0-08 — The other side of the anchor masking has no committed test
 
 - ID: PO-S0-08
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the lead, 2026-11-12, while reading the build of S0-T13 part B, and the independent review of that part (Zhipu AI GLM-5.3 High), proposed item P2
 - CONCERNS: REV-15 (the claim-word rule of the notes check)
 - EVIDENCE: `mask_verified_anchors` in `scripts/pack_anchors.py` blanks a verified anchor before the claim-word scan. The tests hold one control: a claim word inside a verified row anchor is not reported. The lead probed the other side on 2026-11-12 with the tests' own fixture: anchor-shaped text that does not verify (a row that is not in the section, an absent heading, an absent file) is not masked and its claim word is reported, and a claim word outside a verified anchor is reported. No committed test holds those cases.
 - NEEDED: the three cases of text that does not verify, and the case of a word outside a verified anchor, as committed sub-cases of the claim-word test.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-12, by S0-T15: `test_claim_words` in `scripts/tests/test_reference_notes_rows.py` gained four sub-cases beside `control-fast-inside-verified-anchor`: a row not in the section, an absent heading, an absent file, and a claim word outside a verified anchor; each expects exactly one `claim-word` FAIL line.
 
 ### PO-S0-09 — Five rows of the pin record repeat one section anchor
 

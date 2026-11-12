@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import tempfile
 import unittest
 from collections.abc import Sequence
@@ -97,10 +98,17 @@ class PychecksConfig(unittest.TestCase):
             elif cmd[0] == support.tool("mypy"):
                 self.assertEqual(support.mypy_findings(proc.stdout + proc.stderr), [])
 
+    def test_home_tmpdir_is_the_system_temp(self) -> None:
+        self.assertEqual(support.home_tmpdir(), Path(tempfile.gettempdir()))
+        source = inspect.getsource(support.home_tmpdir)
+        self.assertNotIn("ROOT", source)
+        self.assertNotIn("mkdir", source)
+
     def test_support_module_contract(self) -> None:
         """Guard helper constants and error paths used by planted-violation tests."""
         self.assertEqual(support.TIMEOUT_SECONDS, 600)
-        home = support.home_tmpdir()
+        home = Path(tempfile.mkdtemp(dir=support.home_tmpdir()))
+        self.addCleanup(lambda: __import__("shutil").rmtree(home, ignore_errors=True))
         env = support.clean_env(home)
         self.assertEqual(env["TMPDIR"], str(home))
         with self.assertRaises(AssertionError, msg="FAIL tool-missing"):

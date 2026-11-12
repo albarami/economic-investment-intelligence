@@ -154,7 +154,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: the files the closures change, and `OPEN_ITEMS.md`.
 - Depends: every other task of slice S0.
 - Requirements: REV-41, TST-168.
-- Delivery: routine; personas as the items require; status queued.
+- Delivery: routine; personas as the items require; status in review (part A, pull request 20; part B follows before the slice gate).
 
 ## slice S1 — Technical spike
 
