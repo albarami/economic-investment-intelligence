@@ -266,7 +266,7 @@ OI-02 remains open, so the estimates must not be converted to a demonstration da
 - S1-T06 — Prove sandbox enforcement with no fallback.
 - S1-T07 — Build the offline typed-decision gateway contract, providers, records, policy and boundaries.
 - S1-T11 — Assign one hourly origin-destination fixture to the routing graph with one fixed volume-delay rule, and animate the hourly link speeds on the map.
-- S1-T08 — Requalify `evals/typed_decisions/`, reproduce the admitted measurement within its stated intervals, run every choice case in both fixed option orders, confirm pins and record any accepted alternative.
+- S1-T08 — Requalify `evals/typed_decisions/`, reproduce the admitted measurement within its stated intervals, run every choice case in both fixed option orders, confirm pins and record any accepted alternative. During the build the run uses the recorded provider, with no key and no network ([decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12); a live re-run waits for an offline run after the build that a separate owner decision allows (OI-18).
 - S1-T09 — Fix `export_parameter_set` = `A` and the presence and flow parameters of PRV-59 in the rules configuration before the first world build, and record the number of monthly periods shown first.
 - S1-T10 — Close every proposed open item of the slice's reviews before the gate (REV-41).
 
@@ -430,7 +430,7 @@ document has reviewed the lead's last ten corrections to it (made on 2026-11-11 
 [PROGRESS.md](../PROGRESS.md). slice S5 does not start before that evidence exists.
 
 **Tasks.**
-- S5-T01 — After OI-37 is closed with its review recorded, build both proposed parameter sets on resolution-7-parent-by-municipality roots with one parent-linked partition family per contributor universe. A whole-cell unit stays inside one root. The three cross-root municipality exceptions are the remainder (the union of the failed roots of one municipality), the terminal `ha_home` unit (the union of every residence unit and remainder of one municipality) and the municipality unit of each `money` and `quartile` pay partition (the union of that partition's units and remainder in one municipality, holding exact sums of its published units, PRV-16). Include two-sided `home_area_share` complement protection, and build one protected window whose `period` spans its monthly periods.
+- S5-T01 — After OI-37 is closed with its review recorded, build both proposed parameter sets on resolution-7-parent-by-municipality roots with one parent-linked partition family per contributor universe. A whole-cell unit stays inside one root. The three cross-root municipality exceptions are the remainder (the union of the failed roots of one municipality), the terminal `ha_home` unit (the union of every residence unit and remainder of one municipality) and the municipality unit of each of the four pay partitions `rp_all_money`, `rp_all_quartile`, `wp_all_money` and `wp_all_quartile` (the union of that partition's units and remainders in one municipality, holding exact sums of its published units' treated leaves apart from the two unreleased stayer wage bills behind its stayer index, PRV-16, PRV-55). Include two-sided `home_area_share` complement protection, and build one protected window whose `period` spans its monthly periods.
 - S5-T02 — Build distinct-contributor cell keys and stable treatment of mutually exclusive leaf atoms. Exact sums hold inside one additive family only, and `other` is a treated leaf. Include controlled rounding, the insider-removal test on every atom, and the pinned row-dropping order, test order, reason-code mapping and worked example. One treatment holds for every month of the window.
 - S5-T09 — Release hourly presence counts with ranges at release-unit grain, and traffic link speeds by hour from released flows assigned with the one fixed volume-delay rule, under the controls of document 06.
 - S5-T10 — Release the window's monthly periods and the synthetic firm lists under the same minimum, dominance and complement rules as any protected figure.
@@ -515,7 +515,7 @@ document has reviewed the lead's last ten corrections to it (made on 2026-11-11 
 - S7-T04 — Build the licence-density card, national pay, churn and zone momentum; the property-sale method card and the neighbour evidence moved to S6-T10.
 - S7-T05 — Build the second-site comparison, worded as shared reach and overlap, never as lost sales.
 - S7-T07 — Build the customer finder (journey D3): a targeted territory and a prospect list of named synthetic firms by sector and size band.
-- S7-T08 — Build the labour-market view (journey D5): sectors, occupations, pay, trends and marked projections, with official Public splits.
+- S7-T08 — Build the labour-market view (journey D5): occupations, pay, trends, sector views that are Public and national only, and marked projections, with official Public splits.
 - S7-T09 — Build the partner and supplier finder (journey D4) with the supplier and workforce connections of service S3.
 - S7-T10 — Build where to grow (journey D6) with the comparison of growth and operating options of service S2.
 - S7-T11 — Build serving the region (journey D7): travel times to the ports, the airport, the free zones and the land routes, complementary firms, the import context and imports against local production.

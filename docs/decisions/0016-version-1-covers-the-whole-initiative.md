@@ -27,7 +27,7 @@
    | D2 | Which location fits | The location choice for a drawn or travel-time area, with the best-location ranking and its reverse (the flagship) |
    | D3 | Where to find customers | The customer finder: a targeted territory and a prospect list of named synthetic firms by sector and size band |
    | D4 | Whom to partner with | The partner and supplier finder: named synthetic firms ranked by fit, real businesses from public listings, public tenders where a public source exists, and a structured qualification route |
-   | D5 | How to organise staffing | Staffing and pay: pay by occupation and sector with middle ranges and earner counts, where such workers live, trends, and the labour-market view |
+   | D5 | How to organise staffing | Staffing and pay: pay by occupation with middle ranges and earner counts (Synthetic), where such workers live, trends, national mean pay and wage trends by economic activity (Public, item 9), and the labour-market view |
    | D6 | Where to grow in Qatar | Where to grow: openings and closures over time, cluster change and a second-site comparison (shared reach and overlap, never lost sales) |
    | D7 | How to serve the region | Serving the region: travel times from an area to the ports, the airport, the free zones and the land routes, complementary firms, and the import context |
 

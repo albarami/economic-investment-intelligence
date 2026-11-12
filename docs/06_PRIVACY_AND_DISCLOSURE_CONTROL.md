@@ -500,7 +500,11 @@ where those columns belong to two additive families: the wage bill and the earne
 `ALL` row, or a side count and the earner count of an `ALL` row. The closed list of ratio
 statistics is the mean wage and the coverage, irregular and deployed-elsewhere shares; the fact
 lineage of each names both families. A count and the shares shown beside it on one card use the
-same family. No screen, fact or export places two routes to the same population side by side as
+same family. On a municipality card of PRV-16, where the count partitions have no municipality
+unit, the earner count comes from the `money` unit and the band shares from the `quartile` unit:
+those shares carry no count of their own, the earner count is not their count, and their
+denominator is never displayed as a second earner count
+([07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md) MTH-55). No screen, fact or export places two routes to the same population side by side as
 two numeric estimates.
 
 Example with five fine bands and invented numbers. Unit U3 has its two top bands merged.
@@ -522,7 +526,7 @@ set A atom tests.
 
 | ID | Requirement |
 |---|---|
-| PRV-30 | Every figure shown is a fixed function, as in the table above, of one home family's stored atoms over the unit set of its block, or, for the closed list of ratio statistics above, of two columns of the same stored rows. Its fact lineage names the table, partition, measure and breakdown of each family it uses. A count and adjacent shares use the same home family, and no output presents two families as two estimates of one population. The figure is computed by a deterministic, tested function of `eii_core.calc` with a method card and worked regression example. No statistic is computed from base cells, from untreated values, by a model, by the browser, or by a query written at run time. Comparisons, rankings and rounding are calculations under the same rule. |
+| PRV-30 | Every figure shown is a fixed function, as in the table above, of one home family's stored atoms over the unit set of its block, or, for the closed list of ratio statistics above, of two columns of the same stored rows. Its fact lineage names the table, partition, measure and breakdown of each family it uses. A count and adjacent shares use the same home family, and no output presents two families as two estimates of one population. On a municipality card of PRV-16 the band shares of the `quartile` unit carry no count of their own, and the earner count beside them, from the `money` unit, is not their count (section 6.2; [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md) MTH-55). The figure is computed by a deterministic, tested function of `eii_core.calc` with a method card and worked regression example. No statistic is computed from base cells, from untreated values, by a model, by the browser, or by a query written at run time. Comparisons, rankings and rounding are calculations under the same rule. |
 | PRV-31 | Derivation minimums: a mean, a wage bill or a median band is returned only if the summed earner count is at least 30 (A) or 50 (B); quartile bands and the band distribution only if it is at least 100 (A) or 200 (B). Because this check uses treated sums, it can fail even when every true unit total passes its tier; the statistic then returns `SUPPRESSED` with `DETAIL_NEEDS_LARGER_GROUP`. The check stays in the derivation code as a second lock. |
 | PRV-32 | A median or quartile is reported as a band, never as a value, and is never interpolated inside a band. If the units of S share no inner band boundary, band statistics return `SUPPRESSED` with reason `BANDS_NOT_SHARED`. |
 | PRV-33 | Any reliability mark is computed from treated values only. |

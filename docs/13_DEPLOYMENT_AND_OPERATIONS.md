@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
+| Status | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12 |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | How the EII proof of concept is installed, started, frozen, run on stage, recovered, backed up and later deployed. |
@@ -59,8 +59,8 @@ Configuration (names pinned in [02_ARCHITECTURE.md](02_ARCHITECTURE.md); values 
 | `EII_RELEASE_DIR` | `data/releases/<release_id>` | `.env` | Must match the frozen release on stage |
 | `EII_LANG_DEFAULT` | `en` or `ar` | `.env` | Language of the opening scene |
 | `EII_PRESENTER` | `0` or `1` | `.env` | `1` on the stage machine only; enables the presenter console and its controls |
-| `EII_DECISION_PROVIDER` | `none` or `jev`, default `none` | Build/evaluation environment | No stage or run-time use in v1 |
-| `JEV_PRO_API_KEY` | key or absent | Owner, build/evaluation only | Never required by `up`, preflight, freeze or any gate; never printed |
+| `EII_DECISION_PROVIDER` | `none` or `jev`, default `none` | Build/evaluation environment | The build, continuous integration and build-time evaluation use `none`; `jev` is reserved for an offline run after the build that a separate owner decision allows, never at stage or run time ([decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12) |
+| `JEV_PRO_API_KEY` | key or absent | Owner, only for an offline run after the build that a separate owner decision allows | Absent during the build, continuous integration and build-time evaluation; never required by `up`, preflight, freeze or any gate; never printed |
 
 ## 3. Prerequisites and how each is checked
 

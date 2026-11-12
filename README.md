@@ -87,7 +87,7 @@ Seven decision journeys, each ending with its own answer:
 | D2 Which location fits (the flagship) | The location choice for a drawn or travel-time area, with the best-location ranking and its reverse |
 | D3 Where to find customers | A targeted territory and a prospect list of named synthetic firms by sector and size band |
 | D4 Whom to partner with | Named synthetic firms ranked by fit, real businesses from public listings, public tenders where a public source exists, and a structured qualification route |
-| D5 How to organise staffing | Pay by occupation and sector with middle ranges and earner counts, where such workers live, trends and the labour-market view |
+| D5 How to organise staffing | Pay by occupation with middle ranges and earner counts (Synthetic), where such workers live, trends, national mean pay and wage trends by economic activity (Public) and the labour-market view |
 | D6 Where to grow in Qatar | Openings and closures over time, cluster change and a second-site comparison (shared reach and overlap, never lost sales) |
 | D7 How to serve the region | Travel times from an area to the ports, the airport, the free zones and the land routes, complementary firms and the import context |
 
