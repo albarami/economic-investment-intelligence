@@ -409,6 +409,88 @@ class Rows(unittest.TestCase):
                 self.assertNotIn(key, line.text())
         self.assertEqual(ran, labels)
 
+    def test_night_lights_key_row(self) -> None:
+        """OPS-06: night-lights key presence uses only the supplied mapping."""
+        key = stubs.dummy("night")
+        cases: tuple[tuple[dict[str, str], str], ...] = (
+            ({}, "absent"),
+            ({"EARTHDATA_API_KEY": ""}, "absent"),
+            ({"EARTHDATA_API_KEY": key}, "present"),
+        )
+        for env, want in cases:
+            with (
+                self.subTest(want=want, empty=not env),
+                mock.patch.dict(os.environ, {"EARTHDATA_API_KEY": key}, clear=True),
+                mock.patch("socket.socket") as sock,
+                mock.patch("subprocess.Popen") as child,
+            ):
+                line = rows.night_lights_key_row(env)
+                self.assertEqual(line.text(), f"PASS night-lights-key: {want}")
+                self.assertNotIn(key, line.text())
+                sock.assert_not_called()
+                child.assert_not_called()
+
+    def test_traffic_provider_key_row(self) -> None:
+        """OPS-06: optional traffic key and each allowed/default setting pass."""
+        key = stubs.dummy("traffic")
+        for provider in (None, "", "simulated", "tomtom"):
+            for value, presence in ((None, "absent"), ("", "absent"), (key, "present")):
+                with (
+                    self.subTest(
+                        provider=provider, presence=presence, unset=value is None
+                    ),
+                    mock.patch.dict(
+                        os.environ,
+                        {
+                            "TOMTOM_API_KEY": key,
+                            "EII_TRAFFIC_PROVIDER": "tomtom",
+                        },
+                        clear=True,
+                    ),
+                    mock.patch("socket.socket") as sock,
+                    mock.patch("subprocess.Popen") as child,
+                ):
+                    env: dict[str, str] = {}
+                    if provider is not None:
+                        env["EII_TRAFFIC_PROVIDER"] = provider
+                    if value is not None:
+                        env["TOMTOM_API_KEY"] = value
+                    line = rows.traffic_provider_key_row(env)
+                    want = provider or "simulated"
+                    self.assertEqual(
+                        line.text(),
+                        f"PASS traffic-provider-key: {presence}; EII_TRAFFIC_PROVIDER {want}",
+                    )
+                    self.assertNotIn(key, line.text())
+                    sock.assert_not_called()
+                    child.assert_not_called()
+
+    def test_traffic_provider_unknown_value_fails_without_echo(self) -> None:
+        """R3 planted violation: reject an unknown setting with a fixed reason."""
+        unknown = stubs.dummy("unknown")
+        for key in ("", stubs.dummy("traffic")):
+            with (
+                self.subTest(present=bool(key)),
+                mock.patch("socket.socket") as sock,
+                mock.patch("subprocess.Popen") as child,
+            ):
+                line = rows.traffic_provider_key_row(
+                    {
+                        "EII_TRAFFIC_PROVIDER": unknown,
+                        "TOMTOM_API_KEY": key,
+                    }
+                )
+                self.assertEqual(
+                    line.text(),
+                    "FAIL traffic-provider-key: "
+                    "EII_TRAFFIC_PROVIDER must be simulated or tomtom",
+                )
+                self.assertNotIn(unknown, line.text())
+                if key:
+                    self.assertNotIn(key, line.text())
+                sock.assert_not_called()
+                child.assert_not_called()
+
     def test_env_tracked_row_with_real_git(self) -> None:
         """R08: .env tracking with real git."""
         labels = ["untracked", "staged", "nested", "no_git"]

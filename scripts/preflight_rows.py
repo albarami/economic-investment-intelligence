@@ -287,6 +287,28 @@ def model_key_row(environ: Mapping[str, str]) -> store.Line:
     return store.Line("PASS", "model-key", "absent")
 
 
+def traffic_provider_key_row(environ: Mapping[str, str]) -> store.Line:
+    """Report optional traffic key presence and the closed provider setting."""
+    provider = environ.get("EII_TRAFFIC_PROVIDER", "") or "simulated"
+    if provider not in ("simulated", "tomtom"):
+        return store.Line(
+            "FAIL",
+            "traffic-provider-key",
+            "EII_TRAFFIC_PROVIDER must be simulated or tomtom",
+        )
+    presence = "present" if environ.get("TOMTOM_API_KEY", "") else "absent"
+    return store.Line(
+        "PASS", "traffic-provider-key", f"{presence}; EII_TRAFFIC_PROVIDER {provider}"
+    )
+
+
+def night_lights_key_row(environ: Mapping[str, str]) -> store.Line:
+    """Report optional night-lights key presence without contacting a source."""
+    if environ.get("EARTHDATA_API_KEY", ""):
+        return store.Line("PASS", "night-lights-key", "present")
+    return store.Line("PASS", "night-lights-key", "absent")
+
+
 def git_env(root: Path, environ: Mapping[str, str]) -> dict[str, str]:
     """Build git environment with ceiling directories."""
     return proc.child_env(
