@@ -262,7 +262,7 @@ _TOML_INVALID = "FAIL members: pyproject.toml: missing or not valid TOML"
 def invalid_pyproject_cases() -> list[
     tuple[str, Callable[[Path], None], list[str]]
 ]:
-    """Build sub-cases for missing or unparsable member pyproject.toml files."""
+    """Build sub-cases for missing or unparsable workspace pyproject.toml files."""
     bad = "missing or not valid TOML"
     cases: list[tuple[str, Callable[[Path], None], list[str]]] = [
         ("root deleted", lambda r: (r / "pyproject.toml").unlink(), [_TOML_INVALID]),
@@ -325,7 +325,7 @@ def plant_output_order_b(data: dict[str, Any]) -> None:
 
 
 def plant_registry_forbidden_edge(lock: dict[str, Any]) -> None:
-    """Registry-sourced workspace row with a forbidden edge (ignored by guard)."""
+    """Registry-sourced workspace row with a forbidden edge (judged by name)."""
     wf.add_dependency(lock, "eii-core", "eii-custodian")
     row = next(e for e in lock.get("package", []) if e.get("name") == "eii-core")
     row["source"] = {"registry": "https://pypi.org/simple"}
