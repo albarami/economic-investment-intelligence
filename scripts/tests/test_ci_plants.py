@@ -33,6 +33,18 @@ class PlantHarness(unittest.TestCase):
         )
         with self.assertRaises(plants.PlantError):
             plants.validate_cases(planted)
+        repeated_name = (
+            *cases.CASES[:-1],
+            replace(cases.CASES[-1], name=cases.CASES[0].name),
+        )
+        with self.assertRaises(plants.PlantError):
+            plants.validate_cases(repeated_name)
+        unregistered = (
+            *cases.CASES[:-1],
+            replace(cases.CASES[-1], plant="unregistered-plant"),
+        )
+        with self.assertRaises(plants.PlantError):
+            plants.validate_cases(unregistered)
 
     def test_broken_case_table_stops_the_run_before_any_case(self) -> None:
         planted = (
@@ -49,7 +61,7 @@ class PlantHarness(unittest.TestCase):
         for destination_kind in ("root", "symlink", "parent"):
             with self.subTest(destination_kind=destination_kind):
                 home, env = support.temp_home(self)
-                root = support.history_repo(home, env, shallow=False)
+                root = support.history_repo(home, env)
                 link = home / "root-link"
                 link.symlink_to(root, target_is_directory=True)
                 destination = {

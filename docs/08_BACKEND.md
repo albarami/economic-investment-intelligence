@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12 |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Specify the Python packages, the store interface, PostgreSQL, the loader, the closed tool list, the playbooks' calls, the API, seats, the ledger, routing, drawn areas, case sample files and the runtime rules of the serving plane precisely enough to generate tests from. |

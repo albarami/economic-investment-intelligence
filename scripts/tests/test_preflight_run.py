@@ -147,7 +147,7 @@ class Preflight(unittest.TestCase):
             self.assertEqual(sum("not_configured" in line for line in want), 4)
 
     def test_foundation_keeps_other_severities(self) -> None:
-        """U02: one fault per label; first five status 1, last two 0."""
+        """U02: one fault per label; first nine status 1, last two 0."""
         labels = [
             "python",
             "node-npm",

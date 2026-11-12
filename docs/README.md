@@ -32,22 +32,22 @@
 
 | Document | Purpose | Status on 2026-11-12 |
 |---|---|---|
-| [01_PROJECT_BRIEF.md](01_PROJECT_BRIEF.md) | Audience, scope, version 1, journeys and prohibited claims | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
-| [02_ARCHITECTURE.md](02_ARCHITECTURE.md) | Planes, trust boundaries, release, stores and stack | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| [01_PROJECT_BRIEF.md](01_PROJECT_BRIEF.md) | Audience, scope, version 1, journeys and prohibited claims | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| [02_ARCHITECTURE.md](02_ARCHITECTURE.md) | Planes, trust boundaries, release, stores and stack | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12 |
 | [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) | Feed, release, fact, graph and application contracts | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
 | [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) | Public sources, licences, frame, spine and places | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
 | [05_SYNTHETIC_WORLD_AND_SIMULATION.md](05_SYNTHETIC_WORLD_AND_SIMULATION.md) | Synthetic generation, simulation and sealed evaluation | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
 | [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) | Partitions, one selected export, one treatment per window, attacks, receipts and limits | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12; the last ten corrections of 2026-11-11 still await review by another maker (OI-37) |
 | [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md) | Deterministic methods and worked public examples | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
-| [08_BACKEND.md](08_BACKEND.md) | Stores, loader, tools, playbooks, API and seats | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
-| [09_AI_ASSISTANT.md](09_AI_ASSISTANT.md) | Governed composition, catalogues, fallback and evaluation | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
-| [10_FRONTEND.md](10_FRONTEND.md) | Browser components, map, Fact chips and bilingual behaviour | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
-| [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md) | Visual tokens, motion, storyboard and design audit | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
-| [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md) | Test map, gates, CI and evidence standard | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
-| [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md) | Commands, stage operation, freeze and recovery | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
-| [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md) | Slices, dependencies, tasks and gates | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
-| [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md) | Independent checks and verdict format | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
-| [16_DEMO_RUNBOOK.md](16_DEMO_RUNBOOK.md) | Guided session, recoveries and closing request | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| [08_BACKEND.md](08_BACKEND.md) | Stores, loader, tools, playbooks, API and seats | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12 |
+| [09_AI_ASSISTANT.md](09_AI_ASSISTANT.md) | Governed composition, catalogues, fallback and evaluation | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| [10_FRONTEND.md](10_FRONTEND.md) | Browser components, map, Fact chips and bilingual behaviour | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md) | Visual tokens, motion, storyboard and design audit | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md) | Test map, gates, CI and evidence standard | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12; also amended that day by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md), as amended by [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) |
+| [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md) | Commands, stage operation, freeze and recovery | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12 |
+| [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md) | Slices, dependencies, tasks and gates | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12; also amended that day by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md) |
+| [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md) | Independent checks and verdict format | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12; also amended that day by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md), as amended by [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) |
+| [16_DEMO_RUNBOOK.md](16_DEMO_RUNBOOK.md) | Guided session, recoveries and closing request | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12 |
 | [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) | What a deployment on real records must add beyond the demonstrator | Draft v0.2, created by decisions 0016 and 0017 and amended by decisions 0018 and 0019 on 2026-11-12 |
 | [GLOSSARY.md](GLOSSARY.md) | Shared technical and interface vocabulary | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
 | [REFERENCE_NOTES.md](REFERENCE_NOTES.md) | Official pages read for DuckDB 2.0, PostgreSQL 18 and the Claude API, the idioms that changed, and the slice S1 confirmation fields | Draft written by task S0-T13 on 2026-11-12; not approved |

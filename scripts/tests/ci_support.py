@@ -77,7 +77,7 @@ def git(env: Mapping[str, str], repo: Path, *args: str) -> None:
         raise AssertionError(done.stderr or done.stdout)
 
 
-def history_repo(parent: Path, env: Mapping[str, str], *, shallow: bool) -> Path:
+def history_repo(parent: Path, env: Mapping[str, str]) -> Path:
     """Create a repository with two clean commits for history-scan tests."""
     repo = parent / "history"
     repo.mkdir(parents=True)
@@ -92,8 +92,6 @@ def history_repo(parent: Path, env: Mapping[str, str], *, shallow: bool) -> Path
     (repo / "notes.txt").write_text("second\n", encoding="utf-8")
     git(env, repo, "add", "notes.txt")
     git(env, repo, "commit", "-q", "-m", "chore: second")
-    if shallow:
-        git(env, repo, "fetch", "--depth", "1", "origin", "main")
     return repo
 
 
@@ -131,7 +129,7 @@ def shaped_probe_line() -> str:
 
 def history_with_ledger_line(parent: Path, env: Mapping[str, str], line: str) -> Path:
     """Scratch repository whose history holds ``line`` in ``PROGRESS.md`` twice."""
-    repo = history_repo(parent, env, shallow=False)
+    repo = history_repo(parent, env)
     progress = repo / "PROGRESS.md"
     progress.write_text(line + "\n", encoding="utf-8")
     git(env, repo, "add", "PROGRESS.md")

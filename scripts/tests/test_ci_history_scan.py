@@ -115,7 +115,7 @@ class HistoryScan(unittest.TestCase):
 
     def test_shallow_checkout_refusal(self) -> None:
         home, env = support.temp_home(self)
-        repo = support.history_repo(home, env, shallow=False)
+        repo = support.history_repo(home, env)
         with patch.object(
             history,
             "run_git",
@@ -129,7 +129,7 @@ class HistoryScan(unittest.TestCase):
 
     def test_real_scratch_history_with_clean_commits(self) -> None:
         home, env = support.temp_home(self)
-        repo = support.history_repo(home, env, shallow=False)
+        repo = support.history_repo(home, env)
         support.place_scanner(repo)
         out = io.StringIO()
         err = io.StringIO()
@@ -139,7 +139,7 @@ class HistoryScan(unittest.TestCase):
 
     def test_runtime_token_gives_finding(self) -> None:
         home, env = support.temp_home(self)
-        repo = support.history_repo(home, env, shallow=False)
+        repo = support.history_repo(home, env)
         support.place_scanner(repo)
         support.token_in_history(repo, env)
         out = io.StringIO()
@@ -150,7 +150,7 @@ class HistoryScan(unittest.TestCase):
 
     def test_bad_revision_that_exits_zero_still_fails(self) -> None:
         home, env = support.temp_home(self)
-        repo = support.history_repo(home, env, shallow=False)
+        repo = support.history_repo(home, env)
         binary = home / "gitleaks"
         binary.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
         binary.chmod(0o755)
@@ -190,7 +190,7 @@ class HistoryScan(unittest.TestCase):
 
     def test_known_text_after_a_carriage_return_is_not_left_out(self) -> None:
         home, env = support.temp_home(self)
-        repo = support.history_repo(home, env, shallow=False)
+        repo = support.history_repo(home, env)
         line = support.known_ledger_line()
         (repo / "PROGRESS.md").write_bytes(
             ("x\r" + line + "\nsecond line\n").encode("utf-8")
@@ -212,7 +212,7 @@ class HistoryScan(unittest.TestCase):
     def test_known_line_in_other_file_fails(self) -> None:
         home, env = support.temp_home(self)
         line = support.known_ledger_line()
-        repo = support.history_repo(home, env, shallow=False)
+        repo = support.history_repo(home, env)
         other = repo / "ledger_copy.txt"
         other.write_text(line + "\n", encoding="utf-8")
         support.git(env, repo, "add", "ledger_copy.txt")
@@ -226,7 +226,7 @@ class HistoryScan(unittest.TestCase):
 
     def test_shaped_line_in_progress_fails(self) -> None:
         home, env = support.temp_home(self)
-        repo = support.history_repo(home, env, shallow=False)
+        repo = support.history_repo(home, env)
         probe = support.shaped_probe_line()
         (repo / "PROGRESS.md").write_text(probe + "\n", encoding="utf-8")
         support.git(env, repo, "add", "PROGRESS.md")

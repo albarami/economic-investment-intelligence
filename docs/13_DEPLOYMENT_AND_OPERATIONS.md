@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12 |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | How the EII proof of concept is installed, started, frozen, run on stage, recovered, backed up and later deployed. |
@@ -387,7 +387,7 @@ The research checked provider pages on 2026-11-11. They describe what the provid
 | OPS-53 | Later items, not in v1: single sign-on at the API (PostgreSQL 18 offers OAuth authentication) and database audit logging with pgAudit on the managed service. |
 | OPS-54 | Before any deployment statement is made to an audience, the owner records the custodian's confirmed platform in `OPEN_ITEMS.md`. Until then the only permitted sentence is: "PostgreSQL with PostGIS was offered as a managed service in both in-country cloud regions when checked on 2026-11-11." |
 | OPS-68 | A deployment on real records must add what [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) lists ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)), among others the release cadence, rolling windows and query auditing against differencing across periods, query auditing and rate limits for drawn areas, and, for any count taken from a real telecom feed, that feed's own disclosure rules. No deployment statement may imply that version 1 already provides them, and version 1 accepts no real company file in place of a committed case sample file (OPS-67). |
-| OPS-69 | If the demonstrator is ever hosted publicly, the owner decides then which public and investment sources stay on ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)); a public or commercial hosting also leaves the traffic provider, `busy_gmaps` and `weather_openmeteo` off until the owner decides ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) DHA-81 to DHA-83). |
+| OPS-69 | If the demonstrator is ever hosted publicly, the owner decides then which public and investment sources stay on ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)); a public or commercial hosting also leaves the traffic provider, `busy_gmaps` and `weather_openmeteo` off until the owner decides ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) DHA-85 to DHA-87). |
 
 ## 12. Running cost notes (estimates only)
 
