@@ -2916,6 +2916,232 @@ Seed:      none
 Notes:     The scope (TST-163): the work commit changes exactly the 34 files of the plan.
 ```
 
+#### S0-T05: independent review, round 1: APPROVED (two parts)
+
+Reviewed commit `ffe25f6d6095fab322e121084ef6cda86766f678`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/7, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43200844173 ). Reviewer: Zhipu AI GLM-5.3 High, through the Devin command-line tool, read-only; a full review in two parts by component (part 1: the runner, the launcher, the bootstrap and configuration, the package tests, the documents and the ledger; part 2: the Python and web tests and the web test configuration). Each verdict is copied unchanged from its first line (REV-09); both are also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T05 part 1 (pull request 7)
+COMMIT: ffe25f6d6095fab322e121084ef6cda86766f678
+REVIEWER: Zhipu AI, GLM-5.3 High
+CHECKS:
+  REV-10 PASS All three criteria map to committed tests and recorded runs: counts printed per suite and in total (test_clean_suites_exit_zero pins the exact output; the lead's run prints six suite lines and the total), a failing fixture makes the command non-zero (test_failing_test_exits_one_and_later_suites_still_run, test_error_counts_as_failed, test_suite_that_cannot_start, test_timeout_kills_the_process_group, test_garbage_result_is_a_failed_suite, each asserting status 1), clean suites exit zero (test_clean_suites_exit_zero and recorded commands 1 to 3 with exit 0).
+  REV-11 PASS `./eii test --seed 1794000000` exit 0, 825 passed 0 failed 0 skipped, and `python3 scripts/check_docs.py` exit 0, both run by the lead on this head (evidence file); CI green on the same commit: https://github.com/albarami/economic-investment-intelligence/actions/runs/43200844173 ; 50 new guard tests with a planted violation for every rule (crash, garbage result, cannot-start, timeout, interrupt, secret leak, skip reasons, zero tests, usage rows, parser faults, launcher faults); no skips in any run. I could not re-run the commands myself: the review brief forbids shell commands.
+  REV-12 PASS The scope command (command 11, base...WORK) reports exactly the 34 planned files, of which my part's 19 are all named by the plan's files table; nothing under data/; PROGRESS.md and TASKS.md change only in the lead's ledger commits; no unrelated reformatting.
+  REV-13 PASS No TODO, FIXME, NotImplementedError, empty body or fixed return value in the runner modules, launcher, conftest, package tests or documents; the three package tests assert the real import path and the version against each member pyproject (teeth shown by block PKG-TEETH).
+  REV-14 PASS No secret or real data in the diff; LOCKSCAN and the documentation check's secret scan exit 0; the only key-shaped strings in the ledger are the dummy probe values dummy-fe95-probe-one and dummy-fe95-probe-two, which are not secrets; gitleaks itself arrives with S0-T06 and the substitute scans ran (brief note 6).
+  REV-15 PASS Additions only: the dev group gains hypothesis and pytest at exact pins, a new [tool.pytest] table, new tests; no test file, threshold, assertion or lint setting of S0-T01 to S0-T04 is edited; the Hypothesis profile restates the default example count and deadline (no widening); no skip, expected-failure mark or suppression comment is added anywhere.
+  REV-16 PASS The runner modules, eii, conftest.py, the pytest table, the package tests and every document block match the plan's literal blocks and pinned API (Suite table, argument grammar, verdict rules, output grammar, exit codes 0/1/2); the lead correction's interrupt path is built as specified (launch kills the child's process group and re-raises; main prints FAIL interrupted and exits 1; test_interrupt_kills_the_process_group proves the child dies); the pytest table's effect is proven by real runs (profile eii under CI=true, nightly deselection, unknown marker an error, pythonpath teeth in test_test_bootstrap.py).
+  REV-17 PASS README, rule 44 of both agent files, the four member and web READMEs, OI-46 to OI-48, PROGRESS.md and TASKS.md are updated in the same pull request; check_docs exit 0 on the head; the wrongly written Seed and output fields are corrected by an appended second ledger commit that re-runs all eleven commands (append-only, TST-171).
+  REV-18 PASS Child environments are allow-lists built from {} (no os.environ copy reaches a child); secret-named variables never reach a suite (test_secrets_never_reach_a_suite, with a control that fails without the runner); a secret value printed anywhere is redacted and fails the suite (test_secret_value_in_output_is_redacted_and_fails, test_secret_values_are_one_line_per_name_sorted_and_have_a_minimum_length); no SQL, no serving code, no record-level data.
+  REV-19 PASS No dropped or later-list item is built and no decision record is replaced; the launcher's overlap with S0-T09 is the recorded assumption OI-47, and the pin additions are recorded in OI-46.
+  REV-20 N/A This tooling task adds no fact, figure or calculation; every count the runner prints comes from the tools' own result files.
+  REV-21 N/A The task adds no screen, Fact chip, claim template or assistant output.
+  REV-22 N/A The task changes no privacy parameter, partition, treatment, audit, freeze or release logic.
+  REV-23 N/A The task changes no product import or package dependency edge; product/tests/test_product_package.py imports only eii_product.
+  REV-24 N/A The task adds no localized feature view or displayed number.
+  REV-25 PASS No private path, personal name, e-mail, realistic identifier, run of exactly eight or eleven digits (the seeds are ten digits) or prohibited comparison in the diff; check_docs (103 text files, 47 Markdown files) and the tree check exit 0 on the head.
+  REV-26 PASS No prohibited claim appears in the runner, launcher, conftest, tests or documents; the runner claims nothing about custodian data, privacy certification, endorsements or forecasts.
+  REV-27 PASS cmp AGENTS.md CLAUDE.md exits 0 on the head; the two rule-44 edits in the diff are byte-identical.
+  REV-28 N/A The task creates no synthetic identifier and no world record.
+  REV-29 N/A The task attributes nothing to a real named place or business.
+  REV-38 N/A The task adds no serving-plane or run-time code and imports eii_gateway nowhere; the runner only forces EII_DECISION_PROVIDER=none into the test children's environments, which enforces rule 27 rather than reading it.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-13) No dead code: scripts/tests/test_test_bootstrap.py lines 85 to 99 write fx/profile/test_profile.py and lines 101 to 116 immediately overwrite the same file; the first write is a left-over of an edit with no effect (the comment above the second says the profile name is printed through the public function). Harmless; delete the first support.put. This file belongs to part 2 of the review and is recorded here so the point is not lost.
+```
+
+```text
+VERDICT: APPROVED
+TASK: S0-T05 part 2 (pull request 7)
+COMMIT: ffe25f6d6095fab322e121084ef6cda86766f678
+REVIEWER: GLM-5.3 High
+CHECKS:
+  REV-10 PASS Acceptance criteria are met: `./eii test` prints per-suite counts and exits 0 on a clean tree; the committed tests prove a failing fixture exits non-zero and clean suites exit zero.
+  REV-11 PASS Lead's run `./eii test --seed 1794000000` on this head exits 0 with 825 passed, 0 failed, 0 skipped; CI is green at https://github.com/albarami/economic-investment-intelligence/actions/runs/43200844173.
+  REV-12 PASS The diff touches only the 15 files listed for this part: ten Python files under `scripts/tests/` including `runner_support.py`, the Node count reporter and its test, the Vitest config and unit test, and `web/package.json`.
+  REV-13 PASS No `TODO`, `FIXME`, `NotImplementedError`, empty function bodies, or fixed return values stand in for real work; fixture data is synthetic and generated at run time.
+  REV-14 PASS No secret values or real data are committed; dummy secrets are built at run time, and the lock scan and owner hooks in the evidence show no secret hits.
+  REV-15 PASS No threshold is lowered, no assertion is loosened, no skip or expected-failure mark is added, and no lint or type suppression is introduced.
+  REV-16 PASS The implementation follows the plan: `web/package.json` adds `vitest` exactly after `vite`; `web/vitest.config.ts` and `web/scripts/count-reporter.mjs` match the planned text; the Python tests cover the planned cases.
+  REV-17 PASS The documentation check and tree check pass on this head, and the task’s documents and ledger entries are updated in the same pull request.
+  REV-18 PASS Secrets are read only from the environment in tests; child environments are allow-listed; no untrusted free text is passed to a model; no SQL or query text is introduced.
+  REV-19 PASS No settled decision is reopened and nothing on the dropped or later lists is built.
+  REV-20 N/A This part adds no product facts, figures, or lineage objects.
+  REV-21 N/A This part adds no screen, card, or model prose.
+  REV-22 N/A This part does not touch privacy partitions, parameter sets, treatments, or audits.
+  REV-23 N/A This part does not change product imports or package metadata boundaries.
+  REV-24 N/A This part adds no English or Arabic UI strings or numerals.
+  REV-25 PASS No absolute local paths, private names, e-mails, real custodian records, eight- or eleven-digit runs, or named existing product comparisons appear in the new files.
+  REV-26 PASS No prohibited claims about real data, privacy certification, ministry endorsement, forecasts, or lookups appear.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exits 0 on this head.
+  REV-28 N/A This part introduces no synthetic identifiers of the SYN-* forms.
+  REV-29 N/A This part introduces no real named place or business facts.
+  REV-38 PASS No `eii_gateway` import or run-time `EII_DECISION_PROVIDER` read is added; tests explicitly assert child environments set `EII_DECISION_PROVIDER=none`.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T05: merge record
+
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/7 was squash-merged on 2026-11-12 at the approved head `ffe25f6d6095fab322e121084ef6cda86766f678`; merge commit `e5f065d556a037febdbc82191db46c2a696adb02` on main.
+- CI on the merge commit: workflow `docs`, job `check-docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43202924073 .
+- Proposed open items of the verdicts: part 1 proposed one (a first write of a fixture file in scripts/tests/test_test_bootstrap.py that the next write replaces at once); the lead judged it valid; it is entered in OPEN_ITEMS.md as PO-S0-03 with the next change of that file after the open documentation pull request merges, and closed by S0-T15 at the latest.
+- The task log of S0-T05 above is complete with this record: verdict APPROVED in review round 1.
+
+### S0-T12 — Version and retreat pins: task log
+
+- Builder persona: senior platform engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic: versions 1 and 2 by a Claude Sonnet 5.5 subagent, with the lead's corrections L1 to L12 and the alignment X1 to X6; version 3 by a Claude Opus 5.5 subagent under the lead's binding answers; each checked by the lead
+- Plan reviewer maker and model: Cursor command-line tool, `grok-4.7-high` (xAI), read-only: round 1 REJECTED (F1, ruled invalid by the advisor, OpenAI GPT-5.6 Sol), round 2 REJECTED (F2), round 3 APPROVED (version 3)
+- Builder maker and model: Cursor command-line tool, `grok-4.7-medium` (xAI)
+- Reviewer maker and model: Antigravity command-line tool, `gemini-4-carbon-high` (Google), read-only (a maker that neither planned, reviewed the plan, advised on it nor built it)
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, verification-before-completion, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first with recorded red and stub runs, a planted violation for every rule, no suppression comment or weaker setting, no secret, personal name, absolute local path or eight- or eleven-digit run in any file, nothing built beyond the acceptance criteria as hardening (owner's note of 2026-11-12), file length and house style as warnings only, a short pass that breaks each condition once and runs only the covering test module, no network beyond one npm ci, and a report of only the results it saw
+- Branch: `task/S0-T12-version-pins`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/9
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit; the lead-run blocks of the plan go into the evidence file that the external reviewer receives
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4 (system) and 3.14.6 (uv); git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8
+- Build round 1: Cursor command-line tool, `grok-4.7-medium` (xAI): the fifteen files of part A, tests first (the seven test files failed to import, then a stub run of 51 tests failed by assertion only), on main after S0-T05 merged (the owner's throughput rule of 2026-11-12: the task needs nothing S0-T10 produces); a short break pass of 194 branch breaks, 163 caught, 31 listed as equivalent with reasons
+- Build round 2: the same builder, after the lead's run of the plan's blocks: the support module imports the four check modules at import time as the plan writes it (blocks TESTFIRST and recorded command 3), and no file names or creates the lead's run folder (block NOWALK; AGENTS.md rule 13)
+
+#### Evidence for the work commit `8eb4546cee5807aec05f6c05be1cba4d0ada38f6`
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    8eb4546cee5807aec05f6c05be1cba4d0ada38f6
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 57 components: OK"
+Seed:      none
+Notes:     The real tree agrees with pins.toml: criteria 1 to 3, TST-153.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    8eb4546cee5807aec05f6c05be1cba4d0ada38f6
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_versions_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    51 passed, 0 failed, 0 skipped (ran 51 tests, OK)
+Seed:      none
+Notes:     The 51 tests of the seven new files: criterion 3, TST-153.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    8eb4546cee5807aec05f6c05be1cba4d0ada38f6
+Command:   copy=$(mktemp -d); st=9; git ls-files -z | xargs -0 cp --parents -t "$copy" && rm "$copy/scripts/check_versions.py" "$copy/scripts/versions_record.py" "$copy/scripts/versions_tools.py" "$copy/scripts/versions_inputs.py" && st=0; rc=0; if [ "$st" -eq 0 ]; then (cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_versions_*.py' >"$copy/red.log" 2>&1) || rc=$?; else rc=$st; fi; if [ "$rc" -eq 1 ]; then n=$(grep -c 'Failed to import test module' "$copy/red.log") || n=0; test "$n" -eq 7 || rc=8; m=$(grep -c "No module named 'check_versions'" "$copy/red.log") || m=0; test "$m" -eq 7 || rc=7; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The red run of TST-161: with the four modules removed from a copy of the tracked files, the seven new test files fail to import and name check_versions.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    8eb4546cee5807aec05f6c05be1cba4d0ada38f6
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 19 packages in 0.95ms"
+Seed:      none
+Notes:     The Python lock file resolves for the workspace: criterion 1.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    8eb4546cee5807aec05f6c05be1cba4d0ada38f6
+Command:   cd web && npm ci
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Run `npm audit` for details."
+Seed:      none
+Notes:     The npm lock file installs exactly: criterion 1 (it changes web/node_modules only).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    8eb4546cee5807aec05f6c05be1cba4d0ada38f6
+Command:   ./eii test
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    876 passed, 0 failed, 0 skipped (the total: line of six suites)
+Seed:      1794484229
+Notes:     The whole runner, which includes the new tests through the suite python-guards; the seed is the one it printed.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    8eb4546cee5807aec05f6c05be1cba4d0ada38f6
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 116 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    8eb4546cee5807aec05f6c05be1cba4d0ada38f6
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    8eb4546cee5807aec05f6c05be1cba4d0ada38f6
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The lint check on the new files (S0-T04).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    8eb4546cee5807aec05f6c05be1cba4d0ada38f6
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "46 files already formatted"
+Seed:      none
+Notes:     The format check on the new files (S0-T04).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    8eb4546cee5807aec05f6c05be1cba4d0ada38f6
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 42 source files"
+Seed:      none
+Notes:     The strict type check on the new files (S0-T04).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
