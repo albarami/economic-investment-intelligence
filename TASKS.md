@@ -91,7 +91,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: pre-commit configuration and scanner test fixtures.
 - Depends: S0-T04, S0-T05.
 - Requirements: TST-141, TST-144, PLN-05.
-- Delivery: routine; personas Platform; status queued.
+- Delivery: routine; personas Platform; status in review (pull request 19).
 ### S0-T07 — Continuous integration
 - Goal: Build CI for tests, documentation checks, secret scanning, identifier-pattern scanning and the hosted-runner sandbox proof.
 - Acceptance criteria: [ ] all check classes run on pull requests; [ ] the sandbox test runs on the hosted runner and is never skipped; [ ] planted failures block CI; [ ] the foundation commit is green.
@@ -136,11 +136,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas Platform; status done (pull requests 9 and 12, merged 2026-11-12).
 ### S0-T13 — New-library reference notes
 - Goal: Give agents verified official-reference notes for libraries newer than most model training data.
-- Acceptance criteria: [ ] each named newer library has an official-documentation pointer; [ ] no API behaviour is asserted from memory; [ ] slice S1 confirmation fields exist.
+- Acceptance criteria: [x] each named newer library has an official-documentation pointer; [x] no API behaviour is asserted from memory; [x] slice S1 confirmation fields exist.
 - Scope: dependency reference notes under `docs/` assigned to this task only.
 - Depends: S0-T12.
 - Requirements: FE-02, PLN-10, PLN-18, TST-01, DES-25, DES-45.
-- Delivery: routine; personas Platform; status in review (part A merged in pull request 13 on 2026-11-12; part B in pull request 16).
+- Delivery: routine; personas Platform; status done (pull requests 13 and 16, merged 2026-11-12).
 ### S0-T14 — GitHub repository settings
 - Goal: Enable secret scanning, push protection and branch protection under OI-13.
 - Acceptance criteria: [ ] each setting is queried after change; [ ] evidence records the result; [ ] no repository file or git setting is changed by the task.

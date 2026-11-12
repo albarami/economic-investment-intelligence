@@ -8253,6 +8253,743 @@ Seed:      none
 Notes:     The work commit changes exactly the twelve paths of part B against the base (TST-163).
 ```
 
+#### S0-T13: independent review of part B: APPROVED
+
+Reviewed commit `cf5c832a1180ea7551973d5515442da8572d83f7`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/16 , with CI green on it (workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43263343201 ; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43263343209 ). Reviewer: Zhipu AI GLM-5.3 High, through the Devin command-line tool, read-only; a later round under decision record 0018 on the lines of part B. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T13 part B (pull request 16)
+COMMIT: cf5c832a1180ea7551973d5515442da8572d83f7
+REVIEWER: Devin command-line tool, GLM-5.3 High (Zhipu AI)
+EARLIER FINDINGS:
+  none open (part A: F1 to F5 FIXED and APPROVED in round 2)
+CHECKS:
+  REV-10 PASS The three acceptance criteria of S0-T13 hold at this head (Pages tables with official addresses in all six sections; READ/OBSERVED/PACK kinds with "not verified" on every PACK row; Slice S1 confirmation fields in every section — read in both notes), and part B's own duties are met: the owner's anchor rule is implemented (the check verifies each anchor in its cited file; `uv run --locked python scripts/check_reference_notes.py` exit 0, "checked 2 files, 6 libraries, 357 rows: OK"), all 164 citations are converted (ANCHORS.md, 83 distinct; the lead's script proved each notes file equals its merged text plus exactly the replacements and the two changed opening sentences; command 11 and my own search of both notes find no "line/lines <digits>" left), and the shared documents are made true (rule 44 and the information table of AGENTS.md/CLAUDE.md, README.md's count of twenty-one commands and its notes paragraph, docs/README.md's builder row and two table rows, OI-41's two sentences, OI-85 to OI-89 — each statement checked against this head). I verified the anchors semantically on a sample across every cited file: requirement IDs (PUB-17, BE-10, BE-12, BE-31, BE-32, AI-25, AI-48, AI-55, AI-57 to AI-61, TST-64, TST-152, OPS-12, DES-25, DES-45, DES-67, DES-146, FE-03, FE-04, FE-46), section rows (Technology stack "Build engine and embedded reader" and "Serving store", Model settings rows Model to Retries), numbered items (decision 0004 items 1 and 3; Compose service definition items 1, 4 and 5), sections (portable SQL subset (minimum rules), The protocol, The loader, The ledger in PostgreSQL, Stack and pins, State management, Map layers, The basemap, Layouts/presenter, Performance budgets, Open questions, The map, Sources, Deployment path (later), In brief, Model settings, Logical types, Evidence of decisions 0004 and 0006) and the task anchors TASKS.md S1-T02 and S1-T05 — each names the place that holds the statement the old line held, read in the files; the two plural citations of round 2's P4 are converted as two anchors (docs/REFERENCE_NOTES.md line 162).
+  REV-11 PASS Lead's runs recorded for this exact work commit and head (EVIDENCE.md sections 1 and 2): on work commit 452f8690 the notes check exit 0, the four notes test modules 30 passed / 0 failed / 0 skipped, `./eii test --seed 2026111221` exit 0 (1059 passed, 0 failed, 0 skipped), ruff check, ruff format --check, mypy, check_docs, check_tree, cmp AGENTS.md CLAUDE.md, check_versions all exit 0; on the head cf5c832a the same nine checks plus `./eii test --seed 2026111222` exit 0; CI green on the head: https://github.com/albarami/economic-investment-intelligence/actions/runs/43263343201 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43263343209 . Each of the seven rules A1 to A7 of rule pack-cite has one planted violation in test_pack_cites (a1 not-an-anchor refusing the old line form, a2 non-regular file, a3 requirement count, a4 heading count, a5 row label, a6 item number, a7 task heading), and the builder's red run on the unchanged check is recorded (30 tests, 293 failures, first failure the refusal of an anchor as not a line citation). The brief forbids shell commands, so I did not re-run them.
+  REV-12 PASS Recorded command 12 returns "12 [] []": the work commit changes exactly AGENTS.md, CLAUDE.md, OPEN_ITEMS.md, README.md, docs/README.md, the two notes files, scripts/check_reference_notes.py, scripts/reference_notes_parse.py and the three test-side files against base 7dd69aa, nothing under data/; the ledger commit touches only OPEN_ITEMS.md, PROGRESS.md and TASKS.md; the wider document edits are the owner-sanctioned part B scope (rule 44, README, documents index, information table, open items), recorded as OI-85.
+  REV-13 PASS The changed lines are the anchor grammar, its verification, the converted citations, refreshed document texts and ledger records; no TODO, FIXME, empty body, mock or invented figure.
+  REV-14 PASS No secret, .env, key file, real custodian record, field, file or count in the changed lines; reviewers and builders are named by maker and model only; seeds are ten digits.
+  REV-15 PASS No threshold, tolerance or lint rule is lowered and no skip or suppression comment is added; the claim-word rule keeps a planted violation for every one of the thirteen claim words and gains the control control-fast-inside-verified-anchor. The one behaviour change outside rule pack-cite — mask_verified_anchors blanks each verified anchor before the claim-word scan — does not weaken the rule: only anchors that verify are masked (a heading or row label such as "Fast mode" is the pack's wording, not a claim of the notes, and without masking the anchor rule could not be used at all), and the lead's probe (EVIDENCE.md section 4) shows anchor-shaped text that does not verify is not masked and a word outside a verified anchor is still reported, so claim words cannot be laundered through fake anchors; I see the missing committed sub-case for that other side as a follow-up item exactly as the lead proposes (P2 below), not more. The old line-form sub-cases were replaced by the plan's A1 to A7 planted violations, and the check is strictly stronger than before (anchor semantics instead of bare line existence); the remaining test-coverage point is P1 below, outside the verdict.
+  REV-16 PASS The five anchor forms and the seven rules A1 to A7 of PLAN.md section 3 are implemented exactly in scripts/reference_notes_parse.py (five fullmatch forms, refusal of the old line form by the same rule, exactly one row for a requirement ID, exactly one heading, row or item inside that section, task heading with the em dash), read line by line; pinned names are used; no workflow file changed; the module docstring and the opening lines of both notes say the check judges form only.
+  REV-17 PASS Every document the change affects is updated in the same pull request: rule 44 and the information table in both agent files, README.md (twenty-one commands, counted; the notes paragraph), docs/README.md, OI-41, OI-85 to OI-89, PO-S0-03 to PO-S0-06, the task log of S0-T13 with twelve evidence entries, and the S0-T09 closing record; `python3 scripts/check_docs.py` exit 0 on the head. The cite fields of pins.toml and the line citations inside OI-39 to OI-57 are deferred to the next change by PLAN.md section 6, within the owner's rule, which names the merged reference notes; the version check still passes on the unconverted cite fields (exit 0).
+  REV-18 PASS The check opens only the two notes files, pins.toml and the cited pack paths, as regular files (lstat, no symlink), and writes nothing; no SQL, model call or record-level data exists in the changed lines.
+  REV-19 PASS Nothing on the dropped or later lists is built, no accepted decision is removed or replaced, and the slice S0 build order is respected; the rule 44 amendment is the normal per-task command addition, not a reopened decision.
+  REV-20 N/A The change is the notes check, converted citations and documents; it introduces no fact object, release table or displayed number (every number in the notes carries a source and a date, unchanged from approved part A).
+  REV-21 N/A No screen, card, template or model prose is added; the notes are not product output.
+  REV-22 N/A No partition, parameter set, treatment, audit or custodian-plane file is touched; nothing under data/.
+  REV-23 PASS No file under product/, core/ or custodian/ changed, and `./eii test` on the head shows python-guards 377 passed, 0 failed, 0 skipped.
+  REV-24 N/A No user-facing or Arabic strings were added.
+  REV-25 PASS The changed lines hold no private path, personal name, e-mail address, run of exactly eight or eleven digits, named-product comparison or ministry mention; the documentation check exits 0 on the head.
+  REV-26 PASS No prohibited claim anywhere in the changed lines; every PACK row still says "not verified"; README.md states the check's limits ("does not check what the anchored text says, that a quotation is still on its page"); nothing claims custodian data, real-place facts, certified privacy, endorsement, a forecast or a lookup.
+  REV-27 PASS AGENTS.md and CLAUDE.md receive the identical rule 44 and information-table hunks, and `cmp AGENTS.md CLAUDE.md` exits 0 on the head (lead's run, EVIDENCE.md section 2).
+  REV-28 N/A No synthetic identifiers are introduced.
+  REV-29 N/A No fact about a real named place or business; the subjects of every row are software libraries.
+  REV-38 PASS No reference to eii_gateway, EII_DECISION_PROVIDER or JEV_PRO_API_KEY in the changed lines; the check runs offline and no run-time code was added.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-15) TST-01 planted violations of the rule pack-cite: the replacement of the line-form sub-cases also removed the only failing cases planted outside the Statements table (confirmation-line-99 and pack-cite-line-99 in the "Slice S1 confirmation" table, coverage-line-99 and row2-pack-cite-line-99 in the coverage table) and the only missing-file case (docs/nope.md); today every pack-cite planted violation (a1 to a7 of test_pack_cites) sits in one Statements row, so a regression that removes the check_cite call in check_confirmation (scripts/check_reference_notes.py lines 124-125) or check_coverage (lines 231-232), or breaks the "missing" branch of read_regular for a cited file, would not fail a planted test — the calls are present and the real notes pass through them, so this is coverage breadth beyond the plan's one planted violation per rule; add one planted bad anchor in each table (and a missing-file anchor) in the follow-up task of the slice, proved by the notes test modules.
+  P2 (REV-15) claim-word rule and the anchor masking: the lead's probe of the other side of mask_verified_anchors (anchor-shaped text that does not verify is not masked; EVIDENCE.md section 4) is not a committed test sub-case; I see it as exactly a follow-up item for the slice's follow-up task, as the lead proposes — the masking has its control (control-fast-inside-verified-anchor) and the claim-word rule keeps all thirteen planted violations — and recommend adding the probe's three non-masking cases as committed sub-cases there.
+```
+
+#### S0-T13: merge record of part B
+
+- Tree proof on the approved head (ruling L-29), run by the lead on 2026-11-12 before the review: every path of the head's tree is as in the work commit `452f8690d135b455d9577a07137d1db1e843dc35`, except the ledger files; output "TREE-IS-WORK ok: 246 paths at cf5c832a1180ea7551973d5515442da8572d83f7", exit code 0. On the same head `./eii test --seed 2026111222`: exit code 0, "total: 1059 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/16 was squash-merged on 2026-11-12 at the head `cf5c832a1180ea7551973d5515442da8572d83f7`; merge commit `55321cbf77b87295045325d99a3ff914a6ce9ce4` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43265025895 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43265025864 .
+- The task log of S0-T13 is complete with this record: part A APPROVED in review round 2 (pull request 13), part B APPROVED (pull request 16). Its two proposed items are entered by this ledger commit for the follow-up task of the slice: P1 as PO-S0-07 (planted bad anchors outside the Statements table) and P2 as PO-S0-08 (committed sub-cases for the other side of the anchor masking).
+
+#### Addition to the task log of S0-T12: the pin record cites the pack by anchors (follow-up)
+
+- Builder persona: senior platform engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic: the lead (Claude Fable 5.2) wrote a short plan with the four rules of the rule record-cite; the lead's script derived the map of the 57 cite values, and a Claude Sonnet editor the 61 replacements inside the open items, each checked by script
+- Builder maker and model: Cursor command-line tool, `grok-4.7-high` (xAI)
+- Reviewer maker and model: Antigravity command-line tool, Gemini 4 Carbon (Google), read-only (the reviewer of S0-T12's part A; a maker that neither planned nor built it)
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first with a recorded red run, one planted violation for every rule, no suppression comment, skip or weaker assertion, no secret, personal name, absolute local path or eight- or eleven-digit run in any file, and a report of only the results it saw
+- Branch: `task/S0-T12-cite-anchors`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/18
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Owner's rule of 2026-11-12, the reason for the change: the pack is cited by a stable anchor (a requirement ID or the section heading), never by line number. The rule record-cite required the line form, so the check changes with the record
+- What the lead found before the change: the cite values of pins.toml were written against the first pack; a documentation change had moved the stack table of document 02 by one line before the record merged, so its citations into that table have named the neighbouring row since then. Each anchor of the map was read from the row that the value meant in the first pack
+- Build round 1 (code and documents in the same round): red first on the unchanged check (51 tests, 353 failures: the fixture's anchors refused as not a line citation); the anchor grammar and its verification moved unchanged into scripts/pack_anchors.py; record-cite judges a cite value with it; the 57 values and the 61 replacements applied; one planted violation for each of the four rules
+- The lead's check of the build: pins.toml parses to the same rows with only the cite values changed, each equal to the map, and one comment line added; OPEN_ITEMS.md equals its merged text plus exactly the 61 replacements; every moved definition has the same text as before the move; one read of the code and test changes
+- Not changed: PROGRESS.md is a ledger, so the line numbers that its earlier entries record stay as history
+
+#### Evidence for the work commit of the follow-up `91a6834438e998e7a951d717f96f7ef0a2c7a091`
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 57 components: OK"
+Seed:      none
+Notes:     The version check on the converted pin record: every one of the 57 cite values parses as anchors and each anchor exists in its file (the owner's rule of 2026-11-12; TST-43).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The notes check passes unchanged through the shared anchor module.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_versions_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    51 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The tests of the version check: one planted violation for each of the four rules of record-cite (cite missing; not an anchor, the old line form; cited file missing; anchor not in its file).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_reference_notes_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    30 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The tests of the notes check pass without a change to their expectations: the anchor code moved unchanged.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   ./eii test --seed 2026111225
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1059 passed, 0 failed, 0 skipped
+Seed:      2026111225
+Notes:     The project's own test command with a given seed: every network-free suite.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "112 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 108 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 190 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the changed documents (the open items and the README).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The agent files are unchanged and identical.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   python3 -c "import re,sys; h=[(f,m) for f in ('pins.toml','OPEN_ITEMS.md','README.md') for m in re.findall(r'\blines? [0-9]+',open(f,encoding='utf-8').read())]; print(len(h),h[:3]); sys.exit(1 if h else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "0 []"
+Seed:      none
+Notes:     No line citation is left in pins.toml, OPEN_ITEMS.md or README.md: the search for the words line or lines followed by a number finds nothing.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','55321cbf77b87295045325d99a3ff914a6ce9ce4...91a6834438e998e7a951d717f96f7ef0a2c7a091'],check=True,capture_output=True,text=True).stdout.splitlines(); a=set(['OPEN_ITEMS.md', 'README.md', 'pins.toml', 'scripts/check_reference_notes.py', 'scripts/pack_anchors.py', 'scripts/reference_notes_parse.py', 'scripts/tests/test_versions_git.py', 'scripts/tests/test_versions_real.py', 'scripts/tests/test_versions_record.py', 'scripts/tests/versions_support.py', 'scripts/versions_record.py']); o=[x for x in p if x not in a]; m=sorted(a-set(p)); print(len(p),o,m); sys.exit(1 if o or m or len(p)!=11 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "11 [] []"
+Seed:      none
+Notes:     The work commit changes exactly the eleven paths of the change against the base (TST-163).
+```
+
+#### S0-T12: independent review of the follow-up: APPROVED
+
+Reviewed commit `9e86edcd77fbab459a36ed6c6bf59618ed82d9e9`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/18 , with CI green on it (workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43269642094 ; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43269642537 ). Reviewer: Google Gemini 4 Carbon (high), through the Antigravity command-line tool, read-only; a later round under decision record 0018 on the lines of the follow-up. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T12 follow-up (pull request 18)
+COMMIT: 9e86edcd77fbab459a36ed6c6bf59618ed82d9e9
+REVIEWER: Google, Gemini 4 Carbon (High)
+EARLIER FINDINGS:
+  none open (part A and part B of S0-T12 approved)
+CHECKS:
+  REV-10 PASS All three acceptance criteria of S0-T12 in TASKS.md line 132 (lock files resolve; exact and retreat pins are labelled; unsupported version drift fails a check) hold at this head (`uv run --locked python scripts/check_versions.py` exited 0 with `"checked 57 components: OK"` on both work commit 91a6834438e998e7a951d717f96f7ef0a2c7a091 and head 9e86edcd77fbab459a36ed6c6bf59618ed82d9e9, and `test_versions_*.py` passed 51 of 51), and every requirement of this follow-up under the owner's anchor rule of 2026-11-12 is met with section-6.3 evidence in PROGRESS.md lines 8320-8474: (1) all 57 `cite` values in `pins.toml` resolve to verified pack anchors, and my row-by-row check of `.overnight/ANCHORS.md` lines 6-302 against `docs/02_ARCHITECTURE.md`, `docs/08_BACKEND.md`, `docs/09_AI_ASSISTANT.md`, `docs/10_FRONTEND.md`, `docs/12_TESTING_AND_QUALITY.md`, `docs/13_DEPLOYMENT_AND_OPERATIONS.md`, decisions 0003, 0004 and 0014, and `AGENTS.md` confirms every anchor names the place holding the statement meant in the first pack (including correcting the one-line shift in `docs/02_ARCHITECTURE.md` section `"Technology stack"`); (2) `scripts/pack_anchors.py` holds the 20 anchor-grammar and verification definitions moved unchanged out of `scripts/reference_notes_parse.py`, shared by `scripts/versions_record.py` and `scripts/check_reference_notes.py` (`uv run --locked python scripts/check_reference_notes.py` exited 0, `"checked 2 files, 6 libraries, 357 rows: OK"`, 30 of 30 notes tests passing unchanged); and (3) the 61 replacements in `OPEN_ITEMS.md` (`OI-39` to `OI-57`) and `README.md` line 74 (`"the pack anchor it answers"`) convert every remaining line citation without changing any statement, leaving zero `line/lines <digits>` matches across `pins.toml`, `OPEN_ITEMS.md` and `README.md` (recorded command 12: `0 []`).
+  REV-11 PASS The lead (`lead (local)`) recorded 13 commands on work commit 91a6834438e998e7a951d717f96f7ef0a2c7a091 in PROGRESS.md lines 8320-8474 and re-ran the full check set on exact head 9e86edcd77fbab459a36ed6c6bf59618ed82d9e9 in `.overnight/EVIDENCE.md` section 2 (`TREE-IS-WORK ok: 247 paths at 9e86edcd77fbab459a36ed6c6bf59618ed82d9e9`, exit 0): `./eii test --seed 2026111225` (work commit) and `./eii test --seed 2026111226` (exact head) both exited 0 (`1059 passed, 0 failed, 0 skipped in 6 suites, 0 with problems`, including `python-guards: 377 passed`), `python3 scripts/check_docs.py` exited 0 (`checked 190 text files, 53 Markdown files: OK`), `uv run --locked python scripts/check_versions.py` exited 0 (`checked 57 components: OK`), `test_versions_*.py` ran 51 passed / 0 failed / 0 skipped, and `test_reference_notes_*.py` ran 30 passed / 0 failed / 0 skipped. CI is green on head 9e86edcd77fbab459a36ed6c6bf59618ed82d9e9 (workflow `docs`: https://github.com/albarami/economic-investment-intelligence/actions/runs/43269642094 ; workflow `sandbox`: https://github.com/albarami/economic-investment-intelligence/actions/runs/43269642537 ). Each of R1 to R4 of `record-cite` has a planted violation in `scripts/tests/test_versions_record.py::RecordRules.test_cite_rule`, and `.overnight/EVIDENCE.md` section 3 records the builder's red-first run on the unchanged check (`Ran 51 tests` -> `FAILED (failures=353)` overall and `FAILED (failures=4)` on `test_cite_rule`), with 0 skips. I ran no shell commands per the read-only brief.
+  REV-12 PASS Recorded command 13 (`11 [] []`, TST-163) and `.overnight/DIFF.patch` confirm work commit 91a6834438e998e7a951d717f96f7ef0a2c7a091 against base 55321cbf77b87295045325d99a3ff914a6ce9ce4 modifies only the 11 planned paths (`OPEN_ITEMS.md`, `README.md`, `pins.toml`, `scripts/check_reference_notes.py`, `scripts/pack_anchors.py`, `scripts/reference_notes_parse.py`, `scripts/versions_record.py`, `scripts/tests/test_versions_git.py`, `scripts/tests/test_versions_real.py`, `scripts/tests/test_versions_record.py`, `scripts/tests/versions_support.py`), and ledger commit 9e86edcd77fbab459a36ed6c6bf59618ed82d9e9 modifies only `OPEN_ITEMS.md`, `PROGRESS.md` and `TASKS.md`; nothing under `data/` is touched (`python3 scripts/check_tree.py` exit 0) and `uv run --locked ruff format --check .` exited 0 (`112 files already formatted`).
+  REV-13 PASS Line-by-line inspection of `scripts/pack_anchors.py`, `scripts/versions_record.py`, `scripts/reference_notes_parse.py`, `scripts/check_reference_notes.py`, the four test files, `pins.toml`, `README.md`, `OPEN_ITEMS.md`, `PROGRESS.md` and `TASKS.md` finds no `TODO`, `FIXME`, `NotImplementedError`, empty function body, mock release table or invented figure.
+  REV-14 PASS No secret, `.env` file, key material, or real custodian record, field name, file name or count appears anywhere in the diff; `python3 scripts/check_docs.py` exited 0 locally and in CI at https://github.com/albarami/economic-investment-intelligence/actions/runs/43269642094 .
+  REV-15 PASS No threshold, tolerance, assertion, example count, lint rule, type setting or CI workflow is weakened, and no skip, expected-failure mark, `noqa` or `type: ignore` comment is added. Replacing `_cite_item` in `scripts/versions_record.py` with `pack_anchors.check_cite` makes `record-cite` strictly stronger than the retired `<path> line <n>` form: `_PATH` with `fullmatch` admits only single-segment `.md` filenames under `docs/` or `docs/decisions/` plus `AGENTS.md`, `TASKS.md` and `OPEN_ITEMS.md` (still refusing leading-slash paths outside the repository, `..` parent segments, deeper paths, `\` backslashes, arbitrary non-pack files, empty `; ` items and the old line form), `read_regular` still enforces `lstat()`/`stat.S_ISREG`, UTF-8 decoding and non-empty text, and `_anchor_problem` verifies unique anchor presence inside the file rather than mere line count. The seven shared anchor rules retain their planted violations in `test_reference_notes_rows.py::NotesRows.test_pack_cites`, and `test_versions_record.py::RecordRules.test_cite_rule` plants one violation for each of R1 to R4 (`cite is missing`, `"docs/a.md line 5"` refused as not an anchor, `"docs/none.md ARC-01"` refused as not a file, and an absent requirement ID refused with `found 0 times`) as `.overnight/PLAN.md` section 3 specifies.
+  REV-16 OPEN P1 The code, pin record and tests follow `.overnight/PLAN.md` sections 2-4 and `AGENTS.md`: `scripts/pack_anchors.py` holds the exact 20 top-level definitions moved verbatim from `scripts/reference_notes_parse.py` using stdlib only (`re`, `stat`, `pathlib`, `typing`) with no reverse import; `record-cite` reports `FAIL record-cite: pins.toml: component[<i>] <name>: <problem>`; `pins.toml` parses to the same 57 component rows with only `cite` changed to single-quoted TOML strings plus line 7's header comment; `ruff check .`, `ruff format --check .` and `mypy` (`108 source files`) all exited 0; and pinned command boundaries are untouched. `P1` notes the repeated identical section anchor on the five `@deck.gl/*` rows in `pins.toml` lines 49-53, a non-rejecting house-consistency target under REV-16 and REV-39.
+  REV-17 OPEN P2 Every affected document is updated in the same pull request: `pins.toml` (line 7 and 57 `cite` values), `README.md` line 74, `OPEN_ITEMS.md` (`OI-39` to `OI-57`'s 61 citation replacements plus `PO-S0-07` and `PO-S0-08` from `S0-T13` part B under REV-41), `TASKS.md` lines 139 and 143 (`S0-T13` marked `[x]` and `status done (pull requests 13 and 16, merged 2026-11-12)`), and `PROGRESS.md` lines 8256-8474 (`S0-T13` part B verbatim verdict per REV-09, tree proof, squash-merge commit 55321cbf77b87295045325d99a3ff914a6ce9ce4 with green CI links, `S0-T12` follow-up task log and 13 section-6.3 evidence entries, while preserving historical line numbers in earlier entries per rule 38), and `python3 scripts/check_docs.py` exited 0 on the head (`checked 190 text files, 53 Markdown files: OK`). `P2` notes the mis-cited requirement tag (`TST-43` instead of `TST-153`) in `PROGRESS.md` line 8329's `Notes:` field.
+  REV-18 PASS `scripts/pack_anchors.py` and `scripts/versions_record.py` read only repository-bounded regular pack Markdown files checked via `lstat()`/`stat.S_ISREG`, write nothing, touch no secret, database role, SQL query, model call or sandbox profile, and emit no record-level data.
+  REV-19 PASS Nothing on the dropped or later lists of `docs/01_PROJECT_BRIEF.md` is built, no architecture choice or accepted decision record is reopened or replaced, and `confirm_at = "slice S1"`, `spike_result = "not yet run"` and the slice S0 build order remain intact.
+  REV-20 N/A This pull request updates pack-citation checks, `pins.toml` anchor strings, developer documentation and project ledgers only, introducing no economic fact object, calculation function, lineage chain or displayed product number.
+  REV-21 N/A This pull request touches no user-interface screen, card, Fact chip, catalogue template or assistant answer pipeline.
+  REV-22 N/A This pull request modifies no privacy partition, parameter set, disclosure-control rule, adversarial audit, export register or `freeze` implementation.
+  REV-23 PASS No file or package metadata under `product/`, `core/` or `custodian/` changed, `scripts/pack_anchors.py` and `scripts/versions_record.py` import no `eii_custodian` module, and the import-boundary tests passed inside `./eii test --seed 2026111226` on the head (`1059 passed, 0 failed, 0 skipped`).
+  REV-24 N/A This pull request adds or modifies no English or Arabic user-facing view, localized string or displayed product numeral.
+  REV-25 PASS Inspection of `.overnight/DIFF.patch`, `pins.toml`, `OPEN_ITEMS.md`, `README.md`, `PROGRESS.md` and `TASKS.md` finds no absolute local path, private personal name (builders and reviewers are named by maker/tool and model only; `albarami` appears only in repository URLs and standard document headers), e-mail address, real custodian material, internal ministry plan, named existing product comparison, ministry endorsement, secret or bare run of eight or eleven digits (seeds `2026111221`, `2026111222`, `2026111225` and `2026111226` have ten digits; CI run IDs appear only inside full GitHub Actions URLs), and `python3 scripts/check_docs.py` and `python3 scripts/check_tree.py` exited 0 on the head and in CI at https://github.com/albarami/economic-investment-intelligence/actions/runs/43269642094 .
+  REV-26 PASS No code string, comment, pin note, open item or ledger entry makes or implies any prohibited claim; `scripts/pack_anchors.py` line 154 and `README.md` line 76 state explicitly that the anchor check proves only that an anchor exists and not what its text says, and `README.md` keeps its explicit disclaimer that no product, release, privacy engine, assistant or interface is claimed to work yet.
+  REV-27 PASS Neither commit touches `AGENTS.md` or `CLAUDE.md`, my full read of all 111 lines of both files confirms they match byte for byte, and `cmp AGENTS.md CLAUDE.md` and `python3 scripts/check_docs.py` exited 0 on head 9e86edcd77fbab459a36ed6c6bf59618ed82d9e9.
+  REV-28 N/A This pull request creates no synthetic world record, `SYN-*` identifier or fictional firm name.
+  REV-29 N/A This pull request attaches no fact, figure, rank or attribute to any real named place, building, business or FDI project.
+  REV-38 PASS Neither `scripts/pack_anchors.py` nor any modified check or test imports `eii_gateway` or reads `EII_DECISION_PROVIDER` or `JEV_PRO_API_KEY` at run time (`typed-decision-provider` in `pins.toml` line 69 remains a `recorded` metadata row citing decision 0014), and all checks and `./eii test` passed offline.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-16) Duplicate section anchor in `pins.toml` lines 49-53 (REV-16 house consistency with `pins.toml` line 7): for `@deck.gl/core`, `@deck.gl/layers`, `@deck.gl/geo-layers`, `@deck.gl/extensions` and `@deck.gl/maplibre`, `cite` is `'docs/10_FRONTEND.md section "Stack and pins"; docs/10_FRONTEND.md section "Stack and pins"'`, repeating the identical section anchor twice because old lines 59 and 66 both lay in `## 2. Stack and pins` (`docs/10_FRONTEND.md` lines 55-73), whereas `maplibre-gl` (`pins.toml` line 47) cites its table row first and the section second; in `S0-T15`, either cite the `@deck.gl/core` table row of `docs/10_FRONTEND.md` section `"Stack and pins"` as the first item or collapse the duplicate to a single `'docs/10_FRONTEND.md section "Stack and pins"'`.
+  P2 (REV-17) Requirement tag in the first follow-up evidence entry of `PROGRESS.md` (TST-170, TST-171, TST-153): `PROGRESS.md` line 8329 (`uv run --locked python scripts/check_versions.py` on work commit 91a6834438e998e7a951d717f96f7ef0a2c7a091) writes `(the owner's rule of 2026-11-12; TST-43)`, citing `TST-43` (the SQL portability lint, `sqlglot`) instead of `TST-153` (toolchain and version pins, as noted in the part-B merge record at `PROGRESS.md` line 5673); append a one-line correction in the merge record of pull request 18 without editing the recorded block (TST-171).
+```
+
+#### S0-T12: merge record of the follow-up
+
+- Tree proof on the approved head (ruling L-29), run by the lead on 2026-11-12 before the review: every path of the head's tree is as in the work commit `91a6834438e998e7a951d717f96f7ef0a2c7a091`, except the ledger files; output "TREE-IS-WORK ok: 247 paths at 9e86edcd77fbab459a36ed6c6bf59618ed82d9e9", exit code 0. On the same head `./eii test --seed 2026111226`: exit code 0, "total: 1059 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/18 was squash-merged on 2026-11-12 at the head `9e86edcd77fbab459a36ed6c6bf59618ed82d9e9`; merge commit `f3e7d5764ed315706c683ea7b3b1f7c82e0897f2` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43273776859 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43273776965 .
+- Correction, appended here and not made in the recorded entry (TST-171; the verdict's proposed item P2): the note of the first evidence entry of the follow-up, for `uv run --locked python scripts/check_versions.py` at `91a6834438e998e7a951d717f96f7ef0a2c7a091`, names TST-43. The requirement on toolchain and version pins is TST-153; TST-43 is the lint of portable SQL.
+- The verdict's proposed item P1 (five rows of the pin record repeat one section anchor) is entered by this ledger commit as PO-S0-09 for the follow-up task of the slice.
+
+### S0-T06 — Pre-commit hooks: task log
+
+- Builder persona: senior platform engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic: Claude Sonnet planners (version 1), a Claude Opus corrector with a Claude Sonnet checker (version 2, after the first plan review), and a Claude Sonnet planner for the one refresh before the build (tests cut to one planted violation per rule, code and documents in one round, hardening listed and not built, citations by anchor), with the lead's answers to its five questions
+- Plan reviewer maker and model: Google Gemini 4 Carbon, through the Antigravity command-line tool (two rounds on the plan before the refresh)
+- Builder maker and model: Cursor command-line tool, `grok-4.7-high` (xAI)
+- Reviewer maker and model: Devin command-line tool, `kimi-k3-1-pro-medium` (Moonshot AI), read-only, in three parts (a maker that neither planned the task, reviewed its plan nor built it)
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan with the lead's answers above the builder's taste, tests first with a recorded red run, one planted violation for every rule, no suppression comment, skip or weaker assertion, the hook installer and the framework's install command never run in this repository or a work tree of it, no file named .env read outside a scratch repository of a test, the network only for the lock and the one fetch of the scanner, no secret, personal name, absolute local path or eight- or eleven-digit run in any file, the pack cited by requirement ID or section heading, and a report of only the results it saw
+- Branch: `task/S0-T06-pre-commit-hooks`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/19
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4 (system) and 3.14.6 (uv); git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8; pre-commit 4.7.0; gitleaks 8.30.1
+- Build round 1 (code and documents in the same round): tests first; red before any of the four scripts existed (the six hook test modules failed to import, the first naming commit_guard); then the two configuration files, the four scripts, the lock, the two pin rows, the changed statement of the documentation check, rule 44, the README and the open items OI-90 to OI-94. The builder reported 57 of the 58 hook tests passing and left the failing test unchanged: its control expected the framework to warn about an unknown key on a hook, as an observation of the plan said
+- Lead's correction after the build (no further builder round): the lead reproduced the report and read the source of the installed framework: pre-commit 4.7.0 warns about an unknown key at the root and on a repository and says nothing about one on a hook, so the observation of the plan was wrong. The control of that one test now asserts that the framework neither refuses nor names the key; the closed check of the project is unchanged and still names it. The first fetch of one fetch test no longer writes a line to the test output. All 58 hook tests pass
+- The owner's own local hooks: the hooks folder of the main checkout was listed (names, sizes and times only) during the build and after it; the two listings are the same, and core.hooksPath is unset. Nothing of this task is installed in the repository; every installation of a test happens in a scratch repository
+- Lead's check of the build: the two configuration files and the four scripts equal the literal texts of the plan; pyproject.toml, pins.toml, scripts/check_docs.py, rule 44 of both agent files, README.md and OPEN_ITEMS.md equal their base texts plus exactly the plan's blocks; one read of the test modules
+- Lead's answers to the refresh (binding in the plan): the two new rows of the pin record cite TST-141 by anchor; the open items are OI-90 to OI-94; the hardening measures of the plan are entered in document 17 by the follow-up task of the slice and not by this task; a neutral git environment against attributes is not built (a stated limit); and one addition from the external plan review: a database URL whose query string names password or passfile is refused as unparseable, with one planted violation
+
+#### Evidence for the work commit `67f92cb0a63eb89bbe24d304c38bc21af126741a`
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   uv run --locked python scripts/hooks_gitleaks.py fetch
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "gitleaks 8.30.1 already installed at data/tools/gitleaks/8.30.1/gitleaks"
+Seed:      none
+Notes:     The pinned secret scanner is present in the uncommitted folder data/tools/gitleaks (network once; it prints that it is installed when the binary is there).
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   uv run --locked python scripts/hooks_gitleaks.py verify
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "gitleaks 8.30.1 verified at data/tools/gitleaks/8.30.1/gitleaks"
+Seed:      none
+Notes:     The installed scanner reports the pinned version.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   uv run --locked pre-commit validate-config .pre-commit-config.yaml
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The hook configuration is valid for the pinned framework (criterion 1).
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    435 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard-test discovery of rule 44, the hook tests among them: criteria 1 to 4, TST-141, TST-144.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   v="$PWD/.venv"; copy=$(mktemp -d); st=9; git ls-files -z | xargs -0 cp --parents -t "$copy" && mkdir -p "$copy/data/tools" && cp -R data/tools/gitleaks "$copy/data/tools/" && git -C "$copy" init -q && git -C "$copy" add -A && st=0; ctl=9; if [ "$st" -eq 0 ]; then (cd "$copy" && UV_PROJECT_ENVIRONMENT="$v" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p 'test_hooks_*.py' >"$copy/ctl.log" 2>&1) && ctl=0; fi; rc=9; if [ "$ctl" -eq 0 ]; then if rm "$copy/scripts/commit_guard.py" "$copy/scripts/hooks_gitleaks.py" "$copy/scripts/hooks_install.py" "$copy/scripts/hooks_run.py"; then rc=0; (cd "$copy" && UV_PROJECT_ENVIRONMENT="$v" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p 'test_hooks_*.py' >"$copy/red.log" 2>&1) || rc=$?; else rc=6; fi; fi; if [ "$rc" -eq 1 ]; then n=$(grep -c 'Failed to import test module' "$copy/red.log") || n=0; test "$n" -eq 6 || rc=8; m=$(grep -c "No module named 'commit_guard'" "$copy/red.log") || m=0; test "$m" -eq 6 || rc=7; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The red run of TST-161 with its green control: in a scratch copy of the tracked files the six hook test modules pass; with the four scripts removed they fail to import and name commit_guard; the copy is removed.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "Resolved 30 packages in 0.84ms"
+Seed:      none
+Notes:     The lock file agrees with the manifests after the new dev dependency.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   ./eii test
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1117 passed, 0 failed, 0 skipped
+Seed:      1794507962
+Notes:     The project's own test command: every network-free suite; the hook tests run in the suite python-guards.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 203 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check (with the one changed statement of its secret rule).
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 59 components: OK"
+Seed:      none
+Notes:     The version check with the two new rows of the pin record, cited by anchor.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "123 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 119 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The agent files are identical.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   python3 -I -c "import subprocess,sys; g={tuple(l.split('\t')) for l in subprocess.run(['git','diff','--name-status','--no-renames','f3e7d5764ed315706c683ea7b3b1f7c82e0897f2...67f92cb0a63eb89bbe24d304c38bc21af126741a'],check=True,capture_output=True,text=True).stdout.splitlines()}; a='scripts/commit_guard.py scripts/hooks_gitleaks.py scripts/hooks_run.py scripts/hooks_install.py scripts/tests/hooks_support.py scripts/tests/test_hooks_config.py scripts/tests/test_hooks_run.py scripts/tests/test_hooks_guard.py scripts/tests/test_hooks_gitleaks.py scripts/tests/test_hooks_install.py scripts/tests/test_hooks_commit.py .pre-commit-config.yaml .gitleaks.toml'.split(); m='pyproject.toml uv.lock pins.toml scripts/check_docs.py README.md AGENTS.md CLAUDE.md OPEN_ITEMS.md'.split(); w={('A',f) for f in a}|{('M',f) for f in m}; print(len(g),sorted(g^w)); sys.exit(0 if g==w and len(a)==13 and len(m)==8 else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "21 []"
+Seed:      none
+Notes:     The work commits change exactly the 13 added and 8 modified paths of the task against the base (TST-163).
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    67f92cb0a63eb89bbe24d304c38bc21af126741a
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','f3e7d5764ed315706c683ea7b3b1f7c82e0897f2..67f92cb0a63eb89bbe24d304c38bc21af126741a'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Every work commit subject is a Conventional Commit (PLN-05).
+```
+
+#### S0-T06: independent review, round 1
+
+Reviewed commit `6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/19 , with CI green on it (workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333346 ; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333330 ). Reviewer: Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only; a full review in three parts. The verdict of the pull request is the union of the parts: REJECTED, with two findings in part 1. Each verdict is copied unchanged from its first line (REV-09); all three are also posted on the pull request. No part proposed an open item.
+
+#### S0-T06: independent review, round 1, part 1 of 3 (the commit guard, its tests and the shared test helper): REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: S0-T06 part 1 (pull request 19)
+COMMIT: 6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d
+REVIEWER: Moonshot AI, Kimi K3.1 Pro Medium
+CHECKS:
+  REV-10 FAIL F1. Installation, generated-token detection and clean commits have passing integration tests, but criterion 3 and AGENTS.md rule 14 are not met for every staged path because a content refusal can print an eight-character fragment of the local secret.
+  REV-11 PASS On the exact head, the lead recorded `./eii test --seed 2026111219` exit 0 with 1117 passed, 0 failed and 0 skipped, and `python3 scripts/check_docs.py` exit 0; CI docs succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333346 and sandbox at https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333330 . The reviewer ran no commands under the read-only brief.
+  REV-12 PASS DIFF.patch and recorded command 15 show only the 13 added and eight modified work paths, followed by the three ledger paths; nothing under `data/` is committed.
+  REV-13 PASS Inspection of the guard, its tests and the shared helper found no placeholder, unimplemented branch or fixed result standing in for the required behaviour; stub programs are confined to scratch-repository tests.
+  REV-14 FAIL F1. `run` can emit a path containing a fragment of a secret while reporting that the staged content holds that secret, contrary to the prohibition on printing any part of a secret.
+  REV-15 PASS The `check_docs.py` edit replaces disclosure of a secret prefix with `(matched text not shown)` without changing detection. The unknown-key control now matches pre-commit 4.7.0 while retaining the closed-check assertion, and suppressing the first fetch's test output removes no assertion. No skip, tolerance or suppression was added.
+  REV-16 FAIL F1 and F2. The secret-fragment output violates AGENTS.md rule 14 and lacks the planted violation required by rule 37; the helper's direct reads of the real hooks and configuration violate rule 13 and the brief's H10 isolation requirement.
+  REV-17 PASS README, both agent files, OPEN_ITEMS.md, TASKS.md and PROGRESS.md were updated in the pull request; OI-90 through OI-94 record the assumptions, and the head documentation check exited 0.
+  REV-18 FAIL F2. `snapshot_real` reads every regular file in the real repository's hooks directory and reads its real git configuration, although the brief expressly says tests cannot reach either location.
+  REV-19 PASS The reviewed code implements the assigned hook task and does not replace an architecture decision, move a later feature into this slice or alter a slice gate.
+  REV-20 N/A This task adds developer tooling and test counts only; it creates no economic fact, displayed product number, calculation or lineage object.
+  REV-21 N/A No screen, card, Fact chip, catalogue template or assistant answer pipeline is changed.
+  REV-22 N/A No privacy partition, parameter set, treatment, protected table, attack suite or export register is changed.
+  REV-23 PASS No product or custodian package or package metadata is changed, and the complete head test run, including the package boundary suites, exited 0.
+  REV-24 N/A The change adds no English or Arabic product view, localized string or displayed product numeral.
+  REV-25 PASS The reviewed files contain no committed secret, realistic credential, private address or bare eight- or eleven-digit literal; secret-shaped test values are generated at run time, and the head documentation and tree checks exited 0.
+  REV-26 PASS No reviewed code, test message or document claims real custodian data, ministry endorsement, certified privacy, a forecast, a go/no-go verdict or lookup of a real person or firm.
+  REV-27 PASS The lead recorded `cmp AGENTS.md CLAUDE.md` exit 0 on the exact head, and the documentation check reported no agent-file failure.
+  REV-28 N/A The task creates no synthetic world record or synthetic establishment, entity, employer, person or salary-file identifier; generated digit runs are planted forbidden tokens.
+  REV-29 N/A No fact, figure, rank or attribute is attached to a real named place, building, business or FDI project.
+  REV-38 PASS No serving-plane or run-time gateway import is added; the closed secret-name tuple is used only by the offline commit guard and its tests.
+FINDINGS:
+  F1 (REV-14)
+    File: scripts/commit_guard.py
+    Place: `show_path` and `run`, lines 267-279 and 316-323; missing planted case in `scripts/tests/test_hooks_guard.py`
+    Wrong: When staged content contains a local secret, `show_path` withholds the path only if it contains the complete needle. A path containing an eight-character prefix or other window of the secret is printed by line 321, so part of the secret reaches stderr, contrary to AGENTS.md rule 14 and the brief's explicit no-part requirement. Existing tests cover only a path containing the complete value.
+    Fix: Withhold the path for every content refusal at lines 320-323, remove the now-unneeded `show_path` path disclosure and `json` import, and update the expected content messages. First add `test_path_holding_a_secret_fragment_is_withheld`, using a generated value, a path containing its first eight characters and staged content containing the whole value; require exit 1 and run `support.assert_free_of` over combined output. Show that test failing on the current head, then passing after the fix, and run `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` with exit 0.
+  F2 (REV-18)
+    File: scripts/tests/hooks_support.py
+    Place: `snapshot_real`, lines 430-477, and its module setup/teardown callers
+    Wrong: The function resolves the real repository's hooks and configuration paths with `git -C ROOT`, reads every regular hook file at lines 459-465 and reads the real configuration at lines 466-471. This directly reaches locations that AGENTS.md rule 13 and brief item (d)/H10 place off-limits to the tests, even though the bytes are only hashed.
+    Fix: Replace `snapshot_real()` with a snapshot helper that accepts a scratch repository and uses only that repository in `invoke`; delete every real-ROOT hooks/configuration read. Take commit-test snapshots of `base_repo` after its scratch creation and before scratch cleanup, and make install-test snapshots use each test's own scratch repository. Preserve the guard's teeth with a planted modification of a scratch hook or scratch configuration that the comparison must detect. Run `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` and require exit 0 with no skips.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T06: independent review, round 1, part 2 of 3 (the scanner wrapper, the dispatcher, the installer, the two configuration files and their tests): APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T06 part 2 (pull request 19)
+COMMIT: 6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d
+REVIEWER: Moonshot AI, Kimi K3.1 Pro Medium
+CHECKS:
+  REV-10 PASS The criteria have behavioural evidence: installation is proven by test_validate_config_accepts and test_fresh_repository_installs_from_configuration; generated forbidden tokens by test_staged_shapes_are_found_and_redacted; secret refusal without disclosure by the guard tests mapped in PLAN.md; and clean staged content by test_staged_clean_passes and the clean-commit tests. EVIDENCE.md records all 435 guard tests passing on the work commit and head.
+  REV-11 PASS On the exact head, the lead ran ./eii test --seed 2026111219 with exit 0 (1117 passed, 0 failed, 0 skipped) and python3 scripts/check_docs.py with exit 0. CI is green: https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333346 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333330 . Every rule in the plan's table has its planted violation. The reviewer ran no commands, as required by the read-only brief.
+  REV-12 PASS Recorded command 15 reports exactly the 13 added and 8 modified planned paths; the head adds only ledger changes. Nothing under data/ is committed and no unrelated reformatting appears.
+  REV-13 PASS The reviewed scripts and configuration contain no TODO, FIXME, NotImplementedError, empty implementation or fixed-result substitute. Dispatcher stubs are test fixtures; scanner and installer behaviour is exercised with the real pinned tools.
+  REV-14 PASS Inspection found no committed secret, .env or key file, real custodian material or realistic credential. Secret-shaped test values are generated at run time, scanner output is redacted, and python3 scripts/check_docs.py exited 0 on the head.
+  REV-15 PASS No threshold, tolerance, scan rule, test count or CI control is weakened. The check_docs.py change removes disclosure of a secret prefix without changing detection. The unknown-key control now matches pre-commit 4.7.0 behaviour while the project's closed check still rejects and names the unknown key.
+  REV-16 PASS The implementation matches H1-H11, the closed eleven-hook table and the pinned pre-commit 4.7.0 and gitleaks 8.30.1 records. EVIDENCE.md section 3 confirms the four scripts and two configurations equal the approved plan, with earlier-task edits limited to the planned blocks.
+  REV-17 PASS README.md, AGENTS.md, CLAUDE.md, OPEN_ITEMS.md, pins.toml, PROGRESS.md and TASKS.md record the change and its assumptions. The head documentation check exited 0, and no material unrecorded decision was found.
+  REV-18 PASS The reviewed code introduces no database, model-query, serving-plane or record-level data path. Scanner failures are fail-closed, messages use fixed paths, versions and exception types, and installations, commits and scans in tests occur in scratch repositories with neutral git configuration.
+  REV-19 PASS No dropped feature, architecture choice, accepted decision or slice ordering is reopened. Framework, installer, guard and scanner assumptions are explicitly recorded as OI-90 through OI-94.
+  REV-20 N/A This commit adds developer hooks and their tests, not economic fact objects, calculations, lineage records or displayed product numbers.
+  REV-21 N/A No screen, card, Fact chip, catalogue template or assistant answer pipeline is changed.
+  REV-22 N/A No privacy partition, parameter set, treatment, protected export, attack suite or privacy audit is changed.
+  REV-23 PASS The reviewed modules import no eii_custodian code, no product package metadata changes, and the complete head test run passed with the existing import-boundary checks intact.
+  REV-24 N/A No English or Arabic product view, localized string or displayed bilingual numeral is added or changed.
+  REV-25 PASS Inspection of the reviewed files and DIFF.patch found no private absolute path, personal name, real e-mail address, realistic identifier, secret, prohibited comparison or bare eight- or eleven-digit identifier. The documentation and tree checks both exited 0 on the head.
+  REV-26 PASS No code string, configuration, test or documentation addition makes a prohibited claim, gives a go/no-go recommendation or claims real custodian data, certification, endorsement or forecasting capability.
+  REV-27 PASS The head evidence records cmp AGENTS.md CLAUDE.md exiting 0, and both files contain the same rule-44 amendment.
+  REV-28 N/A No synthetic world record, SYN-form identifier or fictional firm name is created; generated scanner tokens are test secrets, not entity identifiers.
+  REV-29 N/A No fact, figure, rank or other attribute is attached to a real named place, building, business or FDI project.
+  REV-38 PASS The reviewed scripts and tests neither import eii_gateway nor read EII_DECISION_PROVIDER or JEV_PRO_API_KEY for gateway use, and no serving-plane or run-time gateway path is added.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T06: independent review, round 1, part 3 of 3 (the commits in a scratch repository, the changed files of earlier tasks, the documents and the ledger): APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T06 part 3 (pull request 19)
+COMMIT: 6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d
+REVIEWER: Moonshot AI, Kimi K3.1 Pro Medium
+CHECKS:
+  REV-10 PASS All four acceptance criteria have behavioural evidence: scratch installation and real commits prove criterion 1; generated cloud-key and eight-digit violations prove criterion 2; a generated local environment value is refused without disclosure for criterion 3; clean documentation, Python and web commits pass for criterion 4. The head run recorded 435 Python guard tests passed with no failures or skips.
+  REV-11 PASS On the exact head, the lead ran `./eii test --seed 2026111219`, exit 0, with 1117 passed, 0 failed and 0 skipped, and `python3 scripts/check_docs.py`, exit 0. The work-commit evidence records the red-first run and the planted violations. CI is green on the head: docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333346 and sandbox https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333330 . The reviewer ran no commands, as required by the brief.
+  REV-12 PASS The recorded scope check returned `21 []`: exactly the 13 planned additions and 8 planned modifications. The head adds only the ledger changes to OPEN_ITEMS.md, PROGRESS.md and TASKS.md; nothing under data/ is committed.
+  REV-13 PASS Inspection of the scratch-commit tests, helper, called scripts, earlier-file changes and ledger found no placeholder implementation, stub delivered as production behaviour, invented figure or mock substitute for the required commit behaviour. Stubbed uv/npm programs are confined to scratch-hook tests.
+  REV-14 PASS No secret, key file, committed .env or real custodian material appears in the diff. Secret-shaped values are generated at runtime; guard and scanner tests check their output for undisclosed windows, and check_docs.py now suppresses the complete matched secret text rather than exposing its prefix.
+  REV-15 PASS The sole check_docs.py change strengthens secret reporting without changing detection. The unknown-key test still proves that the closed check names the planted `allways_run` violation; only its framework control was corrected to observed pre-commit 4.7.0 behaviour. Suppressing the first fetch's test output removes no assertion or check.
+  REV-16 PASS The implementation and documents follow PLAN.md H1-H11, the closed hook table, the 48 planted violations and the lead's binding answers. Commit tests exercise the configured hooks in scratch repositories, with isolated git configuration and no installation or execution in the real repository.
+  REV-17 PASS README.md, both agent files, pins.toml, OPEN_ITEMS.md, TASKS.md and PROGRESS.md were updated together, including OI-90 to OI-94, PO-S0-09 and the work-commit evidence. The head documentation check exited 0 with `checked 203 text files, 53 Markdown files: OK`.
+  REV-18 PASS Secret values are read only by the commit-time guard from its documented environment and scratch/repository-root .env source; outputs name variables rather than values. Missing or wrong scanner versions and unreadable configuration fail closed, and the real hooks/configuration snapshots are used only to detect modification. No application data-handling surface changed.
+  REV-19 PASS No dropped feature, architecture choice, accepted decision or slice-gate ordering is reopened; new framework, scanner and guard choices are explicitly recorded as assumptions in OI-90 to OI-94.
+  REV-20 N/A This commit adds commit-time tooling, tests and documentation only; it introduces no economic fact, lineage object, calculation or displayed product number.
+  REV-21 N/A No screen, card, Fact chip, claim template or assistant answer pipeline is added or changed.
+  REV-22 N/A No privacy partition, parameter set, treatment, export, audit or privacy test is changed.
+  REV-23 PASS No product package or metadata imports custodian code; the new modules are repository tooling and tests, and the head's complete test run passed with the existing import-boundary checks.
+  REV-24 N/A No English or Arabic product view, localized string or displayed bilingual numeral is added or changed.
+  REV-25 PASS Inspection of the committed diff found no private absolute path, personal name, exposed e-mail address, real custodian material, prohibited comparison, secret or forbidden bare identifier run; the head documentation and tree checks both exited 0.
+  REV-26 PASS No code, test, document or ledger entry makes a prohibited claim about real custodian data, privacy certification, endorsement, forecasting, lookup or advice.
+  REV-27 PASS AGENTS.md and CLAUDE.md received the same rule-44 amendment, their full texts match, and the lead's `cmp AGENTS.md CLAUDE.md` on the exact head exited 0.
+  REV-28 N/A No synthetic world record or synthetic identifier is created; the generated digit runs are deliberate scanner violations, not delivered identifiers.
+  REV-29 N/A No fact, figure, rank or other attribute is attached to a real named place or business.
+  REV-38 PASS No serving-plane or runtime gateway import, provider setting, screen element or live gateway call is introduced; the new executable code is offline commit-time tooling under scripts/.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T06: fix round 1
+
+- Lead's ruling on F1 (valid): the module itself promises that no part of a value is printed. The path of a refused content stays visible in the ordinary case, so that the developer learns which file holds the value, and is withheld when it holds eight or more consecutive characters of a guarded value. The reviewer's own fix withheld every path.
+- Lead's ruling on F2 (valid in part): the tests keep one picture of the real repository's hooks folder and configuration before and after, because the task must prove that no test changes them (decision H10 of the plan; the owner's local hooks are never touched); but the test code opens no file there. The picture now holds the names, sizes and modification times of the hook files, the size of the configuration file and the answer of git to one question about core.hooksPath. The modification time of the configuration file is left out on purpose: another git command, a push that sets an upstream for one, rewrites that file without changing it. The reviewer's own fix removed the picture of the real repository. The lead's review brief had said that the tests cannot reach that folder, which was looser than the plan's decision; the round-2 brief says what the picture reads.
+- Build round 2 (the builder of round 1, Cursor command-line tool, `grok-4.7-high`, xAI): two tests first, each red on the reviewed code (the path was printed; the function snapshot did not exist); then the eight-character window in show_path, the picture by file status only with one planted violation in a scratch repository (a hook rewritten with the same length, then core.hooksPath set), its three callers, and one sentence of the README. 60 hook tests.
+- Lead's change after the builder's return: the picture of the configuration file holds its size only (see the ruling on F2).
+
+#### Evidence for the fix commit `f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095`
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   uv run --locked python scripts/hooks_gitleaks.py verify
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "gitleaks 8.30.1 verified at data/tools/gitleaks/8.30.1/gitleaks"
+Seed:      none
+Notes:     The installed scanner reports the pinned version.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    437 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard-test discovery of rule 44 at the fix commit, the 60 hook tests among them (criteria 1 to 4, TST-141, TST-144).
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   v="$PWD/.venv"; copy=$(mktemp -d); st=9; git ls-files -z | xargs -0 cp --parents -t "$copy" && mkdir -p "$copy/data/tools" && cp -R data/tools/gitleaks "$copy/data/tools/" && git -C "$copy" init -q && git -C "$copy" add -A && st=0; t() { (cd "$copy" && UV_PROJECT_ENVIRONMENT="$v" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p "$1" -k "$2" >"$copy/$3.log" 2>&1); }; ctl=9; if [ "$st" -eq 0 ]; then t test_hooks_guard.py test_path_holding_a_part_of_the_value_is_withheld g1 && t test_hooks_install.py test_picture_sees_a_changed_hook i1 && ctl=0; fi; rc=9; if [ "$ctl" -eq 0 ]; then git show 6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d:scripts/commit_guard.py > "$copy/scripts/commit_guard.py" && git show 6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d:scripts/tests/hooks_support.py > "$copy/scripts/tests/hooks_support.py" && rc=0; fi; if [ "$rc" -eq 0 ]; then a=0; t test_hooks_guard.py test_path_holding_a_part_of_the_value_is_withheld g2 || a=$?; b=0; t test_hooks_install.py test_picture_sees_a_changed_hook i2 || b=$?; test "$a" -eq 1 -a "$b" -eq 1 || rc=8; grep -q "FAIL: test_path_holding_a_part_of_the_value_is_withheld" "$copy/g2.log" || rc=7; grep -q "has no attribute 'snapshot'" "$copy/i2.log" || rc=6; fi; rm -rf "$copy"; test "$rc" -eq 0
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The red run of TST-161 for the two new tests, with its green control: in a scratch copy of the tracked files both tests pass; with the guard and the test helper of the reviewed commit put back, the first fails on the printed path and the second cannot find the function snapshot; the copy is removed.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   ./eii test
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1119 passed, 0 failed, 0 skipped
+Seed:      1794510062
+Notes:     The project's own test command: every network-free suite.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "123 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 119 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 203 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The agent files are identical.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   python3 -I -c "import subprocess,sys; g=sorted(subprocess.run(['git','diff','--name-status','--no-renames','6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d..f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095'],check=True,capture_output=True,text=True).stdout.splitlines()); w=sorted('M\t'+f for f in 'README.md scripts/commit_guard.py scripts/tests/hooks_support.py scripts/tests/test_hooks_commit.py scripts/tests/test_hooks_guard.py scripts/tests/test_hooks_install.py'.split()); print(len(g), [x for x in g if x not in w]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "6 []"
+Seed:      none
+Notes:     The fix commit changes exactly the six paths of the two findings (TST-163).
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d..f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Every fix commit subject is a Conventional Commit (PLN-05).
+```
+
 ### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources: record of the change
 
 - Kind of change: documentation only (decision record 0019 and the amendments it makes to the pack); it belongs to no task of TASKS.md and adds the tasks that build what it decides
