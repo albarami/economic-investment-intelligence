@@ -15,13 +15,17 @@ import preflight_rows as rows
 import preflight_store as store
 
 CHECKS = (
+    "python",
+    "node-npm",
     "locked-dependencies",
+    "duckdb-extensions",
     "postgresql",
     "release",
     "load-receipt",
     "embedded-reader",
     "tiles-glyphs-fonts",
     "recorded-replays",
+    "bubblewrap-sandbox",
     "api-port",
     "model-key",
     "env-not-tracked",
@@ -54,15 +58,22 @@ def run_preflight(
     docker: bool = True,
     limit: float = proc.PROBE_TIMEOUT_S,
     api_port: int = rows.API_PORT,
+    tools: rows.ToolChecks | None = None,
 ) -> Report:
     """Run every preflight row inside a temporary scratch folder."""
     with tempfile.TemporaryDirectory(prefix="eii-preflight-") as scratch_name:
         scratch = Path(scratch_name)
         out_lines: list[store.Line] = []
+        tool_checks = (
+            rows.default_tools(root, environ, limit) if tools is None else tools
+        )
 
+        out_lines.append(tool_checks.python())
+        out_lines.append(tool_checks.node_npm())
         out_lines.append(
             rows.locked_dependencies_row(root, environ, scratch, limit),
         )
+        out_lines.append(tool_checks.extensions())
         if embedded:
             sel = database.check_postgres(
                 environ,
@@ -88,6 +99,7 @@ def run_preflight(
         out_lines.append(rel["embedded-reader"])
         out_lines.append(rows.tiles_row(root))
         out_lines.append(rel["recorded-replays"])
+        out_lines.append(tool_checks.bubblewrap())
         out_lines.append(rows.api_port_row(api_port))
         out_lines.append(rows.model_key_row(environ))
         out_lines.append(rows.env_tracked_row(root, environ, limit))

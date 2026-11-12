@@ -8,6 +8,7 @@ import re
 import shutil
 import signal
 import subprocess
+import sys
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,6 +17,8 @@ PROBE_TIMEOUT_S = 5.0
 PG_ISREADY_WAIT = "5"
 HOST = "<host>"
 PORT = "<port>"
+INTERPRETER = Path(sys.executable).name
+SANDBOX_CHECK = "scripts/sandbox_check.py"
 CHECK_QUERY = (
     "SELECT current_setting('server_version_num'), "
     "coalesce((SELECT extversion FROM pg_extension WHERE extname = 'postgis'), '')"
@@ -28,6 +31,8 @@ COMMANDS = (
     ("cmd.exe", ("/c", "ver")),
     ("uv", ("lock", "--check", "--offline")),
     ("npm", ("ls", "--package-lock-only", "--offline", "--logs-max=0")),
+    (INTERPRETER, (SANDBOX_CHECK, "check-extensions")),
+    (INTERPRETER, (SANDBOX_CHECK, "check")),
 )
 FIXED_ENV = {"LANG": "C", "LC_ALL": "C"}
 PASS_THROUGH = {
@@ -45,6 +50,7 @@ PASS_THROUGH = {
     "cmd.exe": ("PATH",),
     "uv": ("PATH",),
     "npm": ("PATH",),
+    INTERPRETER: ("PATH",),
 }
 
 _PORT_RE = re.compile(r"^[1-9][0-9]{0,4}$")

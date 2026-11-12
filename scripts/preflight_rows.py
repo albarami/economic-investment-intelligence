@@ -6,11 +6,15 @@ import errno
 import os
 import re
 import socket
-from collections.abc import Mapping
+import sys
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass
 from pathlib import Path
 
 import preflight_proc as proc
 import preflight_store as store
+import versions_record as versions_record
+import versions_tools as versions_tools
 
 API_HOST = "127.0.0.1"
 API_PORT = 8000
@@ -26,6 +30,163 @@ GIT_UNTRACKED = (
     "error: pathspec '.env' did not match any file(s) known to git\n"
     "Did you forget to 'git add'?\n",
 )
+TOOLCHAIN_NAMES = frozenset({"python", "uv", "node", "npm"})
+ToolchainFailure = tuple[str, str, str]
+
+
+@dataclass(frozen=True)
+class ToolchainProbe:
+    """One complete S0-T12 toolchain probe."""
+
+    record_problems: int
+    failures: tuple[ToolchainFailure, ...]
+    raised: str | None
+
+
+@dataclass(frozen=True)
+class ToolChecks:
+    """Deferred preflight rows, injectable by tests."""
+
+    python: Callable[[], store.Line]
+    node_npm: Callable[[], store.Line]
+    extensions: Callable[[], store.Line]
+    bubblewrap: Callable[[], store.Line]
+
+
+def _probe_toolchain(
+    root: Path,
+    environ: Mapping[str, str],
+    limit: float,
+    interpreter: tuple[int, int, int],
+) -> ToolchainProbe:
+    """Load all toolchain rows and run the S0-T12 checker once."""
+    try:
+        components, record_failures, _count = versions_record.load_record(root)
+        if record_failures:
+            return ToolchainProbe(len(record_failures), (), None)
+        failures = versions_tools.check_toolchain(
+            components,
+            interpreter,
+            environ,
+            root,
+            limit,
+        )
+    except Exception as exc:
+        return ToolchainProbe(0, (), type(exc).__name__)
+    return ToolchainProbe(0, tuple(failures), None)
+
+
+def toolchain_row(
+    check: str,
+    names: frozenset[str],
+    probe: ToolchainProbe,
+) -> store.Line:
+    """Render one row from the complete toolchain probe."""
+    if probe.raised is not None:
+        return store.Line("FAIL", check, f"the check raised {probe.raised}")
+    if probe.record_problems:
+        return store.Line(
+            "FAIL",
+            check,
+            f"pins.toml cannot be read ({probe.record_problems} problems); "
+            "run uv run --locked python scripts/check_versions.py",
+        )
+    selected = [
+        f"{where} {detail}"
+        for _rule, where, detail in probe.failures
+        if where in names or where not in TOOLCHAIN_NAMES
+    ]
+    if selected:
+        return store.Line("FAIL", check, "; ".join(selected))
+    passed = (
+        "Python and uv match pins.toml"
+        if check == "python"
+        else "Node and npm match pins.toml"
+    )
+    return store.Line("PASS", check, passed)
+
+
+def sandbox_row(
+    check: str,
+    command: str,
+    passed: str,
+    root: Path,
+    environ: Mapping[str, str],
+    limit: float,
+) -> store.Line:
+    """Run one supported sandbox CLI under the bounded child runner."""
+    diagnostic = f"run uv run --locked python scripts/sandbox_check.py {command}"
+    env = proc.child_env(proc.INTERPRETER, environ, {})
+    try:
+        result = proc.run_child(
+            sys.executable,
+            (proc.SANDBOX_CHECK, command),
+            env,
+            root,
+            limit=limit,
+        )
+    except proc.CommandRefused:
+        return store.Line(
+            "FAIL",
+            check,
+            f"the sandbox command was refused; {diagnostic}",
+        )
+    if result.start_error is not None:
+        return store.Line(
+            "FAIL",
+            check,
+            f"the sandbox command could not start ({result.start_error}); {diagnostic}",
+        )
+    if result.timed_out:
+        return store.Line(
+            "FAIL",
+            check,
+            f"the sandbox command timed out after {limit:g} s; {diagnostic}",
+        )
+    if result.status != 0:
+        return store.Line(
+            "FAIL",
+            check,
+            f"the sandbox command exited with status {result.status}; {diagnostic}",
+        )
+    return store.Line("PASS", check, passed)
+
+
+def default_tools(
+    root: Path,
+    environ: Mapping[str, str],
+    limit: float,
+) -> ToolChecks:
+    """Build the four real deferred row callables."""
+    probe = _probe_toolchain(root, environ, limit, sys.version_info[:3])
+    return ToolChecks(
+        python=lambda: toolchain_row(
+            "python",
+            frozenset({"python", "uv"}),
+            probe,
+        ),
+        node_npm=lambda: toolchain_row(
+            "node-npm",
+            frozenset({"node", "npm"}),
+            probe,
+        ),
+        extensions=lambda: sandbox_row(
+            "duckdb-extensions",
+            "check-extensions",
+            "spatial and h3 load from the local folder with network access disabled",
+            root,
+            environ,
+            limit,
+        ),
+        bubblewrap=lambda: sandbox_row(
+            "bubblewrap-sandbox",
+            "check",
+            "bubblewrap is present and the sandbox test passes",
+            root,
+            environ,
+            limit,
+        ),
+    )
 
 
 def foundation_mode(environ: Mapping[str, str]) -> bool:
