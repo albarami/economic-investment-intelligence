@@ -14,7 +14,7 @@
 - Every numbered document is a draft. Documents 01 to 16 and the glossary were reviewed by models of other makers and corrected on 2026-11-11, then amended on 2026-11-12 by decisions 0016 and 0017, which also created document 17, and by decision 0018, which also amended the applicable documents and document 17; [PROGRESS.md](../PROGRESS.md) lists the reviews, their verdicts and what is still unreviewed (open items OI-37 and OI-38). No document is approved for a slice gate yet.
 - Version 1 now covers the whole initiative ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)): seven decision journeys, three services and four cases on one living map, with drawn areas, simulated footfall and traffic, monthly periods and named synthetic firms. [Decision 0017](decisions/0017-public-data-additions-and-public-splits.md) adds 77 portal datasets, two investment sources and official splits by sex and nationality as Public facts. [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) lists what a deployment on real records must add.
 - The implementation plan is such a draft too; the task ledger is a draft queue whose tasks all start queued.
-- Decision records 0001 to 0018 are accepted; decision 0016 supersedes decision 0013 and amends decision 0006. Later amendments need new records, not silent edits.
+- Decision records 0001 to 0018 are accepted; decision 0016 supersedes decision 0013 and amends decisions 0006 and 0007. Later amendments need new records, not silent edits.
 - Requirement identifiers are defined once in requirement tables; task identifiers come from the plan and task ledger.
 - [GLOSSARY.md](GLOSSARY.md) pins vocabulary. [OPEN_ITEMS.md](../OPEN_ITEMS.md) tracks what is undecided.
 
@@ -63,7 +63,7 @@
 | [0004](decisions/0004-duckdb-build-engine-and-embedded-standby.md) | DuckDB build engine and embedded standby | Accepted, 2026-11-11 |
 | [0005](decisions/0005-economic-graph-as-tables-neo4j-deferred.md) | Graph as tables; graph server deferred | Accepted, 2026-11-11 |
 | [0006](decisions/0006-fixed-grid-and-pin-based-areas.md) | Fixed grid and pin-based areas | Accepted, 2026-11-11; amended by decision 0016 on 2026-11-12 |
-| [0007](decisions/0007-disclosure-control-by-pooling-and-stable-treatment.md) | Pooling and stable treatment | Accepted, 2026-11-11 |
+| [0007](decisions/0007-disclosure-control-by-pooling-and-stable-treatment.md) | Pooling and stable treatment | Accepted, 2026-11-11; amended by decision 0016 on 2026-11-12 |
 | [0008](decisions/0008-assistant-never-types-a-number.md) | Application-rendered numbers, never model-typed numbers | Accepted, 2026-11-11 |
 | [0009](decisions/0009-provenance-classes-and-evidence-status.md) | Separate provenance and evidence-status axes | Accepted, 2026-11-11 |
 | [0010](decisions/0010-story-opens-on-public-evidence.md) | Public evidence opens the story | Accepted, 2026-11-11 |
