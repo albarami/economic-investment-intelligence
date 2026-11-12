@@ -112,7 +112,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: boundary test module and planted fixtures only.
 - Depends: S0-T02.
 - Requirements: ARC-06, BE-01, TST-60.
-- Delivery: hard; personas Backend; status queued.
+- Delivery: hard; personas Backend; status in review (pull request 8; part B after pull requests 6 and 7 merge).
 ### S0-T11 — Generator sandbox test
 - Goal: Prove locally and on the hosted CI runner that the `build-world` and `build-release` sandbox profiles cannot read outside their allowed mounts or open the network.
 - Acceptance criteria: [ ] both prohibited operations fail under both profiles locally and on the hosted runner; [ ] the read tooth succeeds outside; [ ] CI never skips the test; [ ] a runner restriction on unprivileged user namespaces is handled by a per-binary bubblewrap AppArmor profile or fails the job; [ ] engine extensions are fetched before sandbox entry into a project-local folder mounted read-only and load with the network off.

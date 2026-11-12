@@ -2580,6 +2580,110 @@ Seed:      none
 Notes:     Later-round form of the scope command (TST-163): the eleven created and thirteen named modified paths, the two ledger files of the round-1 ledger commit, and otherwise only modifications of files that the checks reported (the fix-up files), which the output lists in its last field.
 ```
 
+### S0-T10 — Import-boundary test: task log
+
+- Builder persona: senior backend and database engineer
+- Reviewer persona: principal backend security reviewer
+- Planner maker and model: Anthropic: versions 1 and 2 by Claude Sonnet agents; a correction after approval by Claude Sonnet agents; the one refresh of 2026-11-12, against the merged tree and the owner's notes of that day, by a Claude Sonnet editor; each checked by the lead
+- Plan reviewer maker and model: Antigravity command-line tool, `gemini-4-carbon-high` (Google), read-only plan mode: round 1 REJECTED, round 2 APPROVED; the correction after approval and the refresh of 2026-11-12 were not seen by an external plan reviewer
+- Builder maker and model: Cursor command-line tool, `composer-2.5` (Cursor)
+- Reviewer maker and model: Devin command-line tool, `glm-5-3-high` (Zhipu AI), read-only
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, strict-reviewer, verification-before-completion and github-flow; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first, a planted violation for every check, the three Python checks of S0-T04 passing without any suppression, nothing built beyond the acceptance criteria as hardening (owner's note of 2026-11-12), file length and house style as warnings only, a short pass that breaks each condition once and runs only the covering test module, no leftover file, and a report of only the results it saw
+- Branch: `task/S0-T10-import-boundary`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/8
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit (the build round: commands 2 to 8; command 1 follows after S0-T05 merges); the lead-run blocks go into the evidence file that the external reviewer receives
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4; git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8
+- Build round 1: Cursor command-line tool, `composer-2.5` (Cursor): the nine files of part A, tests first, on main after S0-T04 merged (the owner's throughput rule of 2026-11-12: S0-T10 depends only on S0-T02)
+- Build round 2: the same builder: the package parts passed to the judge as the plan defines them, [package, *folders], with relative-escape when the level exceeds their number, and a test that pins that rule to importlib.util.resolve_name; a break pass over the four support modules
+- Build round 3: the same builder, after the lead re-ran every surviving break against all five test modules: the plan's output order (path, line as an integer, text) with a test; a test for a requested forbidden module that was not loaded; a harness sub-case; redundant and unreachable branches deleted
+
+#### Evidence for the work commit `a16d88f265900a9a768f2a84983a16aad5eeea0a` (build round)
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    128 passed, 0 failed, 0 skipped (ran 128 tests, OK)
+Seed:      none
+Notes:     The suite command of rule 44, which runs the guard tests under unittest: test_metadata_guard_is_wired and the four S0-T02 tests on package metadata (criterion 2), and the 33 tests of the nine files of this task (the plan's 30 and three added by the fix rounds); ARC-06, BE-01, TST-60. The project's own ./eii test (TST-162) follows in the later round, after S0-T05 merges.
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 11 packages in 1ms"
+Seed:      none
+Notes:     The lock file is current for the workspace.
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 92 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check (TST-140).
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical (REV-27).
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   copy=$(mktemp -d) && git ls-files -z | xargs -0 cp --parents -t "$copy" && rc=0 && ctl=0 && : >"$copy/red.log"; (cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py' >"$copy/ctl.log" 2>&1) || ctl=$?; (printf '\ncheck_imports = lambda root: ([], [])\n' >> "$copy/scripts/tests/import_boundary_guard.py" && cd "$copy/scripts/tests" && python3 -B -c "import import_boundary_guard as g, sys; sys.exit(0 if g.check_imports.__name__ == '<lambda>' else 3)" && cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py' -v >"$copy/red.log" 2>&1) || rc=$?; miss=0; for t in test_every_edge_every_mechanism test_local_placements test_fullwidth_spelling_is_judged test_non_literal_dynamic_is_a_note test_relative_imports test_missing_source_tree test_unparsable_and_unreadable test_symbolic_links_fail test_pycache_is_scanned test_environment_names test_output_order test_fresh_function_local_is_static_only; do grep -q "^FAIL: $t " "$copy/red.log" || miss=1; done; if grep -q '_FailedTest' "$copy/red.log"; then miss=1; fi; if [ "$miss" -ne 0 ]; then rc=9; fi; if [ "$ctl" -ne 0 ]; then rc=8; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The line succeeds only if the import-boundary tests named in it fail when the static guard does nothing (TST-161).
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    a16d88f265900a9a768f2a84983a16aad5eeea0a
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','c930e3bc18452ef48033f641206848be2e8f6976...a16d88f265900a9a768f2a84983a16aad5eeea0a'],check=True,capture_output=True,text=True).stdout.splitlines(); a={'scripts/tests/import_boundary_judge.py','scripts/tests/import_boundary_guard.py','scripts/tests/import_boundary_child.py','scripts/tests/import_boundary_cases.py','scripts/tests/test_import_boundary_forms.py','scripts/tests/test_import_boundary_files.py','scripts/tests/test_import_boundary_fresh.py','scripts/tests/test_import_boundary_surroundings.py','scripts/tests/test_import_boundary_real.py'}; o=[x for x in p if x not in a]; print(len(p),o); sys.exit(1 if o or len(p)!=9 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "9 []"
+Seed:      none
+Notes:     Part-A form of the scope command: the work commit changes exactly the nine files of part A (TST-163, PLN-22); OPEN_ITEMS.md is part B, made after the open pull requests that edit it have merged.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
