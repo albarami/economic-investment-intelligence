@@ -22,9 +22,15 @@ export function tokenize(text) {
     while (cursor < length && text[cursor] !== '\n') cursor += 1;
     if (text.startsWith(REFERENCE_PREFIX, start)) {
       const body = text.slice(start + REFERENCE_PREFIX.length, cursor);
-      const match = /^\s*<reference\s+(path|types)\s*=\s*(['"])([\s\S]*?)\2/.exec(body);
+      const match =
+        /^\s*<reference\s+(path|types)\s*=\s*(['"])([\s\S]*?)\2/.exec(body);
       if (match) {
-        tokens.push({ type: 'reference', value: match[3], kind: match[1], line });
+        tokens.push({
+          type: 'reference',
+          value: match[3],
+          kind: match[1],
+          line,
+        });
       }
     }
     index = cursor;
@@ -32,7 +38,10 @@ export function tokenize(text) {
 
   function skipBlockComment() {
     index += 2;
-    while (index < length && !(text[index] === '*' && text[index + 1] === '/')) {
+    while (
+      index < length &&
+      !(text[index] === '*' && text[index + 1] === '/')
+    ) {
       if (lineBreak(text, index)) line += 1;
       index += 1;
     }
@@ -174,7 +183,12 @@ export function tokenize(text) {
       index += 1;
       continue;
     }
-    if (current === ' ' || current === '\t' || current === '\r' || current === '\f') {
+    if (
+      current === ' ' ||
+      current === '\t' ||
+      current === '\r' ||
+      current === '\f'
+    ) {
       index += 1;
       continue;
     }
@@ -198,7 +212,11 @@ export function tokenize(text) {
       const startLine = line;
       const start = index;
       while (index < length && /[A-Za-z0-9_$]/.test(text[index])) index += 1;
-      tokens.push({ type: 'word', value: text.slice(start, index), line: startLine });
+      tokens.push({
+        type: 'word',
+        value: text.slice(start, index),
+        line: startLine,
+      });
       continue;
     }
     tokens.push({ type: 'punct', value: current, line });
@@ -254,7 +272,11 @@ export function collectReferences(text) {
       if (matched) {
         const arg = at(tokens, index + 6);
         if (isLiteral(arg)) {
-          references.push({ form: 'glob', specifier: arg.value, line: arg.line });
+          references.push({
+            form: 'glob',
+            specifier: arg.value,
+            line: arg.line,
+          });
         } else if (isPunct(arg, '[')) {
           let depth = 1;
           for (let cursor = index + 7; cursor < tokens.length; cursor += 1) {
@@ -264,7 +286,11 @@ export function collectReferences(text) {
               depth -= 1;
               if (depth === 0) break;
             } else if (isLiteral(item)) {
-              references.push({ form: 'glob', specifier: item.value, line: item.line });
+              references.push({
+                form: 'glob',
+                specifier: item.value,
+                line: item.line,
+              });
             }
           }
         }
@@ -273,18 +299,32 @@ export function collectReferences(text) {
     }
     if (token.value === 'import' && isPunct(at(tokens, index + 1), '(')) {
       const arg = at(tokens, index + 2);
-      if (isLiteral(arg)) references.push({ form: 'import()', specifier: arg.value, line: arg.line });
+      if (isLiteral(arg))
+        references.push({
+          form: 'import()',
+          specifier: arg.value,
+          line: arg.line,
+        });
       else nonLiteral.push({ form: 'import()', line: token.line });
       continue;
     }
     if (token.value === 'import' && isLiteral(at(tokens, index + 1))) {
       const next = tokens[index + 1];
-      references.push({ form: 'import', specifier: next.value, line: next.line });
+      references.push({
+        form: 'import',
+        specifier: next.value,
+        line: next.line,
+      });
       continue;
     }
     if (token.value === 'require' && isPunct(at(tokens, index + 1), '(')) {
       const arg = at(tokens, index + 2);
-      if (isLiteral(arg)) references.push({ form: 'require()', specifier: arg.value, line: arg.line });
+      if (isLiteral(arg))
+        references.push({
+          form: 'require()',
+          specifier: arg.value,
+          line: arg.line,
+        });
       else nonLiteral.push({ form: 'require()', line: token.line });
       continue;
     }
@@ -294,7 +334,12 @@ export function collectReferences(text) {
       isPunct(at(tokens, index + 2), '(')
     ) {
       const arg = at(tokens, index + 3);
-      if (isLiteral(arg)) references.push({ form: 'new URL()', specifier: arg.value, line: arg.line });
+      if (isLiteral(arg))
+        references.push({
+          form: 'new URL()',
+          specifier: arg.value,
+          line: arg.line,
+        });
       else if (arg && arg.type === 'template' && arg.hasSubstitution) {
         nonLiteral.push({ form: 'new URL()', line: token.line });
       }

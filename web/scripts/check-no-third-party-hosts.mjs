@@ -27,19 +27,9 @@ const BINARY_EXTENSIONS = [
   '.zip',
   '.gz',
 ];
-const WALK_DIRECTORIES = [
-  'src',
-  'public',
-];
-const ASSET_ATTRIBUTES = [
-  'src',
-  'href',
-  'srcset',
-];
-const BUILT_SCRIPT_EXTENSIONS = [
-  '.js',
-  '.mjs',
-];
+const WALK_DIRECTORIES = ['src', 'public'];
+const ASSET_ATTRIBUTES = ['src', 'href', 'srcset'];
+const BUILT_SCRIPT_EXTENSIONS = ['.js', '.mjs'];
 
 function usage(message) {
   const error = new Error(message);
@@ -68,7 +58,8 @@ function parseArgs(argv) {
     }
     if (arg === '--root') {
       const value = argv[index + 1];
-      if (value === undefined || value.startsWith('--')) throw usage('flag --root needs a value');
+      if (value === undefined || value.startsWith('--'))
+        throw usage('flag --root needs a value');
       root = value;
       index += 1;
       continue;
@@ -83,7 +74,8 @@ function statRoot(root) {
   try {
     info = fs.statSync(root);
   } catch (error) {
-    if (error.code === 'ENOENT' || error.code === 'ENOTDIR') throw usage('root is not a directory');
+    if (error.code === 'ENOENT' || error.code === 'ENOTDIR')
+      throw usage('root is not a directory');
     throw error;
   }
   if (!info.isDirectory()) throw usage('root is not a directory');
@@ -110,7 +102,8 @@ function assetHits(html, rel) {
   for (const tag of scanTags(html)) {
     for (const attr of tag.attributes) {
       if (!ASSET_ATTRIBUTES.includes(attr.name) || attr.value === '') continue;
-      const candidates = attr.name === 'srcset' ? attr.value.split(',') : [attr.value];
+      const candidates =
+        attr.name === 'srcset' ? attr.value.split(',') : [attr.value];
       for (const candidate of candidates) {
         const url = candidate.trim().split(/\s+/)[0] ?? '';
         if (url && !allowedAsset(url)) {
@@ -169,7 +162,10 @@ function scanFile(root, full, failures, built) {
 function main() {
   try {
     const args = parseArgs(process.argv.slice(2));
-    const root = path.resolve(args.root ?? path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'));
+    const root = path.resolve(
+      args.root ??
+        path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'),
+    );
     statRoot(root);
     const failures = [];
     let files = 0;
@@ -183,10 +179,12 @@ function main() {
       fs.lstatSync(indexHtml);
       indexKind = 'present';
     } catch (error) {
-      if (error.code === 'ENOENT' || error.code === 'ENOTDIR') indexKind = 'absent';
+      if (error.code === 'ENOENT' || error.code === 'ENOTDIR')
+        indexKind = 'absent';
       else throw error;
     }
-    if (indexKind === 'absent') failures.push('FAIL missing-file: index.html: absent');
+    if (indexKind === 'absent')
+      failures.push('FAIL missing-file: index.html: absent');
     else addFile(indexHtml, false);
     const viteConfig = path.join(root, 'vite.config.ts');
     if (fs.existsSync(viteConfig)) addFile(viteConfig, false);
@@ -210,13 +208,16 @@ function main() {
       try {
         distInfo = fs.statSync(dist);
       } catch (error) {
-        if (error.code === 'ENOENT' || error.code === 'ENOTDIR') distInfo = null;
+        if (error.code === 'ENOENT' || error.code === 'ENOTDIR')
+          distInfo = null;
         else throw error;
       }
-      if (!distInfo || !distInfo.isDirectory()) failures.push('FAIL dist-missing: dist: absent');
+      if (!distInfo || !distInfo.isDirectory())
+        failures.push('FAIL dist-missing: dist: absent');
       else {
         const page = path.join(dist, 'index.html');
-        if (!fs.existsSync(page)) failures.push('FAIL missing-file: dist/index.html: absent');
+        if (!fs.existsSync(page))
+          failures.push('FAIL missing-file: dist/index.html: absent');
         walk(dist, (item) => {
           files += 1;
           if (item.error) {

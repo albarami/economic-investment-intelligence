@@ -22,17 +22,21 @@ Only figures marked Public describe Qatar. Synthetic and Simulated figures demon
 
 This repository contains a documentation pack, the [typed-decision qualification set](evals/typed_decisions/README.md) under `evals/`, the scaffolding of the pinned repository layout (slice S0, task S0-T01) and one `uv` workspace with three package skeletons, `eii_core`, `eii_custodian` and `eii_product` (slice S0, task S0-T02). Each skeleton holds a version string and nothing else. There is no feature code yet, and no product, release, privacy engine, assistant or interface is claimed to work.
 
-Five project commands run today: the documentation check, the tree check, the lock check, the tests and, only after a change to a `pyproject.toml`, the command that rewrites the lock file. Python 3.14 and `uv` are needed for the last three.
+Nine project commands run from the repository root today: the documentation check, the tree check, the lock check, the tests, the three Python checks (lint, format and type), the formatter in write mode and, only after a change to a `pyproject.toml`, the command that rewrites the lock file. Python 3.14 and `uv` are needed for all but the first two. Two commands change files and are run only to apply the formatter: `uv run --locked ruff format .` here and `npm run format` in `web/`; the lint, format-check and type-check commands only read.
 
 ```sh
 python3 scripts/check_docs.py
 python3 scripts/check_tree.py
 uv lock --check
 uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+uv run --locked ruff check .
+uv run --locked ruff format --check .
+uv run --locked mypy
+uv run --locked ruff format .
 uv lock
 ```
 
-`web/` also holds an application shell built with React, TypeScript and Vite. It has no feature UI, and nothing is claimed to work beyond the checks listed in [web/README.md](web/README.md). In addition to the commands above, six commands run from `web/` (not from the repository root), and a seventh, `npm install --package-lock-only`, only after a change to `web/package.json`. `npm ci` and that seventh command need the network:
+`web/` also holds an application shell built with React, TypeScript and Vite. It has no feature UI, and nothing is claimed to work beyond the checks listed in [web/README.md](web/README.md). In addition to the commands above, ten commands run from `web/` (not from the repository root), and an eleventh, `npm install --package-lock-only`, only after a change to `web/package.json`. `npm ci` and that eleventh command need the network:
 
 ```sh
 cd web
@@ -42,8 +46,14 @@ npm run check
 npm run check:hosts:dist
 npm run check:dev
 npm run test:checks
+npm run lint
+npm run format:check
+npm run typecheck
+npm run format
 npm install --package-lock-only
 ```
+
+`npm run format` changes files and is run only to apply the formatter.
 
 The `./eii` commands described in the architecture are being built in slice S0; they are not available now. The [implementation plan](docs/14_IMPLEMENTATION_PLAN.md) and [task ledger](TASKS.md) are drafts.
 

@@ -35,7 +35,9 @@ function assertShell(html) {
   if (!html.includes('lang="en"')) problems.push('lang');
   if (!html.includes('dir="ltr"')) problems.push('dir');
   if (!html.includes('name="viewport"')) problems.push('viewport');
-  const titles = [...html.matchAll(/<title>([\s\S]*?)<\/title>/g)].map((item) => item[1]);
+  const titles = [...html.matchAll(/<title>([\s\S]*?)<\/title>/g)].map(
+    (item) => item[1],
+  );
   if (titles.length !== 1 || titles[0] !== TITLE) problems.push('title');
   const headings = html.match(/<h1\b/g) ?? [];
   if (headings.length !== 1) problems.push('h1');
@@ -43,10 +45,19 @@ function assertShell(html) {
   if (/<style\b/i.test(html)) problems.push('style');
   if (/<meta\b[^>]*http-equiv/i.test(html)) problems.push('http-equiv');
   if (!html.includes('id="root"')) problems.push('root');
-  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map((item) => item[1]);
-  const modules = scripts.filter((attrs) => /type\s*=\s*["']module["']/i.test(attrs));
+  const scripts = [...html.matchAll(/<script\b([^>]*)>/gi)].map(
+    (item) => item[1],
+  );
+  const modules = scripts.filter((attrs) =>
+    /type\s*=\s*["']module["']/i.test(attrs),
+  );
   if (modules.length !== 1) problems.push('module');
-  if (scripts.some((attrs) => !/\ssrc\s*=/.test(` ${attrs}`) && !attrs.trim().startsWith('src='))) {
+  if (
+    scripts.some(
+      (attrs) =>
+        !/\ssrc\s*=/.test(` ${attrs}`) && !attrs.trim().startsWith('src='),
+    )
+  ) {
     problems.push('inline-script');
   }
   if (problems.length > 0) throw new Error(problems.join(','));
@@ -59,7 +70,11 @@ function assertMain(source) {
 
 function assertApp(source) {
   if (!source.includes('export function App')) throw new Error('export');
-  if (source.includes(REQUEST) || source.includes(STATE) || source.includes(EFFECT)) {
+  if (
+    source.includes(REQUEST) ||
+    source.includes(STATE) ||
+    source.includes(EFFECT)
+  ) {
     throw new Error('runtime');
   }
 }
@@ -76,7 +91,10 @@ function assertConfig(value) {
   for (const flag of flags) {
     if (options[flag] !== true) throw new Error(flag);
   }
-  if (Object.hasOwn(value, 'ignoreDeprecations') || Object.hasOwn(options, 'ignoreDeprecations')) {
+  if (
+    Object.hasOwn(value, 'ignoreDeprecations') ||
+    Object.hasOwn(options, 'ignoreDeprecations')
+  ) {
     throw new Error('ignoreDeprecations');
   }
 }
@@ -90,17 +108,34 @@ test('shell document helper', () => {
     ['title', SHELL.replace(`<title>${TITLE}</title>`, '')],
     ['other title', SHELL.replace(TITLE, 'Other title', 1)],
     ['second h1', SHELL.replace('<h1>', '<h1></h1><h1>')],
-    ['stylesheet', SHELL.replace('</head>', '<link rel="stylesheet" href="/a.css"></head>')],
+    [
+      'stylesheet',
+      SHELL.replace('</head>', '<link rel="stylesheet" href="/a.css"></head>'),
+    ],
     ['style', SHELL.replace('</head>', '<style>a{}</style></head>')],
     ['inline script', `${SHELL}<script>a</script>\n`],
-    ['second module', SHELL.replace('</body>', '<script type="module" src="/b.js"></script></body>')],
-    ['http-equiv', SHELL.replace('</head>', '<meta http-equiv="refresh" content="0"></head>')],
+    [
+      'second module',
+      SHELL.replace(
+        '</body>',
+        '<script type="module" src="/b.js"></script></body>',
+      ),
+    ],
+    [
+      'http-equiv',
+      SHELL.replace(
+        '</head>',
+        '<meta http-equiv="refresh" content="0"></head>',
+      ),
+    ],
     ['root', SHELL.replace('id="root"', 'id="app"')],
   ];
   for (const [name, html] of plants) {
     assert.throws(() => assertShell(html), Error, name);
   }
-  assert.doesNotThrow(() => assertShell(fs.readFileSync(path.join(WEB, 'index.html'), 'utf8')));
+  assert.doesNotThrow(() =>
+    assertShell(fs.readFileSync(path.join(WEB, 'index.html'), 'utf8')),
+  );
 });
 
 test('main and app', () => {
@@ -108,14 +143,24 @@ test('main and app', () => {
   const app = fs.readFileSync(path.join(WEB, 'src', 'app', 'App.tsx'), 'utf8');
   assert.doesNotThrow(() => assertMain(main));
   assert.doesNotThrow(() => assertApp(app));
-  assert.throws(() => assertMain(main.replace("getElementById('root')", "getElementById('app')")));
-  assert.throws(() => assertMain(main.replace('throw new Error', 'return null')));
+  assert.throws(() =>
+    assertMain(main.replace("getElementById('root')", "getElementById('app')")),
+  );
+  assert.throws(() =>
+    assertMain(main.replace('throw new Error', 'return null')),
+  );
   assert.throws(() => assertApp(`${app}\n${REQUEST}('/x');\n`));
-  assert.throws(() => assertApp(app.replace('export function App', 'export default function App')));
+  assert.throws(() =>
+    assertApp(
+      app.replace('export function App', 'export default function App'),
+    ),
+  );
 });
 
 test('tsconfig strictness', () => {
-  const real = JSON.parse(fs.readFileSync(path.join(WEB, 'tsconfig.json'), 'utf8'));
+  const real = JSON.parse(
+    fs.readFileSync(path.join(WEB, 'tsconfig.json'), 'utf8'),
+  );
   assert.doesNotThrow(() => assertConfig(real));
   const flags = [
     'strict',

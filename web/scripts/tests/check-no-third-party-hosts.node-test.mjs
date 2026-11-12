@@ -15,7 +15,9 @@ const LONG_NAME_LENGTH = 300;
 const HOSTS = ['www.w3.org', 'react.dev', 'reactjs.org', 'github.com'];
 const REQUEST = 'fe' + 'tch';
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-test-check-no-third-party-hosts-'));
+const root = fs.mkdtempSync(
+  path.join(os.tmpdir(), 'eii-test-check-no-third-party-hosts-'),
+);
 const currentTest = new AsyncLocalStorage();
 after(() => fs.rmSync(root, { recursive: true, force: true }));
 
@@ -26,10 +28,11 @@ function bindTest(t) {
       fn = options;
       options = undefined;
     }
-    const wrapped = (sub) => currentTest.run(sub, () => {
-      bindTest(sub);
-      return fn(sub);
-    });
+    const wrapped = (sub) =>
+      currentTest.run(sub, () => {
+        bindTest(sub);
+        return fn(sub);
+      });
     if (options === undefined) return own(name, wrapped);
     return own(name, options, wrapped);
   };
@@ -40,17 +43,20 @@ function test(name, options, fn) {
     fn = options;
     options = undefined;
   }
-  const wrapped = (t) => currentTest.run(t, () => {
-    bindTest(t);
-    return fn(t);
-  });
+  const wrapped = (t) =>
+    currentTest.run(t, () => {
+      bindTest(t);
+      return fn(t);
+    });
   if (options === undefined) return declareTest(name, wrapped);
   return declareTest(name, options, wrapped);
 }
 
 function tempDir(prefix) {
   const dir = fs.mkdtempSync(path.join(root, prefix));
-  currentTest.getStore().after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  currentTest
+    .getStore()
+    .after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
 
@@ -63,7 +69,14 @@ function childTemp(home) {
 function cleanEnv(extra) {
   const home = tempDir('eii-env-');
   const tmp = childTemp(home);
-  const base = { PATH: process.env.PATH, HOME: home, TMPDIR: tmp, TMP: tmp, TEMP: tmp, LANG: 'C' };
+  const base = {
+    PATH: process.env.PATH,
+    HOME: home,
+    TMPDIR: tmp,
+    TMP: tmp,
+    TEMP: tmp,
+    LANG: 'C',
+  };
   return { ...base, ...extra };
 }
 
@@ -77,7 +90,10 @@ function run(args, env) {
 function makeRoot() {
   const root = tempDir('eii-host-');
   fs.mkdirSync(path.join(root, 'src'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'index.html'), '<!doctype html><title>shell</title>\n');
+  fs.writeFileSync(
+    path.join(root, 'index.html'),
+    '<!doctype html><title>shell</title>\n',
+  );
   fs.writeFileSync(path.join(root, 'vite.config.ts'), 'export default {};\n');
   fs.writeFileSync(path.join(root, 'src', 'main.tsx'), 'export {}\n');
   return root;
@@ -104,7 +120,9 @@ function snapshot(root) {
         rows.push(`dir ${rel}`);
         walk(full);
       } else {
-        const digest = createHash('sha256').update(fs.readFileSync(full)).digest('hex');
+        const digest = createHash('sha256')
+          .update(fs.readFileSync(full))
+          .digest('hex');
         rows.push(`file ${rel} ${info.size} ${digest}`);
       }
     }
@@ -143,7 +161,10 @@ test('clean sources', () => {
 test('real web sources pass', () => {
   const result = run(['--root', WEB]);
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  assert.match(result.stdout.trim().split('\n').at(-1), /^checked \d+ files: OK$/);
+  assert.match(
+    result.stdout.trim().split('\n').at(-1),
+    /^checked \d+ files: OK$/,
+  );
 });
 
 test('index.html missing', () => {
@@ -155,13 +176,19 @@ test('index.html missing', () => {
 test('index.html unreadable', () => {
   const root = makeRoot();
   fs.rmSync(path.join(root, 'index.html'));
-  fs.symlinkSync(path.join(root, 'missing-target'), path.join(root, 'index.html'));
+  fs.symlinkSync(
+    path.join(root, 'missing-target'),
+    path.join(root, 'index.html'),
+  );
   assertFail(run(['--root', root]), 'FAIL unreadable-file: index.html');
 });
 
 test('unreadable file in src', () => {
   const root = makeRoot();
-  fs.symlinkSync(path.join(root, 'missing-target'), path.join(root, 'src', 'x.ts'));
+  fs.symlinkSync(
+    path.join(root, 'missing-target'),
+    path.join(root, 'src', 'x.ts'),
+  );
   assertFail(run(['--root', root]), 'FAIL unreadable-file: src/x.ts');
 });
 
@@ -194,8 +221,14 @@ test('scripts and tests are not read', () => {
   const root = makeRoot();
   fs.mkdirSync(path.join(root, 'scripts'));
   fs.mkdirSync(path.join(root, 'tests'));
-  fs.writeFileSync(path.join(root, 'scripts', 'p.mjs'), 'const u = "https://example.com/x";\n');
-  fs.writeFileSync(path.join(root, 'tests', 'p.ts'), 'const u = "https://example.com/x";\n');
+  fs.writeFileSync(
+    path.join(root, 'scripts', 'p.mjs'),
+    'const u = "https://example.com/x";\n',
+  );
+  fs.writeFileSync(
+    path.join(root, 'tests', 'p.ts'),
+    'const u = "https://example.com/x";\n',
+  );
   const result = run(['--root', root]);
   assert.equal(result.status, 0, result.stdout);
   assert.match(result.stdout.trim().split('\n').at(-1), /OK$/);
@@ -203,7 +236,10 @@ test('scripts and tests are not read', () => {
 
 test('vite config with a URL', () => {
   const root = makeRoot();
-  fs.writeFileSync(path.join(root, 'vite.config.ts'), 'const u = "https://example.com/x";\n');
+  fs.writeFileSync(
+    path.join(root, 'vite.config.ts'),
+    'const u = "https://example.com/x";\n',
+  );
   assertFail(run(['--root', root]), 'FAIL absolute-url: vite.config.ts');
 });
 
@@ -215,14 +251,23 @@ test('dist present without page', () => {
   const root = makeRoot();
   fs.mkdirSync(path.join(root, 'dist', 'assets'), { recursive: true });
   fs.writeFileSync(path.join(root, 'dist', 'assets', 'a.js'), 'export {}\n');
-  assertFail(run(['--root', root, '--dist']), 'FAIL missing-file: dist/index.html');
+  assertFail(
+    run(['--root', root, '--dist']),
+    'FAIL missing-file: dist/index.html',
+  );
 });
 
 test('dist clean built page', () => {
   const root = makeRoot();
   fs.mkdirSync(path.join(root, 'dist', 'assets'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'dist', 'index.html'), builtPage('/assets/a.js'));
-  fs.writeFileSync(path.join(root, 'dist', 'assets', 'a.js'), 'http://www.w3.org/2000/svg\n');
+  fs.writeFileSync(
+    path.join(root, 'dist', 'index.html'),
+    builtPage('/assets/a.js'),
+  );
+  fs.writeFileSync(
+    path.join(root, 'dist', 'assets', 'a.js'),
+    'http://www.w3.org/2000/svg\n',
+  );
   const result = run(['--root', root, '--dist']);
   assert.equal(result.status, 0, result.stdout + result.stderr);
   assert.match(result.stdout.trim().split('\n').at(-1), /OK$/);
@@ -234,7 +279,10 @@ test('listed hosts allowed in JavaScript', async (t) => {
       await t.test(`${scheme} ${host}`, () => {
         const root = makeRoot();
         fs.mkdirSync(path.join(root, 'dist', 'assets'), { recursive: true });
-        fs.writeFileSync(path.join(root, 'dist', 'index.html'), builtPage('/assets/a.js'));
+        fs.writeFileSync(
+          path.join(root, 'dist', 'index.html'),
+          builtPage('/assets/a.js'),
+        );
         fs.writeFileSync(
           path.join(root, 'dist', 'assets', 'a.js'),
           `${scheme}://${host}/x\n`,
@@ -250,24 +298,42 @@ test('listed hosts allowed in JavaScript', async (t) => {
 test('JavaScript with another host', () => {
   const root = makeRoot();
   fs.mkdirSync(path.join(root, 'dist', 'assets'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'dist', 'index.html'), builtPage('/assets/a.js'));
-  fs.writeFileSync(path.join(root, 'dist', 'assets', 'a.js'), 'https://example.com/x\n');
+  fs.writeFileSync(
+    path.join(root, 'dist', 'index.html'),
+    builtPage('/assets/a.js'),
+  );
+  fs.writeFileSync(
+    path.join(root, 'dist', 'assets', 'a.js'),
+    'https://example.com/x\n',
+  );
   assertFail(run(['--root', root, '--dist']), 'FAIL absolute-url-js');
 });
 
 test('listed host with another scheme', () => {
   const root = makeRoot();
   fs.mkdirSync(path.join(root, 'dist', 'assets'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'dist', 'index.html'), builtPage('/assets/a.js'));
-  fs.writeFileSync(path.join(root, 'dist', 'assets', 'a.js'), 'ws://www.w3.org/x\n');
+  fs.writeFileSync(
+    path.join(root, 'dist', 'index.html'),
+    builtPage('/assets/a.js'),
+  );
+  fs.writeFileSync(
+    path.join(root, 'dist', 'assets', 'a.js'),
+    'ws://www.w3.org/x\n',
+  );
   assertFail(run(['--root', root, '--dist']), 'FAIL absolute-url-js');
 });
 
 test('listed host written in capitals', () => {
   const root = makeRoot();
   fs.mkdirSync(path.join(root, 'dist', 'assets'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'dist', 'index.html'), builtPage('/assets/a.js'));
-  fs.writeFileSync(path.join(root, 'dist', 'assets', 'a.js'), 'HTTP://WWW.W3.ORG/x\n');
+  fs.writeFileSync(
+    path.join(root, 'dist', 'index.html'),
+    builtPage('/assets/a.js'),
+  );
+  fs.writeFileSync(
+    path.join(root, 'dist', 'assets', 'a.js'),
+    'HTTP://WWW.W3.ORG/x\n',
+  );
   const result = run(['--root', root, '--dist']);
   assert.equal(result.status, 0, result.stdout);
   assert.match(result.stdout.trim().split('\n').at(-1), /OK$/);
@@ -276,14 +342,20 @@ test('listed host written in capitals', () => {
 test('relative asset URL', () => {
   const root = makeRoot();
   fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'dist', 'index.html'), builtPage('./assets/a.js'));
+  fs.writeFileSync(
+    path.join(root, 'dist', 'index.html'),
+    builtPage('./assets/a.js'),
+  );
   assertFail(run(['--root', root, '--dist']), 'FAIL asset-url-shape');
 });
 
 test('protocol-relative asset URL', () => {
   const root = makeRoot();
   fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'dist', 'index.html'), builtPage('//h.example/a.js'));
+  fs.writeFileSync(
+    path.join(root, 'dist', 'index.html'),
+    builtPage('//h.example/a.js'),
+  );
   assertFail(run(['--root', root, '--dist']), 'FAIL asset-url-shape');
 });
 
@@ -300,9 +372,15 @@ test('href not root-relative', () => {
 test('built mjs with another host', () => {
   const root = makeRoot();
   fs.mkdirSync(path.join(root, 'dist', 'assets'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'dist', 'index.html'), builtPage('/assets/a.js'));
+  fs.writeFileSync(
+    path.join(root, 'dist', 'index.html'),
+    builtPage('/assets/a.js'),
+  );
   fs.writeFileSync(path.join(root, 'dist', 'assets', 'a.js'), 'var n = 1;\n');
-  fs.writeFileSync(path.join(root, 'dist', 'assets', 'a.mjs'), 'https://example.com/x\n');
+  fs.writeFileSync(
+    path.join(root, 'dist', 'assets', 'a.mjs'),
+    'https://example.com/x\n',
+  );
   assertFail(run(['--root', root, '--dist']), 'FAIL absolute-url-js');
 });
 
@@ -329,7 +407,10 @@ test('absolute asset URL', () => {
 test('dist CSS with another host', () => {
   const root = makeRoot();
   fs.mkdirSync(path.join(root, 'dist', 'assets'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'dist', 'index.html'), builtPage('/assets/a.js'));
+  fs.writeFileSync(
+    path.join(root, 'dist', 'index.html'),
+    builtPage('/assets/a.js'),
+  );
   fs.writeFileSync(path.join(root, 'dist', 'assets', 'a.js'), 'var n = 1;\n');
   fs.writeFileSync(
     path.join(root, 'dist', 'assets', 'a.css'),
@@ -367,7 +448,10 @@ test('internal error', () => {
   const longName = path.join(root, 'n'.repeat(LONG_NAME_LENGTH));
   const result = run(['--root', longName]);
   assert.equal(result.status, 1);
-  assert.equal(result.stdout, 'FAIL internal-error: ENAMETOOLONG: name too long, stat\n');
+  assert.equal(
+    result.stdout,
+    'FAIL internal-error: ENAMETOOLONG: name too long, stat\n',
+  );
   assert.equal(`${result.stdout}${result.stderr}`.includes('    at '), false);
 });
 

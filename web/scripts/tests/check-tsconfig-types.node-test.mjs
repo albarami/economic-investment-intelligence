@@ -20,10 +20,11 @@ function bindTest(t) {
       fn = options;
       options = undefined;
     }
-    const wrapped = (sub) => currentTest.run(sub, () => {
-      bindTest(sub);
-      return fn(sub);
-    });
+    const wrapped = (sub) =>
+      currentTest.run(sub, () => {
+        bindTest(sub);
+        return fn(sub);
+      });
     if (options === undefined) return own(name, wrapped);
     return own(name, options, wrapped);
   };
@@ -34,17 +35,20 @@ function test(name, options, fn) {
     fn = options;
     options = undefined;
   }
-  const wrapped = (t) => currentTest.run(t, () => {
-    bindTest(t);
-    return fn(t);
-  });
+  const wrapped = (t) =>
+    currentTest.run(t, () => {
+      bindTest(t);
+      return fn(t);
+    });
   if (options === undefined) return declareTest(name, wrapped);
   return declareTest(name, options, wrapped);
 }
 
 function tempDir(prefix) {
   const dir = fs.mkdtempSync(path.join(root, prefix));
-  currentTest.getStore().after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  currentTest
+    .getStore()
+    .after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
 
@@ -131,7 +135,10 @@ test('tsconfig windows paths on this platform', async (t) => {
         path.join(root, 'tsconfig.json'),
         `${JSON.stringify({ include: [entry] })}\n`,
       );
-      assertFail(run(['--root', root], cleanEnv(), root), 'FAIL tsconfig-outside');
+      assertFail(
+        run(['--root', root], cleanEnv(), root),
+        'FAIL tsconfig-outside',
+      );
     });
   }
 });
@@ -146,7 +153,10 @@ test('tsconfig entries with the wrong element type', async (t) => {
   for (const [name, body] of cases) {
     await t.test(name, () => {
       const root = makeRoot();
-      fs.writeFileSync(path.join(root, 'tsconfig.json'), `${JSON.stringify(body)}\n`);
+      fs.writeFileSync(
+        path.join(root, 'tsconfig.json'),
+        `${JSON.stringify(body)}\n`,
+      );
       assertFail(run(['--root', root]), 'FAIL tsconfig-json: tsconfig.json');
     });
   }

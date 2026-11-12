@@ -10,7 +10,9 @@ import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SCRIPT = path.join(HERE, '..', 'check-exact-versions.mjs');
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-test-check-exact-versions-lock-'));
+const root = fs.mkdtempSync(
+  path.join(os.tmpdir(), 'eii-test-check-exact-versions-lock-'),
+);
 const currentTest = new AsyncLocalStorage();
 after(() => fs.rmSync(root, { recursive: true, force: true }));
 
@@ -21,10 +23,11 @@ function bindTest(t) {
       fn = options;
       options = undefined;
     }
-    const wrapped = (sub) => currentTest.run(sub, () => {
-      bindTest(sub);
-      return fn(sub);
-    });
+    const wrapped = (sub) =>
+      currentTest.run(sub, () => {
+        bindTest(sub);
+        return fn(sub);
+      });
     if (options === undefined) return own(name, wrapped);
     return own(name, options, wrapped);
   };
@@ -35,17 +38,20 @@ function test(name, options, fn) {
     fn = options;
     options = undefined;
   }
-  const wrapped = (t) => currentTest.run(t, () => {
-    bindTest(t);
-    return fn(t);
-  });
+  const wrapped = (t) =>
+    currentTest.run(t, () => {
+      bindTest(t);
+      return fn(t);
+    });
   if (options === undefined) return declareTest(name, wrapped);
   return declareTest(name, options, wrapped);
 }
 
 function tempDir(prefix) {
   const dir = fs.mkdtempSync(path.join(root, prefix));
-  currentTest.getStore().after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  currentTest
+    .getStore()
+    .after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
 
@@ -58,7 +64,14 @@ function childTemp(home) {
 function cleanEnv(extra) {
   const home = tempDir('eii-env-');
   const tmp = childTemp(home);
-  const base = { PATH: process.env.PATH, HOME: home, TMPDIR: tmp, TMP: tmp, TEMP: tmp, LANG: 'C' };
+  const base = {
+    PATH: process.env.PATH,
+    HOME: home,
+    TMPDIR: tmp,
+    TMP: tmp,
+    TEMP: tmp,
+    LANG: 'C',
+  };
   return { ...base, ...extra };
 }
 
@@ -93,7 +106,11 @@ function lockFor(pkg, version = 3) {
   ]) {
     if (pkg[section] !== undefined) rootEntry[section] = pkg[section];
   }
-  for (const section of ['dependencies', 'devDependencies', 'optionalDependencies']) {
+  for (const section of [
+    'dependencies',
+    'devDependencies',
+    'optionalDependencies',
+  ]) {
     for (const [name, spec] of Object.entries(pkg[section] ?? {})) {
       packages[`node_modules/${name}`] = { version: spec };
     }
@@ -127,7 +144,10 @@ test('clean lock with lockfileVersion 2', () => {
 });
 
 test('lock missing', () => {
-  assertFail(run(writeRoot(basePackage(), null)), 'FAIL missing-lock: package-lock.json');
+  assertFail(
+    run(writeRoot(basePackage(), null)),
+    'FAIL missing-lock: package-lock.json',
+  );
 });
 
 test('lock parse failures', async (t) => {
@@ -143,7 +163,10 @@ test('lock parse failures', async (t) => {
   });
   await t.test('without packages', () => {
     const root = writeRoot(basePackage());
-    fs.writeFileSync(path.join(root, 'package-lock.json'), '{"lockfileVersion":3}\n');
+    fs.writeFileSync(
+      path.join(root, 'package-lock.json'),
+      '{"lockfileVersion":3}\n',
+    );
     assertFail(run(root), 'FAIL lock-parse: package-lock.json');
   });
 });
@@ -151,13 +174,19 @@ test('lock parse failures', async (t) => {
 test('lockfileVersion rejected', async (t) => {
   await t.test('version 1', () => {
     const pkg = basePackage();
-    assertFail(run(writeRoot(pkg, lockFor(pkg, 1))), 'FAIL lock-version: package-lock.json');
+    assertFail(
+      run(writeRoot(pkg, lockFor(pkg, 1))),
+      'FAIL lock-version: package-lock.json',
+    );
   });
   await t.test('string 3', () => {
     const pkg = basePackage();
     const lock = lockFor(pkg, 3);
     lock.lockfileVersion = '3';
-    assertFail(run(writeRoot(pkg, lock)), 'FAIL lock-version: package-lock.json');
+    assertFail(
+      run(writeRoot(pkg, lock)),
+      'FAIL lock-version: package-lock.json',
+    );
   });
 });
 
@@ -170,11 +199,17 @@ test('lock root mismatch', async (t) => {
   ]) {
     await t.test(section, () => {
       const pkg = basePackage();
-      if (section === 'optionalDependencies' || section === 'peerDependencies') {
+      if (
+        section === 'optionalDependencies' ||
+        section === 'peerDependencies'
+      ) {
         pkg[section] = { sample: '1.2.3' };
       }
       const lock = lockFor(pkg);
-      lock.packages[''][section] = { ...(lock.packages[''][section] ?? {}), extra: '1.2.3' };
+      lock.packages[''][section] = {
+        ...(lock.packages[''][section] ?? {}),
+        extra: '1.2.3',
+      };
       if (section === 'optionalDependencies') {
         lock.packages['node_modules/sample'] = { version: '1.2.3' };
       }
@@ -198,14 +233,16 @@ test('locked version mismatch', async (t) => {
   for (const [section, name] of sections) {
     await t.test(`${section} version differs`, () => {
       const pkg = basePackage();
-      if (section === 'optionalDependencies') pkg.optionalDependencies = { sample: '1.2.3' };
+      if (section === 'optionalDependencies')
+        pkg.optionalDependencies = { sample: '1.2.3' };
       const lock = lockFor(pkg);
       lock.packages[`node_modules/${name}`].version = '9.9.9';
       assertFail(run(writeRoot(pkg, lock)), 'FAIL lock-version-mismatch');
     });
     await t.test(`${section} entry absent`, () => {
       const pkg = basePackage();
-      if (section === 'optionalDependencies') pkg.optionalDependencies = { sample: '1.2.3' };
+      if (section === 'optionalDependencies')
+        pkg.optionalDependencies = { sample: '1.2.3' };
       const lock = lockFor(pkg);
       delete lock.packages[`node_modules/${name}`];
       assertFail(run(writeRoot(pkg, lock)), 'FAIL lock-version-mismatch');

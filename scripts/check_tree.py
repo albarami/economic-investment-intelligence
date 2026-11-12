@@ -81,8 +81,16 @@ import sys
 from pathlib import Path
 
 PINNED_FOLDERS = (
-    "contracts", "core", "custodian", "product", "web",
-    "evals", "gateway", "infra", "scripts", "docs",
+    "contracts",
+    "core",
+    "custodian",
+    "product",
+    "web",
+    "evals",
+    "gateway",
+    "infra",
+    "scripts",
+    "docs",
 )
 TOP_LEVEL_ALLOWED = frozenset(PINNED_FOLDERS) | {".github"}
 
@@ -136,16 +144,20 @@ class CheckError(Exception):
     """A root-validation or git failure; reported on standard error."""
 
 
-def git(root: Path, *args: str, feed: bytes = b"") -> subprocess.CompletedProcess:
+def git(
+    root: Path, *args: str, feed: bytes = b""
+) -> subprocess.CompletedProcess[bytes]:
     """One git call with personal ignore files and user configuration off."""
     env = dict(os.environ)
     env["GIT_CONFIG_GLOBAL"] = os.devnull
     env["GIT_CONFIG_SYSTEM"] = os.devnull
     try:
         return subprocess.run(
-            ["git", "-c", f"core.excludesFile={os.devnull}",
-             "-C", str(root), *args],
-            input=feed, capture_output=True, env=env)
+            ["git", "-c", f"core.excludesFile={os.devnull}", "-C", str(root), *args],
+            input=feed,
+            capture_output=True,
+            env=env,
+        )
     except OSError as exc:
         raise CheckError(f"git could not be run: {exc}") from exc
 
@@ -162,13 +174,16 @@ def validate_root(root: Path) -> None:
         raise CheckError(f"{root}: not the top of a git work tree")
 
 
-def tracked_files(root: Path) -> set:
+def tracked_files(root: Path) -> set[str]:
     """TRACKED: staged, repository-relative paths."""
     done = git(root, "ls-files", "-z", "--cached")
     if done.returncode != 0:
         raise CheckError("git ls-files failed")
-    return {name for name in
-            done.stdout.decode("utf-8", errors="replace").split("\0") if name}
+    return {
+        name
+        for name in done.stdout.decode("utf-8", errors="replace").split("\0")
+        if name
+    }
 
 
 def beyond_a_symbolic_link(root: Path, path: str) -> bool:
@@ -181,16 +196,14 @@ def beyond_a_symbolic_link(root: Path, path: str) -> bool:
     return False
 
 
-def ignore_matches(root: Path, paths: set) -> dict:
+def ignore_matches(root: Path, paths: set[str]) -> dict[str, tuple[str, str, str]]:
     """MATCH: the deciding ignore record for each path that has one."""
-    judged = {path for path in paths
-              if not beyond_a_symbolic_link(root, path)}
+    judged = {path for path in paths if not beyond_a_symbolic_link(root, path)}
     if not judged:
         return {}
     given = {f"./{path}" for path in judged}
     feed = ("\0".join(sorted(given)) + "\0").encode("utf-8")
-    done = git(root, "check-ignore", "-v", "-z", "--no-index", "--stdin",
-               feed=feed)
+    done = git(root, "check-ignore", "-v", "-z", "--no-index", "--stdin", feed=feed)
     if done.returncode not in (0, 1):
         raise CheckError("git check-ignore failed")
     fields = [field for field in done.stdout.split(b"\0") if field]
@@ -200,7 +213,8 @@ def ignore_matches(root: Path, paths: set) -> dict:
     for index in range(0, len(fields), 4):
         source, line, pattern, path = (
             fields[index + offset].decode("utf-8", errors="replace")
-            for offset in range(4))
+            for offset in range(4)
+        )
         if not path.startswith("./") or path not in given:
             raise CheckError("git check-ignore returned unexpected output")
         records[path[2:]] = (source, line, pattern)
@@ -213,8 +227,7 @@ def literal_index_record(root: Path, source: str) -> tuple[bytes, str] | None:
     None when the index has no record, more than one, or a record whose
     path is not source.
     """
-    done = git(
-        root, "--literal-pathspecs", "ls-files", "-s", "-z", "--", source)
+    done = git(root, "--literal-pathspecs", "ls-files", "-s", "-z", "--", source)
     if done.returncode != 0:
         raise CheckError("git ls-files failed")
     records = [record for record in done.stdout.split(b"\0") if record]
@@ -255,9 +268,18 @@ def work_tree_object_id(root: Path, source: str) -> str:
     """
     try:
         done = subprocess.run(
-            ["git", "-c", f"core.excludesFile={os.devnull}",
-             "-C", str(root), "hash-object", "--", source],
-            capture_output=True)
+            [
+                "git",
+                "-c",
+                f"core.excludesFile={os.devnull}",
+                "-C",
+                str(root),
+                "hash-object",
+                "--",
+                source,
+            ],
+            capture_output=True,
+        )
     except OSError as exc:
         raise CheckError(f"git could not be run: {exc}") from exc
     if done.returncode != 0:
@@ -289,7 +311,7 @@ def gitignore_affects(source: str, path: str) -> bool:
     """True when source is the root ignore file or a folder above path."""
     if source == ".gitignore":
         return True
-    folder = source[:-len(".gitignore")]
+    folder = source[: -len(".gitignore")]
     return folder.endswith("/") and path.startswith(folder)
 
 
@@ -299,8 +321,12 @@ class Checker:
     def __init__(self, root: Path) -> None:
         self.root = root
         self.tracked = tracked_files(root)
-        probes = (set(DATA_PROBES) | set(SECRET_PROBES)
-                  | set(GENERATED_PROBES) | {ENV_EXAMPLE})
+        probes = (
+            set(DATA_PROBES)
+            | set(SECRET_PROBES)
+            | set(GENERATED_PROBES)
+            | {ENV_EXAMPLE}
+        )
         self.matches = ignore_matches(root, probes | self.tracked)
         self._committed: dict[str, bool] = {}
         self.unsynced = self._unsynced_sources()
@@ -308,9 +334,10 @@ class Checker:
     def _unsynced_sources(self) -> list[str]:
         """Sorted tracked .gitignore paths that do not equal their staged blob."""
         return sorted(
-            path for path in self.tracked
-            if path.split("/")[-1] == ".gitignore"
-            and not self.source_committed(path))
+            path
+            for path in self.tracked
+            if path.split("/")[-1] == ".gitignore" and not self.source_committed(path)
+        )
 
     def source_committed(self, source: str) -> bool:
         """True when source is a tracked .gitignore equal to its staged blob."""
@@ -318,16 +345,16 @@ class Checker:
             tracked_gitignore = (
                 not source.startswith("/")
                 and source.split("/")[-1] == ".gitignore"
-                and source in self.tracked)
-            self._committed[source] = (
-                tracked_gitignore
-                and gitignore_matches_staged(self.root, source))
+                and source in self.tracked
+            )
+            self._committed[source] = tracked_gitignore and gitignore_matches_staged(
+                self.root, source
+            )
         return self._committed[source]
 
     def affected_by_unsynced(self, path: str) -> bool:
         """True when an unsynced .gitignore lies at the root or above path."""
-        return any(
-            gitignore_affects(source, path) for source in self.unsynced)
+        return any(gitignore_affects(source, path) for source in self.unsynced)
 
     def ignored_by_committed_rule(self, path: str) -> bool:
         """True when path has a non-negated record from a committed source."""
@@ -335,10 +362,11 @@ class Checker:
         return (
             record is not None
             and not record[2].startswith("!")
-            and self.source_committed(record[0]))
+            and self.source_committed(record[0])
+        )
 
 
-def committed_folder(check: Checker, failures: list) -> None:
+def committed_folder(check: Checker, failures: list[str]) -> None:
     for name in PINNED_FOLDERS:
         if not (check.root / name).is_dir():
             failures.append(f"FAIL committed-folder: {name}: missing")
@@ -346,17 +374,16 @@ def committed_folder(check: Checker, failures: list) -> None:
             failures.append(f"FAIL committed-folder: {name}: no tracked file")
 
 
-def top_level_folder(check: Checker, failures: list) -> None:
-    components = sorted({
-        path.split("/", 1)[0]
-        for path in check.tracked if "/" in path
-    } - TOP_LEVEL_ALLOWED)
+def top_level_folder(check: Checker, failures: list[str]) -> None:
+    components = sorted(
+        {path.split("/", 1)[0] for path in check.tracked if "/" in path}
+        - TOP_LEVEL_ALLOWED
+    )
     for component in components:
-        failures.append(
-            f"FAIL top-level-folder: {component}: not a pinned folder")
+        failures.append(f"FAIL top-level-folder: {component}: not a pinned folder")
 
 
-def data_untracked(check: Checker, failures: list) -> None:
+def data_untracked(check: Checker, failures: list[str]) -> None:
     for path in sorted(check.tracked):
         if path == "data" or path.startswith("data/"):
             failures.append(f"FAIL data-untracked: {path}: tracked")
@@ -365,38 +392,38 @@ def data_untracked(check: Checker, failures: list) -> None:
         failures.append("FAIL data-untracked: data: not a real directory")
 
 
-def probes_ignored(check: Checker, failures: list,
-                   probes: tuple, rule: str) -> None:
+def probes_ignored(
+    check: Checker, failures: list[str], probes: tuple[str, ...], rule: str
+) -> None:
     for probe in probes:
-        if (check.affected_by_unsynced(probe)
-                or not check.ignored_by_committed_rule(probe)):
-            failures.append(
-                f"FAIL {rule}: {probe}: not ignored by a committed rule")
+        if check.affected_by_unsynced(probe) or not check.ignored_by_committed_rule(
+            probe
+        ):
+            failures.append(f"FAIL {rule}: {probe}: not ignored by a committed rule")
 
 
-def env_example(check: Checker, failures: list) -> None:
+def env_example(check: Checker, failures: list[str]) -> None:
     tracked = ENV_EXAMPLE in check.tracked
     if not tracked:
         failures.append(f"FAIL env-example: {ENV_EXAMPLE}: not tracked")
-    record = check.matches.get(ENV_EXAMPLE)
-    if record is not None and not record[2].startswith("!"):
+    match = check.matches.get(ENV_EXAMPLE)
+    if match is not None and not match[2].startswith("!"):
         failures.append(
-            f"FAIL env-example: {ENV_EXAMPLE}: "
-            f"ignored by {record[0]}:{record[1]}")
+            f"FAIL env-example: {ENV_EXAMPLE}: ignored by {match[0]}:{match[1]}"
+        )
     if check.affected_by_unsynced(ENV_EXAMPLE):
         failures.append(
             f"FAIL env-example: {ENV_EXAMPLE}: cannot be judged: "
-            ".gitignore differs from its staged content")
+            ".gitignore differs from its staged content"
+        )
     if not tracked:
         return
-    not_regular = (
-        f"FAIL env-example: {ENV_EXAMPLE}: "
-        "not a regular file in the index")
-    record = literal_index_record(check.root, ENV_EXAMPLE)
-    if record is None:
+    not_regular = f"FAIL env-example: {ENV_EXAMPLE}: not a regular file in the index"
+    index_record = literal_index_record(check.root, ENV_EXAMPLE)
+    if index_record is None:
         failures.append(not_regular)
         return
-    mode, object_id = record
+    mode, object_id = index_record
     if mode not in REGULAR_INDEX_MODES:
         failures.append(not_regular)
         return
@@ -406,8 +433,7 @@ def env_example(check: Checker, failures: list) -> None:
     try:
         lines = done.stdout.decode("utf-8").splitlines()
     except UnicodeDecodeError:
-        failures.append(
-            f"FAIL env-example: {ENV_EXAMPLE}: cannot be read as UTF-8")
+        failures.append(f"FAIL env-example: {ENV_EXAMPLE}: cannot be read as UTF-8")
         return
     names = []
     for number, line in enumerate(lines, 1):
@@ -416,31 +442,38 @@ def env_example(check: Checker, failures: list) -> None:
         if not ENV_NAME.match(line):
             failures.append(
                 f"FAIL env-example: {ENV_EXAMPLE}:{number}: "
-                "not a name with an empty value")
+                "not a name with an empty value"
+            )
         else:
             names.append(line[:-1])
     if names != list(ENV_EXAMPLE_NAMES):
         failures.append(
-            f"FAIL env-example: {ENV_EXAMPLE}: names differ from the pinned list")
+            f"FAIL env-example: {ENV_EXAMPLE}: names differ from the pinned list"
+        )
 
 
-def tracked_ignored(check: Checker, failures: list) -> None:
+def tracked_ignored(check: Checker, failures: list[str]) -> None:
     for source in check.unsynced:
         failures.append(
-            f"FAIL tracked-ignored: {source}: differs from its staged content")
+            f"FAIL tracked-ignored: {source}: differs from its staged content"
+        )
     for path in sorted(check.tracked):
         record = check.matches.get(path)
-        if (record is not None and not record[2].startswith("!")
-                and check.source_committed(record[0])):
+        if (
+            record is not None
+            and not record[2].startswith("!")
+            and check.source_committed(record[0])
+        ):
             failures.append(
                 f"FAIL tracked-ignored: {path}: "
-                f"tracked although ignored by {record[0]}:{record[1]}")
+                f"tracked although ignored by {record[0]}:{record[1]}"
+            )
 
 
-def run(root: Path) -> list:
+def run(root: Path) -> list[str]:
     validate_root(root)
     check = Checker(root)
-    failures: list = []
+    failures: list[str] = []
     committed_folder(check, failures)
     top_level_folder(check, failures)
     data_untracked(check, failures)
@@ -452,17 +485,24 @@ def run(root: Path) -> list:
     return failures
 
 
-def main(argv: list | None = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="check_tree.py",
         description="Check the pinned repository layout and ignore rules "
-                    "against the staged state of a git work tree.")
+        "against the staged state of a git work tree.",
+    )
     parser.add_argument(
-        "--root", metavar="PATH", default=None,
-        help="work tree to check (default: the repository root)")
+        "--root",
+        metavar="PATH",
+        default=None,
+        help="work tree to check (default: the repository root)",
+    )
     args = parser.parse_args(argv)
-    root = (Path(args.root).resolve() if args.root
-            else Path(__file__).resolve().parent.parent)
+    root = (
+        Path(args.root).resolve()
+        if args.root
+        else Path(__file__).resolve().parent.parent
+    )
     try:
         failures = run(root)
     except CheckError as exc:

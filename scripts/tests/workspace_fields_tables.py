@@ -14,8 +14,8 @@ edit = wf.edit
 put = wf.put
 pop = wf.pop
 adds = wf.adds
-MEMBERS = wf.MEMBERS
-NAMES = wf.NAMES
+MEMBERS: tuple[str, ...] = wf.MEMBERS
+NAMES: tuple[str, ...] = wf.NAMES
 
 
 def write_toml(path: Path, data: dict[str, Any]) -> None:
@@ -190,7 +190,8 @@ MEMBER_LIST_CASES = [
             lambda d: (
                 put("tool.uv.workspace.members", ["core", "custodian"])(d),
                 put("tool.uv.package", True)(d),
-            ),
+                None,
+            )[-1],
         ),
         _members("core, custodian"),
     ),
@@ -259,36 +260,46 @@ def _lock_members(listed: str) -> list[str]:
 _TOML_INVALID = "FAIL members: pyproject.toml: missing or not valid TOML"
 
 
-def invalid_pyproject_cases() -> list[
-    tuple[str, Callable[[Path], None], list[str]]
-]:
+def _unlink_member_toml(member: str) -> Callable[[Path], None]:
+    def plant(root: Path) -> None:
+        (root / member / "pyproject.toml").unlink()
+
+    return plant
+
+
+def _bad_member_toml(member: str) -> Callable[[Path], None]:
+    def plant(root: Path) -> None:
+        (root / member / "pyproject.toml").write_text(wf.NOT_VALID, encoding="utf-8")
+
+    return plant
+
+
+def _unlink_root_toml(root: Path) -> None:
+    (root / "pyproject.toml").unlink()
+
+
+def _bad_root_toml(root: Path) -> None:
+    (root / "pyproject.toml").write_text(wf.NOT_VALID, encoding="utf-8")
+
+
+def _core_utf16_toml(root: Path) -> None:
+    (root / "core" / "pyproject.toml").write_bytes(b"\xff\xfe")
+
+
+def invalid_pyproject_cases() -> list[tuple[str, Callable[[Path], None], list[str]]]:
     """Build sub-cases for missing or unparsable workspace pyproject.toml files."""
     bad = "missing or not valid TOML"
     cases: list[tuple[str, Callable[[Path], None], list[str]]] = [
-        ("root deleted", lambda r: (r / "pyproject.toml").unlink(), [_TOML_INVALID]),
-        (
-            "root bad",
-            lambda r: (r / "pyproject.toml").write_text(wf.NOT_VALID),
-            [_TOML_INVALID],
-        ),
+        ("root deleted", _unlink_root_toml, [_TOML_INVALID]),
+        ("root bad", _bad_root_toml, [_TOML_INVALID]),
     ]
     for mdir in MEMBERS:
         line = f"FAIL package-layout: {mdir}/pyproject.toml: {bad}"
-        cases.append((
-            f"{mdir} deleted",
-            lambda r, d=mdir: (r / d / "pyproject.toml").unlink(),
-            [line],
-        ))
-        cases.append((
-            f"{mdir} bad",
-            lambda r, d=mdir: (r / d / "pyproject.toml").write_text(wf.NOT_VALID),
-            [line],
-        ))
-    cases.append((
-        "core utf16",
-        lambda r: (r / "core" / "pyproject.toml").write_bytes(b"\xff\xfe"),
-        _layout("core/pyproject.toml", bad),
-    ))
+        cases.append((f"{mdir} deleted", _unlink_member_toml(mdir), [line]))
+        cases.append((f"{mdir} bad", _bad_member_toml(mdir), [line]))
+    cases.append(
+        ("core utf16", _core_utf16_toml, _layout("core/pyproject.toml", bad)),
+    )
     return cases
 
 
@@ -355,8 +366,7 @@ OUTPUT_ORDER_B = [
 OUTPUT_ORDER_C = [
     "FAIL dependency-edge: core/pyproject.toml: "
     "project.dependencies names eii-custodian",
-    "FAIL dependency-edge: core/pyproject.toml: "
-    "project.dependencies names eii-product",
+    "FAIL dependency-edge: core/pyproject.toml: project.dependencies names eii-product",
     "FAIL dependency-edge: core/pyproject.toml: "
     "build-system.requires names eii-custodian",
     "FAIL dependency-edge: custodian/pyproject.toml: "

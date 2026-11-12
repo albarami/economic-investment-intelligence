@@ -10,6 +10,10 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1 --strictPort",
     "build": "tsc --noEmit && vite build",
+    "lint": "eslint --max-warnings 0 .",
+    "format:check": "prettier --check --no-editorconfig .",
+    "format": "prettier --write --no-editorconfig .",
+    "typecheck": "tsc --noEmit",
     "check": "npm run check:layout && npm run check:versions && npm run check:boundary && npm run check:hosts",
     "check:layout": "node scripts/check-layout.mjs",
     "check:versions": "node scripts/check-exact-versions.mjs",
@@ -24,10 +28,16 @@
     "react-dom": "19.3.1"
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.3.0",
+    "eslint": "10.14.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.14.0",
+    "prettier": "3.9.10",
     "typescript": "6.0.3",
+    "typescript-eslint": "8.72.2",
     "vite": "8.3.8"
   }
 }
