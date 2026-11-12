@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import io
 import os
+import shutil
 import subprocess
 import sys
 import unittest
@@ -21,6 +22,24 @@ import hooks_gitleaks
 
 
 class HistoryScan(unittest.TestCase):
+    def test_missing_scanner_fails_and_is_not_skipped(self) -> None:
+        home, _env = support.temp_home(self)
+        shutil.copy2(support.ROOT / "pins.toml", home / "pins.toml")
+        probe = home / "history"
+        probe.mkdir(parents=True)
+        with patch.object(support, "ROOT", home):
+            try:
+                support.place_scanner(probe)
+            except unittest.SkipTest:
+                self.fail("a missing scanner skipped the test instead of failing it")
+            except AssertionError as error:
+                self.assertIn(
+                    "uv run --locked python scripts/hooks_gitleaks.py fetch",
+                    str(error),
+                )
+            else:
+                self.fail("a missing scanner was accepted")
+
     def test_progress_has_known_ledger_line(self) -> None:
         line = support.known_ledger_line()
         digest = hashlib.sha256(line.encode("utf-8")).hexdigest()

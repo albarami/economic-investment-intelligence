@@ -102,7 +102,7 @@ def place_scanner(repo: Path) -> None:
     version = hooks_gitleaks.read_version(ROOT)
     source = ROOT / "data" / "tools" / "gitleaks" / version / "gitleaks"
     if not source.is_file():
-        raise unittest.SkipTest(
+        raise AssertionError(
             "scanner missing; run uv run --locked python scripts/hooks_gitleaks.py fetch"
         )
     target = repo / "data" / "tools" / "gitleaks" / version / "gitleaks"

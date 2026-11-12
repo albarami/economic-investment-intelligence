@@ -77,23 +77,47 @@ class PlantHarness(unittest.TestCase):
         self.assertIsNone(reason)
         self.assertEqual(len(destinations), 2)
 
-    def test_blocked_evidence_judgement(self) -> None:
+    def test_planted_copy_that_passes_is_reported(self) -> None:
+        home, env = support.temp_home(self)
         case = cases.CASES[0]
+        controls: dict[tuple[str, str], tuple[int, str]] = {}
+        with patch.object(plants, "make_copy", return_value=home / "copy"):
+            with patch.object(plants, "prepare"):
+                with patch.object(
+                    plants,
+                    "run_check",
+                    side_effect=[(0, "clean"), (0, "planted ok")],
+                ):
+                    with patch.object(cases, "git"):
+                        with patch.dict(
+                            cases.PLANTS, {case.plant: lambda *_a, **_k: None}
+                        ):
+                            reason = plants.run_case(
+                                case, support.ROOT, home / "scratch", env, controls
+                            )
+        self.assertIsNotNone(reason)
+        self.assertIn("the planted copy passed", reason or "")
 
-        def judge(status: int, output: str) -> str | None:
-            if status == 0:
-                return f"the planted copy passed: {output}"
-            if case.expect not in output:
-                return (
-                    f"status {status} but the line {case.expect!r} was not printed: "
-                    f"{output}"
-                )
-            return None
-
-        missing = judge(1, "failed without evidence")
-        self.assertIsNotNone(missing)
-        self.assertIn("was not printed", missing or "")
-        self.assertIsNone(judge(1, case.expect))
+    def test_failure_without_the_evidence_line_is_reported(self) -> None:
+        home, env = support.temp_home(self)
+        case = cases.CASES[0]
+        controls: dict[tuple[str, str], tuple[int, str]] = {}
+        with patch.object(plants, "make_copy", return_value=home / "copy"):
+            with patch.object(plants, "prepare"):
+                with patch.object(
+                    plants,
+                    "run_check",
+                    side_effect=[(0, "clean"), (1, "failed without evidence")],
+                ):
+                    with patch.object(cases, "git"):
+                        with patch.dict(
+                            cases.PLANTS, {case.plant: lambda *_a, **_k: None}
+                        ):
+                            reason = plants.run_case(
+                                case, support.ROOT, home / "scratch", env, controls
+                            )
+        self.assertIsNotNone(reason)
+        self.assertIn("was not printed", reason or "")
 
     def test_totals_and_exit(self) -> None:
         out = io.StringIO()
