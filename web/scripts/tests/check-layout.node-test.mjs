@@ -70,6 +70,7 @@ const REQUIRED_FILES = [
   'index.html',
   'src/main.tsx',
   'eslint.config.js',
+  'REFERENCE_NOTES.md',
 ];
 const FORBIDDEN_CONFIGS = [
   'vite.config.js',
@@ -225,9 +226,9 @@ test('complete fixture', () => {
   const notes = result.stdout
     .split('\n')
     .filter((line) => line.startsWith('NOTE deferred:'));
-  assert.equal(notes.length, 1);
+  assert.equal(notes.length, 0);
   const lines = result.stdout.trim().split('\n');
-  assert.equal(lines[lines.length - 1], 'checked 31 entries: OK');
+  assert.equal(lines[lines.length - 1], 'checked 32 entries: OK');
 });
 
 test('real web passes', () => {
@@ -235,21 +236,6 @@ test('real web passes', () => {
   assert.equal(result.status, 0, result.stdout + result.stderr);
   const lines = result.stdout.trim().split('\n');
   assert.match(lines[lines.length - 1], /^checked \d+ entries: OK$/);
-});
-
-test('deferred file present', () => {
-  const root = makeFixture();
-  fs.writeFileSync(path.join(root, 'REFERENCE_NOTES.md'), 'x\n');
-  const result = run(['--root', root]);
-  assert.equal(result.status, 0, result.stdout);
-  const notes = result.stdout
-    .split('\n')
-    .filter((line) => line.startsWith('NOTE deferred:'));
-  assert.equal(notes.length, 0);
-  assert.match(
-    result.stdout.trim().split('\n').at(-1),
-    /^checked \d+ entries: OK$/,
-  );
 });
 
 test('each required directory removed', async (t) => {
@@ -383,6 +369,12 @@ test('a directory in place of a file', async (t) => {
     fs.rmSync(path.join(root, 'eslint.config.js'));
     fs.mkdirSync(path.join(root, 'eslint.config.js'));
     assertFail(run(['--root', root]), 'FAIL missing-file: eslint.config.js');
+  });
+  await t.test('REFERENCE_NOTES.md', () => {
+    const root = makeFixture();
+    fs.rmSync(path.join(root, 'REFERENCE_NOTES.md'));
+    fs.mkdirSync(path.join(root, 'REFERENCE_NOTES.md'));
+    assertFail(run(['--root', root]), 'FAIL missing-file: REFERENCE_NOTES.md');
   });
 });
 
