@@ -568,7 +568,3 @@ class ImportBoundaryFilesTest(unittest.TestCase):
                 ],
             )
             self.assertEqual(notes, [])
-
-
-if __name__ == "__main__":
-    unittest.main()

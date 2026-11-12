@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 import tempfile
 import unittest
 from collections.abc import Callable
@@ -161,13 +162,60 @@ class ImportBoundaryFreshTest(unittest.TestCase):
                 extra_paths=[cases.gateway_src(root)],
             )
             self.assertEqual(
-                sorted(result),
-                sorted(
-                    [
-                        cases.expected_fresh_attempted("eii_product", "eii_custodian"),
-                        cases.expected_fresh_loaded("eii_product", "eii_gateway"),
-                    ]
-                ),
+                result,
+                [
+                    cases.expected_fresh_loaded("eii_product", "eii_gateway"),
+                    cases.expected_fresh_attempted("eii_product", "eii_custodian"),
+                ],
+            )
+
+    def test_fresh_failure_line_order(self) -> None:
+        """Fresh-interpreter lines stay grouped; each group sorted by module name."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            cases.make_tree(root, gateway=True)
+            blocked = cases.package_dir(root, "eii_custodian") / "__init__.py"
+            blocked.write_text('raise ImportError("blocked")\n', encoding="utf-8")
+            broken = cases.package_dir(root, "eii_core") / "broken"
+            broken.mkdir()
+            (broken / "__init__.py").write_text(
+                'raise RuntimeError("x")\n', encoding="utf-8"
+            )
+            cases.write_planted(
+                root,
+                "eii_core",
+                "import eii_gateway\n"
+                "try:\n"
+                "    import eii_custodian\n"
+                "except ImportError:\n"
+                "    pass\n",
+            )
+            path_dir = Path(folder) / "path_inject"
+            path_dir.mkdir()
+            (path_dir / "sitecustomize.py").write_text(
+                "import sys, types\n"
+                'sys.modules["eii_product"] = types.ModuleType("eii_product")\n',
+                encoding="utf-8",
+            )
+            env = os.environ.copy()
+            env["PYTHONPATH"] = str(path_dir)
+            result = child.run_fresh(
+                root,
+                "eii_core",
+                extra_paths=[cases.gateway_src(root)],
+                flags=("-B",),
+                env=env,
+            )
+            self.assertEqual(
+                result,
+                [
+                    cases.expected_fresh_already_loaded("eii_core", "eii_product"),
+                    cases.expected_fresh_loaded("eii_core", "eii_gateway"),
+                    cases.expected_fresh_attempted("eii_core", "eii_custodian"),
+                    cases.expected_fresh_import_error(
+                        "eii_core", "eii_core.broken", "RuntimeError"
+                    ),
+                ],
             )
 
     def test_fresh_import_errors(self) -> None:
@@ -248,7 +296,3 @@ class ImportBoundaryFreshTest(unittest.TestCase):
             count += 1
 
         self.assertEqual(count, 2)
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -136,7 +136,3 @@ class ImportBoundaryRealTest(unittest.TestCase):
             tuple(guard.FORBIDDEN),
             tuple(pkg for pkg, _rel in guard.PACKAGES),
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

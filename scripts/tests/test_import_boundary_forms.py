@@ -421,7 +421,3 @@ class ImportBoundaryFormsTest(unittest.TestCase):
                     self.assertEqual(result, expected)
                 count += 1
         self.assertEqual(count, 10)
-
-
-if __name__ == "__main__":
-    unittest.main()

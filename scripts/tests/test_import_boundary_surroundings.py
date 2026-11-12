@@ -274,7 +274,3 @@ class ImportBoundarySurroundingsTest(unittest.TestCase):
                 self.assertEqual(child.child_env(), {"SYSTEMROOT": "q"})
             count += 1
         self.assertEqual(count, 2)
-
-
-if __name__ == "__main__":
-    unittest.main()

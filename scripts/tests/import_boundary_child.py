@@ -132,32 +132,40 @@ def run_fresh(
     for key in ("before", "errors", "loaded", "requested"):
         if key not in payload:
             return [f"FAIL fresh-interpreter: {package}: harness failed (no result)"]
-    out: list[str] = []
     before = payload["before"]
+    already: list[str] = []
     for name in before:
-        out.append(
+        already.append(
             f"FAIL fresh-interpreter: {package}: {name} was already loaded before the import"
         )
+    loaded_lines: list[str] = []
     for name in payload["loaded"]:
-        out.append(
+        loaded_lines.append(
             f"FAIL fresh-interpreter: {package}: forbidden module loaded: {name}"
         )
+    attempted_lines: list[str] = []
     for name in payload["requested"]:
         if name not in payload["loaded"] and not any(
             m.startswith(name + ".") or m == name for m in payload["loaded"]
         ):
             first = name.split(".")[0]
             if first in guard.FORBIDDEN[package]:
-                out.append(
+                attempted_lines.append(
                     f"FAIL fresh-interpreter: {package}: forbidden import attempted: {first}"
                 )
+    error_lines: list[str] = []
     for item in payload["errors"]:
         if isinstance(item, list) and len(item) == 2:
             mod, cls = item[0], item[1]
-            out.append(
+            error_lines.append(
                 f"FAIL fresh-interpreter: {package}: {mod} could not be imported ({cls})"
             )
-    return sorted(out)
+    return (
+        sorted(already)
+        + sorted(loaded_lines)
+        + sorted(attempted_lines)
+        + sorted(error_lines)
+    )
 
 
 def check_fresh(root: Path) -> list[str]:
