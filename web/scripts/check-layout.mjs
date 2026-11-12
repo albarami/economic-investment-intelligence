@@ -60,6 +60,7 @@ const REQUIRED_FILES = [
   'index.html',
   'src/main.tsx',
   'eslint.config.js',
+  'REFERENCE_NOTES.md',
 ];
 const FORBIDDEN_CONFIGS = [
   'vite.config.js',
@@ -68,7 +69,6 @@ const FORBIDDEN_CONFIGS = [
   'vite.config.mts',
   'vite.config.cts',
 ];
-const DEFERRED = [['REFERENCE_NOTES.md', 'S0-T13']];
 const ENTRY_COUNT = REQUIRED_DIRECTORIES.length + REQUIRED_FILES.length;
 
 function usage(message) {
@@ -215,14 +215,8 @@ function main() {
         );
       }
     }
-    const notes = [];
-    for (const [name, owner] of DEFERRED) {
-      if (!existsAny(path.join(root, name)))
-        notes.push(`NOTE deferred: ${name} (${owner})`);
-    }
     const tail = failures.length === 0 ? 'OK' : `${failures.length} failure(s)`;
     for (const line of failures) process.stdout.write(`${line}\n`);
-    for (const line of notes) process.stdout.write(`${line}\n`);
     process.stdout.write(`checked ${ENTRY_COUNT} entries: ${tail}\n`);
     process.exitCode = failures.length === 0 ? 0 : 1;
   } catch (error) {
