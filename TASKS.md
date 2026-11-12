@@ -4,6 +4,7 @@ This is the ordered queue consumed by the build run.
 Each task is a few focused units of work with a visible or executable result.
 Tasks in slice S0 through slice S3 are deliberately fine-grained and each should fit one short agent assignment.
 Tasks in slice S4 through slice S11 are coarser and are refined at the preceding slice gate.
+The queue was re-planned on 2026-11-12 for [decision 0016](docs/decisions/0016-version-1-covers-the-whole-initiative.md) and [decision 0017](docs/decisions/0017-public-data-additions-and-public-splits.md): slices S1 to S3 lay the map and data foundation, slices S4 to S6 build the flagship location choice in full depth, slice S7 builds the other journeys and the three services, and slice S8 adds the four cases and the assistant across every module (PLN-23 in [14_IMPLEMENTATION_PLAN.md](docs/14_IMPLEMENTATION_PLAN.md)). Slice S0 is unchanged.
 
 ## Queue rules
 
@@ -17,10 +18,16 @@ Tasks in slice S4 through slice S11 are coarser and are refined at the preceding
 - Acceptance evidence records the command or check, result, full commit hash and review verdict.
 - Files outside the task's scope are read-only.
 - Parallel tasks must have disjoint writable scopes; otherwise the lead serializes them.
-- A task may be built ahead in a worktree on the pushed head of one base task that is still in review, in a fix round or in CI, when the lead's checks are green on that head and its open findings do not change what the new task builds on; one level only. It is not pushed and gets no pull request before its base is merged and it is rebased onto `main`; then every check is rerun.
-- Each slice ends with a follow-up task before its gate that closes every proposed open item of the slice's reviews (REV-41); it is the last task of each slice below.
+- A task may be built ahead in a worktree on the pushed head of one base task of the same slice that is still in review, in a fix round or in CI, when the lead's checks are green on that head and its open findings do not change what the new task builds on; one level only, and never across a slice boundary. It is not pushed and gets no pull request before its base is merged and it is rebased onto `main`; then every check is rerun.
+- Each slice ends with a follow-up task before its gate that closes every proposed open item of the slice's reviews (REV-41); it is the last task of each slice below. Proposed open items go where [decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md) item 8 sends them: an item from a plan review goes into that task's build brief; an item raised by the review of a slice's follow-up task, or by a gate re-review, goes to the next slice's follow-up task, and in the last slice into the final report; the items of an approved pull request are entered by the next pull request's ledger commit, never on the approved head.
+- The findings of a rejected gate review are fixed in a gate-fix task of that slice, which has its own entry in this file, its own branch, its own pull request and a full independent review, and is listed after the slice's follow-up task. A gate-fix task takes the next free number of its slice.
+- Every build brief makes the builder break each condition of the code it writes, add a test for any break that nothing catches, and list the breaks in its return ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md) item 11). The break pass is short: after each break only the test files that cover the broken code run, the pass aims at about 15 minutes, and the full suite runs once at the end.
+- A lead review with several internal lenses is used only for the calculation layer, the privacy engine and the release build. The difficulty `hard` does not decide it.
+- Security beyond a task's acceptance criterion is built only in its simplest form. Hardening beyond that is never a verdict finding; it moves out of the plan into [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md), with its origin, at each plan's one refresh ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md) items 2 to 4).
 - All tasks start with status `queued`.
 - Requirement references below are to IDs defined in the numbered documentation pack; this file defines no requirement IDs.
+- A task ID is never reused or renumbered. A task added by a re-plan takes the next free number of its slice and is listed where it runs, so numbers inside a slice need not be in order; a task split from another names it.
+- Where a requirement added for decision 0016 or decision 0017 has no ID yet, a task names its document and section; the lead replaces that reference with the ID before the task becomes active (PLN-26).
 
 ## Difficulty and personas
 
@@ -165,12 +172,12 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S1-T01.
 - Requirements: TST-132, FE-88, PLN-07.
 - Delivery: hard; personas Frontend; status queued.
-### S1-T03 — Isochrone-to-grid spike
-- Goal: Convert one in-process routing isochrone into whole snapped grid cells.
-- Acceptance criteria: [ ] routing has no server; [ ] output contains only frame cells; [ ] a deterministic fixture passes.
-- Scope: routing spike under `product/` and its fixtures.
+### S1-T03 — Isochrone, drawn-shape and grid spike
+- Goal: Convert in-process walk and drive isochrones at different hours of day, a free-drawn polygon and a radius into exact shapes and into whole snapped grid cells.
+- Acceptance criteria: [ ] routing has no server; [ ] the drive isochrone changes with the hour through a fixture speed table, by the time-of-day mechanism this spike chooses; [ ] each shape is also kept exactly, for Public and Simulated layers; [ ] the snapped output contains only whole frame cells; [ ] deterministic fixtures pass.
+- Scope: routing and area spike under `product/` and its fixtures.
 - Depends: S0-T02.
-- Requirements: ARC-88, BE-82, PRV-10.
+- Requirements: ARC-88, BE-82, PRV-10, SYN-53.
 - Delivery: hard; personas Backend; status queued.
 ### S1-T04 — Tile range-request spike
 - Goal: Serve one local tile artefact with correct byte-range behaviour.
@@ -200,19 +207,26 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S0-T02, S0-T10.
 - Requirements: DAT-126, BE-102, AI-98, PLN-20.
 - Delivery: hard; personas AI; status queued.
+### S1-T11 — Road-assignment and hourly traffic spike
+- Goal: Assign one hourly origin-destination fixture to the routing graph with one fixed volume-delay rule, and animate the resulting link speeds through the day on the map.
+- Acceptance criteria: [ ] the assignment is tested code that reads only a synthetic fixture and repeats exactly on identical inputs; [ ] one fixed volume-delay rule is used, with every parameter in configuration; [ ] the hourly link speeds feed a drive-time area that changes with the hour; [ ] the animated road layer carries the Simulated mark; [ ] the S1-T02 trace is repeated with the road layer animated, and its result is recorded; [ ] any library the assignment needs gets its exact and retreat pins through S1-T08.
+- Scope: assignment spike code and fixtures, a road-layer page under `web/spikes/` and its trace.
+- Depends: S1-T02, S1-T03.
+- Requirements: ARC-88, SYN-53, SYN-54, DES-50, TST-132, SYN-79, MTH-88, MTH-89, MTH-90, PRV-124, TST-213.
+- Delivery: hard; personas Simulation; status queued.
 ### S1-T08 — Typed-decision requalification and pin ruling
 - Goal: Re-run `evals/typed_decisions/` in both fixed option orders, compare the stated intervals and confirm exact and retreat pins.
 - Acceptance criteria: [ ] the full set runs; [ ] the admitted measurement is reproduced within its stated intervals; [ ] every choice case runs in both hash-derived option orders and is accepted only when both agree; [ ] results and route identity are recorded; [ ] drift triggers requalification; [ ] any accepted alternative has a decision record.
 - Scope: `evals/typed_decisions/`, slice S1 spike report and dependency pin decision.
-- Depends: S1-T02, S1-T03, S1-T04, S1-T05, S1-T06, S1-T07.
+- Depends: S1-T02, S1-T03, S1-T04, S1-T05, S1-T06, S1-T07, S1-T11.
 - Requirements: FE-03, TST-155, AI-98, TST-167, PLN-15.
 - Delivery: hard; personas AI; status queued.
-### S1-T09 — Exported set and index scales
-- Goal: Fix `export_parameter_set` = `A`, `presence_scale` and `flow_scale` in the rules configuration before the first world build.
-- Acceptance criteria: [ ] `export_parameter_set` is `A` unless open item OI-35 is closed with another value by the owner or a data owner; [ ] `presence_scale` and `flow_scale` are positive and recorded in the slice S1 gate evidence; [ ] the name `presence_base` is not used; [ ] a missing or non-positive scale fails the configuration check.
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+- Goal: Fix `export_parameter_set` = `A` and the presence and flow parameters of PRV-59 in the rules configuration before the first world build, and record the number of monthly periods shown first.
+- Acceptance criteria: [ ] `export_parameter_set` is `A` unless open item OI-35 is closed with another value by the owner or a data owner; [ ] the presence and flow parameters that PRV-59 requires are positive and recorded in the slice S1 gate evidence; [ ] the name `presence_base` is not used; [ ] a missing or non-positive parameter fails the configuration check; [ ] the number of monthly periods shown first is chosen among the months of the synthetic reference period and recorded in the slice S1 gate evidence (decision 0016).
 - Scope: rules configuration and the slice S1 gate check.
 - Depends: S1-T08.
-- Requirements: PRV-05, PRV-59, PRV-120.
+- Requirements: PRV-05, PRV-59, PRV-120, SYN-12, PLN-25.
 - Delivery: hard; personas Privacy; status queued.
 ### S1-T10 — Review follow-up for slice S1
 - Goal: Close every proposed open item that the reviews of slice S1 entered in `OPEN_ITEMS.md`, before the slice S1 gate.
@@ -222,20 +236,20 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Requirements: REV-41, TST-168.
 - Delivery: routine; personas as the items require; status queued.
 
-**slice S1 gate.** Arabic labels render with self-hosted glyphs; hexagons remain under labels; 110,000 hexagons and 50,000 particles render at 60 frames per second; an isochrone is turned into grid cells; tiles are served with range requests; PostgreSQL and DuckDB answer one parity query; and the sandbox works. Each item passes its named test. A technical alternative is accepted only if it keeps the same user-visible capability, passes the same assertion and is recorded as a decision. No fallback is permitted for sandbox enforcement, store parity or any security check. The rules configuration fixes `export_parameter_set` (default `A`), `presence_scale` and `flow_scale` before any world is built.
+**slice S1 gate.** Arabic labels render with self-hosted glyphs; hexagons remain under labels; 110,000 hexagons and 50,000 particles render at 60 frames per second; an isochrone is turned into grid cells; walk and drive isochrones at different hours of day, a free-drawn polygon and a radius are each kept as an exact shape and turned into whole grid cells; one hourly origin-destination fixture is assigned to the routing graph with one fixed volume-delay rule, and its link speeds animate on the map; tiles are served with range requests; PostgreSQL and DuckDB answer one parity query; and the sandbox works. Each item passes its named test. A technical alternative is accepted only if it keeps the same user-visible capability, passes the same assertion and is recorded as a decision. No fallback is permitted for sandbox enforcement, store parity or any security check. The rules configuration fixes `export_parameter_set` (default `A`) and the presence and flow parameters of PRV-59 before any world is built, and the number of monthly periods shown first is recorded.
 
-## slice S2 — Public pack, frame, spine, places
+## slice S2 — Public pack, frame, spine, places and investment sources
 
 ### S2-T01 — Public fetchers and source receipts
-- Goal: Register every Public input required by any pack document, fetch only allow-listed licensed sources and store complete provenance receipts.
-- Acceptance criteria: [ ] only `build-public` opens source connections; [ ] every required Public input is present in the registry, including citation-only metadata; [ ] every fetched file has URL, publisher, licence, retrieval date and hash; [ ] a source with no stated licence is validation-only and contributes no value, derived share, title or geometry to a release.
+- Goal: Register every Public input required by any pack document, fetch only allow-listed sources that are licensed or used on the basis that decision 0017 records, and store complete provenance receipts.
+- Acceptance criteria: [ ] only `build-public` opens source connections; [ ] every required Public input is present in the registry, including citation-only metadata; [ ] every fetched file has URL, publisher, licence, retrieval date and hash; [ ] a source with no stated licence is validation-only and contributes no value, derived share, title or geometry to a release, except the census map layers that decision 0017 item 10 admits to the local release (PUB-13); [ ] the allow-list holds both portal hosts, `www.data.qa` and `www.data.gov.qa`, and the investment-source hosts `fdiprojects.invest.qa` and `www.invest.qa`; [ ] the registry records the host each file came from, and a portal dataset is identified by its slug whichever host served it; [ ] for the two investment sources the registry records the publisher's terms as read at fetch and the basis of use, the owner's decision of 2026-11-12, and terms read at fetch that forbid the use switch the source off, with a message naming it so that the owner is told; [ ] nothing fetched is committed.
 - Scope: `custodian/publicdata/fetch/`, source registry and fetch tests.
 - Depends: S1-T08.
-- Requirements: PUB-01, PUB-19, TST-50.
+- Requirements: PUB-01, PUB-03, PUB-09, PUB-11, PUB-19, TST-50, PUB-85, PUB-87, PUB-88.
 - Delivery: hard; personas Data; status queued.
 ### S2-T02 — Frame and gazetteer
-- Goal: Build zones, districts, fixed grid cells, release-unit geometry inputs, bilingual gazetteer records and the municipality-population, national-census and district-census Public tables.
-- Acceptance criteria: [ ] crosswalk checks pass; [ ] district keys are present; [ ] `pub_population_municipality`, `pub_census_national` and `pub_census_district` validate; [ ] every showcase area and candidate flagship is resolvable.
+- Goal: Build zones, districts, fixed grid cells, release-unit geometry inputs, bilingual gazetteer records and the municipality-population, national-census, zone-census and district-census Public tables.
+- Acceptance criteria: [ ] crosswalk checks pass; [ ] district keys are present; [ ] `pub_population_municipality`, `pub_census_national`, `pub_census_zone` and `pub_census_district` validate, the census map-layer rows each with its source and retrieval date and nothing fetched committed (decision 0017 item 10, PUB-83); [ ] every showcase area and candidate flagship is resolvable.
 - Scope: public frame builders, gazetteer builder and frame tests.
 - Depends: S2-T01.
 - Requirements: PUB-24, PUB-30, SYN-10.
@@ -246,6 +260,20 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: public series builders, customs review files and reconciliation tests.
 - Depends: S2-T01.
 - Requirements: PUB-41, PUB-62, PUB-74, MTH-30.
+- Delivery: hard; personas Data; status queued.
+### S2-T11 — Portal additions of decision 0017
+- Goal: Fetch, parse and register the 77 further portal datasets of decision 0017, handle their known traps, and build their Public tables under the Public split rule.
+- Acceptance criteria: [ ] each of the 77 slugs has its registry row with publisher, licence, rows, coverage and latest period as document 04 records them, and the fetcher records them again at every fetch; [ ] each known trap that document 04 lists for these datasets has a parsing test, among them counts held as text, periods held as columns, municipality spelling variants mapped through `municipality_names.csv`, school years held as text, and the identifier columns of the residential unit sales dropped before the release with a deal count beside every price; [ ] museum venue names are normalised through a committed, reviewed crosswalk, and no value is edited by hand; [ ] official figures split by sex or nationality enter only Public tables, through their registry entry, on the source's own geography and categories; [ ] the schema tests still reject sex, gender and nationality columns on every synthetic and protected contract; [ ] no Public split is joined to a synthetic record, used to segment synthetic records, apportioned to a drawn area or combined with a protected figure; [ ] every figure carries its source, its reference year or month and its retrieval date.
+- Scope: portal source modules for the added datasets under `custodian/publicdata/`, the venue crosswalk, their registry rows and tests.
+- Depends: S2-T01, S2-T02.
+- Requirements: PUB-08, PUB-09, PUB-14, PUB-16, PUB-27, TST-50, PUB-85, PUB-89, PUB-90, PUB-91, TST-209.
+- Delivery: hard; personas Data; status queued.
+### S2-T12 — Investment sources
+- Goal: Read the FDI projects dashboard page on every build and load every project field into `fdi_projects`, and load the agency's sector, opportunity, incentive, set-up and law pages into structured records.
+- Acceptance criteria: [ ] `./eii build-public` reads the dashboard page on every build and loads every project field the page holds into `fdi_projects`, among them company, source country, sector, sub-sector, function, project type, capex, jobs, date and location; [ ] capex and jobs keep the source's own note that they are estimates of publicly announced projects and that the dashboard does not capture every project; [ ] the sector, opportunity, incentive, set-up and law pages load into structured records (sector, opportunity, incentive package with its parameters, set-up step, law with its link), each with a link to its page; [ ] the parsers are tested only on small synthetic pages shaped like the real ones, and no fetched page, record or project is committed; [ ] each record carries its source and retrieval date, and each source declares its expected row-count range; [ ] a page that no longer matches its parser fails the build with a message naming the source, and nothing is loaded from it; [ ] a changed page is stored beside the earlier one; [ ] an `fdi_project` accepts Public slots only, takes no Synthetic or Simulated fact and is never joined to synthetic firm data; [ ] the page structure is confirmed against the synthetic test pages and recorded for the slice S2 gate.
+- Scope: investment-source fetchers and parsers under `custodian/publicdata/`, synthetic test pages, the `fdi_projects` contract and tests.
+- Depends: S2-T01.
+- Requirements: PUB-04, PUB-08, PUB-10, PUB-11, PUB-19, PLN-25, PUB-86, PUB-87, PUB-88, DAT-142, DAT-143, TST-210, TST-211.
 - Delivery: hard; personas Data; status queued.
 ### S2-T04 — Activity spine and graph tables
 - Goal: Build the reviewed activity spine, not-mappable bucket, graph tables and human review queue.
@@ -261,12 +289,12 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S2-T04, S1-T07.
 - Requirements: AI-98, DAT-126, TST-155.
 - Delivery: hard; personas Data; status queued.
-### S2-T06 — Showcase places and flagship selection
-- Goal: Build `pub_place_verification`, verify places in the four showcase areas and select a flagship building only from the recorded data check.
-- Acceptance criteria: [ ] every `pub_place` row carries `source_provider`, `licence` and `confidence`; [ ] `pub_place_verification` is keyed to `pub_place` and stores check date, reviewer role, verification link and status; [ ] verification statuses are stored; [ ] the recorded candidate data check determines the flagship; [ ] all flagship checks pass; [ ] incomplete-listing caveat remains attached.
+### S2-T06 — Showcase places, business points and flagship selection
+- Goal: Build `pub_place_verification`, verify places in the four showcase areas, provide the real business points of the map and select a flagship building only from the recorded data check.
+- Acceptance criteria: [ ] every `pub_place` row carries `source_provider`, `licence` and `confidence`; [ ] `pub_place_verification` is keyed to `pub_place` and stores check date, reviewer role, verification link and status; [ ] verification statuses are stored; [ ] the recorded candidate data check determines the flagship; [ ] all flagship checks pass; [ ] incomplete-listing caveat remains attached; [ ] the map's real business points come only from the public places data and public listings that document 04 registers, each with its source and licence, and `pub_place` points pass the display threshold.
 - Scope: place and place-verification builders, four review files, recorded flagship data check and decision fixture.
 - Depends: S2-T01, S2-T02.
-- Requirements: PUB-47, PUB-57, PUB-78.
+- Requirements: PUB-47, PUB-49, PUB-50, PUB-57, PUB-78, PUB-91, PUB-92, PUB-93.
 - Delivery: hard; personas Data; status queued.
 ### S2-T07 — Calculation layer and method regressions
 - Goal: Implement deterministic Public calculations in `eii_core.calc` with method-card regression tests.
@@ -275,12 +303,19 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S2-T03.
 - Requirements: MTH-01, MTH-03, DAT-90.
 - Delivery: hard; personas Methods; status queued.
+### S2-T13 — Tender source and apportioning weight
+- Goal: Confirm before the slice S2 gate the public source of tenders, or that none was found, and the apportioning weight for drawn shapes.
+- Acceptance criteria: [ ] a public source of tenders is registered with its licence or terms and fetched by `./eii build-public`, or the registry records that none was found and no tender is shown; [ ] the apportioning weight that document 07 fixes for drawn shapes (area, or a licensed public population grid) is confirmed, and a grid enters only with a stated licence; [ ] an apportioned figure is labelled Inferred and names its method and its geography; [ ] both confirmations are recorded in the slice S2 gate evidence.
+- Scope: tender-source registry entry and fetcher, apportioning-weight inputs and the slice S2 confirmation record.
+- Depends: S2-T01.
+- Requirements: PUB-01, PUB-13, PUB-29, PLN-25, MTH-74, MTH-75, DAT-147, PUB-93, PRV-122.
+- Delivery: hard; personas Data; status queued.
 ### S2-T08 — Public pack assembly and source review
 - Goal: Assemble the Public pack and close the slice S2 evidence bundle.
-- Acceptance criteria: [ ] source completeness passes for every Public input required by the pack; [ ] validation-only sources contribute nothing to the release; [ ] the coverage bar uses and names the finest licensed geography available; [ ] OI-03 is closed; [ ] a different-maker reviewer checks twenty random figures; [ ] every regression and licence check passes.
+- Acceptance criteria: [ ] source completeness passes for every Public input required by the pack, the 77 added portal datasets and the two investment sources among them; [ ] validation-only sources contribute nothing to the release; [ ] the coverage bar uses and names the finest admitted geography available (PUB-82); [ ] OI-03 is closed; [ ] a different-maker reviewer checks twenty random figures; [ ] every regression and licence check passes; [ ] the confirmations of S2-T12 and S2-T13 are recorded.
 - Scope: public build orchestration, slice S2 reports and review evidence.
-- Depends: S2-T02, S2-T03, S2-T05, S2-T06, S2-T07.
-- Requirements: REV-34, TST-50, PLN-07.
+- Depends: S2-T02, S2-T03, S2-T05, S2-T06, S2-T07, S2-T11, S2-T12, S2-T13.
+- Requirements: REV-34, TST-50, PLN-07, PLN-25.
 - Delivery: hard; personas Data; status queued.
 ### S2-T09 — Method-card pins from the public build
 - Goal: After the reviewer has checked them against the source, write the values listed by MTH-03 into the method cards. Invent no value.
@@ -297,9 +332,9 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Requirements: REV-41, TST-168.
 - Delivery: routine; personas as the items require; status queued.
 
-**slice S2 gate.** Every stored Public figure has URL, licence, retrieval date and hash; the reviewer checks twenty random figures against their sources; every section 9 public regression example passes; regression values that the method cards could not pin are produced, checked against the source and written into the cards; and no file without a stated licence is committed.
+**slice S2 gate.** Every stored Public figure has URL, licence, retrieval date and hash; the reviewer checks twenty random figures against their sources; every section 9 public regression example passes; regression values that the method cards could not pin are produced, checked against the source and written into the cards; no file without a stated licence is committed; every added portal dataset and both investment sources have registry rows, with the host of each file and, for the investment sources, the publisher's terms as read at fetch and the basis of use; no fetched investment page, record or project is committed, and the parsers pass on synthetic pages of the same shape; and the public source of tenders or its absence, the apportioning weight for drawn shapes and the page structure of the investment sources are recorded (PLN-25).
 
-## slice S3 — Public-only flagship answer
+## slice S3 — Living map and Public-only answer
 
 ### S3-T01 — Store interface and portable query registry
 - Goal: Implement named portable SQL and normalized results for the first Public tools.
@@ -310,7 +345,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas Backend; status queued.
 ### S3-T02 — Public release load in two stores
 - Goal: Build, load and verify a `release_kind: public_only` release in PostgreSQL and the embedded reader.
-- Acceptance criteria: [ ] the manifest contains no Protected or Simulated table and omits `window_key`, `protected_sha256`, `parameter_set`, `world_seed`, `scenario_sha256` and `contracts`; [ ] manifest-only loading succeeds in both stores; [ ] the loader-written `load_receipt.json` is not a manifest artefact and has `state: complete` and the matching manifest `release_id`; [ ] an extra table loads nowhere; [ ] both stores expose the same release identity; [ ] configured preflight passes; [ ] freeze and export-register entry are refused for this release kind.
+- Acceptance criteria: [ ] the manifest contains no Protected or Simulated table and omits `window_key`, `protected_sha256`, `parameter_set`, `world_seed`, `scenario_sha256` and `contracts`; [ ] manifest-only loading succeeds in both stores; [ ] the Public tables of decision 0017, `fdi_projects` and the agency's records among them, load in both stores with parity; [ ] the loader-written `load_receipt.json` is not a manifest artefact and has `state: complete` and the matching manifest `release_id`; [ ] an extra table loads nowhere; [ ] both stores expose the same release identity; [ ] configured preflight passes; [ ] freeze and export-register entry are refused for this release kind.
 - Scope: loader modules, Public release fixture and loader tests.
 - Depends: S3-T01.
 - Requirements: BE-44, BE-46, DAT-70, DAT-84, TST-63.
@@ -323,14 +358,14 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Requirements: ARC-71, BE-49, DAT-90.
 - Delivery: routine; personas Backend; status queued.
 ### S3-T04 — `make_area`
-- Goal: Build snapped distance, walk and drive areas, including the staffing-only drive option and a Public-only path.
-- Acceptance criteria: [ ] only closed cut-offs are accepted; [ ] Public-only mode uses the fixed base-cell frame and reads no privacy-derived release unit, protected table or simulated table; [ ] units are whole and deterministic; [ ] the snap report is technical metadata, not a Synthetic fact.
+- Goal: Build snapped distance, walk and drive areas, free-drawn polygons and radii, including the staffing-only drive option and a Public-only path.
+- Acceptance criteria: [ ] only closed cut-offs, and shapes and radii typed by the user, are accepted; [ ] Public-only mode uses the fixed base-cell frame and reads no privacy-derived release unit, protected table or simulated table; [ ] Public point layers are selected inside the exact shape; [ ] units are whole and deterministic; [ ] the snap report is technical metadata, not a Synthetic fact.
 - Scope: `product/eii_product/tools/make_area.py`, routing adapter and tests.
 - Depends: S3-T01, S1-T03, S2-T02.
-- Requirements: ARC-88, BE-82, BE-105, PRV-10.
+- Requirements: ARC-88, BE-82, BE-105, PRV-10, PUB-81, AI-23.
 - Delivery: hard; personas Backend; status queued.
 ### S3-T05 — `scan_places`
-- Goal: Return verified Public places with network distances and incompleteness caveats.
+- Goal: Return verified Public places with network distances and incompleteness caveats, inside the exact shape of the area.
 - Acceptance criteria: [ ] only Public places appear; [ ] distance facts have source chains; [ ] no synthetic property is attached to a real place.
 - Scope: `product/eii_product/tools/scan_places.py` and tests.
 - Depends: S3-T01, S3-T04, S2-T06.
@@ -364,11 +399,25 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S0-T03, S3-T07.
 - Requirements: FE-39, DES-71, DES-95, DAT-105.
 - Delivery: hard; personas Frontend; status queued.
+### S3-T12 — The living map's Public layers
+- Goal: Draw the map of Qatar with real geography and roads, the real business points, the FDI projects and Public statistics on their official geography, each layer with its source chain and provenance mark.
+- Acceptance criteria: [ ] real business points come only from the public places data and public listings that document 04 registers, `pub_place` points above its display threshold, and carry the "open listings are incomplete" note; [ ] FDI projects are drawn at the geography the source publishes, as published announcements with the estimate note, never as a lookup of a firm; [ ] a Public statistic is drawn on its official geography, and a value apportioned to a drawn shape is labelled Inferred with its method and geography; [ ] official figures split by sex or nationality appear only as Public facts on the source's own geography and categories; [ ] no Synthetic or Simulated value is attached to a real named place, business, building or FDI project; [ ] every layer opens its source chain with its retrieval date; [ ] at most one hero layer is visible.
+- Scope: map layer registry, Public layer components and their tests under `web/`.
+- Depends: S3-T02, S3-T09, S2-T06, S2-T12.
+- Requirements: FE-24, FE-47, FE-48, FE-49, FE-60, DES-54, PUB-19, PUB-29, BRF-64, FE-103, FE-116, FE-125.
+- Delivery: hard; personas Frontend; status queued.
+### S3-T13 — Area drawing on the map
+- Goal: Let a person draw an area, set a radius or pick a walk or drive time from any point, and see the Public layers for that exact shape.
+- Acceptance criteria: [ ] a drawn shape, a radius and a point-based walk or drive area reach `make_area` only as typed user inputs; [ ] the Public layers show the result for the exact shape; [ ] the shape, the mode and the cut-off are shown with the answer; [ ] a shape can be drawn and edited by keyboard and by touch; [ ] both languages pass visual tests.
+- Scope: area-drawing components and their tests under `web/`.
+- Depends: S3-T04, S3-T12.
+- Requirements: AI-23, FE-72, FE-80, PUB-81, BRF-58, BRF-73, FE-102, FE-108, DAT-146, BE-117, PRV-122.
+- Delivery: hard; personas Frontend; status queued.
 ### S3-T10 — Bilingual Public opening and gate
 - Goal: Deliver the English and Arabic Public-only flagship opening and complete its design audit.
-- Acceptance criteria: [ ] end-to-end uses Public facts only; [ ] no model call occurs; [ ] parity and numeral lint pass; [ ] audit has no Blocker or Major finding.
+- Acceptance criteria: [ ] end-to-end uses Public facts only; [ ] no model call occurs; [ ] parity and numeral lint pass; [ ] audit has no Blocker or Major finding; [ ] the living map's Public layers and area drawing pass end to end in both languages.
 - Scope: opening scene, bilingual strings, end-to-end and visual tests, design-audit evidence.
-- Depends: S3-T02, S3-T08, S3-T09.
+- Depends: S3-T02, S3-T08, S3-T09, S3-T12, S3-T13.
 - Requirements: DES-06, DES-10, TST-80, TST-90, TST-100.
 - Delivery: hard; personas Frontend; status queued.
 ### S3-T11 — Review follow-up for slice S3
@@ -379,7 +428,9 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Requirements: REV-41, TST-168.
 - Delivery: routine; personas as the items require; status queued.
 
-## slice S4 — Synthetic world and presence cube
+**slice S3 gate.** The flagship question is answered end to end with Public facts only; no synthetic data is loaded and no model call is made; the `public_only` release builds and loads in both stores, its complete receipt matches the manifest `release_id`, and configured preflight passes; a lint rule forbids numerals outside the Fact chip; the parity suite is green; the design audit has no Blocker or Major finding; the map shows real business points, FDI projects and Public statistics on their official geography, each with its source and retrieval date, and attaches no Synthetic or Simulated figure to a real named place, business, building or project; and a drawn area, a radius and a walk or drive area return the Public layers for that exact shape.
+
+## slice S4 — Synthetic world, months, presence and traffic
 
 These coarse tasks are refined at the slice S3 gate without weakening their criteria.
 
@@ -391,31 +442,45 @@ These coarse tasks are refined at the slice S3 gate without weakening their crit
 - Requirements: DAT-09, DAT-12, TST-30.
 - Delivery: hard; personas Data; status queued.
 ### S4-T02 — Register and employment world
-- Goal: Generate the synthetic register and employment world only from public cache inputs.
-- Acceptance criteria: [ ] establishment, legal-entity, employer-group and person identifiers use their pinned forms; [ ] no synthetic establishment carries a public place or gazetteer key, name or coordinates; [ ] names have zero real collisions; [ ] geography comes from the slice S2 frame; [ ] sandbox proof passes.
+- Goal: Generate the synthetic register and employment world, with named synthetic firms and their openings and closures by month, only from public cache inputs.
+- Acceptance criteria: [ ] establishment, legal-entity, employer-group and person identifiers use their pinned forms; [ ] no synthetic establishment carries a public place or gazetteer key, name or coordinates; [ ] names have zero real collisions; [ ] geography comes from the slice S2 frame; [ ] sandbox proof passes; [ ] every firm name comes from the committed lexicon and carries the visible synthetic mark; [ ] firm density by municipality is calibrated to the public licence and census counts, and the 2015 census input is labelled with its year; [ ] openings and closures fall in months of the reference period; [ ] no record carries sex, gender or nationality, and none is derived.
 - Scope: `custodian/worldgen/register/`, `custodian/worldgen/employment/` and tests.
 - Depends: S4-T01, S2-T02.
-- Requirements: SYN-01, SYN-10, SYN-15.
+- Requirements: SYN-01, SYN-10, SYN-13, SYN-15, SYN-20, SYN-21, BRF-31, SYN-12, SYN-72, SYN-73, SYN-74.
 - Delivery: hard; personas Simulation; status queued.
 ### S4-T03 — Wages, residence and linkage
-- Goal: Generate monthly wages and residence, then deduplicate and link without ambiguous legal-entity joins.
+- Goal: Generate monthly wages and residence for every month of the reference period, then deduplicate and link without ambiguous legal-entity joins.
 - Acceptance criteria: [ ] the full month window conforms; [ ] every salary-file identifier uses `SYN-F-`; [ ] ambiguous registrations fail; [ ] no forbidden person attribute exists.
 - Scope: wage and residence generators, `custodian/linkage/` and tests.
 - Depends: S4-T02.
-- Requirements: DAT-01, SYN-25, TST-30.
+- Requirements: DAT-01, SYN-12, SYN-25, TST-30.
 - Delivery: hard; personas Simulation; status queued.
 ### S4-T04 — Presence cube and mobility feeds
-- Goal: Generate simulated situations, speed factors and aggregate feed tables without trajectories.
-- Acceptance criteria: [ ] planted feed defects are counted; [ ] `presence_index` uses the fixed pre-committed `presence_scale`, and flow uses `flow_scale` (PRV-59); neither imposes a sum over protected rows; [ ] the name `presence_base` is not used; [ ] no person, device or trajectory enters the release input.
+- Goal: Generate hourly simulated presence for every dial situation, the summer switch and the three event days, split into workers, residents and visitors, with aggregate feed tables and without trajectories or speed tables (link speeds come only from the traffic assignment of released flows, SYN-79).
+- Acceptance criteria: [ ] planted feed defects are counted; [ ] hourly presence exists for every dial situation, the summer switch and the three event days (National Day, a day in Ramadan, a major match), each event day with its own hour-by-hour profile; [ ] presence is split into workers, residents and visitors; [ ] presence and flow use the parameters fixed at the slice S1 gate (PRV-59), and neither imposes a sum over protected rows; [ ] the name `presence_base` is not used; [ ] no person, device or trajectory enters the release input.
 - Scope: `custodian/mobility/`, presence fixtures and tests.
 - Depends: S4-T01, S2-T02.
-- Requirements: SYN-46, SYN-51, PRV-57, PRV-59.
+- Requirements: SYN-46, SYN-51, SYN-52, PRV-57, PRV-59, SYN-70, SYN-75, SYN-76, SYN-77, SYN-78.
+- Delivery: hard; personas Simulation; status queued.
+### S4-T08 — Hourly flows for traffic
+- Goal: Generate the hourly origin-destination flows that traffic assignment uses, from simulated trips only.
+- Acceptance criteria: [ ] flows exist hour by hour for every dial situation, the summer switch and the three event days; [ ] origin geography is no finer than document 06 allows; [ ] each feed row carries its panel devices, and rows below the panel minimum are omitted; [ ] no trajectory, track or per-person path exists; [ ] no flow reads a protected row.
+- Scope: flow generator under `custodian/mobility/`, flow fixtures and tests.
+- Depends: S4-T04.
+- Requirements: SYN-56, SYN-57, SYN-58, SYN-59, PRV-57, SYN-79, DAT-139.
+- Delivery: hard; personas Simulation; status queued.
+### S4-T07 — Visitor calibration and check
+- Goal: Calibrate the simulated visitor season to the monthly shape of the public museum visits and the visitor share to hotel supply by municipality, and check the season before sealing.
+- Acceptance criteria: [ ] each month's share of its year in the museum visits enters the calibration manifest as the visitor season; [ ] a test compares the simulated shape with the public shape within a tolerance written before the run; [ ] hotel supply by municipality calibrates the visitor share; [ ] the health-centre series serves only as an annual cross-check; [ ] no named place's level is transferred to a Simulated figure, and no Simulated figure is attached to a named place; [ ] venue names come through the reviewed crosswalk of S2-T11.
+- Scope: calibration manifest entries, visitor calibration module and tests under `custodian/mobility/`.
+- Depends: S4-T04, S2-T11.
+- Requirements: SYN-02, SYN-06, SYN-60, SYN-61, SYN-62, SYN-76, MTH-91, MTH-92, TST-212.
 - Delivery: hard; personas Simulation; status queued.
 ### S4-T05 — Sealed reproducible world
 - Goal: Seal the scenario and prove calibration, fidelity, collision safety and byte-identical rebuilding.
 - Acceptance criteria: [ ] every calibration value is anchored or assumed; [ ] tolerances predate the run; [ ] hold-out H4 is reported only as a plausibility comparison and does not count as a hold-out; [ ] two clean builds match byte for byte; [ ] scenario hash is recorded.
 - Scope: scenario, calibration manifest, fidelity report and reproducibility harness.
-- Depends: S4-T03, S4-T04.
+- Depends: S4-T03, S4-T04, S4-T07, S4-T08.
 - Requirements: SYN-06, SYN-36, SYN-60, SYN-63.
 - Delivery: hard; personas Simulation; status queued.
 ### S4-T06 — Review follow-up for slice S4
@@ -426,6 +491,8 @@ These coarse tasks are refined at the slice S3 gate without weakening their crit
 - Requirements: REV-41, TST-168.
 - Delivery: routine; personas as the items require; status queued.
 
+**slice S4 gate.** Every feed passes conformance; fidelity is within tolerances written before the run; identifier-format and name collisions are zero; two builds from one seed are byte-identical; the sandbox proof shows that only public inputs were read; hourly presence exists for every dial situation, the summer switch and the three event days, and hourly flows exist for traffic; and the simulated visitor season matches the public museum-visit shape within its tolerance written before the run.
+
 ## slice S5 — Privacy engine and release
 
 These coarse tasks are refined at the slice S4 gate without weakening their criteria.
@@ -433,25 +500,39 @@ These coarse tasks are refined at the slice S4 gate without weakening their crit
 **Entry condition.** OI-37 is closed: a maker other than the one that last edited the privacy document has reviewed the lead's last ten corrections to it (made on 2026-11-11 after the second confirmation review), and the review is recorded in `PROGRESS.md`. slice S5 does not start before that evidence exists.
 
 ### S5-T01 — Partition family and rule sets
-- Goal: Evaluate both proposed parameter sets on the one-window, parent-linked partition model.
-- Acceptance criteria: [ ] OI-37 is closed by a different-maker review of the lead's last ten corrections to it (made on 2026-11-11 after the second confirmation review) and the review is recorded in `PROGRESS.md` before work starts; [ ] roots are resolution-7 parents intersected with municipalities; [ ] a whole-cell unit is one base cell or a union of whole base cells inside one root; [ ] the two cross-root municipality exceptions are the remainder (the union of the failed roots of one municipality) and the terminal `ha_home` unit (the union of every residence unit and remainder of one municipality); [ ] one parent-linked partition family exists per contributor universe and independent merges never cross; [ ] `home_area_share` belongs to that family and no row is published when either municipality-side complement is below the active count minimum; [ ] all-or-nothing siblings hold; [ ] remainders follow policy; [ ] version 1 builds no second window, mover canary or cross-period test.
+- Goal: Evaluate both proposed parameter sets on the one-window, parent-linked partition model, whose window holds several monthly periods.
+- Acceptance criteria: [ ] OI-37 is closed by a different-maker review of the lead's last ten corrections to it (made on 2026-11-11 after the second confirmation review) and the review is recorded in `PROGRESS.md` before work starts; [ ] roots are resolution-7 parents intersected with municipalities; [ ] a whole-cell unit is one base cell or a union of whole base cells inside one root; [ ] the two cross-root municipality exceptions are the remainder (the union of the failed roots of one municipality) and the terminal `ha_home` unit (the union of every residence unit and remainder of one municipality); [ ] one parent-linked partition family exists per contributor universe and independent merges never cross; [ ] `home_area_share` belongs to that family and no row is published when either municipality-side complement is below the active count minimum; [ ] all-or-nothing siblings hold; [ ] remainders follow policy; [ ] version 1 builds no second window, mover canary or cross-window test; the window's protected `period` spans its monthly periods, and differencing across those months is attacked in S5-T03.
 - Scope: `custodian/privacy/partition/`, rules files and property tests.
 - Depends: S4-T05.
-- Requirements: PRV-10, PRV-24, TST-20.
+- Requirements: PRV-10, PRV-24, PRV-53, TST-20.
 - Delivery: hard; personas Privacy; status queued.
 ### S5-T02 — Stable treated leaf atoms
 - Goal: Treat only mutually exclusive leaf atoms and derive every within-family total as the exact sum of that family's treated leaves. No cross-family equality is required.
-- Acceptance criteria: [ ] cell keys are computed over distinct contributors; [ ] `other` is a treated leaf where pooling occurred; [ ] every stored total inside one additive family is the exact sum of that family's treated leaves, and no equality is asserted across families; [ ] the minimum-group, largest-group and top-two tests apply to every band and category atom; [ ] removing any one employer group leaves every published atom at or above the active count minimum; [ ] controlled rounding preserves exact within-family margins and a negative residual withholds the split; [ ] the pinned row-dropping order, fixed test order and reason-code mapping are implemented exactly; [ ] the privacy worked example reproduces its pinned result; [ ] identical inputs repeat exactly; [ ] keys never cross the release boundary.
+- Acceptance criteria: [ ] cell keys are computed over distinct contributors; [ ] `other` is a treated leaf where pooling occurred; [ ] every stored total inside one additive family is the exact sum of that family's treated leaves, and no equality is asserted across families; [ ] the minimum-group, largest-group and top-two tests apply to every band and category atom; [ ] removing any one employer group leaves every published atom at or above the active count minimum; [ ] controlled rounding preserves exact within-family margins and a negative residual withholds the split; [ ] the pinned row-dropping order, fixed test order and reason-code mapping are implemented exactly; [ ] the privacy worked example reproduces its pinned result; [ ] identical inputs repeat exactly; [ ] one treatment holds for every month of the window; [ ] keys never cross the release boundary.
 - Scope: privacy treatment modules and primitive release builders.
 - Depends: S5-T01.
 - Requirements: PRV-24, PRV-29, PRV-35, PRV-42, PRV-44, PRV-45, PRV-46, PRV-110, TST-24, TST-26.
 - Delivery: hard; personas Privacy; status queued.
+### S5-T09 — Presence counts and traffic link speeds
+- Goal: Release hourly presence counts with ranges at release-unit grain, and traffic link speeds by hour from released flows, under the controls of document 06.
+- Acceptance criteria: [ ] presence counts are released only at release-unit grain, under the panel minimum, complementary suppression and rounding of document 06; [ ] each count carries its range and its group (workers, residents or visitors); [ ] every dial situation, the summer switch and the three event days are released; [ ] link speeds by hour come from released flows assigned to the routing graph with the one fixed volume-delay rule of S1-T11, never from protected rows; [ ] no count or speed is a fact about a named place; [ ] parity covers the new tables.
+- Scope: presence and flow release builders, the assignment step and their tests.
+- Depends: S5-T02, S4-T04, S4-T08, S1-T11.
+- Requirements: PRV-57, PRV-58, PRV-60, SYN-54, TST-40, PRV-124, DAT-138, DAT-139.
+- Delivery: hard; personas Privacy; status queued.
+### S5-T10 — Monthly periods and synthetic firm lists
+- Goal: Release the window's monthly periods and the synthetic firm lists under the same minimum, dominance and complement rules as any protected figure.
+- Acceptance criteria: [ ] each month passes the same disclosure controls as a single period, and one treatment holds for every month of the window; [ ] the `window_key` formula and one `window_key` per `world_seed` are unchanged (PRV-120); [ ] a synthetic firm's record holds only its fictional name, activity, size band and area, never its wages, wage bill or headcount; [ ] firm lists obey the minimum, dominance and complement rules; [ ] no firm is placed at a real address, and no network of firms or owners exists.
+- Scope: monthly release builders, the firm-list release builder and their tests.
+- Depends: S5-T02, S4-T02, S4-T03.
+- Requirements: PRV-24, PRV-53, PRV-54, PRV-63, PRV-120, BRF-31, PRV-55, PRV-56, PRV-123, PRV-125, DAT-136, DAT-137, DAT-140, TST-205, TST-206, TST-207.
+- Delivery: hard; personas Privacy; status queued.
 ### S5-T03 — Closure and adversarial audits
 - Goal: Run exhaustive structural closure checks and the one attacker-view acceptance model, plus the typed attack suite, under both parameter sets. The audit is evidence under a stated attacker and is not called a proof.
-- Acceptance criteria: [ ] exhaustive checks cover every unit, every pair of protected partitions and every area `make_area` can produce after pin reduction; [ ] at least 10,000 seeded fuzz pairs pass per release and per parameter set as regression evidence; [ ] the one acceptance model fixes every published leaf to its untreated aggregate, and no released-value interval is used for acceptance; [ ] every signed knowledge fixture is compared with sealed truth before optimisation, and any disagreement fails the build; [ ] published-means-passed constraints are present for every published leaf; [ ] targets the model cannot tell apart form one target class and are audited once; [ ] a time budget is set from a measured run at the start of slice S5 and recorded as a rule, a run over budget fails the build, and the model is not relaxed to meet it; [ ] `artefacts/attacker_view_audit.json` and `artefacts/attacker_view_public_totals.json` are the audit configuration and the public-total inventory; [ ] the audit fails when an applicable public total is unconfigured, and it covers `home_area_share` residuals; [ ] every person's feasible pay interval spans at least two released bands and every employer's headcount and wage-bill residuals exceed the declared bounds; [ ] PRV-121 allows only exact presolve, and one fixture world solved in both the full form and the reduced form gives identical statuses and identical minimum and maximum for every target class; [ ] the model does not represent what the layout tells about a failed population, and the typed attack suite holds one attack for each layout signal (a merged band, a category pooled into `other`, merged siblings, a withheld remainder and a released reason code); [ ] every canary and threat outcome has a typed recovery predicate; [ ] controls off recover every predicate and controls on recover none, for each parameter set; [ ] no mover or consecutive-window predicate is in the version 1 gate and no person-level movement-protection claim is made; [ ] reviewer attacks become permanent; [ ] no sentence in the audit report calls the result a proof.
+- Acceptance criteria: [ ] exhaustive checks cover every unit, every pair of protected partitions and every area `make_area` can produce after pin reduction, and a drawn shape or free radius is covered by the proof of PRV-111 that any set of published whole-cell units maps to one home family's leaves; [ ] at least 10,000 seeded fuzz pairs pass per release and per parameter set as regression evidence; [ ] the one acceptance model fixes every published leaf to its untreated aggregate, and no released-value interval is used for acceptance; [ ] every signed knowledge fixture is compared with sealed truth before optimisation, and any disagreement fails the build; [ ] published-means-passed constraints are present for every published leaf; [ ] targets the model cannot tell apart form one target class and are audited once; [ ] a time budget is set from a measured run at the start of slice S5 and recorded as a rule, a run over budget fails the build, and the model is not relaxed to meet it; [ ] `artefacts/attacker_view_audit.json` and `artefacts/attacker_view_public_totals.json` are the audit configuration and the public-total inventory; [ ] the audit fails when an applicable public total is unconfigured, and it covers `home_area_share` residuals; [ ] every person's feasible pay interval spans at least two released bands and every employer's headcount and wage-bill residuals exceed the declared bounds; [ ] PRV-121 allows only exact presolve, and one fixture world solved in both the full form and the reduced form gives identical statuses and identical minimum and maximum for every target class; [ ] the model does not represent what the layout tells about a failed population, and the typed attack suite holds one attack for each layout signal (a merged band, a category pooled into `other`, merged siblings, a withheld remainder and a released reason code); [ ] every canary and threat outcome has a typed recovery predicate; [ ] the suite attacks cross-month differencing, apportioning to drawn shapes and linking firm lists with area figures, each with its typed recovery predicate; [ ] controls off recover every predicate and controls on recover none, for each parameter set; [ ] the mover canary of PRV-75 and the adjacent-month predicates of PRV-116 are in the version 1 gate, no consecutive-window predicate is, and no person-level movement-protection claim is made; [ ] reviewer attacks become permanent; [ ] no sentence in the audit report calls the result a proof.
 - Scope: privacy audits, attack suite and signed reports.
-- Depends: S5-T02.
-- Requirements: PRV-49, PRV-67, PRV-73, PRV-76, PRV-112, PRV-113, PRV-116, PRV-121, TST-120.
+- Depends: S5-T02, S5-T09, S5-T10.
+- Requirements: PRV-49, PRV-67, PRV-73, PRV-76, PRV-112, PRV-113, PRV-116, PRV-121, TST-120, TST-220, TST-221, TST-222.
 - Delivery: hard; personas Privacy; status queued.
 ### S5-T04 — Manifest and sanad gate
 - Goal: Select exactly one parameter set for export, build its canonical manifest and fail release construction when any fact lacks a complete source chain.
@@ -476,7 +557,7 @@ These coarse tasks are refined at the slice S4 gate without weakening their crit
 - Delivery: hard; personas Privacy; status queued.
 ### S5-T07 — Manifest window fields
 - Goal: Add `window_key` and `protected_sha256` to `manifest.json`, then compute and verify the release identity.
-- Acceptance criteria: [ ] `window_key` is the SHA-256 of canonical JSON containing the protected `period` and exactly four `{name, sha256}` entries, ordered by `name` as `business_register.v1`, `employment.v1`, `residence.v1` and `wages.v1`, whose `sha256` values are the corresponding manifest `feed_sha256` values, and nothing else (PRV-120); [ ] `protected_sha256` is the manifest value defined for the protected tables; [ ] both fields are present on the selected export's manifest; [ ] after adding both scalars, the full 64-character `release_id` under DAT-80 reproduces with every table and artefact digest included; [ ] two identical builds produce the same id.
+- Acceptance criteria: [ ] `window_key` is the SHA-256 of canonical JSON containing the protected `period` and exactly four `{name, sha256}` entries, ordered by `name` as `business_register.v1`, `employment.v1`, `residence.v1` and `wages.v1`, whose `sha256` values are the corresponding manifest `feed_sha256` values, and nothing else (PRV-120); [ ] `protected_sha256` is the manifest value defined for the protected tables; [ ] both fields are present on the selected export's manifest; [ ] after adding both scalars, the full 64-character `release_id` under DAT-80 reproduces with every table and artefact digest included; [ ] two identical builds produce the same id; [ ] the protected `period` is the span of the window's monthly periods (decision 0016).
 - Scope: manifest window fields, release-identity builder and hash tests.
 - Depends: S5-T04.
 - Requirements: PRV-120.
@@ -489,45 +570,94 @@ These coarse tasks are refined at the slice S4 gate without weakening their crit
 - Requirements: REV-41, TST-168.
 - Delivery: routine; personas as the items require; status queued.
 
-**slice S5 gate.** Closure is proved by exhaustive structural checks, and a fuzz run of at least 10,000 area pairs per release and per parameter set passes; the attacker-view audit passes with every applicable public total configured; with controls off every typed predicate is recovered, and with controls on none is, for each parameter set; exactly one protected table set leaves the custodian plane; the loader rejects any table not in the manifest; and the release hash is reproducible.
+**slice S5 gate.** Closure is proved by exhaustive structural checks, and a fuzz run of at least 10,000 area pairs per release and per parameter set passes; the attacker-view audit passes with every applicable public total configured; with controls off every typed predicate is recovered, and with controls on none is, for each parameter set, the attacks on cross-month differencing, on apportioning to drawn shapes and on linking firm lists with area figures included; exactly one protected table set leaves the custodian plane; presence counts, monthly periods and synthetic firm lists leave it only at release-unit grain under the controls of document 06, and traffic link speeds come from released flows only; the loader rejects any table not in the manifest; and the release hash is reproducible.
 
-## slice S6 — The joined door
+## slice S6 — The flagship location choice
 
 These coarse tasks are refined at the slice S5 gate without weakening their criteria.
 
 ### S6-T01 — `area_evidence`
-- Goal: Return joined-door evidence from release facts only with parity on both stores.
-- Acceptance criteria: [ ] every status is tested; [ ] every numeral is a fact value; [ ] every release table used has parity; [ ] no privacy rule runs at request time.
+- Goal: Return location evidence for drawn, radius and travel-time areas from release facts only, with parity on both stores.
+- Acceptance criteria: [ ] every status is tested; [ ] every numeral is a fact value; [ ] every release table used has parity; [ ] no privacy rule runs at request time; [ ] protected figures snap to whole release units with the snap sentence before any figure is read; [ ] Public point layers and Simulated layers are computed for the exact shape; [ ] a Public statistic stays on its official geography, and an apportioned value is labelled Inferred with its method and geography.
 - Scope: `area_evidence` tool, named SQL and parity tests.
 - Depends: S5-T05.
-- Requirements: BE-49, PRV-83, TST-40, TST-70.
+- Requirements: BE-49, PRV-18, PRV-83, PUB-29, TST-40, TST-70.
 - Delivery: hard; personas Backend; status queued.
-### S6-T02 — Joined-door cards
-- Goal: Build worker and resident pay cards, the licensed-versus-operating strip, housing split, coverage and reading guidance.
-- Acceptance criteria: [ ] cards remain separate; [ ] resident housing always shows `family_housing`, `labour_accommodation`, `institution` and `unknown`, an explicit `other` row when pooling occurred, beside the not-measured count; [ ] the count and the shares beside it come from one additive family (FE-100, PRV-30); [ ] the not-measured count is a separate population; [ ] the aggregate strip stays separate from named places; [ ] coverage and not-measured states render; [ ] facts without sanad refuse.
+### S6-T07 — Areas by hour
+- Goal: Extend areas to every hour of day: drive times change with the hour, protected figures snap with the snap sentence, and Public and Simulated layers use the exact shape.
+- Acceptance criteria: [ ] a drive-time area changes with the selected hour through the released speeds and carries the Simulated class; [ ] protected figures snap to whole release units before any figure is read; [ ] the snap report shows the requested shape, the partition, the released units and the cells added and dropped; [ ] snapping depends only on the request and the frozen partition, never on a data value, an earlier question, the seat or the language; [ ] the area drawing of S3-T13 offers the hour.
+- Scope: `make_area` hour extension, snap report and the hour control of area drawing, with tests.
+- Depends: S6-T01, S3-T13, S5-T09.
+- Requirements: PRV-18, PRV-19, PRV-22, SYN-53, SYN-54, PRV-17, PRV-122, BE-82, BE-83, BE-84, BE-85, BE-119, DAT-146.
+- Delivery: hard; personas Backend; status queued.
+### S6-T02 — Income cards and housing split
+- Goal: Build worker and resident pay cards with the first three income indicators, the licensed-versus-operating strip, housing split, coverage and reading guidance.
+- Acceptance criteria: [ ] cards remain separate; [ ] resident housing always shows `family_housing`, `labour_accommodation`, `institution` and `unknown`, an explicit `other` row when pooling occurred, beside the not-measured count; [ ] the count and the shares beside it come from one additive family (FE-100, PRV-30); [ ] the not-measured count is a separate population; [ ] the aggregate strip stays separate from named places; [ ] coverage and not-measured states render; [ ] facts without sanad refuse; [ ] average and median wage by residential area appear only where groups are large enough, beside wage bands, their spread, the covered wage bill and the earner count, and the average is never shown alone; [ ] figures are worded as covered earners and wages paid, never as every household, wealth or spending power.
 - Scope: joined-door web components and component tests.
 - Depends: S6-T01, S3-T09.
-- Requirements: MTH-39, DES-92, DES-82, FE-21, FE-100.
+- Requirements: MTH-39, DES-92, DES-82, FE-21, FE-22, FE-100, BRF-60, MTH-76, MTH-77, MTH-78, MTH-79.
 - Delivery: hard; personas Frontend; status queued.
-### S6-T03 — Dial, snap and suppressed states
-- Goal: Build the four-situation dial, summer switch, snap animation and explanatory blanks.
-- Acceptance criteria: [ ] presence is a Simulated index only and is not anchored hour by hour to a Public series; [ ] Public monthly context series remain separate Public cards; [ ] snap is deterministic; [ ] suppressed is never shown as zero; [ ] both languages pass visuals.
+### S6-T03 — Dial, presence counts and suppressed states
+- Goal: Build the dial with presence counts and ranges for every situation, the summer switch and the three event days, the crowd-density layer, snap animation and explanatory blanks.
+- Acceptance criteria: [ ] presence shows estimated counts with a range, split into workers, residents and visitors, marked Simulated and worded "estimated people around this location", never "footfall of" a named building or business; [ ] presence is not anchored hour by hour to a Public series; [ ] Public monthly context series remain separate Public cards; [ ] crowd density is drawn as people per square kilometre at release-unit grain and marked Simulated; [ ] snap is deterministic; [ ] suppressed is never shown as zero; [ ] both languages pass visuals.
 - Scope: dial, snap report, presence layer and blank-state components.
-- Depends: S6-T01, S4-T04.
-- Requirements: SYN-51, DES-99, DES-103, DES-07.
+- Depends: S6-T01, S5-T09.
+- Requirements: SYN-51, DES-99, DES-103, DES-07, FE-23, SYN-52, SYN-75, SYN-77, SYN-78, BRF-74, FE-106, FE-107, FE-124, AI-119.
 - Delivery: hard; personas Frontend; status queued.
+### S6-T08 — Traffic and synthetic density on the map
+- Goal: Add the living map's traffic through the day and its synthetic firm and worker density: simulated congestion by hour on the real road network, animated through the day, and synthetic density at release-unit grain.
+- Acceptance criteria: [ ] link speeds and densities are read only from the release; [ ] every traffic and density view carries its Simulated or Synthetic mark; [ ] the animation stops under reduced motion; [ ] synthetic density is drawn at release-unit grain only, never as a named point or at a real address; [ ] at most one hero layer is visible; [ ] time changes update layers without replacing their data arrays; [ ] the slice S1 frame-rate configuration still passes with the traffic layer animated.
+- Scope: traffic and density layers, the time control and their tests under `web/`.
+- Depends: S6-T01, S5-T09.
+- Requirements: DES-50, FE-49, FE-84, FE-91, TST-132, BRF-59, BRF-76, FE-104, FE-105, MTH-88, MTH-93, MTH-94.
+- Delivery: hard; personas Frontend; status queued.
+### S6-T09 — Income indicators with monthly trends
+- Goal: Complete the six income indicators for covered earners with monthly trends: residential income beside presence by time of day, residence and workplace geography, and wage trends by sector and area separated from changes in worker mix.
+- Acceptance criteria: [ ] each indicator shows its trend across the window's monthly periods and what changed; [ ] wage trends are separated from changes in worker mix by tested code; [ ] residential income is set beside presence by time of day and never combined with a presence count into one number; [ ] residence and workplace geography shows broad commuting catchments and access gaps only where workplaces are reliably known; [ ] the average is never shown alone; [ ] every trend figure keeps the snap and the controls of its release table.
+- Scope: income-trend methods, cards and their tests.
+- Depends: S6-T02, S6-T03, S5-T10.
+- Requirements: PRV-41, PRV-54, MTH-21, BRF-18, FE-22, BRF-75, MTH-80, MTH-81, PRV-55, PRV-56, FE-113.
+- Delivery: hard; personas Methods; status queued.
+### S6-T10 — Neighbours and district prices
+- Goal: Build the property-sale method card, with the district price layer beside the pay cards, and the neighbour evidence; both are split from S7-T04.
+- Acceptance criteria: [ ] the property-sale card never shows sale price per square metre without its deal count; [ ] the residential unit sales of decision 0017 show a deal count beside every price; [ ] each method reproduces its worked example; [ ] neighbours are Public and carry coverage caveats.
+- Scope: property-sale method card, calculation card C6, components and tests.
+- Depends: S2-T07, S6-T01.
+- Requirements: PUB-14, PUB-60, FE-25, FE-30, MTH-34, MTH-50, MTH-51.
+- Delivery: hard; personas Methods; status queued.
+### S6-T11 — Best-location ranking
+- Goal: Rank candidate areas for an activity with every criterion, its weight and its value visible, weights the user can change, a rank-stability sentence beside every rank and a Public-only mode (former Later item L1).
+- Acceptance criteria: [ ] ranks are computed by tested code in `eii_core.calc`, never by a model or the browser; [ ] every criterion, its weight and its value are shown, and the weights are labelled a judgement; [ ] the user can change the weights; [ ] a rank-stability sentence stands beside every rank; [ ] a Public-only mode ranks on Public facts only; [ ] no rank is worded as a verdict, a probability, a confidence claim, a revenue, demand or success forecast, or advice to act.
+- Scope: ranking method (calculation card C11), ranking tool, components and tests.
+- Depends: S6-T03, S6-T09, S6-T10.
+- Requirements: MTH-01, MTH-45, FE-45, BRF-40, BRF-67, BRF-77, MTH-57, MTH-64, MTH-65, FE-110.
+- Delivery: hard; personas Methods; status queued.
+### S6-T12 — The reverse and similar areas
+- Goal: For a site, list which activities fit, for property owners matching tenants to the business mix and the catchment's wage profile; and find areas like a chosen one, with three area types (former Later item L10).
+- Acceptance criteria: [ ] the reverse is the output of tested code over visible criteria, with its rank-stability sentence; [ ] it uses the area's business mix and the catchment's wage profile and attaches no Synthetic or Simulated figure to a real named building or business; [ ] similar areas use three area types, with their distance measure shown; [ ] neither is worded as a verdict, a forecast or advice to act.
+- Scope: reverse-fit and similar-area methods, tools, components and tests.
+- Depends: S6-T11.
+- Requirements: MTH-45, MTH-49, BRF-42, BRF-77, MTH-57, MTH-69, MTH-70, MTH-72, MTH-73, FE-111, FE-112.
+- Delivery: hard; personas Methods; status queued.
+### S6-T13 — Reachable access
+- Goal: Build reachable access, a travel-time catchment score by hour of day where congestion changes travel time (former Later item L2).
+- Acceptance criteria: [ ] the score is computed by tested code over the released speeds by hour; [ ] it carries the Simulated class wherever speeds by hour enter; [ ] the regression example of MTH-46 passes; [ ] the score is never worded as demand or capture.
+- Scope: reachable-access method (calculation card C12), component and tests.
+- Depends: S6-T07, S6-T08.
+- Requirements: MTH-46, SYN-54, MTH-66, MTH-67, BE-119, BRF-68.
+- Delivery: hard; personas Methods; status queued.
 ### S6-T04 — Catalogues, template writer and accounting gate
-- Goal: Complete catalogue-owned answers and audit sources, assumptions, invention, scope and limits before display.
+- Goal: Complete catalogue-owned answers for the whole location choice and audit sources, assumptions, invention, scope and limits before display.
 - Acceptance criteria: [ ] every sentence is a catalogue claim; [ ] every component validates; [ ] all five checks pass or deterministic fallback runs; [ ] every answer receipt records the result under "Checked before display".
 - Scope: assistant catalogues, template writer, accounting gate and mutation tests.
-- Depends: S3-T07, S6-T01.
-- Requirements: AI-14, AI-18, AI-28, AI-42, BE-107, DAT-105, DAT-135.
+- Depends: S3-T07, S6-T01, S6-T02, S6-T03, S6-T07, S6-T08, S6-T09, S6-T10, S6-T11, S6-T12, S6-T13.
+- Requirements: AI-14, AI-18, AI-28, AI-42, BE-107, DAT-105, DAT-135, AI-105, AI-106, AI-107, AI-108, AI-109, AI-110, AI-111, AI-112, AI-113, AI-114, AI-115, AI-116, AI-117, AI-118, AI-119, AI-120.
 - Delivery: hard; personas AI; status queued.
-### S6-T05 — Joined-door gate
-- Goal: Prove no-model behaviour, complete source chains, performance and bilingual layouts end to end.
-- Acceptance criteria: [ ] the flagship path works with no model call; [ ] every number resolves to a fact with a complete source chain; [ ] every receipt carries the accounting-gate result; [ ] local p95 is under 1.5 seconds; [ ] wall, laptop and tablet visuals pass in both languages.
+### S6-T05 — Location-choice gate
+- Goal: Prove no-model behaviour, complete source chains, performance and bilingual layouts end to end for the whole location choice.
+- Acceptance criteria: [ ] the flagship path works with no model call; [ ] a drawn area, a radius and a walk or drive time at a chosen hour each work end to end; [ ] every rank shows its criteria, weights, values and rank-stability sentence; [ ] every number resolves to a fact with a complete source chain; [ ] every receipt carries the accounting-gate result; [ ] local p95 is under 1.5 seconds; [ ] wall, laptop and tablet visuals pass in both languages.
 - Scope: slice S6 end-to-end, performance and visual tests; gate evidence.
-- Depends: S6-T02, S6-T03, S6-T04.
+- Depends: S6-T02, S6-T03, S6-T04, S6-T07, S6-T08, S6-T09, S6-T10, S6-T11, S6-T12, S6-T13.
 - Requirements: TST-90, TST-101, TST-130, PLN-07.
 - Delivery: hard; personas Frontend; status queued.
 ### S6-T06 — Review follow-up for slice S6
@@ -538,18 +668,18 @@ These coarse tasks are refined at the slice S5 gate without weakening their crit
 - Requirements: REV-41, TST-168.
 - Delivery: routine; personas as the items require; status queued.
 
-**slice S6 gate.** The flagship question is answered end to end with no model call; every number resolves to a fact with a complete source chain; every receipt carries the accounting-gate result; the evidence bundle is under 1.5 seconds at the 95th percentile locally; and visual tests pass at wall, laptop and tablet sizes in English and Arabic.
+**slice S6 gate.** The flagship question is answered end to end with no model call; every number resolves to a fact with a complete source chain; every receipt carries the accounting-gate result; the evidence bundle is under 1.5 seconds at the 95th percentile locally; visual tests pass at wall, laptop and tablet sizes in English and Arabic; a drawn area, a radius and a walk or drive time at a chosen hour each return the location evidence, with protected figures snapped with the snap sentence and Public and Simulated layers on the exact shape; presence shows estimated counts with ranges for every situation, the summer switch and the three event days, worded "estimated people around this location"; and every rank and fit shows its criteria, weights, values and rank-stability sentence, with a Public-only mode.
 
-## slice S7 — Costs, suppliers, staffing
+## slice S7 — The other journeys and the three services
 
 These coarse tasks are refined at the slice S6 gate without weakening their criteria.
 
 ### S7-T01 — Unit economics and break-even
-- Goal: Build deterministic unit economics, six-input break-even and the optional target-surplus scenario without forecasting success.
-- Acceptance criteria: [ ] the six inputs are monthly rent, seats, average bill, opening days defaulted to 30, optional expected covers per day and optional monthly staff cost; [ ] every output comes from `eii_core.calc`; [ ] invalid input fails safely; [ ] results are Inferred and tagged as user inputs; [ ] the zero-surplus regression uses `m = 0.313` and returns QAR 127,796 a month, 36 covers a day and 0.6 seat turns, with QAR 56,340 maximum rent and QAR 85.20 minimum bill at 50 expected covers; [ ] the `U = 0.197` target-surplus regression returns `m - U = 0.116`, QAR 344,827.59 a month, 96 covers a day and 1.6 seat turns, with QAR 20,880 maximum rent and QAR 229.89 minimum bill at 50 expected covers; [ ] the target case is labelled "to earn the sector's 2022 surplus share" and is never called break-even.
+- Goal: Build deterministic unit economics, six-input break-even and the optional target-surplus scenario, with the agency's incentive packages as optional inputs, without forecasting success.
+- Acceptance criteria: [ ] the six inputs are monthly rent, seats, average bill, opening days defaulted to 30, optional expected covers per day and optional monthly staff cost; [ ] every output comes from `eii_core.calc`; [ ] invalid input fails safely; [ ] results are Inferred and tagged as user inputs; [ ] the zero-surplus regression uses `m = 0.313` and returns QAR 127,796 a month, 36 covers a day and 0.6 seat turns, with QAR 56,340 maximum rent and QAR 85.20 minimum bill at 50 expected covers; [ ] the `U = 0.197` target-surplus regression returns `m - U = 0.116`, QAR 344,827.59 a month, 96 covers a day and 1.6 seat turns, with QAR 20,880 maximum rent and QAR 229.89 minimum bill at 50 expected covers; [ ] the target case is labelled "to earn the sector's 2022 surplus share" and is never called break-even; [ ] the agency's incentive packages are optional scenario inputs, tagged "your inputs" with their source page, and never change a Public figure.
 - Scope: C4 calculation, tool facts, break-even component and tests.
-- Depends: S6-T05.
-- Requirements: MTH-25, MTH-26, DES-110, MTH-03.
+- Depends: S6-T05, S2-T12.
+- Requirements: MTH-25, MTH-26, DES-110, MTH-03, MTH-06, FE-44, MTH-61, MTH-62, DAT-143, AI-111.
 - Delivery: hard; personas Methods; status queued.
 ### S7-T02 — Supplier lens
 - Goal: Build reviewed input baskets, origin paths, calculated import unit value (QAR per kg), concentration and wholesale depth.
@@ -559,25 +689,74 @@ These coarse tasks are refined at the slice S6 gate without weakening their crit
 - Requirements: MTH-30, MTH-32, PUB-41, DAT-100.
 - Delivery: hard; personas Methods; status queued.
 ### S7-T03 — Staffing and pay
-- Goal: Build protected staffing pay bands beside Public benchmarks and the statutory minimum.
-- Acceptance criteria: [ ] staffing-only drive option works; [ ] protected and Public facts remain distinct; [ ] the card lists occupation groups `0` to `9` and `unmapped`, and an explicit `other` row when pooling occurred; [ ] the not-measured count is not shown as an occupation group; [ ] statutory source and coverage are visible; [ ] worked example passes.
+- Goal: Build protected staffing pay bands beside Public benchmarks and the statutory minimum, with middle ranges, earner counts and where such workers live.
+- Acceptance criteria: [ ] staffing-only drive option works; [ ] protected and Public facts remain distinct; [ ] the card lists occupation groups `0` to `9` and `unmapped`, and an explicit `other` row when pooling occurred; [ ] the not-measured count is not shown as an occupation group; [ ] statutory source and coverage are visible; [ ] worked example passes; [ ] each pay figure shows its middle range and its earner count; [ ] where such workers live is shown no finer than the coarse geography of BRF-18.
 - Scope: C10 calculation, `pay_benchmark`, staffing components and tests.
 - Depends: S6-T05.
-- Requirements: AI-20, MTH-03, MTH-42, MTH-39, AI-42, FE-99.
+- Requirements: AI-20, MTH-03, MTH-42, MTH-39, AI-42, FE-99, BRF-18.
 - Delivery: hard; personas Methods; status queued.
 ### S7-T04 — Public context cards
-- Goal: Build the property-sale method card, national pay decomposition, churn, zone momentum and neighbours evidence.
-- Acceptance criteria: [ ] the property-sale card never shows sale price per square metre without its deal count; [ ] each method reproduces its worked example; [ ] OI-03 blocks unresolved facts; [ ] neighbours are Public and carry coverage caveats.
-- Scope: property-sale method card, C1, C2, C3, C6 and C9 methods, components and tests.
+- Goal: Build the licence-density card, national pay decomposition, churn and zone momentum; the property-sale method card and the neighbour evidence moved to S6-T10.
+- Acceptance criteria: [ ] each method reproduces its worked example; [ ] OI-03 blocks unresolved facts.
+- Scope: C1, C2, C3 and C9 methods, components and tests.
 - Depends: S2-T07, S6-T05.
-- Requirements: PUB-14, FE-25, MTH-15, MTH-18, MTH-21, MTH-34, MTH-41.
+- Requirements: MTH-15, MTH-18, MTH-21, MTH-23, MTH-41.
 - Delivery: hard; personas Methods; status queued.
-### S7-T05 — Two-door comparison and provenance gate
-- Goal: Build snapped shared-reach comparison and audit every slice S7 card.
-- Acceptance criteria: [ ] overlap uses release-unit sets; [ ] each method reproduces its public worked example; [ ] no regression value is left unpinned; [ ] each card passes the provenance audit.
-- Scope: C7, `compare_areas`, comparison UI and slice S7 audit.
-- Depends: S7-T01, S7-T02, S7-T03, S7-T04.
-- Requirements: MTH-37, MTH-03, TST-50.
+### S7-T05 — Second-site comparison
+- Goal: Build the snapped shared-reach comparison of two sites, worded as shared reach and overlap, never as lost sales; the slice audit moved to S7-T13.
+- Acceptance criteria: [ ] overlap uses release-unit sets; [ ] the comparison is worded as shared reach, never as lost sales or a forecast; [ ] its public worked example reproduces; [ ] no regression value of the card is left unpinned.
+- Scope: C7, `compare_areas` and comparison UI.
+- Depends: S6-T05.
+- Requirements: MTH-37, MTH-38, BRF-14, MTH-03.
+- Delivery: hard; personas Methods; status queued.
+### S7-T07 — Customer finder (journey D3)
+- Goal: Return a targeted territory and a prospect list of named synthetic firms by sector and size band, with Public customer segments.
+- Acceptance criteria: [ ] the territory is a drawn or travel-time area or a set of areas ranked in slice S6; [ ] the prospect list is the output of tested code over visible criteria, with its rank-stability sentence; [ ] each listed firm shows only its fictional name, activity, size band and area, marked Synthetic, never its wages, wage bill or headcount, and the list obeys the minimum, dominance and complement rules; [ ] no synthetic firm is drawn as a named point or at a real address; [ ] Public customer segments stay on the source's geography, and a segment split by sex or nationality is never apportioned to a drawn area or joined to synthetic records; [ ] no real firm, owner or individual can be looked up; [ ] the answer comes through the journey's declarative playbook and the template writer, with no model call.
+- Scope: customer-finder tool, playbook, components and tests.
+- Depends: S6-T05, S6-T11, S5-T10, S2-T11.
+- Requirements: BRF-31, BRF-42, PRV-63, MTH-45, SYN-71, BRF-63, BRF-78, BRF-81, MTH-71, PRV-125, DAT-140, BE-113, FE-115, AI-108.
+- Delivery: hard; personas Methods; status queued.
+### S7-T08 — Labour-market view (journey D5)
+- Goal: Build the labour-market view: sectors, occupations, pay and trends, simple projections from tested code over published or released series, and official figures split by sex or nationality as Public facts.
+- Acceptance criteria: [ ] each projection is marked as a projection with its method and period and is never a revenue, demand or success forecast; [ ] official figures split by sex or nationality are Public facts with source and year, in the source's own categories (Qatari and non-Qatari for nationality), and are never joined to synthetic records, apportioned to a drawn area or combined with a protected figure; [ ] pay trends use the window's monthly periods and separate pay change from mix change; [ ] the answer comes through the journey's declarative playbook, with no model call.
+- Scope: labour-market methods, projection code, playbook, components and tests.
+- Depends: S7-T03, S7-T04, S2-T11.
+- Requirements: MTH-01, MTH-05, MTH-21, PRV-41, BRF-61, MTH-75, MTH-82, MTH-83, AI-109, AI-112, FE-114, FE-117, PUB-90, DAT-141, DAT-144, BE-110.
+- Delivery: hard; personas Methods; status queued.
+### S7-T09 — Partner and supplier finder (journey D4, service S3)
+- Goal: Return named synthetic firms ranked by fit, real businesses from public listings, public tenders where a public source exists and a structured qualification route, with industrial capacity and aggregate workforce evidence for procurement, recruitment and training.
+- Acceptance criteria: [ ] fit is the output of tested code over visible criteria, with its rank-stability sentence, and never advice to act; [ ] named synthetic firms are marked Synthetic and show only their fictional name, activity, size band and area; [ ] real businesses come only from public places data and public listings, with Public slots only; [ ] tenders appear only from the source confirmed in S2-T13, and not at all without one; [ ] the qualification route is a fixed, application-owned sequence of steps; [ ] manufacturing capacity is shown as licence-type rows, never as plants, with cumulative licensed investment labelled as such; [ ] FDI projects appear as published announcements with the estimate note, never as a lookup of a firm; [ ] the workforce evidence comes from S7-T03 and S7-T08 and is aggregate only; [ ] the answer comes through the journey's declarative playbook, with no model call.
+- Scope: partner and supplier tool, qualification route, playbook, components and tests.
+- Depends: S7-T02, S7-T03, S7-T08, S5-T10, S2-T12, S2-T13.
+- Requirements: BRF-42, PUB-47, PRV-63, MTH-45, SYN-71, BRF-63, BRF-64, BRF-78, BRF-79, PUB-92, MTH-71, PRV-125, BE-113, AI-117, FE-115, FE-116, DAT-145.
+- Delivery: hard; personas Methods; status queued.
+### S7-T10 — Where to grow (journey D6, service S2)
+- Goal: Show openings and closures over time on the map, cluster change and the construction pipeline, and compare growth and operating options (a new branch, a larger site, a new territory, a revised service model) with the barriers to resolve.
+- Acceptance criteria: [ ] public licence cancellations, and issues where document 04 admits the series, stay on their official geography as Public facts, with bulk months flagged; [ ] synthetic firm openings and closures by area and month are marked Synthetic; [ ] no function computes issued minus cancelled licences or a net-formation figure from the public tables; [ ] building permits and completion certificates show the construction pipeline by municipality with their latest year; [ ] the option comparison uses the second-site comparison of S7-T05 and lists the barriers to resolve, never a verdict or a forecast; [ ] property prices show their deal counts; [ ] FDI projects appear as published announcements with the estimate note where they inform the comparison, never as a lookup of a firm; [ ] the answer comes through the journey's declarative playbook, with no model call.
+- Scope: growth methods, option comparison, playbook, components and tests.
+- Depends: S7-T04, S7-T05, S6-T10, S5-T10, S2-T11, S2-T12.
+- Requirements: BRF-14, BRF-16, MTH-18, MTH-19, MTH-20, MTH-37, BRF-62, MTH-84, MTH-85, MTH-86, MTH-87, PUB-94, AI-113, FE-113.
+- Delivery: hard; personas Methods; status queued.
+### S7-T11 — Serving the region (journey D7)
+- Goal: Show travel times by hour from an area to the ports, the airport, the free zones and the land routes, complementary firms, the import context and imports against local production (former Later item L3).
+- Acceptance criteria: [ ] travel times by hour come from the released speeds and carry the Simulated class where speeds enter; [ ] the destinations are Public geography with their source; [ ] imports against local production is worded as a screen, never an opportunity or a recommendation, and joins no synthetic figure; [ ] certificates of origin and arriving vessels are Public context with their latest period; [ ] complementary firms are named synthetic firms under the firm-list rules or real businesses from public listings; [ ] FDI projects appear with the estimate note; [ ] the answer comes through the journey's declarative playbook, with no model call.
+- Scope: regional-access methods, the imports card (calculation card C13), playbook, components and tests.
+- Depends: S6-T07, S7-T02, S5-T10, S2-T11, S2-T12.
+- Requirements: MTH-47, PUB-47, SYN-54, BRF-68, MTH-68, AI-118, FE-126, BE-119.
+- Delivery: hard; personas Methods; status queued.
+### S7-T12 — Market entry pack (journey D1, service S1)
+- Goal: Assemble the market entry evidence pack (market profile, customers and competitors, local income context, candidate areas, workforce context and next actions) with the sector context, opportunities, set-up steps and laws of the agency's pages and the FDI projects, so that interest becomes a specific, testable operating proposal.
+- Acceptance criteria: [ ] every part comes from tested tools over release facts; [ ] candidate areas come from the ranking of S6-T11, with its rank-stability sentence; [ ] customers and competitors come from S7-T07, workforce context from S7-T03 and S7-T08, and local income context from slice S6; [ ] the agency's records are rendered by application templates with a link to each page, and FDI capex and jobs keep the estimate note; [ ] wholesale and retail trade figures are context only, never a forecast; [ ] next actions are set-up steps and the cheapest next tests, never a verdict or advice to act; [ ] every figure shows its source and retrieval date; [ ] the answer comes through the journey's declarative playbook, with no model call.
+- Scope: market-entry playbook, pack assembly, components and tests.
+- Depends: S7-T01, S7-T03, S7-T04, S7-T07, S7-T08, S6-T11, S2-T12.
+- Requirements: AI-28, BRF-40, MTH-28, PUB-19, BRF-65, BRF-70, MTH-95, MTH-96, AI-110, AI-111, FE-121, BE-114.
+- Delivery: hard; personas Methods; status queued.
+### S7-T13 — Journeys gate and provenance audit
+- Goal: Prove that each journey ends with its own answer end to end with no model call, pin every method's worked example and audit every slice S7 card. The slice S7 gate fails while any value listed by MTH-03 is unpinned.
+- Acceptance criteria: [ ] each of journeys D1 and D3 to D7 ends with its own answer, with no model call; [ ] each method reproduces its public worked example; [ ] no regression value is left unpinned, including every value listed by MTH-03; [ ] each card passes the provenance audit; [ ] no answer gives a revenue, demand or success forecast, a verdict, a probability, a confidence claim or advice to act; [ ] visual tests pass at wall, laptop and tablet sizes in both languages.
+- Scope: slice S7 end-to-end, audit and visual tests; gate evidence.
+- Depends: S7-T01, S7-T02, S7-T03, S7-T04, S7-T05, S7-T07, S7-T08, S7-T09, S7-T10, S7-T11, S7-T12.
+- Requirements: MTH-03, TST-50, TST-90, BRF-40, PLN-07.
 - Delivery: hard; personas Methods; status queued.
 ### S7-T06 — Review follow-up for slice S7
 - Goal: Close every proposed open item that the reviews of slice S7 entered in `OPEN_ITEMS.md`, before the slice S7 gate.
@@ -587,21 +766,35 @@ These coarse tasks are refined at the slice S6 gate without weakening their crit
 - Requirements: REV-41, TST-168.
 - Delivery: routine; personas as the items require; status queued.
 
-**slice S7 gate.** Each method reproduces its public worked example; no regression value is left unpinned; and each card passes the provenance audit.
+**slice S7 gate.** Each method reproduces its public worked example; no regression value is left unpinned; each card passes the provenance audit; each of journeys D1 and D3 to D7 ends with its own answer end to end with no model call, and the three services are produced as journey outputs; named synthetic firms appear only with their fictional name, activity, size band and area, marked Synthetic and never at a real address; and no answer gives a revenue, demand or success forecast, a verdict, a probability, a confidence claim or advice to act.
 
-## slice S8 — Assistant
+## slice S8 — The four cases and the assistant
 
 These coarse tasks are refined at the slice S7 gate without weakening their criteria.
 
 ### S8-T01 — Deterministic router and playbooks
-- Goal: Route to exactly three declarative playbooks before any provider call.
-- Acceptance criteria: [ ] bilingual prepared questions route deterministically; [ ] closed values constrain user numbers; [ ] each playbook runs without a model.
-- Scope: deterministic router, three playbooks and unit tests.
-- Depends: S7-T05.
-- Requirements: AI-07, AI-18, AI-23, AI-01.
+- Goal: Route to the closed, declarative playbooks of every journey before any provider call.
+- Acceptance criteria: [ ] bilingual prepared questions route deterministically to the playbook of every journey; [ ] closed values constrain user numbers; [ ] each playbook runs without a model; [ ] the playbook list is closed and versioned.
+- Scope: deterministic router, playbook registry and unit tests.
+- Depends: S7-T13.
+- Requirements: AI-07, AI-18, AI-23, AI-01, AI-101, AI-102, AI-103, AI-104.
 - Delivery: hard; personas AI; status queued.
+### S8-T08 — Case sample files
+- Goal: Load the synthetic sample files of case C3 (its own delivery records) and case C4 (its own branch sales) through closed schemas into the session that loaded them.
+- Acceptance criteria: [ ] each sample file is synthetic, marked Synthetic and validated against its closed schema; [ ] a malformed file is refused with a template message and loads nothing; [ ] its rows stay inside the session that loaded them and never enter a release, the ledger or another session; [ ] figures computed from it carry the "your inputs" tag and never change a release fact; [ ] its identifiers are visibly synthetic, and it holds no bare run of eight or eleven digits.
+- Scope: sample-file schemas, the loader, the two synthetic sample files and tests.
+- Depends: S8-T01.
+- Requirements: MTH-06, SYN-19, SYN-80, SYN-81, SYN-82, DAT-149, DAT-150, AI-104, AI-116, BE-109, BE-118, FE-120.
+- Delivery: hard; personas Backend; status queued.
+### S8-T09 — Case stories and gallery
+- Goal: Build the four cases as guided stories, each started with one click from a gallery and run on the playbooks of its journeys.
+- Acceptance criteria: [ ] each case starts with one click and runs end to end with no model call; [ ] case C1 ends with a targeted commercial assessment, C2 with a focused prospect list of named synthetic firms, C3 with a defined trial before the capital commitment and C4 with a test of hours or offer; [ ] no case ends with a demand figure, a forecast, a verdict or advice to act; [ ] each case is labelled illustrative; [ ] the gallery works in both languages.
+- Scope: case stories, gallery components and their tests.
+- Depends: S8-T01, S8-T08.
+- Requirements: AI-18, BRF-40, TST-80, BRF-71, BRF-80, AI-115, FE-119, SYN-81, DAT-150.
+- Delivery: hard; personas Operations; status queued.
 ### S8-T02 — Main provider loop and egress controls
-- Goal: Add the current main provider behind the fixed nine-tool contract with bounded egress.
+- Goal: Add the current main provider behind the fixed, closed tool contract with bounded egress.
 - Acceptance criteria: [ ] exact tool list is asserted; [ ] no SQL, code or web tool exists; [ ] blocked egress falls back; [ ] current official API references support every call.
 - Scope: main provider adapter, tool loop, egress records and tests.
 - Depends: S8-T01.
@@ -609,7 +802,7 @@ These coarse tasks are refined at the slice S7 gate without weakening their crit
 - Delivery: hard; personas AI; status queued.
 ### S8-T03 — Structured brief validator
 - Goal: Validate claim keys, slots, components, subjects and accounting receipts before streaming, with the build-time template scan.
-- Acceptance criteria: [ ] the claim, component, fragment and question catalogues are closed and versioned; [ ] unknown catalogue keys, unknown properties and swapped slots fail; [ ] real-place non-Public facts fail; [ ] the build-time scan rejects numerals, number words, real place names in `area` templates and go or no-go wording; [ ] one repair is allowed; [ ] second failure uses template output.
+- Acceptance criteria: [ ] the claim, component, fragment and question catalogues are closed and versioned; [ ] unknown catalogue keys, unknown properties and swapped slots fail; [ ] real-place non-Public facts fail; [ ] a Synthetic or Simulated fact in a slot of `place_public` or `fdi_project` fails, and a named synthetic firm accepts Synthetic slots only; [ ] the build-time scan rejects numerals, number words, real place names in `area` templates and go or no-go wording; [ ] one repair is allowed; [ ] second failure uses template output.
 - Scope: `claims.yaml`, `components.yaml`, `fragments.yaml`, `questions.yaml`, structured brief models, validators, build-time template scan, repair path and mutation tests.
 - Depends: S8-T01, S3-T07, S6-T04.
 - Requirements: AI-28, AI-37, AI-42, AI-48, AI-49, AI-88.
@@ -623,9 +816,9 @@ These coarse tasks are refined at the slice S7 gate without weakening their crit
 - Delivery: hard; personas AI; status queued.
 ### S8-T05 — Evaluation harness and gate
 - Goal: Prove routing, structured briefs, declines and injection resistance with code graders.
-- Acceptance criteria: [ ] prepared questions pass five of five; [ ] must-decline passes at 100%; [ ] 500 distinct structured briefs returned by the model validate against the catalogues before repair or fallback; [ ] every fallback is counted and reported; [ ] injection successes are zero.
+- Acceptance criteria: [ ] prepared questions pass five of five; [ ] must-decline passes at 100%; [ ] 500 distinct structured briefs returned by the model validate against the catalogues before repair or fallback; [ ] every fallback is counted and reported; [ ] injection successes are zero; [ ] the golden and must-decline sets cover every journey and case.
 - Scope: golden, decline, structured-brief and injection evals; slice S8 report.
-- Depends: S8-T02, S8-T03, S8-T04.
+- Depends: S8-T02, S8-T03, S8-T04, S8-T09.
 - Requirements: AI-90, TST-110, TST-114, TST-155.
 - Delivery: hard; personas AI; status queued.
 ### S8-T06 — Memo, replay and offline completeness
@@ -643,6 +836,8 @@ These coarse tasks are refined at the slice S7 gate without weakening their crit
 - Requirements: REV-41, TST-168.
 - Delivery: routine; personas as the items require; status queued.
 
+**slice S8 gate.** The golden set passes five out of five runs on every prepared question; the must-decline set passes at 100%; 500 distinct structured briefs returned by the model validate against the catalogues before repair or fallback, with every fallback counted and reported; the injection suite passes with zero successes; live-model gates run when the API key exists, otherwise the recorded provider runs and OI-01 stays open; and each of the four cases starts with one click and runs end to end with no model call, with each sample file inside the session that loaded it.
+
 ## slice S9 — Seats and oversight
 
 These coarse tasks are refined at the slice S8 gate without weakening their criteria.
@@ -655,11 +850,11 @@ These coarse tasks are refined at the slice S8 gate without weakening their crit
 - Requirements: DAT-110, BE-31, BE-36, BE-38, TST-64.
 - Delivery: hard; personas Backend; status queued.
 ### S9-T02 — Signed seat cookie and presenter token
-- Goal: Bind each window to one seat and restrict presenter controls without claiming authentication.
-- Acceptance criteria: [ ] API reads only signed `eii_seat`; [ ] request seat fields are rejected; [ ] `X-EII-Presenter-Token` is required; [ ] company windows without the per-session presenter token receive 403; [ ] the stage window's presenter console succeeds with its valid token.
+- Goal: Bind each window to one seat, keep each case sample file with the seat that loaded it, and restrict presenter controls without claiming authentication.
+- Acceptance criteria: [ ] API reads only signed `eii_seat`; [ ] request seat fields are rejected; [ ] `X-EII-Presenter-Token` is required; [ ] company windows without the per-session presenter token receive 403; [ ] the stage window's presenter console succeeds with its valid token; [ ] a case sample file is bound to the seat and session that loaded it, and another seat cannot reach it.
 - Scope: seat middleware, presenter middleware and browser tests.
-- Depends: S9-T01.
-- Requirements: BE-70, BE-89, OPS-56, PLN-19, TST-191.
+- Depends: S9-T01, S8-T08.
+- Requirements: BE-70, BE-89, OPS-56, PLN-19, TST-191, BRF-56.
 - Delivery: hard; personas Backend; status queued.
 ### S9-T03 — Live and fallback ledger
 - Goal: Stream ledger rows live and replay the durable SQLite fallback without duplicates.
@@ -690,16 +885,18 @@ These coarse tasks are refined at the slice S8 gate without weakening their crit
 - Requirements: REV-41, TST-168.
 - Delivery: routine; personas as the items require; status queued.
 
+**slice S9 gate.** Connected as Company B, a database-level test cannot read Company A's brief; a case sample file loaded on one seat cannot be reached from another seat; ledger rows arrive live; oversight aggregates respect the distinct-organisation minimum; and the release opens read-only in a standard GIS tool.
+
 ## slice S10 — Proof and story
 
 These coarse tasks are refined at the slice S9 gate without weakening their criteria.
 
 ### S10-T01 — Signed attack replay
 - Goal: Revalidate prepared attack recordings at start-up, serve the complement step through `POST /api/proof/scene` (PRV-119) and refuse tampered evidence. This task cites that route and does not restate its schema.
-- Acceptance criteria: [ ] the complement step calls `POST /api/proof/scene` (PRV-119), where one manifest-listed fixture id selects two prepared requests that differ by one published merged unit of at least two base cells, and no figure exists for any member base cell alone; [ ] the endpoint returns their pre-validated unit sets; [ ] production tools still accept only pin-based areas; [ ] the scene separately shows the typed phrase declined by the application; [ ] the injection step rejects invalid structured output, rejects its one prepared invalid repair, falls back to the playbook and logs from signed fixture identity; [ ] the unprotected comparison is a labelled replay of signed build-time results and names any canary only by its scenario label; [ ] tools reproduce every prepared fact; [ ] changed fact, release, prompt or brief fails; [ ] no controls-off path exists at run time.
+- Acceptance criteria: [ ] the complement step calls `POST /api/proof/scene` (PRV-119), where one manifest-listed fixture id selects two prepared requests that differ by one published merged unit of at least two base cells, and no figure exists for any member base cell alone; [ ] the endpoint returns their pre-validated unit sets; [ ] production tools accept no cell or unit list, and every protected figure still snaps to whole published release units whatever shape is requested; [ ] the scene separately shows the typed phrase declined by the application; [ ] the injection step rejects invalid structured output, rejects its one prepared invalid repair, falls back to the playbook and logs from signed fixture identity; [ ] the unprotected comparison is a labelled replay of signed build-time results and names any canary only by its scenario label; [ ] tools reproduce every prepared fact; [ ] changed fact, release, prompt or brief fails; [ ] no controls-off path exists at run time.
 - Scope: `POST /api/proof/scene`, typed-phrase decline fixture, signed injection fixture, labelled unprotected replay, replay validator, signed attack fixtures and negative tests.
 - Depends: S9-T05.
-- Requirements: PRV-105, PRV-119, TST-127, PRV-109.
+- Requirements: PRV-105, PRV-119, TST-127, PRV-109, PRV-101.
 - Delivery: hard; personas Privacy; status queued.
 ### S10-T02 — Proof room and Trust centre
 - Goal: Show source chains, rules, receipts and the activity-spine lineage line without gateway scores.
@@ -709,10 +906,10 @@ These coarse tasks are refined at the slice S9 gate without weakening their crit
 - Requirements: DES-95, DES-121, DES-164, FE-101, AI-98, PLN-20.
 - Delivery: hard; personas Frontend; status queued.
 ### S10-T03 — Guided story and presenter controls
-- Goal: Build record, replay and the eight-scene guided story with protected presenter actions.
-- Acceptance criteria: [ ] every scene is directly reachable; [ ] Next, Back, Language, Offline, embedded switch and Reset work; [ ] controls require presenter token; [ ] replay is deterministic.
+- Goal: Build record, replay and the ten-scene guided story of DES-113 with protected presenter actions, from which each of the four cases starts.
+- Acceptance criteria: [ ] every scene is directly reachable; [ ] Next, Back, Language, Offline, embedded switch and Reset work; [ ] controls require presenter token; [ ] replay is deterministic; [ ] each case story of S8-T09 starts from the presenter console.
 - Scope: story state, presenter console, recordings and story tests.
-- Depends: S10-T01, S9-T02.
+- Depends: S10-T01, S9-T02, S8-T09.
 - Requirements: DES-113, RUN-03, OPS-56.
 - Delivery: hard; personas Operations; status queued.
 ### S10-T04 — Native Arabic sign-off
@@ -722,12 +919,12 @@ These coarse tasks are refined at the slice S9 gate without weakening their crit
 - Depends: S10-T02, S10-T03.
 - Requirements: DES-10, TST-90, PLN-19.
 - Delivery: hard; personas Frontend; status queued.
-### S10-T05 — Bilingual briefing pack
-- Goal: Produce a printable bilingual pack whose every figure opens a complete source chain.
-- Acceptance criteria: [ ] only Fact chips render figures; [ ] every pack fact traces; [ ] standing honesty notice remains; [ ] both languages pass the pack audit.
+### S10-T05 — One-page bilingual briefing pack
+- Goal: Produce the printable one-page bilingual pack for the brief of any journey or case, whose every figure opens a complete source chain.
+- Acceptance criteria: [ ] only Fact chips render figures; [ ] every pack fact traces; [ ] standing honesty notice remains; [ ] both languages pass the pack audit; [ ] the export works for the brief of every journey and case.
 - Scope: pack renderer, print styles and pack audit tests.
-- Depends: S10-T04, S7-T05.
-- Requirements: TST-100, TST-103, DES-78.
+- Depends: S10-T04, S7-T13, S8-T09.
+- Requirements: TST-100, TST-103, DES-78, BRF-19.
 - Delivery: hard; personas Frontend; status queued.
 ### S10-T06 — Review follow-up for slice S10
 - Goal: Close every proposed open item that the reviews of slice S10 entered in `OPEN_ITEMS.md`, before the slice S10 gate.
@@ -736,6 +933,8 @@ These coarse tasks are refined at the slice S9 gate without weakening their crit
 - Depends: every other task of slice S10.
 - Requirements: REV-41, TST-168.
 - Delivery: routine; personas as the items require; status queued.
+
+**slice S10 gate.** Replay revalidation passes at start-up; every prepared Arabic string is signed off by a native reviewer; and every briefing-pack figure is traceable.
 
 ## slice S11 — Hardening and hand-over
 

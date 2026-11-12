@@ -2,50 +2,71 @@
 
 | | |
 |---|---|
-| Status | Draft v0.2, corrected after independent review on 2026-11-11 (see PROGRESS.md) |
-| Date | 2026-11-11 |
+| Status | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
+| Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Define every public source the product uses, how it is fetched, licensed, checked, crosswalked and attributed, and what public data cannot give. |
-| Read first | [01 Project brief](01_PROJECT_BRIEF.md), [02 Architecture](02_ARCHITECTURE.md), [03 Data contracts](03_DATA_CONTRACTS.md) |
+| Read first | [01 Project brief](01_PROJECT_BRIEF.md), [02 Architecture](02_ARCHITECTURE.md), [03 Data contracts](03_DATA_CONTRACTS.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) |
 
 ## In brief
 
-- Every figure marked Public comes from a source in the registry below, with URL, licence, retrieval
-  date and SHA-256 recorded at fetch time. Nothing is fetched at run time.
+- Every figure marked Public comes from a source in the registry below, with URL, licence (or
+  basis of use), retrieval date and SHA-256 recorded at fetch time. Nothing is fetched at run time.
 - Fetchers run only in `./eii build-public`, only against an allow-list of hosts, and fail loudly.
+- [Decision 0017](decisions/0017-public-data-additions-and-public-splits.md) adds 77 portal
+  datasets in 18 source groups (property sales, venue visits, building permits, employer scale,
+  manufacturing, trade, logistics, population, workforce, pay, students and visitors) and two
+  investment sources: the FDI projects dashboard, read on every build, and the sector,
+  opportunity, incentive, set-up and law pages of the national investment promotion agency.
+  Capex and jobs keep the source's note that they are estimates.
 - A source without stated reuse terms is validation-only: no value, derived share, title or
-  geometry from it enters a release while OI-04 is open.
+  geometry from it enters a release. The only exceptions are the two investment sources and the
+  census map layers, used by the owner's decisions of 2026-11-12 for this personal internal
+  project; decision 0017 item 10 closes OI-04 for version 1. Nothing fetched from them is
+  committed, and the archived census 2020 workbook stays validation-only.
+- Official figures split by sex or nationality are Public facts, shown only as published, with
+  source and year. They are never joined to a synthetic record, used to segment synthetic records,
+  combined with a protected figure or apportioned to a drawn area.
+- A drawn area counts Public points inside it exactly. A statistic published on an official
+  geography stays on that geography, or is labelled Inferred where it is apportioned to the shape.
 - The verified figures of the master design are regression examples: each has a dataset and an
   exact check. Two public figures conflict (OI-03) and are blocked from display until reconciled.
 - Work in slice S2 also builds the frame (zones, districts, municipalities, gazetteer, crosswalks), the
-  activity spine, the customs baskets, the hand-verified places of four showcase areas, and the
-  candidate record for the flagship building.
+  activity spine, the customs baskets, the hand-verified places of four showcase areas, the venue
+  crosswalk, the two page parsers and the candidate record for the flagship building.
 
 ## 1. Scope
 
-This document owns the public half of the custodian plane: `custodian/publicdata/` and the release
-tables whose names start `pub_`, plus the frame tables `zone`, `municipality`, `gazetteer` and the
-public parts of `graph_node`, `graph_edge` and `source_registry`. Methods that compute on these
-tables (location quotients, pay decomposition, break-even, bulk-month rule, co-location) are owned
-by [07 Economic methods](07_ECONOMIC_METHODS.md). Fact fields and provenance rules are owned by
-[03 Data contracts](03_DATA_CONTRACTS.md). The synthetic world reads this pack but is specified in
-[05 Synthetic world and simulation](05_SYNTHETIC_WORLD_AND_SIMULATION.md).
+This document owns the public half of the custodian plane: `custodian/publicdata/` (fetchers, page
+parsers and review files) and the release tables whose names start `pub_`, plus `fdi_projects`, the
+frame tables `zone`, `municipality`, `gazetteer` and the public parts of `graph_node`, `graph_edge`
+and `source_registry`. Methods that compute on these tables (location quotients, pay decomposition,
+break-even, bulk-month rule, co-location, apportioning to a drawn shape) are owned by
+[07 Economic methods](07_ECONOMIC_METHODS.md). Fact fields, release-table columns and provenance
+rules are owned by [03 Data contracts](03_DATA_CONTRACTS.md). The synthetic world reads this pack
+but is specified in [05 Synthetic world and simulation](05_SYNTHETIC_WORLD_AND_SIMULATION.md).
 
 Terms used here:
 
 - **Portal**: the Qatar Open Data Portal, `www.data.gov.qa`, which serves datasets through an
   Explore API (version 2.1) and states a licence based on CC BY 4.0 (portal licence page, retrieved
-  2026-11-11).
+  2026-11-11). The same portal answers the same API and slugs at `www.data.qa`
+  ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)).
 - **Public cache**: `data/public_cache/`, the local, uncommitted store of fetched files.
 - **Registry**: the committed list of sources (`custodian/publicdata/sources.yaml`) and its copy in
   the release table `source_registry`.
 - **Licence-activity count**: one activity on one commercial licence. It is not a firm, an
   establishment or a job.
+- **Investment sources**: `fdi_projects` (the FDI projects dashboard) and `investqa_pages` (the
+  sector, opportunity, incentive, set-up and law pages of the national investment promotion
+  agency), used by the owner's decision of 2026-11-12 (PUB-12).
+- **Public split**: an official figure split by sex or nationality. It is only ever a Public fact
+  (PUB-90).
 
 ```mermaid
 flowchart LR
   A["Allow-listed hosts"] -->|"build-public only"| B["public_cache: file and sidecar"]
-  B --> C["Checks: licence, schema, rows, regression"]
+  B --> C["Parsers and checks: licence or basis, schema, rows, regression"]
   C --> D["Reviewed configs: spine, baskets, places, crosswalks"]
   D --> E["Release: pub tables, frame, graph, source_registry"]
   E --> F["Product plane: read-only, no network to sources"]
@@ -53,11 +74,18 @@ flowchart LR
 
 ## 2. Source registry
 
-Every source the master design relies on is listed here. The key (first column) is the
-`source_id` used in the registry, in lineage and in the evidence drawer. Portal dataset
-identifiers are the slugs after `/explore/dataset/` in the URLs given by the project research
-(retrieved 2026-11-11). Publisher names are those reported by the research; the fetcher copies the
-publisher from the portal metadata at fetch time and fails if it differs (PUB-09).
+Every source the master design and decisions 0016 and 0017 rely on is listed here. The key (first
+column) is the `source_id` used in the registry, in lineage and in the evidence drawer. Portal
+dataset identifiers are the slugs after `/explore/dataset/` in the URLs given by the project
+research (retrieved 2026-11-11). Publisher names are those reported by the research; the fetcher
+copies the publisher from the portal metadata at fetch time and fails if it differs (PUB-09).
+
+[Decision 0017](decisions/0017-public-data-additions-and-public-splits.md) adds the rows from
+`prop_resi_units` onwards: 77 portal datasets in 18 source groups (the seventeen groups of the
+decision, with museum visits and health-centre visits kept as two sources), then the two
+investment sources. The slugs, publishers, rows, coverage and modified dates of the 77 datasets
+were read from the portal's catalogue and records on 2026-11-12, and the fetcher records them again
+at every fetch (PUB-85). A group has one `source_id` and one registry entry per slug.
 
 ### 2.1 Identity, fetch and licence
 
@@ -117,27 +145,54 @@ publisher from the portal metadata at fetch time and fails if it differs (PUB-09
 | `ref_ramadan_private_hours` | Ramadan working hours for the private sector | The Peninsula | citation only: `https://s.thepeninsula.qa/article/14/02/2026/ministry-of-labour-announces-ramadan-working-hours-for-private-sector` | to be confirmed at slice S2 |
 | `ref_ramadan_transit_hours` | Metro and tram Ramadan hours | The Peninsula | citation only: `https://s.thepeninsula.qa/article/17/02/2026/doha-metro-and-lusail-tram-announce-operating-hours-in-ramadan` | to be confirmed at slice S2 |
 | `ref_traffic_index` | Doha Traffic Index 2025 | TomTom | citation only: `https://www.tomtom.com/traffic-index/city/doha/` | proprietary publication; citation-only plausibility comparison |
+| `prop_resi_units` | Residential unit sales, weekly bulletin | Ministry of Justice | portal `weekly-residential-units-sales-bulletin` | CC BY (portal) |
+| `visits_museum` | Visitors of museums and exhibitions by month and museum | National Planning Council | portal `visitors-of-museums-and-exhibition-by-month-and-museum` | CC BY (portal) |
+| `visits_phcc` | Patient visits by health centre and region | Primary Health Care Corporation | portal `phcc-patient-visits-by-health-center-and-region` | CC BY (portal) |
+| `permits_muni` | Building permits and completion certificates: totals by municipality and building type, and monthly permits by type for each municipality | National Planning Council | portal `total-building-permits-issued-by-municipality-and-type-of-building-type-of-permit`, `total-building-completion-certificates-issued-by-municipality-and-type-of-building-type-of`, `building-permits-issued-by-type-of-permit-and-month-al-daayen-municipality`, `building-permits-issued-by-type-of-permit-and-month-al-khor-and-al-thakhira-municipality`, `building-permits-issued-by-type-of-permit-and-month-al-rayyan-municipality`, `building-permits-issued-by-type-of-permit-and-month-al-shahhaniya-municipality`, `building-permits-issued-by-type-of-permit-and-month-al-shamal-municipality`, `building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality`, `building-permits-issued-by-type-of-permit-and-month-doha-municipality`, `building-permits-issued-by-type-of-permit-and-month-umm-slal-municipality` | CC BY (portal) |
+| `est_size_act` | Establishments and employees by size of establishment and activity, with compensation | National Planning Council | portal `number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-two`, `number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-wholesale-and-retail-trade-four-digits`, `number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-transport`, `number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-social-and-personal-services-two-digits`, `number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-energy`, `number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-one`, `establishments-employees-and-compensation-of-employees-by-economic-activity-business-services` | CC BY (portal) |
+| `mfg_industry` | Manufacturing industries (one dataset per industry) and main manufacturing products | Ministry of Commerce and Industry (industry datasets); National Planning Council (`main-manufacturing-products`) | portal `manufacture-of-basic-metals`, `manufacture-of-basic-pharmaceutical-products-and-pharmaceutical-preparations`, `manufacture-of-beverages`, `manufacture-of-chemicals-and-chemical-products`, `manufacture-of-coke-and-refined-petroleum-products`, `manufacture-of-computer-electronic-and-optical-products`, `manufacture-of-electrical-equipment`, `manufacture-of-fabricated-metal-products-except-machinery-and-equipment`, `manufacture-of-food-products`, `manufacture-of-furniture`, `manufacture-of-leather-and-related-products`, `manufacture-of-machinery-and-equipment-nec`, `manufacture-of-manufacture-of-wood-and-of-products-of-wood-and-cork-except-furniture-manufacture`, `manufacture-of-motor-vehicles-trailers-and-semi-trailers`, `manufacture-of-other-non-metallic-mineral-products`, `manufacture-of-other-transport-equipment`, `manufacture-of-paper-and-paper-products`, `manufacture-of-rubber-and-plastics-products`, `manufacture-of-textiles`, `manufacture-of-wearing-apparel`, `main-manufacturing-products` | CC BY (portal) |
+| `trade_wr` | Purchases, sales and stocks during the year by type of trade, wholesale and retail | National Planning Council | portal `purchases-sales-and-stocks-during-the-year-by-type-of-trade-wholesale-and-retail-trade-all` | CC BY (portal) |
+| `pop_muni_age` | Population by municipality and age groups | National Planning Council | portal `population-by-municipality-and-age-groups` | CC BY (portal) |
+| `hotels_muni` | Hotels and hotel apartments by municipality | National Planning Council | portal `hotels-and-hotel-apartments-by-municipality` | CC BY (portal) |
+| `trade_logistics` | Certificates of origin by importing country; arriving vessels by previous port and by registration | Qatar Chamber of Commerce & Industry (certificates of origin); National Planning Council (vessels) | portal `annual-certificates-of-origin-by-type-and-importing-country`, `arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-previous-port`, `arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-registration-hamad-port0` | CC BY (portal) |
+| `est_census_2015_muni` | Business establishments and employees by municipality, census 2015 | National Planning Council | portal `distribution-of-business-establishments-and-employees-by-municipalities-according-to-census-2015` | CC BY (portal) |
+| `lf_muni_sex` | Population, labour force, employed and unemployed persons by sex and municipality | National Planning Council | portal `female-population-and-labour-force-by-municipality`, `male-population-and-labour-force-by-municipality`, `employed-persons-15-years-and-above-by-gender-and-municipality`, `unemployed-persons-15-years-and-above-by-gender-and-municipality` | CC BY (portal) |
+| `pop_muni_age_sex` | Population by municipality, age group and sex | National Planning Council | portal `females-population-by-municipality-and-age-groups-december-2020`, `males-population-by-municipality-and-age-groups-december-2020` | CC BY (portal) |
+| `active_sex_age_act` | Economically active females and males by age group and economic activity | National Planning Council | portal `economically-active-females-15-years-and-above-by-age-group-and-economic-activity`, `economically-active-males-15-years-and-above-by-age-group-and-economic-activity` | CC BY (portal) |
+| `active_nat_occ_act` | Economically active Qatari and non-Qatari population by occupation and economic activity (all, males, females) | National Planning Council | portal `economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity`, `economically-active-non-qatari-males-15-years-and-above-by-occupation-and-economic-activity`, `economically-active-non-qatari-population-15-years-and-above-by-occupation-and-economic-activity`, `economically-active-qatari-females-15-years-and-above-by-occupation-and-economic-activity`, `economically-active-qatari-males-15-years-and-above-by-occupation-and-economic-activity`, `economically-active-qatari-population-15-years-and-above-by-occupation-and-economic-activity` | CC BY (portal) |
+| `comp_nat_act` | Employees and compensation of employees by nationality and main economic activity (one dataset per survey sector) | National Planning Council | portal `number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity`, `number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-building`, `number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-business`, `number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy`, `number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy0`, `number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy1`, `number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-one`, `number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social`, `number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social0`, `number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social1` | CC BY (portal) |
+| `students_muni` | Students by level of education, municipality, sex, type of education and nationality | Ministry of Education and Higher Education | portal `students-by-level-of-education-municipality-gender-type-of-education-and-nationality-2025-2026` | CC BY (portal) |
+| `visitors_markets` | Hotel guests by nationality, hotel rating and stays; visitor arrivals | National Planning Council (hotel guests; arrivals by mode of entry and by region); Qatar Tourism (arrival trends by mode of transport) | portal `hotel-guests-by-nationality-hotel-rating-and-hotel-stays`, `visitor-arrivals-by-mode-of-entry`, `visitor-arrivals-by-region`, `visitor-arrivals-trends-by-mode-of-transport-air-land-sea` | CC BY (portal) |
+| `fdi_projects` | FDI projects dashboard: announced investment projects, data from fDi Markets | National investment promotion agency | page `https://fdiprojects.invest.qa/`, read on every build and parsed by the FDI page parser (PUB-86, PUB-87) | publisher's own terms as read at fetch; basis of use: owner decision of 2026-11-12 for this personal internal project (PUB-12) |
+| `investqa_pages` | Sector, opportunity, incentive, set-up and law pages | National investment promotion agency | pages of `https://www.invest.qa/`, parsed by the agency page parsers (PUB-86, PUB-88); page list confirmed at slice S2 | as `fdi_projects` |
 
 The `.../` prefix in census and boundary rows is
 `https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/`. A portal identifier is
-fetched as `https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/<id>/exports/json`, and its
+fetched as `https://<host>/api/explore/v2.1/catalog/datasets/<id>/exports/json`, and its
 metadata (licence, modified date, publisher) from
-`https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/<id>` (URL pattern as used by the
-project research, 2026-11-11).
+`https://<host>/api/explore/v2.1/catalog/datasets/<id>`, where `<host>` is `www.data.gov.qa` or
+`www.data.qa` (URL pattern as used by the project research, 2026-11-11; the second host by
+decision 0017). A slug names the same dataset on either host, and the registry records the host
+that served each file (PUB-03). The investment sources are fetched as pages from their own hosts
+and parsed by the page parsers of section 3.2.
 
 ### 2.2 Coverage, use and traps
 
-All coverage facts below are from the project research, retrieved 2026-11-11, and must be
-re-recorded by the fetcher.
+Coverage facts of the rows above `prop_resi_units` are from the project research, retrieved
+2026-11-11. Those of the 18 decision 0017 groups were read from the portal's catalogue and records
+on 2026-11-12; where a group holds several slugs, rows are given per slug, and modified dates per
+slug or as the range they span. Those of the two investment sources come from the dashboard page,
+read 2026-11-12, and from [decision 0017](decisions/0017-public-data-additions-and-public-splits.md).
+All must be re-recorded by the fetcher.
 
 | source_id | Coverage, grain, last period | Product use | Release table | Known traps |
 |---|---|---|---|---|
 | `lic_active` | Snapshot "as of May 2025"; municipality x activity code; 13,189 rows; modified 2025-08-04 | capability M3 licences against national rate; capability S1 context; capability S8 denominator; spine input | `pub_licence_active` | Arabic names only; 8 municipalities, nothing inside one; 6-digit legacy codes do not follow ISIC; codes predate the June 2026 recoding; not comparable with census establishments |
-| `lic_cancelled` | 2015 to May 2025; year-month x municipality x code; 40,472 rows | capability S8 churn with bulk months flagged | `pub_licence_cancelled` | 1,221 rows (7,386 licences) undated; July 2020 holds 40,791 cancellations; three months hold 43% of dated cancellations |
-| `lic_issued` | to May 2025; 8,259 rows; 610 codes only | none on screen; audit of incompleteness only | none | sums to 12,533; restaurants (5610101), cafeteria (5610201), general contracting (4100001) and foodstuff trade (4630901) absent; never compute net formation |
-| `cus_imp_2025` | Jan 2025 to Feb 2026; 12-digit tariff line x origin x month; 252,048 rows; modified 2026-10-19 | capability S5 supplier lens; basket unit values | `pub_customs_import` | quantity units are not all kg; descriptions vary by year; bilingual origin names |
-| `cus_imp_2019` | 2019 to 2024; 8-digit lines; 830,494 rows | capability S5 trend before 2025 | `pub_customs_import` | coarser code than 2025 data: basket lines must roll up (PUB-44); slug ends in `-copy` |
-| `sec_hr_ind`, `sec_hr_goods`, `sec_hr_serv`, `sec_hr_size` | annual 2018 to 2022; national; activities 551, 561, 562, 563 | capability M6 unit economics and break-even | `pub_sector_accounts` | latest year 2022 (a World Cup year); national averages over all outlet types; surplus share jumped after 2019 for an unexplained reason; restaurant revenue conflict (OI-03) |
+| `lic_cancelled` | 2015 to May 2025; year-month x municipality x code; 40,472 rows | capability S8 churn with bulk months flagged; D6 licence cancellations over time on the map (PUB-94) | `pub_licence_cancelled` | 1,221 rows (7,386 licences) undated; July 2020 holds 40,791 cancellations; three months hold 43% of dated cancellations |
+| `lic_issued` | to May 2025; 8,259 rows; 610 codes only | D6 licence issues over time on the map, only for the codes it covers and always with its incompleteness note (PUB-94, [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 11); audit of incompleteness | `pub_licence_issued` | sums to 12,533; restaurants (5610101), cafeteria (5610201), general contracting (4100001) and foodstuff trade (4630901) absent; never compute net formation |
+| `cus_imp_2025` | Jan 2025 to Feb 2026; 12-digit tariff line x origin x month; 252,048 rows; modified 2026-10-19 | capability S5 supplier lens; basket unit values; D7 import context and imports against local production with `mfg_industry` | `pub_customs_import` | quantity units are not all kg; descriptions vary by year; bilingual origin names |
+| `cus_imp_2019` | 2019 to 2024; 8-digit lines; 830,494 rows | capability S5 trend before 2025; D7 imports against local production with `mfg_industry` | `pub_customs_import` | coarser code than 2025 data: basket lines must roll up (PUB-44); slug ends in `-copy` |
+| `sec_hr_ind`, `sec_hr_goods`, `sec_hr_serv`, `sec_hr_size` | annual 2018 to 2022; national; activities 551, 561, 562, 563 | capability M6 unit economics and break-even; `sec_hr_size` also employer scale by size class for restaurants and the other hotel and restaurant activities ([07](07_ECONOMIC_METHODS.md) C24) | `pub_sector_accounts`; `sec_hr_size` also `pub_establishment_size`, under its own `table_code` | latest year 2022 (a World Cup year); national averages over all outlet types; surplus share jumped after 2019 for an unexplained reason; restaurant revenue conflict (OI-03) |
 | `sec_hr_comp_occ` | to 2022; national; occupation classes | capability S2 staffing context | `pub_wage_table` | national only |
 | `wage_occ` | 2020 to 2025; national; 9 occupation groups x sex | capability S3 national pay card; capability S2 public mean | `pub_wage_table` | means only, no percentiles or area; implies a different 2020 mean from `wage_act` (OI-03) |
 | `wage_act` | 2020 to 2023; national; 21 activity sections x sex | capability S2 context | `pub_wage_table` | as above; includes government and domestic work |
@@ -154,23 +209,45 @@ re-recorded by the fetcher.
 | `est_census` | 2010 and 2020; national by activity group; 2020 total 71,203 | places coverage note; calibration ([05](05_SYNTHETIC_WORLD_AND_SIMULATION.md)) | `pub_census_national` | national only |
 | `census_hh_type_2020` | Census night, December 2020; household type and place of residence | housing-class calibration | none until publisher, licence, columns and types are confirmed | expected source schema to be confirmed at slice S2 |
 | `census_2020_workbook` | Census 2020; Tables 1, 2, 151 and 152 | zone totals, establishment size classes and municipal establishment counts for validation | none | no licence stated; validation-only; workbook sheet names, columns and types to be confirmed at slice S2 |
-| `worldpop_qat_2020` | constrained 100 m grid, 2020 | relative within-zone family-housing weights, rescaled to separately anchored totals | none | raster schema and file URL to be confirmed at slice S2; never treated as a 2025 population total |
+| `worldpop_qat_2020` | constrained 100 m grid, 2020 | relative within-zone family-housing weights, rescaled to separately anchored totals; relative weights for apportioning counts of people to a drawn shape ([07](07_ECONOMIC_METHODS.md) C18) and the free-flow demand layer of reachable access (C12), the only one in public-only mode, both confirmed at slice S2 | for C12, `access_score_grid` (the cell weights and free-flow scores of [03](03_DATA_CONTRACTS.md) DAT-154), once slice S2 confirms the file and licence for that use; for C18, none until slice S2 fixes, with the apportioning weight, how the weights enter the release | raster schema and file URL to be confirmed at slice S2; never treated as a 2025 population total; weights only, never a population figure on screen |
 | `accident` | 2024 records with zone field | simulation plausibility hold-out | none | publisher, licence, exact source columns and types to be confirmed at slice S2 |
-| `census_zone_*`, `census_district_pop` | December 2020; zone (91) or district (778 with population) | validation of coverage geography and calibration; `census_district_pop` writes `pub_census_district` when licensed | `pub_census_zone`, `pub_census_district` (zero rows while OI-04 is open) | no licence stated for the source; validation-only until terms are recorded (OI-04); every release still includes both tables, with zero rows until licensed |
-| `bnd_zone_2020`, `bnd_district_2020` | 91 zones numbered within 1 to 99; 781 districts | validation of licensed frame geometry | none while OI-04 is open | no licence stated; validation-only; zone numbers 8, 9, 10, 11, 59, 87, 88, 89 unused |
+| `census_zone_*`, `census_district_pop` | December 2020; zone (91) or district (778 with population) | coverage geography and calibration; `census_district_pop` writes `pub_census_district` | `pub_census_zone`, `pub_census_district` | no licence stated for the source; used in the local release by [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10 (OI-04 closed for version 1), each figure with its source and retrieval date, never committed (PUB-13); every release includes both tables |
+| `bnd_zone_2020`, `bnd_district_2020` | 91 zones numbered within 1 to 99; 781 districts | validation of licensed frame geometry | none: the frame uses `bnd_hdx` | no licence stated; decision 0017 item 10 allows them in the local release, but version 1 uses them only to check `bnd_hdx` (PUB-13); never committed; zone numbers 8, 9, 10, 11, 59, 87, 88, 89 unused |
 | `bnd_hdx` | 8 municipalities, 91 zones, 781 districts in the files; geometry dated 2015-11-30; modified 2026-08-19 | bilingual names; licensed geometry | `zone`, `municipality`, `gazetteer` | description says 87 zones and 718 districts, files hold 91 and 781; 2015 geometry: check Lusail against the 2020 layer |
 | `bnd_muni_2025` | 8 municipality polygons | municipality geometry | `municipality` | no dataset-level licence metadata |
 | `bnd_geob` | 8 municipalities, 79 zones (some merged, e.g. '18-19') | fallback if no licensed zone geometry | `zone` (fallback) | coarser, 2015 |
-| `places_ovt` | 26,383 records with country QA (26,404 in the bounding box) | capability M3 named places with network distances; capability S9 neighbours; showcase verification | `pub_place` | incomplete (PUB-50); duplicates and junk records; Meta-dominated; taxonomy changed in late 2026; 'Italian' includes pizza through the category hierarchy |
+| `places_ovt` | 26,383 records with country QA (26,404 in the bounding box) | capability M3 named places with network distances; capability S9 neighbours; showcase verification; real business points on the map (PUB-92); venue points (PUB-89) | `pub_place` | incomplete (PUB-50); duplicates and junk records; Meta-dominated; taxonomy changed in late 2026; 'Italian' includes pizza through the category hierarchy |
 | `bldg_ovt` | 4,400 footprints in the Lusail box; 73 with a height | flagship and showcase building points | `gazetteer` | most heights unknown; ODbL |
-| `roads_osm` | Qatar; about 24.5 MB; changes daily | pyvalhalla graph for `walk` and `drive` areas and network distances | none (routing graph is a build artefact) | free-flow only; "latest" URL is not a version: the hash is the pin; ODbL share-alike |
+| `roads_osm` | Qatar; about 24.5 MB; changes daily | pyvalhalla graph for `walk` and `drive` areas and network distances; the real road network for simulated congestion by hour and for drive-time areas that change with the hour ([05](05_SYNTHETIC_WORLD_AND_SIMULATION.md), decision 0016) | none (routing graph is a build artefact) | free-flow only; "latest" URL is not a version: the hash is the pin; ODbL share-alike |
 | `cls_isic4` | ISIC Rev.4 classes (now a previous ISIC version on the UNSD page) | spine validity check; English class titles | `graph_node` | no Arabic file confirmed (open question); not committed |
 | `ref_min_wage` | QAR 1,000 basic plus at least 500 housing and 300 food when not provided in kind | capability S2 statutory minimum line | `pub_wage_table` (one reference row) | a legal fact, not a survey figure; `public_document`, citation-only |
 | `ref_wps_report`, `ref_expansion_method`, `ref_gov_hours`, `ref_friday_closure`, `ref_transit_hours`, `ref_summer_work`, `ref_truck_hours`, `ref_ramadan_public_hours`, `ref_ramadan_private_hours`, `ref_ramadan_transit_hours`, `ref_traffic_index` | citation-only public documents | calibration rules or plausibility context in [05](05_SYNTHETIC_WORLD_AND_SIMULATION.md) | none | registry metadata only; no fetched file or dataset schema; H4 road speed is a plausibility comparison, not a hold-out |
+| `prop_resi_units` | 2025-08-24 to 2025-12-31; weekly bulletin rows of residential unit sales; 570 rows; modified 2026-08-31 | D2 district price layer beside the pay cards; D6; the reverse location view for property owners and developers | `pub_property_resi` (aggregates only) | encrypted transaction and parcel numbers are dropped before the release (PUB-14); few rows: every price shows its deal count; area names go through the district crosswalk (PUB-28); not the same dataset as `prop_sales` |
+| `visits_museum` | 2013 to 2024; monthly by museum or exhibition; 1,372 rows; modified 2026-06-24 | published visitor counts of named public venues (`place_public`, PUB-91); the monthly shape calibrates and checks the simulated footfall ([05](05_SYNTHETIC_WORLD_AND_SIMULATION.md)) | `pub_venue_visits` | the count field is text: parsed by the build, and a value that does not parse fails it; venue names change between years: normalised through the venue crosswalk (PUB-89), never by hand |
+| `visits_phcc` | 2020 to 2024, annual, years as columns; by health centre and region; 35 rows; modified 2025-05-28 | published patient visits of named health centres (`place_public`, PUB-91); annual cross-check of simulated presence near them | `pub_venue_visits` | annual only: no monthly shape; the build reads the year columns as periods |
+| `permits_muni` | totals by municipality, building type and permit type, 2021 to 2023: permits 264 rows, completion certificates 240 rows, both modified 2026-06-05; monthly permits by type, one dataset per municipality, 2016 to 2023 with 288 rows each, except Al Shahhaniya (2017 to 2023, 252 rows); modified 2026-09-02, except Doha and Umm Slal (2026-08-31) | construction pipeline by municipality: D6, what changed, the reverse location view | `pub_building_permits` | monthly series by municipality end in 2023; Al Shahhaniya starts in 2017; municipality spelling variants (PUB-27) |
+| `est_size_act` | national; establishments and employees by size of establishment and activity, one survey bulletin per sector; 2015 to 2022, except transport (2014 to 2019) and business services with compensation (2015 to 2021); rows: slug ending `-two` 556, wholesale and retail (four digits) 1,840, transport 356, social and personal services (two digits) 316, energy 2,912, slug ending `-one` 160, business services 324; modified 2026-08-27 to 2026-11-02 | employer scale and wage bill by activity: D1 market entry pack, D3 customer finder, S1, cases C1 and C2 | `pub_establishment_size` | survey bulletins by sector with different last years (transport ends 2019); national only; size-class labels differ between bulletins |
+| `mfg_industry` | one dataset per manufacturing industry, rows by licence type, 2019 to 2025, 14 rows each (computer, electronic and optical products: 7), modified 2025-05-27 to 2026-11-03; main manufacturing products, 2016 to 2022, 35 rows, modified 2026-07-25 | industrial capacity per industry: D4 partner and supplier finder, S3, D7 imports against local production (with `cus_imp_2025` and `cus_imp_2019`), case C1 | `pub_manufacturing` | licence-type rows, not plants; investment in QAR million is cumulative licensed investment; one slug repeats 'manufacture-of-'; field names differ slightly between industries |
+| `trade_wr` | 2015 to 2022; national; by type of trade, wholesale and retail; 864 rows; modified 2026-11-01 | market context in the market entry pack (D1, S1) | `pub_trade_wr` | context only, never a forecast; national |
+| `pop_muni_age` | 2014 to 2024; municipality x age group; 1,584 rows; modified 2026-08-19 | customer segments by area and age (D3) | `pub_population_age` | estimates; spelling variants of municipality names (PUB-27) |
+| `hotels_muni` | 2022 to 2024; municipality; 48 rows; modified 2026-08-02 | visitor accommodation supply (D1); calibrates the visitor share of the simulated footfall ([05](05_SYNTHETIC_WORLD_AND_SIMULATION.md)) | `pub_hotels_municipality` | counts of facilities, not rooms or guests |
+| `trade_logistics` | certificates of origin by type and importing country, 2019 to 2024, 1,162 rows, modified 2025-05-29; arriving vessels, gross and net tonnage by type of vessel and country of previous port, 2016 to 2022, 1,890 rows, modified 2026-06-20; the same by country of registration (Hamad Port), 2019 to 2023, 717 rows, modified 2026-04-27 | serving the region and logistics access (D7) | `pub_trade_logistics` | a second certificates dataset with fewer rows exists on the portal and is not used; vessel series end in 2022 and 2023 |
+| `est_census_2015_muni` | census 2015; municipality; 8 rows; modified 2025-06-02 | calibrates the density of synthetic firms by municipality ([05](05_SYNTHETIC_WORLD_AND_SIMULATION.md)) | `pub_census_2015_municipality` | dated 2015: every use says so; carries municipality geometry, which the frame does not use (section 5) |
+| `lf_muni_sex` | 2020 to 2025; municipality x sex; female and male population and labour force, 240 rows each, modified 2026-09-30; employed persons 15 years and above, 96 rows, modified 2026-09-10; unemployed persons 15 years and above, 96 rows, modified 2026-09-06 | workforce available by area and sex, including the unemployed pool: D5 staffing; services aimed at women | `pub_labour_sex_municipality` | survey estimates (Labour Force Sample Survey); Public split by sex on the source's municipality geography only (PUB-90) |
+| `pop_muni_age_sex` | 2014 to 2023; municipality x age group x sex; 1,440 rows each; modified 2025-06-02 (females) and 2025-05-07 (males) | customer segments by area, age and sex (D3), for example women aged 25 to 44 | `pub_population_age_sex` | titled December 2020 but holding 2014 to 2023; the year field is a date in one and text in the other; Public split by sex (PUB-90) |
+| `active_sex_age_act` | 2017 to 2023; national; sex x age group x economic activity; females 1,551 rows, males 1,617 rows; modified 2026-11-04 | workforce by sex and age for each sector (D5) | `pub_active_sex_age` | national; Public split by sex (PUB-90) |
+| `active_nat_occ_act` | national; Qatari and non-Qatari by occupation and economic activity, for all, males and females; 2017 to 2023, except Qatari males and the Qatari population (2017 to 2024); rows: non-Qatari females 1,269, non-Qatari males 1,323, non-Qatari population 1,323, Qatari females 1,206, Qatari males 1,440, Qatari population 1,440; modified 2026-11-04 | the Qatari talent pool by occupation and sector: staffing and Qatarization context (D5) | `pub_active_nationality_occupation` | national; Public split by nationality in the published Qatari and non-Qatari categories only (PUB-90); last year differs (2023 or 2024) |
+| `comp_nat_act` | national; employees and annual compensation by nationality and main economic activity, one dataset per survey sector; 2015 to 2022, except the base slug (2016 to 2021) and the slug ending `-building` (2017 to 2022); rows by slug ending: base 72, `-building` 72, `-business` 556, `-energy` 2,872, `-energy0` 1,040, `-energy1` 2,904, `-one` 160, `-social` 1,092, `-social0` 1,072, `-social1` 1,092; modified 2025-08-17 to 2026-11-01 | Qatari and non-Qatari employment and pay per activity: pay benchmarks and Qatarization context (D5, D1) | `pub_compensation_nationality` | one dataset per survey bulletin with different field names; compensation is annual; national; Public split by nationality (PUB-90), never combined with a protected pay figure |
+| `students_muni` | school years 2020-2021 to 2025-2026; municipality x level of education x sex x type of education x nationality; 1,570 rows; modified 2026-09-29 | students by area: training providers, family services, the future workforce (D3, D5) | `pub_students` | school years as text ('2025-2026'); Public splits by sex and nationality as published (PUB-90) |
+| `visitors_markets` | hotel guests by nationality, hotel rating and stays, 2020 to 2022, 192 rows, modified 2026-06-20; visitor arrivals by mode of entry (3 rows) and by region (6 rows), June to November 2024 with the months as columns, modified 2026-11-04; arrival trends by mode of transport (air, land, sea), 2019 to 2025, 20 rows, modified 2026-10-19 | visitor source markets for hospitality decisions (D1, D3) | `pub_visitor_markets` | two arrival tables hold June to November 2024 as columns; hotel guests end in 2022; Public split by nationality as published (PUB-90) |
+| `fdi_projects` | about 1,596 announced projects embedded in one page (the owner's figure, 2026-11-12), one record per project; fields: company, source country, sector, sub-sector, function, project type, capex, jobs, date, location and any further field the page holds; period range from the project dates at fetch | a Public source on the map and in D1, D4, D6 and D7, the market entry pack (S1) and the expansion comparison (S2) | `fdi_projects` (contract in [03](03_DATA_CONTRACTS.md)) | capex and jobs are the source's estimates of publicly announced projects; the dashboard does not capture every project and its data is subject to change; each project names a real investing company: Public-only subject `fdi_project` (PUB-87); page structure and location precision confirmed at slice S2 |
+| `investqa_pages` | the sector, opportunity, incentive, set-up and law pages; parsed into records: sector, opportunity, incentive package with its parameters, set-up step, law with its link; page list confirmed at slice S2 | sector context (D1), the market entry pack (S1), the set-up steps, and the incentive packages as optional inputs of the break-even calculator ([07](07_ECONOMIC_METHODS.md)) | `pub_investqa_record` | page structure confirmed at slice S2; a forecast stated on a page is not loaded as a figure (PUB-88); a page that states no period is shown as read on its retrieval date |
 
 Sources mentioned in research but **not in v1**: the 2014 to 2018 imports, Harvard Growth Lab Atlas
-files (Later, L3 and L9), UN Comtrade, World Bank and ILOSTAT benchmarks, and OpenStreetMap points
-of interest (cross-check aid only, PUB-55).
+files (Later, L9), UN Comtrade, World Bank and ILOSTAT benchmarks, and OpenStreetMap points of
+interest (cross-check aid only, PUB-55). Imports against local production (formerly L3) is now in
+version 1 ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)); it uses the
+customs data (`cus_imp_2025`, `cus_imp_2019`) with the manufacturing datasets (`mfg_industry`).
 GADM is excluded: its licence forbids commercial use and redistribution (gadm.org licence page,
 per research).
 
@@ -180,7 +257,7 @@ per research).
 |---|---|
 | PUB-01 | Public sources are fetched only by `./eii build-public`. No other command, test or product code opens a network connection to a source host. |
 | PUB-02 | The product plane (`product/`, `web/`) contains no code path that contacts a source host; a test asserts that the product imports no fetcher module and that the API process makes no request to any source host during the guided story. |
-| PUB-03 | The fetcher accepts only HTTPS, or S3 for Overture, to `www.data.gov.qa`, `services7.arcgis.com`, `data.humdata.org`, `s3.us-east-1.amazonaws.com`, `www.geoboundaries.org`, `github.com`, `raw.githubusercontent.com`, `stac.overturemaps.org`, `overturemaps-us-west-2.s3.us-west-2.amazonaws.com`, `download.openstreetmap.fr`, `unstats.un.org`, `data.worldpop.org` and `web.archive.org`. Redirect and storage hosts are checked too. A source whose direct URL or redirect host is still marked to be confirmed at slice S2 is blocked. Adding a host needs a reviewed registry change. |
+| PUB-03 | The fetcher accepts only HTTPS, or S3 for Overture, to `www.data.gov.qa`, `www.data.qa`, `services7.arcgis.com`, `data.humdata.org`, `s3.us-east-1.amazonaws.com`, `www.geoboundaries.org`, `github.com`, `raw.githubusercontent.com`, `stac.overturemaps.org`, `overturemaps-us-west-2.s3.us-west-2.amazonaws.com`, `download.openstreetmap.fr`, `unstats.un.org`, `data.worldpop.org`, `web.archive.org`, `fdiprojects.invest.qa` and `www.invest.qa`. `www.data.gov.qa` and `www.data.qa` serve the same portal and the same slugs ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)): a dataset is identified by its slug whichever host served it, and the registry records the host each file came from (`fetch_host`). Redirect and storage hosts are checked too. A source whose direct URL or redirect host is still marked to be confirmed at slice S2 is blocked. Adding a host needs a reviewed registry change. |
 | PUB-04 | Every fetched file is stored in `data/public_cache/<source_id>/<sha256>.<ext>` with a complete sidecar holding the fields of section 3.1. An entry with `kind: public_document` and `fetch_mode: citation_only` opens no network request, requires no cached file, and writes registry metadata with `sha256: "CITATION_ONLY"`. |
 | PUB-05 | Writes are atomic: a file enters the cache only after its download completes, its SHA-256 is computed and its checks pass. An interrupted run leaves no partial entry. |
 | PUB-06 | A failed request is retried at most three times with back-off, then the build exits non-zero with a message naming the `source_id`, the URL and the failed check. There is no silent fallback to an older file. |
@@ -189,28 +266,33 @@ per research).
 | PUB-09 | For portal sources, the fetcher reads the dataset metadata and records licence, publisher and modified date. A missing licence, a licence different from the registry, or a publisher different from the named publisher fails the build. A publisher or licence marked to be confirmed at slice S2 blocks that source until a reviewer records the exact metadata. |
 | PUB-10 | When an upstream file changes (new SHA-256), the new version is stored beside the old one. The release manifest names exactly one hash per source, and changing it is a reviewed registry change. |
 | PUB-11 | No file is committed unless its licence is stated and permits redistribution. `data/` is never committed. Committed derived files (section 6 configs, test fixtures) record the `source_id` they derive from. |
-| PUB-12 | A portal dataset with no dataset-level licence metadata may be used only with `licence_basis: portal_terms` and a reviewer note in the registry; it is never committed. |
-| PUB-13 | Until written terms or permission covering the intended use are recorded, sources marked `none stated` are validation-only. No raw value, derived share, title or geometry from them enters a release; affected tools return `NO_DATA`. The 2020 boundary layers are used only to check licensed HDX geometry. The same release-lineage block applies to unresolved UN classification terms. |
-| PUB-14 | Transaction and parcel identifiers in `prop_sales`, and any other identifier column in a public source, are dropped before the release; only aggregates with their deal counts are stored. |
+| PUB-12 | A portal dataset with no dataset-level licence metadata may be used only with `licence_basis: portal_terms` and a reviewer note in the registry; it is never committed. A source whose publisher states no reuse terms covering the use made here may enter a release only when an accepted decision record of the owner names it, with `licence_basis: owner_decision`. [Decision 0017](decisions/0017-public-data-additions-and-public-splits.md) names the only such sources: the two investment sources, `fdi_projects` and `investqa_pages` (the owner's decision of 2026-11-12 for this personal internal project, without a permission request), and the census map layers of PUB-13 (item 10). The investment sources' registry entries record the publisher's own terms as read at fetch (page, retrieval date and hash) and that basis; a changed terms page is a reviewed registry change, like a changed file (PUB-10). They are never committed. If the terms read at fetch forbid the use made here, the source is switched off (no value from it enters a release, and its tools return `NO_DATA`) and the owner is told. If the demonstrator is ever hosted publicly, the owner decides then which of these sources stay on. |
+| PUB-13 | Until written terms or permission covering the intended use are recorded, sources marked `none stated` are validation-only. No raw value, derived share, title or geometry from them enters a release; affected tools return `NO_DATA`. The 2020 boundary layers are used only to check licensed HDX geometry. The same release-lineage block applies to unresolved UN classification terms. The two investment sources of PUB-12 and the census map layers (`census_zone_sector`, `census_zone_occ`, `census_zone_hh`, `census_zone_lab`, `census_district_pop`) are the only sources without such terms that enter a release, by the owner's decision ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md) items 6 to 8 and 10; item 10 closes OI-04 for version 1), each figure with its source and retrieval date and nothing fetched from them committed. The archived census 2020 workbook and every other source without stated reuse terms stay validation-only, and no other source may use that basis without a new decision record. |
+| PUB-14 | Transaction and parcel identifiers in `prop_sales` and `prop_resi_units`, and any other identifier column in a public source, are dropped before the release; only aggregates with their deal counts are stored. |
 | PUB-15 | `./eii build-public` prints, for the slice S2 gate, 20 randomly drawn stored figures, each with its `source_id`, URL, filter and value, so a reviewer can check them against the source. The seed and the list are saved with the build log. |
 | PUB-16 | Fetchers record retrieval time in UTC and never use a file date or a portal "modified" date as the reference period of the data. The reference period comes from the data's own period fields. |
 | PUB-17 | The Overture extract is read with DuckDB from the pinned release path, filtered to the Qatar bounding box and `country = 'QA'`, and stored as Parquet. DuckDB 2.x needs `SET geometry_always_xy=true` (research note); read the current DuckDB spatial documentation before writing this step. |
 | PUB-18 | ArcGIS feature services are paged at the server's stated maximum (2,000 features per request per research) until the reported total is reached; a short final total fails the build. |
 | PUB-80 | Every number and comparison emitted from this pack is produced by a deterministic tested release-build function or by `eii_core.calc`, with a method card and worked regression example. The browser only formats returned facts and never calculates a displayed value. |
+| PUB-85 | Each of the 18 source groups added by [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) keeps one `source_id` and has one registry entry per slug, keyed `<source_id>/<slug>`. Each slug is a dataset of its own for PUB-04 to PUB-10 and PUB-16: its own sidecar, hash, host, declared columns and types, row-count range, last period, and publisher and licence checks. The release manifest names exactly one hash per slug, and lineage and the evidence drawer name the slug. The coverage facts in section 2.2 for these groups were read from the portal's catalogue and records on 2026-11-12 and are recorded again at every fetch. Every figure from them is shown as Public with its source, its reference year (or month) and its retrieval date. |
 
 ### 3.1 Registry and sidecar record
 
 ```yaml
-source_id: util_elec
+source_id: util_elec            # decision 0017 groups: one entry per slug, <source_id>/<slug> (PUB-85)
 kind: public_dataset            # public_dataset | public_document
 fetch_mode: fetch               # fetch | citation_only
 title_en: Electricity Total Consumption by Zone Number
 publisher: Kahramaa            # copied from portal metadata at fetch
+fetch_host: www.data.gov.qa    # host that served the file; portal: www.data.gov.qa or www.data.qa (PUB-03)
 fetch_url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/electricity-total-consumption-by-zone-number/exports/json
 landing_url: https://www.data.gov.qa/explore/dataset/electricity-total-consumption-by-zone-number/
 licence_id: CC-BY-4.0          # one of the ids in section 4
-licence_basis: dataset         # dataset | portal_terms | none_stated
+licence_basis: dataset         # dataset | portal_terms | none_stated | owner_decision (PUB-12)
 licence_url: https://www.data.gov.qa/pages/license/annexes
+terms_sha256: null             # owner_decision only: hash of the publisher's terms as read at fetch
+decision_record: null          # owner_decision only: the record that grants the use (0017 for the investment sources and the census map layers)
+public_splits: []              # split dimensions this Public source may carry: sex, nationality (PUB-90)
 commit_allowed: false          # true only for small derived configs and fixtures
 retrieved_utc: 2026-11-11T09:00:00Z   # example value
 sha256: <64 hex characters>
@@ -225,22 +307,39 @@ release_tables: [pub_zone_utility]
 caveat_keys: [proxy_not_population, partial_latest_year]
 ```
 
+### 3.2 Investment sources and page parsers
+
+The two investment sources are pages, not portal datasets. On 2026-11-12 the owner decided to use
+them in full for this personal internal project
+([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)). PUB-12 sets their
+basis of use; their fetch follows PUB-01 to PUB-10 like every other source.
+
+| ID | Requirement |
+|---|---|
+| PUB-86 | The FDI page parser and the agency page parsers are deterministic functions in `custodian/publicdata/` that turn a cached page into typed records. They read only the cached file of PUB-04, never a live page. Each declares the page structure it expects, confirmed at slice S2 ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)); a missing or changed element fails the build, naming the `source_id`, URL and element, and nothing is loaded in part. Their tests use only a small synthetic page shaped like the real one, whose names, figures and text are invented and copy no value or text from the real page. Nothing fetched is committed: the pages and the parsed records stay in the uncommitted `data/` folder (PUB-11), and only the fetchers, the parsers, the contracts and their tests are committed. The publisher's name and terms are recorded from the site at each fetch (PUB-12). |
+| PUB-87 | `fdi_projects` is read from the dashboard page `https://fdiprojects.invest.qa/` (data from fDi Markets) on every `./eii build-public`. Every project field the page holds is loaded into the contract `fdi_projects` ([03](03_DATA_CONTRACTS.md)); a field the contract does not declare fails the build until the contract adds it, so no field is dropped silently. A changed page is stored under its new hash and enters a release through the reviewed registry change of PUB-10. Capex keeps the currency and unit the page states; nothing is converted. Every capex and jobs figure carries the source's note that it is an estimate of a publicly announced project, and every count or list of projects carries the note that the dashboard does not capture every project and that its data is subject to change. The subject `fdi_project` accepts Public slots only: no Synthetic or Simulated fact is attached to it, it is never joined to synthetic firm data, and it is shown as a published announcement with its source and the estimate note, never as a lookup of a firm ([AGENTS.md](../AGENTS.md) rule 24). A project is placed only at the location the page gives, resolved to an official geography through the gazetteer: a location given as a city or municipality is shown on that geography, never at an invented point, and is never counted as inside a drawn shape; an unresolved location has no map position. Its company names are real business names in the public cache, so the name-collision check of SYN-20 covers them. |
+| PUB-88 | `investqa_pages` loads the sector, opportunity, incentive, set-up and law pages of `https://www.invest.qa/` into `pub_investqa_record`: one typed record per sector, opportunity, incentive package (with its parameters), set-up step and law (with its link), each with its page URL and retrieval date. Screens show these records only through application templates, with a link to each page. Every number parsed from a page (an incentive parameter, for example) is a typed field shown only as a Public fact; a record whose page states no period is shown as read on its retrieval date. A forecast stated on a page (of revenue, demand, market size or growth) is not loaded as a figure; the record links to the page instead ([AGENTS.md](../AGENTS.md) rule 24). Incentive packages are optional scenario inputs of the break-even calculator of [07](07_ECONOMIC_METHODS.md), tagged "your inputs" with their source page; they never change a Public figure. |
+
 ## 4. Licences and attribution
 
 Attribution is shown in three places: the evidence drawer of every Public fact chip, the Trust
 centre source list, and every export (briefing pack, reviewer's GIS mirror). Attribution names the
-publisher of a public dataset; it never presents a publisher as a supplier or endorser of the POC.
+publisher of a public dataset or page; it never presents a publisher as a supplier or endorser of
+the POC.
 
 | Licence | Sources | Text on screen and in exports (template) | Extra duty |
 |---|---|---|---|
-| CC BY 4.0 (portal licence) | all portal sources | "Source: {publisher}, {dataset title}, Qatar Open Data Portal, retrieved {date}. Licensed under CC BY 4.0. {Modified: aggregated by EII.} No endorsement implied." | link to the dataset page; state modifications |
+| CC BY 4.0 (portal licence) | all portal sources, from either host | "Source: {publisher}, {dataset title}, Qatar Open Data Portal, retrieved {date}. Licensed under CC BY 4.0. {Modified: aggregated by EII.} No endorsement implied." | link to the dataset page; state modifications |
 | CC BY-IGO | `bnd_hdx` | "Boundaries: Planning and Statistics Authority via HDX (COD-AB Qatar), CC BY-IGO, retrieved {date}." | link to the HDX page |
 | CC BY 4.0 | `bnd_geob` (fallback) | "Boundaries: geoBoundaries, CC BY 4.0, retrieved {date}." | link |
 | CDLA Permissive 2.0 | `places_ovt` records from Meta, Microsoft, PinMeTo, Uberall and other listed sources | "Data from {provider}. Available under CDLA Permissive 2.0." plus "Overture Maps Foundation, overturemaps.org, release 2026-10-21.0, accessed {date}." | any shared copy of place data carries the full CDLA Permissive 2.0 text (agreement section 2.1, cdla.dev, checked 2026-11-11) |
 | Apache 2.0 | `places_ovt` records sourced from Foursquare | "Copyright 2024 Foursquare Labs, Inc. All rights reserved. Licensed under Apache 2.0; transformed to the Overture schema." | link the Foursquare NOTICE file as Overture's attribution page directs |
 | CC0 1.0 | `places_ovt` records from AllThePlaces | "Data from AllThePlaces." | none |
 | ODbL 1.0 | `roads_osm`, `bldg_ovt` | "© OpenStreetMap contributors. Available under the Open Database License." with a link to `https://www.openstreetmap.org/copyright` | any distributed database derived from these (for example the routing graph) is offered under ODbL |
-| none stated (OI-04) | census layers, 2020 boundary layers, archived census workbook | validation-only; no release attribution is rendered | no raw value, derivative, title or geometry enters a release |
+| Publisher's own terms, used by owner decision ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)) | `fdi_projects` | "Source: {publisher}, FDI Projects dashboard, data from fDi Markets, retrieved {date}. Capex and jobs are estimates of publicly announced projects; the dashboard does not capture every project, and its data is subject to change. No endorsement implied." | link to the dashboard page; the estimate note beside every capex or jobs figure and every count or list of projects (PUB-87); the Trust centre shows the terms as read at fetch and the basis of use |
+| Publisher's own terms, used by owner decision ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)) | `investqa_pages` | "Source: {publisher}, {page title}, retrieved {date}. No endorsement implied." | link to each page; the Trust centre shows the terms as read at fetch and the basis of use |
+| none stated; used by owner decision ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10) | census map layers (`census_zone_*`, `census_district_pop`) | "Source: {publisher}, {layer title}, public map service, retrieved {date}. No licence stated. No endorsement implied." | every figure shows its source and retrieval date; nothing fetched is committed (PUB-13) |
+| none stated | 2020 boundary layers, archived census workbook | validation-only; no release attribution is rendered | no raw value, derivative, title or geometry enters a release |
 | UN terms unresolved | `cls_isic4` | validation-only until intended-use terms are recorded | no classification title or derived mapping enters a release |
 | citation-only | `ref_*` | "{Publisher}, {document title}, retrieved {date}." | registry metadata only; no fetched file |
 
@@ -255,15 +354,16 @@ publisher of a public dataset; it never presents a publisher as a supplier or en
 ## 5. The frame: geographies, gazetteer and crosswalks
 
 Public statistics stay on their official geographies and are never blended into a protected figure
-(master design section 6). The frame lets a pin find its zone, district and municipality, lets
+(master design section 6). Where one is apportioned to a drawn shape, the result is Inferred
+(PUB-29). The frame lets a pin or a drawn area find its zones, districts and municipalities, lets
 sources join, and lets the user type a place name in either language.
 
 | Level | Count (research, 2026-11-11) | Geometry source | Names source | Used by |
 |---|---|---|---|---|
-| Municipality | 8 | `bnd_muni_2025`, check against `bnd_hdx` | `bnd_hdx` (Arabic and English) | licences, population, cancellations |
+| Municipality | 8 | `bnd_muni_2025`, check against `bnd_hdx` | `bnd_hdx` (Arabic and English) | licences, population, cancellations, and the municipality tables of decision 0017 (permits, population by age and sex, labour force, hotels, students) |
 | Zone | 91 polygons in the 2020 layer | `bnd_hdx` (licensed) checked against `bnd_zone_2020` | `bnd_hdx` | utility series, census shares |
-| District | 781 polygons (778 with population) | `bnd_hdx`, checked against `bnd_district_2020` | `bnd_hdx`; `prop_sales` names via crosswalk | property sales |
-| Grid cell | H3 resolution 9 (Greater Doha) and 8 elsewhere | computed | none | protected statistics only ([06](06_PRIVACY_AND_DISCLOSURE_CONTROL.md)) |
+| District | 781 polygons (778 with population) | `bnd_hdx`, checked against `bnd_district_2020` | `bnd_hdx`; `prop_sales` and `prop_resi_units` names via crosswalk | property sales, residential unit sales |
+| Grid cell | H3 resolution 9 (Greater Doha) and 8 elsewhere | computed | none | protected and simulated statistics only ([06](06_PRIVACY_AND_DISCLOSURE_CONTROL.md)); no public figure is apportioned to it |
 
 | ID | Requirement |
 |---|---|
@@ -271,15 +371,17 @@ sources join, and lets the user type a place name in either language.
 | PUB-25 | A committed `custodian/publicdata/review/zone_crosswalk.csv` lists every zone number seen in any source with one column per source (`bnd_zone_2020`, `bnd_hdx`, `util_elec`, census tables, `bnd_geob`) and a status: `matched`, `absent_in_source`, `merged`, `no_polygon`. Zone numbers 10 and 11 in the utility series and the merged geoBoundaries zones (for example '18-19') must appear with an explicit status. |
 | PUB-26 | A utility row whose zone has no polygon is kept in national totals and listed as "zone without boundary" in the coverage note; it is never assigned to a neighbouring zone. |
 | PUB-27 | A committed `municipality_names.csv` maps every spelling seen in sources (for example Al Sheehaniya and Al Shahaniya, Umm Slal and Umm Salal, Al Khor and Al Thakhira) to one municipality key. An unmapped spelling fails the build. |
-| PUB-28 | A committed `district_crosswalk.csv` maps each `prop_sales` district name (Arabic and English) to one or more boundary districts, including renamed districts such as 'Lusail' and 'Lusail 69'. Unmatched names are listed and excluded from district figures, never guessed. |
-| PUB-29 | A pin finds its zone, district and municipality by point-in-polygon on the pin itself. No public figure is apportioned to grid cells or to areas built by `make_area`. |
+| PUB-28 | A committed `district_crosswalk.csv` maps each `prop_sales` and `prop_resi_units` district name (Arabic and English) to one or more boundary districts, including renamed districts such as 'Lusail' and 'Lusail 69'. Unmatched names are listed and excluded from district figures, never guessed. |
+| PUB-29 | A pin finds its zone, district and municipality by point-in-polygon on the pin itself. A drawn area (a drawn shape, a radius, or a walk or drive time from a point) finds every official geography its shape overlaps, by polygon intersection, not only those that hold its vertices. Public point layers (places, venues, and FDI projects with a point location) are counted inside the drawn shape exactly, by point-in-polygon; a count of places is a count of listed records with the note of PUB-50, never a count of businesses. A statistic published on an official geography is shown on that geography, which is named. Where it is apportioned to the drawn shape, the result is labelled Inferred, names the apportioning method of [07 Economic methods](07_ECONOMIC_METHODS.md) and the source geography, and takes its provenance under PUB-20. Public splits by sex or nationality are never apportioned (PUB-90). No public figure is apportioned to grid cells or release units, or blended into a protected figure. Figures from the protected record types (business register, employment, residence, wages) snap to whole release units, with the snap sentence, before any figure is read ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)). |
 | PUB-30 | The `gazetteer` table uses the contract fields `place_key`, `kind`, `name_en`, `name_ar`, `aliases`, `lon`, `lat`, `cell`, `showcase_verified` and `source_id` for every municipality, zone, district, showcase area and flagship building. |
 | PUB-31 | Arabic search keys remove diacritics and tatweel, unify alef forms, map final ta marbuta to ha and alef maqsura to ya; English keys are lower-cased with punctuation removed. The same function is used by `resolve`; keys are computed in memory and are not release columns. |
 | PUB-32 | Arabic names come from `bnd_hdx` or another licensed source. Names the team writes (showcase areas, the flagship building, activity labels) are marked "pending native review" until signed off under OI-09. |
 | PUB-81 | In public-only mode, `make_area` uses the fixed base-cell frame, reads no privacy-derived release unit and no Protected or Simulated table, and emits the snap report as technical metadata rather than a Synthetic fact. |
-| PUB-82 | The coverage bar uses the finest licensed geography available—zone, otherwise municipality, otherwise national—and names that geography. It never uses a validation-only value or derivative. |
-| PUB-83 | `pop_muni` writes `pub_population_municipality` (`municipality_code`, `period`, `indicator`, `value`, `unit`, `source_id`); `est_census` writes `pub_census_national` (`period`, `indicator`, `value`, `unit`, `source_id`); a licensed district source writes `pub_census_district` (`district_key`, `period`, `indicator`, `value`, `unit`, `source_id`). `pub_census_zone` and `pub_census_district` are present in every release; while a source is unlicensed (open item OI-04) the corresponding table has zero rows and no value from that source enters any fact. National or district census population rows never enter `pub_census_zone` as national aggregates, and population lineage never enters a geometry table. |
+| PUB-82 | The coverage bar uses the finest geography available from a source that may enter a release (PUB-12, PUB-13)—zone, otherwise municipality, otherwise national—and names that geography. It never uses a validation-only value or derivative. |
+| PUB-83 | `pop_muni` writes `pub_population_municipality` (`municipality_code`, `period`, `indicator`, `value`, `unit`, `source_id`); `est_census` writes `pub_census_national` (`period`, `indicator`, `value`, `unit`, `source_id`); `census_district_pop` writes `pub_census_district` (`district_key`, `period`, `indicator`, `value`, `unit`, `source_id`). `pub_census_zone` and `pub_census_district` are present in every release and hold the rows of the census map layers that [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10 admits to the local release (OI-04 closed for version 1); a table whose source is switched off (PUB-12) has zero rows, and no value from a validation-only source enters any fact. National or district census population rows never enter `pub_census_zone` as national aggregates, and population lineage never enters a geometry table. |
 | PUB-84 | The closed count `indicator` names and `unit` values for the attacker-view audit (PRV-115) in `pub_population_municipality`, `pub_census_national`, `pub_census_district` and `pub_census_zone` are exactly: `residents` (`persons`), `households` (`households`), `establishments` (`establishments`), `employees` (`persons`). Indicator names are lower snake case. No other indicator is a count for audit selectors until a contract revision adds it. PUB-15 regression values not pinned in [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md) at slice S2 are produced by `./eii build-public`, checked against the source by the reviewer, and written into the method cards by a slice S2 task; slice S7 fails while any remain unpinned (MTH-03). |
+| PUB-89 | A committed `custodian/publicdata/review/venue_crosswalk.csv` maps every venue name seen in `visits_museum`, in every year, to one venue key, and each venue key to the `pub_place` record of that venue where a reviewer finds one, with reviewer role and date; health-centre names in `visits_phcc` are mapped the same way. An unmapped name fails the build, and a venue with no reviewed match has no map point. The build normalises names only through this crosswalk and never edits a value by hand ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)). |
+| PUB-90 | Official figures split by sex or nationality are Public facts, shown only as published: on the source's own geography and categories (the workforce and pay tables publish Qatari and non-Qatari), each with its source and reference year ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)). A `pub_` table may carry a sex or nationality column only when its source's registry entry declares that dimension in `public_splits` (section 3.1); the schema tests that reject sex, gender and nationality columns keep their full strength on every synthetic and protected contract. No Public split is joined to a synthetic record, used to segment synthetic records or to derive an attribute for them, apportioned to a drawn area, or combined with a protected, Synthetic or Simulated figure in any fact, ratio or weight. A calibration input that carries such a split uses only its totals over the split. The registry entries of `wage_occ`, `wage_act`, `wage_sector` and `work_hours_act` declare their national sex split the same way. |
 
 ## 6. The activity spine
 
@@ -338,20 +440,23 @@ products. The Italian-restaurant basket lists only lines whose descriptions name
 or fresh as the reviewer decides) and excludes lines that name instant noodles. The heading-level
 8.69 and 11.45 are regression checks (section 10), never displayed figures.
 
-## 8. Places
+## 8. Places, named public venues and real businesses
 
 | ID | Requirement |
 |---|---|
 | PUB-47 | `pub_place` is built only from Overture release 2026-10-21.0, schema 2.0.0. Changing the release is a reviewed registry change that re-runs place verification for the showcase areas. |
-| PUB-48 | `pub_place` holds only source-given `place_id`, names, category, coordinates, cell, source release, `source_provider`, `licence`, `confidence` and reviewed `merged_ids`. Verification is separate in `pub_place_verification`, keyed to `pub_place`, with check date, reviewer role, verification link and status. No synthetic or invented attribute (staffing, licence status, sales, footfall, survival or rating) is ever joined to a named place. |
+| PUB-48 | `pub_place` holds only source-given `place_id`, names, category, coordinates, cell, source release, `source_provider`, `licence`, `confidence` and reviewed `merged_ids`. Verification is separate in `pub_place_verification`, keyed to `pub_place`, with check date, reviewer role, verification link and status. No synthetic or invented attribute (staffing, licence status, sales, footfall, survival or rating) is ever joined to a named place. Published visitor counts of named public venues are Public facts in `pub_venue_visits` (PUB-91), never columns of `pub_place` and never footfall. |
 | PUB-49 | The display threshold is confidence of at least 0.7 outside showcase areas (**ASSUMPTION:** research counts about 11,400 such records; it trims junk while keeping most named places). Inside showcase areas, the verification status overrides confidence. |
 | PUB-50 | Every places answer carries the standing note "Open listings are incomplete": about 26,000 Qatar records against 71,203 establishments counted in Census 2020 (`places_ovt`, `est_census`). Places are named points, never a count of businesses; an absent category reads "not found in public places data". |
 | PUB-51 | De-duplication: two records are duplicate candidates when their normalised names match in either language and they lie within 50 m (**ASSUMPTION:** a typical mall-unit spacing). Outside showcase areas the higher-confidence record is kept and the other recorded in `merged_ids`; inside showcase areas the reviewer decides. |
 | PUB-52 | Each showcase area (Lusail, West Bay, Msheireb, The Pearl) is defined in `showcase_areas.yaml` by a pin at a named public landmark and the 10-minute `walk` area from it (**ASSUMPTION:** covers the flagship default of walk 5 minutes with margin). Verification covers every place in food-service categories and every place named in a prepared story answer. |
 | PUB-53 | Each verified place has a status (`verified_open`, `closed_or_moved`, `not_found`, `duplicate`), check date, reviewer role and verification link in `pub_place_verification`. Results are committed as `verified_places.csv` with the licence texts of the sources it derives from (PUB-21). |
-| PUB-54 | Acceptable verification sources are official directories: the tenant directory of the development, mall or district operator, the place's own official website, or a public-authority listing (**ASSUMPTION** on the last two). Review sites, delivery or booking platforms and map-search listings are not sources, and no site is scraped; checks are made by hand. |
+| PUB-54 | Acceptable verification sources are official directories: the tenant directory of the development, mall or district operator, the place's own official website, or a public-authority listing (**ASSUMPTION** on the last two). Review sites, delivery or booking platforms and map-search listings are not sources, and no site is scraped for verification; checks are made by hand. The page parsers of section 3.2 read only the two investment sources of [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) and are not verification sources. |
 | PUB-55 | OpenStreetMap points of interest may be viewed by the reviewer as a cross-check aid but are never merged into `pub_place` (this keeps ODbL share-alike out of the places table). |
 | PUB-56 | A verified place that is `closed_or_moved` or `not_found` is hidden in showcase answers; the count of hidden records is shown in the coverage note. |
+| PUB-91 | `pub_venue_visits` holds the published monthly visitors of museums and exhibitions (`visits_museum`) and the annual patient visits of health centres (`visits_phcc`), keyed by the venue key of PUB-89. They are Public facts of `place_public` subjects, each with its source and year (or month), worded as published visitor counts, never as presence estimates or footfall. Their monthly shape (each month's share of its year), computed by tested code, is the public shape against which [05](05_SYNTHETIC_WORLD_AND_SIMULATION.md) calibrates and checks the seasonal profile of simulated visitors; the health-centre series serves only as an annual cross-check. A named place's level is never transferred to a Simulated figure, no Simulated figure is attached to a named place, and simulated presence near a venue is worded "estimated people around this location", never "footfall of" the venue ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)). |
+| PUB-92 | Real businesses appear only as points from public places data (`pub_place`, PUB-47 to PUB-56) and from public listings registered in section 2 with a licence or basis of use, plus the FDI projects of PUB-87 ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 13). A public listing enters only through a reviewed registry change naming its source, licence, release table and attribution; until one is recorded, real business points come from `pub_place` alone. A real business keeps only its source-given fields: no Synthetic or Simulated figure, and no fit, rank or score computed with a Synthetic or Simulated input, is attached to it, and it is never joined to synthetic firm data. |
+| PUB-93 | Public tenders appear, in D4, only from a public source registered in section 2 with its licence and reference period. The source is confirmed at slice S2 ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)); until one is recorded, no tender is shown and a request for tenders returns `NO_DATA` with its caveat (section 12). No Synthetic or Simulated figure is attached to a tender. |
 
 ## 9. Flagship building selection
 
@@ -371,7 +476,7 @@ QiG Tower, Sendian Tower. The slice S2 builder may add candidates; each needs a 
 | PUB-58 | slice S2 records passing candidates. After the slice S5 survival report exists, the owner confirms the pin and default cut-offs. The snap and survival reports state any coarsening honestly; no privacy rule is tuned to make the area look finer. If no candidate passes, candidates are added; thresholds change only through a decision record. |
 | PUB-59 | The final choice is recorded after the slice S5 survival report in `docs/decisions/NNNN-flagship-building.md`, with every candidate and check result, the places release, verification date, reviewer role, survival result, chosen building and reason, and in `custodian/publicdata/review/flagship.yaml`, which the build reads. |
 | PUB-60 | The flagship record also stores the district deal count for sale prices near the building, shown on screen with any median (the 'Lusail 69' medians rest on 6 and 13 deals for 2024 and 2025 per research). |
-| PUB-61 | A grid cell may hold synthetic establishments and Public places, but no synthetic establishment carries the key, name or coordinates of a `pub_place` or gazetteer entry. No fictional firm is named on a version 1 screen, and no screen places a Synthetic or Simulated attribute on a Public place. The build checks all three rules over the complete tables. |
+| PUB-61 | A grid cell may hold synthetic establishments and Public places, but no synthetic establishment carries the key, name or coordinates of a `pub_place`, gazetteer, venue or `fdi_projects` entry. A named synthetic firm is always marked Synthetic, its name never resembles a real place or business name (the build fails on a collision, BRF-31), and it is never drawn as a named point at a real address ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 12). No screen places a Synthetic or Simulated attribute on a Public place, a named public venue or an FDI project. The build checks all three rules over the complete tables. |
 
 ## 10. Regression examples (master design section 9)
 
@@ -390,7 +495,7 @@ fails until a reviewer updates the value with a note naming the new hash (PUB-10
 | PUB-66 | Imports 2025: rows with year 2025 number 216,073 and their QAR value sums to 138.53 bn (2 dp in billions) | `cus_imp_2025` |
 | PUB-67 | Active licence-activity counts, May 2025: 13,189 rows; Σ count 249,622; 4,755 distinct codes; the four groups reconcile to the total: 84.6% (211,277) under seven-digit codes with an ISIC-class prefix, 4.5% (11,276) under other seven-digit codes, 10.8% (26,844) under six-digit legacy codes and 0.1% (225: 169 under 13 five-digit codes and 56 under eight eight-digit codes); exactly 138 six-digit codes have a first-four-digit match to an existing ISIC class but remain `not_mappable_legacy`; the spine maps 5610101 to ISIC 5610; code 5610101 counts 361 in Al Daayen and 4,782 nationally | `lic_active` |
 | PUB-68 | Cancellations 2015 to 2025: Σ count 161,055, of which 7,386 undated; July 2020 (40,791), June 2022 (14,212) and September 2024 (11,232) together divided by the dated total (153,669) round to 43%; the bulk-month rule of [07 Economic methods](07_ECONOMIC_METHODS.md) flags all three | `lic_cancelled` |
-| PUB-69 | Issued series incomplete: Σ count 12,533; 610 distinct codes; zero rows for 5610101; no release table is built from this source | `lic_issued` |
+| PUB-69 | Issued series incomplete: Σ count 12,533; 610 distinct codes; zero rows for 5610101 in the source and in `pub_licence_issued`; every fact from `pub_licence_issued` carries the incompleteness note, and no net formation is built from it (PUB-94) | `lic_issued` |
 | PUB-70 | Metro riders, December 2025: Metro December 2025 equals 7,375,367 and December 2024 equals 5,529,167; growth rounds (0 dp) to 33% | `transit_monthly` |
 | PUB-71 | Private-employer share, two Lusail-area zones: private ÷ all employed residents rounds (0 dp) to 72% for zone 69 and 45% for zone 70; national 1,617,208 ÷ 2,050,252 rounds (1 dp) to 78.9% | `census_zone_sector` |
 | PUB-72 | Restaurant licences per 10,000 residents: use the 2025 `pop_muni` values, 111,282 for Al Daayen and 3,219,982 nationally, for the May 2025 snapshot; 361 ÷ 111,282 × 10,000 rounds (0 dp) to 32 and 4,782 ÷ 3,219,982 × 10,000 rounds to 15; the period `2025` is carried on the fact | `lic_active`, `pop_muni` |
@@ -415,7 +520,7 @@ resolved.
 
 ## 12. What public data cannot give, and how the product says so
 
-| Gap | Evidence (research, 2026-11-11) | What the product shows |
+| Gap | Evidence (research, 2026-11-11, unless stated) | What the product shows |
 |---|---|---|
 | Rent by district | no official open rent dataset found; the real-estate regulator's weekly press releases give rent contracts by municipality only | break-even takes the user's own rent; caveat "No official rent data by district is published" |
 | Openings for restaurant codes | `lic_issued` excludes restaurant codes and sums to 12,533 against 161,055 cancellations | churn shows cancellations only, with "Openings are not published for this activity; net change is unknown" |
@@ -425,11 +530,13 @@ resolved.
 | Cuisine in licences | one restaurant code; no cuisine code | cuisine only from public places, labelled incomplete |
 | Station or hourly ridership | national monthly totals only | monthly Public context, never hourly counts |
 | Pay percentiles or pay by area | public wage tables give national means only | public means beside Synthetic bands, each marked |
+| Public tenders | [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) (2026-11-12) leaves the public source open until slice S2 | no tender is shown until a source is registered (PUB-93); caveat "No public tender source is recorded" |
 
 | ID | Requirement |
 |---|---|
 | PUB-78 | Each gap above has a `caveat_key` with English and Arabic text (Arabic pending native review, OI-09), attached by the application, not by the model, whenever a question touches the gap. |
 | PUB-79 | A tool asked for one of these gaps returns `NO_DATA` with the caveat key, never a zero, a proxy dressed as the figure, or an estimate from another economy. |
+| PUB-94 | The Public part of the openings and closures view ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 11) shows licence issues from `lic_issued` and licence cancellations from `lic_cancelled` over time on their official geography, worded on screen as licence issues and cancellations, never as business openings or closures ([07 Economic methods](07_ECONOMIC_METHODS.md) C2 and C22). Issues are shown only for the codes the issued series covers, and every issue fact carries the note that the series is incomplete; no net formation (issues minus cancellations) is computed or shown. A code the issued series lacks reads "New licences for this activity are not published, so net change is unknown". Cancellations keep the bulk-month flag of C2. |
 
 ## Open questions and assumptions
 
@@ -446,15 +553,47 @@ ASSUMPTIONS (each also listed in the return message):
 7. PUB-76: the national pay card uses `wage_occ`.
 8. File paths under `custodian/publicdata/` (registry, `review/`, `tests/`) are this document's
    choice within the pinned layout.
+9. PUB-85: a decision 0017 group keeps one `source_id` and has one registry entry per slug, keyed
+   `<source_id>/<slug>`. The key format is this document's choice; `source_id` stays the registry
+   key of [03](03_DATA_CONTRACTS.md).
+10. Section 2.2: the release-table names of the decision 0017 groups and `pub_investqa_record` are
+    this document's choice; [03](03_DATA_CONTRACTS.md) holds their columns.
+11. PUB-87: reading the dashboard on every build detects a changed page; the changed page enters a
+    release only through the reviewed registry change of PUB-10.
+12. PUB-89: health-centre names use the venue crosswalk too, and a venue links only to a `pub_place`
+    record.
+13. PUB-88, as stated by decision 0017: incentive packages are optional scenario inputs of the
+    break-even calculator, tagged "your inputs" with their source page; they never change a Public
+    figure.
+14. PUB-94: the public licence issues of decision 0016 come from `lic_issued`, shown only for the
+    codes it covers and always with its incompleteness note.
 
-Open items touching this document: OI-03 (section 11), OI-04 (census and 2020 boundary layers:
-PUB-13), OI-06 (source labels for custodian record types; public attribution follows section 4),
-OI-09 (Arabic names and caveats).
+Open items touching this document: OI-03 (section 11), OI-04 (closed for version 1 by decision
+0017 item 10: the census map layers enter the local release and the 2020 boundary layers only
+check HDX geometry, PUB-13; any wider use is a deployment item of document 17), OI-06 (source
+labels for custodian record types; public attribution follows section 4), OI-09 (Arabic names and
+caveats).
 
 Open questions: whether UNSD publishes ISIC Rev.4 titles in Arabic (not confirmed on the UNSD page,
 2026-11-11; otherwise reviewed team labels); the valuation basis of the customs values; and the
 publisher, licence, direct URL or source schema entries explicitly marked to be confirmed at
 slice S2.
+
+- OPEN: the page structure of the dashboard and of the agency's pages, the agency's page list,
+  where each publisher states its terms, and whether a project's location is a point or a city are
+  confirmed at slice S2, against a synthetic test page of the same shape (decision 0017).
+- OPEN: whether the dashboard page holds an identifier column, and how PUB-14 applies to it, is
+  settled at slice S2 with the page structure.
+- OPEN: the public source of tenders is confirmed at slice S2; without one, tenders are not shown
+  (decision 0016, PUB-93).
+- OPEN: the public listings beyond `places_ovt`, with their licences, are confirmed at slice S2
+  (PUB-92).
+- OPEN: the apportioning weight for drawn shapes (area, or a licensed public population grid such
+  as `worldpop_qat_2020`) is fixed in [07](07_ECONOMIC_METHODS.md) and confirmed at slice S2
+  (decision 0016).
+- OPEN: the expected row-count range and last period of each new slug and of `fdi_projects`
+  (PUB-08), and one regression example per new source group (section 10), are fixed at the slice
+  S2 gate.
 
 ## Sources
 
@@ -462,6 +601,19 @@ All retrieved 2026-11-11 unless stated.
 
 - Qatar Open Data Portal, dataset pages and Explore API v2.1, `https://www.data.gov.qa/`, for every
   portal `source_id` in section 2; licence page `https://www.data.gov.qa/pages/license/annexes`.
+- Qatar Open Data Portal, catalogue export and record queries (Explore API v2.1),
+  `https://www.data.gov.qa/api/explore/v2.1/`, for the 77 datasets of decision 0017 (slug,
+  publisher, licence, modified date, rows, first and latest period), retrieved 2026-11-12; the same
+  portal answers at `https://www.data.qa/`.
+- FDI Projects dashboard, `https://fdiprojects.invest.qa/` (data from fDi Markets), read
+  2026-11-12, including its statement that its data includes estimates of publicly announced
+  projects, does not capture all investment projects and is subject to change.
+- The national investment promotion agency's site, `https://www.invest.qa/` (sector, opportunity,
+  incentive, set-up and law pages), read at each fetch; its page list and structure are confirmed
+  at slice S2.
+- [Decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) and
+  [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), recording the
+  owner's decisions of 2026-11-12.
 - Statistics authority public ArcGIS services,
   `https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services`.
 - HDX, Qatar Subnational Administrative Boundaries, `https://data.humdata.org/dataset/cod-ab-qat`.

@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| Status | Draft v0.2, corrected after independent review on 2026-11-11 (see PROGRESS.md) |
-| Date | 2026-11-11 |
+| Status | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12 |
+| Date | 2026-11-12 |
 | Owner | albarami |
-| Purpose | Specify the Python packages, the store interface, PostgreSQL, the loader, the nine tools, the playbooks, the API, seats, the ledger, routing and the runtime rules of the serving plane precisely enough to generate tests from. |
-| Read first | [02 Architecture](02_ARCHITECTURE.md), [03 Data contracts](03_DATA_CONTRACTS.md), [06 Privacy and disclosure control](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [07 Economic methods](07_ECONOMIC_METHODS.md) |
+| Purpose | Specify the Python packages, the store interface, PostgreSQL, the loader, the closed tool list, the playbooks' calls, the API, seats, the ledger, routing, drawn areas, case sample files and the runtime rules of the serving plane precisely enough to generate tests from. |
+| Read first | [02 Architecture](02_ARCHITECTURE.md), [03 Data contracts](03_DATA_CONTRACTS.md), [06 Privacy and disclosure control](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [07 Economic methods](07_ECONOMIC_METHODS.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) |
 
 ## In brief
 
@@ -14,13 +14,17 @@
 - Every tool reads the release through one store interface. Tool SQL is a small portable subset, checked by a lint step, run with parameters only, on PostgreSQL and on an embedded DuckDB file. A parity case for every tool proves both engines return identical facts.
 - PostgreSQL holds one schema per release, plus the `app` schema for seats, briefs, the ledger and the egress record. Three roles support query isolation after a seat is selected, not tenant authentication; the application role owns nothing and has no `SELECT` on application base tables.
 - A manifest-driven loader is the only way data enters a serving store. It rejects any table the manifest does not name.
-- Nine typed tools, three deterministic playbooks and a template writer give a full brief with no model. The API streams plan steps, stage directives, cards and narrative as server-sent events, evidence first; the brief itself is sent only after the accounting gate has passed on the complete brief.
+- A closed, versioned list of typed tools and the thirteen deterministic playbooks of document 09 cover the seven journeys, three services and four cases of [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md); with the template writer they give a full brief with no model. The API streams plan steps, stage directives, cards and narrative as server-sent events, evidence first; the brief itself is sent only after the accounting gate has passed on the complete brief.
+- An area is drawn, set by a radius, or made by walk or drive time from any point, by hour. Public points and Simulated layers use its exact shape; figures from the four protected record types snap to whole release units before any is read. Drawn shapes and case sample files live only in the API process's memory, for one session and seat.
+- New tools, layers and routes serve presence counts by hour and event day, crowd density, traffic by hour, the ranking and its reverse, similar areas, reachable access, monthly periods and "what changed", the labour-market view, openings and closures, firm lists, FDI projects and the agency's records. Each returns facts with provenance and lineage, and no route computes a number outside `eii_core.calc`, the release build or a listed fixed read function (BE-116).
 - The product serves exactly one mounted release, named by `EII_RELEASE_DIR`. A protected build writes one release for its selected parameter set; a `public_only` build has no parameter set. No route, setting or switch selects a parameter set at run time.
 - The store is chosen at start-up. A presenter switch moves to the embedded reader at a request boundary. There is no automatic failover in the middle of a request.
 
 ## 1. Scope
 
 This document covers the serving plane (`product/`) and the shared library (`core/`). It names the custodian modules only to fix the import boundary; their behaviour is in [04](04_PUBLIC_DATA_PACK.md), [05](05_SYNTHETIC_WORLD_AND_SIMULATION.md) and [06](06_PRIVACY_AND_DISCLOSURE_CONTROL.md). The model loop, prompts, validator and evaluation harness are in [09](09_AI_ASSISTANT.md). Table columns and the manifest format are in [03](03_DATA_CONTRACTS.md); where a column name below differs from document 03, document 03 wins. Deployment, the compose file and the stage machine are in [13](13_DEPLOYMENT_AND_OPERATIONS.md). Terms are in the [glossary](GLOSSARY.md).
+
+Version 1 covers the whole initiative ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)) with the public additions of [decision 0017](decisions/0017-public-data-additions-and-public-splits.md). This document fixes the names of the new tools, the calls of every playbook bundle and the new stage directives; document 09 names the playbooks, the evidence they gather and the catalogue keys. The release tables added by the two decisions carry the names of document 03 section 7.2: among them `road_link`, `presence_count`, `flow_hourly` and `traffic_hourly` (which replace `presence_index`, `flow_od` and `speed_factor`), `month_change`, `firm_list`, `fdi_projects`, `pub_investqa_record` and the `pub_` tables of the 77 portal datasets. Where a table name here differs from document 03, document 03 wins.
 
 Library versions follow the master design and are confirmed at the spike (slice S1) with written retreat pins. PostgreSQL 18, DuckDB 2.0 and FastAPI's server-sent-event support are newer than most coding-assistant training data: builders must read the current official documentation before writing code against them.
 
@@ -35,15 +39,16 @@ All three packages use a `src` layout: `core/src/eii_core/`, `custodian/src/eii_
 | `provenance` | The four provenance classes, the three evidence statuses plus "not measured", and `least_real(classes)` (Public over Synthetic over Simulated; any Suppressed input makes the composite Suppressed). |
 | `facts` | The pinned fact object as a strict Pydantic model; deterministic `fact_id`; the reliability band helper that applies the rule in document 06. |
 | `manifest` | Manifest model, canonical hashing, `release_id` check, and the allow-list of release table names from the master design (section 5.4). |
-| `grid` | H3 helpers: frame resolution for a point (9 in Greater Doha, 8 elsewhere), cell to parent, distance rings. No database access. |
+| `grid` | H3 helpers: frame resolution for a point (9 in Greater Doha, 8 elsewhere), cell to parent, distance rings, and a polygon or circle to frame cells under the containment rule of BE-84. No database access. |
+| `shapes` | The canonical form and SHA-256 of a drawn polygon; its validity checks (a simple polygon inside the frame, within the vertex and size limits fixed at the slice S2 gate); exact point-in-shape tests for Public points; the representative point of a shape for travel times (ASSUMPTION). No database access. |
 | `ids` | All five synthetic identifier formats (`SYN-E-…`, `SYN-L-…`, `SYN-G-…`, `SYN-P-…`, `SYN-F-…`) and the complete `SYN-[ELGPF]-` pattern used to reject them in released data. |
 | `text` | Normalisation for matching: Unicode NFKC, case folding, Arabic normalisation (unify alef variants, remove diacritics and tatweel, unify final yaa and taa marbuta forms). ASSUMPTION: these steps are pending native review (OI-09). |
-| `situations` | The four situations (`weekday_lunch`, `weekday_evening`, `friday_evening`, `ramadan_iftar`) and the `summer` switch rule. |
-| `calc` | The request-time part of the calculation layer (MTH-01, MTH-02): sums over release units, derived statistics, comparisons (difference, ratio, rank, direction facts) and the break-even calculator. Every displayed number is produced by deterministic tested code in `eii_core.calc`, the release build, or a fixed application-schema read function listed by the data contracts and covered by tests. Nothing else computes, rounds or compares a number, and no model ever does (BE-104). |
+| `situations` | The four situations (`weekday_lunch`, `weekday_evening`, `friday_evening`, `ramadan_iftar`) and the `summer` switch rule; the closed hour, day and month key lists of the release (document 03), the day keys including the three event days of decision 0016. |
+| `calc` | The request-time part of the calculation layer (MTH-01, MTH-02): sums over release units, derived statistics, comparisons (difference, ratio, rank, direction facts) and the break-even calculator. Every displayed number is produced by deterministic tested code in `eii_core.calc`, the release build, or a fixed application-schema read function listed by the data contracts and covered by tests. Nothing else computes, rounds or compares a number, and no model ever does (BE-104). Under decision 0016 it also apportions released Public statistics and Simulated counts to a drawn shape, and computes crowd density, ranks, fits, similar-area ranks, reachable-access scores, monthly differences and trends, projections marked as projections, case-file figures, travel-time comparisons and the break-even calculator with an optional incentive package; each has a method card in document 07. |
 
 ### 2.2 `eii_custodian` (build plane)
 
-`publicdata/` (fetchers, document 04), `worldgen/` (synthetic world, document 05), `linkage/`, `privacy/` (document 06), `mobility/` (simulator, document 05), `release/` (writes Parquet, manifest, story-pin catchments and routing tiles). Only this package may open `data/vault/`.
+`publicdata/` (fetchers and page parsers, document 04: the portal on both its hosts, the FDI dashboard and the agency's pages), `worldgen/` (synthetic world, document 05), `linkage/`, `privacy/` (document 06; it also releases the presence counts and the firm list), `mobility/` (simulator, document 05, and the traffic assignment that `./eii build-release` runs on the released flows, ARC-133), `release/` (writes Parquet, manifest, story-pin catchments and routing tiles). Only this package may open `data/vault/`; the traffic assignment reads only the released flows and the routing graph.
 
 ### 2.3 `eii_product` (serving plane)
 
@@ -52,10 +57,10 @@ All three packages use a `src` layout: `core/src/eii_core/`, `custodian/src/eii_
 | `config` | Reads the pinned environment variables (section 11.2); no other configuration source for secrets. |
 | `preflight` | Start-up checks and store selection (section 11.2); used by `./eii preflight` and `./eii up`. |
 | `store/` | `protocol.py` (the interface), `postgres.py`, `embedded.py`, `sql/` (one file per named query), `lint.py`, `normalise.py`, `parity.py`, `loader.py`, `reviewer_views.py`. |
-| `tools/` | `registry.py`, one module per tool, `areas.py` (area ids and snapping), `routing.py` (pyvalhalla), `fact_builder.py`. |
-| `assistant/` | `playbooks/` (the three playbooks and evidence bundles) and `templates/` (template writer and status templates); the other sub-folders (parser, router, model loop, validator, memo, egress scan, providers) are specified in document 09. |
+| `tools/` | `registry.py`, one module per tool of section 6.2, `areas.py` (area ids and snapping), `routing.py` (pyvalhalla with the hourly link speeds), `fact_builder.py`. |
+| `assistant/` | `playbooks/` (the playbooks of document 09 and their evidence bundles) and `templates/` (template writer and status templates); the other sub-folders (parser, router, model loop, validator, memo, egress scan, providers) are specified in document 09. |
 | `ledger/` | `postgres.py`, `local.py` (SQLite local ledger), `egress_store.py`, `oversight.py`, `seed.py` (seeded synthetic history). |
-| `api/` | FastAPI application, routes, server-sent events, seat handling, presenter routes, static files (built front end, PMTiles, glyphs). |
+| `api/` | FastAPI application, routes, server-sent events, seat handling, presenter routes, the drawn-shape and case routes (section 8.3), `session_store.py` (BE-109), static files (built front end, PMTiles, glyphs). |
 
 ### 2.4 Requirements
 
@@ -68,6 +73,7 @@ All three packages use a `src` layout: `core/src/eii_core/`, `custodian/src/eii_
 | BE-05 | No module of `eii_product` contains the path segment `vault`, and at start-up the product refuses to run if `EII_RELEASE_DIR` resolves inside `data/vault/`. |
 | BE-06 | The front end (`web/`) reaches the backend only over HTTP; no Python module serves data to it by any other route. |
 | BE-102 | `eii_product` never imports or invokes the typed-decision gateway and does not read `EII_DECISION_PROVIDER` or `JEV_PRO_API_KEY`; those variables belong only to explicit offline build/evaluation scripts. The separate `gateway/` package (`eii_gateway`) is imported only by tooling under `evals/` and `scripts/`; nothing under `core/`, `custodian/` or `product/` imports it. |
+| BE-109 | `api/session_store.py` holds drawn shapes and case sample files in process memory only, keyed by the verified `eii_seat` session and its seat. It has no disk, database, cache or log path. An entry is never visible to another session, another seat or the oversight seat, and every entry is dropped when its session ends, at `./eii down` and at every restart. No `app` table holds either (DAT-149). |
 
 ## 3. The store interface
 
@@ -150,7 +156,7 @@ Forbidden, with the reason:
 
 ### 3.3 Parameter passing
 
-Lists of cells and units are computed in Python and passed as one list parameter. Query files use the neutral placeholder `:name`. The PostgreSQL adapter rewrites it to `%(name)s` for psycopg, which adapts a Python `list` to a PostgreSQL array and recommends `= ANY(%s)` over `IN` (psycopg 3 documentation). The DuckDB adapter rewrites it to `$name` and passes a dictionary (DuckDB 2.0 Python documentation).
+Lists of cells and units are computed in Python and passed as one list parameter. A drawn shape or an exact outline never reaches SQL: a query receives only the frame cells or the release units the outline touches (`= ANY(:cells)`, `= ANY(:units)`), and for protected tables only the whole units it snaps to; the exact point-in-shape test and any apportioning run in Python (`eii_core.shapes`, `eii_core.calc`). Query files use the neutral placeholder `:name`. The PostgreSQL adapter rewrites it to `%(name)s` for psycopg, which adapts a Python `list` to a PostgreSQL array and recommends `= ANY(%s)` over `IN` (psycopg 3 documentation). The DuckDB adapter rewrites it to `$name` and passes a dictionary (DuckDB 2.0 Python documentation).
 
 | ID | Requirement |
 |---|---|
@@ -197,7 +203,7 @@ named by `EII_RELEASE_DIR` (BE-103).
 | Schema | Owner | Contents |
 |---|---|---|
 | `r_<16 hex>` | `eii_owner` | One schema per loaded release: every manifest table plus the loader-materialised `release_manifest`. At most two release schemas online. |
-| `app` | `eii_owner` | The five pinned application tables and fixed read functions. The one canonical DDL is [document 03, section 12](03_DATA_CONTRACTS.md#12-the-application-schema-postgresql-only-schema-app). |
+| `app` | `eii_owner` | The seven pinned application tables, the two reference tables of DAT-148 among them, and fixed read functions. The one canonical DDL is [document 03, section 12](03_DATA_CONTRACTS.md#12-the-application-schema-postgresql-only-schema-app). |
 | `review` | `eii_owner` | Read-only views for reviewers, generated from the manifest (section 4.4). ASSUMPTION: schema name `review`; the master design names the views but not the schema. |
 | `public` | `eii_owner` | PostGIS objects only. |
 
@@ -260,7 +266,7 @@ The loader is the only way data enters PostgreSQL or the embedded DuckDB file. I
 |---|---|
 | 1 | Verify the manifest's canonical hash equals the `release_id`, and each listed table and artefact's SHA-256, row count where applicable and schema hash. |
 | 2 | Require exact manifest agreement under `tables/` and `artefacts/`. At the root allow only `manifest.json`, `release.duckdb` and `load_receipt.json`. Reject absolute paths, `..`, symlinks, non-regular files and resolved paths outside the release root or expected subdirectory. Reject any table name outside the allow-list of `eii_core.manifest` or any column differing from the manifest schema. |
-| 3 | Scan every text column for `SYN-[ELGPF]-` and reject the complete forbidden column list in DAT-83. No v1 release table carries an establishment, legal-entity, person, group or salary-file identifier (OI-07). |
+| 3 | Scan every text column for `SYN-[ELGPF]-` and reject the complete forbidden column list in DAT-83. No v1 release table carries an establishment, legal-entity, person, group or salary-file identifier (OI-07). The named synthetic firm list carries only each listed firm's fictional name, activity, size band and release unit ([02](02_ARCHITECTURE.md) ARC-131; document 03 pins its columns and key). |
 | 4 | PostgreSQL: if schema `r_<16 hex>` exists and its stored manifest hash matches, report "already loaded", skip the PostgreSQL load and continue to DuckDB verification or rebuild and receipt verification. Otherwise remove only a stale `r_<16 hex>__loading` schema, load into it, create the manifest indexes, `ANALYZE`, verify counts and digests (BE-29), grant to `eii_app`, regenerate `review` views and rename the schema in one transaction. |
 | 5 | DuckDB: build `release.duckdb` under a temporary name inside the release directory, verify counts and digests, then rename it atomically. Rebuild it when missing, corrupt or from the wrong engine pin even when PostgreSQL was already loaded; skip only when its recorded digest and engine pin match. |
 | 6 | Apply the canonical `app` schema DDL from [document 03, section 12](03_DATA_CONTRACTS.md#12-the-application-schema-postgresql-only-schema-app) through the idempotent migrations in `infra/postgres/`; do not restate its columns in backend SQL. Load seeded ledger history (section 9.2) if absent. |
@@ -277,7 +283,7 @@ The copy mechanism (DuckDB's PostgreSQL extension or psycopg `COPY`) is chosen a
 | BE-48 | The loader never deletes or alters a file listed in the manifest. |
 | BE-103 | The product serves exactly one mounted release, the one `EII_RELEASE_DIR` names. For a `protected` release, no route, setting or switch selects a parameter set at run time; `GET /api/release` reports the exported set as data and nothing else offers one. No second protected table set of one window exists in the product plane. The product shows the aggregate survival and attack results of both parameter sets, read from the `survival_report` control table (PRV-80) and the signed attack report (PRV-79); it holds no other value of the unselected set. A `public_only` release reports `release_kind: public_only`, has no parameter set or protected-window field, and contains no Protected or Simulated table. |
 
-## 6. The nine tools
+## 6. The tools
 
 ### 6.1 Common contract
 
@@ -307,10 +313,17 @@ Statuses are exactly `OK`, `SUPPRESSED`, `NO_DATA`, `OUT_OF_SCOPE`. A status is 
 | BE-51 | Composite facts take their provenance from `least_real` over their inputs and list every input class in `input_classes`. |
 | BE-52 | A figure computed from the user's own inputs has `evidence_status` `inferred`, the caveat key `your_inputs`, and is never written to the release or to `ledger_entry`. |
 | BE-53 | A withheld item is returned as a fact with provenance `suppressed`, no value, and the reason key from `suppression_reason`, so "Why can't I see this?" always has an answer. |
-| BE-54 | Tools that read protected tables accept an `area_id` from `make_area`, never raw cells, polygons or coordinates, so no figure is read before snapping. The sole exception is the non-production scene endpoint defined by PRV-119 (BE-106). It is not an assistant tool, accepts only a manifest-listed `fixture_id`, and returns two pre-validated unit sets and area answers. |
-| BE-55 | Public figures stay on their official geography: `public_context` uses `grid_cell.district_key` and reports the district, zone and municipality containing the pin cell; property-sale lookup reads `district` and `pub_property_sale`. It never area-weights or blends an official geography into a protected figure. |
+| BE-54 | Tools that read protected tables accept an `area_id` from `make_area`, whatever the area kind (a drawn shape included), never raw cells, polygons or coordinates, so no protected figure is read before snapping. The sole exception is the non-production scene endpoint defined by PRV-119 (BE-106). It is not an assistant tool, accepts only a manifest-listed `fixture_id`, and returns two pre-validated unit sets and area answers. |
+| BE-55 | Public figures stay on their official geography: `public_context` uses `grid_cell.district_key` and reports the district, zone and municipality containing the pin cell; property-sale lookup reads `district` and `pub_property_sale`. It never area-weights or blends an official geography into a protected figure. Where a tool apportions a Public statistic to an area's exact outline, `eii_core.calc` applies the Public weight of document 07 (OPEN: area or a licensed public population grid, confirmed at slice S2); the fact has evidence status `inferred` and names its method and its official geography. An official split by sex or nationality is never apportioned (BE-110). |
 | BE-104 | Every displayed number, comparisons included, is produced by deterministic tested code in `eii_core.calc`, by the release build, or by a fixed read function of the application schema that [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) lists and the tests cover. Difference, ratio, rank and direction facts are calculation facts (MTH-01, PRV-30). Nothing else computes, rounds or compares a number, and no model ever does; no other query file or handler holds display arithmetic. The fact API (`GET /api/facts/{fact_id}/lineage`) emits no fact whose `lineage_ref` does not resolve to a complete source chain — release table, method and version, source with publisher, licence, retrieval date and file hash — which the evidence drawer shows under the label "Source chain". |
 | BE-108 | Every figure a tool, playbook or model path returns from protected or simulated tables is normally computed from exactly one additive family — one release table, one partition, one measure and one breakdown — named in the fact's lineage, and a count and adjacent non-ratio shares shown on one card come from the same family (PRV-30). The only exception is the closed list of ratio statistics: mean wage and the coverage, irregular and deployed-elsewhere shares. Each takes numerator and denominator columns from the same stored rows — one table, one partition, one unit set and one measure where applicable — even when those columns belong to two additive families, and its lineage names both. No tool result, evidence block, card, brief or export presents two routes to one population as two numeric estimates. The housing split lists `family_housing`, `labour_accommodation`, `institution` and `unknown` with an explicit `other` row only where pooling occurred, beside the separate not-measured count (PRV-39); no output says the listed classes reconcile to the card total. |
+| BE-110 | Official figures split by sex or nationality ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)) are returned only as Public facts with their source and year, on the source's own geography and categories (for nationality, the published Qatari and non-Qatari categories). No tool joins such a split to a synthetic record, uses it to segment synthetic records, apportions it to a drawn area or combines it with a protected figure in a calculation; a lineage test fails on any fact whose inputs include both a split and a protected table. Synthetic and protected records carry no sex, gender or nationality, and none is derived for them. |
+| BE-111 | Presence is returned as Simulated estimated counts of people, each with its range, by hour, segment (workers, residents, visitors) and day key, and crowd density as people per square kilometre ([02](02_ARCHITECTURE.md) ARC-129). Counts are read at release-unit grain and apportioned to the exact outline only by `eii_core.calc`. No count or density is returned for a named building, business or place: titles and templates say "estimated people around this location", and the build-time template scan rejects "footfall of". The 24-hour animation is offered for traffic and crowd density only, and every frame carries the Simulated mark. |
+| BE-112 | Every rank, fit, similarity rank, reachable-access score and projection is computed by `eii_core.calc` under its method card and returned as facts: each criterion's value, each weight (tagged "your inputs" when the user changed it) and the rank (DAT-134), with the rank-stability facts of method card C11 beside every rank. The weighted score of C11 only orders the candidates and is never returned as a fact (PRV-41). Weights come only from the catalogue defaults or the user's typed values, never from the model. No result carries a verdict, a probability, a confidence claim, a revenue, demand or success forecast or advice to act; a projection carries its method and period and the caveat that it is a projection. |
+| BE-113 | Only `synthetic_firms` returns synthetic firms, each marked Synthetic with its fictional name, activity, size band and release unit, from the rows the privacy engine released under the minimum, dominance and complement rules of document 06. The tool filters and orders those rows and never adds a row or a field. It never returns a firm's wages, wage bill, headcount, address or point, never places a firm at a real address, and never joins a firm to an FDI project, a public place or another firm (no network of firms or owners). A territory whose list the privacy engine withheld returns `SUPPRESSED` with the reason code the release records. |
+| BE-114 | `investment_context` returns FDI projects only as published announcements: every loaded field as a label, and capex and jobs as Public facts, each carrying the caveat key with the source's note that they are estimates of publicly announced projects and that the dashboard does not capture every project. Its subject is `fdi_project`, which accepts Public slots only; no Synthetic or Simulated fact is attached to a project, and a project is never joined to synthetic firm data. No input names a company, and a request to look up a firm, owner or person returns `OUT_OF_SCOPE`, as `resolve` does. The agency's records are returned as structured records for application templates, each with its page link and retrieval date. Every figure from either source shows its source and retrieval date. |
+| BE-115 | Protected blocks read one month, or a range of months, of the release's one window ([02](02_ARCHITECTURE.md) ARC-130). Every change between months comes from the treated `month_change` rows: `eii_core.calc` computes change facts only from those rows, never by subtracting two monthly values, and a change that the release carries forward, or that spans a withheld month, is returned as `SUPPRESSED`, never as zero. The wage trend of an area, separated from changes in worker mix, is the fixed-composition index that the release holds in `month_change.stayer_wage_index` (document 07, method card C19, indicator 6); no stayer wage bill is released, and no index is averaged or combined across units. Wage trends by sector wait for the protected split by activity that document 03 leaves open; the national split of pay change from changes in worker mix stays method card C3's. No route reads a second window. |
+| BE-116 | Every tool of section 6.2 and every layer of section 8.1 reads the release only through named queries (BE-07), returns every number as a fact with provenance and a lineage that resolves (BE-104), and has at least one parity case (BE-26). No route, handler or query file computes, rounds, compares, ranks or selects a number outside `eii_core.calc`, the release build or a fixed read function that document 03 lists. |
 
 ### 6.2 Tool contracts
 
@@ -328,40 +341,42 @@ Statuses are exactly `OK`, `SUPPRESSED`, `NO_DATA`, `OUT_OF_SCOPE`. A status is 
 
 | Field | Contract |
 |---|---|
-| Inputs | `pin` (latitude and longitude, or a gazetteer key), `mode` (`distance`, `walk`, `drive`), `cutoff` (250, 500, 1,000 metres for distance; 5, 10, 15 minutes for walk or drive; drive 30 only for `staffing_and_pay`), optional `situation` and `summer` (drive only). |
-| Outputs | `payload.area_id` (section 11.1); `payload.units` by partition key; `payload.snap_report` with the requested outline (GeoJSON for drawing), cells inside, units used, cells added and cells dropped by snapping. The snap-report counts are facts with provenance `synthetic`, because the unit partition is derived from protected tables (ASSUMPTION). |
-| Statuses | `OK`; `OUT_OF_SCOPE` for a pin outside the frame; `NO_DATA` when no release unit survives snapping. |
-| Errors | `INVALID_ARGUMENT` for a cutoff not in the list, drive 30 outside `staffing_and_pay`, or `summer` with `ramadan_iftar`. |
-| Reads | `grid_cell`, `release_unit`, `unit_member`, `speed_factor` (drive with a situation). In public-only mode (BE-105): `grid_cell` only. |
+| Inputs | Either `shape_id` (a polygon the user drew, registered by `POST /api/areas/shapes` for this session and seat, BE-117; the model passes only the identifier), or `pin` (latitude and longitude from the user's click, or a gazetteer key) with `mode` (`distance`, `walk`, `drive`) and `cutoff` (250, 500, 1,000 metres for distance; 5, 10, 15 minutes for walk or drive; drive 30 only for `staffing_and_pay`). For drive only: optional `situation` and `summer`, or an `hour_key` and a `day_key` from the release's closed lists ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)). |
+| Outputs | `payload.area_id` (section 11.1); `payload.outline` (GeoJSON of the exact shape, used for Public points and Simulated layers); `payload.units` by partition key; `payload.snap_report` with the requested outline, cells inside, units used, cells added and cells dropped by snapping, and the key of the snap sentence. The snap-report counts are facts with provenance `synthetic`, because the unit partition is derived from protected tables (ASSUMPTION). |
+| Statuses | `OK`; `OUT_OF_SCOPE` for a pin or a shape outside the frame. When no release unit survives snapping, the area is still made for its exact outline with an empty unit list, and every protected block read through it returns `NO_DATA` with reason `SNAPPED_TO_WHOLE_UNITS` (ASSUMPTION: in the first pack `make_area` itself returned `NO_DATA` here; Public and Simulated blocks now use the exact outline). |
+| Errors | `INVALID_ARGUMENT` for a cutoff not in the list, drive 30 outside `staffing_and_pay`, `summer` with `ramadan_iftar`, an hour or day key outside the release's lists, both a `shape_id` and a `pin`, an unknown `shape_id`, or a `shape_id` of another session or seat. |
+| Reads | `grid_cell`, `release_unit`, `unit_member`, `road_link` and `traffic_hourly` (drive with a situation or an hour). In public-only mode (BE-105): `grid_cell` only, with free-flow drive areas. |
 | Public-only mode | When the mounted release holds Public tables only (slice S3), `make_area` uses the fixed base-cell frame: it reads no privacy-derived `release_unit` and no protected or simulated table, its area is the set of frame cells selected by the shape plus the pin's base cell, and the snap report is emitted as technical metadata, not as a Synthetic fact. |
-| Parity case | The flagship pin with walk 5 and drive 10: identical unit lists on both engines. |
+| Parity case | The flagship pin with walk 5 and drive 10; a drive 10 area at two hours of one day key; a fixture polygon: identical unit lists and outlines on both engines. |
 
 `area_evidence`
 
 | Field | Contract |
 |---|---|
-| Inputs | `area_id`; `blocks` (any of `resident_pay`, `worker_pay`, `presence`, `register`, `coverage`, `public_context`); `situation` and `summer` for `presence`. |
-| Outputs | `resident_pay` and `worker_pay`: rounded earner count, median band, quartile band range, band distribution, and the housing split of covered earners that feeds the `live_pay` card of document 10 — `family_housing`, `labour_accommodation`, `institution` and `unknown`, an explicit `other` row only where pooling occurred (values as [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) defines them), beside the separate protected `not_measured_count`, which is a separate population from `resident_pay` on `rp_housing_count` (PRV-39); mean wage and wage bill flagged "more evidence"; `worker_pay` also carries the coarse home-area shares (capability S10). `presence`: an index for workers, residents and visitors, never a count, with metro, tram, bus, hotel and restaurant-and-hotel price-index series as separate Public context facts. `register`: licensed outlets within reach and the share showing payroll activity by size band (capability S1). `coverage`: the licensed C8 Public proxy, naming its geography, with its remainder labelled `outside this proxy`, never Not measured; while OI-04 is open the source is validation-only and the coverage bar uses the finest separately licensed geography or returns `NO_DATA`. It never derives a not-measured share by subtracting the Public proxy. `public_context`: licences against the national rate, zone electricity growth, transit riders, sale price per square metre with its deal count, and census shares only at a licensed geography. Every pay and split figure is computed from exactly one additive family, named in the fact lineage, and a count and the shares shown beside it on one card come from the same family (PRV-30, BE-108); no block or card presents two routes to one population as two numeric estimates. Every result carries a privacy receipt (release, rules version, the exported parameter set where applicable, units, treatments, withheld items, snap report). |
+| Inputs | `area_id`; `blocks` (any of `resident_pay`, `worker_pay`, `presence`, `traffic`, `register`, `coverage`, `public_context`); optional `month_key` for the protected blocks (one month of the release's closed month list; default the latest month, ASSUMPTION); for `presence` and `traffic`, a `day_key` (or `situation` and `summer`) and an optional `hour_key` (every hour of the day when absent). |
+| Outputs | `resident_pay` and `worker_pay`: rounded earner count, median band, quartile band range, band distribution, and the housing split of covered earners that feeds the `live_pay` card of document 10 — `family_housing`, `labour_accommodation`, `institution` and `unknown`, an explicit `other` row only where pooling occurred (values as [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) defines them), beside the separate protected `not_measured_count`, which is a separate population from `resident_pay` on `rp_housing_count` (PRV-39); mean wage and wage bill flagged "more evidence"; `worker_pay` also carries the coarse home-area shares (capability S10). `presence` (from [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), replacing the index of the first pack): Simulated estimated counts of people around this location, each with its range, for workers, residents and visitors, hour by hour through the chosen day or for one hour, with crowd density (people per square kilometre) for the same hours; released counts are apportioned to the exact outline by `eii_core.calc` (BE-111); metro, tram, bus, hotel and restaurant-and-hotel price-index series stay separate Public context facts. `traffic`: Simulated slowdown by hour on the roads of the area, computed by `eii_core.calc` from the travel-time factors of `traffic_hourly` on the area's `road_link` rows as method card C25 defines it (the length-weighted mean of the speed ratios inside the outline, a link without a row at 1.000), and for a drive area the area reached at each hour (ARC-133). `register`: licensed outlets within reach and the share showing payroll activity by size band (capability S1). `coverage`: the C8 Public proxy, naming its geography, with its remainder labelled `outside this proxy`, never Not measured; the coverage bar uses the finest admitted geography, the census map layers included under decision 0017 item 10 (OI-04 closed for version 1), or returns `NO_DATA` (PUB-82). It never derives a not-measured share by subtracting the Public proxy. `public_context`: licences against the national rate, zone electricity growth, transit riders, sale price per square metre with its deal count, and census shares only at an admitted geography (PUB-82); from [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), for the municipality containing the pin cell or the shape's representative point, residential unit sales with their deal counts, building permits and completion certificates, population by age and, as separate Public splits, population by age and sex, each on its source's own geography with source and period and never apportioned to the area (BE-110). Every pay and split figure is computed from exactly one additive family, named in the fact lineage, and a count and the shares shown beside it on one card come from the same family (PRV-30, BE-108); no block or card presents two routes to one population as two numeric estimates. Every result carries a privacy receipt (release, rules version, the exported parameter set where applicable, units, treatments, withheld items, snap report). |
 | Statuses | Per block and overall: `OK`, `SUPPRESSED` (a derivation minimum in document 06 fails for the area total), `NO_DATA`. |
-| Reads | `resident_pay`, `worker_pay`, `home_area_share`, `presence_index`, `outlet_register`, `release_unit`, `unit_member`, `suppression_reason`, `rules_version`, `pub_licence_active`, `pub_zone_utility`, `pub_transit_monthly`, `pub_hotel_monthly`, `pub_price_index`, `pub_property_sale`, `pub_census_zone`, `pub_census_district`, `pub_population_municipality`, `pub_census_national`, `district`, `zone`, `municipality`. |
-| Parity case | All blocks for the flagship walk-5 and drive-10 areas, each situation. |
+| Reads | `resident_pay`, `worker_pay`, `home_area_share`, `presence_count`, `traffic_hourly`, `outlet_register`, `release_unit`, `unit_member`, `suppression_reason`, `rules_version`, `pub_licence_active`, `pub_zone_utility`, `pub_transit_monthly`, `pub_hotel_monthly`, `pub_price_index`, `pub_property_sale`, `pub_property_resi`, `pub_building_permits`, `pub_population_age`, `pub_population_age_sex`, `pub_census_zone`, `pub_census_district`, `pub_population_municipality`, `pub_census_national`, `district`, `zone`, `municipality`. |
+| Parity case | All blocks for the flagship walk-5 and drive-10 areas, each situation; `presence` and `traffic` for one day key at every hour and for each event day; one fixture polygon. |
+
+The six area-level income indicators of [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 9 come from these blocks and from `what_changed`: average and median wage by residential area where groups are large enough, wage bands and their spread, and the covered wage bill with the earner count (`resident_pay`, `worker_pay`); residential income beside presence by time of day (`resident_pay` with `presence`); residence and workplace geography (the home-area shares of `worker_pay`); and wage trends separated from changes in worker mix: by area, the fixed-composition index of method card C19 (`what_changed`); by sector, they wait for the protected split by activity that document 03 leaves open, and the national split of method card C3 stands in `sector_facts` (`pay_decomposition`). The mean wage is never returned without the median band, the band distribution and the earner count of the same family, and the figures describe covered earners and wages paid, never every household, wealth or spending power.
 
 `scan_places`
 
 | Field | Contract |
 |---|---|
 | Inputs | `area_id`; `categories` (spine keys); `limit` (1 to 50); `include_neighbours` (bool). |
-| Outputs | Public places whose precomputed cell is in the area, each with name, category, source provider, licence and confidence (the `pub_place` columns of PUB-48), its verification status when `pub_place_verification` holds a row for it (PUB-53), and a network distance from the pin as a fact (provenance `public`; `simulated` if a situation speed factor applies). The caveat key `open_listings_incomplete` is always present. With `include_neighbours`, at most six "found near" categories from co-location edges (capability S9). |
+| Outputs | Public places whose precomputed cell is in the area and, for a drawn shape or an exact outline, whose point lies inside it (`eii_core.shapes`), each with name, category, source provider, licence and confidence (the `pub_place` columns of PUB-48), its verification status when `pub_place_verification` holds a row for it (PUB-53), and a network distance from the pin as a Public fact; it never takes an hourly link speed (MTH-57, PUB-92). For a named museum, exhibition or health centre, its published visitor counts as Public facts of a `place_public` subject with source and period ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)), never an estimate of people present. These are the real businesses and named public places of the journeys; no Synthetic or Simulated figure, fit or rank is attached to one. The caveat key `open_listings_incomplete` is always present. With `include_neighbours`, at most six "found near" categories from co-location edges (capability S9). |
 | Statuses | `OK`; `NO_DATA` (no listed place, which is not evidence that none exist); `OUT_OF_SCOPE` for a category outside the spine. |
-| Reads | `pub_place`, `pub_place_verification`, `graph_node`, `graph_edge`, `grid_cell`. |
+| Reads | `pub_place`, `pub_place_verification`, `pub_venue_visits`, `graph_node`, `graph_edge`, `grid_cell`. |
 | Parity case | Restaurants around the flagship pin. |
 
 `compare_areas`
 
 | Field | Contract |
 |---|---|
-| Inputs | `area_id_a`, `area_id_b`, `blocks`. |
-| Outputs | The `area_evidence` result for each area, plus overlap: the shared units and the residents and workers in them, labelled "shared reach, not lost sales" (capability S6). Disjoint snapped areas return 0% shared reach when both weights are nonzero. `eii_core.calc` applies C7's derivation and privacy checks to the intersection and each denominator; a failing derivation minimum returns `SUPPRESSED`. |
+| Inputs | `area_id_a`, `area_id_b` (any two areas, drawn shapes included), `blocks`. |
+| Outputs | The `area_evidence` result for each area, plus overlap: the shared units and the residents and workers in them, labelled "shared reach, not lost sales" (capability S6); the second-site comparison of journey D6 and service S2 shows overlap, never lost sales. Disjoint snapped areas return 0% shared reach when both weights are nonzero. `eii_core.calc` applies C7's derivation and privacy checks to the intersection and each denominator; a failing derivation minimum returns `SUPPRESSED`. |
 | Statuses | As `area_evidence`; `NO_DATA` only when either weight is zero or a required source is unavailable; `SUPPRESSED` when a C7 privacy or derivation minimum fails. |
 | Reads | As `area_evidence`. |
 | Parity case | The flagship pin against a second Lusail pin. |
@@ -370,7 +385,7 @@ Statuses are exactly `OK`, `SUPPRESSED`, `NO_DATA`, `OUT_OF_SCOPE`. A status is 
 
 | Field | Contract |
 |---|---|
-| Inputs | `area_id`; `occupation_groups` (keys) or `activity` (spine key mapped to occupation groups). |
+| Inputs | `area_id`; `occupation_groups` (keys) or `activity` (spine key mapped to occupation groups); optional `month_key` (as `area_evidence`). |
 | Outputs | Pay bands by occupation group for residents of the area (Synthetic), the published national average for the group, the statutory minimum and the C10 restaurant annual-wage and monthly-equivalent anchor from `pub_sector_accounts` (Public, documents 04 and 07). The occupation-group values may include `other` beside `0` to `9` and `unmapped` (values as [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) defines them). A median band or quartile range that the exported tier does not publish for a group returns `SUPPRESSED` with the reason code of document 06, and the answer template reads "not available at this area size" and offers the wider area (wording of [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md); PRV-21). |
 | Statuses | `OK`, `SUPPRESSED`, `NO_DATA`, `OUT_OF_SCOPE` (unmapped activity). |
 | Reads | `occupation_pay`, `release_unit`, `unit_member`, `pub_wage_table`, `pub_sector_accounts`. |
@@ -380,10 +395,10 @@ Statuses are exactly `OK`, `SUPPRESSED`, `NO_DATA`, `OUT_OF_SCOPE`. A status is 
 
 | Field | Contract |
 |---|---|
-| Inputs | `activity`; `topic` (`unit_economics`, `licences`, `churn`, `zone_momentum`, `pay_decomposition`); `geography` (national, municipality or zone code); optional `scenario_inputs` for `unit_economics`: the six inputs of method card C4 in document 07 — monthly rent, seats, average bill, opening days (default 30), and the optional expected covers per day and monthly staff cost — plus the optional target surplus share `U` (default 0, break-even). |
-| Outputs | Public facts on their official geography; with `scenario_inputs`, the covers per day required and the breakpoint as `inferred` facts tagged "your inputs", every one computed by `eii_core.calc` under method card C4 (MTH-25 to MTH-28). Breakpoints appear only when expected covers are entered. The target-surplus result is a separate line labelled "to earn the sector's 2022 surplus share" and is never called break-even (MTH-26). Churn facts flag bulk months (capability S8). |
+| Inputs | `activity`; `topic` (`unit_economics`, `licences`, `churn`, `zone_momentum`, `pay_decomposition`, and from [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) `employer_scale`, `market_context` and `visitor_markets`); `geography` (national, municipality or zone code); optional `scenario_inputs` for `unit_economics`: the six inputs of method card C4 in document 07 — monthly rent, seats, average bill, opening days (default 30), and the optional expected covers per day and monthly staff cost — plus the optional target surplus share `U` (default 0, break-even), and an optional `incentive_key` naming one `incentive` record of `pub_investqa_record` that the user chose, whose parameters are that record's `incentive_parameter` rows (DAT-143). |
+| Outputs | Public facts on their official geography; with `scenario_inputs`, the covers per day required and the breakpoint as `inferred` facts tagged "your inputs", every one computed by `eii_core.calc` under method card C4 (MTH-25 to MTH-28). Breakpoints appear only when expected covers are entered. The target-surplus result is a separate line labelled "to earn the sector's 2022 surplus share" and is never called break-even (MTH-26). With an `incentive_key`, the package's parameters enter the calculator as Public facts naming their source page and retrieval date, as document 07 defines; the result keeps the "your inputs" tag and no Public figure changes. Churn facts flag bulk months (capability S8). `employer_scale`: establishments and employees by size class and activity, with compensation where published, each bulletin with its own last year, and the 2015 census by municipality marked as dated 2015. `market_context`: wholesale and retail purchases, sales and stocks, national, as context and never a forecast. `visitor_markets`: hotels and hotel apartments by municipality, hotel guests by nationality as a Public split (BE-110) and visitor arrivals. |
 | Statuses | `OK`; `NO_DATA`; `OUT_OF_SCOPE` for an activity with no published cost structure. |
-| Reads | `pub_sector_accounts`, `pub_licence_active`, `pub_licence_cancelled`, `pub_zone_utility`, `pub_wage_table`, `pub_price_index`, `fact_lineage`, `source_registry`. |
+| Reads | `pub_sector_accounts`, `pub_licence_active`, `pub_licence_cancelled`, `pub_zone_utility`, `pub_wage_table`, `pub_price_index`, `pub_establishment_size`, `pub_census_2015_municipality`, `pub_trade_wr`, `pub_hotels_municipality`, `pub_visitor_markets`, `pub_investqa_record`, `fact_lineage`, `source_registry`. |
 | Parity case | Restaurants (activity 561), 2022, national unit economics; the national pay-versus-mix decomposition. |
 
 `supplier_lens`
@@ -391,10 +406,124 @@ Statuses are exactly `OK`, `SUPPRESSED`, `NO_DATA`, `OUT_OF_SCOPE`. A status is 
 | Field | Contract |
 |---|---|
 | Inputs | `activity`; optional `input_key`; `period`. |
-| Outputs | Input basket, tariff lines at eight digits or finer, ordered origin data for the ranked bars with the calculated import unit value (QAR per kg) and its valuation basis as the source states it, concentration and trend, and licensed wholesale depth by municipality. The Source chain is limited to fifteen nodes. |
+| Outputs | Input basket, tariff lines at eight digits or finer, ordered origin data for the ranked bars with the calculated import unit value (QAR per kg) and its valuation basis as the source states it, concentration and trend, and licensed wholesale depth by municipality. From [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), which brings backlog item L3 into version 1: imports against local production (method card C13), with manufacturing industries and main products as separate Public facts with their own units and periods (a licence-type row is not a plant, and licensed investment is cumulative); and for journey D7, certificates of origin by importing country and arriving vessels as Public context. Never a capacity, demand or substitution figure. The Source chain is limited to fifteen nodes. |
 | Statuses | `OK`; `NO_DATA`; `OUT_OF_SCOPE` for an activity without a reviewed basket. |
-| Reads | `graph_node`, `graph_edge` (through `graph_` queries, at most four steps), `pub_customs_import`, `pub_licence_active`. |
+| Reads | `graph_node`, `graph_edge` (through `graph_` queries, at most four steps), `pub_customs_import`, `pub_licence_active`, `pub_manufacturing`, `pub_trade_logistics`. |
 | Parity case | The pasta input of the restaurant basket. |
+
+The journey tools added by [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) follow the same common contract (section 6.1). Each reads the release through named queries only and returns numbers only as facts (BE-116).
+
+`travel_times`
+
+| Field | Contract |
+|---|---|
+| Inputs | `area_id`; `destinations` (`place_key` values of `gazetteer` entries of kind `gateway`: the ports, the airport, the free zones and the land routes, document 03); optional `day_key` and `hour_key` (free flow when absent). |
+| Outputs | One network travel time in minutes per destination, from the area's pin or, for a drawn shape, its representative point (`eii_core.shapes`): provenance `public` at free flow, `simulated` when an hour applies (ARC-92). The fact's subject is the area: the destination appears only as the Public label of the trip's end, and no figure is presented as the destination's own (BE-119). A straight-line distance is never labelled a network time (ARC-95). |
+| Statuses | `OK`; `NO_DATA` when no route exists; `OUT_OF_SCOPE` for a destination outside the list. |
+| Reads | `gazetteer`, the routing graph artefact, `road_link`, `traffic_hourly`. |
+| Parity case | The flagship drive-10 area to every destination at free flow and at two hours of one day key. |
+
+`area_ranking`
+
+| Field | Contract |
+|---|---|
+| Inputs | `activity` (spine key); `candidates`: candidates of one kind, as method card C11 of document 07 defines them: areas the user builds (pins with walk, drive or radius areas, or drawn shapes); the published release units of one partition inside a region the user draws; or, in public-only mode, the official zones or municipalities; `weights` (one per criterion of the closed criterion list of method card C11, fixed at slice S2: the catalogue defaults or the user's typed values); `mode` (`full` or `public_only`). |
+| Outputs | For each candidate, an `area_id` (section 11.1), the value of every criterion as a fact with its own class, each weight (tagged "your inputs" when the user changed it), the rank as a comparison fact (DAT-134), and the rank-stability facts of method card C11, all computed by `eii_core.calc` (BE-112). The weighted score only orders the candidates and is never returned (PRV-41). Protected criteria are read at whole release units; criterion values per candidate come from release rows, never from a whole-country sum at request time ([02](02_ARCHITECTURE.md) ARC-57). `public_only` reads no Protected or Simulated table. |
+| Statuses | `OK`; `SUPPRESSED` for a criterion withheld for a candidate (document 07 fixes how the candidate is then ranked); `NO_DATA`; `OUT_OF_SCOPE` for an activity outside the spine. |
+| Reads | The tables of the criteria of method card C11 among `resident_pay`, `worker_pay`, `outlet_register`, `presence_count`, `access_score`, `access_score_grid`, `pub_place`, `pub_licence_active`, `pub_property_resi`, `pub_building_permits` and `pub_population_age`; `release_unit`, `unit_member`. The Public statistics among them (`pub_licence_active`, `pub_property_resi`, `pub_building_permits`, `pub_population_age`) are read only for official-geography candidates in public-only mode, or as apportioned counts (method card C18) for areas the user builds, never for release-unit candidates (MTH-65); `access_score_grid` is read only for official-geography candidates and areas the user builds, never for release-unit candidates (DAT-154, MTH-56). |
+| Parity case | Restaurants (activity 561), with the default weights: the release units of one partition inside a fixture region around the flagship pin, and, in public-only mode, the official zones of the flagship's municipality. |
+
+`activity_fit`
+
+| Field | Contract |
+|---|---|
+| Inputs | `area_id`; optional `activities` (spine keys; default the closed activity list of document 07); `weights` as for `area_ranking`. |
+| Outputs | The reverse of `area_ranking`, for property owners matching tenants: activities ranked by fit for the area, each with every criterion of the closed list of method card C16 in document 07 as facts (places of the activity's category in the exact shape, typical neighbours near the pin, the location quotient, the catchment's wage-band share, estimated people at the selected hours); residential sales and the construction pipeline stand beside the fit as context, never in the score. The rank is a comparison fact, with the rank-stability facts (BE-112); the score only orders the activities and is never returned (PRV-41). A fit is never a forecast of a tenant's success. |
+| Statuses | `OK`; `SUPPRESSED` for a withheld criterion; `NO_DATA`. |
+| Reads | `resident_pay`, `presence_count`, `pub_place`, `pub_licence_active`, `pub_property_resi`, `pub_building_permits`, `graph_node`, `graph_edge`, `release_unit`, `unit_member`. |
+| Parity case | The flagship walk-5 area against the default activity list. |
+
+`similar_areas`
+
+| Field | Contract |
+|---|---|
+| Inputs | `area_id`; optional `area_type` (one of the three area types of document 07). |
+| Outputs | The area's type, with its stability facts, and the official zones ordered by similarity (method card C17), each with its rank-stability facts (BE-112); with `area_type`, only the zones of that type. The typing uses Public features only. |
+| Statuses | `OK`; `NO_DATA`. |
+| Reads | `zone_type` (the area types and stability figures that the release build writes, method card C17, DAT-152), `zone`, and the Public feature tables of C17's reviewed feature list (for example `pub_place` and `pub_zone_utility`). |
+| Parity case | The flagship walk-5 area. |
+
+`reachable_access`
+
+| Field | Contract |
+|---|---|
+| Inputs | `area_id` or `activity`; `mode` (`walk`, `drive`) and `cutoff`, a closed value: one of the cut-offs that method card C12 stores for the chosen mode, fixed at slice S2 (DAT-151, DAT-154), never a free number and not the `make_area` list; optional `day_key` and `hour_key`. |
+| Outputs | The reachable-access score of method card C12 (a travel-time catchment score) as a fact computed by `eii_core.calc` from the stored scores of the area's demand locations, weighted as C12 defines (BE-112). Its class is the least-real class of its demand layer, supply layer and times (MTH-67): Public for the population grid with Public points at free flow, and Simulated with estimated residents present or any hour's times. Each layer's score is its own fact; the two are never combined. No protected figure enters the score (PRV-41). |
+| Statuses | `OK`; `SUPPRESSED` with `BELOW_PANEL_MINIMUM` when the score draws on a withheld presence group (PRV-58); `NO_DATA` when a layer is missing, when the area's demand weights sum to 0 (for the grid layer, no populated cell in the area) and for an hour or day key in public-only mode, where only free-flow scores exist, while an area that reaches no supply point has the score 0, as C12 defines; `OUT_OF_SCOPE` for an activity outside the spine. |
+| Reads | `access_score` (DAT-151), `access_score_grid` (DAT-154), `presence_count` (the demand weights of C12), `pub_place`, `release_unit`, `unit_member`. Public-only mode reads `access_score_grid` and `pub_place` only; a protected release may read both score tables. The build-time times of `access_score` are in the manifest artefact `travel_time_matrix` (DAT-153); the tool reads the stored scores, not the times. |
+| Parity case | The flagship drive-10 area at free flow and at one hour; the same area on the grid layer at free flow. |
+
+`what_changed`
+
+| Field | Contract |
+|---|---|
+| Inputs | `area_id`; `block` (`resident_pay`, `worker_pay`, `register`); `from_month_key` and `to_month_key` (two months of the release's closed list). The tool returns area figures only; wage trends by sector wait for the protected split by activity that document 03 leaves open. |
+| Outputs | The released value of each month as Synthetic facts, and, for every pair of adjacent months in between, the published components of the treated `month_change` rows summed over the area's units (joiners, leavers and stayers, or openings and closures for `register`), computed by `eii_core.calc` under method card C20, never by subtracting two monthly values; for `resident_pay` and `worker_pay`, the wage trend of the same earners for each pair: each unit's `stayer_wage_index` with its change and direction (method card C19, indicator 6), never averaged or combined across units (BE-115). Every change carries the caveat that a change between synthetic months is a change in the synthetic world, not in Qatar. |
+| Statuses | `OK`; `SUPPRESSED` when either month is withheld for the area, or with `CARRIED_FORWARD` when a `month_change` row of the pair is carried forward, an empty cohort's row included (DAT-137), and then no change is returned for that pair, never zero; `NO_DATA`. |
+| Reads | The protected tables of the block at their monthly periods, `month_change`, `release_unit`, `unit_member`, `suppression_reason`. |
+| Parity case | `resident_pay` and `worker_pay` for the flagship drive-10 area between the first and last month of the window. |
+
+`labour_facts`
+
+| Field | Contract |
+|---|---|
+| Inputs | `activity` or `occupation_groups`; `geography` (national or municipality code); `split` (`none`, `sex`, `nationality`); optional `projection` (true or false). |
+| Outputs | The labour-market view of journey D5: sectors, occupations, pay bands with middle ranges and earner counts from the released national and municipal rows (Synthetic), each month's released values with every carried-forward month marked (PRV-123), and the national split of pay change from changes in worker mix (method card C3, on its Public table); published labour-force, employment, unemployment, compensation and student series (Public), and, when `split` asks for one, the official split by sex or nationality as Public facts on the source's own geography and categories (BE-110); with `projection`, simple projections computed by `eii_core.calc` over a published or released series, each marked as a projection with its method and period, never a revenue, demand or success forecast (BE-112). No Public split and no Synthetic figure share a calculation. |
+| Statuses | `OK`; `NO_DATA`; `OUT_OF_SCOPE` for an activity or occupation outside the spine. |
+| Reads | `occupation_pay`, `month_change` (the carried-forward marks), `release_unit`, `pub_wage_table`, `pub_labour_sex_municipality`, `pub_active_sex_age`, `pub_active_nationality_occupation`, `pub_compensation_nationality`, `pub_students`. |
+| Parity case | Food-service occupations, national, with each split value and with a projection. |
+
+`openings_closures`
+
+| Field | Contract |
+|---|---|
+| Inputs | `area_id` or `municipality_code`; optional `activity`, which filters the Public series only (the synthetic births and closures carry no activity class); `from_month_key` and `to_month_key`, or published periods for the Public series. |
+| Outputs | Public licence openings and closures over time on their official geography, openings only for the codes the issued series covers and always with its incompleteness note, closures with bulk months flagged (method card C2), and no net formation from the Public series; Synthetic firm births and closures by release unit and pair of adjacent months, all activity classes together, from the `openings` and `closures` of the `month_change` rows of `outlet_register`, read at whole units under the disclosure controls (method card C22). The two are never shown as one series. |
+| Statuses | `OK`; `SUPPRESSED` for a withheld month or unit, or with `CARRIED_FORWARD` for a carried-forward pair, which an empty cohort also causes (DAT-137), never zero; `NO_DATA`. |
+| Reads | `pub_licence_issued`, `pub_licence_cancelled`, `month_change` (the openings and closures of its `outlet_register` rows), `release_unit`, `unit_member`. |
+| Parity case | Restaurants in the flagship's municipality over the window. |
+
+`synthetic_firms`
+
+| Field | Contract |
+|---|---|
+| Inputs | `area_id` (the territory; a candidate or official geography from `area_ranking` included); `activities` (spine keys); optional `size_bands` (closed list: the bands of the exported parameter set, read from the release (manifest `parameter_set`), as `firm_list` holds them: `s00_09`, `s10_49` and `s50_plus` under set A, `s00_49` and `s50_plus` under set B; a filter selects whole joined bands only, and a band that the exported set does not hold is not offered); `purpose` (`prospects`, `partners`, `suppliers`, `complementary`: the one closed list that method card C16 of document 07 also uses, each kept through the reviewed relation between activities); optional `weights` for ordering by fit. |
+| Outputs | Named synthetic firms from the released firm list: fictional name, activity, size band and release unit only, each marked Synthetic; with `weights`, a fit rank and its rank-stability facts from `eii_core.calc` under method card C16 (BE-112, BE-113). No count of listed firms is returned. |
+| Statuses | `OK`; `SUPPRESSED` for a territory whose list the privacy engine withheld; `NO_DATA`; `OUT_OF_SCOPE` for a request that names a firm to look it up. |
+| Reads | `firm_list`, `release_unit`, `unit_member`, `graph_node` and `graph_edge` (activity spine), the routing graph artefact and `road_link` (the free-flow drive times of C16), and the `parameter_set` of `release_manifest` (the closed size-band list). |
+| Parity case | Food-service suppliers in the flagship drive-10 area, with and without weights. |
+
+`investment_context`
+
+| Field | Contract |
+|---|---|
+| Inputs | `topic` (`fdi_projects`, `sectors`, `opportunities`, `incentives`, `setup_steps`, `laws`); optional `sector`, `source_country` and `municipality_code` filters for `fdi_projects`; optional `sector` for the agency's records. A `tenders` topic exists only once slice S2 confirms a public source of tenders. |
+| Outputs | For `fdi_projects`: published announcements with every loaded field as labels, capex and jobs as Public facts with the source's estimate note, and counts by the requested breakdown as facts from `eii_core.calc`; a project is placed on the map only at the location the source states (BE-114). For the agency's topics: structured records with their page links and retrieval dates, every number in them a Public fact. |
+| Statuses | `OK`; `NO_DATA`; `OUT_OF_SCOPE` for a request that names a company to look it up. |
+| Reads | `fdi_projects`, `pub_investqa_record`, `source_registry`. |
+| Parity case | Projects by sector, national; the incentive records. |
+
+`own_records` (playbook-only)
+
+| Field | Contract |
+|---|---|
+| Inputs | `case_key` (`c3` or `c4`); `blocks` (`concentrations`, `access` for case C3; `branch_sales` for case C4); an optional `area_id` to set the records beside. |
+| Outputs | Facts computed by `eii_core.calc` under method card C29 from the case sample file that this session and seat loaded (BE-118): provenance `synthetic`, the caveat key `your_inputs` and evidence status `inferred`, with the subject `area` the records describe. `access` gives, for each depot of the file and, when the optional `area_id` gives one, the candidate depot at its pin, the delivered units and the share of the file within each free-flow drive cut-off; free-flow times only, so the facts stay Synthetic. |
+| Statuses | `OK`; `NO_DATA` with the reason that no sample file is loaded when the session has none. |
+| Reads | The session store (BE-109) for the file, and for `access` the routing graph artefact and `road_link` at free flow; no release table holds the file. |
+| Parity case | Each committed sample file on both engines, with the same `area_id`. |
+
+`own_records` is called only by the `depot_options` and `branch_check` playbooks and by the case routes of section 8.3. It is not offered to the model, and its facts are never sent in a model request ([02](02_ARCHITECTURE.md) ARC-128).
 
 `stage`
 
@@ -416,29 +545,46 @@ The `stage` schema (the closed list; every object forbids unknown fields). A dir
 {"directive": "rings",     "area_ids": ["…"]}                       (one or two)
 {"directive": "dial",      "situation": "weekday_lunch | weekday_evening | friday_evening | ramadan_iftar",
                            "summer": false}
+{"directive": "hour",      "hour_key": "<a key of the release's closed hour list>"}
+{"directive": "day",       "day_key": "<a key of the release's closed day list: a day type and season, or an event day>"}
+{"directive": "month",     "month_key": "<a key of the release's closed month list>"}
 {"directive": "split",     "area_ids": ["…", "…"]} | {"off": true}
 {"directive": "set_scenario_inputs", "open": true, "focus": "rent | seats | average_bill"}
 ```
 
-`set_scenario_inputs` opens the scenario panel; the values themselves come only from the user or the local parser (document 09), never from a directive.
+`set_scenario_inputs` opens the scenario panel; the values themselves come only from the user or the local parser (document 09), never from a directive. `hour`, `day` and `month` ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)) select a stored hour, a day type or event day, and a month of the release; hero layers of the living map stay selected by `layer`. The 24-hour animation of traffic and crowd density is a control of the screen (document 10), not a directive. No directive opens a drawing, places a shape or loads a sample file: a shape comes only from the user's drawing, and a sample file only from the user's upload or the one-click case start.
 
 | ID | Requirement |
 |---|---|
-| BE-56 | The tool registry contains exactly these nine names; a test fails on any other. |
-| BE-57 | Every release table of the master design (section 5.4) is read by at least one tool or endpoint, or is listed in the registry as control-only; a test checks this list against the manifest allow-list. |
-| BE-58 | `flow_od` is read only by the layers endpoint (`GET /api/layers/flows`, section 8.1) and appears only as aggregate flows. |
-| BE-59 | No tool returns a fictional firm. A Synthetic or Simulated fact may appear only in a claim or component whose subject is `area`; the validator decides this from the resolved place and fact slots, never from wording. A claim with subject `place_public` accepts Public slots only, and cards showing Synthetic or Simulated area facts are titled as statistics of the area within reach of the pin (master design sections 3.3, 8 and 16). |
+| BE-56 | The tool registry contains exactly the names of section 6.2: the nine tools of the first pack, the ten journey tools of [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) and the playbook-only `own_records`; a test fails on any other. The model is offered every name but `own_records` ([02](02_ARCHITECTURE.md) ARC-71). A further tool is a versioned change with its own contract and parity case. |
+| BE-57 | Every release table of the master design (section 5.4), and every table that decisions 0016 and 0017 add to the catalogue of document 03 section 7.2, is read by at least one tool or endpoint, or is listed in the registry as control-only; a test checks this list against the manifest allow-list. |
+| BE-58 | `flow_hourly`, which replaces the first pack's `flow_od`, is read only by the layers endpoint (`GET /api/layers/flows`, section 8.1) and appears only as aggregate flows. The traffic assignment reads the released flows at build time in the custodian plane ([02](02_ARCHITECTURE.md) ARC-133); no product code assigns traffic. |
+| BE-59 | Only `synthetic_firms` returns fictional firms, each with only its fictional name, activity, size band and release unit (BE-113). A Synthetic or Simulated fact may appear only in a claim or component whose subject is `area`, or, for a Synthetic fact of one named synthetic firm, `synthetic_firm`; the validator decides this from the resolved place, subject and fact slots, never from wording. Claims with subject `place_public` or `fdi_project` accept Public slots only, and cards showing Synthetic or Simulated area facts are titled as statistics of the area (the shape the user drew, or the area within reach of the pin), never of a named building, business or place (master design sections 3.3, 8 and 16; [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 20). |
 | BE-105 | In public-only mode (a mounted release whose tables are Public only, slice S3), `make_area` uses the fixed base-cell frame: it reads no privacy-derived `release_unit` and no protected or simulated table, its area is the set of frame cells selected by the shape plus the pin's base cell, and it emits the snap report as technical metadata, not as a Synthetic fact. When a protected release is mounted, BE-54 and the snap rule of document 06 apply unchanged. |
 
 ## 7. Playbooks and the template writer
 
-A playbook is a fixed, deterministic list of tool calls. Its output is an evidence bundle: release id, playbook, inputs, ordered plan steps, stage directives, cards (each a list of fact ids) and all facts. Bundles are memoised by `(playbook, normalised inputs, release_id, rules_version)`; a bundle is language-independent because every fact carries both labels, so a language flip re-uses it. Every brief carries a `catalogue_version` hash, and that hash is also part of the brief memo key.
+A playbook is a fixed, deterministic list of tool calls. Its output is an evidence bundle: release id, playbook, inputs, ordered plan steps, stage directives, cards (each a list of fact ids) and all facts. Bundles are memoised by `(playbook, normalised inputs, release_id, rules_version)`; a bundle is language-independent because every fact carries both labels, so a language flip re-uses it. Every brief carries a `catalogue_version` hash, and that hash is also part of the brief memo key. A bundle that uses a case sample file is never memoised (BE-118).
+
+The playbook list is the closed, versioned list of document 09 section 3: the three playbooks of the first pack and the ten added by [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), which together cover the seven journeys, three services and four cases. Document 09 names each playbook, its journeys, services and cases, and the evidence it gathers; this table fixes the calls of every bundle, and where the two differ this table wins and document 09 is corrected. "Near area" is the walk 5 area, or the shape the user drew, a radius or a walk time; "wider area" is the drive 10 area, or a drive time by hour.
 
 | Playbook | Order of calls | What lands on screen first |
 |---|---|---|
-| `site_check` | `resolve` → `make_area` walk 5 → `make_area` drive 10 → `stage` fly and rings → `area_evidence` (presence, worker_pay, register, public_context on walk 5; resident_pay, coverage on drive 10) → `scan_places` (walk 5, with neighbours) → `sector_facts` unit_economics | Fly, rings and snap report; then four hero cards in this order: who is present, real competitors with distances, pay of workers and of residents with the coverage bar, restaurant unit economics. |
+| `site_check` | `resolve` → `make_area` near area → `make_area` wider area → `stage` fly and rings → `area_evidence` (presence by hour for the selected day, worker_pay, register, public_context on the near area; resident_pay, coverage on the wider area, and traffic when the wider area is a drive area) → `scan_places` (near area, with neighbours) → `sector_facts` unit_economics | Fly, rings and snap report; then four hero cards in this order: who is present (estimated people around this location, by hour), real competitors with distances, pay of workers and of residents with the coverage bar, restaurant unit economics. |
 | `staffing_and_pay` | `resolve` → `make_area` drive 30 → `stage` fly and rings → `area_evidence` (resident_pay, worker_pay, coverage) → `pay_benchmark` → `sector_facts` pay_decomposition | Snap report; pay of workers and of residents with the coverage bar; staffing pay card; national pay card. |
-| `costs_and_suppliers` | `resolve` → `sector_facts` unit_economics (with scenario inputs when given) → `stage` set_scenario_inputs → `supplier_lens` | Unit economics and break-even card; supplier path card. |
+| `costs_and_suppliers` | `resolve` → `investment_context` incentives → `sector_facts` unit_economics (with scenario inputs and the incentive package the user chose, when given) → `stage` set_scenario_inputs → `supplier_lens` | Unit economics and break-even card; supplier path card. |
+| `market_entry` | `resolve` (activity) → `sector_facts` employer_scale, licences and market_context → `area_ranking` (candidate areas) → `area_evidence` (resident_pay, public_context) on the first-ranked candidates → `scan_places` on the first-ranked candidate → `labour_facts` → `investment_context` fdi_projects, sectors, setup_steps and laws → `stage` fly and layer | The market entry pack: market profile, customers and competitors, local income context, candidate areas, workforce context, set-up steps and the cheapest next tests. |
+| `rank_areas` | `resolve` (activity) → `area_ranking` (full, or public-only) → `stage` layer and highlight → `similar_areas` and `reachable_access` (by hour when an hour is selected) for the first-ranked candidate | The ranked candidates with every criterion, weight and value, and the rank-stability sentence beside every rank. |
+| `site_fit` | `resolve` (place) → `make_area` near area → `stage` fly and rings → `activity_fit` → `area_evidence` (presence by hour, register, resident_pay, public_context) → `scan_places` | Activities ranked by fit with their criteria and rank stability; the area's business mix and pay profile. |
+| `customer_finder` | `resolve` (activity) → `area_ranking` (the territory) → `synthetic_firms` prospects on the first-ranked candidates → `sector_facts` employer_scale, licences and visitor_markets → `area_evidence` public_context on the first-ranked candidate → `labour_facts` (students) → `stage` layer and highlight | The targeted territory and the prospect list of named synthetic firms by sector and size band. |
+| `partner_finder` | `resolve` (activity) → `make_area` near area, or the territory the user chose → `synthetic_firms` partners or suppliers, with weights → `scan_places` → `supplier_lens` → `labour_facts` → `investment_context` fdi_projects (and tenders once a public source exists) → `stage` rings | Named synthetic firms ranked by fit, real businesses from public listings, the structured qualification route and aggregate workforce evidence. |
+| `labour_market` | `resolve` (activity or occupation) → `labour_facts` (with the split and projection the user asked for) → with an area: `pay_benchmark` and `what_changed` worker_pay → `stage` | Pay bands with middle ranges and earner counts, trends, published series and splits with source and year, and projections marked as projections. |
+| `where_to_grow` | `resolve` → `make_area` current site → `make_area` candidate site → `stage` split → `openings_closures` (both areas) → `what_changed` (both areas) → `area_evidence` public_context (both areas) → `compare_areas` → `investment_context` fdi_projects → `stage` month | Openings and closures over time, cluster change and the second-site comparison as shared reach and overlap, with the barriers to resolve. |
+| `serve_region` | `resolve` → `make_area` near area → `travel_times` (every destination, at free flow and at the selected hour) → `supplier_lens` → `synthetic_firms` complementary → `scan_places` → `investment_context` fdi_projects → `stage` fly and layer | Travel times to the ports, the airport, the free zones and the land routes, complementary firms and the import context. |
+| `depot_options` | `make_area` current depot and candidate depot, as drive areas at the selected hour → `own_records` (concentrations, and access with the candidate depot's `area_id`) → `stage` split → `compare_areas` → `synthetic_firms` partners → `scan_places` | The company's customer concentrations beside the two drive areas and their shared reach, and the partner candidates: a defined trial before the capital commitment. |
+| `branch_check` | `own_records` (branch_sales) → `make_area` the branch's near area → `stage` fly and rings → `area_evidence` (presence by hour, resident_pay) → `what_changed` → `scan_places` | The branch's own sales beside estimated people by hour, residential pay bands and what changed in the area: a test of hours or offer. |
+
+The four cases of decision 0016 are guided stories with a one-click start: case C1 runs `market_entry` and `partner_finder`, case C2 `customer_finder`, case C3 `depot_options` and case C4 `branch_check` (document 09 owns the stories). Without a loaded sample file, the `own_records` blocks of `depot_options` and `branch_check` return `NO_DATA` and the rest of the bundle runs.
 
 ASSUMPTION (site check): workers, presence and outlets use walk 5 and residents use drive 10, because those are the two flagship defaults (master design section 6) and lunch trade is local. Staffing uses drive 30, the staffing-only cut-off pinned by the master design.
 
@@ -457,7 +603,7 @@ review, OI-09).
 | ID | Requirement |
 |---|---|
 | BE-60 | A playbook runs with no model call and its bundle is byte-identical across runs and engines (apart from BE-27 exclusions). |
-| BE-61 | At build time, a lint test scans every claim and fragment template and rejects numerals, number words, names of real places inside `area` claims, and go or no-go wording. No run-time scan of model prose exists because no model-written prose reaches the screen in version 1. |
+| BE-61 | At build time, a lint test scans every claim and fragment template and rejects numerals, number words, names of real places inside `area` claims, go or no-go wording, "footfall of" wording and wording of advice to act. No run-time scan of model prose exists because no model-written prose reaches the screen in version 1. |
 | BE-62 | The template writer places a fact in Observed or Inferred by its `evidence_status`, never by its provenance; a Synthetic observed fact never reads as real. |
 | BE-63 | The template writer's output passes the same structured-brief and catalogue validator as model output (document 09). One invalid item rejects the brief; after one repair attempt, the template writer composes the brief from the playbook's default selection. |
 | BE-64 | When the model is absent, refuses, or fails validation, the answer completes with the template writer and the stream reports `writer: template`. |
@@ -476,13 +622,18 @@ window binding, not authentication. `EventSource` therefore needs no custom seat
 | Method and path | Request | Response |
 |---|---|---|
 | `GET /health` | none | the health object with exactly the fields document 13 defines (store, PostgreSQL state, release, parity, ledger, model mode, tiles, fonts, replays) |
-| `GET /api/release` | none | manifest summary: release id, tables, rules version, and the exported parameter set of this release, as data (BE-103); no route offers a choice of set |
+| `GET /api/release` | none | manifest summary: release id, tables, rules version, the exported parameter set of this release, and the closed hour, day and month key lists, as data (BE-103); no route offers a choice of set |
 | `GET /api/seats` | none | the three seat keys with labels, for the seat picker |
 | `GET /api/seat/whoami` | none | `{seat, organisation_label_en, organisation_label_ar, fictional: true}`: the Viewing-as value from the signed cookie |
-| `POST /api/ask` | `{question, lang}` plus optional `{pin, mode, cutoff, situation, summer, scenario_inputs}` | `202 {answer_id, events_url}` |
-| `POST /api/playbooks/{playbook}` | structured playbook inputs | `202 {answer_id, events_url}`; never calls the model |
+| `POST /api/ask` | `{question, lang}` plus optional `{pin, shape_id, mode, cutoff, situation, summer, hour_key, day_key, month_key, scenario_inputs, case_key}` | `202 {answer_id, events_url}` |
+| `POST /api/playbooks/{playbook}` | structured playbook inputs, for any playbook of section 7 | `202 {answer_id, events_url}`; never calls the model |
 | `GET /api/answers/{answer_id}/events` | `Last-Event-ID` header optional | event stream (section 8.2) |
-| `POST /api/tools/{tool}` | tool input model | tool result envelope; used by the dial, pins and area cards with no model |
+| `POST /api/tools/{tool}` | tool input model of any tool of section 6.2 | tool result envelope; used by the dial, the hour, day and month controls, pins, drawn areas and area cards with no model |
+| `POST /api/areas/shapes` | `{geometry}` exactly: one GeoJSON polygon from the user's drawing | `201 {shape_id}`, bound to the session and seat (BE-117); `422 INVALID_ARGUMENT` for an extra property or a polygon that is not simple, lies outside the frame or exceeds the vertex or size limit. Not model-callable |
+| `GET /api/cases` | none | the four cases with their labels, the playbooks each runs and their one-click start inputs |
+| `POST /api/cases/{case_key}/sample-file` | the sample file's bytes; `case_key` is `c3` or `c4` | `201 {case_key, sample_sha256}`, held in the session store for this session and seat (BE-118); `422 INVALID_ARGUMENT` for another case key, a body larger than the largest committed sample file of that case, a SHA-256 that is not one of its committed synthetic sample files, or a file that fails the case's column schema. Not model-callable |
+| `GET /api/cases/{case_key}/sample-file/facts` | none | the facts that `own_records` computes from the loaded file (BE-118); `404 NOT_FOUND` when this session and seat loaded none |
+| `DELETE /api/cases/{case_key}/sample-file` | none | `204`; drops the file, its facts and any brief that used them from the session store |
 | `GET /api/facts/{fact_id}/lineage` | none | the fact's source chain — table, source, licence, retrieval date, release, rules — shown by the evidence drawer under the label "Source chain"; the API emits no fact whose `lineage_ref` does not resolve to a complete chain (BE-104) |
 | `POST /api/briefs` | `{answer_id}` | `201 {brief_id}` |
 | `GET /api/briefs` | none | own briefs through the company read function |
@@ -490,9 +641,9 @@ window binding, not authentication. `EventSource` therefore needs no custom seat
 | `GET /api/oversight/ledger` | `since`, `limit` | fixed oversight function result, with no organisation identity or question text |
 | `GET /api/oversight/ledger/events` | none | live ledger stream using the same oversight return type |
 | `GET /api/oversight/demand` | `by` (`area`, `activity`, `decision`) | aggregates above the distinct-organisation minimum |
-| `GET /api/layers/{layer}` | `situation`, `summer` | layer values as facts for one key of the closed layer list: `zone_electricity_growth`, `licence_density`, `transit_riders`, `presence_index`, `flows`, `public_places`, `release_units` (ASSUMPTION: the list the opening scene and the dial need). JSON, or Arrow when the client asks for it and the layer exceeds about 10,000 rows (document 10). |
+| `GET /api/layers/{layer}` | `situation`, `summer`; from decision 0016, `day_key`, `hour_key` or `hours=all` (the 24-hour animation, for `traffic` and `crowd_density` only), and `month_key` | layer values as facts for one key of the closed layer list: `zone_electricity_growth`, `licence_density`, `transit_riders`, `presence` (estimated people by hour, replacing `presence_index`), `crowd_density`, `traffic`, `flows`, `public_places`, `release_units`, `openings`, `closures`, `firm_density`, `fdi_projects`, `property_prices`, `construction_pipeline` (ASSUMPTION: the list the opening scene, the dial, the hour, day and month controls and the journeys need). Simulated layers carry the Simulated mark on every frame; a Public layer stays on its official geography. JSON, or Arrow when the client asks for it and the layer exceeds about 10,000 rows (document 10). |
 | `GET /api/proof/parity`, `GET /api/proof/survival`, `GET /api/trust` | none | parity report; the survival report with one aggregate row per parameter set (PRV-80); the signed attack report replay, verified at start-up as PRV-107 requires; rules text generated from `rules_version` and the tool registry |
-| `POST /api/proof/scene` | `{fixture_id: string}` exactly, with no other property; a fixture id is `scene:` followed by the lowercase SHA-256 already listed for its signed scene artefact in `manifest.artefacts` (PRV-119, BE-106) | `200`: the two pre-validated unit sets and area answers of that artefact's two prepared requests. `422 INVALID_ARGUMENT` for an extra property or a fixture id not of that form; `404 NOT_FOUND` for a well-formed id absent from `manifest.artefacts`. It is not one of the nine tools and is not model-callable (PRV-100); it has no custodian-plane path |
+| `POST /api/proof/scene` | `{fixture_id: string}` exactly, with no other property; a fixture id is `scene:` followed by the lowercase SHA-256 already listed for its signed scene artefact in `manifest.artefacts` (PRV-119, BE-106) | `200`: the two pre-validated unit sets and area answers of that artefact's two prepared requests. `422 INVALID_ARGUMENT` for an extra property or a fixture id not of that form; `404 NOT_FOUND` for a well-formed id absent from `manifest.artefacts`. It is not one of the tools of section 6.2 and is not model-callable (PRV-100); it has no custodian-plane path |
 | `GET /api/presenter/state` | `X-EII-Presenter-Token` header | store, PostgreSQL state, ledger state; only when `EII_PRESENTER=1` and the per-session token is valid |
 | `POST /api/presenter/switch-to-embedded` | `X-EII-Presenter-Token` header | `202 {effective: "next_request"}`; only when `EII_PRESENTER=1` and the per-session token is valid |
 | `GET /`, `/assets/*`, `/tiles/*.pmtiles`, `/fonts/*` | none | built front end, basemap with HTTP range requests, glyphs |
@@ -532,11 +683,20 @@ Every answer follows the five stages of the master design (section 17.4): First 
 |---|---|
 | BE-65 | Every `evidence` event of the playbook bundle is sent before the first `narrative` event, and every fact id in a structured brief item's `slots` has been sent in an earlier `evidence` event. Components appear only after their typed catalogue schemas validate. The whole structured brief is buffered until the accounting gate has passed on the complete brief (BE-107); evidence events are not held back by it. |
 | BE-66 | Reconnecting with `Last-Event-ID` replays every later event of the same answer exactly once and in order. |
-| BE-67 | Every request body model forbids unknown fields; playbook, tool, layer, situation and cutoff values are closed enumerations. The one-time seat-selection handler accepts only the three pinned seat keys and no later route accepts a seat field. |
+| BE-67 | Every request body model forbids unknown fields; playbook, tool, layer, situation, cutoff, hour, day, month and case values are closed enumerations. The one-time seat-selection handler accepts only the three pinned seat keys and no later route accepts a seat field. |
 | BE-68 | Company seats calling an oversight route receive 403 `SEAT_FORBIDDEN`; an unknown seat receives 404. |
 | BE-69 | Every tool call on any route writes one ledger entry, whether it came from the model, a playbook or a direct call. |
-| BE-106 | `POST /api/proof/scene` is the sole non-production area endpoint (PRV-119). Its request body is exactly `{fixture_id: string}` with no other property; a fixture id is `scene:` followed by the lowercase SHA-256 already listed for its signed scene artefact in `manifest.artefacts`. The endpoint resolves that id only to the artefact's two prepared requests and returns their two pre-validated unit sets and area answers. It accepts no pin, polygon, cut-off, arbitrary cell or unit id, SQL, question text or model argument; it is not one of the nine tools, is not model-callable (PRV-100, PRV-101) and has no custodian-plane path. An extra property or a fixture id not of that form is rejected with `INVALID_ARGUMENT`; a well-formed id absent from the manifest is rejected with `NOT_FOUND` (ASSUMPTION: the code split; PRV-119 requires only rejection). |
+| BE-106 | `POST /api/proof/scene` is the sole non-production area endpoint (PRV-119). Its request body is exactly `{fixture_id: string}` with no other property; a fixture id is `scene:` followed by the lowercase SHA-256 already listed for its signed scene artefact in `manifest.artefacts`. The endpoint resolves that id only to the artefact's two prepared requests and returns their two pre-validated unit sets and area answers. It accepts no pin, polygon, cut-off, arbitrary cell or unit id, SQL, question text or model argument; it is not one of the tools of section 6.2, is not model-callable (PRV-100, PRV-101) and has no custodian-plane path. An extra property or a fixture id not of that form is rejected with `INVALID_ARGUMENT`; a well-formed id absent from the manifest is rejected with `NOT_FOUND` (ASSUMPTION: the code split; PRV-119 requires only rejection). |
 | BE-107 | The accounting gate is a code module of the product plane with exactly five checks — Sources, Assumptions, Nothing invented, Scope, Limits stated (master design section 17.3) — each reported as pass or fail. It runs after the catalogue validation of BE-63 and before any `narrative` or `done` event is sent: the whole structured brief is buffered, the five checks run once on the complete brief, and only then is the brief sent. `evidence` events may be sent earlier, each fact with its complete source chain. On any failed check the template writer's default answer is sent, the failure is logged with the BE-94 fields, and the receipt carries each check's result under "Checked before display". |
+
+### 8.3 Drawn shapes and case sample files
+
+Both enter from the browser, never from the release or the model, and both stay in the session store of BE-109 for the session and seat that supplied them ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md); [02](02_ARCHITECTURE.md) section 3.8).
+
+| ID | Requirement |
+|---|---|
+| BE-117 | `POST /api/areas/shapes` is the only way a polygon enters the product. It accepts one GeoJSON polygon from the user's drawing, checks it with `eii_core.shapes` (simple, inside the frame, within the vertex and size limits fixed at the slice S2 gate), and stores its canonical form in the session store under a `shape_id` that is the SHA-256 of that form, bound to the session and seat. `make_area` accepts a `shape_id` only from the same session and seat. The route is not model-callable, and the model never writes a coordinate of a shape. Ledger rows and logs record the `shape_id` or the `area_id`, never the coordinates. |
+| BE-118 | `POST /api/cases/{case_key}/sample-file` accepts a file only for cases `c3` and `c4`, only when its SHA-256 equals one of that case's committed synthetic sample files (ASSUMPTION: version 1 accepts no other file, so no real record can enter), and only within the size of the largest committed sample file of that case. The file is parsed against the case's closed column schema (document 03) and held in the session store for the session and seat that loaded it. `own_records` computes its facts with `eii_core.calc`: provenance `synthetic`, the caveat key `your_inputs`, evidence status `inferred`, marked as a sample file that stands for the company's own records, with a lineage that names the method card and the committed file's SHA-256. The file, its facts and any brief that uses them are never written to the release, a store, `app.brief`, `ledger_entry` (which records only the call, the case key and the status), `egress_record`, a log or the memo; they are never sent to the model (ASSUMPTION: the egress record keeps exact payloads beyond the session), so the template writer places their cards; and another seat or the oversight seat receives 404 with the same body as for a case with no file. Saving such a brief returns `INVALID_ARGUMENT`. |
 
 ## 9. Seats and the ledger
 
@@ -552,7 +712,7 @@ The seats are a seat picker, not an identity system: there are no passwords and 
 
 ### 9.2 The ledger in PostgreSQL
 
-`app.ledger_entry` uses exactly the canonical DDL in [document 03, section 12](03_DATA_CONTRACTS.md#12-the-application-schema-postgresql-only-schema-app); this document does not restate its columns. The application generates UUIDv7 identifiers in Python with `uuid.uuid7()` (added in Python 3.14). Tool arguments are stored without scenario-input values. Question text is available only through the asking company seat's read function; the fixed oversight return type omits it (BE-38).
+`app.ledger_entry` uses exactly the canonical DDL in [document 03, section 12](03_DATA_CONTRACTS.md#12-the-application-schema-postgresql-only-schema-app); this document does not restate its columns. The application generates UUIDv7 identifiers in Python with `uuid.uuid7()` (added in Python 3.14). Tool arguments are stored without scenario-input values, without a drawn shape's coordinates (only its `shape_id` or `area_id`) and without any content of a case sample file (BE-117, BE-118). Question text is available only through the asking company seat's read function; the fixed oversight return type omits it (BE-38).
 
 After the insert, the same transaction runs `SELECT pg_notify('eii_ledger', :entry_id)`. Notifications are delivered only when the transaction commits, and the payload must be shorter than 8,000 bytes by default (PostgreSQL 18 documentation), so only the id is sent and the listener calls the fixed oversight read function.
 
@@ -586,24 +746,25 @@ pyvalhalla runs in-process on the OpenStreetMap Qatar extract; the routing tiles
 
 | ID | Requirement |
 |---|---|
-| BE-82 | `distance` areas use no routing: the cells of the frame whose centres lie within the cutoff great-circle distance of the pin cell's centre. |
-| BE-83 | Catchments for the story pins (every distance, walk and drive cut-off, including drive 30 for staffing only, and each applicable situation) are precomputed at release time and read from a manifest-listed artefact; a live pin computes its catchment on request. Privacy, routing and parity tests include drive 30 for `staffing_and_pay`. |
-| BE-84 | A catchment polygon becomes cells of the frame at the pin's resolution, then whole release units by the snap rule of document 06, before any figure is read. The cell-containment rule of the H3 library is confirmed at slice S1. |
-| BE-85 | Time-of-day differences come only from `speed_factor` (by road class, situation and summer) and every such fact is Simulated. The mechanism (per-request costing options, or build-time catchments with a uniform factor for live pins) is chosen at slice S1 and written down; no proprietary congestion data is used. |
+| BE-82 | `distance` areas use no routing. For protected figures the area is the cells of the frame whose centres lie within the cutoff great-circle distance of the pin cell's centre, snapped by BE-84. For Public points and Simulated layers the exact outline is the circle of the cutoff radius around the point. |
+| BE-83 | Catchments for the story pins (every distance, walk and drive cut-off, including drive 30 for staffing only, each applicable situation, and each hour and day key the guided stories and cases use) are precomputed at release time and read from a manifest-listed artefact; a live pin or a drawn shape computes its area on request. Privacy, routing and parity tests include drive 30 for `staffing_and_pay`. |
+| BE-84 | A catchment polygon becomes cells of the frame at the pin's resolution, and a drawn polygon becomes cells of the frame at their own frame resolution; both then become whole release units by the snap rule of document 06 before any protected figure is read. Public points and Simulated layers use the exact polygon. The cell-containment rule of the H3 library is confirmed at slice S1. |
+| BE-85 | Time-of-day differences come only from the hourly link speeds of the traffic assignment (by road link, hour and day key; [02](02_ARCHITECTURE.md) ARC-133), and every such fact is Simulated. A `situation` uses the hours that `situation_windows` gives it, combined as document 07 defines. The mechanism (per-request costing options, the routing engine's own time-dependent speeds, or build-time catchments for live pins) is chosen at slice S1 and written down; no proprietary congestion data is used. |
+| BE-119 | `travel_times` and `reachable_access` use the routing graph and hourly link speeds that `make_area` uses. A travel time to a destination (a port, the airport, a free zone or a land route) is a fact of the trip from the area, with subject `area`; the destination appears only as a Public label, and no Synthetic or Simulated figure is presented as the destination's own. |
 
 ## 11. Areas, configuration, start-up and the presenter switch
 
 ### 11.1 Area ids
 
-`area_id` is a readable, self-describing string: release prefix, mode, cutoff, pin cell, situation and summer flag. Any process can recompute the area from it, so no server state is needed.
+`area_id` is a readable, self-describing string: release prefix, mode, cutoff, pin cell, situation and summer flag, and from decision 0016 the point (to the six decimal places of the gazetteer's coordinates), the hour and day keys, or the official geography or release unit of a candidate returned by `area_ranking`. Any process can recompute such an area from it, so no server state is needed. For a drawn polygon the `area_id` carries the `shape_id` (the SHA-256 of the canonical shape) instead, and only the session and seat that hold the shape can decode it (BE-117).
 
 | ID | Requirement |
 |---|---|
-| BE-86 | Decoding an `area_id` and calling `make_area` again yields the same units; an `area_id` from another release returns `INVALID_ARGUMENT`. |
+| BE-86 | Decoding an `area_id` and calling `make_area` again yields the same units and the same outline; an `area_id` from another release, or a drawn-shape `area_id` of another session or seat, returns `INVALID_ARGUMENT`. |
 
 ### 11.2 Configuration and preflight
 
-Pinned variables: `ANTHROPIC_API_KEY` (optional; absent means template writer only), `EII_STORE` (`postgres` or `embedded`), `EII_DATABASE_URL`, `EII_RELEASE_DIR`, `EII_LANG_DEFAULT` (`en` or `ar`), `EII_PRESENTER` (`0` or `1`). Secrets come from the environment only; `.env` is never committed.
+Pinned variables: `ANTHROPIC_API_KEY` (optional; supplied for go-live and not used during the build; absent, or the live adapter not switched on by the owner, means template writer only), `EII_STORE` (`postgres` or `embedded`), `EII_DATABASE_URL`, `EII_RELEASE_DIR`, `EII_LANG_DEFAULT` (`en` or `ar`), `EII_PRESENTER` (`0` or `1`). Secrets come from the environment only; `.env` is never committed.
 
 Preflight checks (the full list and output format are in document 13), in order: variable values;
 release directory and manifest hashes; a complete matching `load_receipt.json`; `release.duckdb`
@@ -637,7 +798,7 @@ Model unavailability is not an error: it is reported as a `status` event with `w
 |---|---|---|
 | `INVALID_ARGUMENT` | 422 | input fails its model |
 | `SEAT_FORBIDDEN` | 403 | company seat on an oversight route |
-| `NOT_FOUND` | 404 | unknown seat, answer or brief (including briefs not visible), or a scene fixture id absent from the manifest (BE-106) |
+| `NOT_FOUND` | 404 | unknown seat, answer or brief (including briefs not visible), a scene fixture id absent from the manifest (BE-106), or a case sample file this session and seat did not load (BE-118) |
 | `BRIEF_STORE_PAUSED` | 503 | brief saving unavailable in embedded mode |
 | `STORE_UNAVAILABLE` | 503 | the selected store did not answer |
 | `QUERY_TIMEOUT` | 504 | statement exceeded its timeout |
@@ -651,7 +812,7 @@ Model unavailability is not an error: it is reported as a `status` event with `w
 | BE-92 | Release reads run with a 2,000 ms statement timeout (ASSUMPTION: measured tool queries take 0.4 to 3 ms, so this only stops pathology). |
 | BE-93 | Each seat is limited to 10 asks per minute (ASSUMPTION: generous for a demonstration, bounds model spend). |
 | BE-94 | Logs are JSON lines on standard output with `ts`, `level`, `event`, `answer_id`, `seat_key`, `tool`, `engine`, `release_id`, `status`, `duration_ms`, `error_code`, `error_id`. |
-| BE-95 | Logs never contain the API key, request headers, model payloads (only `egress_id`), question text or scenario-input values. |
+| BE-95 | Logs never contain the API key, request headers, model payloads (only `egress_id`), question text, scenario-input values, a drawn shape's coordinates, or a case sample file or any value computed from it. |
 
 ## 13. Performance budgets
 
@@ -666,7 +827,7 @@ All values are targets, to be measured on the build machine and recorded; none i
 | `./eii up` to ready, release already loaded | under 15 s | ASSUMPTION |
 | Ledger entry visible on the oversight seat | under 1 s | value-candidate statement in the architecture research |
 
-Whole-country aggregates are precomputed at build time: PostgreSQL took 104 ms at the median on one such query against 4.3 ms for DuckDB (architecture research).
+Whole-country aggregates are precomputed at build time: PostgreSQL took 104 ms at the median on one such query against 4.3 ms for DuckDB (architecture research). Targets for drawn areas, hourly layers, the 24-hour animation, rankings and the case files are set when the slices that build them are planned (OPEN), then recorded under BE-96.
 
 | ID | Requirement |
 |---|---|
@@ -680,7 +841,7 @@ Whole-country aggregates are precomputed at build time: PostgreSQL took 104 ms a
 | BE-98 | Release reads use read-only connections: `READ ONLY` transactions as `eii_app` (which holds only `SELECT` on release schemas) and a `read_only=True` DuckDB connection. |
 | BE-99 | The product has no path to the vault: BE-02, BE-05 and the loader's manifest check together; a test runs the API with `data/vault/` present and unreadable and proves start-up and every tool still work. |
 | BE-100 | The API binds to `127.0.0.1` by default; cross-origin requests are not enabled. |
-| BE-101 | Text from third parties (place names, activity descriptions) reaches the model only as JSON string values inside tool results (document 09). |
+| BE-101 | Text from third parties (place names, activity descriptions, the fields of FDI projects, the titles of the agency's records) reaches the model only as JSON string values inside tool results (document 09), and the screen shows it only through application templates. |
 
 ## 15. Tests each module ships with
 
@@ -690,15 +851,17 @@ The strategy, fixtures and CI layout are in [12 Testing and quality](12_TESTING_
 |---|---|
 | `eii_core.provenance`, `facts`, `calc` | least-real rule table; deterministic `fact_id`; strict model rejects unknown fields; every method card's worked example reproduced, comparison facts included (BE-104, MTH-03) |
 | `eii_core.text` | normalisation cases in both languages |
+| `eii_core.shapes` | canonical form and hash of a polygon; refusal of a self-intersecting polygon, a polygon outside the frame and one over the vertex or size limit; point-in-shape cases on both sides of the Greater Doha resolution boundary (BE-117) |
 | import boundary | BE-01 to BE-06 and BE-102, including the offline-gateway boundary |
 | `store/lint.py` | each forbidden construct rejected; every allowed construct accepted (BE-13 to BE-16) |
 | `store/` adapters | placeholder rewrite (BE-17), normalisation (BE-20 to BE-22), read-only enforcement (BE-09, BE-10) |
 | `store/parity.py` | every tool and every query file covered, including district and stored unit geometry (BE-26 to BE-29) |
 | `store/loader.py` | rejects an unlisted table, a bad hash, a synthetic identifier; rebuilds DuckDB after a PostgreSQL skip; requires the two-store completion receipt; idempotent; interrupted load ineligible (BE-44 to BE-48, BE-103) |
 | `infra/postgres/` | tests generated from the canonical application DDL; owner and extension checks; direct base-read refusal; fixed-function seat matrix and locked `search_path`; reviewer refusals (BE-31 to BE-41) |
-| `tools/` | one contract test per status of each tool; snapping before reading (BE-54); no firm and no Synthetic or Simulated fact outside an `area` subject (BE-59); public-only `make_area` reads no protected or simulated table and emits the snap report as technical metadata (BE-105); the housing split lists `family_housing`, `labour_accommodation`, `institution`, `unknown` and `other` only where pooled; occupation groups may include `other`; an unpublished occupation band returns `SUPPRESSED` with "not available at this area size"; every non-ratio figure names one home family, each ratio statistic uses two columns of the same stored rows and names both families, a count and its adjacent non-ratio shares come from the same family, and no output presents two routes to one population side by side (BE-108) |
-| `assistant/` playbooks and writer | determinism, build-time template scans, structured catalogue validation, template fallback (BE-60 to BE-64); `staffing_and_pay` calls `area_evidence` for its resident, worker and coverage blocks, agreeing with the playbook table of document 09 |
-| `api/` | endpoint shapes, signed-cookie seat binding, presenter-token refusal, stream order and resumption (BE-65 to BE-69, BE-70, BE-89); no route or setting selects a parameter set (BE-103); the scene endpoint rejects an extra property, a malformed id and an unlisted id (BE-106); the brief is buffered until the accounting gate passes, a failed check sends the template writer's default answer, logs the failure and shows "Checked before display" (BE-107) |
+| `tools/` | one contract test per status of each tool; snapping before reading, a drawn shape included (BE-54); only `synthetic_firms` returns firms, and no Synthetic or Simulated fact outside an `area` subject or, Synthetic only, a `synthetic_firm` subject (BE-59); public-only `make_area` reads no protected or simulated table and emits the snap report as technical metadata (BE-105); the housing split lists `family_housing`, `labour_accommodation`, `institution`, `unknown` and `other` only where pooled; occupation groups may include `other`; an unpublished occupation band returns `SUPPRESSED` with "not available at this area size"; every non-ratio figure names one home family, each ratio statistic uses two columns of the same stored rows and names both families, a count and its adjacent non-ratio shares come from the same family, and no output presents two routes to one population side by side (BE-108) |
+| journey tools | the travel-time subject is the area (BE-119); presence counts with ranges, apportioned only by `eii_core.calc`, and no count or density for a named place (BE-111); rank-stability facts beside every rank, no weighted score returned as a fact, weights from defaults or typed values only, public-only mode reads no Protected or Simulated table (BE-112); the firm list's four fields only, no join to an FDI project, a public place or another firm (BE-113); the FDI estimate caveat beside every capex and jobs figure, no company lookup (BE-114); every change between months from `month_change`, none by subtracting monthly values, and a carried-forward change returned as `SUPPRESSED` (BE-115); splits never joined, segmented, apportioned or combined with a protected figure (BE-110); every number from `eii_core.calc` with a resolving lineage and a parity case (BE-116) |
+| `assistant/` playbooks and writer | determinism, build-time template scans, structured catalogue validation, template fallback (BE-60 to BE-64); `staffing_and_pay` calls `area_evidence` for its resident, worker and coverage blocks, and every playbook's calls agree with the table of section 7 and the playbook list of document 09; a bundle with sample-file facts is never memoised (BE-118) |
+| `api/` | endpoint shapes, signed-cookie seat binding, presenter-token refusal, stream order and resumption (BE-65 to BE-69, BE-70, BE-89); no route or setting selects a parameter set (BE-103); the scene endpoint rejects an extra property, a malformed id and an unlisted id (BE-106); the brief is buffered until the accounting gate passes, a failed check sends the template writer's default answer, logs the failure and shows "Checked before display" (BE-107); the shape and case routes refuse every invalid input, return 404 to another seat and to oversight, keep nothing in the ledger, egress record, logs, memo or `app.brief`, and lose every entry at restart (BE-109, BE-117, BE-118) |
 | `ledger/` | idempotent replay, append-only, paused state, demand minimum, exact payload bytes (BE-73 to BE-81) |
 | `preflight`, presenter | store selection matrix, complete receipt, PostGIS version failure, no database start by `up`, no automatic switch (BE-87 to BE-90) |
 
@@ -717,16 +880,35 @@ ASSUMPTIONS made in this document (each also marked where it appears):
 9. SRID 4326 for reviewer geometry.
 10. 2,000 ms statement timeout; 10 asks per minute per seat; performance targets marked ASSUMPTION; 50% regression threshold.
 11. Model unavailability reported as a status, not an error.
-12. The closed layer list of `GET /api/layers/{layer}` and the argument shapes of the `stage` directives (zoom levels, scenario-panel focus).
+12. The closed layer list of `GET /api/layers/{layer}`, extended for decision 0016, and the argument shapes of the `stage` directives (zoom levels, scenario-panel focus, the hour, day and month keys).
 13. Question text stored in the ledger for the asking seat only.
 14. The scene endpoint's refusal split: a malformed body or fixture id is `INVALID_ARGUMENT`, a well-formed id absent from the manifest is `NOT_FOUND` (BE-106); PRV-119 requires only rejection.
+15. The names of the journey tools and the calls of every playbook bundle (sections 6.2 and 7) are fixed here, as document 09 asks; the playbook names are document 09's.
+16. The tables added by decisions 0016 and 0017 carry the names of document 03 section 7.2. The agency's records are the release table `pub_investqa_record`, whose `incentive_parameter` rows hold the incentive parameters, read through the source `investqa_pages` (documents 03 and 04 agree).
+17. The protected blocks default to the latest month of the window when no month is chosen.
+18. When no release unit survives snapping, `make_area` still makes the area for its exact outline, and protected blocks return `NO_DATA` (section 6.2).
+19. A drawn polygon enters only through `POST /api/areas/shapes` and reaches tools as a `shape_id`; the model never passes its coordinates (BE-117). Document 09 AI-23 also allows a vertex of the drawn shape as a numeric argument; this document passes none.
+20. A case sample file is accepted only when its SHA-256 equals a committed synthetic sample file of its case; neither it nor any value computed from it reaches the model, the memo, `app.brief`, the ledger beyond the call, or the egress record, because the egress record keeps exact payloads beyond the session (BE-118). The playbook-only tool `own_records` reads it; document 09 AI-116 keeps the file's rows from the model, and this document also keeps the values computed from them out of model requests.
+21. Travel times start from the area's pin or, for a drawn shape, its representative point (`eii_core.shapes`).
+22. The drawn-shape route and the case routes add no `app` table and no error code; they use `INVALID_ARGUMENT` and `NOT_FOUND`.
+23. Destinations of `travel_times` (the ports, the airport, the free zones and the land routes) are the `gazetteer` entries of kind `gateway` that document 03 defines.
 
-Open items from the master design that touch this document: OI-01 (API key; template writer until then), OI-04 (census licence: zero-row tables and the coverage-bar geography fallback), OI-07 (no firm lists, basis of the complete synthetic-identifier scan), OI-08 (ledger row label and distinct-organisation minimum), OI-09 (Arabic review of templates and normalisation), OI-10 (where PostgreSQL runs on the build machine), OI-11 (privacy thresholds are proposals), OI-35 (which parameter set is exported; default A).
+OPEN items raised by decisions 0016 and 0017 that touch this document:
+
+- OPEN: the apportioning weight for drawn shapes (area, or a licensed public population grid) is fixed in document 07 and confirmed at slice S2; the vertex and size limits of a drawn shape are fixed at the same gate (BE-117).
+- OPEN: the closed criterion list of `area_ranking` is fixed at slice S2 (document 07, method card C11). Document 07 now fixes how a `situation`'s hours combine for a drive area (C25), the candidate kinds of `area_ranking` (C11), the criteria of `activity_fit` (C16), the area types of `similar_areas` (C17), the access scores and times of `reachable_access` (C12) and the projection method (C21).
+- OPEN: the public source of tenders is confirmed at slice S2; until then `investment_context` has no `tenders` topic and no tender is shown.
+- OPEN: the page structure of the FDI dashboard and of the agency's pages, and whether a project's location is a point or a city, are confirmed at slice S2 against a synthetic test page of the same shape.
+- OPEN: performance targets for drawn areas, hourly layers, the 24-hour animation, rankings and the case files are set when the slices that build them are planned (section 13).
+
+Open items from the master design that touch this document: OI-01 (API key supplied for go-live and not used during the build; template writer throughout the build), OI-04 (closed for version 1 by decision 0017 item 10: the census map layers fill `pub_census_zone` and `pub_census_district` in the local release; the coverage-bar geography fallback stays), OI-07 (firm lists: decision 0016 now allows the named synthetic firm list of BE-113, and the complete synthetic-identifier scan keeps its full strength), OI-08 (ledger row label and distinct-organisation minimum), OI-09 (Arabic review of templates and normalisation), OI-10 (where PostgreSQL runs on the build machine), OI-11 (privacy thresholds are proposals), OI-35 (which parameter set is exported; default A).
 
 ## Sources
 
 Every timing and size in this document that is attributed to the design research of 2026-11-11 was measured once at design time, on third-party software with throwaway synthetic tables or public inputs, before any product code existed; none is a test result of this product, and each is measured again at the slice that builds the part concerned ([README.md](README.md), "Identifiers and change control", item 8).
 
+- [Decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) and [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), the owner's decisions of 2026-11-12 (amendments 3 and 4 to the first pack).
+- Qatar Open Data Portal, Explore API v2.1, https://www.data.gov.qa/api/explore/v2.1/ (CC BY 4.0), and the FDI projects dashboard, https://fdiprojects.invest.qa/ , both read 2026-11-12 as recorded in decision 0017; every public source's registry entry is in [04 Public data pack](04_PUBLIC_DATA_PACK.md).
 - EII design research, architecture options report, measurements on the build machine, 2026-11-11 (PostgreSQL start, memory, load and query timings; row-level security, notification and read-only role tests; DuckDB `ANY(list)` form; geometry transfer).
 - EII design research, feasibility and cost judgement, 2026-11-11 (no automatic failover; PostGIS 3.6; routing timings from the methods report).
 - PostgreSQL Global Development Group, PostgreSQL 18 documentation: Row Security Policies, https://www.postgresql.org/docs/18/ddl-rowsecurity.html; NOTIFY, https://www.postgresql.org/docs/18/sql-notify.html; System Administration Functions, https://www.postgresql.org/docs/18/functions-admin.html; Sorting Rows, https://www.postgresql.org/docs/18/queries-order.html; Mathematical Functions and Operators, https://www.postgresql.org/docs/18/functions-math.html; retrieved 2026-11-11.

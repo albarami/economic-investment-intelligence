@@ -13,21 +13,24 @@
 - OPEN means a decision, source or proof is still needed.
 - ASSUMPTION means work may use the stated default, but the named owner must confirm or replace it.
 - PENDING means review or correction work has not yet supplied evidence.
+- CLOSED means the item is settled by the decision it names; its earlier text is kept.
+- MOVED means a real-deployment item now listed in [docs/17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md); its earlier text is kept.
 - The recommendation is the safe default, not a new decision. A material change needs a decision record.
 - Items OI-01 to OI-18 carry the master decisions; OI-19 to OI-38 come from the written pack and its review.
 - OI-36 to OI-38 record what the review of 2026-11-11 left open: an objection of two reviewers that was not accepted for version 1, and two sets of last corrections that another maker has not yet read.
 - OI-35 records which parameter set is exported. A lead ruling of 2026-11-11 sets the default to A; the owner or a data owner may overrule it before the slice S1 gate.
 - OI-39 onwards are raised during the build.
 
-## OI-01 — Main model key and spend cap
+## OI-01 — Main model key (supplied for go-live; not used during the build)
 
 - ID: OI-01
 - TYPE: OPEN
-- NEEDED: The owner to supply the main model key and set daily and total spend caps.
+- NEEDED: At go-live only: the owner's decision to switch the live adapter on, with any spend caps set then. During the build the key is not used.
 - WHY: Live-model evaluation and operation cannot be claimed until the key and cost limits exist.
 - DONE SO FAR: The template writer and recorded provider are the default; live gates remain open.
-- OPTIONS: **Recommendation:** keep template/recorded mode until the owner supplies both. Alternative: enable the live adapter only within the approved caps.
-- NEEDED BY: slice S8 live-model gates; slice S11 stage decision.
+- OPTIONS: **Recommendation:** keep the template writer and the recorded provider for the whole build; the live adapter and its evaluation gates wait for the owner's go-live decision.
+- NEEDED BY: go-live (not before; the build runs in template mode).
+- UPDATE: 2026-11-12, by the owner's note of that day, recorded in [decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md): key supplied for go-live; not used during the build. The assistant stays in template mode during the build.
 
 ## OI-02 — Demonstration date
 
@@ -52,12 +55,13 @@
 ## OI-04 — Census map-layer licence
 
 - ID: OI-04
-- TYPE: OPEN
+- TYPE: CLOSED for version 1 (was OPEN)
 - NEEDED: Written licence confirmation for the statistics authority's census map layers and associated boundary use.
 - WHY: Redistribution and display rights are not stated.
 - DONE SO FAR: A source with no stated licence is validation-only until its terms are recorded. No value, derived share, title or geometry from it enters a release. The coverage bar uses the finest licensed geography available (zone, otherwise municipality, otherwise national) and names it.
 - OPTIONS: **Recommendation:** obtain and record written confirmation; until then keep the source validation-only and use the finest separately licensed geography for coverage and boundary geometry.
 - NEEDED BY: slice S2 public frame and coverage data.
+- CLOSED: 2026-11-12, by the owner's note of that day, recorded in [decision 0017](docs/decisions/0017-public-data-additions-and-public-splits.md): the census map layers of the statistics authority's public map service are used in this internal project. The written licence question for any use beyond it is a real-deployment item in [docs/17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md), section "Items moved from OPEN_ITEMS.md".
 
 ## OI-05 — Product and Arabic names
 
@@ -82,12 +86,13 @@
 ## OI-07 — Fictional prospect list
 
 - ID: OI-07
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - NEEDED: Owner decision on whether later item L8 may include a clearly fictional list of firms.
 - WHY: A synthetic prospect list can read as a real recommendation and reopens the firm channel.
 - DONE SO FAR: No prospect list is in version 1; firm and owner networks are dropped.
 - OPTIONS: **Recommendation:** keep it excluded. Any later list needs an owner-approved decision and a fresh privacy and wording review.
 - NEEDED BY: After slice S11, backlog item L8.
+- CLOSED: 2026-11-12, by the owner's decisions of that day, recorded in [decision 0016](docs/decisions/0016-version-1-covers-the-whole-initiative.md) (item 12): named synthetic firms are allowed in version 1 as prospects, partners and suppliers, always marked Synthetic, with names that never resemble real ones; networks of firms or owners stay dropped.
 
 ## OI-08 — Oversight labels and organisation minimum
 
@@ -122,12 +127,13 @@
 ## OI-11 — Privacy thresholds
 
 - ID: OI-11
-- TYPE: OPEN
+- TYPE: MOVED (was OPEN)
 - NEEDED: Data owners to set real privacy thresholds before any real-data pilot.
 - WHY: Sets A and B are proposals measured only on synthetic data, not approved production rules.
 - DONE SO FAR: Both parameter sets, stable treatment and attack requirements are specified. Both are evaluated inside the custodian plane, but exactly one selected set's protected tables are exported in a release. A lead ruling of 2026-11-11 accepts the rewritten privacy document as the disclosure-control reference. A lead ruling of 2026-11-11 sets the demonstrator default `export_parameter_set` to `A` (open item OI-35). A lead ruling of 2026-11-11 defines `window_key` as the SHA-256 of canonical JSON holding the protected `period` and the four name-ordered `{name, sha256}` pairs for `business_register.v1`, `employment.v1`, `residence.v1` and `wages.v1`, using each feed's manifest `feed_sha256`; nothing else enters it. Continuous integration checks the register alone and allows one `protected_sha256` per `window_key` and one `window_key` per `world_seed`; for a frozen release, the installed application's register is the allow-list and `freeze.json` must say complete. No signed receipt file is added. A lead ruling of 2026-11-11 limits exact sums to one additive family. Real thresholds remain for data owners, so this item stays open.
 - OPTIONS: **Recommendation:** retain both for custodian-plane evaluation and export only the selected set for the demonstrator; custodians supply and hold real values for a pilot. Never tune a rule to make an area look finer.
 - NEEDED BY: slice S5; any real-data pilot.
+- MOVED: 2026-11-12, by the owner's note of that day: a real-deployment item, now in [docs/17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md), section "Items moved from OPEN_ITEMS.md". Version 1 keeps the documented default: sets A and B evaluated inside the custodian plane, set A exported.
 
 ## OI-12 — Graph server
 
@@ -258,6 +264,7 @@
 - DONE SO FAR: A lead ruling of 2026-11-11 decides the acceptance model: one model, every published leaf fixed to its untreated aggregate, knowledge fixtures checked against sealed truth before use, published-means-passed constraints, one solve per target class, and a time budget set from a measured run at the start of slice S5. What the layout tells about a failed population is not in that model; the typed attack suite holds one attack per layout signal. The audit is evidence under a stated attacker, not a proof. A lead ruling of 2026-11-11 pins `artefacts/attacker_view_public_totals.json` (PRV-115), and the audit configuration is `artefacts/attacker_view_audit.json`. A lead ruling of 2026-11-11 closes the count indicators that may be enabled: `residents` (`persons`), `households` (`households`), `establishments` (`establishments`) and `employees` (`persons`). A lead ruling of 2026-11-11 requires the inventory to equal the source registry plus every Public-table row. Which of those rows a release marks enabled is still selected at slice S5. Cross-period complement fixtures and mover attacks are part of backlog item L4. Whether an independent human attacker session precedes a real-data pilot is still open.
 - OPTIONS: **Recommendation:** derive the list from the reviewed public registry in slice S5 and require an independent human attack before any real-data pilot.
 - NEEDED BY: slice S5; real-data pilot gate.
+- MOVED PART: 2026-11-12, by the owner's note of that day: whether an independent human attacker session precedes a real-data pilot is a real-deployment item, now in [docs/17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md), section "Items moved from OPEN_ITEMS.md". The selection of the public totals for the attacker-view audit stays here, for slice S5.
 
 ## OI-25 — Interface and test-matrix alignment
 
@@ -272,22 +279,24 @@
 ## OI-26 — Later deployment platform
 
 - ID: OI-26
-- TYPE: OPEN
+- TYPE: MOVED (was OPEN)
 - NEEDED: The custodian to confirm its database platform, approved region, data-residency terms and operating environment.
 - WHY: Public provider offerings do not prove what a custodian runs or permits.
 - DONE SO FAR: Available managed offerings were researched; no fit is claimed.
 - OPTIONS: **Recommendation:** make no deployment-fit statement until written custodian confirmation; keep the build plane inside that environment.
 - NEEDED BY: Later deployment only, not the local version 1 demonstrator.
+- MOVED: 2026-11-12, by the owner's note of that day: a real-deployment item, now in [docs/17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md), section "Items moved from OPEN_ITEMS.md". Version 1 makes no deployment-fit statement, the documented default.
 
 ## OI-27 — Company-seat notice and decision scope
 
 - ID: OI-27
-- TYPE: ASSUMPTION
+- TYPE: CLOSED (was ASSUMPTION)
 - NEEDED: Owner approval of the company-seat recording notice and confirmation that cross-country entry comparison and serving the region stay outside the current backlog.
 - WHY: The project brief classifies these points without a master owner decision.
 - DONE SO FAR: Draft wording discloses aggregate oversight recording; those two wider decisions are currently outside version 1 and the ordered backlog.
 - OPTIONS: **Recommendation:** keep the disclosure and limited scope unless the owner adds work by decision record.
 - NEEDED BY: slice S3 company interface; backlog review after slice S11.
+- CLOSED: 2026-11-12, by the owner's decisions of that day, recorded in [decision 0016](docs/decisions/0016-version-1-covers-the-whole-initiative.md): serving the region (journey D7) is in version 1; a cross-country entry comparison stays out of version 1. The company-seat recording notice keeps its draft wording, the documented default.
 
 ## OI-28 — Pilot request and lawful real-data path
 
@@ -372,12 +381,13 @@
 ## OI-36 — Layout signals outside the audit acceptance model
 
 - ID: OI-36
-- TYPE: OPEN
+- TYPE: MOVED (was OPEN)
 - NEEDED: Before any real-data pilot, either model the disclosure-control failure branches, with predicates that separate what a rule publishes by design from what it leaks, or run an attack against every released instance of each layout signal.
 - WHY: Layout signals are outside the acceptance model of the audit. Two independent reviewers object that one typed attack per kind of signal can miss a disclosure at another instance.
 - DONE SO FAR: A lead ruling of 2026-11-11 keeps layout signals outside the acceptance model for version 1 (section 17 of the privacy document). The limit is stated, and the typed attack suite covers at least one merged band, category pooled into `other`, merged sibling set, withheld remainder and released reason code.
 - OPTIONS: **Recommendation:** retain that ruling for the synthetic demonstration and state the limit. Before a real-data pilot, choose and complete one of the two needed routes; do not call the current audit a general proof.
 - NEEDED BY: Before any real-data pilot.
+- MOVED: 2026-11-12, by the owner's note of that day: a real-deployment item, now in [docs/17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md), section "Items moved from OPEN_ITEMS.md". Version 1 keeps the documented default: layout signals stay outside the acceptance model, the limit is stated and the typed attack suite covers each kind of layout signal.
 
 ## OI-37 — Independent review of the last privacy corrections
 
@@ -423,7 +433,7 @@
 
 - ID: OI-41
 - TYPE: ASSUMPTION
-- NEEDED: Owner confirmation of eleven conventions of `web/`, each one a choice the pack permits and does not require: (1) the empty folders of the section 3.1 layout are kept by empty `.gitkeep` files; (2) `web/scripts/` holds the checks beside the pinned layout; (3) files owned by other tasks are not created and are named as deferred by the layout check; (4) the shell is English, with `lang="en" dir="ltr"` on the root element, an empty `main` element, a `data:,` icon and only the working title as text; (5) the development server binds `127.0.0.1` with a strict port through the flags of the `dev` script, keeping Vite's default port, and `engines.node` is the range `>=22.12.0 <23`; (6) the scan rules: the scan of the built JavaScript allows four named hosts, and the host scan and the import-boundary check handle closed lists of forms, each with a stated "not handled" part; (7) the TypeScript compiler options in `tsconfig.json` (strict family flags, `ES2022`, `bundler` resolution, `react-jsx`, `types` empty, no emit) and the `build` script `tsc --noEmit && vite build`; (8) the checks are dependency-free Node scripts run as `check:*` and `test:checks`, tested with Node's built-in runner in `*.node-test.mjs` files; (9) the package metadata (`name` `eii-web`, `private`, version `0.0.0`, licence `UNLICENSED`) and the absence of an `.npmrc`; (10) the import-boundary check reads `src/`, `tests/`, `eslint-rules/` and `vite.config.ts`, which is wider than FE-07, whose words name `web/src` only, and does not read `scripts/`, and the layout check fails a second Vite configuration file name beside `vite.config.ts`; (11) no code file under `web/` is longer than 500 lines, a house limit that the pack does not state, so the larger check scripts and test files are split by theme into several files.
+- NEEDED: Owner confirmation of eleven conventions of `web/`, each one a choice the pack permits and does not require: (1) the empty folders of the section 3.1 layout are kept by empty `.gitkeep` files; (2) `web/scripts/` holds the checks beside the pinned layout; (3) files owned by other tasks are not created and are named as deferred by the layout check; (4) the shell is English, with `lang="en" dir="ltr"` on the root element, an empty `main` element, a `data:,` icon and only the working title as text; (5) the development server binds `127.0.0.1` with a strict port through the flags of the `dev` script, keeping Vite's default port, and `engines.node` is the range `>=22.12.0 <23`; (6) the scan rules: the scan of the built JavaScript allows four named hosts, and the host scan and the import-boundary check handle closed lists of forms, each with a stated "not handled" part; (7) the TypeScript compiler options in `tsconfig.json` (strict family flags, `ES2022`, `bundler` resolution, `react-jsx`, `types` empty, no emit) and the `build` script `tsc --noEmit && vite build`; (8) the checks are dependency-free Node scripts run as `check:*` and `test:checks`, tested with Node's built-in runner in `*.node-test.mjs` files; (9) the package metadata (`name` `eii-web`, `private`, version `0.0.0`, licence `UNLICENSED`) and the absence of an `.npmrc`; (10) the import-boundary check reads `src/`, `tests/`, `eslint-rules/` and `vite.config.ts`, which is wider than FE-07, whose words name `web/src` only, and does not read `scripts/`, and the layout check fails a second Vite configuration file name beside `vite.config.ts`; (11) code files under `web/` aim at no more than 500 lines, a house target that the pack does not state, so the larger check scripts and test files were split by theme into several files; by [decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md) item 14 the limit is a target, never a gate: a file a little over is fine and a size check only warns.
 - WHY: The pack fixes the layout and the file names of `web/` (docs/10 section 3.1, lines 93 to 122), Node 22 with npm (docs/02 lines 508 and 522), React 19.3.1 and Vite 8.3.x (docs/10 lines 55 and 56), the built front end served at `/` and `/assets/*` (docs/08 line 498), no third-party host (FE-05, DES-24), the import-boundary check (FE-07: it fails if `web/src` imports from outside `web/`, docs/10 line 205) and the document language and direction set at the root (DES-143). It does not say how an empty folder is kept, does not list `scripts/` in the layout, gives no compiler options, no script names, no package metadata and no limit on the length of a code file, and names Vitest for front-end tests with tools pinned at slice S0 (docs/10 line 569, docs/12 line 443). The product name is not cleared (OI-05) and language switching is slice S3 (FE-61). Node is given as "22 (22.12 or later ...)", a range, while FE-01 asks for exact versions of dependencies. React ships namespace and message URLs that are not requests.
 - DONE SO FAR: 21 empty marker files (14 under `src/`, 6 under `tests/`, 1 `eslint-rules/`), proved by `npm run check:layout`. `eslint.config.js` (S0-T04) and `REFERENCE_NOTES.md` (S0-T13) are named as deferred, not created. The allowed hosts for built JavaScript are `www.w3.org`, `react.dev`, `reactjs.org` and `github.com`, taken from the contents of the React packages, applied to built JavaScript only; a host outside the list found in a real build is reported to the lead and never added by the builder. The compiler options are observed by `npm run build`. The shell files and the `dev` flags are proved by `npm run test:checks` and `npm run check:dev`; the `engines` key is required to be present and its value is not judged. On 2026-11-11 the owner decided that the lead assigns each slice S0 requirement that no task owned to the nearest task and records it; the lead then assigned the import-boundary check of FE-07 to S0-T03, FE-11 to S0-T04, and the confirmation of font weights and of the icon licence (DES-25, DES-45) to S0-T13. The exact Node patch and version files are S0-T12; the test runner choice for the front end is S0-T05.
 - OPTIONS: **Recommendation:** keep these readings; the end-to-end test that blocks other origins (ARC-36) and the server Content Security Policy are the later guards. Alternative: a one-line `README.md` in each marker folder; a scanner that parses the built JavaScript; moving the check tests to Vitest when S0-T05 lands; reading `web/src` only in the import-boundary check.

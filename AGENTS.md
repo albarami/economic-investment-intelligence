@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft v0.2, corrected after independent review on 2026-11-11 (see PROGRESS.md) |
-| Date | 2026-11-11 |
+| Status | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
+| Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Give every coding agent the binding safety, accuracy, workflow and evidence rules. |
 | Read first | [docs/README.md](docs/README.md) and the documents for the assigned task |
@@ -20,9 +20,9 @@
 5. Cite every Public input with publisher, dataset or page, licence and retrieval date; preserve its hash in the source registry.
 6. Keep provenance (Public, Synthetic, Simulated, Suppressed) separate from evidence status (Observed, Inferred, Still to test). "Not measured" is a coverage label, not an evidence status.
 7. Give every number provenance and lineage. A fact without a complete source chain is not a fact: fail its build, chip and claim validation.
-8. Never invent an attribute for a real named place or business. Synthetic or Simulated facts may appear only in an `area` subject; `place_public` accepts Public slots only.
+8. Never invent an attribute for a real named place or business. An `area` subject accepts Public, Synthetic, Simulated and Inferred slots; `place_public` and `fdi_project` accept Public slots only; a named synthetic firm accepts Synthetic slots only and is never placed at a real address. No other subject accepts a Synthetic or Simulated slot.
 9. Use visibly synthetic identifiers that never imitate real registrations, establishments or personal identifiers. Fail on real-name collisions and on bare digit runs of exactly eight or eleven digits.
-10. Add no nationality attribute, dimension or proxy, and no area-level sex split.
+10. Add no nationality, sex or gender attribute, dimension or proxy on the synthetic or protected records or on anything derived from them. Official figures split by sex or nationality appear only as Public facts with source and year, on the source's own geography and categories, and are never joined to a synthetic record, used to segment synthetic records, apportioned to a drawn area or combined with a protected figure.
 11. The product must never import custodian code or reach `data/vault/`. Only a verified release crosses from the custodian plane to the product plane.
 12. Do not weaken privacy invariants, security controls, their tests, attack sizes or tolerances. No fallback is allowed for sandbox enforcement, store parity or any security check. Evaluate privacy parameter sets A and B only inside the custodian plane and export exactly one selected set's protected tables. Never tune a privacy rule to make an area look finer. A window is never exported under two treatments (PRV-120). `window_key` is the SHA-256 of canonical JSON holding the protected `period` and the four name-ordered `{name, sha256}` pairs for `business_register.v1`, `employment.v1`, `residence.v1` and `wages.v1`, using each feed's manifest `feed_sha256`; nothing else enters it. Continuous integration checks the export register alone: existing lines stay unchanged, with one `protected_sha256` per `window_key` and one `window_key` per `world_seed`. A freeze is refused on either uniqueness conflict; after a freeze, a change of rules version, exported set, treatment code or world generator requires a new `world_seed` and a new build before another freeze. `./eii freeze` is run twice with no new flag: the first run writes the bundle, checksum list and pending `freeze.json` and appends the register line; after normal merge, the second run from the containing base-branch commit builds and verifies the application archive, writes its checksum and marks `freeze.json` complete. For a frozen release only, install and start refuse with exit 7 unless the installed application's register holds the line and `freeze.json` says complete; the remedy is to finish the freeze, not change the seed. No signed receipt file is added.
 13. Keep `data/vault/`, every folder that git ignores or does not track, and every path outside the repository off-limits. Tests may use only their documented repository, cache and temporary paths.
@@ -39,8 +39,8 @@
 21. No model-written prose reaches the screen. Models select and order catalogue claims, components, fragments, questions and stage directives; application-owned templates render every word.
 22. Keep claim, component, fragment and question catalogues closed, versioned and typed. Reject unknown keys, properties, wrong fact slots and invalid layouts; one repair, then template fallback.
 23. Render every numeral only through the Fact chip family. Build-time scans cover templates; do not substitute a run-time scan of model prose for structural prevention.
-24. Never claim real custodian data, a Synthetic or Simulated fact about a real place, named-building footfall, certified or formal privacy, inferiority of an existing public service, ministry endorsement or operation, a revenue/demand/success forecast, or lookup of a firm, owner or individual.
-25. Give no go/no-go verdict, recommendation, probability or confidence claim. Show evidence, limitations and the cheapest next test instead.
+24. Never claim real custodian data, a Synthetic or Simulated fact about a real place, a Simulated or Synthetic footfall figure attributed to a named building or business, certified or formal privacy, inferiority of an existing public service, ministry endorsement or operation, a revenue/demand/success forecast, or lookup of a firm, owner or individual.
+25. Give no go/no-go verdict, probability or confidence claim. A ranking, fit or suggestion is shown only as the output of tested code over criteria the user can see and change, with its rank-stability sentence, never as advice to act. Show evidence, limitations and the cheapest next test.
 
 ## Offline typed-decision gateway
 
