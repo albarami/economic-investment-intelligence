@@ -13,10 +13,12 @@ Tasks in slice S4 through slice S11 are coarser and are refined at the preceding
 - The builder and first reviewer must come from different makers.
 - Every task brief starts with the stated builder persona and reviewer persona.
 - A task is done only when it is built, verified, reviewed, merged and green in CI.
-- A reviewer returns only `APPROVED` or `REJECTED`; a rejection includes exact fixes.
+- A reviewer returns only `APPROVED` or `REJECTED`; a rejection includes exact fixes. After round 1 only the kinds of finding of REV-39 reject; other valid points are proposed open items ([decision 0015](docs/decisions/0015-review-rounds-and-the-scope-of-repository-checks.md)).
 - Acceptance evidence records the command or check, result, full commit hash and review verdict.
 - Files outside the task's scope are read-only.
 - Parallel tasks must have disjoint writable scopes; otherwise the lead serializes them.
+- A task may be built ahead in a worktree on the pushed head of one base task that is still in review, in a fix round or in CI, when the lead's checks are green on that head and its open findings do not change what the new task builds on; one level only. It is not pushed and gets no pull request before its base is merged and it is rebased onto the base branch; then every check is rerun.
+- Each slice ends with a follow-up task before its gate that closes every proposed open item of the slice's reviews (REV-41); it is the last task of each slice below.
 - All tasks start with status `queued`.
 - Requirement references below are to IDs defined in the numbered documentation pack; this file defines no requirement IDs.
 
@@ -139,6 +141,13 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S0-T07.
 - Requirements: TST-141, PLN-06, PLN-12.
 - Delivery: routine; personas Platform; status queued.
+### S0-T15 — Review follow-up for slice S0
+- Goal: Close every proposed open item that the reviews of slice S0 entered in `OPEN_ITEMS.md`, before the slice S0 gate.
+- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Scope: the files the closures change, and `OPEN_ITEMS.md`.
+- Depends: every other task of slice S0.
+- Requirements: REV-41, TST-168.
+- Delivery: routine; personas as the items require; status queued.
 
 ## slice S1 — Technical spike
 
@@ -205,6 +214,13 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S1-T08.
 - Requirements: PRV-05, PRV-59, PRV-120.
 - Delivery: hard; personas Privacy; status queued.
+### S1-T10 — Review follow-up for slice S1
+- Goal: Close every proposed open item that the reviews of slice S1 entered in `OPEN_ITEMS.md`, before the slice S1 gate.
+- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Scope: the files the closures change, and `OPEN_ITEMS.md`.
+- Depends: every other task of slice S1.
+- Requirements: REV-41, TST-168.
+- Delivery: routine; personas as the items require; status queued.
 
 **slice S1 gate.** Arabic labels render with self-hosted glyphs; hexagons remain under labels; 110,000 hexagons and 50,000 particles render at 60 frames per second; an isochrone is turned into grid cells; tiles are served with range requests; PostgreSQL and DuckDB answer one parity query; and the sandbox works. Each item passes its named test. A technical alternative is accepted only if it keeps the same user-visible capability, passes the same assertion and is recorded as a decision. No fallback is permitted for sandbox enforcement, store parity or any security check. The rules configuration fixes `export_parameter_set` (default `A`), `presence_scale` and `flow_scale` before any world is built.
 
@@ -273,6 +289,13 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S2-T08.
 - Requirements: MTH-03.
 - Delivery: hard; personas Methods; status queued.
+### S2-T10 — Review follow-up for slice S2
+- Goal: Close every proposed open item that the reviews of slice S2 entered in `OPEN_ITEMS.md`, before the slice S2 gate.
+- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Scope: the files the closures change, and `OPEN_ITEMS.md`.
+- Depends: every other task of slice S2.
+- Requirements: REV-41, TST-168.
+- Delivery: routine; personas as the items require; status queued.
 
 **slice S2 gate.** Every stored Public figure has URL, licence, retrieval date and hash; the reviewer checks twenty random figures against their sources; every section 9 public regression example passes; regression values that the method cards could not pin are produced, checked against the source and written into the cards; and no file without a stated licence is committed.
 
@@ -348,6 +371,13 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S3-T02, S3-T08, S3-T09.
 - Requirements: DES-06, DES-10, TST-80, TST-90, TST-100.
 - Delivery: hard; personas Frontend; status queued.
+### S3-T11 — Review follow-up for slice S3
+- Goal: Close every proposed open item that the reviews of slice S3 entered in `OPEN_ITEMS.md`, before the slice S3 gate.
+- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Scope: the files the closures change, and `OPEN_ITEMS.md`.
+- Depends: every other task of slice S3.
+- Requirements: REV-41, TST-168.
+- Delivery: routine; personas as the items require; status queued.
 
 ## slice S4 — Synthetic world and presence cube
 
@@ -388,6 +418,13 @@ These coarse tasks are refined at the slice S3 gate without weakening their crit
 - Depends: S4-T03, S4-T04.
 - Requirements: SYN-06, SYN-36, SYN-60, SYN-63.
 - Delivery: hard; personas Simulation; status queued.
+### S4-T06 — Review follow-up for slice S4
+- Goal: Close every proposed open item that the reviews of slice S4 entered in `OPEN_ITEMS.md`, before the slice S4 gate.
+- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Scope: the files the closures change, and `OPEN_ITEMS.md`.
+- Depends: every other task of slice S4.
+- Requirements: REV-41, TST-168.
+- Delivery: routine; personas as the items require; status queued.
 
 ## slice S5 — Privacy engine and release
 
@@ -444,6 +481,13 @@ These coarse tasks are refined at the slice S4 gate without weakening their crit
 - Depends: S5-T04.
 - Requirements: PRV-120.
 - Delivery: hard; personas Privacy; status queued.
+### S5-T08 — Review follow-up for slice S5
+- Goal: Close every proposed open item that the reviews of slice S5 entered in `OPEN_ITEMS.md`, before the slice S5 gate.
+- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Scope: the files the closures change, and `OPEN_ITEMS.md`.
+- Depends: every other task of slice S5.
+- Requirements: REV-41, TST-168.
+- Delivery: routine; personas as the items require; status queued.
 
 **slice S5 gate.** Closure is proved by exhaustive structural checks, and a fuzz run of at least 10,000 area pairs per release and per parameter set passes; the attacker-view audit passes with every applicable public total configured; with controls off every typed predicate is recovered, and with controls on none is, for each parameter set; exactly one protected table set leaves the custodian plane; the loader rejects any table not in the manifest; and the release hash is reproducible.
 
@@ -486,6 +530,13 @@ These coarse tasks are refined at the slice S5 gate without weakening their crit
 - Depends: S6-T02, S6-T03, S6-T04.
 - Requirements: TST-90, TST-101, TST-130, PLN-07.
 - Delivery: hard; personas Frontend; status queued.
+### S6-T06 — Review follow-up for slice S6
+- Goal: Close every proposed open item that the reviews of slice S6 entered in `OPEN_ITEMS.md`, before the slice S6 gate.
+- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Scope: the files the closures change, and `OPEN_ITEMS.md`.
+- Depends: every other task of slice S6.
+- Requirements: REV-41, TST-168.
+- Delivery: routine; personas as the items require; status queued.
 
 **slice S6 gate.** The flagship question is answered end to end with no model call; every number resolves to a fact with a complete source chain; every receipt carries the accounting-gate result; the evidence bundle is under 1.5 seconds at the 95th percentile locally; and visual tests pass at wall, laptop and tablet sizes in English and Arabic.
 
@@ -528,6 +579,13 @@ These coarse tasks are refined at the slice S6 gate without weakening their crit
 - Depends: S7-T01, S7-T02, S7-T03, S7-T04.
 - Requirements: MTH-37, MTH-03, TST-50.
 - Delivery: hard; personas Methods; status queued.
+### S7-T06 — Review follow-up for slice S7
+- Goal: Close every proposed open item that the reviews of slice S7 entered in `OPEN_ITEMS.md`, before the slice S7 gate.
+- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Scope: the files the closures change, and `OPEN_ITEMS.md`.
+- Depends: every other task of slice S7.
+- Requirements: REV-41, TST-168.
+- Delivery: routine; personas as the items require; status queued.
 
 **slice S7 gate.** Each method reproduces its public worked example; no regression value is left unpinned; and each card passes the provenance audit.
 
@@ -577,6 +635,13 @@ These coarse tasks are refined at the slice S7 gate without weakening their crit
 - Depends: S8-T03, S8-T05.
 - Requirements: AI-63, AI-69, AI-71, AI-95, OPS-37, TST-127.
 - Delivery: hard; personas AI; status queued.
+### S8-T07 — Review follow-up for slice S8
+- Goal: Close every proposed open item that the reviews of slice S8 entered in `OPEN_ITEMS.md`, before the slice S8 gate.
+- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Scope: the files the closures change, and `OPEN_ITEMS.md`.
+- Depends: every other task of slice S8.
+- Requirements: REV-41, TST-168.
+- Delivery: routine; personas as the items require; status queued.
 
 ## slice S9 — Seats and oversight
 
@@ -617,6 +682,13 @@ These coarse tasks are refined at the slice S8 gate without weakening their crit
 - Depends: S9-T01, S9-T04.
 - Requirements: TST-64, TST-65, REV-33.
 - Delivery: hard; personas Backend; status queued.
+### S9-T06 — Review follow-up for slice S9
+- Goal: Close every proposed open item that the reviews of slice S9 entered in `OPEN_ITEMS.md`, before the slice S9 gate.
+- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Scope: the files the closures change, and `OPEN_ITEMS.md`.
+- Depends: every other task of slice S9.
+- Requirements: REV-41, TST-168.
+- Delivery: routine; personas as the items require; status queued.
 
 ## slice S10 — Proof and story
 
@@ -657,6 +729,13 @@ These coarse tasks are refined at the slice S9 gate without weakening their crit
 - Depends: S10-T04, S7-T05.
 - Requirements: TST-100, TST-103, DES-78.
 - Delivery: hard; personas Frontend; status queued.
+### S10-T06 — Review follow-up for slice S10
+- Goal: Close every proposed open item that the reviews of slice S10 entered in `OPEN_ITEMS.md`, before the slice S10 gate.
+- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Scope: the files the closures change, and `OPEN_ITEMS.md`.
+- Depends: every other task of slice S10.
+- Requirements: REV-41, TST-168.
+- Delivery: routine; personas as the items require; status queued.
 
 ## slice S11 — Hardening and hand-over
 
@@ -685,7 +764,7 @@ These coarse tasks are refined at the slice S10 gate without weakening their cri
 - Delivery: hard; personas Operations; status queued.
 ### S11-T04 — Final independent reviews
 - Goal: Complete task, slice, security, design and operational-readiness reviews on the frozen candidate.
-- Acceptance criteria: [ ] all slice S11 gate evidence is checked; [ ] every finding has an exact fix; [ ] final verdict is `APPROVED`; [ ] merged commit remains green.
+- Acceptance criteria: [ ] all slice S11 gate evidence is checked; [ ] every finding has an exact fix; [ ] final verdict is `APPROVED`, or counts as approved under REV-40; [ ] merged commit remains green.
 - Scope: review reports and evidence only.
 - Depends: S11-T03.
 - Requirements: REV-06, REV-30, REV-33, TST-160.
@@ -704,5 +783,12 @@ These coarse tasks are refined at the slice S10 gate without weakening their cri
 - Depends: S11-T01, S5-T07.
 - Requirements: PRV-120, RUN-13.
 - Delivery: hard; personas Platform; status queued.
+### S11-T07 — Review follow-up for slice S11
+- Goal: Close every proposed open item that the reviews of slice S11 entered in `OPEN_ITEMS.md`, before the slice S11 gate.
+- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Scope: the files the closures change, and `OPEN_ITEMS.md`.
+- Depends: every other task of slice S11.
+- Requirements: REV-41, TST-168.
+- Delivery: routine; personas as the items require; status queued.
 
 **slice S11 gate.** Three rehearsals are complete, including one with PostgreSQL stopped and one offline; versions are frozen; the freeze carries a recorded human review of the release and passes the export-register check; the independent reviewer returns `APPROVED`; and the owner records go or no-go.

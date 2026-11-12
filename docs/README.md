@@ -69,7 +69,7 @@
 | [0012](decisions/0012-neutral-source-labels-and-no-product-comparisons.md) | Neutral labels and no named product comparisons | Accepted, 2026-11-11 |
 | [0013](decisions/0013-one-deep-journey-before-breadth.md) | One deep journey before breadth | Accepted, 2026-11-11 |
 | [0014](decisions/0014-typed-decision-gateway.md) | Offline typed-decision gateway, default provider none | Accepted, 2026-11-11 (amendment 1 to the first pack) |
-| [0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md) | Limited review rounds after the first; what the repository's own checks defend against | Accepted, 2026-11-12 (amendment 2 to the first pack) |
+| [0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md) | Review rounds after the first, proposed open items, the scope of the repository's checks, and building ahead | Accepted, 2026-11-12 (amendment 2 to the first pack) |
 
 ## Identifiers and change control
 

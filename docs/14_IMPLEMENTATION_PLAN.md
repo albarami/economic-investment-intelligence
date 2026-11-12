@@ -63,15 +63,15 @@ The lead reproduces the decisive checks before merge.
 ## 3. Branch, pull request and evidence protocol
 
 1. The lead marks one queued task active and records its writable file scope.
-2. The builder creates a task branch from the current green base branch.
+2. The builder creates a task branch from the current green base branch, or, when the lead builds a task ahead under [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md), works in a worktree on the pushed head of its one base task; a task built ahead is rebased onto the base branch, and every check is rerun, before it is pushed.
 3. The builder works test-first where behaviour changes and commits with a Conventional Commit message.
 4. The lead confirms no other active task owns any file in that scope.
 5. The lead grants the single push slot; only that branch pushes.
 6. CI runs tests, documentation checks, secret scanning and identifier-pattern scanning as applicable.
 7. The reviewer from another maker reviews the final commit and returns `APPROVED` or `REJECTED`.
-8. For `REJECTED`, the builder applies every exact fix and the reviewer reviews the new commit under REV-08 and REV-39.
-9. For `APPROVED`, the lead reproduces the gate evidence and merges.
-10. The merged commit must be green before the next dependent task or slice starts.
+8. For `REJECTED`, the builder applies every exact fix and the reviewer reviews the new commit under REV-08 and REV-39; a rejected third round is followed as REV-40 says, and no task ends blocked.
+9. For `APPROVED`, or a commit that counts as APPROVED under REV-40, the lead reproduces the gate evidence and merges.
+10. The merged commit must be green before the next dependent task is pushed or the slice gate review starts; a dependent task may be built ahead earlier, as step 2 says.
 
 Evidence follows TST-01 and TST-160 to TST-171.
 No statement that a feature works is accepted without its recorded result.
