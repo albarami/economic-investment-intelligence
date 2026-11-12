@@ -94,11 +94,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: routine; personas Platform; status done (pull request 19, merged 2026-11-12).
 ### S0-T07 — Continuous integration
 - Goal: Build CI for tests, documentation checks, secret scanning, identifier-pattern scanning and the hosted-runner sandbox proof.
-- Acceptance criteria: [ ] all check classes run on pull requests; [ ] the sandbox test runs on the hosted runner and is never skipped; [ ] planted failures block CI; [ ] the foundation commit is green.
+- Acceptance criteria: [x] all check classes run on pull requests; [x] the sandbox test runs on the hosted runner and is never skipped; [x] planted failures block CI; [x] the foundation commit is green.
 - Scope: CI workflow files and CI-only setup scripts.
 - Depends: S0-T04, S0-T05, S0-T06.
 - Requirements: TST-61, TST-62, TST-140, TST-141, TST-150.
-- Delivery: routine; personas Platform; status in review (pull request 21).
+- Delivery: routine; personas Platform; status done (pull request 21, merged 2026-11-13).
 ### S0-T08 — Compose and store preflight
 - Goal: Add the portable database service and probes that select a store without starting or stopping it.
 - Acceptance criteria: [ ] Compose defines the pinned database and PostGIS line; [ ] probes time out as specified; [ ] absent PostgreSQL selects embedded with a warning; [ ] with `EII_RELEASE_DIR` unset, foundation preflight exits zero, reports `WARN not_configured` for release, load-receipt, embedded-reader and recorded-replay checks, and keeps every other check's normal severity; [ ] `up` still refuses without a configured complete release.
@@ -147,7 +147,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: GitHub repository settings only; repository files are read-only.
 - Depends: S0-T07.
 - Requirements: TST-141, PLN-06, PLN-12.
-- Delivery: routine; personas Platform; status queued.
+- Delivery: routine; personas Platform; status in review (pull request 23).
 ### S0-T15 — Review follow-up for slice S0
 - Goal: Close every proposed open item that the reviews of slice S0 entered in `OPEN_ITEMS.md`, before the slice S0 gate.
 - Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
