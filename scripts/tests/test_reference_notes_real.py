@@ -143,7 +143,14 @@ class RealNotes(unittest.TestCase):
             tables.EXTRA_SECTIONS,
             {tables.WEB: (tables.ASSIGNED,), tables.DOCS: ()},
         )
-        self.assertEqual(tables.ASSIGNED_SENTENCE, sup.SENTENCE)
+        self.assertEqual(
+            tables.ASSIGNED_SENTENCE,
+            (
+                "The owner decided on 2026-11-11 that the lead assigns each slice S0 "
+                "requirement that no task owned to the nearest task; the lead assigned "
+                "DES-25 and DES-45 to S0-T13."
+            ),
+        )
         self.assertEqual(tables.QUOTE_WORDS, (3, 40))
         self.assertEqual(tables.KINDS, ("READ", "OBSERVED", "PACK"))
         self.assertEqual(len(tables.OPENING), 2)

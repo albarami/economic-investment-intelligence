@@ -754,8 +754,22 @@ class NotesForm(unittest.TestCase):
                     sup.fails(lines),
                     [sup.fail_line(WEB, "address", n, f"{url}: {reason}")],
                 )
-        for host, prefix in tables.OFFICIAL:
-            url = f"https://{host}{prefix}x"
+        control_addresses = (
+            "https://maplibre.org/maplibre-gl-js/docs/x",
+            "https://github.com/maplibre/x",
+            "https://raw.githubusercontent.com/maplibre/x",
+            "https://deck.gl/docs/x",
+            "https://github.com/visgl/x",
+            "https://duckdb.org/docs/2.0/x",
+            "https://duckdb.org/2026/10/21/announcing-duckdb-200x",
+            "https://www.postgresql.org/docs/18/x",
+            "https://www.postgresql.org/support/versioning/x",
+            "https://hub.docker.com/_/postgresx",
+            "https://github.com/carbon-design-system/x",
+            "https://raw.githubusercontent.com/carbon-design-system/x",
+            "https://platform.claude.com/docs/en/x",
+        )
+        for url in control_addresses:
             with self.subTest(control=url):
                 folder, root = _root()
                 self.addCleanup(folder.cleanup)
