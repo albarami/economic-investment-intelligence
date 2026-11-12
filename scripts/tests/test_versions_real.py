@@ -133,7 +133,7 @@ class RealTree(unittest.TestCase):
         for row in rows.values():
             cite = getattr(row, "cite", "")
             for item in str(cite).split("; "):
-                path = item.split(" line ", 1)[0]
+                path = item.split(" ", 1)[0]
                 if path and path not in rels:
                     rels.append(path)
         return rels
