@@ -1,0 +1,43 @@
+version = 1
+revision = 3
+requires-python = ">=3.14"
+
+[manifest]
+members = [
+    "eii-core",
+    "eii-custodian",
+    "eii-product",
+    "eii-workspace",
+]
+
+[[package]]
+name = "eii-core"
+version = "0.0.0"
+source = { editable = "core" }
+
+[[package]]
+name = "eii-custodian"
+version = "0.0.0"
+source = { editable = "custodian" }
+dependencies = [
+    { name = "eii-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "eii-core", editable = "core" }]
+
+[[package]]
+name = "eii-product"
+version = "0.0.0"
+source = { editable = "product" }
+dependencies = [
+    { name = "eii-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "eii-core", editable = "core" }]
+
+[[package]]
+name = "eii-workspace"
+version = "0.0.0"
+source = { virtual = "." }
