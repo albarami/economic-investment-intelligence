@@ -2114,6 +2114,233 @@ Seed:      none
 Notes:     Later-round form of the scope command: the branch changes the fifty-three planned paths, the 5 test files added in the fix round and the break pass, and the two ledger files, and nothing else (TST-163).
 ```
 
+#### S0-T03: independent review, round 2: APPROVED
+
+Reviewed commit `d3516c01c60f82f2f0b27c82d2095090817fe2c3`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/3, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43176057455 ). Reviewer: Google Gemini 4 Carbon (High), through the Antigravity command-line tool, review only; a later round under the review rules as the owner amended them on 2026-11-12. The verdict is copied unchanged (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T03
+COMMIT: d3516c01c60f82f2f0b27c82d2095090817fe2c3
+REVIEWER: Google, Gemini 4 Carbon (High)
+EARLIER FINDINGS:
+  F1 FIXED web/scripts/check-import-boundary.mjs lines 107-123 add resolveRealAncestor(target) and use it in locate(fromDir, spec) for both fromDir and path.resolve(baseDir, spec); web/scripts/tests/check-import-boundary-links.node-test.mjs lines 105-137 add all three planted symlink tests, proved by cd web && npm run test:checks exit 0 (620 passed).
+  F2 FIXED web/scripts/check-import-boundary.mjs lines 245-286 validate string and object element types across include, exclude, files, extends, references, compilerOptions.paths, rootDirs, and typeRoots in tsconfigTypeError(config) and reject backslash and drive-letter entries in entryOutside(root, entry); web/scripts/tests/check-tsconfig-types.node-test.mjs lines 103-153 cover both planted groups and per-field type errors, proved by cd web && npm run test:checks exit 0 (620 passed).
+  F3 FIXED web/scripts/import-tokenizer.mjs lines 220-226 and 248-295 add isPunct and isWord and apply them to every punctuation and keyword lookahead in collectReferences; web/scripts/tests/check-import-boundary-forms.node-test.mjs lines 253-278 and web/scripts/tests/check-import-form-guards.node-test.mjs lines 18-44 prove glob bracket-string handling, side-effect import '.' / import '(', and lookahead guards (620 passed).
+  F4 FIXED web/scripts/host-scan-rules.mjs lines 21 and 65 add ',' and ')' to HOST_STOP and exclude them from the protocolHits host character class; web/scripts/tests/check-no-third-party-hosts-forms.node-test.mjs lines 188-204 and web/scripts/tests/check-host-boundaries.node-test.mjs lines 5-60 prove comma-separated srcset, CSS url(//host.example), and every stop character (620 passed).
+  F5 FIXED web/scripts/tests/check-dev-server-fake.node-test.mjs lines 212, 226, 235, and 307 assert that trimmed stdout ends with /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/ in 'bin field, string form', 'bin field, object form', 'terminate signal ignored', and all four 'content types' subtests (620 passed).
+  F6 FIXED web/scripts/tests/check-dev-server-surroundings.node-test.mjs lines 203, 217, 224, 229, and 234 assert that trimmed stdout ends with /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/ in 'child environment', 'child environment, a name absent in the parent', and all three runs of 'hostile surroundings' (620 passed).
+  F7 FIXED web/scripts/tests/check-dev-server.node-test.mjs lines 101, 111, and 146 assert that trimmed stdout ends with /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/ in 'real shell starts', 'minimal root starts', and 'absent package.json uses the default flags' (620 passed).
+  F8 FIXED web/scripts/tests/check-layout.node-test.mjs line 231 asserts that trimmed stdout ends with /^checked \d+ entries: OK$/ in 'deferred file present' (620 passed).
+  F9 FIXED web/scripts/dev-server-process.mjs line 12 removes STOP_POLL_MS and lines 123-141 replace the polling loop in stopChild with a single once('exit', onExit) listener paired with one STOP_WAIT_MS timer that removes onExit on timeout and clears the timer on exit; web/scripts/tests/check-dev-server-fake.node-test.mjs line 236 asserts result.stderr === '' and web/scripts/tests/check-stop-child.node-test.mjs lines 59-83 prove listener and timer cleanup (620 passed).
+CHECKS:
+  REV-10 PASS All three acceptance criteria are met and recorded in PROGRESS.md on 2c47a105ee321e580ba40432a11f35eb8e584399 and re-run on head d3516c01c60f82f2f0b27c82d2095090817fe2c3 in .overnight/EVIDENCE.md: cd web && npm run check:dev exited 0 with DEV-GONE exit 0 (criterion 1), cd web && npm run build exited 0 with DIST-PRE and DIST exit 0 (criterion 2), and cd web && npm run check plus cd web && npm run check:hosts:dist exited 0 with F4 fixed in web/scripts/host-scan-rules.mjs (criterion 3, FE-05, DES-24; round-1 P1 is hardening routed to docs/17_DEPLOYMENT_HARDENING.md under the owner's 2026-11-12 rule).
+  REV-11 PASS Lead runs on 2c47a105ee321e580ba40432a11f35eb8e584399 in PROGRESS.md and head re-runs on d3516c01c60f82f2f0b27c82d2095090817fe2c3 in .overnight/EVIDENCE.md show cd web && npm run test:checks exit 0 (620 passed, 0 failed, 0 skipped; ./eii test arrives in S0-T05 and S0-T09), uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v exit 0 (81 passed, 0 skipped), python3 scripts/check_docs.py exit 0, python3 scripts/check_tree.py exit 0, TST-161 red-run control exit 0, and CI workflow docs job check-docs green on head ( https://github.com/albarami/economic-investment-intelligence/actions/runs/43176057455 ); F1 to F9 carry 17 planted tests plus 5 break-pass tests with 0 skips (my own re-run is omitted under this read-only no-command brief).
+  REV-12 PASS Scope check against merged base 5ddb81229d6b480b250721ef0fd34d073333bd2f on 2c47a105ee321e580ba40432a11f35eb8e584399 exited 0 with "60 [] []" (49 planned web/ paths, 5 web/scripts/tests/*.node-test.mjs files added for F1-F9, the break pass, and the 500-line split, 4 PART B files README.md, AGENTS.md, CLAUDE.md, and OPEN_ITEMS.md, and 2 ledger files PROGRESS.md and TASKS.md), HEAD-DIFF on d3516c01c60f82f2f0b27c82d2095090817fe2c3 lists only ['PROGRESS.md', 'TASKS.md'], and block TRACKED confirms nothing under data/ or web/dist/ is tracked.
+  REV-13 PASS Full inspection of .overnight/DIFF.patch and all changed files finds no TODO, FIXME, NotImplementedError, stub, empty function body, mock data, or invented figure.
+  REV-14 PASS Line-by-line review of .overnight/DIFF.patch, python3 scripts/check_docs.py exit 0 on d3516c01c60f82f2f0b27c82d2095090817fe2c3, and block LOCKSCAN exit 0 (lock hits: []) confirm no .env, key file, secret, or real custodian record, field, file name, or count (gitleaks arrives in S0-T06).
+  REV-15 PASS Line-by-line review of all changed check scripts and tests confirms no lowered threshold, loosened assertion, skip, suppression comment, retry, or weakened CI setting; F1 to F8 tighten the guards and clean-test assertions, splitting web/scripts/tests/check-import-boundary.node-test.mjs preserves every assertion unchanged, and passing web check tests increased from 598 to 620 with 0 skips.
+  REV-16 PASS PART B updates README.md, rule 44 of AGENTS.md and CLAUDE.md, and OI-41 to OI-43 in OPEN_ITEMS.md with blocks CMDS, README-B, and OI all exiting 0; F1 to F9 are applied as specified; block SIZE exits 0 with all 28 web code files under the 500-line house limit (largest scripts/check-import-boundary.mjs at 498 lines after formatting).
+  REV-17 PASS README.md, AGENTS.md, CLAUDE.md, OPEN_ITEMS.md (OI-41 to OI-43), TASKS.md, and PROGRESS.md (S0-T02 closing record, S0-T03 unchanged round-1 verdict, and all 13 evidence entries on 2c47a105ee321e580ba40432a11f35eb8e584399) are updated and current; block LEDGER exited 0 (ledger problems: []) and python3 scripts/check_docs.py exited 0 on d3516c01c60f82f2f0b27c82d2095090817fe2c3.
+  REV-18 PASS Changed scripts, tests, and PART B documents introduce no secrets, database connections, SQL, model calls, or record-level logging; child-environment allow-listing, 127.0.0.1 binding with --strictPort, port probing, and listener-leak-free stopChild cleanup are verified by the 620-test check suite.
+  REV-19 PASS PART B and the round-2 fixes follow docs/01_PROJECT_BRIEF.md, docs/02_ARCHITECTURE.md, docs/14_IMPLEMENTATION_PLAN.md, decision 0015, and the owner's 2026-11-12 review rules without reopening any settled decision or building deferred items.
+  REV-20 N/A Does not apply to this commit because S0-T03 delivers only the feature-free web/ shell, check scripts, tests, and S0 foundation documentation, with no fact objects, lineage references, calculations, or displayed figures.
+  REV-21 N/A Does not apply to this commit because the web/ shell renders only the working title and an empty main landmark, with no numerals, Fact chips, cards, claim templates, or assistant pipeline stages, and the numeral lint rules belong to S0-T04.
+  REV-22 N/A Does not apply to this commit because S0-T03 touches no custodian partition, privacy parameter set, disclosure treatment, attacker-view audit, freeze command, or proof-room endpoint.
+  REV-23 PASS product/ is untouched (Python workspace suite 81 passed, 0 failed), web/ sources and package.json do not import custodian or eii_custodian, and with F1, F2, and F3 fixed in web/scripts/check-import-boundary.mjs and web/scripts/import-tokenizer.mjs, symlink, backslash/drive-letter tsconfig.json, and import.meta.glob array escapes out of web/ fail with planted tests.
+  REV-24 N/A Does not apply to this commit because the web/ shell has no feature UI, no Arabic view or localized strings (web/src/i18n holds only .gitkeep), no fact identifiers, and no rendered numbers.
+  REV-25 PASS python3 scripts/check_docs.py exited 0 on d3516c01c60f82f2f0b27c82d2095090817fe2c3, block LOCKSCAN exited 0 (lock hits: []), and full diff review of AGENTS.md, CLAUDE.md, OPEN_ITEMS.md, README.md, PROGRESS.md, TASKS.md, and web/scripts/** confirms no local paths, personal names, e-mails, secrets, bare 8- or 11-digit runs, named product comparisons, ministry endorsement claims, or unlicenced public files.
+  REV-26 PASS Full review of README.md, AGENTS.md, CLAUDE.md, OPEN_ITEMS.md, PROGRESS.md, TASKS.md, and web/ confirms none of the prohibited claims (real custodian data, Synthetic/Simulated facts on real places, named-building footfall, certified/formal privacy, public-service inferiority, ministry endorsement, forecasts, or entity lookup) appear.
+  REV-27 PASS AGENTS.md and CLAUDE.md received identical rule-44 changes (blob 162e668), cmp AGENTS.md CLAUDE.md exited 0 on 2c47a105ee321e580ba40432a11f35eb8e584399 and d3516c01c60f82f2f0b27c82d2095090817fe2c3, and python3 scripts/check_docs.py reported no agent-file mismatch.
+  REV-28 N/A Does not apply to this commit because S0-T03 defines no synthetic establishment, legal-entity, employer-group, person, or salary-file identifiers and touches no synthetic world build.
+  REV-29 N/A Does not apply to this commit because the web/ shell and PART B documents define no place records and attach no attributes or footfall figures to any real named place, business, or building.
+  REV-38 PASS web/ renders no gateway text, score, badge, or panel, reads neither EII_DECISION_PROVIDER nor JEV_PRO_API_KEY, rejects bare gateway/eii_gateway specifiers, and with F1, F2, and F3 fixed in web/scripts/check-import-boundary.mjs and web/scripts/import-tokenizer.mjs, rejects symlink, tsconfig.json, and import.meta.glob escapes out of web/ into ../gateway.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T03: merge record
+
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/3 was squash-merged on 2026-11-12 at the approved head `d3516c01c60f82f2f0b27c82d2095090817fe2c3`; merge commit `f32dba33e7a50c6180f226c44b4570cc03447812` on main.
+- CI on the merge commit: workflow `docs`, job `check-docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43177228212 .
+- The task log of S0-T03 above is complete with this record: verdict APPROVED in review round 2.
+
+### S0-T04 — Lint, format and type checks: task log
+
+- Builder persona: senior platform engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic: version 1 by a Claude Sonnet subagent; version 2 by three Claude Sonnet agents (reviser, critic, finaliser); a refresh after approval, against version 5 of S0-T02 and S0-T03, by three Claude Sonnet agents; the one refresh of 2026-11-12, against the merged tree and the owner's notes of that day, by a Claude Sonnet editor; each checked by the lead
+- Plan reviewer maker and model: Cursor command-line tool, `grok-4.7-high` (xAI), read-only: round 1 REJECTED (five findings), round 2 APPROVED; the refresh after approval and the refresh of 2026-11-12 were not seen by an external plan reviewer
+- Builder maker and model: Cursor command-line tool, `composer-2.5` (Cursor)
+- Reviewer maker and model: Cursor command-line tool, `gpt-5.6-sol-high` (OpenAI), read-only
+- Skills and brief rules: the lead used project-orientation, task-standards, writing-plans, test-driven-development, verification-before-completion, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first with a recorded red run, a planted violation for every check, the fix-up rule (a change that cannot alter behaviour; no suppression comment, ignore entry, exclusion or weaker setting), no secret, personal name, absolute local path or eight- or eleven-digit run in any file, nothing built beyond the acceptance criteria as hardening (owner's note of 2026-11-12), file length and house style reported as warnings only, a short pass that breaks each condition once and runs only the covering test file, temporary folders inside the run's temporary folder, and a report of only the results it saw
+- Branch: `task/S0-T04-lint-format-types`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/5
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit; the lead-run blocks of the plan go into the evidence file that the external reviewer receives
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4; git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8
+- Build round 1: Cursor command-line tool, `composer-2.5` (Cursor): the eleven created and thirteen named modified paths, and the fix-up files that the checks reported in files of S0-T01 to S0-T03 (formatting, strict type annotations, one comprehension variable renamed for E741), tests first (the new Python tests ran red before the configuration existed: exit 1, twelve failures)
+- Build round 2: the same builder: a short pass that broke each condition of the configuration and the Python test helper once, running only the covering test file (owner's rule of 2026-11-12); the five breaks that no test caught are closed by three tests (one Python, two web), each seen failing on its break and passing restored; the configuration ended byte-identical; the builder did not break every comparison of the four web test helpers one by one and judged them covered by their planted-violation tables
+
+#### Evidence for the work commit `97512346b074d311a0665f5506161ee6b82dc27c`
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    97512346b074d311a0665f5506161ee6b82dc27c
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The Python lint check over the four source roots, one documented command (criterion 1, PLN-07).
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    97512346b074d311a0665f5506161ee6b82dc27c
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "17 files already formatted"
+Seed:      none
+Notes:     The Python format check over the four source roots, one documented command (criterion 1, PLN-07).
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    97512346b074d311a0665f5506161ee6b82dc27c
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 17 source files"
+Seed:      none
+Notes:     The Python strict type check over the four source roots, one documented command (criterion 1, PLN-07).
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    97512346b074d311a0665f5506161ee6b82dc27c
+Command:   cd web && npm run lint
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "> eslint --max-warnings 0 ."
+Seed:      none
+Notes:     The web lint check with the FE-11 rule, run from `web/`, one documented command (criterion 1, PLN-07).
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    97512346b074d311a0665f5506161ee6b82dc27c
+Command:   cd web && npm run format:check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All matched files use Prettier code style!"
+Seed:      none
+Notes:     The web format check, run from `web/`, one documented command (criterion 1, PLN-07).
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    97512346b074d311a0665f5506161ee6b82dc27c
+Command:   cd web && npm run typecheck
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "> tsc --noEmit"
+Seed:      none
+Notes:     The web type check, run from `web/`, one documented command (criterion 1, PLN-07).
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    97512346b074d311a0665f5506161ee6b82dc27c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    95 passed, 0 failed, 0 skipped (ran 95 tests)
+Seed:      none
+Notes:     The whole Python suite, which includes the tests of the three `test_pychecks_*.py` files (the plan's thirteen and one added by the break pass) and, among the tests of earlier tasks, the places of the clean-environment test file of S0-T02 that rows C1 to C3 change (the shared sync constant used by `setUpClass` and the hostile-surroundings test, and the stale-lock test) (criteria 2 and 3, TST-161); `./eii test` does not exist before S0-T05 and S0-T09, so this is the only Python runner; the counts are those the run printed.
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    97512346b074d311a0665f5506161ee6b82dc27c
+Command:   cd web && npm run test:checks
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    657 passed, 0 failed, 0 skipped (tests 657, cancelled 0, todo 0)
+Seed:      none
+Notes:     The whole web check suite, which includes the tests of the four new files (the FE-11 forms, the allowed `src/api/` files and the boundary cases, two of them added by the break pass) and the layout tests that row C8 changes (criteria 2 and 3, FE-11, TST-161); the counts are those the run printed.
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    97512346b074d311a0665f5506161ee6b82dc27c
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 11 packages in 0.85ms"
+Seed:      none
+Notes:     The lock file is current with the dev group.
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    97512346b074d311a0665f5506161ee6b82dc27c
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 83 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check (TST-162); `./eii test` does not exist yet.
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    97512346b074d311a0665f5506161ee6b82dc27c
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    97512346b074d311a0665f5506161ee6b82dc27c
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    97512346b074d311a0665f5506161ee6b82dc27c
+Command:   python3 -c "import re,subprocess,sys; r=subprocess.run(['git','diff','--name-status','--no-renames','f32dba33e7a50c6180f226c44b4570cc03447812...97512346b074d311a0665f5506161ee6b82dc27c'],check=True,capture_output=True,text=True).stdout.splitlines(); s={l.split('\t')[1]:l.split('\t')[0] for l in r}; t='scripts/tests/'; w='web/scripts/tests/'; c={t+x for x in 'pychecks_support.py test_pychecks_config.py test_pychecks_ruff.py test_pychecks_mypy.py'.split()}|{'web/eslint.config.js','web/.prettierrc.json','web/.prettierignore'}|{w+x+'.node-test.mjs' for x in 'lint-rules lint-fe11 format typecheck'.split()}; m={'pyproject.toml','uv.lock',t+'test_clean_environment.py','scripts/check_docs.py','web/package.json','web/package-lock.json','web/scripts/check-layout.mjs',w+'check-layout.node-test.mjs','web/README.md','README.md','AGENTS.md','CLAUDE.md','OPEN_ITEMS.md'}; f=re.compile(r'^((scripts|core|custodian|product)/.*\.py|web/.*)$'); bad=[p for p in c if s.get(p)!='A']+[p for p in m if s.get(p)!='M']+[p for p,k in s.items() if p not in c|m and (k!='M' or not f.match(p))]; print(len(c),len(m),bad,sorted(p for p in s if p not in c|m)); sys.exit(1 if bad or len(c)!=11 or len(m)!=13 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "11 13 [] ['scripts/check_tree.py', 'scripts/tests/test_check_tree.py', 'scripts/tests/test_check_tree_index.py', 'scripts/tests/test_workspace_metadata.py', 'scripts/tests/workspace_fields.py', 'scripts/tests/workspace_fields_tables.py', 'scripts/tests/workspace_guard.py', 'web/scripts/check-dev-server.mjs', 'web/scripts/check-exact-versions.mjs', 'web/scripts/check-import-boundary.mjs', 'web/scripts/check-no-third-party-hosts.mjs', 'web/scripts/dev-server-process.mjs', 'web/scripts/host-scan-rules.mjs', 'web/scripts/import-tokenizer.mjs', 'web/scripts/tests/check-dev-server-fake.node-test.mjs', 'web/scripts/tests/check-dev-server-surroundings.node-test.mjs', 'web/scripts/tests/check-dev-server.node-test.mjs', 'web/scripts/tests/check-exact-versions-lock.node-test.mjs', 'web/scripts/tests/check-exact-versions.node-test.mjs', 'web/scripts/tests/check-import-boundary-forms.node-test.mjs', 'web/scripts/tests/check-import-boundary-links.node-test.mjs', 'web/scripts/tests/check-import-boundary.node-test.mjs', 'web/scripts/tests/check-no-third-party-hosts-forms.node-test.mjs', 'web/scripts/tests/check-no-third-party-hosts.node-test.mjs', 'web/scripts/tests/check-tsconfig-types.node-test.mjs', 'web/scripts/tests/scripts-use-only-node-builtins.node-test.mjs', 'web/scripts/tests/shell-document.node-test.mjs']"
+Seed:      none
+Notes:     The scope (TST-163): the eleven created and thirteen named modified paths, and otherwise only modifications of files that the checks reported (the fix-up files, formatting, strict type annotations and one renamed comprehension variable), which the output lists in its last field.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

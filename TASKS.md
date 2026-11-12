@@ -59,18 +59,18 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: routine; personas Platform; status done (pull request 4, merged 2026-11-12).
 ### S0-T03 — Web application skeleton
 - Goal: Create the React, TypeScript and Vite application shell with no feature UI.
-- Acceptance criteria: [ ] development build starts; [ ] production build succeeds; [ ] no run-time asset uses a third-party host.
+- Acceptance criteria: [x] development build starts; [x] production build succeeds; [x] no run-time asset uses a third-party host.
 - Scope: `web/`, web package and TypeScript configuration.
 - Depends: S0-T01.
 - Requirements: FE-01, FE-05, FE-07, DES-24.
-- Delivery: routine; personas Frontend; status in review (pull request 3, round 2).
+- Delivery: routine; personas Frontend; status done (pull request 3, merged 2026-11-12).
 ### S0-T04 — Lint, format and type checks
 - Goal: Make Python and web linting, formatting and type checks reproducible.
 - Acceptance criteria: [ ] each check has one documented command; [ ] planted violations fail; [ ] clean scaffolding passes.
 - Scope: lint, formatter and type-checker configuration; check scripts only.
 - Depends: S0-T02, S0-T03.
-- Requirements: PLN-07, TST-161, TST-162.
-- Delivery: routine; personas Platform; status queued.
+- Requirements: PLN-07, TST-161, TST-162, FE-11.
+- Delivery: routine; personas Platform; status in review (pull request 5).
 ### S0-T05 — Test runners
 - Goal: Make `./eii test` run every network-free Python and web pull-request suite.
 - Acceptance criteria: [ ] suite counts are printed; [ ] a failing fixture makes the command non-zero; [ ] clean suites exit zero.
