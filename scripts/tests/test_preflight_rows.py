@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 from unittest import mock
@@ -19,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import preflight_stubs as stubs
 
+import preflight_proc as proc
 import preflight_rows as rows
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -802,7 +804,35 @@ class Rows(unittest.TestCase):
                                 echo=True,
                                 stderr=marker,
                             )
-                    line = func(*args)
+                    need_child_spy = label in ("r08_timeout", "r09_timeout")
+                    if need_child_spy:
+                        child_results: list[proc.ChildResult] = []
+                        real_run_child = proc.run_child
+
+                        def spy_run_child(
+                            program: str,
+                            args: object,
+                            env_arg: object,
+                            cwd: Path,
+                            *,
+                            limit: float = proc.PROBE_TIMEOUT_S,
+                            _real: Callable[..., proc.ChildResult] = real_run_child,
+                            _results: list[proc.ChildResult] = child_results,
+                        ) -> proc.ChildResult:
+                            from collections.abc import Mapping, Sequence
+
+                            assert isinstance(args, Sequence)
+                            assert isinstance(env_arg, Mapping)
+                            child = _real(program, args, env_arg, cwd, limit=limit)
+                            _results.append(child)
+                            return child
+
+                        with mock.patch.object(
+                            proc, "run_child", side_effect=spy_run_child
+                        ):
+                            line = func(*args)
+                    else:
+                        line = func(*args)
                     text = line.text()
                     if label == "r08_timeout":
                         self.assertEqual(
@@ -815,6 +845,12 @@ class Rows(unittest.TestCase):
                             "WARN wsl-interop: cmd.exe gave no answer within 0.5 s",
                         )
                     self.assertNotIn(marker, text)
+                    if need_child_spy:
+                        self.assertEqual(len(child_results), 1)
+                        child = child_results[0]
+                        self.assertTrue(child.timed_out)
+                        self.assertIn(marker, child.stdout)
+                        self.assertIn(marker, child.stderr)
                     skip_env = frozenset({"C", "1", "false", os.devnull})
                     for call in stubs.calls(stub_dir):
                         for value in call["env"].values():

@@ -23,19 +23,50 @@ class ChildRunner(unittest.TestCase):
 
     def test_real_limit_kills_sleeping_child(self) -> None:
         """P01: default limit ends a long sleep."""
+        labels = ["default_limit", "timeout_partial_streams"]
+        ran: list[str] = []
         with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
-            program = stubs.write_stub(folder, "pg_isready", sleep=60.0)
-            env = {"PATH": str(folder), "LANG": "C", "LC_ALL": "C"}
-            start = time.monotonic()
-            result = proc.run_child(
-                str(program), ["-h", "h", "-p", "1", "-t", "5"], env, folder
-            )
-            elapsed = time.monotonic() - start
-            self.assertTrue(result.timed_out)
-            self.assertEqual(result.status, -9)
-            self.assertGreaterEqual(elapsed, 5.0)
-            self.assertLess(elapsed, 7.5)
+            for label in labels:
+                with self.subTest(label=label):
+                    ran.append(label)
+                    if label == "default_limit":
+                        program = stubs.write_stub(folder, "pg_isready", sleep=60.0)
+                        env = {"PATH": str(folder), "LANG": "C", "LC_ALL": "C"}
+                        start = time.monotonic()
+                        result = proc.run_child(
+                            str(program),
+                            ["-h", "h", "-p", "1", "-t", "5"],
+                            env,
+                            folder,
+                        )
+                        elapsed = time.monotonic() - start
+                        self.assertTrue(result.timed_out)
+                        self.assertEqual(result.status, -9)
+                        self.assertGreaterEqual(elapsed, 5.0)
+                        self.assertLess(elapsed, 7.5)
+                    else:
+                        marker = stubs.dummy("MARK")
+                        program = stubs.write_stub(
+                            folder,
+                            "pg_isready",
+                            sleep=60.0,
+                            echo=True,
+                            stdout=marker,
+                            stderr=marker,
+                        )
+                        env = {"PATH": str(folder)}
+                        result = proc.run_child(
+                            str(program),
+                            ["-h", "h", "-p", "1", "-t", "5"],
+                            env,
+                            folder,
+                            limit=0.5,
+                        )
+                        self.assertTrue(result.timed_out)
+                        self.assertIn(marker, result.stdout)
+                        self.assertIn(marker, result.stderr)
+        self.assertEqual(ran, labels)
 
     def test_injected_limit_kills_the_whole_group(self) -> None:
         """P02: a short limit kills the grandchild process group."""

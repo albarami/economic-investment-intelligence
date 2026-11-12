@@ -65,6 +65,8 @@ def write_stub(
             payload = json.dumps({{"argv": sys.argv, "env": env}})
             sys.stdout.write(payload)
             sys.stderr.write(payload)
+            sys.stdout.flush()
+            sys.stderr.flush()
         if CONNECT:
             host = port = None
             for idx, arg in enumerate(sys.argv):
@@ -83,6 +85,8 @@ def write_stub(
                 Path(PID_FILE).write_text(str(proc.pid), encoding="utf-8")
         sys.stdout.write(STDOUT)
         sys.stderr.write(STDERR)
+        sys.stdout.flush()
+        sys.stderr.flush()
         if SLEEP:
             time.sleep(SLEEP)
         raise SystemExit(STATUS)
