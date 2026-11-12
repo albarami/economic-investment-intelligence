@@ -133,6 +133,7 @@ flowchart LR
 | [0012](decisions/0012-neutral-source-labels-and-no-product-comparisons.md) | Neutral source labels; no named product comparisons |
 | [0013](decisions/0013-one-deep-journey-before-breadth.md) | One deep journey before breadth |
 | [0014](decisions/0014-typed-decision-gateway.md) | A typed-decision gateway, off by default, gives decision evidence only (amendment 1 of the master design, written by the lead) |
+| [0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md) | Review rounds after the first may reject only for four kinds of finding; the repository's own checks are judged against mistakes, not deliberate tampering (amendment 2, owner decisions of 2026-11-12) |
 
 ## 2. Components
 

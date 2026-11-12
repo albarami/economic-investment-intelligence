@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft v0.2, corrected after independent review on 2026-11-11 (see PROGRESS.md) |
-| Date | 2026-11-11 |
+| Status | Draft v0.2, corrected after independent review on 2026-11-11 (see PROGRESS.md); amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md) |
+| Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Define the gated build sequence, task boundaries, review method and evidence needed to deliver the EII proof of concept. |
 | Read first | [01 Project brief](01_PROJECT_BRIEF.md), [02 Architecture](02_ARCHITECTURE.md), [12 Testing and quality](12_TESTING_AND_QUALITY.md), [15 Reviewer checklist](15_REVIEWER_CHECKLIST.md), [16 Demo runbook](16_DEMO_RUNBOOK.md) |
@@ -56,8 +56,8 @@
 The lead supplies each maker with the same task brief, including the relevant source extracts.
 The builder hands over a final commit and evidence bundle.
 The reviewer uses [15 Reviewer checklist](15_REVIEWER_CHECKLIST.md).
-A `REJECTED` task returns to the same builder with the exact fixes.
-The reviewer rechecks the full task, not only the changed lines.
+A `REJECTED` task returns to the same builder with the exact fixes, except where REV-40 names another builder.
+In round 1 the reviewer checks the full task; in a later round the reviewer still answers every check but may reject only for the kinds of finding in REV-39.
 The lead reproduces the decisive checks before merge.
 
 ## 3. Branch, pull request and evidence protocol
@@ -69,7 +69,7 @@ The lead reproduces the decisive checks before merge.
 5. The lead grants the single push slot; only that branch pushes.
 6. CI runs tests, documentation checks, secret scanning and identifier-pattern scanning as applicable.
 7. The reviewer from another maker reviews the final commit and returns `APPROVED` or `REJECTED`.
-8. For `REJECTED`, the builder applies every exact fix and the full review repeats.
+8. For `REJECTED`, the builder applies every exact fix and the reviewer reviews the new commit under REV-08 and REV-39.
 9. For `APPROVED`, the lead reproduces the gate evidence and merges.
 10. The merged commit must be green before the next dependent task or slice starts.
 
@@ -667,4 +667,4 @@ Only the owner can close an item that the master design reserves to the owner.
 - Product and architecture: [01](01_PROJECT_BRIEF.md), [02](02_ARCHITECTURE.md), [03](03_DATA_CONTRACTS.md), [04](04_PUBLIC_DATA_PACK.md) and [05](05_SYNTHETIC_WORLD_AND_SIMULATION.md).
 - Rules and build design: [06](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [07](07_ECONOMIC_METHODS.md), [08](08_BACKEND.md), [09](09_AI_ASSISTANT.md) and [10](10_FRONTEND.md).
 - Quality and operation: [11](11_DESIGN_DIRECTION.md), [12](12_TESTING_AND_QUALITY.md), [13](13_DEPLOYMENT_AND_OPERATIONS.md), [15](15_REVIEWER_CHECKLIST.md) and [16](16_DEMO_RUNBOOK.md).
-- Decision records [0001](decisions/0001-fully-synthetic-records-real-public-data.md) to [0014](decisions/0014-typed-decision-gateway.md). No external source was used directly in this plan.
+- Decision records [0001](decisions/0001-fully-synthetic-records-real-public-data.md) to [0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md). No external source was used directly in this plan.

@@ -13,7 +13,7 @@
 - Read the project brief before any specialised document.
 - Every numbered document is a draft that models of other makers reviewed and that was corrected on 2026-11-11; [PROGRESS.md](../PROGRESS.md) lists the reviews, their verdicts and what is still unreviewed (open items OI-37 and OI-38). No document is approved for a slice gate yet.
 - The implementation plan is such a draft too; the task ledger is a draft queue whose tasks all start queued.
-- Decision records 0001 to 0014 are accepted; later amendments need new records, not silent edits.
+- Decision records 0001 to 0015 are accepted; later amendments need new records, not silent edits.
 - Requirement identifiers are defined once in requirement tables; task identifiers come from the plan and task ledger.
 - [GLOSSARY.md](GLOSSARY.md) pins vocabulary. [OPEN_ITEMS.md](../OPEN_ITEMS.md) tracks what is undecided.
 
@@ -69,6 +69,7 @@
 | [0012](decisions/0012-neutral-source-labels-and-no-product-comparisons.md) | Neutral labels and no named product comparisons | Accepted, 2026-11-11 |
 | [0013](decisions/0013-one-deep-journey-before-breadth.md) | One deep journey before breadth | Accepted, 2026-11-11 |
 | [0014](decisions/0014-typed-decision-gateway.md) | Offline typed-decision gateway, default provider none | Accepted, 2026-11-11 (amendment 1 to the first pack) |
+| [0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md) | Limited review rounds after the first; what the repository's own checks defend against | Accepted, 2026-11-12 (amendment 2 to the first pack) |
 
 ## Identifiers and change control
 

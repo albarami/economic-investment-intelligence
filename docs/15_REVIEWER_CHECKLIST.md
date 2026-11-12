@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft v0.2, corrected after independent review on 2026-11-11 (see PROGRESS.md) |
-| Date | 2026-11-11 |
+| Status | Draft v0.2, corrected after independent review on 2026-11-11 (see PROGRESS.md); amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md) |
+| Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | The checklist and verdict format an independent reviewer applies to one commit before it may merge. |
 | Read first | [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md), [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md), [AGENTS.md](../AGENTS.md) |
@@ -14,6 +14,7 @@
 - The reviewer reviews exactly one commit, applies every check in sections 2 and 3, and returns APPROVED or REJECTED in the fixed format of section 4.
 - The reviewer changes no file. A REJECTED verdict always gives, for each finding, the file, the line, what is wrong and the exact fix.
 - APPROVED means no open finding. There is no "approved with comments".
+- Round 1 is the full review. A later round still answers every check but may reject only for the four kinds of finding in REV-39; every other valid point is a proposed open item, closed before the slice gate.
 - Evidence counts; assurances do not. A check passes only when the reviewer has seen its evidence.
 
 ## 1. Rules of the review
@@ -25,10 +26,14 @@
 | REV-03 | The reviewer changes no file: no edit, no commit, no push, no formatting fix, no baseline update. The reviewer may run commands that leave tracked files unchanged, such as `./eii test` and `python3 scripts/check_docs.py`. |
 | REV-04 | The reviewer reads, before judging: the task and its acceptance criteria in [TASKS.md](../TASKS.md), the full diff against the base branch, the evidence entries in [PROGRESS.md](../PROGRESS.md) for this commit, and the documents the task touches. |
 | REV-05 | Every check in sections 2 and 3 receives PASS, FAIL or N/A with its evidence. N/A needs one sentence saying why the check does not apply to this commit. |
-| REV-06 | One FAIL makes the verdict REJECTED. APPROVED requires every check to be PASS or a justified N/A, and no finding. A design-audit Minor, as defined in [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md) section 16, is recorded in the design audit with an owner and a target slice and is not a verdict finding. A design-audit Blocker or Major is a FAIL of that slice gate and a verdict finding. |
+| REV-06 | One FAIL makes the verdict REJECTED. APPROVED requires every check to be PASS or a justified N/A, and no finding. In a round after the first, a check is FAIL only for a finding of one of the four kinds in REV-39; any other valid point is listed under PROPOSED OPEN ITEMS and does not make a check FAIL. A design-audit Minor, as defined in [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md) section 16, is recorded in the design audit with an owner and a target slice and is not a verdict finding. A design-audit Blocker or Major is a FAIL of that slice gate and a verdict finding. |
 | REV-07 | Each finding must cite the check or the requirement it breaks. A preference is not a finding. A reviewer who thinks a settled decision is wrong raises it with the lead as a proposed open item, not as a finding. |
-| REV-08 | After a REJECTED verdict, the writer fixes, the lead re-runs the evidence, and the reviewer re-reviews the new commit against all checks, not only the earlier findings. |
+| REV-08 | After a REJECTED verdict, the writer fixes, the lead re-runs the evidence, and the reviewer reviews the new commit. Round 1 is the full review. In every later round the reviewer still answers every check, within the limit of REV-39. |
 | REV-09 | The verdict is posted on the pull request, and the lead copies it unchanged into [PROGRESS.md](../PROGRESS.md). |
+| REV-39 | In a round after the first, a verdict finding may only be one of four kinds: an earlier finding that is not fixed; a defect in, or caused by, lines changed since the commit the reviewer last reviewed; a secret, real data or a private path anywhere in the pull request; an acceptance criterion of the task that is not met. Every other valid point goes under PROPOSED OPEN ITEMS, outside the verdict. The brief for round 1 says so, so that everything the reviewer can find is reported in round 1. If a reviewer puts a point outside the four kinds into the verdict, the lead asks an advisor once, and the advisor's ruling on the kind of the point stands. The same limit applies when a plan is reviewed again. |
+| REV-40 | Every verdict finding is fixed before the merge. If round 3 is REJECTED and the lead judges its findings valid, the findings are fixed by a stronger builder from a maker other than the reviewer's, and the same reviewer gives up to two confirmation reviews under REV-39. If the second confirmation review is still REJECTED, the task is blocked for the owner and is not merged. |
+| REV-41 | Valid proposed open items are entered in [OPEN_ITEMS.md](../OPEN_ITEMS.md) and closed in one follow-up pull request per slice, before that slice's gate review. The slice reviewer checks that none is left open. |
+| REV-42 | The repository's own checks (the tree check, the documentation check, the hooks, the commit guard and the CI scripts) are judged against mistakes in three settings: a fresh clone, the CI runner, and a checkout used through the documented commands, including ordinary differences between machines such as personal git configuration, locale or a linked path. Deliberate defeat of a check on one's own checkout (an index flag such as assume-unchanged, a replaced program, a race by a second local process) is outside their scope, and the generator sandbox is judged by what the sandboxed program can do, not by what a second local process could do to the launcher. A point that needs such tampering is a proposed open item, not a verdict finding. |
 
 ### 1.1 Order of work
 
@@ -91,7 +96,11 @@ FINDINGS:
     Line: <line number or range>
     Wrong: <what is wrong, with the requirement it breaks>
     Fix: <the exact change, and the test or command that will prove it>
+PROPOSED OPEN ITEMS:
+  <none, or one line per valid point that is outside the verdict (REV-39, REV-42)>
 ```
+
+In a round after the first, the block `EARLIER FINDINGS:` stands between `REVIEWER:` and `CHECKS:`, with one line per earlier finding: its number, `FIXED` or `NOT FIXED`, and the evidence.
 
 | ID | Requirement |
 |---|---|
@@ -125,7 +134,7 @@ An illustrative finding (the path and line are examples, not files of this repos
 ## Open questions and assumptions
 
 - ASSUMPTION: the verdict is posted on the pull request and copied into PROGRESS.md by the lead (REV-09), because the owner's method needs one durable record per task and the pull request is where the commit lives.
-- ASSUMPTION: there is no "approved with comments" (REV-06), because a gate that passes with open defects is a weakened check.
+- There is no "approved with comments" (REV-06, REV-40): every verdict finding is fixed before the merge. A valid point that a later round may not reject for (REV-39), or that needs deliberate tampering (REV-42), is not a comment on an approval: it is entered as an open item and closed before the slice gate (REV-41). The owner decided this on 2026-11-12 ([decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md)); it replaces the earlier assumption that every round is a full review.
 - Open items touching this document: OI-01 (recorded provider allowed while the key is absent), OI-09 (native Arabic sign-off is separate from this review), OI-13 (GitHub secret scanning and push protection), OI-14 (no run-time use of the typed-decision gateway before an approved route), OI-35 (which parameter set is exported; default A until the owner or a data owner decides, needed by the slice S1 gate), OI-36 (layout signals outside the acceptance model) and OI-37 (independent review before slice S5).
 
 ## Sources
