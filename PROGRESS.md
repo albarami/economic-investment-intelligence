@@ -2916,6 +2916,157 @@ Seed:      none
 Notes:     The scope (TST-163): the work commit changes exactly the 34 files of the plan.
 ```
 
+### S0-T08 — Compose and store preflight: task log
+
+- Builder persona: senior platform engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic: version 1 by a Claude Opus subagent with the corrections of its internal critique; the one refresh of 2026-11-12 (the owner's Docker note) by a Claude Sonnet editor; the part A cut of 2026-11-12 (the owner's approval of the split) by a Claude Sonnet editor, checked by five Claude Sonnet checkers and a Claude Opus judge, whose ten valid findings the lead applied; each checked by the lead
+- Plan reviewer maker and model: none: the plan had no external plan review; the owner's throughput note of 2026-11-12 started the build on the refreshed plan, and the external code review is the review gate
+- Builder maker and model: Cursor command-line tool, `composer-2.5` (Cursor)
+- Reviewer maker and model: Cursor command-line tool, `gpt-5.6-sol-high` (OpenAI), read-only
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, security-review, verification-before-completion, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first with a recorded red run, a planted violation for every check, no docker command that changes state and no listing of other projects' objects, no use of ports 55432, 18710 or 18711, no secret or connection string written in a file, no suppression comment or weaker setting, nothing built beyond the acceptance criteria as hardening (owner's note of 2026-11-12), file length and house style as warnings only, a short break pass, and a report of only the results it saw
+- Branch: `task/S0-T08-compose-preflight`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/10
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit; the lead-run blocks, the service steps and the tree proofs go into the evidence file that the external reviewer receives
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4 (system) and 3.14.6 (uv); git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8; Docker server 29.9.3 with Compose; PostgreSQL client programs 18.6
+- Build round 1: Cursor command-line tool, `composer-2.5` (Cursor): the 13 paths of part A on main after S0-T05 merged (the owner's approval of 2026-11-12 to start without the deferred rows), tests first with stub modules; 43 collected tests; the read-only Compose configuration checks of step 3a; a break pass of three breaks
+- Build round 2: the same builder, after the lead's run against the real service and the lead's internal check (30 findings, each ruled valid by a judge): the code follows the plan's rules and literals (the wsl-interop row judges each line of output; npm status 0 with standard error is not understood; the URL parser keeps only the plan's closed rules; FACTS_RE is the plan's literal; a refused command in the postgresql row is a FAIL line; the live module reads the URL through the parser), and the tests are as strict as the plan's tables, with labelled sub-cases for the conditions the break passes showed unguarded
+
+#### Evidence for the work commit `4f71fc00e5f12a6e4ad16856dab9b00c83dac383`
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   ./eii test --seed 2026111208
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    868 passed, 0 failed, 0 skipped (the total: line of six suites)
+Seed:      2026111208
+Notes:     The project's runner: the six suites with the new tests in python-guards; the seed is fixed by the command.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    188 passed, 0 failed, 0 skipped (ran 188 tests, OK)
+Seed:      none
+Notes:     Every Python guard test, the 43 of this task's five collected modules among them (criteria 2 to 5, OPS-06, OPS-09, OPS-17, BE-87).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The lint check on the new files (S0-T04).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "46 files already formatted"
+Seed:      none
+Notes:     The format check on the new files (S0-T04).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 42 source files"
+Seed:      none
+Notes:     The strict type check on the new files (S0-T04).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 116 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   root=$PWD; copy=$(mktemp -d) && git ls-files -z | xargs -0 cp --parents -t "$copy" && rc=0 && ctl=0 && : >"$copy/red.log"; (cd "$copy" && UV_PROJECT_ENVIRONMENT="$root/.venv" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p 'test_preflight_*.py' >"$copy/ctl.log" 2>&1) || ctl=$?; (printf '\ndef select_store(pg, docker):\n    return Selection(Line("PASS", "postgresql", "planted"), "postgres")\n' >> "$copy/scripts/preflight_store.py" && printf '\ndef up_decision(environ, report):\n    return 0, ""\n' >> "$copy/scripts/preflight.py" && cd "$copy" && UV_PROJECT_ENVIRONMENT="$root/.venv" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p 'test_preflight_*.py' -v >"$copy/red.log" 2>&1) || rc=$?; miss=0; for t in test_selection_table test_foundation_preflight_exits_zero test_up_decision; do grep -q "^FAIL: $t " "$copy/red.log" || miss=1; done; if grep -q '_FailedTest' "$copy/red.log"; then miss=1; fi; if [ "$miss" -ne 0 ]; then rc=9; fi; if [ "$ctl" -ne 0 ]; then rc=8; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The red run of TST-161: with a planted select_store that always selects PostgreSQL and a planted up_decision that always allows, the three named tests fail and the unmodified control passes.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','e5f065d556a037febdbc82191db46c2a696adb02...4f71fc00e5f12a6e4ad16856dab9b00c83dac383'],check=True,capture_output=True,text=True).stdout.splitlines(); a={'infra/compose.yaml','scripts/preflight.py','scripts/preflight_proc.py','scripts/preflight_store.py','scripts/preflight_database.py','scripts/preflight_rows.py','scripts/tests/preflight_stubs.py','scripts/tests/test_preflight_proc.py','scripts/tests/test_preflight_database.py','scripts/tests/test_preflight_store.py','scripts/tests/test_preflight_rows.py','scripts/tests/test_preflight_run.py','scripts/tests/live_preflight_server.py'}; o=[x for x in p if x not in a]; print(len(p),o); sys.exit(1 if o or len(p)!=13 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "13 []"
+Seed:      none
+Notes:     Part A form of the scope command (TST-163): the work commits change exactly the 13 paths of part A.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'live_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped (ran 4 tests, OK)
+Seed:      none
+Notes:     The live module against the project's Compose service on 127.0.0.1:55440, started before and stopped after this command by the lead (criterion 3 with a real server, BE-87).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
