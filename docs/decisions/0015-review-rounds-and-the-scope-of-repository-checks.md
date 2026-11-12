@@ -19,7 +19,7 @@ Review rounds
 
 1. Round 1 of a review is the full review. Its brief says that later rounds are limited as point 2 says, so that everything the reviewer can find is reported in round 1.
 2. After round 1 a review still answers every check, but it may reject only for: (a) an earlier finding that is not fixed; (b) a defect in, or caused by, lines that the task's own patch changed since the commit last reviewed (changes that come only from updating the base do not count); (c) a violation of a safety check anywhere in the pull request: REV-14, REV-15, REV-18, REV-20 to REV-29, REV-38; (d) an acceptance criterion of the task that is not met. Every other valid point is a proposed open item, outside the verdict.
-3. From the second confirmation review on, kind (b) no longer rejects: a new point in changed lines becomes a proposed open item.
+3. From the second confirmation review on, kind (b) no longer rejects: a new point in changed lines becomes a proposed open item. For S0-T01 the review after the current fix round is its second confirmation review.
 4. If a reviewer puts a point outside the kinds that may reject into the verdict, the lead asks an advisor once, and the advisor's ruling on the kind of the point stands.
 5. The same limits apply when a plan is reviewed again.
 6. A check whose only defects are points outside the kinds that may reject reads OPEN with the ids of its proposed open items, not PASS and not FAIL. OPEN does not reject.
