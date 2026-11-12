@@ -11149,6 +11149,155 @@ Seed:      none
 Notes:     Every fix commit subject is a Conventional Commit (PLN-05).
 ```
 
+#### S0-T08: addition to the task log for part C (pull request https://github.com/albarami/economic-investment-intelligence/pull/24 )
+
+- Part C: the four preflight rows that the owner-approved cut of part A had deferred (python, node-npm, duckdb-extensions, bubblewrap-sandbox) with their tests, a closed contract for the existing Compose file, and one canonical list of banned ports for the tests. Preflight has fifteen rows
+- Class of the work (the owner's note of 2026-11-12 on value and cost): standard product code; one independent reviewer of another maker
+- Planner maker and model: Anthropic planners for the first plan; OpenAI GPT-5.6 Sol (high), through the Codex command-line tool, for the refresh and the amendment on the merged tree, with the lead's four answers (the workflow rules module of S0-T07 offers no general parser, so the Compose contract calls the same library function itself; the open-item block is counted once; the pin note stayed in part B; the two sandbox rows start the sandbox check's two commands as children through the bounded runner with the five-second probe limit, exit 0 passes and anything else fails, never a warning)
+- Builder maker and model: Codex command-line tool, `gpt-6-astra` (OpenAI), effort high, in its workspace-write sandbox
+- Reviewer maker and model: Devin command-line tool, `glm-5-3-high` (Zhipu AI), read-only (a maker that neither planned nor built this part)
+- Branch: `task/S0-T08C-preflight-rows`
+- Built ahead on the pushed head of pull request 21 (ruling L-49) while that pull request was in its fix rounds, and moved onto main after its merge; every check below was run again on the moved tree
+- Build: tests first (red recorded: the missing adapters, the missing allow-list entries, the eleven-row report); twenty-nine OLD blocks, each found once. The builder stopped, as its brief told it to, on two points where the plan's literal text and the existing tests disagreed, and the lead ruled on both as the builder proposed: the test stubs keep the name of the port list as an alias of the one canonical list in the sandbox check, because the command tests of S0-T09 read it; and preflight's rows import the two version modules in the explicit re-export form that strict type checking requires. No suppression comment and no changed test
+- Break pass by the builder: 116 breaks of the conditions written in this part; 97 caught at once; 19 survivors, each now failed by one of six added test methods; none declared equivalent. 55 test methods for the task
+- Two commands the builder could not run inside its tool's sandbox, reported and not worked around: one command test fails there because a nested `uv` call cannot write its default cache, and the real preflight probes Docker, which the builder's brief forbade. Both are run by the lead below and pass
+- Lead's check of the build: the commands below; one read of the production changes (the runner's two allow-list entries, the fifteen-row order, the four row owners): a sandbox row judges only the child's exit status and the time limit and never reads its output
+- Verdict of part C: PENDING (the verdict and the merge record are entered by the next pull request)
+
+#### Evidence for the work commit `2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37`
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37
+Command:   ./eii test --seed 2026111208
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1168 passed, 0 failed, 0 skipped
+Seed:      2026111208
+Notes:     The project's own test command with the plan's seed: every network-free suite, none skipped.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    486 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard-test discovery of rule 44, the 55 test methods of the task among them (criteria 1 to 5 of the task; OPS-06, OPS-09).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "132 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 128 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 215 text files, 55 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 59 components: OK"
+Seed:      none
+Notes:     The version check, whose toolchain probe the two new rows share.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37
+Command:   ./eii preflight
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; 15 lines (9 PASS, 6 WARN, 0 FAIL), last line "store: embedded"
+Seed:      none
+Notes:     The real preflight on the build machine in foundation mode: it only probes. Fifteen lines; exit code 0; the four new rows pass here (the pinned toolchain, the fetched extensions and a working sandbox are present); the five foundation rows warn; the store is embedded.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37
+Command:   python3 -I -c "import subprocess,sys; g=sorted(subprocess.run(['git','diff','--name-status','--no-renames','889e09bbc724b4738ca1b2981bd805dc11ac991f...2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37'],check=True,capture_output=True,text=True).stdout.splitlines()); w=sorted(['M\t'+f for f in 'OPEN_ITEMS.md scripts/preflight.py scripts/preflight_proc.py scripts/preflight_rows.py scripts/tests/live_preflight_server.py scripts/tests/preflight_stubs.py scripts/tests/test_preflight_proc.py scripts/tests/test_preflight_run.py'.split()]+['A\t'+f for f in 'scripts/tests/compose_rules.py scripts/tests/test_compose_file.py scripts/tests/test_preflight_tools.py'.split()]); print(len(g), [x for x in g if x not in w]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "11 []"
+Seed:      none
+Notes:     The work commit changes eight files and adds three: the eleven paths of the plan (TST-163).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','889e09bbc724b4738ca1b2981bd805dc11ac991f..2ed98dd8a34c4f762fdaf357b62c55b7dc29ae37'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Every work commit subject is a Conventional Commit (PLN-05).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
