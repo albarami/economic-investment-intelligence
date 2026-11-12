@@ -2580,6 +2580,342 @@ Seed:      none
 Notes:     Later-round form of the scope command (TST-163): the eleven created and thirteen named modified paths, the two ledger files of the round-1 ledger commit, and otherwise only modifications of files that the checks reported (the fix-up files), which the output lists in its last field.
 ```
 
+#### S0-T04: independent review, round 2: APPROVED
+
+Reviewed commit `b204855e9099d951f4184e869c5526c2c656d804`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/5, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43190760230 ). Reviewer: OpenAI GPT-5.6 Sol (high), through the Cursor command-line tool, read-only; a later round under decision record 0015 as the owner amended it on 2026-11-12. The verdict is copied unchanged (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T04
+COMMIT: b204855e9099d951f4184e869c5526c2c656d804
+REVIEWER: OpenAI, GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED advisor ruled invalid
+  F2 FIXED Unused helpers were deleted; every recorded helper break was caught or listed with a valid reason, omitted judged files gained regression coverage, and 662 web tests pass.
+  F3 FIXED P14-WEB records exit 0 for build, check, check:hosts:dist and check:dev on the work commit and head.
+  F4 FIXED All four conditional fixture plants now assert the prerequisite type and mutate unconditionally; mypy and 95 Python tests pass.
+  F5 FIXED OI-44 names the dependency-groups adjustment and its reason, and PROGRESS.md appends the build-round correction.
+CHECKS:
+  REV-10 PASS The six documented checks pass; planted violations, clean-copy checks and the required short break pass cover the acceptance criteria.
+  REV-11 PASS Lead runs report 95 Python and 662 web tests passing with no failures or skips; head checks exit 0 and CI succeeded: https://github.com/albarami/economic-investment-intelligence/actions/runs/43190760230 .
+  REV-12 PASS The later-round scope proof reports no unexpected path; the patch contains only finding fixes and ledger updates.
+  REV-13 PASS The reviewed patch contains no placeholder, stub, TODO, mock data or commented-out implementation.
+  REV-14 PASS LOCKSCAN and documentation checks report no secret-shaped token, forbidden lock content or real data.
+  REV-15 PASS The four fixture plants are unconditional again, and the web-test changes strengthen copy validation without loosening assertions, thresholds or checks.
+  REV-16 PASS The changes follow the operative plan; F1 was ruled invalid and F2 through F5 now meet their stated fix standards.
+  REV-17 PASS OI-44, PROGRESS.md and TASKS.md are current; documentation and tree checks exit 0.
+  REV-18 PASS The patch introduces no serving code, secret handling, SQL, external call or record-level data handling.
+  REV-19 PASS No settled decision, deferred feature or cut order is reopened.
+  REV-20 N/A This tooling task adds no facts, figures, calculations, provenance or lineage.
+  REV-21 N/A This task adds no rendered numeral, Fact chip, claim template or assistant output.
+  REV-22 N/A This task changes no privacy parameter, partition, treatment, audit, freeze or protected release logic.
+  REV-23 N/A This task changes no product import or package dependency boundary.
+  REV-24 N/A This task adds no localized feature view or displayed number.
+  REV-25 PASS The scans and reviewed patch show no private path, personal identity, e-mail, realistic identifier or prohibited comparison.
+  REV-26 PASS No prohibited custodian, privacy, endorsement, forecast or entity-lookup claim appears.
+  REV-27 PASS The recorded agent-file comparison exits 0 on the work commit and head.
+  REV-28 N/A This task creates no synthetic identifier or world record.
+  REV-29 N/A This task creates no place or business fact and attributes nothing to a real named place.
+  REV-38 N/A This task changes no serving-plane code, gateway import, runtime provider setting or screen text.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T04: merge record
+
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/5 was squash-merged on 2026-11-12 at the approved head `b204855e9099d951f4184e869c5526c2c656d804`; merge commit `c930e3bc18452ef48033f641206848be2e8f6976` on main.
+- CI on the merge commit: workflow `docs`, job `check-docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43191294034 .
+- Proposed open items of the last verdict: none.
+- The task log of S0-T04 above is complete with this record: verdict APPROVED in review round 2.
+
+### S0-T05 — Test runners: task log
+
+- Builder persona: senior platform engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic: version 1 by a Claude Sonnet subagent; version 2 by Claude Sonnet agents after the first plan review; the one refresh of 2026-11-12, against the merged tree and the owner's notes of that day, by a Claude Sonnet editor; a lead correction at the top of the plan (the interrupt path is built); each checked by the lead
+- Plan reviewer maker and model: Antigravity command-line tool, `gemini-4-carbon-high` (Google), read-only plan mode: round 1 REJECTED (five findings), round 2 APPROVED; the refresh of 2026-11-12 and the lead correction were not seen by an external plan reviewer
+- Builder maker and model: Cursor command-line tool, `grok-4.7-medium` (xAI)
+- Reviewer maker and model: Devin command-line tool, `glm-5-3-high` (Zhipu AI), read-only
+- Skills and brief rules: the lead used project-orientation, task-standards, writing-plans, test-driven-development, verification-before-completion, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first with a recorded red run, a planted violation for every check, no suppression comment or weaker setting, no secret, personal name, absolute local path or eight- or eleven-digit run in any file, nothing built beyond the acceptance criteria as hardening (owner's note of 2026-11-12) except the interrupt path the lead's correction keeps, file length and house style reported as warnings only, a short pass that breaks each condition once and runs only the covering test files, temporary folders inside the run's temporary folder, and a report of only the results it saw
+- Branch: `task/S0-T05-test-runners`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/7
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit; the lead-run blocks of the plan go into the evidence file that the external reviewer receives
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4; git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8
+- Build round 1: Cursor command-line tool, `grok-4.7-medium` (xAI): the 34 files of the plan, tests first (each new Python module ran red before the runner existed), built ahead on the head of pull request 5 inside slice S0 (decision 0015 point 16) and moved onto main after S0-T04 merged, with no conflict
+- Build round 2: the same builder: OI-46's convention 12 corrected to the built interrupt path (the lead's correction), and the branches the first break pass had left unbroken broken once each (all caught)
+
+#### Evidence for the work commit `c9e4b51b38c84f77bbb557c09f8ce588012358d3`
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   ./eii test --seed 1794000000
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    825 passed, 0 failed, 0 skipped (the total: line of six suites)
+Seed:      1794000000 for commands 1 to 3 (fixed by the command); none for the others
+Notes:     Criteria 1 and 3 and TST-15: the six suite lines with their counts (python-guards, python-core, python-custodian, python-product, web-checks and web-unit) and the total; exit 0.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   EII_DECISION_PROVIDER=jev bwrap --dev-bind / / --unshare-net --die-with-parent ./eii test --seed 1794000000
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    825 passed, 0 failed, 0 skipped (the total: line of six suites)
+Seed:      1794000000 for commands 1 to 3 (fixed by the command); none for the others
+Notes:     The whole command passes with the network disabled (a network namespace of its own) and a hostile provider value (TST-15, M12, ARC-13).
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   o=$(mktemp) && rc=0 && ANTHROPIC_API_KEY=dummy-fe95-probe-one BAR_TOKEN=dummy-fe95-probe-two ./eii test --seed 1794000000 >"$o" 2>&1 || rc=$?; tail -n 2 "$o"; ok=0; test "$rc" -eq 0 -a -s "$o" || ok=1; grep -q -e dummy-fe95-probe-one -e dummy-fe95-probe-two "$o" && ok=1; rm -f "$o"; test "$ok" -eq 0
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    825 passed, 0 failed, 0 skipped (the total: line of six suites)
+Seed:      1794000000 for commands 1 to 3 (fixed by the command); none for the others
+Notes:     FE-95: with dummy values in two variables named like API keys the run exits 0, prints output and prints neither value; that no suite receives them is shown by the tests A10, A11, A29 and B06 to B08 inside commands 1 and 6.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 19 packages in 0.85ms"
+Seed:      1794000000 for commands 1 to 3 (fixed by the command); none for the others
+Notes:     The lock file is current for the workspace.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   python3 -I -c "import json,tomllib; r=tomllib.load(open('pyproject.toml','rb')); g=r['dependency-groups']['dev']; want={'hypothesis':'6.170.15','pytest':'9.2.0','mypy':'2.4.1','ruff':'0.17.4'}; assert sorted(g)==sorted(n+'=='+v for n,v in want.items()),g; have={p['name']:p.get('version') for p in tomllib.load(open('uv.lock','rb'))['package']}; assert all(have.get(n)==v for n,v in want.items()),have; t=r['tool']['pytest']; assert t['strict'] is True and t['addopts'][-2:]==['-m','not nightly'] and t['pythonpath']==['scripts','scripts/tests','core/src','custodian/src','product/src'],t; w=json.load(open('web/package-lock.json',encoding='utf-8')); p=json.load(open('web/package.json',encoding='utf-8')); assert w['lockfileVersion']==3 and p['devDependencies']['vitest']=='5.1.0' and w['packages']['node_modules/vitest']['version']=='5.1.0'; assert not [n for n in ('jsdom','happy-dom','@playwright/test','@testing-library/react') if 'node_modules/'+n in w['packages']]; assert len(p['devDependencies'])+len(p['dependencies'])==14"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      1794000000 for commands 1 to 3 (fixed by the command); none for the others
+Notes:     The exact pins and the shape of the pytest table (OI-46).
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    145 passed, 0 failed, 0 skipped (ran 145 tests)
+Seed:      1794000000 for commands 1 to 3 (fixed by the command); none for the others
+Notes:     The guard tests, including the 50 new ones (the plan's 48, the interrupt test A31 of the lead's correction and one test added by the break pass), with none skipped; ./eii test is the runner of commands 1 to 3.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   copy=$(mktemp -d) && git ls-files -z | xargs -0 cp --parents -t "$copy" && bad=0 && (cd "$copy" && uv run --locked python -B -m unittest discover -s scripts/tests -p 'test_launcher.py' >"$copy/ctl.log" 2>&1 && uv run --locked python -B -c "import sys; sys.path.insert(0,'scripts'); import run_tests, run_tests_counts, run_tests_exec, hypothesis" >>"$copy/ctl.log" 2>&1) || bad=1; rm "$copy/eii" "$copy/scripts/run_tests.py" "$copy/scripts/run_tests_counts.py" "$copy/scripts/run_tests_exec.py" || bad=1; for p in test_runner_verdicts test_runner_failures test_runner_environment test_runner_node test_runner_vitest test_runner_usage test_count_parsers test_launcher; do r=0; (cd "$copy" && uv run --locked python -B -m unittest discover -s scripts/tests -p "$p.py" >"$copy/red.log" 2>&1) || r=$?; test "$r" -eq 1 || bad=1; case "$p" in test_runner_*) m="No module named 'run_tests'";; test_count_parsers) m="No module named 'run_tests_counts'";; *) m="FAIL launcher: eii: missing";; esac; grep -Fq -- "$m" "$copy/red.log" || bad=1; done; rm -rf "$copy"; test "$bad" -eq 0
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      1794000000 for commands 1 to 3 (fixed by the command); none for the others
+Notes:     Criterion 2 (a failing fixture makes the command non-zero) by removal: the runner, parser and launcher tests fail with the stated messages when eii and the three runner modules are removed from a copy of the work commit.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 103 text files, 47 Markdown files: OK"
+Seed:      1794000000 for commands 1 to 3 (fixed by the command); none for the others
+Notes:     The documentation check (TST-162).
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      1794000000 for commands 1 to 3 (fixed by the command); none for the others
+Notes:     The tree check.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      1794000000 for commands 1 to 3 (fixed by the command); none for the others
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   python3 -c "import subprocess,sys; g={tuple(l.split('\t')) for l in subprocess.run(['git','diff','--name-status','--no-renames','c930e3bc18452ef48033f641206848be2e8f6976...c9e4b51b38c84f77bbb557c09f8ce588012358d3'],check=True,capture_output=True,text=True).stdout.splitlines()}; t='runner_support test_runner_verdicts test_runner_failures test_runner_environment test_runner_node test_runner_vitest test_runner_usage test_count_parsers test_test_bootstrap test_launcher'.split(); a=['eii','conftest.py','scripts/run_tests.py','scripts/run_tests_counts.py','scripts/run_tests_exec.py','core/tests/test_core_package.py','custodian/tests/test_custodian_package.py','product/tests/test_product_package.py','web/vitest.config.ts','web/tests/unit/app.test.ts','web/scripts/count-reporter.mjs','web/scripts/tests/count-reporter.node-test.mjs']+['scripts/tests/'+n+'.py' for n in t]; m='pyproject.toml uv.lock web/package.json web/package-lock.json README.md AGENTS.md CLAUDE.md web/README.md core/README.md custodian/README.md product/README.md OPEN_ITEMS.md'.split(); w={('A',f) for f in a}|{('M',f) for f in m}; print(len(g),sorted(g^w)); sys.exit(0 if g==w and len(w)==34 else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "34 []"
+Seed:      1794000000 for commands 1 to 3 (fixed by the command); none for the others
+Notes:     The scope (TST-163): the work commit changes exactly the 34 files of the plan.
+```
+
+#### Correction to the eleven entries above (appended; TST-171)
+
+The Seed field of the eleven entries above was written as one sentence for all of them, and the commands that print nothing were recorded as "no output". The plan's ledger format asks for the seed 1794000000 in the entries of commands 1 to 3, none in the others, and output "" for a command that prints nothing. The eleven commands were run again at the same work commit; the corrected entries below supersede the eleven above, which stand as written.
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   ./eii test --seed 1794000000
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    825 passed, 0 failed, 0 skipped (the total: line of six suites)
+Seed:      1794000000
+Notes:     Criteria 1 and 3 and TST-15: the six suite lines with their counts (python-guards, python-core, python-custodian, python-product, web-checks and web-unit) and the total; exit 0.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   EII_DECISION_PROVIDER=jev bwrap --dev-bind / / --unshare-net --die-with-parent ./eii test --seed 1794000000
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    825 passed, 0 failed, 0 skipped (the total: line of six suites)
+Seed:      1794000000
+Notes:     The whole command passes with the network disabled (a network namespace of its own) and a hostile provider value (TST-15, M12, ARC-13).
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   o=$(mktemp) && rc=0 && ANTHROPIC_API_KEY=dummy-fe95-probe-one BAR_TOKEN=dummy-fe95-probe-two ./eii test --seed 1794000000 >"$o" 2>&1 || rc=$?; tail -n 2 "$o"; ok=0; test "$rc" -eq 0 -a -s "$o" || ok=1; grep -q -e dummy-fe95-probe-one -e dummy-fe95-probe-two "$o" && ok=1; rm -f "$o"; test "$ok" -eq 0
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    825 passed, 0 failed, 0 skipped (the total: line of six suites)
+Seed:      1794000000
+Notes:     FE-95: with dummy values in two variables named like API keys the run exits 0, prints output and prints neither value; that no suite receives them is shown by the tests A10, A11, A29 and B06 to B08 inside commands 1 and 6.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 19 packages in 0.83ms"
+Seed:      none
+Notes:     The lock file is current for the workspace.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   python3 -I -c "import json,tomllib; r=tomllib.load(open('pyproject.toml','rb')); g=r['dependency-groups']['dev']; want={'hypothesis':'6.170.15','pytest':'9.2.0','mypy':'2.4.1','ruff':'0.17.4'}; assert sorted(g)==sorted(n+'=='+v for n,v in want.items()),g; have={p['name']:p.get('version') for p in tomllib.load(open('uv.lock','rb'))['package']}; assert all(have.get(n)==v for n,v in want.items()),have; t=r['tool']['pytest']; assert t['strict'] is True and t['addopts'][-2:]==['-m','not nightly'] and t['pythonpath']==['scripts','scripts/tests','core/src','custodian/src','product/src'],t; w=json.load(open('web/package-lock.json',encoding='utf-8')); p=json.load(open('web/package.json',encoding='utf-8')); assert w['lockfileVersion']==3 and p['devDependencies']['vitest']=='5.1.0' and w['packages']['node_modules/vitest']['version']=='5.1.0'; assert not [n for n in ('jsdom','happy-dom','@playwright/test','@testing-library/react') if 'node_modules/'+n in w['packages']]; assert len(p['devDependencies'])+len(p['dependencies'])==14"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output ""
+Seed:      none
+Notes:     The exact pins and the shape of the pytest table (OI-46).
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    145 passed, 0 failed, 0 skipped (ran 145 tests)
+Seed:      none
+Notes:     The guard tests, including the 50 new ones (the plan's 48, the interrupt test A31 of the lead's correction and one test added by the break pass), with none skipped; ./eii test is the runner of commands 1 to 3.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   copy=$(mktemp -d) && git ls-files -z | xargs -0 cp --parents -t "$copy" && bad=0 && (cd "$copy" && uv run --locked python -B -m unittest discover -s scripts/tests -p 'test_launcher.py' >"$copy/ctl.log" 2>&1 && uv run --locked python -B -c "import sys; sys.path.insert(0,'scripts'); import run_tests, run_tests_counts, run_tests_exec, hypothesis" >>"$copy/ctl.log" 2>&1) || bad=1; rm "$copy/eii" "$copy/scripts/run_tests.py" "$copy/scripts/run_tests_counts.py" "$copy/scripts/run_tests_exec.py" || bad=1; for p in test_runner_verdicts test_runner_failures test_runner_environment test_runner_node test_runner_vitest test_runner_usage test_count_parsers test_launcher; do r=0; (cd "$copy" && uv run --locked python -B -m unittest discover -s scripts/tests -p "$p.py" >"$copy/red.log" 2>&1) || r=$?; test "$r" -eq 1 || bad=1; case "$p" in test_runner_*) m="No module named 'run_tests'";; test_count_parsers) m="No module named 'run_tests_counts'";; *) m="FAIL launcher: eii: missing";; esac; grep -Fq -- "$m" "$copy/red.log" || bad=1; done; rm -rf "$copy"; test "$bad" -eq 0
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output ""
+Seed:      none
+Notes:     Criterion 2 (a failing fixture makes the command non-zero) by removal: the runner, parser and launcher tests fail with the stated messages when eii and the three runner modules are removed from a copy of the work commit.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 103 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check (TST-162).
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output ""
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T05 — Test runners
+Commit:    c9e4b51b38c84f77bbb557c09f8ce588012358d3
+Command:   python3 -c "import subprocess,sys; g={tuple(l.split('\t')) for l in subprocess.run(['git','diff','--name-status','--no-renames','c930e3bc18452ef48033f641206848be2e8f6976...c9e4b51b38c84f77bbb557c09f8ce588012358d3'],check=True,capture_output=True,text=True).stdout.splitlines()}; t='runner_support test_runner_verdicts test_runner_failures test_runner_environment test_runner_node test_runner_vitest test_runner_usage test_count_parsers test_test_bootstrap test_launcher'.split(); a=['eii','conftest.py','scripts/run_tests.py','scripts/run_tests_counts.py','scripts/run_tests_exec.py','core/tests/test_core_package.py','custodian/tests/test_custodian_package.py','product/tests/test_product_package.py','web/vitest.config.ts','web/tests/unit/app.test.ts','web/scripts/count-reporter.mjs','web/scripts/tests/count-reporter.node-test.mjs']+['scripts/tests/'+n+'.py' for n in t]; m='pyproject.toml uv.lock web/package.json web/package-lock.json README.md AGENTS.md CLAUDE.md web/README.md core/README.md custodian/README.md product/README.md OPEN_ITEMS.md'.split(); w={('A',f) for f in a}|{('M',f) for f in m}; print(len(g),sorted(g^w)); sys.exit(0 if g==w and len(w)==34 else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "34 []"
+Seed:      none
+Notes:     The scope (TST-163): the work commit changes exactly the 34 files of the plan.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
