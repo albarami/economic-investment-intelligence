@@ -8733,6 +8733,263 @@ Seed:      none
 Notes:     Every work commit subject is a Conventional Commit (PLN-05).
 ```
 
+#### S0-T06: independent review, round 1
+
+Reviewed commit `6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/19 , with CI green on it (workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333346 ; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333330 ). Reviewer: Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only; a full review in three parts. The verdict of the pull request is the union of the parts: REJECTED, with two findings in part 1. Each verdict is copied unchanged from its first line (REV-09); all three are also posted on the pull request. No part proposed an open item.
+
+#### S0-T06: independent review, round 1, part 1 of 3 (the commit guard, its tests and the shared test helper): REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: S0-T06 part 1 (pull request 19)
+COMMIT: 6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d
+REVIEWER: Moonshot AI, Kimi K3.1 Pro Medium
+CHECKS:
+  REV-10 FAIL F1. Installation, generated-token detection and clean commits have passing integration tests, but criterion 3 and AGENTS.md rule 14 are not met for every staged path because a content refusal can print an eight-character fragment of the local secret.
+  REV-11 PASS On the exact head, the lead recorded `./eii test --seed 2026111219` exit 0 with 1117 passed, 0 failed and 0 skipped, and `python3 scripts/check_docs.py` exit 0; CI docs succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333346 and sandbox at https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333330 . The reviewer ran no commands under the read-only brief.
+  REV-12 PASS DIFF.patch and recorded command 15 show only the 13 added and eight modified work paths, followed by the three ledger paths; nothing under `data/` is committed.
+  REV-13 PASS Inspection of the guard, its tests and the shared helper found no placeholder, unimplemented branch or fixed result standing in for the required behaviour; stub programs are confined to scratch-repository tests.
+  REV-14 FAIL F1. `run` can emit a path containing a fragment of a secret while reporting that the staged content holds that secret, contrary to the prohibition on printing any part of a secret.
+  REV-15 PASS The `check_docs.py` edit replaces disclosure of a secret prefix with `(matched text not shown)` without changing detection. The unknown-key control now matches pre-commit 4.7.0 while retaining the closed-check assertion, and suppressing the first fetch's test output removes no assertion. No skip, tolerance or suppression was added.
+  REV-16 FAIL F1 and F2. The secret-fragment output violates AGENTS.md rule 14 and lacks the planted violation required by rule 37; the helper's direct reads of the real hooks and configuration violate rule 13 and the brief's H10 isolation requirement.
+  REV-17 PASS README, both agent files, OPEN_ITEMS.md, TASKS.md and PROGRESS.md were updated in the pull request; OI-90 through OI-94 record the assumptions, and the head documentation check exited 0.
+  REV-18 FAIL F2. `snapshot_real` reads every regular file in the real repository's hooks directory and reads its real git configuration, although the brief expressly says tests cannot reach either location.
+  REV-19 PASS The reviewed code implements the assigned hook task and does not replace an architecture decision, move a later feature into this slice or alter a slice gate.
+  REV-20 N/A This task adds developer tooling and test counts only; it creates no economic fact, displayed product number, calculation or lineage object.
+  REV-21 N/A No screen, card, Fact chip, catalogue template or assistant answer pipeline is changed.
+  REV-22 N/A No privacy partition, parameter set, treatment, protected table, attack suite or export register is changed.
+  REV-23 PASS No product or custodian package or package metadata is changed, and the complete head test run, including the package boundary suites, exited 0.
+  REV-24 N/A The change adds no English or Arabic product view, localized string or displayed product numeral.
+  REV-25 PASS The reviewed files contain no committed secret, realistic credential, private address or bare eight- or eleven-digit literal; secret-shaped test values are generated at run time, and the head documentation and tree checks exited 0.
+  REV-26 PASS No reviewed code, test message or document claims real custodian data, ministry endorsement, certified privacy, a forecast, a go/no-go verdict or lookup of a real person or firm.
+  REV-27 PASS The lead recorded `cmp AGENTS.md CLAUDE.md` exit 0 on the exact head, and the documentation check reported no agent-file failure.
+  REV-28 N/A The task creates no synthetic world record or synthetic establishment, entity, employer, person or salary-file identifier; generated digit runs are planted forbidden tokens.
+  REV-29 N/A No fact, figure, rank or attribute is attached to a real named place, building, business or FDI project.
+  REV-38 PASS No serving-plane or run-time gateway import is added; the closed secret-name tuple is used only by the offline commit guard and its tests.
+FINDINGS:
+  F1 (REV-14)
+    File: scripts/commit_guard.py
+    Place: `show_path` and `run`, lines 267-279 and 316-323; missing planted case in `scripts/tests/test_hooks_guard.py`
+    Wrong: When staged content contains a local secret, `show_path` withholds the path only if it contains the complete needle. A path containing an eight-character prefix or other window of the secret is printed by line 321, so part of the secret reaches stderr, contrary to AGENTS.md rule 14 and the brief's explicit no-part requirement. Existing tests cover only a path containing the complete value.
+    Fix: Withhold the path for every content refusal at lines 320-323, remove the now-unneeded `show_path` path disclosure and `json` import, and update the expected content messages. First add `test_path_holding_a_secret_fragment_is_withheld`, using a generated value, a path containing its first eight characters and staged content containing the whole value; require exit 1 and run `support.assert_free_of` over combined output. Show that test failing on the current head, then passing after the fix, and run `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` with exit 0.
+  F2 (REV-18)
+    File: scripts/tests/hooks_support.py
+    Place: `snapshot_real`, lines 430-477, and its module setup/teardown callers
+    Wrong: The function resolves the real repository's hooks and configuration paths with `git -C ROOT`, reads every regular hook file at lines 459-465 and reads the real configuration at lines 466-471. This directly reaches locations that AGENTS.md rule 13 and brief item (d)/H10 place off-limits to the tests, even though the bytes are only hashed.
+    Fix: Replace `snapshot_real()` with a snapshot helper that accepts a scratch repository and uses only that repository in `invoke`; delete every real-ROOT hooks/configuration read. Take commit-test snapshots of `base_repo` after its scratch creation and before scratch cleanup, and make install-test snapshots use each test's own scratch repository. Preserve the guard's teeth with a planted modification of a scratch hook or scratch configuration that the comparison must detect. Run `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` and require exit 0 with no skips.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T06: independent review, round 1, part 2 of 3 (the scanner wrapper, the dispatcher, the installer, the two configuration files and their tests): APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T06 part 2 (pull request 19)
+COMMIT: 6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d
+REVIEWER: Moonshot AI, Kimi K3.1 Pro Medium
+CHECKS:
+  REV-10 PASS The criteria have behavioural evidence: installation is proven by test_validate_config_accepts and test_fresh_repository_installs_from_configuration; generated forbidden tokens by test_staged_shapes_are_found_and_redacted; secret refusal without disclosure by the guard tests mapped in PLAN.md; and clean staged content by test_staged_clean_passes and the clean-commit tests. EVIDENCE.md records all 435 guard tests passing on the work commit and head.
+  REV-11 PASS On the exact head, the lead ran ./eii test --seed 2026111219 with exit 0 (1117 passed, 0 failed, 0 skipped) and python3 scripts/check_docs.py with exit 0. CI is green: https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333346 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333330 . Every rule in the plan's table has its planted violation. The reviewer ran no commands, as required by the read-only brief.
+  REV-12 PASS Recorded command 15 reports exactly the 13 added and 8 modified planned paths; the head adds only ledger changes. Nothing under data/ is committed and no unrelated reformatting appears.
+  REV-13 PASS The reviewed scripts and configuration contain no TODO, FIXME, NotImplementedError, empty implementation or fixed-result substitute. Dispatcher stubs are test fixtures; scanner and installer behaviour is exercised with the real pinned tools.
+  REV-14 PASS Inspection found no committed secret, .env or key file, real custodian material or realistic credential. Secret-shaped test values are generated at run time, scanner output is redacted, and python3 scripts/check_docs.py exited 0 on the head.
+  REV-15 PASS No threshold, tolerance, scan rule, test count or CI control is weakened. The check_docs.py change removes disclosure of a secret prefix without changing detection. The unknown-key control now matches pre-commit 4.7.0 behaviour while the project's closed check still rejects and names the unknown key.
+  REV-16 PASS The implementation matches H1-H11, the closed eleven-hook table and the pinned pre-commit 4.7.0 and gitleaks 8.30.1 records. EVIDENCE.md section 3 confirms the four scripts and two configurations equal the approved plan, with earlier-task edits limited to the planned blocks.
+  REV-17 PASS README.md, AGENTS.md, CLAUDE.md, OPEN_ITEMS.md, pins.toml, PROGRESS.md and TASKS.md record the change and its assumptions. The head documentation check exited 0, and no material unrecorded decision was found.
+  REV-18 PASS The reviewed code introduces no database, model-query, serving-plane or record-level data path. Scanner failures are fail-closed, messages use fixed paths, versions and exception types, and installations, commits and scans in tests occur in scratch repositories with neutral git configuration.
+  REV-19 PASS No dropped feature, architecture choice, accepted decision or slice ordering is reopened. Framework, installer, guard and scanner assumptions are explicitly recorded as OI-90 through OI-94.
+  REV-20 N/A This commit adds developer hooks and their tests, not economic fact objects, calculations, lineage records or displayed product numbers.
+  REV-21 N/A No screen, card, Fact chip, catalogue template or assistant answer pipeline is changed.
+  REV-22 N/A No privacy partition, parameter set, treatment, protected export, attack suite or privacy audit is changed.
+  REV-23 PASS The reviewed modules import no eii_custodian code, no product package metadata changes, and the complete head test run passed with the existing import-boundary checks intact.
+  REV-24 N/A No English or Arabic product view, localized string or displayed bilingual numeral is added or changed.
+  REV-25 PASS Inspection of the reviewed files and DIFF.patch found no private absolute path, personal name, real e-mail address, realistic identifier, secret, prohibited comparison or bare eight- or eleven-digit identifier. The documentation and tree checks both exited 0 on the head.
+  REV-26 PASS No code string, configuration, test or documentation addition makes a prohibited claim, gives a go/no-go recommendation or claims real custodian data, certification, endorsement or forecasting capability.
+  REV-27 PASS The head evidence records cmp AGENTS.md CLAUDE.md exiting 0, and both files contain the same rule-44 amendment.
+  REV-28 N/A No synthetic world record, SYN-form identifier or fictional firm name is created; generated scanner tokens are test secrets, not entity identifiers.
+  REV-29 N/A No fact, figure, rank or other attribute is attached to a real named place, building, business or FDI project.
+  REV-38 PASS The reviewed scripts and tests neither import eii_gateway nor read EII_DECISION_PROVIDER or JEV_PRO_API_KEY for gateway use, and no serving-plane or run-time gateway path is added.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T06: independent review, round 1, part 3 of 3 (the commits in a scratch repository, the changed files of earlier tasks, the documents and the ledger): APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T06 part 3 (pull request 19)
+COMMIT: 6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d
+REVIEWER: Moonshot AI, Kimi K3.1 Pro Medium
+CHECKS:
+  REV-10 PASS All four acceptance criteria have behavioural evidence: scratch installation and real commits prove criterion 1; generated cloud-key and eight-digit violations prove criterion 2; a generated local environment value is refused without disclosure for criterion 3; clean documentation, Python and web commits pass for criterion 4. The head run recorded 435 Python guard tests passed with no failures or skips.
+  REV-11 PASS On the exact head, the lead ran `./eii test --seed 2026111219`, exit 0, with 1117 passed, 0 failed and 0 skipped, and `python3 scripts/check_docs.py`, exit 0. The work-commit evidence records the red-first run and the planted violations. CI is green on the head: docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333346 and sandbox https://github.com/albarami/economic-investment-intelligence/actions/runs/43280333330 . The reviewer ran no commands, as required by the brief.
+  REV-12 PASS The recorded scope check returned `21 []`: exactly the 13 planned additions and 8 planned modifications. The head adds only the ledger changes to OPEN_ITEMS.md, PROGRESS.md and TASKS.md; nothing under data/ is committed.
+  REV-13 PASS Inspection of the scratch-commit tests, helper, called scripts, earlier-file changes and ledger found no placeholder implementation, stub delivered as production behaviour, invented figure or mock substitute for the required commit behaviour. Stubbed uv/npm programs are confined to scratch-hook tests.
+  REV-14 PASS No secret, key file, committed .env or real custodian material appears in the diff. Secret-shaped values are generated at runtime; guard and scanner tests check their output for undisclosed windows, and check_docs.py now suppresses the complete matched secret text rather than exposing its prefix.
+  REV-15 PASS The sole check_docs.py change strengthens secret reporting without changing detection. The unknown-key test still proves that the closed check names the planted `allways_run` violation; only its framework control was corrected to observed pre-commit 4.7.0 behaviour. Suppressing the first fetch's test output removes no assertion or check.
+  REV-16 PASS The implementation and documents follow PLAN.md H1-H11, the closed hook table, the 48 planted violations and the lead's binding answers. Commit tests exercise the configured hooks in scratch repositories, with isolated git configuration and no installation or execution in the real repository.
+  REV-17 PASS README.md, both agent files, pins.toml, OPEN_ITEMS.md, TASKS.md and PROGRESS.md were updated together, including OI-90 to OI-94, PO-S0-09 and the work-commit evidence. The head documentation check exited 0 with `checked 203 text files, 53 Markdown files: OK`.
+  REV-18 PASS Secret values are read only by the commit-time guard from its documented environment and scratch/repository-root .env source; outputs name variables rather than values. Missing or wrong scanner versions and unreadable configuration fail closed, and the real hooks/configuration snapshots are used only to detect modification. No application data-handling surface changed.
+  REV-19 PASS No dropped feature, architecture choice, accepted decision or slice-gate ordering is reopened; new framework, scanner and guard choices are explicitly recorded as assumptions in OI-90 to OI-94.
+  REV-20 N/A This commit adds commit-time tooling, tests and documentation only; it introduces no economic fact, lineage object, calculation or displayed product number.
+  REV-21 N/A No screen, card, Fact chip, claim template or assistant answer pipeline is added or changed.
+  REV-22 N/A No privacy partition, parameter set, treatment, export, audit or privacy test is changed.
+  REV-23 PASS No product package or metadata imports custodian code; the new modules are repository tooling and tests, and the head's complete test run passed with the existing import-boundary checks.
+  REV-24 N/A No English or Arabic product view, localized string or displayed bilingual numeral is added or changed.
+  REV-25 PASS Inspection of the committed diff found no private absolute path, personal name, exposed e-mail address, real custodian material, prohibited comparison, secret or forbidden bare identifier run; the head documentation and tree checks both exited 0.
+  REV-26 PASS No code, test, document or ledger entry makes a prohibited claim about real custodian data, privacy certification, endorsement, forecasting, lookup or advice.
+  REV-27 PASS AGENTS.md and CLAUDE.md received the same rule-44 amendment, their full texts match, and the lead's `cmp AGENTS.md CLAUDE.md` on the exact head exited 0.
+  REV-28 N/A No synthetic world record or synthetic identifier is created; the generated digit runs are deliberate scanner violations, not delivered identifiers.
+  REV-29 N/A No fact, figure, rank or other attribute is attached to a real named place or business.
+  REV-38 PASS No serving-plane or runtime gateway import, provider setting, screen element or live gateway call is introduced; the new executable code is offline commit-time tooling under scripts/.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T06: fix round 1
+
+- Lead's ruling on F1 (valid): the module itself promises that no part of a value is printed. The path of a refused content stays visible in the ordinary case, so that the developer learns which file holds the value, and is withheld when it holds eight or more consecutive characters of a guarded value. The reviewer's own fix withheld every path.
+- Lead's ruling on F2 (valid in part): the tests keep one picture of the real repository's hooks folder and configuration before and after, because the task must prove that no test changes them (decision H10 of the plan; the owner's local hooks are never touched); but the test code opens no file there. The picture now holds the names, sizes and modification times of the hook files, the size of the configuration file and the answer of git to one question about core.hooksPath. The modification time of the configuration file is left out on purpose: another git command, a push that sets an upstream for one, rewrites that file without changing it. The reviewer's own fix removed the picture of the real repository. The lead's review brief had said that the tests cannot reach that folder, which was looser than the plan's decision; the round-2 brief says what the picture reads.
+- Build round 2 (the builder of round 1, Cursor command-line tool, `grok-4.7-high`, xAI): two tests first, each red on the reviewed code (the path was printed; the function snapshot did not exist); then the eight-character window in show_path, the picture by file status only with one planted violation in a scratch repository (a hook rewritten with the same length, then core.hooksPath set), its three callers, and one sentence of the README. 60 hook tests.
+- Lead's change after the builder's return: the picture of the configuration file holds its size only (see the ruling on F2).
+
+#### Evidence for the fix commit `f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095`
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   uv run --locked python scripts/hooks_gitleaks.py verify
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "gitleaks 8.30.1 verified at data/tools/gitleaks/8.30.1/gitleaks"
+Seed:      none
+Notes:     The installed scanner reports the pinned version.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    437 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard-test discovery of rule 44 at the fix commit, the 60 hook tests among them (criteria 1 to 4, TST-141, TST-144).
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   v="$PWD/.venv"; copy=$(mktemp -d); st=9; git ls-files -z | xargs -0 cp --parents -t "$copy" && mkdir -p "$copy/data/tools" && cp -R data/tools/gitleaks "$copy/data/tools/" && git -C "$copy" init -q && git -C "$copy" add -A && st=0; t() { (cd "$copy" && UV_PROJECT_ENVIRONMENT="$v" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p "$1" -k "$2" >"$copy/$3.log" 2>&1); }; ctl=9; if [ "$st" -eq 0 ]; then t test_hooks_guard.py test_path_holding_a_part_of_the_value_is_withheld g1 && t test_hooks_install.py test_picture_sees_a_changed_hook i1 && ctl=0; fi; rc=9; if [ "$ctl" -eq 0 ]; then git show 6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d:scripts/commit_guard.py > "$copy/scripts/commit_guard.py" && git show 6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d:scripts/tests/hooks_support.py > "$copy/scripts/tests/hooks_support.py" && rc=0; fi; if [ "$rc" -eq 0 ]; then a=0; t test_hooks_guard.py test_path_holding_a_part_of_the_value_is_withheld g2 || a=$?; b=0; t test_hooks_install.py test_picture_sees_a_changed_hook i2 || b=$?; test "$a" -eq 1 -a "$b" -eq 1 || rc=8; grep -q "FAIL: test_path_holding_a_part_of_the_value_is_withheld" "$copy/g2.log" || rc=7; grep -q "has no attribute 'snapshot'" "$copy/i2.log" || rc=6; fi; rm -rf "$copy"; test "$rc" -eq 0
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The red run of TST-161 for the two new tests, with its green control: in a scratch copy of the tracked files both tests pass; with the guard and the test helper of the reviewed commit put back, the first fails on the printed path and the second cannot find the function snapshot; the copy is removed.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   ./eii test
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1119 passed, 0 failed, 0 skipped
+Seed:      1794510062
+Notes:     The project's own test command: every network-free suite.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "123 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 119 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 203 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The agent files are identical.
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   python3 -I -c "import subprocess,sys; g=sorted(subprocess.run(['git','diff','--name-status','--no-renames','6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d..f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095'],check=True,capture_output=True,text=True).stdout.splitlines()); w=sorted('M\t'+f for f in 'README.md scripts/commit_guard.py scripts/tests/hooks_support.py scripts/tests/test_hooks_commit.py scripts/tests/test_hooks_guard.py scripts/tests/test_hooks_install.py'.split()); print(len(g), [x for x in g if x not in w]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "6 []"
+Seed:      none
+Notes:     The fix commit changes exactly the six paths of the two findings (TST-163).
+```
+
+```text
+### S0-T06 — Pre-commit hooks
+Commit:    f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','6d2807bd74e2fdae9b752e2c1f3ea4ba5128d22d..f1c7ef2b4e87f4640e2fd6e88c2dbf1c45789095'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Every fix commit subject is a Conventional Commit (PLN-05).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
