@@ -4731,6 +4731,148 @@ Seed:      none
 Notes:     Scope of part B (TST-163): the four documents the plan names, and nothing else.
 ```
 
+### S0-T13 — New-library reference notes: task log
+
+- Builder persona: senior platform engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic: a Claude Sonnet 5.5 subagent with four research records, corrected by the lead's points C1 to C8
+- Plan reviewer maker and model: none; the plan had no external plan review (owner's decisions of 2026-11-12: short plans, real builds, and the build by a builder that can run commands as the try-out)
+- Builder maker and model: Cursor command-line tool, `composer-2.5` (Cursor)
+- Reviewer maker and model: Devin command-line tool, `glm-5-3-high` (Zhipu AI), read-only (a maker that neither planned nor built it)
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, github-flow and strict-reviewer; the builder's tool has no skills, so its briefs gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first with a recorded red run, a planted violation for every rule of the check, no suppression comment or weaker setting, no secret, personal name, absolute local path or eight- or eleven-digit run in any file, never a note changed from memory (a page that disagrees is reported, not edited), file length and house style as warnings only, and a report of only the results it saw
+- Branch: `task/S0-T13-reference-notes`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/13
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit; the lead-run blocks of the plan go into the evidence file that the external reviewer receives
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4 (system) and 3.14.6 (uv); git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8
+- Build round 1: the two notes files and the five code files as the plan gives them, the support module, four test modules with 30 tests, and the layout check's change; the builder could not reach the web, so the lead repeated the second reading: every cited page fetched and every quotation found on it, every recorded run reproduced, both font packages compared with their rows
+- Build round 2: the same builder wrote the labelled cases of the plan's test tables; two cases failed and one sub-case rewrote a code file on disk inside a test
+- Build round 3: the same builder, after the lead's probe of the fixture: the two cases planted as the plan words them, and the sub-case that rewrote a code file removed; 30 tests pass
+- Build round 4: the same builder made two expectations literal (the assigned-task sentence and the thirteen control addresses), which the tests had read from the table they judge
+- Owner's note of 2026-11-12, applied from here: the acceptance criteria of TASKS.md decide when the task is done; a check that a plan invents needs one planted violation per rule; the plan's tables of 307 cases and its list of mutations are not required, and no further round is run for them
+
+#### Evidence for the work commit `a7e1db94cfce94308f238466c8f8289a7fb3ce84`
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    a7e1db94cfce94308f238466c8f8289a7fb3ce84
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The two notes files agree with the closed tables and pins.toml: criteria 1 and 3; FE-02.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    a7e1db94cfce94308f238466c8f8289a7fb3ce84
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_reference_notes_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    30 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The 30 tests of the four new test files: criteria 1 to 3; DES-25 and DES-45 (the rules weights and icon-licence).
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    a7e1db94cfce94308f238466c8f8289a7fb3ce84
+Command:   ./eii test --seed 1794000000
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    985 passed, 0 failed, 0 skipped
+Seed:      1794000000
+Notes:     The project's own test command, which runs them in the suite python-guards.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    a7e1db94cfce94308f238466c8f8289a7fb3ce84
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 150 text files, 49 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    a7e1db94cfce94308f238466c8f8289a7fb3ce84
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    a7e1db94cfce94308f238466c8f8289a7fb3ce84
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The agent files are identical.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    a7e1db94cfce94308f238466c8f8289a7fb3ce84
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 57 components: OK"
+Seed:      none
+Notes:     The version check of S0-T12 still passes with the new files.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    a7e1db94cfce94308f238466c8f8289a7fb3ce84
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['node','web/scripts/check-layout.mjs'],capture_output=True,text=True); l=p.stdout.splitlines(); sys.exit(0 if p.returncode==0 and l[-1:]==['checked 32 entries: OK'] and not any(x.startswith('NOTE') for x in l) and p.stderr=='' else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The layout check requires the web notes file and prints no NOTE line (FE-02).
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    a7e1db94cfce94308f238466c8f8289a7fb3ce84
+Command:   copy=$(mktemp -d); st=9; git ls-files -z | xargs -0 cp --parents -t "$copy" && rm "$copy/scripts/check_reference_notes.py" "$copy/scripts/reference_notes_parse.py" "$copy/scripts/reference_notes_tables.py" "$copy/scripts/reference_notes_report.py" "$copy/scripts/reference_notes_assigned.py" && st=0; rc=0; if [ "$st" -eq 0 ]; then (cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_reference_notes_*.py' >"$copy/red.log" 2>&1) || rc=$?; else rc=$st; fi; if [ "$rc" -eq 1 ]; then n=$(grep -c 'Failed to import test module' "$copy/red.log") || n=0; test "$n" -eq 4 || rc=8; m=$(grep -c "No module named 'check_reference_notes'" "$copy/red.log") || m=0; test "$m" -eq 4 || rc=7; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The red run of TST-161: with the five code files removed from a copy of the tracked files, the four test modules fail to import and name check_reference_notes.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    a7e1db94cfce94308f238466c8f8289a7fb3ce84
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','171869a8a614a9720e78f59913b2b57a0f23ed1a...a7e1db94cfce94308f238466c8f8289a7fb3ce84'],check=True,capture_output=True,text=True).stdout.splitlines(); req={'web/REFERENCE_NOTES.md','docs/REFERENCE_NOTES.md','scripts/reference_notes_tables.py','scripts/reference_notes_parse.py','scripts/reference_notes_report.py','scripts/reference_notes_assigned.py','scripts/check_reference_notes.py','scripts/tests/reference_notes_support.py','scripts/tests/test_reference_notes_form.py','scripts/tests/test_reference_notes_rows.py','scripts/tests/test_reference_notes_real.py','scripts/tests/test_reference_notes_assigned.py','web/scripts/check-layout.mjs','web/scripts/tests/check-layout.node-test.mjs'}; o=[x for x in p if x not in req|{'web/README.md'}]; m=[x for x in req if x not in p]; print(len(p),o,m); sys.exit(1 if o or m else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "14 [] []"
+Seed:      none
+Notes:     Part-A form of the scope command (TST-163): the fourteen paths of part A; the five shared documents of part B (README.md, AGENTS.md, CLAUDE.md, docs/README.md, OPEN_ITEMS.md) follow in a later change.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
