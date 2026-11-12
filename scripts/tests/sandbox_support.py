@@ -16,11 +16,9 @@ from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
-from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import ci_apparmor
 import ci_sandbox
 import extension_tree
 import sandbox_launch as launch
@@ -52,7 +50,7 @@ INSIDE_EQUAL = [
 ]
 DNS_LINE = re.compile(r"dns_lookup error gaierror -[23]")
 FAKE_EXTENSION_BYTES = {"h3": b"h3-bytes", "spatial": b"spatial-bytes"}
-PINNED_BYTES = b"profile text\n"
+PROFILE_BYTES = b"profile text\n"
 OK = ci_sandbox.CommandResult(0, "", "")
 LISTING_OK = ci_sandbox.CommandResult(
     0,
@@ -534,17 +532,6 @@ class FakeFiles:
         if data is None:
             raise FileNotFoundError(path)
         return data
-
-
-@contextmanager
-def pinned_profile() -> Iterator[None]:
-    """Patch the profile pin to the synthetic bytes ``PINNED_BYTES``."""
-    digest = hashlib.sha256(PINNED_BYTES).hexdigest()
-    with (
-        patch.object(ci_apparmor, "PROFILE_SIZE", len(PINNED_BYTES)),
-        patch.object(ci_apparmor, "PROFILE_SHA256", digest),
-    ):
-        yield
 
 
 def load_module(name: str, path: Path) -> Any:

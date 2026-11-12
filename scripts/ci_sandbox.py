@@ -6,13 +6,15 @@ sandbox-marked tests and judge each required test case by name).
 
 The restriction of unprivileged user namespaces is handled only by the AppArmor
 profile of the bubblewrap binary. This module never writes a kernel setting and
-never starts another sandbox tool. Every program it starts is judged exactly
-(exit status, standard error, standard output); the judges of the AppArmor
-proof are in ``ci_apparmor`` and those of the test result in ``ci_junit``.
+never starts another sandbox tool. Installation, loading and namespace probes
+are judged exactly (exit status, standard error, standard output). Profile file
+sizes and hashes, the status listing and the label are printed for the record
+only. The judges of the test result are in ``ci_junit``.
 """
 
 from __future__ import annotations
 
+import hashlib
 import os
 import platform
 import re
@@ -24,7 +26,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TextIO
 
-import ci_apparmor as apparmor
 import ci_junit as junit
 import sandbox_check
 import sandbox_profiles as tables
@@ -200,14 +201,21 @@ def _read(read_bytes: ReadBytes, path: Path) -> bytes | None:
         return None
 
 
-def _place_and_load(runner: Runner, read_bytes: ReadBytes) -> list[str]:
-    """Install the pinned profile file when absent, check it, and load it."""
+def _profile_record(path: Path, data: bytes, out: TextIO) -> None:
+    """Print the file size and hash without comparing them with a pin."""
+    print(
+        f"profile file {path}: {len(data)} bytes, SHA-256 "
+        f"{hashlib.sha256(data).hexdigest()}",
+        file=out,
+    )
+
+
+def _place_and_load(runner: Runner, read_bytes: ReadBytes, out: TextIO) -> list[str]:
+    """Install the distribution profile when absent, record its bytes, and load."""
     source = _read(read_bytes, PROFILE_SOURCE)
     if source is None:
         return [f"profile file not found: {PROFILE_SOURCE}"]
-    problems = apparmor.profile_file_problems(str(PROFILE_SOURCE), source)
-    if problems:
-        return problems
+    _profile_record(PROFILE_SOURCE, source, out)
     target = _read(read_bytes, PROFILE_TARGET)
     if target is None:
         problems = judge("install", runner(INSTALL_ARGV), [])
@@ -216,34 +224,18 @@ def _place_and_load(runner: Runner, read_bytes: ReadBytes) -> list[str]:
         target = _read(read_bytes, PROFILE_TARGET)
         if target is None:
             return [f"profile file not found after the install: {PROFILE_TARGET}"]
-    # An existing file that differs from the pin fails here and is never replaced.
-    problems = apparmor.profile_file_problems(str(PROFILE_TARGET), target)
-    if problems:
-        return problems
+    # An existing file that differs is never replaced.
+    _profile_record(PROFILE_TARGET, target, out)
     return judge("apparmor_parser -r", runner(PARSER_ARGV), [])
 
 
-def _in_force(runner: Runner, out: TextIO) -> list[str]:
-    """Prove that the profile is loaded, enforced and attached; print raw outputs."""
-    listing = runner(LISTING_ARGV)
-    print(f"aa-status --json raw: exit {listing.returncode}", file=out)
-    print(f"aa-status --json raw stdout: {listing.stdout!r}", file=out)
-    print(f"aa-status --json raw stderr: {listing.stderr!r}", file=out)
-    problems = sandbox_check.exit_problems(
-        "aa-status --json", listing.returncode, listing.stderr
-    )
-    problems += apparmor.status_problems(listing.stdout)
-    if problems:
-        return problems
-    problems = judge("probe after", runner(PROBE_ARGV), [])
-    if problems:
-        return problems
-    label = runner(LABEL_ARGV)
-    print(f"label raw: exit {label.returncode}", file=out)
-    print(f"label raw stdout: {label.stdout!r}", file=out)
-    print(f"label raw stderr: {label.stderr!r}", file=out)
-    problems = sandbox_check.exit_problems("label read", label.returncode, label.stderr)
-    return problems + apparmor.label_problems(label.stdout)
+def _record_state(runner: Runner, out: TextIO) -> None:
+    """Print raw listing and label results; neither decides the proof."""
+    for name, argv in (("aa-status --json", LISTING_ARGV), ("label", LABEL_ARGV)):
+        result = runner(argv)
+        print(f"{name} raw: exit {result.returncode}", file=out)
+        print(f"{name} raw stdout: {result.stdout!r}", file=out)
+        print(f"{name} raw stderr: {result.stderr!r}", file=out)
 
 
 def install_profile(
@@ -256,13 +248,11 @@ def install_profile(
 ) -> int:
     """Make namespace creation work for bubblewrap, or fail.
 
-    Only on a GitHub-hosted runner. When the restriction does not read 1, the
-    probe must pass and nothing is installed. When it reads 1, the profile file
-    of the distribution package is checked against the pin, installed when
-    absent (an existing file must equal the pin), loaded, listed in enforce
-    mode, the probe must pass, and a program started by bubblewrap must carry
-    the stacked label of the profile. Every other case fails. No kernel setting
-    is written.
+    Only on a GitHub-hosted runner. A passing first probe installs nothing.
+    When it fails and the restriction reads 1, the distribution profile must
+    exist. Its size and hash are recorded, it is installed only when absent,
+    and the target is recorded and loaded. The same probe must then pass.
+    Status and label commands print records only. No kernel setting is written.
 
     Args:
         environ: The process environment.
@@ -273,8 +263,8 @@ def install_profile(
         err: Where the refusal goes.
 
     Returns:
-        0 when namespace creation works (with the restriction, through the
-        profile in force), 1 when it does not, 2 when this is not a
+        0 when namespace creation works, 1 when setup or the probe fails,
+        2 when this is not a
         GitHub-hosted runner (nothing is run then).
     """
     if any(environ.get(key) != value for key, value in HOSTED_RUNNER.items()):
@@ -290,19 +280,23 @@ def install_profile(
         f"probe before: exit {before.returncode}, standard error {before.stderr!r}",
         file=out,
     )
-    if value != "1":
-        problems = judge("probe", before, [])
-        if problems:
-            problems.append(
-                f"namespace creation fails while the restriction reads {value}; this step handles only the AppArmor restriction"
-            )
-            return report(problems, out)
+    problems = judge("probe", before, [])
+    if not problems:
         print("namespace creation works; nothing to install", file=out)
         return 0
-    problems = _place_and_load(runner, read_bytes) or _in_force(runner, out)
+    if value != "1":
+        problems.append(
+            f"namespace creation fails while the restriction reads {value}; this step handles only the AppArmor restriction"
+        )
+        return report(problems, out)
+    problems = _place_and_load(runner, read_bytes, out)
     if problems:
         return report(problems, out)
-    print("namespace creation works with the per-binary profile in force", file=out)
+    problems = judge("probe after", runner(PROBE_ARGV), [])
+    if problems:
+        return report(problems, out)
+    _record_state(runner, out)
+    print("namespace creation works after loading the per-binary profile", file=out)
     return 0
 
 

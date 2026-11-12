@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import unittest
 from collections.abc import Mapping, Sequence
 from pathlib import Path
@@ -39,9 +40,7 @@ def clean_env(home: Path) -> dict[str, str]:
 
 def fresh_copy(case: unittest.TestCase) -> Path:
     """Copy workspace sources into a temporary tree for planted violations."""
-    tmp = Path(
-        __import__("tempfile").mkdtemp(prefix="pychecks-", dir=str(home_tmpdir()))
-    )
+    tmp = Path(tempfile.mkdtemp(prefix="pychecks-", dir=home_tmpdir()))
     case.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
     shutil.copy2(ROOT / "pyproject.toml", tmp / "pyproject.toml")
     for folder in ("scripts", "core", "custodian", "product"):
@@ -61,10 +60,8 @@ def fresh_copy(case: unittest.TestCase) -> Path:
 
 
 def home_tmpdir() -> Path:
-    """Return the workspace temporary root."""
-    base = ROOT / ".overnight" / "tmp"
-    base.mkdir(parents=True, exist_ok=True)
-    return base
+    """Return the environment's temporary directory (TMPDIR and friends)."""
+    return Path(tempfile.gettempdir())
 
 
 def write_files(root: Path, files: Mapping[str, str]) -> None:
