@@ -1154,7 +1154,7 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: three pull requests had each appended open items at the same place of this file. The updates with the base branch kept every line of both sides, the base branch's first, so OI-110 to OI-112 stand before OI-96 to OI-103, and OI-95 and OI-104 to OI-108 after them. No item is lost or changed.
 - NEEDED: the sections are put back in numeric order, with no change of their text.
 - CLOSED BY: S0-T15
-- CLOSED: 2026-11-13, by S0-T15: the sections that begin with "## OI-" stand in ascending numeric order, and no line inside a section was changed. Proved by the order of those headings in this file.
+- CLOSED: 2026-11-13, by S0-T15: the sections that begin with "## OI-" stand in ascending numeric order, and the move changed no line inside a section. Proved by the order of those headings in this file and by a comparison of every section with its text before the move. Two sections, OI-13 and OI-95, are closed by this same task with the evidence of S0-T14; that is their only change.
 
 ### PO-S0-16 — Two refusals of the case-table validator have no planted table of their own
 
@@ -1165,7 +1165,7 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: `validate_cases` in `scripts/ci_plants.py` refuses a repeated case name and an unregistered plant. The tests plant a duplicated guard name only, so deleting those two refusals leaves the suite green.
 - NEEDED: one planted table for each of the two refusals, or one line saying why the rule's one planted violation suffices.
 - CLOSED BY: S0-T15
-- CLOSED: 2026-11-13, by S0-T15: `test_one_case_per_guard` in `scripts/tests/test_ci_plants.py` plants a repeated case name and an unregistered plant, and each raises `PlantError`. Proved by deleting each matching raise in `validate_cases`, which fails that test, and restoring the line; `scripts/ci_plants.py` is unchanged.
+- CLOSED: 2026-11-13, by S0-T15: `test_one_case_per_guard` in `scripts/tests/test_ci_plants.py` plants a repeated case name and an unregistered plant, and each raises `PlantError`. Proved by removing each matching refusal (the condition with its raise) from `validate_cases` in turn, which fails that test, and restoring it; `scripts/ci_plants.py` is unchanged.
 
 ### PO-S0-17 — The same three identifiers head two sets of rows in document 17
 
