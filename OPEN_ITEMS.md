@@ -961,6 +961,26 @@
 - OPTIONS: **Recommendation:** keep. Alternatives: an ignore file with commit fingerprints (the commit hook would honour it too, and it does not hold in a scratch copy); an allow-list in the scanner's configuration (the hook configuration of S0-T06 keeps none); scanning only the commits of the pull request (weaker than TST-141).
 - NEEDED BY: slice S0 gate.
 
+## OI-113 — A dependency alert on a development-only package of the web lock file
+
+- ID: OI-113
+- TYPE: OPEN
+- NEEDED: The owner to say whether the lock file is raised before the slice S0 gate or with the next change of the web dependencies.
+- WHY: GitHub reports one open alert of medium severity for the package `minimatch` in `web/package-lock.json` (a possible denial of service through a pattern; fixed in its version 11.0.1). The package is a transitive dependency of the lint tools, in development scope only: it runs on the build machine and in CI and is never served.
+- DONE SO FAR: Nothing is changed. A lock file changes only inside a task that owns it, and `npm install --package-lock-only` runs only after a change to `web/package.json` (rule 44 of [AGENTS.md](AGENTS.md)).
+- OPTIONS: **Recommendation:** raise it in the follow-up task of the slice if a fixed version resolves without a change of the pinned lint tools; otherwise with the first task that changes the web dependencies. Alternative: leave it until slice S1 confirms the web pins.
+- NEEDED BY: slice S1 gate; not a blocker.
+
+## OI-114 — A default of the service in the ruleset that the owner's table did not name
+
+- ID: OI-114
+- TYPE: ASSUMPTION
+- NEEDED: The owner to note it, and to decide it again if a non-zero number of approving reviews is ever required.
+- WHY: The ruleset `main-protection` of the base branch was created from the owner-approved body (task S0-T14). The service returns one further parameter of its pull-request rule that the body did not send, `require_extra_approval_for_unattributed_changes`, with the value true. GitHub's documentation (the REST reference of repository rules and the page on the available rules for rulesets, read on 2026-11-13) says: "When Copilot opens a pull request without a human collaborator, require one more approving review if a non-zero approval count is required"; the setting is enabled by default and has no effect if the ruleset requires zero approvals.
+- DONE SO FAR: The ruleset requires zero approving reviews, so the parameter changes nothing; it is recorded with the ruleset's answer in [PROGRESS.md](PROGRESS.md). No call was made to change it: the task changes nothing outside the owner's table.
+- OPTIONS: **Recommendation:** leave it. Alternative: a later owner-approved settings task sets it to false.
+- NEEDED BY: any change of the required number of approving reviews; not a blocker.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -1064,6 +1084,76 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: REV-16 (house consistency: a target, never a verdict finding)
 - EVIDENCE: the rows `@deck.gl/core`, `@deck.gl/layers`, `@deck.gl/geo-layers`, `@deck.gl/extensions` and `@deck.gl/maplibre` of `pins.toml` hold the `cite` value `docs/10_FRONTEND.md section "Stack and pins"; docs/10_FRONTEND.md section "Stack and pins"`: the two lines that the old values named lie in one section, so the conversion wrote the same anchor twice. The row `maplibre-gl` cites its table row first and the section second.
 - NEEDED: each of the five rows cites the table row of its package in that section first, or the repeated anchor is written once.
+- CLOSED BY: S0-T15
+
+### PO-S0-10 — The closure line of PO-S0-04 says more than the change did
+
+- ID: PO-S0-10
+- TYPE: OPEN
+- RAISED BY: independent review of S0-T15 part A (Alibaba Qwen 3.8 Max Thinking), 2026-11-12, proposed item P1
+- CONCERNS: REV-17 (documents current)
+- EVIDENCE: the CLOSED line of PO-S0-04 says "every test that takes a folder from it removes it by `addCleanup`". The change added the cleanup to one caller, `test_support_module_contract` in `scripts/tests/test_pychecks_config.py`, and left the other eight call sites as they were (five in `scripts/tests/test_pychecks_config.py`, one in `scripts/tests/test_pychecks_ruff.py`, two in `scripts/tests/test_pychecks_mypy.py`). The requirement of PO-S0-04 itself is met: `home_tmpdir()` returns the system temporary folder and creates nothing under the repository root.
+- NEEDED: an appended line says what the change did, or the other call sites remove what they create.
+- CLOSED BY: S0-T15
+
+### PO-S0-11 — One sentence of decision record 0020 says more for each document than its change
+
+- ID: PO-S0-11
+- TYPE: OPEN
+- RAISED BY: independent review of S0-T08 part B (Cognition SWE-2 High), 2026-11-12, proposed item P1
+- CONCERNS: REV-16 (the work follows the plan and the standards)
+- EVIDENCE: the consequences of [decision 0020](docs/decisions/0020-freeze-bundle-check-and-project-database-port.md) say that documents 08, 12, 13, 14 and 16 read "normal severity" through the corrected preflight table and use the documented default address. Document 16 holds no "normal severity" phrase (its change is the port), and documents 08, 12 and 14 name no address. The reviewer calls a collective reading defensible.
+- NEEDED: the sentence is corrected in the way the change control of decision records allows, or one line says why it stands.
+- CLOSED BY: S0-T15
+
+### PO-S0-12 — The ledger of S0-T08 part B names another reviewer than the one who gave the verdict
+
+- ID: PO-S0-12
+- TYPE: OPEN
+- RAISED BY: independent review of S0-T08 part B (Cognition SWE-2 High), 2026-11-12, proposed item P2
+- CONCERNS: REV-17 (PROGRESS.md current)
+- EVIDENCE: the task log of S0-T08 part B in [PROGRESS.md](PROGRESS.md) names a Google model as the reviewer. The tool that was to run that review refused the job before it began, and the lead gave the review to Cognition SWE-2 High through the Devin command-line tool, whose verdict is the one review of the part. The closing record of the part, appended to PROGRESS.md with this entry, names the reviewer who gave the verdict; the earlier row is not rewritten.
+- NEEDED: the reviewer of the follow-up task checks that the appended record corrects the reviewer line.
+- CLOSED BY: S0-T15
+
+### PO-S0-13 — Status lines and the status table do not name decisions 0019 and 0020
+
+- ID: PO-S0-13
+- TYPE: OPEN
+- RAISED BY: independent review of S0-T08 part B (Cognition SWE-2 High), 2026-11-12, proposed item P3
+- CONCERNS: REV-17 (documents current)
+- EVIDENCE: documents 02, 08, 12, 13, 14 and 16 were amended by decision 0020 on 2026-11-12, and the pack by decision 0019 on the same day. Their header status lines, and their rows in the table of section "Status on 2026-11-12" of [docs/README.md](docs/README.md), list decisions 0016 to 0018 only, although each amending decision is listed by precedent.
+- NEEDED: one sweep of the status lines and of the table rows, now that both records are merged.
+- CLOSED BY: S0-T15
+
+### PO-S0-14 — An unused parameter of a test helper of the history scan
+
+- ID: PO-S0-14
+- TYPE: OPEN
+- RAISED BY: second independent review of round 1 of S0-T07 (Google Gemini), 2026-11-12, proposed item P2; raised again by review round 2 (xAI Grok 4.7), 2026-11-13, proposed item P1
+- CONCERNS: REV-13, as the reviewer names it (code with no effect)
+- EVIDENCE: `history_repo` in `scripts/tests/ci_support.py` takes a parameter `shallow` whose branch fetches from a remote that the fresh scratch repository does not have; no test passes it as true. `test_shallow_checkout_refusal` in `scripts/tests/test_ci_history_scan.py` replaces the git call instead of making a shallow clone.
+- NEEDED: the parameter is removed, or the test makes a real shallow clone of a local repository.
+- CLOSED BY: S0-T15
+
+### PO-S0-15 — The sections of this file are out of numeric order
+
+- ID: PO-S0-15
+- TYPE: OPEN
+- RAISED BY: the lead, 2026-11-12, after three pull requests were updated with the base branch; not a reviewer's item
+- CONCERNS: REV-17 (documents current; house style: a target, never a verdict finding)
+- EVIDENCE: three pull requests had each appended open items at the same place of this file. The updates with the base branch kept every line of both sides, the base branch's first, so OI-110 to OI-112 stand before OI-96 to OI-103, and OI-95 and OI-104 to OI-108 after them. No item is lost or changed.
+- NEEDED: the sections are put back in numeric order, with no change of their text.
+- CLOSED BY: S0-T15
+
+### PO-S0-16 — Two refusals of the case-table validator have no planted table of their own
+
+- ID: PO-S0-16
+- TYPE: OPEN
+- RAISED BY: independent review round 2 of S0-T07 (xAI Grok 4.7), 2026-11-13, proposed item P2
+- CONCERNS: TST-04 (planted failures), as the reviewer's evidence implies; the rule of the plan, a closed case table, has its one planted violation
+- EVIDENCE: `validate_cases` in `scripts/ci_plants.py` refuses a repeated case name and an unregistered plant. The tests plant a duplicated guard name only, so deleting those two refusals leaves the suite green.
+- NEEDED: one planted table for each of the two refusals, or one line saying why the rule's one planted violation suffices.
 - CLOSED BY: S0-T15
 
 ## Sources
