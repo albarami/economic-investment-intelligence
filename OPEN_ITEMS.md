@@ -149,12 +149,13 @@
 ## OI-13 — Repository protections
 
 - ID: OI-13
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - NEEDED: Enable secret scanning, push protection and branch protection under the owner's standing permission.
 - WHY: Public-repository safety needs platform controls as well as local scans.
 - DONE SO FAR: The requirement is assigned to slice S0; local documentation and identifier checks exist.
 - OPTIONS: **Recommendation:** enable all three and record the settings evidence; do not weaken them to make CI pass.
 - NEEDED BY: slice S0.
+- CLOSED: 2026-11-13, by task S0-T14: secret scanning and push protection are enabled, and the ruleset `main-protection` protects the base branch (pull requests only, the six checks of S0-T07 required on an up-to-date head, no bypass, no deletion, no forced push). Each setting was read back after its change; the calls and the service's answers are the entries of S0-T14 in [PROGRESS.md](PROGRESS.md). One default of the service outside the owner's table is recorded as OI-114.
 
 ## OI-14 — Approved typed-decision route
 
@@ -790,35 +791,16 @@
 - OPTIONS: **Recommendation:** keep. Alternatives: the framework's gitleaks hook (a Go toolchain and a 329 MB cache at first use); a package-manager install (a global install, not wanted); more platforms (each needs its own pinned digest).
 - NEEDED BY: slice S0 gate.
 
-## OI-110 — Placement, row set and output readings of preflight
+## OI-95 — Required CI check names and workflow split
 
-- ID: OI-110
-- TYPE: ASSUMPTION
-- NEEDED: The owner to confirm or replace the placement and output readings of task S0-T08.
-- WHY: `docs/08_BACKEND.md` section "Configuration and preflight" names the product preflight responsibility; `docs/13_DEPLOYMENT_AND_OPERATIONS.md` OPS-06 names the full table and line form; `TASKS.md S0-T08` scopes the probe modules and tests. The current product package has no API or configuration module.
-- DONE SO FAR: The current implementation is `scripts/preflight.py` and its sibling modules. It prints `<PASS|WARN|FAIL> <check>: <reason>` and then `store: <postgres|embedded|none>`. Empty `EII_RELEASE_DIR` is unset; the four foundation rows are `WARN not_configured`. With a release path set, the release, receipt and embedded-reader rows fail as not built and replay warns as not built. An absent model key passes as absent. `./eii up` returns exit 4 when the release path is unset and invokes preflight with Docker probing disabled, so its PostgreSQL warning says `Docker not probed`. The offline lock row runs the locked `uv` and npm checks. The fifteen-row tuple also runs the Python and Node/npm pin checks from S0-T12 and the DuckDB-extension and bubblewrap checks from S0-T11; their normal FAIL severity is unchanged in foundation mode.
-- OPTIONS: **Recommendation:** keep the current placement through slice S0 and move product-plane responsibility only in the slice that builds the API and configuration module. Keep `Docker not probed` for `./eii up`. Alternative: move the same complete row set with its tests when that product module is built.
-- NEEDED BY: slice S0 gate.
-
-## OI-111 — PostgreSQL client programs before the driver pin
-
-- ID: OI-111
-- TYPE: ASSUMPTION
-- NEEDED: The owner to confirm that preflight continues to use the PostgreSQL client programs until slice S1 decides the driver pin.
-- WHY: `docs/13_DEPLOYMENT_AND_OPERATIONS.md` section "Prerequisites and how each is checked" names `pg_isready` and a version query; `docs/02_ARCHITECTURE.md` section "Technology stack", row "PostgreSQL driver", leaves the driver to slice S1.
-- DONE SO FAR: Preflight runs `pg_isready` and then one `psql` query. The password reaches only the `psql` child environment. A missing `pg_isready` or no answer selects embedded with a warning; an answering server whose checks cannot be completed is a failure, never a fallback. The S0-T08 task log records all four live tests against this project's service.
-- OPTIONS: **Recommendation:** keep the client programs through slice S0 and decide together with the driver pin at slice S1. Alternative: a separately scoped dependency and licence change adds the driver earlier.
-- NEEDED BY: slice S1 gate.
-
-## OI-112 — Choices in the Compose file and database commands
-
-- ID: OI-112
-- TYPE: ASSUMPTION
-- NEEDED: The owner to confirm or replace the Compose choices not fixed by `docs/13_DEPLOYMENT_AND_OPERATIONS.md` section "Compose service definition (in words)".
-- WHY: That section fixes six service elements but does not specify the interpolation name, project-name enforcement, secret-file creator or first-image installation path. `TASKS.md S0-T09` owns the database commands.
-- DONE SO FAR: The required interpolation name `EII_COMPOSE_DB_PORT` carries the host port from `EII_DATABASE_URL` through a generated temporary file and is not read by the product. The Compose file names project `eii-poc`; `./eii db-up` and `./eii db-down` also pass `-p eii-poc`. A test refuses `infra/.env`. Both commands require `data/compose/postgres_superuser_password` to be a regular file, never create it and never print its contents. The image uses `pull_policy: never`, so it must already be present. The file does not set `POSTGRES_DB`.
-- OPTIONS: **Recommendation:** keep these choices; the owner creates the uncommitted secret file and arranges the pinned image before the first start. Alternative: a later operations decision defines another installation path without weakening the digest pin.
-- NEEDED BY: slice S1 gate.
+- ID: OI-95
+- TYPE: CLOSED (was ASSUMPTION)
+- NEEDED: Owner confirmation that the six required check names are `check-docs`, `static-checks`, `tests`, `secret-scan`, `planted-failures` and `sandbox proof`, split across `docs.yml`, `ci.yml` and `sandbox.yml`.
+- WHY: The pack fixes the stages but not every workflow file name or required-check label.
+- DONE SO FAR: Task S0-T07 uses the six names above. The repository-settings task may require exactly these names without changing their commands.
+- OPTIONS: **Recommendation:** keep the names stable.
+- NEEDED BY: S0-T14 and the slice S0 gate.
+- CLOSED: 2026-11-13, by the owner's answer of 2026-11-12 on the repository settings (recorded in the task log of S0-T14 in [PROGRESS.md](PROGRESS.md)): the six names are the required checks of the ruleset `main-protection`, as task S0-T07 delivers them in `docs.yml`, `ci.yml` and `sandbox.yml`.
 
 ## OI-96 — Age of the places copy of decision 0019
 
@@ -901,16 +883,6 @@
 - OPTIONS: **Recommendation:** a warning line that names the key and the layer left out. The alternative is a silent omission of the layer. In both cases `build-public` continues successfully. Exit 6 stays for an unavailable network.
 - NEEDED BY: the task that builds the night-lights fetcher (S2-T14).
 
-## OI-95 — Required CI check names and workflow split
-
-- ID: OI-95
-- TYPE: ASSUMPTION
-- NEEDED: Owner confirmation that the six required check names are `check-docs`, `static-checks`, `tests`, `secret-scan`, `planted-failures` and `sandbox proof`, split across `docs.yml`, `ci.yml` and `sandbox.yml`.
-- WHY: The pack fixes the stages but not every workflow file name or required-check label.
-- DONE SO FAR: Task S0-T07 uses the six names above. The repository-settings task may require exactly these names without changing their commands.
-- OPTIONS: **Recommendation:** keep the names stable.
-- NEEDED BY: S0-T14 and the slice S0 gate.
-
 ## OI-104 — Full-history scanner count evidence
 
 - ID: OI-104
@@ -961,6 +933,36 @@
 - OPTIONS: **Recommendation:** keep. Alternatives: an ignore file with commit fingerprints (the commit hook would honour it too, and it does not hold in a scratch copy); an allow-list in the scanner's configuration (the hook configuration of S0-T06 keeps none); scanning only the commits of the pull request (weaker than TST-141).
 - NEEDED BY: slice S0 gate.
 
+## OI-110 — Placement, row set and output readings of preflight
+
+- ID: OI-110
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm or replace the placement and output readings of task S0-T08.
+- WHY: `docs/08_BACKEND.md` section "Configuration and preflight" names the product preflight responsibility; `docs/13_DEPLOYMENT_AND_OPERATIONS.md` OPS-06 names the full table and line form; `TASKS.md S0-T08` scopes the probe modules and tests. The current product package has no API or configuration module.
+- DONE SO FAR: The current implementation is `scripts/preflight.py` and its sibling modules. It prints `<PASS|WARN|FAIL> <check>: <reason>` and then `store: <postgres|embedded|none>`. Empty `EII_RELEASE_DIR` is unset; the four foundation rows are `WARN not_configured`. With a release path set, the release, receipt and embedded-reader rows fail as not built and replay warns as not built. An absent model key passes as absent. `./eii up` returns exit 4 when the release path is unset and invokes preflight with Docker probing disabled, so its PostgreSQL warning says `Docker not probed`. The offline lock row runs the locked `uv` and npm checks. The fifteen-row tuple also runs the Python and Node/npm pin checks from S0-T12 and the DuckDB-extension and bubblewrap checks from S0-T11; their normal FAIL severity is unchanged in foundation mode.
+- OPTIONS: **Recommendation:** keep the current placement through slice S0 and move product-plane responsibility only in the slice that builds the API and configuration module. Keep `Docker not probed` for `./eii up`. Alternative: move the same complete row set with its tests when that product module is built.
+- NEEDED BY: slice S0 gate.
+
+## OI-111 — PostgreSQL client programs before the driver pin
+
+- ID: OI-111
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm that preflight continues to use the PostgreSQL client programs until slice S1 decides the driver pin.
+- WHY: `docs/13_DEPLOYMENT_AND_OPERATIONS.md` section "Prerequisites and how each is checked" names `pg_isready` and a version query; `docs/02_ARCHITECTURE.md` section "Technology stack", row "PostgreSQL driver", leaves the driver to slice S1.
+- DONE SO FAR: Preflight runs `pg_isready` and then one `psql` query. The password reaches only the `psql` child environment. A missing `pg_isready` or no answer selects embedded with a warning; an answering server whose checks cannot be completed is a failure, never a fallback. The S0-T08 task log records all four live tests against this project's service.
+- OPTIONS: **Recommendation:** keep the client programs through slice S0 and decide together with the driver pin at slice S1. Alternative: a separately scoped dependency and licence change adds the driver earlier.
+- NEEDED BY: slice S1 gate.
+
+## OI-112 — Choices in the Compose file and database commands
+
+- ID: OI-112
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm or replace the Compose choices not fixed by `docs/13_DEPLOYMENT_AND_OPERATIONS.md` section "Compose service definition (in words)".
+- WHY: That section fixes six service elements but does not specify the interpolation name, project-name enforcement, secret-file creator or first-image installation path. `TASKS.md S0-T09` owns the database commands.
+- DONE SO FAR: The required interpolation name `EII_COMPOSE_DB_PORT` carries the host port from `EII_DATABASE_URL` through a generated temporary file and is not read by the product. The Compose file names project `eii-poc`; `./eii db-up` and `./eii db-down` also pass `-p eii-poc`. A test refuses `infra/.env`. Both commands require `data/compose/postgres_superuser_password` to be a regular file, never create it and never print its contents. The image uses `pull_policy: never`, so it must already be present. The file does not set `POSTGRES_DB`.
+- OPTIONS: **Recommendation:** keep these choices; the owner creates the uncommitted secret file and arranges the pinned image before the first start. Alternative: a later operations decision defines another installation path without weakening the digest pin.
+- NEEDED BY: slice S1 gate.
+
 ## OI-113 — A dependency alert on a development-only package of the web lock file
 
 - ID: OI-113
@@ -992,12 +994,13 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 ### PO-S0-01 — Count list of the S0-T02 plan against the delivered sub-cases
 
 - ID: PO-S0-01
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: independent review round 1 of S0-T02 (Zhipu AI GLM-5.3 High), 2026-11-12, proposed item P1
 - CONCERNS: REV-16 (the work follows the plan)
 - EVIDENCE: `test_member_list_wrong_fails` runs 8 sub-cases where the plan's count list says 7, `test_missing_and_unparsable_lock_fail` counts 4 where it says 3, `test_lock_ignores_self_and_third_party_edges` runs three blocks with no count assertion where it says 2, and `test_output_order` asserts no count where it says 3; the ledger says only that sub-cases were added. The plan is a project record held by the owner, not in this repository.
 - NEEDED: the plan record states the delivered sub-cases and counts, or the additions are annotated.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-13, by S0-T15: the additions are annotated: the ledger of this task in [PROGRESS.md](PROGRESS.md) states the delivered sub-cases of the four tests against the plan's count list. The plan record itself is held by the owner outside this repository and is not changed.
 
 ### PO-S0-02 — Suppression comments ahead of the checks of S0-T04
 
@@ -1030,7 +1033,7 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: `home_tmpdir()` in `scripts/tests/pychecks_support.py`, delivered by S0-T04, creates the folder `.overnight/tmp` under the repository root, and the tests of the Python checks make their temporary folders in it. No rule of `.gitignore` covers that folder, so on a fresh clone the tests leave an untracked folder behind. The cause was the wording of the build brief on temporary folders. No verdict so far depends on it.
 - NEEDED: the support takes its temporary folders from `tempfile` under the environment's settings, and the tests leave nothing behind in the checkout.
 - CLOSED BY: S0-T15
-- CLOSED: 2026-11-12, by S0-T15: `home_tmpdir()` in `scripts/tests/pychecks_support.py` returns `Path(tempfile.gettempdir())` and creates nothing under the repository root; every test that takes a folder from it removes it by `addCleanup`. Proved by the new test `test_home_tmpdir_is_the_system_temp` in `scripts/tests/test_pychecks_config.py`, which fails on the old support.
+- CLOSED: 2026-11-12, by S0-T15: `home_tmpdir()` in `scripts/tests/pychecks_support.py` returns `Path(tempfile.gettempdir())` and creates nothing under the repository root; each call in `scripts/tests/test_pychecks_config.py`, `scripts/tests/test_pychecks_ruff.py` and `scripts/tests/test_pychecks_mypy.py` that creates a folder under the returned directory removes that folder by `addCleanup`. Proved by the new test `test_home_tmpdir_is_the_system_temp` in `scripts/tests/test_pychecks_config.py`, which fails on the old support.
 
 ### PO-S0-05 — A dead assignment in a test of the extension files
 
@@ -1079,82 +1082,123 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 ### PO-S0-09 — Five rows of the pin record repeat one section anchor
 
 - ID: PO-S0-09
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: independent review of the S0-T12 follow-up (Google Gemini 4 Carbon), 2026-11-12, proposed item P1
 - CONCERNS: REV-16 (house consistency: a target, never a verdict finding)
 - EVIDENCE: the rows `@deck.gl/core`, `@deck.gl/layers`, `@deck.gl/geo-layers`, `@deck.gl/extensions` and `@deck.gl/maplibre` of `pins.toml` hold the `cite` value `docs/10_FRONTEND.md section "Stack and pins"; docs/10_FRONTEND.md section "Stack and pins"`: the two lines that the old values named lie in one section, so the conversion wrote the same anchor twice. The row `maplibre-gl` cites its table row first and the section second.
 - NEEDED: each of the five rows cites the table row of its package in that section first, or the repeated anchor is written once.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-13, by S0-T15: the `cite` value of `@deck.gl/core`, `@deck.gl/layers`, `@deck.gl/geo-layers`, `@deck.gl/extensions` and `@deck.gl/maplibre` in `pins.toml` is `docs/10_FRONTEND.md section "Stack and pins"` once. Proved by those five rows.
 
 ### PO-S0-10 — The closure line of PO-S0-04 says more than the change did
 
 - ID: PO-S0-10
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: independent review of S0-T15 part A (Alibaba Qwen 3.8 Max Thinking), 2026-11-12, proposed item P1
 - CONCERNS: REV-17 (documents current)
 - EVIDENCE: the CLOSED line of PO-S0-04 says "every test that takes a folder from it removes it by `addCleanup`". The change added the cleanup to one caller, `test_support_module_contract` in `scripts/tests/test_pychecks_config.py`, and left the other eight call sites as they were (five in `scripts/tests/test_pychecks_config.py`, one in `scripts/tests/test_pychecks_ruff.py`, two in `scripts/tests/test_pychecks_mypy.py`). The requirement of PO-S0-04 itself is met: `home_tmpdir()` returns the system temporary folder and creates nothing under the repository root.
 - NEEDED: an appended line says what the change did, or the other call sites remove what they create.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-13, by S0-T15: every call of `home_tmpdir()` in `scripts/tests/test_pychecks_config.py`, `scripts/tests/test_pychecks_ruff.py` and `scripts/tests/test_pychecks_mypy.py` was read; each call that creates a folder under the returned directory already removes it by `addCleanup`, so no test was changed, and the last clause of PO-S0-04 now states that. Proved by those calls.
 
 ### PO-S0-11 — One sentence of decision record 0020 says more for each document than its change
 
 - ID: PO-S0-11
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: independent review of S0-T08 part B (Cognition SWE-2 High), 2026-11-12, proposed item P1
 - CONCERNS: REV-16 (the work follows the plan and the standards)
 - EVIDENCE: the consequences of [decision 0020](docs/decisions/0020-freeze-bundle-check-and-project-database-port.md) say that documents 08, 12, 13, 14 and 16 read "normal severity" through the corrected preflight table and use the documented default address. Document 16 holds no "normal severity" phrase (its change is the port), and documents 08, 12 and 14 name no address. The reviewer calls a collective reading defensible.
 - NEEDED: the sentence is corrected in the way the change control of decision records allows, or one line says why it stands.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-13, by S0-T15: an accepted decision record is amended only by a new record (AGENTS.md rule 46); the sentence reads collectively, which the reviewer calls defensible; what each document changed is in the record's amended documents and in PROGRESS.md. No file of the record changes.
 
 ### PO-S0-12 — The ledger of S0-T08 part B names another reviewer than the one who gave the verdict
 
 - ID: PO-S0-12
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: independent review of S0-T08 part B (Cognition SWE-2 High), 2026-11-12, proposed item P2
 - CONCERNS: REV-17 (PROGRESS.md current)
 - EVIDENCE: the task log of S0-T08 part B in [PROGRESS.md](PROGRESS.md) names a Google model as the reviewer. The tool that was to run that review refused the job before it began, and the lead gave the review to Cognition SWE-2 High through the Devin command-line tool, whose verdict is the one review of the part. The closing record of the part, appended to PROGRESS.md with this entry, names the reviewer who gave the verdict; the earlier row is not rewritten.
 - NEEDED: the reviewer of the follow-up task checks that the appended record corrects the reviewer line.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-13, by S0-T15: the closing record of part B in PROGRESS.md (section heading "S0-T08: independent review of part B: APPROVED") names the reviewer who gave the verdict and says what happened; the earlier row is not rewritten.
 
 ### PO-S0-13 — Status lines and the status table do not name decisions 0019 and 0020
 
 - ID: PO-S0-13
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: independent review of S0-T08 part B (Cognition SWE-2 High), 2026-11-12, proposed item P3
 - CONCERNS: REV-17 (documents current)
 - EVIDENCE: documents 02, 08, 12, 13, 14 and 16 were amended by decision 0020 on 2026-11-12, and the pack by decision 0019 on the same day. Their header status lines, and their rows in the table of section "Status on 2026-11-12" of [docs/README.md](docs/README.md), list decisions 0016 to 0018 only, although each amending decision is listed by precedent.
 - NEEDED: one sweep of the status lines and of the table rows, now that both records are merged.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-13, by S0-T15: the header status lines of documents 02, 08, 12, 13, 14 and 16 name decision 0020 beside the decisions they already listed, and each status cell for documents 01 to 17 and the glossary in section "Status on 2026-11-12" of [docs/README.md](docs/README.md) matches that document's header. Proved by those header rows and that table.
 
 ### PO-S0-14 — An unused parameter of a test helper of the history scan
 
 - ID: PO-S0-14
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: second independent review of round 1 of S0-T07 (Google Gemini), 2026-11-12, proposed item P2; raised again by review round 2 (xAI Grok 4.7), 2026-11-13, proposed item P1
 - CONCERNS: REV-13, as the reviewer names it (code with no effect)
 - EVIDENCE: `history_repo` in `scripts/tests/ci_support.py` takes a parameter `shallow` whose branch fetches from a remote that the fresh scratch repository does not have; no test passes it as true. `test_shallow_checkout_refusal` in `scripts/tests/test_ci_history_scan.py` replaces the git call instead of making a shallow clone.
 - NEEDED: the parameter is removed, or the test makes a real shallow clone of a local repository.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-13, by S0-T15: the parameter `shallow` of `history_repo` in `scripts/tests/ci_support.py`, the two lines only it reaches, and the argument at every call are removed. No test changes its meaning. Proved by `scripts/tests/ci_support.py`, `scripts/tests/test_ci_history_scan.py` and `scripts/tests/test_ci_plants.py`.
 
 ### PO-S0-15 — The sections of this file are out of numeric order
 
 - ID: PO-S0-15
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the lead, 2026-11-12, after three pull requests were updated with the base branch; not a reviewer's item
 - CONCERNS: REV-17 (documents current; house style: a target, never a verdict finding)
 - EVIDENCE: three pull requests had each appended open items at the same place of this file. The updates with the base branch kept every line of both sides, the base branch's first, so OI-110 to OI-112 stand before OI-96 to OI-103, and OI-95 and OI-104 to OI-108 after them. No item is lost or changed.
 - NEEDED: the sections are put back in numeric order, with no change of their text.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-13, by S0-T15: the sections that begin with "## OI-" stand in ascending numeric order, and the move changed no line inside a section. Proved by the order of those headings in this file and by a comparison of every section with its text before the move. Two sections, OI-13 and OI-95, are closed by this same task with the evidence of S0-T14; that is their only change.
 
 ### PO-S0-16 — Two refusals of the case-table validator have no planted table of their own
 
 - ID: PO-S0-16
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: independent review round 2 of S0-T07 (xAI Grok 4.7), 2026-11-13, proposed item P2
 - CONCERNS: TST-04 (planted failures), as the reviewer's evidence implies; the rule of the plan, a closed case table, has its one planted violation
 - EVIDENCE: `validate_cases` in `scripts/ci_plants.py` refuses a repeated case name and an unregistered plant. The tests plant a duplicated guard name only, so deleting those two refusals leaves the suite green.
 - NEEDED: one planted table for each of the two refusals, or one line saying why the rule's one planted violation suffices.
 - CLOSED BY: S0-T15
+- CLOSED: 2026-11-13, by S0-T15: `test_one_case_per_guard` in `scripts/tests/test_ci_plants.py` plants a repeated case name and an unregistered plant, and each raises `PlantError`. Proved by removing each matching refusal (the condition with its raise) from `validate_cases` in turn, which fails that test, and restoring it; `scripts/ci_plants.py` is unchanged.
+
+### PO-S0-17 — The same three identifiers head two sets of rows in document 17
+
+- ID: PO-S0-17
+- TYPE: CLOSED (was OPEN)
+- RAISED BY: the lead, 2026-11-13, after pull requests 17 and 20 merged; not a reviewer's item
+- CONCERNS: REV-16, pinned names are used exactly, and REV-17
+- EVIDENCE: Two pull requests each added three rows under DHA-81, DHA-82 and DHA-83. Section "Public and investment sources if hosted publicly" holds the traffic provider, the relative busyness of named venues and the weather history. Section "Hardening register" holds the three AppArmor entries. PROGRESS.md records the register rows under those identifiers.
+- NEEDED: The register rows keep DHA-81, DHA-82 and DHA-83. The three rows of section 6 become DHA-85, DHA-86 and DHA-87. Every citation that means the section 6 rows follows.
+- CLOSED BY: S0-T15
+- CLOSED: 2026-11-13, by S0-T15: the section 6 rows are DHA-85, DHA-86 and DHA-87 and the section 9 rows stay DHA-81, DHA-82 and DHA-83; OPS-69, DHA-51, the open-questions line and the sources line of document 17 that mean the section 6 rows now cite them (the sources line cites DHA-84 to DHA-87, with the forecast row). Proved by those rows in [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) and by OPS-69 in [13_DEPLOYMENT_AND_OPERATIONS.md](docs/13_DEPLOYMENT_AND_OPERATIONS.md). PROGRESS.md was not changed; its citations name the register rows.
+
+### PO-S0-18 — A docstring of a preflight test names the old counts
+
+- ID: PO-S0-18
+- TYPE: CLOSED (was OPEN)
+- RAISED BY: independent review of S0-T08 part C (Zhipu AI GLM-5.3 High), 2026-11-13, proposed item P1
+- CONCERNS: REV-16 (house style: a target, never a verdict finding)
+- EVIDENCE: the docstring of `test_foundation_keeps_other_severities` in `scripts/tests/test_preflight_run.py` said "first five status 1, last two 0". Since part C the method has eleven labels, of which the first nine give exit status 1 and the last two 0.
+- NEEDED: the docstring says what the method does.
+- CLOSED BY: S0-T15
+- CLOSED: 2026-11-13, by S0-T15: the docstring reads "first nine status 1, last two 0"; the method's assertions are unchanged and the guard suite passes.
+
+### PO-S0-19 — The plan of S0-T08 part C counts fewer test methods than were delivered
+
+- ID: PO-S0-19
+- TYPE: CLOSED (was OPEN)
+- RAISED BY: independent review of S0-T08 part C (Zhipu AI GLM-5.3 High), 2026-11-13, proposed item P2
+- CONCERNS: REV-16 (the work follows the plan)
+- EVIDENCE: the plan's section on files and counts names six added test methods and forty-nine after part C; the build added twelve and the ledger records fifty-five. The six further methods were added by the builder's break pass for breaks that no test had caught.
+- NEEDED: one line that reconciles the two counts.
+- CLOSED BY: S0-T15
+- CLOSED: 2026-11-13, by S0-T15: the ledger of this task in [PROGRESS.md](PROGRESS.md) states the reconciliation by test module (forty-nine planned, six added by the break pass, fifty-five delivered).
 
 ## Sources
 

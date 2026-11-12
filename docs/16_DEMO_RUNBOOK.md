@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12 |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | The exact steps, checks, story, recoveries and words for a live EII session in front of a Minister. |

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12; also amended that day by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md) |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12; also amended that day by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md) |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Define the gated build sequence, task boundaries, review method and evidence needed to deliver the EII proof of concept. |
