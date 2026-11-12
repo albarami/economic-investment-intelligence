@@ -12100,6 +12100,254 @@ Seed:      none
 Notes:     Every work commit subject is a Conventional Commit (PLN-05).
 ```
 
+### S0-T16 — Gate fix for slice S0: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/27 )
+
+- Why this task exists: the first review of the slice S0 gate (the gate record of pull request https://github.com/albarami/economic-investment-intelligence/pull/26 ) was rejected by both of its reviewers for one gap, and the pack sends the findings of a rejected gate review to a gate-fix task with its own entry in TASKS.md, its own branch and pull request and a full independent review (TST-169; TASKS.md, section "Queue rules"). The two verdicts are entered unchanged by the gate record's next ledger commit
+- The findings, each checked by the lead in the files and judged valid. Second reviewer (Moonshot AI Kimi K3.1 Pro, the records): F1, the preflight table of document 13 has seventeen checks since decision record 0019 added the rows of the traffic-provider key and the night-lights key, and the built preflight ran fifteen, so OPS-06 was not met and the output test of OPS-07 covered one key of three; F2, the status line of S0-T12 in TASKS.md omitted its follow-up pull request 18. Designated reviewer (Google Gemini): F1, the same two rows; F2, `.env.example` held the eight names from before that decision and the tree check pinned the same old list (ARC-97, ARC-98)
+- How the gap arose: the plan of the preflight rows (part C of S0-T08) was written against the table of fifteen checks; decision record 0019 merged before the rows did, and the plan was not compared with its table again. The lead's base update compares paths, the review of the rows worked from their patch, and the lead's gate evidence ran the commands without counting the table
+- The lead's sweep after the second reviewer's verdict (every line that decision record 0019 added about things slice S0 had built): it found `.env.example` before the designated reviewer's verdict arrived, and the commit guard, whose list of never-printed variables (OI-92) lacked `TOMTOM_API_KEY` and `EARTHDATA_API_KEY`; the designated reviewer proposed the same for the guard as its item P2, which is therefore done here. No process of the build ever read those two values (the lead never opens `.env`, workers and tests run in work trees that hold no `.env`, and the guard read only its three listed names)
+- Class of the work (the owner's note of 2026-11-12 on value and cost): standard product code; the commit guard is a security control and is changed in its simplest form
+- Plan: none of its own; the lead (Anthropic, Claude Fable 5.2) ruled on each point in two builder briefs
+- Builder maker and model: Codex command-line tool, `gpt-6-astra` (OpenAI), two jobs at the same time in two work trees: the two preflight rows with their tests and OI-110; the example file, the commit guard with its tests, README.md and OI-92
+- Reviewer maker and model: Cursor command-line tool, `grok-4.7-high` (xAI), read-only (a maker that neither ruled on the points nor built the task); a full review
+- Branch: `task/S0-T16-gate-fix`
+- The rulings: the rows are named `traffic-provider-key` and `night-lights-key` and stand in the table's order after the model-key row; the night-lights row reports `present` or `absent`; the traffic row reports the same and the value of `EII_TRAFFIC_PROVIDER`: `simulated` when the variable is unset or empty (its default), the value itself when it is one of the two that the variable table allows, and for any other value it fails at normal severity with a fixed reason that does not repeat the value (the one rule this task invents, with its planted violation); `tomtom` with the key absent passes, because document 13 says an absent key means simulated congestion only; neither row prints a key, starts a program or opens a connection; the two keys join the commit guard's list and are treated exactly as the other keys
+- What the builders found beyond their briefs: the tree check pins the names of `.env.example` in its own list, so it would have refused the corrected file; the second builder extended that list to the eleven names and said so. One break of its pass survived (the membership test of the guard's reader of the fixture file) and is now failed by an added test
+- Test methods: the guard discovery had 486 and has 494: four for the preflight rows and four for the commit guard. Red runs before the code: 18 failures and 17 errors of the full discovery before the rows existed; twelve failing subtests of the guard's test file before its list changed. Break passes of the builders: 23 and 7 breaks, 29 caught at once
+- The lead's additions: the entry of this task in TASKS.md, after the follow-up task; the status line of S0-T12 with pull request 18 (finding F2 of the second reviewer); one doubled bracket removed in OI-92
+- Lead's check of the build: the commands below; four breaks of the lead's own on a complete scratch copy, each caught (the unknown value repeated in the failing line; the two rows in the other order; the night-lights row printing its key, which fails the three-key output test in eight sub-cases; the guard's list without the night-lights key); the real preflight also run with the switch at its second allowed value; one read of every changed line outside the tests
+- The foundation-mode preflight output at the work commit:
+
+```text
+PASS python: Python and uv match pins.toml
+PASS node-npm: Node and npm match pins.toml
+PASS locked-dependencies: uv.lock and web/package-lock.json match their manifests with network access disabled
+PASS duckdb-extensions: spatial and h3 load from the local folder with network access disabled
+WARN postgresql: EII_DATABASE_URL is not set; store embedded; Docker reachable (server 29.9.3)
+WARN release: not_configured (EII_RELEASE_DIR is not set)
+WARN load-receipt: not_configured (EII_RELEASE_DIR is not set)
+WARN embedded-reader: not_configured (EII_RELEASE_DIR is not set)
+WARN tiles-glyphs-fonts: no_freeze_bundle (no freeze.json under data/freeze; checked with full severity once a freeze bundle exists)
+WARN recorded-replays: not_configured (EII_RELEASE_DIR is not set)
+PASS bubblewrap-sandbox: bubblewrap is present and the sandbox test passes
+PASS api-port: 127.0.0.1:8000 is free
+PASS model-key: absent
+PASS traffic-provider-key: absent; EII_TRAFFIC_PROVIDER simulated
+PASS night-lights-key: absent
+PASS env-not-tracked: .env is not tracked by git
+PASS wsl-interop: cmd.exe printed a Windows version
+store: embedded
+```
+
+- Not changed, and why: OI-103 already said that preflight reports the night-lights key as present or absent, which this task makes true. Two proposed items of the designated gate reviewer go to the follow-up task of slice S1 (REV-41): the boundary guard's list of environment names, and document 17 with its identifiers in the documentation check
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+
+#### Evidence for the work commit `260c43c768dfb81895997a202b543f1da0edeb1a`
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   ./eii test --seed 2026111307
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1176 passed, 0 failed, 0 skipped
+Seed:      2026111307
+Notes:     The project's own test command: every network-free suite, none skipped.
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    494 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard-test discovery of rule 44 with the eight new test methods; none is skipped.
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   ./eii preflight
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; 17 lines (11 PASS, 6 WARN, 0 FAIL), last line "store: embedded"
+Seed:      none
+Notes:     Criterion 1. The real preflight on the build machine in foundation mode: seventeen check lines and the store line, exit code 0; the two new rows stand after the model-key row and report an absent key and the default of the switch; the four rows of the gate warn as not configured; it only probes.
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   python3 -I -c "import os,subprocess,sys; e=dict(os.environ, EII_TRAFFIC_PROVIDER='plantedunknownword'); r=subprocess.run(['./eii','preflight'],env=e,capture_output=True,text=True); o=r.stdout+r.stderr; print(r.returncode, 'plantedunknownword' in o, [l for l in o.splitlines() if 'traffic-provider-key:' in l]); sys.exit(0 if r.returncode==1 and 'plantedunknownword' not in o else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "1 False ['FAIL traffic-provider-key: EII_TRAFFIC_PROVIDER must be simulated or tomtom']" (exit code of preflight; the planted word printed; the row)
+Seed:      none
+Notes:     The planted violation of the one rule this task invents (TST-04): with an unknown value of the provider switch the real preflight exits 1, the row fails at normal severity and the value is nowhere in its output.
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_preflight_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    52 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Criteria 1, 2 and 4: the preflight modules, with the two rows, the order of the seventeen names, the planted unknown value, foundation mode and, for criterion 3, the test that runs the whole preflight with a dummy value for each of the three keys and finds none in anything it prints (OPS-07).
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_hooks_guard.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    22 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The commit guard: each of the two new names refused when staged, from the environment and from a fixture file, the variable named and no value printed; a short value refused; a clean file passes (criterion 3 of task S0-T06).
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_check_tree*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    52 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The tree check with its pinned list of the eleven names of the example file.
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the real tree: the example file holds exactly the pinned names.
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   python3 -I -c "import re; n=[l[:-2] for l in open('.env.example',encoding='utf-8') if re.fullmatch(r'[A-Z][A-Z0-9_]*=\n', l)]; print(len(n), ' '.join(n))"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "11 ANTHROPIC_API_KEY EII_STORE EII_DATABASE_URL EII_RELEASE_DIR EII_LANG_DEFAULT EII_PRESENTER EII_TRAFFIC_PROVIDER TOMTOM_API_KEY EII_DECISION_PROVIDER JEV_PRO_API_KEY EARTHDATA_API_KEY"
+Seed:      none
+Notes:     The eleven variable names of the example file, each with an empty value (ARC-97, ARC-98).
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 215 text files, 55 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the changed documents.
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "132 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 128 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The agent files are not changed by this task and stay byte-identical.
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 59 components: OK"
+Seed:      none
+Notes:     The version check; no manifest, lock or pin changes.
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   python3 -I -c "import subprocess,sys; g=sorted(subprocess.run(['git','diff','--name-status','--no-renames','50db0e8a9cac22d5d4f8bd602fa1bd9667bee560...260c43c768dfb81895997a202b543f1da0edeb1a'],check=True,capture_output=True,text=True).stdout.splitlines()); w=sorted('M\t'+f for f in '.env.example OPEN_ITEMS.md README.md TASKS.md scripts/check_tree.py scripts/commit_guard.py scripts/preflight.py scripts/preflight_rows.py scripts/tests/test_hooks_guard.py scripts/tests/test_preflight_rows.py scripts/tests/test_preflight_run.py'.split()); print(len(g), [x for x in g if x not in w]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "11 []"
+Seed:      none
+Notes:     The work commit changes exactly eleven files: those of the rulings, the tree check's list that the second builder found, and TASKS.md (TST-163).
+```
+
+```text
+### S0-T16 — Gate fix for slice S0
+Commit:    260c43c768dfb81895997a202b543f1da0edeb1a
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','50db0e8a9cac22d5d4f8bd602fa1bd9667bee560..260c43c768dfb81895997a202b543f1da0edeb1a'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The work commit subject is a Conventional Commit (PLN-05).
+```
+
 #### S0-T15: independent review of part B: APPROVED
 
 Reviewed commit `33082c1ece4d318d8169fc580026a596b8c7bae4`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/25 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43316690887; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43316690889; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43316690919 ). Reviewer: OpenAI GPT-5.6 Sol (effort high), through the Codex command-line tool, read-only; a full review; a maker that neither ruled on the items nor built the task. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
