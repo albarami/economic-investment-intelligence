@@ -91,7 +91,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: pre-commit configuration and scanner test fixtures.
 - Depends: S0-T04, S0-T05.
 - Requirements: TST-141, TST-144, PLN-05.
-- Delivery: routine; personas Platform; status queued.
+- Delivery: routine; personas Platform; status in review (pull request 19).
 ### S0-T07 — Continuous integration
 - Goal: Build CI for tests, documentation checks, secret scanning, identifier-pattern scanning and the hosted-runner sandbox proof.
 - Acceptance criteria: [ ] all check classes run on pull requests; [ ] the sandbox test runs on the hosted runner and is never skipped; [ ] planted failures block CI; [ ] the foundation commit is green.
