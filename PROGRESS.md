@@ -8990,6 +8990,275 @@ Seed:      none
 Notes:     Every fix commit subject is a Conventional Commit (PLN-05).
 ```
 
+#### S0-T06: independent review, round 2: APPROVED
+
+Reviewed commit `4019ef077d8c44d8f9548dfdab291774ce672e7a`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/19 , with CI green on it (workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43286222061 ; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43286222055 ). Reviewer: Moonshot AI Kimi K3.1 Pro, the reviewer of round 1, through the Abacus AI command-line tool, read-only; a later round under decision record 0018 on the fix. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T06 (pull request 19)
+COMMIT: 4019ef077d8c44d8f9548dfdab291774ce672e7a
+REVIEWER: Moonshot AI, Kimi K3.1 Pro
+EARLIER FINDINGS:
+  F1 FIXED scripts/commit_guard.py:53 and 268-286 checks every eight-byte window of every guarded value, and run uses show_path for content refusals at 323-331. test_path_holding_a_part_of_the_value_is_withheld at scripts/tests/test_hooks_guard.py:226-250 proves that an eight-character prefix is withheld and a seven-character control remains visible; EVIDENCE.md command 3 records the old-code failure and fixed-code pass.
+  F2 FIXED scripts/tests/hooks_support.py:429-488 opens no hook or configuration file: it records hook name, size and modification time through lstat, configuration size through lstat, and git's core.hooksPath answer. Real-repository before/after callers remain at test_hooks_commit.py:33-40 and test_hooks_install.py:33-40,230-231. The planted scratch test at test_hooks_install.py:216-228 detects a same-length hook rewrite with a later modification time and a core.hooksPath change.
+CHECKS:
+  REV-10 PASS Round-1 parts 2 and 3 verified repository-configuration installation, generated-token detection and clean staged commits. The corrected guard and new planted tests complete criterion 3 without disclosure; EVIDENCE.md records 437 guard tests and 1119 total tests passing with no skips.
+  REV-11 PASS On the exact head, the lead ran ./eii test --seed 2026111222, exit 0, with 1119 passed, 0 failed and 0 skipped, and python3 scripts/check_docs.py, exit 0. CI is green: docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43286222061 and sandbox https://github.com/albarami/economic-investment-intelligence/actions/runs/43286222055 . EVIDENCE.md command 3 proves both new tests red on the reviewed code and green on the fix. The reviewer ran no build or test commands under the read-only brief.
+  REV-12 PASS EVIDENCE.md command 10 records exactly the six intended fix paths with output "6 []"; the head adds only the PROGRESS.md ledger entry. The previously approved pull-request scope is unchanged, with nothing committed under data/.
+  REV-13 PASS Inspection of the guard, snapshot helper, tests, README change and ledger found no placeholder, unimplemented branch, fixed-result substitute or mock standing in for delivered behaviour.
+  REV-14 PASS No secret, .env, key file or real custodian material is added. Test values are generated at run time; content-refusal paths are withheld whenever they contain any guarded eight-byte window, and the existing whole-value path refusal remains generic.
+  REV-15 PASS The fix adds two planted violations and preserves the real-repository before/after equality assertions. No threshold, tolerance, detection rule, test count, skip, retry, suppression or CI control is weakened; the metadata-only picture implements the binding F2 ruling.
+  REV-16 PASS The eight-byte path rule and lstat-only picture follow the lead's F1/F2 rulings and H10. Both guards have red-first evidence under EVIDENCE.md command 3, satisfying the planted-violation requirement; the README describes the resulting path behaviour.
+  REV-17 PASS README.md records the eight-character withholding rule, and PROGRESS.md contains the unchanged round-1 verdicts, rulings and fix evidence. The head documentation check exited 0 with "checked 203 text files, 53 Markdown files: OK"; no new material decision is unrecorded.
+  REV-18 PASS The real-repository picture opens no hook or configuration file and emits no recorded contents; only lstat metadata and git's core.hooksPath answer are compared. Scratch repositories hold all intentional writes, and no application, database, model-query or record-level data path changes.
+  REV-19 PASS The fix remains within S0-T06 and reopens no dropped feature, architecture choice, accepted decision, build order or slice gate.
+  REV-20 N/A This task changes developer tooling and test evidence only; it creates no economic fact, calculation, lineage object or displayed product number.
+  REV-21 N/A No screen, card, Fact chip, catalogue template or assistant answer pipeline is changed.
+  REV-22 N/A No privacy partition, parameter set, treatment, protected export, attack suite or privacy audit is changed.
+  REV-23 PASS No product or custodian package or package metadata is changed, and the exact-head full test run passed with the existing import-boundary suites intact.
+  REV-24 N/A No English or Arabic product view, localized string or displayed bilingual numeral is added or changed.
+  REV-25 PASS Inspection of the fix and ledger found no committed secret, private absolute path, personal name, exposed e-mail address, realistic identifier, prohibited comparison or real custodian material; the exact-head documentation and tree checks both exited 0.
+  REV-26 PASS No changed code, test message, README text or ledger entry makes a prohibited claim about real custodian data, privacy certification, ministry endorsement, forecasting, lookup or a go/no-go recommendation.
+  REV-27 PASS The exact-head evidence records cmp AGENTS.md CLAUDE.md exiting 0, and the documentation check reported no agent-file failure.
+  REV-28 N/A The task creates no synthetic world record or synthetic identifier; generated secret-shaped values exist only as run-time test fixtures.
+  REV-29 N/A No fact, figure, rank or other attribute is attached to a real named place, building, business or FDI project.
+  REV-38 PASS The changes are confined to offline repository tooling, tests and documentation; they add no serving-plane or run-time gateway import, provider setting, screen element or live gateway call.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T06: merge record
+
+- Tree proof on the approved head (ruling L-29), run by the lead on 2026-11-12 before the review: every path of the head's tree is as in the fix commit, except the ledger files; output "TREE-IS-WORK ok: 260 paths at 4019ef077d8c44d8f9548dfdab291774ce672e7a", exit code 0. On the same head `./eii test --seed 2026111222`: exit code 0, "total: 1119 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/19 was squash-merged on 2026-11-12 at the head `4019ef077d8c44d8f9548dfdab291774ce672e7a`; merge commit `09e9b16556a304259ad256911e7153c7366789f6` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43288014673 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43288014653 .
+- The task log of S0-T06 is complete with this record: REJECTED in review round 1 (two findings in part 1), APPROVED in round 2. No part of either round proposed an open item.
+
+### S0-T07 — Continuous integration: task log
+
+- Builder persona: principal continuous-integration and reproducible-build engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic (Claude planners: the first plan and its corrections after the plan review), then OpenAI GPT-5.6 Sol (high), through the Cursor command-line tool, for the one refresh before the build (the workflow files, the scripts and the tests re-derived on the merged tree; tests cut to one planted violation per rule; hardening listed and not built; citations by anchor), with the lead's notes
+- Builder maker and model: Cursor command-line tool, `composer-2.5` (Cursor), two rounds
+- Reviewer maker and model: Cursor command-line tool, `grok-4.7-high` (xAI), read-only (a maker that neither planned nor built the task)
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan with the lead's notes above the builder's taste, tests first, no continue-on-error, retry, skip, suppression or weaker assertion, no workflow that uses a secret, every action pinned by its full commit hash, the sandbox workflow and its scripts unchanged, every planted token built at run time, and a report of only the results it saw
+- Branch: `task/S0-T07-continuous-integration`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/21
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit; the six required checks on the pull request head are the hosted evidence and are entered with the verdict
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4 (system) and 3.14.6 (uv); git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8; gitleaks 8.30.1
+- Build round 1: the three workflow files, the three scripts, the two support modules and three test modules (22 tests, 12 planted cases) and the documents of the task in the same round; every check green except the full-history secret scan and one clean control of the plant harness, with one cause: four findings of the scanner's general rule on two identical lines of PROGRESS.md
+- Lead's examination and ruling: both lines are the recorded command of task S0-T05 that plants two dummy values in the environment to prove that `./eii test` prints no environment value; they are not secrets; the history of the base branch is never rewritten and the scan covers the full history (TST-141). The judge of the scan knows that line by its exact content (file, rule and SHA-256 of the line) and leaves out a finding only there; every other finding fails, and a missing or inconsistent report fails. No ignore file, no allow-list in the scanner's configuration, no narrower range. Entered as OI-108 for the owner's confirmation
+- Build round 2: seven tests first (four planted violations of the new rule), then the judge; the real scan passes with four findings on the known line left out and counted, the plant harness blocks twelve of twelve; 29 tests in the three modules
+- Lead's check of the build: the two workflow files and the table of planted cases equal the plan's literal texts; the plant harness differs from the plan by one accepted change (two empty configuration files for npm instead of the null device, which npm 10 refuses); one read of the new judge
+
+#### Evidence for the work commit `33d6a9f4b2b583bcd9127df4c40e7d9e086390fa`
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked python scripts/hooks_gitleaks.py fetch
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "gitleaks 8.30.1 already installed at data/tools/gitleaks/8.30.1/gitleaks"
+Seed:      none
+Notes:     The pinned secret scanner is present (network once; it prints that it is installed when the binary is there).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    466 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard-test discovery of rule 44, the 29 tests of the three CI modules among them (the workflow rules with their planted violations, the judge of the history scan, the plant harness).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked python scripts/ci_plants.py run
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    12 planted cases blocked, 0 failed; RESULT: PASSED
+Seed:      none
+Notes:     The plant harness: each of the twelve planted violations is blocked by the check that owns it in a scratch copy, and each clean control passes (criterion 3, TST-04).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 212 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "131 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 127 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   cd web && npm ci
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "Run `npm audit` for details."
+Seed:      none
+Notes:     The web dependencies from the lock file.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   cd web && npm run build
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "✓ built in 110ms"
+Seed:      none
+Notes:     The web build.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   cd web && npm run lint
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "> eslint --max-warnings 0 ."
+Seed:      none
+Notes:     Web lint.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   cd web && npm run format:check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Web format check.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   cd web && npm run typecheck
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "> tsc --noEmit"
+Seed:      none
+Notes:     Web typecheck.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   ./eii test --seed 2026111201
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1148 passed, 0 failed, 0 skipped
+Seed:      2026111201
+Notes:     The project's own test command with the plan's seed: every network-free suite.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: 4 finding(s) on known ledger lines left out (2 line(s))" and "history scan: range HEAD, 20 commits, at least 20 to list, RESULT: PASSED"
+Seed:      none
+Notes:     The full-history secret scan on this branch (TST-141): every commit listed; the findings on the ledger line that the judge knows by exact content are left out and counted; nothing else is found.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   python3 -I -c "import subprocess,sys; g=sorted(subprocess.run(['git','diff','--name-status','--no-renames','09e9b16556a304259ad256911e7153c7366789f6...33d6a9f4b2b583bcd9127df4c40e7d9e086390fa'],check=True,capture_output=True,text=True).stdout.splitlines()); w=sorted(['A\t'+f for f in 'scripts/ci_history_scan.py scripts/ci_plant_cases.py scripts/ci_plants.py scripts/tests/ci_support.py scripts/tests/ci_workflow_rules.py scripts/tests/test_ci_history_scan.py scripts/tests/test_ci_plants.py scripts/tests/test_ci_workflows.py .github/workflows/ci.yml'.split()]+['M\t'+f for f in '.github/workflows/docs.yml AGENTS.md CLAUDE.md OPEN_ITEMS.md README.md docs/13_DEPLOYMENT_AND_OPERATIONS.md'.split()]); print(len(g), [x for x in g if x not in w]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "15 []"
+Seed:      none
+Notes:     The work commit adds nine paths and changes six: the fifteen paths of the task (TST-163).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','09e9b16556a304259ad256911e7153c7366789f6..33d6a9f4b2b583bcd9127df4c40e7d9e086390fa'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Every work commit subject is a Conventional Commit (PLN-05).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
