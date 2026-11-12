@@ -52,18 +52,18 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: routine; personas Platform; status done (pull request 1, merged 2026-11-12).
 ### S0-T02 — Python workspace and three packages
 - Goal: Create one `uv` workspace containing `eii_core`, `eii_custodian` and `eii_product`.
-- Acceptance criteria: [ ] Python resolves all three packages; [ ] each package imports in a clean environment; [ ] workspace metadata names no forbidden dependency edge.
+- Acceptance criteria: [x] Python resolves all three packages; [x] each package imports in a clean environment; [x] workspace metadata names no forbidden dependency edge.
 - Scope: root Python workspace files, `core/`, `custodian/`, `product/`.
 - Depends: S0-T01.
 - Requirements: ARC-01, BE-01, TST-60.
-- Delivery: routine; personas Platform; status in review (pull request 4).
+- Delivery: routine; personas Platform; status done (pull request 4, merged 2026-11-12).
 ### S0-T03 — Web application skeleton
 - Goal: Create the React, TypeScript and Vite application shell with no feature UI.
 - Acceptance criteria: [ ] development build starts; [ ] production build succeeds; [ ] no run-time asset uses a third-party host.
 - Scope: `web/`, web package and TypeScript configuration.
 - Depends: S0-T01.
 - Requirements: FE-01, FE-05, FE-07, DES-24.
-- Delivery: routine; personas Frontend; status in review (pull request 3; PART B after S0-T02 merges).
+- Delivery: routine; personas Frontend; status in review (pull request 3, round 2).
 ### S0-T04 — Lint, format and type checks
 - Goal: Make Python and web linting, formatting and type checks reproducible.
 - Acceptance criteria: [ ] each check has one documented command; [ ] planted violations fail; [ ] clean scaffolding passes.
