@@ -149,7 +149,7 @@ Same setup and folders as the Runs table of the MapLibre section.
 | spike result that chose between pin and retreat | not yet confirmed | @deck.gl/core | docs/10_FRONTEND.md line 86 |
 | style extensions through H3HexagonLayer | not yet confirmed | - | docs/10_FRONTEND.md line 401 |
 | method for moving dashes | not yet confirmed | - | docs/10_FRONTEND.md line 648 |
-| load trial of 110,000 hexagons and 50,000 particles | not yet confirmed | - | TASKS.md line 154 |
+| load trial of 110,000 hexagons and 50,000 particles | not yet confirmed | - | TASKS.md line 163 |
 | no code path enables WebGPU | not yet confirmed | - | docs/10_FRONTEND.md line 87 |
 
 ## deck.gl MapLibre module

@@ -16,7 +16,7 @@ The last section of each file lists the statements of the pack about these libra
 
 ## DuckDB 2.0
 
-Used here as the build engine for the public pack, the synthetic world and the release (docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 19) and as the embedded reader (docs/02_ARCHITECTURE.md line 500). Series 2.0, retreat series 1.5; the pins.toml row is `duckdb`.
+Used here as the build engine for the public pack, the synthetic world and the release (docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 19) and as the embedded reader (docs/02_ARCHITECTURE.md line 501). Series 2.0, retreat series 1.5; the pins.toml row is `duckdb`.
 
 ### Pages read
 
@@ -87,26 +87,26 @@ Setup, in an empty folder: `uv venv --python 3.14 venv`, then `uv pip install --
 | S21 | In duckdb 2.0.0, the Python-style lambda is accepted. | OBSERVED | R6 | - |
 | S22 | Any error inside an explicit transaction aborts the transaction in DuckDB 2.0.0. | READ | P2 | "any error inside an explicit transaction aborts the transaction" |
 | S23 | The function postgres_execute sends its query to PostgreSQL with no transformation or analysis by DuckDB. | READ | P6 | "no transformation or analysis of this query is performed by DuckDB" |
-| S24 | The pack says postgres_execute takes one statement per call (docs/02_ARCHITECTURE.md line 500); the function page names one query argument and does not state a limit on statements, and no PostgreSQL server was available: not verified. | PACK | docs/02_ARCHITECTURE.md line 500 | - |
+| S24 | The pack says postgres_execute takes one statement per call (docs/02_ARCHITECTURE.md line 501); the function page names one query argument and does not state a limit on statements, and no PostgreSQL server was available: not verified. | PACK | docs/02_ARCHITECTURE.md line 501 | - |
 | S25 | The pack says DuckDB 2.x needs SET geometry_always_xy=true for the Overture extract (docs/04_PUBLIC_DATA_PACK.md line 197); the spatial extension overview page (P12) does not mention the setting: not verified. | PACK | docs/04_PUBLIC_DATA_PACK.md line 197 | - |
 | S26 | The pack records that a DuckDB GEOMETRY column arrives as a PostGIS geometry column through the PostgreSQL extension with no conversion (docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 33); that was measured by the architecture research and not repeated here: not verified. | PACK | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 33 | - |
-| S27 | The pack lists byte-order sorting of text as an assumption to be confirmed with the parity query of slice S1 (docs/02_ARCHITECTURE.md line 410); the page read (S19) names the default for DuckDB only, and no parity query has been run: not verified. | PACK | docs/02_ARCHITECTURE.md line 410 | - |
+| S27 | The pack lists byte-order sorting of text as an assumption to be confirmed with the parity query of slice S1 (docs/02_ARCHITECTURE.md line 411); the page read (S19) names the default for DuckDB only, and no parity query has been run: not verified. | PACK | docs/02_ARCHITECTURE.md line 411 | - |
 
 ### Slice S1 confirmation
 
 | Field | Value | Rows in pins.toml | Pack source |
 |---|---|---|---|
 | exact pin, or the retreat series chosen instead | not yet confirmed | duckdb | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 21 |
-| path of the project-local extension directory | not yet confirmed | - | docs/02_ARCHITECTURE.md line 699 |
+| path of the project-local extension directory | not yet confirmed | - | docs/02_ARCHITECTURE.md line 700 |
 | need for geometry_always_xy | not yet confirmed | - | docs/03_DATA_CONTRACTS.md line 64 |
-| text ordering by byte value, by the parity query | not yet confirmed | - | docs/02_ARCHITECTURE.md line 410 |
+| text ordering by byte value, by the parity query | not yet confirmed | - | docs/02_ARCHITECTURE.md line 411 |
 | threading guidance of the 2.0 Python interface | not yet confirmed | - | docs/08_BACKEND.md line 119 |
 | copy mechanism from DuckDB to PostgreSQL | not yet confirmed | - | docs/08_BACKEND.md line 269 |
 | files written by 2.0 when the retreat series is chosen | not yet confirmed | duckdb | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 39 |
 
 ## PostgreSQL 18
 
-Used here as the serving store, with PostGIS and no other extension (docs/02_ARCHITECTURE.md line 501). Series 18; the pins.toml rows are `postgresql`, `postgis` and `postgis-image`.
+Used here as the serving store, with PostGIS and no other extension (docs/02_ARCHITECTURE.md line 502). Series 18; the pins.toml rows are `postgresql`, `postgis` and `postgis-image`.
 
 ### Pages read
 
@@ -146,16 +146,16 @@ Used here as the serving store, with PostGIS and no other extension (docs/02_ARC
 | S11 | Multiple jobs of pg_restore cannot be used together with the option --single-transaction. | READ | P8 | "multiple jobs cannot be used together with the option --single-transaction" |
 | S12 | The pack applies the volume layout of the official postgres image to the postgis/postgis image (docs/13_DEPLOYMENT_AND_OPERATIONS.md line 131); the page read is the page of the official image, not of the PostGIS image: not verified. | PACK | docs/13_DEPLOYMENT_AND_OPERATIONS.md line 131 | - |
 | S13 | The pack says the PostGIS image defines no health check and that the first-boot server listens on the socket only (docs/12_TESTING_AND_QUALITY.md line 326; docs/13_DEPLOYMENT_AND_OPERATIONS.md line 132); neither was looked for here: not verified. | PACK | docs/12_TESTING_AND_QUALITY.md line 326 | - |
-| S14 | The pack says the database may carry only PostGIS and the built-in procedural language, and that text columns use the C collation (docs/08_BACKEND.md line 217; docs/13_DEPLOYMENT_AND_OPERATIONS.md line 155); neither was looked for here: not verified. | PACK | docs/08_BACKEND.md line 217; docs/13_DEPLOYMENT_AND_OPERATIONS.md line 155 | - |
+| S14 | The pack says the database may carry only PostGIS and the built-in procedural language, and that text columns use the C collation (docs/08_BACKEND.md line 217; docs/13_DEPLOYMENT_AND_OPERATIONS.md line 155; docs/02_ARCHITECTURE.md line 411); neither was looked for here: not verified. | PACK | docs/08_BACKEND.md line 217; docs/13_DEPLOYMENT_AND_OPERATIONS.md line 155; docs/02_ARCHITECTURE.md line 411 | - |
 
 ### Slice S1 confirmation
 
 | Field | Value | Rows in pins.toml | Pack source |
 |---|---|---|---|
-| exact pin of PostgreSQL 18 and the PostGIS 3.6 line | not yet confirmed | postgresql, postgis | docs/02_ARCHITECTURE.md line 501 |
+| exact pin of PostgreSQL 18 and the PostGIS 3.6 line | not yet confirmed | postgresql, postgis | docs/02_ARCHITECTURE.md line 502 |
 | image digest of the PostGIS image | not yet confirmed | postgis-image | docs/13_DEPLOYMENT_AND_OPERATIONS.md line 128 |
 | data directory and volume path of that image | not yet confirmed | postgis-image | docs/13_DEPLOYMENT_AND_OPERATIONS.md line 131 |
-| first parity query on both stores | not yet confirmed | - | TASKS.md line 173 |
+| first parity query on both stores | not yet confirmed | - | TASKS.md line 182 |
 
 ## Claude API
 
@@ -258,7 +258,7 @@ Used here behind one provider adapter for the router and the writer, with the te
 | The embedded adapter opens read-only, then sets enable_external_access to false and lock_configuration to true | docs/08_BACKEND.md line 117 | DuckDB 2.0 S10; DuckDB 2.0 S12; DuckDB 2.0 S13 |
 | DuckDB accepts cell = ANY(list), and a dictionary of named parameters | docs/08_BACKEND.md line 123; docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 32 | DuckDB 2.0 S20 |
 | A DuckDB GEOMETRY column arrives as a PostGIS geometry column with no conversion | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 33 | DuckDB 2.0 S26 |
-| DuckDB orders text by byte value by default (assumption) | docs/02_ARCHITECTURE.md line 410 | DuckDB 2.0 S19; DuckDB 2.0 S27 |
+| DuckDB orders text by byte value by default (assumption) | docs/02_ARCHITECTURE.md line 411 | DuckDB 2.0 S19; DuckDB 2.0 S27 |
 | The adapter uses one cursor per thread (assumption) | docs/08_BACKEND.md line 119 | DuckDB 2.0 S14 |
 | PostgreSQL set_config with is_local true limits the value to the current transaction | docs/08_BACKEND.md line 110 | PostgreSQL 18 S6 |
 | PostgreSQL integer division truncates towards zero | docs/08_BACKEND.md line 137 | PostgreSQL 18 S7 |
@@ -270,7 +270,7 @@ Used here behind one provider adapter for the router and the writer, with the te
 | The PostGIS image has no health check and the first-boot server listens on the socket only | docs/12_TESTING_AND_QUALITY.md line 326; docs/13_DEPLOYMENT_AND_OPERATIONS.md line 132 | PostgreSQL 18 S13 |
 | Parallel restore does not work with --single-transaction | docs/13_DEPLOYMENT_AND_OPERATIONS.md line 325 | PostgreSQL 18 S11 |
 | PostgreSQL 18 adds OAuth authentication and data checksums by default | docs/13_DEPLOYMENT_AND_OPERATIONS.md line 354 | PostgreSQL 18 S2; PostgreSQL 18 I2 |
-| The database carries only PostGIS and plpgsql, and text columns use the C collation | docs/08_BACKEND.md line 217; docs/13_DEPLOYMENT_AND_OPERATIONS.md line 155 | PostgreSQL 18 S14 |
+| The database carries only PostGIS and plpgsql, and text columns use the C collation | docs/08_BACKEND.md line 217; docs/13_DEPLOYMENT_AND_OPERATIONS.md line 155; docs/02_ARCHITECTURE.md line 411 | PostgreSQL 18 S14 |
 | Thinking is omitted or adaptive, and disabled or a token budget returns a 400 error | docs/09_AI_ASSISTANT.md line 220 | Claude API I1 |
 | The thinking display default is omitted | docs/09_AI_ASSISTANT.md line 221 | Claude API S4 |
 | The default effort is medium | docs/09_AI_ASSISTANT.md line 222 | Claude API S2 |
