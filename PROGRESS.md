@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Ledger current to the first commit, 2026-11-11 |
-| Date | 2026-11-11 |
+| Status | Ledger current to decision record 0015, 2026-11-12 |
+| Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Record only completed work with evidence, and reserve later rows for evidence not yet available. |
 | Read first | [docs/README.md](docs/README.md), [OPEN_ITEMS.md](OPEN_ITEMS.md) |
@@ -47,6 +47,58 @@
 | PENDING | Review of the lead's last ten corrections to the privacy document by another maker (open item OI-37) | PENDING: maker, model, verdict | PENDING |
 | PENDING | Confirmation by another maker that the 23 findings of the final read-through are resolved (open item OI-38) | PENDING: maker, model, verdict | PENDING |
 | 2026-11-12 | Decision record 0015 written from the owner's decisions of 2026-11-12 (review rounds after the first; what the repository's own checks defend against); documents 14 and 15 and the two decision indexes corrected to it; pull request https://github.com/albarami/economic-investment-intelligence/pull/2 | Commit `ef8558b1fcda03830566cee71781937768d054e7`: `python3 scripts/check_docs.py`, exit code 0, output "checked 47 text files, 40 Markdown files: OK"; `cmp AGENTS.md CLAUDE.md`, exit code 0; both run by the lead on 2026-11-12 in a clean worktree of that commit. Independent review of the head of the pull request: PENDING, to be recorded with its unchanged verdict by the next pull request | Text by the lead (Claude, Anthropic) from the owner's decisions; applied by Devin local, model `swe-2-high` (Cognition) |
+| 2026-11-12 | Decision record 0015 corrected after its first independent review (findings F1 and F2 applied; F3, this ledger's header, applied in this ledger commit) and rewritten to the owner's exact rule text of 2026-11-12 (second message): sixteen points; REV-05, REV-06, REV-08, REV-33, REV-39 to REV-42 and the verdict format of document 15, steps 2, 8, 9 and 10 of document 14, TST-164, TST-168 and TST-169 of document 12, and the queue rules of TASKS.md corrected; one follow-up task added to each slice of TASKS.md | Commit `747a68cd7ee965c4e2e02973ee9de1ed1312a698`: `python3 scripts/check_docs.py`, exit code 0, output "checked 47 text files, 40 Markdown files: OK"; `cmp AGENTS.md CLAUDE.md`, exit code 0; both run by the lead on 2026-11-12 in a worktree proven equal to that commit. The verdict of review round 1 follows this table, unchanged; the verdict of the next review is recorded by the next pull request | Text by the lead (Claude, Anthropic) from the owner's decisions; applied by Devin local, model `swe-2-high` (Cognition) |
+
+#### Decision record 0015: independent review, round 1
+
+Reviewed commit `259dd8b2601324079813beb5e570a9c0c38fea78`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/2 at that time, with CI green on it. Reviewer: OpenAI GPT-5.6 Sol, through the Cursor command-line tool, read-only. The verdict is copied unchanged (REV-09); it is also posted on the pull request. All three findings were accepted and are applied in the commits that follow it.
+
+```text
+VERDICT: REJECTED
+TASK: decision record 0015 (documentation-only pull request 2)
+COMMIT: 259dd8b2601324079813beb5e570a9c0c38fea78
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 FAIL F1: the record contains historical assertions not supported by the supplied evidence or repository.
+  REV-11 PASS .overnight/EVIDENCE.md records `python3 scripts/check_docs.py` exit 0 on the head, and CI job `check-docs` succeeded on the head.
+  REV-12 PASS The diff changes only six documentation and ledger files required by the amendment.
+  REV-13 N/A This documentation-only commit delivers no code, release tables or mock implementation.
+  REV-14 PASS The full diff and successful documentation safety check show no secret or real custodian data.
+  REV-15 PASS No test, assertion, threshold, CI configuration or technical guard is changed.
+  REV-16 FAIL F2: the Decision section adds an unsupported rule not stated by the owner.
+  REV-17 FAIL F3: PROGRESS.md is no longer current as its header claims.
+  REV-18 N/A This documentation-only commit changes no security or data-handling implementation.
+  REV-19 PASS The changed review rule has the owner-ordered decision record rather than silently reopening a settled decision.
+  REV-20 N/A No fact object, displayed figure, provenance or lineage implementation changes.
+  REV-21 N/A No screen, template, numeral or Fact-chip implementation changes.
+  REV-22 N/A No privacy partition, parameter, treatment or audit implementation changes.
+  REV-23 N/A No product or custodian package code exists or changes in this commit.
+  REV-24 N/A No English or Arabic view changes.
+  REV-25 PASS The full diff and documentation check show no private path, personal name, e-mail address, secret, realistic identifier or prohibited comparison.
+  REV-26 PASS The changed text makes none of the prohibited product, privacy, endorsement, forecast or lookup claims.
+  REV-27 PASS AGENTS.md and CLAUDE.md are untouched; recorded `cmp AGENTS.md CLAUDE.md` and the documentation check both exited 0.
+  REV-28 N/A No synthetic identifier is added or changed.
+  REV-29 N/A No attribute or fact about a real named place or business is added.
+  REV-38 N/A No serving-plane or typed-decision gateway implementation changes.
+FINDINGS:
+  F1 (REV-10)
+    File: docs/decisions/0015-review-rounds-and-the-scope-of-repository-checks.md
+    Line: 14-16, 34-35
+    Wrong: The Context and Evidence assert details about pull request 1, review convergence, unchanged lines and reproduction through an index flag that are not established by .overnight/EVIDENCE.md, the repository or the owner's supplied decisions. This breaks the brief's Truth and Fidelity requirements.
+    Fix: Delete these unsupported Context and Evidence bullets, leaving only claims supported by the old tracked wording and OWNER_DECISIONS.md; then run `python3 scripts/check_docs.py` and repeat the point-by-point comparison with OWNER_DECISIONS.md.
+  F2 (REV-16)
+    File: docs/decisions/0015-review-rounds-and-the-scope-of-repository-checks.md
+    Line: 30
+    Wrong: “This record removes no protection” is presented as part of the Decision, but the owner decided only that plans already written keep what they have. The added broader claim is neither decided nor labelled ASSUMPTION, contrary to the brief's Fidelity requirement.
+    Fix: Remove “This record removes no protection.” from decision item 11, leaving the owner's sentence about existing plans; then run `python3 scripts/check_docs.py` and compare every Decision item with OWNER_DECISIONS.md.
+  F3 (REV-17)
+    File: PROGRESS.md
+    Line: 5-6
+    Wrong: The header says the ledger is current only to the first commit on 2026-11-11, but line 49 now records work from 2026-11-12. The changed document is therefore not current as REV-17 requires.
+    Fix: Update the Status row to say the ledger is current through the decision-record-0015 entry and update the Date row to 2026-11-12; then run `python3 scripts/check_docs.py`.
+PROPOSED OPEN ITEMS:
+  none
+```
 
 ## Evidence rules for later entries
 
