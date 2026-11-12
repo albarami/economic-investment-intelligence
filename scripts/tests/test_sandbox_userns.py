@@ -284,7 +284,8 @@ class RunnerRules(unittest.TestCase):
                 [
                     "FAIL aa-status --json: exit status 4, expected 0",
                     "FAIL aa-status --json: standard error is not empty: 'aa-status: not enough privileges\\n'",
-                    "FAIL aa-status --json did not print exactly one line: ''",
+                    "FAIL aa-status --json printed no JSON object with unique keys "
+                    "(Expecting value: line 1 column 1 (char 0))",
                 ],
             ),
             (

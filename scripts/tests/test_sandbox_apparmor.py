@@ -67,6 +67,12 @@ class AppArmorRules(unittest.TestCase):
         self.assertEqual(labels, [1, 2, 3, 4])
 
     def test_aa_status_listing_grammar(self) -> None:
+        # Hosted runner: a valid status object whose closing brace stands
+        # alone on the last line, and the output ends with a line feed.
+        hosted = json.dumps(json.loads(GOOD), indent=2) + "\n"
+        self.assertEqual(hosted.splitlines()[-1], "}", "hosted runner shape")
+        self.assertTrue(hosted.endswith("}\n"), "hosted runner shape")
+        self.assertEqual(ci_apparmor.status_problems(hosted), [], "hosted runner shape")
         other = _listing(
             {
                 "/usr/bin/man": "enforce",
@@ -125,20 +131,16 @@ class AppArmorRules(unittest.TestCase):
             ),
             (
                 GOOD + GOOD,
-                [f"aa-status --json did not print exactly one line: {(GOOD + GOOD)!r}"],
-            ),
-            ("", ["aa-status --json did not print exactly one line: ''"]),
-            ("x", ["aa-status --json did not print exactly one line: 'x'"]),
-            (
-                GOOD.replace("\n", "\r\n"),
                 [
-                    f"aa-status --json line has leading or trailing white space: {GOOD.replace(chr(10), chr(13) + chr(10))!r}"
+                    "aa-status --json printed no JSON object with unique keys "
+                    "(Extra data: line 2 column 1 (char 122))"
                 ],
             ),
             (
-                " " + GOOD,
+                "",
                 [
-                    f"aa-status --json line has leading or trailing white space: {(' ' + GOOD)!r}"
+                    "aa-status --json printed no JSON object with unique keys "
+                    "(Expecting value: line 1 column 1 (char 0))"
                 ],
             ),
             (
@@ -152,8 +154,8 @@ class AppArmorRules(unittest.TestCase):
         ]
         # The last plant rebuilds the object with a NaN member rather than the false branch.
         body = GOOD[:-1]
-        plants[15] = (body[:-1] + ', "x": NaN}\n', plants[15][1])
-        self.assertEqual(len(plants), 16)
+        plants[12] = (body[:-1] + ', "x": NaN}\n', plants[12][1])
+        self.assertEqual(len(plants), 13)
         for index, (text, want) in enumerate(plants, start=1):
             self.assertEqual(ci_apparmor.status_problems(text), want, index)
 
@@ -338,7 +340,8 @@ class AppArmorRules(unittest.TestCase):
                 [
                     "FAIL aa-status --json: exit status 4, expected 0",
                     f"FAIL aa-status --json: standard error is not empty: {denied!r}",
-                    "FAIL aa-status --json did not print exactly one line: ''",
+                    "FAIL aa-status --json printed no JSON object with unique keys "
+                    "(Expecting value: line 1 column 1 (char 0))",
                 ],
             )
         self.assertEqual(labels, list("abcdefghijk"))

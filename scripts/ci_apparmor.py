@@ -21,8 +21,9 @@ from typing import Any
 PROFILE_PACKAGE = "apparmor-profiles 4.0.1really4.0.1-0ubuntu0.24.04.9"
 PROFILE_SIZE = 1936
 PROFILE_SHA256 = "11d39094f044f0cda0febb3ad517b830301da6b2ce929664af09ee9e4dd264f9"
-# aa-status --json of AppArmor 4.0.1 prints one line: an object with the keys
-# version ("2"), profiles (name -> mode) and processes.
+# aa-status --json of AppArmor 4.0.1 prints one JSON object, which may span
+# lines: keys version ("2"), profiles (name -> mode) and processes. The hosted
+# runner puts the closing brace alone on the last line.
 STATUS_VERSION = "2"
 PROFILE_NAMES = ("bwrap", "unpriv_bwrap")
 ENFORCE = "enforce"
@@ -92,22 +93,23 @@ def one_line(what: str, stdout: str) -> tuple[str | None, list[str]]:
 
 
 def status_problems(stdout: str) -> list[str]:
-    """Judge the output of ``aa-status --json``.
+    """Judge the whole standard output of ``aa-status --json`` as one JSON document.
+
+    The output must be one JSON object and nothing else. White space between
+    JSON tokens, including line feeds, is accepted. A second document, text
+    before or after the object, or an empty output is a problem.
 
     Args:
         stdout: Its standard output.
 
     Returns:
-        Problem texts; empty when the output is one JSON object of format
-        ``STATUS_VERSION`` without a repeated key, whose ``profiles`` object
-        lists each name of ``PROFILE_NAMES`` exactly, in enforce mode.
+        Problem texts; empty when that object is format ``STATUS_VERSION``
+        without a repeated key, and its ``profiles`` object lists each name
+        of ``PROFILE_NAMES`` exactly, in enforce mode.
     """
-    line, problems = one_line("aa-status --json", stdout)
-    if line is None:
-        return problems
     try:
         data = json.loads(
-            line, object_pairs_hook=_unique_keys, parse_constant=_no_constant
+            stdout, object_pairs_hook=_unique_keys, parse_constant=_no_constant
         )
     except ValueError as error:
         return [f"aa-status --json printed no JSON object with unique keys ({error})"]
