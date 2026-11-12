@@ -52,6 +52,7 @@
 | 2026-11-12 | Decision record 0015 corrected after its third independent review (finding F9: decision item 3 now also holds the owner's sentence on the second confirmation review of task S0-T01) | Commit `f19386e3195086d48edfad06c5c852a6c0332efc`: `python3 scripts/check_docs.py`, exit code 0, output "checked 57 text files, 47 Markdown files: OK", run by the lead on 2026-11-12 in a worktree proven equal to that commit. The verdict of review round 3 follows this table, unchanged | Correction applied by the Cursor command-line tool, model `grok-4.7-high` (xAI), a maker other than the reviewer's; ledger by the lead (Claude, Anthropic) |
 | 2026-11-12 | Decision records 0016, 0017 and 0018 written from the owner's decisions of 2026-11-12 (version 1 covers the whole initiative; public data additions and public splits; priorities and amendments to decision 0015); documents 01 to 16, the glossary, the indexes, AGENTS.md and CLAUDE.md (rules 8, 10, 24, 25), TASKS.md and OPEN_ITEMS.md rewritten to them; new document 17 (deployment hardening); pull request https://github.com/albarami/economic-investment-intelligence/pull/6 | Commit `ccd1b274b839ae616bba0c301128a578fb1d2d27`: `python3 scripts/check_docs.py`, exit code 0, output "checked 81 text files, 51 Markdown files: OK"; `python3 scripts/check_tree.py`, exit code 0, output "checked 8 rules: OK"; `cmp AGENTS.md CLAUDE.md`, exit code 0; run by the lead on 2026-11-12 in the worktree of that commit. Internal checks before the pull request (privacy engine, calculation layer, general): 54 findings, all fixed and verified | Text by the lead; documents rewritten by Claude Sonnet editors and Claude Opus fixers and editors (Anthropic); independent review PENDING (another maker) |
 | 2026-11-12 | Version-1 documentation corrected after its first independent review (26 findings of ten parts: 25 fixed in the documents, one answered by the round-2 evidence), then main merged into the branch | Commit `ac3629c33c04873421021754d65fa613a80940b6` (the fixes) and merge commit `ad462b78468ca363241f0fb906eba39f4f2dc7ac`: `python3 scripts/check_docs.py`, exit code 0, output "checked 87 text files, 51 Markdown files: OK"; `python3 scripts/check_tree.py`, exit code 0, output "checked 8 rules: OK"; `cmp AGENTS.md CLAUDE.md`, exit code 0; run by the lead on 2026-11-12 on the merge commit | Text by the lead; fixes by Claude Opus and Claude Sonnet editors (Anthropic); independent review round 2 PENDING (another maker) |
+| 2026-11-12 | Version-1 documentation corrected after its second independent review (six findings of four parts, all fixed; the close-out of the cross-document requests; the owner's note on the stayer index) | Commit `6ab0255c544dfc65ffe42585823585ed9c5e6bfb`: `python3 scripts/check_docs.py`, exit code 0, output "checked 87 text files, 51 Markdown files: OK"; `python3 scripts/check_tree.py`, exit code 0, output "checked 8 rules: OK"; `cmp AGENTS.md CLAUDE.md`, exit code 0; run by the lead on 2026-11-12 on that commit | Text by the lead; fixes by Claude Opus and Claude Sonnet editors (Anthropic); independent review round 3 PENDING (another maker) |
 
 #### Decision record 0015: independent review, round 1
 
@@ -3057,6 +3058,418 @@ PROPOSED OPEN ITEMS:
 ```
 
 The lead judged all 26 findings valid (three of them rest on a decision's wording, which the lead read: decision 0016 items 9 and 14, decision 0017 item 1). Part 1's F1 (the lead's evidence must be on the exact reviewed commit) is answered in the round-2 evidence, which holds the head checks of the commit under review. The other 25 were fixed by three editors on disjoint files (Claude Opus for the privacy engine and egress, and for methods and data; Claude Sonnet for the plan, tests and indexes) and verified by a Claude Sonnet verifier (25 of 25 fixed); a close-out pass added the test rows of document 12 and removed the contradictions the fixes left between documents (18 of 18 verified), and the lead corrected five last lines. Main (with S0-T04) was then merged into the branch, without conflict.
+
+#### Version-1 documentation (pull request 6): independent review, round 2
+
+Reviewed commit `ca4fc936bda25def27ab6ab1ca6f3377fbdee6b2`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/6, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43197988938 ). Reviewer: OpenAI GPT-5.6 Sol (high), through the Cursor command-line tool, read-only; a later round in ten parts under decision record 0015 as the owner amended it on 2026-11-12. Each part's verdict is copied unchanged from its first line (REV-09); they are also posted on the pull request.
+
+#### Version-1 documentation (pull request 6): independent review, round 2, part 1 of 10: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: D0016 part p01 (pull request 6)
+COMMIT: ca4fc936bda25def27ab6ab1ca6f3377fbdee6b2
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED .overnight/EVIDENCE.md records the lead's documentation check, tree check and agent-file comparison, all exit 0 on the exact reviewed head; CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43197988938
+  F2 FIXED docs/README.md lines 14 and 48-49 now include decision 0018 in the amendment summary and statuses of documents 14 and 15.
+  F3 FIXED OPEN_ITEMS.md lines 4-5 now state Draft v0.3, decisions 0016 to 0018 and 2026-11-12.
+  F4 FIXED OPEN_ITEMS.md line 264 now separates version-1 cross-month attacks from deployment hardening across two windows.
+  F5 FIXED OPEN_ITEMS.md line 377 now says version 1 uses rounded estimated presence counts and flows without either scale.
+  F6 FIXED docs/13_DEPLOYMENT_AND_OPERATIONS.md line 20 now refers to sections 2 to 8 of document 17.
+CHECKS:
+  REV-10 FAIL F7-F9: three assigned passages still contradict decisions 0016 or 0018.
+  REV-11 PASS The lead ran the documentation check, tree check and agent-file comparison on the exact head, all exit 0; CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43197988938
+  REV-12 PASS .overnight/DIFF.md contains only the assigned documentation files.
+  REV-13 N/A This documentation-only part delivers no implementation code, release data or mock substitute.
+  REV-14 PASS No secret, private identifier or real custodian record appears.
+  REV-15 PASS No test, assertion, threshold, tolerance, attack size or CI control is weakened.
+  REV-16 FAIL F8-F9 retain build-time live-model use contrary to the accepted operating rule.
+  REV-17 FAIL F7-F9 show that affected glossary, operations and open-item text is not fully current with decisions 0016 and 0018.
+  REV-18 PASS The changed operational text keeps secrets environmental, case inputs closed and the custodian/product boundary intact.
+  REV-19 FAIL F7 contradicts decision 0016 item 12 and its release-table consequence; F8-F9 contradict decision 0018 item 12.
+  REV-20 PASS Quantitative claims retain attribution or are explicitly labelled requirements, estimates or assumptions.
+  REV-21 PASS Fact chips remain the only screen numeral renderer and model-written screen prose remains prohibited.
+  REV-22 PASS The corrected text keeps required cross-month attacks in version 1 and cross-window hardening in document 17.
+  REV-23 N/A No product or custodian package code changes occur in this documentation-only part.
+  REV-24 N/A No Arabic interface string or numeric-rendering implementation changes occur.
+  REV-25 PASS No private path, personal name, e-mail address, secret, realistic identifier or prohibited comparison appears.
+  REV-26 PASS The part makes no prohibited certification, endorsement, lookup, forecast or action-verdict claim.
+  REV-27 PASS The lead's exact-head comparison of AGENTS.md and CLAUDE.md exited 0.
+  REV-28 N/A No synthetic record identifier or fictional firm name is introduced.
+  REV-29 PASS Real named entities remain Public-only and named synthetic firms remain Synthetic-only.
+  REV-38 PASS The typed-decision gateway remains offline and absent from serving and run-time paths.
+FINDINGS:
+  F7 (REV-19; kind d)
+    File: docs/GLOSSARY.md
+    Line: 16
+    Wrong: “A release contains statistics only” contradicts decision 0016 item 12 and its consequence that release tables carry named synthetic-firm lists containing fictional name, activity, size band and area.
+    Fix: State that a release contains statistics and Public records plus the restricted named synthetic-firm list, while all other record-level synthetic inputs remain in the vault; run `python3 scripts/check_docs.py`.
+  F8 (REV-19; kind d)
+    File: docs/13_DEPLOYMENT_AND_OPERATIONS.md
+    Line: 39
+    Wrong: The developer-machine model mode says “Key optional”, permitting keyed live-model use during the build contrary to decision 0018 item 12.
+    Fix: Replace it with “Template writer and recorded provider only; never a live key during the build”, and run `python3 scripts/check_docs.py`.
+  F9 (REV-19; kind d)
+    File: OPEN_ITEMS.md
+    Line: 329
+    Wrong: OI-30 still makes “slice S8 live-model tuning” the deadline, contradicting decision 0018 item 12, which moves every keyed live-model run to the owner-enabled go-live gate.
+    Fix: Replace the deadline with go-live after OI-01 is closed and state that slice S8 uses only the template writer and recorded provider; run `python3 scripts/check_docs.py`.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Version-1 documentation (pull request 6): independent review, round 2, part 2 of 10: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: D0016 part p02 (pull request 6)
+COMMIT: ca4fc936bda25def27ab6ab1ca6f3377fbdee6b2
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED TASKS.md line 504 now retains the mover canary and adjacent-month predicates in the version-1 gate while excluding only a second window and cross-window test.
+  F2 FIXED TASKS.md lines 818-839 now assign model-returned briefs and live runs only to the owner-enabled go-live gate; all build gates use recorded fixtures without a key or network.
+  F3 FIXED docs/14_IMPLEMENTATION_PLAN.md lines 542, 568-570 and 748 now keep template and recorded-provider operation throughout the build and permit live-model use only by owner decision at go-live.
+CHECKS:
+  REV-10 PASS All three earlier findings are fixed, and the changed lines implement decisions 0016 and 0018.
+  REV-11 PASS The lead recorded `python3 scripts/check_docs.py` exit 0 and `python3 scripts/check_tree.py` exit 0 on this exact head; CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43197988938.
+  REV-12 PASS The supplied task-change diff contains only TASKS.md and docs/14_IMPLEMENTATION_PLAN.md; the main merge is identified as a base update.
+  REV-13 PASS The changed planning text contains no placeholder, stub, invented figure or mock substitute for required work.
+  REV-14 PASS No secret or real custodian record, field, file or count appears in the assigned changes.
+  REV-15 PASS No test, threshold, tolerance, assertion, example count or required check is weakened.
+  REV-16 PASS The changes preserve the approved slice order, privacy gate, offline build path and owner-controlled go-live boundary.
+  REV-17 PASS Both assigned planning documents are consistent, and the documentation check exited 0 on the reviewed head.
+  REV-18 PASS The changed lines keep build execution offline with no key or network and introduce no data-handling defect.
+  REV-19 PASS The key-existence trigger is removed; live-model use now requires an owner decision at go-live, as decision 0018 item 12 requires.
+  REV-20 PASS The changed text does not permit model calculations or unlined facts and preserves deterministic evaluation fixtures.
+  REV-21 PASS Closed-catalogue validation, template-writer output and fallback accounting remain required.
+  REV-22 PASS TASKS.md lines 504 and 532 consistently retain the mover canary, adjacent-month predicates and within-window differencing attacks.
+  REV-23 PASS No product-to-custodian import or boundary relaxation is introduced.
+  REV-24 PASS No bilingual numeral-parity requirement is changed.
+  REV-25 PASS No private path, personal name, e-mail address, realistic identifier, secret or prohibited comparison appears.
+  REV-26 PASS The changed text makes no prohibited claim, forecast, verdict, probability, confidence claim or advice.
+  REV-27 PASS The lead recorded `cmp AGENTS.md CLAUDE.md` exit 0 on the exact head.
+  REV-28 PASS No synthetic identifier rule is changed or violated.
+  REV-29 PASS No Synthetic or Simulated attribute is attached to a real named place or business.
+  REV-38 PASS Build gates remain on recorded offline inputs without a key or network; no serving-plane gateway use is introduced.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Version-1 documentation (pull request 6): independent review, round 2, part 3 of 10: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: D0016 part p03 (pull request 6)
+COMMIT: ca4fc936bda25def27ab6ab1ca6f3377fbdee6b2
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED AI-70 now requires the template writer for guided and case stories during the build, and the template-mode Prepared story row names the template writer.
+  F2 FIXED AI-68 defines deterministic recorded-provider fixtures requiring no live call; AI-90 separates the offline build bar from the live go-live bar; AI-91 permits the live gate only after OI-01 is closed.
+  F3 FIXED BRF-19 now requires deterministic selection and layout to fit one bilingual A4 portrait page.
+CHECKS:
+  REV-10 PASS The three decision records and the earlier findings are implemented in this part.
+  REV-11 PASS The lead recorded check_docs exit 0, check_tree exit 0 and cmp exit 0 on this exact head; CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43197988938
+  REV-12 PASS The supplied part diff changes only docs/01_PROJECT_BRIEF.md and docs/09_AI_ASSISTANT.md.
+  REV-13 N/A This documentation-only part delivers no implementation in which a placeholder, stub or mock could stand for real work.
+  REV-14 PASS The part contains no secret or real custodian data; real figures are attributed Public inputs.
+  REV-15 PASS No test, assertion, threshold, tolerance, skip or CI configuration is changed in this part.
+  REV-16 PASS The corrected one-page export and offline build path follow the accepted decisions and pinned terminology.
+  REV-17 PASS Both affected documents are updated, and the lead's documentation check exited 0.
+  REV-18 FAIL F4 leaves contradictory requirements for blocked egress records containing synthetic-firm fields.
+  REV-19 PASS The fixes implement decisions 0016 and 0018 without reopening a settled decision.
+  REV-20 PASS The documents require deterministic calculation facts and complete source chains for every displayed number.
+  REV-21 PASS Displayed prose remains application-owned, numerals remain Fact-chip values and synthetic-firm rows are rendered deterministically outside briefs.
+  REV-22 PASS The changed text preserves firm-list minimum, dominance, complement and linkage-attack controls.
+  REV-23 N/A This documentation-only part changes no product import or package metadata.
+  REV-24 PASS The documents retain identical facts and Western numerals across English and Arabic.
+  REV-25 PASS No private path, personal name, e-mail address, secret, realistic identifier or named-product comparison appears.
+  REV-26 PASS The prohibited real-data, named-place, forecast, lookup, confidence, verdict and action-advice claims remain absent.
+  REV-27 PASS The lead recorded cmp AGENTS.md CLAUDE.md exit 0 on this exact head.
+  REV-28 PASS No synthetic identifier is introduced, and the collision and digit-run requirements remain intact.
+  REV-29 PASS Real named entities remain Public-only and named synthetic firms remain Synthetic-only.
+  REV-38 PASS BRF-55 and AI-98 keep the typed-decision gateway offline and outside serving and run-time planes.
+FINDINGS:
+  F4 (REV-18; kind b)
+    File: docs/09_AI_ASSISTANT.md
+    Line: 242, 430, 444-451
+    Wrong: Changed requirements AI-77 and AI-108 require a blocked payload containing a listed firm's name or key to produce an egress record while forbidding every firm field from reaching that record. The egress-field table still requires `payload_json` to hold the exact payload for each row, and AI-82 does not make it null for blocked calls. An implementation following that table stores the prohibited firm field in the blocked egress record, breaking AI-108 and referenced ARC-73.
+    Fix: State in the egress-field table and AI-82 that `payload_json` is null for an egress-scan-blocked call and only the proposed payload hash is stored; require a planted firm name and key to be absent from the blocked egress row.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Version-1 documentation (pull request 6): independent review, round 2, part 4 of 10: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: D0016 part p04 (pull request 6)
+COMMIT: ca4fc936bda25def27ab6ab1ca6f3377fbdee6b2
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED docs/02_ARCHITECTURE.md line 35 now states that the release holds statistics and Public records plus the ARC-131 named synthetic firm list.
+  F2 FIXED docs/02_ARCHITECTURE.md lines 486 and 638 exclude every firm-list row and field from model requests and egress records and require the planted egress scan.
+CHECKS:
+  REV-10 PASS The amended architecture implements decisions 0016 to 0018 in this part, and both earlier defects are fixed.
+  REV-11 PASS The lead’s documentation check exited 0 on this exact head, and CI succeeded: https://github.com/albarami/economic-investment-intelligence/actions/runs/43197988938
+  REV-12 PASS The supplied task diff changes only docs/02_ARCHITECTURE.md and docs/16_DEMO_RUNBOOK.md in this part.
+  REV-13 PASS No placeholder, stub, invented result or mock implementation stands in for the documented requirements.
+  REV-14 PASS The part contains no secret or real custodian data.
+  REV-15 PASS No threshold, tolerance, assertion, attack size or check is weakened; the changed lines add refusal and planted-violation checks.
+  REV-16 PASS The changed architecture and runbook follow the accepted release, model-boundary and sample-file requirements.
+  REV-17 PASS The affected documents are updated consistently, and python3 scripts/check_docs.py exited 0 after checking 87 text files and 51 Markdown files.
+  REV-18 PASS ARC-73 and ARC-109 now keep firm rows out of model payloads, egress records, ledgers and logs; ARC-128 accepts only closed sample keys.
+  REV-19 PASS The changed text implements decision 0016’s named synthetic firms and cases without reopening a settled decision.
+  REV-20 PASS Displayed numbers remain deterministic facts with complete provenance and lineage.
+  REV-21 PASS Numbers remain Fact-chip values, while firm-list rows are rendered deterministically by the application and excluded from briefs and model requests.
+  REV-22 PASS The firm list retains its minimum, dominance, complement and linkage-attack requirements; no privacy invariant is weakened.
+  REV-23 PASS The product and custodian import boundary remains explicit and tested.
+  REV-24 PASS ARC-107 and runbook step D10 retain identical facts and numerals across English and Arabic.
+  REV-25 PASS The part contains no prohibited private path, personal name, e-mail address, realistic identifier, secret or product comparison; the documentation check passed.
+  REV-26 PASS The architecture and runbook retain the prohibitions on certification, endorsement, forecasts, lookup, advice and real-place attribution.
+  REV-27 PASS cmp AGENTS.md CLAUDE.md exited 0 on the reviewed head.
+  REV-28 PASS The released firm key uses the allowed SYN-E- form, is generated independently of vault identifiers and is tested against collisions.
+  REV-29 PASS Real places, businesses and FDI projects remain Public-only; named synthetic firms remain Synthetic and are never placed at real addresses.
+  REV-38 PASS ARC-80 and ARC-81 keep the typed-decision gateway outside serving and run time.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Version-1 documentation (pull request 6): independent review, round 2, part 5 of 10: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: D0016 part p05 (pull request 6)
+COMMIT: ca4fc936bda25def27ab6ab1ca6f3377fbdee6b2
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED docs/03_DATA_CONTRACTS.md lines 166-169, 600, 670, 774 and 927-936 define a separately generated released SYN-E key, prohibit equality with any vault identifier and add the requested refusal fixtures.
+CHECKS:
+  REV-10 PASS The contracts implement decisions 0016, 0017 and 0018, and the round-1 identifier defect is fixed.
+  REV-11 PASS The lead ran the documentation and tree checks on this exact head with exit 0; CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43197988938
+  REV-12 PASS The supplied task diff changes only docs/03_DATA_CONTRACTS.md; the identified main merge is a base update.
+  REV-13 PASS No placeholder, stub or invented value substitutes for a required contract.
+  REV-14 PASS No secret or real custodian data appears; real fields are attributed Public inputs.
+  REV-15 PASS The changes add refusal fixtures and boundary checks without weakening a threshold, assertion or privacy control.
+  REV-16 PASS The released firm key now uses an approved visibly synthetic form while remaining distinct from vault identifiers.
+  REV-17 PASS The affected contract and cross-references are updated; the documentation check exited 0.
+  REV-18 PASS The changes preserve fixed reads, serving-store boundaries and session-only handling.
+  REV-19 PASS No settled decision is reopened; the changes implement the three supplied decision records.
+  REV-20 PASS Facts, calculations and the added national sector-trend branch retain deterministic methods and complete lineage.
+  REV-21 PASS Structural fact validation and catalogue restrictions remain intact.
+  REV-22 PASS Monthly-cohort, firm-list and release-boundary controls are clarified and strengthened without weakening a privacy invariant.
+  REV-23 N/A This documentation-only part changes no product imports or package metadata.
+  REV-24 N/A This part changes no rendered English or Arabic view.
+  REV-25 PASS No secret, private path, personal identity, prohibited comparison or realistic identifier appears.
+  REV-26 PASS The contracts retain the prohibited-claim restrictions.
+  REV-27 PASS The lead recorded cmp AGENTS.md CLAUDE.md with exit 0 on this exact head.
+  REV-28 PASS firm_key now uses the permitted SYN-E form, is generated independently for the release, is checked against every vault identifier and has planted rejection fixtures.
+  REV-29 PASS Subject validation continues to prevent Synthetic or Simulated attributes on real named places or businesses.
+  REV-38 PASS DAT-126 keeps the typed-decision gateway offline and outside the serving plane.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Version-1 documentation (pull request 6): independent review, round 2, part 6 of 10: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: D0016 part p06 (pull request 6)
+COMMIT: ca4fc936bda25def27ab6ab1ca6f3377fbdee6b2
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED Lines 289-294, 388-414, 447 and 637 now limit cohort components and route pairs to the tables permitted by DAT-137 and make occupation_pay and home_area_share status-only.
+  F2 NOT FIXED Lines 741-766 replace the secret untreated ratio, but the continuous treatment-factor interval and inclusive rounding bounds relax PRV-45 while claiming an exact formulation.
+  F3 FIXED Lines 868-907 and 1013-1030 add firm-specific staff and wage variables, register-only location knowledge, explicit target expressions and controls-on/off fixtures.
+CHECKS:
+  REV-10 FAIL F4 leaves the attacker-view acceptance model non-exact.
+  REV-11 PASS The lead ran python3 scripts/check_docs.py and python3 scripts/check_tree.py with exit 0; CI succeeded on this commit at https://github.com/albarami/economic-investment-intelligence/actions/runs/43197988938.
+  REV-12 PASS .overnight/DIFF.md contains only the in-scope document; the merge from main is identified separately as a base update.
+  REV-13 PASS The changed text contains complete requirements and regression specifications, not placeholders or stubs.
+  REV-14 PASS The document uses synthetic records and contains no secret or real custodian record.
+  REV-15 FAIL F4 widens the acceptance model beyond the actual PRV-45 treatment and rounding possibilities.
+  REV-16 FAIL F4 contradicts the document's binding no-relaxation rule PRV-121.
+  REV-17 PASS The affected document and its references are updated, and the documentation check exited 0.
+  REV-18 FAIL F4 permits the privacy audit to miss a recovery that the exact treatment constraints would expose.
+  REV-19 PASS The changes do not reopen a settled decision.
+  REV-20 PASS The changed figures and examples retain explicit deterministic methods and lineage.
+  REV-21 PASS Fact-chip and closed-template requirements remain intact.
+  REV-22 FAIL F4 makes the attacker-view model a relaxation rather than the required exact model.
+  REV-23 PASS The product remains restricted to release tables and does not import custodian data.
+  REV-24 N/A This documentation-only part changes no bilingual numeric rendering.
+  REV-25 PASS The document contains no prohibited private material, realistic identifier or secret.
+  REV-26 PASS No prohibited privacy, named-place, forecast, lookup or verdict claim was introduced.
+  REV-27 PASS The lead's cmp AGENTS.md CLAUDE.md check exited 0.
+  REV-28 PASS The added released firm key uses the permitted SYN-E- form and is collision-checked against vault identifiers.
+  REV-29 PASS Real named places and businesses remain Public-only.
+  REV-38 PASS PRV-109 keeps the typed-decision gateway outside privacy, release-building and serving imports.
+FINDINGS:
+  F4 (REV-22; kind a)
+    File: docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md
+    Line: 748-766
+    Wrong: The model lets g range continuously over the whole factor interval, although PRV-45 permits only factors generated by a 32-bit treatment draw, and it includes both endpoints of the money-rounding interval although half-up rounding excludes the upper endpoint. This enlarges the feasible set, can hide recovery, and contradicts PRV-121's ban on relaxation and the claim that the formulation is exact. F2 is therefore not fixed.
+    Fix: Replace continuous g with the exact finite 32-bit draw variable shared by both stayer bills, impose PRV-45's half-up inequalities in scaled integer arithmetic with the upper endpoint excluded, and linearise all bounded products exactly. Add boundary regressions and a fixture that is feasible under the relaxation but infeasible under exact PRV-45 constraints; require identical full and reduced model statuses and extrema under PRV-121.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Version-1 documentation (pull request 6): independent review, round 2, part 7 of 10: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: D0016 part p07 (pull request 6)
+COMMIT: ca4fc936bda25def27ab6ab1ca6f3377fbdee6b2
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED SYN-83 and SYN-84 separate the two Public anchors from the assumed weight, define the target as a deterministic derived calculation, require complete lineage and plant failing lineage fixtures.
+  F2 FIXED FE-120 permits only closed sample keys; no browser file input, upload, drop, paste or hashing path exists, and the server loads only the committed synthetic fixture.
+  F3 FIXED Front-end audit item 6 now implements the complete subject matrix and includes the three requested fixtures.
+CHECKS:
+  REV-10 PASS The assigned documents implement all three earlier fixes and the applicable decisions; documentation checks and CI pass on this commit.
+  REV-11 PASS Lead run `python3 scripts/check_docs.py` exited 0 on this commit; documentation CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43197988938.
+  REV-12 PASS The supplied part diff changes only docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md and docs/10_FRONTEND.md.
+  REV-13 PASS No placeholder, stub or invented figure stands in for the specified work.
+  REV-14 PASS FE-120 prevents arbitrary browser files from entering the product; changed lines contain no secret or real custodian data.
+  REV-15 PASS No test, threshold, tolerance, assertion, lint rule or CI control is weakened.
+  REV-16 PASS SYN-83, SYN-84 and FE-120 now conform to the provenance, calculation and data-boundary standards.
+  REV-17 PASS Both affected documents are updated consistently; the lead’s documentation check examined 87 text files and 51 Markdown files and exited 0.
+  REV-18 PASS The sample-file design accepts only a closed key and loads the corresponding committed synthetic fixture server-side.
+  REV-19 PASS The changes implement decisions 0016, 0017 and 0018 without reopening a settled decision.
+  REV-20 PASS SYN-83 and SYN-84 classify the municipal target as derived, name both Public sources, the assumed weight, the national-target inputs and the manifest hash, and require deterministic calculation and lineage tests.
+  REV-21 PASS Audit item 6 permits the valid `area` and `synthetic_firm` combinations and rejects invalid `place_public`, `fdi_project`, `synthetic_firm` and other-subject combinations.
+  REV-22 PASS The changes do not alter privacy parameters, treatments, partitions, attacks or release invariants.
+  REV-23 N/A This documentation-only part changes no product or custodian import.
+  REV-24 PASS FE-62 and FE-63 continue to require Western digits and identical fact identifiers and digit strings in both languages.
+  REV-25 PASS The changed text contains no private path, personal name, e-mail address, realistic identifier, secret or prohibited comparison.
+  REV-26 PASS The documents retain the required provenance wording and contain no prohibited verdict, forecast, confidence, endorsement, lookup or named-place simulation claim.
+  REV-27 PASS The lead’s `cmp AGENTS.md CLAUDE.md` check exited 0 on this commit.
+  REV-28 PASS The documents preserve the five allowed synthetic identifier forms and collision checks.
+  REV-29 PASS The corrected audit enforces Public-only facts for `place_public` and `fdi_project`, Synthetic-only facts for `synthetic_firm`, and the permitted `area` classes.
+  REV-38 PASS The front end retains only the permitted fixed Proof-room lineage sentence and specifies no gateway import, score, control or run-time call.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Version-1 documentation (pull request 6): independent review, round 2, part 8 of 10: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: D0016 part p08 (pull request 6)
+COMMIT: ca4fc936bda25def27ab6ab1ca6f3377fbdee6b2
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED C19 now specifies Public national sector trends, the Kitagawa split, fixtures and MTH-97 at docs/07_ECONOMIC_METHODS.md lines 1040-1127.
+CHECKS:
+  REV-10 PASS Decision 0016 item 9 is implemented by C19 and MTH-76 to MTH-79 and MTH-97.
+  REV-11 PASS The lead recorded documentation and tree checks at exit 0; CI succeeded on this exact commit: https://github.com/albarami/economic-investment-intelligence/actions/runs/43197988938
+  REV-12 PASS The supplied task diff changes only docs/07_ECONOMIC_METHODS.md.
+  REV-13 PASS The new sector branch has explicit arithmetic and missing-cell fixtures; release values remain governed by MTH-60.
+  REV-14 PASS No secret, private custodian material or real custodian count appears.
+  REV-15 PASS No test, threshold, tolerance, assertion or CI control is weakened.
+  REV-16 PASS The change implements the settled version-1 sector-and-area wage-trend requirement.
+  REV-17 PASS The affected methods document is updated and the lead’s documentation check exited 0.
+  REV-18 PASS The sector branch uses only the Public wage table in the release build and preserves plane and provenance boundaries.
+  REV-19 PASS The change implements rather than reopens decisions 0016, 0017 and 0018.
+  REV-20 PASS MTH-97 specifies deterministic calculations, Public provenance, evidence status, source table, periods, retrieval date and regression lineage.
+  REV-21 PASS Numbers remain returned facts rendered through closed templates; the model neither calculates nor writes screen prose.
+  REV-22 PASS The branch reads no protected split and does not alter privacy parameters, treatment or invariants.
+  REV-23 N/A This documentation-only part adds no product or custodian import.
+  REV-24 PASS The application-owned template and returned-fact rules preserve bilingual numeric parity.
+  REV-25 PASS No secret, private path, personal identifier, prohibited digit run or named product comparison appears.
+  REV-26 PASS The changed wording avoids forecasts, advice, confidence claims, real-data claims and unsupported sector claims.
+  REV-27 PASS The lead recorded `cmp AGENTS.md CLAUDE.md` at exit 0.
+  REV-28 N/A The change introduces no synthetic record identifier or synthetic firm name.
+  REV-29 PASS Sector figures are Public national facts and are explicitly forbidden on areas, municipalities or drawn shapes.
+  REV-38 N/A This documentation-only part adds no gateway import, provider setting, runtime call or gateway screen element.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Version-1 documentation (pull request 6): independent review, round 2, part 9 of 10: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: D0016 part p09 (pull request 6)
+COMMIT: ca4fc936bda25def27ab6ab1ca6f3377fbdee6b2
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED docs/12_TESTING_AND_QUALITY.md lines 31, 52, 278-279, 361, 408, 494 and 530 consistently make live-model execution go-live-only and prohibit keyed calls during build, CI and slice gates.
+  F2 FIXED docs/08_BACKEND.md lines 323 and 511-512 require every digit-bearing FDI field, including `announced`, to be a Public fact rendered through a Fact chip; docs/12_TESTING_AND_QUALITY.md line 128 adds the required planted regression.
+  F3 FIXED docs/12_TESTING_AND_QUALITY.md lines 98 and 402 replace the obsolete scales with the positive `round_movement` base for each parameter set, with set B no smaller than set A.
+CHECKS:
+  REV-10 FAIL F4: the corrected FDI requirement cannot be implemented against the binding fact schema.
+  REV-11 PASS Lead `python3 scripts/check_docs.py`, `python3 scripts/check_tree.py` and `cmp AGENTS.md CLAUDE.md` each exited 0; CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43197988938
+  REV-12 PASS The supplied task diff for this part contains only docs/08_BACKEND.md and docs/12_TESTING_AND_QUALITY.md.
+  REV-13 N/A This documentation-only part delivers specifications, not executable implementations where placeholders or stubs could substitute for work.
+  REV-14 PASS No secret, private custodian record or real custodian field appears in the supplied changes.
+  REV-15 PASS No threshold, tolerance, attack size, assertion or required check is weakened.
+  REV-16 PASS The earlier S1-gate conflict is corrected and the changed requirements otherwise retain the approved rules.
+  REV-17 FAIL F4: the changed FDI requirement affects the binding fact contract, but that contract was not updated.
+  REV-18 PASS The changed backend requirements preserve environment-only secrets, fixed inputs, session isolation and serving-plane boundaries.
+  REV-19 PASS The changes implement decision 0018's no-key-during-build rule and do not reopen a settled decision.
+  REV-20 FAIL F4: the binding fact schema has no valid unit for the required announcement-date or other digit-bearing textual facts.
+  REV-21 FAIL F4: the required FDI Fact-chip path cannot validate those facts against the binding schema.
+  REV-22 PASS Privacy thresholds, partitions, treatment rules, attack sizes and one-export invariants remain undiminished.
+  REV-23 PASS BE-01 to BE-05, BE-99 and their tests continue to prohibit product imports of custodian code and vault access.
+  REV-24 PASS TST-81, TST-216 and TST-217 retain bilingual parity requirements.
+  REV-25 PASS No prohibited private path, personal name, e-mail address, secret or realistic identifier appears.
+  REV-26 PASS The changed requirements retain the prohibited-claim, projection, ranking and presence-wording controls.
+  REV-27 PASS The lead's `cmp AGENTS.md CLAUDE.md` exited 0 on this exact head.
+  REV-28 PASS The released `firm_key` remains a visibly synthetic `SYN-E-` key distinct from every vault identifier, with planted rejection cases.
+  REV-29 PASS Real places and FDI projects remain Public-only; named synthetic firms remain Synthetic-only.
+  REV-38 PASS BE-102 and TST-155 keep the typed-decision gateway outside serving and runtime planes.
+FINDINGS:
+  F4 (REV-17, REV-20, REV-21; kind b)
+    File: docs/08_BACKEND.md
+    Line: 323, 511-512, 903
+    Wrong: BE-114 now requires `announced` and every other digit-bearing textual FDI field to be a Public fact, but line 903 acknowledges that the binding fact schema has no date or text unit. Its current unit enum cannot represent these values validly, so the corrected requirement and TST-210 cannot be implemented while preserving complete facts and Fact-chip rendering.
+    Fix: Extend the binding fact contract in docs/03_DATA_CONTRACTS.md with closed, validated representations for announcement dates and other digit-bearing published text, add their schema-conformance fixtures, remove the open item at line 903, and prove all references with `python3 scripts/check_docs.py`.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Version-1 documentation (pull request 6): independent review, round 2, part 10 of 10: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: D0016 part p10 (pull request 6)
+COMMIT: ca4fc936bda25def27ab6ab1ca6f3377fbdee6b2
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED docs/04_PUBLIC_DATA_PACK.md lines 15-22, 84-90 and 280 now state that decision 0017 has seventeen groups represented by eighteen source-id families because the museum and health-centre group uses two families.
+CHECKS:
+  REV-10 PASS Both documents implement the relevant requirements of decisions 0016, 0017 and 0018, and the sole earlier defect is fixed.
+  REV-11 PASS The lead ran the documentation check, tree check and agent-file comparison on this exact commit with exit code 0; CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43197988938.
+  REV-12 PASS DIFF.md limits this part's task changes to docs/04_PUBLIC_DATA_PACK.md; docs/11_DESIGN_DIRECTION.md is unchanged since the prior review.
+  REV-13 PASS Future confirmations are explicitly assigned to later slices; no placeholder substitutes for a decided requirement.
+  REV-14 PASS No secret, private record or real custodian data appears; real figures are attributed Public inputs.
+  REV-15 PASS The diff changes documentation only and does not weaken any test, threshold, assertion, CI configuration or suppression.
+  REV-16 PASS The corrected source-family wording and the added wage-trend use preserve the pinned standards and decision 0016's sector-trend requirement.
+  REV-17 PASS The affected documentation is updated consistently, and the documentation check exits 0.
+  REV-18 PASS PUB-01 to PUB-13 preserve allow-listed build-time fetching, uncommitted source data and serving-plane isolation.
+  REV-19 PASS The document now preserves decision 0017's settled seventeen groups while accurately recording their eighteen source-id families.
+  REV-20 PASS PUB-19, PUB-20, PUB-80 and PUB-85 require complete source chains, per-slug lineage and deterministic calculations.
+  REV-21 PASS DES-71 to DES-77, DES-88, DES-155 and DES-186 require Fact chips and application-owned catalogue text.
+  REV-22 PASS PUB-29 and DES-99 preserve release-unit snapping before protected figures; no privacy parameter, treatment or audit is changed.
+  REV-23 PASS PUB-02 forbids serving-plane fetcher access; this documentation-only part adds no product import.
+  REV-24 PASS DES-30, DES-119 and DES-144 require Western digits and identical displayed numbers in both languages.
+  REV-25 PASS The documentation check exits 0, and the part contains no secret, private path, realistic synthetic identifier or prohibited comparison.
+  REV-26 PASS The documents prohibit attributed synthetic footfall, forecasts, advice, verdicts, certification, endorsement and firm lookup.
+  REV-27 PASS The lead's comparison of AGENTS.md and CLAUDE.md on this exact commit exits 0.
+  REV-28 PASS No synthetic identifier is introduced; PUB-61 preserves real-name collision rejection and visibly Synthetic firm treatment.
+  REV-29 PASS PUB-87, PUB-90 to PUB-92, DES-54 and DES-177 to DES-179 keep real subjects Public-only and synthetic firms separate.
+  REV-38 PASS PUB-35 and DES-136 keep the gateway offline and behind the stage, with only the permitted Proof-room lineage sentence.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+Parts 2, 4, 5, 7, 8 and 10 were approved. The lead judged the six findings of parts 1, 3, 6 and 9 valid. Part 1's three lines were corrected by the lead; parts 3, 6 and 9 by two Claude Opus editors on disjoint files, checked by a Claude Sonnet verifier (six of six fixed). A close-out applied the requests that the disjoint ownership left (docs/02, docs/10, docs/12, docs/07), checked by a Claude Sonnet and a Claude Opus verifier. While making the attacker-view model of the stayer index exact, the editors found that draws which PRV-42 and PRV-43 share between stayer bills of nested or overlapping units and of different pairs of months are not modelled. The owner's note of 2026-11-12 settles it under point 3 of the owner's scope decision (each period gets the same disclosure control; defences against differencing across periods go to document 17): for version 1 the stayer bills keep the ordinary leaf treatment with the draw of their own cell key; the index is released only at municipality level or coarser (by sector where counts allow) and only where its stayer count passes the threshold; the exact sharing of draws is a stated limit of the audit (document 06, section 17) and item DHA-25 of document 17. With the current partitions, which hold no municipality unit in the money and quartile tiers and no protected split by activity, version 1 releases the index at national level only.
 
 ## Open questions and assumptions
 
