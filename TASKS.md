@@ -66,18 +66,18 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: routine; personas Frontend; status done (pull request 3, merged 2026-11-12).
 ### S0-T04 — Lint, format and type checks
 - Goal: Make Python and web linting, formatting and type checks reproducible.
-- Acceptance criteria: [ ] each check has one documented command; [ ] planted violations fail; [ ] clean scaffolding passes.
+- Acceptance criteria: [x] each check has one documented command; [x] planted violations fail; [x] clean scaffolding passes.
 - Scope: lint, formatter and type-checker configuration; check scripts only.
 - Depends: S0-T02, S0-T03.
 - Requirements: PLN-07, TST-161, TST-162, FE-11.
-- Delivery: routine; personas Platform; status in review (pull request 5, round 2).
+- Delivery: routine; personas Platform; status done (pull request 5, merged 2026-11-12).
 ### S0-T05 — Test runners
 - Goal: Make `./eii test` run every network-free Python and web pull-request suite.
 - Acceptance criteria: [ ] suite counts are printed; [ ] a failing fixture makes the command non-zero; [ ] clean suites exit zero.
 - Scope: test configuration, test bootstrap files, `scripts/` test runner.
 - Depends: S0-T02, S0-T03.
-- Requirements: TST-15, TST-01, PLN-14.
-- Delivery: routine; personas Platform; status queued.
+- Requirements: TST-15, TST-01, PLN-14, FE-95.
+- Delivery: routine; personas Platform; status in review (pull request 7).
 ### S0-T06 — Pre-commit hooks
 - Goal: Run formatting, lint, documentation, secret and identifier checks before commits.
 - Acceptance criteria: [ ] hooks install from repository configuration; [ ] generated forbidden tokens are caught; [ ] a commit guard refuses any staged value equal to a non-empty local secret without printing the value; [ ] clean staged files pass.

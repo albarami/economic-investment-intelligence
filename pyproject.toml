@@ -7,7 +7,9 @@ dependencies = []
 
 [dependency-groups]
 dev = [
+  "hypothesis==6.170.15",
   "mypy==2.4.1",
+  "pytest==9.2.0",
   "ruff==0.17.4",
 ]
 
@@ -31,3 +33,27 @@ python_version = "3.14"
 strict = true
 files = "scripts,core/src,custodian/src,product/src"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/scripts:$MYPY_CONFIG_FILE_DIR/core/src:$MYPY_CONFIG_FILE_DIR/custodian/src:$MYPY_CONFIG_FILE_DIR/product/src"
+
+[tool.pytest]
+strict = true
+addopts = [
+  "--import-mode=importlib",
+  "--hypothesis-profile=eii",
+  "-p",
+  "no:cacheprovider",
+  "-m",
+  "not nightly",
+]
+pythonpath = [
+  "scripts",
+  "scripts/tests",
+  "core/src",
+  "custodian/src",
+  "product/src",
+]
+markers = [
+  "postgres: needs a reachable PostgreSQL; with none it is skipped with the reason OI-10",
+  "sandbox: needs bubblewrap; it is never skipped",
+  "nightly: not part of the pull-request run",
+  "live_model: needs a live model key; with none it is skipped with the reason OI-01",
+]

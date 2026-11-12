@@ -20,11 +20,12 @@ Only figures marked Public describe Qatar. Synthetic and Simulated figures demon
 
 ## Current status
 
-This repository contains a documentation pack, the [typed-decision qualification set](evals/typed_decisions/README.md) under `evals/`, the scaffolding of the pinned repository layout (slice S0, task S0-T01) and one `uv` workspace with three package skeletons, `eii_core`, `eii_custodian` and `eii_product` (slice S0, task S0-T02). Each skeleton holds a version string and nothing else. There is no feature code yet, and no product, release, privacy engine, assistant or interface is claimed to work.
+This repository contains a documentation pack, the [typed-decision qualification set](evals/typed_decisions/README.md) under `evals/`, the scaffolding of the pinned repository layout (slice S0, task S0-T01) and one `uv` workspace with three package skeletons, `eii_core`, `eii_custodian` and `eii_product` (slice S0, task S0-T02). Each skeleton holds a version string and a small test of its own. There is no feature code yet, and no product, release, privacy engine, assistant or interface is claimed to work.
 
-Nine project commands run from the repository root today: the documentation check, the tree check, the lock check, the tests, the three Python checks (lint, format and type), the formatter in write mode and, only after a change to a `pyproject.toml`, the command that rewrites the lock file. Python 3.14 and `uv` are needed for all but the first two. Two commands change files and are run only to apply the formatter: `uv run --locked ruff format .` here and `npm run format` in `web/`; the lint, format-check and type-check commands only read.
+Ten project commands run from the repository root today: the test command `./eii test`, the documentation check, the tree check, the lock check, the guard tests on their own, the three Python checks (lint, format and type), the formatter in write mode and, only after a change to a `pyproject.toml`, the command that rewrites the lock file. Python 3.14 and `uv` are needed for all but the documentation check and the tree check. Two commands change files and are run only to apply the formatter: `uv run --locked ruff format .` here and `npm run format` in `web/`; the lint, format-check and type-check commands only read.
 
 ```sh
+./eii test
 python3 scripts/check_docs.py
 python3 scripts/check_tree.py
 uv lock --check
@@ -55,7 +56,7 @@ npm install --package-lock-only
 
 `npm run format` changes files and is run only to apply the formatter.
 
-The `./eii` commands described in the architecture are being built in slice S0; they are not available now. The [implementation plan](docs/14_IMPLEMENTATION_PLAN.md) and [task ledger](TASKS.md) are drafts.
+`./eii test` runs the six suites that exist, one after the other, and prints the passed, failed and skipped counts of each; the guard-test command above and `npm run test:checks` run the same files as the suites `python-guards` and `web-checks`, without the counts. A Python test that uses subtests counts once, as one test. It exits 0 only if every suite ran at least one test, none failed or errored, every skipped test that the tools report names the standing reason OI-01 or OI-10, and each tool's exit status agrees with its counts. Two Vitest forms are not reported by its JSON reporter and so are not seen: an `it.fails` test whose body fails as expected is written as passed, and a `describe.todo` without a body is omitted; they are left to review and lint (`web/README.md`). The suites are listed in one table at the top of `scripts/run_tests.py`: the guard tests under `scripts/tests`, one suite for each of the three Python packages, the Node checks of `web/` and the Vitest unit tests of `web/`. It needs `uv`, and a prior `npm ci` in `web/` for the two web suites; once those environments are installed it needs neither network nor database. It prints `seed=<n>` first, and `./eii test --seed <n>` repeats a run with the same seed. Only this one `./eii` command exists; the other eleven commands described in the architecture are being built in slice S0 and are not available now. The [implementation plan](docs/14_IMPLEMENTATION_PLAN.md) and [task ledger](TASKS.md) are drafts.
 
 ## How to read the documentation
 
@@ -78,7 +79,7 @@ Accuracy is enforced by three code mechanisms: no model calculates, no fact is a
 
 ## Planned repository layout
 
-The architecture pins this layout. `docs/`, `evals/` and `scripts/` hold the documentation pack, the qualification set and the repository checks. `contracts/`, `gateway/` and `infra/` exist as scaffolding, each with a short note and no feature code yet. `web/` holds the application shell, which has no feature UI yet. `core/`, `custodian/` and `product/` each hold one package skeleton, a version string and nothing else. Nothing under `data/` is ever committed (ARC-99), so a fresh clone has no `data/` folder:
+The architecture pins this layout. `docs/`, `evals/` and `scripts/` hold the documentation pack, the qualification set, the repository checks and the test runner; the file `eii` at the root is the command launcher. `contracts/`, `gateway/` and `infra/` exist as scaffolding, each with a short note and no feature code yet. `web/` holds the application shell, which has no feature UI yet. `core/`, `custodian/` and `product/` each hold one package skeleton, a version string and a small test of its own. Nothing under `data/` is ever committed (ARC-99), so a fresh clone has no `data/` folder:
 
 ```text
 contracts/    source and release contracts
