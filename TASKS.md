@@ -112,7 +112,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: root `eii` launcher and `scripts/commands/`.
 - Depends: S0-T08.
 - Requirements: OPS-26, OPS-27, OPS-28, ARC-96.
-- Delivery: hard; personas Platform; status queued.
+- Delivery: hard; personas Platform; status in review (pull request 15).
 ### S0-T10 — Import-boundary test
 - Goal: Enforce the three-plane imports before feature code exists.
 - Acceptance criteria: [x] direct, local and dynamic forbidden imports fail; [x] package metadata edges are checked; [x] clean packages pass.

@@ -7731,6 +7731,320 @@ Seed:      none
 Notes:     The work commits change exactly the 33 paths of the task against the base they contain (TST-163, PLN-22).
 ```
 
+#### S0-T11: independent review, round 1
+
+Reviewed commit `c4c1ca5a0f481b204a1957c50e50ac79f5c2fde2`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/14 , with CI green on it (workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43251593277 ; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43251593297 ). Reviewer: Zhipu AI GLM-5.3 High, through the Devin command-line tool, read-only; a full review in three parts, each in its own session. Each verdict is copied unchanged from its first line (REV-09); all three are also posted on the pull request. The verdict of part 3 has no REVIEWER line; the job record names the same tool and model as for parts 1 and 2.
+
+#### S0-T11: independent review, round 1, part 1 of 3 (the sandbox, the probe and the engine extensions): APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T11 part 1 (pull request 14)
+COMMIT: c4c1ca5a0f481b204a1957c50e50ac79f5c2fde2
+REVIEWER: Z.ai, GLM-5.3 High (Devin)
+CHECKS:
+  REV-10 PASS Criteria 1, 2 and 5 (this part). Criterion 1: test_sandbox_sentinel.py::test_both_profiles_block_read_and_network runs the probe under both profiles (read_outside ENOENT; tcp_loopback and unix_abstract ECONNREFUSED; tcp_unrouted ENETUNREACH) and passed locally (EVIDENCE.md commands 4, 6, 7, 8; ./eii test exit 0, 1051 passed, 0 skipped) and on the hosted runner (https://github.com/albarami/economic-investment-intelligence/actions/runs/43251593297 ; 19 case-passed lines, RESULT: PASSED). Criterion 2: the same test's outside run asserts "read_outside ok", and sandbox_check.check_bubblewrap judges the tooth (command 4, exit 0). Criterion 5: fetch runs before any sandbox entry (engine_extensions.py fetch, hosted step before prove; commands 2 and 3), the four extension files are opened, hashed and bound by descriptor (extension_tree.open_tree; sandbox_launch.open_sources; test_sandbox_extensions.py::test_launcher_binds_the_checked_files), the folder is an in-memory tmpfs of its own sealed with --remount-ro even when no file is given (build_argv lines 374-383; golden lists; write_extensions EROFS in test_filesystem_modes_in_both_profiles; test_empty_folder_and_read_only_install), loading runs with the network off and the signature check on (test_load_offline_read_only_in_both_profiles with tcp_unrouted ENETUNREACH and fds none during the load; allow_unsigned_extensions=False; LOCK autoinstall error InvalidInputException locked; no automatic install, test_automatic_loading_is_off; check_extensions command 5, exit 0).
+  REV-11 PASS EVIDENCE.md section 5 on this head: ./eii test --seed 2026111219 exit 0 (1051 passed, 0 failed, 0 skipped), python3 scripts/check_docs.py exit 0, ci_sandbox.py prove exit 0, both workflows green on the head (https://github.com/albarami/economic-investment-intelligence/actions/runs/43251593297 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43251593277 ), run by the lead; every new guard of this part has its planted violation (26 open_sources cases in test_sandbox_argv.py, 26 extension-tree cases in test_sandbox_extensions.py, 8 planted leaks in test_planted_leaks_are_seen including no-extension-remount-ro, and the TST-161 red run recorded as command 17: with the launcher stubbed to skip bubblewrap the named sentinel tests fail); this part's modules fail, never skip, when bubblewrap, the engine group or the extensions are missing (require_environment, require_engine).
+  REV-12 PASS Command 18 verified the diff against the base lists exactly the task's 33 paths; every file of this part (scripts/sandbox_profiles.py, sandbox_launch.py, sandbox_check.py, extension_tree.py, engine_extensions.py, scripts/sandbox_inside/sentinel_probe.py and extension_check.py, and the nine test helpers/modules named in the brief) is in the task's scope; nothing under data/ is committed (check_tree exit 0, command 15).
+  REV-13 PASS No TODO, FIXME, NotImplementedError or empty body in this part's files (searched); FakeDuckdb is a stand-in for pure logic and failure paths only; the real engine and the real fetched extensions are exercised by test_real_extension_folder_is_populated, test_load_offline_read_only_in_both_profiles, test_signature_check_stays_on and the hosted run.
+  REV-14 PASS No secret or real data in this part's diff; EII_PLANTED_SECRET/"planted-value-1234" is a declared fake planted to prove --clearenv; the pins are size and SHA-256 of public DuckDB extension binaries; .env, other vaults and releases are never mounted (test_repository_secrets_are_not_mounted; hidden list; the checkout is mounted as three code folders only).
+  REV-15 PASS No check or test of an earlier task edited (plan rows C1 to C8; commands 9 to 15 exit 0); this part's tests add no skip, expected-failure mark, lint or type suppression, retry or continue-on-error (searched); every started program is judged exactly (output_problems, sandbox_support._lines).
+  REV-16 PASS The code matches the cut plan including its three recorded deviations (PLAN.md head note: the extension folder is an in-memory mount of its own sealed with --remount-ro); the two golden command lines equal build_argv's output token by token (test_golden_command_line_build_world/build_release), with --tmpfs /tmp before every data mount, the extension tmpfs between the cache bind and the scenario/vault binds, its seal after the file binds and --remount-ro / last; pinned names (build-world, build-release, scripts/sandbox_inside, data/engine_extensions) are used exactly.
+  REV-17 PASS README documents the launcher, the no-fallback rule and data/engine_extensions as an uncommitted cache path; AGENTS.md and CLAUDE.md command list extended; OI-60 to OI-64 added citing the pack by anchor; docs/13 section 4.5 names both workflow files; pins.toml moves the duckdb row to installed with the note; check_docs exit 0 (command 14).
+  REV-18 PASS Generators run inside the sandbox only; the launcher starts bubblewrap with env={}, --clearenv, four --setenv, pass_fds limited to the mount descriptors and close_fds=True (test_run_starts_bubblewrap_with_nothing_inherited; test_hostile_surroundings_do_not_reach_the_sandbox: hostile PYTHONPATH/LD_PRELOAD/environment and a leaked descriptor 1000 do not reach the child); repository secrets are not mounted; problem texts and logs carry no record-level data.
+  REV-19 PASS Bubblewrap only, no fallback and no equivalent-sandbox row used; nothing on the dropped or later lists built; no approved decision reopened (the three deviations are recorded in the plan's head note and the open items).
+  REV-20 N/A This part adds build tooling and tests only; no displayed number, fact object or product screen is in its diff (the pinned sizes and hashes are integrity pins of public binaries, not rendered facts).
+  REV-21 N/A No screen, card, template or model prose exists in this part's files.
+  REV-22 N/A No change to the privacy partition, the two parameter sets, treatment or any audit in this part.
+  REV-23 PASS This part adds no product-plane file and no import of eii_custodian; the full guard suite, including S0-T10's import-boundary test, passed (command 8, exit 0).
+  REV-24 N/A This part's output is English-only check and test text; no user-facing view exists in it.
+  REV-25 PASS Searched this part's files: no absolute private path (only system paths /usr/bin/bwrap, /tmp, /scenario, /usr/lib), no personal name or e-mail, no run of exactly eight or eleven digits (sizes written 520_766 and 108_189_118), no real custodian record, field or count; the golden paths /w/repo and /w/py are synthetic; 192.0.2.1 and example.invalid are documentation-range addresses.
+  REV-26 PASS No prohibited claim: the README paragraph states the sandbox's limits and assumptions (bubblewrap only, no fallback, nothing certified, no real custodian data); no forecast, verdict, probability, endorsement, ministry or lookup claim appears in this part's files or document edits.
+  REV-27 PASS The diff edits AGENTS.md and CLAUDE.md with identical hunks; cmp AGENTS.md CLAUDE.md exit 0 on the head (EVIDENCE.md section 5, command 16).
+  REV-28 N/A This part creates no synthetic record identifier.
+  REV-29 N/A This part attaches no fact, figure or rank to a real named place or business.
+  REV-38 N/A This part is build and test tooling under scripts/ and scripts/sandbox_inside/; no file of it imports eii_gateway or reads EII_DECISION_PROVIDER (searched).
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-16) House-style target (decision 0018 item 14; never a verdict finding): scripts/tests/test_sandbox_extensions.py lines 318-322 hold a dead first `binaries` assignment (`path.suffix == ""`) that the next statement overwrites with the name-endswith filter; remove the dead line; `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` proves it (still all tests ok).
+```
+
+#### S0-T11: independent review, round 1, part 2 of 3 (the hosted-runner proof): APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T11 part 2 (pull request 14)
+COMMIT: c4c1ca5a0f481b204a1957c50e50ac79f5c2fde2
+REVIEWER: Devin command-line tool, GLM-5.3 High (Zhipu AI)
+CHECKS:
+  REV-10 PASS Criteria 3 and 4 of this part. Criterion 3: .github/workflows/sandbox.yml holds one job on pull_request and push to main with no `if`, `needs`, `paths`, `continue-on-error` or `||` (read line by line; also enforced by check_workflow with 17 planted violations); scripts/ci_sandbox.py prove with scripts/ci_junit.py requires each of the 19 cases of REQUIRED exactly once and passed, no other case, empty standard error and an exit status that agrees with the failed cases; the hosted run https://github.com/albarami/economic-investment-intelligence/actions/runs/43251593297 prints exactly the 19 `case passed` lines (compared by identity with REQUIRED: equal) and RESULT: PASSED. Criterion 4: the hosted log lines given in EVIDENCE.md section 1 show `restriction setting: 1`, `probe before: exit 1` with bubblewrap's refusal, the pinned package file installed (apparmor-profiles 4.0.1really4.0.1-0ubuntu0.24.04.9), `aa-status --json raw: exit 0` naming bwrap and unpriv_bwrap in enforce mode, `label raw stdout: 'bwrap//&unpriv_bwrap (enforce)'` and `namespace creation works with the per-binary profile in force`; no system-wide switch is written anywhere (SYSCTL read only in restriction_value; sudo only in INSTALL_ARGV, PARSER_ARGV, LISTING_ARGV; enforced by check_ci_module and check_no_switch with planted violations). The run is public and cannot be opened from this session, so its log lines are judged as given in EVIDENCE.md.
+  REV-11 PASS The lead's own runs on this exact head (EVIDENCE.md section 5): `./eii test --seed 2026111219` exit 0 (1051 passed, 0 failed, 0 skipped), `python3 scripts/check_docs.py` exit 0, and `uv run --locked python scripts/ci_sandbox.py prove` exit 0 with RESULT: PASSED; CI green on the head: https://github.com/albarami/economic-investment-intelligence/actions/runs/43251593277 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43251593297. This review's brief forbids running commands, so the recorded runs are the evidence. Every new guard of this part has its planted violation: 17 workflow plants, 14 forbidden-word plus 9 structural module plants, 9 JUnit judgement plants, 6 prove stub plants, 13 aa-status grammar plants, 12 label plants, 9 install-profile failure plants, 28 exact-output fault plants; no skip anywhere (0 skipped in every suite).
+  REV-12 PASS The recorded scope check (EVIDENCE.md command 18) lists exactly 33 changed paths against base 1ba76a453b623c619647ed51bb92301fb87c0cd8, none outside the plan's set and nothing under data/; this part's files (.github/workflows/sandbox.yml, scripts/ci_sandbox.py, scripts/ci_apparmor.py, scripts/ci_junit.py, scripts/tests/sandbox_workflow.py, test_sandbox_userns.py, test_sandbox_apparmor.py, test_sandbox_output.py, test_sandbox_prove.py) are all in that set; tree_is_work confirms the head differs from the work commit only by ledger files.
+  REV-13 PASS No TODO, FIXME, NotImplementedError, empty body or fixed stand-in in the part's delivered code; FakeRunner, FakeFiles and FakeDuckdb are fixtures of the tests' own subject, not substitutes for delivered work.
+  REV-14 PASS Every line of the part's files was read: no secret, no .env or key file, no real custodian record, field, file name or count; the pytest child runs with a fixed small environment (PATH, LANG, NO_COLOR, PYTHONDONTWRITEBYTECODE, HYPOTHESIS_STORAGE_DIRECTORY), proved against a hostile environment by test_pytest_child_environment.
+  REV-15 PASS All files of this part are new; no earlier check, test, threshold or tolerance is edited. The one change after a hosted run, status_problems reading the whole aa-status output as one JSON document, keeps every fact (exactly one object, unique keys, no NaN or Infinity constants, version "2", both profile names in enforce) and only accepts line feeds between JSON tokens, a format difference shown by the first hosted run; it is recorded in PLAN.md head note 1 and its runner-shaped sub-case was red first (EVIDENCE.md section 2).
+  REV-16 PASS The workflow matches the plan's rules: runs-on ubuntu-24.04, pull_request and push to main, one job, actions pinned by commit (actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1, astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2), permissions contents: read, timeout-minutes: 30, and the seven expected run steps; uv 0.11.31 equals pyproject.toml required-version and Python 3.14 equals .python-version; the marker `sandbox` and the names bwrap, unpriv_bwrap and /proc/self/attr/apparmor/current are the pinned ones. House-style note, never a finding: test_sandbox_userns.py (668 lines), sandbox_support.py (608) and test_sandbox_prove.py (499) sit around or past the 500-line target.
+  REV-17 PASS docs/13_DEPLOYMENT_AND_OPERATIONS.md section 4.5 names docs.yml and sandbox.yml; OI-60 to OI-64 record this part's choices with their evidence; PROGRESS.md holds the task's 18 command entries with exit codes at the work commit; check_docs.py exit 0 and cmp AGENTS.md CLAUDE.md exit 0 on the head (EVIDENCE.md section 5).
+  REV-18 PASS Secrets come only from the environment; no SQL or query text from a model; the generators run in the sandbox, and the hosted job proves both profiles; the part's logs hold versions, hashes and case names only, no record-level data.
+  REV-19 PASS The per-binary AppArmor profile is the route TST-62 prefers; the equivalent-sandbox rows of the pack stay unused; nothing on the dropped or later lists is built and no component decision is replaced.
+  REV-20 N/A This part adds no fact object and no displayed number; the versions, sizes and hashes in the job's log are CI reports, not product figures.
+  REV-21 N/A This part touches no screen, card, template or claim catalogue.
+  REV-22 N/A This part changes no privacy parameter, partition, treatment or audit, and it adds no fallback for sandbox enforcement: install-profile fails the job rather than switching anything system-wide.
+  REV-23 PASS The part's code lives in scripts/ only; nothing under product/ changes and no import of eii_custodian is added; the import-boundary test passes on the head (`./eii test`, 1051 passed, 0 failed).
+  REV-24 N/A This part adds no user-facing string.
+  REV-25 PASS No private path (only the system paths the subject needs), no personal name or e-mail address, no real custodian name, no named existing product in a comparison, no run of exactly eight or eleven digits (the pinned SHA-256, the profile size, the action hashes and the package versions checked), no secret; both actions are pinned by commit hash.
+  REV-26 PASS Nothing in the part's files states or implies a prohibited claim: no real custodian data, no certified or formal privacy, no endorsement, no forecast, no lookup of a firm or individual.
+  REV-27 PASS cmp AGENTS.md CLAUDE.md exit 0 on the head (EVIDENCE.md section 5); the two files received for this review are identical.
+  REV-28 N/A This part defines no synthetic record identifier.
+  REV-29 N/A This part attaches no fact, figure or rank to any real place, business or person.
+  REV-38 PASS The part's modules import ci_apparmor, ci_junit, sandbox_check and sandbox_profiles only; nothing reads EII_DECISION_PROVIDER or a provider key, and nothing under product/, web/ or the serving plane changes.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T11: independent review, round 1, part 3 of 3 (the documents and the ledger): APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T11 part 3 (pull request 14)
+COMMIT: c4c1ca5a0f481b204a1957c50e50ac79f5c2fde2
+CHECKS:
+  REV-10 PASS For this part (documents and ledger) every acceptance criterion is truthfully recorded and every statement I checked holds. Rule 44 and the README list commands that exist and that the evidence ran: scripts/engine_extensions.py (fetch, verify), scripts/sandbox_check.py (check, check-extensions), scripts/ci_sandbox.py (facts, install-profile — which refuses off a hosted runner, scripts/ci_sandbox.py line 282 —, prove); EVIDENCE.md commands 1 to 18 and the head checks match them. The five open items state what is built (DONE SO FAR names scripts and tests that all exist: test_run_starts_bubblewrap_with_nothing_inherited and test_current_venv_refuses_outside_an_environment in test_sandbox_argv.py, the five tests of test_sandbox_records.py, test_extension_tree_cases and test_launcher_binds_the_checked_files, the loading and prove tests, GOLDEN_WORLD/GOLDEN_RELEASE, ci_junit.REQUIRED with 19 cases, TIMEOUT_SECONDS 120, PINNED matching the fetched sizes and hashes), what is assumed (TYPE: ASSUMPTION, NEEDED) and what is not protected (OI-61's two limits). Every anchor cited exists and holds its statement: docs/02 sections "Repository layout, commands and configuration" (custodian/ six sub-folders, scripts/ "developer commands", row `./eii test` "sentinel test only", data/ three children) and "Technology stack" row "Build engine and embedded reader", ARC-09/10/12/14 rows, SYN-01, SYN-41 and "Rule zero and the sandbox" ("Read the current bubblewrap manual") in docs/05, PUB-01/PUB-03 in docs/04, TST-06/15/16/61/62, "The CI pipeline", "Slice gates" row "slice S0 Foundation" in docs/12, "Environments" row "Continuous integration", OPS-09, "The `./eii` commands" row `./eii test` in docs/13, decision 0004 items 1 and 59, decision 0002 item 3, TASKS.md tasks S0-T11 and S0-T07. The hosted run is public and I cannot open the web, so I judge its lines as given in EVIDENCE.md section 1: restriction setting 1, probe before exit 1 with 'bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted', label 'bwrap//&unpriv_bwrap (enforce)', "namespace creation works with the per-binary profile in force", the two pinned extension files fetched before prove, 19 case-passed lines including test_both_profiles_block_read_and_network and test_load_offline_read_only_in_both_profiles, RESULT: PASSED; the OI-63 correction appended by the ledger commit holds those facts (kernel 7.0.0-1017-azure, the packages, the probe's message, the label, the one-JSON-document fix), verified by presence in the line.
+  REV-11 PASS Lead's runs recorded by the lead, not re-run by me (the brief forbids shell commands): at work commit e8f3ca543e21e06337c6ee7ffbe2ca347b6be401, `./eii test` exit 0 (1051 passed, 0 failed, 0 skipped in 6 suites; 66 new tests, the suite grew from 985 at the S0-T13 head) and `python3 scripts/check_docs.py` exit 0 (commands 8 and 14); on the head c4c1ca5 (EVIDENCE.md section 5) `./eii test --seed 2026111219` exit 0, check_docs, check_tree, ruff check, ruff format --check, mypy, check_versions, cmp and prove all exit 0. CI green on the head, judged as given: https://github.com/albarami/economic-investment-intelligence/actions/runs/43251593277 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43251593297 . Each of the 18 ledger entries names its command, the work commit and a real exit code (all 0, matching EVIDENCE.md commands 1 to 18); the planted-violation red run is recorded (command 17: stubbed launcher, the two sentinel tests fail); no skip anywhere (0 skipped in every suite).
+  REV-12 PASS The ledger commit changes only PROGRESS.md, TASKS.md (the status line "in review (pull request 14)") and the OI-63 correction; command 18 proves the work commits changed exactly the 33 task paths ("33 [] []") and the tree proof on the head reads "TREE-IS-WORK ok: 236 paths at c4c1ca5a0f481b204a1957c50e50ac79f5c2fde2"; nothing under data/.
+  REV-13 PASS The changed lines are rules, records and ledger entries only; the two "TODO" matches in OPEN_ITEMS.md are the pre-existing OI-45/OI-46 text about Vitest's `describe.todo`, outside this diff; no placeholder, stub, mock or invented figure in the new lines.
+  REV-14 PASS No secret, `.env`, key file or real custodian record, field, file or count in the changed lines; the hosted-run log lines quoted record only the operating system, kernel and package versions.
+  REV-15 PASS The documents weaken no check: the duckdb row of pins.toml moves recorded→installed exactly as S0-T12's state rule requires (check_versions exit 0 on the head), the pyproject gains the engine group without touching any check (369 guard tests pass, the clean-environment test still syncs --all-packages --no-dev --offline), and no threshold, assertion, skip or CI control is touched by this part's files.
+  REV-16 PASS The documents are those the plan's PART B names (rule 44 in both agent files, the README command list and sandbox paragraph, OI-60 to OI-64, one sentence of document 13, the pin note) with pinned names used exactly (profiles build-world/build-release, marker sandbox, OI numbers 60 to 64 free as the plan states, workflow name); the three deviations from the plan are declared in its head note with their evidence (the two-line aa-status JSON, the sealed extension-folder tmpfs with the write_extensions attempt present in the probe, the anchor citations).
+  REV-17 PASS Every affected document is updated in the same pull request; PROGRESS.md holds the S0-T11 task log, the 18 evidence entries in the section 6.3 format, and the closing record of S0-T13 part A copied as one unchanged block (round-2 verdict and merge record, whose internal facts hold: reviewed head afaf68ba of pull request 13, merge commit 1ba76a453b623c619647ed51bb92301fb87c0cd8 equal to this pull request's base); OPEN_ITEMS.md holds OI-60 to OI-64; `python3 scripts/check_docs.py` exits 0 on the head (lead's run).
+  REV-18 PASS For this part the documents make no security claim the code does not hold: install-profile refuses everywhere but a GitHub-hosted runner, the AppArmor profile file is pinned by size and SHA-256 in scripts/ci_apparmor.py (1936 bytes, 11d39094f044f0cda0febb3ad517b830301da6b2ce929664af09ee9e4dd264f9), the no-fallback rule is stated and matched, and no log or record carries record-level data.
+  REV-19 PASS Nothing on the dropped or later lists is built and no decision record is removed or replaced; the documents claim nothing beyond what exists ("Only `./eii test` exists" verified against the launcher, which knows one command).
+  REV-20 N/A The change is documents, ledger records and a dependency-group list; it introduces no fact object, release table or rendered number (every number is a tool version, file size, hash, exit code, count or seed with its source in the evidence).
+  REV-21 N/A No screen, card, template or model prose is added; the documents are not product output.
+  REV-22 N/A No partition, parameter set, treatment, audit or custodian-plane file is touched; nothing under data/ is committed.
+  REV-23 PASS No file under core/, custodian/ or product/ is changed (the 33-path list holds none); the suites on the head pass python-product and the import-boundary test; the new code lives in scripts/ and scripts/sandbox_inside/.
+  REV-24 N/A No user-facing or Arabic strings are added.
+  REV-25 PASS The changed lines hold no private path, personal name, e-mail address, real custodian record, named-product comparison or secret; the CI run links follow the record form of the merged S0-T13 ledger, the extension sizes are written with underscores (520_766, 108_189_118), and the documentation check exits 0 on the head.
+  REV-26 PASS No prohibited claim: the documents state the sandbox is bubblewrap only with no fallback, mark every assumption as an assumption, and claim nothing about custodian data, real-place facts, certified privacy, endorsement, forecasts or lookups; the README keeps "no product, release, privacy engine, assistant or interface is claimed to work".
+  REV-27 PASS AGENTS.md and CLAUDE.md are identical: I read both files of the head line by line (110 lines each, rule 44 amended identically in both) and the lead's `cmp AGENTS.md CLAUDE.md` on the head exits 0.
+  REV-28 N/A No synthetic identifiers are introduced.
+  REV-29 N/A No fact about a real named place or business; the subjects of the changed lines are commands, packages, mounts and records.
+  REV-38 PASS The changed lines add no reference to eii_gateway, EII_DECISION_PROVIDER or JEV_PRO_API_KEY, and no run-time code reads them; the typed-decision gateway stays absent from the serving plane.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T11: merge record
+
+- Tree proof on the approved head (ruling L-29), run by the lead on 2026-11-12 before the review: every path of the head's tree is as in the work commit `e8f3ca543e21e06337c6ee7ffbe2ca347b6be401`, except the ledger files; output "TREE-IS-WORK ok: 236 paths at c4c1ca5a0f481b204a1957c50e50ac79f5c2fde2", exit code 0. On the same head `./eii test --seed 2026111219`: exit code 0, "total: 1051 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/14 was squash-merged on 2026-11-12 at the head `c4c1ca5a0f481b204a1957c50e50ac79f5c2fde2`; merge commit `103884cb79d7c2e935ebcc42b7f788bca6f510d2` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43253478671 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43253478826 .
+- The verdict of the task log of S0-T11 is APPROVED. Proposed item of round 1, part 1: a dead assignment in scripts/tests/test_sandbox_extensions.py (house style; never a verdict finding); it joins the items for the follow-up task of the slice. Parts 2 and 3 proposed none.
+
+### S0-T09 — `./eii` command skeleton and database commands: task log
+
+- Builder persona: senior platform engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic: a Claude Sonnet 5.5 planner (a short plan: one test per acceptance criterion and requirement), with the lead's answers to its eight questions
+- Plan reviewer maker and model: none; the plan had no external plan review (owner's decisions of 2026-11-12: short plans, real builds, and the build by a builder that can run commands as the try-out)
+- Builder maker and model: Cursor command-line tool, `grok-4.7-high` (xAI)
+- Reviewer maker and model: Antigravity, `gemini-4-carbon-high` (Google), read-only (a maker that neither planned nor built it)
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, github-flow and strict-reviewer; the builder's tool has no skills, so its briefs gave the rules: the persona, an exact reading list, the plan with the lead's answers above the builder's taste, tests first with a recorded red run, one planted violation for every rule, no suppression comment, skip or weaker assertion, no docker command run by the builder, no secret, personal name, absolute local path or eight- or eleven-digit run in any file, the pack cited by requirement ID or section heading and never by line number, and a report of only the results it saw
+- Branch: `task/S0-T09-command-skeleton`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/15
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit; the lead's live check goes into the evidence file that the external reviewer receives
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4 (system) and 3.14.6 (uv); git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8; Docker version 29.9.3, build 5457199; Docker Compose version v5.7.0; PostgreSQL client 18.6
+- Build round 1: the launcher, the eight modules of scripts/commands, the support module and two test modules, and the documents of the task in the same round (rule 44, the README, infra/README.md, one cell of document 13, the open items OI-80 to OI-84 and one sentence of OI-47); the builder's own break pass named one break that no test saw
+- Build round 2: that break closed: the guard now reads the imports, and no module but the dispatcher may import the database command module; one planted violation; red first
+- Base update by the lead: the generator sandbox (pull request 14) merged while this task was in its checks; main at `103884cb79d7c2e935ebcc42b7f788bca6f510d2` was merged into the branch at the built commit `bcfd3c19ddfd46da499c971fad023bb4217765e4`. Rule 44 of the agent files, one README paragraph and the place of the new open items conflicted; the merged text of those four files is main's text with this branch's own changes applied to it by the lead's script, each cut from the branch's file (the README then counts twenty commands; OI-80 to OI-84 follow OI-64); the merged tree differs from main in the 18 paths of the task only
+- Live check by the lead on the built commit `bcfd3c19ddfd46da499c971fad023bb4217765e4` with the project's own database service (project eii-poc, service db, 127.0.0.1:55440; no other container, volume or network touched): `./eii db-up` exits 0 and the service is healthy; `./eii preflight` exits 0 with the PostgreSQL line PASS and `store: postgres`; `./eii up` exits 4 and, with a recording stand-in for docker first on PATH, makes no docker call, the container being the same and still running afterwards; `./eii db-down` exits 0, no container runs and the volume is still there; a second `./eii db-up` and `./eii db-down` exit 0; `./eii db-up` with an empty `EII_DATABASE_URL` exits 1, names the variable and makes no docker call; without the secret file `./eii db-down` exits 1 and names the file. The lead then removed the stopped container and the network of the project and the secret copy; the volume stays
+- Owner's notes of 2026-11-12, applied: the acceptance criteria of TASKS.md decide when the task is done, with one planted violation per rule; code and documents are built in the same round, so the task has one review cycle
+
+#### Evidence for the work commit `d855a6097691a1fa0cf6a92f0386ba887c0f5616`
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   ./eii test --seed 2026111210
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1059 passed, 0 failed, 0 skipped
+Seed:      2026111210
+Notes:     The project's own test command with a given seed: every network-free suite, the new tests in the suite python-guards; run on the merged tree, so the sandbox tests of S0-T11 run too.
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    377 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The guard tests on their own: the seven tests of test_commands.py and the six of test_launcher.py among them (criteria 1 to 4; OPS-26, OPS-27, OPS-28, ARC-96).
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "111 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 107 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 189 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 57 components: OK"
+Seed:      none
+Notes:     The version check still passes with the new files.
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The lock file agrees with the manifests.
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The agent files are identical.
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   ./eii; echo "exit=$?"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; the command's own status printed as "exit=2"
+Seed:      none
+Notes:     No word: the usage error on standard error, the twelve forms one a line, status 2 (criterion 1; ARC-96).
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   ./eii bogus; echo "exit=$?"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; the command's own status printed as "exit=2"
+Seed:      none
+Notes:     An unknown word: the same usage error, status 2.
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   ./eii up; echo "exit=$?"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; the command's own status printed as "exit=4"
+Seed:      none
+Notes:     With no release configured, up probes, selects the store and refuses with status 4; it starts nothing (criterion 4; OPS-27).
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   ./eii down; echo "exit=$?"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; the command's own status printed as "exit=1"
+Seed:      none
+Notes:     A placeholder: status 1 with its failure line; it deletes nothing (OPS-28).
+```
+
+```text
+### S0-T09 — `./eii` command skeleton and database commands
+Commit:    d855a6097691a1fa0cf6a92f0386ba887c0f5616
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','103884cb79d7c2e935ebcc42b7f788bca6f510d2...d855a6097691a1fa0cf6a92f0386ba887c0f5616'],check=True,capture_output=True,text=True).stdout.splitlines(); a=set(['AGENTS.md', 'CLAUDE.md', 'OPEN_ITEMS.md', 'README.md', 'docs/13_DEPLOYMENT_AND_OPERATIONS.md', 'eii', 'infra/README.md', 'scripts/commands/__init__.py', 'scripts/commands/database.py', 'scripts/commands/exits.py', 'scripts/commands/main.py', 'scripts/commands/placeholder.py', 'scripts/commands/preflight_cmd.py', 'scripts/commands/table.py', 'scripts/commands/up_cmd.py', 'scripts/tests/commands_support.py', 'scripts/tests/test_commands.py', 'scripts/tests/test_launcher.py']); o=[x for x in p if x not in a]; m=sorted(a-set(p)); print(len(p),o,m); sys.exit(1 if o or m or len(p)!=18 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "18 [] []"
+Seed:      none
+Notes:     The work commit changes exactly the 18 paths of the task against the base it contains (TST-163).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
