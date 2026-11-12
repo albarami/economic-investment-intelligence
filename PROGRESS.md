@@ -2341,6 +2341,245 @@ Seed:      none
 Notes:     The scope (TST-163): the eleven created and thirteen named modified paths, and otherwise only modifications of files that the checks reported (the fix-up files, formatting, strict type annotations and one renamed comprehension variable), which the output lists in its last field.
 ```
 
+#### S0-T04: independent review, round 1: REJECTED
+
+Reviewed commit `d2da662903f7acd63a30a3de53e591c066c1fc26`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/5, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43182652171 ). Reviewer: OpenAI GPT-5.6 Sol (high), through the Cursor command-line tool, read-only; a full review. The verdict is copied unchanged (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S0-T04
+COMMIT: d2da662903f7acd63a30a3de53e591c066c1fc26
+REVIEWER: OpenAI, GPT-5.6 Sol
+CHECKS:
+  REV-10 PASS The six documented commands pass; the 95-test Python and 657-test web suites include planted violations and clean-copy checks.
+  REV-11 PASS Lead runs report 95 Python and 657 web tests passing with zero failures or skips; documentation checks and CI passed on the head: https://github.com/albarami/economic-investment-intelligence/actions/runs/43182652171 .
+  REV-12 PASS The scope proof reports the eleven created files, thirteen named modifications, twenty-seven permitted fix-up files and two ledger files only.
+  REV-13 PASS The reviewed diffs contain no placeholder, stub, TODO, mock data or commented-out implementation.
+  REV-14 PASS LOCKSCAN, the documentation scanner and hook evidence report no secret-shaped token, forbidden lock content or real data; gitleaks belongs to S0-T06.
+  REV-15 FAIL Two converted lock-fixture plants can silently do nothing instead of failing when their prerequisite has the wrong type (F4).
+  REV-16 FAIL The current refreshed plan lacks independent approval, the binding break pass is incomplete, required P14 runs are absent, and an implemented clean-environment change is outside the documented rows (F1-F3, F5).
+  REV-17 FAIL OI-44 says only two clean-environment adjustments were made, but a third fixture rewrite exists (F5).
+  REV-18 PASS The changes introduce no serving code, secrets, SQL, external calls or record-level data handling; dependency and lock scans passed.
+  REV-19 PASS No settled architecture, deferred feature or cut-order decision is reopened.
+  REV-20 N/A This foundation tooling task adds no facts, figures, calculations, provenance or lineage.
+  REV-21 N/A This task adds no feature interface, rendered numeral, Fact chip, claim template or assistant output.
+  REV-22 N/A This task changes no privacy parameter, partition, treatment, audit, freeze or protected release logic.
+  REV-23 N/A This task changes no product import or package dependency boundary.
+  REV-24 N/A This task adds no English or Arabic feature view, localized fact or displayed number.
+  REV-25 PASS The documentation and lock scans pass, and the reviewed changes contain no private path, personal identity, e-mail, realistic identifier or prohibited comparison.
+  REV-26 PASS No prohibited product, custodian, privacy, endorsement, forecast or entity-lookup claim appears.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exited 0 on the work commit and head.
+  REV-28 N/A This task creates no synthetic identifier or world record.
+  REV-29 N/A This task creates no place or business fact and attributes nothing to a real named place.
+  REV-38 N/A This task changes no serving-plane code, gateway import, runtime provider setting or screen text.
+FINDINGS:
+  F1 (REV-16)
+    File: PROGRESS.md
+    Line: 2173
+    Wrong: The task log states that both refreshes of the implemented plan were not independently reviewed. REV-16 requires work to follow the approved plan; the refresh changed proof blocks, counts and the binding break pass.
+    Fix: Submit the exact refreshed plan to an independent plan reviewer and record APPROVED. Apply any required changes, then rerun all task evidence on the resulting head.
+  F2 (REV-16)
+    File: PROGRESS.md
+    Line: 2185
+    Wrong: The builder admits it did not break every comparison in the four web test helpers, contrary to the plan’s binding break-pass requirement.
+    Fix: Break every remaining comparison, branch and expected value once; run its covering test file; add a regression test for every surviving mutation; restore the implementation and rerun the full web suite.
+  F3 (REV-16)
+    File: .overnight/EVIDENCE.md
+    Line: 120-173
+    Wrong: The head evidence omits P14’s required `npm run build`, `npm run check`, `npm run check:hosts:dist` and `npm run check:dev` runs.
+    Fix: Run those four commands on the new head in that order after `npm ci`, record their real exit codes and outputs, and include them in the review evidence.
+  F4 (REV-15)
+    File: scripts/tests/test_workspace_metadata.py
+    Line: 319-323, 339-342
+    Wrong: The former unconditional fixture mutations now use `if isinstance(pkg, list)` and silently do nothing otherwise. A malformed prerequisite can therefore bypass the intended plant, weakening the tests.
+    Fix: Replace both conditional blocks with `assert isinstance(pkg, list)` followed by the existing append, then run mypy and the complete Python suite.
+  F5 (REV-16; REV-17)
+    File: OPEN_ITEMS.md
+    Line: 458
+    Wrong: OI-44 documents two clean-environment adjustments, but `scripts/tests/test_clean_environment.py` lines 396-403 also removes dependency groups and regenerates the hostile-surroundings fixture lock. That change is absent from the plan rows and current documentation.
+    Fix: Add this fixture change and rationale to the approved plan and OI-44, append a correction to PROGRESS.md, then rerun the Python suite and documentation check.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+The lead judged F2, F3, F4 and F5 valid. F4 was fixed as a class: four fixture plants, not two. F3 is answered in the evidence file of the next review: the four web commands of P14 run as their own block. The lead believed F1 wrong (no rule asks for an external review of the one refresh that the owner allows before a build) and asked the advisor once, under the run rule; the ruling, copied unchanged:
+
+```text
+ADVISOR: Google, Gemini 4 Carbon
+FINDING: F1 (S0-T04, round 1)
+RULING: INVALID
+REASONS:
+  1. By its literal text in docs/15_REVIEWER_CHECKLIST.md line 57, REV-16 ("Follows the approved plan and standards") requires that the work match the task in docs/14_IMPLEMENTATION_PLAN.md and the standards in AGENTS.md, using pinned names and specified command and session behaviours exactly. No rule in the reviewed files requires an independent re-review of a task plan after a pre-build refresh: docs/14_IMPLEMENTATION_PLAN.md lines 63-75 requires independent review only of the task's final commit (line 71), docs/15_REVIEWER_CHECKLIST.md line 33 (REV-39) and docs/decisions/0015-review-rounds-and-the-scope-of-repository-checks.md line 24 only limit what findings may reject when a plan is reviewed again, and owner decision 7 (.overnight/OWNER_DECISIONS.md line 8) explicitly directs finishing already-written dry-run corrections and performing one refresh against the merged tree before the build and proceeding directly to the real build without further plan-review workflows.
+  2. No: the work does not fail to follow the plan of record in any way F1 names. Under REV-16 (docs/15_REVIEWER_CHECKLIST.md line 57) and TASKS.md lines 67-73, F1 identifies no discrepancy with docs/14_IMPLEMENTATION_PLAN.md, TASKS.md or AGENTS.md (and .overnight/VERDICT_R1.md lines 6, 8 and 15 mark REV-10, REV-12 and REV-19 PASS), while under owner decision 7 (.overnight/OWNER_DECISIONS.md line 8) the refreshed plan is the operative build plan of record: updating counts and proof blocks to the merged tree, moving beyond-criterion hardening to document 17, and adding the short break pass (.overnight/PLAN_REFRESHES.md lines 14, 47, 53, 60-74) preserved the approved v2 design (tool pins, rule families, FE-11 table, planted violations and document texts) and complied with the owner's 2026-11-12 decisions rather than departing from the plan of record (whereas actual implementation departures from the refreshed plan are addressed separately in F2, F3 and F5).
+FIX OR RECORD: Nothing; F1 breaks no project or run requirement (docs/15_REVIEWER_CHECKLIST.md line 30, REV-07), so no proposed open item is needed, and PROGRESS.md lines 2173-2174 already records that the two pre-build refreshes were not seen by an external plan reviewer.
+```
+
+#### Addition to the task log of S0-T04
+
+- Correction to build round 1 (appended; findings F4 and F5 of review round 1): besides formatting, annotations and the renamed variable, the fix-up made four fixture plants of the metadata test of S0-T02 conditional (made unconditional again in build round 3), and in the clean-environment test of S0-T02 it removed the root dependency-groups table from the workspace copies of the stale-lock test and of the hostile-surroundings test's per-variable runs and regenerated their locks offline; OI-44 now names both and why.
+- Build round 3: Cursor command-line tool, `composer-2.5` (Cursor): findings F4 and F5 of review round 1 (the four fixture plants of the metadata test of S0-T02 assert their type and mutate unconditionally again; OI-44 names the third clean-environment adjustment, with the reason observed by removing it once)
+- Build round 4: the same builder, in three short passes (finding F2, under the owner's rule of a short break pass and the owner's note that scaled F2 back to it): the unused helper tool and a planted test that only named it deleted; each condition of the helpers of the four web test files broken once, covering file only; a test 'copy includes the judged files' added in each file for the false pass of a copy that leaves out src/, scripts/ or one of the eight judged top-level files; every other break listed with its reason in the evidence. A longer pass, meant to close every surviving mutant of a mutation run by the lead, was stopped by that note and its edits were discarded
+
+#### Evidence for the work commit of fix round 1 `c29bb6422dc2ad756280899ec030700199dc787b`
+
+All thirteen commands of the plan, at the commit that follows fix round 1; command 13 in its later-round form.
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    c29bb6422dc2ad756280899ec030700199dc787b
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The Python lint check over the four source roots, one documented command (criterion 1, PLN-07).
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    c29bb6422dc2ad756280899ec030700199dc787b
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "17 files already formatted"
+Seed:      none
+Notes:     The Python format check over the four source roots, one documented command (criterion 1, PLN-07).
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    c29bb6422dc2ad756280899ec030700199dc787b
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 17 source files"
+Seed:      none
+Notes:     The Python strict type check over the four source roots, one documented command (criterion 1, PLN-07).
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    c29bb6422dc2ad756280899ec030700199dc787b
+Command:   cd web && npm run lint
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "> eslint --max-warnings 0 ."
+Seed:      none
+Notes:     The web lint check with the FE-11 rule, run from `web/`, one documented command (criterion 1, PLN-07).
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    c29bb6422dc2ad756280899ec030700199dc787b
+Command:   cd web && npm run format:check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All matched files use Prettier code style!"
+Seed:      none
+Notes:     The web format check, run from `web/`, one documented command (criterion 1, PLN-07).
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    c29bb6422dc2ad756280899ec030700199dc787b
+Command:   cd web && npm run typecheck
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "> tsc --noEmit"
+Seed:      none
+Notes:     The web type check, run from `web/`, one documented command (criterion 1, PLN-07).
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    c29bb6422dc2ad756280899ec030700199dc787b
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    95 passed, 0 failed, 0 skipped (ran 95 tests)
+Seed:      none
+Notes:     The whole Python suite after fix round 1, with the four fixture plants of the S0-T02 metadata test unconditional again (finding F4) (criteria 2 and 3, TST-161); `./eii test` does not exist before S0-T05 and S0-T09, so this is the only Python runner; the counts are those the run printed.
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    c29bb6422dc2ad756280899ec030700199dc787b
+Command:   cd web && npm run test:checks
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    662 passed, 0 failed, 0 skipped (tests 662, cancelled 0, todo 0)
+Seed:      none
+Notes:     The whole web check suite after fix round 1: the unused helper and its planted test deleted, and the tests that the short break pass of the four web test files added (finding F2) (criteria 2 and 3, FE-11, TST-161); the counts are those the run printed.
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    c29bb6422dc2ad756280899ec030700199dc787b
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 11 packages in 0.87ms"
+Seed:      none
+Notes:     The lock file is current with the dev group.
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    c29bb6422dc2ad756280899ec030700199dc787b
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 83 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check (TST-162); `./eii test` does not exist yet.
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    c29bb6422dc2ad756280899ec030700199dc787b
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    c29bb6422dc2ad756280899ec030700199dc787b
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T04 — Lint, format and type checks
+Commit:    c29bb6422dc2ad756280899ec030700199dc787b
+Command:   python3 -c "import re,subprocess,sys; r=subprocess.run(['git','diff','--name-status','--no-renames','f32dba33e7a50c6180f226c44b4570cc03447812...c29bb6422dc2ad756280899ec030700199dc787b'],check=True,capture_output=True,text=True).stdout.splitlines(); s={l.split('\t')[1]:l.split('\t')[0] for l in r}; t='scripts/tests/'; w='web/scripts/tests/'; c={t+x for x in 'pychecks_support.py test_pychecks_config.py test_pychecks_ruff.py test_pychecks_mypy.py'.split()}|{'web/eslint.config.js','web/.prettierrc.json','web/.prettierignore'}|{w+x+'.node-test.mjs' for x in 'lint-rules lint-fe11 format typecheck'.split()}; m={'pyproject.toml','uv.lock',t+'test_clean_environment.py','scripts/check_docs.py','web/package.json','web/package-lock.json','web/scripts/check-layout.mjs',w+'check-layout.node-test.mjs','web/README.md','README.md','AGENTS.md','CLAUDE.md','OPEN_ITEMS.md','PROGRESS.md','TASKS.md'}; f=re.compile(r'^((scripts|core|custodian|product)/.*\.py|web/.*)$'); bad=[p for p in c if s.get(p)!='A']+[p for p in m if s.get(p)!='M']+[p for p,k in s.items() if p not in c|m and (k!='M' or not f.match(p))]; print(len(c),len(m),bad,sorted(p for p in s if p not in c|m)); sys.exit(1 if bad or len(c)!=11 or len(m)!=15 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "11 15 [] ['scripts/check_tree.py', 'scripts/tests/test_check_tree.py', 'scripts/tests/test_check_tree_index.py', 'scripts/tests/test_workspace_metadata.py', 'scripts/tests/workspace_fields.py', 'scripts/tests/workspace_fields_tables.py', 'scripts/tests/workspace_guard.py', 'web/scripts/check-dev-server.mjs', 'web/scripts/check-exact-versions.mjs', 'web/scripts/check-import-boundary.mjs', 'web/scripts/check-no-third-party-hosts.mjs', 'web/scripts/dev-server-process.mjs', 'web/scripts/host-scan-rules.mjs', 'web/scripts/import-tokenizer.mjs', 'web/scripts/tests/check-dev-server-fake.node-test.mjs', 'web/scripts/tests/check-dev-server-surroundings.node-test.mjs', 'web/scripts/tests/check-dev-server.node-test.mjs', 'web/scripts/tests/check-exact-versions-lock.node-test.mjs', 'web/scripts/tests/check-exact-versions.node-test.mjs', 'web/scripts/tests/check-import-boundary-forms.node-test.mjs', 'web/scripts/tests/check-import-boundary-links.node-test.mjs', 'web/scripts/tests/check-import-boundary.node-test.mjs', 'web/scripts/tests/check-no-third-party-hosts-forms.node-test.mjs', 'web/scripts/tests/check-no-third-party-hosts.node-test.mjs', 'web/scripts/tests/check-tsconfig-types.node-test.mjs', 'web/scripts/tests/scripts-use-only-node-builtins.node-test.mjs', 'web/scripts/tests/shell-document.node-test.mjs']"
+Seed:      none
+Notes:     Later-round form of the scope command (TST-163): the eleven created and thirteen named modified paths, the two ledger files of the round-1 ledger commit, and otherwise only modifications of files that the checks reported (the fix-up files), which the output lists in its last field.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

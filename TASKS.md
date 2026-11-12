@@ -70,7 +70,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: lint, formatter and type-checker configuration; check scripts only.
 - Depends: S0-T02, S0-T03.
 - Requirements: PLN-07, TST-161, TST-162, FE-11.
-- Delivery: routine; personas Platform; status in review (pull request 5).
+- Delivery: routine; personas Platform; status in review (pull request 5, round 2).
 ### S0-T05 — Test runners
 - Goal: Make `./eii test` run every network-free Python and web pull-request suite.
 - Acceptance criteria: [ ] suite counts are printed; [ ] a failing fixture makes the command non-zero; [ ] clean suites exit zero.
