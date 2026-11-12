@@ -11,9 +11,6 @@
 ## Context
 
 - The first pack made every review round a full review in which any finding rejects: REV-06 and REV-08 as first written, and the sentence in document 14 that the reviewer rechecks the full task, not only the changed lines.
-- The first build task of slice S0 did not converge under that rule. Its pull request was reviewed three times by the same independent reviewer. Each later round confirmed every earlier finding fixed and rejected the commit on new findings, some of them in lines that had not changed since the round before.
-- One of those findings needed someone to defeat a check on their own checkout on purpose, by setting a flag on an entry of git's index. The pack did not say what the repository's own checks are meant to withstand, so a reviewer had no rule by which to place such a point.
-- The owner weighed two risks: a task that is rejected again and again on lines that did not change, and a defect that is let through. The decision keeps every verdict finding binding and moves every other valid point to a list that is closed before the slice gate.
 
 ## Decision
 
@@ -27,12 +24,10 @@
 8. The repository's own checks (the tree check, the documentation check, the hooks, the commit guard and the CI scripts) protect against mistakes in three settings: a fresh clone, the CI runner, and a checkout used through the documented commands. That includes ordinary differences between machines, such as personal git configuration, locale or a linked path.
 9. Someone deliberately defeating a check on their own checkout is outside the scope of those checks: for example an index flag such as assume-unchanged, a replaced program, or a race by a second local process. A point that needs such tampering is a proposed open item, not a verdict finding.
 10. The generator sandbox is judged by what the sandboxed program can do, not by what a second local process could do to the launcher.
-11. Plans already written keep what they have. This record removes no protection.
+11. Plans already written keep what they have.
 
 ## Evidence
 
-- Pull request 1 of this repository (task S0-T01) was reviewed three times by the same independent reviewer between 2026-11-11 and 2026-11-12. Each later round confirmed every earlier finding fixed and rejected the commit on new findings. The verdicts are posted on the pull request.
-- The finding of the third review on the tree check is reproduced by setting a flag on an index entry by hand. A fresh clone and a CI checkout carry no such flag.
 - The owner's decisions of 2026-11-12, which this record states.
 
 ## Consequences
