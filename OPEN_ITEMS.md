@@ -20,7 +20,7 @@
 - OI-36 to OI-38 record what the review of 2026-11-11 left open: an objection of two reviewers that was not accepted for version 1, and two sets of last corrections that another maker has not yet read.
 - OI-35 records which parameter set is exported. A lead ruling of 2026-11-11 sets the default to A; the owner or a data owner may overrule it before the slice S1 gate.
 - OI-39 onwards are raised during the build.
-- OI-96 onwards record the open points of [decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md): the age of the places copy, the Public source for the survival base rate, the Public source of each forecast series without a table, the provider's rule on storing responses, the sources that are off under a public or commercial hosting, the size of the public-total inventory with the two gridded Public tables, the subject of a district series and the build without the night-lights key.
+- OI-96 (closed by the owner's answer of 2026-11-12) and the items after it record the points of [decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md): the age of the places copy, the Public source for the survival base rate, the Public source of each forecast series without a table, the provider's rule on storing responses, the sources that are off under a public or commercial hosting, the size of the public-total inventory with the two gridded Public tables, the subject of a district series and the build without the night-lights key.
 
 ## OI-01 — Main model key (supplied for go-live; not used during the build)
 
@@ -743,12 +743,13 @@
 ## OI-96 — Age of the places copy of decision 0019
 
 - ID: OI-96
-- TYPE: ASSUMPTION
+- TYPE: CLOSED (was ASSUMPTION)
 - NEEDED: The owner to confirm that the newest release of the public copy of the places dataset, dated 2025-01-10, is the one used, or to supply a newer one.
 - WHY: The places source `places_fsq` is fetched inside `./eii build-public` from the public copy on Source Cooperative (`https://data.source.coop/fused/fsq-os-places/`, host `data.source.coop`), which is read without an account; only the files that cover Qatar are fetched. Read on 2026-11-12, its README states the Apache License, Version 2.0 and the publisher's copyright line, and its listing holds three dated releases, the newest dated 2025-01-10, with no update rhythm stated. A newer release comes from the publisher's portal, which needs an account, and is the owner's choice ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 21).
 - DONE SO FAR: The source `places_fsq` and its table `pub_place_fsq` are listed in [04_PUBLIC_DATA_PACK.md](docs/04_PUBLIC_DATA_PACK.md). Task S2-T15 builds the fetcher, the registry row that records the release used, the reviewed category mapping and the extended real-name collision checks; the places are shown with the date of that release. No variable is added for this source. The files that cover Qatar are assumed to be found through the dataset's own metadata file, which the task that builds the fetcher confirms.
 - OPTIONS: **Recommendation:** use the release dated 2025-01-10 and show its date; a newer release is the owner's choice. Alternative: leave the source out and keep the other registered places data.
 - NEEDED BY: slice S2 gate (S2-T15, PLN-25); not a blocker.
+- CLOSED: 2026-11-12, by the owner's answer of that day, recorded in [decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 21: the copy dated 2025-01-10 is used for version 1 as it is and is shown with its date; where a place of the copy disagrees with OpenStreetMap or Overture, which are current, the newer source wins; no account is opened and no newer release is fetched for now.
 
 ## OI-97 — Public source for the survival base rate
 
@@ -814,10 +815,10 @@
 
 - ID: OI-103
 - TYPE: OPEN
-- NEEDED: For the task that builds the night-lights fetcher, what `./eii build-public` does when `EARTHDATA_API_KEY` is absent: a warning and no night-lights layer, or a failed step.
-- WHY: The night-lights source `ntl_blackmarble` is fetched with the Earthdata token inside `./eii build-public` ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 16 and 20). No test, gate, command or the guided story needs the key, and exit 6 stays for an unavailable network.
+- NEEDED: For the task that builds the night-lights fetcher, whether absence of `EARTHDATA_API_KEY` produces a warning that names the key and the layer left out, or a silent omission of the night-lights layer.
+- WHY: The night-lights source `ntl_blackmarble` is fetched with the Earthdata token inside `./eii build-public` ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 16 and 20). No test, gate, command or the guided story needs the key. `./eii build-public` must continue successfully without the night-lights layer when the key is absent, and exit 6 stays for an unavailable network only.
 - DONE SO FAR: Preflight reports the key as `present` or `absent` and never prints it.
-- OPTIONS: **Recommendation:** the task that builds the fetcher chooses between a warning with no night-lights layer and a failed step, and records the choice here. Exit 6 stays for an unavailable network.
+- OPTIONS: **Recommendation:** a warning line that names the key and the layer left out. The alternative is a silent omission of the layer. In both cases `build-public` continues successfully. Exit 6 stays for an unavailable network.
 - NEEDED BY: the task that builds the night-lights fetcher (S2-T14).
 
 ## Change control

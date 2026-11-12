@@ -47,7 +47,7 @@
 | [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md) | Commands, stage operation, freeze and recovery | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
 | [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md) | Slices, dependencies, tasks and gates | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
 | [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md) | Independent checks and verdict format | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
-| [16_DEMO_RUNBOOK.md](16_DEMO_RUNBOOK.md) | Guided session, recoveries and closing request | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| [16_DEMO_RUNBOOK.md](16_DEMO_RUNBOOK.md) | Guided session, recoveries and closing request | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
 | [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) | What a deployment on real records must add beyond the demonstrator | Draft v0.2, created by decisions 0016 and 0017 and amended by decisions 0018 and 0019 on 2026-11-12 |
 | [GLOSSARY.md](GLOSSARY.md) | Shared technical and interface vocabulary | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
 | [REFERENCE_NOTES.md](REFERENCE_NOTES.md) | Official pages read for DuckDB 2.0, PostgreSQL 18 and the Claude API, the idioms that changed, and the slice S1 confirmation fields | Draft written by task S0-T13 on 2026-11-12; not approved |
