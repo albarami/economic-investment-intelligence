@@ -108,11 +108,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas Platform; status in review (part A merged in pull request 10 on 2026-11-12; part B follows; part C after S0-T07 and S0-T11 merge).
 ### S0-T09 — `./eii` command skeleton and database commands
 - Goal: Create every pinned command entry point, including `db-up` and `db-down`, with safe placeholder dispatch.
-- Acceptance criteria: [ ] usage lists every pinned command; [ ] `preflight` only probes; [ ] `db-up` and `db-down` alone start and stop the database; [ ] `up` never starts it.
+- Acceptance criteria: [x] usage lists every pinned command; [x] `preflight` only probes; [x] `db-up` and `db-down` alone start and stop the database; [x] `up` never starts it.
 - Scope: root `eii` launcher and `scripts/commands/`.
 - Depends: S0-T08.
 - Requirements: OPS-26, OPS-27, OPS-28, ARC-96.
-- Delivery: hard; personas Platform; status in review (pull request 15).
+- Delivery: hard; personas Platform; status done (pull request 15, merged 2026-11-12).
 ### S0-T10 — Import-boundary test
 - Goal: Enforce the three-plane imports before feature code exists.
 - Acceptance criteria: [x] direct, local and dynamic forbidden imports fail; [x] package metadata edges are checked; [x] clean packages pass.
@@ -122,11 +122,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas Backend; status done (pull requests 8 and 11, merged 2026-11-12).
 ### S0-T11 — Generator sandbox test
 - Goal: Prove locally and on the hosted CI runner that the `build-world` and `build-release` sandbox profiles cannot read outside their allowed mounts or open the network.
-- Acceptance criteria: [ ] both prohibited operations fail under both profiles locally and on the hosted runner; [ ] the read tooth succeeds outside; [ ] CI never skips the test; [ ] a runner restriction on unprivileged user namespaces is handled by a per-binary bubblewrap AppArmor profile or fails the job; [ ] engine extensions are fetched before sandbox entry into a project-local folder mounted read-only and load with the network off.
+- Acceptance criteria: [x] both prohibited operations fail under both profiles locally and on the hosted runner; [x] the read tooth succeeds outside; [x] CI never skips the test; [x] a runner restriction on unprivileged user namespaces is handled by a per-binary bubblewrap AppArmor profile or fails the job; [x] engine extensions are fetched before sandbox entry into a project-local folder mounted read-only and load with the network off.
 - Scope: sandbox launcher, hosted-runner namespace setup, project-local engine-extension folder, sentinel generator and sandbox tests.
 - Depends: S0-T02, S0-T05.
 - Requirements: ARC-09, ARC-10, ARC-14, SYN-01, TST-61, TST-62.
-- Delivery: hard; personas Platform; status in review (pull request 14).
+- Delivery: hard; personas Platform; status done (pull request 14, merged 2026-11-12).
 ### S0-T12 — Version and retreat pins
 - Goal: Pin supported toolchains and libraries with written retreat pins where the design requires them.
 - Acceptance criteria: [x] lock files resolve; [x] exact and retreat pins are labelled; [x] unsupported version drift fails a check.
@@ -140,7 +140,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: dependency reference notes under `docs/` assigned to this task only.
 - Depends: S0-T12.
 - Requirements: FE-02, PLN-10, PLN-18, TST-01, DES-25, DES-45.
-- Delivery: routine; personas Platform; status in review (pull request 13, round 2; its shared documents follow as part B).
+- Delivery: routine; personas Platform; status in review (part A merged in pull request 13 on 2026-11-12; part B in pull request 16).
 ### S0-T14 — GitHub repository settings
 - Goal: Enable secret scanning, push protection and branch protection under OI-13.
 - Acceptance criteria: [ ] each setting is queried after change; [ ] evidence records the result; [ ] no repository file or git setting is changed by the task.

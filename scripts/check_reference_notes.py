@@ -1,8 +1,9 @@
 """Check the form of the reference notes (FE-02, TST-01).
 
 Reads `web/REFERENCE_NOTES.md`, `docs/REFERENCE_NOTES.md` and `pins.toml`, and the pack
-files that a note cites by line. It writes nothing and uses no network. It does not decide
-whether a quotation is still on its page: that is the work of the second reader.
+files that hold the anchors the notes cite. It checks that each anchor exists in its file
+and not what the anchored text says. It writes nothing and uses no network. It does not
+decide whether a quotation is still on its page: that is the work of the second reader.
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ from reference_notes_parse import (
     check_cite,
     file_date,
     load_pins,
+    mask_verified_anchors,
     quote_problem,
     read_regular,
     source_problem,
@@ -95,7 +97,7 @@ def check_claims(
             report.fail("unverified", n, f'{ident}: PACK row lacks "{UNVERIFIED}"')
         if kind != "PACK" and UNVERIFIED in claim:
             report.fail("unverified", n, f'{ident}: {kind} row says "{UNVERIFIED}"')
-        hit = CLAIM_RE.search(text)
+        hit = CLAIM_RE.search(mask_verified_anchors(root, text))
         if hit:
             report.fail("claim-word", n, f'{ident}: word "{hit.group(1).lower()}"')
     return runs, pages
@@ -213,7 +215,7 @@ def check_coverage(
     span: tuple[int, int],
     known: dict[str, set[str] | None],
 ) -> None:
-    """Judge the coverage section: one table of pack claim, pack line and where it stands."""
+    """Judge the coverage section: one table of pack claim, pack anchor and where it stands."""
     check_prose(report, lines, span, True)
     first = table_after(lines, span[0] + 1, span[1])
     if first is None:

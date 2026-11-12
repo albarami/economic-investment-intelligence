@@ -10,13 +10,13 @@
 
 ## How to read these notes
 
-Every statement in a table has one kind. READ: an official page, read on the date given, whose quoted words support the statement and nothing more. OBSERVED: a command run on the date given with the package and version named; the command and its output are in the Runs table of the section. PACK: the pack says it, the pack line is given, and it could be neither read nor observed here, so the statement says "not verified". A page can change after its date: quoted words are searched for again when the notes are checked.
+Every statement in a table has one kind. READ: an official page, read on the date given, whose quoted words support the statement and nothing more. OBSERVED: a command run on the date given with the package and version named; the command and its output are in the Runs table of the section. PACK: the pack says it, the pack anchor is given, and it could be neither read nor observed here, so the statement says "not verified". A page can change after its date: quoted words are searched for again when the notes are checked.
 
-The last section of each file lists the statements of the pack about these libraries and where each stands: a row of these notes, or "not covered" with the reason. The notes name a series, not a pin. Exact pins and retreat pins are the rows of `pins.toml`, which a check compares with the manifests; the table at the end of each section lists what slice S1 still has to confirm, and every value in it is "not yet confirmed". No PostgreSQL server was started and no request was sent to the Claude API for these notes (no key, no account), so every PostgreSQL and Claude API row is READ or PACK. The notes make no claim that a library works in this project: no run of this project's own code exists yet. `scripts/check_reference_notes.py` checks the form of these notes (sections, kinds, sources, allowed addresses, dates, the confirmation tables and the coverage table) and nothing about whether a quotation is still on its page.
+The last section of each file lists the statements of the pack about these libraries and where each stands: a row of these notes, or "not covered" with the reason. The notes name a series, not a pin. Exact pins and retreat pins are the rows of `pins.toml`, which a check compares with the manifests; the table at the end of each section lists what slice S1 still has to confirm, and every value in it is "not yet confirmed". No PostgreSQL server was started and no request was sent to the Claude API for these notes (no key, no account), so every PostgreSQL and Claude API row is READ or PACK. The notes make no claim that a library works in this project: no run of this project's own code exists yet. `scripts/check_reference_notes.py` checks the form of these notes (sections, kinds, sources, allowed addresses, dates, the confirmation tables and the coverage table), that each anchor exists in the cited file and not what the anchored text says, and nothing about whether a quotation is still on its page.
 
 ## DuckDB 2.0
 
-Used here as the build engine for the public pack, the synthetic world and the release (docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 19) and as the embedded reader (docs/02_ARCHITECTURE.md line 540). Series 2.0, retreat series 1.5; the pins.toml row is `duckdb`.
+Used here as the build engine for the public pack, the synthetic world and the release (docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Decision" item 1) and as the embedded reader (docs/02_ARCHITECTURE.md section "Technology stack" row "Build engine and embedded reader"). Series 2.0, retreat series 1.5; the pins.toml row is `duckdb`.
 
 ### Pages read
 
@@ -87,26 +87,26 @@ Setup, in an empty folder: `uv venv --python 3.14 venv`, then `uv pip install --
 | S21 | In duckdb 2.0.0, the Python-style lambda is accepted. | OBSERVED | R6 | - |
 | S22 | Any error inside an explicit transaction aborts the transaction in DuckDB 2.0.0. | READ | P2 | "any error inside an explicit transaction aborts the transaction" |
 | S23 | The function postgres_execute sends its query to PostgreSQL with no transformation or analysis by DuckDB. | READ | P6 | "no transformation or analysis of this query is performed by DuckDB" |
-| S24 | The pack says postgres_execute takes one statement per call (docs/02_ARCHITECTURE.md line 540); the function page names one query argument and does not state a limit on statements, and no PostgreSQL server was available: not verified. | PACK | docs/02_ARCHITECTURE.md line 540 | - |
-| S25 | The pack says DuckDB 2.x needs SET geometry_always_xy=true for the Overture extract (docs/04_PUBLIC_DATA_PACK.md line 277); the spatial extension overview page (P12) does not mention the setting: not verified. | PACK | docs/04_PUBLIC_DATA_PACK.md line 277 | - |
-| S26 | The pack records that a DuckDB GEOMETRY column arrives as a PostGIS geometry column through the PostgreSQL extension with no conversion (docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 33); that was measured by the architecture research and not repeated here: not verified. | PACK | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 33 | - |
-| S27 | The pack lists byte-order sorting of text as an assumption to be confirmed with the parity query of slice S1 (docs/02_ARCHITECTURE.md line 443); the page read (S19) names the default for DuckDB only, and no parity query has been run: not verified. | PACK | docs/02_ARCHITECTURE.md line 443 | - |
+| S24 | The pack says postgres_execute takes one statement per call (docs/02_ARCHITECTURE.md section "Technology stack" row "Build engine and embedded reader"); the function page names one query argument and does not state a limit on statements, and no PostgreSQL server was available: not verified. | PACK | docs/02_ARCHITECTURE.md section "Technology stack" row "Build engine and embedded reader" | - |
+| S25 | The pack says DuckDB 2.x needs SET geometry_always_xy=true for the Overture extract (docs/04_PUBLIC_DATA_PACK.md PUB-17); the spatial extension overview page (P12) does not mention the setting: not verified. | PACK | docs/04_PUBLIC_DATA_PACK.md PUB-17 | - |
+| S26 | The pack records that a DuckDB GEOMETRY column arrives as a PostGIS geometry column through the PostgreSQL extension with no conversion (docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence"); that was measured by the architecture research and not repeated here: not verified. | PACK | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" | - |
+| S27 | The pack lists byte-order sorting of text as an assumption to be confirmed with the parity query of slice S1 (docs/02_ARCHITECTURE.md section "The portable SQL subset (minimum rules)"); the page read (S19) names the default for DuckDB only, and no parity query has been run: not verified. | PACK | docs/02_ARCHITECTURE.md section "The portable SQL subset (minimum rules)" | - |
 
 ### Slice S1 confirmation
 
 | Field | Value | Rows in pins.toml | Pack source |
 |---|---|---|---|
-| exact pin, or the retreat series chosen instead | not yet confirmed | duckdb | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 21 |
-| path of the project-local extension directory | not yet confirmed | - | docs/02_ARCHITECTURE.md line 744 |
-| need for geometry_always_xy | not yet confirmed | - | docs/03_DATA_CONTRACTS.md line 91 |
-| text ordering by byte value, by the parity query | not yet confirmed | - | docs/02_ARCHITECTURE.md line 443 |
-| threading guidance of the 2.0 Python interface | not yet confirmed | - | docs/08_BACKEND.md line 125 |
-| copy mechanism from DuckDB to PostgreSQL | not yet confirmed | - | docs/08_BACKEND.md line 275 |
-| files written by 2.0 when the retreat series is chosen | not yet confirmed | duckdb | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 39 |
+| exact pin, or the retreat series chosen instead | not yet confirmed | duckdb | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Decision" item 3 |
+| path of the project-local extension directory | not yet confirmed | - | docs/02_ARCHITECTURE.md section "Open questions and assumptions" item 2 |
+| need for geometry_always_xy | not yet confirmed | - | docs/03_DATA_CONTRACTS.md section "Logical types" |
+| text ordering by byte value, by the parity query | not yet confirmed | - | docs/02_ARCHITECTURE.md section "The portable SQL subset (minimum rules)" |
+| threading guidance of the 2.0 Python interface | not yet confirmed | - | docs/08_BACKEND.md BE-12 |
+| copy mechanism from DuckDB to PostgreSQL | not yet confirmed | - | docs/08_BACKEND.md section "The loader (`./eii load-release`)" |
+| files written by 2.0 when the retreat series is chosen | not yet confirmed | duckdb | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" |
 
 ## PostgreSQL 18
 
-Used here as the serving store, with PostGIS and no other extension (docs/02_ARCHITECTURE.md line 541). Series 18; the pins.toml rows are `postgresql`, `postgis` and `postgis-image`.
+Used here as the serving store, with PostGIS and no other extension (docs/02_ARCHITECTURE.md section "Technology stack" row "Serving store"). Series 18; the pins.toml rows are `postgresql`, `postgis` and `postgis-image`.
 
 ### Pages read
 
@@ -144,22 +144,22 @@ Used here as the serving store, with PostGIS and no other extension (docs/02_ARC
 | S9 | A NOTIFY executed in a transaction is not delivered unless the transaction is committed. | READ | P4 | "the notify events are not delivered until and unless the transaction is committed" |
 | S10 | In the default configuration a notification payload must be shorter than 8000 bytes. | READ | P4 | "In the default configuration it must be shorter than 8000 bytes." |
 | S11 | Multiple jobs of pg_restore cannot be used together with the option --single-transaction. | READ | P8 | "multiple jobs cannot be used together with the option --single-transaction" |
-| S12 | The pack applies the volume layout of the official postgres image to the postgis/postgis image (docs/13_DEPLOYMENT_AND_OPERATIONS.md line 133); the page read is the page of the official image, not of the PostGIS image: not verified. | PACK | docs/13_DEPLOYMENT_AND_OPERATIONS.md line 133 | - |
-| S13 | The pack says the PostGIS image defines no health check and that the first-boot server listens on the socket only (docs/12_TESTING_AND_QUALITY.md line 374; docs/13_DEPLOYMENT_AND_OPERATIONS.md line 134); neither was looked for here: not verified. | PACK | docs/12_TESTING_AND_QUALITY.md line 374 | - |
-| S14 | The pack says the database may carry only PostGIS and the built-in procedural language, and that text columns use the C collation (docs/08_BACKEND.md line 223; docs/13_DEPLOYMENT_AND_OPERATIONS.md line 157; docs/02_ARCHITECTURE.md line 443); neither was looked for here: not verified. | PACK | docs/08_BACKEND.md line 223; docs/13_DEPLOYMENT_AND_OPERATIONS.md line 157; docs/02_ARCHITECTURE.md line 443 | - |
+| S12 | The pack applies the volume layout of the official postgres image to the postgis/postgis image (docs/13_DEPLOYMENT_AND_OPERATIONS.md section "Compose service definition (in words)" item 4); the page read is the page of the official image, not of the PostGIS image: not verified. | PACK | docs/13_DEPLOYMENT_AND_OPERATIONS.md section "Compose service definition (in words)" item 4 | - |
+| S13 | The pack says the PostGIS image defines no health check and that the first-boot server listens on the socket only (docs/12_TESTING_AND_QUALITY.md TST-152; docs/13_DEPLOYMENT_AND_OPERATIONS.md section "Compose service definition (in words)" item 5); neither was looked for here: not verified. | PACK | docs/12_TESTING_AND_QUALITY.md TST-152 | - |
+| S14 | The pack says the database may carry only PostGIS and the built-in procedural language, and that text columns use the C collation (docs/08_BACKEND.md BE-32; docs/13_DEPLOYMENT_AND_OPERATIONS.md OPS-12; docs/02_ARCHITECTURE.md section "The portable SQL subset (minimum rules)"); neither was looked for here: not verified. | PACK | docs/08_BACKEND.md BE-32; docs/13_DEPLOYMENT_AND_OPERATIONS.md OPS-12; docs/02_ARCHITECTURE.md section "The portable SQL subset (minimum rules)" | - |
 
 ### Slice S1 confirmation
 
 | Field | Value | Rows in pins.toml | Pack source |
 |---|---|---|---|
-| exact pin of PostgreSQL 18 and the PostGIS 3.6 line | not yet confirmed | postgresql, postgis | docs/02_ARCHITECTURE.md line 541 |
-| image digest of the PostGIS image | not yet confirmed | postgis-image | docs/13_DEPLOYMENT_AND_OPERATIONS.md line 130 |
-| data directory and volume path of that image | not yet confirmed | postgis-image | docs/13_DEPLOYMENT_AND_OPERATIONS.md line 133 |
-| first parity query on both stores | not yet confirmed | - | TASKS.md line 189 |
+| exact pin of PostgreSQL 18 and the PostGIS 3.6 line | not yet confirmed | postgresql, postgis | docs/02_ARCHITECTURE.md section "Technology stack" row "Serving store" |
+| image digest of the PostGIS image | not yet confirmed | postgis-image | docs/13_DEPLOYMENT_AND_OPERATIONS.md section "Compose service definition (in words)" item 1 |
+| data directory and volume path of that image | not yet confirmed | postgis-image | docs/13_DEPLOYMENT_AND_OPERATIONS.md section "Compose service definition (in words)" item 4 |
+| first parity query on both stores | not yet confirmed | - | TASKS.md S1-T05 |
 
 ## Claude API
 
-Used here behind one provider adapter for the router and the writer, with the template writer as the retreat (docs/09_AI_ASSISTANT.md lines 21 and 323). The model string and the Python SDK are the pins.toml rows `claude-model` and `anthropic`. The pack says its statements about the API were checked against a reference bundled with a coding tool and not against an official page (docs/09_AI_ASSISTANT.md line 319); every row below is a page read on the date given, or a pack statement marked "not verified". Page titles are the `title` of the front matter of each page's Markdown form (the page address plus `.md`).
+Used here behind one provider adapter for the router and the writer, with the template writer as the retreat (docs/09_AI_ASSISTANT.md section "In brief"; docs/09_AI_ASSISTANT.md section "Model settings" row "Model"). The model string and the Python SDK are the pins.toml rows `claude-model` and `anthropic`. The pack says its statements about the API were checked against a reference bundled with a coding tool and not against an official page (docs/09_AI_ASSISTANT.md section "Model settings"); every row below is a page read on the date given, or a pack statement marked "not verified". Page titles are the `title` of the front matter of each page's Markdown form (the page address plus `.md`).
 
 ### Pages read
 
@@ -218,14 +218,14 @@ Used here behind one provider adapter for the router and the writer, with the te
 | S20 | United States only inference is priced at 1.1 times the standard rate. | READ | P11 | "is priced at 1.1x the standard rate" |
 | S21 | By default the SDK retries certain errors twice: connection errors and the statuses 408, 409, 429 and 500 or above. | READ | P12 | "By default, the SDK retries certain errors twice ... It retries connection errors ... 408 Request Timeout, 409 Conflict, 429 Rate Limit, and >=500 Internal errors" |
 | S22 | A client from the separate httpx package, given to the SDK, raises a TypeError. | READ | P12 | "Passing a client from the separate httpx package raises a TypeError" |
-| S23 | The pack says a zero-output pre-warm is rejected together with streaming or structured output (docs/09_AI_ASSISTANT.md line 353); no page read says so: not verified. | PACK | docs/09_AI_ASSISTANT.md line 353 | - |
-| S24 | The pack calls eager input streaming the reference's recommended setting (docs/09_AI_ASSISTANT.md line 329); no page read calls it recommended: not verified. | PACK | docs/09_AI_ASSISTANT.md line 329 | - |
-| S25 | The pack says earlier turns must be byte-identical (docs/09_AI_ASSISTANT.md line 273); the page read says the prefix is compared with what was sent: not verified as worded. | PACK | docs/09_AI_ASSISTANT.md line 273 | - |
-| S26 | The pack says the reference recommends server-side refusal fallbacks by default (docs/09_AI_ASSISTANT.md line 356); the page read does not use that wording: not verified. | PACK | docs/09_AI_ASSISTANT.md line 356 | - |
-| S27 | The pack asks whether other inference geographies exist and whether either runs in Qatar (docs/09_AI_ASSISTANT.md line 335); the page read names no Qatar region and does not rule one out for global: not verified. | PACK | docs/09_AI_ASSISTANT.md line 335 | - |
+| S23 | The pack says a zero-output pre-warm is rejected together with streaming or structured output (docs/09_AI_ASSISTANT.md AI-57); no page read says so: not verified. | PACK | docs/09_AI_ASSISTANT.md AI-57 | - |
+| S24 | The pack calls eager input streaming the reference's recommended setting (docs/09_AI_ASSISTANT.md section "Model settings" row "Tool definitions"); no page read calls it recommended: not verified. | PACK | docs/09_AI_ASSISTANT.md section "Model settings" row "Tool definitions" | - |
+| S25 | The pack says earlier turns must be byte-identical (docs/09_AI_ASSISTANT.md AI-48); the page read says the prefix is compared with what was sent: not verified as worded. | PACK | docs/09_AI_ASSISTANT.md AI-48 | - |
+| S26 | The pack says the reference recommends server-side refusal fallbacks by default (docs/09_AI_ASSISTANT.md AI-60); the page read does not use that wording: not verified. | PACK | docs/09_AI_ASSISTANT.md AI-60 | - |
+| S27 | The pack asks whether other inference geographies exist and whether either runs in Qatar (docs/09_AI_ASSISTANT.md section "Model settings" row "Inference geography"); the page read names no Qatar region and does not rule one out for global: not verified. | PACK | docs/09_AI_ASSISTANT.md section "Model settings" row "Inference geography" | - |
 | S28 | Claude Opus 5.5 does not support forced tool use, and sending a forcing tool choice returns a 400 invalid_request_error. | READ | P2 | "Claude Opus 5.5 ... don't support forced tool use ... returns a 400 invalid_request_error" |
 | S29 | The page on the speed setting prices it at a multiplier on standard rates and lists Claude Opus 5.5 at 8 USD for input and 40 USD for output per million tokens. | READ | P14 | "Fast mode is priced at a multiplier on standard rates ... Input ... Output ... Claude Opus 5.5 ... $8 USD / MTok ... $40 USD / MTok" |
-| S30 | The pack calls the price of the speed setting twice the standard price (docs/09_AI_ASSISTANT.md line 334); the page read gives a multiplier and not that ratio in words: not verified as worded. | PACK | docs/09_AI_ASSISTANT.md line 334 | - |
+| S30 | The pack calls the price of the speed setting twice the standard price (docs/09_AI_ASSISTANT.md section "Model settings" row "Fast mode"); the page read gives a multiplier and not that ratio in words: not verified as worded. | PACK | docs/09_AI_ASSISTANT.md section "Model settings" row "Fast mode" | - |
 | S31 | A one-hour cache lifetime can be requested instead of the five-minute default. | READ | P7 | "By default, automatic caching uses a 5-minute TTL. You can specify a 1-hour TTL at 2x the base input token price" |
 | S32 | A compiled structured-output schema is cached for 24 hours from last use. | READ | P3 | "Compiled grammars are cached for 24 hours from last use" |
 | S33 | A tool result carries an optional is_error field, set to true when the tool execution failed. | READ | P15 | "Set to true if the tool execution resulted in an error" |
@@ -235,63 +235,63 @@ Used here behind one provider adapter for the router and the writer, with the te
 
 | Field | Value | Rows in pins.toml | Pack source |
 |---|---|---|---|
-| SDK pin and written retreat pin | not yet confirmed | anthropic | docs/09_AI_ASSISTANT.md line 319 |
-| model string | not yet confirmed | claude-model | docs/09_AI_ASSISTANT.md line 323 |
-| thinking counts toward max_tokens | not yet confirmed | - | docs/09_AI_ASSISTANT.md line 331 |
-| inference geographies | not yet confirmed | - | docs/09_AI_ASSISTANT.md line 335 |
-| minimum cacheable prefix | not yet confirmed | - | docs/09_AI_ASSISTANT.md line 354 |
+| SDK pin and written retreat pin | not yet confirmed | anthropic | docs/09_AI_ASSISTANT.md section "Model settings" |
+| model string | not yet confirmed | claude-model | docs/09_AI_ASSISTANT.md section "Model settings" row "Model" |
+| thinking counts toward max_tokens | not yet confirmed | - | docs/09_AI_ASSISTANT.md section "Model settings" row "`max_tokens`" |
+| inference geographies | not yet confirmed | - | docs/09_AI_ASSISTANT.md section "Model settings" row "Inference geography" |
+| minimum cacheable prefix | not yet confirmed | - | docs/09_AI_ASSISTANT.md AI-58 |
 
 ## Pack statements and where each stands
 
 | Pack claim | Pack source | Where |
 |---|---|---|
-| DuckDB 2.0.0 is a long-term support release supported until at least October 2027 | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 38 | DuckDB 2.0 S1 |
-| The announcement suggests waiting for a first patch release for mission-critical work | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 38 | DuckDB 2.0 S3 |
-| Files written by 2.0 cannot be read by earlier versions | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 39 | DuckDB 2.0 S4 |
-| One read-write process, or several read-only processes | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 40 | DuckDB 2.0 S5 |
-| An extension needs the network for its first install and is cached locally afterwards | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 41 | DuckDB 2.0 S6 |
-| Python relations no longer have fetchone() | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 34 | DuckDB 2.0 S7; DuckDB 2.0 S8 |
-| postgres_execute takes one statement per call | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 34 | DuckDB 2.0 S24 |
-| DuckDB 2.x needs SET geometry_always_xy=true for the Overture extract | docs/04_PUBLIC_DATA_PACK.md line 277 | DuckDB 2.0 S25 |
-| The operator / is float division in DuckDB | docs/08_BACKEND.md line 143 | DuckDB 2.0 S15; DuckDB 2.0 S16 |
-| DuckDB keeps NULLS LAST for DESC | docs/08_BACKEND.md line 145 | DuckDB 2.0 S17; DuckDB 2.0 S18 |
-| The embedded adapter opens read-only, then sets enable_external_access to false and lock_configuration to true | docs/08_BACKEND.md line 123 | DuckDB 2.0 S10; DuckDB 2.0 S12; DuckDB 2.0 S13 |
-| DuckDB accepts cell = ANY(list), and a dictionary of named parameters | docs/08_BACKEND.md line 129; docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 32 | DuckDB 2.0 S20 |
-| A DuckDB GEOMETRY column arrives as a PostGIS geometry column with no conversion | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md line 33 | DuckDB 2.0 S26 |
-| DuckDB orders text by byte value by default (assumption) | docs/02_ARCHITECTURE.md line 443 | DuckDB 2.0 S19; DuckDB 2.0 S27 |
-| The adapter uses one cursor per thread (assumption) | docs/08_BACKEND.md line 125 | DuckDB 2.0 S14 |
-| PostgreSQL set_config with is_local true limits the value to the current transaction | docs/08_BACKEND.md line 116 | PostgreSQL 18 S6 |
-| PostgreSQL integer division truncates towards zero | docs/08_BACKEND.md line 143 | PostgreSQL 18 S7 |
-| PostgreSQL defaults to NULLS FIRST for DESC | docs/08_BACKEND.md line 145 | PostgreSQL 18 S8 |
-| Notifications are delivered only when the transaction commits and the payload is under 8,000 bytes | docs/08_BACKEND.md line 717 | PostgreSQL 18 S9; PostgreSQL 18 S10 |
-| Table owners bypass row-level security unless it is forced | docs/08_BACKEND.md line 222 | PostgreSQL 18 S3 |
-| With row_security set to off a query that would be filtered raises an error | docs/12_TESTING_AND_QUALITY.md line 221 | PostgreSQL 18 S5 |
-| The version 18 images declare /var/lib/postgresql as the volume | docs/13_DEPLOYMENT_AND_OPERATIONS.md line 133 | PostgreSQL 18 I1; PostgreSQL 18 S12 |
-| The PostGIS image has no health check and the first-boot server listens on the socket only | docs/12_TESTING_AND_QUALITY.md line 374; docs/13_DEPLOYMENT_AND_OPERATIONS.md line 134 | PostgreSQL 18 S13 |
-| Parallel restore does not work with --single-transaction | docs/13_DEPLOYMENT_AND_OPERATIONS.md line 337 | PostgreSQL 18 S11 |
-| PostgreSQL 18 adds OAuth authentication and data checksums by default | docs/13_DEPLOYMENT_AND_OPERATIONS.md line 366 | PostgreSQL 18 S2; PostgreSQL 18 I2 |
-| The database carries only PostGIS and plpgsql, and text columns use the C collation | docs/08_BACKEND.md line 223; docs/13_DEPLOYMENT_AND_OPERATIONS.md line 157; docs/02_ARCHITECTURE.md line 443 | PostgreSQL 18 S14 |
-| Thinking is omitted or adaptive, and disabled or a token budget returns a 400 error | docs/09_AI_ASSISTANT.md line 324 | Claude API I1 |
-| The thinking display default is omitted | docs/09_AI_ASSISTANT.md line 325 | Claude API S4 |
-| The default effort is medium | docs/09_AI_ASSISTANT.md line 326 | Claude API S2 |
-| temperature, top_p and top_k are rejected with a 400 error | docs/09_AI_ASSISTANT.md line 327 | Claude API I2 |
-| Only the auto tool choice is allowed and forcing a tool returns a 400 error | docs/09_AI_ASSISTANT.md line 328 | Claude API I3; Claude API S28 |
-| Eager input streaming stops server validation, and the API buffers by default | docs/09_AI_ASSISTANT.md line 329 | Claude API S10; Claude API S24 |
-| Tool definitions carry strict: true | docs/09_AI_ASSISTANT.md line 329 | not covered: the strict tool use page is not quoted in these notes |
-| Structured-output schemas do not support numeric range constraints | docs/09_AI_ASSISTANT.md line 164 | Claude API S5 |
-| Structured output is schema-valid except on refusal or max_tokens and cannot be combined with citations or prefill | docs/09_AI_ASSISTANT.md line 330 | Claude API S8; Claude API S9; Claude API I4 |
-| Thinking counts toward the max_tokens limit | docs/09_AI_ASSISTANT.md line 331 | Claude API S3 |
-| Five stop reasons exist and a refusal arrives as HTTP 200 | docs/09_AI_ASSISTANT.md line 332 | Claude API S11; Claude API S12 |
-| Fast mode costs 8 and 40 USD per million tokens, twice the standard price | docs/09_AI_ASSISTANT.md line 334 | Claude API S29; Claude API S30 |
-| The inference geography is global by default and us costs 1.1 times the price | docs/09_AI_ASSISTANT.md line 335 | Claude API S19; Claude API S20; Claude API S27 |
-| A system message after the user turn is supported | docs/09_AI_ASSISTANT.md line 336 | Claude API S18 |
-| The SDK retries 408, 409, 429, 5xx and connection errors twice by default | docs/09_AI_ASSISTANT.md line 337 | Claude API S21 |
-| Preserved thinking checks that earlier turns are byte-identical | docs/09_AI_ASSISTANT.md line 273 | Claude API S17; Claude API S25 |
-| One explicit one-hour breakpoint and a five-minute automatic default | docs/09_AI_ASSISTANT.md line 351 | Claude API S14; Claude API S31 |
-| A zero-output pre-warm is rejected together with streaming or structured output | docs/09_AI_ASSISTANT.md line 353 | Claude API S23 |
-| The structured-output schema compilation is cached for 24 hours | docs/09_AI_ASSISTANT.md line 353 | Claude API S32 |
-| The minimum cacheable prefix is 512 tokens | docs/09_AI_ASSISTANT.md line 354 | Claude API S16 |
-| Changing the effort setting invalidates the cache | docs/09_AI_ASSISTANT.md line 345 | Claude API S15 |
-| Server-side refusal fallbacks are recommended by default | docs/09_AI_ASSISTANT.md line 356 | Claude API S26 |
-| A failed tool is returned as a result with is_error: true | docs/09_AI_ASSISTANT.md line 357 | Claude API S33 |
-| All parallel tool results are returned in one user message | docs/09_AI_ASSISTANT.md line 357 | Claude API S34 |
+| DuckDB 2.0.0 is a long-term support release supported until at least October 2027 | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" | DuckDB 2.0 S1 |
+| The announcement suggests waiting for a first patch release for mission-critical work | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" | DuckDB 2.0 S3 |
+| Files written by 2.0 cannot be read by earlier versions | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" | DuckDB 2.0 S4 |
+| One read-write process, or several read-only processes | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" | DuckDB 2.0 S5 |
+| An extension needs the network for its first install and is cached locally afterwards | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" | DuckDB 2.0 S6 |
+| Python relations no longer have fetchone() | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" | DuckDB 2.0 S7; DuckDB 2.0 S8 |
+| postgres_execute takes one statement per call | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" | DuckDB 2.0 S24 |
+| DuckDB 2.x needs SET geometry_always_xy=true for the Overture extract | docs/04_PUBLIC_DATA_PACK.md PUB-17 | DuckDB 2.0 S25 |
+| The operator / is float division in DuckDB | docs/08_BACKEND.md section "The portable SQL subset" row "`/` and `%`" | DuckDB 2.0 S15; DuckDB 2.0 S16 |
+| DuckDB keeps NULLS LAST for DESC | docs/08_BACKEND.md section "The portable SQL subset" row "`ORDER BY` without explicit `NULLS FIRST` or `NULLS LAST`" | DuckDB 2.0 S17; DuckDB 2.0 S18 |
+| The embedded adapter opens read-only, then sets enable_external_access to false and lock_configuration to true | docs/08_BACKEND.md BE-10 | DuckDB 2.0 S10; DuckDB 2.0 S12; DuckDB 2.0 S13 |
+| DuckDB accepts cell = ANY(list), and a dictionary of named parameters | docs/08_BACKEND.md section "The portable SQL subset"; docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" | DuckDB 2.0 S20 |
+| A DuckDB GEOMETRY column arrives as a PostGIS geometry column with no conversion | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" | DuckDB 2.0 S26 |
+| DuckDB orders text by byte value by default (assumption) | docs/02_ARCHITECTURE.md section "The portable SQL subset (minimum rules)" | DuckDB 2.0 S19; DuckDB 2.0 S27 |
+| The adapter uses one cursor per thread (assumption) | docs/08_BACKEND.md BE-12 | DuckDB 2.0 S14 |
+| PostgreSQL set_config with is_local true limits the value to the current transaction | docs/08_BACKEND.md section "The protocol" | PostgreSQL 18 S6 |
+| PostgreSQL integer division truncates towards zero | docs/08_BACKEND.md section "The portable SQL subset" row "`/` and `%`" | PostgreSQL 18 S7 |
+| PostgreSQL defaults to NULLS FIRST for DESC | docs/08_BACKEND.md section "The portable SQL subset" row "`ORDER BY` without explicit `NULLS FIRST` or `NULLS LAST`" | PostgreSQL 18 S8 |
+| Notifications are delivered only when the transaction commits and the payload is under 8,000 bytes | docs/08_BACKEND.md section "The ledger in PostgreSQL" | PostgreSQL 18 S9; PostgreSQL 18 S10 |
+| Table owners bypass row-level security unless it is forced | docs/08_BACKEND.md BE-31 | PostgreSQL 18 S3 |
+| With row_security set to off a query that would be filtered raises an error | docs/12_TESTING_AND_QUALITY.md TST-64 | PostgreSQL 18 S5 |
+| The version 18 images declare /var/lib/postgresql as the volume | docs/13_DEPLOYMENT_AND_OPERATIONS.md section "Compose service definition (in words)" item 4 | PostgreSQL 18 I1; PostgreSQL 18 S12 |
+| The PostGIS image has no health check and the first-boot server listens on the socket only | docs/12_TESTING_AND_QUALITY.md TST-152; docs/13_DEPLOYMENT_AND_OPERATIONS.md section "Compose service definition (in words)" item 5 | PostgreSQL 18 S13 |
+| Parallel restore does not work with --single-transaction | docs/13_DEPLOYMENT_AND_OPERATIONS.md section "Logs, backups and restore" row "Release schema damaged or missing" | PostgreSQL 18 S11 |
+| PostgreSQL 18 adds OAuth authentication and data checksums by default | docs/13_DEPLOYMENT_AND_OPERATIONS.md section "Deployment path (later)" | PostgreSQL 18 S2; PostgreSQL 18 I2 |
+| The database carries only PostGIS and plpgsql, and text columns use the C collation | docs/08_BACKEND.md BE-32; docs/13_DEPLOYMENT_AND_OPERATIONS.md OPS-12; docs/02_ARCHITECTURE.md section "The portable SQL subset (minimum rules)" | PostgreSQL 18 S14 |
+| Thinking is omitted or adaptive, and disabled or a token budget returns a 400 error | docs/09_AI_ASSISTANT.md section "Model settings" row "Thinking" | Claude API I1 |
+| The thinking display default is omitted | docs/09_AI_ASSISTANT.md section "Model settings" row "Thinking display" | Claude API S4 |
+| The default effort is medium | docs/09_AI_ASSISTANT.md section "Model settings" row "Effort" | Claude API S2 |
+| temperature, top_p and top_k are rejected with a 400 error | docs/09_AI_ASSISTANT.md section "Model settings" row "Sampling" | Claude API I2 |
+| Only the auto tool choice is allowed and forcing a tool returns a 400 error | docs/09_AI_ASSISTANT.md section "Model settings" row "Tool choice" | Claude API I3; Claude API S28 |
+| Eager input streaming stops server validation, and the API buffers by default | docs/09_AI_ASSISTANT.md section "Model settings" row "Tool definitions" | Claude API S10; Claude API S24 |
+| Tool definitions carry strict: true | docs/09_AI_ASSISTANT.md section "Model settings" row "Tool definitions" | not covered: the strict tool use page is not quoted in these notes |
+| Structured-output schemas do not support numeric range constraints | docs/09_AI_ASSISTANT.md AI-25 | Claude API S5 |
+| Structured output is schema-valid except on refusal or max_tokens and cannot be combined with citations or prefill | docs/09_AI_ASSISTANT.md section "Model settings" row "Structured output" | Claude API S8; Claude API S9; Claude API I4 |
+| Thinking counts toward the max_tokens limit | docs/09_AI_ASSISTANT.md section "Model settings" row "`max_tokens`" | Claude API S3 |
+| Five stop reasons exist and a refusal arrives as HTTP 200 | docs/09_AI_ASSISTANT.md section "Model settings" row "Stop reasons" | Claude API S11; Claude API S12 |
+| Fast mode costs 8 and 40 USD per million tokens, twice the standard price | docs/09_AI_ASSISTANT.md section "Model settings" row "Fast mode" | Claude API S29; Claude API S30 |
+| The inference geography is global by default and us costs 1.1 times the price | docs/09_AI_ASSISTANT.md section "Model settings" row "Inference geography" | Claude API S19; Claude API S20; Claude API S27 |
+| A system message after the user turn is supported | docs/09_AI_ASSISTANT.md section "Model settings" row "Response language" | Claude API S18 |
+| The SDK retries 408, 409, 429, 5xx and connection errors twice by default | docs/09_AI_ASSISTANT.md section "Model settings" row "Retries" | Claude API S21 |
+| Preserved thinking checks that earlier turns are byte-identical | docs/09_AI_ASSISTANT.md AI-48 | Claude API S17; Claude API S25 |
+| One explicit one-hour breakpoint and a five-minute automatic default | docs/09_AI_ASSISTANT.md AI-55 | Claude API S14; Claude API S31 |
+| A zero-output pre-warm is rejected together with streaming or structured output | docs/09_AI_ASSISTANT.md AI-57 | Claude API S23 |
+| The structured-output schema compilation is cached for 24 hours | docs/09_AI_ASSISTANT.md AI-57 | Claude API S32 |
+| The minimum cacheable prefix is 512 tokens | docs/09_AI_ASSISTANT.md AI-58 | Claude API S16 |
+| Changing the effort setting invalidates the cache | docs/09_AI_ASSISTANT.md section "Model settings" row "Repair" | Claude API S15 |
+| Server-side refusal fallbacks are recommended by default | docs/09_AI_ASSISTANT.md AI-60 | Claude API S26 |
+| A failed tool is returned as a result with is_error: true | docs/09_AI_ASSISTANT.md AI-61 | Claude API S33 |
+| All parallel tool results are returned in one user message | docs/09_AI_ASSISTANT.md AI-61 | Claude API S34 |

@@ -603,7 +603,7 @@ class NotesForm(unittest.TestCase):
             sup.edit(
                 root,
                 WEB,
-                "| A claim | docs/stub.md line 5 | MapLibre GL JS 6 S1; deck.gl 9.4 I1 |\n| Another claim | AGENTS.md line 2 | not covered: no row for it |\n",
+                '| A claim | docs/stub.md ARC-01 | MapLibre GL JS 6 S1; deck.gl 9.4 I1 |\n| Another claim | AGENTS.md section "Rules" | not covered: no row for it |\n',
                 "",
             )
             t = sup.line_of(root, WEB, "| Pack claim | Pack source | Where |")

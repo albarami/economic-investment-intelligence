@@ -8045,6 +8045,214 @@ Seed:      none
 Notes:     The work commit changes exactly the 18 paths of the task against the base it contains (TST-163).
 ```
 
+#### S0-T09: independent review, round 1: APPROVED
+
+Reviewed commit `7876e0791c96c847b0d49ebb9579142026395378`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/15 , with CI green on it (workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43255113938 ; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43255119830 ). Reviewer: Google Gemini 4 Carbon (high), through the Antigravity command-line tool, read-only; a full review in one part. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T09 (pull request 15)
+COMMIT: 7876e0791c96c847b0d49ebb9579142026395378
+REVIEWER: Google, Gemini 4 Carbon (High)
+CHECKS:
+  REV-10 PASS All four acceptance criteria of S0-T09 and requirements ARC-96, OPS-26, OPS-27 and OPS-28 are met with recorded tests and checks: (1) usage lists every pinned command (ARC-96) — `eii` lines 7-23 and `scripts/commands/table.py` lines 26-57 list all twelve forms (`preflight`, `db-up`, `db-down`, `up`, `up --embedded`, `down`, `test [--seed N]`, `build-public`, `build-world`, `build-release`, `load-release`, `freeze`) in the exact order and planes of `docs/02_ARCHITECTURE.md` section "Repository layout, commands and configuration", exiting 2 on stderr, proved by `test_commands.py::test_usage_lists_every_command`, `test_commands.py::test_launcher_dispatch`, `test_launcher.py::test_launcher_usage_errors` and `test_words_reach_uv`, and recorded commands 11 and 12; (2) `preflight` only probes — `scripts/commands/preflight_cmd.py` rejects arguments with exit 2 and calls only `preflight.run_preflight(root, environ)` over `preflight_proc.COMMANDS`'s seven read-only probes, proved by `test_commands.py::test_preflight_only_probes` (closed probe log plus unchanged root snapshot) and live check L3 (`./eii preflight` exit 0, `store: postgres`); (3) `db-up` and `db-down` alone start and stop the database (OPS-27) — `scripts/commands/database.py` is the only module in `scripts/commands/` naming `subprocess`, `docker` or `compose`, running only the two closed `docker compose -p eii-poc -f infra/compose.yaml --env-file <env-file>` forms (`up -d --wait --wait-timeout 60 db` with 90 s limit; `stop db` with 60 s limit), proved by `test_commands.py::test_db_up_and_db_down_alone` (including static and AST import guard `source_problems`) and live checks L1, L2, L6, L7, L8, L9 and LX; (4) `up` never starts it (OPS-27) — `scripts/commands/up_cmd.py` passes `docker=False` (and `embedded=True` for `--embedded`), refuses with exit 4 via `preflight.up_decision` without a configured complete release, and leaves `code == 0` as a fail-closed exit-1 placeholder guarded statically by `source_problems`, proved by `test_commands.py::test_up_never_starts_a_database`, recorded command 13 (`./eii up` exit 4) and live checks L4 and L5 (`0` docker calls recorded by the shim, container `8a0c05db657e` unchanged); OPS-26 and OPS-28 are proved by `test_exit_codes_are_in_the_table`, `test_down_deletes_nothing` and recorded command 14 (`./eii down` exit 1). Docker cannot be run in this read-only review, so the live check lines in `.overnight/EVIDENCE.md` section 1 are judged as given.
+  REV-11 PASS The lead (`lead (local)`) recorded 15 commands at work commit `d855a6097691a1fa0cf6a92f0386ba887c0f5616` in `PROGRESS.md` and re-ran head checks on exact commit `7876e0791c96c847b0d49ebb9579142026395378` in `.overnight/EVIDENCE.md` section 3 (`tree_is_work.py` exit 0 over 246 paths): `./eii test --seed 2026111210` (work commit) and `./eii test --seed 2026111220` (exact head) both exited 0 (`1059 passed, 0 failed, 0 skipped in 6 suites, 0 with problems`, including `python-guards: 377 passed`), `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` exited 0 (`377 passed, 0 failed, 0 skipped`), and `python3 scripts/check_docs.py` exited 0 (`checked 189 text files, 53 Markdown files: OK`). CI is green on head `7876e0791c96c847b0d49ebb9579142026395378` (workflow `docs`: https://github.com/albarami/economic-investment-intelligence/actions/runs/43255113938 ; workflow `sandbox`: https://github.com/albarami/economic-investment-intelligence/actions/runs/43255119830 ). Every rule and guard has a planted violation (`db-down` omitted from usage, `docker compose up` probe call, `"planted-extra"` file in `preflight`, `docker compose down` banned argument, `from . import database` in `up_cmd.py` with a recorded red-first run, `docker compose up -d` in `up`, out-of-range exit code `9`, removed `local-ledger.jsonl` in `down`, and `"bogus"` launcher word), with 0 skips; shell commands were not re-run by me because the brief forbids them.
+  REV-12 PASS Recorded command 15 (`18 [] []`) and `.overnight/DIFF.patch` confirm the work commit `d855a6097691a1fa0cf6a92f0386ba887c0f5616` against base `103884cb79d7c2e935ebcc42b7f788bca6f510d2` changes only the 18 in-scope paths (`eii`, eight `scripts/commands/*.py` files, `scripts/tests/commands_support.py`, `scripts/tests/test_commands.py`, `scripts/tests/test_launcher.py`, `AGENTS.md`, `CLAUDE.md`, `README.md`, `infra/README.md`, `docs/13_DEPLOYMENT_AND_OPERATIONS.md`, `OPEN_ITEMS.md`), and the ledger commit touches only `PROGRESS.md` and `TASKS.md`; nothing under `data/` is committed (`python3 scripts/check_tree.py` exit 0) and `uv run --locked ruff format --check .` exited 0 (`111 files already formatted`).
+  REV-13 PASS Line-by-line inspection of `eii`, `scripts/commands/*.py` and the three test modules finds no `TODO`, `FIXME`, `NotImplementedError`, empty body, mock release table or invented figure; the `not_built` exit-1 placeholders in `scripts/commands/placeholder.py` and `scripts/commands/up_cmd.py` are the safe placeholder dispatch that `TASKS.md` S0-T09 specifies and never claim unbuilt work succeeded.
+  REV-14 PASS No secret, `.env`, key file or real custodian record, field name, file name or count appears anywhere in the diff; `scripts/commands/database.py` checks `data/compose/postgres_superuser_password` via `lstat()` without creating, reading or printing it, writes only `EII_COMPOSE_DB_PORT=<port>` into a temporary directory outside the repository, and strips `EII_DATABASE_URL` from the `docker` child environment.
+  REV-15 PASS No threshold, tolerance, assertion, test count, lint rule, type check or CI control is weakened, and zero skips, expected-failure marks, `noqa` comments or `type: ignore` markers appear; in `scripts/tests/test_launcher.py` lines 39-46, S0-T05's single-line usage check (assigned to S0-T09 by `OI-47`) is strengthened to exact twelve-form equality `self.assertEqual(proc.stderr, commands.expected_usage(ROOT))` while keeping the `eii: usage error:` prefix check.
+  REV-16 OPEN P2 The code and tests match `.overnight/PLAN.md` and all binding lead answers in section 8: exact pinned names (`eii-poc`, `infra/compose.yaml`, `data/compose/postgres_superuser_password`, `EII_DATABASE_URL`, `EII_COMPOSE_DB_PORT`, `EII_RELEASE_DIR` and the twelve command forms), `preflight` only probes, `db-up` and `db-down` alone start and stop Compose `db`, `up` passes `docker=False` and never starts a database, `freeze` accepts no flag, placeholders exit 1 naming tasks only where `TASKS.md` does (`S2-T01`, `S3-T02`, `S11-T01 and S11-T06`) and `not_built (not built yet)` otherwise, and `ruff check .`, `ruff format --check .`, `mypy` and `check_versions.py` all exit 0; `P2` notes the non-rejecting `OPS-26` detail on S0-T05's two exit-1 paths.
+  REV-17 OPEN P1 Every document affected by S0-T09 is updated in this pull request (`AGENTS.md` and `CLAUDE.md` rule 44 naming existing commands after the base update, `README.md` accurately counting twenty root commands, `infra/README.md`, `docs/13_DEPLOYMENT_AND_OPERATIONS.md` section "The two options" Option C command line, `OPEN_ITEMS.md` `OI-47` appended sentence plus `OI-80` to `OI-84` placed after `OI-64` citing only stable anchors with no new pack line numbers, `PROGRESS.md` with 15 section-6.3 entries, and `TASKS.md` moving `S0-T09` to `in review`), and `python3 scripts/check_docs.py` exited 0 on the head; `P1` notes the post-merge `TASKS.md` status and `OPEN_ITEMS.md` `REV-41` entry still needed for merged pull request 14 (`S0-T11`).
+  REV-18 OPEN P3 Secrets remain environmental or in uncommitted `data/compose/postgres_superuser_password`, `scripts/commands/database.py` invokes `docker` via list `subprocess.Popen` (`shell=False`, `stdin=DEVNULL`, `start_new_session=True`, `close_fds=True`, process-group `SIGKILL` on timeout) with `preflight_proc.child_env("docker", ...)` omitting `EII_DATABASE_URL` and `EII_COMPOSE_DB_PORT`, `compose_port_env` emits fixed reason strings without echoing URL credentials, and no SQL, model call or record-level data exists; `P3` records deployment-hardening items for `docs/17_DEPLOYMENT_HARDENING.md` (`DHA-07`).
+  REV-19 PASS Nothing on the dropped or later lists of `docs/01_PROJECT_BRIEF.md` is built, no architecture choice or accepted decision record is reopened or replaced, and the slice S0 build order is respected with assumptions recorded in `OI-80` to `OI-84`.
+  REV-20 N/A This commit builds CLI command dispatch, Compose process wrappers, guard tests and developer documentation only, introducing no economic fact object, calculation function, lineage chain or displayed product number.
+  REV-21 N/A This commit adds no user-interface screen, card, Fact chip, claim-catalogue template or assistant answer pipeline.
+  REV-22 N/A This commit touches no partition, privacy parameter set, disclosure-control rule, adversarial audit, export register or `freeze` implementation (`freeze` remains a no-flag exit-1 placeholder).
+  REV-23 PASS No file or package metadata under `product/`, `core/` or `custodian/` is modified, `scripts/commands/` imports no `eii_custodian` module, and S0-T10's import-boundary tests passed on the head inside `./eii test --seed 2026111220` (`1059 passed, 0 failed`).
+  REV-24 N/A This commit adds no English or Arabic user-facing view, localized string or displayed product numeral.
+  REV-25 PASS Inspection of every changed file finds no absolute local path, personal name or e-mail address (reviewers in `PROGRESS.md` are named by maker/tool and model only), real custodian material, named existing product comparison, ministry endorsement, secret or bare run of eight or eleven digits (seeds `2026111210` and `2026111220` have ten digits), and `python3 scripts/check_docs.py` exited 0 on the head and in CI at https://github.com/albarami/economic-investment-intelligence/actions/runs/43255113938 .
+  REV-26 PASS No code string, comment or document makes any prohibited claim; `AGENTS.md`, `CLAUDE.md`, `README.md` and `OI-80` explicitly state that the six placeholder commands exit 1 and are never claimed to work, and `README.md` retains "no product, release, privacy engine, assistant or interface is claimed to work".
+  REV-27 PASS `AGENTS.md` and `CLAUDE.md` receive the identical rule 44 hunk in `.overnight/DIFF.patch`, match line for line in the workspace, and passed `cmp AGENTS.md CLAUDE.md` (exit 0) and `python3 scripts/check_docs.py` (exit 0) on exact head `7876e0791c96c847b0d49ebb9579142026395378`.
+  REV-28 N/A This commit creates no synthetic entity, establishment, group, person or salary-file identifier and no fictional firm name.
+  REV-29 N/A This commit attaches no fact, figure, rank or attribute to any real named place, business or FDI project.
+  REV-38 PASS Neither `eii` nor any module in `scripts/commands/` imports `eii_gateway` or reads `EII_DECISION_PROVIDER` or `JEV_PRO_API_KEY`, nothing in `product/` or `web/` changed, and `./eii test`, `./eii preflight` and `./eii up` run offline with provider `none`.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17) REV-41 and TASKS.md post-merge bookkeeping for pull request 14 (`S0-T11`): the ledger commit records pull request 14 as approved and squash-merged in `PROGRESS.md` (including round 1 part 1's proposed item `P1` on the dead `binaries` assignment in `scripts/tests/test_sandbox_extensions.py` lines 318-322), while `TASKS.md` still shows `S0-T11` with `[ ]` checkboxes and `status in review (pull request 14)` and `OPEN_ITEMS.md` (`## Proposed open items from reviews`) does not yet hold `PO-S0-03` for `S0-T11`'s `P1`; update `S0-T11` in `TASKS.md` and enter `PO-S0-03` in `OPEN_ITEMS.md` so `S0-T15` closes it before the slice S0 gate.
+  P2 (REV-16) OPS-26 and `OI-80` coverage of S0-T05's two exit-1 paths: `scripts/commands/exits.py` prints `eii: exit <code>: <meaning>` for every command in `scripts/commands/`, whereas `eii` lines 46-49 on missing `uv` (kept from S0-T05 per `PLAN.md` section 3.1 item 1 so `test_launcher.py::test_missing_uv` stays unchanged) and `scripts/run_tests.py` lines 186-188 and 233 on `./eii test` failure (outside S0-T09's scope) exit 1 without the `eii: exit 1:` meaning line while `OI-80` mentions only `./eii test`'s usage line; note those two S0-T05 exit-1 paths in `OI-80` in `S0-T15` or align them in `S11-T01`.
+  P3 (REV-18) hardening: document 17 (DHA-07, OPS-14, OPS-27) — `scripts/commands/database.py` lines 127-136 and 147-152 verify `lstat()` regularity only on the leaf `data/compose/postgres_superuser_password` (not parent-folder symlinks, mode `0600` or non-empty secret content) and forward `docker compose` output without secret redaction, and `scripts/tests/commands_support.py` lines 236-292 (`source_problems`) checks static `import`/`from` statements and four literal words rather than `importlib` dynamic imports or `os.exec*`/`podman`/`pg_ctl` tokens; record in `docs/17_DEPLOYMENT_HARDENING.md`.
+```
+
+#### S0-T09: merge record
+
+- Tree proof on the approved head (ruling L-29), run by the lead on 2026-11-12 before the review: every path of the head's tree is as in the work commit `d855a6097691a1fa0cf6a92f0386ba887c0f5616` (the base update of the built commit), except the ledger files; output "TREE-IS-WORK ok: 246 paths at 7876e0791c96c847b0d49ebb9579142026395378", exit code 0. On the same head `./eii test --seed 2026111220`: exit code 0, "total: 1059 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/15 was squash-merged on 2026-11-12 at the head `7876e0791c96c847b0d49ebb9579142026395378`; merge commit `7dd69aa4476c46cd0d1b9e70937513043333fffa` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43258947466 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43258947952 .
+- The verdict of the task log of S0-T09 is APPROVED. Its three proposed items: P1, the bookkeeping of S0-T11 after its merge, is done by this ledger commit (TASKS.md shows S0-T11 and S0-T09 as done with their boxes ticked, and the proposed item of S0-T11's review is entered as PO-S0-05); P2, the two exit-1 paths of the test command, is entered as PO-S0-06; P3 is hardening beyond the acceptance criteria and becomes a register entry of docs/17_DEPLOYMENT_HARDENING.md with the follow-up task of the slice (decision 0018).
+- Proposed items of earlier work entered by this ledger commit as well: PO-S0-03 (review round 1 of S0-T05, part 1) and PO-S0-04 (found by the lead while checking S0-T12).
+
+#### Addition to the task log of S0-T13: part B
+
+- Builder persona: senior platform engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic: the lead (Claude Fable 5.2) wrote a short plan: the citation grammar of five anchor forms and the seven rules of the rule pack-cite; a Claude Sonnet editor refreshed the texts of the shared documents against the merged tree
+- Builder maker and model: Cursor command-line tool, `grok-4.7-high` (xAI)
+- Reviewer maker and model: Devin command-line tool, `glm-5-3-high` (Zhipu AI), read-only (the reviewer of part A; a maker that neither planned nor built it)
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first with a recorded red run, one planted violation for every rule, no suppression comment, skip or weaker assertion, no secret, personal name, absolute local path or eight- or eleven-digit run in any file, never a note changed from memory, and a report of only the results it saw
+- Branch: `task/S0-T13-part-b`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/16
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Owner's rule of 2026-11-12, the reason for the wider part B: the pack is cited by a stable anchor (a requirement ID or the section heading), never by line number, because every documentation change moves the lines; the notes check verifies that each anchor exists in the cited file
+- The map of citations, by the lead's script: the two notes cited 84 distinct pack lines in 164 places (two places named two lines each); each place became an anchor read from the cited lines themselves: 165 anchors, of which 44 are a requirement ID, 39 a section with a table row, 10 a section with a numbered item, 70 a section alone and 2 a task ID (the place that named two lines of two sections became two anchors); no cited heading occurs twice in its file
+- Build round 1 (code and documents in the same round): the stand-in pack file of the fixture gained a heading, a requirement row, a table row and a numbered item; the line-form cases of the rule pack-cite were replaced by one planted violation for each of its seven rules; red first on the unchanged check (30 tests, 293 failures, the first of them the refusal of an anchor as not a line citation); then the check parses the five anchor forms and verifies each in its file, and a verified anchor is left out of the claim-word scan; the 164 replacements of the map and the refreshed document texts applied
+- The lead's check of the build: each notes file equals its merged text with exactly the mapped replacements and the two new opening sentences; every document block is applied as written; one read of the code and test changes
+- The check still judges form only: it proves that an anchor exists, not what the anchored text says. The cite fields of pins.toml and the line citations inside OI-39 to OI-57 are converted by the next change
+
+#### Evidence for the work commit of part B `452f8690d135b455d9577a07137d1db1e843dc35`
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    452f8690d135b455d9577a07137d1db1e843dc35
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The notes check on the converted notes: every one of the 164 citations parses as an anchor and each anchor exists in its file (the owner's rule of 2026-11-12; criteria 1 and 3; FE-02).
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    452f8690d135b455d9577a07137d1db1e843dc35
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_reference_notes_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    30 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The tests of the four notes test modules: one planted violation for each of the seven rules of the rule pack-cite, the old line form among them, and the control that a claim word inside a verified anchor is not a claim.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    452f8690d135b455d9577a07137d1db1e843dc35
+Command:   ./eii test --seed 2026111221
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1059 passed, 0 failed, 0 skipped
+Seed:      2026111221
+Notes:     The project's own test command with a given seed: every network-free suite; the notes tests run in the suite python-guards.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    452f8690d135b455d9577a07137d1db1e843dc35
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    452f8690d135b455d9577a07137d1db1e843dc35
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "111 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    452f8690d135b455d9577a07137d1db1e843dc35
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 107 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    452f8690d135b455d9577a07137d1db1e843dc35
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 189 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the changed documents (rule 44, the README, the documents index, the open items).
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    452f8690d135b455d9577a07137d1db1e843dc35
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    452f8690d135b455d9577a07137d1db1e843dc35
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     Rule 44 and the information table changed in both agent files; they stay byte-identical (REV-27).
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    452f8690d135b455d9577a07137d1db1e843dc35
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 57 components: OK"
+Seed:      none
+Notes:     The version check still passes; the cite fields of pins.toml are converted by the next change.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    452f8690d135b455d9577a07137d1db1e843dc35
+Command:   python3 -c "import re,sys; t=open('OPEN_ITEMS.md',encoding='utf-8').read(); a=t.index('## OI-85 '); b=t.index('## Change control',a); s=open('docs/REFERENCE_NOTES.md',encoding='utf-8').read()+open('web/REFERENCE_NOTES.md',encoding='utf-8').read()+t[a:b]; h=re.findall(r'\blines? [0-9]+',s); print(len(h),h[:3]); sys.exit(1 if h else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "0 []"
+Seed:      none
+Notes:     No line citation is left in the two notes or in the new open items OI-85 to OI-89: the search for the words line or lines followed by a number finds nothing.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    452f8690d135b455d9577a07137d1db1e843dc35
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','7dd69aa4476c46cd0d1b9e70937513043333fffa...452f8690d135b455d9577a07137d1db1e843dc35'],check=True,capture_output=True,text=True).stdout.splitlines(); a=set(['AGENTS.md', 'CLAUDE.md', 'OPEN_ITEMS.md', 'README.md', 'docs/README.md', 'docs/REFERENCE_NOTES.md', 'scripts/check_reference_notes.py', 'scripts/reference_notes_parse.py', 'scripts/tests/reference_notes_support.py', 'scripts/tests/test_reference_notes_form.py', 'scripts/tests/test_reference_notes_rows.py', 'web/REFERENCE_NOTES.md']); o=[x for x in p if x not in a]; m=sorted(a-set(p)); print(len(p),o,m); sys.exit(1 if o or m or len(p)!=12 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "12 [] []"
+Seed:      none
+Notes:     The work commit changes exactly the twelve paths of part B against the base (TST-163).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

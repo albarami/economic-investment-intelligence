@@ -20,15 +20,14 @@ WEB = sup.WEB
 DOCS = sup.DOCS
 WEB_LIB = sup.WEB_LIB
 DOCS_LIB = sup.DOCS_LIB
-PACK_LINE = "docs/stub.md line 5"
+PACK_LINE = "docs/stub.md ARC-01"
+AGENTS_CITE = 'AGENTS.md section "Rules"'
 DUCK_FIELD0 = tables.LIBRARIES[DOCS][0].fields[0]
 DUCK_FIELD1 = tables.LIBRARIES[DOCS][0].fields[1]
 WEB_LIB0 = tables.LIBRARIES[WEB][0].name
 WEB_LIB1 = tables.LIBRARIES[WEB][1].name
-COVERAGE_ROW1 = f"| A claim | docs/stub.md line 5 | {WEB_LIB0} S1; {WEB_LIB1} I1 |"
-COVERAGE_ROW2 = (
-    f"| Another claim | AGENTS.md line 2 | {tables.NOT_COVERED}no row for it |"
-)
+COVERAGE_ROW1 = f"| A claim | {PACK_LINE} | {WEB_LIB0} S1; {WEB_LIB1} I1 |"
+COVERAGE_ROW2 = f"| Another claim | {AGENTS_CITE} | {tables.NOT_COVERED}no row for it |"
 
 
 class NotesRows(unittest.TestCase):
@@ -165,7 +164,7 @@ class NotesRows(unittest.TestCase):
                         WEB,
                         "pack-cite",
                         n,
-                        'S3: cite item "P1" is not "<path> line <n>" for a file of the pack',
+                        'S3: cite item "P1" is not an anchor',
                     )
                 ],
             )
@@ -309,117 +308,25 @@ class NotesRows(unittest.TestCase):
 
     def test_pack_cites(self) -> None:
         lib = WEB_LIB
-        cases = [
-            (
-                "line-99",
-                PACK_LINE,
-                "docs/stub.md line 99",
-                "docs/stub.md has 30 lines, line 99 does not exist",
-            ),
-            (
-                "line-0",
-                PACK_LINE,
-                "docs/stub.md line 0",
-                'cite item "docs/stub.md line 0" is not "<path> line <n>" for a file of the pack',
-            ),
-            ("missing", PACK_LINE, "docs/nope.md line 1", "docs/nope.md is not a file"),
-            (
-                "dotdot",
-                PACK_LINE,
-                "docs/../x.md line 1",
-                'cite item "docs/../x.md line 1" is not "<path> line <n>" for a file of the pack',
-            ),
-            (
-                "absolute",
-                PACK_LINE,
-                "/etc/x.md line 1",
-                'cite item "/etc/x.md line 1" is not "<path> line <n>" for a file of the pack',
-            ),
-            (
-                "vault",
-                PACK_LINE,
-                "data/vault/x.md line 1",
-                'cite item "data/vault/x.md line 1" is not "<path> line <n>" for a file of the pack',
-            ),
-            (
-                "two",
-                PACK_LINE,
-                "docs/stub.md line 5; docs/nope.md line 1",
-                "docs/nope.md is not a file",
-            ),
-            (
-                "bare",
-                PACK_LINE,
-                "docs/stub.md",
-                'cite item "docs/stub.md" is not "<path> line <n>" for a file of the pack',
-            ),
-        ]
-        for name, _old, cite, tail in cases:
-            with self.subTest(name=name):
-                root = self._plant(
-                    cast(
-                        Callable[[Path], None],
-                        lambda r, c=cite: sup.edit_in(
-                            r,
-                            WEB,
-                            lib,
-                            f"| S3 | A pack statement: {tables.UNVERIFIED}. | PACK | {PACK_LINE} |",
-                            f"| S3 | A pack statement: {tables.UNVERIFIED}. | PACK | {c} |",
-                        ),
-                    )
-                )
-                n = sup.line_of(root, WEB, "| S3 | A pack")
-                self.assertEqual(
-                    sup.fails(sup.run(root)),
-                    [sup.fail_line(WEB, "pack-cite", n, f"S3: {tail}")],
-                )
-        with self.subTest(name="symlink"):
-            root = self._plant(lambda r: None)
-            os.symlink(root / "docs/stub.md", root / "docs/link.md")
-            sup.edit_in(
-                root,
-                WEB,
-                lib,
-                f"| S3 | A pack statement: {tables.UNVERIFIED}. | PACK | {PACK_LINE} |",
-                f"| S3 | A pack statement: {tables.UNVERIFIED}. | PACK | docs/link.md line 1 |",
-            )
-            n = sup.line_of(root, WEB, "| S3 | A pack")
-            self.assertEqual(
-                sup.fails(sup.run(root)),
-                [sup.fail_line(WEB, "pack-cite", n, "S3: docs/link.md is not a file")],
-            )
-        with self.subTest(label="confirmation-line-99"):
+        old = f"| S3 | A pack statement: {tables.UNVERIFIED}. | PACK | {PACK_LINE} |"
+
+        def one(cite: str) -> tuple[Path, int]:
             root = self._plant(
-                lambda r: sup.edit_in(
-                    r,
-                    DOCS,
-                    DOCS_LIB,
-                    f"| {DUCK_FIELD1} | {tables.CONFIRMED} | - | {PACK_LINE} |",
-                    f"| {DUCK_FIELD1} | {tables.CONFIRMED} | - | docs/stub.md line 99 |",
+                cast(
+                    Callable[[Path], None],
+                    lambda r, c=cite: sup.edit_in(
+                        r,
+                        WEB,
+                        lib,
+                        old,
+                        f"| S3 | A pack statement: {tables.UNVERIFIED}. | PACK | {c} |",
+                    ),
                 )
             )
-            n = sup.line_of(root, DOCS, f"| {DUCK_FIELD1} |")
-            self.assertEqual(
-                sup.fails(sup.run(root)),
-                [
-                    sup.fail_line(
-                        DOCS,
-                        "pack-cite",
-                        n,
-                        f"{DUCK_FIELD1}: docs/stub.md has 30 lines, line 99 does not exist",
-                    )
-                ],
-            )
-        with self.subTest(label="coverage-line-99"):
-            root = self._plant(
-                lambda r: sup.edit(
-                    r,
-                    WEB,
-                    COVERAGE_ROW1,
-                    f"| A claim | docs/stub.md line 99 | {WEB_LIB0} S1; {WEB_LIB1} I1 |",
-                )
-            )
-            n = sup.line_of(root, WEB, "docs/stub.md line 99 |")
+            return root, sup.line_of(root, WEB, "| S3 | A pack")
+
+        with self.subTest(name="a1-not-an-anchor"):
+            root, n = one("docs/stub.md line 5")
             self.assertEqual(
                 sup.fails(sup.run(root)),
                 [
@@ -427,20 +334,85 @@ class NotesRows(unittest.TestCase):
                         WEB,
                         "pack-cite",
                         n,
-                        "row 1: docs/stub.md has 30 lines, line 99 does not exist",
+                        'S3: cite item "docs/stub.md line 5" is not an anchor',
                     )
                 ],
             )
-        with self.subTest(label="control-agents-line-2"):
-            root = self._plant(
-                lambda r: sup.edit_in(
-                    r,
-                    WEB,
-                    WEB_LIB,
-                    f"| S3 | A pack statement: {tables.UNVERIFIED}. | PACK | {PACK_LINE} |",
-                    f"| S3 | A pack statement: {tables.UNVERIFIED}. | PACK | AGENTS.md line 2 |",
-                )
+        with self.subTest(name="a2-not-a-regular-file"):
+            root, n = one("docs/link.md ARC-01")
+            os.symlink(root / "docs/stub.md", root / "docs/link.md")
+            self.assertEqual(
+                sup.fails(sup.run(root)),
+                [sup.fail_line(WEB, "pack-cite", n, "S3: docs/link.md is not a file")],
             )
+        with self.subTest(name="a3-requirement-count"):
+            root, n = one("docs/stub.md ARC-99")
+            self.assertEqual(
+                sup.fails(sup.run(root)),
+                [
+                    sup.fail_line(
+                        WEB,
+                        "pack-cite",
+                        n,
+                        'S3: requirement "ARC-99" found 0 times',
+                    )
+                ],
+            )
+        with self.subTest(name="a4-heading-count"):
+            root, n = one('docs/stub.md section "Absent"')
+            self.assertEqual(
+                sup.fails(sup.run(root)),
+                [
+                    sup.fail_line(
+                        WEB,
+                        "pack-cite",
+                        n,
+                        'S3: heading "Absent" found 0 times',
+                    )
+                ],
+            )
+        with self.subTest(name="a5-row-label"):
+            root, n = one('docs/stub.md section "Tables" row "Absent"')
+            self.assertEqual(
+                sup.fails(sup.run(root)),
+                [
+                    sup.fail_line(
+                        WEB,
+                        "pack-cite",
+                        n,
+                        'S3: row "Absent" is not in that section',
+                    )
+                ],
+            )
+        with self.subTest(name="a6-item-number"):
+            root, n = one('docs/stub.md section "Items" item 2')
+            self.assertEqual(
+                sup.fails(sup.run(root)),
+                [
+                    sup.fail_line(
+                        WEB,
+                        "pack-cite",
+                        n,
+                        "S3: item 2 is not in that section",
+                    )
+                ],
+            )
+        with self.subTest(name="a7-task-heading"):
+            root, n = one("TASKS.md S0-T99")
+            sup.write(root, "TASKS.md", "# Tasks\n\n### S0-T01 \u2014 Present\n")
+            self.assertEqual(
+                sup.fails(sup.run(root)),
+                [
+                    sup.fail_line(
+                        WEB,
+                        "pack-cite",
+                        n,
+                        'S3: task "S0-T99" has no heading',
+                    )
+                ],
+            )
+        with self.subTest(label="control-agents-section"):
+            root, _n = one(AGENTS_CITE)
             self.assertEqual(sup.fails(sup.run(root)), [])
         with self.subTest(label="control-stub-and-agents"):
             root = self._plant(
@@ -449,7 +421,7 @@ class NotesRows(unittest.TestCase):
                     DOCS,
                     DOCS_LIB,
                     f"| {DUCK_FIELD1} | {tables.CONFIRMED} | - | {PACK_LINE} |",
-                    f"| {DUCK_FIELD1} | {tables.CONFIRMED} | - | {PACK_LINE}; AGENTS.md line 2 |",
+                    f"| {DUCK_FIELD1} | {tables.CONFIRMED} | - | {PACK_LINE}; {AGENTS_CITE} |",
                 )
             )
             self.assertEqual(sup.fails(sup.run(root)), [])
@@ -716,6 +688,26 @@ class NotesRows(unittest.TestCase):
                 )
             )
             self.assertEqual(sup.fails(sup.run(root)), [])
+        with self.subTest(label="control-fast-inside-verified-anchor"):
+
+            def plant_anchor(r: Path) -> None:
+                sup.edit(
+                    r,
+                    "docs/stub.md",
+                    "| First row | a value |",
+                    "| First row | a value |\n| Fast mode | a value |",
+                )
+                sup.edit_in(
+                    r,
+                    WEB,
+                    lib,
+                    "| S1 | A read statement. | READ |",
+                    "| S1 | The pack names the row "
+                    '(docs/stub.md section "Tables" row "Fast mode"). | READ |',
+                )
+
+            root = self._plant(plant_anchor)
+            self.assertEqual(sup.fails(sup.run(root)), [])
         with self.subTest(label="control-best-in-pages-title"):
             root = self._plant(
                 lambda r: sup.edit_in(
@@ -754,7 +746,7 @@ class NotesRows(unittest.TestCase):
                     DOCS,
                     lib,
                     f"| {field} | {tables.CONFIRMED} | - | {PACK_LINE} |",
-                    "| Renamed field | not yet confirmed | - | docs/stub.md line 5 |",
+                    f"| Renamed field | not yet confirmed | - | {PACK_LINE} |",
                 )
             )
             t = sup.line_of(root, DOCS, confirm_header)
@@ -814,28 +806,6 @@ class NotesRows(unittest.TestCase):
                         )
                     ],
                 )
-        with self.subTest(label="pack-cite-line-99"):
-            root = self._plant(
-                lambda r: sup.edit_in(
-                    r,
-                    DOCS,
-                    lib,
-                    f"| {field} | {tables.CONFIRMED} | - | {PACK_LINE} |",
-                    f"| {field} | {tables.CONFIRMED} | - | docs/stub.md line 99 |",
-                )
-            )
-            n = sup.line_of(root, DOCS, f"| {field} |")
-            self.assertEqual(
-                sup.fails(sup.run(root)),
-                [
-                    sup.fail_line(
-                        DOCS,
-                        "pack-cite",
-                        n,
-                        f"{field}: docs/stub.md has 30 lines, line 99 does not exist",
-                    )
-                ],
-            )
 
     def test_pins_rows(self) -> None:
         lib = DOCS_LIB
@@ -942,8 +912,8 @@ class NotesRows(unittest.TestCase):
             sup.edit(
                 root,
                 WEB,
-                "| A claim | docs/stub.md line 5 |",
-                "| https://example.org/x | docs/stub.md line 5 |",
+                f"| A claim | {PACK_LINE} |",
+                f"| https://example.org/x | {PACK_LINE} |",
             )
             sup.edit_in(
                 root,
@@ -1201,10 +1171,10 @@ class NotesRows(unittest.TestCase):
                     r,
                     WEB,
                     COVERAGE_ROW1,
-                    f"|  | docs/stub.md line 5 | {WEB_LIB0} S1; {WEB_LIB1} I1 |",
+                    f"|  | {PACK_LINE} | {WEB_LIB0} S1; {WEB_LIB1} I1 |",
                 )
             )
-            n = sup.line_of(root, WEB, "|  | docs/stub.md line 5 |")
+            n = sup.line_of(root, WEB, f"|  | {PACK_LINE} |")
             self.assertEqual(
                 sup.fails(sup.run(root)),
                 [sup.fail_line(WEB, "coverage", n, "row 1: claim is empty")],
@@ -1245,11 +1215,11 @@ class NotesRows(unittest.TestCase):
                             r,
                             WEB,
                             COVERAGE_ROW1,
-                            f"| A claim | docs/stub.md line 5 | {w} |",
+                            f"| A claim | {PACK_LINE} | {w} |",
                         ),
                     )
                 )
-                n = sup.line_of(root, WEB, f"| A claim | docs/stub.md line 5 | {where}")
+                n = sup.line_of(root, WEB, f"| A claim | {PACK_LINE} | {where}")
                 self.assertEqual(
                     sup.fails(sup.run(root)),
                     [sup.fail_line(WEB, "coverage", n, detail)],
@@ -1260,7 +1230,7 @@ class NotesRows(unittest.TestCase):
                     r,
                     WEB,
                     COVERAGE_ROW2,
-                    "| Another claim | AGENTS.md line 2 | not covered: no |",
+                    f"| Another claim | {AGENTS_CITE} | not covered: no |",
                 )
             )
             n = sup.line_of(root, WEB, "not covered: no |")
@@ -1281,10 +1251,10 @@ class NotesRows(unittest.TestCase):
                     r,
                     WEB,
                     COVERAGE_ROW2,
-                    "| Another claim | AGENTS.md line 2 | nothing |",
+                    f"| Another claim | {AGENTS_CITE} | nothing |",
                 )
             )
-            n = sup.line_of(root, WEB, "| Another claim | AGENTS.md line 2 | nothing |")
+            n = sup.line_of(root, WEB, f"| Another claim | {AGENTS_CITE} | nothing |")
             self.assertEqual(
                 sup.fails(sup.run(root)),
                 [
@@ -1293,27 +1263,6 @@ class NotesRows(unittest.TestCase):
                         "coverage",
                         n,
                         'row 2: "nothing" is not a row of this file',
-                    )
-                ],
-            )
-        with self.subTest(label="row2-pack-cite-line-99"):
-            root = self._plant(
-                lambda r: sup.edit(
-                    r,
-                    WEB,
-                    COVERAGE_ROW2,
-                    f"| Another claim | docs/stub.md line 99 | {tables.NOT_COVERED}no row for it |",
-                )
-            )
-            n = sup.line_of(root, WEB, "| Another claim | docs/stub.md line 99 |")
-            self.assertEqual(
-                sup.fails(sup.run(root)),
-                [
-                    sup.fail_line(
-                        WEB,
-                        "pack-cite",
-                        n,
-                        "row 2: docs/stub.md has 30 lines, line 99 does not exist",
                     )
                 ],
             )

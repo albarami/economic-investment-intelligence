@@ -23,7 +23,7 @@
 | Role | Read in this order |
 |---|---|
 | Owner | [01](01_PROJECT_BRIEF.md) → [14](14_IMPLEMENTATION_PLAN.md) → [OPEN_ITEMS.md](../OPEN_ITEMS.md) → relevant decision records → [16](16_DEMO_RUNBOOK.md) → [17](17_DEPLOYMENT_HARDENING.md) |
-| Builder | [AGENTS.md](../AGENTS.md) → assigned task in [TASKS.md](../TASKS.md) and slice in [14](14_IMPLEMENTATION_PLAN.md) → [02](02_ARCHITECTURE.md) → task-specific documents → [12](12_TESTING_AND_QUALITY.md) |
+| Builder | [AGENTS.md](../AGENTS.md) → assigned task in [TASKS.md](../TASKS.md) and slice in [14](14_IMPLEMENTATION_PLAN.md) → [02](02_ARCHITECTURE.md) → task-specific documents → the reference notes of any library they name ([engines and the Claude API](REFERENCE_NOTES.md), [map libraries](../web/REFERENCE_NOTES.md)) → [12](12_TESTING_AND_QUALITY.md) |
 | Reviewer | [15](15_REVIEWER_CHECKLIST.md) → task and full diff → [12](12_TESTING_AND_QUALITY.md) → [PROGRESS.md](../PROGRESS.md) → affected documents and decision records |
 | Data custodian | [01](01_PROJECT_BRIEF.md) → [03](03_DATA_CONTRACTS.md) → [06](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) → [17](17_DEPLOYMENT_HARDENING.md) → [05](05_SYNTHETIC_WORLD_AND_SIMULATION.md) → [04](04_PUBLIC_DATA_PACK.md) → [16](16_DEMO_RUNBOOK.md) |
 | Designer | [01](01_PROJECT_BRIEF.md) → [GLOSSARY.md](GLOSSARY.md) → [11](11_DESIGN_DIRECTION.md) → [10](10_FRONTEND.md) → [09](09_AI_ASSISTANT.md) → [16](16_DEMO_RUNBOOK.md) |
@@ -50,6 +50,8 @@
 | [16_DEMO_RUNBOOK.md](16_DEMO_RUNBOOK.md) | Guided session, recoveries and closing request | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
 | [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) | What a deployment on real records must add beyond the demonstrator | Draft v0.2, created by decisions 0016 and 0017 and amended by decision 0018 on 2026-11-12 |
 | [GLOSSARY.md](GLOSSARY.md) | Shared technical and interface vocabulary | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
+| [REFERENCE_NOTES.md](REFERENCE_NOTES.md) | Official pages read for DuckDB 2.0, PostgreSQL 18 and the Claude API, the idioms that changed, and the slice S1 confirmation fields | Draft written by task S0-T13 on 2026-11-12; not approved |
+| [web/REFERENCE_NOTES.md](../web/REFERENCE_NOTES.md) | The same for MapLibre GL JS 6, deck.gl 9.4 and the deck.gl MapLibre module (FE-02), and the font weights and icon licence confirmations (DES-25, DES-45) | Draft written by task S0-T13 on 2026-11-12; not approved |
 | [TASKS.md](../TASKS.md) | Task-level scope, acceptance criteria and evidence links | Draft task queue; all tasks start queued |
 | [evals/](../evals/typed_decisions/README.md) | Current typed-decision cases, blind labels and initial qualification results | Recorded initial set; fresh human-labelled qualification remains open under OI-15 |
 

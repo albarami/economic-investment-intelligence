@@ -270,8 +270,8 @@ def _coverage_block(rel: str) -> str:
 
 | Pack claim | Pack source | Where |
 |---|---|---|
-| A claim | docs/stub.md line 5 | {first} S1; {second} I1 |
-| Another claim | AGENTS.md line 2 | {NOT_COVERED}no row for it |
+| A claim | docs/stub.md ARC-01 | {first} S1; {second} I1 |
+| Another claim | AGENTS.md section "Rules" | {NOT_COVERED}no row for it |
 """
 
 
@@ -293,7 +293,7 @@ def fixture_notes(rel: str) -> str:
 
 Fixture.
 """
-    pack_line = "docs/stub.md line 5"
+    pack_line = "docs/stub.md ARC-01"
     body = "".join(
         _library_block(lib, pack_line) + "\n\n" for lib in tables.LIBRARIES[rel]
     )
@@ -309,9 +309,25 @@ def make_root(tmp: Path) -> Path:
     write(
         root,
         "docs/stub.md",
-        "\n".join(f"line {index}" for index in range(1, 31)) + "\n",
+        "# Stub pack\n"
+        "\n"
+        "## Requirements\n"
+        "\n"
+        "| ID | Text |\n"
+        "|---|---|\n"
+        "| ARC-01 | A requirement row |\n"
+        "\n"
+        "## Tables\n"
+        "\n"
+        "| Label | Value |\n"
+        "|---|---|\n"
+        "| First row | a value |\n"
+        "\n"
+        "## Items\n"
+        "\n"
+        "1. A numbered item\n",
     )
-    write(root, "AGENTS.md", "line one\nline two\nline three\n")
+    write(root, "AGENTS.md", "# Fixture\n\n## Rules\n\nA rule.\n")
     write(root, PINS, _pins_toml())
     write(root, WEB, fixture_notes(WEB))
     write(root, DOCS, fixture_notes(DOCS))
