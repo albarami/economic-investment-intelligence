@@ -29,7 +29,7 @@ GIT: str = _GIT_FOUND
 GOOD_INTERPRETER = (3, 14, 6)
 SUMMARY_OK = "checked 12 components: OK"
 PACK = "pack, confirm at slice S1"
-CITE = "docs/a.md line 5"
+CITE = "docs/a.md ARC-01"
 SHELL_ENV_KEYS = frozenset({"PWD", "SHLVL", "_", "OLDPWD"})
 
 
@@ -303,7 +303,11 @@ def make_tree(root: Path) -> None:
             )
         ),
     )
-    write(root, "docs/a.md", "".join(f"line {index}\n" for index in range(1, 41)))
+    write(
+        root,
+        "docs/a.md",
+        "".join(f"line {index}\n" for index in range(1, 41)) + "| ARC-01 | fixture |\n",
+    )
     git_init(root)
 
 

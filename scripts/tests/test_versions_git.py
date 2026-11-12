@@ -244,7 +244,7 @@ class GitRules(unittest.TestCase):
         git_link = Path(path) / "git"
         if git_link.is_symlink():
             git_link.unlink()
-        base.edit_row(root, 'name = "alpha"', base.CITE, "docs/none.md line 1")
+        base.edit_row(root, 'name = "alpha"', base.CITE, "docs/none.md ARC-01")
         cite = [
             "FAIL record-cite: pins.toml: component[4] alpha: docs/none.md is not a file",
             S1,

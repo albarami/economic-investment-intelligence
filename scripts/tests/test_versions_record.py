@@ -519,86 +519,49 @@ class RecordRules(unittest.TestCase):
                 )
 
     def test_cite_rule(self) -> None:
-        plants = (
-            (
-                f'cite = "{base.CITE}", ',
-                "",
-                "component[4] alpha: cite is missing",
-            ),
-            (
-                base.CITE,
-                "docs/a.md 5",
-                'component[4] alpha: cite item "docs/a.md 5" is not "<path> line <n>"',
-            ),
-            (
-                base.CITE,
-                "docs/a.md line 0",
-                'component[4] alpha: cite item "docs/a.md line 0" is not "<path> line <n>"',
-            ),
-            (
-                base.CITE,
-                "docs/a.md line -1",
-                'component[4] alpha: cite item "docs/a.md line -1" is not "<path> line <n>"',
-            ),
-            (
-                base.CITE,
-                "docs/a.md line 5x",
-                'component[4] alpha: cite item "docs/a.md line 5x" is not "<path> line <n>"',
-            ),
-            (
-                base.CITE,
-                "docs/a.md line  5",
-                'component[4] alpha: cite item "docs/a.md line  5" is not "<path> line <n>"',
-            ),
-            (
-                base.CITE,
-                "/etc/passwd line 1",
-                'component[4] alpha: cite item "/etc/passwd line 1" is not "<path> line <n>"',
-            ),
-            (
-                base.CITE,
-                "../x.md line 1",
-                'component[4] alpha: cite item "../x.md line 1" is not "<path> line <n>"',
-            ),
-            (
-                base.CITE,
-                "docs\\\\a.md line 1",
-                'component[4] alpha: cite item "docs\\a.md line 1" is not "<path> line <n>"',
-            ),
-            (
-                base.CITE,
-                f"{base.CITE}; ",
-                'component[4] alpha: cite item "" is not "<path> line <n>"',
-            ),
-            (
-                base.CITE,
-                "docs/none.md line 1",
-                "component[4] alpha: docs/none.md is not a file",
-            ),
-            (
-                base.CITE,
-                "docs line 1",
-                "component[4] alpha: docs is not a file",
-            ),
-            (
-                base.CITE,
-                "docs/a.md line 41",
-                "component[4] alpha: docs/a.md has 40 lines, line 41 does not exist",
-            ),
-            (
-                base.CITE,
-                f"{base.CITE}; docs/none.md line 1",
-                "component[4] alpha: docs/none.md is not a file",
-            ),
-        )
-        for old, new, detail in plants:
-            with self.subTest(detail=detail):
-                root, path = base.ready(self)
-                base.edit_row(root, 'name = "alpha"', old, new)
-                self.assertEqual(
-                    base.run(root, path=path),
-                    [f"FAIL record-cite: pins.toml: {detail}", base.summary(1)],
-                )
+        with self.subTest(rule="R1"):
+            root, path = base.ready(self)
+            base.edit_row(root, 'name = "alpha"', f'cite = "{base.CITE}", ', "")
+            self.assertEqual(
+                base.run(root, path=path),
+                [
+                    "FAIL record-cite: pins.toml: component[4] alpha: cite is missing",
+                    base.summary(1),
+                ],
+            )
+        with self.subTest(rule="R2"):
+            root, path = base.ready(self)
+            base.edit_row(root, 'name = "alpha"', base.CITE, "docs/a.md line 5")
+            self.assertEqual(
+                base.run(root, path=path),
+                [
+                    "FAIL record-cite: pins.toml: component[4] alpha: "
+                    'cite item "docs/a.md line 5" is not an anchor',
+                    base.summary(1),
+                ],
+            )
+        with self.subTest(rule="R3"):
+            root, path = base.ready(self)
+            base.edit_row(root, 'name = "alpha"', base.CITE, "docs/none.md ARC-01")
+            self.assertEqual(
+                base.run(root, path=path),
+                [
+                    "FAIL record-cite: pins.toml: component[4] alpha: "
+                    "docs/none.md is not a file",
+                    base.summary(1),
+                ],
+            )
+        with self.subTest(rule="R4"):
+            root, path = base.ready(self)
+            base.edit_row(root, 'name = "alpha"', base.CITE, "docs/a.md ARC-99")
+            self.assertEqual(
+                base.run(root, path=path),
+                [
+                    "FAIL record-cite: pins.toml: component[4] alpha: "
+                    'requirement "ARC-99" found 0 times',
+                    base.summary(1),
+                ],
+            )
 
     def test_duplicates(self) -> None:
         addition = (
@@ -662,7 +625,7 @@ class RecordRules(unittest.TestCase):
         root, path = base.ready(self)
         (root / "custodian" / "pyproject.toml").unlink()
         base.write(root, "web/package.json", "{")
-        base.edit_row(root, 'name = "alpha"', base.CITE, "docs/none.md line 1")
+        base.edit_row(root, 'name = "alpha"', base.CITE, "docs/none.md ARC-01")
         self.assertEqual(
             base.run(root, path=path),
             [

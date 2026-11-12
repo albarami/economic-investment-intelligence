@@ -12,18 +12,16 @@ import re
 import sys
 from pathlib import Path
 
+from pack_anchors import check_cite, mask_verified_anchors, read_regular
 from reference_notes_assigned import check_assigned
 from reference_notes_parse import (
     URL_RE,
     Ids,
     Table,
     check_address,
-    check_cite,
     file_date,
     load_pins,
-    mask_verified_anchors,
     quote_problem,
-    read_regular,
     source_problem,
     table_after,
 )

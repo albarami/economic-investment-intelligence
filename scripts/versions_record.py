@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import re
-import stat
 from dataclasses import dataclass
 from pathlib import Path
 
+import pack_anchors
 import versions_inputs
 
 EXACT_RE = re.compile(r"\d+(\.\d+){1,3}", re.ASCII)
@@ -26,7 +26,6 @@ _KINDS = frozenset({"toolchain", "python", "npm", "external"})
 _STATES = frozenset({"installed", "recorded"})
 _VERSIONED = frozenset({"toolchain", "python", "npm"})
 _FIRST_USE_RE = re.compile(r"S\d{1,2}-T\d{2}|slice S\d{1,2}", re.ASCII)
-_CITE_RE = re.compile(r"^([A-Za-z0-9_./-]+) line ([1-9][0-9]*)$", re.ASCII)
 _UV_PIN_RE = re.compile(r"\d+\.\d+\.\d+", re.ASCII)
 _NODE_PIN_RE = re.compile(r"\d+\.x", re.ASCII)
 _SEPARATORS = re.compile(r"[-_.]+")
@@ -336,39 +335,8 @@ def _cites(
         cite = item.get("cite")
         if not isinstance(cite, str):
             continue
-        for piece in cite.split("; "):
-            detail = _cite_item(root, piece)
-            if detail is not None:
-                failures.append(
-                    ("record-cite", "pins.toml", _prefixed(component, detail))
-                )
-
-
-def _cite_item(root: Path, piece: str) -> str | None:
-    match = _CITE_RE.fullmatch(piece)
-    if (
-        match is None
-        or ".." in match.group(1).split("/")
-        or match.group(1).startswith("/")
-    ):
-        return f'cite item "{piece}" is not "<path> line <n>"'
-    rel = match.group(1)
-    line_no = int(match.group(2))
-    path = root / rel
-    try:
-        info = path.lstat()
-    except OSError:
-        return f"{rel} is not a file"
-    if not stat.S_ISREG(info.st_mode):
-        return f"{rel} is not a file"
-    try:
-        text = path.read_text(encoding="utf-8")
-    except (OSError, UnicodeError):
-        return f"{rel} is not a file"
-    count = len(text.splitlines())
-    if line_no > count:
-        return f"{rel} has {count} lines, line {line_no} does not exist"
-    return None
+        for problem in pack_anchors.check_cite(root, cite):
+            failures.append(("record-cite", "pins.toml", _prefixed(component, problem)))
 
 
 def _duplicates(components: list[Component], failures: list[Failure]) -> None:
