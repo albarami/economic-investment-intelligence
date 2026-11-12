@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12 |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | The exact steps, checks, story, recoveries and words for a live EII session in front of a Minister. |
-| Read first | [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md), [01_PROJECT_BRIEF.md](01_PROJECT_BRIEF.md), [10_FRONTEND.md](10_FRONTEND.md), [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) |
+| Read first | [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md), [01_PROJECT_BRIEF.md](01_PROJECT_BRIEF.md), [10_FRONTEND.md](10_FRONTEND.md), [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) |
 
 ## In brief
 
@@ -15,7 +15,7 @@
 - Checklists run the day before, one hour before and five minutes before. Each step names its command and the result that counts as a pass.
 - The guided story has ten scenes ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)). It opens on the living map's real public evidence, shows the Qatari day hour by hour, gives the reading guidance, makes the flagship location choice with a drawn area, presence by hour, an event day and traffic by hour, ranks where else fits, then runs costs, the privacy attack, the oversight minute and the four cases as one-click stories before the hand-over. Its total keeps the 8 to 9 minute target of BRF-33; the targets of the new scenes are set at the first full rehearsal of slice S11. Each scene names what to tap, what must appear, the provenance marks to point at, and the fallback, and every scene keeps the honesty lines.
 - Twelve failures are rehearsed: database not answering, network down, model refusing or slow, blank map tiles, missing Arabic glyphs, browser or machine failure, refused freeze, refused frozen-bundle install or start, and, for the new scenes, hourly layers stalled or blank, a drawn area or its evidence failing, a ranking that does not update, and a case story or sample file failing. Each has one decision and one recovery.
-- Honest answers to thirteen hard questions, the prohibited claims, a pilot-request template and the after-session record close the runbook.
+- Honest answers to sixteen hard questions, the prohibited claims, a pilot-request template and the after-session record close the runbook.
 
 ## 1. Roles, kit and rules
 
@@ -40,14 +40,15 @@
 | RUN-03 | The presenter console offers exactly these controls: Next, Back, Language, Offline, Switch to embedded reader, Reset, Theme (dark or light), Room scale (1.0, 1.15, 1.3), Pause motion, and Scenario inputs (which types the break-even values into the wall). Next also applies each step's prepared inputs from the story script: the drawn shape, the hour, the day, the ranking weights and a case's shipped sample file. It shows every field of `GET /health`, polled every 5 s. Every presenter control sends the per-session presenter token; a call without it is refused. |
 | RUN-04 | Every guided-story and case-story question is answered from its prepared recording (see [09_AI_ASSISTANT.md](09_AI_ASSISTANT.md)) and shows the "Prepared" mark. During the build, and at any rehearsal before go-live, scene 9 has no live question. Once the owner has switched the live adapter on at go-live, scene 9 may ask one live question when a key is present and the session is online. The answer is still claim templates and catalogue components. It shows no "Prepared" mark. If the returned layout is invalid, the playbook default is shown and the presenter does not comment on a model. |
 | RUN-05 | Every story scene and every case-story step has a URL; reloading the browser returns to the start of the current scene or step with the same seat and language. |
-| RUN-06 | The presenter never reads a Synthetic or Simulated number aloud as a fact about a real place, says "estimated people around this location" and never "footfall of" a named building or business, and never states a prohibited claim (section 8). |
+| RUN-06 | The presenter never reads a Synthetic or Simulated number aloud as a fact about a real place, says "estimated people around this location" and never "footfall of" a named building or business, says "relative busyness by hour, Public, from Google Maps popular times" for the hourly index of a named venue, and never states a prohibited claim (section 8). |
 | RUN-07 | Every command and expected result in this runbook is executed in the three slice S11 rehearsals; a step that fails is fixed in the product or rewritten here before the first session. |
 | RUN-12 | `./eii freeze` requires a recorded human review of the release: the reviewer's role, the date, and that the survival report and the signed attack report were read. No review record, no freeze. The day-before checklist confirms that record before the session. |
 | RUN-13 | `./eii freeze` takes no new flag and is run twice. Its first run writes the data bundle, checksum list and pending `freeze.json` and appends the seven-field register line; its second run, from the base-branch commit containing that line, builds and verifies the application archive, writes its checksum beside the bundle and marks `freeze.json` complete. Continuous integration checks the register file alone: existing lines unchanged, one `protected_sha256` per `window_key`, and one `window_key` per `world_seed` (PRV-120). For a frozen release only, install and `./eii up` require the complete descriptor and matching line in the installed application's register; otherwise they exit 7. A build release with no `freeze.json` is not checked. No signed receipt file replaces these checks. |
 | RUN-14 | The limits page carries this sentence: "Figures from different tables can differ slightly because each table is protected on its own." |
 | RUN-15 | During the story the presenter never draws a shape freehand, edits a weight by hand or loads any file: each prepared input is applied by Next from the story script, so that every prepared answer's memo key matches. Free drawing, other weights and live questions belong to the hand-over. |
-| RUN-16 | Every scene and case story keeps the honesty lines of DES-187 in [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md). The presenter says "estimated people around this location", "fictional firm", "ranked by the criteria you set" and "projection", and never "footfall of" a named place, "real company", "the best location" or "forecast"; FDI capex and jobs are always called the source's estimates. |
+| RUN-16 | Every scene and case story keeps the honesty lines of DES-187 in [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md). The presenter says "estimated people around this location", "fictional firm", "ranked by the criteria you set", "projection", "your scenario", "estimate on simulated inputs", "relative busyness" and "night-time radiance". The presenter says "forecast" only for a forecast of a published series or of a released monthly series (the latter marked Synthetic), with its range and its backtest error, and never for a projection, a ranking, a fit, an estimate or the user's scenario. The presenter never says "footfall of" a named place, "real company", "the best location", "odds", "probability", "confidence", "spending power", "income present" or "purchasing power"; FDI capex and jobs are always called the source's estimates. |
 | RUN-17 | Cases C3 and C4 load only their shipped synthetic sample files. No company's real records are loaded at any time, and a sample file is unloaded by Reset, by a change of seat and at the end of the session. |
+| RUN-18 | The guided story and the three slice S11 rehearsals run with `EII_TRAFFIC_PROVIDER` at its default `simulated` and need neither `TOMTOM_API_KEY` nor `EARTHDATA_API_KEY`, so every traffic layer and drive-time outline in the story is Simulated and no step needs the network ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 17). If the owner switches the live provider on for a hand-over, the presenter says that the layer is live traffic from the provider, shown as a picture with the provider's attribution, that no figure is read from it, and that a drive-time area from the provider is the session's own area; the console never shows a key. |
 
 ## 2. One start, one stop, health
 
@@ -90,6 +91,7 @@ Healthy looks like this (values in angle brackets are the frozen release's own):
   "ledger": "postgres",
   "local_ledger_rows": 0,
   "model": "live",
+  "traffic": "simulated",
   "tiles": "ok",
   "fonts": "ok",
   "replays": "ok"
@@ -113,7 +115,7 @@ Checklist steps are named D (the day before), H (one hour before) and F (five mi
 | D5 | Full rehearsal with PostgreSQL up, timed per scene | Each scene within 30 s of its planned time; no fallback used |
 | D6 | Rehearsal with PostgreSQL stopped at scene 3: in a second terminal run `./eii db-down`, then use "Switch to embedded reader" | Story completes; every figure equals rehearsal D5; oversight seat shows "paused" |
 | D7 | `./eii db-up`, then `./eii down` and `./eii up` | `./eii up` reports the number of local ledger rows replayed; health `ledger: postgres` |
-| D8 | Offline rehearsal: switch Windows networking off, press Offline on the presenter console, then run the whole story | Model mode `replay` or `template`; Trust centre egress record shows zero outbound calls; map and fonts intact |
+| D8 | Offline rehearsal: switch Windows networking off, press Offline on the presenter console, then run the whole story | Model mode `replay` or `template`; Trust centre egress record shows zero outbound calls, with the traffic provider off (its default); map and fonts intact |
 | D9 | At the venue resolution, open the browser's GPU status page (`chrome://gpu` or `edge://gpu`) | WebGL2 reported as hardware accelerated |
 | D10 | Flip to Arabic on scenes 0, 3 and 4 | Every label shaped and legible; no empty boxes; numbers identical to English |
 | D11 | Record a passing run of the full story on screen | Recording copied to the separate device and plays there |
@@ -129,6 +131,7 @@ Checklist steps are named D (the day before), H (one hour before) and F (five mi
 | D21 | Play scene 1 and the first act of scene 3 at the venue resolution | Every stored hour lands in order with no visible stall; Pause motion stops playback; the traffic layer and the drive-time outline change with the hour |
 | D22 | Load and unload the shipped sample files of cases C3 and C4, then post an unknown sample key and a file body to the case route | Each sample loads with its Synthetic mark and sentence; Reset unloads it; both requests are refused and nothing of either is kept or shown |
 | D23 | Open the FDI list, the agency records and one Public split card in the frozen release | Each shows its source and retrieval date; the estimate note sits under the FDI list; every FDI and split chip shows its year |
+| D24 | Open one forecast of a published series, one base rate and, when the release holds them, one venue's relative busyness, one people-present-by-pay-band view and, only when OI-03 is closed, one site estimate | The forecast shows its range, its caption with two counts and its measured backtest error; the base rate shows numerator, denominator and period; the busyness is labelled "Google Maps popular times" with its retrieval date; the pay-band view shows the Simulated mark and its caveat; the estimate shows "estimate on simulated inputs" and its low, middle and high cases; none uses a word that RUN-16 keeps off screen |
 
 ### 3.2 One hour before
 
@@ -150,7 +153,7 @@ Checklist steps are named D (the day before), H (one hour before) and F (five mi
 
 | Step | Command or action | Pass when |
 |---|---|---|
-| F1 | Look at the presenter console: every field of `GET /health`, refreshed every 5 s | `store: postgres`, `postgres: up`, `ledger: postgres`, model mode as decided, replays ok |
+| F1 | Look at the presenter console: every field of `GET /health`, refreshed every 5 s | `store: postgres`, `postgres: up`, `ledger: postgres`, model mode as decided, `traffic: simulated`, replays ok |
 | F2 | Open `/{lang}/story/0` | Scene 0 is on the wall; the standing strip is visible; the four provenance marks are in the strip before the first figure |
 | F3 | Language | Set to the opening language agreed with the host |
 | F4 | Windows focus mode on; sound muted | No pop-ups possible |
@@ -162,16 +165,16 @@ Checklist steps are named D (the day before), H (one hour before) and F (five mi
 
 Latency targets, to be measured, not promised: evidence on screen within 2 s; the checked brief within 6 s when no live model is called (template writer or recorded provider), and within 20 s when a live model composes it. The brief is buffered until the accounting gate has passed; evidence cards may appear earlier. If evidence has not landed by 5 s, use the scene's fallback.
 
-The flagship building is the one chosen in slice S2 after its public places were checked by hand ([04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md)). Do not substitute another building on the day. The prepared shape drawn around it, the event days, the hours and the ranking weights are those of the story script; do not change them on the day (RUN-15).
+The flagship building is the one chosen in slice S2 after its public places were checked by hand ([04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md)). Do not substitute another building on the day. The story runs with the default traffic provider (RUN-18). The prepared shape drawn around it, the event days, the hours and the ranking weights are those of the story script; do not change them on the day (RUN-15).
 
 ### Scene 0 — The living map, real public evidence first (30 s)
 
 | | |
 |---|---|
 | Tap | Next |
-| Appears | The living map's roads and the business points of public places data; then the zone map lit by real electricity growth, licence density and metro and tram ridership; the standing strip and the four provenance marks dock and stay |
+| Appears | The living map's roads and the business points of public places data; then the zone map lit by real electricity growth, licence density and metro and tram ridership and, when the release holds it, night-time radiance by area and month; the standing strip and the four provenance marks dock and stay |
 | Point at | The solid Public line style; one figure: Lusail zone 69 electricity rose 3.34 times from 2021 to 2025 against 1.34 nationally (Qatar Open Data Portal, checked 2026-11-11) |
-| Say | "Everything marked Public is real and cited: these roads and business points, electricity, licences and metro riders. Everything else is invented or simulated, and marked." |
+| Say | "Everything marked Public is real and cited: these roads and business points, electricity, licences, metro riders and, when shown, night-time radiance. Everything else is invented, simulated or worked out from real data by tested code, and marked." |
 | Fallback | Map blank: recovery R4. Strip or marks missing: reload the scene (RUN-05); if still missing, play this scene from the recording. Never continue without the strip |
 
 ### Scene 1 — The Qatari day, hour by hour (target set at rehearsal, step D20)
@@ -194,7 +197,7 @@ The flagship building is the one chosen in slice S2 after its public places were
 | Say | "The same average can hide two different markets. That is why the card never shows the average alone." |
 | Fallback | Wage view appears without the housing split: Back at once. If the split is still missing, play scene 2 from the recording and say it is a recording. Do not open the pay cards in scene 3 |
 
-If OI-03 is open, do not show the unit-economics hero or the national pay card. Say: "Those two published tables stay off screen until they are reconciled." The break-even panel (method card C4) is also off screen until OI-03 is closed, so scene 5 then shows the supplier lens only (MTH-23 and MTH-29 in [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md)).
+If OI-03 is open, do not show the unit-economics hero or the national pay card. Say: "Those two published tables stay off screen until they are reconciled." The break-even panel (method card C4), the catchment-share scenario and the revenue range of the user's outlet (cards C34 and C35) and the site estimate (card C33) are also off screen until OI-03 is closed, so scene 5 then shows the supplier lens only (MTH-23 and MTH-29 in [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md)).
 
 ### Scene 3 — The flagship: one location, drawn (target set at rehearsal, step D20)
 
@@ -224,7 +227,7 @@ If OI-03 is open, do not show the unit-economics hero or the national pay card. 
 | Appears | The break-even panel opens empty, with six inputs in this order: monthly rent, seats (a whole number, at least 1), average bill, opening days (default 30, editable), expected covers (optional), monthly staff cost (optional). Rent opens empty. The panel posts the inputs to the server method and renders the returned facts; the browser computes nothing. Results are Inferred "your inputs" chips: the 2022 covers per day and the minimum and maximum across 2018–2022. Breakpoints appear only because expected covers is filled: maximum rent, minimum bill and, when monthly staff cost is entered, maximum staff cost; the track's tick is maximum rent and its marker is the entered rent. The optional second result line reads "to earn the sector's 2022 surplus share" and is never called break-even. An optional input after the six chooses one incentive package from the agency's pages, shown with its source page and retrieval date; the results stay "your inputs". Then the supplier lens: ranked bars, one block per basket input, at most five origins per input, with chips labelled "Calculated import unit value (QAR per kg)" and the valuation basis as the source states it or "not stated by the source" |
 | Point at | The "your inputs" tag; the incentive package's source page and retrieval date, when shown; one basket-line chip labelled "Calculated import unit value (QAR per kg)" that the release actually shows |
 | Say | "The cost structure is public; the break-even is your own scenario, and an incentive package is an option you choose from the agency's published page. This is not a sales forecast." |
-| Fallback | If OI-03 is open, skip the break-even and show the supplier lens only. Calculator error: Reload; if it still fails, show the break-even page of the printed pack. Supplier lens missing: move on without comment |
+| Fallback | If OI-03 is open, skip the break-even and the scenario tools and show the supplier lens only. Calculator error: Reload; if it still fails, show the break-even page of the printed pack. Supplier lens missing: move on without comment |
 
 ### Scene 6 — Try to break it (90 s)
 
@@ -383,25 +386,28 @@ Each answer is short and true. If a question goes beyond these, say "I will come
 
 | Question | Answer |
 |---|---|
-| Is this real footfall? | No. The people shown are estimates from a local simulation built from public rules, always with a range, for an area you draw or choose. They are never the footfall of a named building or business. Their seasonal shape is calibrated and checked against published monthly museum visitor counts, which are real Public counts for those named places and are shown separately as such. Separate Public monthly context series sit beside them on their own cards and are not matched to the hour. No telecom operator was contacted. |
-| Is any of this real data? | Only the figures marked Public, each with its source, licence and date. Every company, person, wage and residence record is invented, and so is every firm in a prospect, partner or supplier list. |
+| Is this real footfall? | No. The people shown are estimates from a local simulation built from public rules, always with a range, for an area you draw or choose. They are never the footfall of a named building or business. Their seasonal shape is calibrated and checked against published monthly museum visitor counts, which are real Public counts for those named places and are shown separately as such. The hourly shape of the simulated visits is also calibrated to the relative busyness by hour of the named venues of each place category, pooled; a named venue's own relative busyness by hour is a Public fact from Google Maps popular times, with its retrieval date, a relative index and not a count of people, and it never sits in one component with an estimated-people figure. Separate Public monthly context series sit beside them on their own cards and are not matched to the hour. No telecom operator was contacted. |
+| Is any of this real data? | Only the figures marked Public, each with its source, licence and date, and what tested code works out from them: a forecast of a Public series is marked Inferred and keeps that source; a base rate of a Public series is marked Observed and keeps that source; and a forecast of a released monthly series is marked Synthetic. Every company, person, wage and residence record is invented, and so is every firm in a prospect, partner or supplier list. |
 | Are these firms real? | No. Every firm in a prospect, partner or supplier list is fictional and marked Synthetic; its name is checked so that it never matches a real business, and it is never placed at a real address. Real businesses appear only from public places data and public listings, marked Public, in their own list. |
 | Is the ranking a recommendation? | No. It orders areas by criteria you can see and weights you can change, and the sentence beside each rank says how much the order depends on those weights. It is not advice, a probability or a forecast. |
 | Where do the investment projects and the agency's information come from, and may you use them? | From the FDI projects dashboard of the national investment promotion agency, whose data come from fDi Markets, and from the agency's sector, opportunity, incentive, set-up and law pages, read by the fetcher at each build. Capex and jobs are the source's own estimates of publicly announced projects, and the dashboard does not capture every project. The registry records the publisher's terms as read at fetch and the basis of use: the owner's decision for this personal internal project, made without a permission request. Citing a source is not an endorsement: the agency has not endorsed this work. If the demonstrator were ever hosted publicly, the owner would decide then which sources stay on. |
 | Can I load my own company's records? | Not in this demonstrator. Cases C3 and C4 load only their shipped synthetic sample files, which stand for a company's own records and stay in the session that loaded them. A company's real records would be real data, which the demonstrator never takes. |
 | What leaves the building to the model, and who approved it? | Only tool results: protected aggregates, public figures and simulated aggregates. Never a record, and never a row of a sample file. Every call is listed in the egress record in the Trust centre. The owner approved an online model for this synthetic demonstrator. The model runs on the provider's servers, not on this machine; no in-country processing is claimed. Using it with real data would be the custodians' decision. Today it can run with no model at all. |
 | Is other AI used? | One typed-decision model sits behind the stage only for build, evaluation and scripted-rehearsal work. It never sees visitor-typed text or chooses screen content. It may order the human review queue, but every mapping is signed by a person; the Proof room shows that lineage in one line. |
-| Can a company look up a competitor or a person? | No. Pay for a named entity is declined. Real named places carry only public facts: name, category, distance. The list of announced investment projects shows published announcements and cannot be searched by company name. Each company seat sees only its own briefs: the seat is a signed session cookie in its own browser profile, and where two-company separation shipped and PostgreSQL is running, the database refuses another seat's brief. This is query isolation after a seat is selected, not an account or tenant authentication; confirm before the session which applies. |
+| Can a company look up a competitor or a person? | No. Pay for a named entity is declined, and no estimate, share or score is made for a named competitor. Real named places carry only public facts: name, category, distance. The list of announced investment projects shows published announcements and cannot be searched by company name. Each company seat sees only its own briefs: the seat is a signed session cookie in its own browser profile, and where two-company separation shipped and PostgreSQL is running, the database refuses another seat's brief. This is query isolation after a seat is selected, not an account or tenant authentication; confirm before the session which applies. |
 | How do you know the privacy rules hold? | Each selected release passes exhaustive structural closure checks, at least 10,000 fuzz pairs per release and parameter set, and typed attacks with controls off and on. The attacker-view audit is evidence under a stated attacker, not a proof. It uses one model: every published leaf is fixed to its untreated aggregate, knowledge fixtures are checked against sealed truth before use, and a published leaf is treated as having passed its rules. The audit does not model what the layout tells about a population that failed a rule; the typed attack suite holds one attack for each such signal. Figures from different tables can differ slightly because each table is protected on its own. Version 1 makes no consecutive-window claim. Its monthly periods sit inside that one protected window, and the attack suite adds differencing across months, apportioning to drawn shapes and linking firm lists with area figures; each must recover nothing with the controls on. Both parameter sets are evaluated inside the custodian plane, but exactly one selected set's protected tables are exported. `window_key` is the SHA-256 of canonical JSON holding the protected `period` and, in name order, `{name, sha256}` for `business_register.v1`, `employment.v1`, `residence.v1` and `wages.v1`, using each feed's manifest `feed_sha256`; nothing else enters it. Continuous integration allows one `protected_sha256` per `window_key` and one `window_key` per `world_seed`. For a frozen release, the register inside the installed application is the allow-list and `freeze.json` must say complete; a window is never exported under two treatments (PRV-120). The Proof room may show survival figures for both sets and tables for the exported set only. No person-level protection is claimed for movement. These are proposals for data owners, not a certification, and real suppression rates are unknown until the engine runs on real data inside a custodian's environment. Before the session, confirm in the Proof room that the release on screen passed. |
 | Why not use the existing services? | They do their own jobs well. Existing public business maps show where businesses are. This adds what only joined records can show, pay and residence and estimated people around a location, under visible protection. It is designed to plug in beside them, not replace them. |
 | Has any ministry endorsed or used this? | No. It is a demonstrator built on invented records and public data. |
-| What would it take to make it real? | The same engine run inside a custodian's environment on real feeds, publishing only protected statistics. The pilot request (section 9) states which feeds and how we would judge it. |
+| What would it take to make it real? | The same engine run inside a custodian's environment on real feeds, publishing only protected statistics. The models read the release tables that the five feeds fill, named by their contracts, so the same code runs on real feeds; nothing here says that real records are used. The pilot request (section 9) states which feeds and how we would judge it. |
+| Where do popular times, live traffic, night-time lights, places and weather come from, and may you use them? | The project's own build reads them from their publishers into a local cache: relative busyness by hour of named venues from Google Maps popular times, night-time radiance from NASA, population by age and sex from WorldPop, hourly weather from Open-Meteo, and a further open places dataset from the public Source Cooperative copy (`places_fsq`), read without an account; the owner decided on 2026-11-12 that this copy, dated 2025-01-10, is used for version 1 as it is, and where a place of it disagrees with OpenStreetMap or Overture the newer source wins. The registry records each one's publisher, licence or terms, and retrieval date. The popular-times source states no licence for reuse and the publisher's terms name automated reading; the registry records those terms as read, and the basis of use is the owner's decision for this personal internal project (`licence_basis: owner_decision`). Its values stay in the uncommitted cache, in no test fixture and out of the nightly fetch. Live traffic is off by default, and the traffic is then simulated locally. If the owner switches the provider on, the API process fetches flow tiles and traffic-aware drive-time areas from the provider, shows its attribution, reads no number from a tile and stores nothing of a response; the browser contacts only this machine. If the demonstrator were ever hosted publicly or for a commercial purpose, the provider, popular times and the free weather interface would be off until the owner decides. |
+| Can it forecast whether a venture would succeed? | No. It gives no forecast of the success of a venture, no verdict and no advice. What it gives is computed by tested code and shown with its method and source: a forecast of a published series, such as licence issues or hotel room rates (or of a released monthly series, marked Synthetic), with a range taken from the model's own past errors, the number of past values that fell inside the range that the other past errors gave and its measured error; a base rate, which is a share of past licences of an activity and area with its counts and period, not the chance that your own venture survives; an estimate for a place with low, middle and high cases of the model, labelled "estimate on simulated inputs" while an input is simulated; and your own scenario, with every assumption visible and editable, which is never a forecast. None of them is made for a named business or competitor. |
+| Is the pay of the people present what they spend? | No. The figure of people present by pay band assumes that the workers and residents present have the pay bands of the unit's covered workers and residents; it is simulated, inferred and marked so. A pay band is a wage statistic and not a spending figure. Visitors have no pay band and are shown as one count without a band; the figure does not separate people who have no wage record. |
 
 ## 7. Tone
 
 - Say "demonstrator" and "proof of method". Say "Synthetic", "Simulated" and "Public" exactly as the marks do.
-- Say "estimated people around this location", "fictional firm", "ranked by the criteria you set", "projection" and "the source's estimates" (for FDI capex and jobs), exactly as the screen does (RUN-16).
-- Volunteer a limit before you are asked: coverage is partial; wages paid are not spending power; open listings are incomplete; estimated people are not purchases; a change between synthetic months is not a change in Qatar.
+- Say "estimated people around this location", "fictional firm", "ranked by the criteria you set", "projection", "your scenario", "estimate on simulated inputs", "relative busyness" and "the source's estimates" (for FDI capex and jobs), and "forecast" only for a forecast of a published or released series with its backtest error, exactly as the screen does (RUN-16).
+- Volunteer a limit before you are asked: coverage is partial; wages paid are not spending power; open listings are incomplete; estimated people are not purchases; a pay band is not spending; a base rate describes past licences and not your venture; the range of a forecast is the record of its own backtest and not a promise about the next value; relative busyness is an index and not a count; a change between synthetic months is not a change in Qatar.
 
 ## 8. Prohibited claims
 
@@ -409,20 +415,24 @@ Never say or imply that:
 
 1. the POC uses real custodian data;
 2. a Synthetic or Simulated figure describes a real place;
-3. a Simulated or Synthetic footfall figure belongs to a named building or business (say "estimated people around this location");
+3. a Simulated or Synthetic footfall figure, or an estimate, share or score, belongs to a named building or business (say "estimated people around this location");
 4. the privacy engine is certified or formally private;
 5. an existing public service is wrong or inferior;
 6. the ministries have endorsed or run the system;
-7. a revenue, demand or success forecast is given;
+7. a forecast of the success of a venture is given, or a forecast, estimate or base rate is shown that tested code did not compute or that lacks its interval, range or counts, its method and its source;
 8. any firm, owner or individual can be looked up.
 
-Under [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) and [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), also never say or imply that:
+Under [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) and [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), also never say or imply that:
 
 - a ranking, fit or suggestion is advice to act, a verdict, a probability or a confidence;
 - a fictional firm is a real business;
 - a projection is a forecast;
+- a scenario, an estimate, a ranking or a fit is a forecast;
+- a base rate is the chance that the user's own venture survives, or the range of a forecast or the cases of an estimate are a probability or a confidence;
+- the people present by pay band are spending, spending power or income present;
+- relative busyness by hour is a count of people or the footfall of a venue, or night-time radiance measures business activity;
 - an FDI capex or jobs figure is exact or complete, or that the investment promotion agency endorses this work;
-- an official split by sex or nationality describes a drawn area or the synthetic records;
+- an official split by sex or nationality describes the synthetic records, or is apportioned to a drawn area (whole cells of the published population grid, summed over an area, are shown as that sum, Public, with their year);
 - a change between synthetic months is a change in Qatar.
 
 If a slip happens, correct it on the spot in one sentence and record it.
@@ -508,17 +518,20 @@ ASSUMPTIONS made in this document:
 - The story plays National Day in scene 1 and a major match in scene 3, one event day per scene, so that each scene keeps one idea.
 - The four cases run in order in scene 8, each from one click.
 
-Open points from decisions 0016 and 0017:
+Open points from decisions 0016, 0017 and 0019:
 
 - OPEN: the targets of scenes 1, 3, 4 and 8 are set at the first full rehearsal of slice S11 (step D20) and written here and into DES-113 of [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md), within the 8 to 9 minute total of BRF-33 unless the owner changes that target.
 - OPEN: whether the release holds an incentive package that the break-even method of [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md) accepts for the flagship activity; scene 5 shows the package only if it does.
-- OPEN: whether `GET /health` reports the state of the hourly layers, the investment sources or the sample files is for [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md) to decide; this runbook checks them by steps D21 to D23.
+- OPEN: whether `GET /health` reports the state of the hourly layers, the traffic source, the investment sources or the sample files is for [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md) to decide; this runbook checks them by steps D21 to D24.
+- OPEN: whether the story shows any figure of decision 0019 (a forecast, the site estimate, people present by pay band, popular times or the 3D view) is set at the first full rehearsal (step D20). Until then the ten scenes and their targets are unchanged and none of these figures is in the story; they are available at the hand-over, under the honesty lines of RUN-16. Scene 1 stays free of pay.
+- OPEN: whether the 3D view is staged as a prepared step applied by Next, or set at start. The closed list of presenter controls in RUN-03 changes only by an owner decision. The guided story runs with simulated traffic (RUN-18); any live-provider hand-over is configured at process start, outside the guided story.
 
 Open items from the master design that touch this document: OI-01 (key supplied for go-live, not used during the build; spend cap set at go-live), OI-02 (demonstration date), OI-03 (restaurant totals and wage-table means must be reconciled before scenes 3, 5 and 7 show them), OI-06 (source labels on screen), OI-08 (label for live ledger rows), OI-09 (native Arabic reviewer), OI-11 (privacy thresholds are proposals), OI-14 (no run-time use of the typed-decision gateway before an approved route), OI-18 (token cap on the subscription), OI-35 (which parameter set is exported; default A until the owner or a data owner decides, needed before the slice S1 gate).
 
 ## Sources
 
 - [Decision 0016 — Version 1 covers the whole initiative](decisions/0016-version-1-covers-the-whole-initiative.md) and [decision 0017 — Public data additions and public splits](decisions/0017-public-data-additions-and-public-splits.md), accepted 2026-11-12: the ten-scene story's new content, the cases and sample files, the investment sources and their basis of use.
+- [Decision 0019 — Forecasts, estimates and scenarios by tested code; six self-serve sources](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), accepted 2026-11-12: the presenter words for forecasts, estimates, scenarios and base rates, the default traffic provider of the story, popular times and its basis of use, and the prohibited claims it adds.
 - FDI projects dashboard of the national investment promotion agency, `https://fdiprojects.invest.qa/` (data from fDi Markets), read 2026-11-12 as recorded in decision 0017: the estimate note quoted in section 6.
 - Qatar Open Data Portal (CC BY), zone electricity, wage, restaurant-sector and customs tables, figures checked 2026-11-11 as recorded in [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md).
 - EII architecture-options research, 2026-11-11 (project research record held by the owner): WSL interoperability failure and its fix.
