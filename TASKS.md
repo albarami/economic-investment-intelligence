@@ -115,7 +115,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas Platform; status queued.
 ### S0-T10 — Import-boundary test
 - Goal: Enforce the three-plane imports before feature code exists.
-- Acceptance criteria: [ ] direct, local and dynamic forbidden imports fail; [ ] package metadata edges are checked; [ ] clean packages pass.
+- Acceptance criteria: [x] direct, local and dynamic forbidden imports fail; [x] package metadata edges are checked; [x] clean packages pass.
 - Scope: boundary test module and planted fixtures only.
 - Depends: S0-T02.
 - Requirements: ARC-06, BE-01, TST-60.
@@ -129,11 +129,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas Platform; status queued.
 ### S0-T12 — Version and retreat pins
 - Goal: Pin supported toolchains and libraries with written retreat pins where the design requires them.
-- Acceptance criteria: [ ] lock files resolve; [ ] exact and retreat pins are labelled; [ ] unsupported version drift fails a check.
+- Acceptance criteria: [x] lock files resolve; [x] exact and retreat pins are labelled; [x] unsupported version drift fails a check.
 - Scope: lock files, version files and dependency constraints.
 - Depends: S0-T02, S0-T03.
 - Requirements: FE-03, TST-153, PLN-15, TST-43, BE-13.
-- Delivery: hard; personas Platform; status in review (part A merged in pull request 9 on 2026-11-12; part B in pull request 12).
+- Delivery: hard; personas Platform; status done (pull requests 9 and 12, merged 2026-11-12).
 ### S0-T13 — New-library reference notes
 - Goal: Give agents verified official-reference notes for libraries newer than most model training data.
 - Acceptance criteria: [ ] each named newer library has an official-documentation pointer; [ ] no API behaviour is asserted from memory; [ ] slice S1 confirmation fields exist.
