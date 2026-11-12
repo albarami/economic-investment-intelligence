@@ -4350,6 +4350,278 @@ Seed:      none
 Notes:     The live module against the project's Compose service on 127.0.0.1:55440, started before and stopped after this command by the lead (criterion 3 with a real server, BE-87).
 ```
 
+#### S0-T10: independent review, round 2: APPROVED
+
+Reviewed commit `172d4580cb2904f54400f7e9a3048d12108e8ec2`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/8 , with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43202324649 ). Reviewer: Zhipu AI GLM-5.3 High, through the Devin command-line tool, read-only; a later round under decision record 0018. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T10
+COMMIT: 172d4580cb2904f54400f7e9a3048d12108e8ec2
+REVIEWER: Devin command-line tool, glm-5-3-high (Zhipu AI)
+EARLIER FINDINGS:
+  F1 FIXED `run_fresh` now builds the four groups and returns `sorted(already) + sorted(loaded_lines) + sorted(attempted_lines) + sorted(error_lines)` (scripts/tests/import_boundary_child.py lines 136-168), the plan's table order (already-loaded, loaded, attempted, import errors) with each group sorted — within a group the line prefix before the module name is constant, so the sort is by module name. `test_fresh_failure_line_order` (scripts/tests/test_import_boundary_fresh.py lines 172-219) plants one line of every group (sitecustomize-preloaded `eii_product`, gateway load, blocked custodian attempt, broken sub-package) and asserts the exact four-line list, and `test_fresh_requested_while_other_forbidden_loaded` (lines 159-170) now compares the exact unsorted list `[loaded, attempted]`. The lead's SUITE block at the work commit 7fa0a9d ran 129 tests OK with the fix in place, and on the head 172d458 (129 tests, OK).
+  F2 FIXED The trailing `if __name__ == "__main__": unittest.main()` blocks are deleted from all five test modules (DIFF.patch, five hunks); a search for `__main__` over `scripts/tests/` matches only seven pre-existing modules outside this task's nine files, none of them an `import_boundary_*` or `test_import_boundary_*` file.
+CHECKS:
+  REV-10 PASS All three criteria map to recorded evidence as in round 1 (criterion 1: T01, T03, T06, T15, T16, T17 plus the mutant block and the neutralised-guard command 7; criterion 2: `test_metadata_guard_is_wired` plus the four S0-T02 metadata tests and `uv lock --check` exit 0; criterion 3: T02, T24, T25, T26, T22), re-asserted at the fix-round work commit 7fa0a9d (SUITE: ran 129, own passed 34, metadata passed 4, exit 0) and on the head (129 tests, OK). The later-round forms — 34 own tests (the plan's 30 plus the four fix-round tests) and M12 no longer expecting T19 — were each asserted before they were applied, per EVIDENCE.md.
+  REV-11 PASS Lead's runs: `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` exit 0 at 7fa0a9d (129 passed, 0 failed, 0 skipped) and again on the head (129 tests, OK, exit 0); `python3 scripts/check_docs.py` exit 0 on both; `./eii test` still does not exist on main (S0-T05 is pull request 7), exactly as in round 1, and rule 44's suite command stands in. CI green on the head: https://github.com/albarami/economic-investment-intelligence/actions/runs/43202324649 . The new behaviour has its new test (`test_fresh_failure_line_order`), and the lead saw both order tests fail on the old global sort and pass on the fix; skips remain 0.
+  REV-12 PASS Round-2 SCOPE form (command 8): the range `c930e3b...7fa0a9d` changes exactly the nine part-A files plus `PROGRESS.md` and `TASKS.md` (the round-1 ledger commit's files, inside the range), output "11 []"; the fix commit itself touches only `import_boundary_child.py` and the five test modules; HEAD-DIFF: the round-2 ledger commit changes only `PROGRESS.md` and `TASKS.md`; nothing under `data/`; no unrelated reformatting (the formatter check passes on the head, EVIDENCE.md).
+  REV-13 PASS The round-2 diff adds one real test with real run-time fixtures and removes dead blocks; no TODO, FIXME, NotImplementedError, empty body or fixed return value appears in the changed lines, and the round-1 reading of the nine files stands.
+  REV-14 PASS No secret, `.env` or key file in the diff; the only new environment-variable name is `PYTHONPATH`, not a secret and not one of the forbidden pair; no real custodian record, field, file name or count anywhere.
+  REV-15 PASS The round-2 diff only strengthens: `test_fresh_requested_while_other_forbidden_loaded` compares the exact unsorted list where it previously sorted both sides, a new order test was added, and the `__main__` deletions remove code the plan forbids; no lowered threshold, loosened assertion, skip, expected-failure, suppression comment, `continue-on-error` or retry appears in the diff.
+  REV-16 PASS F1 and F2 are fixed exactly as the plan specifies (see EARLIER FINDINGS): the fresh-interpreter failure lines are returned in the plan's group order, each group sorted by module name, and no file of the task carries a `__main__` block. The new test stays inside the plan's fixture rules (temporary folders, the pinned plane names, the plan's own `flags` and `env` parameters of `run_fresh`); no other deviation is introduced by the changed lines.
+  REV-17 PASS `PROGRESS.md` appends the round-1 verdict copied from its first line (REV-09), the build-round-4 task-log line and the seven evidence entries at 7fa0a9d, without rewriting earlier rows; `TASKS.md` moves the status to round 2; `OPEN_ITEMS.md` is deferred to part B by the approved plan; `python3 scripts/check_docs.py` exit 0 on the head (92 text files, 47 Markdown files, OK).
+  REV-18 PASS Test-only change; the new test passes `os.environ` plus `PYTHONPATH` only to a child interpreter it starts in its own new empty temporary folder and asserts on its failure lines, logging nothing from the environment; no SQL, no application role, no record-level data; generators untouched.
+  REV-19 PASS As in round 1: nothing on the dropped or later lists is built, the seven forbidden edges follow ARC-06, and the round-2 changes alter no edge, rule or component decision.
+  REV-20 N/A The task adds no facts, figures or displayed numbers; the round-2 numerals are test-internal (line numbers, group counts, exception names).
+  REV-21 N/A No screen, card, template or prose is added; the nine files are test modules and never render.
+  REV-22 PASS Nothing in the round-2 diff touches the partition, the two parameter sets, treatment, exports or any privacy audit or test.
+  REV-23 PASS The suite passes on the head (129 tests, OK), so the import-boundary test passes on the real tree, static and fresh, and the metadata guard is wired and passing; the fix rounds change only line ordering and tests, no judged form, path or edge, so the round-1 trace of every judged form stands; the not-judged routes remain the plan's documented table (OI-51, part B).
+  REV-24 N/A No English or Arabic screen strings are added by this task.
+  REV-25 PASS The new test builds every path from its own `tempfile.TemporaryDirectory()` folder; no absolute local path, personal name, e-mail address, named existing product in a comparison, or run of exactly eight or eleven digits appears in the diff; `check_docs.py` exits 0 on the head.
+  REV-26 PASS No string, docstring or document in the round-2 diff makes or implies any prohibited claim.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exit 0 on the head (EVIDENCE.md); the round-2 diff touches neither file and the documentation check reports no agent-file failure.
+  REV-28 PASS No synthetic entity identifiers are introduced; the fixture package names remain the plan's pinned plane names and no identifier imitates a real registration (no bare eight- or eleven-digit run).
+  REV-29 N/A No real named place or business appears anywhere in the change.
+  REV-38 PASS Unchanged by the fix rounds and the suite is green on the head: the edges to `eii_gateway` are enforced on all three planes and the env-name rule forbids `EII_DECISION_PROVIDER` and `JEV_PRO_API_KEY` in the source trees (T13, real-tree pass); the gateway exists only as a stub fixture inside temporary folders; the web clause belongs to S0-T03's existing check, outside this diff.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none — round-1 items are already dispositioned in the round-2 ledger: P1 and P3 are hardening for document 17, entered with part B (document 17 arrives with pull request 6), and P2 is OI-52 of part B, before the slice gate.
+```
+
+#### S0-T10: merge record of part A
+
+- Tree proof on the approved head (ruling L-29), run by the lead on 2026-11-12 before the merge: every path of the head's tree is as in the work commit of fix round 1 `7fa0a9ddd71d50707b721c5db7c7e0ee567c6d03`, except the two ledger files; output "TREE-IS-WORK ok: 146 paths at 172d4580cb2904f54400f7e9a3048d12108e8ec2", exit code 0.
+- Base update: main (with S0-T05) was merged into the branch, commit `319d102bccc600cf9f6678b82c4a4f06fe65962e`. Both sides had only appended to `PROGRESS.md`; the merge keeps main's block, then the branch's. The lead checked the merged tree: `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` ran 179 tests, OK; `./eii test --seed 1794000000` 859 passed, 0 failed, 0 skipped in 6 suites, RESULT: PASSED; `uv run --locked ruff check .`, `uv run --locked mypy`, `python3 scripts/check_docs.py` and `python3 scripts/check_tree.py` exit code 0. CI on that commit: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43226730935 .
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/8 was squash-merged on 2026-11-12 at the head `319d102bccc600cf9f6678b82c4a4f06fe65962e`; merge commit `bdfd8d985596537841a066c82d952255057fb4f2` on main. CI on the merge commit: workflow `docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43226807203 .
+- Proposed items of round 1: P1 and P3 (hardening of the import-boundary guard) go to document 17 when the version-1 documentation (pull request 6) brings it; P2 is OI-52, entered by part B. Round 2 proposed none.
+- The task log of S0-T10 above is complete for part A with this record: verdict APPROVED in review round 2. Part B is pull request https://github.com/albarami/economic-investment-intelligence/pull/11 (entries below).
+
+#### S0-T12: independent review, round 2
+
+Reviewed commit `813daffbf1d7c8077ece0851ed6025b6b9aac7df`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/9 , with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43219437286 ). Reviewer: Google Gemini 4 Carbon (High), through the Antigravity command-line tool, read-only; a later round under decision record 0018, of parts 1 and 3 (part 2 was approved in round 1). The first two runs of part 1 ended on errors of the Antigravity server before any verdict; the third run gave the verdict below. Each verdict is copied unchanged from its first line (REV-09); both are also posted on the pull request.
+
+#### S0-T12: independent review, round 2, part 1 of 3: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T12 part 1 (pull request 9)
+COMMIT: 813daffbf1d7c8077ece0851ed6025b6b9aac7df
+REVIEWER: Google, Gemini 4 Carbon (High)
+EARLIER FINDINGS:
+  F1 FIXED scripts/versions_inputs.py lines 244-256 now default missing tool and uv keys to {} while returning (None, None) when tool or tool.uv is present and not a dict, so a root pyproject.toml without [tool] or [tool.uv] emits "FAIL input: pyproject.toml: tool.uv.workspace.members is not a list of strings" and exits 1 while non-table tool/tool.uv still reports only shape_pyproject's "tool.uv is not a table"; verified by the 51-test version suite (PROGRESS.md lines 3309-3318 and EVIDENCE.md Sitting 4 SUITE).
+CHECKS:
+  REV-10 PASS All three S0-T12 criteria are met with recorded evidence: lock resolution via uv lock --check (exit 0) and cd web && npm ci (exit 0) at work commit cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c plus EVIDENCE.md LOCKS-UNCHANGED ([]) and PLANT; exact and retreat pin labelling via uv run --locked python scripts/check_versions.py exit 0 ("checked 57 components: OK") and BLOCK RECORD (57 components); unsupported version drift failing a check via the F1 fix in scripts/versions_inputs.py lines 244-256, 51 passed tests in scripts/tests/test_versions_*.py, ./eii test (876 passed, 0 failed, 0 skipped), and BLOCK PLANT (plants not detected: []).
+  REV-11 PASS PROGRESS.md records 11 commands run by lead (local) at work commit cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c all with exit code 0, including ./eii test (876 passed, 0 failed, 0 skipped, seed 1794486903), unittest over test_versions_*.py (51 passed, 0 failed, 0 skipped), the TST-161 red run, and python3 scripts/check_docs.py; EVIDENCE.md Sitting 4 (TREE-IS-WORK, HEAD-DIFF, SUITE, REAL, LEDGER) confirms head 813daffbf1d7c8077ece0851ed6025b6b9aac7df adds only PROGRESS.md and TASKS.md and passes on head, CI (docs / check-docs) is green on 813daffbf1d7c8077ece0851ed6025b6b9aac7df at https://github.com/albarami/economic-investment-intelligence/actions/runs/43219437286 , and red runs were observed for the new sub-cases before fixing; I did not re-run commands myself because the review brief forbids shell commands.
+  REV-12 PASS Since 4f251782e4d17eb15174e1738862c46c8a9df095 this part modifies only scripts/versions_inputs.py, scripts/check_versions.py, PROGRESS.md and TASKS.md; EVIDENCE.md blocks SCOPE (bad: []) and LOCKS-UNCHANGED ([]) confirm nothing outside Part A and the two ledger files changed against main, nothing under data/ was touched, and there is no unrelated reformatting.
+  REV-13 PASS Line-by-line inspection of DIFF.patch, scripts/versions_inputs.py and scripts/check_versions.py shows no TODO, FIXME, NotImplementedError, empty function body, placeholder return value or invented figure.
+  REV-14 PASS No secret, .env file, private key or real custodian record, field name, file name or count appears anywhere in the pull request or round-2 diff; python3 scripts/check_docs.py exited 0 and CI check-docs passed on head 813daffbf1d7c8077ece0851ed6025b6b9aac7df at https://github.com/albarami/economic-investment-intelligence/actions/runs/43219437286 (gitleaks arrives in queued task S0-T06).
+  REV-15 PASS No threshold, tolerance, assertion, test count, Hypothesis setting, ruff rule, mypy setting or workflow check is weakened, and EVIDENCE.md blocks STYLE (12 files; problems: []) and SUITE (any skip: False) confirm zero skips, expected-failure marks or lint/type suppression comments.
+  REV-16 PASS scripts/versions_inputs.py lines 244-256 (F1) and scripts/check_versions.py lines 406-420 (round-1 P1: always include root pyproject.toml in _python_docs when present in docs) and lines 495, 581, 593, 601, 645 and 653 (round-1 P2: pass unquoted input names, keys and versions through _show) conform to PLAN.md lines 21, 25, 31 and 49-58 and AGENTS.md standards, with ruff check, ruff format --check and mypy all exiting 0.
+  REV-17 PASS PROGRESS.md (append-only verbatim copy of all three round-1 verdicts per REV-09, lead ruling, build round 3 task log, and 11 command entries at cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c) and TASKS.md (S0-T12 updated to round 2) are current and verified by EVIDENCE.md LEDGER-LIST (11 listed; 11 in block LEDGER), LEDGER (ledger problems: []) and CI check-docs at https://github.com/albarami/economic-investment-intelligence/actions/runs/43219437286 ; README.md, rule 44 of AGENTS.md and CLAUDE.md, and OPEN_ITEMS.md remain deferred to Part B until the open documentation pull requests merge.
+  REV-18 PASS The round-2 edits perform only in-memory dictionary lookups and ASCII unicode_escape formatting; allow-list child environments, subprocess argument lists without shell=True, lstat() regular-file checks, path-traversal guards and NOWALK (12 files; problems: []) remain intact.
+  REV-19 PASS Nothing on the dropped or later lists is built, no architecture or approved decision record is reopened or replaced, and the slice S0 cut order is respected.
+  REV-20 N/A This foundation version-pinning task introduces no economic fact, displayed figure, lineage chain or calculation function.
+  REV-21 N/A This task adds no user-interface screen, Fact chip, catalogue template or assistant answer pipeline.
+  REV-22 N/A This task touches no privacy partition, parameter set, disclosure-control rule, adversarial audit, manifest or freeze logic.
+  REV-23 N/A This task modifies no file or package metadata under product/ and introduces no import of eii_custodian.
+  REV-24 N/A This task adds no English or Arabic user-facing view, string or numeral.
+  REV-25 PASS No absolute local path, personal name, e-mail address, realistic identifier, bare run of eight or eleven digits, secret or named product comparison appears in the diff, and python3 scripts/check_docs.py, python3 scripts/check_tree.py and CI check-docs at https://github.com/albarami/economic-investment-intelligence/actions/runs/43219437286 all passed.
+  REV-26 PASS No comment, docstring, code string, pin note or ledger entry makes any prohibited claim regarding real custodian data, formal privacy certification, real-place synthetic figures, public-service inferiority, ministry endorsement, forecasts or entity lookup.
+  REV-27 PASS Neither AGENTS.md nor CLAUDE.md is modified in Part A, and python3 scripts/check_docs.py and CI check-docs on head 813daffbf1d7c8077ece0851ed6025b6b9aac7df at https://github.com/albarami/economic-investment-intelligence/actions/runs/43219437286 exited 0 with no agent-file mismatch.
+  REV-28 N/A This task generates no synthetic world record or SYN-* identifier.
+  REV-29 N/A This task attaches no fact or attribute to any real named place or business.
+  REV-38 PASS No serving-plane or run-time code is added, eii_gateway is imported nowhere, and no run-time code reads EII_DECISION_PROVIDER or JEV_PRO_API_KEY.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T12: independent review, round 2, part 3 of 3: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T12 part 3 (pull request 9)
+COMMIT: 813daffbf1d7c8077ece0851ed6025b6b9aac7df
+REVIEWER: Google Gemini 4 Carbon (High)
+EARLIER FINDINGS:
+  F1 FIXED `scripts/tests/test_versions_git.py` lines 267 and 300-328 save `original_config`, restore clean `root/.git/config` at line 300 before running separate `bare` (`XDG_CONFIG_HOME` via `home/.config/git/ignore`, lines 301-311) and `home_only` (`HOME` via `home/.gitconfig` without `GIT_CONFIG_GLOBAL`, lines 312-321) controls, and restore `core.excludesFile` at lines 322-328 before `repo_only` and `moved`; verified by `SUITE` (`ran: 51 | any skip: False`, exit 0) in `.overnight/EVIDENCE.md`.
+  F2 FIXED `scripts/tests/test_versions_git.py` lines 457-461 add `_expect_cli_fail` asserting `proc.returncode == 1`, `proc.stderr == ""` and `proc.stdout.splitlines() == expected`, called for `(a)` to `(g)`, `(i)` and `(j)` at lines 172, 181, 186, 209, 215, 220, 226, 242 and 253, with `(d)` at lines 201-209 populating `sub` with `base.make_tree(sub)` and replacing `sub/.git` with an empty directory; verified by `SUITE` (`ran: 51 | any skip: False`, exit 0) in `.overnight/EVIDENCE.md`.
+  F3 FIXED `scripts/tests/test_versions_git.py` lines 383-386 assert `lines == [base.SUMMARY_OK]`, lines 417-435 assert three chunks (`chunks[2] == ""`, `env_chunks[2] == ""`) and exact child environments `{"GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull, "LANG": "C", "PATH": path}` for `env_chunks[:2]` (removing `_env_keys`), and lines 436-439 assert `base.versions_inputs.list_candidates(root, hostile) == (self._listed(root, base.git_env(), switches=True), None)`; verified by `SUITE` (`ran: 51 | any skip: False`, exit 0) in `.overnight/EVIDENCE.md`.
+CHECKS:
+  REV-10 PASS All three acceptance criteria of S0-T12 map to recorded checks and tests on fix commit `cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c` and head `813daffbf1d7c8077ece0851ed6025b6b9aac7df` (`.overnight/EVIDENCE.md`): criterion 1 (`lock files resolve`) by `LOCKS-UNCHANGED` (`[]`) and `PLANT` primary/retreat resolutions (exit 0); criterion 2 (`exact and retreat pins are labelled`) by `RECORD` (`record ok: 57 components`, exit 0) and `REAL` (exit 0); criterion 3 (`unsupported version drift fails a check`) by `SUITE` (`ran: 51 | any skip: False`, exit 0), `PLANT` (`plants not detected: []`), `MUTANTS` (exit 0) and `EARLIER` (`876 passed, 0 failed, 0 skipped`; `673` web tests passed, exit 0).
+  REV-11 PASS On fix commit `cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c` and head `813daffbf1d7c8077ece0851ed6025b6b9aac7df` (`.overnight/EVIDENCE.md`), the lead recorded exit 0 for `EARLIER` (`./eii test`: 876 passed, 0 failed, 0 skipped; web checks: 673 passed, 0 failed, 0 skipped), `SUITE` (`51` `test_versions_*.py` tests passed, 0 skipped), `PLANT`, `MUTANTS` and `LEDGER` (`ledger problems: []`, including `python3 scripts/check_docs.py` exit 0), CI workflow `docs` (`check-docs`) succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43219437286 (reviewer ran no commands per the read-only brief), round-1 findings F1 and F2 are fixed, and the added `absent_tool` and `lock-version-newline` subTests in `scripts/tests/test_versions_inputs.py` lines 179-215 carry planted violations.
+  REV-12 PASS This part's round-2 patch (`DIFF.patch`) modifies only `scripts/tests/test_versions_git.py`, `scripts/tests/test_versions_inputs.py` and `scripts/tests/test_versions_toolchain.py`; blocks `SCOPE` (`bad: []` in part A later-round form), `LOCKS-UNCHANGED` (`[]`) and `HEAD-DIFF` exited 0 on `cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c` and `813daffbf1d7c8077ece0851ed6025b6b9aac7df`, nothing under `data/` is touched, and there is no unrelated reformatting.
+  REV-13 PASS None of the five files in this part contains `TODO`, `FIXME`, `NotImplementedError`, an empty function body, mock release data or a fixed return value standing in for real work, and the redundant fixture write noted as round-1 `P1` in `scripts/tests/test_versions_toolchain.py` was removed in `DIFF.patch` lines 308-316.
+  REV-14 PASS No secret, `.env` file, key material, or real custodian record, field name, file name or count appears anywhere in the five files or `DIFF.patch`; `LEDGER` (`ledger problems: []`) and `EARLIER` exited 0 (`.overnight/EVIDENCE.md`).
+  REV-15 PASS No existing test, CI configuration, lint or type setting, threshold or assertion is weakened, no skip or expected-failure mark is added (`any skip: False`), no `# noqa` or `# type: ignore` comment is introduced, `STYLE` (`12 files; problems: []`) exited 0, and `DIFF.patch` only strengthens test assertions.
+  REV-16 PASS With F1, F2 and F3 resolved in `scripts/tests/test_versions_git.py` and the `tool.uv.workspace.members` and escaped-newline subTests added in `scripts/tests/test_versions_inputs.py` lines 179-215, all five files in this part match the approved `PLAN.md` specifications, pinned names, strict typing and closed-set repository-read rules.
+  REV-17 PASS For part A (`README.md`, rule 44 of `AGENTS.md` and `CLAUDE.md`, and `OPEN_ITEMS.md` OI-54 to OI-57 belong to part B after the open documentation pull requests merge), `PROGRESS.md` and `TASKS.md` are updated on head `813daffbf1d7c8077ece0851ed6025b6b9aac7df`, blocks `LEDGER-LIST` (`11 listed; 11 in block LEDGER`) and `LEDGER` (`ledger problems: []`, including `python3 scripts/check_docs.py` exit 0) passed, and CI `check-docs` succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43219437286.
+  REV-18 PASS Subprocess environments in `versions_support.py`, `test_versions_toolchain.py`, `test_versions_inputs.py` and `test_versions_git.py` use explicit allow-lists without `shell=True`, temporary trees use `tempfile.TemporaryDirectory()` only, no ignored or repository-outside path is walked (`NOWALK`: `12 files; problems: []`), and no secret, SQL or serving path is touched.
+  REV-19 PASS Nothing on the dropped or later lists is built, no architecture or decision record is reopened, and slice S1 pin confirmation (`spike_result = "not yet run"`) remains assigned to S1-T08 as planned.
+  REV-20 N/A This part adds developer version-pin guard tests only and introduces no product fact, displayed figure, lineage reference or calculation.
+  REV-21 N/A This part adds no user-interface screen, card, Fact chip, catalogue template or assistant pipeline output.
+  REV-22 N/A This part changes no privacy partition, parameter set, disclosure treatment, adversarial audit, release manifest or freeze logic.
+  REV-23 N/A This part modifies test modules under `scripts/tests/` only and touches nothing under `product/` or package dependency metadata.
+  REV-24 N/A This part adds no English or Arabic interface view, localized string or displayed numeral.
+  REV-25 PASS None of the five files or `DIFF.patch` contains an absolute local path, personal name, e-mail address (git test identity uses `"fixture"`, test URLs use `example.invalid`), real custodian name, ministry internal plan, named product comparison, bare eight- or eleven-digit run or secret, and `LEDGER` and CI `check-docs` at https://github.com/albarami/economic-investment-intelligence/actions/runs/43219437286 exited 0.
+  REV-26 PASS No comment, docstring or string in the five files or `DIFF.patch` makes any prohibited claim regarding real custodian data, real-place synthetic or simulated facts, privacy certification, public-service inferiority, ministry endorsement, forecasts or firm/person lookup.
+  REV-27 PASS This part modifies neither `AGENTS.md` nor `CLAUDE.md`, and `LEDGER` (`ledger problems: []`) and CI `check-docs` at https://github.com/albarami/economic-investment-intelligence/actions/runs/43219437286 confirmed byte parity on `813daffbf1d7c8077ece0851ed6025b6b9aac7df`.
+  REV-28 N/A This part introduces no synthetic world record or `SYN-*` identifier.
+  REV-29 N/A This part introduces no real named place or business record or attribute.
+  REV-38 PASS None of the five files imports `eii_gateway` or reads `EII_DECISION_PROVIDER` or `JEV_PRO_API_KEY`, and no serving-plane or run-time code is added (`"gateway/pyproject.toml"` appears only as an unscanned path string in `test_versions_git.py`).
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T12: merge record of part A
+
+- Tree proof on the approved head (ruling L-29), run by the lead on 2026-11-12 before the merge: every path of the head's tree is as in the work commit of fix round 2 `cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c`, except the two ledger files; output "TREE-IS-WORK ok: 173 paths at 813daffbf1d7c8077ece0851ed6025b6b9aac7df", exit code 0.
+- Base update: main (with S0-T10) was merged into the branch, commit `bbfad41d2576eab58b91b72b9baf9c64800b1f42`, in the same way. The lead checked the merged tree: `uv run --locked python scripts/check_versions.py` "checked 57 components: OK"; `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` ran 230 tests, OK; `./eii test --seed 1794000000` 910 passed, 0 failed, 0 skipped in 6 suites, RESULT: PASSED; `uv run --locked ruff check .`, `uv run --locked mypy`, `python3 scripts/check_docs.py` and `python3 scripts/check_tree.py` exit code 0. CI on that commit: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43227389210 .
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/9 was squash-merged on 2026-11-12 at the head `bbfad41d2576eab58b91b72b9baf9c64800b1f42`; merge commit `00388d65384624e0e92944bd26aaf2fd208996de` on main. CI on the merge commit: workflow `docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43227429074 .
+- Round 2 proposed no item.
+- The task log of S0-T12 above is complete for part A with this record: part 2 APPROVED in round 1, parts 1 and 3 in round 2. Part B (rule 44, `README.md`, the OI-40 sentence and OI-54 to OI-57) follows in its own pull request.
+
+#### S0-T08: independent review, round 3
+
+Reviewed commit `57f6bc37b6a67469e0a3e4aa6748e8119f4febec`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/10 . Reviewer: OpenAI GPT-5.6 Sol (high), through the Cursor command-line tool, read-only; a later round under decision record 0018, of parts 1 and 3 (part 2 was approved in round 2). Each verdict is copied unchanged from its first line (REV-09); both are also posted on the pull request.
+
+#### S0-T08: independent review, round 3, part 1 of 3: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T08 part 1 (pull request 10)
+COMMIT: 57f6bc37b6a67469e0a3e4aa6748e8119f4febec
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED The relative-PATH fix remains unchanged; the head suite passes.
+  F2 FIXED The decoded-NUL rejection remains unchanged; the head suite passes.
+CHECKS:
+  REV-10 PASS All five part-A criteria remain mapped to recorded tests and checks; flushing makes the timeout-output planted violation effective.
+  REV-11 OPEN P2 The lead recorded 43 preflight tests with no surviving mutants, 188 Python guard tests and 868 project tests passing; head checks exited 0, but the supplied head-CI URL is incomplete.
+  REV-12 PASS The scope proof reports the 13 part-A paths plus PROGRESS.md and TASKS.md; since the last review only the test-support file and ledger changed.
+  REV-13 PASS The flushes are test-support behavior and introduce no placeholder or fixed result standing in for delivered work.
+  REV-14 PASS The changed lines contain no secret or real custodian data; documentation and tree checks pass.
+  REV-15 PASS The patch strengthens timeout-output coverage and weakens no assertion, threshold, test count, tolerance or enforcement.
+  REV-16 PASS Both streams are flushed before sleeping, so timeout handling now exercises retained partial output as planned.
+  REV-17 PASS PROGRESS.md and TASKS.md record the review and fix round; the documentation check examined 116 text files and 47 Markdown files with exit 0.
+  REV-18 OPEN P1 Closed command forms, exact child environments and process-group limits remain enforced; executable authentication remains documented hardening outside the acceptance criteria.
+  REV-19 PASS The owner-approved part-A cut and deferred parts B and C remain unchanged.
+  REV-20 N/A This patch introduces no displayed figure, fact object or lineage.
+  REV-21 N/A This patch introduces no screen, template or rendered prose.
+  REV-22 N/A This patch changes no privacy parameter, partition, treatment or release invariant.
+  REV-23 PASS The changed test-support script imports no custodian package and alters no product package metadata.
+  REV-24 N/A This patch introduces no English or Arabic view.
+  REV-25 PASS The patch contains no private path, personal identity, e-mail address, realistic identifier, real custodian material or secret.
+  REV-26 PASS No prohibited product, privacy, endorsement, forecast or lookup claim appears.
+  REV-27 PASS The recorded cmp AGENTS.md CLAUDE.md check exits 0.
+  REV-28 N/A This patch introduces no synthetic entity or person identifier.
+  REV-29 N/A This patch introduces no fact about a real named place or business.
+  REV-38 PASS No serving-plane code imports eii_gateway or reads gateway provider or key settings.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-18) hardening: document 17 — scripts/preflight_proc.py authenticates the selected executable by closed basename and arguments, not by executable identity; deliberate PATH replacement remains outside this task’s acceptance criteria.
+  P2 (REV-11) The head-CI evidence reports success but supplies only an incomplete actions/runs/ URL; record the complete run link.
+```
+
+#### S0-T08: independent review, round 3, part 3 of 3: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T08 part 3 (pull request 10)
+COMMIT: 57f6bc37b6a67469e0a3e4aa6748e8119f4febec
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED scripts/tests/preflight_stubs.py lines 66-69 and 85-88 flush both streams before sleeping; P01 timeout_partial_streams and R10 r08_timeout/r09_timeout assert retained partial markers, and the 43-test suite passed.
+CHECKS:
+  REV-10 PASS The acceptance evidence remains mapped, and the missing timeout-stream proof now exists and passed.
+  REV-11 OPEN P1 The lead’s 43-test run and seeded suite exited 0, but the supplied CI evidence lacks a verifiable run identifier.
+  REV-12 PASS The patch changes only the two assigned preflight test files.
+  REV-13 PASS No placeholder or stub stands in for delivered behavior; the stub module is test support.
+  REV-14 PASS The changes use generated dummy markers and temporary repositories, with no secret or real data.
+  REV-15 PASS Assertions were added and no threshold, skip, configuration, or existing assertion was weakened.
+  REV-16 PASS The changes follow the approved P01 and R10 timeout-output proof.
+  REV-17 N/A This part changes tests only; documentation is assigned to approved part B, and the documentation check exited 0.
+  REV-18 PASS The test changes introduce no security or data-handling problem.
+  REV-19 PASS The approved part A scope and deferred parts B and C remain respected.
+  REV-20 N/A No displayed figure, fact object, provenance, or lineage behavior changes.
+  REV-21 N/A No rendered numeral, template, catalogue, or screen changes.
+  REV-22 N/A No privacy invariant or protected-data behavior changes.
+  REV-23 N/A No product or custodian import changes.
+  REV-24 N/A No bilingual view or number changes.
+  REV-25 PASS The changes contain no private path, realistic identifier, real custodian material, or secret.
+  REV-26 PASS No prohibited product claim is introduced.
+  REV-27 PASS Neither agent file changes, and the documentation check reports success.
+  REV-28 N/A No synthetic identifier is introduced.
+  REV-29 N/A No fact or attribute about a real named place is introduced.
+  REV-38 N/A No gateway or serving-plane code changes.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-11) CI evidence for this head is not independently checkable: EVIDENCE.md reports success but its run path has no run identifier; record the full successful CI-run link.
+```
+
+#### S0-T08: merge record of part A
+
+- No CI run exists on the reviewed head `57f6bc37b6a67469e0a3e4aa6748e8119f4febec`: the pull request then conflicted with its base in `PROGRESS.md`, and GitHub starts no pull-request run while a pull request cannot be merged; the workflow `docs` runs on pull requests and on pushes to main only. The evidence file of round 3 therefore held an empty run link, which both verdicts note (part 1 P2, part 3 P1). The CI run that judges this code is the one on the base-update commit below.
+- Tree proof on the approved head (ruling L-29), run by the lead on 2026-11-12 before the merge: every path of the head's tree is as in the work commit of fix round 3 `ffd672a75427283836b6e1911c01e131a3231860`, except the two ledger files; output "TREE-IS-WORK ok: 172 paths at 57f6bc37b6a67469e0a3e4aa6748e8119f4febec", exit code 0.
+- Base update: main (with S0-T10 and S0-T12) was merged into the branch, commit `be907075733266a465c70fdf5b6b4ccd9d7ac360`. Both sides had only appended to `PROGRESS.md`; the merge keeps main's block, then the branch's; `TASKS.md` merged without conflict. The lead checked the merged tree: `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `uv run --locked mypy`, `uv run --locked python scripts/check_versions.py`, `python3 scripts/check_docs.py`, `python3 scripts/check_tree.py` and `cmp AGENTS.md CLAUDE.md` exit code 0; `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` ran 273 tests, OK, once the web packages were installed (the first run, before `npm ci` in the fresh worktree, failed the 20 vitest tests of S0-T05's runner that need them, and only those); `./eii test --seed 2026111217` 953 passed, 0 failed, 0 skipped in 6 suites, RESULT: PASSED. CI on that commit: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43230887969 .
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/10 was squash-merged on 2026-11-12 at the head `be907075733266a465c70fdf5b6b4ccd9d7ac360`; merge commit `2b253e3704f2f6d1308c664f493f30134b3ba4db` on main. CI on the merge commit: workflow `docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43231067563 .
+- Proposed items of round 3: part 1 P1 (authenticating the selected executable by identity, not by closed name and arguments) is hardening for document 17, as in round 2; part 1 P2 and part 3 P1 (the run link) are answered by the first line of this record.
+- The task log of S0-T08 above is complete for part A with this record: part 2 APPROVED in round 2, parts 1 and 3 in round 3. Part B (its decision record, document 13 and its open items) follows; part C (the rows that need other tasks) after S0-T07 and S0-T11 merge.
+
+#### S0-T10: evidence for part B (pull request https://github.com/albarami/economic-investment-intelligence/pull/11 )
+
+Part B enters OI-50 to OI-53 in `OPEN_ITEMS.md`, copied exactly from the task's plan, after OI-48 and before "Change control". Builder: Cursor Composer 2.5 (Anysphere), through the Cursor command-line tool, one round; the lead compared the inserted text with the plan byte for byte. Work commit `4547953e9cce62421c47410c990fda0f48cf5b7c`; the entries below ran on `e79873fd0b0ff27ffe6b9a3684712345aec54d7e`, the work commit after its base update (main with S0-T08 merged in), whose tree differs from main in `OPEN_ITEMS.md` only.
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    e79873fd0b0ff27ffe6b9a3684712345aec54d7e
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 138 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check (TST-140) on the four new open items.
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    e79873fd0b0ff27ffe6b9a3684712345aec54d7e
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    e79873fd0b0ff27ffe6b9a3684712345aec54d7e
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical (REV-27); part B does not change them.
+```
+
+```text
+### S0-T10 — Import-boundary test
+Commit:    e79873fd0b0ff27ffe6b9a3684712345aec54d7e
+Command:   git diff --name-only 00388d65384624e0e92944bd26aaf2fd208996de...4547953e9cce62421c47410c990fda0f48cf5b7c
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "OPEN_ITEMS.md"
+Seed:      none
+Notes:     Scope of part B (TST-163): the work commit changes `OPEN_ITEMS.md` only.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
