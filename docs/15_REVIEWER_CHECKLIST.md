@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft v0.2, corrected after independent review on 2026-11-11 (see PROGRESS.md) |
-| Date | 2026-11-11 |
+| Status | Draft v0.2, corrected after independent review on 2026-11-11 (see PROGRESS.md); amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md) |
+| Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | The checklist and verdict format an independent reviewer applies to one commit before it may merge. |
 | Read first | [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md), [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md), [AGENTS.md](../AGENTS.md) |
@@ -14,6 +14,7 @@
 - The reviewer reviews exactly one commit, applies every check in sections 2 and 3, and returns APPROVED or REJECTED in the fixed format of section 4.
 - The reviewer changes no file. A REJECTED verdict always gives, for each finding, the file, the line, what is wrong and the exact fix.
 - APPROVED means no open finding. There is no "approved with comments".
+- Round 1 is the full review. A later round still answers every check but may reject only for the kinds of finding in REV-39; a check whose only defects are other points reads OPEN, and those points are proposed open items, closed before the slice gate (REV-41).
 - Evidence counts; assurances do not. A check passes only when the reviewer has seen its evidence.
 
 ## 1. Rules of the review
@@ -24,11 +25,15 @@
 | REV-02 | The review covers exactly one commit, named by its full 40-character hash, and that commit must be the head of the task's pull request. A verdict on any other commit is void. |
 | REV-03 | The reviewer changes no file: no edit, no commit, no push, no formatting fix, no baseline update. The reviewer may run commands that leave tracked files unchanged, such as `./eii test` and `python3 scripts/check_docs.py`. |
 | REV-04 | The reviewer reads, before judging: the task and its acceptance criteria in [TASKS.md](../TASKS.md), the full diff against the base branch, the evidence entries in [PROGRESS.md](../PROGRESS.md) for this commit, and the documents the task touches. |
-| REV-05 | Every check in sections 2 and 3 receives PASS, FAIL or N/A with its evidence. N/A needs one sentence saying why the check does not apply to this commit. |
-| REV-06 | One FAIL makes the verdict REJECTED. APPROVED requires every check to be PASS or a justified N/A, and no finding. A design-audit Minor, as defined in [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md) section 16, is recorded in the design audit with an owner and a target slice and is not a verdict finding. A design-audit Blocker or Major is a FAIL of that slice gate and a verdict finding. |
+| REV-05 | Every check in sections 2 and 3 receives PASS, FAIL, OPEN or N/A with its evidence. N/A needs one sentence saying why the check does not apply to this commit. OPEN marks a check whose only defects are points outside the kinds of finding that may reject (REV-39); it names the ids of its proposed open items and does not reject. |
+| REV-06 | One FAIL makes the verdict REJECTED. APPROVED requires every check to be PASS, OPEN or a justified N/A, and no finding; a commit also counts as APPROVED under REV-40. After round 1, a check is FAIL only for a finding of the kinds in REV-39. A design-audit Minor, as defined in [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md) section 16, is recorded in the design audit with an owner and a target slice and is not a verdict finding. A design-audit Blocker or Major is a FAIL of that slice gate and a verdict finding. |
 | REV-07 | Each finding must cite the check or the requirement it breaks. A preference is not a finding. A reviewer who thinks a settled decision is wrong raises it with the lead as a proposed open item, not as a finding. |
-| REV-08 | After a REJECTED verdict, the writer fixes, the lead re-runs the evidence, and the reviewer re-reviews the new commit against all checks, not only the earlier findings. |
+| REV-08 | After a REJECTED verdict, the writer fixes, the lead re-runs the evidence, and the reviewer reviews the new commit. Round 1 is the full review; in every later round the reviewer still answers every check, within the limits of REV-39. |
 | REV-09 | The verdict is posted on the pull request, and the lead copies it unchanged into [PROGRESS.md](../PROGRESS.md). |
+| REV-39 | After round 1 a review still answers every check, but a verdict finding may only be: (a) an earlier finding that is not fixed; (b) a defect in, or caused by, lines that the task's own patch changed since the commit last reviewed (changes that come only from updating the base do not count); (c) a violation of a safety check anywhere in the pull request: REV-14, REV-15, REV-18, REV-20 to REV-29, REV-38; (d) an acceptance criterion of the task that is not met. From the second confirmation review on, kind (b) no longer rejects. Every other valid point goes under PROPOSED OPEN ITEMS, outside the verdict. The brief for round 1 says so, so that everything the reviewer can find is reported in round 1. If a reviewer puts a point outside these kinds into the verdict, the lead asks an advisor once, and the advisor's ruling on the kind of the point stands. The same limits apply when a plan is reviewed again. |
+| REV-40 | Every verdict finding is fixed before the merge. If round 3 is REJECTED and the lead judges its findings valid, the findings are fixed by a stronger builder from a maker other than the reviewer's, and the same reviewer gives up to two confirmation reviews under REV-39. There is no blocked end: if the same finding is NOT FIXED twice in a row, the lead fixes it and asks the advisor to rule on that finding; if the advisor rules that it is not fixed, the lead applies the fix the advisor names and asks again. When every finding of the last verdict is fixed by the reviewer's word or the advisor's ruling, the commit counts as APPROVED. CI that stays red is handled the same way: the lead finds the cause and never weakens a check. |
+| REV-41 | Each proposed open item names the requirement it concerns and its evidence, and the lead enters every one in [OPEN_ITEMS.md](../OPEN_ITEMS.md). Each slice ends with a follow-up task before its gate, listed in [TASKS.md](../TASKS.md), with its own branch, its own pull request and a full independent review. It closes each item by a fix, or by one line saying why the item is not valid or is out of scope under REV-42; its reviewer checks every closure. Nothing is deferred out of that task, and the gate is not passed while an item is open. |
+| REV-42 | The repository's own checks (the tree check, the documentation check, the hooks, the commit guard and the CI scripts) protect against mistakes in three settings: a fresh clone, the CI runner, and a checkout used through the documented commands, including ordinary differences between machines such as personal git configuration, locale or a linked path. Outside their scope is only: someone on the same machine replacing the checker, git or a hook program; an index flag set by hand; a race by a second local process. This never covers an input whose pin, digest or checksum must be verified: dependencies, downloads, images, bundles, releases. Line-ending conversion and personal git configuration are in scope. For the generator sandbox the launcher must build and verify the documented mounts and namespaces, and the guarantee covers what the launched program can read, write and reach. A point that needs such tampering is recorded as out of scope in one line and needs no fix, unless it is already a verdict finding. |
 
 ### 1.1 Order of work
 
@@ -82,16 +87,21 @@ REVIEWER: <maker and model of the reviewer>
 CHECKS:
   REV-10 PASS <evidence>
   REV-11 PASS <evidence: command, exit code, run by>
+  REV-12 OPEN P1 <evidence>
   ...
   REV-29 N/A <why it does not apply>
   REV-38 PASS <evidence>
 FINDINGS:
-  F1 (REV-nn)
+  F1 (REV-nn; after round 1 also its kind: a, b, c or d of REV-39)
     File: <repository-relative path>
     Line: <line number or range>
     Wrong: <what is wrong, with the requirement it breaks>
     Fix: <the exact change, and the test or command that will prove it>
+PROPOSED OPEN ITEMS:
+  <none, or one item per valid point outside the verdict: P1 (REV-nn) <requirement concerned> <evidence>>
 ```
+
+In a round after the first, the block `EARLIER FINDINGS:` stands between `REVIEWER:` and `CHECKS:`, with one line per earlier finding: its number, `FIXED` or `NOT FIXED`, and the evidence.
 
 | ID | Requirement |
 |---|---|
@@ -116,7 +126,7 @@ An illustrative finding (the path and line are examples, not files of this repos
 
 | ID | Requirement |
 |---|---|
-| REV-33 | A slice review covers the slice's final commit and every gate item of that slice in [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md) section 5. Each gate item is listed in CHECKS with PASS or FAIL and its evidence, after REV-10 to REV-29 and REV-38. |
+| REV-33 | A slice review covers the slice's final commit and every gate item of that slice in [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md) section 5. Each gate item is listed in CHECKS with PASS, FAIL or OPEN and its evidence, after REV-10 to REV-29 and REV-38. The first review of a slice gate is always a full review; its later rounds follow REV-39 and REV-40. The gate is not passed while a proposed open item of the slice is open (REV-41). |
 | REV-34 | For the slice S2 gate, the reviewer personally checks 20 randomly chosen stored public figures against their sources and lists each figure, its source link and the result in the verdict. |
 | REV-35 | For the slice S5 gate, the reviewer first confirms that OI-37 is closed: a maker other than the one that last edited the privacy document reviewed the lead's last ten corrections to it (made on 2026-11-11 after the second confirmation review) and the review is recorded in PROGRESS.md. The reviewer also confirms the OI-36 layout-signal limit is stated. The reviewer adds attacks of their own to the attack suite through the lead; each new attack becomes a permanent test, and before APPROVED it must recover nothing from the protected release under both parameter sets; an attack that succeeds is a privacy defect that blocks the slice. |
 | REV-36 | For a commit that changes only documents, REV-11 is met by `python3 scripts/check_docs.py` exiting 0, and REV-20 to REV-24 may be N/A with a reason; REV-25 to REV-27 always apply. |
@@ -125,7 +135,7 @@ An illustrative finding (the path and line are examples, not files of this repos
 ## Open questions and assumptions
 
 - ASSUMPTION: the verdict is posted on the pull request and copied into PROGRESS.md by the lead (REV-09), because the owner's method needs one durable record per task and the pull request is where the commit lives.
-- ASSUMPTION: there is no "approved with comments" (REV-06), because a gate that passes with open defects is a weakened check.
+- There is no "approved with comments" (REV-06, REV-40): every verdict finding is fixed before the merge. A valid point that a later round may not reject for (REV-39), or that needs tampering outside the scope of REV-42, is not a comment on an approval: it is a proposed open item, closed by the slice's follow-up task before the gate, or recorded there as out of scope in one line (REV-41). The owner decided this on 2026-11-12 ([decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md)); it replaces the earlier assumption that every round is a full review.
 - Open items touching this document: OI-01 (recorded provider allowed while the key is absent), OI-09 (native Arabic sign-off is separate from this review), OI-13 (GitHub secret scanning and push protection), OI-14 (no run-time use of the typed-decision gateway before an approved route), OI-35 (which parameter set is exported; default A until the owner or a data owner decides, needed by the slice S1 gate), OI-36 (layout signals outside the acceptance model) and OI-37 (independent review before slice S5).
 
 ## Sources
