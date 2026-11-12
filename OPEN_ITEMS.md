@@ -807,6 +807,26 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - NEEDED: OI-80 names the two paths, or they print the meaning line.
 - CLOSED BY: S0-T15
 
+### PO-S0-07 — Planted bad anchors only in one table of the notes fixture
+
+- ID: PO-S0-07
+- TYPE: OPEN
+- RAISED BY: independent review of S0-T13 part B (Zhipu AI GLM-5.3 High), 2026-11-12, proposed item P1
+- CONCERNS: REV-15; TST-01 (planted violations of the rule `pack-cite`)
+- EVIDENCE: every planted bad anchor of `test_pack_cites` in `scripts/tests/test_reference_notes_rows.py` sits in one row of the Statements table. The earlier planted cases in the confirmation table and in the coverage table, and the missing-file case, were removed with the line form. The anchor check is called for both tables and the real notes pass through it, but a change that dropped the call for one of them would fail no planted test.
+- NEEDED: one planted bad anchor in the confirmation table, one in the coverage table, and one anchor into a missing file, each proved by the notes test modules.
+- CLOSED BY: S0-T15
+
+### PO-S0-08 — The other side of the anchor masking has no committed test
+
+- ID: PO-S0-08
+- TYPE: OPEN
+- RAISED BY: the lead, 2026-11-12, while reading the build of S0-T13 part B, and the independent review of that part (Zhipu AI GLM-5.3 High), proposed item P2
+- CONCERNS: REV-15 (the claim-word rule of the notes check)
+- EVIDENCE: `mask_verified_anchors` in `scripts/pack_anchors.py` blanks a verified anchor before the claim-word scan. The tests hold one control: a claim word inside a verified row anchor is not reported. The lead probed the other side on 2026-11-12 with the tests' own fixture: anchor-shaped text that does not verify (a row that is not in the section, an absent heading, an absent file) is not masked and its claim word is reported, and a claim word outside a verified anchor is reported. No committed test holds those cases.
+- NEEDED: the three cases of text that does not verify, and the case of a word outside a verified anchor, as committed sub-cases of the claim-word test.
+- CLOSED BY: S0-T15
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).

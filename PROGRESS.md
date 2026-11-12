@@ -8253,6 +8253,226 @@ Seed:      none
 Notes:     The work commit changes exactly the twelve paths of part B against the base (TST-163).
 ```
 
+#### S0-T13: independent review of part B: APPROVED
+
+Reviewed commit `cf5c832a1180ea7551973d5515442da8572d83f7`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/16 , with CI green on it (workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43263343201 ; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43263343209 ). Reviewer: Zhipu AI GLM-5.3 High, through the Devin command-line tool, read-only; a later round under decision record 0018 on the lines of part B. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T13 part B (pull request 16)
+COMMIT: cf5c832a1180ea7551973d5515442da8572d83f7
+REVIEWER: Devin command-line tool, GLM-5.3 High (Zhipu AI)
+EARLIER FINDINGS:
+  none open (part A: F1 to F5 FIXED and APPROVED in round 2)
+CHECKS:
+  REV-10 PASS The three acceptance criteria of S0-T13 hold at this head (Pages tables with official addresses in all six sections; READ/OBSERVED/PACK kinds with "not verified" on every PACK row; Slice S1 confirmation fields in every section — read in both notes), and part B's own duties are met: the owner's anchor rule is implemented (the check verifies each anchor in its cited file; `uv run --locked python scripts/check_reference_notes.py` exit 0, "checked 2 files, 6 libraries, 357 rows: OK"), all 164 citations are converted (ANCHORS.md, 83 distinct; the lead's script proved each notes file equals its merged text plus exactly the replacements and the two changed opening sentences; command 11 and my own search of both notes find no "line/lines <digits>" left), and the shared documents are made true (rule 44 and the information table of AGENTS.md/CLAUDE.md, README.md's count of twenty-one commands and its notes paragraph, docs/README.md's builder row and two table rows, OI-41's two sentences, OI-85 to OI-89 — each statement checked against this head). I verified the anchors semantically on a sample across every cited file: requirement IDs (PUB-17, BE-10, BE-12, BE-31, BE-32, AI-25, AI-48, AI-55, AI-57 to AI-61, TST-64, TST-152, OPS-12, DES-25, DES-45, DES-67, DES-146, FE-03, FE-04, FE-46), section rows (Technology stack "Build engine and embedded reader" and "Serving store", Model settings rows Model to Retries), numbered items (decision 0004 items 1 and 3; Compose service definition items 1, 4 and 5), sections (portable SQL subset (minimum rules), The protocol, The loader, The ledger in PostgreSQL, Stack and pins, State management, Map layers, The basemap, Layouts/presenter, Performance budgets, Open questions, The map, Sources, Deployment path (later), In brief, Model settings, Logical types, Evidence of decisions 0004 and 0006) and the task anchors TASKS.md S1-T02 and S1-T05 — each names the place that holds the statement the old line held, read in the files; the two plural citations of round 2's P4 are converted as two anchors (docs/REFERENCE_NOTES.md line 162).
+  REV-11 PASS Lead's runs recorded for this exact work commit and head (EVIDENCE.md sections 1 and 2): on work commit 452f8690 the notes check exit 0, the four notes test modules 30 passed / 0 failed / 0 skipped, `./eii test --seed 2026111221` exit 0 (1059 passed, 0 failed, 0 skipped), ruff check, ruff format --check, mypy, check_docs, check_tree, cmp AGENTS.md CLAUDE.md, check_versions all exit 0; on the head cf5c832a the same nine checks plus `./eii test --seed 2026111222` exit 0; CI green on the head: https://github.com/albarami/economic-investment-intelligence/actions/runs/43263343201 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43263343209 . Each of the seven rules A1 to A7 of rule pack-cite has one planted violation in test_pack_cites (a1 not-an-anchor refusing the old line form, a2 non-regular file, a3 requirement count, a4 heading count, a5 row label, a6 item number, a7 task heading), and the builder's red run on the unchanged check is recorded (30 tests, 293 failures, first failure the refusal of an anchor as not a line citation). The brief forbids shell commands, so I did not re-run them.
+  REV-12 PASS Recorded command 12 returns "12 [] []": the work commit changes exactly AGENTS.md, CLAUDE.md, OPEN_ITEMS.md, README.md, docs/README.md, the two notes files, scripts/check_reference_notes.py, scripts/reference_notes_parse.py and the three test-side files against base 7dd69aa, nothing under data/; the ledger commit touches only OPEN_ITEMS.md, PROGRESS.md and TASKS.md; the wider document edits are the owner-sanctioned part B scope (rule 44, README, documents index, information table, open items), recorded as OI-85.
+  REV-13 PASS The changed lines are the anchor grammar, its verification, the converted citations, refreshed document texts and ledger records; no TODO, FIXME, empty body, mock or invented figure.
+  REV-14 PASS No secret, .env, key file, real custodian record, field, file or count in the changed lines; reviewers and builders are named by maker and model only; seeds are ten digits.
+  REV-15 PASS No threshold, tolerance or lint rule is lowered and no skip or suppression comment is added; the claim-word rule keeps a planted violation for every one of the thirteen claim words and gains the control control-fast-inside-verified-anchor. The one behaviour change outside rule pack-cite — mask_verified_anchors blanks each verified anchor before the claim-word scan — does not weaken the rule: only anchors that verify are masked (a heading or row label such as "Fast mode" is the pack's wording, not a claim of the notes, and without masking the anchor rule could not be used at all), and the lead's probe (EVIDENCE.md section 4) shows anchor-shaped text that does not verify is not masked and a word outside a verified anchor is still reported, so claim words cannot be laundered through fake anchors; I see the missing committed sub-case for that other side as a follow-up item exactly as the lead proposes (P2 below), not more. The old line-form sub-cases were replaced by the plan's A1 to A7 planted violations, and the check is strictly stronger than before (anchor semantics instead of bare line existence); the remaining test-coverage point is P1 below, outside the verdict.
+  REV-16 PASS The five anchor forms and the seven rules A1 to A7 of PLAN.md section 3 are implemented exactly in scripts/reference_notes_parse.py (five fullmatch forms, refusal of the old line form by the same rule, exactly one row for a requirement ID, exactly one heading, row or item inside that section, task heading with the em dash), read line by line; pinned names are used; no workflow file changed; the module docstring and the opening lines of both notes say the check judges form only.
+  REV-17 PASS Every document the change affects is updated in the same pull request: rule 44 and the information table in both agent files, README.md (twenty-one commands, counted; the notes paragraph), docs/README.md, OI-41, OI-85 to OI-89, PO-S0-03 to PO-S0-06, the task log of S0-T13 with twelve evidence entries, and the S0-T09 closing record; `python3 scripts/check_docs.py` exit 0 on the head. The cite fields of pins.toml and the line citations inside OI-39 to OI-57 are deferred to the next change by PLAN.md section 6, within the owner's rule, which names the merged reference notes; the version check still passes on the unconverted cite fields (exit 0).
+  REV-18 PASS The check opens only the two notes files, pins.toml and the cited pack paths, as regular files (lstat, no symlink), and writes nothing; no SQL, model call or record-level data exists in the changed lines.
+  REV-19 PASS Nothing on the dropped or later lists is built, no accepted decision is removed or replaced, and the slice S0 build order is respected; the rule 44 amendment is the normal per-task command addition, not a reopened decision.
+  REV-20 N/A The change is the notes check, converted citations and documents; it introduces no fact object, release table or displayed number (every number in the notes carries a source and a date, unchanged from approved part A).
+  REV-21 N/A No screen, card, template or model prose is added; the notes are not product output.
+  REV-22 N/A No partition, parameter set, treatment, audit or custodian-plane file is touched; nothing under data/.
+  REV-23 PASS No file under product/, core/ or custodian/ changed, and `./eii test` on the head shows python-guards 377 passed, 0 failed, 0 skipped.
+  REV-24 N/A No user-facing or Arabic strings were added.
+  REV-25 PASS The changed lines hold no private path, personal name, e-mail address, run of exactly eight or eleven digits, named-product comparison or ministry mention; the documentation check exits 0 on the head.
+  REV-26 PASS No prohibited claim anywhere in the changed lines; every PACK row still says "not verified"; README.md states the check's limits ("does not check what the anchored text says, that a quotation is still on its page"); nothing claims custodian data, real-place facts, certified privacy, endorsement, a forecast or a lookup.
+  REV-27 PASS AGENTS.md and CLAUDE.md receive the identical rule 44 and information-table hunks, and `cmp AGENTS.md CLAUDE.md` exits 0 on the head (lead's run, EVIDENCE.md section 2).
+  REV-28 N/A No synthetic identifiers are introduced.
+  REV-29 N/A No fact about a real named place or business; the subjects of every row are software libraries.
+  REV-38 PASS No reference to eii_gateway, EII_DECISION_PROVIDER or JEV_PRO_API_KEY in the changed lines; the check runs offline and no run-time code was added.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-15) TST-01 planted violations of the rule pack-cite: the replacement of the line-form sub-cases also removed the only failing cases planted outside the Statements table (confirmation-line-99 and pack-cite-line-99 in the "Slice S1 confirmation" table, coverage-line-99 and row2-pack-cite-line-99 in the coverage table) and the only missing-file case (docs/nope.md); today every pack-cite planted violation (a1 to a7 of test_pack_cites) sits in one Statements row, so a regression that removes the check_cite call in check_confirmation (scripts/check_reference_notes.py lines 124-125) or check_coverage (lines 231-232), or breaks the "missing" branch of read_regular for a cited file, would not fail a planted test — the calls are present and the real notes pass through them, so this is coverage breadth beyond the plan's one planted violation per rule; add one planted bad anchor in each table (and a missing-file anchor) in the follow-up task of the slice, proved by the notes test modules.
+  P2 (REV-15) claim-word rule and the anchor masking: the lead's probe of the other side of mask_verified_anchors (anchor-shaped text that does not verify is not masked; EVIDENCE.md section 4) is not a committed test sub-case; I see it as exactly a follow-up item for the slice's follow-up task, as the lead proposes — the masking has its control (control-fast-inside-verified-anchor) and the claim-word rule keeps all thirteen planted violations — and recommend adding the probe's three non-masking cases as committed sub-cases there.
+```
+
+#### S0-T13: merge record of part B
+
+- Tree proof on the approved head (ruling L-29), run by the lead on 2026-11-12 before the review: every path of the head's tree is as in the work commit `452f8690d135b455d9577a07137d1db1e843dc35`, except the ledger files; output "TREE-IS-WORK ok: 246 paths at cf5c832a1180ea7551973d5515442da8572d83f7", exit code 0. On the same head `./eii test --seed 2026111222`: exit code 0, "total: 1059 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/16 was squash-merged on 2026-11-12 at the head `cf5c832a1180ea7551973d5515442da8572d83f7`; merge commit `55321cbf77b87295045325d99a3ff914a6ce9ce4` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43265025895 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43265025864 .
+- The task log of S0-T13 is complete with this record: part A APPROVED in review round 2 (pull request 13), part B APPROVED (pull request 16). Its two proposed items are entered by this ledger commit for the follow-up task of the slice: P1 as PO-S0-07 (planted bad anchors outside the Statements table) and P2 as PO-S0-08 (committed sub-cases for the other side of the anchor masking).
+
+#### Addition to the task log of S0-T12: the pin record cites the pack by anchors (follow-up)
+
+- Builder persona: senior platform engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic: the lead (Claude Fable 5.2) wrote a short plan with the four rules of the rule record-cite; the lead's script derived the map of the 57 cite values, and a Claude Sonnet editor the 61 replacements inside the open items, each checked by script
+- Builder maker and model: Cursor command-line tool, `grok-4.7-high` (xAI)
+- Reviewer maker and model: Antigravity command-line tool, Gemini 4 Carbon (Google), read-only (the reviewer of S0-T12's part A; a maker that neither planned nor built it)
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first with a recorded red run, one planted violation for every rule, no suppression comment, skip or weaker assertion, no secret, personal name, absolute local path or eight- or eleven-digit run in any file, and a report of only the results it saw
+- Branch: `task/S0-T12-cite-anchors`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/18
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Owner's rule of 2026-11-12, the reason for the change: the pack is cited by a stable anchor (a requirement ID or the section heading), never by line number. The rule record-cite required the line form, so the check changes with the record
+- What the lead found before the change: the cite values of pins.toml were written against the first pack; a documentation change had moved the stack table of document 02 by one line before the record merged, so its citations into that table have named the neighbouring row since then. Each anchor of the map was read from the row that the value meant in the first pack
+- Build round 1 (code and documents in the same round): red first on the unchanged check (51 tests, 353 failures: the fixture's anchors refused as not a line citation); the anchor grammar and its verification moved unchanged into scripts/pack_anchors.py; record-cite judges a cite value with it; the 57 values and the 61 replacements applied; one planted violation for each of the four rules
+- The lead's check of the build: pins.toml parses to the same rows with only the cite values changed, each equal to the map, and one comment line added; OPEN_ITEMS.md equals its merged text plus exactly the 61 replacements; every moved definition has the same text as before the move; one read of the code and test changes
+- Not changed: PROGRESS.md is a ledger, so the line numbers that its earlier entries record stay as history
+
+#### Evidence for the work commit of the follow-up `91a6834438e998e7a951d717f96f7ef0a2c7a091`
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 57 components: OK"
+Seed:      none
+Notes:     The version check on the converted pin record: every one of the 57 cite values parses as anchors and each anchor exists in its file (the owner's rule of 2026-11-12; TST-43).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The notes check passes unchanged through the shared anchor module.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_versions_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    51 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The tests of the version check: one planted violation for each of the four rules of record-cite (cite missing; not an anchor, the old line form; cited file missing; anchor not in its file).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_reference_notes_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    30 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The tests of the notes check pass without a change to their expectations: the anchor code moved unchanged.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   ./eii test --seed 2026111225
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1059 passed, 0 failed, 0 skipped
+Seed:      2026111225
+Notes:     The project's own test command with a given seed: every network-free suite.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "112 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 108 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 190 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the changed documents (the open items and the README).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The agent files are unchanged and identical.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   python3 -c "import re,sys; h=[(f,m) for f in ('pins.toml','OPEN_ITEMS.md','README.md') for m in re.findall(r'\blines? [0-9]+',open(f,encoding='utf-8').read())]; print(len(h),h[:3]); sys.exit(1 if h else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "0 []"
+Seed:      none
+Notes:     No line citation is left in pins.toml, OPEN_ITEMS.md or README.md: the search for the words line or lines followed by a number finds nothing.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    91a6834438e998e7a951d717f96f7ef0a2c7a091
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','55321cbf77b87295045325d99a3ff914a6ce9ce4...91a6834438e998e7a951d717f96f7ef0a2c7a091'],check=True,capture_output=True,text=True).stdout.splitlines(); a=set(['OPEN_ITEMS.md', 'README.md', 'pins.toml', 'scripts/check_reference_notes.py', 'scripts/pack_anchors.py', 'scripts/reference_notes_parse.py', 'scripts/tests/test_versions_git.py', 'scripts/tests/test_versions_real.py', 'scripts/tests/test_versions_record.py', 'scripts/tests/versions_support.py', 'scripts/versions_record.py']); o=[x for x in p if x not in a]; m=sorted(a-set(p)); print(len(p),o,m); sys.exit(1 if o or m or len(p)!=11 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "11 [] []"
+Seed:      none
+Notes:     The work commit changes exactly the eleven paths of the change against the base (TST-163).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
