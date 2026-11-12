@@ -143,7 +143,7 @@ Every capability below is a user-visible requirement, and version 1 builds every
 | BRF-16 | Licence cancellations over time, with bulk months flagged as an inference. | S8 Licence churn | Public |
 | BRF-17 | A row of at most six "found near" chips for typical neighbouring place categories, with the coverage note. | S9 Typical neighbours | Public |
 | BRF-18 | A coarse, protected share of where the door's workers live, with origin geography no finer than a large pooled district. | S10 Where the door's workers live | Synthetic |
-| BRF-19 | One tap produces a printable briefing pack: one A4 portrait page in the light theme, bilingual on that page (English label, Fact chip, Arabic label) so each number is printed once; a second page is used only when content overflows. Simulated values print as static dashes. The standing strip and watermark appear on every page. Every figure is traceable. | S11 Briefing pack | Inherits the classes of its facts |
+| BRF-19 | One tap produces a printable briefing pack: one A4 portrait page in the light theme, bilingual on that page (English label, Fact chip, Arabic label) so each number is printed once; deterministic content selection and layout fit everything on that one page. Simulated values print as static dashes. The standing strip and watermark appear on the page. Every figure is traceable. | S11 Briefing pack | Inherits the classes of its facts |
 
 ### 6.3 The living map
 

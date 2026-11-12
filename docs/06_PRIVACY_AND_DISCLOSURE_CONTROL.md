@@ -57,8 +57,8 @@ the assistant attacks. Slice S10 builds the scene of section 16.
 | Party | Sees | Never sees |
 |---|---|---|
 | Custodian plane (offline build) | synthetic records in the vault, linkage tokens, keys, true values; both candidate protected table sets | nothing is kept: the vault and the unselected protected table set are deleted when the build ends |
-| Product plane (serving) | one selected release: frame tables, treated statistics, public and simulated tables, control tables, aggregate survival and attack results for both sets, signed reports | a record, a token, a key, a true value, the unselected protected table set |
-| Model | tool results for the current question: facts built from treated statistics, public figures and simulated estimates, with statuses, reason codes and the snap report | a record, a table, a withheld value (none exists) |
+| Product plane (serving) | one selected release: frame tables, treated statistics, the named synthetic firm list of PRV-125, public and simulated tables, control tables, aggregate survival and attack results for both sets, signed reports | a record, a token, a key, a true value, the unselected protected table set |
+| Model | tool results for the current question: facts built from treated statistics, public figures and simulated estimates, with statuses, reason codes and the snap report | a record, a firm-list row or any field of one, a table, a withheld value (none exists) |
 | Company seat | its own questions and briefs | another company's questions or briefs |
 | Oversight seat | the question ledger without company identity; what was sent to the model | a record; a company's identity |
 
@@ -286,10 +286,12 @@ Every work-side marginal therefore belongs to the workplace family and every hom
 the residence family. Residuals between the two contributor universes are audit targets under PRV-40
 and section 10.
 
-`month_change` is the cohort table of each protected table
-([03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) DAT-137). Its rows for a table are stored on that
-table's own partitions (for `home_area_share`, on the work units of `ha_work_count`), so it adds no
-partition and no unit. Section 6.1 defines its additive families.
+`month_change` holds, for each published unit of each protected table and each pair of adjacent
+months, the month mark of PRV-123, and cohort counts for three tables only
+([03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) DAT-137): stayers, joiners and leavers for
+`resident_pay` and `worker_pay`, and openings and closures for `outlet_register`. Its rows for a
+table are stored on that table's own partitions (for `home_area_share`, on the work units of
+`ha_work_count`), so it adds no partition and no unit. Section 6.1 defines its additive families.
 
 | ID | Requirement |
 |---|---|
@@ -383,23 +385,33 @@ wage-bill leaves. Category totals, side totals and home-by-work marginals follow
 `other` is a treated leaf only where pooling occurred. No two treated leaves of one family overlap,
 and no equality is required between different tables, partitions, measures or breakdowns.
 
-Each additive family of `month_change` is one described table, partition, measure and pair of
-adjacent months, with breakdown `cohort`. Its mutually exclusive leaves on each unit are the
-stayers, joiners and leavers of that unit (for `outlet_register`, its openings and closures). Each
-is a treated count leaf (PRV-44), and the family stores no total. Stayers plus joiners reach the
-later month's `ALL` count of the described table through another family, and stayers plus leavers
-the earlier month's; PRV-71 pairs those routes.
+`month_change` has additive families for three described tables only, the ones whose rows DAT-137
+lets hold cohort counts. Each family is one described table, partition, measure and pair of
+adjacent months, with breakdown `cohort`. For `resident_pay` and `worker_pay` its mutually
+exclusive leaves on each unit are the stayers, joiners and leavers of that unit; for
+`outlet_register` they are the unit's openings and closures. Each is a treated count leaf
+(PRV-44), and the family stores no total. For `resident_pay` and `worker_pay`, stayers plus
+joiners reach the later month's `ALL` count of the described table through another family, and
+stayers plus leavers the earlier month's; PRV-71 pairs those routes. Openings and closures, beside
+which no stayers are released, reach no count of another family and form no route pair.
 
-An empty cohort, a released component (stayers, joiners or leavers; openings or closures) that
-counts nobody for a unit and pair of months, is a count of zero, which is below every count
-threshold. It fails its cohort tests exactly like a non-empty cohort below its threshold, with the
+The `month_change` rows of `occupation_pay` and `home_area_share` are status-only carry-forward
+markers: each holds the month mark of PRV-123 and no cohort count, and they form no additive family.
+Their changed cohorts (joiners, leavers, movers and contributors whose employer group, band or
+category changed) are latent cohorts all the same: no component releases them, so PRV-56 tests
+each of them that is not empty, as the next paragraph sets out, and PRV-113 item 11 models them.
+
+An empty cohort, a released component (stayers, joiners or leavers of `resident_pay` or
+`worker_pay`; openings or closures of `outlet_register`) that counts nobody for a unit and pair of
+months, is a count of zero, which is below every count threshold. It fails its cohort tests
+exactly like a non-empty cohort below its threshold, with the
 same consequence: the row and its containing units are carried forward as PRV-56 requires for a
 failing cohort. A published `month_change` row therefore never holds an empty cohort: an empty
 cohort is never shown as zero, and never as a withheld value on a published row, and no route pair
 of PRV-71, which pairs only leaves that show atoms of the same month, holds one. A changed cohort
-that no component releases on its own (movers, and contributors whose employer group, band or
-category changed) is tested when it is not empty, as PRV-113 item 11 does (ASSUMPTION 35;
-[03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) DAT-137).
+that no component releases on its own (movers, contributors whose employer group, band or category
+changed, and every changed cohort behind a status-only row) is tested when it is not empty, as
+PRV-113 item 11 does (ASSUMPTION 35; [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) DAT-137).
 
 The release does not use one joint treatment basis crossing geography, housing, occupation, side
 class, net band and basic band: that cross-classification would put almost every leaf below the
@@ -429,7 +441,7 @@ three wide ranges, which is the detail those precedents publish.
 | PRV-26 | Band merging, per unit and measure: a band row is joined to a neighbour when it holds fewer than five earners in any month (none included), or fails minimum groups, largest-group, top-two or insider removal on its earners, or a wage-bill test where it carries wage bill (ASSUMPTION 10). Scan from the top band down; a failing row joins the band below; a failing lowest row joins the band above; recompute the merged population and repeat until every row passes or one row is left. The largest-group cap is 40% (A) or 30% (B), and the earners outside any one employer group must number at least `min_earners_count`. |
 | PRV-27 | A unit left with a single band row fails the tier. Every remaining band and category atom, not only the unit total, must pass the minimum-group, largest-group, top-two and insider-removal tests. |
 | PRV-28 | At a `quartile` unit, the coarse boundaries that every `money` unit inside it kept are fixed first, and any other coarse boundary is dropped. Fine bands are then merged only between the fixed boundaries. So the fine rows of a unit never give a figure that one of its `money` units had merged away (ASSUMPTION 11). |
-| PRV-29 | Inside one additive family, every stored `ALL` or `all` row, merged band range, municipality total, national total and area sum is the exact arithmetic sum of that family's treated leaves and receives no second treatment or rounding. Where a family has no breakdown, the `ALL` row is its one treated leaf. `other` is an explicit treated leaf. A `month_change` family stores no total: an area's cohort is the exact sum of its units' treated cohort leaves. No value is obtained by subtraction, and no equality is required or claimed between different families. |
+| PRV-29 | Inside one additive family, every stored `ALL` or `all` row, merged band range, municipality total, national total and area sum is the exact arithmetic sum of that family's treated leaves and receives no second treatment or rounding. Where a family has no breakdown, the `ALL` row is its one treated leaf. `other` is an explicit treated leaf. A `month_change` family exists only for `resident_pay` and `worker_pay` (stayers, joiners and leavers) and for `outlet_register` (openings and closures), and stores no total: an area's cohort is the exact sum of its units' treated cohort leaves. A `month_change` row of `occupation_pay` or `home_area_share` is a status-only month mark: it stores no cohort count and belongs to no family (DAT-137). No value is obtained by subtraction, and no equality is required or claimed between different families. |
 
 ### 6.2 Derived statistics
 
@@ -509,7 +521,7 @@ perturbation [S2] [S13]. Margin-preserving rounding follows.
 |---|---|
 | PRV-42 | Record key: `basis` is exactly `residence`, `workplace` or `register`. The contributor value is respectively the person token, canonical JSON `[person_token,employer_group_token]`, or the establishment token. That array has this order, no insignificant whitespace, and JSON string escaping; it is encoded as UTF-8. The HMAC message is the UTF-8 encoding of `basis + ":" + contributor value`. `rk` is the first four digest bytes of `HMAC-SHA-256(treatment_key, message)`, read as an unsigned big-endian integer. `ck` is the sum of `rk` over the leaf atom's distinct contributors, modulo 2^32. There is one term per distinct contributor, never one per contributor-month. |
 | PRV-43 | Draws: `ck` is written as unsigned decimal with no sign, padding or whitespace. The SHA-256 message is the UTF-8 encoding of that decimal text, `:`, and `purpose`. `u(purpose)` is the first four digest bytes read as an unsigned big-endian integer and divided by 2^32. The only purposes are `A:count` and `A:money`, or `B:count` and `B:money`, matching the candidate parameter set. The parameter-set identifier is therefore in every purpose. These serialisations are versioned by `rules_version_id`; changing any byte rule is a treatment-code change under PRV-120. |
-| PRV-44 | Every count leaf (unit counts where unsplit, band leaves, category leaves, joint home-by-work leaves, side counts, outlet counts, and the cohort counts of `month_change`: stayers, joiners, leavers, openings and closures; an empty cohort is never a leaf, because it fails its cohort tests and its row is carried forward, section 6.1): add `d`, which is −2, −1, 0, +1 or +2 as `u(<set>:count)` falls below 0.05, 0.25, 0.75, 0.95 or 1; then round to the nearest multiple of 5 (A) or 10 (B), halves up. A stored count leaf is never below its rounding base (ASSUMPTION 15). |
+| PRV-44 | Every count leaf (unit counts where unsplit, band leaves, category leaves, joint home-by-work leaves, side counts, outlet counts, and the cohort counts of `month_change`: stayers, joiners and leavers of `resident_pay` and `worker_pay`, and openings and closures of `outlet_register`, the only tables whose rows hold them (DAT-137); an empty cohort is never a leaf, because it fails its cohort tests and its row is carried forward, section 6.1): add `d`, which is −2, −1, 0, +1 or +2 as `u(<set>:count)` falls below 0.05, 0.25, 0.75, 0.95 or 1; then round to the nearest multiple of 5 (A) or 10 (B), halves up. A stored count leaf is never below its rounding base (ASSUMPTION 15). |
 | PRV-45 | Wage-bill leaves, including the two stayer wage bills behind each `stayer_wage_index` of `month_change`, which are treated here but never released (PRV-55): multiply by `1 + (2 * u(<set>:money) - 1) * delta`, with `delta` 0.02 (A) or 0.03 (B) read from rule `money_delta`; then round to the nearest QAR 100 (A) or 500 (B), halves up (ASSUMPTION 15). |
 | PRV-46 | Treatment is applied once per mutually exclusive leaf of one additive family, at build time. Only that family's treated leaves and exact derived totals are written. A leaf in another table, partition, measure or breakdown belongs to another family and receives its own treatment; equality across families is neither required nor claimed. A true value, key, cell key or draw must not appear in a release, log or report. |
 | PRV-47 | The engine uses no wall-clock time and no unseeded randomness. Two builds from the same inputs and keys give byte-identical protected tables. |
@@ -523,11 +535,14 @@ Why identical questions return identical answers: an answer depends only on the 
 stored atoms. Nothing is drawn at run time, and nothing depends on who asks, in which language, or
 what was asked before.
 
-No audit acceptance result in this document leans on perturbation or rounding. The attacker-view
-model fixes each published protected leaf to its untreated monthly aggregate after checking declared
-attacker knowledge against sealed truth. PRV-114's outer intervals are used only by the treatment
-consistency audit and movement predicates. Small differences between families are permitted
-only within the bound of PRV-71.
+No audit acceptance result in this document leans on the perturbation or rounding of a published
+leaf. The attacker-view model fixes each published protected leaf to its untreated monthly
+aggregate after checking declared attacker knowledge against sealed truth. The one released value
+computed from unreleased treated values, `stayer_wage_index`, is modelled as released: as the
+rounded ratio of two treated and rounded stayer bills held as latent variables, never as a sealed
+untreated ratio (PRV-113 item 4), because no published leaf holds those bills. PRV-114's outer
+intervals are used only by the treatment consistency audit and movement predicates. Small
+differences between families are permitted only within the bound of PRV-71.
 
 ## 8. What subtraction returns
 
@@ -604,7 +619,7 @@ its rounding interval (PRV-114), not an exact count.
 | PRV-63 | Version 1 releases no protected fact about a single firm, establishment, owner or person: no pay, wage bill, headcount, flag, group or owner link. The one firm-level release is the named synthetic firm list of PRV-125, with its four fields only. No tool returns a row that describes a person, or a firm's pay, wage bill or headcount. A request for one returns `OUT_OF_SCOPE` with reason `NO_FIRM_OR_PERSON_FACTS`. |
 | PRV-64 | `outlet_register` holds mutually exclusive activity-class × size-band leaves, `no_payroll` included, for the activity classes that the rules version lists (adding one needs a new rules version and a full re-audit, PRV-34), all on `or_register_count`. An establishment is counted once, under its primary activity. Every non-empty joint leaf, every activity-class leaf and every size-band leaf must have at least 5 (A) or 10 (B) unrelated employer groups, largest-group and top-two shares within the caps, and at least `min_groups_count` unrelated groups after any one group is removed. If any category leaf fails, the geographic unit merges; there are no activity-specific partitions and no separately dropped register rows. Every outlet total inside its activity-by-size additive family is the exact sum of that family's treated leaves (ASSUMPTION 19). |
 | PRV-65 | A real named place or business (from public listings or public places data, a named public venue with published visitor counts, or an FDI project) carries Public facts only. No protected or Simulated figure is attached to it or computed for its footprint alone, and none is joined to a synthetic firm ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)). |
-| PRV-125 | Named synthetic firm lists ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)). A list entry is one synthetic establishment and shows only its fictional name (SYN-20), its activity class, its size band and, as its area, the published `or_register_count` unit that holds it, with the Synthetic mark. It never shows the firm's wages, wage bill, headcount, employer group, legal entity, owner, staff, opening or closing month, address, cell or point, and the firm is never drawn as a named point. A list exists only for a published unit of `or_register_count` and one activity class that the rules version lists, whose leaves passed PRV-64 in every month; a list for a unit or leaf that fails the minimum or dominance tests is withheld with its reason, and a remainder follows PRV-14. Lists exist only on that one register partition, so no list is the difference of two others. A list describes the last month of the window only, so no firm's change between months can be read from lists. A list exists only where the unit's `outlet_register` atoms shown for the last month are that month's own; where they are carried forward under PRV-56, the list is withheld with the reason `CARRIED_FORWARD`. A size band is shown only where its staff range is wider than `audit_headcount_width` of the candidate set; a narrower band is joined to the next larger band until the joined range is wider (ASSUMPTION 32). A ranking, fit or order of listed firms is the output of tested code over the list fields, Public inputs such as free-flow drive time, and the user's typed criteria and weights ([03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) DAT-145, [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md) MTH-71); no protected or Simulated area figure is a criterion. It is shown with its criteria and its rank-stability sentence, and it never uses, orders by or breaks a tie by a firm's wages, wage bill, headcount, group or any other unreleased value. Names are drawn independently of employer group, legal entity, pay and headcount, so that no name shows that two establishments share a group, and no name matches the canary or synthetic identifier patterns of PRV-102 and PRV-103. A list for a drawn or travel-time area is the union of the lists of the units it snaps to (PRV-18). The list fields are attacker knowledge in the attacker-view audit (PRV-113 item 12), and the firm-list attacks of PRV-76 must recover nothing. |
+| PRV-125 | Named synthetic firm lists ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)). A list entry is one synthetic establishment and shows only its fictional name (SYN-20), its activity class, its size band and, as its area, the published `or_register_count` unit that holds it, with the Synthetic mark. It never shows the firm's wages, wage bill, headcount, employer group, legal entity, owner, staff, opening or closing month, address, cell or point, and the firm is never drawn as a named point. A list exists only for a published unit of `or_register_count` and one activity class that the rules version lists, whose leaves passed PRV-64 in every month; a list for a unit or leaf that fails the minimum or dominance tests is withheld with its reason, and a remainder follows PRV-14. Lists exist only on that one register partition, so no list is the difference of two others. A list describes the last month of the window only, so no firm's change between months can be read from lists. A list exists only where the unit's `outlet_register` atoms shown for the last month are that month's own; where they are carried forward under PRV-56, the list is withheld with the reason `CARRIED_FORWARD`. A size band is shown only where its staff range is wider than `audit_headcount_width` of the candidate set; a narrower band is joined to the next larger band until the joined range is wider (ASSUMPTION 32). A ranking, fit or order of listed firms is the output of tested code over the list fields, Public inputs such as free-flow drive time, and the user's typed criteria and weights ([03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) DAT-145, [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md) MTH-71); no protected or Simulated area figure is a criterion. It is shown with its criteria and its rank-stability sentence, and it never uses, orders by or breaks a tie by a firm's wages, wage bill, headcount, group or any other unreleased value. Names are drawn independently of employer group, legal entity, pay and headcount, so that no name shows that two establishments share a group, and no name matches the canary or synthetic identifier patterns of PRV-102 and PRV-103. Each row carries a released key ([03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) DAT-140): a visibly synthetic `SYN-E-` identifier from a sequence of the release's own, drawn like the name independently of the vault identifier, employer group, legal entity, pay and headcount, and never equal to an identifier of the vault. The key stays in the release and the serving stores: no API response, model payload, egress record, ledger row, log or export carries it (PRV-72, PRV-103). The application renders the list's rows deterministically as evidence, and no row or field of one enters a model request or an egress record ([02_ARCHITECTURE.md](02_ARCHITECTURE.md) ARC-73). A list for a drawn or travel-time area is the union of the lists of the units it snaps to (PRV-18). The list fields are attacker knowledge in the attacker-view audit (PRV-113 item 12), and the firm-list attacks of PRV-76 must recover nothing. |
 | PRV-66 | Oversight roll-ups of questions are statistics about companies. They show no company identity and only groups of at least the distinct-organisation minimum of open item OI-08. |
 
 ## 10. Audits that gate a release
@@ -620,8 +635,8 @@ attacker-view audit is evidence under the stated model, not a general non-disclo
 | PRV-68 | Exhaustive structural closure proof and fuzz regression (section 8). | any assertion of PRV-111 or PRV-51 fails, or fewer than 10,000 pairs ran for any release and parameter set |
 | PRV-69 | The one attacker-view acceptance model of PRV-112 to PRV-116, run once per target class against every protected table of the candidate release, both parameter sets' released survival values, every row and source in the signed public-total inventory, and every verified local, insider and colluder fixture. Its variables cover every month of the window, with the adjacent-month identities of PRV-113 item 11 and every published firm list (item 12); no variable crosses into another window. | a knowledge fixture disagrees with sealed truth; a published-leaf exact aggregate, attacker-knowledge, published-means-passed, survival or public-total constraint is absent or violated; any applicable inventory entry is absent or not enabled; any target is recovered under PRV-116; any directly computed positive home-area or applicable public count residual is below `min_earners_count`; the base model is infeasible; a solve has an unaccepted status; the measured time budget is exceeded; or any observable release field required by this model is omitted |
 | PRV-70 | Group disclosure: every published band set has at least two rows; every band, category and side leaf passes PRV-24; every split satisfies PRV-35; no treated leaf has a true value of zero. | any of these is false |
-| PRV-71 | Treatment consistency, separate from acceptance: the build enumerates every family route and deterministically pairs all routes with the same contributor universe, month, primitive and source-population selector after expanding geography and pooled categories. For each unit, described table, measure and pair of adjacent months, the stayers plus joiners of `month_change` are a route to the later month's `ALL` earner count and the stayers plus leavers a route to the earlier month's, paired in the same way. The two treated stayer wage bills behind a `stayer_wage_index` are wage-bill leaves of this check; no other family holds the stayers' wage bill, so they form no route pair (PRV-55). A leaf carried forward under PRV-56 is checked against the untreated aggregate of the month whose atoms it repeats, and a cross-family route pair is formed only between leaves that show atoms of the same month. Every within-family total equals the exact sum of its treated leaves; every treated count and wage-bill leaf contains its untreated aggregate in the PRV-114 outer interval; and every enumerated cross-family pair is checked by the count or wage-bill bound in section 10.3. The report lists every family, pair, leaf count and bound; its pair count must equal the independently recomputed Cartesian grouping by those four keys. | a route or pair is missing or extra; a within-family margin differs; an untreated leaf lies outside its outer interval; an absolute cross-family route difference exceeds its formula bound; a margin is negative; or a row references a unit outside its partition or family |
-| PRV-72 | Release scan: search both candidate protected table sets, the selected release, manifests and reports, the built web bundle, logs and recorded model payloads for vault tokens, synthetic identifiers, canary markers and each canary's exact pay value. | one hit |
+| PRV-71 | Treatment consistency, separate from acceptance: the build enumerates every family route and deterministically pairs all routes with the same contributor universe, month, primitive and source-population selector after expanding geography and pooled categories. For each unit and measure of `resident_pay` or `worker_pay` and each pair of adjacent months, the stayers plus joiners of `month_change` are a route to the later month's `ALL` earner count and the stayers plus leavers a route to the earlier month's, paired in the same way. `month_change` forms no other route: the openings and closures of `outlet_register` reach no count of another family, and the status-only rows of `occupation_pay` and `home_area_share` hold no cohort (section 6.1, DAT-137). The two treated stayer wage bills behind a `stayer_wage_index` are wage-bill leaves of this check; no other family holds the stayers' wage bill, so they form no route pair (PRV-55). A leaf carried forward under PRV-56 is checked against the untreated aggregate of the month whose atoms it repeats, and a cross-family route pair is formed only between leaves that show atoms of the same month. Every within-family total equals the exact sum of its treated leaves; every treated count and wage-bill leaf contains its untreated aggregate in the PRV-114 outer interval; and every enumerated cross-family pair is checked by the count or wage-bill bound in section 10.3. The report lists every family, pair, leaf count and bound; its pair count must equal the independently recomputed Cartesian grouping by those four keys. | a route or pair is missing or extra; a within-family margin differs; an untreated leaf lies outside its outer interval; an absolute cross-family route difference exceeds its formula bound; a margin is negative; or a row references a unit outside its partition or family |
+| PRV-72 | Release scan: search both candidate protected table sets, the selected release, manifests and reports, the built web bundle, logs and recorded model payloads for vault tokens, synthetic identifiers, canary markers and each canary's exact pay value. The one synthetic identifier a release may hold is the released key of a listed firm in the `firm_key` column of `firm_list` ([03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) DAT-140), which the scan compares with every identifier of the vault. | one hit, a released firm key outside that column included, or a released firm key equal to an identifier of the vault |
 | PRV-73 | Typed attack suite (below). | any controls-on predicate is recovered under either parameter set, or a controls-off release predicate is not recovered |
 
 ### 10.1 Attacker-view inputs and truth separation
@@ -713,19 +728,53 @@ classes: target employer group, insiders and colluders.
    sum(R matching register leaf l) = A_register[l,m]
    ```
 
-   For every published `month_change` component `l` (the stayers, joiners, leavers, openings or
-   closures of one unit, described table, measure and pair of months `m` and `m+1`), let
-   `A_cohort[l,m]` be its sealed untreated count; for every published `stayer_wage_index` `l`, let
-   `I[l,m]` be its sealed untreated value before rounding. The stayer wage variables of a month are
-   the stayers' wage sums in that month (item 11). Then:
+   For every published `month_change` component `l` (the stayers, joiners or leavers of one unit
+   and measure of `resident_pay` or `worker_pay`, or the openings or closures of one
+   `outlet_register` unit, for a pair of months `m` and `m+1`), let `A_cohort[l,m]` be its sealed
+   untreated count. The status-only rows of `occupation_pay` and `home_area_share` add no equality
+   here; their changed cohorts enter through item 11. Then:
 
    ```text
    sum(cohort variables matching published month_change component l, months m and m+1) = A_cohort[l,m]
-   100 * sum(stayer wage variables of l, month m+1) = I[l,m] * sum(stayer wage variables of l, month m)
    ```
 
-   The second equality is linear, because `I[l,m]` is a constant. A merged band sums its member
-   joint-band cells. A category leaf sums its source category;
+   For every published `stayer_wage_index` `l` of one unit and measure `q` between months `m` and
+   `m+1`, let `J[l]` be its released value, a multiple of 0.5, and `Sw[l,t]` the sum of the stayer
+   wage variables of measure `q` in month `t` (item 11). The model holds the released value only:
+   no sealed stayer wage bill, treatment draw or untreated ratio enters it. It models the index as
+   PRV-55 computes it. Both stayer bills have the same contributors and so one treatment factor
+   (ASSUMPTION 17); each was rounded half-up to a multiple of the `round_money` base `r`; and the
+   index is 100 times the ratio of the two rounded bills, rounded half-up to half a point. The
+   latent variables are the integers `k[l,t] >= 1`, so that `r * k[l,t]` is the treated and
+   rounded bill of month `t`; one continuous `g[l]` between `1 / (1 + delta)` and
+   `1 / (1 - delta)`, the reciprocal of the shared factor, with `delta` the `money_delta` value of
+   the candidate set; and the rounding remainders `e[l,t]`, in untreated units. For `t` in
+   `{m, m+1}`:
+
+   ```text
+   Sw[l,t] = r * g[l] * k[l,t] + e[l,t]
+   -(r / 2) * g[l] <= e[l,t] <= (r / 2) * g[l]
+   (4 * J[l] - 1) * k[l,m] <= 400 * k[l,m+1] <= (4 * J[l] + 1) * k[l,m] - 1
+   ```
+
+   The first two lines are the money treatment and half-up rounding of PRV-45 written in untreated
+   units; the third is the half-point rounding of the index, exact because both sides are
+   integers. Each product `g[l] * k[l,t]` is written exactly in linear form: `k[l,t]`, which the
+   unit's fixed wage-bill aggregates bound, is expanded into binary digits, and the product of
+   `g[l]` with each digit uses the four standard bounds of a bounded continuous variable times a
+   binary variable. This is an exact reformulation, not a relaxation (PRV-121).
+
+   Example (set A, invented values). The shared factor turns the two stayer bills into QAR 202,049
+   and QAR 202,550 before rounding. Because the factor is shared, 100 times their ratio, 100.248,
+   is also 100 times the untreated ratio, and it would round to 100.0. Rounded to QAR 100 the
+   bills become QAR 202,000 and QAR 202,600; 100 times their ratio is 100.297, and the released
+   index is 100.5. The factor is the same for both bills: only the two rounding remainders, minus
+   49 and plus 50, move the index. A regression fixture holds these values: the base model with
+   the true stayer bills is feasible under the released 100.5; a model that applies the
+   half-point interval of the index to the untreated bills is infeasible, because 100.248 lies
+   outside it; and a model that holds the untreated ratio fails the sealed-value check of PRV-112.
+
+   A merged band sums its member joint-band cells. A category leaf sums its source category;
    `other` sums only the categories assigned by the released layout. A joint `home_area_share` leaf
    sums matching work cells and home cells. Derived `ALL`, `all`, parent-band, area, municipality,
    national and marginal rows add no equation unless they are the one treated leaf of a
@@ -809,20 +858,53 @@ classes: target employer group, insiders and colluders.
     their origin leaf and joiners of their destination leaf; the stayers of each leaf are a further
     cohort count with their wage sums in each month; and the later month's variables equal the
     earlier month's after those cohorts. The `month_change` equalities of item 4 are included
-    for every published component and every published `stayer_wage_index`. For every change that the
-    release shows, each non-empty changed cohort satisfies the linear tests of item 6. A unit and
-    tier carried forward add no equality for the later month; their variables still satisfy items 6
+    for every published component, and its latent stayer-bill constraints for every published
+    `stayer_wage_index`; the changed cohorts of the status-only rows of `occupation_pay` and
+    `home_area_share` enter only through these identities. For every change that the release
+    shows, each non-empty changed cohort satisfies the linear tests of item 6. A unit and tier
+    carried forward add no equality for the later month; their variables still satisfy items 6
     and 7, and the next comparison runs from the month the release shows. Successive windows add a
     window index only in a deployment ([17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md)).
-12. **Published firm lists.** For every firm in a published list (PRV-125), the model fixes its
-    listed unit, activity class and month and adds a non-negative integer staff variable bounded by
-    the range of its released, possibly joined, size band, with no upper bound for the open top band.
-    Each listed firm belongs to exactly one contribution class: the target employer group's class
-    where the scenario label says so, an insider or colluder class where a verified fixture says so,
-    and the aggregate class otherwise. Its staff enter that class's register and workplace variables
-    of its unit through the contract definition of the size band
-    ([03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md)). The list adds no group membership to the
-    aggregate class: the hidden group never leaves the vault.
+12. **Published firm lists.** For every firm `f` of a published list (PRV-125), with listed unit
+    `U_f`, activity class `a_f`, released size band `s_f` (possibly joined) and the list's month
+    `m*`, the last month of the window, the model adds latent variables for that one establishment
+    and links their sums to the aggregate variables of item 1. `f` belongs to exactly one
+    contribution class `h_f`: the target employer group's class where the scenario label says so,
+    an insider or colluder class where a verified fixture says so, and the aggregate class
+    otherwise. The list adds no group membership to the aggregate class: the hidden group never
+    leaves the vault.
+
+    - *Register location only.* The listed unit fixes where `f` is registered and nothing more:
+      binary variables `x_f[c,s]`, one for each base cell `c` of `U_f` and each contract size band
+      `s` inside `s_f`, sum to one, and `f` is one of the establishments that
+      `R[c,m*,h_f,(a_f,s)]` counts where `x_f[c,s] = 1`. At every register tuple the listed firms
+      that select it number at most `R`, and exactly `R` where their list holds every
+      establishment of its unit and activity class.
+    - *Jobs.* `f`'s jobs in month `m*` are latent non-negative integer counts by worksite
+      (located, deployed elsewhere or unknown) and by pay class (eligible, with a net and a basic
+      band index, or not), and every eligible count has its own net and basic wage variables. Which
+      worksite, category and bands a job has stays latent: the list fixes no workplace location
+      and no deployed status (PRV-61, PRV-62). Each job is part of exactly the aggregate variables
+      that the contracts put it in, with class `h_f` and the same categories, bands and wages. In
+      particular, at the cell where `f` is registered, a located eligible job is part of a
+      `workplace` variable `N` and its wages part of `W_net` and `W_basic`, a located job that is
+      not eligible is part of an `irregular` side variable `S`, and a deployed job is part of the
+      `deployed_elsewhere` side variable `S` and of no `workplace` wage variable (DAT-33); a job of
+      unknown worksite is part of no `workplace` variable; and the job that DAT-04 attaches to its
+      person is also part of the `residence` variable at the person's home cell. At every tuple
+      the parts of the listed firms and one remainder part for all other contributors add up to
+      the aggregate variable, every part satisfies the band bounds of item 2 on its own, and every
+      `workplace` part of `f` is zero at a cell where `f` is not registered.
+    - *Target expressions.* `listed_firm_headcount` and `listed_firm_pay` of PRV-116 read only
+      these sums, in month `m*`:
+
+      ```text
+      n_f    = the jobs of f that the contract counts for its size band, inside the staff range of the
+               size band that x_f selects (no upper bound for the open top band)
+      E_f    = the eligible jobs of f
+      V_f[q] = the sum of the wage variables of measure q over the eligible jobs of f, wherever they
+               enter, for q in {net, basic}
+      ```
 
 | ID | Requirement |
 |---|---|
@@ -928,8 +1010,8 @@ checked only after the attacker-view optimisation has produced its result.
 | `hidden_group_dominance` | Whether a scenario-labelled hidden group supplies more than half of a scenario-labelled population's earners, establishments or wage bill. Recovered only when TRUE is forced and sealed truth is TRUE (ASSUMPTION 26). | TRUE is not forced |
 | `band_or_category_residual` | The count or wage bill of a band range merged away, a withheld side count, or a withheld category within an explicit `other` leaf. A published leaf's own total is not a residual target. It scores withheld values only: a null `not_measured_count` or `deployed_elsewhere_count` on a published unit means nobody by design (PRV-39), is not a withheld side count and is not counted as recovered. Recovered under the corresponding headcount or wage interval rule and a truth match. | interval wider than the applicable bound or truth outside it |
 | `month_change_residual` | The count or wage bill of one changed cohort of a published leaf between two adjacent months of the window: its joiners, its leavers, its movers, or its contributors whose employer group, band or category changed. A cohort value that `month_change` publishes is not a residual target. Recovered under the corresponding headcount or wage interval rule and a truth match. | interval wider than the applicable bound or truth outside it |
-| `listed_firm_headcount` | A scenario-labelled listed firm's own staff count in the list's month, with every released list field as attacker knowledge. Recovered when the interval width is at most `audit_headcount_width` and the interval contains sealed truth; a released size band no wider than that bound is itself a recovery. | width greater than the bound or truth outside it |
-| `listed_firm_pay` | For the same firm and one measure: its own wage bill, recovered when the relative interval width is at most `audit_wage_relative_width` and the interval contains sealed truth; or the pay band of its mean wage, recovered when exactly one released band range is feasible and contains sealed truth. | relative width greater than the bound, at least two feasible ranges, or truth outside |
+| `listed_firm_headcount` | A scenario-labelled listed firm's own staff count in the list's month: the target expression `n_f` of PRV-113 item 12, minimised and maximised with every released list field as attacker knowledge. Recovered when the interval width is at most `audit_headcount_width` and the interval contains sealed truth; a released size band no wider than that bound is itself a recovery. | width greater than the bound or truth outside it |
+| `listed_firm_pay` | For the same firm and one measure `q`: its own wage bill, the target expression `V_f[q]` of PRV-113 item 12, minimised and maximised, recovered when the relative interval width is at most `audit_wage_relative_width` and the interval contains sealed truth; or the pay band of its mean wage `V_f[q] / E_f`, for which each coarse band range of PRV-25 (ASSUMPTION 36), from band `b1` to band `b2`, is tested by a solve conditioned on `E_f >= 1` with `L(b1) * E_f <= V_f[q] <= U(b2) * E_f` (item 2's band bounds; no upper inequality for B05 to B12), recovered when exactly one range is feasible and contains sealed truth. | relative width greater than the bound, at least two feasible ranges, or truth outside |
 | `home_area_residual` | Any complement of PRV-40, including a municipality residence total against its `home_area_share` column sum and a work-unit total against its row sum. It scores withheld values only: a complement of zero, which PRV-40 lets stand beside published rows, is shown by design and is not counted as recovered. Recovered when the count interval is at most `audit_headcount_width` and contains truth. | wider interval; separately, no actual positive residual below `min_earners_count` |
 | `public_coverage_residual` | An enabled public-total equation's uncovered or unpublished population, including a public zone total minus the sum of the model's untreated aggregates for the published protected leaves mapped to that zone. Recovered when the count interval is at most `audit_headcount_width` and contains truth. | wider interval; no directly computed positive residual below `min_earners_count` |
 | `mobility_residual` | A suppressed presence or flow group, or an incomplete presence or OD marginal, in expanded units. Recovered only when both bounds are finite, their width is at most the `round_movement` base (for a value kept as an index, a score-equivalent width of 0.0001) plus twice `outward_bound`, and the interval contains sealed truth. PRV-59's absence of a total leaves the suppressed residual unbounded unless another declared constraint bounds it. | unbounded or wider interval, or truth outside it; no person-level claim |
@@ -939,6 +1021,13 @@ checked only after the attacker-view optimisation has produced its result.
 | `named_entity_fact` | Any fact, payload or page asserting a protected attribute of a named person or employer: for a named synthetic firm, anything beyond the four list fields of PRV-125; for a real business, place or FDI project, any protected, Synthetic or Simulated attribute. Recovery is one confirmed occurrence. | zero occurrences |
 | `record_token_key_egress` | Any record, raw identifier, linkage token, treatment key, cell key or draw outside the custodian plane. Recovery is one confirmed occurrence. | zero occurrences |
 | `assistant_tool_escape` | Any tool call outside the closed, versioned production tool list, argument outside a closed schema, unknown claim or component, invalid fact slot, or model-written prose reaching execution or display. Recovery is one confirmed occurrence. | zero occurrences |
+
+The two firm-list predicates have fixtures of their own for the scenario-labelled listed firm of
+PRV-75. The controls-off fixture runs `listed_firm_headcount` and `listed_firm_pay`, for both
+measures and for the wage bill and the mean-wage band, against the naive twin of PRV-77; the
+controls-on fixture runs the same predicates on the target expressions of PRV-113 item 12 against
+each candidate release. Both predicates must execute in both fixtures, be recovered in the naive
+twin and not be recovered with the controls on.
 
 ### 10.6 Attack suite
 
@@ -1075,9 +1164,9 @@ privilege, separation of untrusted content, and validated output [S18].
 | ID | Requirement |
 |---|---|
 | PRV-100 | The privacy argument does not need the model to behave. A model that ignores every instruction can still obtain only what the production tools of the closed, versioned tool list of [08_BACKEND.md](08_BACKEND.md) return, and they return release facts only. The scene-only endpoint of PRV-119 is not an assistant tool and is not model-callable. |
-| PRV-101 | No production tool accepts a query, a table name, a column name, a cell, a unit list or a shape from the model; a drawn shape reaches `make_area` only from the user's drawing on the map. No production tool returns a row about one person, or a firm's pay, wage bill, headcount, group or owner; the one firm-level row is an entry of a named synthetic firm list (PRV-125), with its four fields only. Protected tables are read only through an `area_id` from `make_area`. The manifest-listed fixture route of PRV-119 is the sole scene-only exception and accepts no arbitrary area, cells or unit ids. |
+| PRV-101 | No production tool accepts a query, a table name, a column name, a cell, a unit list or a shape from the model; a drawn shape reaches `make_area` only from the user's drawing on the map. No production tool returns a row about one person, or a firm's pay, wage bill, headcount, group or owner; the one firm-level row is an entry of a named synthetic firm list (PRV-125), with its four fields only, and it reaches the application, never the model ([02_ARCHITECTURE.md](02_ARCHITECTURE.md) ARC-73). Protected tables are read only through an `area_id` from `make_area`. The manifest-listed fixture route of PRV-119 is the sole scene-only exception and accepts no arbitrary area, cells or unit ids. |
 | PRV-102 | Canary markers are strings that match `CANARY-[0-9A-HJKMNP-TV-Z]{10}`. The sealed scenario plants one in every free-text field of every canary record (ASSUMPTION 23), except an establishment's fictional name, which a firm list may release by design (PRV-125). A canary's identifier and its exact pay value are canary strings too. |
-| PRV-103 | Tripwire at run time: every outbound model payload and every API response is scanned for the canary marker pattern and for synthetic identifiers (`SYN-`, a capital letter, a hyphen). A hit blocks the payload, shows the sentence of `EGRESS_BLOCKED`, and writes an incident row that the oversight seat shows. Canaries never appear on a rendered page, in an export or in a payload; a replay or proof panel uses only the scenario label. |
+| PRV-103 | Tripwire at run time: every outbound model payload and every API response is scanned for the canary marker pattern and for synthetic identifiers (`SYN-`, a capital letter, a hyphen), the released key of a listed firm included, since that key never leaves the serving stores (PRV-125). A hit blocks the payload, shows the sentence of `EGRESS_BLOCKED`, and writes an incident row that the oversight seat shows. Canaries never appear on a rendered page, in an export or in a payload; a replay or proof panel uses only the scenario label. |
 | PRV-104 | Text written by third parties (place names, labels) reaches the model only as JSON string values inside tool results, declared as untrusted data. |
 | PRV-109 | The typed-decision gateway is build-time and evaluation-only, defaults to provider `none`, and is absent from privacy, release-building and serving imports. It takes no part in any rule, audit, tripwire or scene step. Its only visible trace is the fixed activity-spine lineage sentence in the Proof room, rendered from the human review log; no provider output or score is displayed. |
 | PRV-118 | The application-owned structured brief has only `headline_key`; `decision_template_key`; `observed[]` and `inferred[]`, each `{claim_key, slots}` with typed fact ids and, for inferred items, `strength` (`strong`, `indicative` or `illustrative`); `still_to_test[]` and `not_measured[]` chosen by the application from fact caveat and coverage keys; `next_questions[]`, each `{question_key, slots}`; `layout[]` as ordered component instances `{component, props}`; and `stage[]` directives, all from the versioned application catalogues. The model may select and order only the claims, components, questions and directives; its brief carries `catalogue_version`. English and Arabic prose is rendered only from application-owned templates; model-written prose is discarded. An unknown key or property, a wrong fact slot or an invalid layout is rejected, followed by one repair attempt and then the playbook default. A Synthetic or Simulated claim or component must have an `area` as its subject (a drawn area or the area around a point), or, with Synthetic slots only, a named synthetic firm, and must never name a real place, building or business ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)). No runtime scan of model prose substitutes for these structural checks. |
@@ -1141,7 +1230,7 @@ Each ASSUMPTION is the simplest safe choice where the master design is silent.
 14. Home units are municipalities formed by the terminal union of every whole-cell unit and remainder of the governing residence family: the coarsest reading of "a large pooled district", with both sides' complements audited.
 15. The perturbation table, the wage-bill factor and the key construction: small, symmetric and stable.
 16. Version 1 has one protected window of `window_months` consecutive complete months. [Decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) assumes the 24 months of the synthetic reference period (SYN-12); the number is fixed at the slice S1 gate. Between the months of that window the carry-forward rule of PRV-56 is built and attacked; between successive windows it stays a proposal until a deployment builds two adjacent test windows that pass every cohort and cross-period attack.
-17. A fixed-composition trend index tracks the same earners in both months, so a mover cannot show in it. Its two stayer wage bills have the same contributors and so the same treatment draw, which cancels in the ratio: the half-point rounding and the minimums of PRV-55 are its controls, and the attacker-view audit already treats it as exact (PRV-113 item 4). It is withheld where a joiner or leaver cohort is too small for its wage bill to be derivable from the index, because the index and the unit's two monthly wage bills fix a combination of those cohorts' wage bills.
+17. A fixed-composition trend index tracks the same earners in both months, so a mover cannot show in it. Its two stayer wage bills have the same contributors and so the same treatment draw, whose factor cancels in their ratio before the money rounding but not after it, so the released index is a function of the two rounded bills. The half-point rounding and the minimums of PRV-55 are its controls, and the attacker-view audit models the index as released, through the two treated and rounded bills held as latent variables, never through the sealed untreated ratio (PRV-113 item 4). It is withheld where a joiner or leaver cohort is too small for its wage bill to be derivable from the index, because the index and the unit's two monthly wage bills fix a combination of those cohorts' wage bills.
 18. The carry-forward rule is the simplest safe choice for a failing cohort, between months as between windows; data owners may choose another only through a new decision record and a fresh attack audit.
 19. `outlet_register` covers the activity classes each rules version lists, with the group minimum on every size band and one shared register partition. Expect detail, and firm lists, to survive only for large units.
 20. The attacker-audit width bounds are 5 / 10 earners and 15% / 20% relative wage-bill width around the feasible midpoint. They are proposed audit decision bounds, not proof of a privacy level; the wage range lies within the 10 to 20% range published for p% rules [S5].
@@ -1159,7 +1248,8 @@ Each ASSUMPTION is the simplest safe choice where the master design is silent.
 32. A listed firm is one establishment, the record that may carry a fictional name (SYN-13). A firm list describes the last month of the window, so it shows no opening, closing or change of size of a firm. A size band no wider than `audit_headcount_width` is joined to the next larger band: with the contract's bands (`no_payroll`, `s01_09`, `s10_49`, `s50_plus`), `no_payroll` joins `s01_09` under set A, and the three lower bands form one range under set B. Ties in a ranking of firms are broken by fictional name.
 33. Cohorts between months are enumerated against the month that the release shows for the unit and tier, so a change that failed alone is tested again together with later changes.
 34. Flows are released as rounded estimates of trips, like presence, because the traffic assignment needs volumes and a rounded count is coarser than a four-decimal index on a known scale. Should a contract keep a flow index instead, the index rule of PRV-59 applies to it.
-35. A changed cohort that a `month_change` component releases fails when it is empty, as an empty frame cell fails in ASSUMPTION 2: a published row that held it, as a zero or as a withheld value, would show that it was empty, because a failing non-empty cohort carries its whole row forward and so leaves no gap on a published row. A changed cohort that no component releases (movers, and contributors whose employer group, band or category changed) is tested only when it is not empty, as in PRV-113 item 11: nothing on the row shows it, and failing every empty one would carry nearly every row forward.
+35. A changed cohort that a `month_change` component releases fails when it is empty, as an empty frame cell fails in ASSUMPTION 2: a published row that held it, as a zero or as a withheld value, would show that it was empty, because a failing non-empty cohort carries its whole row forward and so leaves no gap on a published row. A changed cohort that no component releases (movers, contributors whose employer group, band or category changed, and every changed cohort behind a status-only row of `occupation_pay` or `home_area_share`) is tested only when it is not empty, as in PRV-113 item 11: nothing on the row shows it, and failing every empty one would carry nearly every row forward.
+36. A listed firm has no released band layout of its own, so the pay band of its mean wage (`listed_firm_pay`) is tested against the three coarse band ranges of PRV-25, the finest ranges any `money` unit releases.
 
 Open items from the master design that touch this document: OI-11 (every value here is a proposal);
 OI-35 (which parameter set is exported; default A);
@@ -1183,9 +1273,12 @@ Open questions from decisions 0016 and 0017:
   before the first release gate, whether presence must instead be
   released on the units of the protected count partitions, or withheld where they are withheld. The
   release rule is tightened, never the attack.
-- OPEN: pay by sector, which journey D5 and the wage trends by sector of decision 0016 need, is a
-  split outside the closed list of PRV-34. It needs a new rules version, its place in a partition
-  family, the atom tests and a full re-audit before any release.
+- OPEN: a protected split of pay by sector, which protected or area-level pay by sector and wage
+  trends by sector (journey D5, decision 0016) would need, lies outside the closed list of PRV-34.
+  It needs a new rules version, its place in a partition family, the atom tests and a full
+  re-audit before any release. National wage trends by sector need no such split: they are the
+  Public branch of method card C19 over the activity table of `pub_wage_table`, which reads no
+  protected table ([07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md) MTH-97).
 
 ## Sources
 

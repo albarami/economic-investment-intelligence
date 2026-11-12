@@ -11,7 +11,7 @@
 ## In brief
 
 - Read the project brief before any specialised document.
-- Every numbered document is a draft. Documents 01 to 16 and the glossary were reviewed by models of other makers and corrected on 2026-11-11, then amended on 2026-11-12 by decisions 0016 and 0017, which also created document 17; [PROGRESS.md](../PROGRESS.md) lists the reviews, their verdicts and what is still unreviewed (open items OI-37 and OI-38). No document is approved for a slice gate yet.
+- Every numbered document is a draft. Documents 01 to 16 and the glossary were reviewed by models of other makers and corrected on 2026-11-11, then amended on 2026-11-12 by decisions 0016 and 0017, which also created document 17, and by decision 0018, which also amended the applicable documents and document 17; [PROGRESS.md](../PROGRESS.md) lists the reviews, their verdicts and what is still unreviewed (open items OI-37 and OI-38). No document is approved for a slice gate yet.
 - Version 1 now covers the whole initiative ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)): seven decision journeys, three services and four cases on one living map, with drawn areas, simulated footfall and traffic, monthly periods and named synthetic firms. [Decision 0017](decisions/0017-public-data-additions-and-public-splits.md) adds 77 portal datasets, two investment sources and official splits by sex and nationality as Public facts. [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) lists what a deployment on real records must add.
 - The implementation plan is such a draft too; the task ledger is a draft queue whose tasks all start queued.
 - Decision records 0001 to 0018 are accepted; decision 0016 supersedes decision 0013 and amends decision 0006. Later amendments need new records, not silent edits.
@@ -45,8 +45,8 @@
 | [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md) | Visual tokens, motion, storyboard and design audit | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
 | [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md) | Test map, gates, CI and evidence standard | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
 | [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md) | Commands, stage operation, freeze and recovery | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md) | Slices, dependencies, tasks and gates | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md) | Independent checks and verdict format | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
+| [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md) | Slices, dependencies, tasks and gates | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12 |
+| [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md) | Independent checks and verdict format | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12 |
 | [16_DEMO_RUNBOOK.md](16_DEMO_RUNBOOK.md) | Guided session, recoveries and closing request | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
 | [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) | What a deployment on real records must add beyond the demonstrator | Draft v0.2, created by decisions 0016 and 0017 and amended by decision 0018 on 2026-11-12 |
 | [GLOSSARY.md](GLOSSARY.md) | Shared technical and interface vocabulary | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |

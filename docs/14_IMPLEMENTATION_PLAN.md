@@ -539,7 +539,7 @@ document has reviewed the lead's last ten corrections to it (made on 2026-11-11 
 
 **Goal.** Add the four cases as one-click guided stories with their sample files, and governed planning and composition across every module, while keeping facts, calculations, prose and interface code under application control.
 
-**Visible outcome.** A person starts any of the four cases with one click from the gallery, with the synthetic sample file of case C3 or C4 where the case has one, and prepared questions on every module produce validated structured briefs through the live or recorded provider, while template mode remains complete offline.
+**Visible outcome.** A person starts any of the four cases with one click from the gallery, with the synthetic sample file of case C3 or C4 where the case has one, and prepared questions on every module produce validated structured briefs through the template writer and the recorded provider, while template mode remains complete offline.
 
 **Scope.** Deterministic router over the closed playbooks of every journey and case; the four case stories and their gallery; the synthetic sample files of cases C3 and C4, marked Synthetic and held inside the session that loaded them; main model loop, fixed tools, structured brief, catalogues grown to cover the journeys, validator, memo, replay, egress, evaluations and admitted offline gateway classes.
 
@@ -563,12 +563,12 @@ document has reviewed the lead's last ten corrections to it (made on 2026-11-11 
 **Gate: all statements must be true.**
 - The golden set passes five out of five runs on every prepared question.
 - The must-decline set passes at 100%.
-- 500 distinct structured briefs returned by the model validate against the catalogues before repair or fallback, with every fallback counted and reported.
+- 500 distinct structured briefs from the template-writer and recorded-provider fixtures validate against the catalogues before repair or fallback, with every fallback counted and reported; none is presented as newly model-returned.
 - The injection suite passes with zero successes.
-- Live-model gates run when the API key exists; otherwise the recorded provider runs and OI-01 stays open.
+- All build gates run against the recorded provider with no key or network; OI-01 stays open, and a live run is enabled only by an owner decision at go-live.
 - Each of the four cases starts with one click and runs end to end with no model call, and each sample file stays inside the session that loaded it.
 
-**Cut first.** No validator, decline or offline path is cut. Live-provider polish is omitted while OI-01 remains open.
+**Cut first.** No validator, decline or offline path is cut. Live-provider polish is omitted throughout the build; live-model runs are a go-live gate.
 
 ## 17. slice S9 — Seats and oversight
 
@@ -745,7 +745,7 @@ The open points of decisions 0016 and 0017 are settled at the gates that PLN-25 
 - ASSUMPTION: one builder owns each task branch even when a maker uses internal subagents; this preserves one accountable writer and one independent reviewer.
 - ASSUMPTION: repository settings in S0-T14 are an operational task with no repository file edits; the lead records the command results as evidence under OI-13.
 - ASSUMPTION: a slice's coarse tasks from slice S4 onward may be split only at the preceding gate, with new task IDs appended and no acceptance criterion weakened.
-- OI-01: use the template writer and recorded provider until the API key exists.
+- OI-01: use the template writer and recorded provider throughout the build; live model use begins only at go-live by owner decision.
 - OI-02: make no date-driven freeze and publish no calendar schedule.
 - OI-03: block the conflicting restaurant and wage figures until slice S2 reconciles them and records the item closed as part of its gate.
 - OI-04: closed for version 1 by [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10: the census map layers enter the local release, each figure with its source and retrieval date, and are never committed; the coverage bar uses and names the finest admitted geography available.

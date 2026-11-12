@@ -14,11 +14,12 @@
   basis of use), retrieval date and SHA-256 recorded at fetch time. Nothing is fetched at run time.
 - Fetchers run only in `./eii build-public`, only against an allow-list of hosts, and fail loudly.
 - [Decision 0017](decisions/0017-public-data-additions-and-public-splits.md) adds 77 portal
-  datasets in 18 source groups (property sales, venue visits, building permits, employer scale,
-  manufacturing, trade, logistics, population, workforce, pay, students and visitors) and two
-  investment sources: the FDI projects dashboard, read on every build, and the sector,
-  opportunity, incentive, set-up and law pages of the national investment promotion agency.
-  Capex and jobs keep the source's note that they are estimates.
+  datasets in seventeen groups (property sales, venue visits, building permits, employer scale,
+  manufacturing, trade, logistics, population, workforce, pay, students and visitors), which the
+  registry holds as eighteen source-id families because the decision's group of museum and
+  health-centre visits uses two, and two investment sources: the FDI projects dashboard, read on
+  every build, and the sector, opportunity, incentive, set-up and law pages of the national
+  investment promotion agency. Capex and jobs keep the source's note that they are estimates.
 - A source without stated reuse terms is validation-only: no value, derived share, title or
   geometry from it enters a release. The only exceptions are the two investment sources and the
   census map layers, used by the owner's decisions of 2026-11-12 for this personal internal
@@ -81,11 +82,12 @@ research (retrieved 2026-11-11). Publisher names are those reported by the resea
 copies the publisher from the portal metadata at fetch time and fails if it differs (PUB-09).
 
 [Decision 0017](decisions/0017-public-data-additions-and-public-splits.md) adds the rows from
-`prop_resi_units` onwards: 77 portal datasets in 18 source groups (the seventeen groups of the
-decision, with museum visits and health-centre visits kept as two sources), then the two
-investment sources. The slugs, publishers, rows, coverage and modified dates of the 77 datasets
-were read from the portal's catalogue and records on 2026-11-12, and the fetcher records them again
-at every fetch (PUB-85). A group has one `source_id` and one registry entry per slug.
+`prop_resi_units` onwards: 77 portal datasets in the seventeen groups of the decision, represented
+by eighteen source-id families because its group of museum and health-centre visits uses two
+(`visits_museum` and `visits_phcc`), then the two investment sources. A source-id family is one
+`source_id` with one registry entry per slug. The slugs, publishers, rows, coverage and modified
+dates of the 77 datasets were read from the portal's catalogue and records on 2026-11-12, and the
+fetcher records them again at every fetch (PUB-85).
 
 ### 2.1 Identity, fetch and licence
 
@@ -179,11 +181,12 @@ and parsed by the page parsers of section 3.2.
 ### 2.2 Coverage, use and traps
 
 Coverage facts of the rows above `prop_resi_units` are from the project research, retrieved
-2026-11-11. Those of the 18 decision 0017 groups were read from the portal's catalogue and records
-on 2026-11-12; where a group holds several slugs, rows are given per slug, and modified dates per
-slug or as the range they span. Those of the two investment sources come from the dashboard page,
-read 2026-11-12, and from [decision 0017](decisions/0017-public-data-additions-and-public-splits.md).
-All must be re-recorded by the fetcher.
+2026-11-11. Those of the eighteen source-id families of decision 0017 were read from the portal's
+catalogue and records on 2026-11-12; where a family holds several slugs, rows are given per slug,
+and modified dates per slug or as the range they span. Those of the two investment sources come
+from the dashboard page, read 2026-11-12, and from
+[decision 0017](decisions/0017-public-data-additions-and-public-splits.md). All must be re-recorded
+by the fetcher.
 
 | source_id | Coverage, grain, last period | Product use | Release table | Known traps |
 |---|---|---|---|---|
@@ -195,7 +198,7 @@ All must be re-recorded by the fetcher.
 | `sec_hr_ind`, `sec_hr_goods`, `sec_hr_serv`, `sec_hr_size` | annual 2018 to 2022; national; activities 551, 561, 562, 563 | capability M6 unit economics and break-even; `sec_hr_size` also employer scale by size class for restaurants and the other hotel and restaurant activities ([07](07_ECONOMIC_METHODS.md) C24) | `pub_sector_accounts`; `sec_hr_size` also `pub_establishment_size`, under its own `table_code` | latest year 2022 (a World Cup year); national averages over all outlet types; surplus share jumped after 2019 for an unexplained reason; restaurant revenue conflict (OI-03) |
 | `sec_hr_comp_occ` | to 2022; national; occupation classes | capability S2 staffing context | `pub_wage_table` | national only |
 | `wage_occ` | 2020 to 2025; national; 9 occupation groups x sex | capability S3 national pay card; capability S2 public mean | `pub_wage_table` | means only, no percentiles or area; implies a different 2020 mean from `wage_act` (OI-03) |
-| `wage_act` | 2020 to 2023; national; 21 activity sections x sex | capability S2 context | `pub_wage_table` | as above; includes government and domestic work |
+| `wage_act` | 2020 to 2023; national; 21 activity sections x sex | capability S2 context; D5 national wage trends by economic activity, with the split of the national change into within-sector and employment-mix components ([07](07_ECONOMIC_METHODS.md) C19, indicator 6 by sector) | `pub_wage_table` | as above; includes government and domestic work |
 | `wage_sector` | 2017 to 2023; national; sector x sex | capability S2 context: covered private pay versus government pay | `pub_wage_table` | national only |
 | `wage_bands_priv` | 2021 to 2025; private-sector wage bands | wage-band boundary source and calibration check | `pub_wage_table` | counts occupations, not workers; exact source columns and types to be confirmed at slice S2 |
 | `work_hours_act` | published years and activity grain to be confirmed at slice S2 | simulated schedule anchor | none | exact source columns, types, coverage and last period to be confirmed at slice S2 |
@@ -274,12 +277,12 @@ per research).
 | PUB-17 | The Overture extract is read with DuckDB from the pinned release path, filtered to the Qatar bounding box and `country = 'QA'`, and stored as Parquet. DuckDB 2.x needs `SET geometry_always_xy=true` (research note); read the current DuckDB spatial documentation before writing this step. |
 | PUB-18 | ArcGIS feature services are paged at the server's stated maximum (2,000 features per request per research) until the reported total is reached; a short final total fails the build. |
 | PUB-80 | Every number and comparison emitted from this pack is produced by a deterministic tested release-build function or by `eii_core.calc`, with a method card and worked regression example. The browser only formats returned facts and never calculates a displayed value. |
-| PUB-85 | Each of the 18 source groups added by [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) keeps one `source_id` and has one registry entry per slug, keyed `<source_id>/<slug>`. Each slug is a dataset of its own for PUB-04 to PUB-10 and PUB-16: its own sidecar, hash, host, declared columns and types, row-count range, last period, and publisher and licence checks. The release manifest names exactly one hash per slug, and lineage and the evidence drawer name the slug. The coverage facts in section 2.2 for these groups were read from the portal's catalogue and records on 2026-11-12 and are recorded again at every fetch. Every figure from them is shown as Public with its source, its reference year (or month) and its retrieval date. |
+| PUB-85 | The seventeen groups of [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) are represented by eighteen source-id families, because the decision's group of museum and health-centre visits uses two (`visits_museum` and `visits_phcc`). Each family keeps one `source_id` and has one registry entry per slug, keyed `<source_id>/<slug>`. Each slug is a dataset of its own for PUB-04 to PUB-10 and PUB-16: its own sidecar, hash, host, declared columns and types, row-count range, last period, and publisher and licence checks. The release manifest names exactly one hash per slug, and lineage and the evidence drawer name the slug. The coverage facts in section 2.2 for these families were read from the portal's catalogue and records on 2026-11-12 and are recorded again at every fetch. Every figure from them is shown as Public with its source, its reference year (or month) and its retrieval date. |
 
 ### 3.1 Registry and sidecar record
 
 ```yaml
-source_id: util_elec            # decision 0017 groups: one entry per slug, <source_id>/<slug> (PUB-85)
+source_id: util_elec            # decision 0017 source-id families: one entry per slug, <source_id>/<slug> (PUB-85)
 kind: public_dataset            # public_dataset | public_document
 fetch_mode: fetch               # fetch | citation_only
 title_en: Electricity Total Consumption by Zone Number
@@ -553,11 +556,12 @@ ASSUMPTIONS (each also listed in the return message):
 7. PUB-76: the national pay card uses `wage_occ`.
 8. File paths under `custodian/publicdata/` (registry, `review/`, `tests/`) are this document's
    choice within the pinned layout.
-9. PUB-85: a decision 0017 group keeps one `source_id` and has one registry entry per slug, keyed
-   `<source_id>/<slug>`. The key format is this document's choice; `source_id` stays the registry
-   key of [03](03_DATA_CONTRACTS.md).
-10. Section 2.2: the release-table names of the decision 0017 groups and `pub_investqa_record` are
-    this document's choice; [03](03_DATA_CONTRACTS.md) holds their columns.
+9. PUB-85: a decision 0017 source-id family keeps one `source_id` and has one registry entry per
+   slug, keyed `<source_id>/<slug>`. The key format is this document's choice; `source_id` stays
+   the registry key of [03](03_DATA_CONTRACTS.md).
+10. Section 2.2: the release-table names of the decision 0017 source-id families and
+    `pub_investqa_record` are this document's choice; [03](03_DATA_CONTRACTS.md) holds their
+    columns.
 11. PUB-87: reading the dashboard on every build detects a changed page; the changed page enters a
     release only through the reviewed registry change of PUB-10.
 12. PUB-89: health-centre names use the venue crosswalk too, and a venue links only to a `pub_place`
@@ -592,7 +596,7 @@ slice S2.
   as `worldpop_qat_2020`) is fixed in [07](07_ECONOMIC_METHODS.md) and confirmed at slice S2
   (decision 0016).
 - OPEN: the expected row-count range and last period of each new slug and of `fdi_projects`
-  (PUB-08), and one regression example per new source group (section 10), are fixed at the slice
+  (PUB-08), and one regression example per new source-id family (section 10), are fixed at the slice
   S2 gate.
 
 ## Sources

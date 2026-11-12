@@ -17,7 +17,7 @@
 - PostgreSQL 18 with PostGIS serves the release. On the build machine it runs either as a native service inside Ubuntu or through Docker Compose; preflight uses whichever answers. Continuous integration always uses a service container.
 - The store is chosen once, at start-up: PostgreSQL if it answers, otherwise the embedded DuckDB reader. During a session only the presenter can move reads to the embedded DuckDB reader, and only at a request boundary. There is no automatic failover.
 - The stage runs from a frozen bundle: release files, database dumps, saved images, recorded assistant replays, tiles and fonts, the application source and an offline install archive. It needs neither the network nor an API key.
-- Deployment later means the same PostgreSQL engine in a custodian-approved place. The build engine never leaves the custodian environment. What a deployment on real records adds beyond version 1 is listed in [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) (section 11).
+- Deployment later means the same PostgreSQL engine in a custodian-approved place. The build engine never leaves the custodian environment. What a deployment on real records adds beyond version 1 is listed in [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) (sections 2 to 8).
 
 ## 1. Terms
 
@@ -397,7 +397,7 @@ ASSUMPTIONS made in this document:
 - The freeze bundle lives in `data/freeze/<release_id>/`.
 - The human-review record of OPS-62 is written before freeze and copied into the bundle as `review.json`, with the pinned fields in that requirement.
 - Logs are daily files kept for 30 days (OPS-39).
-- A case sample file is accepted only when its SHA-256 equals a committed synthetic sample file of its case, so no real record can enter, and the one-click case start loads the committed file through the same route (OPS-67; [08_BACKEND.md](08_BACKEND.md) BE-118).
+- A case sample file is loaded only by the server, from a closed key naming a committed synthetic sample file of its case, and only when that file's SHA-256 equals its committed value; no file is received from the browser, so no real record can enter, and the one-click case start loads the committed file through the same route (OPS-67; [08_BACKEND.md](08_BACKEND.md) BE-118).
 - A blocked host stops `./eii build-public` with exit 1, the code of a failed check, not exit 6, which stays for an unavailable network (OPS-65).
 
 OPEN items raised by decisions 0016 and 0017 that touch this document:
