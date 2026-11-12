@@ -547,6 +547,234 @@ Seed:      none
 Notes:     REV-27: the two files are byte-identical.
 ```
 
+#### Independent review, round 3: REJECTED
+
+Reviewed commit `2df0f9276a8bae60304231bc9a317fc40fb4d8ee`, the head of pull request 1 at that time, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43105828765 ). Reviewer: OpenAI GPT-5.6 Sol, through the Cursor command-line tool, read-only. The verdict is copied unchanged (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S0-T01
+COMMIT: 2df0f9276a8bae60304231bc9a317fc40fb4d8ee
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED `env_example` reads the staged mode and blob; four index/work-tree regression tests are present.
+  F2 FIXED PROGRESS.md appends reproducible exact commands correcting the three descriptive entries.
+  F3 FIXED The tests were split into files of 462 and 82 lines, with recorded verification.
+  F4 FIXED Every test method in both modules now has `-> None`, with recorded AST verification.
+CHECKS:
+  REV-10 PASS All three acceptance criteria map to the recorded tree check, exit 0; scope and folder evidence covers ARC-01, PLN-22 and TST-163.
+  REV-11 FAIL The 35 tests are recorded passing, but the committed-ignore guard can pass falsely when an index flag hides an unstaged `.gitignore` difference; see F5.
+  REV-12 PASS The recorded scope check lists the fourteen task paths, the review-required test module and two ledger files only; nothing under data/ changed.
+  REV-13 PASS The folder notes are the required scaffolding and no placeholder substitutes for product behaviour.
+  REV-14 PASS No secret value, `.env`, key file or real custodian data appears; the token scan exited 0, while gitleaks belongs to S0-T06.
+  REV-15 PASS No existing assertion, threshold, test or CI check was weakened, skipped or deleted.
+  REV-16 FAIL The ignore check does not fully enforce its staged-state contract, and the task log omits binding metadata; see F5 and F6.
+  REV-17 FAIL The documentation check exited 0, but the S0-T01 task log is incomplete and contains an incorrect build-round count; see F6.
+  REV-18 FAIL A staged removal of secret or data ignore protection can be masked by the work tree when `.gitignore` is marked assume-unchanged; see F5.
+  REV-19 PASS The commit follows the S0 cut order and reopens no settled decision.
+  REV-20 N/A This commit adds no displayed figure or fact requiring provenance or lineage.
+  REV-21 N/A This commit adds no screen, claim template or rendered numeral.
+  REV-22 N/A This commit changes no privacy rule, parameter, treatment, release or attack.
+  REV-23 N/A No product or custodian package exists yet; the import-boundary test belongs to S0-T10.
+  REV-24 N/A This commit adds no English or Arabic application view.
+  REV-25 PASS The changed public files contain no private path, personal identity, e-mail address, realistic identifier, prohibited digit run, comparison or secret.
+  REV-26 PASS The changed files make no prohibited product, custodian-data, privacy, endorsement, forecast or lookup claim.
+  REV-27 PASS The lead recorded `cmp AGENTS.md CLAUDE.md` exiting 0 on the reviewed head.
+  REV-28 N/A This commit creates no synthetic records or identifiers.
+  REV-29 N/A This commit assigns no attribute or simulated fact to a real place or business.
+  REV-38 PASS Gateway content remains scaffolding only, with no serving-plane import, settings read or run-time call.
+FINDINGS:
+  F5 (REV-11)
+    File: scripts/check_tree.py
+    Line: 208-212
+    Wrong: `source_committed` trusts `git diff --quiet` to prove that the work-tree `.gitignore` equals the staged blob. Git skips work-tree checking for an index entry marked assume-unchanged, so a staged removal of `data/` or a secret pattern can be hidden by restoring the work-tree rule and setting that flag. `check-ignore` then reads the restored rule and the guard passes, breaking the approved staged-state contract, TST-04, REV-16 and REV-18.
+    Fix: Compare each tracked `.gitignore` directly with its staged blob from `git cat-file blob :<source>`, rejecting symlinks before reading work-tree bytes, instead of trusting `git diff`. Add a black-box test that stages removal of `data/`, restores the work-tree file, marks it assume-unchanged and requires the `data-ignored` failure. Run unittest discovery, `python3 scripts/check_tree.py` and `python3 scripts/check_docs.py`, all with exit 0.
+  F6 (REV-16)
+    File: PROGRESS.md
+    Line: 67
+    Wrong: The S0-T01 task log omits the builder and reviewer personas, skills or equivalent task-brief rules used, and branch required by AGENTS.md rule 34 and PLN-12. It also says the Cognition builder performed two build rounds, while the review evidence records three Cognition rounds followed by one xAI correction round.
+    Fix: Append a correction entry naming line 67 and recording the senior builder and strict reviewer personas, each maker and model, the actual skills or equivalent rules used, branch `task/S0-T01-repository-scaffolding`, pull request link, and the correct three Cognition plus one xAI build-round history. Do not edit the earlier entry. Run `python3 scripts/check_docs.py` and record exit 0.
+PROPOSED OPEN ITEMS (REV-07):
+  none
+```
+
+The four earlier findings are confirmed fixed. The owner decided on 2026-11-12 that the task is neither merged as it is nor restarted: both findings are fixed as the reviewer wrote them, the class of F5 is closed inside `scripts/check_tree.py`, and the same reviewer then gives a confirmation review. F5 was applied by a builder of another maker than the reviewer (Cursor command-line tool, `grok-4.7-high`, xAI): a tracked `.gitignore` now equals its staged content only when its index entry and its work-tree path are regular files and the work-tree bytes equal the blob read from the index; `git diff` is no longer called. For the class: every tracked `.gitignore` that fails that comparison makes the probes it can affect count as not ignored (rules 4 to 6), is reported by rule 8 and, at the root, makes rule 7 report that `.env.example` cannot be judged. Eight black-box tests were added to `scripts/tests/test_check_tree_index.py`, written before the change and run against the unchanged check: seven failed, and the eighth is a control that passes before and after. No existing test was changed. F6 is answered by the correction entry that follows.
+
+#### Correction to the task log of S0-T01 (line 67 of this file)
+
+Line 67, the paragraph that starts "Plan: lead (Claude, Anthropic)", is not edited. It lacks fields that AGENTS.md rule 34 and PLN-12 require, and its count of build rounds was wrong. The complete task log is:
+
+- Builder persona: senior platform engineer.
+- Reviewer persona: principal platform and supply-chain reviewer.
+- Planner maker and model: the lead, a Claude model (Anthropic).
+- Plan reviewer maker and model: Gemini 4 Carbon (Google), through the Antigravity command-line tool; approved in its second review round.
+- Builder maker and model: Devin local, model `swe-2-high` (Cognition), for three build rounds: the first build, a fix round after the lead's first verification, and a fix round after review round 1. Cursor command-line tool, model `grok-4.7-high` (xAI), for two correction rounds: after review round 2 and after review round 3. At the commit of review round 3 the history was three Cognition rounds and one xAI round; the earlier text said two build rounds.
+- Reviewer maker and model: GPT-5.6 Sol (OpenAI), through the Cursor command-line tool, read-only; three review rounds.
+- Skills and brief rules: the lead used the skills `project-orientation`, `task-standards`, `superpowers:writing-plans`, `superpowers:test-driven-development`, `strict-reviewer` and `github-flow`. The builders' and the reviewer's tools have no such skills, so each brief carried the equivalent rules: the persona, the task's scope and files, the test-first order with a red run, exact fix lists after each rejection, and for the reviewer the checklist and the verdict format of document 15.
+- Branch: `task/S0-T01-repository-scaffolding`.
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/1
+- Evidence: the entries of this section, each with its commit, command and exit code.
+- Verdict: review round 1 REJECTED (F1, F2); round 2 REJECTED (F3, F4); round 3 REJECTED (F5, F6). The confirmation review of the head that carries this entry is recorded by the next pull request.
+- Environment of the lead's runs: Ubuntu under WSL2, Python 3.14.4, git version 2.53.0.
+
+#### Evidence for the corrected work commit `ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2`
+
+This commit directly follows the reviewed head `2df0f9276a8bae60304231bc9a317fc40fb4d8ee` and changes only `scripts/check_tree.py` and `scripts/tests/test_check_tree_index.py`.
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   python3 -c "import subprocess,sys; p=sorted(subprocess.run(['git','diff','--name-only','2df0f9276a8bae60304231bc9a317fc40fb4d8ee..ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2'],check=True,capture_output=True,text=True).stdout.splitlines()); print(p); sys.exit(0 if p==['scripts/check_tree.py','scripts/tests/test_check_tree_index.py'] else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "['scripts/check_tree.py', 'scripts/tests/test_check_tree_index.py']"
+Seed:      none
+Notes:     The fix commit changes exactly the check and the test module of finding F5.
+```
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   python3 -c "import sys; q=chr(34); t=open('scripts/check_tree.py',encoding='utf-8').read(); n=t.count(q+'diff'+q); print(n); sys.exit(1 if n else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "0"
+Seed:      none
+Notes:     Finding F5: the check no longer passes the word diff to git; the output is the number of such arguments.
+```
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   cd scripts/tests && python3 -m unittest -v test_check_tree_index.CheckTreeIndexTests.test_assume_unchanged_hides_staged_removal_of_data_rule
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Finding F5, the reviewer's case: the root `.gitignore` is staged without `data/`, restored in the work tree and marked assume-unchanged; the check must exit 1 with a `data-ignored` line.
+```
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   python3 -c "import sys; n={p:len(open(p,encoding='utf-8').read().splitlines()) for p in ['scripts/check_tree.py','scripts/tests/test_check_tree.py','scripts/tests/test_check_tree_index.py']}; print(n); sys.exit(0 if max(n.values())<=500 else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "{'scripts/check_tree.py': 435, 'scripts/tests/test_check_tree.py': 462, 'scripts/tests/test_check_tree_index.py': 196}"
+Seed:      none
+Notes:     None of the three Python files of the task is longer than 500 lines.
+```
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   python3 -c "import ast,sys; bad=[(p,n.name) for p in ['scripts/check_tree.py','scripts/tests/test_check_tree.py','scripts/tests/test_check_tree_index.py'] for n in ast.walk(ast.parse(open(p,encoding='utf-8').read())) if isinstance(n,(ast.FunctionDef,ast.AsyncFunctionDef)) and (n.returns is None or any(a.annotation is None and a.arg!='self' for a in n.args.posonlyargs+n.args.args+n.args.kwonlyargs+[x for x in (n.args.vararg,n.args.kwarg) if x]))]; print(len(bad),bad[:3]); sys.exit(1 if bad else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "0 []"
+Seed:      none
+Notes:     In the three Python files of the task every function and method has a return annotation and an annotation on every parameter other than `self`; the output is the number of functions that have not.
+```
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The three acceptance criteria and ARC-01 on the corrected commit.
+```
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    43 passed, 0 failed, 0 skipped (ran 43 tests)
+Seed:      none
+Notes:     Both test modules are discovered: 31 tests in `test_check_tree` and 12 in `test_check_tree_index` (the four earlier ones and the eight of this round).
+```
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   base=$(mktemp -d) && git worktree add -q --detach "$base" a81f69337bd7384c11823eab5e6f7977bdccf1f5 && rc=0; python3 scripts/check_tree.py --root "$base" >/dev/null || rc=$?; git worktree remove --force "$base"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     The line succeeds only if the check exits 1 on the tree as it was before the task (TST-161).
+```
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   copy=$(mktemp -d) && cp -r scripts "$copy/" && rm "$copy/scripts/check_tree.py" && rc=0; (cd "$copy" && python3 -m unittest discover -s scripts/tests -p 'test_*.py' >/dev/null 2>&1) || rc=$?; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    the suite fails; counts are not meaningful without the implementation
+Seed:      none
+Notes:     The line succeeds only if the tests exit 1 when the implementation is absent (TST-161).
+```
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   test -f core/README.md -a -f custodian/README.md -a -f product/README.md -a -f web/README.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     ARC-01: the pinned plane folders exist with their notes.
+```
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   python3 -c "import re,subprocess,sys; p=subprocess.run(['git','diff','--name-only','a81f69337bd7384c11823eab5e6f7977bdccf1f5...ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2'],check=True,capture_output=True,text=True).stdout.splitlines(); a=re.compile(r'(contracts|core|custodian|product|web|gateway|infra)/README\.md|\.env\.example|\.gitignore|scripts/check_tree\.py|scripts/tests/test_check_tree\.py|scripts/tests/test_check_tree_index\.py|README\.md|AGENTS\.md|CLAUDE\.md|PROGRESS\.md|OPEN_ITEMS\.md'); o=[x for x in p if not a.fullmatch(x)]; print(len(p),o); sys.exit(1 if o or len(p)!=17 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "17 []"
+Seed:      none
+Notes:     TST-163 and PLN-22: the branch changes the fourteen paths of the task, the test module added by review round 2 and the two ledger files, and nothing else.
+```
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   tracked=$(git ls-files -- data); test -z "$tracked"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     ARC-99: nothing under `data/` is tracked.
+```
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 56 text files, 46 Markdown files: OK"
+Seed:      none
+Notes:     TST-140.
+```
+
+```text
+Commit:    ac14ebc7758cd6407ee7a4a9d5ab13127dc6fba2
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     REV-27: the two files are byte-identical.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
