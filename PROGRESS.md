@@ -775,6 +775,216 @@ Seed:      none
 Notes:     REV-27: the two files are byte-identical.
 ```
 
+#### Confirmation review after round 3: REJECTED
+
+Reviewed commit `e91718a7bb3643c42d4e601c7223264aae32b812`, the head of pull request 1 at that time, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43151742802 ). Reviewer: OpenAI GPT-5.6 Sol, through the Cursor command-line tool, read-only. By the owner's decision of 2026-11-12 a round after the first still answers every check but may reject only for an earlier finding that is not fixed, a defect in or caused by lines changed since the commit last reviewed, a secret, real data or a private path, or an acceptance criterion that is not met. The verdict is copied unchanged (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S0-T01
+COMMIT: e91718a7bb3643c42d4e601c7223264aae32b812
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 to F4 STILL FIXED
+  F5 FIXED The root comparison checks index mode, rejects non-regular work-tree paths before reading bytes, compares against the staged blob without `git diff`, and the assume-unchanged regression test passes.
+  F6 FIXED PROGRESS.md appends the required personas, makers, models, skills or equivalent rules, branch, pull request, evidence and corrected build-round history.
+CHECKS:
+  REV-10 PASS The head records the three acceptance criteria satisfied by the tree check, exit 0, with the required folders present.
+  REV-11 FAIL The 43 tests pass, but no planted violation covers pathspec metacharacters causing the new index-mode query to inspect another path; see F7.
+  REV-12 PASS The recorded scope check lists only the seventeen task, test and ledger paths; nothing under data/ is tracked.
+  REV-13 PASS The changed code and ledger contain no placeholder or substitute implementation; unchanged parts rely on round 3.
+  REV-14 PASS No secret or real custodian data appears in the changed lines; unchanged parts rely on round 3.
+  REV-15 PASS The change adds eight tests and strengthens the staged-state guard without weakening an existing assertion or check.
+  REV-16 FAIL The new index-mode lookup does not reliably inspect the named tracked `.gitignore`; see F7.
+  REV-17 PASS The appended correction and evidence are present, and the documentation check on the head exited 0.
+  REV-18 FAIL A pathspec-bearing tracked path can make the staged-state security guard accept a non-regular index entry; see F7.
+  REV-19 PASS No settled decision is reopened; unchanged parts rely on round 3.
+  REV-20 N/A No displayed figure or fact is added.
+  REV-21 N/A No screen, claim template or rendered numeral is added.
+  REV-22 N/A No privacy rule, parameter, treatment, release or attack changes.
+  REV-23 N/A No product or custodian package exists yet; unchanged parts rely on round 3.
+  REV-24 N/A No English or Arabic application view is added.
+  REV-25 PASS The changed public text contains no private path, personal identity, e-mail address, realistic identifier, prohibited comparison or secret.
+  REV-26 PASS The changed lines contain no prohibited product or data claim.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exited 0 on the head.
+  REV-28 N/A No synthetic record or identifier is added.
+  REV-29 N/A No attribute or simulated fact is assigned to a real place or business.
+  REV-38 PASS Gateway content remains unchanged scaffolding outside the serving plane, relying on round 3.
+FINDINGS:
+  F7 (REV-18; kind ii)
+    File: scripts/check_tree.py
+    Line: 201-207
+    Wrong: `git ls-files -s -z -- <source>` treats the tracked filename as a Git pathspec, and the code takes the mode from the first returned record without verifying its path. For a nested `.gitignore` beneath a directory containing pathspec metacharacters, such as `docs/a[b]/.gitignore`, the query can return `docs/ab/.gitignore` instead. A non-regular index entry for the named source can therefore be accepted as regular, breaking the staged-state contract and allowing the guard to pass falsely.
+    Fix: Query with a literal pathspec, require exactly one NUL-delimited record whose path equals `source`, and parse that record’s mode and object ID; read the staged blob by that object ID so mode and content are bound to the same entry. Add a black-box test containing `docs/a[b]/.gitignore` and `docs/ab/.gitignore`, with the bracketed source staged as mode 120000 while its work-tree path is a regular same-byte file, and require a `tracked-ignored` failure. Prove the test fails before the fix, then run unittest discovery, `python3 scripts/check_tree.py` and `python3 scripts/check_docs.py`, all with exit 0.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+Findings F5 and F6 are confirmed fixed. F7, a defect in the lines of the last fix, was applied as written by the same builder of another maker than the reviewer (Cursor command-line tool, `grok-4.7-high`, xAI): the index is queried with a literal pathspec, exactly one record whose path equals the source is required, and the mode and the object id are taken from that record. In the same round, by a further decision of the owner of 2026-11-12, the comparison of a tracked `.gitignore` with its staged content is made by object id and no longer by raw bytes: the id of that index record against the id git would stage for the work-tree file (`git hash-object`), so that a checkout with line-ending conversion compares equal; that one call runs with the checkout's own git configuration. The class of F7 was closed in the same round, by a further decision of the owner: every git call of the check that is given a path takes it literally: the index is queried with git's literal-pathspec option, `git check-ignore` (which refuses that option for every path) gets each path with a `./` prefix, and the blob of `.env.example` is read by the object id of its one literal index record, so its mode and its content come from one entry. Nine black-box tests were added. Seven were written before the change, and five of them failed on the old check: a pair of folder names for which the old check read the wrong record, a CRLF work-tree file with `core.autocrlf` set in the repository, the same with the setting in a user-level file, a tracked file named `:.env`, and tracked files whose names begin with pathspec magic; the other two, the reviewer's own pair and a control with CRLF and no conversion, pass on both. Two more were added after the builder's hand mutants showed two conditions without a failing test: a synced pair of bracketed names that must pass, and a test of the index-record function that refuses a record whose path is not the source. No existing test was changed.
+
+#### Addition to the task log of S0-T01
+
+- Builder maker and model: a third correction round by the Cursor command-line tool, model `grok-4.7-high` (xAI), after the confirmation review (finding F7, its class and the comparison by object id), in three passes of the same builder. The history is now three build rounds by the Cognition model and three correction rounds by the xAI model.
+- Verdict: the confirmation review after round 3 REJECTED (F7). The next confirmation review, of the head that carries this entry, is recorded by the next pull request.
+
+#### Evidence for the corrected work commit `da86dce0be49abefedea24b66cb4ec0b58a31136`
+
+This commit directly follows the reviewed head `e91718a7bb3643c42d4e601c7223264aae32b812` and changes only `scripts/check_tree.py` and `scripts/tests/test_check_tree_index.py`.
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   python3 -c "import subprocess,sys; p=sorted(subprocess.run(['git','diff','--name-only','e91718a7bb3643c42d4e601c7223264aae32b812..da86dce0be49abefedea24b66cb4ec0b58a31136'],check=True,capture_output=True,text=True).stdout.splitlines()); print(p); sys.exit(0 if p==['scripts/check_tree.py','scripts/tests/test_check_tree_index.py'] else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "['scripts/check_tree.py', 'scripts/tests/test_check_tree_index.py']"
+Seed:      none
+Notes:     The fix commit changes exactly the check and its index test module.
+```
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   cd scripts/tests && python3 -m unittest -v test_check_tree_index.CheckTreeIndexTests.test_uppercase_bracket_symlink_index_is_unsynced
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Finding F7: a tracked `.gitignore` under a folder whose name holds pathspec characters is staged as a symbolic-link entry while a sibling folder holds a regular one; the check must report the bracketed source.
+```
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   cd scripts/tests && python3 -m unittest -v test_check_tree_index.CheckTreeIndexTests.test_crlf_gitignore_matches_under_repository_autocrlf
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The owner's fixture: with `core.autocrlf` set to true and a work-tree `.gitignore` with CRLF line ends the check passes.
+```
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   python3 -c "import sys; n={p:len(open(p,encoding='utf-8').read().splitlines()) for p in ['scripts/check_tree.py','scripts/tests/test_check_tree.py','scripts/tests/test_check_tree_index.py']}; print(n); sys.exit(0 if max(n.values())<=500 else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "{'scripts/check_tree.py': 479, 'scripts/tests/test_check_tree.py': 462, 'scripts/tests/test_check_tree_index.py': 330}"
+Seed:      none
+Notes:     None of the three Python files of the task is longer than 500 lines.
+```
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   python3 -c "import ast,sys; bad=[(p,n.name) for p in ['scripts/check_tree.py','scripts/tests/test_check_tree.py','scripts/tests/test_check_tree_index.py'] for n in ast.walk(ast.parse(open(p,encoding='utf-8').read())) if isinstance(n,(ast.FunctionDef,ast.AsyncFunctionDef)) and (n.returns is None or any(a.annotation is None and a.arg!='self' for a in n.args.posonlyargs+n.args.args+n.args.kwonlyargs+[x for x in (n.args.vararg,n.args.kwarg) if x]))]; print(len(bad),bad[:3]); sys.exit(1 if bad else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "0 []"
+Seed:      none
+Notes:     In the three Python files of the task every function and method has a return annotation and an annotation on every parameter other than `self`; the output is the number of functions that have not.
+```
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The three acceptance criteria and ARC-01 on the corrected commit.
+```
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    52 passed, 0 failed, 0 skipped (ran 52 tests)
+Seed:      none
+Notes:     Both test modules are discovered: 31 tests in `test_check_tree` and 21 in `test_check_tree_index`.
+```
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   base=$(mktemp -d) && git worktree add -q --detach "$base" a81f69337bd7384c11823eab5e6f7977bdccf1f5 && rc=0; python3 scripts/check_tree.py --root "$base" >/dev/null || rc=$?; git worktree remove --force "$base"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     The line succeeds only if the check exits 1 on the tree as it was before the task (TST-161).
+```
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   copy=$(mktemp -d) && cp -r scripts "$copy/" && rm "$copy/scripts/check_tree.py" && rc=0; (cd "$copy" && python3 -m unittest discover -s scripts/tests -p 'test_*.py' >/dev/null 2>&1) || rc=$?; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    the suite fails; counts are not meaningful without the implementation
+Seed:      none
+Notes:     The line succeeds only if the tests exit 1 when the implementation is absent (TST-161).
+```
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   test -f core/README.md -a -f custodian/README.md -a -f product/README.md -a -f web/README.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     ARC-01: the pinned plane folders exist with their notes.
+```
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   python3 -c "import re,subprocess,sys; p=subprocess.run(['git','diff','--name-only','a81f69337bd7384c11823eab5e6f7977bdccf1f5...da86dce0be49abefedea24b66cb4ec0b58a31136'],check=True,capture_output=True,text=True).stdout.splitlines(); a=re.compile(r'(contracts|core|custodian|product|web|gateway|infra)/README\.md|\.env\.example|\.gitignore|scripts/check_tree\.py|scripts/tests/test_check_tree\.py|scripts/tests/test_check_tree_index\.py|README\.md|AGENTS\.md|CLAUDE\.md|PROGRESS\.md|OPEN_ITEMS\.md'); o=[x for x in p if not a.fullmatch(x)]; print(len(p),o); sys.exit(1 if o or len(p)!=17 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "17 []"
+Seed:      none
+Notes:     TST-163 and PLN-22: the branch changes the fourteen paths of the task, the test module added by review round 2 and the two ledger files, and nothing else.
+```
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   tracked=$(git ls-files -- data); test -z "$tracked"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     ARC-99: nothing under `data/` is tracked.
+```
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 56 text files, 46 Markdown files: OK"
+Seed:      none
+Notes:     TST-140.
+```
+
+```text
+Commit:    da86dce0be49abefedea24b66cb4ec0b58a31136
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite
+Seed:      none
+Notes:     REV-27: the two files are byte-identical.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
