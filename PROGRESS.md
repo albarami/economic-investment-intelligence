@@ -4622,6 +4622,115 @@ Seed:      none
 Notes:     Scope of part B (TST-163): the work commit changes `OPEN_ITEMS.md` only.
 ```
 
+#### S0-T10: independent review of part B: APPROVED
+
+Reviewed commit `bbb5d93a380d4fbc41ea143580d49fd00c15a542`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/11 , with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43231479901 ). Reviewer: Zhipu AI GLM-5.3 High, through the Devin command-line tool, read-only; a later round limited to the part-B lines and the four kinds of decision record 0018, under the owner's note of 2026-11-12. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T10 part B (pull request 11)
+COMMIT: bbb5d93a380d4fbc41ea143580d49fd00c15a542
+REVIEWER: Devin command-line tool, glm-5-3-high (Zhipu AI)
+EARLIER FINDINGS:
+  none open (round 2 of part A: F1 and F2 FIXED)
+CHECKS:
+  REV-10 PASS Part B's specification is the plan's document-update section, and it is met: OI-50 to OI-53 sit in OPEN_ITEMS.md directly before `## Change control`, after OI-48, with OI-49 left free, each item followed by one blank line and "In brief" untouched (OPEN_ITEMS.md lines 502-541); the inserted text matches the plan's block on every line my tools read in full, and OI-51's DONE SO FAR line has the same 2903-character length and the same 2000-character visible prefix in plan and file, with the lead's byte-for-byte comparison recorded (EVIDENCE.md); the DOCS block reports 4 items, no duplicate numbers, last headings [OI-48, OI-50, OI-51, OI-52, OI-53, Change control]. The task's three TASKS.md criteria were met in part A (approved in round 2, merged in pull request 8) and are untouched by part B. I re-checked the items' claims against the tree: the nine boundary files exist (four `import_boundary_*.py` support modules, five `test_import_boundary_*.py` test modules, all `unittest.TestCase`, no pytest import), `python-guards` runs pytest over `scripts/tests` (scripts/run_tests.py line 46), every named test exists (`test_tables_have_their_sizes`, `test_real_tree_static_passes`, `test_metadata_guard_is_wired`; `test_environment_names`, `test_symbolic_links_fail`; `test_every_edge_every_mechanism`, `test_not_judged_forms_in_the_child`; `test_fresh_every_edge_import_time`; three `test_fresh_*` in test_import_boundary_surroundings.py), and every cited pack line resolves: BE-04 docs/08 line 67, BE-05 line 68, BE-102 line 70, pytest of the Boundary class docs/12 line 45, TST-60 line 180, ARC-06 docs/02 line 187, ARC-81 line 462, SYN-68 docs/05 line 494, PRV-02 docs/06 line 53, REV-38 docs/15 line 76, TASKS.md lines 74 and 112.
+  REV-11 OPEN P1 CI green on the head (workflow docs, job check-docs, https://github.com/albarami/economic-investment-intelligence/actions/runs/43231479901 ); the lead's four PROGRESS entries record exit 0 for `python3 scripts/check_docs.py` (138 text files, OK), `python3 scripts/check_tree.py`, `cmp AGENTS.md CLAUDE.md` and the scope diff, run by the lead (local) — but on e79873f, not on the reviewed head, and no part-B entry records `./eii test` on the head; part B adds no code and no behaviour (the work commit changes OPEN_ITEMS.md only; the head adds only the two ledger files), so the gap is outside the kinds of REV-39 and cannot reject — see P1. The reviewer ran no commands, per the read-only brief.
+  REV-12 PASS The work commit 4547953 changes `OPEN_ITEMS.md` only (`git diff --stat 00388d6 HEAD`: "OPEN_ITEMS.md | 40 insertions", one file; PROGRESS entry, exit 0, output "OPEN_ITEMS.md"); the ledger commit bbb5d93 changes only `PROGRESS.md` (a pure addition of 272 lines, no earlier row rewritten; the file matches the diff at both hunk boundaries) and `TASKS.md` (three status lines), the two ledger files the owner's merge rule of 2026-11-12 names; nothing under `data/`; no unrelated reformatting; the base update e79873f is not part of the task's patch.
+  REV-13 PASS The added lines are open-item records, copied verdicts, merge records and evidence entries; no TODO, FIXME, NotImplementedError, empty body or fixed return value appears in the diff; the four open items are the deliverable of part B, not placeholders standing in for real work.
+  REV-14 PASS No secret, `.env` or key file in the diff; the only environment-variable names (EII_DECISION_PROVIDER, JEV_PRO_API_KEY in OI-52 and the copied verdicts, PYTHONPATH in a copied verdict) are names the pack itself pins, not values; no real custodian record, field, file name or count anywhere in the pull request.
+  REV-15 PASS The diff touches no test, threshold, tolerance, assertion, CI configuration, lint or type setting; no skip, expected-failure mark, suppression comment, `continue-on-error`, retry or baseline change; the three TASKS.md lines are status text; the house-style warning of the DOCS block is a warning, never a failure, and `check_docs.py` exits 0.
+  REV-16 PASS The insertion follows the plan's part-B section exactly: position (after OI-48, before `## Change control`), fixed numbers OI-50 to OI-53, one blank line after each item, byte-identical text (see REV-10); pinned names are used exactly (`eii_gateway`, `python-guards`, the three package trees, the rule 44 unittest command, the named tests and modules all resolve in the tree).
+  REV-17 PASS `PROGRESS.md` appends without rewriting earlier rows: the round-2 verdict of part A copied unchanged from its first line (REV-09; matches `.overnight/EARLIER_VERDICT.md` line for line), the three merge records of the approved heads with their tree proofs, base updates and CI links, and the four part-B evidence entries in TST-170 form (full 40-character hash, exact command, exit code, date, run by, counts, seed); `TASKS.md` moves three status lines; `OPEN_ITEMS.md` now holds OI-50 to OI-53 (round-1 P2 is OI-52, as dispositioned); `python3 scripts/check_docs.py` exit 0 (lead on e79873f; CI check-docs on the head).
+  REV-18 N/A Part B changes no code; the added lines are documentation and ledger records with no SQL, role, table, generator or data handling.
+  REV-19 PASS The four items are ASSUMPTIONs raised to the owner through the open-items mechanism (rule 46), each naming the committed test or file that proves its sentences; nothing on the dropped or later lists is built, no component decision is removed or replaced, and the boundary guard's judged forms and edges are unchanged by the diff.
+  REV-20 N/A The task adds no facts, figures or displayed numbers; the numerals in the items are line numbers, file and test counts and requirement IDs, each with its citation.
+  REV-21 N/A No screen, card, template or prose is added; the changed files never render.
+  REV-22 PASS Nothing in the diff touches the partition, the two parameter sets, treatment, exports or any privacy audit, attack size or test.
+  REV-23 PASS Part B changes no code: the import-boundary test of part A is merged and unaltered, no import of `eii_custodian` and no package metadata is changed by the diff, and the recorded runs on the merged base are green (273 unittest tests OK, `./eii test --seed 2026111217` 953 passed, 0 failed, 0 skipped, in the S0-T08 merge record).
+  REV-24 N/A No English or Arabic screen strings are added by this task.
+  REV-25 PASS No absolute local path (the copied verdict's `127.0.0.1:55440` is a loopback service address, not a path), no personal name (the reviewers and the builder are named by maker and model, as REV-01 requires), no e-mail address, no real custodian record, field or file name, no named existing product in a comparison (tool attributions are attributions, not comparisons), no secret; the eleven-digit strings in the ledger are CI run identifiers inside the full links the checklist itself requires, the seeds in the copied records are ten digits, and the specified scanner (`check_docs.py`, TST-140) exits 0 on the changed files; `AGENTS.md` and `CLAUDE.md` are untouched.
+  REV-26 PASS No string, item, verdict copy or merge record in the diff makes or implies any prohibited claim; the items state limits ("not judged", "not tested", "is not caught") as the required disclosure of what the guard does not do.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exit 0, run by the lead on e79873f; the diff touches neither file, and CI check-docs on the head reports no agent-file failure.
+  REV-28 PASS No synthetic entity identifiers are introduced and no bare run of exactly eight or eleven digits is used as an identifier anywhere in the change.
+  REV-29 N/A No real named place or business appears anywhere in the change.
+  REV-38 PASS No serving-plane or run-time code is added: the gateway stays absent from `core/`, `custodian/` and `product/` exactly as the approved part A left it, the diff reads neither `EII_DECISION_PROVIDER` nor `JEV_PRO_API_KEY` at run time, and OI-52 records the gateway edge and the two environment names as judged by the boundary test, with its proving tests present in the tree.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-11; TST-162 evidence on the final commit) No lead-run entry records `./eii test` or `python3 scripts/check_docs.py` on the reviewed head bbb5d93 itself: the four part-B entries ran on e79873f, and only CI ran check-docs on the head ( https://github.com/albarami/economic-investment-intelligence/actions/runs/43231479901 ). Part B changes Markdown only, so the point is outside the kinds of REV-39 and does not reject; the remedy is a lead run of `./eii test` and `python3 scripts/check_docs.py` on the head (or on the merge commit of pull request 11), appended to PROGRESS.md.
+```
+
+#### S0-T10: merge record of part B
+
+- Tree proof on the approved head (ruling L-29), run by the lead on 2026-11-12 before the merge: every path of the head's tree is as in the tested commit `e79873fd0b0ff27ffe6b9a3684712345aec54d7e` (the part-B work commit after its base update), except the two ledger files; output "TREE-IS-WORK ok: 195 paths at bbb5d93a380d4fbc41ea143580d49fd00c15a542", exit code 0.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/11 was squash-merged on 2026-11-12 at the head `bbb5d93a380d4fbc41ea143580d49fd00c15a542`; merge commit `77625c08124311108022d270b85ee6ee73e7b8c3` on main. CI on the merge commit: workflow `docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43232387220 .
+- The verdict's proposed item P1 (no lead run on the head itself): the lead ran on `bbb5d93a380d4fbc41ea143580d49fd00c15a542`, on 2026-11-12, `python3 scripts/check_docs.py`, exit code 0, output "checked 138 text files, 47 Markdown files: OK"; and, after `npm ci` in web/, `./eii test --seed 2026111218`, exit code 0, "total: 953 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- The task log of S0-T10 above is complete with this record: part A APPROVED in review round 2 (pull request 8), part B APPROVED (pull request 11).
+
+#### S0-T12: evidence for part B (pull request https://github.com/albarami/economic-investment-intelligence/pull/12 )
+
+Part B copies the plan's document blocks exactly: rule 44 of `AGENTS.md` and `CLAUDE.md` gains the version check after mypy; `README.md` names it in the commands sentence and the `sh` block and adds the paragraph on `pins.toml`; `OPEN_ITEMS.md` updates the OI-40 sentence and adds OI-54 to OI-57 after OI-53. Builder: Cursor Composer 2.5 (Anysphere), through the Cursor command-line tool, one round on a worktree at the S0-T10 part-B work commit, and a fix of one blank line that the lead's byte comparison found; the lead applied the same diff to main after pull request 11 merged and compared every edit with the plan's blocks byte for byte. Work commit `a7e9acc0c6ec286e5d2df98aebd029262615eaad`.
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    a7e9acc0c6ec286e5d2df98aebd029262615eaad
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 138 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check (TST-140) on the part-B texts.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    a7e9acc0c6ec286e5d2df98aebd029262615eaad
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    a7e9acc0c6ec286e5d2df98aebd029262615eaad
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     Rule 44 changed in both agent files; they stay byte-identical (REV-27).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    a7e9acc0c6ec286e5d2df98aebd029262615eaad
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Installed 14 packages in 24ms"
+Seed:      none
+Notes:     The command that rule 44 and README.md now list runs on this commit and passes (TST-43).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    a7e9acc0c6ec286e5d2df98aebd029262615eaad
+Command:   git diff --name-only 77625c08124311108022d270b85ee6ee73e7b8c3...a7e9acc0c6ec286e5d2df98aebd029262615eaad
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output the four paths AGENTS.md, CLAUDE.md, OPEN_ITEMS.md, README.md
+Seed:      none
+Notes:     Scope of part B (TST-163): the four documents the plan names, and nothing else.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
