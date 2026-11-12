@@ -315,8 +315,6 @@ class ExtensionTreeRules(unittest.TestCase):
             support.fake_extensions(tree.extensions)
             opened = tree.open("build-world")
             files = launch.extension_files(tree.layout("build-world"))
-            binaries = [path for path in files if path.suffix == ""]
-            # suffix of h3.duckdb_extension is .duckdb_extension; select by name ending.
             binaries = [
                 path for path in files if path.name.endswith(".duckdb_extension")
             ]
