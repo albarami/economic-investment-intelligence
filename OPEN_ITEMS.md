@@ -120,7 +120,7 @@
 - TYPE: OPEN
 - NEEDED: Choose and prove a native Ubuntu service or Docker Desktop with working WSL integration.
 - WHY: Start-up, stage recovery and local database tests need one reliable path.
-- DONE SO FAR: Preflight uses whichever answers; CI always uses a service container.
+- DONE SO FAR: Preflight probes the database named by `EII_DATABASE_URL` and selects the embedded store with a warning when PostgreSQL does not answer (task S0-T08). `infra/compose.yaml` defines this project's Compose service under project `eii-poc` on `127.0.0.1:55440`; the lead ran the live probe tests against it. The native-option setup script is not built in version 1. The later slice that loads a release owns its continuous-integration database service.
 - OPTIONS: **Recommendation:** prefer the native service on stage after the owner's one-time setup; retain Compose for CI and portable deployment.
 - NEEDED BY: slices S0 and S1; slice S11 rehearsals.
 
@@ -788,6 +788,36 @@
 - DONE SO FAR: `scripts/hooks_gitleaks.py fetch` downloads the Linux x86-64 release archive of the version in `pins.toml` from GitHub (the release page and its asset host), checks the SHA-256 of the archive against a value written in the script, and installs the binary into `data/tools/gitleaks/<version>/` (uncommitted; a cache path in the sense of AGENTS.md rule 13). The release has no signature, only a checksum list from the same page, so the digest is pinned in the repository. Other platforms are refused. Every later run checks that the binary reports the pinned version and needs no network. The hook tests need the binary and are never skipped: until the one-time download has run, `./eii test` and the unittest command fail and name the command to run, so every continuous-integration job that runs `./eii test`, the suite `python-guards` or the unittest command must run `uv run --locked python scripts/hooks_gitleaks.py fetch` before the suite (TASKS.md, task S0-T07). Not closed, by design, because they go beyond the acceptance criteria (docs/decisions/0018-priorities-and-amendments-to-decision-0015.md, items 2 to 4): git attributes and textconv drivers that hide a staged token from the scanner, a `.gitleaksignore` file, `GITLEAKS_` environment variables, a second digest for the binary itself; they are entered in docs/17_DEPLOYMENT_HARDENING.md, section "Hardening register", by the follow-up task of the slice (TASKS.md, task S0-T15). The full-history scan belongs to S0-T07, push protection and secret scanning to S0-T14, and a clone where nobody ran the installer, or a commit made while skipping the hooks, is not judged by the hooks; the framework's store can hold the unstaged diff of tracked files as patch files.
 - OPTIONS: **Recommendation:** keep. Alternatives: the framework's gitleaks hook (a Go toolchain and a 329 MB cache at first use); a package-manager install (a global install, not wanted); more platforms (each needs its own pinned digest).
 - NEEDED BY: slice S0 gate.
+
+## OI-110 — Placement, row set and output readings of preflight
+
+- ID: OI-110
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm or replace the placement and output readings of task S0-T08, including the rows deferred from its owner-approved Part A cut.
+- WHY: `docs/08_BACKEND.md` section "Configuration and preflight" names the product preflight responsibility; `docs/13_DEPLOYMENT_AND_OPERATIONS.md` OPS-06 names the full table and line form; `TASKS.md S0-T08` scopes the probe modules and tests. The current product package has no API or configuration module.
+- DONE SO FAR: The current implementation is `scripts/preflight.py` and its sibling modules. It prints `<PASS|WARN|FAIL> <check>: <reason>` and then `store: <postgres|embedded|none>`. Empty `EII_RELEASE_DIR` is unset; the four foundation rows are `WARN not_configured`. With a release path set, the release, receipt and embedded-reader rows fail as not built and replay warns as not built. An absent model key passes as absent. `./eii up` returns exit 4 when the release path is unset and invokes preflight with Docker probing disabled, so its PostgreSQL warning says `Docker not probed`. The offline lock row runs the locked `uv` and npm checks. The Python, Node/npm, DuckDB-extension and bubblewrap rows of the document 13 table are not in the current `CHECKS` tuple after the owner-approved Part A cut; this documentation-only part neither adds nor claims them.
+- OPTIONS: **Recommendation:** keep the current placement through slice S0, record explicitly which four rows remain outside the current tuple, and move product-plane responsibility only in the slice that builds the API and configuration module. Keep `Docker not probed` for `./eii up`. Alternative: a separately scoped task adds the deferred rows before the slice S0 gate.
+- NEEDED BY: slice S0 gate.
+
+## OI-111 — PostgreSQL client programs before the driver pin
+
+- ID: OI-111
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm that preflight continues to use the PostgreSQL client programs until slice S1 decides the driver pin.
+- WHY: `docs/13_DEPLOYMENT_AND_OPERATIONS.md` section "Prerequisites and how each is checked" names `pg_isready` and a version query; `docs/02_ARCHITECTURE.md` section "Technology stack", row "PostgreSQL driver", leaves the driver to slice S1.
+- DONE SO FAR: Preflight runs `pg_isready` and then one `psql` query. The password reaches only the `psql` child environment. A missing `pg_isready` or no answer selects embedded with a warning; an answering server whose checks cannot be completed is a failure, never a fallback. The S0-T08 task log records all four live tests against this project's service.
+- OPTIONS: **Recommendation:** keep the client programs through slice S0 and decide together with the driver pin at slice S1. Alternative: a separately scoped dependency and licence change adds the driver earlier.
+- NEEDED BY: slice S1 gate.
+
+## OI-112 — Choices in the Compose file and database commands
+
+- ID: OI-112
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm or replace the Compose choices not fixed by `docs/13_DEPLOYMENT_AND_OPERATIONS.md` section "Compose service definition (in words)".
+- WHY: That section fixes six service elements but does not specify the interpolation name, project-name enforcement, secret-file creator or first-image installation path. `TASKS.md S0-T09` owns the database commands.
+- DONE SO FAR: The required interpolation name `EII_COMPOSE_DB_PORT` carries the host port from `EII_DATABASE_URL` through a generated temporary file and is not read by the product. The Compose file names project `eii-poc`; `./eii db-up` and `./eii db-down` also pass `-p eii-poc`. A test refuses `infra/.env`. Both commands require `data/compose/postgres_superuser_password` to be a regular file, never create it and never print its contents. The image uses `pull_policy: never`, so it must already be present. The file does not set `POSTGRES_DB`.
+- OPTIONS: **Recommendation:** keep these choices; the owner creates the uncommitted secret file and arranges the pinned image before the first start. Alternative: a later operations decision defines another installation path without weakening the digest pin.
+- NEEDED BY: slice S1 gate.
 
 ## Change control
 

@@ -147,6 +147,7 @@ flowchart LR
 | [0016](decisions/0016-version-1-covers-the-whole-initiative.md) | Version 1 covers the whole initiative: seven decision journeys, three services and four cases on one living map, with drawn areas, simulated presence counts and traffic by hour, monthly periods inside one protected window and named synthetic firms; supersedes 0013 and amends 0006 (amendment 3, owner decisions of 2026-11-12) |
 | [0017](decisions/0017-public-data-additions-and-public-splits.md) | 77 portal datasets and two investment sources join the public pack; official splits by sex or nationality are shown as Public facts only; published visitor counts of named public places calibrate and check the simulated footfall (amendment 4, owner decisions of 2026-11-12) |
 | [0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) | Security is strict only for the public repository and for numbers and claims; other hardening goes to document 17; amendments to decision 0015 on review rounds and building ahead |
+| [0020](decisions/0020-freeze-bundle-check-and-project-database-port.md) | The tiles and fonts row is a freeze-bundle check, and this project's Compose database service uses the documented loopback port 55440 |
 
 ## 2. Components
 
