@@ -10459,6 +10459,696 @@ Seed:      none
 Notes:     The fix commit changes four paths against the commit reviewed in round 2, every one a document (TST-163).
 ```
 
+#### S0-T06: independent review, round 2: APPROVED
+
+Reviewed commit `4019ef077d8c44d8f9548dfdab291774ce672e7a`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/19 , with CI green on it (workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43286222061 ; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43286222055 ). Reviewer: Moonshot AI Kimi K3.1 Pro, the reviewer of round 1, through the Abacus AI command-line tool, read-only; a later round under decision record 0018 on the fix. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T06 (pull request 19)
+COMMIT: 4019ef077d8c44d8f9548dfdab291774ce672e7a
+REVIEWER: Moonshot AI, Kimi K3.1 Pro
+EARLIER FINDINGS:
+  F1 FIXED scripts/commit_guard.py:53 and 268-286 checks every eight-byte window of every guarded value, and run uses show_path for content refusals at 323-331. test_path_holding_a_part_of_the_value_is_withheld at scripts/tests/test_hooks_guard.py:226-250 proves that an eight-character prefix is withheld and a seven-character control remains visible; EVIDENCE.md command 3 records the old-code failure and fixed-code pass.
+  F2 FIXED scripts/tests/hooks_support.py:429-488 opens no hook or configuration file: it records hook name, size and modification time through lstat, configuration size through lstat, and git's core.hooksPath answer. Real-repository before/after callers remain at test_hooks_commit.py:33-40 and test_hooks_install.py:33-40,230-231. The planted scratch test at test_hooks_install.py:216-228 detects a same-length hook rewrite with a later modification time and a core.hooksPath change.
+CHECKS:
+  REV-10 PASS Round-1 parts 2 and 3 verified repository-configuration installation, generated-token detection and clean staged commits. The corrected guard and new planted tests complete criterion 3 without disclosure; EVIDENCE.md records 437 guard tests and 1119 total tests passing with no skips.
+  REV-11 PASS On the exact head, the lead ran ./eii test --seed 2026111222, exit 0, with 1119 passed, 0 failed and 0 skipped, and python3 scripts/check_docs.py, exit 0. CI is green: docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43286222061 and sandbox https://github.com/albarami/economic-investment-intelligence/actions/runs/43286222055 . EVIDENCE.md command 3 proves both new tests red on the reviewed code and green on the fix. The reviewer ran no build or test commands under the read-only brief.
+  REV-12 PASS EVIDENCE.md command 10 records exactly the six intended fix paths with output "6 []"; the head adds only the PROGRESS.md ledger entry. The previously approved pull-request scope is unchanged, with nothing committed under data/.
+  REV-13 PASS Inspection of the guard, snapshot helper, tests, README change and ledger found no placeholder, unimplemented branch, fixed-result substitute or mock standing in for delivered behaviour.
+  REV-14 PASS No secret, .env, key file or real custodian material is added. Test values are generated at run time; content-refusal paths are withheld whenever they contain any guarded eight-byte window, and the existing whole-value path refusal remains generic.
+  REV-15 PASS The fix adds two planted violations and preserves the real-repository before/after equality assertions. No threshold, tolerance, detection rule, test count, skip, retry, suppression or CI control is weakened; the metadata-only picture implements the binding F2 ruling.
+  REV-16 PASS The eight-byte path rule and lstat-only picture follow the lead's F1/F2 rulings and H10. Both guards have red-first evidence under EVIDENCE.md command 3, satisfying the planted-violation requirement; the README describes the resulting path behaviour.
+  REV-17 PASS README.md records the eight-character withholding rule, and PROGRESS.md contains the unchanged round-1 verdicts, rulings and fix evidence. The head documentation check exited 0 with "checked 203 text files, 53 Markdown files: OK"; no new material decision is unrecorded.
+  REV-18 PASS The real-repository picture opens no hook or configuration file and emits no recorded contents; only lstat metadata and git's core.hooksPath answer are compared. Scratch repositories hold all intentional writes, and no application, database, model-query or record-level data path changes.
+  REV-19 PASS The fix remains within S0-T06 and reopens no dropped feature, architecture choice, accepted decision, build order or slice gate.
+  REV-20 N/A This task changes developer tooling and test evidence only; it creates no economic fact, calculation, lineage object or displayed product number.
+  REV-21 N/A No screen, card, Fact chip, catalogue template or assistant answer pipeline is changed.
+  REV-22 N/A No privacy partition, parameter set, treatment, protected export, attack suite or privacy audit is changed.
+  REV-23 PASS No product or custodian package or package metadata is changed, and the exact-head full test run passed with the existing import-boundary suites intact.
+  REV-24 N/A No English or Arabic product view, localized string or displayed bilingual numeral is added or changed.
+  REV-25 PASS Inspection of the fix and ledger found no committed secret, private absolute path, personal name, exposed e-mail address, realistic identifier, prohibited comparison or real custodian material; the exact-head documentation and tree checks both exited 0.
+  REV-26 PASS No changed code, test message, README text or ledger entry makes a prohibited claim about real custodian data, privacy certification, ministry endorsement, forecasting, lookup or a go/no-go recommendation.
+  REV-27 PASS The exact-head evidence records cmp AGENTS.md CLAUDE.md exiting 0, and the documentation check reported no agent-file failure.
+  REV-28 N/A The task creates no synthetic world record or synthetic identifier; generated secret-shaped values exist only as run-time test fixtures.
+  REV-29 N/A No fact, figure, rank or other attribute is attached to a real named place, building, business or FDI project.
+  REV-38 PASS The changes are confined to offline repository tooling, tests and documentation; they add no serving-plane or run-time gateway import, provider setting, screen element or live gateway call.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T06: merge record
+
+- Tree proof on the approved head (ruling L-29), run by the lead on 2026-11-12 before the review: every path of the head's tree is as in the fix commit, except the ledger files; output "TREE-IS-WORK ok: 260 paths at 4019ef077d8c44d8f9548dfdab291774ce672e7a", exit code 0. On the same head `./eii test --seed 2026111222`: exit code 0, "total: 1119 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/19 was squash-merged on 2026-11-12 at the head `4019ef077d8c44d8f9548dfdab291774ce672e7a`; merge commit `09e9b16556a304259ad256911e7153c7366789f6` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43288014673 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43288014653 .
+- The task log of S0-T06 is complete with this record: REJECTED in review round 1 (two findings in part 1), APPROVED in round 2. No part of either round proposed an open item.
+
+### S0-T07 — Continuous integration: task log
+
+- Builder persona: principal continuous-integration and reproducible-build engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic (Claude planners: the first plan and its corrections after the plan review), then OpenAI GPT-5.6 Sol (high), through the Cursor command-line tool, for the one refresh before the build (the workflow files, the scripts and the tests re-derived on the merged tree; tests cut to one planted violation per rule; hardening listed and not built; citations by anchor), with the lead's notes
+- Builder maker and model: Cursor command-line tool, `composer-2.5` (Cursor), two rounds
+- Reviewer maker and model: Cursor command-line tool, `grok-4.7-high` (xAI), read-only (a maker that neither planned nor built the task)
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan with the lead's notes above the builder's taste, tests first, no continue-on-error, retry, skip, suppression or weaker assertion, no workflow that uses a secret, every action pinned by its full commit hash, the sandbox workflow and its scripts unchanged, every planted token built at run time, and a report of only the results it saw
+- Branch: `task/S0-T07-continuous-integration`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/21
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit; the six required checks on the pull request head are the hosted evidence and are entered with the verdict
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4 (system) and 3.14.6 (uv); git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8; gitleaks 8.30.1
+- Build round 1: the three workflow files, the three scripts, the two support modules and three test modules (22 tests, 12 planted cases) and the documents of the task in the same round; every check green except the full-history secret scan and one clean control of the plant harness, with one cause: four findings of the scanner's general rule on two identical lines of PROGRESS.md
+- Lead's examination and ruling: both lines are the recorded command of task S0-T05 that plants two dummy values in the environment to prove that `./eii test` prints no environment value; they are not secrets; the history of the base branch is never rewritten and the scan covers the full history (TST-141). The judge of the scan knows that line by its exact content (file, rule and SHA-256 of the line) and leaves out a finding only there; every other finding fails, and a missing or inconsistent report fails. No ignore file, no allow-list in the scanner's configuration, no narrower range. Entered as OI-108 for the owner's confirmation
+- Build round 2: seven tests first (four planted violations of the new rule), then the judge; the real scan passes with four findings on the known line left out and counted, the plant harness blocks twelve of twelve; 29 tests in the three modules
+- Lead's check of the build: the two workflow files and the table of planted cases equal the plan's literal texts; the plant harness differs from the plan by one accepted change (two empty configuration files for npm instead of the null device, which npm 10 refuses); one read of the new judge
+
+#### Evidence for the work commit `33d6a9f4b2b583bcd9127df4c40e7d9e086390fa`
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked python scripts/hooks_gitleaks.py fetch
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "gitleaks 8.30.1 already installed at data/tools/gitleaks/8.30.1/gitleaks"
+Seed:      none
+Notes:     The pinned secret scanner is present (network once; it prints that it is installed when the binary is there).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    466 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard-test discovery of rule 44, the 29 tests of the three CI modules among them (the workflow rules with their planted violations, the judge of the history scan, the plant harness).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked python scripts/ci_plants.py run
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    12 planted cases blocked, 0 failed; RESULT: PASSED
+Seed:      none
+Notes:     The plant harness: each of the twelve planted violations is blocked by the check that owns it in a scratch copy, and each clean control passes (criterion 3, TST-04).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 212 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "131 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 127 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   cd web && npm ci
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "Run `npm audit` for details."
+Seed:      none
+Notes:     The web dependencies from the lock file.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   cd web && npm run build
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "✓ built in 110ms"
+Seed:      none
+Notes:     The web build.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   cd web && npm run lint
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "> eslint --max-warnings 0 ."
+Seed:      none
+Notes:     Web lint.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   cd web && npm run format:check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Web format check.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   cd web && npm run typecheck
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "> tsc --noEmit"
+Seed:      none
+Notes:     Web typecheck.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   ./eii test --seed 2026111201
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1148 passed, 0 failed, 0 skipped
+Seed:      2026111201
+Notes:     The project's own test command with the plan's seed: every network-free suite.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: 4 finding(s) on known ledger lines left out (2 line(s))" and "history scan: range HEAD, 20 commits, at least 20 to list, RESULT: PASSED"
+Seed:      none
+Notes:     The full-history secret scan on this branch (TST-141): every commit listed; the findings on the ledger line that the judge knows by exact content are left out and counted; nothing else is found.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   python3 -I -c "import subprocess,sys; g=sorted(subprocess.run(['git','diff','--name-status','--no-renames','09e9b16556a304259ad256911e7153c7366789f6...33d6a9f4b2b583bcd9127df4c40e7d9e086390fa'],check=True,capture_output=True,text=True).stdout.splitlines()); w=sorted(['A\t'+f for f in 'scripts/ci_history_scan.py scripts/ci_plant_cases.py scripts/ci_plants.py scripts/tests/ci_support.py scripts/tests/ci_workflow_rules.py scripts/tests/test_ci_history_scan.py scripts/tests/test_ci_plants.py scripts/tests/test_ci_workflows.py .github/workflows/ci.yml'.split()]+['M\t'+f for f in '.github/workflows/docs.yml AGENTS.md CLAUDE.md OPEN_ITEMS.md README.md docs/13_DEPLOYMENT_AND_OPERATIONS.md'.split()]); print(len(g), [x for x in g if x not in w]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "15 []"
+Seed:      none
+Notes:     The work commit adds nine paths and changes six: the fifteen paths of the task (TST-163).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    33d6a9f4b2b583bcd9127df4c40e7d9e086390fa
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','09e9b16556a304259ad256911e7153c7366789f6..33d6a9f4b2b583bcd9127df4c40e7d9e086390fa'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Every work commit subject is a Conventional Commit (PLN-05).
+```
+
+#### S0-T07: independent review, round 1: REJECTED
+
+Reviewed commit `438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/21 , with CI green on it (workflow ci, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332; workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43290196952; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43290196879 ). Reviewer: xAI Grok 4.7 (high), through the Cursor command-line tool, read-only; a full review; a maker that neither planned nor built the task. Two findings; no proposed item. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S0-T07 (pull request 21)
+COMMIT: 438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb
+REVIEWER: SpaceXAI, Grok 4.7
+CHECKS:
+  REV-10 PASS The four acceptance criteria are met on this head. All six check classes run on the pull request: check-docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43290196952/job/131434087582 , static-checks https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332/job/131434088818 , tests https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332/job/131434089166 , secret-scan https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332/job/131434089158 , planted-failures https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332/job/131434089190 , sandbox proof https://github.com/albarami/economic-investment-intelligence/actions/runs/43290196879/job/131434087075 . sandbox.yml has no skip, retry, or continue-on-error, and the tests job runs install-profile before ./eii test. The lead's ci_plants.py run blocked 12 of 12. The same six checks are success on this head.
+  REV-11 PASS On the work commit the lead ran ./eii test --seed 2026111201, exit 0, 1148 passed, 0 failed, 0 skipped, and python3 scripts/check_docs.py, exit 0. On this head the lead ran ./eii test --seed 2026111230, exit 0, 1148 passed, 0 failed, 0 skipped, and python3 scripts/check_docs.py, exit 0. The six hosted checks above are success. The reviewer ran no commands; the brief forbids them. The new skip in F1 did not fire in these runs.
+  REV-12 PASS The work commit is the fifteen planned paths (nine added, six modified) and the ledger commit adds only PROGRESS.md and TASKS.md. Nothing under data/. The merge from main is outside this review.
+  REV-13 PASS The workflows, the history-scan judge, the plant harness, and the tests contain no TODO, FIXME, NotImplementedError, empty body, or fixed stand-in for a check.
+  REV-14 PASS The diff adds no .env, key file, or custodian record. Planted tokens are built at run time from parts. The lead's full-history scan passed with four findings, all on the two copies of the S0-T05 dummy probe command in PROGRESS.md.
+  REV-15 FAIL The known-line rule does not weaken the scan: it leaves out a finding only when the report entry is one line, the file is PROGRESS.md, the rule is generic-api-key, and the SHA-256 of that line at the named commit is the one closed digest. The same text in another file, a different line in PROGRESS.md, any extra finding, a missing report, an empty report, a count that disagrees with the report, a missing field, an unreadable commit, and a multi-line range all fail. Those dummies are the probe values dummy-fe95-probe-one and dummy-fe95-probe-two. History stays full (fetch-depth 0 and --full-history HEAD). The failure is the new SkipTest in F1, which lets the guard-test command succeed without the history-scan teeth.
+  REV-16 FAIL Workflows match the plan's pins, permissions, runners, and step order; docs.yml and ci.yml equal the plan; the npm scratch-config change is the accepted ten-line difference; OI-95 and OI-104 through OI-108 sit before Change control. The plan's plants for a planted command that returns zero and for a failure that omits the evidence line do not reach ci_plants.run_case (F2).
+  REV-17 PASS AGENTS.md rule 44, CLAUDE.md, README.md (twenty-six commands and the CI section), docs/13_DEPLOYMENT_AND_OPERATIONS.md section 4.5, and OPEN_ITEMS.md name the workflows and the two commands. python3 scripts/check_docs.py exited 0 on this head (210 text files). cmp AGENTS.md CLAUDE.md exited 0.
+  REV-18 PASS Workflow permissions are contents: read, credentials are not persisted, no workflow step reads a secret, and the scanner is invoked with --redact. The sandbox workflow and its setup scripts are unchanged. No application role, query, or record-level log path is added.
+  REV-19 PASS The change stays inside S0-T07. No dropped feature, architecture choice, or slice gate is reopened.
+  REV-20 N/A The change adds CI tooling and documents only, so it creates no fact, lineage, or displayed number.
+  REV-21 N/A No screen, template, Fact chip, or answer pipeline is changed.
+  REV-22 N/A No partition, parameter set, treatment, export, freeze, or attack test is changed.
+  REV-23 PASS No product or custodian package is changed, and the head test run passed with the existing import-boundary suites.
+  REV-24 N/A No English or Arabic product string or numeral is added.
+  REV-25 PASS The diff has no private absolute path, personal name, e-mail address, eight-digit or eleven-digit identifier, or product comparison. The documentation check on this head exited 0. Digits in the plants are assembled at run time.
+  REV-26 PASS No changed file claims real custodian data, certified privacy, endorsement, a forecast, a lookup, or a go or no-go.
+  REV-27 PASS cmp AGENTS.md CLAUDE.md exited 0 on this head, and the documentation check reported no agent-file failure.
+  REV-28 N/A The change creates no synthetic establishment, entity, group, person, or salary-file identifier.
+  REV-29 N/A No attribute is attached to a real named place, building, business, or FDI project.
+  REV-38 PASS The diff does not import eii_gateway or read EII_DECISION_PROVIDER or JEV_PRO_API_KEY, and it adds no screen score, badge, or live call.
+FINDINGS:
+  F1 (REV-15)
+    File: scripts/tests/ci_support.py
+    Place: place_scanner, lines 104-107
+    Wrong: If the pinned scanner file is absent, place_scanner raises unittest.SkipTest. The history-scan tests that depend on it, including the clean scratch scan, the runtime token, and the known-line plants, are skipped. python -m unittest treats a skip as success, so the guard-test command can exit 0 while those teeth do not run. That is a new skip (REV-15, AGENTS.md rule 36) and it is outside the two standing skips TST-06 allows. The hook tests fail, and name the fetch command, when the same binary is missing.
+    Fix: Raise AssertionError with the same fetch instruction. With data/tools/gitleaks moved aside, uv run --locked python -m unittest scripts.tests.test_ci_history_scan.HistoryScan.test_runtime_token_gives_finding must fail and must not be reported skipped. Restore the scanner and the same test must pass. ./eii test --seed 2026111201 must still report 0 skipped.
+  F2 (REV-16)
+    File: scripts/tests/test_ci_plants.py
+    Place: PlantHarness.test_blocked_evidence_judgement, lines 80-96
+    Wrong: The plan requires one plant that makes a planted command return zero and one plant that fails without the expected evidence line, both caught by the plant harness. This test copies those branches into a local function, never calls ci_plants.run_case, and never calls even the local function with status 0. Replacing the status == 0 return in scripts/ci_plants.py run_case (lines 234-235) with return None would leave this test, the other PlantHarness tests, and the hosted planted-failures job green, so that guard has no tooth (TST-04).
+    Fix: Call plants.run_case with make_copy, prepare, and git mocked. For the zero-status plant, make run_check return (0, "clean") and then (0, "planted ok"), and assert the reason contains "the planted copy passed". For the missing-evidence plant, make the planted run_check return (1, "failed without evidence"), and assert the reason contains "was not printed". Show this test fails while the status == 0 return in run_case is return None, then restore that return and show uv run --locked python -m unittest scripts.tests.test_ci_plants.PlantHarness.test_blocked_evidence_judgement passes and uv run --locked python scripts/ci_plants.py run still reports 12 blocked, 0 failed.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T07: fix round 1
+
+- The lead read both places in the code before ruling. Both findings are valid.
+- Lead's ruling on F1: a new skip is not allowed (AGENTS.md rule 36; TST-06 allows two standing skips only). The helper fails with the fetch instruction when the pinned scanner is absent, as the hook tests of S0-T06 already do. One planted violation, written first: a scratch root that holds the pin record and no scanner must make the helper fail and must not skip. The real scanner folder is never moved to prove it.
+- Lead's ruling on F2: the test judged a copy of the code, so the harness had no tooth for two of its three outcomes. Two tests replace it and call run_case itself, with its collaborators mocked as the neighbouring test does: a planted copy that passes is reported, and a failure without its evidence line is reported. The neighbouring test stays as the control (a failure that prints its evidence line gives no reason). scripts/ci_plants.py does not change.
+- Fix round (the builder of the task, Cursor command-line tool, `composer-2.5`, Cursor): the three tests first, each shown red (the first on the unchanged helper; the other two by breaking the branch each guards once and restoring it); then the one-line change of the helper. Three test files; 31 tests in the three CI modules, 468 in the guard suite, none skipped.
+- The lead repeated the three breaks on a scratch copy before the commit: each new test fails on its break and passes without it.
+
+#### Evidence for the fix commit `30a04bc458dfaef3b7b25de69be507325ca43412`
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   uv run --locked python scripts/hooks_gitleaks.py verify
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "gitleaks 8.30.1 verified at data/tools/gitleaks/8.30.1/gitleaks"
+Seed:      none
+Notes:     The installed scanner reports the pinned version.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    468 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard-test discovery of rule 44 at the fix commit, the 31 tests of the three CI modules among them; none is skipped (finding F1; TST-06).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   v="$PWD/.venv"; copy=$(mktemp -d); st=9; git ls-files -z | xargs -0 cp --parents -t "$copy" && st=0; t() { (cd "$copy" && UV_PROJECT_ENVIRONMENT="$v" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p "$1" -k "$2" >"$copy/$3.log" 2>&1); }; brk() { python3 -I -c "import pathlib,sys; p=pathlib.Path(sys.argv[1]); t=p.read_text(encoding='utf-8'); n=t.count(sys.argv[2]); p.write_text(t.replace(sys.argv[2], sys.argv[3]), encoding='utf-8'); sys.exit(0 if n==1 else 1)" "$@"; }; ctl=9; if [ "$st" -eq 0 ]; then t test_ci_history_scan.py test_missing_scanner_fails_and_is_not_skipped h1 && t test_ci_plants.py test_planted_copy_that_passes_is_reported p1 && t test_ci_plants.py test_failure_without_the_evidence_line_is_reported q1 && ctl=0; fi; rc=9; if [ "$ctl" -eq 0 ]; then rc=0; git show 438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb:scripts/tests/ci_support.py > "$copy/scripts/tests/ci_support.py" || rc=5; a=0; t test_ci_history_scan.py test_missing_scanner_fails_and_is_not_skipped h2 || a=$?; brk "$copy/scripts/ci_plants.py" 'return f"the planted copy passed: {tail(output)}"' 'return None' || rc=5; b=0; t test_ci_plants.py test_planted_copy_that_passes_is_reported p2 || b=$?; git show HEAD:scripts/ci_plants.py > "$copy/scripts/ci_plants.py" || rc=5; brk "$copy/scripts/ci_plants.py" 'if case.expect not in output:' 'if False:' || rc=5; c=0; t test_ci_plants.py test_failure_without_the_evidence_line_is_reported q2 || c=$?; test "$a" -eq 1 -a "$b" -eq 1 -a "$c" -eq 1 || rc=8; grep -q "a missing scanner skipped the test instead of failing it" "$copy/h2.log" || rc=7; grep -q "FAIL: test_planted_copy_that_passes_is_reported" "$copy/p2.log" || rc=6; grep -q "FAIL: test_failure_without_the_evidence_line_is_reported" "$copy/q2.log" || rc=4; fi; rm -rf "$copy"; test "$rc" -eq 0
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The red run of TST-161 for the three new tests, with its green control: in a scratch copy of the tracked files all three pass; with the test helper of the reviewed commit put back, the first fails because the helper skips; with the branch of run_case that reports a planted copy that passes made to return nothing, the second fails; with the branch that reports a failure without its evidence line switched off, the third fails; the copy is removed.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   uv run --locked python scripts/ci_plants.py run
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "plants: 12 cases, 12 blocked, 0 failed", RESULT: PASSED
+Seed:      none
+Notes:     The plant harness itself is unchanged and still blocks each of the twelve planted violations (criterion 3, TST-04).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   ./eii test --seed 2026111201
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1150 passed, 0 failed, 0 skipped
+Seed:      2026111201
+Notes:     The project's own test command with the plan's seed: every network-free suite, none skipped.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "129 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 125 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 210 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The agent files are identical.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   python3 -I -c "import subprocess,sys; g=sorted(subprocess.run(['git','diff','--name-status','--no-renames','438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb..30a04bc458dfaef3b7b25de69be507325ca43412'],check=True,capture_output=True,text=True).stdout.splitlines()); w=sorted('M\t'+f for f in 'scripts/tests/ci_support.py scripts/tests/test_ci_history_scan.py scripts/tests/test_ci_plants.py'.split()); print(len(g), [x for x in g if x not in w]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "3 []"
+Seed:      none
+Notes:     The fix commit changes exactly the three test files of the two findings (TST-163).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb..30a04bc458dfaef3b7b25de69be507325ca43412'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Every fix commit subject is a Conventional Commit (PLN-05).
+```
+
+#### S0-T07: second independent review of round 1: REJECTED
+
+Reviewed commit `438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb`, the commit of the first review, with CI green on it (workflow ci, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332; workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43290196952; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43290196879 ). The lead added a second reviewer of another maker with one question, whether a check can pass without doing its work, because every later merge relies on these six checks (the owner's note of 2026-11-12 on value and cost: a task judged riskier than its class moves up). Reviewer: Google Gemini (model `GEMINI_4_CARBON`; it names itself in the verdict), through the Abacus AI command-line tool, read-only; a full review; a maker that neither planned nor built the task. Three findings and two proposed items. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request. Its REV-10 and REV-11 lines name the checks of the reviewed commit; the first fix round was pushed while this review ran, and all six checks are green on that head, `b6a143353944e5e9cb11e23f0f350f02a36a3343` (workflow ci, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43299071256; workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43299071388; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43299071300 ).
+
+```text
+VERDICT: REJECTED
+TASK: S0-T07 (pull request 21)
+COMMIT: 438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb
+REVIEWER: Google Gemini 3.1 Pro
+CHECKS:
+  REV-10 FAIL All six required checks ran on pull request 21 head 438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb and succeeded on ubuntu-24.04 (check-docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43290196952/job/131434087582, static-checks https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332/job/131434088818, tests https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332/job/131434089166, secret-scan https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332/job/131434089158, planted-failures https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332/job/131434089190, sandbox proof https://github.com/albarami/economic-investment-intelligence/actions/runs/43290196879/job/131434087075), and ci_plants.py blocked all 12 check-class cases, but F1, F2 and F3 leave TST-04 and TST-161 unmet for the newly introduced workflow-contract and plant-harness guards.
+  REV-11 FAIL The lead recorded exit code 0 on work commit 33d6a9f4b2b583bcd9127df4c40e7d9e086390fa (./eii test --seed 2026111201: 1148 passed, 0 failed, 0 skipped; python3 scripts/check_docs.py: exit 0) and on head 438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb (./eii test --seed 2026111230: 1148 passed, 0 failed, 0 skipped; python3 scripts/check_docs.py: exit 0). Under Lens 1, inspecting every job and step in docs.yml, ci.yml and sandbox.yml confirmed bash -eo pipefail defaults, no swallowed exit codes, no if:/needs:/continue-on-error skips, non-empty commit-bound checks in ci_history_scan.py and scanner/sandbox setup before ./eii test, but inspecting the new tests uncovered tautological self-comparisons in ci_workflow_rules.py where WORKFLOW_DIR and sandbox.yml are compared against themselves (F1) and unwired/missing guard tests in test_ci_plants.py and ci_plants.py (F2, F3).
+  REV-12 PASS Work commit 33d6a9f4b2b583bcd9127df4c40e7d9e086390fa adds the 9 planned files and modifies the 6 planned files (15 paths total, verified in EVIDENCE.md command 16), commit 42065c5752dd6590529615986db3e5a708bf584c touches only lead-owned ledger files (PROGRESS.md and TASKS.md), merge commit 438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb is a clean base update with main, and nothing under data/ is tracked.
+  REV-13 FAIL Production modules scripts/ci_history_scan.py, scripts/ci_plant_cases.py and scripts/ci_plants.py contain no TODO, FIXME or stub, but PlantHarness.test_blocked_evidence_judgement in scripts/tests/test_ci_plants.py defines a local nested judge function and tests that inline stub instead of calling scripts/ci_plants.py (F2; see also P2 on unused shallow code in scripts/tests/ci_support.py).
+  REV-14 OPEN P1 No secret, .env file, key file or real custodian data appears in the diff; planted AWS-shaped tokens and 8-digit/path probes are constructed at run time, and gitleaks runs with --redact and removes its temporary JSON report before returning. Under Lens 2, tracing ci_history_scan.py against missing/empty/malformed/non-list reports, log-vs-JSON leak-count mismatches, status-0 leak or ERR/FTL lines, zero or below-bound commit counts, multi-line findings (StartLine != EndLine), findings in any file other than PROGRESS.md, rules other than generic-api-key, and appending a real secret onto the S0-T05 PROGRESS.md line confirmed every case fails closed because line_digest(lines[start - 1]) changes or report validation returns False; only a deliberate CR/Unicode line-separator injection before a real secret could shift blob.splitlines() relative to gitleaks' LF line count (recorded as P1 for document 17).
+  REV-15 FAIL No workflow or existing test adds continue-on-error, retries, skips, lint/type suppressions or widened tolerances, and under Lens 2 the lead's KNOWN_LINES ruling (EVIDENCE.md section 5) is a sound way to keep full-history scanning (TST-141) and an allow-list-free .gitleaks.toml without weakening secret detection on any other file, rule or modified line; however, under Lens 1 ci_workflow_rules.py compares WORKFLOW_DIR and sandbox.yml against themselves, leaves PIN_RE unanchored at the end and ignores uses: values without '@' (F1), and test_ci_plants.py leaves ci_plants.run_case's status-0 and missing-evidence failure branches untested so deleting them still passes unittest (F2).
+  REV-16 FAIL Job ids, check names, ubuntu-24.04 runners, full-SHA action pins, command strings and OI numbers (OI-95, OI-104 to OI-108) match PLAN.md, docs/14_IMPLEMENTATION_PLAN.md and AGENTS.md, and .github/workflows/sandbox.yml is untouched, but ci_workflow_rules.py omits the closed workflow step table required by PLAN.md (F1), test_ci_plants.py omits real calls into ci_plants.py for its planted-rule checks (F2), and ci_plants.py omits the scratch-root and duplicate-guard checks required by PLAN.md (F3).
+  REV-17 PASS AGENTS.md, CLAUDE.md, README.md, docs/13_DEPLOYMENT_AND_OPERATIONS.md, OPEN_ITEMS.md (OI-95 and OI-104 to OI-108) and PROGRESS.md accurately describe the six required checks, the two new rule-44 commands and the known ledger-line ruling, and python3 scripts/check_docs.py exited 0 on both 33d6a9f4b2b583bcd9127df4c40e7d9e086390fa and 438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb.
+  REV-18 PASS All workflows declare permissions: contents: read, set persist-credentials: false and read no secrets; ci_plants.py restricts child environments to the closed PASS_THROUGH allow-list with UV_OFFLINE=1 and isolated temporary config files; ci_history_scan.py redacts scanner output and never prints report entries; no database, model or product boundary is changed.
+  REV-19 PASS All changes stay within foundation task S0-T07 in docs/14_IMPLEMENTATION_PLAN.md and reopen no settled decision, dropped scope item or slice gate.
+  REV-20 N/A This commit changes CI workflows, developer guard scripts, tests and operational documentation only, introducing no economic fact, calculation or lineage chain.
+  REV-21 N/A This commit adds or modifies no screen, card, Fact chip, closed catalogue template or assistant answer pipeline.
+  REV-22 N/A This commit touches no custodian world generator, partition, privacy parameter set, disclosure treatment, export register or attack suite.
+  REV-23 PASS No file or package metadata under product/ or custodian/ is touched, and ./eii test --seed 2026111230 passed all 1148 tests on the head with import-boundary checks intact.
+  REV-24 N/A This commit adds or changes no English or Arabic product interface, localized string or displayed bilingual numeral.
+  REV-25 PASS Inspection of DIFF.patch and python3 scripts/check_docs.py exiting 0 on head 438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb confirm no private local path, personal name, private e-mail address, real custodian item, bare 8- or 11-digit run, secret or named product comparison is committed.
+  REV-26 PASS No workflow, script, test message, open item or documentation line makes or implies any prohibited claim under docs/01_PROJECT_BRIEF.md section 13 or AGENTS.md rules 24 and 25.
+  REV-27 PASS AGENTS.md and CLAUDE.md receive identical edits in DIFF.patch, cmp AGENTS.md CLAUDE.md exited 0 on 438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb, and python3 scripts/check_docs.py reported OK.
+  REV-28 N/A This commit creates no synthetic establishment, legal-entity, employer-group, person or salary-file identifier and no synthetic firm name.
+  REV-29 N/A This commit attaches no fact, attribute, rank or figure to any real named place, building, business or FDI project.
+  REV-38 PASS None of the added or modified files imports eii_gateway or references EII_DECISION_PROVIDER or JEV_PRO_API_KEY, and no serving-plane or runtime code is changed.
+FINDINGS:
+  F1 (REV-10; REV-11; REV-15; REV-16)
+    File: scripts/tests/ci_workflow_rules.py
+    Place: PIN_RE (line 30), SANDBOX_REFERENCE_TEXT (line 42), _reference_workflows (lines 96-97), check_required_steps (lines 178-207), check_no_weakeners (lines 315-318), validate (lines 347-354), and sandbox_unchanged (lines 362-369), exercised by WorkflowRules.test_real_files_pass and WorkflowRules.test_unchanged_sandbox_file in scripts/tests/test_ci_workflows.py (lines 16-17 and 53-54)
+    Wrong: _reference_workflows() loads WORKFLOW_DIR from disk instead of defining the closed step table required by PLAN.md ("The closed table contains the exact job ids, check names, runners, timeouts, actions, with values, commands and working directories"), so validate(support.WORKFLOW_DIR) compares every job's steps against themselves at line 200 (_norm_job(job) != _norm_job(ref_job) is always False) and passes even if required steps in ci.yml, docs.yml or sandbox.yml are deleted or replaced; SANDBOX_REFERENCE_TEXT at line 42 also reads WORKFLOW_DIR / "sandbox.yml" at import time and sandbox_unchanged(support.WORKFLOW_DIR) compares that file against itself with no planted mutation test; and PIN_RE at line 30 lacks a trailing $ anchor while line 317 guards PIN_RE with 'if "@" in action', letting trailing characters after 40 hex digits or '@'-less uses: references (such as ./local or docker://...) pass (breaks TST-02, TST-04, TST-161, AGENTS.md rule 37, REV-10, REV-11, REV-15, REV-16).
+    Fix: Replace _reference_workflows() in scripts/tests/ci_workflow_rules.py with a closed literal mapping of 'docs.yml', 'ci.yml' and 'sandbox.yml' to their exact expected normalized jobs and ordered steps without reading WORKFLOW_DIR; replace the live read in SANDBOX_REFERENCE_TEXT at line 42 with the literal S0-T07 sandbox.yml text (or its pinned SHA-256 digest) and add a scratch-folder mutation in WorkflowRules.test_unchanged_sandbox_file (scripts/tests/test_ci_workflows.py lines 53-54) asserting rules.sandbox_unchanged(mutated_folder) is non-empty; anchor PIN_RE with $ at line 30 (r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+@[0-9a-f]{40}$") and drop '"@" in action and' at line 317 so every uses: action must match PIN_RE; then prove with uv run --locked python -m unittest discover -s scripts/tests -p 'test_ci_workflows.py' -v and ./eii test --seed 2026111201.
+  F2 (REV-10; REV-11; REV-13; REV-15; REV-16)
+    File: scripts/tests/test_ci_plants.py
+    Place: PlantHarness.test_one_case_per_guard (lines 27-31), PlantHarness.test_scratch_only_writes (lines 48-79), PlantHarness.test_blocked_evidence_judgement (lines 80-97), and PlantHarness.test_totals_and_exit (lines 98-114)
+    Wrong: test_blocked_evidence_judgement never calls scripts/ci_plants.py at all, instead defining a local nested judge() stub at lines 83-91 and asserting only on that local function (and never testing status == 0 even on the local stub), so deleting lines 234-240 of scripts/ci_plants.py (both 'status == 0' and 'case.expect not in output') leaves the entire unittest suite green; test_scratch_only_writes patches plants.make_copy with a local _copy assertion instead of planting a destination resolving to support.ROOT against plants.make_copy; test_one_case_per_guard asserts only on Python set() over a local list rather than calling a ci_plants validator; and test_totals_and_exit fails all 12 mocked cases instead of planting one failed case among blocked cases and asserting the summary/failure text (breaks TASKS.md S0-T07 criterion 3, TST-04, TST-161, AGENTS.md rule 37, PLAN.md planted-violation rows 13-18, REV-10, REV-11, REV-13, REV-15, REV-16).
+    Fix: Rewrite test_blocked_evidence_judgement to call plants.run_case (with make_copy, prepare, cases.git and cases.PLANTS mocked as in lines 63-76) for both planted violations required by PLAN.md: (a) run_check side_effect=[(0, "clean"), (0, "planted passed")] asserting "planted copy passed" in the returned reason, and (b) side_effect=[(0, "clean"), (1, "failed without evidence")] asserting "was not printed" in the returned reason, plus the passing control [(0, "clean"), (1, case.expect)] returning None; update test_scratch_only_writes to call plants.make_copy with destination=support.ROOT (and support.ROOT / "sub") and assert PlantError is raised; update test_one_case_per_guard to pass a case tuple with a duplicated check name into ci_plants's case-table validator and assert PlantError; and update test_totals_and_exit's failure check to use side_effect=[None] * (len(cases.CASES) - 1) + ["planted copy passed"] and assert status 1, "11 blocked, 1 failed" and "RESULT: FAILED" in stdout, and "FAIL plant" in stderr. Prove with uv run --locked python -m unittest discover -s scripts/tests -p 'test_ci_plants.py' -v and ./eii test --seed 2026111201.
+  F3 (REV-10; REV-11; REV-16)
+    File: scripts/ci_plants.py
+    Place: make_copy (lines 118-140) and run_all (lines 244-268)
+    Wrong: make_copy writes files and runs git init/add/commit in destination without checking that destination resolves outside root, so passing a path equal to or inside root writes into the real checkout instead of failing closed as required by PLAN.md's scratch-only writes rule (row 14) and AGENTS.md rule 13; and ci_plants.py performs no case-table closure check for unique guard names/case names and registered plants before running cases as required by PLAN.md's plant table closure rule (row 13) (breaks TST-04, AGENTS.md rules 13 and 37, REV-10, REV-11, REV-16).
+    Fix: In scripts/ci_plants.py, add a check at the start of make_copy resolving root_real = root.resolve() and dest_real = destination.resolve() and raising PlantError("scratch copy destination must be outside the repository root") if dest_real == root_real or dest_real.is_relative_to(root_real) or root_real.is_relative_to(dest_real); add a validate_cases(case_list: Sequence[cases.Case]) -> None function verifying len(case_list) == len(cases.CLASSES), tuple(c.check for c in case_list) == cases.CLASSES (catching duplicate or missing guard names), len({c.name for c in case_list}) == len(case_list) and all(c.plant in cases.PLANTS for c in case_list), raising PlantError otherwise, and call validate_cases(cases.CASES) in run_all before creating temporary directories. Prove with uv run --locked python -m unittest discover -s scripts/tests -p 'test_ci_plants.py' -v and uv run --locked python scripts/ci_plants.py run.
+PROPOSED OPEN ITEMS:
+  P1 (REV-14) TST-141 hardening: document 17 — In scripts/ci_history_scan.py line 164 (finding_is_known), blob.splitlines() splits on CR (\r), \v, \f, \x85, \u2028 and \u2029 in addition to \n, whereas gitleaks counts StartLine by \n only; a deliberately crafted commit placing \r plus the exact S0-T05 line on \n-line 1 of PROGRESS.md before a real generic-api-key secret on \n-line 2 would make gitleaks report StartLine=2 while blob.splitlines()[1] hashes the known line and leaves out the finding (splitting on "\n" and stripping one trailing "\r" closes the gap).
+  P2 (REV-13) TST-141 — In scripts/tests/ci_support.py lines 95-96, history_repo(..., shallow=True) runs 'git fetch --depth 1 origin main' on a freshly initialized repository with no 'origin' remote and is never called, while HistoryScan.test_shallow_checkout_refusal (scripts/tests/test_ci_history_scan.py lines 97-110) mocks history.run_git instead of cloning via file:// with --depth 1; either remove the unused shallow parameter in ci_support.py or create a real file:// shallow clone for that test.
+```
+
+#### S0-T07: fix round 2
+
+- The lead read every place the verdict names before ruling: the workflow rules module in full, the three plant-harness tests, make_copy, run_all, finding_is_known and the plan's table of planted violations. All three findings are valid in the form ruled below; the part of F2 on test_blocked_evidence_judgement is the first reviewer's F2 and was already fixed.
+- Ruling G1 (F1): for the real workflow files the rule required-steps compared each job with itself, because its reference was read from the files under test, and sandbox_unchanged compared the sandbox workflow with a copy read at import. The closed reference is now the pinned text of the three workflow files: one SHA-256 literal a file in the rules module, reported first by the rule required-steps and used by sandbox_unchanged. A change of a workflow file changes its pin in the same commit, where a reviewer sees it. The reviewer's own fix was a literal table of normalized jobs and steps; the digest pins every byte of the same files with three literals instead of a second copy of the workflows. One planted violation removes the line that runs `./eii test` from a folder that is its own reference. The pin pattern ends with its anchor and applies to every `uses:` value.
+- Ruling G2 and G3 (F2 and F3): the case table is validated by code that the harness calls before it makes any folder (guard names exactly the closed list in order, unique case names, registered plants), with a planted duplicate; make_copy refuses a destination that resolves to the root or to a folder that contains the root, with a planted test whose root is a scratch repository (on unfixed code a call with the real root would write into the checkout); the totals test plants one failed case among blocked ones, as the plan's table says. The reviewer's own fix also refused every destination inside the root; that is not taken, because a temporary folder may lie in an ignored folder inside the checkout.
+- Ruling G4 (proposed item P1, ruled into the round): the lead's review question had asked for a finding that the known-line rule would wrongly leave out, and the reviewer constructed one. The judge looked a finding's line up with a wider line definition than the scanner's, so a line holding a carriage return before the known text could shift the lookup. The lookup now splits on line feed only; one planted test.
+- The reviewer's proposed item P2 (an unused parameter of a test helper) is entered as a proposed open item by the next ledger.
+- Fix round 2 (a stronger builder of a maker other than both reviewers, REV-40: the Codex command-line tool, `gpt-6-astra`, OpenAI): tests first, then the changes. The builder reported G4 as not fixed after the lead's first ruling on it, one changed line: its planted test, a real scratch history without a mock, still failed, because the git call in text mode had already turned the carriage return into a line feed. The lead's remedy was wrong and the test written first showed it; the revised ruling reads the file's bytes through a byte-mode call, splits on the line-feed byte and decodes the one line strictly.
+- The lead's checks before the commit: nine breaks of G1 to G3 on a scratch copy, each caught by its test except one, the call of the validator from the run. The lead added that test (a planted table handed to the run is refused before any case runs) and one sentence of the README on the pins, and repeated the break of G4 after the revised fix.
+- Seven files; 37 tests in the three CI modules, 474 in the guard suite, none skipped.
+
+#### Evidence for the commit of fix round 2 `1140caeb2daf3ad3f45313f197f65e93da38a68f`
+
+```text
+### S0-T07 — Continuous integration
+Commit:    1140caeb2daf3ad3f45313f197f65e93da38a68f
+Command:   uv run --locked python scripts/hooks_gitleaks.py verify
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "gitleaks 8.30.1 verified at data/tools/gitleaks/8.30.1/gitleaks"
+Seed:      none
+Notes:     The installed scanner reports the pinned version.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    1140caeb2daf3ad3f45313f197f65e93da38a68f
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    474 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard-test discovery of rule 44 at the commit of fix round 2, the 37 tests of the three CI modules among them; none is skipped.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    1140caeb2daf3ad3f45313f197f65e93da38a68f
+Command:   v="$PWD/.venv"; copy=$(mktemp -d); st=9; git ls-files -z | xargs -0 cp --parents -t "$copy" && st=0; t() { (cd "$copy" && UV_PROJECT_ENVIRONMENT="$v" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p "$1" -k "$2" >"$copy/$3.log" 2>&1); }; ctl=9; if [ "$st" -eq 0 ]; then ctl=0; t test_ci_workflows.py test_pinned_text_of_the_three_workflows w1a || ctl=8; t test_ci_workflows.py test_removed_test_command_is_refused_even_as_its_own_reference w2a || ctl=8; t test_ci_workflows.py test_action_pin_must_be_exact w3a || ctl=8; t test_ci_plants.py test_one_case_per_guard p1a || ctl=8; t test_ci_plants.py test_copy_destination_that_resolves_to_the_root_is_refused p2a || ctl=8; t test_ci_plants.py test_broken_case_table_stops_the_run_before_any_case p3a || ctl=8; t test_ci_history_scan.py test_known_text_after_a_carriage_return_is_not_left_out h1a || ctl=8; fi; rc=9; if [ "$ctl" -eq 0 ]; then rc=0; git show b6a143353944e5e9cb11e23f0f350f02a36a3343:scripts/tests/ci_workflow_rules.py > "$copy/scripts/tests/ci_workflow_rules.py" || rc=5; git show b6a143353944e5e9cb11e23f0f350f02a36a3343:scripts/ci_plants.py > "$copy/scripts/ci_plants.py" || rc=5; git show b6a143353944e5e9cb11e23f0f350f02a36a3343:scripts/ci_history_scan.py > "$copy/scripts/ci_history_scan.py" || rc=5; x=0; t test_ci_workflows.py test_pinned_text_of_the_three_workflows w1b || x=$?; test "$x" -eq 1 || rc=8; grep -Eq "^(FAIL|ERROR): test_pinned_text_of_the_three_workflows " "$copy/w1b.log" || rc=7; x=0; t test_ci_workflows.py test_removed_test_command_is_refused_even_as_its_own_reference w2b || x=$?; test "$x" -eq 1 || rc=8; grep -Eq "^(FAIL|ERROR): test_removed_test_command_is_refused_even_as_its_own_reference " "$copy/w2b.log" || rc=7; x=0; t test_ci_workflows.py test_action_pin_must_be_exact w3b || x=$?; test "$x" -eq 1 || rc=8; grep -Eq "^(FAIL|ERROR): test_action_pin_must_be_exact " "$copy/w3b.log" || rc=7; x=0; t test_ci_plants.py test_one_case_per_guard p1b || x=$?; test "$x" -eq 1 || rc=8; grep -Eq "^(FAIL|ERROR): test_one_case_per_guard " "$copy/p1b.log" || rc=7; x=0; t test_ci_plants.py test_copy_destination_that_resolves_to_the_root_is_refused p2b || x=$?; test "$x" -eq 1 || rc=8; grep -Eq "^(FAIL|ERROR): test_copy_destination_that_resolves_to_the_root_is_refused " "$copy/p2b.log" || rc=7; x=0; t test_ci_plants.py test_broken_case_table_stops_the_run_before_any_case p3b || x=$?; test "$x" -eq 1 || rc=8; grep -Eq "^(FAIL|ERROR): test_broken_case_table_stops_the_run_before_any_case " "$copy/p3b.log" || rc=7; x=0; t test_ci_history_scan.py test_known_text_after_a_carriage_return_is_not_left_out h1b || x=$?; test "$x" -eq 1 || rc=8; grep -Eq "^(FAIL|ERROR): test_known_text_after_a_carriage_return_is_not_left_out " "$copy/h1b.log" || rc=7; fi; rm -rf "$copy"; test "$rc" -eq 0
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The red run of TST-161 for the seven new or rewritten tests of this round, with its green control: in a scratch copy of the tracked files all seven pass; with the workflow rules module, the plant harness and the judge of the history scan of the commit before the round put back, each of the seven fails or cannot find the function it tests; the copy is removed.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    1140caeb2daf3ad3f45313f197f65e93da38a68f
+Command:   uv run --locked python scripts/ci_plants.py run
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "plants: 12 cases, 12 blocked, 0 failed", RESULT: PASSED
+Seed:      none
+Notes:     The plant harness, with the validated case table and the refusal in make_copy, still blocks each of the twelve planted violations in its scratch copies (criterion 3, TST-04).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    1140caeb2daf3ad3f45313f197f65e93da38a68f
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: 4 finding(s) on known ledger lines left out (2 line(s))" and "history scan: range HEAD, 29 commits, at least 27 to list, RESULT: PASSED"
+Seed:      none
+Notes:     The full-history secret scan with the changed line lookup: the findings on the known ledger line are still left out and counted; nothing else is found (TST-141).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    1140caeb2daf3ad3f45313f197f65e93da38a68f
+Command:   ./eii test --seed 2026111201
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1156 passed, 0 failed, 0 skipped
+Seed:      2026111201
+Notes:     The project's own test command with the plan's seed: every network-free suite, none skipped.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    1140caeb2daf3ad3f45313f197f65e93da38a68f
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    1140caeb2daf3ad3f45313f197f65e93da38a68f
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "129 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    1140caeb2daf3ad3f45313f197f65e93da38a68f
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 125 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    1140caeb2daf3ad3f45313f197f65e93da38a68f
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 212 text files, 55 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    1140caeb2daf3ad3f45313f197f65e93da38a68f
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The agent files are identical.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    1140caeb2daf3ad3f45313f197f65e93da38a68f
+Command:   python3 -I -c "import subprocess,sys; g=sorted(subprocess.run(['git','diff','--name-status','--no-renames','b6a143353944e5e9cb11e23f0f350f02a36a3343..1140caeb2daf3ad3f45313f197f65e93da38a68f'],check=True,capture_output=True,text=True).stdout.splitlines()); w=sorted('M\t'+f for f in 'README.md scripts/ci_history_scan.py scripts/ci_plants.py scripts/tests/ci_workflow_rules.py scripts/tests/test_ci_history_scan.py scripts/tests/test_ci_plants.py scripts/tests/test_ci_workflows.py'.split()); print(len(g), [x for x in g if x not in w]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "7 []"
+Seed:      none
+Notes:     The commit of fix round 2 changes exactly seven files: the six of the rulings and the README (TST-163).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    1140caeb2daf3ad3f45313f197f65e93da38a68f
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','b6a143353944e5e9cb11e23f0f350f02a36a3343..1140caeb2daf3ad3f45313f197f65e93da38a68f'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Every fix commit subject is a Conventional Commit (PLN-05).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

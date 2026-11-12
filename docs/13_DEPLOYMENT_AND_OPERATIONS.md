@@ -152,7 +152,7 @@ This native-option procedure is not built in version 1: this project's Compose s
 
 ### 4.5 Continuous integration
 
-The CI workflow declares a `postgres` service container from the pinned `db` image digest, publishes port 5432 to the job, and waits on a `pg_isready` health check before any step runs. The job then runs the same role setup as Option N, `./eii load-release` on a small fixture release, and `./eii test`. CI never uses the native option and never needs Docker Desktop. The workflow files that exist so far, in `.github/workflows/`, are `docs.yml`, which runs the documentation and repository-safety check, and `sandbox.yml`, which runs the tests marked `sandbox` through `scripts/ci_sandbox.py prove` on an `ubuntu-24.04` runner; task S0-T07 lists the further workflow files here.
+The CI workflow declares a `postgres` service container from the pinned `db` image digest, publishes port 5432 to the job, and waits on a `pg_isready` health check before any step runs. The job then runs the same role setup as Option N, `./eii load-release` on a small fixture release, and `./eii test`. CI never uses the native option and never needs Docker Desktop. The workflow files in `.github/workflows/` are `docs.yml`, which provides `check-docs`; `ci.yml`, which provides `static-checks`, `tests`, `secret-scan` and `planted-failures`; and `sandbox.yml`, which provides `sandbox proof` by running the tests marked `sandbox` through `scripts/ci_sandbox.py prove` on an `ubuntu-24.04` runner. Every workflow runs on pull requests and pushes to `main`; no failed check is skipped, retried or converted to success.
 
 ### 4.6 Roles and schemas
 

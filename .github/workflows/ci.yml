@@ -1,0 +1,169 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  static-checks:
+    name: static-checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.11.31"
+          enable-cache: "false"
+      - name: Install Python from .python-version
+        run: uv python install
+      - name: Install Node from .nvmrc
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Print tool versions
+        run: uv --version && node --version && npm --version && git --version
+      - name: Check the tree
+        run: uv run --no-project python3 scripts/check_tree.py
+      - name: Check the lock
+        run: uv lock --check
+      - name: Check versions
+        run: uv run --locked python scripts/check_versions.py
+      - name: Check reference notes
+        run: uv run --locked python scripts/check_reference_notes.py
+      - name: Check Python lint
+        run: uv run --locked ruff check .
+      - name: Check Python format
+        run: uv run --locked ruff format --check .
+      - name: Check Python types
+        run: uv run --locked mypy
+      - name: Install web dependencies
+        run: npm ci
+        working-directory: web
+      - name: Check web structure
+        run: npm run check
+        working-directory: web
+      - name: Check web lint
+        run: npm run lint
+        working-directory: web
+      - name: Check web format
+        run: npm run format:check
+        working-directory: web
+      - name: Check web types
+        run: npm run typecheck
+        working-directory: web
+
+  tests:
+    name: tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.11.31"
+          enable-cache: "false"
+      - name: Install Python from .python-version
+        run: uv python install
+      - name: Install Node from .nvmrc
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Sync the locked environment with the engine group
+        run: uv sync --managed-python --all-packages --locked --group engine
+      - name: Install bubblewrap and AppArmor profiles
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends bubblewrap apparmor-profiles
+      - name: Print runner facts
+        run: uv run --locked python scripts/ci_sandbox.py facts
+      - name: Make namespace creation work for bubblewrap
+        run: uv run --locked python scripts/ci_sandbox.py install-profile
+      - name: Fetch engine extensions
+        run: uv run --locked python scripts/engine_extensions.py fetch
+      - name: Fetch the secret scanner
+        run: uv run --locked python scripts/hooks_gitleaks.py fetch
+      - name: Install web dependencies
+        run: npm ci
+        working-directory: web
+      - name: Build the web application
+        run: npm run build
+        working-directory: web
+      - name: Check built hosts
+        run: npm run check:hosts:dist
+        working-directory: web
+      - name: Check the development server
+        run: npm run check:dev
+        working-directory: web
+      - name: Run all tests
+        run: ./eii test --seed 2026111201
+
+  secret-scan:
+    name: secret-scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.11.31"
+          enable-cache: "false"
+      - name: Install Python from .python-version
+        run: uv python install
+      - name: Fetch the secret scanner
+        run: uv run --locked python scripts/hooks_gitleaks.py fetch
+      - name: Verify the secret scanner
+        run: uv run --locked python scripts/hooks_gitleaks.py verify
+      - name: Scan the full branch history
+        run: uv run --locked python scripts/ci_history_scan.py scan
+
+  planted-failures:
+    name: planted-failures
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.11.31"
+          enable-cache: "false"
+      - name: Install Python from .python-version
+        run: uv python install
+      - name: Install Node from .nvmrc
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Install web dependencies
+        run: npm ci
+        working-directory: web
+      - name: Fetch the secret scanner
+        run: uv run --locked python scripts/hooks_gitleaks.py fetch
+      - name: Plant one violation per CI guard
+        run: uv run --locked python scripts/ci_plants.py run
