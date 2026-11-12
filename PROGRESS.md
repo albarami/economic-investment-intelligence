@@ -13584,6 +13584,62 @@ Seed:      none
 Notes:     TST-150: the rules active on the base branch at the gate: no deletion, no forced push, pull requests only, the six required checks on an up-to-date head. The identifier of the ruleset is not recorded.
 ```
 
+#### Slice S0 gate — Foundation: review round 2, second reviewer: REJECTED for one finding; the correction of one entry of S0-T16
+
+Reviewed commit `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, the head of the gate-record pull request at that time, with all six required checks green on it. Second reviewer: Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only, the records. Its two findings of round 1 are FIXED; it raises one new finding, F3. The verdict is copied unchanged (REV-09) and was posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: slice S0 gate, round 2 (pull request 26)
+COMMIT: 154f1101e78d17ee53d88a9b21bc8e7e16c63a1a
+REVIEWER: Moonshot AI Kimi K3.1 Pro Medium
+EARLIER FINDINGS:
+  F1 FIXED The seventeen table rows in docs/13_DEPLOYMENT_AND_OPERATIONS.md lines 74-90 match, one by one and in order, `CHECKS` and `run_preflight` in scripts/preflight.py lines 17-35 and 73-110. EVIDENCE.md lines 15-34 records the same seventeen checks, exit 0, including `traffic-provider-key` and `night-lights-key`. scripts/preflight_rows.py lines 290-309 implements both without a provider call or key disclosure; scripts/tests/test_preflight_run.py lines 583-708 tests all three dummy keys across output and child arguments. OPEN_ITEMS.md OI-110 line 942 now correctly describes the seventeen-row tuple.
+  F2 FIXED TASKS.md line 136 names pull requests 9, 12 and follow-up pull request 18. The gate table at PROGRESS.md line 13116 also records all three and pull request 18's merge commit `f3e7d5764ed315706c683ea7b3b1f7c82e0897f2`.
+CHECKS:
+  REV-10 FAIL F3 Gate 1 PASS: all six checks succeeded on final commit `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` (https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800, https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476700, https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476793). Gate 2 PASS: foundation preflight exited 0 with seventeen checks, 11 PASS, 6 WARN and the four required `WARN not_configured` rows. Gate 3 PASS: `./eii test --seed 2026111309` exited 0 with 1176 passed, 0 failed, 0 skipped. Gate 4 PASS: 34 boundary, 22 metadata and 65 sandbox tests passed; both sandbox checks and the 19-case proof passed with their teeth. Gate 5 FAIL: independent APPROVED cannot be returned while F3 remains. TST-165 PASS: all sixteen tasks, including S0-T16, are done with pull requests and merge commits recorded. TST-166 PASS: the round-2 gate evidence is recorded against the one final commit. TST-167 PASS: the named boundary, sandbox, documentation, scanner and provider-none evidence passes. TST-168 PASS: PO-S0-01 through PO-S0-19 are closed, no random failure is recorded, and the gate review's proposed items are registered for S1; OI-38 remains pending for unavailable pre-repository texts, not a gate statement.
+  REV-11 PASS On the reviewed head, EVIDENCE.md lines 614-655 records the lead's `./eii test --seed 2026111317` exit 0 with 1176 passed, 0 failed, 0 skipped, and `python3 scripts/check_docs.py` exit 0. Head CI is green: https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831189, https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831268, https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831184. The reviewer ran no commands under the read-only brief.
+  REV-12 PASS DIFF.patch part 1 contains the eleven scoped gate-fix files; part 2 changes only PROGRESS.md, TASKS.md and OPEN_ITEMS.md. Nothing under `data/` changed.
+  REV-13 PASS The new preflight rows and commit-guard entries are real behaviour with runtime-generated test values; no placeholder or fabricated result was added.
+  REV-14 PASS The final full-history scan passed with only the exact-content ledger exceptions documented by OI-108; the diff contains no `.env`, key value or real custodian material. Secret-scan CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800/job/131566868205.
+  REV-15 PASS The test changes add coverage and preserve existing assertions; the two changed expectation indices account for the inserted rows. No skip, suppression, retry, tolerance or assertion was weakened.
+  REV-16 PASS The seventeen pinned check names and ordering match document 13; the provider switch uses only `simulated` or `tomtom`, invalid values fail without echo, and preflight only probes.
+  REV-17 FAIL F3 TASKS.md, OPEN_ITEMS.md and the gate records otherwise reflect the delivered work, and `python3 scripts/check_docs.py` exited 0, but the S0-T16 evidence entry at PROGRESS.md line 12204 assigns its proof to the wrong acceptance-criterion numbers.
+  REV-18 PASS The new probes read only supplied environment mappings and make no provider connection; the guard tests refuse both new local key values without printing them. No secret or provider response is stored.
+  REV-19 PASS S0-T16 implements the gate-fix requirement of TST-169, and PO-S1-01 through PO-S1-03 follow REV-41; no settled decision is reopened.
+  REV-20 N/A The changes add no economic fact, displayed figure, forecast, estimate or calculation requiring provenance and lineage.
+  REV-21 N/A No product screen, claim template, model prose or rendered numeral changed.
+  REV-22 N/A No privacy partition, parameter set, treatment, export, window key or attack-suite behaviour changed.
+  REV-23 PASS The final-commit evidence records 34 import-boundary and 22 workspace-metadata tests passing; the gate-fix diff adds no product-to-custodian edge.
+  REV-24 N/A No English or Arabic product view or bilingual numeral changed.
+  REV-25 PASS The documentation check passed on the final commit and reviewed head; inspection of the changed records and code found no private path, personal details, realistic identifier, secret or prohibited comparison.
+  REV-26 PASS The changed records and output contain no prohibited custodian, real-place, certification, endorsement, forecast, lookup or go/no-go claim.
+  REV-27 PASS Recorded `cmp AGENTS.md CLAUDE.md` exited 0 on both the final commit and reviewed head, and the documentation checks passed.
+  REV-28 N/A No synthetic establishment, entity, group, person or salary-file identifier was introduced.
+  REV-29 N/A No Synthetic or Simulated attribute, figure or fit was attached to a real named place or business.
+  REV-38 PASS Provider-none `./eii test` and `./eii preflight` passed with the network unshared; the diff adds no serving-plane gateway import, runtime provider read, score, badge, panel or live call.
+FINDINGS:
+  F3 (REV-10, REV-17; kind b)
+    File: PROGRESS.md
+    Place: S0-T16 evidence entry for `uv run --locked python -m unittest discover -s scripts/tests -p 'test_preflight_*.py' -v`, Notes at line 12204
+    Wrong: The note calls the preflight tests “Criteria 1, 2 and 4” and then calls the three-dummy-key test “criterion 3”. In TASKS.md line 160, criterion 2 is the three-dummy-key test, criterion 3 is the eleven empty names in `.env.example`, and criterion 4 is the commit-guard refusal. This added ledger entry therefore gives false acceptance-criterion cross-references, so PROGRESS.md is not current as REV-17 requires and the gate cannot yet receive independent APPROVED.
+    Fix: Append a correction naming the entry at line 12204, without editing that earlier entry (TST-171), stating that this command proves S0-T16 criteria 1 and 2; criterion 3 is proved by the example-file/name evidence at lines 12219-12253, criterion 4 by the commit-guard evidence at lines 12207-12217, and criterion 5 by TASKS.md line 136. Run `python3 scripts/check_docs.py`, record its exit code 0 against the new commit, and submit the corrected record for confirmation.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+- The lead's judgement (REV-43): F3 is valid. The lead wrote the notes of the entries of S0-T16 from the numbering of the builder's brief, which had four criteria for the preflight part, before the entry of S0-T16 in TASKS.md had its five criteria. It is corrected here, in the same round, by this appended record; the entry itself is not edited (TST-171)
+- The entry corrected: task S0-T16, commit `260c43c768dfb81895997a202b543f1da0edeb1a`, command `uv run --locked python -m unittest discover -s scripts/tests -p 'test_preflight_*.py' -v`. Its note says "Criteria 1, 2 and 4" and "criterion 3"; those numbers are not the numbers of TASKS.md
+- By the five acceptance criteria of TASKS.md, task S0-T16, the evidence is:
+  1. `./eii preflight` runs the seventeen checks of the preflight table, and neither new row prints a key or makes a call: that command (the two rows, the order of the seventeen names, no program started and no connection opened, foundation mode), the entry of the real preflight with its seventeen lines, and the entry of the planted unknown value of the provider switch
+  2. A test runs preflight with a known dummy value for each of the three keys and finds none in the output: the test `test_no_secret_in_any_line` of `scripts/tests/test_preflight_run.py`, run by that same command
+  3. `.env.example` holds the eleven variable names with empty values: the entries of `python3 scripts/check_tree.py`, of the command that prints the eleven names, and of the tree-check modules
+  4. The commit guard refuses a staged value equal to the local value of either new key without printing it: the entry of `test_hooks_guard.py`
+  5. The status of S0-T12 names its three pull requests: the status line of S0-T12 in TASKS.md, which names pull requests 9, 12 and 18
+- No other note of the entries of S0-T16 numbers a criterion of that task: the entry of the real preflight says criterion 1, which is right, and the entry of the commit guard names criterion 3 of task S0-T06, which is right
+- The documentation check on the commit that carries this correction is part of the lead's checks on the head; they are entered by the next ledger, as for every head
+- The designated reviewer's verdict of round 2 is entered by the next ledger commit
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
