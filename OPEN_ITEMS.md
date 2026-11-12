@@ -1200,6 +1200,37 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CLOSED BY: S0-T15
 - CLOSED: 2026-11-13, by S0-T15: the ledger of this task in [PROGRESS.md](PROGRESS.md) states the reconciliation by test module (forty-nine planned, six added by the break pass, fifty-five delivered).
 
+### PO-S1-01 — The commit guard's list lacked the two keys of decision 0019
+
+- ID: PO-S1-01
+- TYPE: CLOSED (was OPEN)
+- RAISED BY: gate review of slice S0, round 1, designated reviewer (Google Gemini), 2026-11-13, proposed item P2; found by the lead's own sweep on the same day
+- CONCERNS: OPS-71; TST-141 (the commit guard of task S0-T06)
+- EVIDENCE: `SECRET_NAMES` in `scripts/commit_guard.py` held `ANTHROPIC_API_KEY`, `JEV_PRO_API_KEY` and `EII_DATABASE_URL`. The variable table of document 13 marks `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` as never printed as well, and the guard's rule for its list is that table (OI-92).
+- NEEDED: the two names join the list, so that a staged copy of either local value is refused.
+- CLOSED BY: S0-T16
+- CLOSED: 2026-11-13, by S0-T16: the list holds the five names. Proved by `test_new_key_staged_value_refused`, `test_new_key_short_value_fails_closed` and `test_new_key_clean_file_passes` in `scripts/tests/test_hooks_guard.py`, each for both names, from the environment and from a fixture file.
+
+### PO-S1-02 — The boundary guard's list of environment names does not hold the night-lights key
+
+- ID: PO-S1-02
+- TYPE: OPEN
+- RAISED BY: gate review of slice S0, round 1, designated reviewer (Google Gemini), 2026-11-13, proposed item P1
+- CONCERNS: ARC-81, as the reviewer names it (the variables that belong to build and evaluation tooling only)
+- EVIDENCE: `ENV_NAMES` in `scripts/tests/import_boundary_guard.py` holds `EII_DECISION_PROVIDER` and `JEV_PRO_API_KEY`. Document 02 says that `EARTHDATA_API_KEY` belongs to build and evaluation tooling only and is read by the public fetchers of `./eii build-public`; no test refuses a reference to it under `product/` or `core/` (OI-52).
+- NEEDED: the guard refuses a reference to `EARTHDATA_API_KEY` under `product/` and `core/` while `custodian/` may read it, with one planted violation; or one line saying why it is not needed.
+- CLOSED BY: S1-T10
+
+### PO-S1-03 — Document 17 and its identifiers are outside the documentation check
+
+- ID: PO-S1-03
+- TYPE: OPEN
+- RAISED BY: gate review of slice S0, round 1, designated reviewer (Google Gemini), 2026-11-13, proposed item P3
+- CONCERNS: TST-140
+- EVIDENCE: `REQUIRED_FILES` of `scripts/check_docs.py` does not hold `docs/17_DEPLOYMENT_HARDENING.md`, and `REQUIREMENT_PREFIXES` does not hold `DHA`. An identifier of document 17 that heads two rows therefore passes the check; PO-S0-17 was such a case and was found by hand.
+- NEEDED: the file and the prefix join the two lists, with one planted violation each; or one line saying why not.
+- CLOSED BY: S1-T10
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).
