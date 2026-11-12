@@ -10,15 +10,15 @@
 
 ## How to read these notes
 
-Every statement in a table has one kind. READ: an official page, read on the date given, whose quoted words support the statement and nothing more. OBSERVED: a command run on the date given with the package and version named; the command and its output are in the Runs table of the section, and no browser was used. PACK: the pack says it, the pack line is given, and it could be neither read nor observed here, so the statement says "not verified". A page can change after its date: quoted words are searched for again when the notes are checked.
+Every statement in a table has one kind. READ: an official page, read on the date given, whose quoted words support the statement and nothing more. OBSERVED: a command run on the date given with the package and version named; the command and its output are in the Runs table of the section, and no browser was used. PACK: the pack says it, the pack anchor is given, and it could be neither read nor observed here, so the statement says "not verified". A page can change after its date: quoted words are searched for again when the notes are checked.
 
-The last section of each file lists the statements of the pack about these libraries and where each stands: a row of these notes, or "not covered" with the reason. The notes name a series, not a pin. Exact pins and retreat pins are the rows of `pins.toml`, which a check compares with the manifests; the table at the end of each section lists what slice S1 still has to confirm, and every value in it is "not yet confirmed". The notes make no claim that a library works in this project: no row says so, because no run of this project's own code exists yet. `scripts/check_reference_notes.py` checks the form of these notes (sections, kinds, sources, allowed addresses, dates, the confirmation tables and the coverage table) and nothing about whether a quotation is still on its page.
+The last section of each file lists the statements of the pack about these libraries and where each stands: a row of these notes, or "not covered" with the reason. The notes name a series, not a pin. Exact pins and retreat pins are the rows of `pins.toml`, which a check compares with the manifests; the table at the end of each section lists what slice S1 still has to confirm, and every value in it is "not yet confirmed". The notes make no claim that a library works in this project: no row says so, because no run of this project's own code exists yet. `scripts/check_reference_notes.py` checks the form of these notes (sections, kinds, sources, allowed addresses, dates, the confirmation tables and the coverage table), that each anchor exists in the cited file and not what the anchored text says, and nothing about whether a quotation is still on its page.
 
-The section "Confirmations assigned to this task" is not about a library. It records what was observed in the files of the two Fontsource packages for IBM Plex Sans and IBM Plex Sans Arabic (the weights of DES-25, docs/11_DESIGN_DIRECTION.md line 143) and in the package that holds the Carbon icons, with the licence of that package and of its repository (DES-45, docs/11_DESIGN_DIRECTION.md line 210). It adds no package to a manifest and pins nothing: the two font packages are rows of `pins.toml`, and the pack says that the icons are vendored locally with their licence recorded in the repository and names no slice for it. A row of the font table is the files of one subset at one weight; nothing is said about glyph coverage or font features.
+The section "Confirmations assigned to this task" is not about a library. It records what was observed in the files of the two Fontsource packages for IBM Plex Sans and IBM Plex Sans Arabic (the weights of DES-25, docs/11_DESIGN_DIRECTION.md DES-25) and in the package that holds the Carbon icons, with the licence of that package and of its repository (DES-45, docs/11_DESIGN_DIRECTION.md DES-45). It adds no package to a manifest and pins nothing: the two font packages are rows of `pins.toml`, and the pack says that the icons are vendored locally with their licence recorded in the repository and names no slice for it. A row of the font table is the files of one subset at one weight; nothing is said about glyph coverage or font features.
 
 ## MapLibre GL JS 6
 
-Used here for the basemap, camera, building extrusion and label rendering (docs/10_FRONTEND.md line 65). Series 6; the pins.toml rows are `maplibre-gl` and `@mapbox/mapbox-gl-rtl-text`.
+Used here for the basemap, camera, building extrusion and label rendering (docs/10_FRONTEND.md section "Stack and pins" row "`maplibre-gl`"). Series 6; the pins.toml rows are `maplibre-gl` and `@mapbox/mapbox-gl-rtl-text`.
 
 ### Pages read
 
@@ -74,7 +74,7 @@ Setup, in an empty folder: three sub-folders `v6`, `v5` and `mb`, each with a `p
 | S10 | The API page of setRTLTextPlugin is marked deprecated, because MapLibre shapes Arabic itself. | READ | P4 | "MapLibre shapes Arabic and reorders bidirectional text itself" |
 | S11 | The typings of maplibre-gl 6.17.0 carry a deprecated tag on setRTLTextPlugin. | OBSERVED | R6 | - |
 | S12 | The typings of maplibre-gl 5.24.1 carry no deprecated tag on setRTLTextPlugin. | OBSERVED | R7 | - |
-| S13 | The retreat to a 5.x release loses the built-in Arabic shaping (docs/10_FRONTEND.md line 73); the changelog places the shaping at version 6.9.0, the retreat has not been run, and Arabic shaping itself was not run here (no browser): not verified. | PACK | docs/10_FRONTEND.md line 73 | - |
+| S13 | The retreat to a 5.x release loses the built-in Arabic shaping (docs/10_FRONTEND.md section "Stack and pins"); the changelog places the shaping at version 6.9.0, the retreat has not been run, and Arabic shaping itself was not run here (no browser): not verified. | PACK | docs/10_FRONTEND.md section "Stack and pins" | - |
 | S14 | Arabic labels need real glyphs; the skill file names serving the glyph files, or a local fallback that depends on the environment. | READ | P7 | "Arabic, Hebrew and other alphabetic scripts - need real glyphs ... serve its glyph PBFs ... which is environment-dependent" |
 | S15 | Version 6.7.0 added map.setFontFaces and map.getFontFaces for the font-faces property of the style specification. | READ | P3 | "Support the style specification's font-faces property, with map.setFontFaces and map.getFontFaces" |
 | S16 | A page that loads the library through the latest tag goes to a blank grey screen under version 6. | READ | P1 | "a page pinned to @latest goes to a blank gray screen" |
@@ -82,22 +82,22 @@ Setup, in an empty folder: three sub-folders `v6`, `v5` and `mb`, each with a `p
 | S18 | The pixelRatio option defaults to the device pixel ratio. | READ | P5 | "Defaults to devicePixelRatio if not specified" |
 | S19 | The project's agent-skills repository lists a skill for the version 6 migration (maplibre-v6-migration). | READ | P6 | "A v5 app breaks after upgrading to v6, or before pinning a v6 install" |
 | S20 | The project's agent-skills repository lists a skill for hosting tiles without a tile server (maplibre-pmtiles-patterns). | READ | P6 | "Hosting tiles without a tile server" |
-| S21 | The pack gives the light position of the MapLibre style specification as an azimuthal angle clockwise from north and a polar angle of 0 directly overhead (docs/11_DESIGN_DIRECTION.md line 264); no page of the style specification was read here: not verified. | PACK | docs/11_DESIGN_DIRECTION.md line 264 | - |
+| S21 | The pack gives the light position of the MapLibre style specification as an azimuthal angle clockwise from north and a polar angle of 0 directly overhead (docs/11_DESIGN_DIRECTION.md section "The map"); no page of the style specification was read here: not verified. | PACK | docs/11_DESIGN_DIRECTION.md section "The map" | - |
 
 ### Slice S1 confirmation
 
 | Field | Value | Rows in pins.toml | Pack source |
 |---|---|---|---|
-| exact pin, last 5.x release and right-to-left plugin for the retreat | not yet confirmed | maplibre-gl, @mapbox/mapbox-gl-rtl-text | docs/10_FRONTEND.md line 73 |
-| spike result that chose between pin and retreat | not yet confirmed | maplibre-gl | docs/10_FRONTEND.md line 94 |
-| Arabic glyph route (glyph files or font-faces) | not yet confirmed | - | docs/10_FRONTEND.md line 536 |
-| hexagons under labels | not yet confirmed | - | docs/10_FRONTEND.md line 518 |
-| pixel-ratio cap value | not yet confirmed | - | docs/10_FRONTEND.md line 593 |
-| watermark mechanism | not yet confirmed | - | docs/10_FRONTEND.md line 776 |
+| exact pin, last 5.x release and right-to-left plugin for the retreat | not yet confirmed | maplibre-gl, @mapbox/mapbox-gl-rtl-text | docs/10_FRONTEND.md section "Stack and pins" |
+| spike result that chose between pin and retreat | not yet confirmed | maplibre-gl | docs/10_FRONTEND.md FE-03 |
+| Arabic glyph route (glyph files or font-faces) | not yet confirmed | - | docs/10_FRONTEND.md section "The basemap" |
+| hexagons under labels | not yet confirmed | - | docs/10_FRONTEND.md FE-46 |
+| pixel-ratio cap value | not yet confirmed | - | docs/10_FRONTEND.md section "Layouts, presenter mode and big-screen rules" |
+| watermark mechanism | not yet confirmed | - | docs/10_FRONTEND.md section "Open questions and assumptions" |
 
 ## deck.gl 9.4
 
-Used here for the data layers, interleaved with the basemap through `@deck.gl/maplibre` (docs/10_FRONTEND.md line 66). Series 9.4; the pins.toml rows are `@deck.gl/core`, `@deck.gl/layers`, `@deck.gl/geo-layers` and `@deck.gl/extensions`.
+Used here for the data layers, interleaved with the basemap through `@deck.gl/maplibre` (docs/10_FRONTEND.md section "Stack and pins"). Series 9.4; the pins.toml rows are `@deck.gl/core`, `@deck.gl/layers`, `@deck.gl/geo-layers` and `@deck.gl/extensions`.
 
 ### Pages read
 
@@ -135,8 +135,8 @@ Same setup and folders as the Runs table of the MapLibre section.
 | S5 | Applications that target WebGL2 only can resolve the export condition visgl:webgl-only, which selects builds without the WebGPU branches. | READ | P1 | "configure their bundler to resolve the custom export condition visgl:webgl-only" |
 | S6 | The export map of @deck.gl/core 9.4.1 contains the condition visgl:webgl-only. | OBSERVED | R1 | - |
 | S7 | When the data prop of a layer changes, the layer recalculates all of its GPU buffers. | READ | P2 | "When the data prop changes, the layer will recalculate all of its GPU buffers" |
-| S8 | Whether FillStyleExtension and PathStyleExtension apply through the sublayers of H3HexagonLayer is not confirmed by the pack (docs/10_FRONTEND.md line 500) and was not looked for here: not verified. | PACK | docs/10_FRONTEND.md line 500 | - |
-| S9 | The pack says the documented dash extension has no control for dash phase (docs/11_DESIGN_DIRECTION.md line 299); the extension page was not searched for it here: not verified. | PACK | docs/11_DESIGN_DIRECTION.md line 299 | - |
+| S8 | Whether FillStyleExtension and PathStyleExtension apply through the sublayers of H3HexagonLayer is not confirmed by the pack (docs/10_FRONTEND.md section "Map layers") and was not looked for here: not verified. | PACK | docs/10_FRONTEND.md section "Map layers" | - |
+| S9 | The pack says the documented dash extension has no control for dash phase (docs/11_DESIGN_DIRECTION.md DES-67); the extension page was not searched for it here: not verified. | PACK | docs/11_DESIGN_DIRECTION.md DES-67 | - |
 | S10 | The performance page says that on 2015 hardware with dual graphics cards most basic layers render at 60 FPS during pan and zoom up to about one million data items. | READ | P2 | "On 2015 ... with dual graphics cards ... renders fluidly at 60 FPS during pan and zoom operations up to about 1M (one million) data items" |
 | S11 | The fillPatternSizeUnits property of FillStyleExtension takes the units meters, common or pixels. | READ | P5 | "fillPatternSizeUnits (string, optional) ... The units of the pattern size, one of 'meters', 'common' and 'pixels'" |
 | S12 | The LightingEffect page calls the shadow effect experimental. | READ | P6 | "For rendering experimental shadow effect, _shadow prop of DirectionalLight must be set to true" |
@@ -145,16 +145,16 @@ Same setup and folders as the Runs table of the MapLibre section.
 
 | Field | Value | Rows in pins.toml | Pack source |
 |---|---|---|---|
-| exact pin and retreat pin of the four layer packages | not yet confirmed | @deck.gl/core, @deck.gl/layers, @deck.gl/geo-layers, @deck.gl/extensions | docs/10_FRONTEND.md line 73 |
-| spike result that chose between pin and retreat | not yet confirmed | @deck.gl/core | docs/10_FRONTEND.md line 94 |
-| style extensions through H3HexagonLayer | not yet confirmed | - | docs/10_FRONTEND.md line 500 |
-| method for moving dashes | not yet confirmed | - | docs/10_FRONTEND.md line 776 |
-| load trial of 110,000 hexagons and 50,000 particles | not yet confirmed | - | TASKS.md line 170 |
-| no code path enables WebGPU | not yet confirmed | - | docs/10_FRONTEND.md line 95 |
+| exact pin and retreat pin of the four layer packages | not yet confirmed | @deck.gl/core, @deck.gl/layers, @deck.gl/geo-layers, @deck.gl/extensions | docs/10_FRONTEND.md section "Stack and pins" |
+| spike result that chose between pin and retreat | not yet confirmed | @deck.gl/core | docs/10_FRONTEND.md FE-03 |
+| style extensions through H3HexagonLayer | not yet confirmed | - | docs/10_FRONTEND.md section "Map layers" |
+| method for moving dashes | not yet confirmed | - | docs/10_FRONTEND.md section "Open questions and assumptions" |
+| load trial of 110,000 hexagons and 50,000 particles | not yet confirmed | - | TASKS.md S1-T02 |
+| no code path enables WebGPU | not yet confirmed | - | docs/10_FRONTEND.md FE-04 |
 
 ## deck.gl MapLibre module
 
-The module `@deck.gl/maplibre` is used here through `MapLibreOverlay`, interleaved with the basemap (docs/10_FRONTEND.md lines 59 and 87). The pins.toml rows are `@deck.gl/maplibre` and, for the retreat, `@deck.gl/mapbox`.
+The module `@deck.gl/maplibre` is used here through `MapLibreOverlay`, interleaved with the basemap (docs/10_FRONTEND.md section "Stack and pins"). The pins.toml rows are `@deck.gl/maplibre` and, for the retreat, `@deck.gl/mapbox`.
 
 ### Pages read
 
@@ -178,7 +178,7 @@ Same setup and folders as the Runs table of the MapLibre section.
 
 | Id | Earlier form | Current form | Kind | Source | Quote |
 |---|---|---|---|---|---|
-| I1 | `MapboxOverlay` from the former `@deck.gl/mapbox` module, which the pack names as the old idiom (docs/10_FRONTEND.md line 88) | `MapLibreOverlay` from `@deck.gl/maplibre` (the older export still exists: S3) | READ | P3 | "New @deck.gl/maplibre module is forked from the former @deck.gl/mapbox module. It provides support for overlaid and interleaved rendering with MapLibre GL JS v4, v5, and the recently released v6." |
+| I1 | `MapboxOverlay` from the former `@deck.gl/mapbox` module, which the pack names as the old idiom (docs/10_FRONTEND.md section "Stack and pins") | `MapLibreOverlay` from `@deck.gl/maplibre` (the older export still exists: S3) | READ | P3 | "New @deck.gl/maplibre module is forked from the former @deck.gl/mapbox module. It provides support for overlaid and interleaved rendering with MapLibre GL JS v4, v5, and the recently released v6." |
 
 ### Statements
 
@@ -195,15 +195,15 @@ Same setup and folders as the Runs table of the MapLibre section.
 | S9 | The props useDevicePixels and device are ignored in interleaved mode, because MapLibre owns the shared canvas. | READ | P1 | "useDevicePixels and device are ignored in interleaved mode" |
 | S10 | Globe integration uses the experimental GlobeView of deck.gl. | READ | P1 | "Globe integration uses deck.gl's experimental GlobeView" |
 | S11 | Interleaved mode needs WebGL2. | READ | P1 | "Interleaved mode only works when WebGL2 is available" |
-| S12 | The retreat uses @deck.gl/mapbox in place of this module (docs/10_FRONTEND.md line 73); it has not been installed or run for this retreat here: not verified. | PACK | docs/10_FRONTEND.md line 73 | - |
+| S12 | The retreat uses @deck.gl/mapbox in place of this module (docs/10_FRONTEND.md section "Stack and pins"); it has not been installed or run for this retreat here: not verified. | PACK | docs/10_FRONTEND.md section "Stack and pins" | - |
 
 ### Slice S1 confirmation
 
 | Field | Value | Rows in pins.toml | Pack source |
 |---|---|---|---|
-| exact pin and the retreat that replaces the module | not yet confirmed | @deck.gl/maplibre, @deck.gl/mapbox | docs/10_FRONTEND.md line 73 |
-| interleaved mode with the pinned MapLibre on WebGL2 | not yet confirmed | - | docs/10_FRONTEND.md line 95 |
-| layers under labels through beforeId | not yet confirmed | - | docs/10_FRONTEND.md line 475 |
+| exact pin and the retreat that replaces the module | not yet confirmed | @deck.gl/maplibre, @deck.gl/mapbox | docs/10_FRONTEND.md section "Stack and pins" |
+| interleaved mode with the pinned MapLibre on WebGL2 | not yet confirmed | - | docs/10_FRONTEND.md FE-04 |
+| layers under labels through beforeId | not yet confirmed | - | docs/10_FRONTEND.md section "Map layers" |
 
 ## Confirmations assigned to this task
 
@@ -273,28 +273,28 @@ Setup, in an empty folder: three sub-folders `f1`, `f2` and `ic`; in each, `npm 
 
 | Pack claim | Pack source | Where |
 |---|---|---|
-| Version 6 is ESM-only | docs/10_FRONTEND.md line 88 | MapLibre GL JS 6 I2 |
-| Version 6 is WebGL2-only | docs/10_FRONTEND.md line 88 | MapLibre GL JS 6 I6 |
-| Version 6 removed map.transform | docs/10_FRONTEND.md line 88 | MapLibre GL JS 6 I5 |
-| Version 6 needs one worker-URL call under a bundler | docs/10_FRONTEND.md line 88 | MapLibre GL JS 6 S5 |
-| Version 6 throws an initialisation error when WebGL2 is missing | docs/10_FRONTEND.md line 88 | MapLibre GL JS 6 S1 |
-| Since 6.9.0 MapLibre shapes Arabic itself, which deprecates setRTLTextPlugin | docs/10_FRONTEND.md line 88 | MapLibre GL JS 6 I4; MapLibre GL JS 6 S10 |
-| The font-faces calls setFontFaces exist since 6.7 | docs/10_FRONTEND.md line 536 | MapLibre GL JS 6 S15 |
-| Coding agents default to version 4 and 5 idioms | docs/10_FRONTEND.md line 88 | MapLibre GL JS 6 I1 |
-| pixelRatio and maxCanvasSize lower the ratio to fit | docs/10_FRONTEND.md line 593 | MapLibre GL JS 6 S17 |
-| The light position has an azimuthal angle clockwise from north and a polar angle of 0 overhead | docs/11_DESIGN_DIRECTION.md line 264 | MapLibre GL JS 6 S21 |
-| The default font set may not cover Arabic, so real Arabic glyphs are needed | docs/10_FRONTEND.md line 536 | MapLibre GL JS 6 S14 |
-| The retreat to a 5.x release loses built-in Arabic shaping | docs/10_FRONTEND.md line 73 | MapLibre GL JS 6 S13 |
-| WebGPU is not production-ready | docs/10_FRONTEND.md line 79 | deck.gl 9.4 S3 |
-| WebGPU cannot interleave with the basemap | docs/10_FRONTEND.md line 79 | deck.gl 9.4 S4 |
-| Basic layers render at 60 frames per second up to about one million items | docs/decisions/0006-fixed-grid-and-pin-based-areas.md line 28; docs/10_FRONTEND.md line 655 | deck.gl 9.4 S10 |
-| Changing the data prop rebuilds every buffer | docs/10_FRONTEND.md line 170 | deck.gl 9.4 S7 |
-| Whether the style extensions apply through the sublayers of H3HexagonLayer is not confirmed | docs/10_FRONTEND.md line 500 | deck.gl 9.4 S8 |
-| The documented dash extension has no control for dash phase | docs/11_DESIGN_DIRECTION.md line 299 | deck.gl 9.4 S9 |
-| The shadow effect of the overlay library is documented as experimental | docs/11_DESIGN_DIRECTION.md line 702 | deck.gl 9.4 S12 |
-| FillStyleExtension gives pixel-sized textures | docs/11_DESIGN_DIRECTION.md line 829 | deck.gl 9.4 S11 |
-| The pixel-ratio cap applies to deck.gl through useDevicePixels set to a number | docs/10_FRONTEND.md line 593 | deck.gl MapLibre module S9 |
-| The module is used interleaved through MapLibreOverlay and MapboxOverlay is the old idiom | docs/10_FRONTEND.md line 66; docs/10_FRONTEND.md line 88 | deck.gl MapLibre module I1; deck.gl MapLibre module S5 |
-| GlobeView is experimental | docs/10_FRONTEND.md line 80 | deck.gl MapLibre module S10 |
-| Data layers sit beneath the label layers through the interleaved beforeId placement | docs/10_FRONTEND.md line 475 | deck.gl MapLibre module S6 |
-| The retreat uses @deck.gl/mapbox in place of the module | docs/10_FRONTEND.md line 73 | deck.gl MapLibre module S12 |
+| Version 6 is ESM-only | docs/10_FRONTEND.md section "Stack and pins" | MapLibre GL JS 6 I2 |
+| Version 6 is WebGL2-only | docs/10_FRONTEND.md section "Stack and pins" | MapLibre GL JS 6 I6 |
+| Version 6 removed map.transform | docs/10_FRONTEND.md section "Stack and pins" | MapLibre GL JS 6 I5 |
+| Version 6 needs one worker-URL call under a bundler | docs/10_FRONTEND.md section "Stack and pins" | MapLibre GL JS 6 S5 |
+| Version 6 throws an initialisation error when WebGL2 is missing | docs/10_FRONTEND.md section "Stack and pins" | MapLibre GL JS 6 S1 |
+| Since 6.9.0 MapLibre shapes Arabic itself, which deprecates setRTLTextPlugin | docs/10_FRONTEND.md section "Stack and pins" | MapLibre GL JS 6 I4; MapLibre GL JS 6 S10 |
+| The font-faces calls setFontFaces exist since 6.7 | docs/10_FRONTEND.md section "The basemap" | MapLibre GL JS 6 S15 |
+| Coding agents default to version 4 and 5 idioms | docs/10_FRONTEND.md section "Stack and pins" | MapLibre GL JS 6 I1 |
+| pixelRatio and maxCanvasSize lower the ratio to fit | docs/10_FRONTEND.md section "Layouts, presenter mode and big-screen rules" | MapLibre GL JS 6 S17 |
+| The light position has an azimuthal angle clockwise from north and a polar angle of 0 overhead | docs/11_DESIGN_DIRECTION.md section "The map" | MapLibre GL JS 6 S21 |
+| The default font set may not cover Arabic, so real Arabic glyphs are needed | docs/10_FRONTEND.md section "The basemap" | MapLibre GL JS 6 S14 |
+| The retreat to a 5.x release loses built-in Arabic shaping | docs/10_FRONTEND.md section "Stack and pins" | MapLibre GL JS 6 S13 |
+| WebGPU is not production-ready | docs/10_FRONTEND.md section "Stack and pins" row "WebGPU in deck.gl" | deck.gl 9.4 S3 |
+| WebGPU cannot interleave with the basemap | docs/10_FRONTEND.md section "Stack and pins" row "WebGPU in deck.gl" | deck.gl 9.4 S4 |
+| Basic layers render at 60 frames per second up to about one million items | docs/decisions/0006-fixed-grid-and-pin-based-areas.md section "Evidence"; docs/10_FRONTEND.md section "Performance budgets" | deck.gl 9.4 S10 |
+| Changing the data prop rebuilds every buffer | docs/10_FRONTEND.md section "State management" | deck.gl 9.4 S7 |
+| Whether the style extensions apply through the sublayers of H3HexagonLayer is not confirmed | docs/10_FRONTEND.md section "Map layers" | deck.gl 9.4 S8 |
+| The documented dash extension has no control for dash phase | docs/11_DESIGN_DIRECTION.md DES-67 | deck.gl 9.4 S9 |
+| The shadow effect of the overlay library is documented as experimental | docs/11_DESIGN_DIRECTION.md DES-146 | deck.gl 9.4 S12 |
+| FillStyleExtension gives pixel-sized textures | docs/11_DESIGN_DIRECTION.md section "Sources" | deck.gl 9.4 S11 |
+| The pixel-ratio cap applies to deck.gl through useDevicePixels set to a number | docs/10_FRONTEND.md section "Layouts, presenter mode and big-screen rules" | deck.gl MapLibre module S9 |
+| The module is used interleaved through MapLibreOverlay and MapboxOverlay is the old idiom | docs/10_FRONTEND.md section "Stack and pins"; docs/10_FRONTEND.md section "Stack and pins" | deck.gl MapLibre module I1; deck.gl MapLibre module S5 |
+| GlobeView is experimental | docs/10_FRONTEND.md section "Stack and pins" row "deck.gl `GlobeView`" | deck.gl MapLibre module S10 |
+| Data layers sit beneath the label layers through the interleaved beforeId placement | docs/10_FRONTEND.md section "Map layers" | deck.gl MapLibre module S6 |
+| The retreat uses @deck.gl/mapbox in place of the module | docs/10_FRONTEND.md section "Stack and pins" | deck.gl MapLibre module S12 |
