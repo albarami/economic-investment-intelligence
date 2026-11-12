@@ -82,21 +82,6 @@ class TestBootstrap(unittest.TestCase):
     def test_profile_is_eii_and_survives_a_ci_variable(self) -> None:
         self._table()
         root = self._root()
-        support.put(
-            root,
-            "fx/profile/test_profile.py",
-            "from hypothesis import settings\n\n"
-            "def test_profile():\n"
-            "    current = settings()\n"
-            "    print('PROFILE', current.profile_name if hasattr(current, 'profile_name') else settings._current_profile)\n"
-            "    print('NAME', __import__('hypothesis').settings.get_current_profile_name() if hasattr(__import__('hypothesis').settings, 'get_current_profile_name') else 'missing')\n"
-            "    print('MAX', current.max_examples)\n"
-            "    print('DB', current.database)\n"
-            "    print('BLOB', current.print_blob)\n"
-            "    print('DERAND', current.derandomize)\n"
-            "    deadline = current.deadline\n"
-            "    print('DEADLINE', None if deadline is None else int(deadline.total_seconds() * 1000))\n",
-        )
         # The profile name is printed through the public function when it exists.
         support.put(
             root,

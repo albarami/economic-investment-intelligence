@@ -121,11 +121,14 @@ On 2026-11-12 the owner's note moved these real-deployment items here ([decision
 
 ## 9. Hardening register
 
-Hardening points raised during the build that go beyond a task's acceptance criterion ([decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) items 3 and 4). Each entry names its origin. None is built now; a deployment on real records, or a decision record, turns an entry into work (DHA-04).
+Hardening points raised during the build that go beyond a task's acceptance criterion ([decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) items 3 and 4). Each entry names its origin. No deciding check is built now; entries that were built and later removed say so explicitly. A deployment on real records, or a decision record, turns an entry into work (DHA-04).
 
 | ID | Requirement |
 |---|---|
 | DHA-80 | Host rule of built JavaScript (origin: the first review of task S0-T03, pull request 3, round 1, proposed item P1). The built-JavaScript host rule stops at a colon and does not look for a user part before an at-sign, so a URL whose user part names an allowed host can hide a third-party host. This is hardening against deliberate evasion. Before a deployment, the rule parses the URL, rejects any user part and compares the real host with the allow-list. Not built now. |
+| DHA-81 | Exact AppArmor listing (origin: the plan of task S0-T11; the owner's notes of 2026-11-12). Requiring `aa-status --json` to parse in an exact format and list `bwrap` and `unpriv_bwrap` by exact name in enforce mode was built with task S0-T11 and removed as a deciding check in task S0-T15. The command's raw exit status, standard output and standard error are printed for the record; behaviour decides the hosted sandbox proof. |
+| DHA-82 | Profile file pin by size and SHA-256 (origin: the plan of task S0-T11; the owner's notes of 2026-11-12). Requiring the distribution and installed `bwrap-userns-restrict` files to match a pinned size and SHA-256 was built with task S0-T11 and removed as a deciding check in task S0-T15. Both files' sizes and hashes are printed for the record without comparison; an existing file that differs is never replaced. The source must exist, installation and loading must succeed, and the probe after loading must pass. |
+| DHA-83 | Stacked AppArmor label (origin: the plan of task S0-T11; the owner's notes of 2026-11-12). Requiring a program started by bubblewrap to read exactly `bwrap//&unpriv_bwrap (enforce)` was built with task S0-T11 and removed as a deciding check in task S0-T15. The label command's raw exit status, standard output and standard error are printed for the record, including failures or text that cannot be parsed; the namespace probe and prohibited-operation tests still decide the result. |
 
 ## Open questions and assumptions
 

@@ -8990,6 +8990,292 @@ Seed:      none
 Notes:     Every fix commit subject is a Conventional Commit (PLN-05).
 ```
 
+### S0-T15 — Review follow-up for slice S0: task log (part A)
+
+- Builder persona: senior platform engineer (the review items); principal platform and sandbox engineer (the sandbox proof)
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: the lead (Anthropic, Claude Fable 5.2): the list of the items from OPEN_ITEMS.md, and the design of the sandbox proof by behaviour, read from the merged code, on the owner's notes of 2026-11-12
+- Builder maker and model: the seven review items: Devin command-line tool, `swe-2-high` (Cognition), a first round that ran no command and failed the lead's checks, then Cursor command-line tool, `composer-2.5` (Cursor); the sandbox proof: Codex command-line tool, `gpt-6-astra` (OpenAI)
+- Reviewer maker and model: Abacus AI command-line tool, `QWEN3_8_MAX_THINKING` (Alibaba), read-only (a maker that neither designed nor built the change)
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, github-flow and strict-reviewer; the builders' tools have no skills, so their briefs gave the rules: the persona, an exact reading list, tests first with a recorded red run, one planted violation for every rule, no suppression comment, skip or weaker assertion, the behaviour proof never weakened and no fallback for sandbox enforcement, install-profile never run on the build machine, no kernel setting written, no secret, personal name, absolute local path or eight- or eleven-digit run in any file, and a report of only the results it saw
+- Branch: `task/S0-T15-slice-follow-up`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/20
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit; the hosted run of the workflow sandbox on the pull request head is the evidence for the runner and is entered with the verdict
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4 (system) and 3.14.6 (uv); git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8; bubblewrap 0.11.1
+- Parts: the task is delivered in two parts. Part A, this pull request, holds the sandbox proof by behaviour and the closures of PO-S0-02 to PO-S0-08. The owner decided on 2026-11-12 that the repository ruleset of task S0-T14 is applied only after the change of the sandbox proof is merged, so that an update of the runner image cannot block every pull request through the required sandbox check. Part B closes the items that are still open (PO-S0-01, PO-S0-09 and what the remaining reviews of the slice propose) after every other task of the slice, as the task's dependency line says
+- Build round 1 of the review items (Devin, `swe-2-high`): edits that had never been run; the lead's checks found 15 lint errors and five failing tests from one of them
+- Build round 2 of the review items (Cursor, `composer-2.5`): the seven items closed, each test red first where a test was added; all checks pass
+- Build round of the sandbox proof (Codex, `gpt-6-astra`): tests first, 13 failures on the unchanged script; then the new flow of install-profile, the removal of scripts/ci_apparmor.py and its test module, the three register entries DHA-81 to DHA-83 of document 17 and OI-63. A first attempt of this round by another OpenAI model through the Cursor tool was stopped after eight minutes on the owner's note on tool routing and its partial edits were discarded; this round started again from the state of the review items
+- Lead's check of the build: one read of the changed proof script (a passing first probe installs nothing; installation, loading and both probes are judged exactly as before; a record command that is missing or times out cannot raise, since the command runner turns both into a result); the lead's runs of the sandbox tests, the proof command and the whole suite; one sentence of OI-63 on the hosted evidence made independent of the date
+
+#### Evidence for the work commit `2e0f4281473e1d5fe766c2c5dfaad072ca488217`
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_sandbox_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    65 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The sandbox test modules, the rules of the new flow of install-profile among them, each with its planted violation.
+```
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   uv run --locked python scripts/ci_sandbox.py prove
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    19 named cases passed, 0 failed, 0 skipped; RESULT: PASSED
+Seed:      none
+Notes:     The proof command of the hosted job, run locally: each of the 19 named behaviour cases exactly once and passed (the acceptance criterion of task S0-T11); the hosted run on the pull request head is the evidence for the runner.
+```
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   v="$PWD/.venv"; copy=$(mktemp -d); st=9; git ls-files -z | xargs -0 cp --parents -t "$copy" && mkdir -p "$copy/data" && cp -R data/engine_extensions "$copy/data/" && git -C "$copy" init -q && git -C "$copy" add -A && st=0; t() { (cd "$copy" && UV_PROJECT_ENVIRONMENT="$v" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p test_sandbox_userns.py >"$copy/$1.log" 2>&1); }; ctl=9; if [ "$st" -eq 0 ]; then t green && ctl=0; fi; rc=9; if [ "$ctl" -eq 0 ]; then git show f3e7d5764ed315706c683ea7b3b1f7c82e0897f2:scripts/ci_sandbox.py > "$copy/scripts/ci_sandbox.py" && git show f3e7d5764ed315706c683ea7b3b1f7c82e0897f2:scripts/ci_apparmor.py > "$copy/scripts/ci_apparmor.py" && rc=0; fi; if [ "$rc" -eq 0 ]; then a=0; t red || a=$?; test "$a" -eq 1 || rc=8; grep -q "^FAILED (" "$copy/red.log" || rc=7; grep -q "test_record_commands_never_decide_the_result" "$copy/red.log" || rc=6; fi; rm -rf "$copy"; test "$rc" -eq 0
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The red run of TST-161 with its green control: in a scratch copy of the tracked files the module test_sandbox_userns passes; with the proof script and the removed module of the base put back it fails, the test of the record commands among the failures; the copy is removed.
+```
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    377 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard-test discovery of rule 44, with the tests of the seven closed items (PO-S0-02 to PO-S0-08).
+```
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   ./eii test
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1059 passed, 0 failed, 0 skipped
+Seed:      1794510205
+Notes:     The project's own test command: every network-free suite.
+```
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint, with no suppression comment left in scripts/tests/workspace_fields.py (PO-S0-02).
+```
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "110 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 106 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 188 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The notes check, unchanged by the new test cases of PO-S0-07 and PO-S0-08.
+```
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The agent files are identical.
+```
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   python3 -I -c "import subprocess,sys; g=sorted(subprocess.run(['git','diff','--name-status','--no-renames','f3e7d5764ed315706c683ea7b3b1f7c82e0897f2...2e0f4281473e1d5fe766c2c5dfaad072ca488217'],check=True,capture_output=True,text=True).stdout.splitlines()); w=sorted(['M\t'+f for f in 'OPEN_ITEMS.md docs/17_DEPLOYMENT_HARDENING.md scripts/ci_sandbox.py scripts/tests/pychecks_support.py scripts/tests/sandbox_support.py scripts/tests/test_pychecks_config.py scripts/tests/test_reference_notes_rows.py scripts/tests/test_sandbox_extensions.py scripts/tests/test_sandbox_output.py scripts/tests/test_sandbox_userns.py scripts/tests/test_test_bootstrap.py scripts/tests/test_workspace_metadata.py scripts/tests/workspace_fields.py'.split()]+['D\t'+f for f in 'scripts/ci_apparmor.py scripts/tests/test_sandbox_apparmor.py'.split()]); print(len(g), [x for x in g if x not in w]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "15 []"
+Seed:      none
+Notes:     The work commit changes exactly 13 paths and removes two (TST-163).
+```
+
+```text
+### S0-T15 — Review follow-up for slice S0
+Commit:    2e0f4281473e1d5fe766c2c5dfaad072ca488217
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','f3e7d5764ed315706c683ea7b3b1f7c82e0897f2..2e0f4281473e1d5fe766c2c5dfaad072ca488217'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Every work commit subject is a Conventional Commit (PLN-05).
+```
+
+#### S0-T08: addition to the task log for part B (pull request https://github.com/albarami/economic-investment-intelligence/pull/22 )
+
+- Part B: the documents of the task and decision record 0020 (the tiles and fonts row of preflight is a freeze-bundle check in every mode; this project's Compose database service uses the loopback port 55440). Part C follows after task S0-T07 merges
+- Planner maker and model of the refresh: OpenAI GPT-5.6 Sol (high), through the Cursor command-line tool (the edits that still apply after the documentation changes merged since the approved plan, the blocks derived again on the current files, citations by anchor), with the lead's notes: the build base holds no decision record 0019, so the two index ranges end at record 0018 and then name record 0020
+- Builder maker and model: Cursor command-line tool, `grok-4.7-high` (xAI)
+- Reviewer maker and model: Antigravity command-line tool, `gemini-4-carbon-high` (Google), read-only (a maker that neither planned nor built it)
+- Branch: `task/S0-T08B-documents`
+- Build round 1: every one of the 25 OLD blocks occurred once in its file; the 25 block pairs applied and the record created; nothing else edited
+- Lead's check of the build: each of the ten changed files equals its base text plus exactly the plan's blocks, and the record equals the plan's literal text (the lead's script); one read of the plan's blocks
+- Verdict of part B: PENDING (the verdict and the merge record are entered by the next pull request)
+
+#### Evidence for the work commit `a4266e17f84e8347b7288e09504a6c43e2d9cb09`
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    a4266e17f84e8347b7288e09504a6c43e2d9cb09
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 204 text files, 54 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the ten changed documents and the new record.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    a4266e17f84e8347b7288e09504a6c43e2d9cb09
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    a4266e17f84e8347b7288e09504a6c43e2d9cb09
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The agent files are not changed by this part and stay byte-identical.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    a4266e17f84e8347b7288e09504a6c43e2d9cb09
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 59 components: OK"
+Seed:      none
+Notes:     The changed note of the pin record and its unchanged anchor citation stay valid.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    a4266e17f84e8347b7288e09504a6c43e2d9cb09
+Command:   ./eii test
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1119 passed, 0 failed, 0 skipped
+Seed:      1794510996
+Notes:     The behaviour of the task stays green after the changes of the documents: every network-free suite.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    a4266e17f84e8347b7288e09504a6c43e2d9cb09
+Command:   python3 -I -c "import subprocess,sys; g=sorted(subprocess.run(['git','diff','--name-status','--no-renames','09e9b16556a304259ad256911e7153c7366789f6...a4266e17f84e8347b7288e09504a6c43e2d9cb09'],check=True,capture_output=True,text=True).stdout.splitlines()); w=sorted(['M\t'+f for f in 'OPEN_ITEMS.md README.md docs/02_ARCHITECTURE.md docs/08_BACKEND.md docs/12_TESTING_AND_QUALITY.md docs/13_DEPLOYMENT_AND_OPERATIONS.md docs/14_IMPLEMENTATION_PLAN.md docs/16_DEMO_RUNBOOK.md docs/README.md pins.toml'.split()]+['A\tdocs/decisions/0020-freeze-bundle-check-and-project-database-port.md']); print(len(g), [x for x in g if x not in w]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "11 []"
+Seed:      none
+Notes:     The work commit changes exactly ten documents and adds the decision record (TST-163).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    a4266e17f84e8347b7288e09504a6c43e2d9cb09
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','09e9b16556a304259ad256911e7153c7366789f6..a4266e17f84e8347b7288e09504a6c43e2d9cb09'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Every work commit subject is a Conventional Commit (PLN-05).
+```
+
 ### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources: record of the change
 
 - Kind of change: documentation only (decision record 0019 and the amendments it makes to the pack); it belongs to no task of TASKS.md and adds the tasks that build what it decides

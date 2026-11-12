@@ -882,7 +882,7 @@ row-level security and fixed read-function privileges, and PostGIS 3.6 (a wrong 
 the vault rule (BE-05); the model API key's presence and, when the provider is `tomtom`, the provider key's presence (never a value); preflight and `./eii up` never contact the provider. Whenever `EII_RELEASE_DIR` is
 unset, foundation preflight prints `WARN not_configured` for the release, load-receipt,
 embedded-reader and recorded-replay checks and those warnings do not make it fail; every other
-check retains its normal severity. `./eii up` always requires a configured complete release. From
+check retains its normal severity as the preflight table of document 13 defines it (the tiles, glyphs and interface fonts row warns until a freeze bundle exists; [decision 0020](decisions/0020-freeze-bundle-check-and-project-database-port.md)). `./eii up` always requires a configured complete release. From
 the slice S3 gate onward every gate runs preflight with `EII_RELEASE_DIR` set.
 
 `./eii preflight` only probes and never starts or stops anything. `./eii db-up` and `./eii db-down`

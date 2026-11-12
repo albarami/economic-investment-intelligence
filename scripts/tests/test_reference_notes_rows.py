@@ -411,6 +411,63 @@ class NotesRows(unittest.TestCase):
                     )
                 ],
             )
+        with self.subTest(name="a8-confirmation-bad-anchor"):
+            root = self._plant(
+                lambda r: sup.edit_in(
+                    r,
+                    DOCS,
+                    DOCS_LIB,
+                    f"| {DUCK_FIELD1} | {tables.CONFIRMED} | - | {PACK_LINE} |",
+                    f"| {DUCK_FIELD1} | {tables.CONFIRMED} | - | "
+                    'docs/stub.md section "Absent" |',
+                )
+            )
+            n = sup.line_of(root, DOCS, f"| {DUCK_FIELD1} |")
+            self.assertEqual(
+                sup.fails(sup.run(root)),
+                [
+                    sup.fail_line(
+                        DOCS,
+                        "pack-cite",
+                        n,
+                        f'{DUCK_FIELD1}: heading "Absent" found 0 times',
+                    )
+                ],
+            )
+        with self.subTest(name="a9-coverage-bad-anchor"):
+            root = self._plant(
+                lambda r: sup.edit(
+                    r,
+                    WEB,
+                    f"| A claim | {PACK_LINE} |",
+                    '| A claim | docs/stub.md section "Absent" |',
+                )
+            )
+            n = sup.line_of(root, WEB, "| A claim |")
+            self.assertEqual(
+                sup.fails(sup.run(root)),
+                [
+                    sup.fail_line(
+                        WEB,
+                        "pack-cite",
+                        n,
+                        'row 1: heading "Absent" found 0 times',
+                    )
+                ],
+            )
+        with self.subTest(name="a10-anchor-missing-file"):
+            root, n = one("docs/gone.md ARC-01")
+            self.assertEqual(
+                sup.fails(sup.run(root)),
+                [
+                    sup.fail_line(
+                        WEB,
+                        "pack-cite",
+                        n,
+                        "S3: docs/gone.md is not a file",
+                    )
+                ],
+            )
         with self.subTest(label="control-agents-section"):
             root, _n = one(AGENTS_CITE)
             self.assertEqual(sup.fails(sup.run(root)), [])
@@ -708,6 +765,49 @@ class NotesRows(unittest.TestCase):
 
             root = self._plant(plant_anchor)
             self.assertEqual(sup.fails(sup.run(root)), [])
+        for label, text in (
+            (
+                "row-not-in-section",
+                '| S1 | The pack names docs/stub.md section "Tables" row '
+                '"Fast lane". | READ |',
+            ),
+            (
+                "section-absent",
+                '| S1 | The pack names docs/stub.md section "Fast things". | READ |',
+            ),
+            (
+                "file-absent",
+                '| S1 | The pack names docs/absent.md section "Fast things". | READ |',
+            ),
+            (
+                "word-outside-verified-anchor",
+                '| S1 | The row (docs/stub.md section "Tables" row "Fast mode") '
+                "is fast. | READ |",
+            ),
+        ):
+            with self.subTest(label=label):
+
+                def plant_bad(r: Path, t: str = text) -> None:
+                    sup.edit(
+                        r,
+                        "docs/stub.md",
+                        "| First row | a value |",
+                        "| First row | a value |\n| Fast mode | a value |",
+                    )
+                    sup.edit_in(
+                        r,
+                        WEB,
+                        lib,
+                        "| S1 | A read statement. | READ |",
+                        t,
+                    )
+
+                root = self._plant(plant_bad)
+                n = sup.line_of(root, WEB, "| S1 | The")
+                self.assertEqual(
+                    sup.fails(sup.run(root)),
+                    [sup.fail_line(WEB, "claim-word", n, 'S1: word "fast"')],
+                )
         with self.subTest(label="control-best-in-pages-title"):
             root = self._plant(
                 lambda r: sup.edit_in(

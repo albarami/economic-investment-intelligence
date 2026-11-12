@@ -247,7 +247,7 @@ OI-02 remains open, so the estimates must not be converted to a demonstration da
 
 **Gate: all statements must be true.**
 - CI is green.
-- With `EII_RELEASE_DIR` unset, `./eii preflight` exits zero in foundation mode: release, load-receipt, embedded-reader and recorded-replay checks report `WARN not_configured`; every other check retains its normal severity.
+- With `EII_RELEASE_DIR` unset, `./eii preflight` exits zero in foundation mode: release, load-receipt, embedded-reader and recorded-replay checks report `WARN not_configured`; every other check retains its normal severity as the preflight table of document 13 defines it (the tiles, glyphs and interface fonts row warns until a freeze bundle exists; [decision 0020](decisions/0020-freeze-bundle-check-and-project-database-port.md)).
 - `./eii test` exits zero.
 - Boundary and sandbox tests exist and pass.
 - The independent reviewer returns `APPROVED`.
@@ -832,4 +832,4 @@ The open points of decisions 0016, 0017 and 0019 are settled at the gates that P
 - Product and architecture: [01](01_PROJECT_BRIEF.md), [02](02_ARCHITECTURE.md), [03](03_DATA_CONTRACTS.md), [04](04_PUBLIC_DATA_PACK.md) and [05](05_SYNTHETIC_WORLD_AND_SIMULATION.md).
 - Rules and build design: [06](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [07](07_ECONOMIC_METHODS.md), [08](08_BACKEND.md), [09](09_AI_ASSISTANT.md) and [10](10_FRONTEND.md).
 - Quality and operation: [11](11_DESIGN_DIRECTION.md), [12](12_TESTING_AND_QUALITY.md), [13](13_DEPLOYMENT_AND_OPERATIONS.md), [15](15_REVIEWER_CHECKLIST.md), [16](16_DEMO_RUNBOOK.md) and [17](17_DEPLOYMENT_HARDENING.md).
-- Decision records [0001](decisions/0001-fully-synthetic-records-real-public-data.md) to [0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md); [decision 0013](decisions/0013-one-deep-journey-before-breadth.md) is superseded by [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md). No external source was used directly in this plan.
+- Decision records [0001](decisions/0001-fully-synthetic-records-real-public-data.md) to [0020](decisions/0020-freeze-bundle-check-and-project-database-port.md); [decision 0013](decisions/0013-one-deep-journey-before-breadth.md) is superseded by [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md). No external source was used directly in this plan.

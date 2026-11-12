@@ -105,7 +105,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: `infra/compose.yaml`, preflight probe modules and probe tests.
 - Depends: S0-T01, S0-T02.
 - Requirements: OPS-06, OPS-09, OPS-17, BE-87.
-- Delivery: hard; personas Platform; status in review (part A merged in pull request 10 on 2026-11-12; part B follows; part C after S0-T07 and S0-T11 merge).
+- Delivery: hard; personas Platform; status in review (part A merged in pull request 10 on 2026-11-12; part B in pull request 22; part C after S0-T07 merges).
 ### S0-T09 — `./eii` command skeleton and database commands
 - Goal: Create every pinned command entry point, including `db-up` and `db-down`, with safe placeholder dispatch.
 - Acceptance criteria: [x] usage lists every pinned command; [x] `preflight` only probes; [x] `db-up` and `db-down` alone start and stop the database; [x] `up` never starts it.
@@ -154,7 +154,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: the files the closures change, and `OPEN_ITEMS.md`.
 - Depends: every other task of slice S0.
 - Requirements: REV-41, TST-168.
-- Delivery: routine; personas as the items require; status queued.
+- Delivery: routine; personas as the items require; status in review (part A, pull request 20; part B follows before the slice gate).
 
 ## slice S1 — Technical spike
 

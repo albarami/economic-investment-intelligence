@@ -141,7 +141,7 @@ Checklist steps are named D (the day before), H (one hour before) and F (five mi
 | H2 | Windows PowerShell: `wsl --list --running` | Only the Ubuntu distribution is listed. Otherwise `wsl --terminate <name>` for each other one |
 | H3 | Ubuntu: `cmd.exe /c ver` | Prints a Windows version. If "Exec format error": `sudo systemctl restart systemd-binfmt`, then repeat |
 | H4 | `./eii db-up` | Exit 0; the database answers within 60 s |
-| H5 | `pg_isready -h 127.0.0.1 -p 55432 -t 5` | "accepting connections", exit 0 |
+| H5 | `pg_isready -h 127.0.0.1 -p 55440 -t 5` (the documented default host and port of `EII_DATABASE_URL`) | "accepting connections", exit 0 |
 | H6 | Decide online or offline. If offline, switch networking off now | Decision written in the session record |
 | H7 | `./eii up` | As in section 2 |
 | H8 | `curl -s http://127.0.0.1:8000/health` | As in section 2 |
