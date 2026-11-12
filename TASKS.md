@@ -126,7 +126,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: sandbox launcher, hosted-runner namespace setup, project-local engine-extension folder, sentinel generator and sandbox tests.
 - Depends: S0-T02, S0-T05.
 - Requirements: ARC-09, ARC-10, ARC-14, SYN-01, TST-61, TST-62.
-- Delivery: hard; personas Platform; status queued.
+- Delivery: hard; personas Platform; status in review (pull request 14).
 ### S0-T12 — Version and retreat pins
 - Goal: Pin supported toolchains and libraries with written retreat pins where the design requires them.
 - Acceptance criteria: [x] lock files resolve; [x] exact and retreat pins are labelled; [x] unsupported version drift fails a check.

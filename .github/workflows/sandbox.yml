@@ -1,0 +1,40 @@
+name: sandbox
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  sandbox-proof:
+    name: sandbox proof
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.11.31"
+          enable-cache: "false"
+      - name: Install Python 3.14
+        run: uv python install 3.14
+      - name: Sync the locked environment
+        run: uv sync --managed-python --all-packages --locked --group engine
+      - name: Install bubblewrap and the AppArmor profiles
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends bubblewrap apparmor-profiles
+      - name: Print the runner facts
+        run: uv run --locked python scripts/ci_sandbox.py facts
+      - name: Make namespace creation work for bubblewrap
+        run: uv run --locked python scripts/ci_sandbox.py install-profile
+      - name: Fetch the engine extensions
+        run: uv run --locked python scripts/engine_extensions.py fetch
+      - name: Run the sandbox tests
+        run: uv run --locked python scripts/ci_sandbox.py prove

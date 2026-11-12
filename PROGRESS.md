@@ -7442,6 +7442,295 @@ Seed:      none
 Notes:     Later-round form of the scope command (TST-163): the fourteen paths of part A and the two ledger files of the first ledger commit, which lies inside the range; the five shared documents of part B follow in a later change.
 ```
 
+#### S0-T13: independent review, round 2: APPROVED
+
+Reviewed commit `afaf68ba8f50a5322dbbe2605b7c68f542a72da8`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/13 , with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43242833057 ). Reviewer: Zhipu AI GLM-5.3 High, through the Devin command-line tool, read-only; a later round under decision record 0018. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T13 part A (pull request 13)
+COMMIT: afaf68ba8f50a5322dbbe2605b7c68f542a72da8
+REVIEWER: Devin command-line tool, GLM-5.3 High (Zhipu AI)
+EARLIER FINDINGS:
+  F1 FIXED web/REFERENCE_NOTES.md line 152 now cites TASKS.md line 170, which holds the load-trial acceptance criteria ("110,000 hexagons render; 50,000 particles render; [ ] the trace records 60 frames per second"); read in the file.
+  F2 FIXED docs/REFERENCE_NOTES.md line 158 now cites TASKS.md line 189, the heading of task S1-T05 "First two-store parity query" (its goal line is 190); read in the file.
+  F3 FIXED docs/REFERENCE_NOTES.md lines 19 and 90 now cite docs/02_ARCHITECTURE.md line 540, the "Build engine and embedded reader | DuckDB" row that carries the embedded-reader role and "postgres_execute takes one statement per call"; read in the file.
+  F4 FIXED docs/REFERENCE_NOTES.md lines 109 and 155 now cite docs/02_ARCHITECTURE.md line 541, the "Serving store | PostgreSQL with PostGIS, no other extension" row holding the PostgreSQL 18 pin and the PostGIS 3.6 line; read in the file.
+  F5 FIXED row S14 (docs/REFERENCE_NOTES.md line 149) and the matching coverage row (line 273) now also cite docs/02_ARCHITECTURE.md line 443, which holds "text columns of release tables use the `C` collation in PostgreSQL"; the other two cited lines (docs/08_BACKEND.md line 223, docs/13_DEPLOYMENT_AND_OPERATIONS.md line 157) hold the extension-limit half; all read in the files.
+CHECKS:
+  REV-10 PASS All three acceptance criteria of S0-T13: every library section keeps its Pages table of official addresses; every statement row keeps READ/OBSERVED/PACK provenance with "not verified" on pack rows; every S1 confirmation field cites a pack line that holds its statement. The five round-1 defects are fixed; the two further off-by-one citations the lead found are corrected too (S27 now cites docs/02_ARCHITECTURE.md line 443; the extension-directory field now cites line 744, both read in the file); the lead's inventory (.overnight/CITATIONS.md, 81 distinct cited lines with their text) lists every citation at this head, and I verified the five finding sites plus a sample of the re-pointed lines in the files themselves.
+  REV-11 PASS Lead's runs on this exact head (EVIDENCE.md, 2026-11-12): `./eii test --seed 1794000000` exit 0 (985 passed, 0 failed, 0 skipped in 6 suites), `uv run --locked python scripts/check_reference_notes.py` exit 0 ("checked 2 files, 6 libraries, 357 rows: OK"), `python3 scripts/check_docs.py` exit 0 ("checked 154 text files, 53 Markdown files: OK"), `uv run --locked ruff check .`, `ruff format --check .`, `mypy`, `python3 scripts/check_tree.py`, `cmp AGENTS.md CLAUDE.md` and the layout check all exit 0; CI green on the head: https://github.com/albarami/economic-investment-intelligence/actions/runs/43242833057 . The brief forbids shell commands, so I did not re-run them myself.
+  REV-12 PASS The task's own patch since my last review changes only the two notes files (fix and re-pointing commits) and PROGRESS.md and TASKS.md (the two ledger commits); the lead's later-round scope command returned "16 [] []" against the new base and the tree proof on the head shows 211 paths; the base update itself is a merge of main, not part of the task's patch; nothing under data/.
+  REV-13 PASS The changed lines are citation line numbers and ledger records only; no placeholder, stub, mock or invented figure was added.
+  REV-14 PASS No secret, .env, key file or real custodian record, field, file or count in the changed lines; the ledger names reviewers by maker and model only.
+  REV-15 PASS No test, assertion, threshold, tolerance, lint rule or CI control is touched by the changed lines; the evidence runs record real exit codes with no retry, skip or suppressed failure.
+  REV-16 PASS F3 to F5 are fixed, and the re-pointing after the base update changed line numbers only: I read the five finding sites, the plural citation "docs/09_AI_ASSISTANT.md lines 21 and 323" (both lines hold their statements) and the sampled pack lines docs/02_ARCHITECTURE.md 443, 540, 541, 744, TASKS.md 170 and 189, docs/04_PUBLIC_DATA_PACK.md 277, docs/08_BACKEND.md 223, docs/12_TESTING_AND_QUALITY.md 374, docs/13_DEPLOYMENT_AND_OPERATIONS.md 157 and docs/10_FRONTEND.md 65, 66 and 500; each citation points at the line that holds the statement the notes make.
+  REV-17 OPEN P1 Part B of the task (README.md's command list, AGENTS.md/CLAUDE.md rule 44, the docs/README.md index, OPEN_ITEMS.md OI-41 and the missing OI-85 to OI-89) is deferred to its own change by the owner's note of 2026-11-12; on the head `python3 scripts/check_docs.py` exits 0 and PROGRESS.md holds the round-1 verdict copied unchanged, the base-update and re-pointing records, the task-log additions and the evidence entries in the section 6.3 format.
+  REV-18 PASS No script changed since round 1; the check still opens only the two notes files, pins.toml and the cited pack paths as regular files and writes nothing (round-1 evidence, files unchanged).
+  REV-19 PASS Nothing on the dropped or later lists is built; no component decision or decision record is removed or replaced; the base update only brings in the accepted version-1 documentation.
+  REV-20 N/A The change is agent documentation, citation line numbers and ledger records; it introduces no fact object, release table or rendered number (every number in the notes carries a source and a date).
+  REV-21 N/A No screen, card, template or model prose is added; the notes are not product output.
+  REV-22 N/A No partition, parameter set, treatment, audit or custodian-plane file is touched; nothing under data/.
+  REV-23 PASS No file under product/, core/ or custodian/ changed, and the suite on the head shows python-guards 303 passed, 0 failed, 0 skipped.
+  REV-24 N/A No user-facing or Arabic strings were added.
+  REV-25 PASS The changed lines hold no private path, personal name, e-mail address, run of exactly eight or eleven digits, named-product comparison or ministry mention; the documentation check exits 0 on the head.
+  REV-26 PASS No prohibited claim anywhere in the notes; every unverified pack statement still says "not verified"; nothing claims custodian data, real-place facts, certified privacy, endorsement, a forecast or a lookup.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exit 0 on the head (lead's run in EVIDENCE.md).
+  REV-28 N/A No synthetic identifiers are introduced.
+  REV-29 N/A No fact about a real named place or business; the subjects of every row are software libraries.
+  REV-38 PASS No reference to eii_gateway, EII_DECISION_PROVIDER or JEV_PRO_API_KEY in the changed lines; no run-time code reads them (unchanged since round 1).
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17) TST-163, documents updated in the same pull request: part A still leaves the shared documents to part B — README.md's command list, AGENTS.md/CLAUDE.md rule 44, the docs/README.md index and OPEN_ITEMS.md (OI-41's DONE SO FAR line and the missing OI-85 to OI-89) do not yet name the notes files or the new check; part B follows as its own change, as the owner's note of 2026-11-12 allows.
+  P4 (REV-10) hardening: document 17 — the lead's citation inventory (.overnight/CITATIONS.md, 81 distinct citations) does not parse the plural-form citation: docs/REFERENCE_NOTES.md line 162 cites "docs/09_AI_ASSISTANT.md lines 21 and 323" and line 21 has no entry in the inventory; I read line 21 ("The model is `claude-opus-5-5` behind one provider adapter") and it holds its statement, so there is no defect in the notes, but the re-pointing script should parse plural-form citations before the next re-point of the pack's line numbers.
+```
+
+#### S0-T13: merge record of part A
+
+- Tree proof on the approved head (ruling L-29), run by the lead on 2026-11-12 before the merge: every path of the head's tree is as in the work commit `17546dcc7e7c176e0de05b3dde7dddc26c9fda83`, except the ledger files; output "TREE-IS-WORK ok: 211 paths at afaf68ba8f50a5322dbbe2605b7c68f542a72da8", exit code 0. On the same head `./eii test --seed 1794000000`: exit code 0, "total: 985 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/13 was squash-merged on 2026-11-12 at the head `afaf68ba8f50a5322dbbe2605b7c68f542a72da8`; merge commit `1ba76a453b623c619647ed51bb92301fb87c0cd8` on main, with the same tree as the head. CI on the merge commit: workflow `docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43243588074 .
+- The verdict of the task log of S0-T13 is APPROVED for part A. Proposed items of round 2: P1, the shared documents (rule 44, the README, the documents index, the open items OI-85 to OI-89), is part B of the task and follows as its own change; P4, that the lead's citation inventory did not parse a citation of the form "lines N and M", is hardening for document 17 (the one citation it missed was read by the reviewer and holds its statement).
+
+### S0-T11 — Generator sandbox test: task log
+
+- Builder persona: senior platform engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic: a planning workflow of Claude Sonnet agents (version 1), a Claude Opus corrector (version 2) and Claude Opus writers (version 3), with the lead's answers and alignment points
+- Plan reviewer maker and model: OpenAI GPT-5.6 Sol (high), through the Cursor command-line tool, read-only: REJECTED in round 1 (findings F1 to F4), REJECTED in round 2 (F5 and F6; F1 to F4 fixed), REJECTED in round 3 (F7; F5 and F6 fixed); F7 was then applied and checked, and the plan was not seen again by a plan reviewer (at most three plan reviews)
+- Builder maker and model: Cursor command-line tool, `grok-4.7-high` (xAI) for the code, the tests, the workflow file and the two fix rounds; `composer-2.5` (Cursor) for the documents, the citation round and the anchor round
+- Reviewer maker and model: Devin command-line tool, `glm-5-3-high` (Zhipu AI), read-only (a maker that neither planned the task, reviewed its plan nor built it)
+- Skills and brief rules: the lead used project-orientation, task-standards, systematic-debugging, test-driven-development, github-flow and strict-reviewer; the builder's tool has no skills, so its briefs gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first with a recorded red run, a planted violation for every rule, no suppression comment, skip or weaker assertion, no fallback for sandbox enforcement (AGENTS.md rule 12), no secret, personal name, absolute local path or eight- or eleven-digit run in any file, file length and house style as warnings only, and a report of only the results it saw
+- Branch: `task/S0-T11-generator-sandbox`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/14
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit; the hosted runs of the workflow `sandbox` are cited by their full links in the evidence file that the external reviewer receives and on the pull request
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4 (system) and 3.14.6 (uv); git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8; bubblewrap 0.11.1; DuckDB 2.0.0
+- Build round 1: the ten code files and the workflow file as the plan gives them, eleven test modules and three support modules, the dependency group engine, the lock file and the pin record; 19 of the tests start a real sandbox
+- Build round 2: the documents of the task in the same pull request (rule 44, the README, the open items OI-60 to OI-64, one sentence of document 13, the note of the pin record)
+- Build round 3, after the first hosted run failed in the AppArmor step: the hosted runner prints its AppArmor status as one JSON object over two lines, and the judge required one line; the judge now reads the whole output as one JSON document, with a sub-case of the runner's shape that was red first
+- Build round 4, after the version-1 documentation merged: the line citations of the five open items re-pointed; the lead read each cited line
+- Build round 5, after the second hosted run passed 18 of the 19 sandbox tests: an extension folder that lies under `/tmp`, where the hosted runner keeps temporary folders, was made on the sandbox's writable scratch mount and was writable inside the sandbox; the launcher now gives the extension folder an in-memory mount of its own and seals it read-only, wherever it lies; the probe gains the attempt `write_extensions` and the planted leaks gain the removed seal; the test that failed on the hosted runner is unchanged; the lead ran it with the temporary folder under `/tmp` (one folder, removed afterwards, as the owner's note of 2026-11-12 allows) and outside it
+- Build round 6, on the owner's note of 2026-11-12 that the pack is cited by a stable anchor and never by line number: the twenty line citations of OI-60 to OI-64 became requirement IDs, section headings, task IDs and numbered items of decision records, from the lead's map; seven of them had pointed at a wrong line since the version-1 documentation merged
+- Owner's note of 2026-11-12, applied: the acceptance criteria of TASKS.md decide when the task is done; a check that a plan invents needs one planted violation per rule; the plan's case tables and its list of 80 mutations are not required, and hardening beyond a criterion goes to document 17
+
+#### Evidence for the work commit `e8f3ca543e21e06337c6ee7ffbe2ca347b6be401`
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   uv sync --managed-python --all-packages --locked --group engine
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The environment of the sandbox tests: the locked workspace with the dependency group engine (DuckDB 2.0.0).
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   uv run --locked python scripts/engine_extensions.py fetch
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "engine extensions: OK"
+Seed:      none
+Notes:     The only command that needs the network. Printed: engine duckdb v2.0.0 linux_amd64; file v2.0.0/linux_amd64/h3.duckdb_extension 520766 bytes sha256 abba3f5702e6917804a1e05be20013b51d2174e296b175f0a3fdfc2eeffd6352; file v2.0.0/linux_amd64/spatial.duckdb_extension 108189118 bytes sha256 8ec99d875355200316c743ede176e2cb50d2b712d2fa192ccbf19cc245a8d0bc. Criterion 5 (ARC-14).
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   uv run --locked python scripts/engine_extensions.py verify
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "engine extensions: OK"
+Seed:      none
+Notes:     The same files checked against the pin without the network. Printed: engine duckdb v2.0.0 linux_amd64. Criterion 5 (ARC-14).
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   uv run --locked python scripts/sandbox_check.py check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox: OK"
+Seed:      none
+Notes:     Criteria 1 and 2 on the build machine, both profiles (bubblewrap 0.11.1): the read outside the mounts and the network attempts fail inside, and the read succeeds outside. ARC-09, ARC-10, SYN-01, TST-61.
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   uv run --locked python scripts/sandbox_check.py check-extensions
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox: OK"
+Seed:      none
+Notes:     Criterion 5: the pinned extensions load inside the sandbox with the network off and the folder read-only.
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   uv run --locked python scripts/ci_sandbox.py prove
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    19 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The proof that the hosted job runs: the 19 cases of ci_junit.REQUIRED, each reported once and passed, and no other case (test_automatic_loading_is_off, test_empty_folder_and_read_only_install, test_extension_files_are_the_checked_objects, test_load_offline_read_only_in_both_profiles, test_namespace_creation_refused_is_reported, test_signature_check_stays_on, test_check_commands_have_teeth, test_die_with_parent, test_environment_names_and_values, test_exit_statuses_and_setup_failure, test_filesystem_modes_in_both_profiles, test_hostile_surroundings_do_not_reach_the_sandbox, test_swapped_source_is_not_mounted, test_timeout_kills_the_process_group, test_both_profiles_block_read_and_network, test_network_attempts_table, test_planted_leaks_are_seen, test_repository_secrets_are_not_mounted, test_scenario_and_staging_mounts); the run took 9 s (the budget of OI-61). TST-62.
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    369 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The guard tests on their own: 66 tests of the eleven sandbox test modules among them, the three modules of the marker sandbox included; the run took 87 s.
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   ./eii test
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1051 passed, 0 failed, 0 skipped
+Seed:      1794498271
+Notes:     The project's own test command, which runs the same tests in the suite python-guards.
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The lock file agrees with the manifests, the dependency group engine included.
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 57 components: OK"
+Seed:      none
+Notes:     The version check: the pin record agrees with the manifests and the lock file, DuckDB now installed.
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "101 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 97 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 179 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The agent files are identical.
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   root=$PWD; copy=$(mktemp -d) && git ls-files -z | xargs -0 cp --parents -t "$copy" && rc=0 && ctl=0 && : >"$copy/red.log"; (cd "$copy" && UV_PROJECT_ENVIRONMENT="$root/.venv" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p test_sandbox_sentinel.py >"$copy/ctl.log" 2>&1) || ctl=$?; (printf '\ndef build_argv(profile, layout, interpreter, command, descriptors):\n    return list(command)\n' >> "$copy/scripts/sandbox_launch.py" && cd "$copy" && UV_PROJECT_ENVIRONMENT="$root/.venv" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p test_sandbox_sentinel.py -v >"$copy/red.log" 2>&1) || rc=$?; miss=0; for t in test_both_profiles_block_read_and_network test_repository_secrets_are_not_mounted; do grep -q "^FAIL: $t " "$copy/red.log" || miss=1; done; if [ "$miss" -ne 0 ]; then rc=9; fi; if [ "$ctl" -ne 0 ]; then rc=8; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The red run of TST-161: in a copy of the tracked files the sentinel tests pass as they are, and with the launcher replaced by a stub that runs the command without bubblewrap the two named sentinel tests fail.
+```
+
+```text
+### S0-T11 — Generator sandbox test
+Commit:    e8f3ca543e21e06337c6ee7ffbe2ca347b6be401
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','1ba76a453b623c619647ed51bb92301fb87c0cd8...e8f3ca543e21e06337c6ee7ffbe2ca347b6be401'],check=True,capture_output=True,text=True).stdout.splitlines(); a={'scripts/sandbox_profiles.py','scripts/sandbox_launch.py','scripts/sandbox_check.py','scripts/engine_extensions.py','scripts/extension_tree.py','scripts/ci_sandbox.py','scripts/ci_apparmor.py','scripts/ci_junit.py','scripts/sandbox_inside/sentinel_probe.py','scripts/sandbox_inside/extension_check.py','.github/workflows/sandbox.yml','scripts/tests/sandbox_support.py','scripts/tests/sandbox_workflow.py','scripts/tests/sandbox_golden.py','scripts/tests/test_sandbox_argv.py','scripts/tests/test_sandbox_probe.py','scripts/tests/test_sandbox_userns.py','scripts/tests/test_sandbox_records.py','scripts/tests/test_sandbox_output.py','scripts/tests/test_sandbox_apparmor.py','scripts/tests/test_sandbox_extensions.py','scripts/tests/test_sandbox_prove.py','scripts/tests/test_sandbox_sentinel.py','scripts/tests/test_sandbox_mounts.py','scripts/tests/test_sandbox_loading.py','pyproject.toml','uv.lock','pins.toml','README.md','AGENTS.md','CLAUDE.md','OPEN_ITEMS.md','docs/13_DEPLOYMENT_AND_OPERATIONS.md'}; o=[x for x in p if x not in a]; m=sorted(a-set(p)); print(len(p),o,m); sys.exit(1 if o or m or len(p)!=33 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "33 [] []"
+Seed:      none
+Notes:     The work commits change exactly the 33 paths of the task against the base they contain (TST-163, PLN-22).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
