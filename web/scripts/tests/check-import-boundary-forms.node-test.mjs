@@ -250,6 +250,33 @@ add('regex hides the rest of the line', `const r = /'/; ${IMP} x ${FROM} '${SPEC
   needle: null,
 });
 
+test('glob array string that looks like a closing bracket', () => {
+  const root = makeRoot();
+  const text = `${IMP}.${META}.${GLOB}([']', '${SPEC}']);\n`;
+  fs.writeFileSync(path.join(root, 'src', 'app', 'case.ts'), text);
+  const result = run(root);
+  assert.equal(result.status, 1, `${result.stdout}\n${result.stderr}`);
+  const prefix = `FAIL outside-web: src/app/case.ts:${lineOf(text, SPEC)}`;
+  const hit = result.stdout.split('\n').some((row) => row.startsWith(prefix));
+  assert.equal(hit, true, `${prefix}\n${result.stdout}`);
+});
+
+test('side-effect import of a dot is collected', () => {
+  const root = makeRoot();
+  fs.writeFileSync(path.join(root, 'src', 'app', 'case.ts'), `${IMP} '.';\n`);
+  const result = run(root);
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+  assert.match(result.stdout.trim().split('\n').at(-1), /^checked 1 references in 1 files: OK$/);
+});
+
+test('side-effect import of an opening parenthesis is collected', () => {
+  const root = makeRoot();
+  fs.writeFileSync(path.join(root, 'src', 'app', 'case.ts'), `${IMP} '(';\n`);
+  const result = run(root);
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+  assert.match(result.stdout.trim().split('\n').at(-1), /^checked 1 references in 1 files: OK$/);
+});
+
 test('reference forms', async (t) => {
   for (const item of cases) {
     await t.test(item.name, () => {

@@ -98,7 +98,7 @@ function assertUsage(result) {
 test('real shell starts', { timeout: 60000 }, () => {
   const result = run(['--root', WEB]);
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  assert.match(result.stdout, /^PASS dev-server http:\/\/127\.0\.0\.1:/m);
+  assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
 });
 
 test('minimal root starts', { timeout: 60000 }, () => {
@@ -108,7 +108,7 @@ test('minimal root starts', { timeout: 60000 }, () => {
   const bin = resolveViteBin(WEB);
   const result = run(['--root', root, '--vite-bin', bin]);
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  assert.match(result.stdout, /^PASS dev-server http:\/\/127\.0\.0\.1:/m);
+  assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
 });
 
 test('absent package.json uses the default flags', () => {
@@ -143,6 +143,7 @@ test('absent package.json uses the default flags', () => {
   );
   const result = run(['--root', root, '--vite-bin', bin]);
   assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
   const argv = JSON.parse(fs.readFileSync(path.join(root, 'argv.json'), 'utf8'));
   assert.deepEqual(argv.slice(0, -1), ['--host', '127.0.0.1', '--strictPort', '--port']);
   assert.match(argv.at(-1), /^\d+$/);

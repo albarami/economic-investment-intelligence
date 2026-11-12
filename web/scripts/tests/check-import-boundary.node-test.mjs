@@ -96,10 +96,11 @@ function cleanEnv(extra) {
   return { ...base, ...extra };
 }
 
-function run(args, env) {
+function run(args, env, cwd) {
   return spawnSync(process.execPath, [SCRIPT, ...args], {
     encoding: 'utf8',
     env: env ?? cleanEnv(),
+    cwd,
   });
 }
 
@@ -307,6 +308,40 @@ test('symbolic link out', () => {
   assertFail(run(['--root', root]), 'FAIL outside-web');
 });
 
+test('extensionless import through a directory symlink', () => {
+  const root = makeRoot();
+  const outside = tempDir('eii-out-');
+  fs.writeFileSync(path.join(outside, 'secret.ts'), 'export const value = 1;\n');
+  fs.symlinkSync(outside, path.join(root, 'src', 'linked'));
+  plant(root, 'src/app/use.ts', fromLine('../linked/secret'));
+  assertFail(run(['--root', root]), 'FAIL outside-web');
+});
+
+test('tsconfig paths through a directory symlink', () => {
+  const root = makeRoot();
+  const outside = tempDir('eii-out-');
+  fs.writeFileSync(path.join(outside, 'secret.ts'), 'export const value = 1;\n');
+  fs.symlinkSync(outside, path.join(root, 'src', 'linked'));
+  fs.writeFileSync(
+    path.join(root, 'tsconfig.json'),
+    `${JSON.stringify({ include: ['src'], compilerOptions: { paths: { a: ['./src/linked/*'] } } })}\n`,
+  );
+  assertFail(run(['--root', root]), 'FAIL tsconfig-outside');
+});
+
+test('root is a symbolic link to the shell', () => {
+  const dir = tempDir('eii-link-');
+  const target = path.join(dir, 'web');
+  fs.symlinkSync(WEB, target);
+  try {
+    const result = run(['--root', target]);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout.trim().split('\n').at(-1), /OK$/);
+  } finally {
+    fs.unlinkSync(target);
+  }
+});
+
 test('forbidden package names', async (t) => {
   for (const spec of FORBIDDEN) {
     await t.test(spec, () => {
@@ -367,6 +402,35 @@ test('tsconfig outside', async (t) => {
       const root = makeRoot();
       fs.writeFileSync(path.join(root, 'tsconfig.json'), `${JSON.stringify(body)}\n`);
       assertFail(run(['--root', root]), 'FAIL tsconfig-outside');
+    });
+  }
+});
+
+test('tsconfig windows paths on this platform', async (t) => {
+  for (const entry of ['..\\..\\core', 'C:/core']) {
+    await t.test(JSON.stringify(entry), () => {
+      const root = makeRoot();
+      fs.writeFileSync(
+        path.join(root, 'tsconfig.json'),
+        `${JSON.stringify({ include: [entry] })}\n`,
+      );
+      assertFail(run(['--root', root], cleanEnv(), root), 'FAIL tsconfig-outside');
+    });
+  }
+});
+
+test('tsconfig entries with the wrong element type', async (t) => {
+  const cases = [
+    ['paths number', { compilerOptions: { paths: { a: 1 } } }],
+    ['paths string', { compilerOptions: { paths: { a: '..' } } }],
+    ['references string', { references: ['../core'] }],
+    ['include number', { include: [1] }],
+  ];
+  for (const [name, body] of cases) {
+    await t.test(name, () => {
+      const root = makeRoot();
+      fs.writeFileSync(path.join(root, 'tsconfig.json'), `${JSON.stringify(body)}\n`);
+      assertFail(run(['--root', root]), 'FAIL tsconfig-json: tsconfig.json');
     });
   }
 });

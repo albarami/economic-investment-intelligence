@@ -209,6 +209,7 @@ test('bin field, string form', () => {
   const result = run(['--root', root]);
   remember(dir);
   assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
 });
 
 test('bin field, object form', () => {
@@ -222,6 +223,7 @@ test('bin field, object form', () => {
   const result = run(['--root', root]);
   remember(dir);
   assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
 });
 
 test('terminate signal ignored', { timeout: 20000 }, () => {
@@ -230,6 +232,8 @@ test('terminate signal ignored', { timeout: 20000 }, () => {
   const pid = Number(fs.readFileSync(path.join(dir, 'pid'), 'utf8'));
   pids.push(pid);
   assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
+  assert.equal(result.stderr, '');
   assert.equal(alive(pid), false);
 });
 
@@ -300,6 +304,7 @@ test('content types', async (t) => {
       const result = run(['--root', root, '--vite-bin', bin]);
       remember(dir);
       assert.equal(result.status, 0, result.stdout + result.stderr);
+      assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
     });
   }
 });

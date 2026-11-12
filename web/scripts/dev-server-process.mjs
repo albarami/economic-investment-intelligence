@@ -10,7 +10,6 @@ const PARENT_ENV_NAMES = [
   'LANG',
 ];
 const STOP_WAIT_MS = 5000;
-const STOP_POLL_MS = 50;
 const ESCAPE_CHARACTER = String.fromCharCode(27);
 const ANSI_ESCAPE = new RegExp(`${ESCAPE_CHARACTER}\\[[0-9;]*m`, 'g');
 
@@ -124,17 +123,22 @@ export function startChild({ bin, args, cwd, env }) {
 export async function stopChild(child) {
   if (!child || child.exitCode !== null || child.signalCode !== null) return;
   child.kill('SIGTERM');
-  const started = Date.now();
-  while (Date.now() - started < STOP_WAIT_MS) {
-    if (child.exitCode !== null || child.signalCode !== null) return;
-    await new Promise((resolve) => {
-      const timer = setTimeout(resolve, STOP_POLL_MS);
-      child.once('exit', () => {
-        clearTimeout(timer);
-        resolve();
-      });
-    });
-  }
+  await new Promise((resolve) => {
+    if (child.exitCode !== null || child.signalCode !== null) {
+      resolve();
+      return;
+    }
+    let timer;
+    const onExit = () => {
+      clearTimeout(timer);
+      resolve();
+    };
+    timer = setTimeout(() => {
+      child.removeListener('exit', onExit);
+      resolve();
+    }, STOP_WAIT_MS);
+    child.once('exit', onExit);
+  });
   if (child.exitCode === null && child.signalCode === null) {
     child.kill('SIGKILL');
     await new Promise((resolve) => {

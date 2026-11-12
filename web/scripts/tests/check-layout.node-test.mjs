@@ -228,6 +228,7 @@ test('deferred file present', () => {
   assert.equal(result.status, 0, result.stdout);
   const notes = result.stdout.split('\n').filter((line) => line.startsWith('NOTE deferred:'));
   assert.equal(notes.length, 1);
+  assert.match(result.stdout.trim().split('\n').at(-1), /^checked \d+ entries: OK$/);
 });
 
 test('each required directory removed', async (t) => {

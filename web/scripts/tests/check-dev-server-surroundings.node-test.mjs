@@ -200,6 +200,7 @@ test('child environment', () => {
   const result = run(['--root', root, '--vite-bin', bin], env);
   remember(dir);
   assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
   const childEnv = recordedEnv(dir);
   assert.deepEqual(Object.keys(childEnv).sort(), ALLOWED);
   assert.equal(childEnv.BROWSER, 'none');
@@ -213,22 +214,24 @@ test('child environment, a name absent in the parent', () => {
   const result = run(['--root', root, '--vite-bin', bin], env);
   remember(dir);
   assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
   assert.deepEqual(Object.keys(recordedEnv(dir)).sort(), ['BROWSER', 'HOME', 'PATH', 'TMPDIR']);
 });
 
 test('hostile surroundings', { timeout: 180000 }, () => {
   const clean = run(['--root', WEB], cleanEnv());
   assert.equal(clean.status, 0, clean.stdout + clean.stderr);
-  assert.match(clean.stdout, /^PASS dev-server http:\/\/127\.0\.0\.1:/m);
+  assert.match(clean.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
   const parent = cleanEnv();
   const hostile = cleanEnv(hostileVars(parent.HOME));
   const again = run(['--root', WEB], hostile);
   assert.equal(again.status, 0, again.stdout + again.stderr);
-  assert.match(again.stdout, /^PASS dev-server http:\/\/127\.0\.0\.1:/m);
+  assert.match(again.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
   const { root, dir, bin } = prepare();
   const fake = run(['--root', root, '--vite-bin', bin], hostile);
   remember(dir);
   assert.equal(fake.status, 0, fake.stdout + fake.stderr);
+  assert.match(fake.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
   const names = Object.keys(recordedEnv(dir));
   for (const name of LEAKED) assert.equal(names.includes(name), false, name);
 });

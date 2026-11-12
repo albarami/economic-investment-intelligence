@@ -104,16 +104,22 @@ function isInside(root, target) {
   return rel === '' || (rel !== '..' && !rel.startsWith(`..${path.sep}`) && !path.isAbsolute(rel));
 }
 
-function locate(fromDir, spec) {
-  const resolved = path.resolve(fromDir, spec);
-  if (fs.existsSync(resolved)) {
-    try {
-      return fs.realpathSync(resolved);
-    } catch {
-      return path.normalize(resolved);
-    }
+function resolveRealAncestor(target) {
+  let current = path.resolve(target);
+  const skipped = [];
+  while (!fs.existsSync(current)) {
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    skipped.push(path.basename(current));
+    current = parent;
   }
-  return path.normalize(resolved);
+  const resolved = fs.realpathSync(current);
+  return path.join(resolved, ...skipped.reverse());
+}
+
+function locate(fromDir, spec) {
+  const baseDir = resolveRealAncestor(fromDir);
+  return resolveRealAncestor(path.resolve(baseDir, spec));
 }
 
 function hasScheme(spec) {
@@ -236,29 +242,46 @@ function isObject(value) {
   return value !== null && typeof value === 'object' && Array.isArray(value) === false;
 }
 
+function hasNonString(list) {
+  return list.some((item) => typeof item !== 'string');
+}
+
 function tsconfigTypeError(config) {
   if (!isObject(config)) return 'top level is not an object';
   for (const key of ['include', 'exclude', 'files']) {
     if (config[key] !== undefined && !Array.isArray(config[key])) return `${key} is not an array`;
+    if (Array.isArray(config[key]) && hasNonString(config[key])) return `${key} has a non-string element`;
   }
   if (config.extends !== undefined && typeof config.extends !== 'string' && !Array.isArray(config.extends)) {
     return 'extends is not a string or an array';
   }
+  if (Array.isArray(config.extends) && hasNonString(config.extends)) return 'extends has a non-string element';
   if (config.references !== undefined && !Array.isArray(config.references)) return 'references is not an array';
+  if (Array.isArray(config.references)) {
+    const bad = config.references.some((item) => !isObject(item) || typeof item.path !== 'string');
+    if (bad) return 'references has an element that is not an object with a string path';
+  }
   const options = config.compilerOptions;
   if (options !== undefined && !isObject(options)) return 'compilerOptions is not an object';
   if (options?.paths !== undefined && !isObject(options.paths)) return 'paths is not an object';
+  if (isObject(options?.paths)) {
+    const bad = Object.values(options.paths).some((value) => !Array.isArray(value) || hasNonString(value));
+    if (bad) return 'paths has a value that is not an array of strings';
+  }
   if (options?.baseUrl !== undefined && typeof options.baseUrl !== 'string') return 'baseUrl is not a string';
   if (options?.rootDirs !== undefined && !Array.isArray(options.rootDirs)) return 'rootDirs is not an array';
+  if (Array.isArray(options?.rootDirs) && hasNonString(options.rootDirs)) return 'rootDirs has a non-string element';
   if (options?.typeRoots !== undefined && !Array.isArray(options.typeRoots)) return 'typeRoots is not an array';
+  if (Array.isArray(options?.typeRoots) && hasNonString(options.typeRoots)) {
+    return 'typeRoots has a non-string element';
+  }
   return null;
 }
 
 function entryOutside(root, entry) {
   if (typeof entry !== 'string') return false;
-  const resolved = path.isAbsolute(entry) || /^[A-Za-z]:[\\/]/.test(entry)
-    ? path.resolve(entry)
-    : locate(root, entry);
+  if (entry.includes('\\') || /^[A-Za-z]:[\\/]/.test(entry)) return true;
+  const resolved = locate(root, entry);
   return !isInside(root, resolved);
 }
 

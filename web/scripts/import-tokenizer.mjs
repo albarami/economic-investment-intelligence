@@ -217,6 +217,14 @@ function at(tokens, index) {
   return tokens[index];
 }
 
+function isPunct(tok, value) {
+  return tok?.type === 'punct' && tok.value === value;
+}
+
+function isWord(tok, value) {
+  return tok?.type === 'word' && tok.value === value;
+}
+
 export function collectReferences(text) {
   const tokens = tokenize(text);
   const references = [];
@@ -237,19 +245,22 @@ export function collectReferences(text) {
       references.push({ form: 'from', specifier: next.value, line: next.line });
       continue;
     }
-    if (token.value === 'import' && at(tokens, index + 1)?.value === '.') {
-      const sequence = ['meta', '.', 'glob', '('];
-      const matched = sequence.every((part, offset) => at(tokens, index + 2 + offset)?.value === part);
+    if (token.value === 'import' && isPunct(at(tokens, index + 1), '.')) {
+      const matched =
+        isWord(at(tokens, index + 2), 'meta') &&
+        isPunct(at(tokens, index + 3), '.') &&
+        isWord(at(tokens, index + 4), 'glob') &&
+        isPunct(at(tokens, index + 5), '(');
       if (matched) {
         const arg = at(tokens, index + 6);
         if (isLiteral(arg)) {
           references.push({ form: 'glob', specifier: arg.value, line: arg.line });
-        } else if (arg && arg.value === '[') {
+        } else if (isPunct(arg, '[')) {
           let depth = 1;
           for (let cursor = index + 7; cursor < tokens.length; cursor += 1) {
             const item = tokens[cursor];
-            if (item.value === '[') depth += 1;
-            else if (item.value === ']') {
+            if (isPunct(item, '[')) depth += 1;
+            else if (isPunct(item, ']')) {
               depth -= 1;
               if (depth === 0) break;
             } else if (isLiteral(item)) {
@@ -260,7 +271,7 @@ export function collectReferences(text) {
       }
       continue;
     }
-    if (token.value === 'import' && at(tokens, index + 1)?.value === '(') {
+    if (token.value === 'import' && isPunct(at(tokens, index + 1), '(')) {
       const arg = at(tokens, index + 2);
       if (isLiteral(arg)) references.push({ form: 'import()', specifier: arg.value, line: arg.line });
       else nonLiteral.push({ form: 'import()', line: token.line });
@@ -271,7 +282,7 @@ export function collectReferences(text) {
       references.push({ form: 'import', specifier: next.value, line: next.line });
       continue;
     }
-    if (token.value === 'require' && at(tokens, index + 1)?.value === '(') {
+    if (token.value === 'require' && isPunct(at(tokens, index + 1), '(')) {
       const arg = at(tokens, index + 2);
       if (isLiteral(arg)) references.push({ form: 'require()', specifier: arg.value, line: arg.line });
       else nonLiteral.push({ form: 'require()', line: token.line });
@@ -279,8 +290,8 @@ export function collectReferences(text) {
     }
     if (
       token.value === 'new' &&
-      at(tokens, index + 1)?.value === 'URL' &&
-      at(tokens, index + 2)?.value === '('
+      isWord(at(tokens, index + 1), 'URL') &&
+      isPunct(at(tokens, index + 2), '(')
     ) {
       const arg = at(tokens, index + 3);
       if (isLiteral(arg)) references.push({ form: 'new URL()', specifier: arg.value, line: arg.line });

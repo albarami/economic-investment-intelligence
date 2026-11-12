@@ -185,6 +185,24 @@ test('protocol-relative forms', async (t) => {
   }
 });
 
+test('protocol-relative host stops at a comma or a closing parenthesis', async (t) => {
+  const samples = [
+    '<img srcset="//cdn,//host.example/x">',
+    'a { background: url(//host.example); }',
+  ];
+  for (const sample of samples) {
+    await t.test(sample, () => {
+      const root = makeRoot();
+      if (sample.startsWith('<')) {
+        fs.writeFileSync(path.join(root, 'index.html'), `${sample}\n`);
+      } else {
+        fs.writeFileSync(path.join(root, 'src', 'a.css'), `${sample}\n`);
+      }
+      assertFail(runNode(SCRIPT, ['--root', root]), 'FAIL protocol-relative-url');
+    });
+  }
+});
+
 test('each character that may precede the slashes', async (t) => {
   const samples = [
     ['double quote', '"//host.example/x"'],

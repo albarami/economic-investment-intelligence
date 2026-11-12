@@ -18,7 +18,7 @@ const PROTOCOL_PRECEDING = [
   ',',
 ];
 
-const HOST_STOP = new Set(['/', '\\', '?', '#', ':', '"', "'", '`', '<', '>', ' ', '\t', '\n', '\r']);
+const HOST_STOP = new Set(['/', '\\', '?', '#', ':', '"', "'", '`', '<', '>', ',', ')', ' ', '\t', '\n', '\r']);
 
 function lineAt(text, index) {
   let line = 1;
@@ -62,7 +62,7 @@ function schemeHits(text, builtScript) {
 function protocolHits(text) {
   const hits = [];
   const escaped = PROTOCOL_PRECEDING.map((character) => character.replace(/[\\^\]-]/g, '\\$&')).join('');
-  const pattern = new RegExp(`([${escaped}])(\\s*)([/\\\\]{2,})([^\\s/\\\\?#:'"\`<>]+)`, 'g');
+  const pattern = new RegExp(`([${escaped}])(\\s*)([/\\\\]{2,})([^\\s/\\\\?#:'"\`<>,)]+)`, 'g');
   let match = pattern.exec(text);
   while (match) {
     const host = match[4];
