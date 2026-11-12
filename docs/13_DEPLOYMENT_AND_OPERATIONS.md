@@ -145,7 +145,7 @@ Run once by the owner, who holds sudo. The script lives in `infra/` (created in 
 
 ### 4.5 Continuous integration
 
-The CI workflow declares a `postgres` service container from the pinned `db` image digest, publishes port 5432 to the job, and waits on a `pg_isready` health check before any step runs. The job then runs the same role setup as Option N, `./eii load-release` on a small fixture release, and `./eii test`. CI never uses the native option and never needs Docker Desktop.
+The CI workflow declares a `postgres` service container from the pinned `db` image digest, publishes port 5432 to the job, and waits on a `pg_isready` health check before any step runs. The job then runs the same role setup as Option N, `./eii load-release` on a small fixture release, and `./eii test`. CI never uses the native option and never needs Docker Desktop. The workflow files that exist so far, in `.github/workflows/`, are `docs.yml`, which runs the documentation and repository-safety check, and `sandbox.yml`, which runs the tests marked `sandbox` through `scripts/ci_sandbox.py prove` on an `ubuntu-24.04` runner; task S0-T07 lists the further workflow files here.
 
 ### 4.6 Roles and schemas
 

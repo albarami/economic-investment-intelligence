@@ -22,7 +22,7 @@ Only figures marked Public describe Qatar. Synthetic and Simulated figures demon
 
 This repository contains a documentation pack, the [typed-decision qualification set](evals/typed_decisions/README.md) under `evals/`, the scaffolding of the pinned repository layout (slice S0, task S0-T01) and one `uv` workspace with three package skeletons, `eii_core`, `eii_custodian` and `eii_product` (slice S0, task S0-T02). Each skeleton holds a version string and a small test of its own. There is no feature code yet, and no product, release, privacy engine, assistant or interface is claimed to work.
 
-Eleven project commands run from the repository root today: the test command `./eii test`, the documentation check, the tree check, the lock check, the guard tests on their own, the three Python checks (lint, format and type), the version check, the formatter in write mode and, only after a change to a `pyproject.toml`, the command that rewrites the lock file. Python 3.14 and `uv` are needed for all but the documentation check and the tree check. Two commands change files and are run only to apply the formatter: `uv run --locked ruff format .` here and `npm run format` in `web/`; the lint, format-check and type-check commands only read.
+Eighteen project commands run from the repository root today: the test command `./eii test`, the documentation check, the tree check, the lock check, the guard tests on their own, the three Python checks (lint, format and type), the version check, the seven sandbox and engine-extension commands (environment, fetch, verify, two launcher checks, the runner facts and the proof of the sandbox tests), the formatter in write mode and, only after a change to a `pyproject.toml`, the command that rewrites the lock file. Python 3.14 and `uv` are needed for all but the documentation check and the tree check. Two commands change files and are run only to apply the formatter: `uv run --locked ruff format .` here and `npm run format` in `web/`; the lint, format-check and type-check commands only read.
 
 ```sh
 ./eii test
@@ -34,6 +34,13 @@ uv run --locked ruff check .
 uv run --locked ruff format --check .
 uv run --locked mypy
 uv run --locked python scripts/check_versions.py
+uv sync --managed-python --all-packages --locked --group engine
+uv run --locked python scripts/engine_extensions.py fetch
+uv run --locked python scripts/engine_extensions.py verify
+uv run --locked python scripts/sandbox_check.py check
+uv run --locked python scripts/sandbox_check.py check-extensions
+uv run --locked python scripts/ci_sandbox.py facts
+uv run --locked python scripts/ci_sandbox.py prove
 uv run --locked ruff format .
 uv lock
 ```
@@ -59,6 +66,8 @@ npm install --package-lock-only
 
 `pins.toml` at the repository root records every pinned version once: the exact version or series, the retreat pin or `none recorded`, a label (a value taken from the documentation pack, to be confirmed at slice S1, or an ASSUMPTION with its source), the pack line it answers, and whether it is installed now or only recorded for the slice that first uses it. The manifests, the lock files and the version files must agree with it: `.python-version` and `.nvmrc` hold the Python and Node series, and `required-version` in the root `pyproject.toml` holds the `uv` version. `uv run --locked python scripts/check_versions.py` fails when a dependency named in a judged place of a manifest, a locked version of a recorded component, a version file, a version field, or the Python that runs it, or the `uv`, Node or npm found on the path, differs from that record, and when a manifest, lock or version file outside its closed set is among the files that git tracks or would track (a file that git ignores and does not track is not judged); the places it does not judge are listed in the docstring of `scripts/check_versions.py`. It reads files, asks git for its list of files and runs `--version` on the tools; it changes nothing. The guard tests include a run of this check on the real repository, so `./eii test` and the guard-test command also need `git` on the path, `uv` at the recorded version, and `node` and `npm` on the path within the recorded series, not only for the two web suites. Slice S1 confirms the pins and writes the spike result; until then they are the values of the pack or labelled assumptions.
 
+The generator sandbox is bubblewrap only; there is no fallback. `scripts/sandbox_launch.py` builds the command line of the two profiles, `build-world` and `build-release`, from the closed tables of `scripts/sandbox_profiles.py`: the network is unshared, the checkout is mounted as three read-only code folders only, `data/public_cache/` is read-only, the engine-extension files are checked and bound one by one, read-only, with nothing else of their folder visible, and the vault folder (for `build-release` also one staging folder) is the only writable host path. Every mount is made from the descriptor of the object that was checked, so a symbolic link, a rename or a replaced file between the check and the start is never mounted. The launcher does not protect against a process outside the sandbox that has write permission on a mounted object (a process of the same user, or root) and changes that object's content while a build runs, nor against root, the kernel or bubblewrap themselves (OI-61). The environment is made by `uv sync --managed-python --all-packages --locked --group engine`. `scripts/engine_extensions.py fetch` is the one command of this part that needs the network: it installs the DuckDB `spatial` and `h3` extensions into `data/engine_extensions/`, an uncommitted folder under `data/` that the sandbox tests and `scripts/sandbox_check.py` read (a cache path in the sense of rule 13; the path is an assumption that slice S1 confirms or moves). The sandbox tests carry the marker `sandbox`, run in `./eii test` and in the unittest command, and are never skipped: without bubblewrap, without the `engine` group or without the fetched extensions they fail and name the command to run. `.github/workflows/sandbox.yml` runs them on a GitHub-hosted Ubuntu 24.04 runner; where the runner restricts unprivileged user namespaces, the job loads the per-binary AppArmor profile of bubblewrap from the distribution package, and where that does not help the job fails; no system-wide switch is ever written.
+
 `./eii test` runs the six suites that exist, one after the other, and prints the passed, failed and skipped counts of each; the guard-test command above and `npm run test:checks` run the same files as the suites `python-guards` and `web-checks`, without the counts. A Python test that uses subtests counts once, as one test. It exits 0 only if every suite ran at least one test, none failed or errored, every skipped test that the tools report names the standing reason OI-01 or OI-10, and each tool's exit status agrees with its counts. Two Vitest forms are not reported by its JSON reporter and so are not seen: an `it.fails` test whose body fails as expected is written as passed, and a `describe.todo` without a body is omitted; they are left to review and lint (`web/README.md`). The suites are listed in one table at the top of `scripts/run_tests.py`: the guard tests under `scripts/tests`, one suite for each of the three Python packages, the Node checks of `web/` and the Vitest unit tests of `web/`. It needs `uv`, and a prior `npm ci` in `web/` for the two web suites; once those environments are installed it needs neither network nor database. It prints `seed=<n>` first, and `./eii test --seed <n>` repeats a run with the same seed. Only this one `./eii` command exists; the other eleven commands described in the architecture are being built in slice S0 and are not available now. The [implementation plan](docs/14_IMPLEMENTATION_PLAN.md) and [task ledger](TASKS.md) are drafts.
 
 ## How to read the documentation
@@ -82,7 +91,7 @@ Accuracy is enforced by three code mechanisms: no model calculates, no fact is a
 
 ## Planned repository layout
 
-The architecture pins this layout. `docs/`, `evals/` and `scripts/` hold the documentation pack, the qualification set, the repository checks and the test runner; the file `eii` at the root is the command launcher. `contracts/`, `gateway/` and `infra/` exist as scaffolding, each with a short note and no feature code yet. `web/` holds the application shell, which has no feature UI yet. `core/`, `custodian/` and `product/` each hold one package skeleton, a version string and a small test of its own. Nothing under `data/` is ever committed (ARC-99), so a fresh clone has no `data/` folder:
+The architecture pins this layout. `docs/`, `evals/` and `scripts/` hold the documentation pack, the qualification set, the repository checks, the test runner and the sandbox launcher with its proofs; the file `eii` at the root is the command launcher. `contracts/`, `gateway/` and `infra/` exist as scaffolding, each with a short note and no feature code yet. `web/` holds the application shell, which has no feature UI yet. `core/`, `custodian/` and `product/` each hold one package skeleton, a version string and a small test of its own. Nothing under `data/` is ever committed (ARC-99), so a fresh clone has no `data/` folder:
 
 ```text
 contracts/    source and release contracts
@@ -95,7 +104,7 @@ gateway/      offline typed-decision package, used only by evals and scripts too
 infra/        database, Compose and stage configuration
 scripts/      developer commands
 docs/         this documentation pack and decision records
-data/         uncommitted public cache, vault and releases
+data/         uncommitted public cache, vault, releases and engine extensions
 ```
 
 The custodian plane is the only place record-level synthetic data may exist. Its vault is deleted after each build. Only an immutable, content-addressed release crosses to the product plane, which never imports custodian code.
