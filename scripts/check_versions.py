@@ -407,7 +407,7 @@ def _python_docs(
     docs: dict[str, dict[str, object]],
 ) -> list[tuple[str, dict[str, object]]]:
     found: list[tuple[str, dict[str, object]]] = []
-    if "pyproject.toml" in docs and "members" not in docs.get("pyproject.toml", {}):
+    if "pyproject.toml" in docs:
         found.append(("pyproject.toml", docs["pyproject.toml"]))
     for rel, doc in docs.items():
         if rel not in {
@@ -415,7 +415,6 @@ def _python_docs(
             "uv.lock",
             "web/package.json",
             "web/package-lock.json",
-            "members",
         }:
             found.append((rel, doc))
     return found
@@ -493,7 +492,7 @@ def _manifests(
                         (
                             "manifest-unrecorded",
                             "web/package.json",
-                            f"{section}.{name}: no component in pins.toml",
+                            f"{section}.{_show(name)}: no component in pins.toml",
                         )
                     )
                     continue
@@ -579,7 +578,7 @@ def _locks(
                     (
                         "lock-source",
                         "uv.lock",
-                        f"{raw_name} {version}: not locked from a registry",
+                        f"{_show(raw_name)} {_show(version)}: not locked from a registry",
                     )
                 )
             if component is not None and registry:
@@ -588,14 +587,19 @@ def _locks(
                 continue
             if not isinstance(version, str):
                 failures.append(
-                    ("lock-version", "uv.lock", f"{raw_name}: entry has no version")
+                    (
+                        "lock-version",
+                        "uv.lock",
+                        f"{_show(raw_name)}: entry has no version",
+                    )
                 )
             elif not versions_record.allowed_by(component, version):
                 failures.append(
                     (
                         "lock-version",
                         "uv.lock",
-                        f"{raw_name} {version}: neither pin {component.pin} nor retreat {component.retreat}",
+                        f"{_show(raw_name)} {_show(version)}: neither pin {component.pin} "
+                        f"nor retreat {component.retreat}",
                     )
                 )
         for folded in named["python"]:
@@ -638,7 +642,7 @@ def _locks(
                         (
                             "lock-version",
                             "web/package-lock.json",
-                            f"{key}: entry has no version",
+                            f"{_show(key)}: entry has no version",
                         )
                     )
                 elif not versions_record.allowed_by(component, version):
@@ -646,7 +650,8 @@ def _locks(
                         (
                             "lock-version",
                             "web/package-lock.json",
-                            f"{key}: {version}: neither pin {component.pin} nor retreat {component.retreat}",
+                            f"{_show(key)}: {_show(version)}: neither pin {component.pin} "
+                            f"nor retreat {component.retreat}",
                         )
                     )
 

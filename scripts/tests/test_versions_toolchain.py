@@ -168,8 +168,6 @@ class ToolchainRules(unittest.TestCase):
             ["FAIL toolchain: npm: not found on PATH", base.summary(1)],
         )
         root, path = self._tools()
-        base.make_tool(Path(path), "uv", "#!/no/such/interpreter\nexit 0\n")
-        # make_tool already wrote a shebang; replace the whole file.
         target = Path(path) / "uv"
         target.write_text("#!/no/such/interpreter\nexit 0\n", encoding="utf-8")
         target.chmod(0o755)

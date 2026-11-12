@@ -241,8 +241,10 @@ def members_of(doc: dict[str, object]) -> tuple[list[str] | None, str | None]:
 
     When ``tool.uv`` is not a table the members line is not given.
     """
-    tool = doc.get("tool")
-    uv = tool.get("uv") if isinstance(tool, dict) else None
+    tool = doc.get("tool", {})
+    if not isinstance(tool, dict):
+        return None, None
+    uv = tool.get("uv", {})
     if not isinstance(uv, dict):
         return None, None
     workspace = uv.get("workspace")

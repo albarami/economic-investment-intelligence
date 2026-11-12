@@ -176,6 +176,43 @@ class InputRules(unittest.TestCase):
                 S1,
             ],
         )
+        members_detail = (
+            "FAIL input: pyproject.toml: "
+            "tool.uv.workspace.members is not a list of strings"
+        )
+        absent_tool = (
+            (
+                "project-only",
+                '[project]\nname = "eii-workspace"\nrequires-python = ">=3.14"\n',
+            ),
+            (
+                "tool-ruff-only",
+                '[project]\nname = "eii-workspace"\nrequires-python = ">=3.14"\n\n'
+                "[tool.ruff]\nline-length = 100\n",
+            ),
+        )
+        for label, text in absent_tool:
+            with self.subTest(label=label):
+                root, path = base.ready(self)
+                base.write(root, "pyproject.toml", text)
+                base.write(root, "core/pyproject.toml", "not = [\n")
+                proc = base.cli(["--root", str(root)], {"PATH": path})
+                self.assertEqual(proc.returncode, 1, proc.stdout + proc.stderr)
+                self.assertEqual(proc.stderr, "")
+                self.assertEqual(proc.stdout.splitlines(), [members_detail, S1])
+        with self.subTest(label="lock-version-newline"):
+            root, path = base.ready(self)
+            base.edit(root, "uv.lock", 'version = "1.2.3"', 'version = "1.2.3\\n"')
+            shown = base.escaped("1.2.3\n")
+            self.assertNotIn("\n", shown)
+            self.assertEqual(
+                base.run(root, path=path),
+                [
+                    "FAIL lock-version: uv.lock: alpha "
+                    f"{shown}: neither pin 1.2.3 nor retreat none recorded",
+                    S1,
+                ],
+            )
 
     def test_fields_not_judged(self) -> None:
         root, path = base.ready(self)
