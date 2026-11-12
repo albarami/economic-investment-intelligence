@@ -13,7 +13,7 @@
 - Provenance and evidence status are different axes; tool status is a third concept.
 - “Observed” never means “real” when a fact is Synthetic or Simulated.
 - “Not measured” is a coverage label, never zero and not an evidence status.
-- A release contains statistics only; record-level synthetic inputs stay in the build vault.
+- A release contains statistics and Public records, plus the restricted named synthetic firm list ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 12; ARC-131); every other record-level synthetic input stays in the build vault.
 - The application calculates and renders. Models select catalogue entries; they do not write prose, queries or numbers.
 - Only figures from the four protected record types snap to release units; the Public and Simulated layers of a drawn area are computed for its exact shape ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)).
 - Synthetic and protected records carry no sex, gender or nationality; an official split by sex or nationality is a Public fact only ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)).

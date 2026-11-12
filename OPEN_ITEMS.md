@@ -326,7 +326,7 @@
 - WHY: These choices affect latency, cost and which provider content can enter an answer; neither is justified before evidence exists.
 - DONE SO FAR: Fast mode is off and server-side fallback is disabled; refusal and failure select the template writer. A lead ruling of 2026-11-11 replaces the earlier first-text target: evidence on screen within 2 s; the checked brief within 6 s when no live model is called (template writer or recorded provider), and within 20 s when a live model composes it. The brief is buffered until the accounting gate has passed. Fast mode remains an owner decision, so this item stays open.
 - OPTIONS: **Recommendation:** keep both off. Reconsider only after cost, latency and the full evaluation harness support the exact proposed model and settings.
-- NEEDED BY: slice S8 live-model tuning; any later provider change.
+- NEEDED BY: go-live, after OI-01 is closed by the owner's decision (decision 0018 item 12); during the build, slice S8 included, only the template writer and the recorded provider run; any later provider change.
 
 ## OI-31 — Sealed-scenario writer and key holder
 

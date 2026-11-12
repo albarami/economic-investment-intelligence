@@ -36,7 +36,7 @@
 
 | Environment | Runs | PostgreSQL | Network | Model |
 |---|---|---|---|---|
-| Developer machine | Windows with Ubuntu under WSL2; Python, Node and the API run inside Ubuntu; the browser runs on Windows | Native service in Ubuntu, or Docker Compose | Available for `./eii build-public`, on the allow-listed hosts only (OPS-65), and for installs | Key optional |
+| Developer machine | Windows with Ubuntu under WSL2; Python, Node and the API run inside Ubuntu; the browser runs on Windows | Native service in Ubuntu, or Docker Compose | Available for `./eii build-public`, on the allow-listed hosts only (OPS-65), and for installs | Template writer and recorded provider only; never a live key during the build ([decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12) |
 | Continuous integration | GitHub Actions on an Ubuntu runner | Service container, same image digest as Compose | Available | Recorded provider only, never a live key |
 | Stage machine | Frozen bundle, native Windows Chrome or Edge in full screen | Whichever preflight finds answering; embedded reader always open | Not required | Live, recorded replay, or template writer |
 | Later deployment | Product plane in a custodian-approved environment | Same engine as a managed service or on a custodian server (section 11) | Custodian-controlled | Custodian decision |

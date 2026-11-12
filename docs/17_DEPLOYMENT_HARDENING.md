@@ -52,6 +52,7 @@ Version 1 holds one protected window with monthly periods inside it. Each month 
 | DHA-22 | Cohort tests: every change between consecutive periods, across months and across windows, is enumerated at origin and destination (joiners, leavers, movers, and contributors whose employer group, band or category changed), and each cohort passes every affected tier and atom test (PRV-56). |
 | DHA-23 | Stable suppression: a cell withheld in one period stays unrecoverable from every later period, every multi-period total and every difference between releases. The mover attack and every cross-period typed predicate run before each new window is exported. |
 | DHA-24 | Query auditing: the serving plane records which released figures each organisation and session read, by area, period and list, with no record-level data in the record (REV-18). A periodic review looks for sequences that combine periods, shapes or lists toward a withheld cell or a small population; a finding tightens the release rule, never the attack (decision 0016). The oversight seat still shows no organisation identity (PRV-66). |
+| DHA-25 | Shared stayer draws: before any real-data pilot, the attacker-view audit models the draws that PRV-42 and PRV-43 share between stayer bills of nested or overlapping units and of different pairs of months, or the stayer index is released only where no two published stayer cohorts can share contributors (origin: pull request 6, review round 2, part 6, F2; document 06, section 17). |
 
 ## 4. Firm-level release of real register fields
 
