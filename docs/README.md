@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12 |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Index the EII pack, its reading orders, statuses, identifiers and amendment process. |
@@ -11,10 +11,10 @@
 ## In brief
 
 - Read the project brief before any specialised document.
-- Every numbered document is a draft. Documents 01 to 16 and the glossary were reviewed by models of other makers and corrected on 2026-11-11, then amended on 2026-11-12 by decisions 0016 and 0017, which also created document 17, and by decision 0018, which also amended the applicable documents and document 17; [PROGRESS.md](../PROGRESS.md) lists the reviews, their verdicts and what is still unreviewed (open items OI-37 and OI-38). No document is approved for a slice gate yet.
-- Version 1 now covers the whole initiative ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)): seven decision journeys, three services and four cases on one living map, with drawn areas, simulated footfall and traffic, monthly periods and named synthetic firms. [Decision 0017](decisions/0017-public-data-additions-and-public-splits.md) adds 77 portal datasets, two investment sources and official splits by sex and nationality as Public facts. [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) lists what a deployment on real records must add.
+- Every numbered document is a draft. Documents 01 to 16 and the glossary were reviewed by models of other makers and corrected on 2026-11-11, then amended on 2026-11-12 by decisions 0016 and 0017, which also created document 17, by decision 0018, which also amended the applicable documents and document 17, and by decision 0019, which also amended the applicable documents and document 17; [PROGRESS.md](../PROGRESS.md) lists the reviews, their verdicts and what is still unreviewed (open items OI-37 and OI-38). No document is approved for a slice gate yet.
+- Version 1 now covers the whole initiative ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)): seven decision journeys, three services and four cases on one living map, with drawn areas, simulated footfall and traffic, monthly periods and named synthetic firms. [Decision 0017](decisions/0017-public-data-additions-and-public-splits.md) adds 77 portal datasets, two investment sources and official splits by sex and nationality as Public facts. [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) lists what a deployment on real records must add. [Decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) replaces the ban on forecasts by forecasts, estimates and base rates computed by tested code, adds scenario tools, people present by pay band, an optional 3D view and six self-serve sources, and sets the citation of the pack by stable anchor, never by line number.
 - The implementation plan is such a draft too; the task ledger is a draft queue whose tasks all start queued.
-- Decision records 0001 to 0018 are accepted; decision 0016 supersedes decision 0013 and amends decisions 0006 and 0007. Later amendments need new records, not silent edits.
+- Decision records 0001 to 0020 are accepted; decision 0016 supersedes decision 0013 and amends decisions 0006 and 0007. Later amendments need new records, not silent edits.
 - Requirement identifiers are defined once in requirement tables; task identifiers come from the plan and task ledger.
 - [GLOSSARY.md](GLOSSARY.md) pins vocabulary. [OPEN_ITEMS.md](../OPEN_ITEMS.md) tracks what is undecided.
 
@@ -32,24 +32,24 @@
 
 | Document | Purpose | Status on 2026-11-12 |
 |---|---|---|
-| [01_PROJECT_BRIEF.md](01_PROJECT_BRIEF.md) | Audience, scope, version 1, journeys and prohibited claims | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [02_ARCHITECTURE.md](02_ARCHITECTURE.md) | Planes, trust boundaries, release, stores and stack | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12 |
-| [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) | Feed, release, fact, graph and application contracts | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) | Public sources, licences, frame, spine and places | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [05_SYNTHETIC_WORLD_AND_SIMULATION.md](05_SYNTHETIC_WORLD_AND_SIMULATION.md) | Synthetic generation, simulation and sealed evaluation | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) | Partitions, one selected export, one treatment per window, attacks, receipts and limits | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12; the last ten corrections of 2026-11-11 still await review by another maker (OI-37) |
-| [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md) | Deterministic methods and worked public examples | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [08_BACKEND.md](08_BACKEND.md) | Stores, loader, tools, playbooks, API and seats | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [09_AI_ASSISTANT.md](09_AI_ASSISTANT.md) | Governed composition, catalogues, fallback and evaluation | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [10_FRONTEND.md](10_FRONTEND.md) | Browser components, map, Fact chips and bilingual behaviour | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md) | Visual tokens, motion, storyboard and design audit | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md) | Test map, gates, CI and evidence standard | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md) | Commands, stage operation, freeze and recovery | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12 |
-| [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md) | Slices, dependencies, tasks and gates | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12 |
-| [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md) | Independent checks and verdict format | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12 |
-| [16_DEMO_RUNBOOK.md](16_DEMO_RUNBOOK.md) | Guided session, recoveries and closing request | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
-| [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) | What a deployment on real records must add beyond the demonstrator | Draft v0.2, created by decisions 0016 and 0017 and amended by decision 0018 on 2026-11-12 |
-| [GLOSSARY.md](GLOSSARY.md) | Shared technical and interface vocabulary | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
+| [01_PROJECT_BRIEF.md](01_PROJECT_BRIEF.md) | Audience, scope, version 1, journeys and prohibited claims | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| [02_ARCHITECTURE.md](02_ARCHITECTURE.md) | Planes, trust boundaries, release, stores and stack | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) | Feed, release, fact, graph and application contracts | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) | Public sources, licences, frame, spine and places | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| [05_SYNTHETIC_WORLD_AND_SIMULATION.md](05_SYNTHETIC_WORLD_AND_SIMULATION.md) | Synthetic generation, simulation and sealed evaluation | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) | Partitions, one selected export, one treatment per window, attacks, receipts and limits | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12; the last ten corrections of 2026-11-11 still await review by another maker (OI-37) |
+| [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md) | Deterministic methods and worked public examples | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| [08_BACKEND.md](08_BACKEND.md) | Stores, loader, tools, playbooks, API and seats | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| [09_AI_ASSISTANT.md](09_AI_ASSISTANT.md) | Governed composition, catalogues, fallback and evaluation | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| [10_FRONTEND.md](10_FRONTEND.md) | Browser components, map, Fact chips and bilingual behaviour | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md) | Visual tokens, motion, storyboard and design audit | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md) | Test map, gates, CI and evidence standard | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md) | Commands, stage operation, freeze and recovery | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md) | Slices, dependencies, tasks and gates | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md) | Independent checks and verdict format | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| [16_DEMO_RUNBOOK.md](16_DEMO_RUNBOOK.md) | Guided session, recoveries and closing request | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 |
+| [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) | What a deployment on real records must add beyond the demonstrator | Draft v0.2, created by decisions 0016 and 0017 and amended by decisions 0018 and 0019 on 2026-11-12 |
+| [GLOSSARY.md](GLOSSARY.md) | Shared technical and interface vocabulary | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
 | [REFERENCE_NOTES.md](REFERENCE_NOTES.md) | Official pages read for DuckDB 2.0, PostgreSQL 18 and the Claude API, the idioms that changed, and the slice S1 confirmation fields | Draft written by task S0-T13 on 2026-11-12; not approved |
 | [web/REFERENCE_NOTES.md](../web/REFERENCE_NOTES.md) | The same for MapLibre GL JS 6, deck.gl 9.4 and the deck.gl MapLibre module (FE-02), and the font weights and icon licence confirmations (DES-25, DES-45) | Draft written by task S0-T13 on 2026-11-12; not approved |
 | [TASKS.md](../TASKS.md) | Task-level scope, acceptance criteria and evidence links | Draft task queue; all tasks start queued |
@@ -74,9 +74,11 @@
 | [0013](decisions/0013-one-deep-journey-before-breadth.md) | One deep journey before breadth | Accepted, 2026-11-11; superseded by decision 0016 on 2026-11-12 |
 | [0014](decisions/0014-typed-decision-gateway.md) | Offline typed-decision gateway, default provider none | Accepted, 2026-11-11 (amendment 1 to the first pack) |
 | [0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md) | Review rounds after the first, proposed open items, the scope of the repository's checks, and building ahead | Accepted, 2026-11-12 (amendment 2 to the first pack) |
-| [0016](decisions/0016-version-1-covers-the-whole-initiative.md) | Version 1 covers the whole initiative: seven journeys, three services and four cases, with drawn areas, simulated footfall and traffic, monthly periods and named synthetic firms | Accepted, 2026-11-12 (amendment 3 to the first pack) |
-| [0017](decisions/0017-public-data-additions-and-public-splits.md) | Public data additions, public splits by sex and nationality, and investment sources | Accepted, 2026-11-12 (amendment 4 to the first pack) |
+| [0016](decisions/0016-version-1-covers-the-whole-initiative.md) | Version 1 covers the whole initiative: seven journeys, three services and four cases, with drawn areas, simulated footfall and traffic, monthly periods and named synthetic firms | Accepted, 2026-11-12 (amendment 3 to the first pack); where it says that no revenue, demand or success forecast is given, amended by decision 0019 on 2026-11-12 |
+| [0017](decisions/0017-public-data-additions-and-public-splits.md) | Public data additions, public splits by sex and nationality, and investment sources | Accepted, 2026-11-12 (amendment 4 to the first pack); items 4 and 5 amended by decision 0019 on 2026-11-12 |
 | [0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) | Priorities of the proof of concept (strict in two places only, other hardening to document 17) and amendments to decision 0015 | Accepted, 2026-11-12 (amendment 5 to the first pack) |
+| [0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) | Forecasts, estimates and base rates by tested code in place of the ban on forecasts; scenario tools; people present by pay band; an optional 3D view; six self-serve sources and two keys; rules 4, 10, 24 and 25 of AGENTS.md amended; the pack cited by stable anchor | Accepted, 2026-11-12 (amendment 6 to the first pack) |
+| [0020](decisions/0020-freeze-bundle-check-and-project-database-port.md) | Freeze-bundle preflight and the database port of this project's Compose service | Accepted, 2026-11-12 (amendment 7 to the first pack) |
 
 ## Identifiers and change control
 
@@ -88,6 +90,7 @@
 6. Routine corrections that do not change a decision still go through the normal task, review and evidence workflow. [PROGRESS.md](../PROGRESS.md) records evidence; [OPEN_ITEMS.md](../OPEN_ITEMS.md) records unresolved questions.
 7. "A lead ruling of 2026-11-11" means a ruling the lead gave on a reviewer's finding while this pack was reviewed. The rulings are a project record held by the owner and are not in this repository; every ruling that changed the design is written into the documents themselves, and into a decision record where it changed a decision.
 8. Figures attributed to "design research", "architecture research", "methods research", "graph research", an "engineering judge" or a "feasibility review" and dated 2026-11-11 were measured once while the design was chosen, on third-party software with throwaway synthetic tables or public inputs, before any product code existed. They are not test results of this product, their raw outputs are not in this repository, and each is measured again at the slice that builds the part concerned.
+9. The pack is cited by a stable anchor, never by line number: a requirement ID with its file, a section heading (with the table row or the numbered item where one is meant), a task ID, a rule number or the numbered item of a decision record. Every check that reads citations verifies that the anchor exists in the cited file (rule 33 of [AGENTS.md](../AGENTS.md); [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 26). In a decision record, write "item 5 of decision 0019", never a bare "D5", which names a journey.
 
 ## Open questions and assumptions
 
