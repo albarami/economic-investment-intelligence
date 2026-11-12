@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017 and 0018 on 2026-11-12 (see PROGRESS.md) |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 (see PROGRESS.md) |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Track every unresolved owner decision, assumption, pending correction and technical unknown without implying closure. |
@@ -20,6 +20,7 @@
 - OI-36 to OI-38 record what the review of 2026-11-11 left open: an objection of two reviewers that was not accepted for version 1, and two sets of last corrections that another maker has not yet read.
 - OI-35 records which parameter set is exported. A lead ruling of 2026-11-11 sets the default to A; the owner or a data owner may overrule it before the slice S1 gate.
 - OI-39 onwards are raised during the build.
+- OI-96 onwards record the open points of [decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md): the age of the places copy, the Public source for the survival base rate, the Public source of each forecast series without a table, the provider's rule on storing responses, the sources that are off under a public or commercial hosting, the size of the public-total inventory with the two gridded Public tables, the subject of a district series and the build without the night-lights key.
 
 ## OI-01 — Main model key (supplied for go-live; not used during the build)
 
@@ -30,7 +31,7 @@
 - DONE SO FAR: The template writer and recorded provider are used throughout the build; no build, CI or slice gate calls a keyed model service, and live-model runs (prepared recordings refreshed live, model-returned briefs, a full live run) form a go-live gate enabled by an owner decision after this item is closed.
 - OPTIONS: **Recommendation:** keep the template writer and the recorded provider for the whole build; the live adapter and its evaluation gates wait for the owner's go-live decision.
 - NEEDED BY: go-live (not before; the build runs in template mode).
-- UPDATE: 2026-11-12, by the owner's note of that day, recorded in [decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md): key supplied for go-live; not used during the build. The assistant stays in template mode during the build.
+- UPDATE: 2026-11-12, by the owner's note of that day, recorded in [decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md): key supplied for go-live; not used during the build. The assistant stays in template mode during the build. `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` lie outside the keys of that item and may be used by the build within their free allowances ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 16); neither is printed, logged or committed, and no test, gate, command or the guided story needs either.
 
 ## OI-02 — Demonstration date
 
@@ -48,7 +49,7 @@
 - TYPE: OPEN
 - NEEDED: Reconcile the two restaurant totals and the two wage-table means by dataset, field, measure, activity scope and year; record owner sign-off.
 - WHY: Conflicting public figures must not be displayed as though they were the same measure.
-- DONE SO FAR: The candidate sources and reconciliation steps are documented; affected display cards stay blocked.
+- DONE SO FAR: The candidate sources and reconciliation steps are documented; affected display cards stay blocked. The site demand and revenue estimate and the revenue range of the user's outlet ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 8 and 10) read the survey figures and stay off screen while this item is open.
 - OPTIONS: **Recommendation:** follow the documented reconciliation and default to the named production-value and occupation tables only after sign-off. Otherwise leave the figures hidden.
 - NEEDED BY: slice S2 reconciliation; slice S7 methods and affected story scenes.
 
@@ -354,9 +355,9 @@
 - TYPE: ASSUMPTION
 - NEEDED: Owner confirmation that the presenter console may carry numeric scenario entry.
 - WHY: The wall has no keyboard, and scenario values must be visibly typed user inputs rather than model-originated numbers.
-- DONE SO FAR: Default is yes. The presenter console carries Scenario inputs for the break-even method, and the server calculates from those typed values.
-- OPTIONS: **Recommendation:** permit numeric entry only in the presenter's Scenario inputs control, limited to the six documented method inputs; keep the browser and model from calculating or inventing values.
-- NEEDED BY: slice S7 break-even method; slice S10 presenter controls and guided story.
+- DONE SO FAR: Default is yes. The presenter console carries Scenario inputs for the break-even method, and the server calculates from those typed values. [Decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 9 and 10 extend the closed list of typed scenario inputs for the catchment-share scenario (card C34) and the revenue range of the user's outlet (card C35): the attractiveness that the user sets for the user's outlet against the competitors as a group or by competitor category, the capture rate, and the editable assumptions of the two cards, beside the average bill that the break-even calculator already takes. The cards fix each input, its range and its default (S7-T14, S7-T15).
+- OPTIONS: **Recommendation:** permit numeric entry only in the presenter's Scenario inputs control, limited to the typed scenario inputs of the closed list: the six documented break-even method inputs and the inputs that cards C34 and C35 add; keep the browser and model from calculating or inventing values.
+- NEEDED BY: slice S7 break-even method and scenario cards (S7-T14, S7-T15); slice S10 presenter controls and guided story.
 
 ## OI-34 — Scope of typed-decision authorisation
 
@@ -738,6 +739,86 @@
 - DONE SO FAR: The section "Confirmations assigned to this task" of `web/REFERENCE_NOTES.md` records, from runs of 2026-11-12, that the two Fontsource packages (version 5.3.0 each, the version `pins.toml` pins) hold the files of the normal style at the weights 400, 500 and 600, as woff2 and woff files, in six subsets for IBM Plex Sans and four for IBM Plex Sans Arabic, and that the package `@carbon/icons` 11.92.0 names the licence Apache-2.0 in its metadata and holds a licence file that begins with the words of the Apache License, Version 2.0, as the licence file of the repository does (page read the same day); no weight is missing and the licence is the one the pack assumes. Nothing was looked at about glyph coverage, font features (the tabular figures that docs/10_FRONTEND.md, section "Bilingual and right-to-left rules", asks to check at slice S1) or the icons themselves (grid and stroke). Proved by the rules `weights` and `icon-licence`, by `test_font_weights`, `test_icon_licence` and `test_real_notes_pass`, and by the second reader's comparison of each font row with its package. The registry metadata of the package @carbon/icons 11.92.0 lists an install script that runs a telemetry command (read on 2026-11-12 with a registry query in a scratch folder); the slice that adds the package decides how it is installed and vendored.
 - OPTIONS: **Recommendation:** pin the icon package and vendor its files with the licence text in the first slice that uses an icon, and re-run the confirmation there. Alternative: add the icon package to `pins.toml` now.
 - NEEDED BY: the first slice that serves a font file or an icon (slice S3 for fonts, FE-97).
+
+## OI-96 — Age of the places copy of decision 0019
+
+- ID: OI-96
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm that the newest release of the public copy of the places dataset, dated 2025-01-10, is the one used, or to supply a newer one.
+- WHY: The places source `places_fsq` is fetched inside `./eii build-public` from the public copy on Source Cooperative (`https://data.source.coop/fused/fsq-os-places/`, host `data.source.coop`), which is read without an account; only the files that cover Qatar are fetched. Read on 2026-11-12, its README states the Apache License, Version 2.0 and the publisher's copyright line, and its listing holds three dated releases, the newest dated 2025-01-10, with no update rhythm stated. A newer release comes from the publisher's portal, which needs an account, and is the owner's choice ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 21).
+- DONE SO FAR: The source `places_fsq` and its table `pub_place_fsq` are listed in [04_PUBLIC_DATA_PACK.md](docs/04_PUBLIC_DATA_PACK.md). Task S2-T15 builds the fetcher, the registry row that records the release used, the reviewed category mapping and the extended real-name collision checks; the places are shown with the date of that release. No variable is added for this source. The files that cover Qatar are assumed to be found through the dataset's own metadata file, which the task that builds the fetcher confirms.
+- OPTIONS: **Recommendation:** use the release dated 2025-01-10 and show its date; a newer release is the owner's choice. Alternative: leave the source out and keep the other registered places data.
+- NEEDED BY: slice S2 gate (S2-T15, PLN-25); not a blocker.
+
+## OI-97 — Public source for the survival base rate
+
+- ID: OI-97
+- TYPE: OPEN
+- NEEDED: A Public table that links a licence cancellation to the issue of the same licence, or the owner's decision to leave the survival base rate out.
+- WHY: The Public licence tables do not link a cancellation to its issue, so no survival base rate can be computed from them; card C31 returns `NO_DATA` with the reason `no_denominator` for it. The closure and entry base rates are flows over the published active stock of the same activity and geography, labelled approximate, each with its two counts and period ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 7).
+- DONE SO FAR: Task S6-T15 builds the base rates of card C31 and promises no survival figure. No survival figure is computed from the Synthetic births and closures.
+- OPTIONS: **Recommendation:** keep the survival base rate at `NO_DATA` until a Public source carries the link; invent no value. Alternative: leave the survival base rate out of the product.
+- NEEDED BY: any proposal to show a survival base rate; not a version 1 blocker.
+
+## OI-98 — Public source of each forecast series without a table
+
+- ID: OI-98
+- TYPE: OPEN
+- NEEDED: For each series of the closed list of card C30 for which the public data pack holds no source table, the Public source (publisher, dataset or page, licence, retrieval date), or the owner's decision to leave the series out.
+- WHY: A series is forecast only when the public data pack holds its source table, and a named series without one is listed as open ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 2). The list is licence issues and cancellations by activity and by the source's own area, property prices by district, hotel demand and room rates, consumer and producer prices, imports by product, announced investment by sector and the construction pipeline by municipality. Several series are short, and their forecasts return `NO_DATA` until the backtest minimum is met.
+- DONE SO FAR: Task S2-T17 records, for each series, the source table that the pack holds or that it holds none; a series without a table is not forecast. The hotel series is also the open point of OI-21 and OI-23.
+- OPTIONS: **Recommendation:** record each missing source at the slice S2 gate or keep the series open and unforecast; invent no value and add no source without its licence.
+- NEEDED BY: slice S2 gate (S2-T17, PLN-25); slice S6 (S6-T14).
+
+## OI-99 — The traffic provider's rule on storing responses
+
+- ID: OI-99
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm that nothing of a traffic-provider response is stored, and to read the provider's developer terms before any use that stores a response.
+- WHY: The provider's developer terms page could not be read on 2026-11-12, so its rule on storing responses is not verified ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 17). The free allowance read that day is monthly (200,000 tile requests; 2,500 reachable-range requests).
+- DONE SO FAR: Nothing of a response is written to disk, to the release, to the ledger or to a log; the run-time lineage keeps the request, the retrieval time and the response hash; no response is committed and every test uses hand-made fixtures. The provider is off by default, and no test, gate, command or the guided story needs it or its key (S6-T19).
+- OPTIONS: **Recommendation:** keep storing nothing; read the developer terms when the owner has an account that can open them, and record the result here.
+- NEEDED BY: any use of the provider that stores a response, and any public or commercial hosting.
+
+## OI-100 — Sources that stay off under a public or commercial hosting
+
+- ID: OI-100
+- TYPE: OPEN
+- NEEDED: Before the demonstrator is hosted publicly or for a commercial purpose, the owner to decide whether the traffic provider, the relative-busyness source `busy_gmaps` and the free weather interface `weather_openmeteo` may stay on.
+- WHY: The provider's terms for that use are unread (OI-99), the relative-busyness source states no licence and its publisher's terms name automated reading, and the free weather interface is for non-commercial use ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), "What would change this decision").
+- DONE SO FAR: Version 1 runs locally as a personal internal project; the three sources are used on the owner's decision of 2026-11-12 or within their free terms, and what a public or commercial hosting would have to settle for each is listed in the section "Public and investment sources if hosted publicly" of [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md). The three sources stay off until the owner decides.
+- OPTIONS: **Recommendation:** keep the three sources off under any public or commercial hosting until the owner records another choice in a decision record; a source whose terms, read at a fetch, forbid the use made here is switched off and the owner is told, except `busy_gmaps`, which the owner decided to use.
+- NEEDED BY: any public or commercial hosting; not a version 1 blocker.
+
+## OI-101 — Size of the public-total inventory with the two gridded Public tables
+
+- ID: OI-101
+- TYPE: OPEN
+- NEEDED: For the slice that builds the privacy engine, the size of the public-total inventory of PRV-115 once the rows of `pub_night_lights` and `pub_pop_agesex_grid` are in it, and whether that size is workable.
+- WHY: The inventory holds one entry for every Public source, one for every row of every Public table and one for every complete category split ([06_PRIVACY_AND_DISCLOSURE_CONTROL.md](docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md), PRV-115). [Decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 20 and 22 add two gridded Public tables, `pub_night_lights` (by frame cell and month) and `pub_pop_agesex_grid` (by grid cell, age band and sex), whose rows join the inventory.
+- DONE SO FAR: PRV-115 states how the rows of both tables are reviewed: the rows of `pub_night_lights` are `different_measure`, and the rows of `pub_pop_agesex_grid` are reviewed for applicability like population rows. No count of entries is stated.
+- OPTIONS: **Recommendation:** the slice that builds the privacy engine (slice S5) counts the entries and records the size; the rule of PRV-115 is not weakened to shrink it.
+- NEEDED BY: slice S5 (privacy engine).
+
+## OI-102 — Subject of a Public series by district
+
+- ID: OI-102
+- TYPE: OPEN
+- NEEDED: The subject of a forecast of a Public series on district geography (property prices by district), fixed at slice S2.
+- WHY: The closed subject list of [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) has no official district, and the series is on the source's own geography ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 2 and 5).
+- DONE SO FAR: Documents 03, 08 and 09 carry the same OPEN line.
+- OPTIONS: **Recommendation:** fix the subject at slice S2 together with documents 03, 08 and 09, without adding an attribute to a real place.
+- NEEDED BY: slice S2 gate (S2-T17); slice S6 (S6-T14).
+
+## OI-103 — Public build without the night-lights key
+
+- ID: OI-103
+- TYPE: OPEN
+- NEEDED: For the task that builds the night-lights fetcher, what `./eii build-public` does when `EARTHDATA_API_KEY` is absent: a warning and no night-lights layer, or a failed step.
+- WHY: The night-lights source `ntl_blackmarble` is fetched with the Earthdata token inside `./eii build-public` ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 16 and 20). No test, gate, command or the guided story needs the key, and exit 6 stays for an unavailable network.
+- DONE SO FAR: Preflight reports the key as `present` or `absent` and never prints it.
+- OPTIONS: **Recommendation:** the task that builds the fetcher chooses between a warning with no night-lights layer and a failed step, and records the choice here. Exit 6 stays for an unavailable network.
+- NEEDED BY: the task that builds the night-lights fetcher (S2-T14).
 
 ## Change control
 

@@ -2,21 +2,22 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016 and 0017 on 2026-11-12 |
+| Status | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Define every economic, location, footfall, traffic and labour-market method the product computes: inputs, formula, worked example (a regression test), provenance, honesty limits, allowed wording and measured cost. |
-| Read first | [01_PROJECT_BRIEF.md](01_PROJECT_BRIEF.md), [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md), [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md), [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) |
+| Read first | [01_PROJECT_BRIEF.md](01_PROJECT_BRIEF.md), [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md), [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md), [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) |
 
 ## In brief
 
-- Twenty-nine version 1 (v1) method cards and a list of methods that must not be built. [Decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) moved the three later cards (C11 ranking, C12 reachable access, C13 imports against local production) into v1. Decisions 0016 and [0017](decisions/0017-public-data-additions-and-public-splits.md) added C16 to C29 and amended C3, C4, C7, C14 and C15. No later card remains.
-- Every method is a small, pure, tested function. Nothing here needs a GPU, a graph server or a spatial database to compute; every method the research timed ran in about three seconds or less on a CPU. The traffic assignment and the national travel-time matrix are not yet timed.
-- A pinned worked example is a regression test that must pass in slice S7. An example whose inputs are not yet pinned is an illustrative note, and the slice S7 gate fails while it stays unpinned. A card added by decisions 0016 and 0017 has a fixture test now and is pinned at the gate of the slice that builds it (MTH-60).
+- Thirty-eight version 1 (v1) method cards and a list of methods that must not be built. [Decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) moved the three later cards (C11 ranking, C12 reachable access, C13 imports against local production) into v1. Decisions 0016 and [0017](decisions/0017-public-data-additions-and-public-splits.md) added C16 to C29 and amended C3, C4, C7, C14 and C15. [Decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) added C30 to C38 (forecasts, base rates, people present by pay band, the site estimate, two scenarios and three Public layers) and amended C4, C11, C15, C18, C19, C22, C23, C25 and C26. No later card remains.
+- Every method is a small, pure, tested function. Nothing here needs a GPU, a graph server or a spatial database to compute; every method the research timed ran in about three seconds or less on a CPU. The traffic assignment, the national travel-time matrix, the backtests of C30 and the draws of C33 are not yet timed.
+- A pinned worked example is a regression test that must pass in slice S7. An example whose inputs are not yet pinned is an illustrative note, and the slice S7 gate fails while it stays unpinned. A card added by decisions 0016, 0017 and 0019 has a fixture test now and is pinned at the gate of the slice that builds it (MTH-60).
 - Public methods produce real findings about Qatar. Methods run on Synthetic or Simulated layers show a format and a protection, never a fact about a place.
 - Rankings, fits and suggestions are tested code over criteria and weights the user can see and change, and every rank has a rank-stability sentence. None is a verdict, a probability, a confidence claim, advice to act or a revenue, demand or success forecast.
-- Figures from the protected record types snap to whole release units, with the snap sentence. Public points and Simulated layers are computed for the exact shape the user draws. A Public statistic or a released Simulated count reaches that shape only through apportioning (C18), and the result is labelled Inferred.
-- Presence is an estimated count of people with a range, hour by hour (C15, C27). Its seasonal shape is calibrated and checked against published museum visitor counts (C26). Traffic is a simple Simulated road assignment (C25).
+- A forecast, an estimate or a base rate appears only as the output of tested code: a forecast of a listed Public series, or of a released monthly series of the window, with its interval from the backtest, its measured backtest error, its method and its source (C30); a base rate with its counts and period (C31); the site estimate with its low, middle and high cases, its main drivers and, while an input is Simulated or Synthetic, the label "estimate on simulated inputs" (C33). A scenario (C34, C35) is the user's, with every assumption visible and editable, and is never called a forecast. Nothing forecasts the success of a venture, nothing is estimated for a named real business, and nothing is a verdict, a probability, a confidence claim or advice to act ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 1 to 10).
+- Figures from the protected record types snap to whole release units, with the snap sentence. Public points and Simulated layers are computed for the exact shape the user draws. A Public statistic or a released Simulated count reaches that shape only through apportioning (C18), and the result is labelled Inferred. Whole cells of the published population grid by age and sex are summed over an area, which is not apportioning (C38).
+- Presence is an estimated count of people with a range, hour by hour (C15, C27). Its seasonal shape is calibrated and checked against published museum visitor counts, and its hour-of-day shape by place category is calibrated to the pooled relative busyness of named venues; no venue's level and no single venue's shape enters it (C26, C37). Traffic is a simple Simulated road assignment (C25) with the default provider; the optional live provider shows flow tiles and traffic-aware drive-time areas, and no figure is read from a tile (C25; ARC-135).
 - Several attractive methods would only return the generator's own assumptions on synthetic data. They are listed under "What would be theatre" and are not built.
 - Qatar has eight municipalities and about 75 usable census zones. That rules out area typologies beyond three types, complexity below national level and hot-spot statistics.
 
@@ -28,11 +29,14 @@
 - **Fixture**: invented inputs of an arithmetic test, labelled as such. A fixture is never a figure about a place or a source.
 - **Apportioning**: moving a count published on an official geography, or a released Simulated count, onto a drawn shape by a stated weight (C18). The result is an estimate, labelled Inferred.
 - **Projection**: a straight-line continuation of a published or released series over a stated window (C21). It is not a forecast.
+- **Forecast**: the value of a later period of a series on the closed list of C30, from the candidate model that the series' own backtest chose, shown with its interval from the backtest and its measured backtest error (C30). A projection, a ranking, a fit, an estimate and a scenario are not forecasts.
+- **Base rate**: a share of past licences of one activity and one area of the source, with its numerator, denominator and period (C31). It describes past licences, not the user's own venture.
+- **Scenario**: a figure computed from assumptions the user sets and can see and change (C4, C34, C35). It is the user's, and it is never called a forecast.
 
 | ID | Requirement |
 |---|---|
 | MTH-01 | Every displayed number is produced by deterministic tested code in `eii_core.calc`, the release build, or a fixed application-schema read function listed by the data contracts and covered by tests. Nothing else computes, rounds or compares a number, and no model ever does. Each method in this document is a deterministic function in `eii_core.calc` (package `core/`). It does not read a file, the network or a database; callers pass the rows. The custodian build and the product plane call these functions. The browser never computes a displayed number; it formats values it receives. A comparison (difference, ratio, rank or direction) is itself a calculation fact. ASSUMPTION: `core/` is the only package both planes may import, so this is the one place a method can be shared. |
-| MTH-02 | Build-time methods run in the custodian plane and write facts into the release: location quotient, churn, decomposition, co-location, coverage, zone momentum, property-sale median, the public series of C13 and C21 to C24, the project counts of C28, the area types of C17 (release table `zone_type`), the access scores of C12 for fixed supply layers, cut-offs and hours (release table `access_score`, with the travel times they use in the manifest artefact `travel_time_matrix`, and, for the population-grid layer at free flow, the Public release table `access_score_grid`), the fixed-composition wage index of C19 (`month_change.stayer_wage_index`, PRV-55), the national wage trends by sector of C19 with their split (MTH-97), the traffic assignment of C25 (over released flows only, after the privacy engine) and the seasonal calibration measure of C26. Request-time methods run in the product plane over release tables only, by calling `eii_core.calc`: the break-even calculator with its incentive inputs, shared reach, band lookup, area presence counts and crowd density, rankings and fits with their stability sentences (C11, C16), similar-area search (C17), area access summaries (C12), apportioning (C18), area income indicators and their monthly changes (C19, C20), changes of Public series (C20), projections of released synthetic series (C21), synthetic births and closures over an area (C22), drive times and drive-time areas by hour (C25) and sums over a sample file (C29). The only application-schema arithmetic is in the fixed read functions listed by the data contracts and covered by their regression tests. |
+| MTH-02 | Build-time methods run in the custodian plane and write facts into the release: location quotient, churn, decomposition, co-location, coverage, zone momentum, property-sale median, the public series of C13 and C21 to C24, the project counts of C28, the area types of C17 (release table `zone_type`), the access scores of C12 for fixed supply layers, cut-offs and hours (release table `access_score`, with the travel times they use in the manifest artefact `travel_time_matrix`, and, for the population-grid layer at free flow, the Public release table `access_score_grid`), the fixed-composition wage index of C19 (`month_change.stayer_wage_index`, PRV-55), the national wage trends by sector of C19 with their split (MTH-97), the traffic assignment of C25 (over released flows only, after the privacy engine), the seasonal calibration measure of C26 with its hourly shape by place category, the forecasts of the Public series of C30 with their backtests (in a release table that document 03 names), and the base rates of C31. The public-data build calls the same package for the night-time radiance by frame cell and month of C36 (`pub_night_lights`). Request-time methods run in the product plane over release tables only, by calling `eii_core.calc`: the break-even calculator with its incentive inputs, shared reach, band lookup, area presence counts and crowd density, rankings and fits with their stability sentences (C11, C16), similar-area search (C17), area access summaries (C12), apportioning (C18), area income indicators and their monthly changes (C19, C20), changes of Public series (C20), projections of released synthetic series (C21), forecasts of the released monthly series of the window (C30, over released rows only, as C21 reads them), synthetic births and closures over an area (C22), drive times and drive-time areas by hour (C25, with the default provider), sums over a sample file (C29), people present by pay band (C32), the site estimate (C33), the two scenarios (C34, C35), radiance over an area (C36) and the whole-cell population sums by age and sex (C38). A traffic-aware drive-time area of the live provider is fetched by the API process, not computed by a method (C25; ARC-135). The only application-schema arithmetic is in the fixed read functions listed by the data contracts and covered by their regression tests. |
 | MTH-03 | A worked example whose inputs, settings and expected result are all written in this document has two tests: an arithmetic test that feeds those inputs into the function and asserts the stated result within the stated tolerance, and a data test that recomputes the same figure from the pinned public file built in slice S2. Regression values that the pack cannot pin today (for example the riyal medians of the property-price method card and the other inputs listed here) are produced by `./eii build-public` at slice S2, checked against the source by the reviewer, and written into the method cards by a slice S2 task; slice S7 fails while any remain unpinned. No value is invented. Four examples are illustrative notes, not passing regression examples, until they are pinned: the Wilson count's period (section 3), the C5 HHI and trend, the C6 seed and full settings, and the C7 coordinates, modes, cut-offs, speed regime, district weights and expected shares. The C14 median prices in riyals are in the same state (MTH-51). |
 | MTH-04 | When a data test does not reproduce a worked example, the builder must record the difference in `OPEN_ITEMS.md` and stop. Parameters must not be tuned until the number matches. |
 | MTH-05 | A value computed by fixed arithmetic from Public release tables carries provenance `public`, evidence status `observed` and the caveat key `calculated`. An interpretation of such a value (for example "these months look administrative") carries evidence status `inferred`. |
@@ -45,10 +49,10 @@
 | MTH-54 | Before an answer is shown, code runs the accounting gate's five checks: sources, assumptions, nothing invented, scope, and limits stated. A method fact supplies what those checks read: the source chain (MTH-08), the evidence status (`observed`, `inferred` or `still_to_test`), the "your inputs" tag where the figure uses the user's inputs (MTH-06), and the caveat keys. The method does not set an inferred item's strength; the claim catalogue does. If a check fails, the template writer's default answer is shown. The receipt labels the result "Checked before display". The Arabic label is pending the owner's review. |
 | MTH-55 | Each derived statistic normally names exactly one home family in its fact lineage, as section 6.2 of [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) defines (PRV-30). The only exception is the closed list of ratio statistics: mean wage and the coverage, irregular and deployed-elsewhere shares. A ratio statistic takes its numerator and denominator from columns of the same stored rows — one table, one partition, one unit set and one measure where the table has measures — even where those columns belong to two additive families; its fact lineage names both families. Mean wage divides `wage_bill` by `earner_count` on the same stored `ALL` rows of `worker_pay` on `wp_all_money` or `resident_pay` on `rp_all_money`. The three side-count shares divide the applicable side-count column by `earner_count` on the same stored `ALL` rows of `resident_pay` on `rp_housing_count` or `worker_pay` on `wp_site_count`. Earner count on a worker card uses `worker_pay` and `wp_all_count` with no breakdown; earner count on a resident card uses `resident_pay` and `rp_all_count` with no breakdown. Wage bill uses that table's money partition. Band shares, the median band and quartile bands use that table's band partition (`wp_all_quartile` or `rp_all_quartile`), and the count beside those shares is that same family's total. A national card follows these rules, with its earner count on `rp_all_count` or `wp_all_count`. A municipality card differs, because the count partitions `rp_all_count` and `wp_all_count` have no municipality unit ([06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-16): mean wage, wage bill and the one earner count displayed come from the stored `ALL` rows of that municipality's unit of `rp_all_money` or `wp_all_money`; the median band, band shares and quartile bands, and the denominator of those shares, come from its unit of `rp_all_quartile` or `wp_all_quartile`; the band shares carry no count of their own, and that denominator is never displayed as a second earner count (MTH-76). A housing count and the housing shares beside it use `resident_pay` and `rp_housing_count` with the housing-class breakdown. An occupation count and the occupation shares beside it use `occupation_pay` and `op_res_quartile` with the occupation-group breakdown. C7 earners mode uses one selected count family, `resident_pay` on `rp_all_count` or `worker_pay` on `wp_all_count`, for both the weight and the share. C15 and C27 use the released presence counts of one segment from one partition (PRV-58); C27's all-people sum adds the three segments of one complete group and never reads a stored total. No method returns two routes to one population as two numbers. |
 | MTH-56 | A method that reads a figure of the protected record types (business register, employment, residence, wages) takes a snapped area of whole release units from `make_area`, shown with the snap sentence of DES-101 in [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md), before any figure is read (BE-54), or reads the released rows of one whole municipality or national unit, labelled with that unit's own released area (C19; [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-16, PRV-55). Public point layers and Simulated layers are computed for the exact shape the user drew, set by radius, or chose by walk or drive time and hour. A statistic published on an official geography is shown on that geography; a method puts it, or a released Simulated count of a release unit, on a drawn shape only through C18, and the result is `inferred`. No Public figure is apportioned to grid cells or release units or blended into a protected figure (PUB-29) ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) items 6 and 17). |
-| MTH-57 | A ranking, fit or suggestion (C11, C16, C17) is the output of tested code over criteria, directions and weights the user can see and change, and every rank stands with its rank-stability sentence (MTH-45). It is never a verdict, a probability, a confidence claim, advice to act, or a revenue, demand or success forecast, and its weights are labelled a judgement ([AGENTS.md](../AGENTS.md) rule 25). A real business from public listings or an FDI project is never scored or fitted; a list of them is ordered by distance only, a Public figure (PUB-92). No Public split by sex or nationality is a criterion (PUB-90). |
-| MTH-58 | An estimate, that is an apportioned figure (C18) or a projection (C21), carries evidence status `inferred`, and so does every value computed from an `inferred` input or from the user's inputs (MTH-06). A value computed by fixed arithmetic from release tables, Synthetic and Simulated ones included, is `observed`. That means read from the release, not real: its class still marks it (DAT-91). |
-| MTH-59 | Release tables, caveat keys, fact units and subjects added by decisions 0016 and 0017 are named here as [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) and [09_AI_ASSISTANT.md](09_AI_ASSISTANT.md) name them, or described where no name exists yet. [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) is the authority: where it names one differently, that document wins and the meaning here stands, as for caveat keys (MTH-11). |
-| MTH-60 | Each card added by decisions 0016 and 0017 has an arithmetic test on the fixture written in the card now, and a data test pinned from the release by the slice that builds the card. The gate of that slice ([14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md)) fails while a regression value the card lists as unpinned stays unpinned. MTH-03 and MTH-04 apply unchanged, and the card's requirement IDs join the test matrix of TST-197. |
+| MTH-57 | A ranking, fit or suggestion (C11, C16, C17) is the output of tested code over criteria, directions and weights the user can see and change, and every rank stands with its rank-stability sentence (MTH-45). It is never a verdict, a probability, a confidence claim, advice to act, or a revenue, demand or success forecast, and its weights are labelled a judgement ([AGENTS.md](../AGENTS.md) rule 25). Its criteria may include the forecasts of C30, the base rates of C31 and the site estimate of C33 under MTH-65; a rank that uses them is still not a forecast. A real business from public listings or an FDI project is never scored, fitted, estimated or given a share; a list of them is ordered by distance only, a Public figure (PUB-92), and the scenario of C34 shows the share of the user's outlet and the competitors' share split by competitor category and by distance band only, never a share of one named business. No Public split by sex or nationality is a criterion (PUB-90). |
+| MTH-58 | An estimate or another derived figure, that is an apportioned figure (C18), a projection (C21), a forecast (C30), a figure of people present by pay band (C32) or the site estimate (C33), carries evidence status `inferred`, and so does every value computed from an `inferred` input or from the user's inputs (MTH-06), the scenario results of C34 and C35 included. A base rate (C31) has the evidence status of the churn rate of C2, `observed`, and so do the whole-cell sums of C38. A value computed by fixed arithmetic from release tables, Synthetic and Simulated ones included, is `observed`. That means read from the release, not real: its class still marks it (DAT-91). |
+| MTH-59 | Release tables, caveat keys, fact units and subjects added by decisions 0016, 0017 and 0019 are named here as [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) and [09_AI_ASSISTANT.md](09_AI_ASSISTANT.md) name them, or described where no name exists yet. [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) is the authority: where it names one differently, that document wins and the meaning here stands, as for caveat keys (MTH-11). |
+| MTH-60 | Each card added by decisions 0016, 0017 and 0019 has an arithmetic test on the fixture written in the card now, and a data test pinned from the release by the slice that builds the card. The gate of that slice ([14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md)) fails while a regression value the card lists as unpinned stays unpinned. MTH-03 and MTH-04 apply unchanged, and the card's requirement IDs join the test matrix of TST-197. |
 
 Each card states its compute cost and which research review measured it. All research timings were taken on 2026-11-11 on the build machine with the CPU only; they show that compute is not the constraint and are not promises for the demo. Where no time was recorded, the card says so. A card added on 2026-11-12 says "not yet timed" where no research timing exists.
 
@@ -80,17 +84,26 @@ Each card states its compute cost and which research review measured it. All res
 | C22 Openings and closures over time | journey D6 | `openings_closures` | Public; Synthetic for synthetic births and closures |
 | C23 Construction pipeline | journey D6; the reverse view | `area_evidence` (`public_context`) | Public |
 | C24 Employer scale and wage bill by activity | journeys D1 and D3; service S1; cases C1 and C2 | `sector_facts` | Public |
-| C25 Traffic assignment and drive times by hour | journeys D2 and D7 | `make_area`, `travel_times`, `area_evidence` (`traffic`), `stage` | Simulated; Public at free flow |
+| C25 Traffic assignment and drive times by hour | journeys D2 and D7 | `make_area`, `travel_times`, `area_evidence` (`traffic`), `stage` | Simulated; Public at free flow; a live provider tile is a picture layer and carries no figure |
 | C26 Seasonal calibration measure | footfall calibration | none: a release check shown in the Proof room | Public and Simulated shapes |
 | C27 Crowd density | journey D2 | `area_evidence` (`presence`), `stage` | Simulated |
 | C28 Announced investment projects | journeys D1, D4, D6 and D7 | `investment_context` | Public |
 | C29 Sums over a case sample file | cases C3 and C4 | `own_records` | Synthetic, your inputs |
+| C30 Forecasts of published series | decision 0019 items 2 to 6 | set by document 08 (family `series_forecast`) | the series' class (Public; Synthetic for a released monthly series); Inferred |
+| C31 Entry, closure and survival base rates | decision 0019 item 7 | set by document 08 (family `base_rates`) | Public |
+| C32 People present by pay band | decision 0019 items 11 and 12 | set by document 08 (family `present_by_pay_band`) | Simulated; Inferred |
+| C33 Site demand and revenue estimate | decision 0019 item 8 | set by document 08 (family `site_estimate`) | least-real class of the inputs (Simulated while presence is simulated); Inferred, your inputs |
+| C34 Catchment-share scenario | decision 0019 item 9 | set by document 08 (family `catchment_scenario`) | Public points and your inputs; Inferred |
+| C35 Revenue range of the user's outlet | decision 0019 item 10 | set by document 08 (family `revenue_range_scenario`) | Simulated, your inputs; Inferred |
+| C36 Night-time radiance by area and month | decision 0019 item 20 | set by document 08 (family `night_lights`) | Public |
+| C37 Relative busyness of named venues | decision 0019 items 18 and 19 | set by document 08 (family `venue_busyness`) | Public |
+| C38 Population by age and sex over an area | decision 0019 item 22 | set by document 08 (family `population_age_sex`) | Public |
 
-In the Capability column, "capability M" and "capability S" are version 1 capabilities from the master design's value stack. For the cards added by decisions 0016 and 0017, the column names the journeys D1 to D7, the services and the cases of [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md). In this document a bare C number is always a method card: the cases are written "case C1" to "case C4" and the services "service S1" to "service S3". Everywhere else in this document, "slice S0" to "slice S11" are build slices. ASSUMPTION: C6 is served by `scan_places`, because it reads public places around a pin, which is that tool's job. Tool names are those of [08_BACKEND.md](08_BACKEND.md) section 6.2 (BE-56).
+In the Capability column, "capability M" and "capability S" are version 1 capabilities from the master design's value stack. For the cards added by decisions 0016 and 0017, the column names the journeys D1 to D7, the services and the cases of [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md). For C30 to C38 it names the items of [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), and the Tool column names the claim family until document 08 names the tool. In this document a bare C number is always a method card: the cases are written "case C1" to "case C4" and the services "service S1" to "service S3". Everywhere else in this document, "slice S0" to "slice S11" are build slices. ASSUMPTION: C6 is served by `scan_places`, because it reads public places around a pin, which is that tool's job. Tool names are those of [08_BACKEND.md](08_BACKEND.md) section 6.2 (BE-56).
 
 ## 3. Shared interval method and reliability mark
 
-This section is used by C1, C2, C8 and C10.
+This section is used by C1, C2, C8, C10 and C31.
 
 **Interval.** For a proportion with `k` events among `n` units, the product shows the Wilson score interval at 95% (z = 1.96) (Wilson 1927):
 
@@ -225,7 +238,7 @@ Tolerance: counts exact; shares ± 0.1 percentage point. The rule may flag other
 | ID | Requirement |
 |---|---|
 | MTH-18 | C2 flags bulk months by the rule above and flags at least the three months in the worked example. |
-| MTH-19 | No function in the repository computes issued minus cancelled licences, an entry rate or a net-formation figure from the public licence tables. |
+| MTH-19 | No function in the repository computes issued minus cancelled licences or a net-formation figure from the public licence tables. Entry and closure base rates are computed from the Public licence tables only by C31, by activity and on the source's own geography, as [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 7 says, and the survival base rate returns `NO_DATA` with `no_denominator` until a Public source links a cancellation to its issue; no rate is computed from the synthetic births and closures (MTH-85), and the screen words stay "licence issues" and "licence cancellations". |
 | MTH-20 | C2 shows every churn rate both with and without flagged months, and labels which is which. |
 
 ### C3 Pay-versus-mix decomposition of national mean pay
@@ -387,19 +400,21 @@ the duration the page states is shown beside the second result, or "duration not
 
 **Incentive regression (fixture package, not a real offer).** Mode A, the illustrative inputs above, and a fixture package that takes `a_R = 0.25` off the rent. `R' = 30,000`. Break-even revenue is 30,000 / 0.313 = 95,846.65, shown as QAR 95,847 a month. 95,846.65 / 3,600 = 26.62, so 27 covers a day, and 27 / 60 = 0.45 seat turns. With E = 50, the minimum bill is 30,000 / (50 * 30 * 0.313) = 30,000 / 469.5 = 63.90, and the highest rent before the package is 56,340 / 0.75 = QAR 75,120. Without the package the results are those of the break-even example.
 
+**Scenarios beside the calculator ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 9 and 10).** The catchment-share scenario (C34) and the revenue range of the user's outlet (C35) join this calculator. C35 shows this card's break-even revenue beside its cases and reads the same survey norms, so it stays off screen while OI-03 is open (MTH-29). No output of this card takes a C33, C34 or C35 figure as an input.
+
 **Provenance and status.** Norms: Public, `observed`, caveats `calculated`, `national_average`, `world_cup_year`. Calculator outputs: Public (least-real release input), `inferred`, "your inputs" tag. With a package, the Source chain also names the package's page and retrieval date, with caveat `agency_page`. **Compute cost.** Trivial (feasibility review; no time recorded).
 
 **Limits and wording.** National averages over all restaurant types and sizes. 2022 was a World Cup year; the surplus share jumped from about 7% (2018–2019) to 15–20% (2020–2022) for reasons not verified. Mode A treats staff as varying with sales, which flatters very small outlets; mode B exists for that reason. The figure 8,579,462 thousand from an earlier design is a different scope and is not used (OI-03).
 
 - Allowed: "At the sector's 2022 cost shares, your rent needs about 36 covers a day to break even (0.6 turns per seat). Across 2018–2022 the figure ranges from {low} to {high}." Also, for the optional scenario only: "To earn the sector's 2022 surplus share, the same inputs need about {covers} covers a day ({turns} turns per seat)." With a package: "With the package you chose, from its page, the same inputs need about {covers} covers a day to break even while the package lasts." The braces are filled by the Fact chip.
-- Never say: "you will make a profit", "expected revenue", "demand at this site", "capture rate", "go" or "no-go" as a verdict, "break-even" for the surplus-share scenario, "you qualify", "you will receive", or "the incentive makes it profitable".
+- Never say: "you will make a profit", "expected revenue", "demand at this site", "capture rate" (allowed only as the name of the user's input in C35), "go" or "no-go" as a verdict, "break-even" for the surplus-share scenario, "you qualify", "you will receive", or "the incentive makes it profitable".
 
 | ID | Requirement |
 |---|---|
 | MTH-25 | C4 computes every output for each survey year 2018–2022 and shows the 2022 value with the min–max range across years. |
 | MTH-26 | C4 reproduces the break-even worked example, the norm checks above, and the target-surplus regression (`m - U = 0.116`; revenue QAR 344,827.59 a month; 96 covers a day; 1.6 seat turns; with E = 50, maximum rent QAR 20,880 and minimum bill QAR 229.89). |
 | MTH-27 | C4 lists every user input and every public norm it used, with year and table, in the Source chain (the evidence drawer). |
-| MTH-28 | No code divides a C4 output by presence, footfall or earner counts. C4 never returns a forecast of revenue, demand or capture. It returns the revenue that the user's own inputs would require. |
+| MTH-28 | No code divides a C4 output by presence, footfall or earner counts. C4 never returns a forecast of revenue, demand or capture. It returns the revenue that the user's own inputs would require. The site estimate (C33) and the user's scenarios (C34, C35) are separate cards; none of them is a forecast, and none feeds a C4 output. |
 | MTH-29 | C4 is not displayed until OI-03 is recorded as closed in `OPEN_ITEMS.md`. |
 | MTH-61 | C4 applies only the four parameter keys above (`rent_share`, `rent_amount`, `staff_share`, `staff_amount`), one package at a time and at most one parameter per input, and returns the results with and without the package side by side, with the duration the page states. It reproduces the incentive fixture: QAR 95,847 a month, 27 covers a day and 0.45 seat turns; with E = 50, a minimum bill of QAR 63.90 and a highest rent before the package of QAR 75,120. |
 | MTH-62 | A package parameter is a Public fact from `pub_investqa_record` with its page link and retrieval date, applied only as the user's input, with caveats `your_inputs` and `agency_page`. No package changes a Public norm, no one-off amount is spread over months, and no forecast stated on a page enters the calculator (PUB-88). |
@@ -456,7 +471,7 @@ These are heading-level checks of the data and arithmetic only. Italy: 2,311 t =
 
 **Purpose.** Show which place categories an activity is found near across the public places data, and which of them are found near the pin.
 
-**Inputs.** `pub_place` (Overture places, release 2026-10-21.0, pinned); co-location pairs stored in `graph_edge` with `clq`, `p`, `q`, `n_focal`, `n_neighbour`.
+**Inputs.** `pub_place` (Overture places, release 2026-10-21.0, pinned); co-location pairs stored in `graph_edge` with `clq`, `p`, `q`, `n_focal`, `n_neighbour`. The third places source, `places_fsq`, keeps its own table `pub_place_fsq`, its attribution and a reviewed category mapping, and it is fetched inside `./eii build-public` from the public copy on Source Cooperative, read without an account, only the files that cover Qatar ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 21); the registry records the release used, and its places are shown with that date. Once it is pinned, C6 and the competitor counts of C33 and C34 may read it; a count or a co-location run reads one places table at a time, named in its lineage, and no count adds or merges the two tables. ASSUMPTION: C12, C16 and C17 keep reading `pub_place` only until a reviewed change adds the third source to them.
 
 **Formula.** Radius co-location quotient (CLQ) in the family of Leslie and Kronenfeld (2011), radius r = 250 m, over points in the Greater Doha box (25.18–25.47 N, 51.35–51.65 E) with confidence of at least 0.5. ASSUMPTION: the box, the confidence filter and r follow the research runs; the exact settings of the feasibility review's run were not all recorded.
 
@@ -485,7 +500,7 @@ With Italian restaurants only (61 points), no neighbour survives. Tolerance: the
 
 **Provenance and status.** Public, `observed`, caveats `found_near_not_attract`, `places_incomplete`, `pizza_included`. **Compute cost.** 2.8 s for 999 permutations (feasibility review); 0.4 s for the full national CLQ matrix and 0.6 s for 199 permutations for one activity (graph research).
 
-**Limits and wording.** A label permutation tests association beyond category frequency but does not control for overall density, so it supports "found near", not "attract". The open places extract holds about 26,000 Qatar records against about 71,000 establishments, so absence may be a data gap. The result with pizza included is the only one that survives; the card must say pizza is included.
+**Limits and wording.** A label permutation tests association beyond category frequency but does not control for overall density, so it supports "found near", not "attract". The open places extract holds about 26,000 Qatar records against about 71,000 establishments, so absence may be a data gap; the coverage of `pub_place_fsq` is counted when it is pinned. The result with pizza included is the only one that survives; the card must say pizza is included.
 
 - Allowed: "In Greater Doha's public places data, Italian restaurants (including pizza places) are found near fast food, coffee shops, cafés, restaurants and fashion stores. Here, 3 of 5 are found within 250 m." For an absent chip: "not found in public places data".
 - Never say: "attract", "draw customers", "missing neighbour", "opportunity", "gap in the market".
@@ -581,7 +596,7 @@ Tolerance: ± 0.5 percentage point.
 
 ### C9 Zone momentum from utility series
 
-**Purpose.** Show which zones are growing in activity, using the only current public zone-level series.
+**Purpose.** Show which zones are growing in activity, using the utility series, the only current public series published by zone. Night-time radiance by area and month is a grid layer of its own (C36) and is never blended into this card.
 
 **Inputs.** `pub_zone_utility` (electricity and water consumption by zone, annual 2021 to 2026; 2026 is January to August); `zone` with a crosswalk where zone numbering differs between sources.
 
@@ -726,13 +741,13 @@ workers, residents and visitors are three facts; their sum is used only by C27 a
   all-people line of the hourly chart, from complete groups
 ```
 
-The seasonal shape of the visitor segment is calibrated and checked against published museum visitor counts (C26). Nothing is anchored hour by hour to a public series, and the screen never says that it is. Public monthly context series, when shown, are separate Public facts.
+The seasonal shape of the visitor segment is calibrated and checked against published museum visitor counts (C26). The hour-of-day shape of simulated visits by place category is calibrated to the relative busyness of the named venues of that category, pooled over the venues ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 18; C26, C37). No level is anchored to a public series, hour by hour or otherwise, no single venue's shape is used, and the screen never says that a count is anchored. Public monthly context series and a venue's relative busyness, when shown, are separate Public facts and never share a component with an estimated-people figure.
 
 **Worked example (synthetic fixture, not a finding about a place).** A set A of two published units, one day type, hour and summer setting. Unit U1 has 120 workers (110 to 130), 40 residents (35 to 45) and 30 visitors (25 to 35). Unit U2 has 80 workers (72 to 88), 40 residents (36 to 44) and 20 visitors (16 to 24). Both groups are complete. A has 200 workers (182 to 218), 80 residents (71 to 89) and 50 visitors (41 to 59). Second fixture: the group of U2 is present with status `withheld`: its three rows hold null values and `BELOW_PANEL_MINIMUM`. All three counts of A are withheld with `BELOW_PANEL_MINIMUM`; the function neither sums the nulls as zero nor returns U1's counts as if they described the whole of A.
 
 **Provenance and status.** Simulated; `observed` for a set of whole units, `inferred` for every area from `make_area` (C18, MTH-58). Caveats `estimate_not_footfall`, `movement_not_purchases`. A count is never a named place's footfall. It may appear only in a claim or component whose subject is `area`. **Compute cost.** Not separately timed.
 
-**Limits and wording.** Movement is not purchases. The counts are simulated estimates with a range, not observations of people.
+**Limits and wording.** Movement is not purchases. The counts are simulated estimates with a range, not observations of people. Typical hourly weather profiles by season modulate the simulated counts, never a dated day's weather (document 05; C26).
 
 - Allowed: "About {count} estimated people around this location at {hour} on a {day type} ({low} to {high}; Simulated), shown as workers, residents and visitors."
 - Never say: "footfall of {building}", "visitors to {business}", "customers", "shoppers", "real-time".
@@ -743,7 +758,7 @@ The seasonal shape of the visitor segment is calibrated and checked against publ
 
 ## 5. Method cards added by decisions 0016 and 0017
 
-[Decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) moves the former later cards C11, C12 and C13 into version 1 (item 18) and asks for the other methods below; [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) adds the public data several of them read. Each card is a deterministic function in `eii_core.calc` (MTH-01). Its fixture is the arithmetic test, and the slice that builds it pins its data test (MTH-60).
+[Decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) moves the former later cards C11, C12 and C13 into version 1 (item 18) and asks for the other methods below; [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) adds the public data several of them read. [Decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) adds C30 to C38 at the end of this section (items 2 to 22). Their models read the release tables that the five feeds fill (business register, employment, wages, residence and mobility), named by their contract names only: synthetic and simulated data fill them now, and nothing says that real records are used (item 15). Each card is a deterministic function in `eii_core.calc` (MTH-01). Its fixture is the arithmetic test, and the slice that builds it pins its data test (MTH-60).
 
 ### C11 Best-location ranking and rank stability
 
@@ -752,8 +767,8 @@ The seasonal shape of the visitor segment is calibrated and checked against publ
 **Inputs.**
 
 - Candidates of one kind: areas the user builds (pins with walk, drive or radius areas, or drawn shapes); the published release units of one partition inside a region the user draws; or, in public-only mode, the official zones or municipalities.
-- For each candidate and criterion, one fact from the card that owns the criterion (for example C1, C6, C9, C12, C14, C15, C18 or C19). This card computes no criterion itself.
-- The criteria form one closed list, versioned with the catalogue. Each entry names its criterion key, the card that owns it, its release table, its default direction and the candidate kinds it applies to, under MTH-65. The list is fixed at slice S2 (open questions), and `area_ranking` ([08_BACKEND.md](08_BACKEND.md)) offers only its entries.
+- For each candidate and criterion, one fact from the card that owns the criterion (for example C1, C6, C9, C12, C14, C15, C18, C19, C30, C31 or C33). This card computes no criterion itself.
+- The criteria form one closed list, versioned with the catalogue. Each entry names its criterion key, the card that owns it, its release table, its default direction and the candidate kinds it applies to, under MTH-65. Forecasts (C30), base rates (C31) and the site estimate (C33) may be entries, each visible with its value and weight and removable by the user ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 13). The list is fixed at slice S2 (open questions), and `area_ranking` ([08_BACKEND.md](08_BACKEND.md)) offers only its entries.
 - For each criterion, a direction (higher or lower ranks higher) and a weight: the catalogue default or the user's typed input. The default weights are equal.
 - The weight range `δ`, fixed at slice S2.
 
@@ -813,7 +828,7 @@ With the fixture range `δ = 0.25` (not the v1 value), w1 runs from 0.45 to 0.75
 |---|---|
 | MTH-45 | A rank is never shown without its stability sentence beside it, and weights are labelled a judgement. The sentence states the best and worst rank of the C11 bound for the box of weights within `δ` of the weights used (`δ` fixed at slice S2). It never states a share of draws, a probability or a confidence level. |
 | MTH-64 | C11 normalises, weights, scores and ranks as above in exact arithmetic and reproduces the fixture: scores 40, 30 and 80; ranks 2, 3 and 1; with `δ = 0.25`, A and B between 2nd and 3rd and C unchanged at 1st; A 3rd without criterion 2 and 1st without criterion 1. A candidate missing a criterion is listed as not ranked with its reason, a constant criterion is left out, and fewer than two ranked candidates return `NO_DATA`. The score orders the candidates only and is never emitted as a fact; leave-one-out keeps the same candidates and the same min and max. |
-| MTH-65 | Candidates are of one kind, and each criterion is a fact for that candidate's own geography from the card that owns it. User-built areas take protected criteria only through the snap of MTH-56, and a count reaches a drawn shape only through C18. Release-unit candidates take only the released facts of their own partition's family and Public point counts inside each unit; no Public statistic and no apportioned value is put on a unit (PUB-29, MTH-75). Official zones and municipalities, in public-only mode, take Public criteria only and carry the Public class. No Public split by sex or nationality is a criterion (PUB-90). |
+| MTH-65 | Candidates are of one kind, and each criterion is a fact for that candidate's own geography from the card that owns it. User-built areas take protected criteria only through the snap of MTH-56, and a count reaches a drawn shape only through C18. Release-unit candidates take only the released facts of their own partition's family and Public point counts inside each unit; no Public statistic and no apportioned value is put on a unit (PUB-29, MTH-75). Official zones and municipalities, in public-only mode, take Public criteria only and carry the Public class. A forecast (C30) or a base rate (C31) of a Public series ranks only candidates on that series' own geography, or enters as an apportioned count where C18 allows one; it enters by its value alone, and its interval or counts stand beside it and are not carried through the stability bound. A forecast of a released monthly series (C30) is a criterion only of the candidate whose series it is. The site estimate (C33), a forecast of a released monthly series, and any other criterion with a Simulated or Synthetic input are off in public-only mode. A rank that uses these criteria keeps its stability sentence, and leave-one-out shows which criteria move it. No Public split by sex or nationality is a criterion, the whole-cell sums of C38 included (PUB-90), and no list of firms is ranked by a protected or Simulated figure (PRV-125). |
 
 ### C12 Reachable-access score
 
@@ -821,7 +836,7 @@ With the fixture range `δ = 0.25` (not the v1 value), w1 runs from 0.45 to 0.75
 
 **Inputs.**
 
-- Demand locations `i` with weights `P_i`, from one layer: estimated residents present at a stated day type, hour and summer setting (C15, Simulated, at unit centroids), or the population grid `worldpop_qat_2020` at its own 100 m cells (Public, 2020; free flow only), once [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) lists that use. The grid is the only layer in public-only mode and a second layer beside the Simulated one in a protected release. No protected figure is a demand weight (PRV-41).
+- Demand locations `i` with weights `P_i`, from one layer: estimated residents present at a stated day type, hour and summer setting (C15, Simulated, at unit centroids), or the population grid `worldpop_qat_2020` at its own 100 m cells (Public, 2020; free flow only), once [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) lists that use. The grid is the only layer in public-only mode and a second layer beside the Simulated one in a protected release. No protected figure is a demand weight of this card (PRV-41): the people present by pay band of C32 are not a layer here, and the age-and-sex grid of C38 is never a demand weight.
 - Supply points `j`, each with `S_j = 1`: Public points of one category from `pub_place`, or a reviewed list of gazetteer points.
 - Travel times `t_ij` by drive or walk: at free flow (Public), or at an hour `h` from C25 (Simulated). The build writes the unit-to-unit times it uses to the manifest artefact `travel_time_matrix` (from unit, to unit, mode, and free flow or hour, in minutes: Public at free flow, Simulated by hour; [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md) DAT-153). A supply point takes the time to the unit that contains it, so a supply point inside the demand location's own unit is at time 0. For the grid layer, `t_ij` is the free-flow time from the graph node of the mode nearest the cell's centre to the graph node of the mode nearest the supply point (ties: lower node id, as C25 loads units); these times are not stored.
 - The cut-offs `t0` of each mode and the decay `f`, fixed at slice S2. The build stores a score for each cut-off, and `reachable_access` ([08_BACKEND.md](08_BACKEND.md)) takes one of them as a closed value, never a free number.
@@ -872,7 +887,7 @@ by hour: steps 1 and 2 are repeated with t_ij(h) from C25 for each hour shown
 |---|---|
 | MTH-46 | C12's research regression (zone 69 at 3.40 and 0.66 per 10,000; Spearman 0.47 across 75 zones) is re-derived with the decay form fixed at slice S2 and runs as a validation test outside every release. If it does not reproduce, MTH-04 applies. |
 | MTH-66 | C12 computes the two steps above, with `D_j` over every demand location of the layer in the frame; lists and leaves out a supply point with no one within reach; returns `NO_DATA` (never zero) when a layer is missing; returns `BELOW_PANEL_MINIMUM` for every demand location that reaches a supply point whose reach includes a withheld presence group, and for an area score that draws on one (PRV-58); weights a Simulated layer's area score by C18's area weights over the units the outline overlaps; gives a demand location from which no supply point is within reach, in either layer, its true score 0; returns the area score 0, not `NO_DATA`, for an area whose demand locations all score 0, and `NO_DATA` for an area whose weights sum to 0; and reproduces the fixture: 2.5 and 5.83 per 10,000 and an area score of 5.0; at the fixture hour, 2.5 and 2.5; the withheld case; and the grid case (4.0 over the three cells, 0 over the third cell alone, `NO_DATA` with no populated cell). The check holds on every run. |
-| MTH-67 | An hour's score uses C25's times for that hour and carries the Simulated class. A score is Public only when its demand layer, supply layer and times are all Public. No protected figure enters a demand weight or an access score (PRV-41). |
+| MTH-67 | An hour's score uses C25's times for that hour and carries the Simulated class. A score is Public only when its demand layer, supply layer and times are all Public. No protected figure enters a demand weight or an access score (PRV-41). The one exception of PRV-126, the people present by pay band of C32, is read only by the site estimate of C33, never by this card. No drive time or drive-time area of the live traffic provider enters an access score (C25). |
 
 ### C13 Imports against local production
 
@@ -1001,7 +1016,7 @@ a user's area takes the type whose centre is nearest, with equal weights
 | another count on the reviewed list of apportionable counts (for example licences or building permits) | area |
 | a released Simulated count of a release unit (C15) | area inside the unit |
 
-Until slice S2 confirms the grid's file and licence for this use, counts of people are apportioned by area, and the card names that method.
+Until slice S2 confirms the grid's file and licence for this use, counts of people are apportioned by area, and the card names that method. The population grid by age and sex (`worldpop_qat_agesex`) is not a weight of this card: its whole cells are summed over an area by C38, which splits no cell and is not apportioning.
 
 **Formula.**
 
@@ -1028,12 +1043,12 @@ A share, rate, mean, median, price or index is never apportioned: the card shows
 **Limits and wording.** Area weighting assumes the count is spread evenly over its geography, which is rarely true. The grid describes 2020 and can miss later growth. A small shape in a large geography gets a small, uncertain share. The published figure on its own geography stays the fact; the apportioned figure is an estimate beside it.
 
 - Allowed: "About {x_S} residents in your shape (estimated: the {year} figure for {geography}, apportioned by the 2020 population grid). The published figure for {geography} is {x_g}."
-- Never say: "exactly", "counted in your area", "census of your area", or a sex or nationality split inside a shape.
+- Never say: "exactly", "counted in your area", "census of your area", or a tabulated sex or nationality split inside a shape (the whole-cell grid sums of C38 are their own card).
 
 | ID | Requirement |
 |---|---|
 | MTH-74 | C18 apportions counts only, with the weight of the table above, and reproduces the fixtures: 275; 5,000; and 80 workers (73 to 87). A share, rate, mean, median, price or index is never apportioned; the overlapped geographies' values are shown with their lowest and highest. |
-| MTH-75 | C18 never apportions a Public split by sex or nationality (a total over every category of such a split may be apportioned as a total) or a figure of the protected record types, which snap (MTH-56). It never writes an apportioned value to the release, to grid cells or to release units. Every apportioned figure is `inferred` and names its method and its source geography. |
+| MTH-75 | C18 never apportions a Public split by sex or nationality (a total over every category of such a split may be apportioned as a total) or a figure of the protected record types, which snap (MTH-56). A tabulated split is never put on a drawn shape; the one exception is C38, whose sums of whole cells of the population grid by age and sex over an area are not an apportionment and are not computed by C18 ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 22). It never writes an apportioned value to the release, to grid cells or to release units. Every apportioned figure is `inferred` and names its method and its source geography. |
 
 ### C19 Six income indicators and pay versus mix by month
 
@@ -1048,7 +1063,7 @@ Indicator 6 by sector: the rows of the activity table `wage_act` in `pub_wage_ta
 | 1 | Average and median wage by residential area, where groups are large enough | mean = `wage_bill` / `earner_count` on the same `ALL` rows (MTH-55); median band from the band partition (PRV-31, PRV-32) |
 | 2 | Wage bands and their spread | band shares and the quartile band range (PRV-32) |
 | 3 | Covered wage bill and earner count | the primitives of the money and count partitions; per municipality, both from the money partition (below) |
-| 4 | Residential income beside presence by time of day | indicators 1 to 3 for residents, beside the presence counts by hour (C15, or C18 for an area from `make_area`), as separate facts and charts |
+| 4 | Residential income beside presence by time of day | indicators 1 to 3 for residents, beside the presence counts by hour (C15, or C18 for an area from `make_area`), as separate facts and charts; and, for a whole release unit only, the people present by pay band of C32 as a third, Inferred element (PRV-126) |
 | 5 | Residence and workplace geography | for located jobs only (PRV-61): the work area's earners by home municipality from `home_area_share`, and the share living in a municipality other than that of their work unit |
 | 6 | Wage trends by sector and area, separated from worker mix | by area: the fixed-composition index of the same earners between adjacent months (below; Synthetic); by sector: the Public national branch below, over the activity table of `pub_wage_table`: each activity's difference, ratio and direction between adjacent years, and C3's within-sector and employment-mix components of the national change; never for an area |
 
@@ -1126,7 +1141,7 @@ a list of activities is ordered by the C20 rule, computed in code (MTH-81)
 | ID | Requirement |
 |---|---|
 | MTH-76 | C19 computes indicators 1 to 5 and indicator 6 by area only from released tables of a snapped area, by the derivations of document 06, for every month of the window on one unit set, and shows an area mean only with the median band, band distribution and earner count of the same area and month. Indicators 1 to 3 are also computed per municipality and nationally, by the same derivations, labelled with that unit's own released area and under the same rule for a mean (PRV-16), each statistic from one partition only, the mean naming both additive families of its money-partition rows in its fact lineage (MTH-55): per municipality, the mean, the wage bill and the one earner count displayed from the `ALL` rows of the municipality unit of `rp_all_money` or `wp_all_money`, and the median band, the band shares and quartile bands, with the denominator of those shares, from the municipality unit of `rp_all_quartile` or `wp_all_quartile`, that denominator never displayed as a second earner count; nationally, the mean and the wage bill from the national unit of the money partition, the bands from that of the quartile partition and the earner count from that of `rp_all_count` or `wp_all_count`. Every other mapping fails its test in the matrix of TST-197, which asserts each statistic's partition in its fact lineage and, for the mean, both additive families. Indicator 6 by sector is the Public national branch of MTH-97, computed only from the activity table of `pub_wage_table`, the public portal's wage series by economic activity, and never for an area or a municipality; no sector trend is computed from protected tables, and national by sector is the finest sector view in version 1. C19's rows in the matrix of TST-197 are MTH-76, MTH-77, MTH-78, MTH-79 and MTH-97 (MTH-60). |
-| MTH-77 | Indicator 4 sets resident pay beside presence counts as separate facts. No code multiplies, divides or otherwise combines pay with presence (section 6). |
+| MTH-77 | Indicator 4 sets resident pay beside presence counts as separate facts. No code multiplies, divides or otherwise combines pay with presence (section 6), with one exception (PRV-126): the people present by pay band of C32, a fixed function of published rows for a whole release unit, and the site estimate of C33, which reads that figure. Every other number that combines a protected value with a presence, flow or traffic value stays forbidden. |
 | MTH-78 | Indicator 6 by area reads only `month_change.stayer_wage_index` of published `resident_pay` or `worker_pay` rows of `money` or `quartile` tier units at municipality level or coarser (`unit_kind` `municipality`, the municipality units of the four pay partitions, or `national`), so it is shown per municipality and nationally, and never by sector: wage trends by sector come only from MTH-97 (DAT-137, PRV-55). The release build computes that index as 100 times the exact ratio of the later stayer wage bill to the earlier one, rounded half-up to the nearest half point, and releases neither bill. The product returns the index, its change (the index minus 100) and its direction, one set of facts for each such unit that contains units of the area's block, labelled with that unit's own released area, and never averages, weights, combines or chains indices; the block's `cell`, `merged` and `remainder` units carry no index. A carried-forward row returns `SUPPRESSED` with `CARRIED_FORWARD`, and a null index on a published row `SUPPRESSED` with `DETAIL_NEEDS_LARGER_GROUP`, never zero or `equal`. It reproduces the fixture (103.5 and 3.5; 104.0 and 4.0; 99.0 and −1.0, direction lower; the carried-forward unit). No Kitagawa split is computed for an area; the split runs only on national Public tables: C3's occupation table and, for indicator 6 by sector, the activity table (MTH-97). |
 | MTH-79 | No C19 card shows a Public split by sex or nationality, and no synthetic or protected figure carries one (PUB-90). |
 | MTH-97 | Indicator 6 by sector reads only the rows of `wage_act` in `pub_wage_table`, national, in the release build. For every pair of adjacent years the table holds, it returns each activity's paid workers and mean monthly wage in both years, weighted by paid workers over the activity's populated activity-by-sex cells and totalled across sexes, with their difference, ratio and direction by the C20 comparison functions; and, by C3's function unchanged over the same cells, the national change with its within-sector and employment-mix components, asserting `within + mix == change`, for every adjacent pair and for the span from the first to the latest year. A cell populated in only one of the two years compared gives `NO_DATA` with `cells_differ_between_years` for that activity and for the national split of those years, never 0 or `equal`. Every figure is Public and `observed`, carries `calculated`, `named_table` and `composition_not_wages`, has subject `sector` or `national`, names `wage_act` and its years on the card face with the occupation table's mean in the Source chain (MTH-22), uses sex only as a grouping inside the calculation (MTH-24), shows a mean only beside its paid-worker count and the PUB-78 caveat that the public wage tables give national means only, is never put on an area, a municipality or a drawn shape, and is not displayed until OI-03 is closed (MTH-23, PUB-74). It reproduces the fixture (P 8,000 to 8,400: 400, 1.05, higher; Q 5,000 to 5,100: 100, 1.02, higher; national 6,500 to 7,575: change 1,075, within 287.5 and mix 787.5; the missing-cell case), and the slice that builds it pins the span 2020 → 2023 against C3's activity row (mix QAR 572 of 673). |
@@ -1200,7 +1215,7 @@ rules: n >= 3; h <= n; a monthly series uses whole years of months (n a multiple
        carried forward for any of its units (month_change); otherwise SUPPRESSED with
        CARRIED_FORWARD, never a line through the repeated month
 the chart shows the window's values, the line and the projection as a labelled dashed continuation;
-no interval is drawn, because an interval would read as a confidence claim
+no interval is drawn: a projection has no backtest from which a range could be measured
 ```
 
 **Worked example (fixture).** y = 100, 103, 109, 111 and 117 for t = 1 to 5. Then ȳ = 108 and t̄ = 3; the cross-sum is 42 and the sum of squares 10, so b = 4.2 and a = 95.4. With h = 2, the projection is 120.6 for t = 6 and 124.8 for t = 7.
@@ -1215,7 +1230,7 @@ no interval is drawn, because an interval would read as a confidence claim
 | ID | Requirement |
 |---|---|
 | MTH-82 | C21 fits the least-squares line on the stated window only, applies the rules above, draws no interval, labels every value a projection with its method and period, and reproduces the fixture (b = 4.2; 120.6 and 124.8). A released synthetic series with a carried-forward pair in its window, for any of its units, returns `SUPPRESSED` with `CARRIED_FORWARD`, and every Synthetic projection carries `synthetic_not_evidence_about_qatar` and `synthetic_change`. |
-| MTH-83 | No projection is an input to another method: no ranking, fit, break-even or access score uses one. No projection is made of revenue, sales, demand, spending or success. Labour-market tightness stays theatre (section 6). |
+| MTH-83 | No projection is an input to another method: no ranking, fit, break-even or access score uses one. No projection is made of revenue, sales, demand, spending or success. Labour-market tightness stays theatre (section 6). A forecast of C30 is not a projection: it has a backtest and a measured error, and it may be a criterion of a ranking as [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 13 says (MTH-65). |
 
 ### C22 Openings and closures over time
 
@@ -1240,7 +1255,7 @@ Synthetic, snapped area A, all activity classes together, for the pair (m-1, m) 
   row included (DAT-137): both counts SUPPRESSED with CARRIED_FORWARD, never 0 and no partial sum
 ```
 
-On screen a Public figure is worded as licence issues or licence cancellations, as C2 requires. "Openings and closures" names the journey's view, and "births and closures" are said only of synthetic firms.
+On screen a Public figure is worded as licence issues or licence cancellations, as C2 requires. "Openings and closures" names the journey's view, and "births and closures" are said only of synthetic firms. The entry and closure base rates of these Public series, each against the active stock and with its counts and period, are computed by C31 and shown on that card, and their forecasts by C30; this card shows the two counts. No rate, net change or survival figure is computed from the synthetic births and closures.
 
 **Worked example.** Pinned check: the issued series sums to 12,533 over 610 codes and has no row for restaurants (5610101) (PUB-69). Fixture: issues of 3, 0 and 5 and dated cancellations of 2, 4 and 1 over three months give 8 issues and 7 cancellations, side by side; a code absent from the issued series returns `NO_DATA`, not 0. Synthetic fixture: for one pair, unit U1's published row has 2 openings and 1 closure and unit U2's has 1 and 3, so the area has 3 births and 4 closures. If U2 had no opening in the pair, its empty openings cohort would fail and carry U2's row forward (DAT-137), as a failing cohort does: in both cases both counts are `SUPPRESSED` with `CARRIED_FORWARD`, never 0 and never U1's counts alone.
 
@@ -1275,16 +1290,18 @@ nothing subtracts completions from permits, and no permit is counted as a start
 
 **Worked example (fixture).** Twelve months of 10 permits and then twelve months of 12 give T = 120 and then 144, a change of (144 − 120) / 120 = 0.20. A municipality with a missing month in the window returns `NO_DATA` for that window. The 2023 totals by municipality are pinned from the source by the slice that builds this card (MTH-60).
 
+**New households and workers by municipality ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 2).** The pipeline is turned into new households and workers only through a C30 forecast of the annual completion certificates by municipality and type of building, multiplied by stated Public averages (households per completed residential building, workers per completed non-residential building), each a Public fact with its source and year, shown beside the result. The forecast's value and both interval ends are multiplied by the same average. Nothing subtracts completions from permits, no permit is counted as a start, and no permit series enters the forecast. The annual series holds three points (2021 to 2023), fewer than the backtest minimum of C30, so this returns `NO_DATA` with reason `series_too_short` until the series is long enough; an average that the public data pack does not hold returns `NO_DATA` with its reason. The result is Inferred (C30) and carries `permit_not_start` and `forecast_backtest_range`.
+
 **Provenance and status.** Public, `observed`, caveats `calculated`, `permit_not_start`. Subjects `municipality` or `national`. **Compute cost.** Trivial; not separately timed.
 
 **Limits and wording.** A permit is an approval, not a start. A completion certificate is not linked to a permit in the data. The series end in 2023.
 
-- Allowed: "In the 12 months to {month}, {municipality} issued {n} building permits of this type, {direction} the previous 12 months. In {year} it issued {c} completion certificates."
+- Allowed: "In the 12 months to {month}, {municipality} issued {n} building permits of this type, {direction} the previous 12 months. In {year} it issued {c} completion certificates." For the forecast, once the series is long enough: "Forecast of completion certificates of this type in {municipality} for {year}: {value}, range {low} to {high}. At the published average of {average} households per completed building ({source}, {year}), that corresponds to about {households} new households, range {low} to {high}."
 - Never say: "construction boom", "oversupply", "prices will fall", "units coming to market", "a pipeline of N homes".
 
 | ID | Requirement |
 |---|---|
-| MTH-86 | C23 computes trailing sums only over complete 12-month windows, never subtracts completions from permits, sums municipalities to a national figure only when all eight are present, and reproduces the fixture (120, 144 and 0.20). |
+| MTH-86 | C23 computes trailing sums only over complete 12-month windows, never subtracts completions from permits, sums municipalities to a national figure only when all eight are present, and reproduces the fixture (120, 144 and 0.20). New households and workers come only from a C30 forecast of the completion certificates times stated Public averages, each shown, and return `NO_DATA` with `series_too_short` while the annual series has three points. |
 
 ### C24 Employer scale and wage bill by activity
 
@@ -1360,18 +1377,20 @@ gateway times (journey D7): the drive time from an area's pin to each gateway on
 
 Further fixtures. Volume band: with fixture edges at 0.25 and 0.75 (not the v1 values), the ratio 500 / 1,000 = 0.5 on O→D lies in vb2. Situation: over a two-hour fixture window in which O→D takes 12.5 minutes in the first hour and has no row in the second (10 minutes), the situation's time on O→D is (12.5 + 10) / 2 = 11.25 minutes. Area slowdown: an area holds 3 km of a link at a speed ratio of 0.750 and 1 km of a link with no row at that hour, so r = (3 × 0.750 + 1 × 1.000) / 4 = 3.25 / 4 = 0.8125, shown as 0.813.
 
-**Provenance and status.** Link speeds, drive times and drive-time areas by hour: Simulated, `observed`, caveat `traffic_simulated`. Free-flow times: Public, `observed`. Gateway times: subject `area`, as the trip from the area, caveat `trip_from_area` (AI-118). **Compute cost.** Not yet timed: free-flow paths are found once for all hours, and each hour reloads the same paths. Slice S1 times it.
+**Provenance and status.** With the default provider (`simulated`), link speeds, drive times and drive-time areas by hour: Simulated, `observed`, caveat `traffic_simulated`. Free-flow times: Public, `observed`. Gateway times: subject `area`, as the trip from the area, caveat `trip_from_area` (AI-118). **Compute cost.** Not yet timed: free-flow paths are found once for all hours, and each hour reloads the same paths. Slice S1 times it.
 
-**Limits and wording.** Drivers do not move away from congestion in this method, so busy roads look slower, and parallel roads emptier, than they would. One rule covers every road class, and the capacities and free-flow speeds are assumptions. Trips inside one unit stay off the network. The flows are simulated, so the congestion is too.
+**Live traffic provider ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 17; ARC-135).** The setting `EII_TRAFFIC_PROVIDER` is `simulated` by default, and everything above is the default. With `tomtom`, the key `TOMTOM_API_KEY` present and the presenter's offline control not set, the API process fetches live flow tiles and traffic-aware drive-time areas from the provider (`traffic_tomtom_flow`, `traffic_tomtom_range`) and passes them on; this card computes nothing from them. A live tile is a picture layer shown with the attribution "© TomTom" while the layer is on; no numeral is read from a tile, and no tile enters the assignment, the volume bands, the area slowdown, an access score (C12), a fit (C16) or a calibration (section 6). A traffic-aware drive-time area is an area of the session: it enters through the adapter as the second route beside the user's drawing, is bound to the session and seat like a drawn shape, and is marked with the provider and its retrieval time. It is session geometry with a provenance note (provider, request, retrieval time and response hash), not a fact; its minutes are the user's own request. Figures over it follow the rules of a drawn shape: protected figures snap to whole release units (MTH-56), Public and Simulated layers use the area itself, and each figure carries the least-real class of its own inputs. Nothing of a response is written to disk, to the release, to the ledger or to a log. With the provider on, a figure over a stored session area is repeatable for that area. No test, gate, command or the guided story needs the provider: its tests read hand-made fixtures in the documented response format. Caveat `live_traffic_provider`.
 
-- Allowed: "Simulated traffic: at {hour} on a {day type}, traffic on this road moves at about {ratio} of its free-flow speed." For an area: "Simulated traffic: at {hour} on a {day type}, traffic on the roads of this area moves at about {ratio} of free-flow speed, weighted by road length." "Drive time from this area to {gateway} at {hour}: about {minutes} minutes (Simulated traffic)."
-- Never say: "live traffic", "measured congestion", "real-time", "a traffic jam at {named place}", or a congestion figure without the Simulated mark.
+**Limits and wording.** Drivers do not move away from congestion in this method, so busy roads look slower, and parallel roads emptier, than they would. One rule covers every road class, and the capacities and free-flow speeds are assumptions. Trips inside one unit stay off the network. With the default provider the flows are simulated, so the congestion is too.
+
+- Allowed: "Simulated traffic: at {hour} on a {day type}, traffic on this road moves at about {ratio} of its free-flow speed." For an area: "Simulated traffic: at {hour} on a {day type}, traffic on the roads of this area moves at about {ratio} of free-flow speed, weighted by road length." "Drive time from this area to {gateway} at {hour}: about {minutes} minutes (Simulated traffic)." With the provider on: "Live traffic layer from the provider (© TomTom); no figure is read from it." "Drive-time area from the live provider, retrieved {time}; figures over it follow the rules of a drawn shape."
+- Never say: "live traffic" or "real-time" of a Simulated figure, "measured congestion", "a traffic jam at {named place}", a congestion figure without the Simulated mark, or any figure read from a provider tile.
 
 | ID | Requirement |
 |---|---|
 | MTH-88 | C25 reads only the released hourly flows and the Public road graph, never a feed row or a protected row (decision 0016 item 8). A release whose flows are not vehicle trips per hour returns `NO_DATA` with reason `flow_unit_not_vehicle_trips`. |
-| MTH-89 | C25 uses one volume-delay rule for every link. α, β, the free-flow speeds, the capacities and the number and edges of the volume bands are fixed at slice S1 before any traffic is built, written in the release's method note and never tuned to match a published figure (MTH-04). Tie rules are fixed, so every run gives identical results. It reproduces the fixture: 12.5 minutes, 48 km/h and a ratio of 0.8 on O→D, and a 12-minute drive time through M; and the volume-band fixture (vb2). |
-| MTH-90 | Every link speed by hour, every hour-dependent drive time and drive-time area, and every figure computed on such an area carries the Simulated class (SYN-54). A free-flow time is Public. A gateway time is a figure of the trip from the area, never the gateway's own (AI-118). A situation's link time is the mean of the link's times over the situation's hours, and an area's slowdown is the length-weighted mean of the speed ratios of the road links inside its outline, with a link without a row at 1.000; both reproduce their fixtures (11.25 minutes; 0.813). |
+| MTH-89 | C25 uses one volume-delay rule for every link. α, β, the free-flow speeds, the capacities and the number and edges of the volume bands are fixed at slice S1 before any traffic is built, written in the release's method note and never tuned to match a published figure or a provider's tile (MTH-04). Tie rules are fixed, so every run gives identical results with the default provider. It reproduces the fixture: 12.5 minutes, 48 km/h and a ratio of 0.8 on O→D, and a 12-minute drive time through M; and the volume-band fixture (vb2). |
+| MTH-90 | With the default provider (`simulated`), every link speed by hour, every hour-dependent drive time and drive-time area, and every figure computed on such an area carries the Simulated class (SYN-54). A traffic-aware drive-time area of the live provider is session geometry with a provenance note (provider, request, retrieval time and response hash), not a fact and not Simulated; a figure over it follows the rules of a drawn shape and carries the least-real class of its own inputs, and no numeral is read from a provider tile (ARC-135). A free-flow time is Public. A gateway time is a figure of the trip from the area, never the gateway's own (AI-118). A situation's link time is the mean of the link's times over the situation's hours, and an area's slowdown is the length-weighted mean of the speed ratios of the road links inside its outline, with a link without a row at 1.000; both reproduce their fixtures (11.25 minutes; 0.813). |
 
 ### C26 Seasonal calibration measure
 
@@ -1394,17 +1413,38 @@ test             pass when D <= τ, otherwise fail: a test-result fact
 
 **Worked example (fixture).** Public: 100 visitors in every month, so each share is 1 / 12 = 0.0833. Simulated: 110 in January, 90 in February and 100 in every other month, 1,200 in all, so January is 0.0917 and February 0.0750. D = 10 / 1,200 = 0.0083, shown as 0.83 percentage point. The pass or fail against τ is a separate assertion.
 
-**Provenance and status.** P(m): Public, `observed`, caveat `calculated`. Q(m): Simulated, `observed`. D and the test result are a calibration check shown in the Proof room, not a fact about Qatar; caveat `seasonal_shape_only`. The health-centre series is annual and gives no monthly shape, so it is not used here. **Compute cost.** Trivial; not separately timed.
+**Hourly shape by place category ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 18).** The hour-of-day shape of simulated visits by place category is calibrated to the relative busyness of the named venues of that category (`busy_gmaps`, `pub_venue_busyness`; C37), pooled over the venues so that no venue's level or own shape enters a generator. The anchors of [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 4 keep their roles, and the health-centre series stays the annual cross-check of document 05.
 
-**Limits and wording.** The check covers the monthly shape of visitors only: not hourly presence, not levels, not workers or residents, and not any named place. The public shape is the calibration input, so agreement with it is built in: the result shows that the calibration was applied and tests nothing independent (SYN-61, SYN-62). Museum visits stand for visiting in general only as a seasonal pattern.
+```
+for each place category g of the build-time venue list, and each day of week d that a day type of
+document 05 covers:
+  r_v(d, h)  the published relative index (0 to 100) of venue v of category g at hour h
+  s_v(d, h)  = r_v(d, h) / the sum of r_v(d, ·) over the hours of d       the venue's level drops out
+             a venue-day with any hour missing, or whose indices sum to 0, is left out
+  H_g(d, h)  = the mean of s_v(d, h) over the venues of g kept for d       the pooled shape
+             computed only when at least the minimum number of venues fixed at slice S1 is kept;
+             otherwise the category keeps the default shape of document 05 for d, and no single
+             venue's shape is used
+simulated  Q_g(d, h) = the share of hour h in the simulated visits of category g on d
+gap        D_g = the largest |Q_g(d, h) - H_g(d, h)| over the hours, in percentage points
+test       pass when D_g <= the hourly tolerance fixed at slice S1 with τ: a calibration fit, never a hold-out
+```
 
-- Allowed: "The simulated visitors' monthly pattern was set from published museum visitor counts. As a calibration fit against that same pattern, the largest monthly gap is {gap} percentage points against a fixed tolerance of {τ}: {result}. This shows that the calibration was applied; it is not an independent check." The result word comes from the test-result fact.
-- Never say: "validated footfall", "accurate visitor numbers", "the museum's visitors" for a Simulated figure, "hold-out", "validated", or "calibrated" of an hourly figure.
+**Worked example, hourly shape (fixture, invented venues over a fixture day of three hours).** Venue V1 has indices 20, 40 and 40, which sum to 100, so its shares are 0.2, 0.4 and 0.4. Venue V2 has 10, 10 and 30, which sum to 50, so its shares are 0.2, 0.2 and 0.6; its lower level does not count. The pooled shape is (0.2 + 0.2) / 2 = 0.2, (0.4 + 0.2) / 2 = 0.3 and (0.4 + 0.6) / 2 = 0.5. A simulated shape of 0.25, 0.25 and 0.5 gives gaps of 0.05, 0.05 and 0, so D = 5 percentage points.
+
+**Weather profiles ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 23).** The generator reads typical hourly weather profiles by season made from `weather_openmeteo` in the public cache, never a dated day. The constants of the modulation are manifest entries with ranges and a sweep (document 05), fixed with τ before any calibration run and never changed to pass (MTH-92). Both shapes above are measured after the modulation. How heat and the summer setting are kept from counting twice is stated by document 05; this card reads no weather value.
+
+**Provenance and status.** P(m) and H_g: Public, `observed`, caveat `calculated`. Q(m) and Q_g: Simulated, `observed`. D, D_g and the test results are calibration checks shown in the Proof room, not facts about Qatar; caveat `seasonal_shape_only`, and `relative_busyness_not_people` on the hourly check. The health-centre series is annual and gives no monthly or hourly shape, so it is not used here. **Compute cost.** Trivial; not separately timed.
+
+**Limits and wording.** The monthly check covers the monthly shape of visitors only: not hourly presence, not levels, not workers or residents, and not any named place. The hourly check covers only the hour-of-day shape of simulated visits by place category against the pooled shape it was set from: not levels, and not any named venue. Each public shape is the calibration input, so agreement with it is built in: the result shows that the calibration was applied and tests nothing independent (SYN-61, SYN-62). Museum visits stand for visiting in general only as a seasonal pattern, and the relative busyness of a category's named venues only as an hourly pattern.
+
+- Allowed: "The simulated visitors' monthly pattern was set from published museum visitor counts. As a calibration fit against that same pattern, the largest monthly gap is {gap} percentage points against a fixed tolerance of {τ}: {result}. This shows that the calibration was applied; it is not an independent check." The result word comes from the test-result fact. For the hourly shape: "The simulated hour-of-day pattern of visits to {category} was set from the published relative busyness of {n} named venues of that category, pooled; no venue's level was used. As a calibration fit against that pooled pattern, the largest hourly gap is {gap} percentage points: {result}."
+- Never say: "validated footfall", "accurate visitor numbers", "the museum's visitors" for a Simulated figure, "hold-out", "validated", "calibrated" of an hourly count or level, or the name of a venue beside a Simulated figure.
 
 | ID | Requirement |
 |---|---|
 | MTH-91 | C26 computes the public shape once, as `mob.visitor_month_shape` of document 05 (each month's share of its year in visits summed over venues after the crosswalk, averaged over the complete years fixed at slice S1), the simulated shape of 2025 as F19 defines it, and the largest absolute gap between the two, and reproduces the fixture (D = 10 / 1,200). |
-| MTH-92 | τ (the tolerance of F19) and the complete years are fixed at slice S1 before any calibration run and are never changed to pass (MTH-04). C26 is a calibration fit, never a hold-out: it is never called a validation or a check against independent data, and its result is rendered as pass or fail from the test-result fact, never as a fixed "within". No venue's level is transferred to a Simulated figure, and no Simulated figure is attached to a named place (decision 0017 item 4). |
+| MTH-92 | τ (the tolerance of F19) and the complete years are fixed at slice S1 before any calibration run and are never changed to pass (MTH-04). C26 is a calibration fit, never a hold-out: it is never called a validation or a check against independent data, and its result is rendered as pass or fail from the test-result fact, never as a fixed "within". No venue's level is transferred to a Simulated figure, and no Simulated figure is attached to a named place (decision 0017 item 4). The hour-of-day shape of simulated visits by place category is set only from the pooled shape H_g above, each venue's indices first divided by their own day's sum, and only when the minimum number of venues fixed at slice S1 is kept; no single venue's shape enters a generator. The hourly tolerance, that minimum and the weather constants are fixed at slice S1 before any calibration run and are never changed to pass. It reproduces the hourly fixture (pooled shape 0.2, 0.3 and 0.5; D = 5 percentage points) ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 18 and 23). |
 
 ### C27 Crowd density
 
@@ -1504,34 +1544,422 @@ area facts (C15, C19, C20, C22) stand beside these as separate facts, never divi
 **Limits and wording.** The sample file is synthetic and stands for a company's own records. A difference between a branch and its area is not a cause. Free-flow times overstate reach at busy hours; the drive areas by hour show the difference.
 
 - Allowed: "In your file, branch {b} sold {difference} {direction} the middle branch in {month}. Beside it, this area's estimated people and covered pay changed as shown." The direction comes from the returned direction fact. For case C3: "Within {T} minutes' free-flow drive of depot {d}, your file holds {units} delivered units, {share} of the file."
-- Never say: "capture rate", "share of footfall", "sales per visitor", "the area is the problem", "the branch is the problem", "will improve".
+- Never say: "capture rate" (allowed only as the name of the user's input in C35), "share of footfall", "sales per visitor", "the area is the problem", "the branch is the problem", "will improve".
 
 | ID | Requirement |
 |---|---|
 | MTH-96 | C29 computes only counts, sums, shares within the file, C20 comparison facts between two months of the file, differences from the median branch (the mean of the two middle values for an even number of branches) and, for case C3, the units and the share of the file within a free-flow drive cut-off of each depot. No code divides or multiplies a sample-file figure by presence, footfall, earner counts or pay (section 6). Its facts carry `your_inputs` and the Synthetic class, are never written to the release, store or ledger, and reproduce the fixtures (median 100 and B1 10 below; median 105 and B1 15 below; 50 units and 0.50 for D1, 70 units and 0.70 for D2). |
 
+### C30 Forecasts of published series
+
+**Purpose.** Forecast each series of a closed, versioned list of published series (Public series, and the released monthly statistics of the custodian-type feeds) with a model that the series' own backtest chooses, and show every forecast with its interval from the backtest, its measured backtest error, its method and its source ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 2 to 6).
+
+**Inputs.**
+
+- One series of the closed, versioned list of forecastable series, with its source table, its geography (the source's own), its period (month, quarter or year) and its horizon `h`. The first list is that of decision 0019 item 2: licence issues and licence cancellations by activity and by the source's own area (`pub_licence_issued`, only for the codes it covers, and `pub_licence_cancelled`, with the bulk months of C2 flagged); property prices by district (the medians of C14, each with its deal count); hotel demand and room rates; consumer and producer prices; imports by product (`pub_customs_import`, on basket lines of eight digits or finer, MTH-30 and MTH-31); announced investment by sector (the project counts and announced capex of C28); and the construction pipeline, through the annual completion certificates by municipality (C23). A Public series is forecast only when the public data pack holds its source table; a named series without one is listed there as open and returns `NO_DATA`. On screen the licence series keep their names, licence issues and licence cancellations (PUB-94), and no net series is formed from them.
+- The released monthly series of the window, on the same list ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 6): pay level, earner count and wage bill, the stayer index at municipality level, and establishments and employment by area, each read from the released rows of its own unit set and partition as C19 and C21 read them (MTH-55, MTH-56). Such a forecast is a fixed function of rows that are already released, so it reveals nothing that those rows do not; it is a labelled projection from the released months, not a protected statistic of a later month (PRV-54), and it states no change between two months (ARC-130). Its origin is the last released month. A series with a carried-forward month in its window, for any of its units, is not forecast and returns `SUPPRESSED` with `CARRIED_FORWARD`, as C21 rules for projections. A request for a protected statistic of a month outside the window, or for a series across windows, is still refused (PRV-54).
+- The closed, versioned list of candidate models. ASSUMPTION, confirmed at the slice that builds the card: seasonal naive, drift and simple exponential smoothing; a longer list needs a library pin.
+- The error measure, the backtest minimum and the interval rule below, each an ASSUMPTION confirmed at the same slice.
+
+**Formula.**
+
+```
+series     y_1 .. y_n: the longest run of consecutive periods with a published value, on one geography
+           and in one unit, ending at the latest period; a period before a gap is not used
+           season length m = 12 for a monthly series, 4 for a quarterly one, 1 for an annual one
+candidates (the closed list; ASSUMPTION), each fitted on y_1 .. y_o only, forecasting y_(o+k), k = 1 .. h:
+  seasonal naive   ŷ(o+k | o) = y_(o+k-m*ceil(k/m))              with m = 1, the last value
+  drift            ŷ(o+k | o) = y_o + k * (y_o - y_1) / (o - 1)
+  simple exponential smoothing
+                   level l_1 = y_1;  l_t = α * y_t + (1 - α) * l_(t-1);  ŷ(o+k | o) = l_o
+                   α from the grid 0.1, 0.2 .. 0.9 with the smallest sum of squared one-step errors
+                   (y_t - l_(t-1)) over t = 2 .. o; ties: the smaller α
+backtest   rolling origin: origins o = L, L + 1 .. n - h, with L = max(2h, m + 1) periods of history at
+           the first origin; at each origin every candidate forecasts the next h periods
+           errors e_c(o, k) = y_(o+k) - ŷ_c(o+k | o)
+minimum    at least three origins (n - h - L + 1 >= 3) and at least twice the horizon of history at the
+           first origin (L >= 2h) (ASSUMPTION); otherwise NO_DATA with reason series_too_short, never a
+           model without a backtest
+error      the mean absolute scaled error, one fixed measure (ASSUMPTION):
+           q = the mean of |y_t - y_(t-m)| over t = m + 1 .. n, one scale for every candidate
+           MASE_c = the mean of |e_c(o, k)| over every origin and horizon, divided by q
+           q = 0: the same mean, unscaled, in the series' unit
+selection  the candidate with the smallest MASE_c; ties: the earlier candidate in the closed list;
+           no person and no language model chooses a model
+forecast   the chosen candidate refitted on y_1 .. y_n: ŷ(n+k), k = 1 .. h
+interval   at each horizon k, from the chosen candidate's own backtest errors at k (ASSUMPTION):
+             low  = ŷ(n+k) + the smallest e(o, k)
+             high = ŷ(n+k) + the largest e(o, k)
+caption    y = the number of backtest values at k; x = how many of them lie inside the range that the
+           other y - 1 errors give around their own backtest forecast: the value at origin o counts
+           when the smallest e(o', k) <= e(o, k) <= the largest e(o', k), taken over the origins o'
+           other than o; no value is checked against a range built with its own error, so x is
+           measured and can be smaller than y; both are Fact chips
+a series that cannot be negative: a point forecast below zero returns NO_DATA (reason
+           forecast_below_zero); an interval end below zero is shown as zero and marked
+a released monthly series (Synthetic): the origin is the last released month of the window; a month of
+           the window carried forward for any unit of the series: SUPPRESSED with CARRIED_FORWARD,
+           never a model through the repeated month
+each forecast carries its lineage: the method and version, the series, the chosen candidate, the
+           horizon, the interval ends, the backtest error and the number of backtest points; the
+           release build writes the forecasts of Public series, and a forecast of a released series
+           is computed at request time from the released rows and never written to the release
+```
+
+**Worked example (fixture, not a series about a place).** An annual series (m = 1) of five values, 10, 12, 11, 13 and 14, with h = 1, and a fixture list of two candidates, seasonal naive (with m = 1, the last value) and drift. L = max(2, 2) = 2, so the origins are 2, 3 and 4: three origins, the minimum. Seasonal naive forecasts 12, 11 and 13 against 11, 13 and 14, with errors −1, +2 and +1. Drift forecasts 12 + (12 − 10) / 1 = 14, 11 + (11 − 10) / 2 = 11.5 and 13 + (13 − 10) / 3 = 14 against the same values, with errors −3, +1.5 and 0. The scale is q = (2 + 1 + 2 + 1) / 4 = 1.5. Seasonal naive has MASE (1 + 2 + 1) / 3 / 1.5 = 0.889; drift has (3 + 1.5 + 0) / 3 / 1.5 = 1.000; seasonal naive is chosen. Its forecast for period 6 is 14, with a range of 14 − 1 = 13 to 14 + 2 = 16. The caption counts 1 of 3: the error +1 lies between the other two, −1 and +2, while −1 lies below both of the others and +2 above both. The error is shown as 0.89. With the first four values only, the origins are 2 and 3, two origins, so the answer is `NO_DATA` with `series_too_short`; so is any series of three annual points (C23). Smoothing recursion: with α = 0.5 on 10, 12 and 11, the levels are 10, 11 and 11, so the forecast is 11; the grid choice of α has its own fixture at the slice that builds the card.
+
+**Provenance and status.** The series' class: Public, or Synthetic for a released monthly series; `inferred` (MTH-58); caveat `forecast_backtest_range`, with the series' own caveats (for example `openings_incomplete` on a licence-issue series, the deal count beside a price series, `fdi_estimates` on announced investment) and the reliability mark where a count below 30 enters (MTH-13). Subject and geography: those of the series. A forecast of a released monthly series carries the word "forecast", the Synthetic class and the caveats `synthetic_not_evidence_about_qatar` and `synthetic_change` beside `forecast_backtest_range`; its subject is the `area` of its series, and its origin is the last released month. A forecast of a Public split by sex or nationality stays on the source's own geography and categories and is never combined with another figure (PUB-90). **Compute cost.** Not yet timed.
+
+**Limits and wording.** A forecast continues the pattern that the chosen candidate found in past values; a shock, a policy change or a turning point that is not in the series is not in the forecast. A short series has few origins, so its range rests on few values. The range is built from the backtest's own errors: it is not a probability or a confidence level, and it is never said to hold for the next value. A forecast chart draws the range as a band with its caption; the projection of C21 keeps its own rules and stays a projection. A forecast of a released monthly series continues the synthetic world's months; it shows the format, not a trend in Qatar. A price forecast is of a median with its deal counts; a forecast of announced investment is of announcements, not realised investment (C28).
+
+- Allowed: "Forecast of {series} for {period}: {value}, range {low} to {high}. In the backtest {x} of {y} past values fell inside the range that the other past errors gave; its error was {error}." With it, the method line: "Method: {candidate}, chosen in code by backtest; source: {source}." For a released monthly series: "Forecast of this area's synthetic {series} for {month}: {value}, range {low} to {high}. In the backtest {x} of {y} past values fell inside the range that the other past errors gave; its error was {error}. These are synthetic months: this shows the format, not Qatar." A series too short for the backtest is shown as "not enough history".
+- Never say: "will", "probability", "confidence", "likely", "certain", "chance", "odds", "the market will rise", a forecast of the success of a venture, or a forecast for a named business, owner or person.
+
+| ID | Requirement |
+|---|---|
+| MTH-98 | C30 forecasts only a series of the closed, versioned list: a Public series whose source table the public data pack holds, or a released monthly series of the window; it chooses the model of each series by the rolling-origin backtest above, from the closed candidate list only: the candidate with the smallest mean absolute scaled error, ties by list order. No person and no language model chooses a model. A series with fewer than three origins, or with less than twice the horizon of history at the first origin, returns `NO_DATA` with reason `series_too_short`, shown as "not enough history", never a model without a backtest. It reproduces the fixture: MASE 0.889 for seasonal naive against 1.000 for drift; forecast 14, range 13 to 16, 1 of 3; `NO_DATA` with four values; the smoothing levels 10, 11 and 11. |
+| MTH-99 | Every forecast is shown with its interval and its measured backtest error. The interval at each horizon runs from the forecast plus the smallest to the forecast plus the largest backtest error of the chosen candidate at that horizon, and its caption states how many past values of the backtest fell inside the range that the other past errors gave, each value checked against a range built without its own error, and how many there were, both as Fact chips and never as a percentage. It is never called a probability or a confidence level and never said to hold for the next value. A forecast chart draws it as a band with that caption. The projection of C21 keeps its own rules and is never shown as a forecast. |
+| MTH-100 | A forecast is `inferred`, takes the subject, geography and class of its series, and names in its lineage the method and version, the series, the chosen candidate, the horizon, the interval ends, the backtest error and the number of backtest points, resolving to the source like any fact (MTH-08). A forecast of a released monthly series is computed at request time from released rows only (MTH-02); it carries the Synthetic class, the word "forecast" and the caveats `synthetic_not_evidence_about_qatar` and `synthetic_change` beside `forecast_backtest_range`, has the subject `area` of its series and the last released month as its origin, is a labelled projection from the released months and not a protected statistic of a later month (PRV-54), states no change between two months (ARC-130), and is off in public-only mode as a ranking criterion (MTH-65); a series with a carried-forward month in its window returns `SUPPRESSED` with `CARRIED_FORWARD`. A forecast of a Public split by sex or nationality stays on the source's own geography and categories. The licence series keep their names, licence issues and licence cancellations (PUB-94), and no net series is formed. Nothing forecasts the success of a venture, and nothing is forecast for a named real business, owner or person; such a question and a series that is not on the list are declined under the class `forecast_not_offered`. |
+
+### C31 Entry, closure and survival base rates
+
+**Purpose.** Show, for an activity on the source's own geography, what share of past licences were issued, cancelled or still held, as base rates from the Public licence tables with their counts and period ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 7). A base rate describes past licences of that activity and area, not the user's own venture.
+
+**Inputs.** `pub_licence_issued` (only the 610 codes it covers; PUB-69, PUB-94), `pub_licence_cancelled` with the C2 bulk-month flag, and `pub_licence_active` (the May 2025 snapshot), by municipality and activity. Never the synthetic births and closures (MTH-85), and never a drawn area.
+
+**Formula.**
+
+```
+municipality j (or national), activity i, calendar year y:
+  A(j, i)    = active licence-activity count at the May 2025 snapshot, the one stock the tables carry
+  I(j, i, y) = licence issues in y;  C(j, i, y) = dated licence cancellations in y (C2)
+entry base rate     I(j, i, y) / A(j, i)
+closure base rate   C(j, i, y) / A(j, i)            the churn rate of C2, by the same function
+both reported including and excluding the bulk months of C2; issues take the same bulk rule over the
+  issued series' own national monthly totals (ASSUMPTION)
+each rate is shown with its numerator, its denominator and its period, and with the Wilson interval
+  of section 3 where the numerator does not exceed the denominator, labelled approximate because a
+  flow is divided by a later stock; a denominator below 30 is low_count (MTH-13)
+an activity code the issued series does not cover: the entry base rate is NO_DATA
+  (reason openings_not_published_for_activity), never zero
+A(j, i) = 0 or missing: NO_DATA (reason no_denominator)
+survival base rate  the share of the licences issued in one period that were not cancelled within a
+  stated time; the Public tables count issues and cancellations by month and never link a cancellation
+  to its issue, so they do not carry the cohort that is its denominator: NO_DATA (reason
+  no_denominator) until a Public table carries it
+no figure of issues minus cancellations is computed or shown (MTH-19)
+```
+
+**Worked example (fixtures).** Activity P in one municipality: issues of 3, 0 and 5 in the months of a year (the C22 fixture) give 8 issues against 40 active licences, an entry base rate of 8 / 40 = 0.20. Activity Q: 6 dated cancellations in the year against 28 active licences give a closure base rate of 6 / 28 = 0.214, with the Wilson interval 0.102 to 0.395 of MTH-12, marked `low_count` because 28 is below 30. A code that the issued series does not cover gives `NO_DATA` with `openings_not_published_for_activity` for entry; an active count of 0 gives `NO_DATA` with `no_denominator`; the survival base rate gives `NO_DATA` with `no_denominator`.
+
+**Provenance and status.** Public, `observed` (MTH-05), the evidence status of the churn rate of C2; caveats `calculated`, `licence_activity_not_firm`, `snapshot_may_2025`, `base_rate_not_your_chance`, and `openings_incomplete` on every entry rate. Subjects `municipality`, `national` or `sector`, on the source's own geography. **Compute cost.** Trivial (as C2); not separately timed.
+
+**Limits and wording.** A licence issue is not a business opening, and a cancellation is not the end of trading. A flow is divided by the later stock of May 2025, so a rate is approximate. Issues are published for part of the activities only, and bulk months are administrative. Most municipality-by-activity cells are small (C1), so many rates carry the `low_count` mark.
+
+- Allowed: "In {year}, licence cancellations for this activity in {municipality} equalled {rate} of the active licences of May 2025 ({cancellations} cancellations; {active} active licences). This describes past licences of this activity and area, not your own business." For entry: "In {year}, licence issues for this activity in {municipality} equalled {rate} of the active licences of May 2025 ({issues} issues; {active} active licences). Issues are published for only part of the activities."
+- Never say: "odds", "chance", "probability", "your survival rate", "likely to close", "net formation", "N businesses opened", "closures" for licence cancellations, "the market grew".
+
+| ID | Requirement |
+|---|---|
+| MTH-101 | C31 computes entry and closure base rates by activity on the source's own geography only, never for a drawn area, from the Public licence tables: each with its numerator, denominator and period, including and excluding bulk months, the closure base rate by C2's churn function. It returns `NO_DATA` with `openings_not_published_for_activity` for an entry rate of a code the issued series does not cover, `NO_DATA` with `no_denominator` where the Public tables carry no denominator, and the survival base rate as `NO_DATA` with `no_denominator` until a Public table carries the cohort. It reproduces the fixtures: 0.20; 0.214 with the interval 0.102 to 0.395 and `low_count`; the three `NO_DATA` cases. |
+| MTH-102 | No base rate is computed from the synthetic births and closures, and no figure of issues minus cancellations is computed or shown (MTH-19, MTH-85). A base rate is worded as a share of past licences of that activity and area, never as the chance that the user's own venture survives; the word "odds" is never on screen, and the screen words stay "licence issues" and "licence cancellations". A base rate enters a ranking only under MTH-65. |
+
+### C32 People present by pay band
+
+**Purpose.** For a whole release unit, a day type and an hour, show the simulated workers and residents present split by pay band ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 11 and 12; PRV-126).
+
+**Inputs.**
+
+- One whole release unit, or a set of whole units of the snapped unit list of PRV-18, with a day type, an hour and a summer setting. Never a drawn outline, and never an area from `make_area` through C18.
+- The published presence groups of the unit's cells (C15: workers, residents and visitors, each with its low and high and its status).
+- The published pay-band shares of the same unit for one month of the window, the month the card shows: the worker-pay partition (`worker_pay` on `wp_all_quartile`) for workers present, and the resident-pay partition (`resident_pay` on `rp_all_quartile`) for residents present (MTH-55).
+- Nothing else. No table is added to the release, no dimension is added to the presence key (PRV-34, PRV-58), and mobility still meets wage statistics only area to area (PRV-99).
+
+**Formula.**
+
+```
+W, R, V   workers, residents and visitors present in unit u (C15's exact sums over u's cells, complete
+          groups only), each with its low and high
+b_k^W     the published share of pay band k among the covered earners of u, worker_pay, wp_all_quartile
+b_k^R     the same in resident_pay, rp_all_quartile
+workers present in band k     = W * b_k^W, and the same for the low and the high
+residents present in band k   = R * b_k^R, and the same for the low and the high
+each rounded half-up to a whole number; the bands of a segment may then differ from its count by
+          rounding, and the card says so
+a set of whole units: the exact sum of the unit figures, only when every unit's figure is returned
+visitors: one count, shown as having no pay band; people with no wage record have no pay band and are
+          shown as such, by the rule that document 06 sets with PRV-126; no one is given a band
+returned only when every row it draws on is published: a withheld, suppressed, carried-forward or
+          remainder row is never filled in, and the segment's bands pass through the suppression
+          reason of the row that is missing (an incomplete presence group: BELOW_PANEL_MINIMUM)
+never apportioned to a drawn outline
+```
+
+**Worked example (synthetic fixture, not a finding about a place).** Unit U1 has 200 workers (180 to 220), 80 residents (72 to 88) and 30 visitors present at one hour. Its worker band shares are 0.25, 0.5 and 0.25, and its resident band shares 0.5, 0.5 and 0. Workers present by band: 50 (45 to 55), 100 (90 to 110) and 50 (45 to 55). Residents present by band: 40 (36 to 44), 40 (36 to 44) and 0. Visitors: 30, with no pay band. Second fixture: U1's resident band row is suppressed; the residents' bands return `SUPPRESSED` with that row's reason, and the workers' bands still stand. Third fixture: U1's presence group is withheld; every band returns `BELOW_PANEL_MINIMUM`.
+
+**Provenance and status.** Simulated mark; `inferred` (MTH-58); caveats `present_by_pay_band_assumed` (it assumes that the people present have the pay bands of the area's covered earners or residents) and `estimate_not_footfall`. Subject `area`. **Compute cost.** Not yet timed.
+
+**Limits and wording.** The figure assumes that the people present in a unit have the pay bands of that unit's covered workers or residents; it does not observe anyone's pay. Pay bands describe covered earners' pay, not spending. The counts are simulated.
+
+- Allowed: "About {count} estimated workers present here at {hour} on a {day type} are in pay band {band} ({low} to {high}; Simulated). This assumes that the people present have the pay bands of this area's workers."
+- Never say: "spending", "spending power", "income present", "purchasing power", "rich crowd", "customers", "footfall of {building}".
+
+| ID | Requirement |
+|---|---|
+| MTH-103 | C32 computes, in the product plane, for a whole release unit or a set of whole units of the snapped unit list of PRV-18, the workers present by band as the published worker count times the published band shares of `worker_pay` on `wp_all_quartile`, and the residents present by band as the published resident count times those of `resident_pay` on `rp_all_quartile`, with lows and highs, rounded half-up. It returns a segment's bands only when every row it draws on is published, passes through the suppression reason of the missing row, never fills a withheld, suppressed, carried-forward or remainder row, gives visitors and people with no wage record no band, and is never apportioned to a drawn outline. It reproduces the three fixtures. |
+| MTH-104 | C32 is the one combination of presence and pay (PRV-126; MTH-77). It is Inferred, carries the Simulated mark and the caveat `present_by_pay_band_assumed`, and is never called spending, spending power, income present or purchasing power. No method but C33 reads it, it is never a demand weight of C12, and no table or presence-key dimension is added for it. |
+
+### C33 Site demand and revenue estimate
+
+**Purpose.** For an area or pin that the user chose, give a low, a middle and a high monthly revenue of an outlet of one activity, from a calibrated model of its catchment, with the main drivers ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 8). It is an estimate of the model, never a forecast, and never an estimate for a named real building or business.
+
+**Inputs.**
+
+- The area or pin the user chose, as an `area` subject. The catchment is snapped to whole release units of PRV-18, shown with the snap sentence, because C32 is never apportioned.
+- The activity, with its row of the hotels-and-restaurants survey (`pub_sector_accounts`, C4), and the opening hours, day types and opening days per month that the user states.
+- People present by pay band through the day (C32) for the units of the catchment, and visitors present (C15) as one group with no band.
+- Competitors from public listings of the activity's category (`pub_place`, or `pub_place_fsq` once pinned; one table at a time, C6) as a count and their straight-line distances from the pin or the representative point. A named competitor keeps only its Public facts and its distance.
+- The uncertain parameters, each a stated, visible and editable range: the share of the people present in an opening hour who buy in the category, by pay band and for visitors; the spend per purchase by pay band and for visitors, a range of the model that is never called spending power; and the distance scale `D` of the competition rule. ASSUMPTION: the default ranges are calibrated at the slice that builds the card so that the middle case for the survey's mean establishment lies inside the survey's range of output per establishment, 2018 to 2022 (C4); the rule and the defaults are written in the release's method note and never tuned to a figure about a named place (MTH-04).
+- The number of draws `N`, fixed at the same slice, and the release seed (ASSUMPTION).
+
+**Formula.**
+
+```
+for each opening hour h of each stated day type, over the units of the catchment:
+  P(b, h)  people present in pay band b (C32);  V(h)  visitors present (C15), with no band
+competition share   σ = 1 / (1 + sum_j max(0, 1 - d_j / D))
+                    d_j = the straight-line distance from the pin to competitor j; only the sum
+                    enters, and no term is computed for display for one competitor
+monthly revenue     M = days * σ * sum_h ( sum_b P(b, h) * a_b * s_b + V(h) * a_V * s_V )
+                    a = the share of people present in an hour who buy; s = the spend per purchase
+draws               N draws with the release seed; each uncertain parameter drawn uniformly and
+                    independently from its stated range (ASSUMPTION); M computed for each draw
+cases               low, middle and high = the 10th, 50th and 90th percentiles of the N values of M
+                    (ASSUMPTION), each the value at rank ceil(p * N) of the values sorted upward
+main drivers        one at a time: each uncertain parameter is set to the low and then the high end of
+                    its range, every other parameter at the middle of its range;
+                    swing = |M(high end) - M(low end)|; drivers ordered by swing, largest first, ties by
+                    parameter key
+a row that C32 or C15 does not return: the estimate passes its reason through and is not computed
+```
+
+**Worked example (fixture, not a finding about a place).** One pay band, one opening hour, no visitors and 30 opening days; 100 people present; the share who buy runs from 0.1 to 0.3 and the spend per purchase from 20 to 40; one competitor at 0.5 km with `D` = 1 km, so σ = 1 / (1 + 0.5) = 2/3. At the middle of both ranges, M = 30 × 2/3 × 100 × 0.2 × 30 = 20 × 600 = 12,000. Swings: the share who buy gives 20 × 300 = 6,000 and 20 × 900 = 18,000, a swing of 12,000; the spend per purchase gives 20 × 400 = 8,000 and 20 × 800 = 16,000, a swing of 8,000; so the share who buy is the first driver. Percentile rule: for ten draws of 1,000, 2,000 .. 10,000, the low case is the value at rank 1 (1,000), the middle at rank 5 (5,000) and the high at rank 9 (9,000).
+
+**Provenance and status.** The least-real class of the inputs, Simulated while presence is simulated (MTH-07); `inferred`, with the "your inputs" tag because the user can change every range (MTH-06); caveats `estimate_on_simulated_inputs` while any input is Simulated or Synthetic, `your_inputs`, `national_average`, `movement_not_purchases` and `present_by_pay_band_assumed`. Subject `area`. Never written to the release or the ledger. Off in public-only mode, and unavailable while OI-03 keeps the survey figures off screen (MTH-29). **Compute cost.** Not yet timed.
+
+**Limits and wording.** The estimate describes the stated model and ranges, not observed sales. The cases are cases of the model. The survey figures are national averages over all outlets of the activity. The competition rule counts competitors by distance only and ignores their size. While presence is simulated, the estimate shows the format a linked mobility feed would give, not a finding about the place.
+
+- Allowed: "Estimate on simulated inputs: with the ranges shown, this model gives an outlet of this activity here a monthly revenue of {low} in its low case, {middle} in its middle case and {high} in its high case. The inputs that move it most are {driver 1} and {driver 2}."
+- Never say: "forecast", "will earn", "expected revenue", "chance", "probability", "confidence", "likely", "spending power", "income present", "purchasing power", "customers will come", any figure for a named competitor, or a share of draws.
+
+| ID | Requirement |
+|---|---|
+| MTH-105 | C33 computes the monthly revenue of the model above over the whole release units of the snapped catchment, from C32's people present by pay band, C15's visitors, the competitor count and distances, and the stated ranges; draws each uncertain parameter from its range with the release seed; returns the 10th, 50th and 90th percentiles of the draws as the low, middle and high cases, by the nearest-rank rule; and returns the main drivers by the one-at-a-time swing, largest first. The same release and inputs return the same cases and drivers. It reproduces the fixture: 12,000 at the middle; swings 12,000 and 8,000; cases 1,000, 5,000 and 9,000 for the ten draws. |
+| MTH-106 | C33 carries the label "estimate on simulated inputs" while any input is Simulated or Synthetic, has subject `area`, and is never an estimate for a named real building or business; no figure for a named competitor is computed for display, shown, stored or logged. The spend per purchase by band is a stated, visible and editable range of the model and is never called spending power. The estimate is off in public-only mode, is unavailable while OI-03 is open (MTH-29), is never called a forecast, and enters a ranking only under MTH-65. |
+
+### C34 Catchment-share scenario
+
+**Purpose.** In the user's scenario, show the share of choices that the user's outlet would take and the share of the competitors split by competitor category and by distance band (for example Italian restaurants within 500 m; other restaurants), never per named business, when customers choose by distance and by an attractiveness that the user sets ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 9). It joins the break-even calculator (C4), is the user's scenario and is never called a forecast.
+
+**Inputs.**
+
+- The user's outlet at the pin of the area the user chose.
+- Competitors: the public places within the catchment that compete with the activity (one places table, C6), each with its category from the reviewed category mapping of the places layer and its distance from the outlet. A named competitor keeps only its Public facts and its distance.
+- The distance bands, a closed list of this card (ASSUMPTION): within 500 m, 500 m to 1 km, 1 km to 2 km, and beyond 2 km of the outlet.
+- Customer locations: the base cells of the fixed frame whose centre lies in the catchment, each counted once with equal weight (ASSUMPTION).
+- The user's settings, each visible and editable and tagged "your inputs": the attractiveness `A_u` of the user's outlet against the competitors as a group (default 1), or one attractiveness for each competitor category, never for one named business; the distance exponent `λ`; and the distance floor `d_0`. The defaults of `λ` and `d_0` are fixed at slice S2 (ASSUMPTION).
+
+**Formula.**
+
+```
+for each customer location i:
+  user's term        T_u(i) = A_u * max(d_iu, d_0)^(-λ)
+  competitors' term  T_c(i) = sum_j A_c(j) * max(d_ij, d_0)^(-λ)
+                     A_c(j) = 1, or the attractiveness the user set for the category of j
+  p_u(i) = T_u(i) / (T_u(i) + T_c(i))
+user's outlet share  S_u = the mean of p_u(i) over the customer locations
+competitors' share   S_c = 1 - S_u
+cells                each competitor j falls in one cell: its category and its distance band from the outlet;
+                     a cell that holds a single competitor is merged into the next wider cell: the same
+                     category in the next distance band, then the cell "other"; repeated from the
+                     nearest band outward; a merged cell is named by its category and the bands it joins
+cell share           S(K) = the mean over i of [sum over j in K of A_c(j) * max(d_ij, d_0)^(-λ)] / (T_u(i) + T_c(i));
+                     the cell shares sum to S_c
+no split             when the cell "other" still holds a single competitor after the merges, the split is not
+                     shown: the card shows S_u and S_c only, because the shown cells and S_c would give that
+                     competitor's share by subtraction
+one competitor       when the list holds one competitor in all, the card shows S_u only and says that one
+                     competitor is listed; it states no share for the competitors
+no customer location: NO_DATA; no competitor: S_u = 1, and the card says that no competitor is listed
+no share or term is computed for display for one competitor
+```
+
+**Worked example (fixture, not a finding about a place).** `λ` = 1, `A_u` = 2, `A_c` = 1, and `d_0` below every distance. Location i1 is 1 km from the outlet and 1 km and 2 km from two competitors: `T_u` = 2 and `T_c` = 1 + 0.5 = 1.5, so `p_u` = 2 / 3.5 = 4/7. Location i2 is 2 km from the outlet and 1 km from each competitor: `T_u` = 1 and `T_c` = 2, so `p_u` = 1/3. `S_u` = (4/7 + 1/3) / 2 = 19/42, shown as 0.45, and `S_c` = 23/42, shown as 0.55.
+
+**Split fixture (not a finding about a place).** One customer location i, `λ` = 1, every attractiveness 1 and `d_0` below every distance. The outlet is 1 km from i, so `T_u` = 1. Competitors a and b, of category K1 and within 500 m of the outlet, are each 1 km from i; competitor c, of K1 and 1 km to 2 km from the outlet, is 2 km from i; competitor d, of K2 and 1 km to 2 km from the outlet, is 2 km from i. So `T_c` = 1 + 1 + 0.5 + 0.5 = 3, `S_u` = 1 / 4 = 0.25 and `S_c` = 3 / 4 = 0.75. The cell of K1 within 500 m holds a and b: (1 + 1) / 4 = 0.50. The cell of K1 at 1 km to 2 km holds c alone, so it is merged into K1 beyond 2 km, which then holds c alone and is merged into "other"; the cell of K2 at 1 km to 2 km holds d alone and goes the same way. "Other" holds c and d: (0.5 + 0.5) / 4 = 0.25. The cells sum to 0.50 + 0.25 = 0.75 = `S_c`, and no cell shows one competitor. Without competitor d, `T_c` = 1 + 1 + 0.5 = 2.5, `S_u` = 1 / 3.5 = 2/7, shown as 0.29, and `S_c` = 5/7, shown as 0.71; c would be alone in "other", so no split is shown. With competitor a alone, `T_c` = 1 and `S_u` = 1 / 2 = 0.50; the card shows the outlet's share only and says that one competitor is listed.
+
+**Provenance and status.** Public points and Public geometry with the user's inputs: Public class; `inferred`, "your inputs" tag (MTH-06); caveats `scenario_not_forecast` and `your_inputs`. Subject `area`. Never written to the release or the ledger. **Compute cost.** Not yet timed.
+
+**Limits and wording.** The scenario holds only the stated distance rule and attractiveness; it is not calibrated to any sales or movement (section 6). Equal weights for the frame cells ignore where people are. The places data is incomplete (C6). The categories are those of the reviewed category mapping of the places layer, and the distance bands are the card's closed list.
+
+- Allowed: "In your scenario, with the attractiveness and distance rule you set, your outlet would take {share} of the choices of people across this area, and the {n} listed competitors together {share}. This is your scenario, not a forecast." For each cell of the split: "{category} within {band}: {share}, {k} listed places." and "Other listed competitors: {share}, {k} listed places." Where no split is shown, the first sentence stands alone. With one listed competitor: "In your scenario, with the attractiveness and distance rule you set, your outlet would take {share} of the choices of people across this area. One competitor is listed. This is your scenario, not a forecast."
+- Never say: "forecast", "will capture", "market share of {business}", any share for a named competitor, a cell that holds or names a single competitor, "you will win", "best", "chance", "probability", "likely".
+
+| ID | Requirement |
+|---|---|
+| MTH-107 | C34 computes the user's outlet share, the competitors' share and its split by competitor category and by distance band by the rule above, the bands from the card's closed list and every cell that holds a single competitor merged into the next wider cell; where "other" still holds a single competitor after the merges it shows no split, and with one competitor in all it shows the outlet's share only, with every setting visible, editable and tagged "your inputs", one attractiveness for the competitors as a group or for each competitor category and never for one named business; it computes, shows, stores and logs no share or term for one competitor; it fits nothing to simulated movement; it is never called a forecast and carries `scenario_not_forecast`; and it reproduces the fixtures (19/42 and 23/42; 0.25 for the outlet, 0.50 for K1 within 500 m and 0.25 for "other"; no split without competitor d, 2/7 and 5/7; the outlet's share alone, 0.50, with one competitor). |
+
+### C35 Revenue range of the user's outlet
+
+**Purpose.** In the user's scenario, show low, middle and high monthly revenue cases for the user's outlet beside the break-even point and a Public benchmark ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 10). It is the user's scenario and is never called a forecast.
+
+**Inputs.**
+
+- The area the user chose and its estimated people present by hour (C15 for a set of whole units, C18 for an area from `make_area`), all people of complete groups, over the opening hours and the day type that the user states.
+- The user's assumptions, each with a low, a middle and a high value, visible, editable and tagged "your inputs": the capture rate (the share of the people present in each opening hour that the user assumes become covers of the outlet) and the average bill; and the opening days per month (C4's input `D`). These inputs join the closed list of typed scenario inputs ([08_BACKEND.md](08_BACKEND.md)).
+- The Public benchmark: the survey's output per establishment of the activity (C4 norms), its 2022 value and its range across 2018 to 2022, shown per month; and C4's break-even revenue from the user's own C4 inputs.
+
+**Formula.**
+
+```
+H        = the sum over the opening hours h of the all-people count present at h (C15 or C18);
+           H_low and H_high = the sums of the lows and of the highs
+low      = H_low  * capture rate (low)    * average bill (low)    * days
+middle   = H      * capture rate (middle) * average bill (middle) * days
+high     = H_high * capture rate (high)   * average bill (high)   * days
+benchmark  the survey's output per establishment / 12: the 2022 value and the 2018-2022 range (C4)
+break-even C4's break-even revenue for 2022 from the user's C4 inputs, shown beside the three cases
+any withheld presence group: SUPPRESSED with BELOW_PANEL_MINIMUM, never filled in
+```
+
+**Worked example (fixture, not a finding about a place).** Two opening hours with 100 (90 to 110) and 200 (180 to 220) people present give H = 300 (270 to 330). With a capture rate of 0.01, 0.02 and 0.03, an average bill of 80, 100 and 120 and 30 days: low = 270 × 0.01 × 80 × 30 = 6,480; middle = 300 × 0.02 × 100 × 30 = 18,000; high = 330 × 0.03 × 120 × 30 = 35,640. Beside them stands C4's break-even revenue for the same user's C4 inputs (QAR 127,796 a month in C4's example).
+
+**Provenance and status.** Simulated, the least-real class of its inputs (MTH-07); `inferred`, "your inputs" tag (MTH-06); caveats `scenario_not_forecast`, `your_inputs`, `national_average` and `movement_not_purchases`. Subject `area`. Never written to the release or the ledger. Off in public-only mode, because its presence input is Simulated, and off screen while OI-03 is open, like the break-even calculator (MTH-29). **Compute cost.** Trivial; not separately timed.
+
+**Limits and wording.** The capture rate and the average bill are the user's assumptions, and the people present are simulated. The benchmark is a national average over all outlets of the activity. Measures of present size, such as a wage bill (C24), a number of firms or retail sales where a Public table publishes them, are measurements with their own class and are not part of this card.
+
+- Allowed: "Your scenario: with your capture rate and average bill, and the estimated people present here (Simulated), monthly revenue would be {low} in your low case, {middle} in your middle case and {high} in your high case. The sector's 2022 output per establishment was {benchmark} a month, and your break-even revenue is {break-even}. This is your scenario, not a forecast."
+- Never say: "forecast", "expected revenue", "you will make a profit", "will earn", "demand at this site", "go" or "no-go" as a verdict, "chance", "probability", "likely", "customers will come".
+
+| ID | Requirement |
+|---|---|
+| MTH-108 | C35 computes the low, middle and high cases as the presence sum times the user's capture rate, average bill and opening days of the same case, shows them beside the survey benchmark per month and C4's break-even revenue, and reproduces the fixture (6,480; 18,000; 35,640). Every assumption is visible, editable and tagged "your inputs"; the result carries `scenario_not_forecast`, is never called a forecast, is off in public-only mode and off screen while OI-03 is open (MTH-29). The words "capture rate" name only this input of the user: the build-time scan allows them only as the label of that input in this card's templates. |
+
+### C36 Night-time radiance by area and month
+
+**Purpose.** Show the night-time radiance of an area by month as a Public layer ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 20). It is worded as night-time radiance, not as a measure of business activity.
+
+**Inputs.** NASA Black Marble VNP46A3 (`ntl_blackmarble`): monthly radiance on a 15 arc-second grid, about 500 m, fetched with the Earthdata token inside `./eii build-public` and held as a hashed file in the public cache, with the product's quality flags; the cells of the fixed frame; an area the user chooses, a release unit or an official geography.
+
+**Formula.**
+
+```
+for each month and each cell c of the fixed frame (the public-data build, writing pub_night_lights):
+  the pixels whose centre lies in c, leaving out fill values and the pixels that the product's quality
+  flag marks as poor, by the flag rule fixed at slice S2
+  radiance(c, month) = the mean of their radiance; no pixel kept: NO_DATA, never 0
+  no pixel is split, so nothing is apportioned
+an area, a release unit or an official geography X:
+  the mean of radiance(c, month) over the frame cells c whose centre lies in X, each cell counted
+  once (ASSUMPTION); no such cell with a value: NO_DATA
+```
+
+**Worked example (fixture).** Cell c1 holds the centres of pixels with radiance 2, 4 and 6 and of one fill pixel, so radiance(c1) = (2 + 4 + 6) / 3 = 4. Cell c2 holds one pixel of 10, so radiance(c2) = 10. An area that holds the centres of c1 and c2 has (4 + 10) / 2 = 7. A cell that holds only fill pixels is `NO_DATA`.
+
+**Provenance and status.** Public, `observed` (MTH-05); caveats `calculated` and `night_lights_not_activity`; NASA acknowledged as the source and the product DOI cited. Subject `area` or the official geography. Never blended into C9 or into a protected or Simulated figure. **Compute cost.** Not yet timed.
+
+**Limits and wording.** Radiance measures light seen from orbit at night: street lighting, roads, ports, industry and flares all add to it, and cloud, moonlight and season can disturb a month. It is not business activity, population or footfall. A pixel of about 500 m is coarser than many areas, and a cell's value covers the pixels whose centre lies inside it.
+
+- Allowed: "Night-time radiance here in {month}: {value} nanowatts per square centimetre per steradian (NASA Black Marble, VNP46A3). Night-time light is not a measure of business activity."
+- Never say: "economic activity", "business activity", "busy", "footfall", "population", "prosperity", "demand", "a growing area".
+
+| ID | Requirement |
+|---|---|
+| MTH-109 | C36 takes the mean radiance of the kept pixels whose centre lies in each frame cell, by month, leaving out fill values and pixels flagged poor by the rule fixed at slice S2, splits no pixel, and returns `NO_DATA`, never 0, where no pixel is kept; an area, release unit or official geography takes the mean of the cell values whose centre lies inside it. It is Public, carries `night_lights_not_activity`, cites the product DOI, is worded as night-time radiance and never as business activity, is never blended into another figure, and reproduces the fixture (4; 10; 7; `NO_DATA`). |
+
+### C37 Relative busyness of named venues
+
+**Purpose.** Show the published relative busyness by hour of a named venue as a Public fact of that venue ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 19). It is a relative index, never a count of people.
+
+**Inputs.** `pub_venue_busyness` from `busy_gmaps`: venue, day of week, hour, relative index from 0 to 100, and retrieval date, for the named venues of a build-time list. The project's own page reader fetches it inside `./eii build-public`, never at run time; the values stay in the uncommitted public cache and never enter the repository or a test fixture, and the source is left out of the nightly live fetch. The publisher states no licence for reuse, and its terms name automated reading; the owner decided on 2026-11-12 to use it in this personal internal project, and decision 0019 names it under PUB-12 with `licence_basis: owner_decision`.
+
+**Formula.**
+
+```
+venue v, day of week d, hour h: the index as published, 0 to 100; no arithmetic on a venue's own row
+an hour with no published index: NO_DATA, never 0
+a list of named venues around a site is ordered by distance only (PUB-92), never by the index
+the pooled hour-of-day shape by place category of C26 is the only computation that reads these rows
+```
+
+**Worked example (fixture, invented venues).** An invented venue's rows for hours 9, 10 and 11 hold 40, nothing and 100: the card shows 40, `NO_DATA` and 100, never 0 for hour 10. Three invented venues at 300 m, 100 m and 200 m from a pin are listed at 100 m, 200 m and 300 m, whatever their indices.
+
+**Provenance and status.** Public, `observed`; subject `place_public`, Public slots only (MTH-10); labelled "Google Maps popular times" with its retrieval date; caveat `relative_busyness_not_people`. It never shares a component with an estimated-people figure (C15, C27), is never a score, rank, fit or criterion (MTH-57), and no venue's level or own shape is transferred to a Simulated figure (MTH-92). **Compute cost.** Trivial; not separately timed.
+
+**Limits and wording.** The index is relative to the venue's own busier times, as the publisher describes it, so it is not a count of people and not a level to compare between venues. Hand-made fixtures test the code; no real value enters a test.
+
+- Allowed: "Google Maps popular times, retrieved {date}: at {hour} on {day}, this venue shows {index} on its own relative scale of 0 to 100. This is not a count of people."
+- Never say: "{n} people at {venue}", "visitors to {venue}", "footfall of {venue}", "busiest venue", "best time to visit", "crowded", "customers", or a Simulated figure beside a venue's index.
+
+| ID | Requirement |
+|---|---|
+| MTH-110 | C37 shows a named venue's relative busyness only as published, as a Public fact of a `place_public` subject labelled "Google Maps popular times" with its retrieval date, returns `NO_DATA` (never 0) for an hour with no index, orders a list of venues by distance only, never puts the index in a component with an estimated-people figure, never scores, ranks or fits a venue by it, and reproduces the fixture. Its values come only from the uncommitted public cache filled by `./eii build-public`; no test fixture holds a real value, and the source is left out of the nightly live fetch. |
+
+### C38 Population by age and sex over an area
+
+**Purpose.** Show the Public population by age and sex of an area the user chooses, as the sum of whole cells of a published population grid ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 22). The sum is not an apportionment, and it is display only.
+
+**Inputs.** `pub_pop_agesex_grid` from `worldpop_qat_agesex` (100 m grid cells, age band, sex, people, year; CC BY 4.0); an area the user chooses or an official geography.
+
+**Formula.**
+
+```
+area X, year, age band a, sex s:
+  people(X, a, s) = the sum of people(c, a, s) over the grid cells c whose centre lies in X
+                    (a centre on the boundary counts as inside; ASSUMPTION); no cell is split
+  rounded half-up to a whole number after summing; a total across age bands or sexes is the sum of
+                    the same cells, rounded once
+  no cell centre in X: NO_DATA
+it applies no weight and splits no cell, so it is not an apportionment (C18)
+```
+
+**Worked example (fixture).** Cells g1 and g2 have their centres in the area and g3 does not. For one age band, the female values are 10.4, 12.3 and 30.0 and the male values 11.2, 13.1 and 25.0. The area holds 10.4 + 12.3 = 22.7 females, shown as 23, and 11.2 + 13.1 = 24.3 males, shown as 24; both sexes together hold 47.0, shown as 47. Cell g3 is left out. An area with no cell centre is `NO_DATA`.
+
+**Provenance and status.** Public, `observed` (MTH-05); caveats `calculated` and `grid_cells_summed`, with the source and year. Subject `area`. Display only: never a ranking criterion (MTH-65), a feature of C17, a demand weight of C12 or a weight of C18; never combined with a protected, Synthetic or Simulated figure, and never on one chart with one. The generator reads the grid only collapsed across age and sex, as weights (document 05); no synthetic record carries sex or age (SYN-13, DAT-141). **Compute cost.** Not yet timed.
+
+**Limits and wording.** The grid holds modelled estimates for one year. A cell whose centre lies inside counts whole even where part of it lies outside, and a cell whose centre lies outside is left out.
+
+- Allowed: "About {people} people of {age band} ({sex}) lived in {year} in the 100 m grid cells whose centres lie in this area (WorldPop modelled estimates, CC BY 4.0; whole cells summed)."
+- Never say: "customers", "counted", "census of your area", "exactly", or this figure beside a Simulated, Synthetic or protected figure.
+
+| ID | Requirement |
+|---|---|
+| MTH-111 | C38 sums whole cells of `pub_pop_agesex_grid` whose centre lies in the area, splitting no cell and applying no weight, and rounds once after summing; it returns `NO_DATA` for an area with no cell centre; it is Public with `grid_cells_summed`, display only, never a criterion, feature or weight, never combined or charted with a protected, Synthetic or Simulated figure; and it reproduces the fixture (23; 24; 47). |
+
 ## 6. What would be theatre
 
-"Theatre" here means a method whose output on synthetic or simulated data can only return what the generator or simulator was told. These must not be built on synthetic or simulated data, and most have no honest public substitute in v1.
+"Theatre" here means a method whose output on synthetic or simulated data can only return what the generator or simulator was told. These must not be built on synthetic or simulated data, except in the labelled forms that a row below names ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 6 to 10), and most have no honest public substitute in v1.
 
 | Method | Why it is theatre here |
 |---|---|
-| Gravity or Huff catchment calibration and capture shares (Huff 1964) | Calibration needs real outlets, customer origins and sales; none is public. The simulator places workplaces with a gravity model (see [05_SYNTHETIC_WORLD_AND_SIMULATION.md](05_SYNTHETIC_WORLD_AND_SIMULATION.md)), so fitting a gravity model to simulated movement recovers the simulator's own settings. |
-| Survival curves (Kaplan and Meier 1958) | Need each licence's issue and cancellation dates, held only in the register. On the synthetic register a survival curve returns the generator's assumption. |
-| Entry rates and net formation | The open "issued" table holds 12,533 licences over 610 codes and no restaurant records; it cannot give entry, so its issues are shown only as published counts for the codes it covers (C22). On synthetic data, entry is planted: synthetic births and closures are shown only as two counts with the Synthetic mark, never as an entry rate, a survival figure or net formation. |
+| Gravity or Huff catchment calibration and capture shares (Huff 1964) | Calibration needs real outlets, customer origins and sales; none is public. The simulator places workplaces with a gravity model (see [05_SYNTHETIC_WORLD_AND_SIMULATION.md](05_SYNTHETIC_WORLD_AND_SIMULATION.md)), so fitting a gravity model to simulated movement recovers the simulator's own settings. A share computed by distance and an attractiveness that the user sets is the user's scenario (C34): it fits nothing, shows the user's outlet and the competitors split by competitor category and by distance band only, a cell that holds a single competitor merged into the next wider cell, and computes no figure for a named competitor. |
+| Survival curves (Kaplan and Meier 1958) | Need each licence's issue and cancellation dates, held only in the register. On the synthetic register a survival curve returns the generator's assumption, so none is built from it. The Public licence tables count issues and cancellations without linking them, so the survival base rate of C31 returns `NO_DATA` until a Public table carries the cohort. |
+| Entry rates and net formation | The open "issued" table holds 12,533 licences over 610 codes and no restaurant records, so entry is known only for the codes it covers: its issues are shown as published counts (C22), and the entry and closure base rates of C31 are computed from the Public tables only where they carry the numerator and the denominator. Net formation, issues minus cancellations, is never computed or shown. On synthetic data, entry is planted: synthetic births and closures are shown only as two counts with the Synthetic mark, never as an entry rate, a survival figure or net formation. |
 | Shift-share (Dunn 1960) | Needs counts by area and activity at two dates; the public table is one snapshot (May 2025). On synthetic data it decomposes planted growth. A second real snapshot would make it real, so every refresh of the public table should be stored. |
 | Labour-market tightness | About 2,988 unemployed against 2.36 million employed in 2025 and no public vacancy series (methods research); on synthetic records hiring and separation rates are parameters. |
 | Multipliers from other economies' input-output tables | No official Qatari input-output or supply-use table was found; the OECD 2025 inter-country tables do not include Qatar. Another economy's coefficients beside Qatar facts would be read as Qatar facts. The real survey cost shares (C4) answer "what does this business buy". |
 | Economic complexity or relatedness below national level (Hidalgo and Hausmann 2009) | Eight municipalities cannot support it. Even nationally, Qatar's distance to every non-exported product lies between 0.953 and 0.992 and 54% of export value is unclassified, so a ranking is close to noise. |
 | Relatedness from synthetic co-licensing | Returns the generator's co-licensing rule. |
-| Sales, revenue or demand forecasts, "spending power present", capture rates | Each multiplies simulated presence by synthetic pay by an assumed rate, or divides a company's sales by presence. There are no sales data. Resident pay and presence stand side by side only (C19), and a sample file's figures are never divided by presence (C29). |
+| Sales, revenue or demand forecasts, "spending power present", capture rates | A revenue or demand figure presented as a finding about a place or a named business, or a money figure of spending power, would multiply simulated presence by synthetic pay by an assumed rate, or divide a company's sales by presence; there are no sales data. Allowed in its place, only as [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 8 to 10 say: the site estimate of C33, with its low, middle and high cases, its main drivers and the label "estimate on simulated inputs"; and the user's scenarios of C34 and C35, never called forecasts, in which "capture rate" names only the user's own input. Still not built: success scores, a money figure of spending power, and any figure for a named competitor. Resident pay and presence stand side by side (C19), except the people present by pay band of C32 (PRV-126), and a sample file's figures are never divided by presence (C29). |
 | Differences between two synthetic releases shown as trends | The difference is a seed or a parameter change, not a change in Qatar. Months inside the one window of one world are shown only as synthetic changes with the Synthetic mark (C20). |
 | A seasonal check on the calibration years called a validation | The simulated shape is set from the same public shape, so agreement is built in. C26 is reported as the calibration fit F19 of document 05, never as a hold-out or a validation, and it tests no hourly presence, level or named place. |
-| Traffic tuned until it matches a published congestion figure | Tuning the volume-delay parameters to a public figure makes any agreement circular (the plausibility comparison of [05_SYNTHETIC_WORLD_AND_SIMULATION.md](05_SYNTHETIC_WORLD_AND_SIMULATION.md) already warns of this). The parameters are fixed before any traffic is built (C25). |
+| Traffic tuned until it matches a published congestion figure | Tuning the volume-delay parameters to a public figure makes any agreement circular (the plausibility comparison of [05_SYNTHETIC_WORLD_AND_SIMULATION.md](05_SYNTHETIC_WORLD_AND_SIMULATION.md) already warns of this). The parameters are fixed before any traffic is built (C25). A live provider's tile is never used to tune them either. |
+| Success scores and policy-lever simulation | A score of how likely a venture is to succeed, or a simulation of what a policy lever would change, would return the generator's settings and read as advice. Neither is built ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 27). |
+| A forecast of a protected or synthetic series in the product plane | On synthetic data a forecast continues the generator's settings, so it is never shown as a finding about Qatar. Allowed only in the labelled form of [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 6: C30 forecasts the released monthly series of the window from released rows only, with the Synthetic class, the word "forecast" and the caveats that synthetic months show the format, not Qatar; such a forecast is not a protected statistic of a later month and states no change between two months (PRV-54, ARC-130). A protected statistic of a month outside the window, and a series across windows, are still refused (PRV-54). |
 
 | ID | Requirement |
 |---|---|
-| MTH-48 | No module in the repository implements any method in the table above against synthetic or simulated release tables, and the assistant's must-decline set includes a question for each row. |
+| MTH-48 | No module in the repository implements any method in the table above against synthetic or simulated release tables, except the labelled forms that a row names as allowed: the forecasts of the released monthly series of C30, the site estimate of C33 and the user's scenarios of C34 and C35. The assistant's must-decline set includes a question for each part of a row that stays theatre, and a forecast it does not offer is declined under the class `forecast_not_offered`; a question about a listed series, a base rate, the site estimate or a scenario is answered by its own family (C30 to C35). |
 
 ## 7. Where the units are too few
 
@@ -1563,12 +1991,19 @@ ASSUMPTIONS (each also marked where it is used):
 11. C25: all-or-nothing assignment on free-flow paths, with one volume-delay rule of the Bureau of Public Roads form, is the simplest form [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 8 asks for (MTH-89).
 12. C27: the three presence segments are exclusive for each hour; document 05 is asked to confirm it (MTH-94).
 13. C16: firm fit lists use free-flow drive times to the drivable node nearest the centroid of the firm's release unit, so that every fit stays Synthetic (MTH-71).
-14. The new release tables are named as document 04 names them; document 03 is the authority (MTH-59).
+14. The new release tables are named as document 04 names them; document 03 is the authority (MTH-59). The tables added by decision 0019 (`pub_venue_busyness`, `pub_night_lights`, `pub_place_fsq` and `pub_pop_agesex_grid`, and the table of the forecasts of C30) follow the same rule.
 15. C19 indicator 6 by sector: "sector" is the economic activity of the national activity table `wage_act`; its groups are the table's populated activity-by-sex cells, as C3 groups the occupation table by occupation and sex; a both-sexes total row is not read; and a cell populated in only one year of a pair gives `NO_DATA` (MTH-97).
+16. C30, confirmed at the slice that builds it: the candidate list is seasonal naive, drift and simple exponential smoothing (a longer list needs a library pin); the one error measure is the mean absolute scaled error; the backtest minimum is at least three origins and at least twice the horizon of history at the first origin; the interval at each horizon runs between the smallest and the largest backtest error of the chosen candidate at that horizon, and the caption counts the backtest values that lie inside the range built from the other errors (MTH-98, MTH-99). Several listed series are short, and their forecasts return `NO_DATA` until the minimum is met.
+17. C31: the closure base rate is C2's churn rate against the May 2025 stock, the one stock the tables carry; issues take C2's bulk rule over their own national monthly totals (MTH-101).
+18. C33, confirmed at the slice that builds it: the cases are the 10th, 50th and 90th percentiles of the draws by the nearest-rank rule; the seed is the release seed; each uncertain parameter is drawn uniformly and independently from its range; the parameter ranges are the stated, visible and editable ranges of the card, with defaults calibrated to the survey's output per establishment (MTH-105, MTH-106).
+19. C34 and C35: the ranges and settings are the user's stated, visible and editable inputs; C34 weights the frame cells of the catchment equally, and its distance bands are within 500 m, 500 m to 1 km, 1 km to 2 km and beyond 2 km of the outlet (MTH-107, MTH-108).
+20. C36: an area takes the mean of the cell values whose centre lies inside it, each cell counted once; C38: a cell centre on the boundary counts as inside (MTH-109, MTH-111).
+21. The places table `pub_place_fsq` is read one table at a time and never merged with `pub_place`; C12, C16 and C17 keep `pub_place` until a reviewed change (C6).
+22. `places_fsq`: the files of the public copy that cover Qatar are found through the dataset's own metadata file, as the task that builds the fetcher confirms. The copy's newest release is dated 2025-01-10; a newer release comes from the publisher's portal, which needs an account, and is the owner's choice (C6, [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 21).
 
 Open items from the master design that touch this document:
 
-- OI-03: the two restaurant totals and the two wage-table means. C3, C4 and the sector branch of C19 stay hidden until it is closed (MTH-23, MTH-29, MTH-97).
+- OI-03: the two restaurant totals and the two wage-table means. C3, C4, the sector branch of C19, the site estimate of C33 and the revenue range of C35 stay hidden until it is closed (MTH-23, MTH-29, MTH-97, MTH-106, MTH-108).
 - OI-04: closed for version 1 by [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10. The census map layers enter the local release, each figure with its source and retrieval date, so C7 resident weights and C8 shares are release facts; the research examples of C12 and C17 still run outside every release. The coverage bar uses the finest admitted geography and names it, or returns `NO_DATA` (PUB-82). Any use beyond this internal project needs written licence terms ([17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md)).
 - OI-11: privacy thresholds are proposals. C7 earners mode, C10, C15, C19 and C22 inherit the exported tier; they do not set a second threshold.
 
@@ -1578,19 +2013,25 @@ Open questions:
 - The Wilson count's period, the C5 HHI and trend, the C6 seed and remaining settings, the C7 coordinates and weights, and the C14 median prices in riyals are not pinned. slice S7 fails while any of them remains unpinned (MTH-03, MTH-51).
 - The 30-minute staffing catchment has not been timed, so its cell range is not written on C10.
 - The weight range `δ` of the rank-stability bound is fixed at slice S2 (MTH-45).
-- C11: the closed criterion list (criterion key, owning card, release table, default direction and the candidate kinds it applies to) is fixed at slice S2 under MTH-65; `area_ranking` in [08_BACKEND.md](08_BACKEND.md) offers only its entries.
+- C11: the closed criterion list (criterion key, owning card, release table, default direction and the candidate kinds it applies to) is fixed at slice S2 under MTH-65; `area_ranking` in [08_BACKEND.md](08_BACKEND.md) offers only its entries. The forecasts of C30, the base rates of C31 and the site estimate of C33 that may be criteria join it there, each with the geography its series allows.
 - C16: the reviewed relation that gives an activity its prospects, partners, suppliers and complementary activities is reviewed at slice S2, and document 03 holds it in the activity spine.
-- The apportioning weight is fixed by C18. Slice S2 confirms the population grid's file and licence for this use, and document 04 lists the use ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)).
+- The apportioning weight is fixed by C18. Slice S2 confirms the population grid's file and licence for this use, and document 04 lists the use ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)). The slice that fetches `worldpop_qat_agesex` confirms the file, age bands and year of C38 the same way.
 - C12: the decay form, the cut-offs of each mode, the supply layers, and the modes and presence keys that `access_score` stores (with the largest cut-off of each mode, which bounds `travel_time_matrix`) are fixed at slice S2 (DAT-151, DAT-153). The population grid is a demand layer only once document 04 lists that use; its scores are stored at free flow in the Public table `access_score_grid` of both release kinds (DAT-154), while `access_score` and `travel_time_matrix` exist only in a protected release.
 - C17: the feature list, the seed, the restarts, the bootstrap draws and the two stability thresholds are fixed at slice S2.
 - C25: α, β, the free-flow speeds and the capacities by road class, and the number and edges of the volume bands, are fixed at slice S1, with their sources. Documents 03 and 05 must state that the released hourly flows are vehicle trips; until they do, C25 returns `NO_DATA` (MTH-88).
-- C26: τ and the complete years of the public shape are fixed at slice S1 with F19 (document 05).
+- C26: τ and the complete years of the public shape are fixed at slice S1 with F19 (document 05), and so are the hourly tolerance, the minimum number of venues of a pooled shape and the constants of the weather modulation.
 - C21: the reviewed list of projectable series, with each window and horizon, is fixed at slice S2.
+- C30: the closed, versioned list of forecastable series, Public and released, with each source or release table, period and horizon, and the closed candidate list are fixed at the slice that builds the card. OPEN: the Public source of each series of decision 0019 item 2 for which the public data pack holds no table yet; such a series returns `NO_DATA` until it does.
+- C31: OPEN: a Public table that links licence cancellations to their issue cohort; until one exists, the survival base rate returns `NO_DATA` with `no_denominator`.
+- C32: how people with no wage record are shown as having no pay band is set by document 06 with PRV-126.
+- C33: the calibration rule of the default ranges, the number of draws and the parameter keys are fixed at the slice that builds the card and written in the release's method note.
+- C34: the defaults of the distance exponent and the distance floor are fixed at slice S2.
+- C36: the quality-flag rule of the night-time radiance product is fixed at slice S2.
 - C13 and C24: the tariff-line crosswalk (with its source and licence) and the size-class crosswalk are reviewed at slice S2.
 - C28 and C4: the page structures of the dashboard and of the agency's pages, the capex currency, and the incentive parameter kinds the pages carry are confirmed at slice S2 ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)).
-- Document 03 holds what these cards write and read: the release tables `access_score` (C12, DAT-151), `access_score_grid` (C12, DAT-154) and `zone_type` (C17, DAT-152), the manifest artefact `travel_time_matrix` (C12, DAT-153), the column `stayer_wage_index` decimal(7,1) of `month_change` (C19, DAT-137; no stayer wage bill is released), the column `price_basis` of `pub_property_resi` (C14: `per_m2` or `per_unit`) and the `traffic` field of the area record, which names a dial situation and its summer setting whose link times C25 averages over the situation's hours (section 9.2).
-- Document 03 must define fact units for people per square kilometre (C27) and kilometres per hour (C25), a geography kind for a drawn shape, the release tables of presence counts, hourly flows, link speeds and synthetic births and closures, and the caveat keys this document adds: `access_not_use`, `apportioned_estimate`, `editorial_crosswalk`, `establishment_survey`, `licence_not_capacity`, `openings_incomplete`, `permit_not_start`, `seasonal_shape_only` and `similar_on_features_only` (MTH-11, MTH-59).
-- The slice that builds each card added by decisions 0016 and 0017 is set by [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md); its gate pins the card's data tests (MTH-60), and the cards join the matrix of TST-197.
+- Document 03 holds what these cards write and read: the release tables `access_score` (C12, DAT-151), `access_score_grid` (C12, DAT-154) and `zone_type` (C17, DAT-152), the manifest artefact `travel_time_matrix` (C12, DAT-153), the column `stayer_wage_index` decimal(7,1) of `month_change` (C19, DAT-137; no stayer wage bill is released), the column `price_basis` of `pub_property_resi` (C14: `per_m2` or `per_unit`) and the `traffic` field of the area record, which names a dial situation and its summer setting whose link times C25 averages over the situation's hours (section 9.2). It also holds the provenance note of a traffic-aware drive-time area of the live provider (provider, request, retrieval time and response hash; C25), the release tables `pub_venue_busyness` (C37), `pub_night_lights` (C36), `pub_place_fsq` (C6) and `pub_pop_agesex_grid` (C38), and the table of the forecasts of C30.
+- Document 03 must define fact units for people per square kilometre (C27), kilometres per hour (C25) and night-time radiance in nanowatts per square centimetre per steradian (C36), a geography kind for a drawn shape, the release tables of presence counts, hourly flows, link speeds and synthetic births and closures, and the caveat keys this document adds: `access_not_use`, `apportioned_estimate`, `editorial_crosswalk`, `establishment_survey`, `licence_not_capacity`, `openings_incomplete`, `permit_not_start`, `seasonal_shape_only`, `similar_on_features_only`, `forecast_backtest_range`, `estimate_on_simulated_inputs`, `scenario_not_forecast`, `base_rate_not_your_chance`, `present_by_pay_band_assumed`, `relative_busyness_not_people`, `night_lights_not_activity`, `live_traffic_provider` and `grid_cells_summed` (MTH-11, MTH-59), and the reason keys `series_too_short`, `no_denominator` and `forecast_below_zero`.
+- The slice that builds each card added by decisions 0016, 0017 and 0019 is set by [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md); its gate pins the card's data tests (MTH-60), and the cards join the matrix of TST-197.
 
 ## Sources
 
@@ -1611,6 +2052,15 @@ Investment sources, used under the publisher's own terms as read at fetch, on th
 
 - FDI Projects dashboard of the national investment promotion agency, data from fDi Markets, read 2026-11-12 (C28): https://fdiprojects.invest.qa/
 - The agency's sector, opportunity, incentive, set-up and law pages (C4 incentive inputs): https://www.invest.qa/
+
+Sources added by [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), pages read 2026-11-12 without any key; [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) holds each with its publisher, licence or terms and retrieval date:
+
+- TomTom Traffic API, live flow tiles and reachable range (`traffic_tomtom_flow`, `traffic_tomtom_range`; C25, off by default; nothing of a response is stored; attribution "© TomTom"): https://docs.tomtom.com/traffic-api/ ; pricing and free allowance: https://docs.tomtom.com/pricing ; copyright: https://developer.tomtom.com/tomtom-orbis-maps/documentation/copyright . The developer terms page needs a login and was not read.
+- Google Maps popular times (`busy_gmaps`; C26, C37): no licence for reuse stated; used on the owner's decision of 2026-11-12 for this personal internal project, with `licence_basis: owner_decision` under PUB-12; the publisher's terms read: https://support.google.com/business/answer/6263531 , https://policies.google.com/terms and https://www.google.com/intl/en/help/terms_maps/ .
+- NASA Black Marble VNP46A3, monthly night-time radiance (`ntl_blackmarble`; C36), DOI 10.5067/VIIRS/VNP46A3.002, NASA acknowledged as the source: https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/ ; data and information policy: https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-information-policy
+- Foursquare Open Source Places (`places_fsq`; C6, C33, C34; Apache 2.0): the access page, https://docs.foursquare.com/data-products/docs/access-fsq-os-places ; fetched from the public copy on Source Cooperative, geospatially partitioned GeoParquet read without an account, whose README states the Apache License, Version 2.0 and whose listing holds three dated releases, the newest dated 2025-01-10, and states no update rhythm: https://data.source.coop/fused/fsq-os-places/README.md and https://data.source.coop/fused/fsq-os-places/ . The registry records the release used.
+- WorldPop age and sex structures, 100 m (`worldpop_qat_agesex`; C38; CC BY 4.0; DOI 10.5258/SOTON/WP00841): https://hub.worldpop.org/project/categories?id=8 and https://hub.worldpop.org/geodata/listing?id=138
+- Open-Meteo historical weather (`weather_openmeteo`; C26 weather profiles; free interface for non-commercial use, data CC BY 4.0, with the attribution the publisher asks for): https://open-meteo.com/en/terms , https://open-meteo.com/en/licence and https://open-meteo.com/en/docs/historical-weather-api . Any use beyond this internal project is settled by [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md).
 
 Other public sources:
 
@@ -1636,3 +2086,4 @@ Method references (DOI links; the three marked were checked 2026-11-11; the refe
 - Goodchild and Lam (1980), areal interpolation, Geo-Processing: the area weighting of C18 (no DOI)
 - Lloyd (1982), least squares quantization (k-means): https://doi.org/10.1109/TIT.1982.1056489 ; Arthur and Vassilvitskii (2007), k-means++ (ACM-SIAM Symposium on Discrete Algorithms; no DOI)
 - Rousseeuw (1987), silhouettes: https://doi.org/10.1016/0377-0427(87)90125-7 ; Hubert and Arabie (1985), comparing partitions (adjusted Rand index): https://doi.org/10.1007/BF01908075
+- Hyndman and Koehler (2006), mean absolute scaled error, the error measure of C30: https://doi.org/10.1016/j.ijforecast.2006.03.001
