@@ -48,6 +48,7 @@
 | PENDING | Confirmation by another maker that the 23 findings of the final read-through are resolved (open item OI-38) | PENDING: maker, model, verdict | PENDING |
 | 2026-11-12 | Decision record 0015 written from the owner's decisions of 2026-11-12 (review rounds after the first; what the repository's own checks defend against); documents 14 and 15 and the two decision indexes corrected to it; pull request https://github.com/albarami/economic-investment-intelligence/pull/2 | Commit `ef8558b1fcda03830566cee71781937768d054e7`: `python3 scripts/check_docs.py`, exit code 0, output "checked 47 text files, 40 Markdown files: OK"; `cmp AGENTS.md CLAUDE.md`, exit code 0; both run by the lead on 2026-11-12 in a clean worktree of that commit. Independent review of the head of the pull request: PENDING, to be recorded with its unchanged verdict by the next pull request | Text by the lead (Claude, Anthropic) from the owner's decisions; applied by Devin local, model `swe-2-high` (Cognition) |
 | 2026-11-12 | Decision record 0015 corrected after its first independent review (findings F1 and F2 applied; F3, this ledger's header, applied in this ledger commit) and rewritten to the owner's exact rule text of 2026-11-12 (second message): sixteen points; REV-05, REV-06, REV-08, REV-33, REV-39 to REV-42 and the verdict format of document 15, steps 2, 8, 9 and 10 of document 14, TST-164, TST-168 and TST-169 of document 12, and the queue rules of TASKS.md corrected; one follow-up task added to each slice of TASKS.md | Commit `747a68cd7ee965c4e2e02973ee9de1ed1312a698`: `python3 scripts/check_docs.py`, exit code 0, output "checked 47 text files, 40 Markdown files: OK"; `cmp AGENTS.md CLAUDE.md`, exit code 0; both run by the lead on 2026-11-12 in a worktree proven equal to that commit. The verdict of review round 1 follows this table, unchanged; the verdict of the next review is recorded by the next pull request | Text by the lead (Claude, Anthropic) from the owner's decisions; applied by Devin local, model `swe-2-high` (Cognition) |
+| 2026-11-12 | Decision record 0015 corrected after its second independent review (findings F4 to F8: three texts now say `main` where a task built ahead is rebased, and two summaries state the rules exactly); the branch then brought up to date with main after the merge of task S0-T01, by a merge commit whose only hand-resolved line is this ledger's header row "Status" | Commit `07f6d80b29dfc03b007c4d8b6909664b7f70bb8d` (the corrections) and merge commit `d090f0b0a62cc5d4406bf0a11e312228345b5fb8`: `python3 scripts/check_docs.py`, exit code 0, output "checked 57 text files, 47 Markdown files: OK", on the merge commit, run by the lead on 2026-11-12 in a worktree proven equal to it. The verdict of review round 2 follows this table, unchanged | Corrections applied by Devin local, model `swe-2-high` (Cognition); merge and ledger by the lead (Claude, Anthropic) |
 
 #### Decision record 0015: independent review, round 1
 
@@ -96,6 +97,71 @@ FINDINGS:
     Line: 5-6
     Wrong: The header says the ledger is current only to the first commit on 2026-11-11, but line 49 now records work from 2026-11-12. The changed document is therefore not current as REV-17 requires.
     Fix: Update the Status row to say the ledger is current through the decision-record-0015 entry and update the Date row to 2026-11-12; then run `python3 scripts/check_docs.py`.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision record 0015: independent review, round 2
+
+Reviewed commit `50496e44e088aa4c3ba7836ad6fb1b5f94dd1e35`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/2 at that time, with CI green on it. Reviewer: OpenAI GPT-5.6 Sol, through the Cursor command-line tool, read-only. The verdict is copied unchanged (REV-09); it is also posted on the pull request. All five findings were accepted and are applied in the commit that follows it.
+
+```text
+VERDICT: REJECTED
+TASK: decision record 0015 (documentation-only pull request 2)
+COMMIT: 50496e44e088aa4c3ba7836ad6fb1b5f94dd1e35
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED The unsupported historical bullets are absent from the decision record.
+  F2 FIXED Decision item 15 retains only “Plans already written keep what they have.”
+  F3 FIXED PROGRESS.md lines 5-6 now identify decision record 0015 and 2026-11-12.
+CHECKS:
+  REV-10 FAIL F4, F7 and F8: owner point 8 requires rebasing onto main; three amended texts instead permit the broader “base branch.”
+  REV-11 PASS .overnight/EVIDENCE.md records `python3 scripts/check_docs.py` exit 0 on the head and successful `check-docs` CI on that commit.
+  REV-12 PASS Evidence records only the seven required documentation files and PROGRESS.md differing from the base.
+  REV-13 N/A This documentation-only pull request delivers no code, release tables or mock implementation.
+  REV-14 PASS The round-1 review and complete subsequent patch show no secret or real custodian data.
+  REV-15 PASS No test, assertion, threshold, CI configuration or technical safety guard is weakened.
+  REV-16 FAIL F5 and F6: two changed summaries overstate the amended review rules.
+  REV-17 FAIL F4 to F8: the amended documents do not yet state the owner’s decision consistently and accurately.
+  REV-18 N/A This documentation-only pull request changes no security or data-handling implementation.
+  REV-19 PASS Decision 0015 records the owner-approved amendment; no unrelated settled decision is reopened.
+  REV-20 N/A No fact object, displayed figure, provenance or lineage implementation changes.
+  REV-21 N/A No screen, template, numeral or Fact-chip implementation changes.
+  REV-22 N/A No privacy partition, parameter, treatment or audit implementation changes.
+  REV-23 N/A No product or custodian package implementation changes.
+  REV-24 N/A No English or Arabic view changes.
+  REV-25 PASS The reviewed material contains no private path, personal name, e-mail address, secret, realistic identifier or prohibited comparison.
+  REV-26 PASS The changed text makes none of the prohibited product, privacy, endorsement, forecast or lookup claims.
+  REV-27 PASS Evidence records `cmp AGENTS.md CLAUDE.md` exit 0 on 747a68c; only PROGRESS.md changed afterward, and the head documentation check passed.
+  REV-28 N/A No synthetic identifier is added or changed.
+  REV-29 N/A No attribute or fact about a real named place or business is added.
+  REV-38 N/A No serving-plane or typed-decision gateway implementation changes.
+FINDINGS:
+  F4 (REV-10; kind d)
+    File: docs/decisions/0015-review-rounds-and-the-scope-of-repository-checks.md
+    Line: 44
+    Wrong: Decision item 16 says a built-ahead task is rebased onto “the base branch,” while owner point 8 requires rebasing onto `main`. This broadens the recorded rule and fails the fidelity acceptance criterion.
+    Fix: Replace “the base branch” with `main`; run `python3 scripts/check_docs.py` and compare item 16 with owner point 8.
+  F5 (REV-16; kind b)
+    File: docs/decisions/0015-review-rounds-and-the-scope-of-repository-checks.md
+    Line: 52
+    Wrong: The sentence says REV-39 to REV-42 state points 1 to 14, but point 6 is stated by REV-05 and REV-06 and point 10 by REV-33. The changed consequence claims more than is true.
+    Fix: State that REV-05, REV-06, REV-08, REV-33 and REV-39 to REV-42 together state points 1 to 14; then run `python3 scripts/check_docs.py`.
+  F6 (REV-16; kind b)
+    File: docs/02_ARCHITECTURE.md
+    Line: 136
+    Wrong: “After round 1 a review rejects only for four kinds” omits that kind (b) stops rejecting from the second confirmation review, overstating the changed rule.
+    Fix: Replace that clause with “After round 1 a review rejects only for the kinds REV-39 permits in that round”; then run `python3 scripts/check_docs.py`.
+  F7 (REV-10; kind d)
+    File: docs/14_IMPLEMENTATION_PLAN.md
+    Line: 66
+    Wrong: Protocol step 2 says a built-ahead task is rebased onto “the base branch,” while owner point 8 requires `main`; the required correction is therefore incomplete.
+    Fix: Replace the relevant “base branch” with `main`; run `python3 scripts/check_docs.py` and compare step 2 with owner point 8.
+  F8 (REV-10; kind d)
+    File: TASKS.md
+    Line: 20
+    Wrong: The queue rule permits rebasing onto “the base branch,” while owner point 8 requires `main`; the tracked rule is broader than the accepted decision.
+    Fix: Replace “the base branch” with `main`; run `python3 scripts/check_docs.py` and verify no tracked building-ahead rule retains “rebased onto the base branch.”
 PROPOSED OPEN ITEMS:
   none
 ```
@@ -1037,6 +1103,51 @@ Counts:    not a test suite
 Seed:      none
 Notes:     REV-27: the two files are byte-identical.
 ```
+
+#### S0-T01: second confirmation review after round 3: APPROVED
+
+Reviewed commit `c58afdc50202d6db3dc9cca28f5a5410a16f4f68`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/1, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43155726519 ). Reviewer: OpenAI GPT-5.6 Sol, through the Cursor command-line tool, read-only. By the owner's decisions of 2026-11-12 this round could reject only for an earlier finding that was not fixed, a violation of a safety check, or an unmet acceptance criterion. The verdict is copied unchanged (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T01
+COMMIT: c58afdc50202d6db3dc9cca28f5a5410a16f4f68
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 to F6 STILL FIXED
+  F7 FIXED `literal_index_record` uses a literal pathspec, requires exactly one record whose path equals the source, and binds its mode and object id to the content comparison; both bracket-pair tests pass.
+CHECKS:
+  REV-10 PASS The head’s tree check exits 0 and covers all three acceptance criteria, including every pinned folder and the generated-data and secret probes.
+  REV-11 PASS The lead ran 52 tests on the exact head with exit 0; the tree and documentation checks also exited 0, CI succeeded on the head, and red runs and mutants exercise the new guards.
+  REV-12 PASS The recorded base comparison contains only the seventeen task, test and ledger paths; the head adds only PROGRESS.md to the fix commit, and nothing under data/ is tracked.
+  REV-13 PASS No placeholder, stub, mock data or fixed substitute appears in the changed implementation or tests; unchanged parts rely on the previous verdict.
+  REV-14 PASS The changed implementation, tests and ledger contain no secret or real custodian data; unchanged parts rely on the previous verdict.
+  REV-15 PASS No assertion or guard was weakened; existing tests were unchanged, nine tests were added, and the object-id comparison implements the owner’s line-ending decision.
+  REV-16 PASS The literal-path handling, exact index-record validation, regular-mode checks and object-id comparison follow the task standards and the owner’s decisions; unchanged parts rely on the previous verdict.
+  REV-17 PASS PROGRESS.md records the correction and evidence, the owner’s decisions are identified for separate decision-record entry, and the documentation check on the head exited 0.
+  REV-18 PASS Paths passed to Git are literal, the index mode and object id come from the same exact record, non-regular entries fail closed, and the relevant planted violations pass.
+  REV-19 PASS The changes implement the owner’s decisions without reopening a settled architecture or scope decision; unchanged parts rely on the previous verdict.
+  REV-20 N/A No displayed figure or fact is added.
+  REV-21 N/A No screen, claim template or rendered numeral is added.
+  REV-22 N/A No privacy rule, parameter, treatment, release or attack changes.
+  REV-23 N/A No product or custodian package implementation is added; unchanged parts rely on the previous verdict.
+  REV-24 N/A No English or Arabic application view is added.
+  REV-25 PASS The changed public files contain no private path, personal identity, e-mail address, realistic identifier, prohibited comparison or secret, and the documentation check exits 0.
+  REV-26 PASS The changed lines contain no prohibited product or data claim.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exited 0 on the head.
+  REV-28 N/A No synthetic record or identifier is added.
+  REV-29 N/A No attribute or simulated fact is assigned to a real place or business.
+  REV-38 PASS Gateway content remains unchanged scaffolding outside the serving plane, relying on the previous verdict.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T01: merge record
+
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/1 was squash-merged on 2026-11-12 at the approved head `c58afdc50202d6db3dc9cca28f5a5410a16f4f68`; merge commit `8edf1023926345b57bcf549cae1079c09c75e55d` on main.
+- CI on the merge commit: workflow `docs`, job `check-docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43156277564 .
+- The task log of S0-T01 above is complete with this record: verdict APPROVED in the second confirmation review after round 3.
 
 ## Open questions and assumptions
 
