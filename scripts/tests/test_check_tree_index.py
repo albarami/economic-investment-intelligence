@@ -14,6 +14,7 @@ Only the Python standard library is used.
 
 from __future__ import annotations
 
+import importlib.util
 import os
 import shutil
 import tempfile
@@ -29,6 +30,8 @@ ENV_EXAMPLE_UNJUDGED = (
 ROOT_GITIGNORE_DIFFERENT = (
     "FAIL tracked-ignored: .gitignore: differs from its staged content"
 )
+HARMLESS_IGNORE_PATTERN = b"*.tmp\n"
+GLOBAL_AUTOCRLF = "[core]\nautocrlf = true\n"
 
 
 def stage_data_rule_removal(root: Path, index_flag: str) -> None:
@@ -39,6 +42,33 @@ def stage_data_rule_removal(root: Path, index_flag: str) -> None:
     base.git(root, "add", ".gitignore")
     path.write_text(original, encoding="utf-8")
     base.git(root, "update-index", index_flag, ".gitignore")
+
+
+def tracked_ignored_line(path: str) -> str:
+    """The rule-8 line for one unsynced ignore file."""
+    return f"FAIL tracked-ignored: {path}: differs from its staged content"
+
+
+def stage_bracket_pair_as_symlink(root: Path, bracketed: str, plain: str) -> None:
+    """Track two ignore files, then stage the bracketed path as a symlink.
+
+    Both work-tree paths stay regular files of the same bytes. The staged
+    symlink blob for the bracketed path holds those bytes too.
+    """
+    for rel in (bracketed, plain):
+        path = root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(HARMLESS_IGNORE_PATTERN)
+    base.git(root, "--literal-pathspecs", "add", "--", bracketed, plain)
+    blob = base.git(
+        root, "hash-object", "-w", "--", bracketed).stdout.decode("utf-8").strip()
+    base.git(root, "update-index", "--cacheinfo", f"120000,{blob},{bracketed}")
+
+
+def rewrite_as_crlf(path: Path) -> None:
+    """Rewrite path so every line ends with CR LF."""
+    payload = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
+    path.write_bytes(payload)
 
 
 class CheckTreeIndexTests(base.CheckTreeCase):
@@ -190,6 +220,110 @@ class CheckTreeIndexTests(base.CheckTreeCase):
                 "FAIL tracked-ignored: docs/.gitignore: differs from its staged content",
                 "checked 8 rules: 1 failure(s)",
             ])
+
+    def test_uppercase_bracket_symlink_index_is_unsynced(self) -> None:
+        bracketed = "docs/a[B]/.gitignore"
+        plain = "docs/aB/.gitignore"
+        with tempfile.TemporaryDirectory() as folder:
+            root = base.make_fixture(folder)
+            stage_bracket_pair_as_symlink(root, bracketed, plain)
+            done = base.run_check(root)
+            self.assertEqual(done.returncode, 1, done.stdout + done.stderr)
+            lines = done.stdout.splitlines()
+            self.assertIn(tracked_ignored_line(bracketed), lines)
+            self.assertNotIn(tracked_ignored_line(plain), lines)
+
+    def test_lowercase_bracket_symlink_index_is_unsynced(self) -> None:
+        bracketed = "docs/a[b]/.gitignore"
+        plain = "docs/ab/.gitignore"
+        with tempfile.TemporaryDirectory() as folder:
+            root = base.make_fixture(folder)
+            stage_bracket_pair_as_symlink(root, bracketed, plain)
+            done = base.run_check(root)
+            self.assertEqual(done.returncode, 1, done.stdout + done.stderr)
+            lines = done.stdout.splitlines()
+            self.assertIn(tracked_ignored_line(bracketed), lines)
+            self.assertNotIn(tracked_ignored_line(plain), lines)
+
+    def test_crlf_gitignore_matches_under_repository_autocrlf(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            root = base.make_fixture(folder)
+            base.git(root, "config", "core.autocrlf", "true")
+            rewrite_as_crlf(root / ".gitignore")
+            self.assert_clean(base.run_check(root))
+
+    def test_crlf_gitignore_matches_under_global_autocrlf(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            root = base.make_fixture(folder)
+            config = Path(folder) / "user.gitconfig"
+            config.write_text(GLOBAL_AUTOCRLF, encoding="utf-8")
+            rewrite_as_crlf(root / ".gitignore")
+            done = base.run_check(
+                root, env_extra={"GIT_CONFIG_GLOBAL": str(config)})
+            self.assert_clean(done)
+
+    def test_crlf_gitignore_differs_without_autocrlf(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            root = base.make_fixture(folder)
+            rewrite_as_crlf(root / ".gitignore")
+            done = base.run_check(root)
+            self.assertEqual(done.returncode, 1, done.stdout + done.stderr)
+            self.assertIn(ROOT_GITIGNORE_DIFFERENT, done.stdout.splitlines())
+
+    def test_synced_bracketed_gitignore_pair_passes(self) -> None:
+        """A synced bracketed ignore file passes beside its plain twin."""
+        bracketed = "docs/a[B]/.gitignore"
+        plain = "docs/aB/.gitignore"
+        with tempfile.TemporaryDirectory() as folder:
+            root = base.make_fixture(folder)
+            for rel in (bracketed, plain):
+                path = root / rel
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(HARMLESS_IGNORE_PATTERN)
+            base.git(
+                root, "--literal-pathspecs", "add", "--", bracketed, plain)
+            self.assert_clean(base.run_check(root))
+
+    def test_literal_index_record_refuses_another_path(self) -> None:
+        """A folder name is refused when the only record has another path."""
+        spec = importlib.util.spec_from_file_location(
+            "check_tree", base.SCRIPT)
+        if spec is None or spec.loader is None:
+            raise AssertionError("check_tree could not be loaded")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as folder:
+            root = base.make_fixture(folder)
+            nested = root / "docs" / "aB" / ".gitignore"
+            nested.parent.mkdir(parents=True)
+            nested.write_bytes(HARMLESS_IGNORE_PATTERN)
+            base.git(root, "add", "--", "docs/aB/.gitignore")
+            self.assertIsNone(module.literal_index_record(root, "docs/aB"))
+            object_id = base.git(
+                root, "rev-parse", ":docs/aB/.gitignore",
+            ).stdout.decode("utf-8").strip()
+            self.assertEqual(
+                module.literal_index_record(root, "docs/aB/.gitignore"),
+                (b"100644", object_id))
+
+    def test_tracked_colon_dot_env_passes(self) -> None:
+        """A tracked top-level file named :.env passes the check."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = base.make_fixture(folder)
+            (root / ":.env").write_text("x\n", encoding="utf-8")
+            base.git(root, "--literal-pathspecs", "add", "--", ":.env")
+            self.assert_clean(base.run_check(root))
+
+    def test_tracked_exclude_magic_names_pass(self) -> None:
+        """Tracked top-level files named :!x and :(exclude)y pass the check."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = base.make_fixture(folder)
+            for name in (":!x", ":(exclude)y"):
+                (root / name).write_text("x\n", encoding="utf-8")
+            base.git(
+                root, "--literal-pathspecs", "add", "--",
+                ":!x", ":(exclude)y")
+            self.assert_clean(base.run_check(root))
 
 
 if __name__ == "__main__":

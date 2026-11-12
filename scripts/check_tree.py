@@ -45,21 +45,27 @@ Rules, in order:
 "Committed rule" means a pattern from a relative path whose last component
 is ``.gitignore``, itself tracked, whose index entry and work-tree path are
 both regular files (the work-tree path is not a symbolic link and does not
-lie beyond one) and whose work-tree bytes equal the staged blob read from
-the index. Git's own change detection is not relied on. A tracked
-``.gitignore`` that fails that comparison is unsynced and affects every
-path in its folder and below; the root file affects every path. Rules 4
-to 6 count an affected probe as not ignored by a committed rule. Rule 7
-reports that ``.env.example`` cannot be judged when an unsynced source
-affects it, and rule 8 reports each unsynced source. ``.git/info/exclude``,
-an untracked ``.gitignore`` and any personal ignore file never count:
-every git call uses ``core.excludesFile=<null device>`` and empty global
-and system configuration.
+lie beyond one) and whose work-tree object id equals the object id in the
+index. The work-tree id is the id git would stage for the work-tree file,
+so a checkout with line-ending conversion compares equal. Git's own change
+detection is not relied on. A tracked ``.gitignore`` that fails that
+comparison is unsynced and affects every path in its folder and below; the
+root file affects every path. Rules 4 to 6 count an affected probe as not
+ignored by a committed rule. Rule 7 reports that ``.env.example`` cannot be
+judged when an unsynced source affects it, and rule 8 reports each unsynced
+source. ``.git/info/exclude``, an untracked ``.gitignore`` and any personal
+ignore file never count: every git call uses ``core.excludesFile=<null
+device>`` and empty global and system configuration, except the call that
+asks for the work-tree object id, which keeps the checkout's configuration.
 
 A path that lies beyond a symbolic link (one of its parent folders in the
 work tree is a symbolic link) is never passed to git, because git refuses
 to judge such a path. A probe of that kind counts as not ignored by a
 committed rule.
+
+Every path the check gives to git is taken literally: the literal flag for
+``ls-files``, the ``./`` prefix for ``check-ignore`` (which refuses that
+flag), and object ids for ``cat-file``. ``hash-object`` takes a file name.
 
 Only the Python standard library is used.
 """
@@ -181,7 +187,8 @@ def ignore_matches(root: Path, paths: set) -> dict:
               if not beyond_a_symbolic_link(root, path)}
     if not judged:
         return {}
-    feed = ("\0".join(sorted(judged)) + "\0").encode("utf-8")
+    given = {f"./{path}" for path in judged}
+    feed = ("\0".join(sorted(given)) + "\0").encode("utf-8")
     done = git(root, "check-ignore", "-v", "-z", "--no-index", "--stdin",
                feed=feed)
     if done.returncode not in (0, 1):
@@ -194,17 +201,39 @@ def ignore_matches(root: Path, paths: set) -> dict:
         source, line, pattern, path = (
             fields[index + offset].decode("utf-8", errors="replace")
             for offset in range(4))
-        records[path] = (source, line, pattern)
+        if not path.startswith("./") or path not in given:
+            raise CheckError("git check-ignore returned unexpected output")
+        records[path[2:]] = (source, line, pattern)
     return records
 
 
-def index_entry_is_regular(root: Path, source: str) -> bool:
-    """True when the index mode of source is 100644 or 100755."""
-    done = git(root, "ls-files", "-s", "-z", "--", source)
+def literal_index_record(root: Path, source: str) -> tuple[bytes, str] | None:
+    """Return the mode and object id of the one literal index record.
+
+    None when the index has no record, more than one, or a record whose
+    path is not source.
+    """
+    done = git(
+        root, "--literal-pathspecs", "ls-files", "-s", "-z", "--", source)
     if done.returncode != 0:
         raise CheckError("git ls-files failed")
-    mode = done.stdout.split(b" ", 1)[0]
-    return mode in REGULAR_INDEX_MODES
+    records = [record for record in done.stdout.split(b"\0") if record]
+    if len(records) != 1:
+        return None
+    mode, object_id, path = parse_stage_record(records[0])
+    if path != source:
+        return None
+    return mode, object_id
+
+
+def parse_stage_record(record: bytes) -> tuple[bytes, str, str]:
+    """Split one ls-files stage record into mode, object id and path."""
+    try:
+        header, raw_path = record.split(b"\t", 1)
+        mode, object_id, _stage = header.split(b" ")
+        return mode, object_id.decode("ascii"), raw_path.decode("utf-8")
+    except (ValueError, UnicodeDecodeError) as exc:
+        raise CheckError("git ls-files returned unexpected output") from exc
 
 
 def work_tree_is_regular(root: Path, source: str) -> bool:
@@ -218,30 +247,42 @@ def work_tree_is_regular(root: Path, source: str) -> bool:
     return stat.S_ISREG(info.st_mode)
 
 
-def staged_blob(root: Path, source: str) -> bytes:
-    """Return the staged blob of source."""
-    done = git(root, "cat-file", "blob", f":{source}")
+def work_tree_object_id(root: Path, source: str) -> str:
+    """Return the object id git would stage for the work-tree file.
+
+    Keeps the checkout's global and system configuration, so line-ending
+    conversion matches git add on this machine.
+    """
+    try:
+        done = subprocess.run(
+            ["git", "-c", f"core.excludesFile={os.devnull}",
+             "-C", str(root), "hash-object", "--", source],
+            capture_output=True)
+    except OSError as exc:
+        raise CheckError(f"git could not be run: {exc}") from exc
     if done.returncode != 0:
-        raise CheckError("git cat-file failed")
-    return done.stdout
+        raise CheckError("git hash-object failed")
+    return done.stdout.decode("utf-8", errors="replace").strip()
 
 
 def gitignore_matches_staged(root: Path, source: str) -> bool:
-    """True when a tracked ignore file equals the blob staged for it.
+    """True when a tracked ignore file equals the object staged for it.
 
-    The index entry and the work-tree path must both be regular files, and
-    the work-tree bytes must equal the staged blob. A symbolic link, a
-    folder or a missing file is rejected before any work-tree byte is read.
+    The index must hold exactly one literal record for source. That
+    record's mode and the work-tree path must both be regular files, and
+    the object id git would stage for the work-tree file must equal the
+    record's object id. A symbolic link, a folder or a missing file is
+    rejected before any work-tree byte is read.
     """
-    if not index_entry_is_regular(root, source):
+    record = literal_index_record(root, source)
+    if record is None:
+        return False
+    mode, object_id = record
+    if mode not in REGULAR_INDEX_MODES:
         return False
     if not work_tree_is_regular(root, source):
         return False
-    try:
-        found = (root / source).read_bytes()
-    except OSError:
-        return False
-    return found == staged_blob(root, source)
+    return work_tree_object_id(root, source) == object_id
 
 
 def gitignore_affects(source: str, path: str) -> bool:
@@ -348,15 +389,18 @@ def env_example(check: Checker, failures: list) -> None:
             ".gitignore differs from its staged content")
     if not tracked:
         return
-    done = git(check.root, "ls-files", "-s", "-z", "--", ENV_EXAMPLE)
-    if done.returncode != 0:
-        raise CheckError("git ls-files failed")
-    if done.stdout.split(b" ", 1)[0] not in (b"100644", b"100755"):
-        failures.append(
-            f"FAIL env-example: {ENV_EXAMPLE}: "
-            "not a regular file in the index")
+    not_regular = (
+        f"FAIL env-example: {ENV_EXAMPLE}: "
+        "not a regular file in the index")
+    record = literal_index_record(check.root, ENV_EXAMPLE)
+    if record is None:
+        failures.append(not_regular)
         return
-    done = git(check.root, "cat-file", "blob", f":{ENV_EXAMPLE}")
+    mode, object_id = record
+    if mode not in REGULAR_INDEX_MODES:
+        failures.append(not_regular)
+        return
+    done = git(check.root, "cat-file", "blob", object_id)
     if done.returncode != 0:
         raise CheckError("git cat-file failed")
     try:
