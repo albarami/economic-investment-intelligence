@@ -55,7 +55,7 @@ Configuration (names pinned in [02_ARCHITECTURE.md](02_ARCHITECTURE.md); values 
 |---|---|---|---|
 | `ANTHROPIC_API_KEY` | key or absent | Owner, stage session only | Absent means template writer and recorded replays only |
 | `EII_STORE` | `postgres` or `embedded` | `./eii up` (section 5) | Not edited by hand on stage |
-| `EII_DATABASE_URL` | connection string to `127.0.0.1:55432` | `.env` | Holds the application role's password; never printed |
+| `EII_DATABASE_URL` | connection string to this project's loopback database, default `127.0.0.1:55440` ([decision 0020](decisions/0020-freeze-bundle-check-and-project-database-port.md)) | `.env` | Holds the application role's password; never printed |
 | `EII_RELEASE_DIR` | `data/releases/<release_id>` | `.env` | Must match the frozen release on stage |
 | `EII_LANG_DEFAULT` | `en` or `ar` | `.env` | Language of the opening scene |
 | `EII_PRESENTER` | `0` or `1` | `.env` | `1` on the stage machine only; enables the presenter console and its controls |
@@ -72,13 +72,13 @@ Exact versions are pinned in slice S0 and confirmed at the spike (slice S1) with
 | Node 22 and npm | [10_FRONTEND.md](10_FRONTEND.md) | `node --version` | Reports v22.x |
 | Locked dependencies | `uv.lock`, `package-lock.json` | The `uv` and `npm` lockfile checks, with network access disabled | Lockfiles match the manifests; nothing to download |
 | DuckDB with `spatial` and `h3` extensions installed locally | 2.0.x, retreat 1.5.x | Load each extension with network access disabled | Both load without a download |
-| PostgreSQL 18 with PostGIS 3.6 | Section 4 | `pg_isready -h 127.0.0.1 -p 55432 -t 5`, then a version query | Exit 0; server 18.x; PostGIS 3.6.x. No answer is a `WARN` and selects `embedded` (section 5); a wrong version is a `FAIL` |
+| PostgreSQL 18 with PostGIS 3.6 | Section 4 | `pg_isready -h <host> -p <port> -t 5` with the host and port of `EII_DATABASE_URL` (default `127.0.0.1:55440`), then one query of the server version and PostGIS version | Exit 0; server 18.x; PostGIS 3.6.x. No answer is a `WARN` and selects `embedded` (section 5); a wrong version, or an answering server whose query fails, is a `FAIL` |
 | Release present and intact | Manifest | Recompute the release hash | Equals the manifest hash |
 | Load receipt | Loader output ([08_BACKEND.md](08_BACKEND.md) BE-46) | Read `load_receipt.json` beside the manifest | Present, `state: complete`, and `release_id` equals the mounted manifest's id. For `protected`, `window_key`, `protected_sha256`, `rules_version_id` and `parameter_set` also match; `public_only` omits those protected-window fields (OPS-64) |
 | Embedded reader file | Loader output | Read its stored `release_id` and hash | Equal to the release on disk |
-| Tiles, glyphs and interface fonts | Freeze bundle | Hash each file | All present, hashes match |
+| Tiles, glyphs and interface fonts | Freeze bundle | Hash each file | A freeze-bundle check in every mode: with a `freeze.json` under `data/freeze/`, all files are present and hashes match, otherwise `FAIL`; with no `freeze.json`, a named `WARN` never makes preflight non-zero ([decision 0020](decisions/0020-freeze-bundle-check-and-project-database-port.md)) |
 | Recorded assistant replays | Freeze bundle | Re-validate each replay against the current release | Every replay is checked. Valid replays report `PASS`; missing or invalid replays report `WARN` naming the affected story steps and are excluded from the memo; those steps use the template writer. Replay failure does not prevent startup unless the runbook explicitly requires that prepared scene |
-| bubblewrap sandbox (build machine only) | [05_SYNTHETIC_WORLD_AND_SIMULATION.md](05_SYNTHETIC_WORLD_AND_SIMULATION.md) | `bwrap --version` and the sandbox test | Present; test passes |
+| bubblewrap sandbox (build machine only) | [05_SYNTHETIC_WORLD_AND_SIMULATION.md](05_SYNTHETIC_WORLD_AND_SIMULATION.md) | `bwrap --version` and the sandbox test | Present; test passes. Never downgraded on the build machine ([decision 0020](decisions/0020-freeze-bundle-check-and-project-database-port.md)) |
 | API port free | OPS-02 | Try to bind `127.0.0.1:8000` | Free |
 | Model key | Optional | Test that `ANTHROPIC_API_KEY` is non-empty | Reports `present` or `absent`; never prints the value |
 | `.env` not tracked | `.gitignore` | `git ls-files --error-unmatch .env` | Fails (file is untracked) |
@@ -86,7 +86,7 @@ Exact versions are pinned in slice S0 and confirmed at the spike (slice S1) with
 
 | ID | Requirement |
 |---|---|
-| OPS-06 | `./eii preflight` runs every check in the table above and prints one line per check: `PASS`, `WARN` or `FAIL`, the check name and a short reason. Whenever `EII_RELEASE_DIR` is unset, it runs in foundation mode: the release, load-receipt, embedded-reader and recorded-replay checks print `WARN not_configured` and do not make the command non-zero; every other check keeps its normal severity. `./eii up` always requires a configured, complete release. From the slice S3 gate onward, every gate runs preflight with `EII_RELEASE_DIR` set, where a missing release, incomplete receipt or mismatched receipt `release_id` is `FAIL`. |
+| OPS-06 | `./eii preflight` runs every check in the table above and prints one line per check: `PASS`, `WARN` or `FAIL`, the check name and a short reason. Whenever `EII_RELEASE_DIR` is unset, it runs in foundation mode: the release, load-receipt, embedded-reader and recorded-replay checks print `WARN not_configured` and do not make the command non-zero; every other check keeps its normal severity; the tiles, glyphs and interface fonts row is a freeze-bundle check in every mode and the bubblewrap sandbox row keeps full severity on the build machine (table above; [decision 0020](decisions/0020-freeze-bundle-check-and-project-database-port.md)). `./eii up` always requires a configured, complete release. From the slice S3 gate onward, every gate runs preflight with `EII_RELEASE_DIR` set, where a missing release, incomplete receipt or mismatched receipt `release_id` is `FAIL`. |
 | OPS-07 | No preflight line, log line or error message prints a secret, a connection password or the value of `ANTHROPIC_API_KEY`. A test asserts this by running preflight with a known dummy key and searching the output. |
 | OPS-08 | Running application code reads secrets only from its process environment or, for the loader's owner role, the libpq password file; setup scripts may read the uncommitted `.env`. The repository commits `.env.example` with variable names and empty values, never a value. |
 | OPS-09 | Network, socket, process and Docker probes have five-second timeouts. The database start waits up to 60 seconds inside `./eii db-up`. File hashing, replay validation and sandbox tests have separately recorded budgets and emit progress; they are not subject to the five-second probe limit. |
@@ -127,19 +127,19 @@ Environment incidents observed the same day: the Linux `docker` command inside U
 
 The file `infra/compose.yaml` defines one service, `db`:
 
-1. Image: `postgis/postgis` on the PostgreSQL 18 with PostGIS 3.6 line, pinned by its image digest, never by a moving tag. The digest is recorded in slice S0 and confirmed at slice S1. Reason: the in-country managed services carried PostGIS 3.6 on 2026-11-11 (section 11), so v1 must not depend on 3.7-only functions.
+1. Image: `postgis/postgis` on the PostgreSQL 18 with PostGIS 3.6 line, pinned by its image digest, never by a moving tag. The image-index digest recorded by S0-T08 is in `infra/compose.yaml`; slice S1 confirms it. Reason: the in-country managed services carried PostGIS 3.6 on 2026-11-11 (section 11), so v1 must not depend on 3.7-only functions.
 2. Pull policy `never` on the stage machine, so a start never reaches the network.
-3. Port: container port 5432 published on `127.0.0.1:55432` only. A fixed port, because engine-chosen ports changed on every start during the measurements.
+3. Port: container port 5432 published on `127.0.0.1` only, on the port of `EII_DATABASE_URL` (default 55440). `./eii db-up` derives it from that variable and passes it to Compose as `EII_COMPOSE_DB_PORT` in a generated file; that name is not a product configuration variable and the Compose file holds no host port number.
 4. Storage: one named volume, `eii_pgdata`, mounted at `/var/lib/postgresql`. The PostgreSQL 18 images declare that path and keep data under `/var/lib/postgresql/18/docker`; the older mount at `/var/lib/postgresql/data` would leave data on an anonymous volume (architecture research).
 5. Health check: `pg_isready -h 127.0.0.1 -p 5432` inside the container, every 2 s, 30 retries. It probes TCP, because the first-boot helper server listens on the Unix socket only.
-6. No `shared_preload_libraries` and no extension beyond PostGIS.
+6. No `shared_preload_libraries` and no extension beyond PostGIS. The file fixes the Compose project name `eii-poc` and takes the superuser password from a Compose secret file under the uncommitted `data/` folder, never from the Compose file itself.
 
 ### 4.4 One-time setup of Option N
 
-Run once by the owner, who holds sudo. The script lives in `infra/` (created in slice S0) and is idempotent.
+This native-option procedure is not built in version 1: this project's Compose service is the PostgreSQL path on the build machine ([decision 0020](decisions/0020-freeze-bundle-check-and-project-database-port.md)); the section remains as the description of the native option.
 
 1. Install the two packages named in section 4.2.
-2. Set the cluster to listen on `localhost` only and on port 55432, then restart the service.
+2. Set the cluster to listen on `localhost` only and on the port of `EII_DATABASE_URL` (default 55440), then restart the service.
 3. Enable the service at boot (`sudo systemctl enable postgresql`).
 4. Create the EII database and the three roles of OPS-13; write the generated `eii_app` and `eii_reviewer` passwords to the local `.env` only, and the `eii_owner` credential to the loader account's libpq password file with owner-only permissions (OPS-14).
 5. Create the PostGIS extension in the EII database.
@@ -153,7 +153,7 @@ The CI workflow declares a `postgres` service container from the pinned `db` ima
 
 | ID | Requirement |
 |---|---|
-| OPS-11 | Option N and Option C both answer on `127.0.0.1:55432`. ASSUMPTION: the native cluster's port is set to 55432 in its configuration. Reason: one `EII_DATABASE_URL` then serves both options. |
+| OPS-11 | Option N and Option C both answer on the loopback host and port of `EII_DATABASE_URL`, default `127.0.0.1:55440` ([decision 0020](decisions/0020-freeze-bundle-check-and-project-database-port.md)). ASSUMPTION: the native cluster is configured to that address. Reason: one `EII_DATABASE_URL` then serves both options. |
 | OPS-12 | The database contains no extension other than PostGIS (and the built-in procedural language). Preflight fails if another extension is installed in the EII database. |
 | OPS-13 | Three roles exist: a loader role that owns the release schemas and `app` tables; an application role that owns no table and is subject to row-level security; a reviewer role with `SELECT` only on the documented release views. Reason: table owners bypass row-level security (observed in the architecture research). |
 | OPS-14 | The `eii_app` and `eii_reviewer` credentials are generated into the uncommitted `.env`; the API receives only `eii_app` through `EII_DATABASE_URL`. The `eii_owner` credential is written only to the loader account's libpq password file with owner-only permissions and is never placed in the API environment. |
@@ -165,7 +165,7 @@ The CI workflow declares a `postgres` service container from the pinned `db` ima
 ```mermaid
 flowchart TD
   U["./eii db-up (before ./eii up)"] --> V["start the database: native service or Compose; wait up to 60 s"]
-  A["./eii up"] --> B{"PostgreSQL answers on 127.0.0.1:55432?"}
+  A["./eii up"] --> B{"PostgreSQL answers at EII_DATABASE_URL?"}
   B -- yes --> D["store = postgres"]
   B -- no --> F["store = embedded; ledger = local; WARN printed"]
   G["./eii up --embedded"] --> H["store = embedded; ledger = local; no PostgreSQL or Docker contact"]
@@ -391,7 +391,7 @@ ASSUMPTIONS made in this document:
 
 - The stage machine is the build machine unless the owner names another.
 - The API listens on `127.0.0.1:8000` (OPS-02).
-- The native PostgreSQL cluster is configured to port 55432 so both options share one connection string (OPS-11).
+- The native PostgreSQL cluster is configured to the loopback host and port of `EII_DATABASE_URL` (default 55440) so both options share one connection string (OPS-11).
 - The presenter switch is one-way per session (OPS-20).
 - The `./eii` exit-code scheme in section 6, including code 7 for a refused freeze.
 - The freeze bundle lives in `data/freeze/<release_id>/`.

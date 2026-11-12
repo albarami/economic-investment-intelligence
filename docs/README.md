@@ -14,7 +14,7 @@
 - Every numbered document is a draft. Documents 01 to 16 and the glossary were reviewed by models of other makers and corrected on 2026-11-11, then amended on 2026-11-12 by decisions 0016 and 0017, which also created document 17, and by decision 0018, which also amended the applicable documents and document 17; [PROGRESS.md](../PROGRESS.md) lists the reviews, their verdicts and what is still unreviewed (open items OI-37 and OI-38). No document is approved for a slice gate yet.
 - Version 1 now covers the whole initiative ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)): seven decision journeys, three services and four cases on one living map, with drawn areas, simulated footfall and traffic, monthly periods and named synthetic firms. [Decision 0017](decisions/0017-public-data-additions-and-public-splits.md) adds 77 portal datasets, two investment sources and official splits by sex and nationality as Public facts. [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) lists what a deployment on real records must add.
 - The implementation plan is such a draft too; the task ledger is a draft queue whose tasks all start queued.
-- Decision records 0001 to 0018 are accepted; decision 0016 supersedes decision 0013 and amends decisions 0006 and 0007. Later amendments need new records, not silent edits.
+- Decision records 0001 to 0018 and 0020 are accepted; decision 0016 supersedes decision 0013 and amends decisions 0006 and 0007. Later amendments need new records, not silent edits.
 - Requirement identifiers are defined once in requirement tables; task identifiers come from the plan and task ledger.
 - [GLOSSARY.md](GLOSSARY.md) pins vocabulary. [OPEN_ITEMS.md](../OPEN_ITEMS.md) tracks what is undecided.
 
@@ -77,6 +77,7 @@
 | [0016](decisions/0016-version-1-covers-the-whole-initiative.md) | Version 1 covers the whole initiative: seven journeys, three services and four cases, with drawn areas, simulated footfall and traffic, monthly periods and named synthetic firms | Accepted, 2026-11-12 (amendment 3 to the first pack) |
 | [0017](decisions/0017-public-data-additions-and-public-splits.md) | Public data additions, public splits by sex and nationality, and investment sources | Accepted, 2026-11-12 (amendment 4 to the first pack) |
 | [0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) | Priorities of the proof of concept (strict in two places only, other hardening to document 17) and amendments to decision 0015 | Accepted, 2026-11-12 (amendment 5 to the first pack) |
+| [0020](decisions/0020-freeze-bundle-check-and-project-database-port.md) | Freeze-bundle preflight and the database port of this project's Compose service | Accepted, 2026-11-12 (amendment 7 to the first pack) |
 
 ## Identifiers and change control
 

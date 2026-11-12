@@ -94,6 +94,12 @@ The commit guard reads `.env` at the repository root and the process environment
 
 Gitleaks runs on the staged changes. It does not scan binary files, does not flag a database URL, skips the paths on its own built-in list (images, fonts, documents, lock files, vendored and package folders and others), and a git attribute that marks a path binary hides that path from it. The documentation check reads only text suffixes of a closed list and misses an eight- or eleven-digit run that has a hyphen, colon or slash beside it (OI-93 in OPEN_ITEMS.md).
 
+## Database service and preflight
+
+`infra/compose.yaml` defines this project's PostgreSQL 18 with PostGIS 3.6 service, pinned by image digest, published on the loopback address only on the port of `EII_DATABASE_URL` (documented default `127.0.0.1:55440`), and isolated under Compose project `eii-poc`. Only `./eii db-up` and `./eii db-down` start or stop it. `./eii preflight` only probes, and `./eii up` never starts a database.
+
+The live probe module under `scripts/tests/` fails rather than skips when the service is down. The lead alone arranges the service state for that module; ordinary tests do not start or stop a container.
+
 ## How to read the documentation
 
 Start with the [documentation index](docs/README.md). It gives each document's status and reading orders for the owner, builders, reviewers, data custodians and designers. New technical terms are in the [glossary](docs/GLOSSARY.md).
