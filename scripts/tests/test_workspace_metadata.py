@@ -227,8 +227,8 @@ class WorkspaceMetadata(unittest.TestCase):
             data = fields.read_toml(root / "product/pyproject.toml")
             uv = data.setdefault("tool", {}).setdefault("uv", {})
             src = uv.setdefault("sources", {})
-            if isinstance(src, dict):
-                src["Eii_Custodian"] = {"workspace": True}
+            assert isinstance(src, dict)
+            src["Eii_Custodian"] = {"workspace": True}
             (root / "product/pyproject.toml").write_text(
                 guard.dump_toml(data),
                 encoding="utf-8",
@@ -319,8 +319,8 @@ class WorkspaceMetadata(unittest.TestCase):
         def plant_drop_and_bad_name(lock: dict[str, object]) -> None:
             fields.drop_product(lock)
             pkg = lock.setdefault("package", [])
-            if isinstance(pkg, list):
-                pkg.append("eii-product")
+            assert isinstance(pkg, list)
+            pkg.append("eii-product")
 
         data = mutated_lock(plant_drop_and_bad_name)
         self.assertEqual(guard.check_lock_data(data), expected)
@@ -338,8 +338,8 @@ class WorkspaceMetadata(unittest.TestCase):
 
         def plant_bad_package_row(lock: dict[str, object]) -> None:
             pkg = lock.setdefault("package", [])
-            if isinstance(pkg, list):
-                pkg.append({"name": 1})
+            assert isinstance(pkg, list)
+            pkg.append({"name": 1})
 
         data = mutated_lock(plant_bad_package_row)
         self.assertEqual(guard.check_lock_data(data), [])
@@ -452,15 +452,15 @@ class WorkspaceMetadata(unittest.TestCase):
 
         def plant_requests(lock: dict[str, object]) -> None:
             pkg = lock.setdefault("package", [])
-            if isinstance(pkg, list):
-                pkg.append(
-                    {
-                        "name": "requests",
-                        "version": "0.0.0",
-                        "source": {"registry": "registry"},
-                        "dependencies": [{"name": "eii-core"}],
-                    }
-                )
+            assert isinstance(pkg, list)
+            pkg.append(
+                {
+                    "name": "requests",
+                    "version": "0.0.0",
+                    "source": {"registry": "registry"},
+                    "dependencies": [{"name": "eii-core"}],
+                }
+            )
 
         data = mutated_lock(plant_requests)
         self.assertEqual(

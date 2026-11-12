@@ -38,6 +38,44 @@ const FETCH_MSG =
 const EVENT_MSG =
   "Unexpected use of 'EventSource'. FE-11: open event streams only through src/api/.";
 
+const JUDGED_TOP_FILES = [
+  'eslint.config.js',
+  '.prettierrc.json',
+  '.prettierignore',
+  'index.html',
+  'package.json',
+  'package-lock.json',
+  'tsconfig.json',
+  'vite.config.ts',
+];
+
+function assertCopyJudged(copy) {
+  assert.equal(fs.existsSync(path.join(copy, 'src/app/App.tsx')), true);
+  assert.equal(
+    fs.existsSync(path.join(copy, 'scripts/check-layout.mjs')),
+    true,
+  );
+  const judgedTopFiles = [
+    'eslint.config.js',
+    '.prettierrc.json',
+    '.prettierignore',
+    'index.html',
+    'package.json',
+    'package-lock.json',
+    'tsconfig.json',
+    'vite.config.ts',
+  ];
+  for (const name of judgedTopFiles) {
+    const expected = fs.readFileSync(path.join(WEB, name));
+    const actualPath = path.join(copy, name);
+    assert.equal(fs.existsSync(actualPath), true, name);
+    assert.ok(
+      fs.readFileSync(actualPath).equals(expected),
+      `${name} byte mismatch`,
+    );
+  }
+}
+
 const copies = [];
 after(() => {
   for (const tmp of copies) {
@@ -50,16 +88,7 @@ function makeCopy() {
   copies.push(tmp);
   const copy = path.join(tmp, 'web');
   fs.mkdirSync(copy, { recursive: true });
-  for (const name of [
-    'eslint.config.js',
-    '.prettierrc.json',
-    '.prettierignore',
-    'index.html',
-    'package.json',
-    'package-lock.json',
-    'tsconfig.json',
-    'vite.config.ts',
-  ]) {
+  for (const name of JUDGED_TOP_FILES) {
     fs.copyFileSync(path.join(WEB, name), path.join(copy, name));
   }
   for (const dir of ['src', 'scripts']) {
@@ -90,16 +119,6 @@ function cleanEnv(tmp) {
 
 function npmRun(copy, script, args, env) {
   return spawnSync('npm', ['run', script, '--silent', '--', ...args], {
-    cwd: copy,
-    env,
-    encoding: 'utf8',
-    timeout: TIMEOUT_MS,
-  });
-}
-
-function tool(copy, bin, args, env) {
-  const file = path.join(copy, 'node_modules', bin);
-  return spawnSync(process.execPath, [file, ...args], {
     cwd: copy,
     env,
     encoding: 'utf8',
@@ -210,8 +229,8 @@ describe('lint-fe11', () => {
     );
   });
 
-  test('helpers wired', () => {
-    assert.equal(typeof tool, 'function');
+  test('copy includes the judged files', () => {
+    assertCopyJudged(makeCopy());
   });
 
   test('plant counts', () => {

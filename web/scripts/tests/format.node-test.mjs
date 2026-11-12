@@ -8,6 +8,44 @@ import { after, describe, test } from 'node:test';
 const WEB = path.resolve(import.meta.dirname, '../..');
 const TIMEOUT_MS = 300000;
 
+const JUDGED_TOP_FILES = [
+  'eslint.config.js',
+  '.prettierrc.json',
+  '.prettierignore',
+  'index.html',
+  'package.json',
+  'package-lock.json',
+  'tsconfig.json',
+  'vite.config.ts',
+];
+
+function assertCopyJudged(copy) {
+  assert.equal(fs.existsSync(path.join(copy, 'src/app/App.tsx')), true);
+  assert.equal(
+    fs.existsSync(path.join(copy, 'scripts/check-layout.mjs')),
+    true,
+  );
+  const judgedTopFiles = [
+    'eslint.config.js',
+    '.prettierrc.json',
+    '.prettierignore',
+    'index.html',
+    'package.json',
+    'package-lock.json',
+    'tsconfig.json',
+    'vite.config.ts',
+  ];
+  for (const name of judgedTopFiles) {
+    const expected = fs.readFileSync(path.join(WEB, name));
+    const actualPath = path.join(copy, name);
+    assert.equal(fs.existsSync(actualPath), true, name);
+    assert.ok(
+      fs.readFileSync(actualPath).equals(expected),
+      `${name} byte mismatch`,
+    );
+  }
+}
+
 const copies = [];
 after(() => {
   for (const tmp of copies) {
@@ -20,16 +58,7 @@ function makeCopy() {
   copies.push(tmp);
   const copy = path.join(tmp, 'web');
   fs.mkdirSync(copy, { recursive: true });
-  for (const name of [
-    'eslint.config.js',
-    '.prettierrc.json',
-    '.prettierignore',
-    'index.html',
-    'package.json',
-    'package-lock.json',
-    'tsconfig.json',
-    'vite.config.ts',
-  ]) {
+  for (const name of JUDGED_TOP_FILES) {
     fs.copyFileSync(path.join(WEB, name), path.join(copy, name));
   }
   for (const dir of ['src', 'scripts']) {
@@ -112,6 +141,34 @@ describe('format', () => {
     for (const line of ['dist/', 'package-lock.json', '*.md']) {
       assert.ok(ignore.includes(line), line);
     }
+  });
+
+  test('copy includes the judged files', async (t) => {
+    await t.test('restored makeCopy', () => {
+      assertCopyJudged(makeCopy());
+    });
+    await t.test('JUDGED_TOP_FILES drop vite.config.ts', () => {
+      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-web-format-'));
+      copies.push(tmp);
+      const copy = path.join(tmp, 'web');
+      fs.mkdirSync(copy, { recursive: true });
+      for (const name of JUDGED_TOP_FILES) {
+        if (name === 'vite.config.ts') {
+          continue;
+        }
+        fs.copyFileSync(path.join(WEB, name), path.join(copy, name));
+      }
+      for (const dir of ['src', 'scripts']) {
+        fs.cpSync(path.join(WEB, dir), path.join(copy, dir), {
+          recursive: true,
+        });
+      }
+      fs.symlinkSync(
+        path.join(WEB, 'node_modules'),
+        path.join(copy, 'node_modules'),
+      );
+      assert.throws(() => assertCopyJudged(copy), assert.AssertionError);
+    });
   });
 
   test('clean copy passes', () => {

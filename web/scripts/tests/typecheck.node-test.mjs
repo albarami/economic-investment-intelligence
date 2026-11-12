@@ -8,6 +8,44 @@ import { after, describe, test } from 'node:test';
 const WEB = path.resolve(import.meta.dirname, '../..');
 const TIMEOUT_MS = 300000;
 
+const JUDGED_TOP_FILES = [
+  'eslint.config.js',
+  '.prettierrc.json',
+  '.prettierignore',
+  'index.html',
+  'package.json',
+  'package-lock.json',
+  'tsconfig.json',
+  'vite.config.ts',
+];
+
+function assertCopyJudged(copy) {
+  assert.equal(fs.existsSync(path.join(copy, 'src/app/App.tsx')), true);
+  assert.equal(
+    fs.existsSync(path.join(copy, 'scripts/check-layout.mjs')),
+    true,
+  );
+  const judgedTopFiles = [
+    'eslint.config.js',
+    '.prettierrc.json',
+    '.prettierignore',
+    'index.html',
+    'package.json',
+    'package-lock.json',
+    'tsconfig.json',
+    'vite.config.ts',
+  ];
+  for (const name of judgedTopFiles) {
+    const expected = fs.readFileSync(path.join(WEB, name));
+    const actualPath = path.join(copy, name);
+    assert.equal(fs.existsSync(actualPath), true, name);
+    assert.ok(
+      fs.readFileSync(actualPath).equals(expected),
+      `${name} byte mismatch`,
+    );
+  }
+}
+
 const copies = [];
 after(() => {
   for (const tmp of copies) {
@@ -20,16 +58,7 @@ function makeCopy() {
   copies.push(tmp);
   const copy = path.join(tmp, 'web');
   fs.mkdirSync(copy, { recursive: true });
-  for (const name of [
-    'eslint.config.js',
-    '.prettierrc.json',
-    '.prettierignore',
-    'index.html',
-    'package.json',
-    'package-lock.json',
-    'tsconfig.json',
-    'vite.config.ts',
-  ]) {
+  for (const name of JUDGED_TOP_FILES) {
     fs.copyFileSync(path.join(WEB, name), path.join(copy, name));
   }
   for (const dir of ['src', 'scripts']) {
@@ -67,16 +96,6 @@ function npmRun(copy, script, args, env) {
   });
 }
 
-function tool(copy, bin, args, env) {
-  const file = path.join(copy, 'node_modules', bin);
-  return spawnSync(process.execPath, [file, ...args], {
-    cwd: copy,
-    env,
-    encoding: 'utf8',
-    timeout: TIMEOUT_MS,
-  });
-}
-
 function writeFile(copy, rel, text) {
   const full = path.join(copy, rel);
   fs.mkdirSync(path.dirname(full), { recursive: true });
@@ -104,7 +123,10 @@ describe('typecheck', () => {
       fs.readFileSync(path.join(WEB, 'package.json'), 'utf8'),
     );
     assert.equal(pkg.scripts.typecheck, 'tsc --noEmit');
-    assert.equal(typeof tool, 'function');
+  });
+
+  test('copy includes the judged files', () => {
+    assertCopyJudged(makeCopy());
   });
 
   test('clean copy passes', () => {
