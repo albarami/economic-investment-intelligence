@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Documentation stage; no application code yet |
+| Status | Slice S0 (foundation) in progress; no application code yet |
 | Date | 2026-11-11 |
 | Owner | albarami |
 | Purpose | Introduce a fully synthetic, public proof-of-concept design and its reading path. |
@@ -20,15 +20,17 @@ Only figures marked Public describe Qatar. Synthetic and Simulated figures demon
 
 ## Current status
 
-This repository contains a documentation pack and the [typed-decision qualification set](evals/typed_decisions/README.md) under `evals/`. There is no application code yet, and no product, release, privacy engine, assistant or interface is claimed to work.
+This repository contains a documentation pack, the [typed-decision qualification set](evals/typed_decisions/README.md) under `evals/`, and the scaffolding of the pinned repository layout (slice S0, task S0-T01). There is no application code yet, and no product, release, privacy engine, assistant or interface is claimed to work.
 
-The only runnable project command today is the documentation check:
+Three project commands run today: the documentation check, the tree check and the tests of the tree check.
 
 ```sh
 python3 scripts/check_docs.py
+python3 scripts/check_tree.py
+python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
 ```
 
-The `./eii` commands described in the architecture are planned for slice S0; they are not available now. The [implementation plan](docs/14_IMPLEMENTATION_PLAN.md) and [task ledger](TASKS.md) are drafts.
+The `./eii` commands described in the architecture are being built in slice S0; they are not available now. The [implementation plan](docs/14_IMPLEMENTATION_PLAN.md) and [task ledger](TASKS.md) are drafts.
 
 ## How to read the documentation
 
@@ -51,7 +53,7 @@ Accuracy is enforced by three code mechanisms: no model calculates, no fact is a
 
 ## Planned repository layout
 
-The architecture pins this layout for the build; these application directories do not exist yet:
+The architecture pins this layout. `docs/`, `evals/` and `scripts/` hold the documentation pack, the qualification set and the repository checks. `contracts/`, `core/`, `custodian/`, `product/`, `web/`, `gateway/` and `infra/` exist as scaffolding, each with a short note and no application code yet. Nothing under `data/` is ever committed (ARC-99), so a fresh clone has no `data/` folder:
 
 ```text
 contracts/    source and release contracts
