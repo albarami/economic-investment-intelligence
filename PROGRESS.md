@@ -12348,6 +12348,1298 @@ Seed:      none
 Notes:     The work commit subject is a Conventional Commit (PLN-05).
 ```
 
+#### S0-T15: independent review of part B: APPROVED
+
+Reviewed commit `33082c1ece4d318d8169fc580026a596b8c7bae4`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/25 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43316690887; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43316690889; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43316690919 ). Reviewer: OpenAI GPT-5.6 Sol (effort high), through the Codex command-line tool, read-only; a full review; a maker that neither ruled on the items nor built the task. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T15 part B (pull request 25)
+COMMIT: 33082c1ece4d318d8169fc580026a596b8c7bae4
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 PASS All twelve closures were checked: PO-S0-01 CHECKED against PROGRESS.md line 11916 and the four methods in test_workspace_metadata.py—counts 8, 4, 3 and 3 are true; PO-S0-09 CHECKED at pins.toml lines 50-54—the five anchors occur once; PO-S0-10 CHECKED at every home_tmpdir() call in the three named test files—each created folder has addCleanup and the non-creating call needs none; PO-S0-11 CHECKED—the one-line reason follows AGENTS.md rule 46 and accepts the defensible collective reading without silently amending decision 0020; PO-S0-12 CHECKED at PROGRESS.md lines 11207-11243—the closing record names Cognition SWE-2 High and explains the earlier incorrect reviewer line; PO-S0-13 CHECKED at the six document headers and docs/README.md status table—every row for documents 01-17 and the glossary equals its document header; PO-S0-14 CHECKED at ci_support.py lines 80-96 and all callers—the unused false-only branch and argument are gone without changing test meaning; PO-S0-15 CHECKED against EVIDENCE.md section 5 and spot checks of OI-96 and OI-110 with git show—the moved section text is unchanged; PO-S0-16 CHECKED at test_ci_plants.py lines 25-47 against ci_plants.py lines 60-67—each planted table violates only its intended refusal and the recorded breaks fail; PO-S0-17 CHECKED at document 17 lines 87, 91-93, 129-145, 154 and 161 and OPS-69—row identifiers are unique and no remaining DHA-81-to-DHA-83 citation means the source rows; PO-S0-18 CHECKED at test_preflight_run.py lines 149-264—the eleven labels divide into nine status-1 and two status-0 cases; PO-S0-19 CHECKED at PROGRESS.md line 11917 against the seven modules—12+9+9+11+3+4+7 equals 55, six above the planned 49. Every proposed slice item is CLOSED, none is deferred, and TST-168 is met.
+  REV-11 PASS The lead recorded ./eii test on the exact head with exit 0, 1168 passed and no skips, plus check_docs exit 0; both new validator refusals have planted violations and recorded red breaks. All six hosted checks succeeded on the head: https://github.com/albarami/economic-investment-intelligence/actions/runs/43316690887, https://github.com/albarami/economic-investment-intelligence/actions/runs/43316690889 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43316690919
+  REV-12 PASS The two work commits change exactly the fourteen ruled files; the ledger commit changes only PROGRESS.md and TASKS.md. No data path or unrelated file changed.
+  REV-13 PASS No placeholder or stub replaces delivered work. “Not built now” appears only in the explicitly scoped hardening register.
+  REV-14 PASS No secret or real custodian data is introduced; the hosted secret-scan check and recorded documentation check are green.
+  REV-15 PASS No check was weakened: test_ci_history_scan.py only drops the always-false helper argument, test_ci_plants.py adds two assertRaises checks, and test_preflight_run.py changes only the accurate docstring. No assertion was removed or loosened.
+  REV-16 PASS The work follows every ruling and uses the pinned identifiers exactly. DHA-88 through DHA-101 accurately account for the four source lists and their origins, mark every measure unbuilt, and lose no protective point; the three excluded points are explicitly accounted for by the mapping.
+  REV-17 PASS OPEN_ITEMS.md, all affected status records, deployment hardening, PROGRESS.md and TASKS.md are current. OI-13 and OI-95 agree with the S0-T14 reads; the pull-request 23 and 24 closing records agree with their verdicts; all S0-T08 and S0-T14 acceptance criteria have evidence in PROGRESS.md. check_docs recorded exit 0.
+  REV-18 PASS No serving, secret-handling or data-handling code changes. The added tests and documentation introduce no security or data-boundary defect.
+  REV-19 PASS No settled decision is reopened: decision 0020 remains unchanged, status bookkeeping follows it, and the extra measures are registered as unbuilt hardening.
+  REV-20 N/A No displayed fact, calculation, fact object or lineage chain is added or changed.
+  REV-21 N/A No screen, card, template, rendered numeral or model-written prose is changed.
+  REV-22 N/A No privacy partition, parameter set, treatment, release rule or privacy test is changed.
+  REV-23 N/A No product package, custodian package or import boundary is changed.
+  REV-24 N/A No English/Arabic view, numeral or translated string is changed.
+  REV-25 PASS The recorded documentation check passes; the change adds no secret, private path, personal identity, unsafe identifier, real custodian material or named-product comparison.
+  REV-26 PASS No prohibited product claim, verdict, forecast, endorsement, lookup claim or advice to act is introduced.
+  REV-27 PASS AGENTS.md and CLAUDE.md are unchanged, and the lead recorded cmp exit 0 on the head.
+  REV-28 N/A No synthetic identifier is introduced or changed.
+  REV-29 N/A No attribute or figure is attached to a real named place or business; the source rows are only renumbered.
+  REV-38 N/A No serving-plane code, gateway import, provider setting or run-time gateway behaviour is changed.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T15: merge record
+
+- The lead's checks on the merged head `33082c1ece4d318d8169fc580026a596b8c7bae4` before the merge (ruling L-29): "TREE-IS-WORK ok: 272 paths at 33082c1ece4d318d8169fc580026a596b8c7bae4", exit code 0; `./eii test --seed 2026111303`: exit code 0, "total: 1168 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/25 was squash-merged on 2026-11-13 at that head; merge commit `50db0e8a9cac22d5d4f8bd602fa1bd9667bee560` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474644; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474508; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474841 .
+
+- The task log of S0-T15 is complete with this record: part A (pull request 20) and part B (pull request 25) are merged; part B was APPROVED in its one review round with no finding and no proposed item.
+
+#### Slice S0 gate — Foundation: gate record (pull request https://github.com/albarami/economic-investment-intelligence/pull/26 )
+
+- The slice's final commit is `50db0e8a9cac22d5d4f8bd602fa1bd9667bee560`: main after the merge of pull request 25, the last task of the slice. Every gate item below was run by the lead at this commit (TST-166), and the six hosted checks ran on it. The commit of this record adds the record only (this file and the status field of S0-T15 in TASKS.md)
+- The gate (document 14, section "slice S0 — Foundation"; document 12, section 5, row "slice S0 Foundation"), statement by statement, with the entries below that prove each:
+  1. CI is green: the six required checks completed with success on the final commit: `check-docs` https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474508/job/131532589782; `planted-failures` https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474644/job/131532589835; `sandbox proof` https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474841/job/131532589114; `secret-scan` https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474644/job/131532590425; `static-checks` https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474644/job/131532589572; `tests` https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474644/job/131532589933
+  2. With `EII_RELEASE_DIR` unset, `./eii preflight` exits zero in foundation mode; its fifteen lines are below
+  3. `./eii test` exits zero: 1168 passed, 0 failed, 0 skipped, seed 2026111304
+  4. Boundary and sandbox tests exist and pass, with their teeth (TST-60, TST-61, TST-62): the import-boundary modules, the package-metadata module, the sandbox modules, the two sandbox check commands and the proof command with its 19 cases; the hosted check `sandbox proof` on the final commit is never skipped
+  5. The independent reviewer returns APPROVED: PENDING (the verdict on the slice as a whole is entered by the next pull request's ledger)
+- The further evidence that the gate row names: TST-140 (the documentation check), TST-141 (the secret scanner as a commit hook and over the full history in CI; secret scanning and push protection read again at the gate), TST-144 (the scanners' teeth generated at run time: the hook tests, the history-scan tests and the twelve planted failures), TST-155 (the complete suite and preflight with provider `none` and the network unshared)
+- The foundation-mode preflight output at the final commit:
+
+```text
+PASS python: Python and uv match pins.toml
+PASS node-npm: Node and npm match pins.toml
+PASS locked-dependencies: uv.lock and web/package-lock.json match their manifests with network access disabled
+PASS duckdb-extensions: spatial and h3 load from the local folder with network access disabled
+WARN postgresql: EII_DATABASE_URL is not set; store embedded; Docker reachable (server 29.9.3)
+WARN release: not_configured (EII_RELEASE_DIR is not set)
+WARN load-receipt: not_configured (EII_RELEASE_DIR is not set)
+WARN embedded-reader: not_configured (EII_RELEASE_DIR is not set)
+WARN tiles-glyphs-fonts: no_freeze_bundle (no freeze.json under data/freeze; checked with full severity once a freeze bundle exists)
+WARN recorded-replays: not_configured (EII_RELEASE_DIR is not set)
+PASS bubblewrap-sandbox: bubblewrap is present and the sandbox test passes
+PASS api-port: 127.0.0.1:8000 is free
+PASS model-key: absent
+PASS env-not-tracked: .env is not tracked by git
+PASS wsl-interop: cmd.exe printed a Windows version
+store: embedded
+```
+
+- TST-165, every task of the slice is done. Each pull request below was merged after an APPROVED verdict of a maker other than its builder's and with CI green on the merged head; the verdicts and merge records are the closing records above:
+
+| Task | Pull requests and merge commits |
+|---|---|
+| S0-T01 — Repository scaffolding and tool configuration | pull request 1, merged 2026-11-12, `8edf1023926345b57bcf549cae1079c09c75e55d` |
+| S0-T02 — Python workspace and three packages | pull request 4, merged 2026-11-12, `5ddb81229d6b480b250721ef0fd34d073333bd2f` |
+| S0-T03 — Web application skeleton | pull request 3, merged 2026-11-12, `f32dba33e7a50c6180f226c44b4570cc03447812` |
+| S0-T04 — Lint, format and type checks | pull request 5, merged 2026-11-12, `c930e3bc18452ef48033f641206848be2e8f6976` |
+| S0-T05 — Test runners | pull request 7, merged 2026-11-12, `e5f065d556a037febdbc82191db46c2a696adb02` |
+| S0-T06 — Pre-commit hooks | pull request 19, merged 2026-11-12, `09e9b16556a304259ad256911e7153c7366789f6` |
+| S0-T07 — Continuous integration | pull request 21, merged 2026-11-13, `889e09bbc724b4738ca1b2981bd805dc11ac991f` |
+| S0-T08 — Compose and store preflight | pull request 10, merged 2026-11-12, `2b253e3704f2f6d1308c664f493f30134b3ba4db`; pull request 22, merged 2026-11-12, `e0d01e9ab5784c36493c61e22b3b31de3a87b808`; pull request 24, merged 2026-11-13, `33c082eec62a17c61b9cc87127c2277d9872ef96` |
+| S0-T09 — `./eii` command skeleton and database commands | pull request 15, merged 2026-11-12, `7dd69aa4476c46cd0d1b9e70937513043333fffa` |
+| S0-T10 — Import-boundary test | pull request 8, merged 2026-11-12, `bdfd8d985596537841a066c82d952255057fb4f2`; pull request 11, merged 2026-11-12, `77625c08124311108022d270b85ee6ee73e7b8c3` |
+| S0-T11 — Generator sandbox test | pull request 14, merged 2026-11-12, `103884cb79d7c2e935ebcc42b7f788bca6f510d2` |
+| S0-T12 — Version and retreat pins | pull request 9, merged 2026-11-12, `00388d65384624e0e92944bd26aaf2fd208996de`; pull request 12, merged 2026-11-12, `171869a8a614a9720e78f59913b2b57a0f23ed1a`; pull request 18, merged 2026-11-12, `f3e7d5764ed315706c683ea7b3b1f7c82e0897f2` |
+| S0-T13 — New-library reference notes | pull request 13, merged 2026-11-12, `1ba76a453b623c619647ed51bb92301fb87c0cd8`; pull request 16, merged 2026-11-12, `55321cbf77b87295045325d99a3ff914a6ce9ce4` |
+| S0-T14 — GitHub repository settings | pull request 23, merged 2026-11-13, `06e3257e13df53c122e0e044eef85fdde3200c19` |
+| S0-T15 — Review follow-up for slice S0 | pull request 20, merged 2026-11-12, `0d33863e4ca358f8df00ef06028ec92ff31b016b`; pull request 25, merged 2026-11-13, `50db0e8a9cac22d5d4f8bd602fa1bd9667bee560` |
+
+- Documentation changes merged beside the slice, each with its own review: pull request 2 (decision record 0015), merged 2026-11-12, `452a7fd9cf0fa1f6928446d64261640ae9ec2494`; pull request 6 (decision records 0016 to 0018 and the amended pack), merged 2026-11-12, `9dfd7e820093540355cd60c085e53a618e53ad39`; pull request 17 (decision record 0019 and its amendments), merged 2026-11-12, `a429c5a3b2d01bce0274cfd5583f12b36dccc39d`
+- TST-168, the open items. Every proposed open item of the slice's reviews is closed by the follow-up task S0-T15 (19 of 19; the entry below). No random failure is recorded for the slice: the lead's records of the run hold no test that failed and then passed unchanged. A proposed item of the review of the follow-up task's part B or of the gate review goes to the follow-up task of the next slice (REV-41)
+- For the owner: 27 assumptions name the slice S0 gate as the time they are needed. Each records a default that a task of the slice chose and built, and asks the owner to confirm or replace it; none is a gate statement: OI-39, OI-41, OI-44, OI-45, OI-46, OI-47, OI-48, OI-50, OI-51, OI-52, OI-53, OI-60, OI-61, OI-63, OI-64, OI-80, OI-82, OI-85, OI-90, OI-91, OI-92, OI-93, OI-94, OI-104, OI-106, OI-108, OI-110
+- Also naming the gate and not closed: OI-38 (PENDING). OI-38 asks a maker other than the one that applied them to confirm the 23 corrections of the final read-through of 2026-11-11, as part of the gate review. The texts of those 23 findings are not in this repository (the read-through and its corrections precede the first commit, and the ledger holds their counts only), so the gate reviewers cannot be given the corrected passages; the owner has been asked for the two verdict files, and OI-38 stays PENDING until then. It is not one of the gate's statements
+- Class of the gate (the owner's note of 2026-11-12 on value and cost): deep. Two reviewers of two makers with two lenses, neither maker a builder of any task of the slice; the first review of a slice gate is a full review (TST-169). The designated reviewer gives the verdict and the second is advisory (REV-43): Google Gemini 4 Carbon, through the Abacus command-line tool (designated), and Moonshot AI Kimi K3.1 Pro, through the Devin command-line tool
+- Verdict of the gate: PENDING
+
+#### Evidence for the final commit `50db0e8a9cac22d5d4f8bd602fa1bd9667bee560`
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   ./eii preflight
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; 15 lines (9 PASS, 6 WARN, 0 FAIL), last line "store: embedded"
+Seed:      none
+Notes:     Gate statement 2. Foundation mode (EII_RELEASE_DIR is not set): exit code 0; fifteen lines; the release, load-receipt, embedded-reader and recorded-replay rows report WARN not_configured; the tiles, glyphs and fonts row warns until a freeze bundle exists (decision 0020); the store row warns and selects the embedded store, because no database address is set; every other row keeps its normal severity and passes here. The fifteen lines stand in the gate record above.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   ./eii test --seed 2026111304
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1168 passed, 0 failed, 0 skipped
+Seed:      2026111304
+Notes:     Gate statement 3 (TST-162). Every network-free suite, none skipped.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 215 text files, 55 Markdown files: OK"
+Seed:      none
+Notes:     TST-140 and TST-162: the documentation check on the final commit.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    34 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Gate statement 4, TST-60: the import-boundary tests of the three packages, with one planted violation for each forbidden edge and each import mechanism, the fresh-interpreter tests and the tests on the real tree.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_workspace_metadata.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    22 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     TST-60, package metadata: no forbidden dependency between the three packages, in the member list, the manifests and the lock.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_sandbox_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    65 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Gate statement 4, TST-61: the sandbox tests; the sentinel outside the public cache and the network attempt both fail inside the sandbox under both profiles, and the same probe outside the sandbox reads the sentinel (the teeth). None is skipped (TST-62).
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python scripts/sandbox_check.py check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox: OK"
+Seed:      none
+Notes:     TST-61: the sandbox check command of rule 44 on this machine.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python scripts/sandbox_check.py check-extensions
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox: OK"
+Seed:      none
+Notes:     TST-61: the engine extensions load inside the sandbox from the local folder.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python scripts/ci_sandbox.py prove
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    19 named cases passed, 0 failed, 0 skipped; RESULT: PASSED
+Seed:      none
+Notes:     TST-61 and TST-62: the proof command of the hosted job, run locally: each of the 19 named behaviour cases exactly once and passed. The hosted run of the same command on the final commit is the check `sandbox proof` in the entry of the check runs.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python scripts/hooks_gitleaks.py verify
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "gitleaks 8.30.1 verified at data/tools/gitleaks/8.30.1/gitleaks"
+Seed:      none
+Notes:     TST-141: the pinned secret scanner is installed as pinned.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_hooks_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    60 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     TST-141 and TST-144: the commit hooks, the commit guard and the scanner; the forbidden tokens are generated at run time in temporary repositories and each scanner must exit non-zero on them.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_ci_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    37 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     TST-141 and TST-144: the workflow rules, the full-history scan with its judge and the planted failures of the CI stages.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: 4 finding(s) on known ledger lines left out (2 line(s))" and "history scan: range HEAD, 26 commits, at least 26 to list, RESULT: PASSED"
+Seed:      none
+Notes:     TST-141: the secret scan over the full history of the checkout; findings on the known ledger line (OI-108) are left out by exact content, everything else fails.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python scripts/ci_plants.py run
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "plants: 12 cases, 12 blocked, 0 failed", RESULT: PASSED
+Seed:      none
+Notes:     TST-04 and TST-144: twelve planted failures, each built at run time in a scratch copy, each blocked by its stage.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   EII_DECISION_PROVIDER=none bwrap --dev-bind / / --unshare-net --die-with-parent ./eii test --seed 2026111305
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1168 passed, 0 failed, 0 skipped
+Seed:      2026111305
+Notes:     TST-155: provider none and the network unshared (a new network namespace with no interface but loopback): the complete suite passes, none skipped. The traffic provider is at its default and neither self-serve key is set in this environment.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   EII_DECISION_PROVIDER=none bwrap --dev-bind / / --unshare-net --die-with-parent ./eii preflight
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; 15 lines (9 PASS, 6 WARN, 0 FAIL), last line "store: embedded"
+Seed:      none
+Notes:     TST-155: preflight with provider none and the network unshared: exit code 0, fifteen lines.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    486 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard-test discovery of rule 44; none is skipped.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "132 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 128 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The lock matches the manifests.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 59 components: OK"
+Seed:      none
+Notes:     The pin record against the manifests, the locks and the toolchain.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes and their anchors.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The agent files are byte-identical.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   cd web && npm run check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "checked 18 files: OK"
+Seed:      none
+Notes:     The web structure checks.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   cd web && npm run lint
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "> eslint --max-warnings 0 ."
+Seed:      none
+Notes:     Web lint, with the rule of FE-11.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   cd web && npm run format:check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Web format.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   cd web && npm run typecheck
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "> tsc --noEmit"
+Seed:      none
+Notes:     Web types.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   cd web && npm run build
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "✓ built in 99ms"
+Seed:      none
+Notes:     The web build.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   cd web && npm run check:hosts:dist
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "checked 20 files: OK"
+Seed:      none
+Notes:     No host outside the allowed set in the built files.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   cd web && npm run check:dev
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "PASS dev-server http://127.0.0.1:39489/"
+Seed:      none
+Notes:     The development server binds to the local address only.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   cd web && npm run test:checks
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    675 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The tests of the web checks.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   python3 -I -c "import re,sys; t=open('OPEN_ITEMS.md',encoding='utf-8').read(); s=re.split(r'(?m)^(?=### PO-S0-)',t)[1:]; o=[x.split(' ',2)[1] for x in s if '- TYPE: CLOSED (was OPEN)' not in x]; print(len(s), o); sys.exit(1 if o else 0)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "19 []" (proposed items; those not closed)
+Seed:      none
+Notes:     TST-168: every proposed open item of the slice's reviews is closed.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   python3 -I -c "import re,sys; t=open('OPEN_ITEMS.md',encoding='utf-8').read(); s=[re.split(r'(?m)^## (?!OI-)',x)[0] for x in re.split(r'(?m)^(?=## OI-[0-9]+ )',t)[1:]]; g=[(x.split(' ',2)[1], re.search(r'(?m)^- TYPE: (\w+)',x).group(1)) for x in s if re.search(r'(?m)^- NEEDED BY: .*S0 gate',x)]; o=[a+' '+b for a,b in g if b!='CLOSED']; print(len(g), len(o), o)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "29 28 ['OI-38 PENDING', 'OI-39 ASSUMPTION', 'OI-41 ASSUMPTION', 'OI-44 ASSUMPTION', 'OI-45 ASSUMPTION', 'OI-46 ASSUMPTION', 'OI-47 ASSUMPTION', 'OI-48 ASSUMPTION', 'OI-50 ASSUMPTION', 'OI-51 ASSUMPTION', 'OI-52 ASSUMPTION', 'OI-53 ASSUMPTION', 'OI-60 ASSUMPTION', 'OI-61 ASSUMPTION', 'OI-63 ASSUMPTION', 'OI-64 ASSUMPTION', 'OI-80 ASSUMPTION', 'OI-82 ASSUMPTION', 'OI-85 ASSUMPTION', 'OI-90 ASSUMPTION', 'OI-91 ASSUMPTION', 'OI-92 ASSUMPTION', 'OI-93 ASSUMPTION', 'OI-94 ASSUMPTION', 'OI-104 ASSUMPTION', 'OI-106 ASSUMPTION', 'OI-108 ASSUMPTION', 'OI-110 ASSUMPTION']" (items naming the gate; those not closed; their identifiers and types)
+Seed:      none
+Notes:     TST-168: the open items that name the slice S0 gate as the time they are needed, with their types (the list for the owner in the gate record above).
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   gh api --method GET "repos/{owner}/{repo}/commits/50db0e8a9cac22d5d4f8bd602fa1bd9667bee560/check-runs?per_page=100" --jq '{total_count,check_runs:[.check_runs[]|{name,head_sha,status,conclusion,html_url}]|sort_by(.name)}'
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (the GitHub command-line program, from the repository root)
+Counts:    not a test suite; 6 check runs, 6 completed with success, 0 other: check-docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474508/job/131532589782; planted-failures https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474644/job/131532589835; sandbox proof https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474841/job/131532589114; secret-scan https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474644/job/131532590425; static-checks https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474644/job/131532589572; tests https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474644/job/131532589933
+Seed:      none
+Notes:     Gate statement 1 (TST-162): CI on the final commit, triggered by the push of the merge. Exactly the six required checks, each completed with success on this commit; the links are the hosted runs.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   gh api --method GET repos/{owner}/{repo} --jq '{secret_scanning:.security_and_analysis.secret_scanning.status,secret_scanning_push_protection:.security_and_analysis.secret_scanning_push_protection.status}'
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (the GitHub command-line program, from the repository root)
+Counts:    not a test suite; output {"secret_scanning":"enabled","secret_scanning_push_protection":"enabled"}
+Seed:      none
+Notes:     TST-141: secret scanning and push protection are enabled (read again at the gate).
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+Command:   gh api --method GET repos/{owner}/{repo}/rules/branches/main --jq '[.[]|{type,ruleset_source_type,parameters:(if .type=="required_status_checks" then {required_status_checks:[.parameters.required_status_checks[]|{context}],strict_required_status_checks_policy:.parameters.strict_required_status_checks_policy} else null end)}]'
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (the GitHub command-line program, from the repository root)
+Counts:    not a test suite; four rule types from the repository's ruleset (deletion, non_fast_forward, pull_request, required_status_checks); required contexts: check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests; strict policy true
+Seed:      none
+Notes:     TST-150: the rules active on the base branch at the gate: no deletion, no forced push, pull requests only, the six required checks on an up-to-date head. The identifier of the ruleset is not recorded.
+```
+
+#### S0-T16: independent review: APPROVED
+
+Reviewed commit `b364dbcf852a5a60d8dcbf4f1ddc0295ffa934b6`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/27 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43325952618; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43325952629; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43325952515 ). Reviewer: xAI Grok 4.7 (high), through the Cursor command-line tool, read-only; a full review; a maker that neither ruled on the points nor built the task. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T16 (pull request 27)
+COMMIT: b364dbcf852a5a60d8dcbf4f1ddc0295ffa934b6
+REVIEWER: SpaceXAI, Grok 4.7
+CHECKS:
+  REV-10 PASS All five acceptance criteria are met on the head, with lead evidence in PROGRESS.md for work commit 260c43c768dfb81895997a202b543f1da0edeb1a (TST-170). (1) `CHECKS` and `run_preflight` in scripts/preflight.py hold the seventeen table names in document 13 order, `traffic-provider-key` then `night-lights-key` after `model-key` and before `env-not-tracked`. `traffic_provider_key_row` reads `TOMTOM_API_KEY` (present if non-empty, else absent) and `EII_TRAFFIC_PROVIDER` (`simulated` when unset or empty; the value itself when it is `simulated` or `tomtom`), and `night_lights_key_row` reads `EARTHDATA_API_KEY` the same present/absent way; both return a `store.Line` only. The lead's `./eii preflight` exited 0 with those two rows as `PASS traffic-provider-key: absent; EII_TRAFFIC_PROVIDER simulated` and `PASS night-lights-key: absent`, and `EII_TRAFFIC_PROVIDER=tomtom` reported `absent; EII_TRAFFIC_PROVIDER tomtom`. Foundation mode still changes only release, load-receipt, embedded-reader and recorded-replays to `WARN not_configured` (`test_foundation_preflight_exits_zero` counts four `not_configured` lines; the full expected list keeps every other row). (2) `test_no_secret_in_any_line` runs the whole preflight with three different runtime dummies (`stubs.dummy` prefixes `key`, `traffic`, `night`). (3) `.env.example` and `ENV_EXAMPLE_NAMES` are the eleven names, each `NAME=` empty, product block then tooling block; the lead's name command printed those eleven and `python3 scripts/check_tree.py` exited 0. (4) `SECRET_NAMES` adds `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` beside the existing keys; `test_new_key_staged_value_refused` refuses each name from the environment and from a fixture file, names the variable, and keeps the value out of the output. (5) S0-T12 status names pull requests 9, 12 and 18. The invented rule is right: the variable table and ARC-97 allow only `simulated` and `tomtom`, and an invalid value stops with a message that names the variable. The row FAILs at normal severity with `EII_TRAFFIC_PROVIDER must be simulated or tomtom` and does not repeat the value. `tomtom` with the key absent stays PASS, matching the `TOMTOM_API_KEY` row (absent means simulated congestion only). The planted violation is real: `test_traffic_provider_unknown_value_fails_without_echo` and `test_unknown_traffic_provider_keeps_failure_in_foundation` use a runtime dummy, and the lead's preflight with `plantedunknownword` exited 1 with that word absent and the fixed FAIL line.
+  REV-11 PASS The lead's `./eii test --seed 2026111307` on 260c43c exited 0 (1176 passed, 0 failed, 0 skipped) and `python3 scripts/check_docs.py` exited 0. On this head the lead re-ran `./eii test --seed 2026111308` (exit 0, same counts) and `python3 scripts/check_docs.py` (exit 0, 215 text files, 55 Markdown files). CI on this head is green: https://github.com/albarami/economic-investment-intelligence/actions/runs/43325952618 https://github.com/albarami/economic-investment-intelligence/actions/runs/43325952629 https://github.com/albarami/economic-investment-intelligence/actions/runs/43325952515 . New rows and the guard each have a planted violation (the unknown switch; the new key tests were red before `SECRET_NAMES` changed). No skip was added.
+  REV-12 PASS The work commit changes exactly the eleven files the rulings and the two builders name (lead command 16 printed `11 []`): `.env.example`, `OPEN_ITEMS.md`, `README.md`, `TASKS.md`, `scripts/check_tree.py`, `scripts/commit_guard.py`, `scripts/preflight.py`, `scripts/preflight_rows.py`, `scripts/tests/test_hooks_guard.py`, `scripts/tests/test_preflight_rows.py`, `scripts/tests/test_preflight_run.py`. This head adds only `PROGRESS.md`, the evidence ledger. Nothing under `data/`. The tree-check name list is the list the second builder had to extend so the corrected example file would pass.
+  REV-13 PASS The new row functions and the guard list are real behaviour. The diff adds no `TODO`, `FIXME`, `NotImplementedError`, empty body or fixed stand-in result. Test dummies come from `stubs.dummy` and `support.random_value` at run time.
+  REV-14 PASS The secret-scan job is in the green CI run https://github.com/albarami/economic-investment-intelligence/actions/runs/43325952618 . The diff commits no `.env` and no key value: `.env.example` values are empty, and every test secret is generated at run time (letters or hex). No custodian record, field, file name or count is in the diff.
+  REV-15 PASS In the three changed test files no assertion was removed or loosened. `test_preflight_rows.py` and `test_hooks_guard.py` only add tests. In `test_preflight_run.py` the two moved positions are the same expectations after the two inserted rows: `env_staged` is `want[15]` and `cmd_missing` is `want[16]`, and every label still compares the full line list. `test_no_secret_in_any_line` still rejects the original model-key dummy, the password, the quoted password and the database URL, and now also rejects the two new dummies in the report, both streams, and stub argv and env. Existing guard tests are unchanged and still expect the old refusals; the longer `SECRET_NAMES` only adds needles in `collect_needles`. No new skip, expected failure, suppression, retry or `continue-on-error`.
+  REV-16 PASS The rows match rulings R1–R4 and the preflight table: names, order, present/absent, default `simulated`, PASS for `tomtom` with the key absent, FAIL for any other switch value without echoing it, and no call. `./eii preflight` only probes. `./eii up` is unchanged apart from seeing the new rows (`up_decision` is not edited; with the release unset it still returns 4, and with a release set the new FAIL returns 1, `a check failed: traffic-provider-key`). Pinned names are used as written.
+  REV-17 PASS README.md now lists the five guarded names. OI-92 says the guard judges the five names, including `TOMTOM_API_KEY` and `EARTHDATA_API_KEY`. OI-110 says the seventeen-row tuple reports key presence as present or absent, reports the traffic switch, and fails an unknown setting without echoing it or contacting a provider. S0-T16 in TASKS.md states the five criteria this change meets, with requirements OPS-06, OPS-07, ARC-97, ARC-98, TST-141 and TST-169. `python3 scripts/check_docs.py` exited 0 on the work commit and on this head. PROGRESS.md on this head records the commands.
+  REV-18 PASS The two keys are read from the supplied environment in preflight and, in the guard, from `.env` and the process environment, the same path as `ANTHROPIC_API_KEY` and `JEV_PRO_API_KEY` (`needles_for` special-cases only `EII_DATABASE_URL`). Refusal output is the variable name and, when the path holds no value, the path. The new tests' `_free` plus exact stderr match show the value is not printed. No traffic response is stored. The diff does not touch the application role, SQL, or egress.
+  REV-19 PASS The diff does not build a dropped item or remove a component decision. The closed switch values and the two keys are already in the variable table, ARC-97 and ARC-98. The FAIL for an unknown switch is the one rule the lead's ruling invented for that closed set; it has its planted violation.
+  REV-20 N/A The diff adds no fact, figure, forecast, estimate or calculation.
+  REV-21 N/A The diff adds no screen, template, claim or rendered numeral.
+  REV-22 PASS The diff does not touch a partition, parameter set, treatment, window key, attack suite or privacy test.
+  REV-23 PASS The diff does not touch `product/` or import `eii_custodian`. The lead's `./eii test` on this head passed, including the product suite.
+  REV-24 N/A The diff adds no English or Arabic view and no new Arabic string.
+  REV-25 PASS The diff has no absolute local path, personal name, e-mail address, custodian field, ministry plan, or product comparison. A search of the patch found no run of exactly eight or eleven digits. `tomtom` is the pinned switch value, not a comparison. CI secret-scan is the run linked under REV-11.
+  REV-26 PASS The new sentences describe probe output and the guard list. None states real custodian data, a synthetic fact about a real place, certified privacy, a ministry endorsement, a forecast, or a go or no-go.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exited 0 on the work commit and on this head. Neither file is in the diff. The documentation check reported no agent-file failure.
+  REV-28 N/A The diff adds no synthetic identifier of any of the five forms.
+  REV-29 N/A The diff attaches no attribute, figure or fit to a place or business.
+  REV-38 PASS The diff does not import `eii_gateway` and does not read `EII_DECISION_PROVIDER` or `JEV_PRO_API_KEY` in run-time code. `.env.example` still holds `EII_DECISION_PROVIDER` empty. No score, badge, panel or live call was added.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T16: merge record
+
+- The lead's checks on the merged head `b364dbcf852a5a60d8dcbf4f1ddc0295ffa934b6` before the merge (ruling L-29): "TREE-IS-WORK ok: 272 paths at b364dbcf852a5a60d8dcbf4f1ddc0295ffa934b6", exit code 0; `./eii test --seed 2026111308`: exit code 0, "total: 1176 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/27 was squash-merged on 2026-11-13 at that head; merge commit `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476700; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476793 .
+
+- The task log of S0-T16 is complete with this record: APPROVED in its one review round, no finding, no proposed item.
+
+#### Slice S0 gate — Foundation: review round 1: REJECTED (pull request https://github.com/albarami/economic-investment-intelligence/pull/26 )
+
+Reviewed commit `64e988fa65c964d26a83d25ed71a6cc45d7229d4`, the head of the gate-record pull request at that time, with all six required checks green on it; the gate items had been run at `50db0e8a9cac22d5d4f8bd602fa1bd9667bee560`, then the slice's final commit. Two reviewers of two makers with two lenses; both verdicts are copied unchanged (REV-09) and were posted on the pull request.
+
+Designated reviewer: Google Gemini (model `GEMINI_4_CARBON` of the Abacus command-line tool, read-only; it names itself otherwise in its verdict), the controls and the gate's proof. The COMMIT line of its verdict miscopies the hash after the seventh character; the job ran in a read-only checkout of exactly the commit named above. A verdict names its commit by the full hash (REV-02), so this text could not stand as an approval; it is a rejection whose findings the lead checked in the files.
+
+```text
+VERDICT: REJECTED
+TASK: S0-GATE (slice S0 — Foundation)
+COMMIT: 64e988f1ba2558d68dd4de15b3847f699962eb82
+REVIEWER: Google Gemini 3.1 Pro
+CHECKS:
+  REV-10 FAIL F1, F2: slice S0 gate statement 2 and S0-T08/S0-T01 requirements OPS-06, OPS-07, OPS-08 and ARC-98 are not met for the two credential rows and configuration names added by decision 0019.
+  REV-11 PASS On slice final commit 50db0e8a9cac22d5d4f8bd602fa1bd9667bee560, `./eii test --seed 2026111304` passed (1168 passed, 0 failed, 0 skipped across 6 suites), all 6 required GitHub checks succeeded on that commit, `ci_sandbox.py prove` passed all 19 named cases, and `ci_plants.py run` blocked all 12 runtime-planted violations.
+  REV-12 PASS Gate commit 64e988f1ba2558d68dd4de15b3847f699962eb82 modifies only PROGRESS.md and the status field of S0-T15 in TASKS.md, and every slice S0 task shipped within scope under Conventional Commits (PLN-05).
+  REV-13 PASS Foundation guards, sandbox launcher, preflight probes, hooks, CI checks and web boundary scripts are real implementations with no fake stubs; unbuilt `./eii` commands exit 1 with explicit placeholder messages as AGENTS.md rule 44 specifies.
+  REV-14 PASS Inspection of `.gitignore`, `.env.example`, `infra/compose.yaml`, workflows, scripts and `DIFF.patch`, together with `check_docs.py` (215 text files, 55 Markdown files: OK) and `ci_history_scan.py scan` (26 commits, RESULT: PASSED), found no secret or real custodian data.
+  REV-15 PASS Workflows pin actions by commit SHA, set job timeouts, and forbid `continue-on-error` and `|| true` (`ci_workflow_rules.py`); `ci_junit.py` enforces 19/19 non-skipped sandbox cases; `run_tests.py` rejects zero-test suites and unapproved skips; active ruleset `main-protection` strictly requires all 6 checks.
+  REV-16 PASS The three-package `uv` workspace, React/Vite loopback skeleton, descriptor-pinned `bubblewrap` profiles, option-C PostGIS Compose service on default port 55440 with banned-port refusal (decision 0020), and `./eii` exit-code contract match the architecture and accepted decisions, subject to F1 and F2.
+  REV-17 FAIL F1, F2: OPEN_ITEMS.md OI-103 claims under DONE SO FAR that preflight already reports `EARTHDATA_API_KEY` as present or absent without printing it, and PROGRESS.md records a 15-line preflight output against the 17-row preflight table of docs/13_DEPLOYMENT_AND_OPERATIONS.md section 3; `.env.example` also lags docs/02_ARCHITECTURE.md ARC-98.
+  REV-18 FAIL F1: sandbox descriptor-pinned mounts (`O_PATH | O_NOFOLLOW`), `--unshare-net`, `--clearenv`, Compose loopback/secret-file isolation, commit hooks, history scan and web origin checks have no injection, traversal, origin bypass or widened sandbox, but the OPS-07 secret-presence checks and dummy-key non-printing tests for `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` are absent from preflight.
+  REV-19 PASS No settled decision is reopened; material amendments were recorded in decision records 0015 to 0020, all 19 review items PO-S0-01 to PO-S0-19 were closed in S0-T15, and the 27 gate-timed assumptions plus pending OI-38 are tracked in OPEN_ITEMS.md.
+  REV-20 N/A Slice S0 is foundation scaffolding and produces no fact, lineage chain, release table or economic calculation.
+  REV-21 PASS `web/index.html` and `web/src/app/App.tsx` render only static shell markup with no numerals and no model prose, and `web/eslint.config.js` restricts `fetch` and `EventSource` to `src/api/`.
+  REV-22 N/A Slice S0 implements no privacy parameter evaluation, suppression logic, `window_key` calculation or export-register writer.
+  REV-23 PASS `product/pyproject.toml` and `uv.lock` contain no edge to `eii-custodian` (`test_workspace_metadata.py`, 22 passed), and `import_boundary_guard.py` with `test_import_boundary_*.py` (34 passed) blocks static, dynamic and fresh-interpreter cross-plane imports as well as `data/vault` paths in `product/` and `core/`.
+  REV-24 N/A Slice S0 adds no bilingual view, Arabic catalogue string, RTL screen or rendered numeral.
+  REV-25 PASS `python3 scripts/check_docs.py` passed across all 215 text files and 55 Markdown files, and manual inspection found no private path, unattributed personal name, e-mail address, realistic identifier, bare 8- or 11-digit number or prohibited product comparison.
+  REV-26 PASS Code, CLI output, web shell and slice documentation contain no prohibited claim of real custodian data, real-place simulation, certified privacy, ministry endorsement, venture forecast, verdict, probability or advice (AGENTS.md rules 24 and 25).
+  REV-27 PASS Direct inspection of `AGENTS.md` and `CLAUDE.md` (111 lines each) and `cmp -s AGENTS.md CLAUDE.md` (exit 0) confirm byte-identity.
+  REV-28 N/A Slice S0 creates no synthetic company, establishment, person or salary-file identifier, while `scripts/check_docs.py` and its hook/plant tests enforce the identifier-pattern guards.
+  REV-29 N/A Slice S0 defines no place subject, slot schema or synthetic firm placement.
+  REV-38 PASS Neither `core/`, `custodian/` nor `product/` defines or imports `eii_gateway` or reads `EII_DECISION_PROVIDER` or `JEV_PRO_API_KEY`, and both `./eii test` and `./eii preflight` pass with `EII_DECISION_PROVIDER=none` inside `bwrap --unshare-net` (TST-155).
+FINDINGS:
+  F1 (REV-10)
+    File: scripts/preflight.py
+    Place: run_preflight, lines 71-109 (with scripts/preflight_rows.py model_key_row and OPEN_ITEMS.md OI-103)
+    Wrong: Slice S0 gate statement 2 (docs/14_IMPLEMENTATION_PLAN.md section "slice S0 — Foundation"; docs/12_TESTING_AND_QUALITY.md section 5, row "slice S0 Foundation") requires `./eii preflight` with `EII_RELEASE_DIR` unset to report `WARN not_configured` on the four release rows while every other check keeps its normal severity as the preflight table of docs/13_DEPLOYMENT_AND_OPERATIONS.md section 3 defines it (OPS-06, cited by S0-T08). Decision 0019 added two rows to that 17-row table — "Traffic provider key" (`TOMTOM_API_KEY` non-empty check and `EII_TRAFFIC_PROVIDER` switch value, default `simulated`) and "Night-lights key" (`EARTHDATA_API_KEY` non-empty check) — and amended OPS-07 (cited by S0-T08) to require that preflight never print `TOMTOM_API_KEY` or `EARTHDATA_API_KEY` and that a test run preflight with a known dummy value for each key and search the output. `run_preflight` emits only 15 rows, omitting both rows, `scripts/tests/test_preflight_rows.py` and `scripts/tests/test_preflight_run.py` test dummy-key redaction only for `ANTHROPIC_API_KEY` and `EII_DATABASE_URL`, neither S2-T14 nor S6-T19 in TASKS.md owns adding preflight rows, and OPEN_ITEMS.md OI-103 (DONE SO FAR) inaccurately states that preflight already reports `EARTHDATA_API_KEY` as present or absent and never prints it.
+    Fix: Add row checks in `scripts/preflight_rows.py` for the "Traffic provider key" row (testing whether `TOMTOM_API_KEY` is non-empty and reading `EII_TRAFFIC_PROVIDER` with default `simulated`, failing on an invalid switch value per ARC-97/OPS-70 without printing any raw value or calling the provider) and the "Night-lights key" row (testing whether `EARTHDATA_API_KEY` is non-empty, reporting `present` or `absent` without printing the value or contacting a host), and append both in table order after `rows.model_key_row(environ)` in `scripts/preflight.py` (`run_preflight`, line 104). Add unit tests, planted leak checks and OPS-07 dummy-key output-search tests covering `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` in `scripts/tests/test_preflight_rows.py` and `scripts/tests/test_preflight_run.py`, and append the updated 17-line gate preflight evidence in `PROGRESS.md`.
+  F2 (REV-10)
+    File: .env.example
+    Place: lines 1-14 (with scripts/check_tree.py ENV_EXAMPLE_NAMES, lines 127-136)
+    Wrong: `docs/02_ARCHITECTURE.md` ARC-98 (cited by S0-T01 and S0-T08) and `docs/13_DEPLOYMENT_AND_OPERATIONS.md` OPS-08 (cited by S0-T01) require `.env.example` to list the pinned configuration variable names with empty values, and ARC-98 explicitly states that `.env.example` holds `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` among them alongside the section 8 configuration table's `EII_TRAFFIC_PROVIDER`. `.env.example` still lists only the 8 pre-decision-0019 names, and `scripts/check_tree.py` (`ENV_EXAMPLE_NAMES`, lines 127-136) hardcodes that stale 8-name tuple.
+    Fix: Add `EII_TRAFFIC_PROVIDER=` and `TOMTOM_API_KEY=` under Product configuration and `EARTHDATA_API_KEY=` under Build and evaluation tooling in `.env.example`, update `ENV_EXAMPLE_NAMES` in `scripts/check_tree.py` (lines 127-136) to the 11 pinned names of `docs/02_ARCHITECTURE.md` section 8, and update `scripts/tests/test_check_tree.py` (including planted value/missing-name cases) to match.
+PROPOSED OPEN ITEMS:
+  P1 Extend `scripts/tests/import_boundary_guard.py` (and assumption OI-52) so `eii_product` and `eii_core` are also forbidden from referencing `EARTHDATA_API_KEY`, matching `docs/02_ARCHITECTURE.md` section 8 (`ARC-81`) and `docs/08_BACKEND.md` section 2.3 (`config`), while keeping `EARTHDATA_API_KEY` permitted in `eii_custodian` for `./eii build-public`.
+  P2 Add `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` to `SECRET_NAMES` in `scripts/commit_guard.py` (line 23) and update assumption OI-92 so staged content carrying a developer's local value for either self-serve key is refused before commit even when the token lacks a distinctive vendor prefix (`OPS-71`).
+  P3 Add `"docs/17_DEPLOYMENT_HARDENING.md"` to `REQUIRED_FILES` (lines 43-69) and `"DHA"` to `REQUIREMENT_PREFIXES` (lines 107-124) in `scripts/check_docs.py` (with planted duplicate/broken-ID tests) so `DHA-*` requirement identifiers in document 17 are validated automatically like every other numbered pack document.
+```
+
+Second reviewer: Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only, the records.
+
+```text
+VERDICT: REJECTED
+TASK: slice S0 gate (pull request 26)
+COMMIT: 64e988fa65c964d26a83d25ed71a6cc45d7229d4
+REVIEWER: Moonshot AI Kimi K3.1 Pro Medium
+CHECKS:
+  REV-10 FAIL F1. TST-165 FAIL: S0-T08 does not run every preflight-table check. I read all S0 task criteria and their review evidence, including every criterion of S0-T07, S0-T08, S0-T11 and S0-T14; the other criteria have test or ledger evidence, and every MAP.md pull request has an APPROVED verdict and merge record with a different builder/reviewer maker. TST-166 PASS: PROGRESS.md records the gate commands and six hosted checks against final commit 50db0e8a9cac22d5d4f8bd602fa1bd9667bee560. TST-167 FAIL: the foundation-preflight requirement is not met. TST-168 PASS: PO-S0-01 through PO-S0-19 all have closures, no random failure is recorded, and later-S1 reasons remain recorded for OI-10 and OI-22.
+  REV-11 PASS Lead runs recorded in EVIDENCE.md: at the final commit `./eii test --seed 2026111304` exited 0 with 1168 passed, 0 failed, 0 skipped and `python3 scripts/check_docs.py` exited 0; at the reviewed head `./eii test --seed 2026111306` exited 0 with the same counts and the documentation check exited 0. Head CI is green: https://github.com/albarami/economic-investment-intelligence/actions/runs/43320439462 , https://github.com/albarami/economic-investment-intelligence/actions/runs/43320440055 , https://github.com/albarami/economic-investment-intelligence/actions/runs/43320439473 . The 12 planted CI failures and scanner/boundary/sandbox teeth are recorded. The reviewer ran no commands under the read-only brief.
+  REV-12 PASS DIFF.patch changes only PROGRESS.md and the S0-T15 status in TASKS.md. MAP.md and the reviewed task records show task-scoped files and necessary shared documents, with nothing delivered under data/.
+  REV-13 PASS Package skeletons and safe command placeholders are explicit S0 deliverables; README.md and the command table disclose the placeholders and never present them as completed product behaviour.
+  REV-14 PASS The head secret-scan check is green, and the final-commit full-history scan passed with only the exact-content dummy ledger lines documented by OI-108 excluded. The reviewed files contain no committed secret, .env or real custodian material.
+  REV-15 PASS No unapproved weakening was found in the reviewed test, CI or lint records. The AppArmor listing, profile-hash and process-label demotions are recorded under the owner's behaviour-based decision and DHA-81 to DHA-83; the namespace probe and 19 behavioural cases still decide the sandbox result.
+  REV-16 FAIL F1. OPS-06 requires every check in the document 13 table, but the implementation omits the Traffic provider key and Night-lights key rows. The other pinned command entry points and documented placeholder behaviours match the tree.
+  REV-17 FAIL F1, F2. OI-110's claimed complete fifteen-row tuple and TASKS.md's S0-T12 delivery status are not current. I checked rule 44 against the launcher and scripts, README.md, the document 13 preflight table, the CI descriptions and three workflows, the docs/README.md status table, and all S0 TASKS.md statuses. `python3 scripts/check_docs.py` exited 0 on both commits. OI-38 remains PENDING because its pre-repository finding texts are unavailable; it is not a gate statement.
+  REV-18 PASS Secrets remain environment-only, the reviewed scripts add no record-level data path, and no provider response is stored. The missing preflight probes are an acceptance/gate defect under F1, not a disclosed secret.
+  REV-19 PASS The reviewed changes preserve the approved slice order and decisions; decisions 0015, 0018, 0019 and 0020 and the owner rulings account for the changes made beside the slice.
+  REV-20 N/A Slice S0 adds no economic fact object, release-table figure, calculation or product displayed number requiring provenance and lineage.
+  REV-21 N/A The feature-free shell has no Fact chip, claim catalogue, assistant answer or rendered product numeral to review.
+  REV-22 N/A Slice S0 contains no privacy partition, parameter-set, treatment, export or attack-suite implementation.
+  REV-23 PASS EVIDENCE.md records 34 import-boundary tests and 22 workspace-metadata tests passing, including real-tree static, fresh-interpreter and package-metadata checks; the full head suite also passed.
+  REV-24 N/A Slice S0 adds no English/Arabic product view or bilingual numerals.
+  REV-25 PASS The documentation scan and secret scan pass; my targeted reads found no real private absolute path, personal address, realistic committed identifier, unsafe eight/eleven-digit identifier, secret or prohibited named-product comparison. Synthetic fixture paths and full CI links are not such violations.
+  REV-26 PASS README.md explicitly disclaims a working product, release, privacy engine, assistant and interface; the reviewed records make no prohibited custodian, real-place, certification, endorsement, forecast, lookup or go/no-go claim.
+  REV-27 PASS I read AGENTS.md and CLAUDE.md and found matching contents; recorded `cmp AGENTS.md CLAUDE.md` exited 0 on the final commit and reviewed head, and the documentation check reports no agent-file failure.
+  REV-28 N/A Slice S0 creates no synthetic establishment, entity, group, person or salary-file identifier; generated scanner tokens are test fixtures only.
+  REV-29 N/A No Synthetic or Simulated attribute is attached to a real named place or business in the reviewed slice.
+  REV-38 PASS The import-boundary suites passed, no serving-plane gateway import or run-time provider read was found, and provider-none tests and preflight passed with the network unshared.
+  GATE-CI PASS All six required checks succeeded on the final commit: https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474644 , https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474508 , https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474841 ; all six also succeeded on the reviewed head as linked under REV-11.
+  GATE-preflight FAIL F1. The recorded fifteen lines are nine PASS, six WARN plus `store: embedded`, with exit 0, but they omit two checks required by the document 13 table; therefore the gate's complete foundation-preflight statement is false.
+  GATE-test PASS `./eii test --seed 2026111304` exited 0 at the final commit with 1168 passed, 0 failed, 0 skipped; the reviewed-head run also exited 0.
+  GATE-boundary-sandbox PASS The recorded 34 boundary, 22 metadata and 65 sandbox tests passed; both sandbox check commands and the 19-case proof exited 0, including the hosted proof at https://github.com/albarami/economic-investment-intelligence/actions/runs/43318474841 .
+  GATE-independent-APPROVED FAIL F1, F2. These valid round-one findings must be fixed before the gate passes under REV-43; the designated reviewer's APPROVED is not yet recorded.
+FINDINGS:
+  F1 (REV-10, REV-16, REV-17)
+    File: scripts/preflight.py
+    Place: `CHECKS` and `run_preflight`, lines 17-33 and 103-106; `model_key_row` in scripts/preflight_rows.py lines 283-287; OI-110 in OPEN_ITEMS.md line 942
+    Wrong: docs/13_DEPLOYMENT_AND_OPERATIONS.md lines 87-88 require Traffic provider key and Night-lights key checks. Neither appears in `CHECKS` or `run_preflight`; `model_key_row` reads only ANTHROPIC_API_KEY. Consequently preflight emits fourteen checks plus the store line instead of seventeen checks plus the store line, and never inspects TOMTOM_API_KEY, EARTHDATA_API_KEY or EII_TRAFFIC_PROVIDER. This breaks OPS-06's requirement to run every table check, S0-T08's foundation-preflight criterion and the corresponding gate statement. OI-110 incorrectly treats the fifteen-line output as the complete row set.
+    Fix: Add `traffic-provider-key` and `night-lights-key` rows in table order. The first must report TOMTOM_API_KEY present/absent and the EII_TRAFFIC_PROVIDER switch without calling the provider; the second must report EARTHDATA_API_KEY present/absent without contacting a source host. Neither may print a key. Register and invoke both rows, extend the preflight fixtures and tests to assert all seventeen checks plus the store line, and add the OPS-07 dummy-value non-disclosure cases for all three keys. Update OI-110 and the gate evidence with the corrected output. Prove with `./eii preflight`, `./eii test` and `python3 scripts/check_docs.py`, all exit 0.
+  F2 (REV-17)
+    File: TASKS.md
+    Place: S0-T12 Delivery field, line 136
+    Wrong: The status names only pull requests 9 and 12. It omits the S0-T12 follow-up pull request 18, merged as f3e7d5764ed315706c683ea7b3b1f7c82e0897f2, although MAP.md, PROGRESS.md lines 8476-8519 and the gate table at PROGRESS.md line 12192 all include it. The task status is therefore incomplete under REV-17.
+    Fix: Change the status to `status done (pull requests 9 and 12, and follow-up pull request 18, merged 2026-11-12)` and run `python3 scripts/check_docs.py` with exit 0.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+- The lead's judgement (REV-43; each point checked in the files): every finding is valid. The designated reviewer's F1 and the second reviewer's F1 are one defect: the preflight table of document 13 has seventeen checks since decision record 0019, the built preflight ran fifteen, and the output test of OPS-07 covered one key of three. The designated reviewer's F2 (`.env.example` and the tree check's pinned list of its names) and the second reviewer's F2 (the status line of S0-T12) are valid as written
+- The fix: the gate-fix task S0-T16 (pull request 27), whose task log above says how the gap arose and what was changed; its closing record stands directly above this section
+- The three proposed items of the designated reviewer are entered in OPEN_ITEMS.md by this commit as PO-S1-01 to PO-S1-03, for the follow-up task of slice S1 (REV-41): P2 (the two keys in the commit guard's list) was done at once by S0-T16 and is entered closed; P1 (the boundary guard's list of environment names) and P3 (document 17 and its identifiers in the documentation check) are open. The second reviewer proposed none
+
+#### Slice S0 gate — Foundation: gate record, round 2 (pull request https://github.com/albarami/economic-investment-intelligence/pull/26 )
+
+- The slice's final commit is now `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78`: main after the merge of the gate-fix task (pull request 27). Every gate item below was run again by the lead at this commit (TST-166), and the six hosted checks ran on it. The gate record of round 1 and its entries at `50db0e8a9cac22d5d4f8bd602fa1bd9667bee560` stay as they were written (TST-171); the evidence that counts for the gate is that of this record. The gate branch was updated with main before this commit; the commit of this record changes the record files only (this file, the status field of S0-T16 in TASKS.md and three entries of OPEN_ITEMS.md)
+- The update of the gate branch with main (merge commit `6857afe38c5e150f2823ff8625170ba9b42bf44d`), and the lead's proof that it changed nothing by itself: PROGRESS.md by the lead's script that keeps every line of both sides, main's first; TASKS.md by a recorded script that takes main's file with the branch's section of S0-T15 and refuses unless each side changed only its own part:
+
+```text
+base update 6857afe38c5e150f2823ff8625170ba9b42bf44d: branch side 64e988fa65c964d26a83d25ed71a6cc45d7229d4, main side e6151a74649078bdb8d496c3cb4d84f3ebdc8e78, merge base 50db0e8a9cac22d5d4f8bd602fa1bd9667bee560
+  branch only: 0
+  main only: 10
+  neither: 260
+  both, git's own merge: (0, [])
+  both, resolved by the lead's script: (2, ['PROGRESS.md', 'TASKS.md'])
+  FAIL: (0, [])
+```
+
+- The gate, statement by statement, with the entries below that prove each:
+  1. CI is green: the six required checks completed with success on the final commit: `check-docs` https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476700/job/131566867730; `planted-failures` https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800/job/131566868490; `sandbox proof` https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476793/job/131566868393; `secret-scan` https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800/job/131566868205; `static-checks` https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800/job/131566868446; `tests` https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800/job/131566868680
+  2. With `EII_RELEASE_DIR` unset, `./eii preflight` exits zero in foundation mode and runs the seventeen checks of the preflight table; its lines are below
+  3. `./eii test` exits zero: 1176 passed, 0 failed, 0 skipped, seed 2026111309
+  4. Boundary and sandbox tests exist and pass, with their teeth (TST-60, TST-61, TST-62): the import-boundary modules, the package-metadata module, the sandbox modules, the two sandbox check commands and the proof command with its 19 cases; the hosted check `sandbox proof` on the final commit is never skipped
+  5. The independent reviewer returns APPROVED: PENDING (round 2 is a confirmation by the same two reviewers under REV-39; the verdict is entered by the next pull request's ledger)
+- The further evidence that the gate row names: TST-140 (the documentation check), TST-141 (the secret scanner as a commit hook and over the full history in CI; secret scanning and push protection read again at the gate), TST-144 (the scanners' teeth generated at run time: the hook tests, the history-scan tests and the twelve planted failures), TST-155 (the complete suite and preflight with provider `none` and the network unshared)
+- The foundation-mode preflight output at the final commit:
+
+```text
+PASS python: Python and uv match pins.toml
+PASS node-npm: Node and npm match pins.toml
+PASS locked-dependencies: uv.lock and web/package-lock.json match their manifests with network access disabled
+PASS duckdb-extensions: spatial and h3 load from the local folder with network access disabled
+WARN postgresql: EII_DATABASE_URL is not set; store embedded; Docker reachable (server 29.9.3)
+WARN release: not_configured (EII_RELEASE_DIR is not set)
+WARN load-receipt: not_configured (EII_RELEASE_DIR is not set)
+WARN embedded-reader: not_configured (EII_RELEASE_DIR is not set)
+WARN tiles-glyphs-fonts: no_freeze_bundle (no freeze.json under data/freeze; checked with full severity once a freeze bundle exists)
+WARN recorded-replays: not_configured (EII_RELEASE_DIR is not set)
+PASS bubblewrap-sandbox: bubblewrap is present and the sandbox test passes
+PASS api-port: 127.0.0.1:8000 is free
+PASS model-key: absent
+PASS traffic-provider-key: absent; EII_TRAFFIC_PROVIDER simulated
+PASS night-lights-key: absent
+PASS env-not-tracked: .env is not tracked by git
+PASS wsl-interop: cmd.exe printed a Windows version
+store: embedded
+```
+
+- TST-165, every task of the slice is done, the gate-fix task among them. Each pull request below was merged after an APPROVED verdict of a maker other than its builder's and with CI green on the merged head; the verdicts and merge records are the closing records above:
+
+| Task | Pull requests and merge commits |
+|---|---|
+| S0-T01 — Repository scaffolding and tool configuration | pull request 1, merged 2026-11-12, `8edf1023926345b57bcf549cae1079c09c75e55d` |
+| S0-T02 — Python workspace and three packages | pull request 4, merged 2026-11-12, `5ddb81229d6b480b250721ef0fd34d073333bd2f` |
+| S0-T03 — Web application skeleton | pull request 3, merged 2026-11-12, `f32dba33e7a50c6180f226c44b4570cc03447812` |
+| S0-T04 — Lint, format and type checks | pull request 5, merged 2026-11-12, `c930e3bc18452ef48033f641206848be2e8f6976` |
+| S0-T05 — Test runners | pull request 7, merged 2026-11-12, `e5f065d556a037febdbc82191db46c2a696adb02` |
+| S0-T06 — Pre-commit hooks | pull request 19, merged 2026-11-12, `09e9b16556a304259ad256911e7153c7366789f6` |
+| S0-T07 — Continuous integration | pull request 21, merged 2026-11-13, `889e09bbc724b4738ca1b2981bd805dc11ac991f` |
+| S0-T08 — Compose and store preflight | pull request 10, merged 2026-11-12, `2b253e3704f2f6d1308c664f493f30134b3ba4db`; pull request 22, merged 2026-11-12, `e0d01e9ab5784c36493c61e22b3b31de3a87b808`; pull request 24, merged 2026-11-13, `33c082eec62a17c61b9cc87127c2277d9872ef96` |
+| S0-T09 — `./eii` command skeleton and database commands | pull request 15, merged 2026-11-12, `7dd69aa4476c46cd0d1b9e70937513043333fffa` |
+| S0-T10 — Import-boundary test | pull request 8, merged 2026-11-12, `bdfd8d985596537841a066c82d952255057fb4f2`; pull request 11, merged 2026-11-12, `77625c08124311108022d270b85ee6ee73e7b8c3` |
+| S0-T11 — Generator sandbox test | pull request 14, merged 2026-11-12, `103884cb79d7c2e935ebcc42b7f788bca6f510d2` |
+| S0-T12 — Version and retreat pins | pull request 9, merged 2026-11-12, `00388d65384624e0e92944bd26aaf2fd208996de`; pull request 12, merged 2026-11-12, `171869a8a614a9720e78f59913b2b57a0f23ed1a`; pull request 18, merged 2026-11-12, `f3e7d5764ed315706c683ea7b3b1f7c82e0897f2` |
+| S0-T13 — New-library reference notes | pull request 13, merged 2026-11-12, `1ba76a453b623c619647ed51bb92301fb87c0cd8`; pull request 16, merged 2026-11-12, `55321cbf77b87295045325d99a3ff914a6ce9ce4` |
+| S0-T14 — GitHub repository settings | pull request 23, merged 2026-11-13, `06e3257e13df53c122e0e044eef85fdde3200c19` |
+| S0-T15 — Review follow-up for slice S0 | pull request 20, merged 2026-11-12, `0d33863e4ca358f8df00ef06028ec92ff31b016b`; pull request 25, merged 2026-11-13, `50db0e8a9cac22d5d4f8bd602fa1bd9667bee560` |
+| S0-T16 — Gate fix for slice S0 | pull request 27, merged 2026-11-13, `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` |
+
+- Documentation changes merged beside the slice, each with its own review: pull request 2 (decision record 0015), merged 2026-11-12, `452a7fd9cf0fa1f6928446d64261640ae9ec2494`; pull request 6 (decision records 0016 to 0018 and the amended pack), merged 2026-11-12, `9dfd7e820093540355cd60c085e53a618e53ad39`; pull request 17 (decision record 0019 and its amendments), merged 2026-11-12, `a429c5a3b2d01bce0274cfd5583f12b36dccc39d`
+- TST-168, the open items. Every proposed open item of the slice's reviews is closed by the follow-up task S0-T15 (19 of 19; the entry below). No random failure is recorded for the slice: the lead's records of the run hold no test that failed and then passed unchanged. The proposed items of the gate review and of the review of the gate-fix task are entered for the follow-up task of slice S1 (REV-41)
+- For the owner: 27 assumptions name the slice S0 gate as the time they are needed. Each records a default that a task of the slice chose and built, and asks the owner to confirm or replace it; none is a gate statement: OI-39, OI-41, OI-44, OI-45, OI-46, OI-47, OI-48, OI-50, OI-51, OI-52, OI-53, OI-60, OI-61, OI-63, OI-64, OI-80, OI-82, OI-85, OI-90, OI-91, OI-92, OI-93, OI-94, OI-104, OI-106, OI-108, OI-110
+- Also naming the gate and not closed: OI-38 (PENDING). OI-38 asks a maker other than the one that applied them to confirm the 23 corrections of the final read-through of 2026-11-11, as part of the gate review. The texts of those 23 findings are not in this repository (the read-through and its corrections precede the first commit, and the ledger holds their counts only), so the gate reviewers cannot be given the corrected passages; the owner has been asked for the two verdict files, and OI-38 stays PENDING until then. It is not one of the gate's statements, and neither reviewer of round 1 held that it blocks one
+- Reviewers of round 2: the same two (REV-08, REV-39): Google Gemini through the Abacus command-line tool (designated) and Moonshot AI Kimi K3.1 Pro through the Devin command-line tool
+- Verdict of the gate: PENDING
+
+#### Evidence for the final commit `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` (round 2)
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   ./eii preflight
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; 17 lines (11 PASS, 6 WARN, 0 FAIL), last line "store: embedded"
+Seed:      none
+Notes:     Gate statement 2. Foundation mode (EII_RELEASE_DIR is not set): exit code 0; the seventeen checks of the preflight table and the store line; the release, load-receipt, embedded-reader and recorded-replay rows report WARN not_configured; the tiles, glyphs and fonts row warns until a freeze bundle exists (decision 0020); the store row warns and selects the embedded store, because no database address is set; every other row keeps its normal severity and passes here, the two key rows of the gate-fix task among them. The lines stand in the gate record above.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   ./eii test --seed 2026111309
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1176 passed, 0 failed, 0 skipped
+Seed:      2026111309
+Notes:     Gate statement 3 (TST-162). Every network-free suite, none skipped.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 215 text files, 55 Markdown files: OK"
+Seed:      none
+Notes:     TST-140 and TST-162: the documentation check on the final commit.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    34 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Gate statement 4, TST-60: the import-boundary tests of the three packages, with one planted violation for each forbidden edge and each import mechanism, the fresh-interpreter tests and the tests on the real tree.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_workspace_metadata.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    22 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     TST-60, package metadata: no forbidden dependency between the three packages, in the member list, the manifests and the lock.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_sandbox_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    65 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Gate statement 4, TST-61: the sandbox tests; the sentinel outside the public cache and the network attempt both fail inside the sandbox under both profiles, and the same probe outside the sandbox reads the sentinel (the teeth). None is skipped (TST-62).
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python scripts/sandbox_check.py check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox: OK"
+Seed:      none
+Notes:     TST-61: the sandbox check command of rule 44 on this machine.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python scripts/sandbox_check.py check-extensions
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox: OK"
+Seed:      none
+Notes:     TST-61: the engine extensions load inside the sandbox from the local folder.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python scripts/ci_sandbox.py prove
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    19 named cases passed, 0 failed, 0 skipped; RESULT: PASSED
+Seed:      none
+Notes:     TST-61 and TST-62: the proof command of the hosted job, run locally: each of the 19 named behaviour cases exactly once and passed. The hosted run of the same command on the final commit is the check `sandbox proof` in the entry of the check runs.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python scripts/hooks_gitleaks.py verify
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "gitleaks 8.30.1 verified at data/tools/gitleaks/8.30.1/gitleaks"
+Seed:      none
+Notes:     TST-141: the pinned secret scanner is installed as pinned.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_hooks_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    64 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     TST-141 and TST-144: the commit hooks, the commit guard and the scanner; the forbidden tokens are generated at run time in temporary repositories and each scanner must exit non-zero on them.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_ci_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    37 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     TST-141 and TST-144: the workflow rules, the full-history scan with its judge and the planted failures of the CI stages.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: 4 finding(s) on known ledger lines left out (2 line(s))" and "history scan: range HEAD, 27 commits, at least 27 to list, RESULT: PASSED"
+Seed:      none
+Notes:     TST-141: the secret scan over the full history of the checkout; findings on the known ledger line (OI-108) are left out by exact content, everything else fails.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python scripts/ci_plants.py run
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "plants: 12 cases, 12 blocked, 0 failed", RESULT: PASSED
+Seed:      none
+Notes:     TST-04 and TST-144: twelve planted failures, each built at run time in a scratch copy, each blocked by its stage.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   EII_DECISION_PROVIDER=none bwrap --dev-bind / / --unshare-net --die-with-parent ./eii test --seed 2026111310
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1176 passed, 0 failed, 0 skipped
+Seed:      2026111310
+Notes:     TST-155: provider none and the network unshared (a new network namespace with no interface but loopback): the complete suite passes, none skipped. The traffic provider is at its default and neither self-serve key is set in this environment.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   EII_DECISION_PROVIDER=none bwrap --dev-bind / / --unshare-net --die-with-parent ./eii preflight
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; 17 lines (11 PASS, 6 WARN, 0 FAIL), last line "store: embedded"
+Seed:      none
+Notes:     TST-155 and TST-235: preflight with provider none and the network unshared: exit code 0, seventeen check lines.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    494 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard-test discovery of rule 44; none is skipped.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "132 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 128 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The lock matches the manifests.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 59 components: OK"
+Seed:      none
+Notes:     The pin record against the manifests, the locks and the toolchain.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes and their anchors.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The agent files are byte-identical.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   cd web && npm run check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "checked 18 files: OK"
+Seed:      none
+Notes:     The web structure checks.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   cd web && npm run lint
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "> eslint --max-warnings 0 ."
+Seed:      none
+Notes:     Web lint, with the rule of FE-11.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   cd web && npm run format:check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Web format.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   cd web && npm run typecheck
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "> tsc --noEmit"
+Seed:      none
+Notes:     Web types.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   cd web && npm run build
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "✓ built in 109ms"
+Seed:      none
+Notes:     The web build.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   cd web && npm run check:hosts:dist
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "checked 20 files: OK"
+Seed:      none
+Notes:     No host outside the allowed set in the built files.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   cd web && npm run check:dev
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0; last line "PASS dev-server http://127.0.0.1:38099/"
+Seed:      none
+Notes:     The development server binds to the local address only.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   cd web && npm run test:checks
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    675 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The tests of the web checks.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   python3 -I -c "import re,sys; t=open('OPEN_ITEMS.md',encoding='utf-8').read(); s=re.split(r'(?m)^(?=### PO-S0-)',t)[1:]; o=[x.split(' ',2)[1] for x in s if '- TYPE: CLOSED (was OPEN)' not in x]; print(len(s), o); sys.exit(1 if o else 0)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "19 []" (proposed items; those not closed)
+Seed:      none
+Notes:     TST-168: every proposed open item of the slice's reviews is closed.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   python3 -I -c "import re,sys; t=open('OPEN_ITEMS.md',encoding='utf-8').read(); s=[re.split(r'(?m)^## (?!OI-)',x)[0] for x in re.split(r'(?m)^(?=## OI-[0-9]+ )',t)[1:]]; g=[(x.split(' ',2)[1], re.search(r'(?m)^- TYPE: (\w+)',x).group(1)) for x in s if re.search(r'(?m)^- NEEDED BY: .*S0 gate',x)]; o=[a+' '+b for a,b in g if b!='CLOSED']; print(len(g), len(o), o)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "29 28 ['OI-38 PENDING', 'OI-39 ASSUMPTION', 'OI-41 ASSUMPTION', 'OI-44 ASSUMPTION', 'OI-45 ASSUMPTION', 'OI-46 ASSUMPTION', 'OI-47 ASSUMPTION', 'OI-48 ASSUMPTION', 'OI-50 ASSUMPTION', 'OI-51 ASSUMPTION', 'OI-52 ASSUMPTION', 'OI-53 ASSUMPTION', 'OI-60 ASSUMPTION', 'OI-61 ASSUMPTION', 'OI-63 ASSUMPTION', 'OI-64 ASSUMPTION', 'OI-80 ASSUMPTION', 'OI-82 ASSUMPTION', 'OI-85 ASSUMPTION', 'OI-90 ASSUMPTION', 'OI-91 ASSUMPTION', 'OI-92 ASSUMPTION', 'OI-93 ASSUMPTION', 'OI-94 ASSUMPTION', 'OI-104 ASSUMPTION', 'OI-106 ASSUMPTION', 'OI-108 ASSUMPTION', 'OI-110 ASSUMPTION']" (items naming the gate; those not closed; their identifiers and types)
+Seed:      none
+Notes:     TST-168: the open items that name the slice S0 gate as the time they are needed, with their types (the list for the owner in the gate record above).
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   gh api --method GET "repos/{owner}/{repo}/commits/e6151a74649078bdb8d496c3cb4d84f3ebdc8e78/check-runs?per_page=100" --jq '{total_count,check_runs:[.check_runs[]|{name,head_sha,status,conclusion,html_url}]|sort_by(.name)}'
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (the GitHub command-line program, from the repository root)
+Counts:    not a test suite; 6 check runs, 6 completed with success, 0 other: check-docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476700/job/131566867730; planted-failures https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800/job/131566868490; sandbox proof https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476793/job/131566868393; secret-scan https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800/job/131566868205; static-checks https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800/job/131566868446; tests https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800/job/131566868680
+Seed:      none
+Notes:     Gate statement 1 (TST-162): CI on the final commit, triggered by the push of the merge. Exactly the six required checks, each completed with success on this commit; the links are the hosted runs.
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   gh api --method GET repos/{owner}/{repo} --jq '{secret_scanning:.security_and_analysis.secret_scanning.status,secret_scanning_push_protection:.security_and_analysis.secret_scanning_push_protection.status}'
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (the GitHub command-line program, from the repository root)
+Counts:    not a test suite; output {"secret_scanning":"enabled","secret_scanning_push_protection":"enabled"}
+Seed:      none
+Notes:     TST-141: secret scanning and push protection are enabled (read again at the gate).
+```
+
+```text
+### Slice S0 gate — Foundation
+Commit:    e6151a74649078bdb8d496c3cb4d84f3ebdc8e78
+Command:   gh api --method GET repos/{owner}/{repo}/rules/branches/main --jq '[.[]|{type,ruleset_source_type,parameters:(if .type=="required_status_checks" then {required_status_checks:[.parameters.required_status_checks[]|{context}],strict_required_status_checks_policy:.parameters.strict_required_status_checks_policy} else null end)}]'
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (the GitHub command-line program, from the repository root)
+Counts:    not a test suite; four rule types from the repository's ruleset (deletion, non_fast_forward, pull_request, required_status_checks); required contexts: check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests; strict policy true
+Seed:      none
+Notes:     TST-150: the rules active on the base branch at the gate: no deletion, no forced push, pull requests only, the six required checks on an up-to-date head. The identifier of the ruleset is not recorded.
+```
+
+#### Slice S0 gate — Foundation: review round 2, second reviewer: REJECTED for one finding; the correction of one entry of S0-T16
+
+Reviewed commit `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, the head of the gate-record pull request at that time, with all six required checks green on it. Second reviewer: Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only, the records. Its two findings of round 1 are FIXED; it raises one new finding, F3. The verdict is copied unchanged (REV-09) and was posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: slice S0 gate, round 2 (pull request 26)
+COMMIT: 154f1101e78d17ee53d88a9b21bc8e7e16c63a1a
+REVIEWER: Moonshot AI Kimi K3.1 Pro Medium
+EARLIER FINDINGS:
+  F1 FIXED The seventeen table rows in docs/13_DEPLOYMENT_AND_OPERATIONS.md lines 74-90 match, one by one and in order, `CHECKS` and `run_preflight` in scripts/preflight.py lines 17-35 and 73-110. EVIDENCE.md lines 15-34 records the same seventeen checks, exit 0, including `traffic-provider-key` and `night-lights-key`. scripts/preflight_rows.py lines 290-309 implements both without a provider call or key disclosure; scripts/tests/test_preflight_run.py lines 583-708 tests all three dummy keys across output and child arguments. OPEN_ITEMS.md OI-110 line 942 now correctly describes the seventeen-row tuple.
+  F2 FIXED TASKS.md line 136 names pull requests 9, 12 and follow-up pull request 18. The gate table at PROGRESS.md line 13116 also records all three and pull request 18's merge commit `f3e7d5764ed315706c683ea7b3b1f7c82e0897f2`.
+CHECKS:
+  REV-10 FAIL F3 Gate 1 PASS: all six checks succeeded on final commit `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` (https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800, https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476700, https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476793). Gate 2 PASS: foundation preflight exited 0 with seventeen checks, 11 PASS, 6 WARN and the four required `WARN not_configured` rows. Gate 3 PASS: `./eii test --seed 2026111309` exited 0 with 1176 passed, 0 failed, 0 skipped. Gate 4 PASS: 34 boundary, 22 metadata and 65 sandbox tests passed; both sandbox checks and the 19-case proof passed with their teeth. Gate 5 FAIL: independent APPROVED cannot be returned while F3 remains. TST-165 PASS: all sixteen tasks, including S0-T16, are done with pull requests and merge commits recorded. TST-166 PASS: the round-2 gate evidence is recorded against the one final commit. TST-167 PASS: the named boundary, sandbox, documentation, scanner and provider-none evidence passes. TST-168 PASS: PO-S0-01 through PO-S0-19 are closed, no random failure is recorded, and the gate review's proposed items are registered for S1; OI-38 remains pending for unavailable pre-repository texts, not a gate statement.
+  REV-11 PASS On the reviewed head, EVIDENCE.md lines 614-655 records the lead's `./eii test --seed 2026111317` exit 0 with 1176 passed, 0 failed, 0 skipped, and `python3 scripts/check_docs.py` exit 0. Head CI is green: https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831189, https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831268, https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831184. The reviewer ran no commands under the read-only brief.
+  REV-12 PASS DIFF.patch part 1 contains the eleven scoped gate-fix files; part 2 changes only PROGRESS.md, TASKS.md and OPEN_ITEMS.md. Nothing under `data/` changed.
+  REV-13 PASS The new preflight rows and commit-guard entries are real behaviour with runtime-generated test values; no placeholder or fabricated result was added.
+  REV-14 PASS The final full-history scan passed with only the exact-content ledger exceptions documented by OI-108; the diff contains no `.env`, key value or real custodian material. Secret-scan CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800/job/131566868205.
+  REV-15 PASS The test changes add coverage and preserve existing assertions; the two changed expectation indices account for the inserted rows. No skip, suppression, retry, tolerance or assertion was weakened.
+  REV-16 PASS The seventeen pinned check names and ordering match document 13; the provider switch uses only `simulated` or `tomtom`, invalid values fail without echo, and preflight only probes.
+  REV-17 FAIL F3 TASKS.md, OPEN_ITEMS.md and the gate records otherwise reflect the delivered work, and `python3 scripts/check_docs.py` exited 0, but the S0-T16 evidence entry at PROGRESS.md line 12204 assigns its proof to the wrong acceptance-criterion numbers.
+  REV-18 PASS The new probes read only supplied environment mappings and make no provider connection; the guard tests refuse both new local key values without printing them. No secret or provider response is stored.
+  REV-19 PASS S0-T16 implements the gate-fix requirement of TST-169, and PO-S1-01 through PO-S1-03 follow REV-41; no settled decision is reopened.
+  REV-20 N/A The changes add no economic fact, displayed figure, forecast, estimate or calculation requiring provenance and lineage.
+  REV-21 N/A No product screen, claim template, model prose or rendered numeral changed.
+  REV-22 N/A No privacy partition, parameter set, treatment, export, window key or attack-suite behaviour changed.
+  REV-23 PASS The final-commit evidence records 34 import-boundary and 22 workspace-metadata tests passing; the gate-fix diff adds no product-to-custodian edge.
+  REV-24 N/A No English or Arabic product view or bilingual numeral changed.
+  REV-25 PASS The documentation check passed on the final commit and reviewed head; inspection of the changed records and code found no private path, personal details, realistic identifier, secret or prohibited comparison.
+  REV-26 PASS The changed records and output contain no prohibited custodian, real-place, certification, endorsement, forecast, lookup or go/no-go claim.
+  REV-27 PASS Recorded `cmp AGENTS.md CLAUDE.md` exited 0 on both the final commit and reviewed head, and the documentation checks passed.
+  REV-28 N/A No synthetic establishment, entity, group, person or salary-file identifier was introduced.
+  REV-29 N/A No Synthetic or Simulated attribute, figure or fit was attached to a real named place or business.
+  REV-38 PASS Provider-none `./eii test` and `./eii preflight` passed with the network unshared; the diff adds no serving-plane gateway import, runtime provider read, score, badge, panel or live call.
+FINDINGS:
+  F3 (REV-10, REV-17; kind b)
+    File: PROGRESS.md
+    Place: S0-T16 evidence entry for `uv run --locked python -m unittest discover -s scripts/tests -p 'test_preflight_*.py' -v`, Notes at line 12204
+    Wrong: The note calls the preflight tests “Criteria 1, 2 and 4” and then calls the three-dummy-key test “criterion 3”. In TASKS.md line 160, criterion 2 is the three-dummy-key test, criterion 3 is the eleven empty names in `.env.example`, and criterion 4 is the commit-guard refusal. This added ledger entry therefore gives false acceptance-criterion cross-references, so PROGRESS.md is not current as REV-17 requires and the gate cannot yet receive independent APPROVED.
+    Fix: Append a correction naming the entry at line 12204, without editing that earlier entry (TST-171), stating that this command proves S0-T16 criteria 1 and 2; criterion 3 is proved by the example-file/name evidence at lines 12219-12253, criterion 4 by the commit-guard evidence at lines 12207-12217, and criterion 5 by TASKS.md line 136. Run `python3 scripts/check_docs.py`, record its exit code 0 against the new commit, and submit the corrected record for confirmation.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+- The lead's judgement (REV-43): F3 is valid. The lead wrote the notes of the entries of S0-T16 from the numbering of the builder's brief, which had four criteria for the preflight part, before the entry of S0-T16 in TASKS.md had its five criteria. It is corrected here, in the same round, by this appended record; the entry itself is not edited (TST-171)
+- The entry corrected: task S0-T16, commit `260c43c768dfb81895997a202b543f1da0edeb1a`, command `uv run --locked python -m unittest discover -s scripts/tests -p 'test_preflight_*.py' -v`. Its note says "Criteria 1, 2 and 4" and "criterion 3"; those numbers are not the numbers of TASKS.md
+- By the five acceptance criteria of TASKS.md, task S0-T16, the evidence is:
+  1. `./eii preflight` runs the seventeen checks of the preflight table, and neither new row prints a key or makes a call: that command (the two rows, the order of the seventeen names, no program started and no connection opened, foundation mode), the entry of the real preflight with its seventeen lines, and the entry of the planted unknown value of the provider switch
+  2. A test runs preflight with a known dummy value for each of the three keys and finds none in the output: the test `test_no_secret_in_any_line` of `scripts/tests/test_preflight_run.py`, run by that same command
+  3. `.env.example` holds the eleven variable names with empty values: the entries of `python3 scripts/check_tree.py`, of the command that prints the eleven names, and of the tree-check modules
+  4. The commit guard refuses a staged value equal to the local value of either new key without printing it: the entry of `test_hooks_guard.py`
+  5. The status of S0-T12 names its three pull requests: the status line of S0-T12 in TASKS.md, which names pull requests 9, 12 and 18
+- No other note of the entries of S0-T16 numbers a criterion of that task: the entry of the real preflight says criterion 1, which is right, and the entry of the commit guard names criterion 3 of task S0-T06, which is right
+- The documentation check on the commit that carries this correction is part of the lead's checks on the head; they are entered by the next ledger, as for every head
+- The designated reviewer's verdict of round 2 is entered by the next ledger commit
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

@@ -150,18 +150,18 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: routine; personas Platform; status done (pull request 23, merged 2026-11-13).
 ### S0-T15 — Review follow-up for slice S0
 - Goal: Close every proposed open item that the reviews of slice S0 entered in `OPEN_ITEMS.md`, before the slice S0 gate.
-- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Acceptance criteria: [x] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [x] the reviewer checks every closure; [x] no item is deferred out of this task; [x] no item of the slice is left open.
 - Scope: the files the closures change, and `OPEN_ITEMS.md`.
 - Depends: every other task of slice S0.
 - Requirements: REV-41, TST-168.
-- Delivery: routine; personas as the items require; status in review (part A merged in pull request 20 on 2026-11-12; part B in pull request 25).
+- Delivery: routine; personas as the items require; status done (part A, pull request 20, merged 2026-11-12; part B, pull request 25, merged 2026-11-13).
 ### S0-T16 — Gate fix for slice S0
 - Goal: Fix the findings of the first review of the slice S0 gate: bring preflight, the example environment file and the commit guard in line with the checks and variables that decision 0019 added to the pack.
-- Acceptance criteria: [ ] `./eii preflight` runs the seventeen checks of the preflight table, the traffic-provider-key and night-lights-key checks among them, and neither of the two prints a key or makes a call; [ ] a test runs preflight with a known dummy value for each of the three keys and finds none in the output; [ ] `.env.example` holds the eleven variable names with empty values; [ ] the commit guard refuses a staged value equal to the local value of `TOMTOM_API_KEY` or of `EARTHDATA_API_KEY` without printing it; [ ] the status of S0-T12 names its three pull requests.
+- Acceptance criteria: [x] `./eii preflight` runs the seventeen checks of the preflight table, the traffic-provider-key and night-lights-key checks among them, and neither of the two prints a key or makes a call; [x] a test runs preflight with a known dummy value for each of the three keys and finds none in the output; [x] `.env.example` holds the eleven variable names with empty values; [x] the commit guard refuses a staged value equal to the local value of `TOMTOM_API_KEY` or of `EARTHDATA_API_KEY` without printing it; [x] the status of S0-T12 names its three pull requests.
 - Scope: preflight probe modules and their tests, `.env.example` with the tree check's list of its names, the commit guard and its tests, the documents that name those lists, and this file.
 - Depends: S0-T15; the first review of the slice S0 gate.
 - Requirements: OPS-06, OPS-07, ARC-97, ARC-98, TST-141, TST-169.
-- Delivery: routine; personas Platform; status in review (pull request 27).
+- Delivery: routine; personas Platform; status done (pull request 27, merged 2026-11-13).
 
 ## slice S1 — Technical spike
 
