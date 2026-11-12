@@ -119,7 +119,7 @@ Environment incidents observed the same day: the Linux `docker` command inside U
 |---|---|---|
 | Install | `sudo apt install postgresql-18 postgresql-18-postgis-3` (the Ubuntu archive offered 18.6 and PostGIS 3.6.2 on 2026-11-11, feasibility research) | Docker Desktop with WSL integration enabled, or Docker Engine inside Ubuntu (neither path was run end to end on 2026-11-11) |
 | Needs | The owner's sudo once (OPEN ITEM OI-10) | A working `docker` command in Ubuntu |
-| Starts | At boot, by systemd; on demand through `./eii db-up` | `./eii db-up` runs `docker compose up -d --wait --wait-timeout 60 db` |
+| Starts | At boot, by systemd; on demand through `./eii db-up` | `./eii db-up` runs `docker compose -p eii-poc -f infra/compose.yaml --env-file <generated-port-file> up -d --wait --wait-timeout 60 db` |
 | Stage risk | Removes Docker from the stage path | Depends on the Docker control path that failed three ways on 2026-11-11 |
 | Default on stage | Preferred | Fallback when Option N is not installed |
 

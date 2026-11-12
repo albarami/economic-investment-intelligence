@@ -495,7 +495,7 @@
 - TYPE: ASSUMPTION
 - NEEDED: Owner confirmation that task S0-T05 creates the root launcher `eii` with the single command `test`, and that task S0-T09 later adds the other eleven commands and replaces the usage text.
 - WHY: TASKS.md gives task S0-T09 the scope "root `eii` launcher and `scripts/commands/`" (line 105) and the goal to create every pinned command entry point, while the goal of task S0-T05 is that `./eii test` runs the suites (line 75) and its scope is test configuration, test bootstrap files and the `scripts/` test runner (line 77). The pack does not say which task creates the launcher first. docs/13 lines 207 and 219 to 220 give the command and the exit codes 1 and 2 that the launcher uses.
-- DONE SO FAR: `eii` is a short POSIX shell script. Any word other than `test`, or none, prints one line and exits 2; a missing `uv` prints one `FAIL` line and exits 1; otherwise it runs the runner through `uv run --locked` and passes the runner's exit status on. Its behaviour is tested by `scripts/tests/test_launcher.py`, whose tests name no word that a later task pins as a command and pin the usage text only by its prefix `eii: usage error:`, so that adding the other eleven commands does not require editing them. Task S0-T09 owns the usage text for all twelve commands and the test that lists them.
+- DONE SO FAR: `eii` is a short POSIX shell script. Any word other than `test`, or none, prints one line and exits 2; a missing `uv` prints one `FAIL` line and exits 1; otherwise it runs the runner through `uv run --locked` and passes the runner's exit status on. Its behaviour is tested by `scripts/tests/test_launcher.py`, whose tests name no word that a later task pins as a command and pin the usage text only by its prefix `eii: usage error:`, so that adding the other eleven commands does not require editing them. Task S0-T09 owns the usage text for all twelve commands and the test that lists them. S0-T09 has added the twelve usage forms and the dispatch, and `scripts/tests/test_commands.py` checks those forms against the architecture table.
 - OPTIONS: **Recommendation:** keep. Alternative: leave the launcher entirely to S0-T09 and run the runner as `uv run --locked python -I scripts/run_tests.py` until then.
 - NEEDED BY: slice S0 gate.
 
@@ -588,6 +588,56 @@
 - DONE SO FAR: Registry facts of 2026-11-11 and 2026-11-12. `@fontsource/ibm-plex-sans` and `@fontsource/ibm-plex-sans-arabic` 5.3.0 (OFL-1.1, a repackaging, no dependency, no install script, WOFF2 and WOFF files) are recorded as ASSUMPTION rows, state recorded; they are not installed. `@ibm/plex-sans` and `@ibm/plex-sans-arabic` 1.1.0 (OFL-1.1, from the typeface's own repository) depend on IBM's telemetry package and run a `postinstall` script that starts a collector at install time; its README gives an environment variable as the opt-out. That is an install-time matter, not the run-time page that line 431 describes, and the pack does not address it. Vendoring the files with the licence text is slice S3 (FE-97, OI-43); the weight confirmation is S0-T13.
 - OPTIONS: **Recommendation:** the Fontsource packages. Alternative: the IBM packages installed with install scripts switched off and the opt-out variable set, which the pack does not mention.
 - NEEDED BY: slice S3 (FE-97).
+
+## OI-80 — Placeholder exit and the failure line
+
+- ID: OI-80
+- TYPE: ASSUMPTION
+- NEEDED: Owner confirmation that a command whose body is not built exits 1 and never 0, and that a failure prints `FAIL <command>: <detail>` followed by `eii: exit <code>: <meaning>` using the meaning text in the operations document.
+- WHY: OPS-26 requires one code from that table and the meaning on failure. The pack has no code for work that is not built, and it does not give the print format. A code outside 0 to 7 is an internal fault and becomes exit 1.
+- DONE SO FAR: Placeholders, including `down`, exit 1. `build-public` names S2-T01, `load-release` names S3-T02, and `freeze` names S11-T01 and S11-T06. The serving body of `up`, and the bodies of `down`, `build-world` and `build-release`, say `not_built (not built yet)` and name no task. `./eii test` keeps the usage line it already prints. On success, `db-down` prints `PASS db-down: database service stopped`, parallel to the success line stated for `db-up`.
+- OPTIONS: **Recommendation:** keep. Alternative: exit 0 for `down` when no API is running, and print no success line for `db-down`.
+- NEEDED BY: the owner, before the slice S0 gate.
+
+## OI-81 — Database commands are Compose only, use stop, and use fixed time limits
+
+- ID: OI-81
+- TYPE: ASSUMPTION
+- NEEDED: Owner confirmation that `db-up` and `db-down` use Compose only, that `db-down` runs `stop` so the volume stays, and that the outer limits are 90 seconds for `db-up` and 60 seconds for `db-down`.
+- WHY: The operations document offers a native service as well as Compose, and it says `db-down` stops the database and never removes volumes. It is silent on the stop verb and on an outer limit beyond the 60 second Compose wait. A native start needs privileges, and the setup script is not in this tree.
+- DONE SO FAR: Both commands refuse when `docker` is not on PATH. `db-down` runs `stop db`. The wait flag is `--wait-timeout 60`. The process limit is 90 seconds for `db-up` and 60 seconds for `db-down`.
+- OPTIONS: **Recommendation:** keep. Alternatives: add the native service path, or stop with `compose down` without removing volumes.
+- NEEDED BY: the owner, before a task builds a native database start.
+
+## OI-82 — No preflight rows inside the database commands, and no product port ban
+
+- ID: OI-82
+- TYPE: ASSUMPTION
+- NEEDED: Owner confirmation of two readings: `db-up` and `db-down` check that `docker` is on PATH and that `EII_DATABASE_URL` yields a loopback port, and they do not run the preflight rows; the command code has no ban on a port the operations document names.
+- WHY: The command table lists "Tools, database" and "Tools" as the checks those two commands run. The same document names a pack port. The build machine forbids three ports for tests and for the lead; that ban is not written as a product rule.
+- DONE SO FAR: Neither command calls preflight. An unset or invalid `EII_DATABASE_URL` exits 1 and names the variable. There is no default port and no port ban in the command code. The two command-table rows were not edited.
+- OPTIONS: **Recommendation:** keep. Alternative: run the preflight rows before starting, and refuse the pack port in code.
+- NEEDED BY: the owner, before the slice S0 gate.
+
+## OI-83 — The Compose secret file is not created by the database commands
+
+- ID: OI-83
+- TYPE: ASSUMPTION
+- NEEDED: Owner confirmation that `db-up` and `db-down` never create or print the Compose secret file, and that they refuse when it is not a regular file.
+- WHY: The pack names `data/compose/postgres_superuser_password` and does not say which command writes it.
+- DONE SO FAR: Both commands require a regular file at that relative path. The failure line names the path. The commands do not create the file and do not print its contents. `db-down` uses the same check because loading the project can read file secrets.
+- OPTIONS: **Recommendation:** keep; the file is created outside these commands, with owner-only permissions. Alternative: generate a value into the uncommitted data folder.
+- NEEDED BY: the owner, before the first live `db-up`.
+
+## OI-84 — No task is named for four command bodies
+
+- ID: OI-84
+- TYPE: OPEN
+- NEEDED: The owner to name the tasks that build the serving body of `up`, the body of `down`, `build-world` and `build-release`, or to confirm that none is named yet.
+- WHY: A placeholder may name a task only where TASKS.md says that the task builds that command's body. S2-T01, S3-T02, S11-T01 and S11-T06 are named for `build-public`, `load-release` and `freeze`. No task is named for the other four bodies.
+- DONE SO FAR: Those four lines say `not_built (not built yet)` and name no task. The other placeholders name only the tasks listed above.
+- OPTIONS: **Recommendation:** the owner names the tasks, or records that they stay unnamed. Alternative: infer task ids from neighbouring tasks, which was refused.
+- NEEDED BY: the owner, before those four bodies are built.
 
 ## Change control
 

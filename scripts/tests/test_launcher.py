@@ -9,6 +9,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import commands_support as commands
 import runner_support as support
 
 ROOT = support.ROOT
@@ -38,9 +39,30 @@ class Launcher(unittest.TestCase):
                 proc = self._run(args, {"PATH": os.environ.get("PATH", "")})
                 self.assertEqual(proc.returncode, 2, proc.stderr)
                 self.assertEqual(proc.stdout, "")
-                lines = proc.stderr.splitlines()
-                self.assertEqual(len(lines), 1, proc.stderr)
-                self.assertTrue(lines[0].startswith("eii: usage error:"), lines[0])
+                self.assertEqual(proc.stderr, commands.expected_usage(ROOT))
+                self.assertTrue(
+                    proc.stderr.startswith("eii: usage error:"),
+                    proc.stderr,
+                )
+
+    def test_words_reach_uv(self) -> None:
+        folder = self._temp()
+        commands.write_fake_uv(folder)
+        env = {"PATH": str(folder)}
+        for word in commands.pinned_words(ROOT):
+            with self.subTest(word=word):
+                extra = "--embedded" if word == "up" else "marker"
+                proc = self._run((word, extra), env)
+                self.assertEqual(proc.returncode, 7, proc.stdout + proc.stderr)
+                lines = proc.stdout.splitlines()
+                self.assertIn("--locked", lines)
+                self.assertIn(extra, lines)
+                if word == "test":
+                    self.assertIn("scripts/run_tests.py", lines)
+                    self.assertNotIn("scripts/commands/main.py", lines)
+                else:
+                    self.assertIn("scripts/commands/main.py", lines)
+                    self.assertIn(word, lines)
 
     def test_missing_uv(self) -> None:
         empty = self._temp()
