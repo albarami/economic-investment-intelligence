@@ -36,15 +36,25 @@ Rules, in order:
 7. env-example: the staged ``.env.example`` is a regular file, is not
    ignored, and holds exactly the pinned variable names, each with an
    empty value. Its content is read from git's index, never from the
-   work tree.
-8. tracked-ignored: no tracked path is ignored by a committed rule.
+   work tree. When an unsynced ``.gitignore`` affects it, the rule reports
+   that it cannot be judged.
+8. tracked-ignored: no tracked path is ignored by a committed rule. Each
+   unsynced ``.gitignore`` is reported, in sorted order, before the
+   per-path lines.
 
 "Committed rule" means a pattern from a relative path whose last component
-is ``.gitignore``, itself tracked, and whose work-tree content equals its
-staged content. ``.git/info/exclude``, an untracked ``.gitignore`` and any
-personal ignore file never count: every git call uses
-``core.excludesFile=<null device>`` and empty global and system
-configuration.
+is ``.gitignore``, itself tracked, whose index entry and work-tree path are
+both regular files (the work-tree path is not a symbolic link and does not
+lie beyond one) and whose work-tree bytes equal the staged blob read from
+the index. Git's own change detection is not relied on. A tracked
+``.gitignore`` that fails that comparison is unsynced and affects every
+path in its folder and below; the root file affects every path. Rules 4
+to 6 count an affected probe as not ignored by a committed rule. Rule 7
+reports that ``.env.example`` cannot be judged when an unsynced source
+affects it, and rule 8 reports each unsynced source. ``.git/info/exclude``,
+an untracked ``.gitignore`` and any personal ignore file never count:
+every git call uses ``core.excludesFile=<null device>`` and empty global
+and system configuration.
 
 A path that lies beyond a symbolic link (one of its parent folders in the
 work tree is a symbolic link) is never passed to git, because git refuses
@@ -59,6 +69,7 @@ from __future__ import annotations
 import argparse
 import os
 import re
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -112,6 +123,7 @@ ENV_EXAMPLE_NAMES = (
 ENV_NAME = re.compile(r"^[A-Z][A-Z0-9_]*=$")
 
 RULE_COUNT = 8
+REGULAR_INDEX_MODES = (b"100644", b"100755")
 
 
 class CheckError(Exception):
@@ -186,6 +198,60 @@ def ignore_matches(root: Path, paths: set) -> dict:
     return records
 
 
+def index_entry_is_regular(root: Path, source: str) -> bool:
+    """True when the index mode of source is 100644 or 100755."""
+    done = git(root, "ls-files", "-s", "-z", "--", source)
+    if done.returncode != 0:
+        raise CheckError("git ls-files failed")
+    mode = done.stdout.split(b" ", 1)[0]
+    return mode in REGULAR_INDEX_MODES
+
+
+def work_tree_is_regular(root: Path, source: str) -> bool:
+    """True when source is a regular file and not beyond a symbolic link."""
+    if beyond_a_symbolic_link(root, source):
+        return False
+    try:
+        info = (root / source).lstat()
+    except OSError:
+        return False
+    return stat.S_ISREG(info.st_mode)
+
+
+def staged_blob(root: Path, source: str) -> bytes:
+    """Return the staged blob of source."""
+    done = git(root, "cat-file", "blob", f":{source}")
+    if done.returncode != 0:
+        raise CheckError("git cat-file failed")
+    return done.stdout
+
+
+def gitignore_matches_staged(root: Path, source: str) -> bool:
+    """True when a tracked ignore file equals the blob staged for it.
+
+    The index entry and the work-tree path must both be regular files, and
+    the work-tree bytes must equal the staged blob. A symbolic link, a
+    folder or a missing file is rejected before any work-tree byte is read.
+    """
+    if not index_entry_is_regular(root, source):
+        return False
+    if not work_tree_is_regular(root, source):
+        return False
+    try:
+        found = (root / source).read_bytes()
+    except OSError:
+        return False
+    return found == staged_blob(root, source)
+
+
+def gitignore_affects(source: str, path: str) -> bool:
+    """True when source is the root ignore file or a folder above path."""
+    if source == ".gitignore":
+        return True
+    folder = source[:-len(".gitignore")]
+    return folder.endswith("/") and path.startswith(folder)
+
+
 class Checker:
     """The staged state of one work tree, read once."""
 
@@ -195,22 +261,32 @@ class Checker:
         probes = (set(DATA_PROBES) | set(SECRET_PROBES)
                   | set(GENERATED_PROBES) | {ENV_EXAMPLE})
         self.matches = ignore_matches(root, probes | self.tracked)
-        self._committed: dict = {}
+        self._committed: dict[str, bool] = {}
+        self.unsynced = self._unsynced_sources()
+
+    def _unsynced_sources(self) -> list[str]:
+        """Sorted tracked .gitignore paths that do not equal their staged blob."""
+        return sorted(
+            path for path in self.tracked
+            if path.split("/")[-1] == ".gitignore"
+            and not self.source_committed(path))
 
     def source_committed(self, source: str) -> bool:
-        """True when an ignore source is a tracked, unmodified .gitignore."""
+        """True when source is a tracked .gitignore equal to its staged blob."""
         if source not in self._committed:
-            committed = (
+            tracked_gitignore = (
                 not source.startswith("/")
                 and source.split("/")[-1] == ".gitignore"
                 and source in self.tracked)
-            if committed:
-                done = git(self.root, "diff", "--quiet", "--", source)
-                if done.returncode not in (0, 1):
-                    raise CheckError("git diff failed")
-                committed = done.returncode == 0
-            self._committed[source] = committed
+            self._committed[source] = (
+                tracked_gitignore
+                and gitignore_matches_staged(self.root, source))
         return self._committed[source]
+
+    def affected_by_unsynced(self, path: str) -> bool:
+        """True when an unsynced .gitignore lies at the root or above path."""
+        return any(
+            gitignore_affects(source, path) for source in self.unsynced)
 
     def ignored_by_committed_rule(self, path: str) -> bool:
         """True when path has a non-negated record from a committed source."""
@@ -251,7 +327,8 @@ def data_untracked(check: Checker, failures: list) -> None:
 def probes_ignored(check: Checker, failures: list,
                    probes: tuple, rule: str) -> None:
     for probe in probes:
-        if not check.ignored_by_committed_rule(probe):
+        if (check.affected_by_unsynced(probe)
+                or not check.ignored_by_committed_rule(probe)):
             failures.append(
                 f"FAIL {rule}: {probe}: not ignored by a committed rule")
 
@@ -265,6 +342,10 @@ def env_example(check: Checker, failures: list) -> None:
         failures.append(
             f"FAIL env-example: {ENV_EXAMPLE}: "
             f"ignored by {record[0]}:{record[1]}")
+    if check.affected_by_unsynced(ENV_EXAMPLE):
+        failures.append(
+            f"FAIL env-example: {ENV_EXAMPLE}: cannot be judged: "
+            ".gitignore differs from its staged content")
     if not tracked:
         return
     done = git(check.root, "ls-files", "-s", "-z", "--", ENV_EXAMPLE)
@@ -300,6 +381,9 @@ def env_example(check: Checker, failures: list) -> None:
 
 
 def tracked_ignored(check: Checker, failures: list) -> None:
+    for source in check.unsynced:
+        failures.append(
+            f"FAIL tracked-ignored: {source}: differs from its staged content")
     for path in sorted(check.tracked):
         record = check.matches.get(path)
         if (record is not None and not record[2].startswith("!")
