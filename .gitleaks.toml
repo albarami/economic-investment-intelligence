@@ -1,0 +1,8 @@
+# Secret scanner configuration (task S0-T06). The default rules and no allow-list of our own.
+# The default configuration carries a global path allow-list (images, fonts, documents, lock
+# files, vendored folders); it is a stated limit, see OI-93 in OPEN_ITEMS.md.
+# scripts/hooks_gitleaks.py passes this file with --config, so a missing file is fatal.
+title = "eii gitleaks configuration"
+
+[extend]
+useDefault = true
