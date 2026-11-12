@@ -1,0 +1,418 @@
+"""Hosted-runner steps for the sandbox proof (TST-62, task S0-T11).
+
+Commands: ``facts`` (report of the runner; fails when bubblewrap or a package
+is missing), ``install-profile`` (GitHub-hosted runner only), ``prove`` (run the
+sandbox-marked tests and judge each required test case by name).
+
+The restriction of unprivileged user namespaces is handled only by the AppArmor
+profile of the bubblewrap binary. This module never writes a kernel setting and
+never starts another sandbox tool. Every program it starts is judged exactly
+(exit status, standard error, standard output); the judges of the AppArmor
+proof are in ``ci_apparmor`` and those of the test result in ``ci_junit``.
+"""
+
+from __future__ import annotations
+
+import os
+import platform
+import re
+import subprocess
+import sys
+import tempfile
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
+from pathlib import Path
+from typing import TextIO
+
+import ci_apparmor as apparmor
+import ci_junit as junit
+import sandbox_check
+import sandbox_profiles as tables
+
+ROOT = Path(__file__).resolve().parents[1]
+SYSCTL = Path("/proc/sys/kernel/apparmor_restrict_unprivileged_userns")
+APPARMOR_ENABLED = Path("/sys/module/apparmor/parameters/enabled")
+OS_RELEASE = Path("/etc/os-release")
+PROFILE_SOURCE = Path("/usr/share/apparmor/extra-profiles/bwrap-userns-restrict")
+PROFILE_TARGET = Path("/etc/apparmor.d/bwrap-userns-restrict")
+PROBE_ARGV = [
+    tables.BWRAP,
+    "--unshare-user",
+    "--unshare-net",
+    "--ro-bind",
+    "/",
+    "/",
+    "true",
+]
+# The AppArmor attribute file of the reading process (libapparmor's interface
+# that holds even when several security modules are stacked).
+LABEL_FILE = "/proc/self/attr/apparmor/current"
+LABEL_ARGV = [*PROBE_ARGV[:-1], "/usr/bin/cat", LABEL_FILE]
+INSTALL_ARGV = [
+    "sudo",
+    "install",
+    "-m",
+    "0644",
+    str(PROFILE_SOURCE),
+    str(PROFILE_TARGET),
+]
+PARSER_ARGV = ["sudo", "apparmor_parser", "-r", str(PROFILE_TARGET)]
+LISTING_ARGV = ["sudo", "aa-status", "--json"]
+PACKAGES_ARGV = [
+    "dpkg-query",
+    "-W",
+    "-f=${Package} ${Version}\n",
+    "apparmor",
+    "apparmor-profiles",
+    "bubblewrap",
+]
+# dpkg-query prints the packages sorted by name, one line each.
+PACKAGE_LINES = tuple(
+    re.compile(re.escape(name) + r" \S+")
+    for name in ("apparmor", "apparmor-profiles", "bubblewrap")
+)
+HOSTED_RUNNER = {"GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "github-hosted"}
+COMMAND_TIMEOUT = 120.0
+PROVE_TIMEOUT = 1500.0
+EXIT_USAGE = 2
+OUTPUT_TAIL = 4000
+
+
+@dataclass(frozen=True)
+class CommandResult:
+    """What a command printed and how it ended."""
+
+    returncode: int
+    stdout: str
+    stderr: str
+
+
+Runner = Callable[[Sequence[str]], CommandResult]
+ReadText = Callable[[Path], str]
+ReadBytes = Callable[[Path], bytes]
+
+
+def run_command(argv: Sequence[str]) -> CommandResult:
+    """Run a command with a small environment and return what it printed.
+
+    Args:
+        argv: The program and its arguments.
+
+    Returns:
+        The exit status (127 when the program does not exist, 124 on a time-out)
+        and the two outputs.
+    """
+    env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "LANG": "C"}
+    try:
+        done = subprocess.run(
+            list(argv),
+            env=env,
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            errors="replace",
+            timeout=COMMAND_TIMEOUT,
+            check=False,
+        )
+    except FileNotFoundError:
+        return CommandResult(127, "", f"{argv[0]}: not found\n")
+    except subprocess.TimeoutExpired:
+        return CommandResult(
+            124, "", f"{argv[0]}: timed out after {COMMAND_TIMEOUT:g} s\n"
+        )
+    return CommandResult(done.returncode, done.stdout, done.stderr)
+
+
+def judge(
+    what: str, result: CommandResult, expected: Sequence[sandbox_check.Expected]
+) -> list[str]:
+    """Judge a command exactly: status 0, empty standard error, the lines given."""
+    return sandbox_check.output_problems(
+        what, result.returncode, result.stdout, result.stderr, expected
+    )
+
+
+def report(problems: Sequence[str], out: TextIO) -> int:
+    """Print one ``FAIL`` line per problem and return the exit status."""
+    for problem in problems:
+        print(f"FAIL {problem}", file=out)
+    return 1 if problems else 0
+
+
+def restriction_value(read_text: ReadText) -> str:
+    """Read the AppArmor restriction setting without changing it.
+
+    Returns:
+        The trimmed text of the setting, or ``absent`` when the file does not exist.
+    """
+    try:
+        return read_text(SYSCTL).strip()
+    except FileNotFoundError:
+        return "absent"
+
+
+def _try(read_text: ReadText, path: Path) -> str:
+    """Read a file, or return an empty string when it does not exist."""
+    try:
+        return read_text(path)
+    except FileNotFoundError:
+        return ""
+
+
+def facts(runner: Runner, read_text: ReadText, out: TextIO) -> int:
+    """Print what the runner is, changing nothing.
+
+    Args:
+        runner: Runs a command.
+        read_text: Reads a file as text; raises FileNotFoundError when absent.
+        out: Where the lines go.
+
+    Returns:
+        0 when ``bwrap --version`` and ``dpkg-query`` printed exactly the
+        expected lines, 1 otherwise (a missing package or bubblewrap).
+    """
+    name = "unknown"
+    for line in _try(read_text, OS_RELEASE).splitlines():
+        if line.startswith("PRETTY_NAME="):
+            name = line.split("=", 1)[1].strip('"')
+    print(f"os: {name}", file=out)
+    print(f"kernel: {platform.release()}", file=out)
+    print(f"restriction setting: {restriction_value(read_text)}", file=out)
+    print(
+        f"apparmor enabled: {_try(read_text, APPARMOR_ENABLED).strip() or 'unknown'}",
+        file=out,
+    )
+    version = runner([tables.BWRAP, "--version"])
+    print(f"bubblewrap: {version.stdout.strip()}", file=out)
+    packages = runner(PACKAGES_ARGV)
+    for line in packages.stdout.splitlines():
+        print(f"package: {line}", file=out)
+    problems = judge("bwrap --version", version, [sandbox_check.VERSION_LINE])
+    problems += judge("dpkg-query", packages, PACKAGE_LINES)
+    return report(problems, out)
+
+
+def _read(read_bytes: ReadBytes, path: Path) -> bytes | None:
+    """Read a file's bytes, or None when it does not exist."""
+    try:
+        return read_bytes(path)
+    except FileNotFoundError:
+        return None
+
+
+def _place_and_load(runner: Runner, read_bytes: ReadBytes) -> list[str]:
+    """Install the pinned profile file when absent, check it, and load it."""
+    source = _read(read_bytes, PROFILE_SOURCE)
+    if source is None:
+        return [f"profile file not found: {PROFILE_SOURCE}"]
+    problems = apparmor.profile_file_problems(str(PROFILE_SOURCE), source)
+    if problems:
+        return problems
+    target = _read(read_bytes, PROFILE_TARGET)
+    if target is None:
+        problems = judge("install", runner(INSTALL_ARGV), [])
+        if problems:
+            return problems
+        target = _read(read_bytes, PROFILE_TARGET)
+        if target is None:
+            return [f"profile file not found after the install: {PROFILE_TARGET}"]
+    # An existing file that differs from the pin fails here and is never replaced.
+    problems = apparmor.profile_file_problems(str(PROFILE_TARGET), target)
+    if problems:
+        return problems
+    return judge("apparmor_parser -r", runner(PARSER_ARGV), [])
+
+
+def _in_force(runner: Runner, out: TextIO) -> list[str]:
+    """Prove that the profile is loaded, enforced and attached; print raw outputs."""
+    listing = runner(LISTING_ARGV)
+    print(f"aa-status --json raw: exit {listing.returncode}", file=out)
+    print(f"aa-status --json raw stdout: {listing.stdout!r}", file=out)
+    print(f"aa-status --json raw stderr: {listing.stderr!r}", file=out)
+    problems = sandbox_check.exit_problems(
+        "aa-status --json", listing.returncode, listing.stderr
+    )
+    problems += apparmor.status_problems(listing.stdout)
+    if problems:
+        return problems
+    problems = judge("probe after", runner(PROBE_ARGV), [])
+    if problems:
+        return problems
+    label = runner(LABEL_ARGV)
+    print(f"label raw: exit {label.returncode}", file=out)
+    print(f"label raw stdout: {label.stdout!r}", file=out)
+    print(f"label raw stderr: {label.stderr!r}", file=out)
+    problems = sandbox_check.exit_problems("label read", label.returncode, label.stderr)
+    return problems + apparmor.label_problems(label.stdout)
+
+
+def install_profile(
+    environ: Mapping[str, str],
+    runner: Runner,
+    read_bytes: ReadBytes,
+    read_text: ReadText,
+    out: TextIO,
+    err: TextIO,
+) -> int:
+    """Make namespace creation work for bubblewrap, or fail.
+
+    Only on a GitHub-hosted runner. When the restriction does not read 1, the
+    probe must pass and nothing is installed. When it reads 1, the profile file
+    of the distribution package is checked against the pin, installed when
+    absent (an existing file must equal the pin), loaded, listed in enforce
+    mode, the probe must pass, and a program started by bubblewrap must carry
+    the stacked label of the profile. Every other case fails. No kernel setting
+    is written.
+
+    Args:
+        environ: The process environment.
+        runner: Runs a command.
+        read_bytes: Reads a file as bytes; raises FileNotFoundError when absent.
+        read_text: Reads a file as text.
+        out: Where the report goes.
+        err: Where the refusal goes.
+
+    Returns:
+        0 when namespace creation works (with the restriction, through the
+        profile in force), 1 when it does not, 2 when this is not a
+        GitHub-hosted runner (nothing is run then).
+    """
+    if any(environ.get(key) != value for key, value in HOSTED_RUNNER.items()):
+        print(
+            "ci_sandbox: install-profile runs only on a GitHub-hosted runner; nothing was changed",
+            file=err,
+        )
+        return EXIT_USAGE
+    value = restriction_value(read_text)
+    print(f"restriction: {value}", file=out)
+    before = runner(PROBE_ARGV)
+    print(
+        f"probe before: exit {before.returncode}, standard error {before.stderr!r}",
+        file=out,
+    )
+    if value != "1":
+        problems = judge("probe", before, [])
+        if problems:
+            problems.append(
+                f"namespace creation fails while the restriction reads {value}; this step handles only the AppArmor restriction"
+            )
+            return report(problems, out)
+        print("namespace creation works; nothing to install", file=out)
+        return 0
+    problems = _place_and_load(runner, read_bytes) or _in_force(runner, out)
+    if problems:
+        return report(problems, out)
+    print("namespace creation works with the per-binary profile in force", file=out)
+    return 0
+
+
+def pytest_environment(parent: Mapping[str, str], tmp: Path) -> dict[str, str]:
+    """Build the environment of the pytest child from an empty dictionary."""
+    env = {
+        "LANG": "C",
+        "NO_COLOR": "1",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "HYPOTHESIS_STORAGE_DIRECTORY": str(tmp / "hypothesis"),
+    }
+    if "PATH" in parent:
+        env["PATH"] = parent["PATH"]
+    return env
+
+
+def prove(root: Path, parent: Mapping[str, str], out: TextIO) -> int:
+    """Run the sandbox-marked tests and judge each required test case by name.
+
+    Args:
+        root: The repository root.
+        parent: The process environment (only ``PATH`` is passed on).
+        out: Where the report goes.
+
+    Returns:
+        0 when the run is proof, 1 otherwise.
+    """
+    print(sandbox_check.bubblewrap_version(), file=out)
+    with tempfile.TemporaryDirectory() as tmp:
+        result_file = Path(tmp) / "sandbox.xml"
+        command = [
+            sys.executable,
+            "-P",
+            "-s",
+            "-m",
+            "pytest",
+            "-c",
+            "pyproject.toml",
+            "--rootdir",
+            ".",
+            "-m",
+            "sandbox",
+            "--junit-xml",
+            str(result_file),
+        ]
+        try:
+            done = subprocess.run(
+                command,
+                cwd=root,
+                env=pytest_environment(parent, Path(tmp)),
+                stdin=subprocess.DEVNULL,
+                capture_output=True,
+                text=True,
+                errors="replace",
+                timeout=PROVE_TIMEOUT,
+                check=False,
+            )
+        except subprocess.TimeoutExpired:
+            print(f"FAIL sandbox-tests: timed out after {PROVE_TIMEOUT:g} s", file=out)
+            print("RESULT: FAILED", file=out)
+            return 1
+        try:
+            cases = junit.read_cases(result_file.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as error:
+            print(done.stdout[-OUTPUT_TAIL:], file=out)
+            print(f"FAIL sandbox-tests: no usable result file ({error})", file=out)
+            print("RESULT: FAILED", file=out)
+            return 1
+    problems = junit.case_problems(cases, done.returncode)
+    if done.stderr:
+        problems.append(
+            f"FAIL sandbox-tests: standard error is not empty: {done.stderr[-OUTPUT_TAIL:]!r}"
+        )
+    if problems:
+        print(done.stdout[-OUTPUT_TAIL:], file=out)
+    for owner, name, status in sorted(cases):
+        print(f"case {status} {owner}::{name}", file=out)
+    for line in problems:
+        print(line, file=out)
+    print("RESULT: FAILED" if problems else "RESULT: PASSED", file=out)
+    return 1 if problems else 0
+
+
+def main(argv: Sequence[str]) -> int:
+    """Run one command.
+
+    Args:
+        argv: ``facts``, ``install-profile`` or ``prove``.
+
+    Returns:
+        The exit status of the command; 2 for a usage error.
+    """
+    if list(argv) == ["facts"]:
+        return facts(
+            run_command, lambda path: path.read_text(encoding="utf-8"), sys.stdout
+        )
+    if list(argv) == ["install-profile"]:
+        return install_profile(
+            os.environ,
+            run_command,
+            lambda path: path.read_bytes(),
+            lambda path: path.read_text(encoding="utf-8"),
+            sys.stdout,
+            sys.stderr,
+        )
+    if list(argv) == ["prove"]:
+        return prove(ROOT, os.environ, sys.stdout)
+    print("ci_sandbox: usage: facts | install-profile | prove", file=sys.stderr)
+    return EXIT_USAGE
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
