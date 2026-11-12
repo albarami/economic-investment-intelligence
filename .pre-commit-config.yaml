@@ -1,0 +1,75 @@
+# Commit hooks (task S0-T06). Every hook runs a project command; none rewrites a file.
+# Developers install them with: uv run --locked python scripts/hooks_install.py
+# (see README.md, section "Commit hooks"). The same checks are meant to run again in
+# continuous integration (task S0-T07).
+minimum_pre_commit_version: "4.7.0"
+default_stages: [pre-commit]
+repos:
+  - repo: local
+    hooks:
+      - id: commit-guard
+        name: commit guard (no staged local secret value)
+        entry: python3 scripts/commit_guard.py
+        language: unsupported
+        pass_filenames: false
+        always_run: true
+      - id: gitleaks
+        name: gitleaks (staged changes)
+        entry: python3 scripts/hooks_gitleaks.py staged
+        language: unsupported
+        pass_filenames: false
+        always_run: true
+      - id: docs
+        name: documentation check (paths, addresses, tokens, identifier numbers)
+        entry: python3 scripts/check_docs.py
+        language: unsupported
+        pass_filenames: false
+        always_run: true
+      - id: tree
+        name: tree check (staged state)
+        entry: python3 scripts/check_tree.py
+        language: unsupported
+        pass_filenames: false
+        always_run: true
+      - id: versions
+        name: version check
+        entry: python3 scripts/hooks_run.py versions
+        language: unsupported
+        pass_filenames: false
+        always_run: true
+      - id: ruff-check
+        name: ruff check
+        entry: python3 scripts/hooks_run.py ruff-check
+        language: unsupported
+        pass_filenames: false
+        files: '\.pyi?$|(^|/)pyproject\.toml$'
+      - id: ruff-format-check
+        name: ruff format check
+        entry: python3 scripts/hooks_run.py ruff-format-check
+        language: unsupported
+        pass_filenames: false
+        files: '\.pyi?$|(^|/)pyproject\.toml$'
+      - id: mypy
+        name: mypy
+        entry: python3 scripts/hooks_run.py mypy
+        language: unsupported
+        pass_filenames: false
+        files: '\.pyi?$|(^|/)pyproject\.toml$'
+      - id: web-lint
+        name: web lint
+        entry: python3 scripts/hooks_run.py web-lint
+        language: unsupported
+        pass_filenames: false
+        files: '^web/'
+      - id: web-format-check
+        name: web format check
+        entry: python3 scripts/hooks_run.py web-format-check
+        language: unsupported
+        pass_filenames: false
+        files: '^web/'
+      - id: web-typecheck
+        name: web typecheck
+        entry: python3 scripts/hooks_run.py web-typecheck
+        language: unsupported
+        pass_filenames: false
+        files: '^web/'

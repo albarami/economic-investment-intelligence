@@ -314,9 +314,7 @@ def check_forbidden(
                 token = match.group(0)
                 if name == "email" and token in EMAIL_ALLOW:
                     continue
-                if name == "secret":
-                    shown = token[:6] + "..."
-                elif name.startswith("extra-"):
+                if name == "secret" or name.startswith("extra-"):
                     shown = "(matched text not shown)"
                 else:
                     shown = token
