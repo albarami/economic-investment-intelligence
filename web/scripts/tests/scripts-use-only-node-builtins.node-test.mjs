@@ -6,7 +6,9 @@ import { after, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { collectReferences, tokenize } from '../import-tokenizer.mjs';
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-test-scripts-use-only-node-builtins-'));
+const root = fs.mkdtempSync(
+  path.join(os.tmpdir(), 'eii-test-scripts-use-only-node-builtins-'),
+);
 after(() => fs.rmSync(root, { recursive: true, force: true }));
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -53,7 +55,12 @@ function wholeEnvAt(tokens, index) {
   const after = tokens[index + 3];
   if (!dot || dot.type !== 'punct' || dot.value !== '.') return false;
   if (!env || env.type !== 'word' || env.value !== 'env') return false;
-  if (after && after.type === 'punct' && (after.value === '.' || after.value === '[')) return false;
+  if (
+    after &&
+    after.type === 'punct' &&
+    (after.value === '.' || after.value === '[')
+  )
+    return false;
   return true;
 }
 
@@ -67,17 +74,36 @@ function envViolations(text) {
   const hits = [];
   for (let index = 0; index < tokens.length; index += 1) {
     const token = tokens[index];
-    if (token.type !== 'word' || token.value !== 'process' || !wholeEnvAt(tokens, index)) continue;
+    if (
+      token.type !== 'word' ||
+      token.value !== 'process' ||
+      !wholeEnvAt(tokens, index)
+    )
+      continue;
     const before = tokens[index - 1];
     const before2 = tokens[index - 2];
     const after = tokens[index + 3];
-    if (before2 && before2.type === 'word' && before2.value === 'env' && before && before.value === ':') {
+    if (
+      before2 &&
+      before2.type === 'word' &&
+      before2.value === 'env' &&
+      before &&
+      before.value === ':'
+    ) {
       hits.push('env-value');
     }
     const dots = [tokens[index - 1], tokens[index - 2], tokens[index - 3]];
-    if (dots.every((item) => item && item.type === 'punct' && item.value === '.')) hits.push('spread');
+    if (
+      dots.every((item) => item && item.type === 'punct' && item.value === '.')
+    )
+      hits.push('spread');
     const callNames = new Set(['assign', 'stringify', ...SPAWN_NAMES]);
-    if (before && (before.value === '(' || before.value === ',') && after && (after.value === ',' || after.value === ')')) {
+    if (
+      before &&
+      (before.value === '(' || before.value === ',') &&
+      after &&
+      (after.value === ',' || after.value === ')')
+    ) {
       let depth = 0;
       let paren = -1;
       for (let cursor = index; cursor >= 0; cursor -= 1) {
@@ -91,7 +117,8 @@ function envViolations(text) {
           depth -= 1;
         }
       }
-      if (paren !== -1 && callNames.has(calleeBefore(tokens, paren))) hits.push('argument');
+      if (paren !== -1 && callNames.has(calleeBefore(tokens, paren)))
+        hits.push('argument');
     }
   }
   return hits;
@@ -104,7 +131,8 @@ function spawnViolations(text) {
     const token = tokens[index];
     if (token.type !== 'word' || !SPAWN_NAMES.includes(token.value)) continue;
     const previous = tokens[index - 1];
-    if (previous && previous.type === 'punct' && previous.value === '.') continue;
+    if (previous && previous.type === 'punct' && previous.value === '.')
+      continue;
     const open = tokens[index + 1];
     if (!open || open.value !== '(') continue;
     let depth = 0;
@@ -117,7 +145,11 @@ function spawnViolations(text) {
         if (depth === 0) break;
       } else if (item.type === 'word' && item.value === 'env') {
         const next = tokens[cursor + 1];
-        if (next && (next.value === ':' || next.value === ',' || next.value === '}')) hasEnv = true;
+        if (
+          next &&
+          (next.value === ':' || next.value === ',' || next.value === '}')
+        )
+          hasEnv = true;
       }
     }
     if (!hasEnv) hits.push(token.value);
@@ -136,7 +168,10 @@ function markerPattern() {
 
 function importViolations(text) {
   const { references } = collectReferences(text);
-  return references.filter((item) => !item.specifier.startsWith('node:') && !item.specifier.startsWith('.'));
+  return references.filter(
+    (item) =>
+      !item.specifier.startsWith('node:') && !item.specifier.startsWith('.'),
+  );
 }
 
 test('imports', () => {
@@ -153,7 +188,8 @@ test('imports', () => {
     `${IMP}('left-pad');\n`,
     `${REQ}('left-pad');\n`,
   ];
-  for (const sample of samples) assert.ok(importViolations(sample).length > 0, sample);
+  for (const sample of samples)
+    assert.ok(importViolations(sample).length > 0, sample);
   assert.deepEqual(importViolations("import fs from 'node:fs';\n"), []);
 });
 
@@ -177,7 +213,8 @@ test('process env', () => {
     '{ env: { PATH: process.env.PATH } }',
     'const { PATH } = process.env;',
   ];
-  for (const sample of good) assert.deepEqual(envViolations(sample), [], sample);
+  for (const sample of good)
+    assert.deepEqual(envViolations(sample), [], sample);
 });
 
 test('spawn name list is complete', () => {
@@ -190,7 +227,10 @@ test('spawn calls carry env', () => {
   }
   for (const name of SPAWN_NAMES) {
     assert.ok(spawnViolations(`${name}('x')`).includes(name), name);
-    assert.ok(spawnViolations(`${name}('x', { cwd: '.' })`).includes(name), name);
+    assert.ok(
+      spawnViolations(`${name}('x', { cwd: '.' })`).includes(name),
+      name,
+    );
   }
   assert.ok(spawnViolations("spawn('x', { note: 'env:' })").includes('spawn'));
   assert.deepEqual(spawnViolations("spawn('x', { env })"), []);

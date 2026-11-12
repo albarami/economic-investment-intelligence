@@ -69,6 +69,7 @@ const REQUIRED_FILES = [
   'tsconfig.json',
   'index.html',
   'src/main.tsx',
+  'eslint.config.js',
 ];
 const FORBIDDEN_CONFIGS = [
   'vite.config.js',
@@ -89,10 +90,11 @@ function bindTest(t) {
       fn = options;
       options = undefined;
     }
-    const wrapped = (sub) => currentTest.run(sub, () => {
-      bindTest(sub);
-      return fn(sub);
-    });
+    const wrapped = (sub) =>
+      currentTest.run(sub, () => {
+        bindTest(sub);
+        return fn(sub);
+      });
     if (options === undefined) return own(name, wrapped);
     return own(name, options, wrapped);
   };
@@ -103,17 +105,20 @@ function test(name, options, fn) {
     fn = options;
     options = undefined;
   }
-  const wrapped = (t) => currentTest.run(t, () => {
-    bindTest(t);
-    return fn(t);
-  });
+  const wrapped = (t) =>
+    currentTest.run(t, () => {
+      bindTest(t);
+      return fn(t);
+    });
   if (options === undefined) return declareTest(name, wrapped);
   return declareTest(name, options, wrapped);
 }
 
 function tempDir(prefix) {
   const dir = fs.mkdtempSync(path.join(root, prefix));
-  currentTest.getStore().after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  currentTest
+    .getStore()
+    .after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
 
@@ -126,7 +131,14 @@ function childTemp(home) {
 function cleanEnv(extra) {
   const home = tempDir('eii-env-');
   const tmp = childTemp(home);
-  const base = { PATH: process.env.PATH, HOME: home, TMPDIR: tmp, TMP: tmp, TEMP: tmp, LANG: 'C' };
+  const base = {
+    PATH: process.env.PATH,
+    HOME: home,
+    TMPDIR: tmp,
+    TMP: tmp,
+    TEMP: tmp,
+    LANG: 'C',
+  };
   return { ...base, ...extra };
 }
 
@@ -172,7 +184,9 @@ function snapshot(root) {
         rows.push(`dir ${rel}`);
         walk(full);
       } else {
-        const digest = createHash('sha256').update(fs.readFileSync(full)).digest('hex');
+        const digest = createHash('sha256')
+          .update(fs.readFileSync(full))
+          .digest('hex');
         rows.push(`file ${rel} ${info.size} ${digest}`);
       }
     }
@@ -208,10 +222,12 @@ test('complete fixture', () => {
   const root = makeFixture();
   const result = run(['--root', root]);
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  const notes = result.stdout.split('\n').filter((line) => line.startsWith('NOTE deferred:'));
-  assert.equal(notes.length, 2);
+  const notes = result.stdout
+    .split('\n')
+    .filter((line) => line.startsWith('NOTE deferred:'));
+  assert.equal(notes.length, 1);
   const lines = result.stdout.trim().split('\n');
-  assert.equal(lines[lines.length - 1], 'checked 30 entries: OK');
+  assert.equal(lines[lines.length - 1], 'checked 31 entries: OK');
 });
 
 test('real web passes', () => {
@@ -223,12 +239,17 @@ test('real web passes', () => {
 
 test('deferred file present', () => {
   const root = makeFixture();
-  fs.writeFileSync(path.join(root, 'eslint.config.js'), 'x\n');
+  fs.writeFileSync(path.join(root, 'REFERENCE_NOTES.md'), 'x\n');
   const result = run(['--root', root]);
   assert.equal(result.status, 0, result.stdout);
-  const notes = result.stdout.split('\n').filter((line) => line.startsWith('NOTE deferred:'));
-  assert.equal(notes.length, 1);
-  assert.match(result.stdout.trim().split('\n').at(-1), /^checked \d+ entries: OK$/);
+  const notes = result.stdout
+    .split('\n')
+    .filter((line) => line.startsWith('NOTE deferred:'));
+  assert.equal(notes.length, 0);
+  assert.match(
+    result.stdout.trim().split('\n').at(-1),
+    /^checked \d+ entries: OK$/,
+  );
 });
 
 test('each required directory removed', async (t) => {
@@ -261,13 +282,19 @@ test('marker-holding directory with the wrong content', async (t) => {
   await t.test('dangling link named x', () => {
     const root = makeFixture();
     fs.rmSync(path.join(root, 'src', 'state', '.gitkeep'));
-    fs.symlinkSync(path.join(root, 'missing-target'), path.join(root, 'src', 'state', 'x'));
+    fs.symlinkSync(
+      path.join(root, 'missing-target'),
+      path.join(root, 'src', 'state', 'x'),
+    );
     assertFail(run(['--root', root]), 'FAIL empty-directory: src/state');
   });
   await t.test('dangling link named .gitkeep', () => {
     const root = makeFixture();
     fs.rmSync(path.join(root, 'src', 'state', '.gitkeep'));
-    fs.symlinkSync(path.join(root, 'missing-target'), path.join(root, 'src', 'state', '.gitkeep'));
+    fs.symlinkSync(
+      path.join(root, 'missing-target'),
+      path.join(root, 'src', 'state', '.gitkeep'),
+    );
     assertFail(run(['--root', root]), 'FAIL empty-directory: src/state');
   });
   await t.test('folder named .gitkeep', () => {
@@ -295,12 +322,22 @@ test('content directory with the wrong content', async (t) => {
   await t.test('src/app dangling link only', () => {
     const root = makeFixture();
     emptyDirectory(root, 'src/app');
-    fs.symlinkSync(path.join(root, 'missing-target'), path.join(root, 'src', 'app', 'x'));
+    fs.symlinkSync(
+      path.join(root, 'missing-target'),
+      path.join(root, 'src', 'app', 'x'),
+    );
     assertFail(run(['--root', root]), 'FAIL empty-directory: src/app');
   });
   await t.test('tests markers removed folders kept', () => {
     const root = makeFixture();
-    for (const dir of ['unit', 'component', 'e2e', 'visual', 'audit', 'fixtures']) {
+    for (const dir of [
+      'unit',
+      'component',
+      'e2e',
+      'visual',
+      'audit',
+      'fixtures',
+    ]) {
       fs.rmSync(path.join(root, 'tests', dir, '.gitkeep'));
     }
     assertFail(run(['--root', root]), 'FAIL empty-directory: tests');
@@ -334,11 +371,19 @@ test('each required file empty', async (t) => {
   }
 });
 
-test('a directory in place of a file', () => {
-  const root = makeFixture();
-  fs.rmSync(path.join(root, 'index.html'));
-  fs.mkdirSync(path.join(root, 'index.html'));
-  assertFail(run(['--root', root]), 'FAIL missing-file: index.html');
+test('a directory in place of a file', async (t) => {
+  await t.test('index.html', () => {
+    const root = makeFixture();
+    fs.rmSync(path.join(root, 'index.html'));
+    fs.mkdirSync(path.join(root, 'index.html'));
+    assertFail(run(['--root', root]), 'FAIL missing-file: index.html');
+  });
+  await t.test('eslint.config.js', () => {
+    const root = makeFixture();
+    fs.rmSync(path.join(root, 'eslint.config.js'));
+    fs.mkdirSync(path.join(root, 'eslint.config.js'));
+    assertFail(run(['--root', root]), 'FAIL missing-file: eslint.config.js');
+  });
 });
 
 test('each forbidden configuration name', async (t) => {
@@ -360,13 +405,22 @@ test('each forbidden configuration name', async (t) => {
 test('forbidden name as a dangling link or a folder', async (t) => {
   await t.test('dangling link', () => {
     const root = makeFixture();
-    fs.symlinkSync(path.join(root, 'missing-target'), path.join(root, 'vite.config.mjs'));
-    assertFail(run(['--root', root]), 'FAIL unexpected-config: vite.config.mjs');
+    fs.symlinkSync(
+      path.join(root, 'missing-target'),
+      path.join(root, 'vite.config.mjs'),
+    );
+    assertFail(
+      run(['--root', root]),
+      'FAIL unexpected-config: vite.config.mjs',
+    );
   });
   await t.test('folder', () => {
     const root = makeFixture();
     fs.mkdirSync(path.join(root, 'vite.config.mjs'));
-    assertFail(run(['--root', root]), 'FAIL unexpected-config: vite.config.mjs');
+    assertFail(
+      run(['--root', root]),
+      'FAIL unexpected-config: vite.config.mjs',
+    );
   });
 });
 
@@ -376,7 +430,10 @@ test('extra entry allowed', () => {
   fs.writeFileSync(path.join(root, 'README.md'), 'x\n');
   const result = run(['--root', root]);
   assert.equal(result.status, 0, result.stdout);
-  assert.match(result.stdout.trim().split('\n').at(-1), /^checked \d+ entries: OK$/);
+  assert.match(
+    result.stdout.trim().split('\n').at(-1),
+    /^checked \d+ entries: OK$/,
+  );
 });
 
 test('usage', async (t) => {
@@ -409,7 +466,10 @@ test('internal error', () => {
   const longName = path.join(root, 'n'.repeat(LONG_NAME_LENGTH));
   const result = run(['--root', longName]);
   assert.equal(result.status, 1);
-  assert.equal(result.stdout, 'FAIL internal-error: ENAMETOOLONG: name too long, stat\n');
+  assert.equal(
+    result.stdout,
+    'FAIL internal-error: ENAMETOOLONG: name too long, stat\n',
+  );
   assert.equal(result.stdout.includes('    at '), false);
   assert.equal(result.stderr.includes('    at '), false);
 });

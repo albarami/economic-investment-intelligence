@@ -51,11 +51,7 @@ const MARKER_DIRECTORIES = [
   'tests/fixtures',
   'eslint-rules',
 ];
-const CONTENT_DIRECTORIES = [
-  'src',
-  'src/app',
-  'tests',
-];
+const CONTENT_DIRECTORIES = ['src', 'src/app', 'tests'];
 const REQUIRED_FILES = [
   'package.json',
   'package-lock.json',
@@ -63,6 +59,7 @@ const REQUIRED_FILES = [
   'tsconfig.json',
   'index.html',
   'src/main.tsx',
+  'eslint.config.js',
 ];
 const FORBIDDEN_CONFIGS = [
   'vite.config.js',
@@ -71,10 +68,7 @@ const FORBIDDEN_CONFIGS = [
   'vite.config.mts',
   'vite.config.cts',
 ];
-const DEFERRED = [
-  ['eslint.config.js', 'S0-T04'],
-  ['REFERENCE_NOTES.md', 'S0-T13'],
-];
+const DEFERRED = [['REFERENCE_NOTES.md', 'S0-T13']];
 const ENTRY_COUNT = REQUIRED_DIRECTORIES.length + REQUIRED_FILES.length;
 
 function usage(message) {
@@ -99,7 +93,8 @@ function parseArgs(argv) {
     const arg = argv[index];
     if (arg === '--root') {
       const value = argv[index + 1];
-      if (value === undefined || value.startsWith('--')) throw usage('flag --root needs a value');
+      if (value === undefined || value.startsWith('--'))
+        throw usage('flag --root needs a value');
       root = value;
       index += 1;
       continue;
@@ -118,7 +113,8 @@ function statRoot(root) {
   try {
     info = fs.statSync(root);
   } catch (error) {
-    if (error.code === 'ENOENT' || error.code === 'ENOTDIR') throw usage('root is not a directory');
+    if (error.code === 'ENOENT' || error.code === 'ENOTDIR')
+      throw usage('root is not a directory');
     throw error;
   }
   if (!info.isDirectory()) throw usage('root is not a directory');
@@ -189,26 +185,40 @@ function main() {
         failures.push(`FAIL missing-directory: ${dir}: not a directory`);
         continue;
       }
-      if (MARKER_DIRECTORIES.includes(dir) && !markerIsRegularFile(path.join(root, dir))) {
-        failures.push(`FAIL empty-directory: ${dir}: no regular file named .gitkeep`);
+      if (
+        MARKER_DIRECTORIES.includes(dir) &&
+        !markerIsRegularFile(path.join(root, dir))
+      ) {
+        failures.push(
+          `FAIL empty-directory: ${dir}: no regular file named .gitkeep`,
+        );
       }
-      if (CONTENT_DIRECTORIES.includes(dir) && !hasRegularFile(path.join(root, dir))) {
-        failures.push(`FAIL empty-directory: ${dir}: no regular file at any depth`);
+      if (
+        CONTENT_DIRECTORIES.includes(dir) &&
+        !hasRegularFile(path.join(root, dir))
+      ) {
+        failures.push(
+          `FAIL empty-directory: ${dir}: no regular file at any depth`,
+        );
       }
     }
     for (const file of REQUIRED_FILES) {
       const kind = fileKind(path.join(root, file));
       if (kind === 'empty') failures.push(`FAIL empty-file: ${file}: empty`);
-      else if (kind !== 'file') failures.push(`FAIL missing-file: ${file}: not a file`);
+      else if (kind !== 'file')
+        failures.push(`FAIL missing-file: ${file}: not a file`);
     }
     for (const name of FORBIDDEN_CONFIGS) {
       if (existsAny(path.join(root, name))) {
-        failures.push(`FAIL unexpected-config: ${name}: only vite.config.ts may configure Vite`);
+        failures.push(
+          `FAIL unexpected-config: ${name}: only vite.config.ts may configure Vite`,
+        );
       }
     }
     const notes = [];
     for (const [name, owner] of DEFERRED) {
-      if (!existsAny(path.join(root, name))) notes.push(`NOTE deferred: ${name} (${owner})`);
+      if (!existsAny(path.join(root, name)))
+        notes.push(`NOTE deferred: ${name} (${owner})`);
     }
     const tail = failures.length === 0 ? 'OK' : `${failures.length} failure(s)`;
     for (const line of failures) process.stdout.write(`${line}\n`);

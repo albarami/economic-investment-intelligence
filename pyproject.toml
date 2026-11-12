@@ -5,8 +5,29 @@ description = "Root of the uv workspace for the three EII Python packages (scaff
 requires-python = ">=3.14"
 dependencies = []
 
+[dependency-groups]
+dev = [
+  "mypy==2.4.1",
+  "ruff==0.17.4",
+]
+
 [tool.uv]
 package = false
 
 [tool.uv.workspace]
 members = ["core", "custodian", "product"]
+
+[tool.ruff]
+target-version = "py312"
+src = ["scripts", "core/src", "custodian/src", "product/src"]
+extend-exclude = ["*.md"]
+fix = false
+
+[tool.ruff.lint]
+select = ["E4", "E7", "F", "B", "I", "UP", "RUF"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+files = "scripts,core/src,custodian/src,product/src"
+mypy_path = "$MYPY_CONFIG_FILE_DIR/scripts:$MYPY_CONFIG_FILE_DIR/core/src:$MYPY_CONFIG_FILE_DIR/custodian/src:$MYPY_CONFIG_FILE_DIR/product/src"

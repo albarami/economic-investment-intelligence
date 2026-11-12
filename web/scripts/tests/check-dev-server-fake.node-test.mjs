@@ -68,7 +68,9 @@ const FAKE_SERVER = [
   '',
 ].join('\n');
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-test-check-dev-server-fake-'));
+const root = fs.mkdtempSync(
+  path.join(os.tmpdir(), 'eii-test-check-dev-server-fake-'),
+);
 const currentTest = new AsyncLocalStorage();
 after(() => fs.rmSync(root, { recursive: true, force: true }));
 
@@ -79,10 +81,11 @@ function bindTest(t) {
       fn = options;
       options = undefined;
     }
-    const wrapped = (sub) => currentTest.run(sub, () => {
-      bindTest(sub);
-      return fn(sub);
-    });
+    const wrapped = (sub) =>
+      currentTest.run(sub, () => {
+        bindTest(sub);
+        return fn(sub);
+      });
     if (options === undefined) return own(name, wrapped);
     return own(name, options, wrapped);
   };
@@ -93,17 +96,20 @@ function test(name, options, fn) {
     fn = options;
     options = undefined;
   }
-  const wrapped = (t) => currentTest.run(t, () => {
-    bindTest(t);
-    return fn(t);
-  });
+  const wrapped = (t) =>
+    currentTest.run(t, () => {
+      bindTest(t);
+      return fn(t);
+    });
   if (options === undefined) return declareTest(name, wrapped);
   return declareTest(name, options, wrapped);
 }
 
 function tempDir(prefix) {
   const dir = fs.mkdtempSync(path.join(root, prefix));
-  currentTest.getStore().after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  currentTest
+    .getStore()
+    .after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
 
@@ -116,7 +122,14 @@ function childTemp(home) {
 function cleanEnv(extra) {
   const home = tempDir('eii-env-');
   const tmp = childTemp(home);
-  const base = { PATH: process.env.PATH, HOME: home, TMPDIR: tmp, TMP: tmp, TEMP: tmp, LANG: 'C' };
+  const base = {
+    PATH: process.env.PATH,
+    HOME: home,
+    TMPDIR: tmp,
+    TMP: tmp,
+    TEMP: tmp,
+    LANG: 'C',
+  };
   return { ...base, ...extra };
 }
 
@@ -205,11 +218,17 @@ test('bin field, string form', () => {
   const { root, dir } = prepare('good');
   const pkg = path.join(root, 'node_modules', 'vite');
   fs.mkdirSync(pkg, { recursive: true });
-  fs.writeFileSync(path.join(pkg, 'package.json'), '{"bin":"../../fake/server.mjs"}\n');
+  fs.writeFileSync(
+    path.join(pkg, 'package.json'),
+    '{"bin":"../../fake/server.mjs"}\n',
+  );
   const result = run(['--root', root]);
   remember(dir);
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
+  assert.match(
+    result.stdout.trim().split('\n').at(-1),
+    /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/,
+  );
 });
 
 test('bin field, object form', () => {
@@ -223,7 +242,10 @@ test('bin field, object form', () => {
   const result = run(['--root', root]);
   remember(dir);
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
+  assert.match(
+    result.stdout.trim().split('\n').at(-1),
+    /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/,
+  );
 });
 
 test('terminate signal ignored', { timeout: 20000 }, () => {
@@ -232,7 +254,10 @@ test('terminate signal ignored', { timeout: 20000 }, () => {
   const pid = Number(fs.readFileSync(path.join(dir, 'pid'), 'utf8'));
   pids.push(pid);
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
+  assert.match(
+    result.stdout.trim().split('\n').at(-1),
+    /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/,
+  );
   assert.equal(result.stderr, '');
   assert.equal(alive(pid), false);
 });
@@ -245,7 +270,10 @@ test('server that never answers', () => {
     path.join(dir, 'sleep.mjs'),
     "import fs from 'node:fs';\nimport path from 'node:path';\nfs.writeFileSync(path.join(path.dirname(process.argv[1]), 'pid'), String(process.pid));\nsetInterval(() => {}, 1000);\n",
   );
-  fs.writeFileSync(path.join(root, 'index.html'), '<script type="module" src="/main.js"></script>\n');
+  fs.writeFileSync(
+    path.join(root, 'index.html'),
+    '<script type="module" src="/main.js"></script>\n',
+  );
   const started = Date.now();
   const result = run([
     '--root',
@@ -264,14 +292,28 @@ test('server that never answers', () => {
 
 test('answers but prints no Local line', () => {
   const { root, dir, bin } = prepare('no-local');
-  const result = run(['--root', root, '--vite-bin', bin, '--timeout-ms', String(SHORT_TIMEOUT_MS)]);
+  const result = run([
+    '--root',
+    root,
+    '--vite-bin',
+    bin,
+    '--timeout-ms',
+    String(SHORT_TIMEOUT_MS),
+  ]);
   remember(dir);
   assertFail(result, 'FAIL timeout: no accepted answer');
 });
 
 test('prints a Local line for another port', () => {
   const { root, dir, bin } = prepare('wrong-port');
-  const result = run(['--root', root, '--vite-bin', bin, '--timeout-ms', String(SHORT_TIMEOUT_MS)]);
+  const result = run([
+    '--root',
+    root,
+    '--vite-bin',
+    bin,
+    '--timeout-ms',
+    String(SHORT_TIMEOUT_MS),
+  ]);
   remember(dir);
   assertFail(result, 'FAIL timeout: no accepted answer');
 });
@@ -298,13 +340,21 @@ test('page without any module script', () => {
 });
 
 test('content types', async (t) => {
-  for (const type of ['text/javascript', 'application/javascript', 'text/ecmascript', 'application/ecmascript']) {
+  for (const type of [
+    'text/javascript',
+    'application/javascript',
+    'text/ecmascript',
+    'application/ecmascript',
+  ]) {
     await t.test(type, () => {
       const { root, dir, bin } = prepare(`ctype:${type}`);
       const result = run(['--root', root, '--vite-bin', bin]);
       remember(dir);
       assert.equal(result.status, 0, result.stdout + result.stderr);
-      assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/);
+      assert.match(
+        result.stdout.trim().split('\n').at(-1),
+        /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/,
+      );
     });
   }
 });
@@ -355,16 +405,24 @@ test('child exits at once', () => {
 
 test('squatter answers while the child exits', async () => {
   const { root, dir, bin } = prepare('squat-exit');
-  const probe = spawnSync(process.execPath, [
-    '-e',
-    "const n=require('node:net');const s=n.createServer();s.listen(0,'127.0.0.1',()=>{process.stdout.write(String(s.address().port));s.close();});",
-  ], { encoding: 'utf8', env: cleanEnv() });
+  const probe = spawnSync(
+    process.execPath,
+    [
+      '-e',
+      "const n=require('node:net');const s=n.createServer();s.listen(0,'127.0.0.1',()=>{process.stdout.write(String(s.address().port));s.close();});",
+    ],
+    { encoding: 'utf8', env: cleanEnv() },
+  );
   const port = probe.stdout.trim();
   assert.match(port, /^\d+$/);
-  const child = spawn(process.execPath, [SCRIPT, '--root', root, '--port', port, '--vite-bin', bin], {
-    env: cleanEnv(),
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
+  const child = spawn(
+    process.execPath,
+    [SCRIPT, '--root', root, '--port', port, '--vite-bin', bin],
+    {
+      env: cleanEnv(),
+      stdio: ['ignore', 'pipe', 'pipe'],
+    },
+  );
   let stdout = '';
   let stderr = '';
   child.stdout.on('data', (chunk) => {

@@ -25,14 +25,23 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from collections.abc import Callable
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "scripts" / "check_tree.py"
 
 PINNED_FOLDERS = (
-    "contracts", "core", "custodian", "product", "web",
-    "evals", "gateway", "infra", "scripts", "docs",
+    "contracts",
+    "core",
+    "custodian",
+    "product",
+    "web",
+    "evals",
+    "gateway",
+    "infra",
+    "scripts",
+    "docs",
 )
 
 # Each pattern is the only .gitignore line covering at least one probe of its rule.
@@ -56,7 +65,7 @@ PATTERN_RULES = (
 FAIL_LINE = re.compile(r"^FAIL [a-z-]+: [^ ]+: .+$")
 
 
-def child_env(extra: dict | None = None) -> dict:
+def child_env(extra: dict[str, str] | None = None) -> dict[str, str]:
     env = dict(os.environ)
     env["GIT_CONFIG_GLOBAL"] = os.devnull
     env["GIT_CONFIG_SYSTEM"] = os.devnull
@@ -65,20 +74,29 @@ def child_env(extra: dict | None = None) -> dict:
     return env
 
 
-def git(root: Path, *args: str, env_extra: dict | None = None) -> subprocess.CompletedProcess:
+def git(
+    root: Path, *args: str, env_extra: dict[str, str] | None = None
+) -> subprocess.CompletedProcess[bytes]:
     return subprocess.run(
         ["git", "-C", str(root), *args],
-        env=child_env(env_extra), capture_output=True, check=True)
+        env=child_env(env_extra),
+        capture_output=True,
+        check=True,
+    )
 
 
-def run_check(root: Path | None = None, args: tuple = (),
-              env_extra: dict | None = None) -> subprocess.CompletedProcess:
+def run_check(
+    root: Path | None = None,
+    args: tuple[str, ...] = (),
+    env_extra: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess[str]:
     command = [sys.executable, str(SCRIPT)]
     if root is not None:
         command += ["--root", str(root)]
     command += list(args)
     return subprocess.run(
-        command, env=child_env(env_extra), capture_output=True, text=True)
+        command, env=child_env(env_extra), capture_output=True, text=True
+    )
 
 
 def make_fixture(folder: str) -> Path:
@@ -105,7 +123,7 @@ def drop_gitignore_line(root: Path, line: str) -> None:
     path.write_text("\n".join(kept) + "\n", encoding="utf-8")
 
 
-def tree_snapshot(root: Path) -> dict:
+def tree_snapshot(root: Path) -> dict[str, bytes]:
     """Every file under root outside .git/, mapped to its bytes."""
     snapshot = {}
     for path in sorted(root.rglob("*")):
@@ -120,19 +138,21 @@ def tree_snapshot(root: Path) -> dict:
 class CheckTreeCase(unittest.TestCase):
     """Assertions shared by the tree-check test modules. It holds no test."""
 
-    def assert_clean(self, done: subprocess.CompletedProcess) -> None:
+    def assert_clean(self, done: subprocess.CompletedProcess[str]) -> None:
         self.assertEqual(done.returncode, 0, done.stderr + done.stdout)
         self.assertEqual(done.stdout.splitlines(), ["checked 8 rules: OK"])
 
-    def assert_line_starting(self, done: subprocess.CompletedProcess, prefix: str) -> None:
+    def assert_line_starting(
+        self, done: subprocess.CompletedProcess[str], prefix: str
+    ) -> None:
         lines = done.stdout.splitlines()
         self.assertTrue(
             any(line.startswith(prefix) for line in lines),
-            f"no line starting {prefix!r} in output: {done.stdout!r}")
+            f"no line starting {prefix!r} in output: {done.stdout!r}",
+        )
 
 
 class CheckTreeTests(CheckTreeCase):
-
     def test_real_repository_passes(self) -> None:
         self.assert_clean(run_check(REPO_ROOT))
 
@@ -157,8 +177,8 @@ class CheckTreeTests(CheckTreeCase):
             done = run_check(root)
             self.assertEqual(done.returncode, 1)
             self.assertIn(
-                "FAIL committed-folder: core: no tracked file",
-                done.stdout.splitlines())
+                "FAIL committed-folder: core: no tracked file", done.stdout.splitlines()
+            )
 
     def test_unexpected_top_level_folder_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -208,7 +228,8 @@ class CheckTreeTests(CheckTreeCase):
             self.assertEqual(done.returncode, 1)
             self.assertIn(
                 "FAIL data-untracked: data: not a real directory",
-                done.stdout.splitlines())
+                done.stdout.splitlines(),
+            )
 
     def test_probes_beyond_a_symbolic_link_count_as_not_ignored(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -218,16 +239,19 @@ class CheckTreeTests(CheckTreeCase):
             os.symlink(target, root / "data")
             done = run_check(root)
             self.assertEqual(done.returncode, 1)
-            self.assertEqual(done.stdout.splitlines(), [
-                "FAIL data-untracked: data: not a real directory",
-                "FAIL data-ignored: data/public_cache/x: not ignored by a committed rule",
-                "FAIL data-ignored: data/vault/x: not ignored by a committed rule",
-                "FAIL data-ignored: data/releases/x/manifest.json: not ignored by a committed rule",
-                "FAIL data-ignored: data/ledger_local.sqlite: not ignored by a committed rule",
-                "FAIL data-ignored: data/logs/x.jsonl: not ignored by a committed rule",
-                "FAIL data-ignored: data/freeze/x/SHA256SUMS: not ignored by a committed rule",
-                "checked 8 rules: 7 failure(s)",
-            ])
+            self.assertEqual(
+                done.stdout.splitlines(),
+                [
+                    "FAIL data-untracked: data: not a real directory",
+                    "FAIL data-ignored: data/public_cache/x: not ignored by a committed rule",
+                    "FAIL data-ignored: data/vault/x: not ignored by a committed rule",
+                    "FAIL data-ignored: data/releases/x/manifest.json: not ignored by a committed rule",
+                    "FAIL data-ignored: data/ledger_local.sqlite: not ignored by a committed rule",
+                    "FAIL data-ignored: data/logs/x.jsonl: not ignored by a committed rule",
+                    "FAIL data-ignored: data/freeze/x/SHA256SUMS: not ignored by a committed rule",
+                    "checked 8 rules: 7 failure(s)",
+                ],
+            )
 
     def test_data_folder_absent_passes(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -282,7 +306,8 @@ class CheckTreeTests(CheckTreeCase):
             self.assertEqual(done.returncode, 1)
             self.assertIn(
                 "FAIL generated-ignored: web/dist/x: not ignored by a committed rule",
-                done.stdout.splitlines())
+                done.stdout.splitlines(),
+            )
 
     def test_unstaged_gitignore_edit_does_not_count(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -315,7 +340,8 @@ class CheckTreeTests(CheckTreeCase):
             done = run_check(root)
             self.assertEqual(done.returncode, 1)
             self.assert_line_starting(
-                done, "FAIL env-example: .env.example: ignored by")
+                done, "FAIL env-example: .env.example: ignored by"
+            )
 
     def test_env_example_missing_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -325,8 +351,8 @@ class CheckTreeTests(CheckTreeCase):
             done = run_check(root)
             self.assertEqual(done.returncode, 1)
             self.assertIn(
-                "FAIL env-example: .env.example: not tracked",
-                done.stdout.splitlines())
+                "FAIL env-example: .env.example: not tracked", done.stdout.splitlines()
+            )
 
     def test_env_example_with_a_value_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -334,22 +360,29 @@ class CheckTreeTests(CheckTreeCase):
             path = root / ".env.example"
             text = path.read_text(encoding="utf-8")
             path.write_text(
-                text.replace("EII_STORE=\n", "EII_STORE=postgres\n"),
-                encoding="utf-8")
+                text.replace("EII_STORE=\n", "EII_STORE=postgres\n"), encoding="utf-8"
+            )
             git(root, "add", ".env.example")
             done = run_check(root)
             self.assertEqual(done.returncode, 1)
-            self.assertTrue(any(
-                line.startswith("FAIL env-example: .env.example:")
-                and line.endswith("not a name with an empty value")
-                for line in done.stdout.splitlines()))
+            self.assertTrue(
+                any(
+                    line.startswith("FAIL env-example: .env.example:")
+                    and line.endswith("not a name with an empty value")
+                    for line in done.stdout.splitlines()
+                )
+            )
 
     def test_env_example_names_differ_fails(self) -> None:
-        edits = (
+        edits: tuple[tuple[str, Callable[[str], str]], ...] = (
             ("removed name", lambda text: text.replace("EII_STORE=\n", "")),
             ("extra name", lambda text: text + "EXTRA_NAME=\n"),
-            ("swapped names", lambda text: text.replace(
-                "EII_STORE=\nEII_DATABASE_URL=", "EII_DATABASE_URL=\nEII_STORE=")),
+            (
+                "swapped names",
+                lambda text: text.replace(
+                    "EII_STORE=\nEII_DATABASE_URL=", "EII_DATABASE_URL=\nEII_STORE="
+                ),
+            ),
         )
         for label, change in edits:
             with self.subTest(case=label), tempfile.TemporaryDirectory() as folder:
@@ -365,7 +398,8 @@ class CheckTreeTests(CheckTreeCase):
                 self.assertEqual(done.returncode, 1)
                 self.assertIn(
                     "FAIL env-example: .env.example: names differ from the pinned list",
-                    done.stdout.splitlines())
+                    done.stdout.splitlines(),
+                )
 
     def test_env_example_not_utf8_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -376,7 +410,8 @@ class CheckTreeTests(CheckTreeCase):
             self.assertEqual(done.returncode, 1)
             self.assertIn(
                 "FAIL env-example: .env.example: cannot be read as UTF-8",
-                done.stdout.splitlines())
+                done.stdout.splitlines(),
+            )
 
     def test_force_tracked_secret_fails(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -422,8 +457,7 @@ class CheckTreeTests(CheckTreeCase):
             git(root, "commit", "-q", "-m", "fixture", env_extra=identity)
             linked = Path(folder) / "linked"
             linked.mkdir()
-            git(root, "worktree", "add", "-q", "--detach",
-                str(linked / "wt"), "HEAD")
+            git(root, "worktree", "add", "-q", "--detach", str(linked / "wt"), "HEAD")
             self.assert_clean(run_check(linked / "wt"))
 
     def test_unknown_option_exits_2(self) -> None:
@@ -454,8 +488,7 @@ class CheckTreeTests(CheckTreeCase):
             status_before = git(root, "status", "--porcelain").stdout
             run_check(root)
             self.assertEqual(tree_snapshot(root), before)
-            self.assertEqual(
-                git(root, "status", "--porcelain").stdout, status_before)
+            self.assertEqual(git(root, "status", "--porcelain").stdout, status_before)
 
 
 if __name__ == "__main__":

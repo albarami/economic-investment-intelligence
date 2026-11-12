@@ -13,7 +13,9 @@ const SCRIPT = path.join(WEB, 'scripts', 'check-import-boundary.mjs');
 const IMP = 'imp' + 'ort';
 const FROM = 'fr' + 'om';
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-test-check-import-boundary-'));
+const root = fs.mkdtempSync(
+  path.join(os.tmpdir(), 'eii-test-check-import-boundary-'),
+);
 const currentTest = new AsyncLocalStorage();
 after(() => fs.rmSync(root, { recursive: true, force: true }));
 
@@ -24,10 +26,11 @@ function bindTest(t) {
       fn = options;
       options = undefined;
     }
-    const wrapped = (sub) => currentTest.run(sub, () => {
-      bindTest(sub);
-      return fn(sub);
-    });
+    const wrapped = (sub) =>
+      currentTest.run(sub, () => {
+        bindTest(sub);
+        return fn(sub);
+      });
     if (options === undefined) return own(name, wrapped);
     return own(name, options, wrapped);
   };
@@ -38,17 +41,20 @@ function test(name, options, fn) {
     fn = options;
     options = undefined;
   }
-  const wrapped = (t) => currentTest.run(t, () => {
-    bindTest(t);
-    return fn(t);
-  });
+  const wrapped = (t) =>
+    currentTest.run(t, () => {
+      bindTest(t);
+      return fn(t);
+    });
   if (options === undefined) return declareTest(name, wrapped);
   return declareTest(name, options, wrapped);
 }
 
 function tempDir(prefix) {
   const dir = fs.mkdtempSync(path.join(root, prefix));
-  currentTest.getStore().after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  currentTest
+    .getStore()
+    .after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
 
@@ -61,7 +67,14 @@ function childTemp(home) {
 function cleanEnv(extra) {
   const home = tempDir('eii-env-');
   const tmp = childTemp(home);
-  const base = { PATH: process.env.PATH, HOME: home, TMPDIR: tmp, TMP: tmp, TEMP: tmp, LANG: 'C' };
+  const base = {
+    PATH: process.env.PATH,
+    HOME: home,
+    TMPDIR: tmp,
+    TMP: tmp,
+    TEMP: tmp,
+    LANG: 'C',
+  };
   return { ...base, ...extra };
 }
 
@@ -102,7 +115,10 @@ function assertFail(result, prefix) {
 test('extensionless import through a directory symlink', () => {
   const root = makeRoot();
   const outside = tempDir('eii-out-');
-  fs.writeFileSync(path.join(outside, 'secret.ts'), 'export const value = 1;\n');
+  fs.writeFileSync(
+    path.join(outside, 'secret.ts'),
+    'export const value = 1;\n',
+  );
   fs.symlinkSync(outside, path.join(root, 'src', 'linked'));
   plant(root, 'src/app/use.ts', fromLine('../linked/secret'));
   assertFail(run(['--root', root]), 'FAIL outside-web');
@@ -111,7 +127,10 @@ test('extensionless import through a directory symlink', () => {
 test('tsconfig paths through a directory symlink', () => {
   const root = makeRoot();
   const outside = tempDir('eii-out-');
-  fs.writeFileSync(path.join(outside, 'secret.ts'), 'export const value = 1;\n');
+  fs.writeFileSync(
+    path.join(outside, 'secret.ts'),
+    'export const value = 1;\n',
+  );
   fs.symlinkSync(outside, path.join(root, 'src', 'linked'));
   fs.writeFileSync(
     path.join(root, 'tsconfig.json'),

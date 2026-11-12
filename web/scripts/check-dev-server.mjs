@@ -57,24 +57,33 @@ function positiveInteger(value, max) {
 }
 
 function parseArgs(argv) {
-  const out = { root: null, port: null, timeoutMs: DEFAULT_TIMEOUT_MS, viteBin: null };
+  const out = {
+    root: null,
+    port: null,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+    viteBin: null,
+  };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (!arg.startsWith('--')) throw usage(`unknown argument ${arg}`);
     const name = arg.slice(2);
-    if (!['root', 'port', 'timeout-ms', 'vite-bin'].includes(name)) throw usage(`unknown flag ${arg}`);
+    if (!['root', 'port', 'timeout-ms', 'vite-bin'].includes(name))
+      throw usage(`unknown flag ${arg}`);
     const value = argv[index + 1];
-    if (value === undefined || value.startsWith('--')) throw usage(`flag ${arg} needs a value`);
+    if (value === undefined || value.startsWith('--'))
+      throw usage(`flag ${arg} needs a value`);
     index += 1;
     if (name === 'root') out.root = value;
     if (name === 'port') {
       const port = positiveInteger(value, MAX_PORT);
-      if (port === null) throw usage('flag --port needs a positive integer port');
+      if (port === null)
+        throw usage('flag --port needs a positive integer port');
       out.port = port;
     }
     if (name === 'timeout-ms') {
       const timeout = positiveInteger(value);
-      if (timeout === null) throw usage('flag --timeout-ms needs a positive integer');
+      if (timeout === null)
+        throw usage('flag --timeout-ms needs a positive integer');
       out.timeoutMs = timeout;
     }
     if (name === 'vite-bin') out.viteBin = value;
@@ -87,11 +96,14 @@ function devFlags(root) {
   let text;
   try {
     const info = fs.statSync(full);
-    if (!info.isFile()) return { fail: 'FAIL dev-script: package.json: not valid JSON' };
+    if (!info.isFile())
+      return { fail: 'FAIL dev-script: package.json: not valid JSON' };
     text = fs.readFileSync(full, 'utf8');
   } catch (error) {
-    if (error.code === 'ENOENT' || error.code === 'ENOTDIR') return { flags: DEFAULT_FLAGS };
-    if (error.code === 'EISDIR') return { fail: 'FAIL dev-script: package.json: not valid JSON' };
+    if (error.code === 'ENOENT' || error.code === 'ENOTDIR')
+      return { flags: DEFAULT_FLAGS };
+    if (error.code === 'EISDIR')
+      return { fail: 'FAIL dev-script: package.json: not valid JSON' };
     throw error;
   }
   let data;
@@ -101,7 +113,8 @@ function devFlags(root) {
     return { fail: 'FAIL dev-script: package.json: not valid JSON' };
   }
   const dev = data?.scripts?.dev;
-  if (typeof dev !== 'string') return { fail: 'FAIL dev-script: package.json: no scripts.dev string' };
+  if (typeof dev !== 'string')
+    return { fail: 'FAIL dev-script: package.json: no scripts.dev string' };
   const words = dev.split(/\s+/).filter((word) => word.length > 0);
   const flags = words.slice(1);
   let hostOk = false;
@@ -109,12 +122,18 @@ function devFlags(root) {
   let bad = words[0] !== 'vite';
   for (let index = 0; index < flags.length; index += 1) {
     const word = flags[index];
-    if (word === '--port' || word.startsWith('--port=') || word.startsWith('--host=')) bad = true;
+    if (
+      word === '--port' ||
+      word.startsWith('--port=') ||
+      word.startsWith('--host=')
+    )
+      bad = true;
     if (word === '--host' && flags[index + 1] !== '127.0.0.1') bad = true;
     if (word === '--host' && flags[index + 1] === '127.0.0.1') hostOk = true;
     if (word === '--strictPort') strict = true;
   }
-  if (bad || !hostOk || !strict) return { fail: `FAIL dev-script: package.json: ${DEV_DETAIL}` };
+  if (bad || !hostOk || !strict)
+    return { fail: `FAIL dev-script: package.json: ${DEV_DETAIL}` };
   return { flags };
 }
 
@@ -132,32 +151,49 @@ function entryFrom(root) {
   let text;
   try {
     const info = fs.statSync(full);
-    if (!info.isFile()) return { fail: 'FAIL entry-source: index.html: missing' };
+    if (!info.isFile())
+      return { fail: 'FAIL entry-source: index.html: missing' };
     text = fs.readFileSync(full, 'utf8');
   } catch (error) {
-    if (error.code === 'ENOENT' || error.code === 'ENOTDIR') return { fail: 'FAIL entry-source: index.html: missing' };
+    if (error.code === 'ENOENT' || error.code === 'ENOTDIR')
+      return { fail: 'FAIL entry-source: index.html: missing' };
     throw error;
   }
-  const modules = scanTags(text).filter((tag) => tag.name === 'script' && isModule(tag));
+  const modules = scanTags(text).filter(
+    (tag) => tag.name === 'script' && isModule(tag),
+  );
   if (modules.length !== 1) {
-    return { fail: `FAIL entry-source: index.html: expected exactly one module script, found ${modules.length}` };
+    return {
+      fail: `FAIL entry-source: index.html: expected exactly one module script, found ${modules.length}`,
+    };
   }
   const src = srcOf(modules[0]);
-  if (src === undefined) return { fail: 'FAIL entry-source: index.html: module script has no src' };
+  if (src === undefined)
+    return { fail: 'FAIL entry-source: index.html: module script has no src' };
   if (src.includes('://') || src.startsWith('//')) {
-    return { fail: 'FAIL entry-source: index.html: module script src is not a local path' };
+    return {
+      fail: 'FAIL entry-source: index.html: module script src is not a local path',
+    };
   }
   return { entry: src };
 }
 
 function childGone(child) {
-  if (child.exitCode !== null) return `FAIL start-failed: child exited with ${child.exitCode}`;
-  if (child.signalCode !== null) return `FAIL start-failed: child exited with signal ${child.signalCode}`;
+  if (child.exitCode !== null)
+    return `FAIL start-failed: child exited with ${child.exitCode}`;
+  if (child.signalCode !== null)
+    return `FAIL start-failed: child exited with signal ${child.signalCode}`;
   return null;
 }
 
 function isNotYet(error) {
-  return ['ECONNREFUSED', 'ECONNRESET', 'EPIPE', 'TIMEOUT', 'ECONNABORTED'].includes(error?.code);
+  return [
+    'ECONNREFUSED',
+    'ECONNRESET',
+    'EPIPE',
+    'TIMEOUT',
+    'ECONNABORTED',
+  ].includes(error?.code);
 }
 
 function mediaType(headers) {
@@ -197,17 +233,23 @@ async function poll(child, output, port, timeoutMs, outer) {
       setTimeout(resolve, POLL_INTERVAL_MS);
     });
   }
-  return { fail: `FAIL timeout: no accepted answer from http://127.0.0.1:${port}/ within ${timeoutMs} ms` };
+  return {
+    fail: `FAIL timeout: no accepted answer from http://127.0.0.1:${port}/ within ${timeoutMs} ms`,
+  };
 }
 
 async function run() {
   const args = parseArgs(process.argv.slice(2));
-  const root = path.resolve(args.root ?? path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'));
+  const root = path.resolve(
+    args.root ??
+      path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'),
+  );
   let info;
   try {
     info = fs.statSync(root);
   } catch (error) {
-    if (error.code === 'ENOENT' || error.code === 'ENOTDIR') throw usage('root is not a directory');
+    if (error.code === 'ENOENT' || error.code === 'ENOTDIR')
+      throw usage('root is not a directory');
     throw error;
   }
   if (!info.isDirectory()) throw usage('root is not a directory');
@@ -234,7 +276,9 @@ async function run() {
     const target = path.resolve(args.viteBin);
     if (!isFile(target)) {
       const rel = path.relative(root, target).split(path.sep).join('/');
-      process.stdout.write(`FAIL start-failed: vite binary not found: ${rel}\n`);
+      process.stdout.write(
+        `FAIL start-failed: vite binary not found: ${rel}\n`,
+      );
       process.exitCode = 1;
       return;
     }
@@ -261,7 +305,13 @@ async function run() {
     outer.fired = true;
   }, OUTER_BOUND_MS);
   try {
-    const polled = await poll(started.child, started, port, args.timeoutMs, outer);
+    const polled = await poll(
+      started.child,
+      started,
+      port,
+      args.timeoutMs,
+      outer,
+    );
     if (polled.fail) {
       process.stdout.write(`${polled.fail}\n`);
       process.exitCode = 1;
@@ -274,17 +324,22 @@ async function run() {
     }
     const tags = scanTags(polled.response.body);
     const present = tags.some(
-      (tag) => tag.name === 'script' && isModule(tag) && srcOf(tag) === entry.entry,
+      (tag) =>
+        tag.name === 'script' && isModule(tag) && srcOf(tag) === entry.entry,
     );
     if (!present) {
-      process.stdout.write(`FAIL missing-entry: served page has no module script with src ${entry.entry}\n`);
+      process.stdout.write(
+        `FAIL missing-entry: served page has no module script with src ${entry.entry}\n`,
+      );
       process.exitCode = 1;
       return;
     }
     const entryUrl = new URL(entry.entry, `http://127.0.0.1:${port}/`).href;
     const script = await httpGet(entryUrl, REQUEST_TIMEOUT_MS);
     if (script.status !== 200) {
-      process.stdout.write(`FAIL bad-status: ${entry.entry}: ${script.status}\n`);
+      process.stdout.write(
+        `FAIL bad-status: ${entry.entry}: ${script.status}\n`,
+      );
       process.exitCode = 1;
       return;
     }
@@ -297,13 +352,17 @@ async function run() {
     const hits = scanText(polled.response.body, { builtScript: false });
     if (hits.length > 0) {
       for (const hit of hits) {
-        process.stdout.write(`FAIL ${hit.rule}: served page:${hit.line}: ${hit.detail}\n`);
+        process.stdout.write(
+          `FAIL ${hit.rule}: served page:${hit.line}: ${hit.detail}\n`,
+        );
       }
       process.exitCode = 1;
       return;
     }
     if (announcesNetwork(started.text())) {
-      process.stdout.write('FAIL network-announced: served output announces a network address\n');
+      process.stdout.write(
+        'FAIL network-announced: served output announces a network address\n',
+      );
       process.exitCode = 1;
       return;
     }
@@ -331,5 +390,7 @@ async function main() {
   process.exit(process.exitCode ?? 0);
 }
 
-const invoked = process.argv[1] && fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
+const invoked =
+  process.argv[1] &&
+  fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
 if (invoked) main();

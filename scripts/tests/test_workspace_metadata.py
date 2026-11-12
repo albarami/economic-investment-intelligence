@@ -7,7 +7,7 @@ import shutil
 import tempfile
 import tomllib
 import unittest
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import workspace_fields as fields
@@ -137,7 +137,7 @@ class WorkspaceMetadata(unittest.TestCase):
 
     def check_cases(
         self,
-        cases: list[tuple[str, Callable[..., None], list[str]]],
+        cases: Sequence[tuple[str, Callable[..., None], list[str]]],
         on_lock: bool = False,
     ) -> int:
         count = 0
@@ -145,11 +145,11 @@ class WorkspaceMetadata(unittest.TestCase):
             with self.subTest(label=label):
                 count += 1
                 if on_lock:
-                    data = mutated_lock(plant)  # type: ignore[arg-type]
+                    data = mutated_lock(plant)
                     actual = guard.check_lock_data(data)
                 else:
                     root = self.fresh()
-                    plant(root)  # type: ignore[misc]
+                    plant(root)
                     actual = guard.check_workspace(root)
                 self.assertEqual(actual, expected)
         return count
@@ -227,8 +227,8 @@ class WorkspaceMetadata(unittest.TestCase):
             data = fields.read_toml(root / "product/pyproject.toml")
             uv = data.setdefault("tool", {}).setdefault("uv", {})
             src = uv.setdefault("sources", {})
-            if isinstance(src, dict):
-                src["Eii_Custodian"] = {"workspace": True}
+            assert isinstance(src, dict)
+            src["Eii_Custodian"] = {"workspace": True}
             (root / "product/pyproject.toml").write_text(
                 guard.dump_toml(data),
                 encoding="utf-8",
@@ -273,7 +273,7 @@ class WorkspaceMetadata(unittest.TestCase):
         self.assertEqual(n, 7)
 
     def test_missing_and_unparsable_pyproject_fail(self) -> None:
-        n = self.check_cases(fields.invalid_pyproject_cases())  # type: ignore[arg-type]
+        n = self.check_cases(fields.invalid_pyproject_cases())
         self.assertEqual(n, fields.COUNT_PYPROJECT_CASES)
 
     def test_forbidden_edge_in_lock(self) -> None:
@@ -282,11 +282,16 @@ class WorkspaceMetadata(unittest.TestCase):
             for rep in range(len(fields.PACKAGE_LOCK_PLANTS)):
                 with self.subTest(source=source, target=target, rep=rep):
                     count += 1
-                    data = mutated_lock(
-                        lambda lock, s=source, t=target, r=rep: (
-                            fields.apply_package_lock_plant(lock, r, s, t)
-                        ),
-                    )
+
+                    def plant_edge(
+                        lock: dict[str, object],
+                        s: str = source,
+                        t: str = target,
+                        r: int = rep,
+                    ) -> None:
+                        fields.apply_package_lock_plant(lock, r, s, t)
+
+                    data = mutated_lock(plant_edge)
                     expected = [
                         f"FAIL lock: uv.lock: edge {source} -> {target} is not allowed",
                     ]
@@ -296,7 +301,11 @@ class WorkspaceMetadata(unittest.TestCase):
     def test_expected_edge_missing_in_lock(self) -> None:
         for name in ("eii-custodian", "eii-product"):
             with self.subTest(name=name):
-                data = mutated_lock(lambda lock, n=name: fields.drop_core_edge(lock, n))
+
+                def plant_drop_edge(lock: dict[str, object], n: str = name) -> None:
+                    fields.drop_core_edge(lock, n)
+
+                data = mutated_lock(plant_drop_edge)
                 expected = [f"FAIL lock: uv.lock: edge {name} -> eii-core is missing"]
                 self.assertEqual(guard.check_lock_data(data), expected)
 
@@ -306,24 +315,33 @@ class WorkspaceMetadata(unittest.TestCase):
         data = mutated_lock(fields.drop_product)
         self.assertEqual(guard.check_lock_data(data), expected)
         n += 1
-        data = mutated_lock(
-            lambda lock: (
-                fields.drop_product(lock),
-                lock.setdefault("package", []).append("eii-product"),
-            ),
-        )
+
+        def plant_drop_and_bad_name(lock: dict[str, object]) -> None:
+            fields.drop_product(lock)
+            pkg = lock.setdefault("package", [])
+            assert isinstance(pkg, list)
+            pkg.append("eii-product")
+
+        data = mutated_lock(plant_drop_and_bad_name)
         self.assertEqual(guard.check_lock_data(data), expected)
         n += 1
-        data = mutated_lock(
-            lambda lock: next(
-                e for e in lock.get("package", []) if e.get("name") == "eii-product"
-            ).__setitem__("name", "Eii_Product"),
-        )
+
+        def plant_rename_product(lock: dict[str, object]) -> None:
+            pkg = lock.get("package", [])
+            assert isinstance(pkg, list)
+            row = next(e for e in pkg if e.get("name") == "eii-product")
+            row["name"] = "Eii_Product"
+
+        data = mutated_lock(plant_rename_product)
         self.assertEqual(guard.check_lock_data(data), [])
         n += 1
-        data = mutated_lock(
-            lambda lock: lock.setdefault("package", []).append({"name": 1}),
-        )
+
+        def plant_bad_package_row(lock: dict[str, object]) -> None:
+            pkg = lock.setdefault("package", [])
+            assert isinstance(pkg, list)
+            pkg.append({"name": 1})
+
+        data = mutated_lock(plant_bad_package_row)
         self.assertEqual(guard.check_lock_data(data), [])
         n += 1
         self.assertEqual(n, 4)
@@ -338,11 +356,16 @@ class WorkspaceMetadata(unittest.TestCase):
             for target in fields.NAMES:
                 with self.subTest(field=field, rep=rep, target=target):
                     count += 1
-                    data = mutated_lock(
-                        lambda lock, f=field, r=rep, t=target: (
-                            fields.apply_wide_lock_plant(lock, f, t, r)
-                        ),
-                    )
+
+                    def plant_wide(
+                        lock: dict[str, object],
+                        f: str = field,
+                        r: int = rep,
+                        t: str = target,
+                    ) -> None:
+                        fields.apply_wide_lock_plant(lock, f, t, r)
+
+                    data = mutated_lock(plant_wide)
                     expected = [f"FAIL lock: uv.lock: {field} names {target}"]
                     self.assertEqual(guard.check_lock_data(data), expected)
         self.assertEqual(count, fields.COUNT_WIDE)
@@ -351,12 +374,15 @@ class WorkspaceMetadata(unittest.TestCase):
         count = 0
         base = tomllib.loads((REPO_ROOT / "uv.lock").read_text(encoding="utf-8"))
         packages = base.get("package", [])
+        assert isinstance(packages, list)
         idx = next(i for i, e in enumerate(packages) if e.get("name") == "eii-core")
         for value in BAD_PATHS:
             with self.subTest(where="source", value=value):
                 count += 1
+
                 def plant_src(lock: dict[str, object], v: str = value) -> None:
-                    pkg = lock["package"]
+                    pkg = lock.get("package", [])
+                    assert isinstance(pkg, list)
                     row = next(e for e in pkg if e.get("name") == "eii-core")
                     row["source"] = {"editable": v}
 
@@ -366,28 +392,44 @@ class WorkspaceMetadata(unittest.TestCase):
                 self.assertEqual(_lock_path_lines(data), expected)
             with self.subTest(where="requires-python", value=value):
                 count += 1
-                data = mutated_lock(
-                    lambda lock, v=value: lock.__setitem__("requires-python", v),
-                )
+
+                def plant_requires_python(
+                    lock: dict[str, object], v: str = value
+                ) -> None:
+                    lock["requires-python"] = v
+
+                data = mutated_lock(plant_requires_python)
                 expected = [f"FAIL lock-paths: uv.lock: requires-python: {_PATH_ERR}"]
                 self.assertEqual(_lock_path_lines(data), expected)
         self.assertEqual(count, fields.COUNT_PATHS)
 
     def test_missing_and_unparsable_lock_fail(self) -> None:
         cases = [
-            ("deleted", lambda r: (r / "uv.lock").unlink(), [
-                "FAIL lock: uv.lock: missing or not valid TOML",
-            ]),
-            ("bad", lambda r: (r / "uv.lock").write_text(fields.NOT_VALID), [
-                "FAIL lock: uv.lock: missing or not valid TOML",
-            ]),
-            ("utf16", lambda r: (r / "uv.lock").write_bytes(b"\xff\xfe"), [
-                "FAIL lock: uv.lock: missing or not valid TOML",
-            ]),
+            (
+                "deleted",
+                lambda r: (r / "uv.lock").unlink(),
+                [
+                    "FAIL lock: uv.lock: missing or not valid TOML",
+                ],
+            ),
+            (
+                "bad",
+                lambda r: (r / "uv.lock").write_text(fields.NOT_VALID),
+                [
+                    "FAIL lock: uv.lock: missing or not valid TOML",
+                ],
+            ),
+            (
+                "utf16",
+                lambda r: (r / "uv.lock").write_bytes(b"\xff\xfe"),
+                [
+                    "FAIL lock: uv.lock: missing or not valid TOML",
+                ],
+            ),
         ]
-        n = self.check_cases(cases)  # type: ignore[arg-type]
+        n = self.check_cases(cases)
         none_line = ["FAIL lock: uv.lock: missing or not valid TOML"]
-        parsed_none = guard.check_lock_data(None)  # type: ignore[arg-type]
+        parsed_none = guard.check_lock_data(None)
         self.assertEqual(parsed_none, none_line)
         self.assertEqual(n + 1, 4)
 
@@ -398,26 +440,35 @@ class WorkspaceMetadata(unittest.TestCase):
         self.assertEqual(listing(root), before)
 
     def test_lock_ignores_self_and_third_party_edges(self) -> None:
-        data = mutated_lock(
-            lambda lock: (
-                fields.add_dependency(lock, "eii-core", "eii-core"),
-                fields.add_dependency(lock, "eii-custodian", "eii-custodian"),
-            ),
-        )
+        def plant_self_edges(lock: dict[str, object]) -> None:
+            fields.add_dependency(lock, "eii-core", "eii-core")
+            fields.add_dependency(lock, "eii-custodian", "eii-custodian")
+
+        data = mutated_lock(plant_self_edges)
         self.assertEqual(
-            [l for l in guard.check_lock_data(data) if "edge" in l],
+            [line for line in guard.check_lock_data(data) if "edge" in line],
             [],
         )
-        data = mutated_lock(
-            lambda lock: lock.setdefault("package", []).append({
-                "name": "requests",
-                "version": "0.0.0",
-                "source": {"registry": "registry"},
-                "dependencies": [{"name": "eii-core"}],
-            }),
-        )
+
+        def plant_requests(lock: dict[str, object]) -> None:
+            pkg = lock.setdefault("package", [])
+            assert isinstance(pkg, list)
+            pkg.append(
+                {
+                    "name": "requests",
+                    "version": "0.0.0",
+                    "source": {"registry": "registry"},
+                    "dependencies": [{"name": "eii-core"}],
+                }
+            )
+
+        data = mutated_lock(plant_requests)
         self.assertEqual(
-            [l for l in guard.check_lock_data(data) if "edge" in l and "requests" in l],
+            [
+                line
+                for line in guard.check_lock_data(data)
+                if "edge" in line and "requests" in line
+            ],
             [],
         )
         data = mutated_lock(fields.plant_registry_forbidden_edge)

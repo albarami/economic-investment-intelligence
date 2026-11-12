@@ -14,15 +14,23 @@ EXPECTED_PYPROJECT_FIELDS, EXPECTED_PYPROJECT_PLANTS = 34, 44
 EXPECTED_PACKAGE_LOCK_PLANTS, EXPECTED_WIDE_LOCK_PLANTS = 8, 14
 COUNT_EVERY_PLACE, COUNT_LOCK_EDGES, COUNT_WIDE = 176, 80, 42
 COUNT_PATHS, COUNT_SPELLINGS, COUNT_PYPROJECT_CASES = 20, 10, 9
-MEMBERS = ("core", "custodian", "product")
-NAMES = ("eii-core", "eii-custodian", "eii-product")
+MEMBERS: tuple[str, ...] = ("core", "custodian", "product")
+NAMES: tuple[str, ...] = ("eii-core", "eii-custodian", "eii-product")
 NOT_VALID = "not = [valid"
 FILLER = "filler"
 PIP_KEYS = (
-    "config-settings-package", "dependency-metadata", "exclude-newer-package",
-    "extra-build-dependencies", "extra-build-variables", "no-binary",
-    "no-build-isolation-package", "no-emit-package", "no-sources-package",
-    "only-binary", "reinstall-package", "upgrade-package",
+    "config-settings-package",
+    "dependency-metadata",
+    "exclude-newer-package",
+    "extra-build-dependencies",
+    "extra-build-variables",
+    "no-binary",
+    "no-build-isolation-package",
+    "no-emit-package",
+    "no-sources-package",
+    "only-binary",
+    "reinstall-package",
+    "upgrade-package",
 )
 
 
@@ -105,7 +113,7 @@ def adds(name: str) -> Callable[[dict[str, Any]], None]:
     return change
 
 
-def _plant_list(parts: list[str]) -> Callable[[dict[str, Any], str, str], None]:
+def _plant_list(parts: list[str]) -> Callable[[str, str, dict[str, Any]], None]:
     def plant(t: str, _f: str, data: dict[str, Any]) -> None:
         _extend(data, parts, t)
 
@@ -191,7 +199,7 @@ def _pip_path(key: str) -> list[str]:
     return ["tool", "uv", "pip", key]
 
 
-PYPROJECT_PLANTS: list[tuple[str, Callable[[dict[str, Any], str, str], None]]] = []
+PYPROJECT_PLANTS: list[tuple[str, Callable[[str, str, dict[str, Any]], None]]] = []
 for label, parts in (
     ("project.dependencies", ["project", "dependencies"]),
     ("build-system.requires", ["build-system", "requires"]),
@@ -217,81 +225,90 @@ PYPROJECT_PLANTS += [
     ("dependency-groups", _plant_dg),
     ("tool.uv.sources", _plant_sources),
 ]
+
+
+def _bind_mode_plant(
+    mode: int,
+    fn: Callable[[str, str, dict[str, Any], int], None],
+) -> Callable[[str, str, dict[str, Any]], None]:
+    def plant(t: str, f: str, d: dict[str, Any]) -> None:
+        fn(t, f, d, mode)
+
+    return plant
+
+
+def _bind_map(dotted: str) -> Callable[[str, str, dict[str, Any]], None]:
+    def plant(t: str, f: str, d: dict[str, Any]) -> None:
+        _plant_map(t, f, d, dotted)
+
+    return plant
+
+
+def _bind_depmeta(
+    mode: int,
+    dotted: str,
+) -> Callable[[str, str, dict[str, Any]], None]:
+    def plant(t: str, f: str, d: dict[str, Any]) -> None:
+        _plant_depmeta(t, f, d, mode, dotted)
+
+    return plant
+
+
+def _bind_extra_build(
+    mode: int,
+    dotted: str,
+) -> Callable[[str, str, dict[str, Any]], None]:
+    def plant(t: str, f: str, d: dict[str, Any]) -> None:
+        _plant_extra_build(t, f, d, mode, dotted)
+
+    return plant
+
+
 def _mode_plants(
     label: str,
     fn: Callable[[str, str, dict[str, Any], int], None],
     modes: int,
 ) -> None:
     for mode in range(modes):
-        PYPROJECT_PLANTS.append(
-            (label, lambda t, f, d, m=mode: fn(t, f, d, m)),
-        )
+        PYPROJECT_PLANTS.append((label, _bind_mode_plant(mode, fn)))
 
 
-_mode_plants(
-    "tool.uv.override-dependencies",
-    lambda t, f, d, m: _plant_scoped(t, f, d, m, "tool.uv.override-dependencies"),
-    3,
-)
-_mode_plants(
-    "tool.uv.exclude-dependencies",
-    lambda t, f, d, m: _plant_scoped(t, f, d, m, "tool.uv.exclude-dependencies"),
-    3,
-)
+def _plant_override_deps(t: str, f: str, d: dict[str, Any], m: int) -> None:
+    _plant_scoped(t, f, d, m, "tool.uv.override-dependencies")
+
+
+def _plant_exclude_deps(t: str, f: str, d: dict[str, Any], m: int) -> None:
+    _plant_scoped(t, f, d, m, "tool.uv.exclude-dependencies")
+
+
+_mode_plants("tool.uv.override-dependencies", _plant_override_deps, 3)
+_mode_plants("tool.uv.exclude-dependencies", _plant_exclude_deps, 3)
 _mode_plants("tool.uv.dependency-metadata", _plant_depmeta, 2)
 PYPROJECT_PLANTS += [
     ("tool.uv.conflicts", _plant_conflicts),
-    (
-        "tool.uv.config-settings-package",
-        lambda t, f, d: _plant_map(t, f, d, "tool.uv.config-settings-package"),
-    ),
-    (
-        "tool.uv.exclude-newer-package",
-        lambda t, f, d: _plant_map(t, f, d, "tool.uv.exclude-newer-package"),
-    ),
+    ("tool.uv.config-settings-package", _bind_map("tool.uv.config-settings-package")),
+    ("tool.uv.exclude-newer-package", _bind_map("tool.uv.exclude-newer-package")),
 ]
 _mode_plants("tool.uv.extra-build-dependencies", _plant_extra_build, 3)
 PYPROJECT_PLANTS.append(
-    (
-        "tool.uv.extra-build-variables",
-        lambda t, f, d: _plant_map(t, f, d, "tool.uv.extra-build-variables"),
-    ),
+    ("tool.uv.extra-build-variables", _bind_map("tool.uv.extra-build-variables")),
 )
 for key in PIP_KEYS:
     if key in ("dependency-metadata",):
         for mode in range(2):
             dotted = f"tool.uv.pip.{key}"
-            PYPROJECT_PLANTS.append(
-                (
-                    dotted,
-                    lambda t, f, d, m=mode, dt=dotted: _plant_depmeta(t, f, d, m, dt),
-                ),
-            )
-    elif key in (
-        "extra-build-dependencies",
-    ):
+            PYPROJECT_PLANTS.append((dotted, _bind_depmeta(mode, dotted)))
+    elif key in ("extra-build-dependencies",):
         for mode in range(3):
             dotted = f"tool.uv.pip.{key}"
-            PYPROJECT_PLANTS.append(
-                (
-                    dotted,
-                    lambda t, f, d, m=mode, dt=dotted: _plant_extra_build(
-                        t, f, d, m, dt,
-                    ),
-                ),
-            )
+            PYPROJECT_PLANTS.append((dotted, _bind_extra_build(mode, dotted)))
     elif key in (
         "config-settings-package",
         "exclude-newer-package",
         "extra-build-variables",
     ):
         dotted = f"tool.uv.pip.{key}"
-        PYPROJECT_PLANTS.append(
-            (
-                dotted,
-                lambda t, f, d, dt=dotted: _plant_map(t, f, d, dt),
-            ),
-        )
+        PYPROJECT_PLANTS.append((dotted, _bind_map(dotted)))
     else:
         dotted = f"tool.uv.pip.{key}"
         PYPROJECT_PLANTS.append((dotted, _plant_list(_pip_path(key))))
@@ -314,10 +331,10 @@ def package_entry(lock: dict[str, Any], name: str) -> dict[str, Any]:
     for key in ("package", "distribution"):
         block = lock.get(key)
         if isinstance(block, list):
-            for entry in block:
-                if isinstance(entry, dict) and entry.get("name") == name:
-                    return entry
-    entry: dict[str, Any] = {
+            for row in block:
+                if isinstance(row, dict) and row.get("name") == name:
+                    return row
+    created: dict[str, Any] = {
         "name": name,
         "version": "0.0.0",
         "source": {"editable": "x"},
@@ -326,8 +343,8 @@ def package_entry(lock: dict[str, Any], name: str) -> dict[str, Any]:
     if not isinstance(pkg, list):
         pkg = []
         lock["package"] = pkg
-    pkg.append(entry)
-    return entry
+    pkg.append(created)
+    return created
 
 
 def drop_core_edge(lock: dict[str, Any], name: str) -> None:
@@ -406,11 +423,19 @@ def apply_package_lock_plant(
 
 
 WIDE_LOCK_PLANTS: list[tuple[str, int]] = [
-    ("manifest.constraints", 0), ("manifest.overrides", 0), ("manifest.overrides", 1),
-    ("manifest.overrides", 2), ("manifest.excludes", 0), ("manifest.excludes", 1),
-    ("manifest.excludes", 2), ("manifest.build-constraints", 0),
-    ("manifest.dependency-metadata", 0), ("manifest.dependency-metadata", 1),
-    ("manifest.dependency-groups", 0), ("manifest.requirements", 0), ("conflicts", 0),
+    ("manifest.constraints", 0),
+    ("manifest.overrides", 0),
+    ("manifest.overrides", 1),
+    ("manifest.overrides", 2),
+    ("manifest.excludes", 0),
+    ("manifest.excludes", 1),
+    ("manifest.excludes", 2),
+    ("manifest.build-constraints", 0),
+    ("manifest.dependency-metadata", 0),
+    ("manifest.dependency-metadata", 1),
+    ("manifest.dependency-groups", 0),
+    ("manifest.requirements", 0),
+    ("conflicts", 0),
     ("options.exclude-newer-package", 0),
 ]
 
@@ -462,9 +487,37 @@ def apply_wide_lock_plant(
 
 
 from workspace_fields_tables import (  # noqa: E402
-    LAYOUT_CASES, LOCK_MEMBER_CASES, MEMBER_LIST_CASES, OUTPUT_ORDER_A,
-    OUTPUT_ORDER_B, OUTPUT_ORDER_C, ROOT_FLAG_CASES, ROOT_NAMING_CASES,
-    SOURCE_CASES, invalid_pyproject_cases, plant_output_order_a,
-    plant_output_order_b, plant_output_order_c, plant_registry_forbidden_edge,
+    LAYOUT_CASES,
+    LOCK_MEMBER_CASES,
+    MEMBER_LIST_CASES,
+    OUTPUT_ORDER_A,
+    OUTPUT_ORDER_B,
+    OUTPUT_ORDER_C,
+    ROOT_FLAG_CASES,
+    ROOT_NAMING_CASES,
+    SOURCE_CASES,
+    invalid_pyproject_cases,
+    plant_output_order_a,
+    plant_output_order_b,
+    plant_output_order_c,
+    plant_registry_forbidden_edge,
     write_toml,
 )
+
+__all__ = [
+    "LAYOUT_CASES",
+    "LOCK_MEMBER_CASES",
+    "MEMBER_LIST_CASES",
+    "OUTPUT_ORDER_A",
+    "OUTPUT_ORDER_B",
+    "OUTPUT_ORDER_C",
+    "ROOT_FLAG_CASES",
+    "ROOT_NAMING_CASES",
+    "SOURCE_CASES",
+    "invalid_pyproject_cases",
+    "plant_output_order_a",
+    "plant_output_order_b",
+    "plant_output_order_c",
+    "plant_registry_forbidden_edge",
+    "write_toml",
+]
