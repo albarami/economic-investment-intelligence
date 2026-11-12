@@ -745,7 +745,7 @@ Close an item only with evidence and the named decision or test that resolves it
 
 ## Proposed open items from reviews
 
-Each item below was proposed by an independent reviewer outside the verdict ([REV-41](docs/15_REVIEWER_CHECKLIST.md)). The follow-up task of its slice closes it before the slice gate, by a fix or by one line saying why it is not valid or is out of scope under REV-42 ([decision 0015](docs/decisions/0015-review-rounds-and-the-scope-of-repository-checks.md)).
+Each item below was proposed by an independent reviewer outside the verdict ([REV-41](docs/15_REVIEWER_CHECKLIST.md)), or was found by the lead after a merge where its RAISED BY line says so. The follow-up task of its slice closes it before the slice gate, by a fix or by one line saying why it is not valid or is out of scope under REV-42 ([decision 0015](docs/decisions/0015-review-rounds-and-the-scope-of-repository-checks.md)).
 
 ### PO-S0-01 — Count list of the S0-T02 plan against the delivered sub-cases
 
@@ -765,6 +765,46 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: REV-15 (no check weakened)
 - EVIDENCE: `scripts/tests/workspace_fields.py` carries `# noqa: E402` for the bottom import that the split into two modules needs, and `scripts/tests/test_workspace_metadata.py` carries several `# type: ignore[...]` comments; no check that runs today is weakened.
 - NEEDED: S0-T04 confirms that its ruff selection accepts that import without the suppression and that each type-ignore marker matches its type checker, or removes them.
+- CLOSED BY: S0-T15
+
+### PO-S0-03 — A file write that the next statement overwrites in the test of the Hypothesis profile
+
+- ID: PO-S0-03
+- TYPE: OPEN
+- RAISED BY: independent review round 1 of S0-T05, part 1 (Zhipu AI GLM-5.3 High), 2026-11-12, proposed item P1
+- CONCERNS: REV-13, as the reviewer names it (a statement with no effect, left from an edit)
+- EVIDENCE: `test_profile_is_eii_and_survives_a_ci_variable` in `scripts/tests/test_test_bootstrap.py` writes `fx/profile/test_profile.py` twice in a row; the second write replaces the file before anything reads it, so the first has no effect. No behaviour is wrong.
+- NEEDED: the first write is deleted, and the test still passes.
+- CLOSED BY: S0-T15
+
+### PO-S0-04 — The test support of the Python checks makes a folder that no ignore rule covers
+
+- ID: PO-S0-04
+- TYPE: OPEN
+- RAISED BY: the lead, 2026-11-12, while checking S0-T12; not a reviewer's item
+- CONCERNS: rule 13 of [AGENTS.md](AGENTS.md) (tests use only their documented repository, cache and temporary paths); REV-42 (the same result on a fresh clone)
+- EVIDENCE: `home_tmpdir()` in `scripts/tests/pychecks_support.py`, delivered by S0-T04, creates the folder `.overnight/tmp` under the repository root, and the tests of the Python checks make their temporary folders in it. No rule of `.gitignore` covers that folder, so on a fresh clone the tests leave an untracked folder behind. The cause was the wording of the build brief on temporary folders. No verdict so far depends on it.
+- NEEDED: the support takes its temporary folders from `tempfile` under the environment's settings, and the tests leave nothing behind in the checkout.
+- CLOSED BY: S0-T15
+
+### PO-S0-05 — A dead assignment in a test of the extension files
+
+- ID: PO-S0-05
+- TYPE: OPEN
+- RAISED BY: independent review round 1 of S0-T11, part 1 (Zhipu AI GLM-5.3 High), 2026-11-12, proposed item P1
+- CONCERNS: REV-16 (house style: a target, never a verdict finding)
+- EVIDENCE: `test_launcher_binds_the_checked_files` in `scripts/tests/test_sandbox_extensions.py` assigns `binaries` from the files with an empty suffix and assigns it again in the next statement from the files whose name ends in `.duckdb_extension`; the first assignment has no effect.
+- NEEDED: the first assignment is removed, and the tests still pass.
+- CLOSED BY: S0-T15
+
+### PO-S0-06 — Two exit-1 paths of the test command print no meaning line
+
+- ID: PO-S0-06
+- TYPE: OPEN
+- RAISED BY: independent review round 1 of S0-T09 (Google Gemini 4 Carbon), 2026-11-12, proposed item P2
+- CONCERNS: OPS-26 (one exit code of the table and its meaning on failure); OI-80
+- EVIDENCE: every command under `scripts/commands/` prints `eii: exit <code>: <meaning>` on failure. The launcher `eii` exits 1 when `uv` is not found, and `scripts/run_tests.py` exits 1 when a suite of `./eii test` fails; neither prints that line, and OI-80 names only the usage line of `./eii test`. Both paths were delivered by S0-T05 and were outside the scope of S0-T09.
+- NEEDED: OI-80 names the two paths, or they print the meaning line.
 - CLOSED BY: S0-T15
 
 ## Sources
