@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import os
 import random
 import re
@@ -427,12 +426,21 @@ def assert_free_of(
             )
 
 
-def snapshot_real() -> dict[str, object]:
-    """Return a read-only picture of the real hooks folder and git configuration.
+def snapshot(root: Path) -> dict[str, object]:
+    """Return a picture of one repository's hooks folder and git configuration.
+
+    No file is opened. Nothing is printed or written.
+
+    Args:
+        root: The repository to picture.
 
     Returns:
-        Sorted regular-file records, the configuration digest, and the
-        ``core.hooksPath`` status. Nothing is printed or written.
+        The name, size and modification time in nanoseconds of each regular
+        file in the hooks folder; the size of the git configuration file, or
+        None when it is absent (not its modification time: another git command,
+        such as a push that sets an upstream, rewrites that file without
+        changing it); and the exit status and standard output of ``git config
+        --get core.hooksPath``.
     """
     env = {
         "PATH": os.environ.get("PATH", ""),
@@ -443,7 +451,7 @@ def snapshot_real() -> dict[str, object]:
 
     def invoke(*args: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            ["git", "-C", str(ROOT), *args],
+            ["git", "-C", str(root), *args],
             capture_output=True,
             text=True,
             errors="replace",
@@ -455,24 +463,27 @@ def snapshot_real() -> dict[str, object]:
     if hooks_proc.returncode != 0:
         raise AssertionError("FAIL snapshot: hooks path")
     hooks = Path(hooks_proc.stdout.strip())
-    files: list[tuple[str, int, str]] = []
+    files: list[tuple[str, int, int]] = []
     if hooks.is_dir():
         for path in sorted(hooks.iterdir(), key=lambda item: item.name):
             info = path.lstat()
             if not stat.S_ISREG(info.st_mode):
                 continue
-            data = path.read_bytes()
-            files.append((path.name, len(data), hashlib.sha256(data).hexdigest()))
+            files.append((path.name, info.st_size, info.st_mtime_ns))
     config_proc = invoke("rev-parse", "--path-format=absolute", "--git-path", "config")
-    config_hash = ""
+    config: int | None = None
     if config_proc.returncode == 0:
-        config = Path(config_proc.stdout.strip())
-        if config.is_file():
-            config_hash = hashlib.sha256(config.read_bytes()).hexdigest()
+        config_path = Path(config_proc.stdout.strip())
+        try:
+            info = config_path.lstat()
+        except FileNotFoundError:
+            config = None
+        else:
+            config = info.st_size
     setting = invoke("config", "--get", "core.hooksPath")
     return {
         "hooks": tuple(files),
-        "config": config_hash,
+        "config": config,
         "hooks_path": (setting.returncode, setting.stdout),
     }
 

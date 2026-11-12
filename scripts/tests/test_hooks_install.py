@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import shutil
 import stat
 import sys
@@ -31,11 +32,11 @@ _LEGACY = (
 
 def setUpModule() -> None:
     global _BEFORE
-    _BEFORE = support.snapshot_real()
+    _BEFORE = support.snapshot(support.ROOT)
 
 
 def tearDownModule() -> None:
-    if support.snapshot_real() != _BEFORE:
+    if support.snapshot(support.ROOT) != _BEFORE:
         raise AssertionError("real hooks or git configuration changed")
 
 
@@ -212,5 +213,19 @@ class HooksInstall(unittest.TestCase):
             ),
         )
 
+    def test_picture_sees_a_changed_hook(self) -> None:
+        hook = self.repo / ".git" / "hooks" / "pre-commit"
+        hook.write_text("#!/bin/sh\necho alpha\n", encoding="utf-8")
+        before = support.snapshot(self.repo)
+        hook.write_text("#!/bin/sh\necho bravo\n", encoding="utf-8")
+        when = hook.stat().st_mtime
+        os.utime(hook, (when + 1, when + 1))
+        after = support.snapshot(self.repo)
+        self.assertNotEqual(after, before)
+        configured = support.git(self.repo, self.env, "config", "core.hooksPath", "x")
+        self.assertEqual(configured.returncode, 0, configured.stderr)
+        changed = support.snapshot(self.repo)
+        self.assertNotEqual(changed, after)
+
     def test_real_repository_untouched(self) -> None:
-        self.assertEqual(support.snapshot_real(), _BEFORE)
+        self.assertEqual(support.snapshot(support.ROOT), _BEFORE)

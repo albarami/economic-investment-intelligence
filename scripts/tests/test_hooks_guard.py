@@ -223,6 +223,32 @@ class CommitGuard(unittest.TestCase):
         )
         self._free(stdout + stderr, key, password)
 
+    def test_path_holding_a_part_of_the_value_is_withheld(self) -> None:
+        _home, env, repo, rng = self._start()
+        key, _gateway, password = self._values(rng)
+        self._write_env(repo, key, password)
+        name = "f_" + key[:8] + ".txt"
+        self._stage(repo, env, name, key.encode())
+        status, stdout, stderr = self._guard(env, repo)
+        self.assertEqual(status, 1)
+        self.assertEqual(stdout, "")
+        self.assertEqual(
+            stderr,
+            "guard: refused: staged content of <path withheld> holds the "
+            "local value of " + _KEY_NAME + "\n",
+        )
+        self._free(stdout + stderr, key, password)
+        _home, env, repo, rng = self._start()
+        key, _gateway, password = self._values(rng)
+        self._write_env(repo, key, password)
+        name = "f_" + key[:7] + ".txt"
+        self._stage(repo, env, name, key.encode())
+        status, stdout, stderr = self._guard(env, repo)
+        self.assertEqual(status, 1)
+        self.assertEqual(stdout, "")
+        self.assertEqual(stderr, _content(name, _KEY_NAME))
+        self._free(stdout + stderr, key, password)
+
     def test_binary_file_is_judged(self) -> None:
         _home, env, repo, rng = self._start()
         key, _gateway, password = self._values(rng)

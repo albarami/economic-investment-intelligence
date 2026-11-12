@@ -50,6 +50,7 @@ DIFF_ARGS = (
     "--diff-filter=AMT",
 )
 WITHHELD = "<path withheld>"
+WINDOW = 8  # consecutive bytes of a guarded value that withhold a path
 REASONS = {
     "weak": f"is shorter than {MIN_LENGTH} characters, so it cannot be checked; use a longer value or remove it",
     "unparseable": "cannot be parsed as a URL, so it cannot be checked; use a longer value or remove it",
@@ -274,8 +275,14 @@ def show_path(path: bytes, needles: list[tuple[str, bytes]]) -> str:
     Returns:
         A JSON string literal of the path, or the withheld marker.
     """
-    if any(needle in path for _, needle in needles):
-        return WITHHELD
+    for _, needle in needles:
+        if needle in path:
+            return WITHHELD
+        span = len(needle) - WINDOW + 1
+        if span > 0 and any(
+            needle[start : start + WINDOW] in path for start in range(span)
+        ):
+            return WITHHELD
     return json.dumps(path.decode("utf-8", "surrogateescape"))
 
 

@@ -32,11 +32,11 @@ ORDER = ALWAYS + PYTHON + WEB
 
 def setUpModule() -> None:
     global _BEFORE
-    _BEFORE = support.snapshot_real()
+    _BEFORE = support.snapshot(support.ROOT)
 
 
 def tearDownModule() -> None:
-    if support.snapshot_real() != _BEFORE:
+    if support.snapshot(support.ROOT) != _BEFORE:
         raise AssertionError("real hooks or git configuration changed")
 
 
