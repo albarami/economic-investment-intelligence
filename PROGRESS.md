@@ -9448,6 +9448,206 @@ Seed:      none
 Notes:     Every work commit subject is a Conventional Commit (PLN-05).
 ```
 
+#### S0-T07: independent review, round 1: REJECTED
+
+Reviewed commit `438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/21 , with CI green on it (workflow ci, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332; workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43290196952; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43290196879 ). Reviewer: xAI Grok 4.7 (high), through the Cursor command-line tool, read-only; a full review; a maker that neither planned nor built the task. Two findings; no proposed item. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S0-T07 (pull request 21)
+COMMIT: 438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb
+REVIEWER: SpaceXAI, Grok 4.7
+CHECKS:
+  REV-10 PASS The four acceptance criteria are met on this head. All six check classes run on the pull request: check-docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43290196952/job/131434087582 , static-checks https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332/job/131434088818 , tests https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332/job/131434089166 , secret-scan https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332/job/131434089158 , planted-failures https://github.com/albarami/economic-investment-intelligence/actions/runs/43290197332/job/131434089190 , sandbox proof https://github.com/albarami/economic-investment-intelligence/actions/runs/43290196879/job/131434087075 . sandbox.yml has no skip, retry, or continue-on-error, and the tests job runs install-profile before ./eii test. The lead's ci_plants.py run blocked 12 of 12. The same six checks are success on this head.
+  REV-11 PASS On the work commit the lead ran ./eii test --seed 2026111201, exit 0, 1148 passed, 0 failed, 0 skipped, and python3 scripts/check_docs.py, exit 0. On this head the lead ran ./eii test --seed 2026111230, exit 0, 1148 passed, 0 failed, 0 skipped, and python3 scripts/check_docs.py, exit 0. The six hosted checks above are success. The reviewer ran no commands; the brief forbids them. The new skip in F1 did not fire in these runs.
+  REV-12 PASS The work commit is the fifteen planned paths (nine added, six modified) and the ledger commit adds only PROGRESS.md and TASKS.md. Nothing under data/. The merge from main is outside this review.
+  REV-13 PASS The workflows, the history-scan judge, the plant harness, and the tests contain no TODO, FIXME, NotImplementedError, empty body, or fixed stand-in for a check.
+  REV-14 PASS The diff adds no .env, key file, or custodian record. Planted tokens are built at run time from parts. The lead's full-history scan passed with four findings, all on the two copies of the S0-T05 dummy probe command in PROGRESS.md.
+  REV-15 FAIL The known-line rule does not weaken the scan: it leaves out a finding only when the report entry is one line, the file is PROGRESS.md, the rule is generic-api-key, and the SHA-256 of that line at the named commit is the one closed digest. The same text in another file, a different line in PROGRESS.md, any extra finding, a missing report, an empty report, a count that disagrees with the report, a missing field, an unreadable commit, and a multi-line range all fail. Those dummies are the probe values dummy-fe95-probe-one and dummy-fe95-probe-two. History stays full (fetch-depth 0 and --full-history HEAD). The failure is the new SkipTest in F1, which lets the guard-test command succeed without the history-scan teeth.
+  REV-16 FAIL Workflows match the plan's pins, permissions, runners, and step order; docs.yml and ci.yml equal the plan; the npm scratch-config change is the accepted ten-line difference; OI-95 and OI-104 through OI-108 sit before Change control. The plan's plants for a planted command that returns zero and for a failure that omits the evidence line do not reach ci_plants.run_case (F2).
+  REV-17 PASS AGENTS.md rule 44, CLAUDE.md, README.md (twenty-six commands and the CI section), docs/13_DEPLOYMENT_AND_OPERATIONS.md section 4.5, and OPEN_ITEMS.md name the workflows and the two commands. python3 scripts/check_docs.py exited 0 on this head (210 text files). cmp AGENTS.md CLAUDE.md exited 0.
+  REV-18 PASS Workflow permissions are contents: read, credentials are not persisted, no workflow step reads a secret, and the scanner is invoked with --redact. The sandbox workflow and its setup scripts are unchanged. No application role, query, or record-level log path is added.
+  REV-19 PASS The change stays inside S0-T07. No dropped feature, architecture choice, or slice gate is reopened.
+  REV-20 N/A The change adds CI tooling and documents only, so it creates no fact, lineage, or displayed number.
+  REV-21 N/A No screen, template, Fact chip, or answer pipeline is changed.
+  REV-22 N/A No partition, parameter set, treatment, export, freeze, or attack test is changed.
+  REV-23 PASS No product or custodian package is changed, and the head test run passed with the existing import-boundary suites.
+  REV-24 N/A No English or Arabic product string or numeral is added.
+  REV-25 PASS The diff has no private absolute path, personal name, e-mail address, eight-digit or eleven-digit identifier, or product comparison. The documentation check on this head exited 0. Digits in the plants are assembled at run time.
+  REV-26 PASS No changed file claims real custodian data, certified privacy, endorsement, a forecast, a lookup, or a go or no-go.
+  REV-27 PASS cmp AGENTS.md CLAUDE.md exited 0 on this head, and the documentation check reported no agent-file failure.
+  REV-28 N/A The change creates no synthetic establishment, entity, group, person, or salary-file identifier.
+  REV-29 N/A No attribute is attached to a real named place, building, business, or FDI project.
+  REV-38 PASS The diff does not import eii_gateway or read EII_DECISION_PROVIDER or JEV_PRO_API_KEY, and it adds no screen score, badge, or live call.
+FINDINGS:
+  F1 (REV-15)
+    File: scripts/tests/ci_support.py
+    Place: place_scanner, lines 104-107
+    Wrong: If the pinned scanner file is absent, place_scanner raises unittest.SkipTest. The history-scan tests that depend on it, including the clean scratch scan, the runtime token, and the known-line plants, are skipped. python -m unittest treats a skip as success, so the guard-test command can exit 0 while those teeth do not run. That is a new skip (REV-15, AGENTS.md rule 36) and it is outside the two standing skips TST-06 allows. The hook tests fail, and name the fetch command, when the same binary is missing.
+    Fix: Raise AssertionError with the same fetch instruction. With data/tools/gitleaks moved aside, uv run --locked python -m unittest scripts.tests.test_ci_history_scan.HistoryScan.test_runtime_token_gives_finding must fail and must not be reported skipped. Restore the scanner and the same test must pass. ./eii test --seed 2026111201 must still report 0 skipped.
+  F2 (REV-16)
+    File: scripts/tests/test_ci_plants.py
+    Place: PlantHarness.test_blocked_evidence_judgement, lines 80-96
+    Wrong: The plan requires one plant that makes a planted command return zero and one plant that fails without the expected evidence line, both caught by the plant harness. This test copies those branches into a local function, never calls ci_plants.run_case, and never calls even the local function with status 0. Replacing the status == 0 return in scripts/ci_plants.py run_case (lines 234-235) with return None would leave this test, the other PlantHarness tests, and the hosted planted-failures job green, so that guard has no tooth (TST-04).
+    Fix: Call plants.run_case with make_copy, prepare, and git mocked. For the zero-status plant, make run_check return (0, "clean") and then (0, "planted ok"), and assert the reason contains "the planted copy passed". For the missing-evidence plant, make the planted run_check return (1, "failed without evidence"), and assert the reason contains "was not printed". Show this test fails while the status == 0 return in run_case is return None, then restore that return and show uv run --locked python -m unittest scripts.tests.test_ci_plants.PlantHarness.test_blocked_evidence_judgement passes and uv run --locked python scripts/ci_plants.py run still reports 12 blocked, 0 failed.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T07: fix round 1
+
+- The lead read both places in the code before ruling. Both findings are valid.
+- Lead's ruling on F1: a new skip is not allowed (AGENTS.md rule 36; TST-06 allows two standing skips only). The helper fails with the fetch instruction when the pinned scanner is absent, as the hook tests of S0-T06 already do. One planted violation, written first: a scratch root that holds the pin record and no scanner must make the helper fail and must not skip. The real scanner folder is never moved to prove it.
+- Lead's ruling on F2: the test judged a copy of the code, so the harness had no tooth for two of its three outcomes. Two tests replace it and call run_case itself, with its collaborators mocked as the neighbouring test does: a planted copy that passes is reported, and a failure without its evidence line is reported. The neighbouring test stays as the control (a failure that prints its evidence line gives no reason). scripts/ci_plants.py does not change.
+- Fix round (the builder of the task, Cursor command-line tool, `composer-2.5`, Cursor): the three tests first, each shown red (the first on the unchanged helper; the other two by breaking the branch each guards once and restoring it); then the one-line change of the helper. Three test files; 31 tests in the three CI modules, 468 in the guard suite, none skipped.
+- The lead repeated the three breaks on a scratch copy before the commit: each new test fails on its break and passes without it.
+
+#### Evidence for the fix commit `30a04bc458dfaef3b7b25de69be507325ca43412`
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   uv run --locked python scripts/hooks_gitleaks.py verify
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "gitleaks 8.30.1 verified at data/tools/gitleaks/8.30.1/gitleaks"
+Seed:      none
+Notes:     The installed scanner reports the pinned version.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    468 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard-test discovery of rule 44 at the fix commit, the 31 tests of the three CI modules among them; none is skipped (finding F1; TST-06).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   v="$PWD/.venv"; copy=$(mktemp -d); st=9; git ls-files -z | xargs -0 cp --parents -t "$copy" && st=0; t() { (cd "$copy" && UV_PROJECT_ENVIRONMENT="$v" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p "$1" -k "$2" >"$copy/$3.log" 2>&1); }; brk() { python3 -I -c "import pathlib,sys; p=pathlib.Path(sys.argv[1]); t=p.read_text(encoding='utf-8'); n=t.count(sys.argv[2]); p.write_text(t.replace(sys.argv[2], sys.argv[3]), encoding='utf-8'); sys.exit(0 if n==1 else 1)" "$@"; }; ctl=9; if [ "$st" -eq 0 ]; then t test_ci_history_scan.py test_missing_scanner_fails_and_is_not_skipped h1 && t test_ci_plants.py test_planted_copy_that_passes_is_reported p1 && t test_ci_plants.py test_failure_without_the_evidence_line_is_reported q1 && ctl=0; fi; rc=9; if [ "$ctl" -eq 0 ]; then rc=0; git show 438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb:scripts/tests/ci_support.py > "$copy/scripts/tests/ci_support.py" || rc=5; a=0; t test_ci_history_scan.py test_missing_scanner_fails_and_is_not_skipped h2 || a=$?; brk "$copy/scripts/ci_plants.py" 'return f"the planted copy passed: {tail(output)}"' 'return None' || rc=5; b=0; t test_ci_plants.py test_planted_copy_that_passes_is_reported p2 || b=$?; git show HEAD:scripts/ci_plants.py > "$copy/scripts/ci_plants.py" || rc=5; brk "$copy/scripts/ci_plants.py" 'if case.expect not in output:' 'if False:' || rc=5; c=0; t test_ci_plants.py test_failure_without_the_evidence_line_is_reported q2 || c=$?; test "$a" -eq 1 -a "$b" -eq 1 -a "$c" -eq 1 || rc=8; grep -q "a missing scanner skipped the test instead of failing it" "$copy/h2.log" || rc=7; grep -q "FAIL: test_planted_copy_that_passes_is_reported" "$copy/p2.log" || rc=6; grep -q "FAIL: test_failure_without_the_evidence_line_is_reported" "$copy/q2.log" || rc=4; fi; rm -rf "$copy"; test "$rc" -eq 0
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The red run of TST-161 for the three new tests, with its green control: in a scratch copy of the tracked files all three pass; with the test helper of the reviewed commit put back, the first fails because the helper skips; with the branch of run_case that reports a planted copy that passes made to return nothing, the second fails; with the branch that reports a failure without its evidence line switched off, the third fails; the copy is removed.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   uv run --locked python scripts/ci_plants.py run
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "plants: 12 cases, 12 blocked, 0 failed", RESULT: PASSED
+Seed:      none
+Notes:     The plant harness itself is unchanged and still blocks each of the twelve planted violations (criterion 3, TST-04).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   ./eii test --seed 2026111201
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1150 passed, 0 failed, 0 skipped
+Seed:      2026111201
+Notes:     The project's own test command with the plan's seed: every network-free suite, none skipped.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "129 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 125 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 210 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The agent files are identical.
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   python3 -I -c "import subprocess,sys; g=sorted(subprocess.run(['git','diff','--name-status','--no-renames','438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb..30a04bc458dfaef3b7b25de69be507325ca43412'],check=True,capture_output=True,text=True).stdout.splitlines()); w=sorted('M\t'+f for f in 'scripts/tests/ci_support.py scripts/tests/test_ci_history_scan.py scripts/tests/test_ci_plants.py'.split()); print(len(g), [x for x in g if x not in w]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "3 []"
+Seed:      none
+Notes:     The fix commit changes exactly the three test files of the two findings (TST-163).
+```
+
+```text
+### S0-T07 — Continuous integration
+Commit:    30a04bc458dfaef3b7b25de69be507325ca43412
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','438ac4f5f7ff26eb736cc4f4dd97e8d8698220eb..30a04bc458dfaef3b7b25de69be507325ca43412'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Every fix commit subject is a Conventional Commit (PLN-05).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
