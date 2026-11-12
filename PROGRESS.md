@@ -46,6 +46,7 @@
 | PENDING | Continuous-integration run of the first commit | PENDING: the run link and the commit hash, to be recorded through a pull request by the next session | PENDING |
 | PENDING | Review of the lead's last ten corrections to the privacy document by another maker (open item OI-37) | PENDING: maker, model, verdict | PENDING |
 | PENDING | Confirmation by another maker that the 23 findings of the final read-through are resolved (open item OI-38) | PENDING: maker, model, verdict | PENDING |
+| 2026-11-12 | Decision record 0015 written from the owner's decisions of 2026-11-12 (review rounds after the first; what the repository's own checks defend against); documents 14 and 15 and the two decision indexes corrected to it; pull request https://github.com/albarami/economic-investment-intelligence/pull/2 | Commit `ef8558b1fcda03830566cee71781937768d054e7`: `python3 scripts/check_docs.py`, exit code 0, output "checked 47 text files, 40 Markdown files: OK"; `cmp AGENTS.md CLAUDE.md`, exit code 0; both run by the lead on 2026-11-12 in a clean worktree of that commit. Independent review of the head of the pull request: PENDING, to be recorded with its unchanged verdict by the next pull request | Text by the lead (Claude, Anthropic) from the owner's decisions; applied by Devin local, model `swe-2-high` (Cognition) |
 
 ## Evidence rules for later entries
 
