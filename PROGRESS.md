@@ -3665,6 +3665,691 @@ Seed:      none
 Notes:     The strict type check on the new files (S0-T04).
 ```
 
+### S0-T08 — Compose and store preflight: task log
+
+- Builder persona: senior platform engineer
+- Reviewer persona: principal platform and supply-chain reviewer
+- Planner maker and model: Anthropic: version 1 by a Claude Opus subagent with the corrections of its internal critique; the one refresh of 2026-11-12 (the owner's Docker note) by a Claude Sonnet editor; the part A cut of 2026-11-12 (the owner's approval of the split) by a Claude Sonnet editor, checked by five Claude Sonnet checkers and a Claude Opus judge, whose ten valid findings the lead applied; each checked by the lead
+- Plan reviewer maker and model: none: the plan had no external plan review; the owner's throughput note of 2026-11-12 started the build on the refreshed plan, and the external code review is the review gate
+- Builder maker and model: Cursor command-line tool, `composer-2.5` (Cursor)
+- Reviewer maker and model: Cursor command-line tool, `gpt-5.6-sol-high` (OpenAI), read-only
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, security-review, verification-before-completion, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first with a recorded red run, a planted violation for every check, no docker command that changes state and no listing of other projects' objects, no use of ports 55432, 18710 or 18711, no secret or connection string written in a file, no suppression comment or weaker setting, nothing built beyond the acceptance criteria as hardening (owner's note of 2026-11-12), file length and house style as warnings only, a short break pass, and a report of only the results it saw
+- Branch: `task/S0-T08-compose-preflight`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/10
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md, at the work commit; the lead-run blocks, the service steps and the tree proofs go into the evidence file that the external reviewer receives
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4 (system) and 3.14.6 (uv); git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8; Docker server 29.9.3 with Compose; PostgreSQL client programs 18.6
+- Build round 1: Cursor command-line tool, `composer-2.5` (Cursor): the 13 paths of part A on main after S0-T05 merged (the owner's approval of 2026-11-12 to start without the deferred rows), tests first with stub modules; 43 collected tests; the read-only Compose configuration checks of step 3a; a break pass of three breaks
+- Build round 2: the same builder, after the lead's run against the real service and the lead's internal check (30 findings, each ruled valid by a judge): the code follows the plan's rules and literals (the wsl-interop row judges each line of output; npm status 0 with standard error is not understood; the URL parser keeps only the plan's closed rules; FACTS_RE is the plan's literal; a refused command in the postgresql row is a FAIL line; the live module reads the URL through the parser), and the tests are as strict as the plan's tables, with labelled sub-cases for the conditions the break passes showed unguarded
+
+#### Evidence for the work commit `4f71fc00e5f12a6e4ad16856dab9b00c83dac383`
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   ./eii test --seed 2026111208
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    868 passed, 0 failed, 0 skipped (the total: line of six suites)
+Seed:      2026111208
+Notes:     The project's runner: the six suites with the new tests in python-guards; the seed is fixed by the command.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    188 passed, 0 failed, 0 skipped (ran 188 tests, OK)
+Seed:      none
+Notes:     Every Python guard test, the 43 of this task's five collected modules among them (criteria 2 to 5, OPS-06, OPS-09, OPS-17, BE-87).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The lint check on the new files (S0-T04).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "46 files already formatted"
+Seed:      none
+Notes:     The format check on the new files (S0-T04).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 42 source files"
+Seed:      none
+Notes:     The strict type check on the new files (S0-T04).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 116 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   root=$PWD; copy=$(mktemp -d) && git ls-files -z | xargs -0 cp --parents -t "$copy" && rc=0 && ctl=0 && : >"$copy/red.log"; (cd "$copy" && UV_PROJECT_ENVIRONMENT="$root/.venv" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p 'test_preflight_*.py' >"$copy/ctl.log" 2>&1) || ctl=$?; (printf '\ndef select_store(pg, docker):\n    return Selection(Line("PASS", "postgresql", "planted"), "postgres")\n' >> "$copy/scripts/preflight_store.py" && printf '\ndef up_decision(environ, report):\n    return 0, ""\n' >> "$copy/scripts/preflight.py" && cd "$copy" && UV_PROJECT_ENVIRONMENT="$root/.venv" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p 'test_preflight_*.py' -v >"$copy/red.log" 2>&1) || rc=$?; miss=0; for t in test_selection_table test_foundation_preflight_exits_zero test_up_decision; do grep -q "^FAIL: $t " "$copy/red.log" || miss=1; done; if grep -q '_FailedTest' "$copy/red.log"; then miss=1; fi; if [ "$miss" -ne 0 ]; then rc=9; fi; if [ "$ctl" -ne 0 ]; then rc=8; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The red run of TST-161: with a planted select_store that always selects PostgreSQL and a planted up_decision that always allows, the three named tests fail and the unmodified control passes.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','e5f065d556a037febdbc82191db46c2a696adb02...4f71fc00e5f12a6e4ad16856dab9b00c83dac383'],check=True,capture_output=True,text=True).stdout.splitlines(); a={'infra/compose.yaml','scripts/preflight.py','scripts/preflight_proc.py','scripts/preflight_store.py','scripts/preflight_database.py','scripts/preflight_rows.py','scripts/tests/preflight_stubs.py','scripts/tests/test_preflight_proc.py','scripts/tests/test_preflight_database.py','scripts/tests/test_preflight_store.py','scripts/tests/test_preflight_rows.py','scripts/tests/test_preflight_run.py','scripts/tests/live_preflight_server.py'}; o=[x for x in p if x not in a]; print(len(p),o); sys.exit(1 if o or len(p)!=13 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "13 []"
+Seed:      none
+Notes:     Part A form of the scope command (TST-163): the work commits change exactly the 13 paths of part A.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    4f71fc00e5f12a6e4ad16856dab9b00c83dac383
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'live_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped (ran 4 tests, OK)
+Seed:      none
+Notes:     The live module against the project's Compose service on 127.0.0.1:55440, started before and stopped after this command by the lead (criterion 3 with a real server, BE-87).
+```
+
+#### S0-T08: independent review, round 1
+
+Reviewed commit `3949021daac945b246b5aa00c51fa121819d798c`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/10, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43216725686 ). Reviewer: OpenAI GPT-5.6 Sol (high), through the Cursor command-line tool, read-only; a full review in three parts (the service file, the modules, the support and live modules and the ledger; the database and store tests; the proc, rows and run tests). A first run of part 2 returned no verdict (the tool could not read its brief) and was run again unchanged. Each verdict is copied unchanged from its first line (REV-09); all three are also posted on the pull request.
+
+#### S0-T08: independent review, round 1, part 1 of 3: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: S0-T08 part 1 (pull request 10)
+COMMIT: 3949021daac945b246b5aa00c51fa121819d798c
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 PASS All five part-A criteria map to Compose configuration, 43 collected tests, 17 killed mutants, four live-service tests and service-up/stopped preflight runs.
+  REV-11 PASS Lead runs report 868 project tests and 188 Python guard tests passing; head reruns exit 0; CI succeeded: https://github.com/albarami/economic-investment-intelligence/actions/runs/43216725686
+  REV-12 PASS The work scope check reports exactly the 13 planned part-A paths; HEAD-DIFF contains only PROGRESS.md and TASKS.md.
+  REV-13 PASS No delivered placeholder or fixed result substitutes for implementation; stub programs are confined to test support.
+  REV-14 PASS The reviewed diff contains no secret or real custodian data; the head documentation and project checks exit 0.
+  REV-15 PASS No threshold, assertion, test count, tolerance or enforcement was weakened; no skip, suppression or retry was added.
+  REV-16 FAIL F1 F2: ordinary configuration and PATH forms can make the approved preflight crash or execute against the wrong path.
+  REV-17 PASS PROGRESS.md and TASKS.md contain the part-A ledger; the owner explicitly deferred part-B documents, and check_docs exits 0.
+  REV-18 OPEN P1 Closed read-only argument forms and process-group limits are present; executable authentication is hardening outside the verdict.
+  REV-19 PASS The owner-approved A/B/C cut is preserved and no settled component decision is reopened.
+  REV-20 N/A This commit introduces no displayed figure, fact object or lineage.
+  REV-21 N/A This commit introduces no screen, template or rendered prose.
+  REV-22 N/A This commit changes no privacy parameter, partition, treatment or release invariant.
+  REV-23 PASS The reviewed scripts import no custodian package and change no product package metadata.
+  REV-24 N/A This commit introduces no English or Arabic view.
+  REV-25 PASS The tracked diff contains no private absolute path, personal identity, e-mail address, realistic identifier or secret; check_docs exits 0.
+  REV-26 PASS No prohibited product, privacy, endorsement, forecast or lookup claim appears.
+  REV-27 PASS cmp AGENTS.md CLAUDE.md exits 0 on the reviewed head.
+  REV-28 N/A This commit introduces no synthetic entity or person identifier.
+  REV-29 N/A This commit introduces no fact about a real named place or business.
+  REV-38 PASS No serving-plane code imports eii_gateway or reads gateway provider or key settings.
+FINDINGS:
+  F1 (REV-16)
+    File: scripts/preflight_proc.py
+    Line: 97-99
+    Wrong: shutil.which can return a relative executable path when PATH contains a relative or empty entry. run_child then changes cwd before execution, so an ordinary PATH can make PostgreSQL, Docker or npm probes start a different path or fail although the located program exists. This breaks portable, closed preflight behaviour.
+    Fix: Convert a non-null shutil.which result to an absolute path relative to the lookup process before returning it. Add a process-runner test with a relative PATH entry and a distinct child cwd that proves the originally located executable runs, then run the Python guard suite and ./eii test.
+  F2 (REV-16)
+    File: scripts/preflight_database.py
+    Line: 84-90
+    Wrong: Percent-decoded user, password and database fields are accepted when they contain a NUL byte. After pg_isready accepts, Popen receives that value in the psql environment and raises an uncaught ValueError, so preflight prints no FAIL result and violates the plan's no-raise probe behaviour.
+    Fix: Decode the three fields once and reject any containing a NUL byte with a fixed, non-secret parse reason before constructing DbTarget. Add cases for %00 in user, password and database proving probe_postgres returns fail without starting a child, then run the Python guard suite and ./eii test.
+PROPOSED OPEN ITEMS:
+  P1 (REV-18) hardening: document 17 — preflight_proc.py lines 97-99 and 133-146 validate only the selected executable's basename and arguments; deliberate PATH replacement can supply a same-named binary that fabricates probe output.
+```
+
+#### S0-T08: independent review, round 1, part 2 of 3: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: S0-T08 part 2 (pull request 10)
+COMMIT: 3949021daac945b246b5aa00c51fa121819d798c
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 PASS D01-D12 and S01-S03 map to Q2, Q3 and Q6; the lead recorded 43 collected tests and 17 mutants passing, plus V01-V04 against PostgreSQL 18.6/PostGIS 3.6.4.
+  REV-11 FAIL F1 F2; the head suite, documentation check and CI passed, but nine tests fail under an ordinary stray TMPDIR value.
+  REV-12 PASS FILES.txt and DIFF.patch contain exactly the two assigned probe-test files.
+  REV-13 PASS No placeholders, stubs standing in for delivered behavior, TODOs or fixed-success assertions appear.
+  REV-14 PASS Diff inspection finds only generated dummy secrets and synthetic loopback test data; no secret or real custodian data appears.
+  REV-15 PASS The files add strict assertions and planted failures; the lead recorded no surviving mutant.
+  REV-16 OPEN P1 Tests implement the approved D01-D12 and S01-S03 tables, subject to the non-verdict file-size item P1.
+  REV-17 PASS Part B documentation is deferred by the owner-approved split; the head documentation check exited 0.
+  REV-18 PASS D03, D08 and D10 verify password redaction and exact child environments; the lead suite passed.
+  REV-19 PASS The tests follow the approved part A split and do not build part B or part C work.
+  REV-20 N/A These tests add no displayed facts, provenance objects or lineage.
+  REV-21 N/A These tests add no rendered text or Fact chips.
+  REV-22 N/A These tests do not change privacy logic or parameters.
+  REV-23 N/A These tests add no product imports.
+  REV-24 N/A These tests add no bilingual views.
+  REV-25 PASS Diff inspection finds no private identity, real custodian material, secret or prohibited identifier.
+  REV-26 PASS The test strings contain no prohibited product or evidence claim.
+  REV-27 PASS The head evidence records cmp AGENTS.md CLAUDE.md exit 0.
+  REV-28 N/A These tests create no synthetic domain identifiers.
+  REV-29 N/A These tests attach no attribute to a real named place.
+  REV-38 N/A These tests add no gateway or serving-plane code.
+FINDINGS:
+  F1 (REV-11)
+    File: scripts/tests/test_preflight_database.py
+    Line: 256, 443, 552, 625, 722, 778, 824, 847
+    Wrong: Each test passes the raw TMPDIR environment value to TemporaryDirectory. If TMPDIR is an ordinary stray value naming a missing path or file, setup raises before the probe is tested. This violates REV-11 test reliability and REV-42, which explicitly keeps ordinary environment differences and stray variables in scope.
+    Fix: Replace every call with tempfile.TemporaryDirectory() without dir=, remove the then-unused os import, and prove it with TMPDIR=/dev/null while running uv run --locked python -m unittest discover -s scripts/tests -p 'test_preflight_database.py' -v.
+  F2 (REV-11)
+    File: scripts/tests/test_preflight_store.py
+    Line: 162-164
+    Wrong: The store-selection test also passes the raw TMPDIR value to TemporaryDirectory, so an ordinary stray TMPDIR can fail S03 before any behavior is checked, contrary to REV-11 and REV-42.
+    Fix: Replace the call with tempfile.TemporaryDirectory() without dir=, remove the then-unused os import, and prove it with TMPDIR=/dev/null while running uv run --locked python -m unittest discover -s scripts/tests -p 'test_preflight_store.py' -v.
+PROPOSED OPEN ITEMS:
+  P1 (REV-16) File-size target: scripts/tests/test_preflight_database.py is 870 lines, exceeding the 500-line target; the owner’s 2026-11-12 amendment makes this a non-verdict item.
+```
+
+#### S0-T08: independent review, round 1, part 3 of 3: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: S0-T08 part 3 (pull request 10)
+COMMIT: 3949021daac945b246b5aa00c51fa121819d798c
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 PASS Q1-Q5 map every acceptance criterion to recorded tests and checks; the lead recorded successful Compose, live-service and foundation-mode evidence.
+  REV-11 FAIL F1; the lead's 188-test run exited 0 and CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43216725686, but R10 omits required planted timeout-output violations.
+  REV-12 PASS .overnight/FILES.txt and .overnight/DIFF.patch contain only the three assigned preflight test files.
+  REV-13 PASS The diff contains no placeholder, stub or fixed result standing in for tested behavior.
+  REV-14 PASS Tests use generated dummy secrets and synthetic temporary repositories only.
+  REV-15 PASS The three files are new tests; no assertion, threshold, skip or configuration was weakened.
+  REV-16 FAIL F1; test R10 does not implement every failing-state case required by the approved plan.
+  REV-17 N/A Documentation is explicitly deferred to approved part B and this part changes tests only.
+  REV-18 PASS No secret, unsafe command or real-data handling appears in the diff.
+  REV-19 PASS The approved part A cut and deferred parts B and C are respected.
+  REV-20 N/A No displayed figure, fact object or lineage behavior is changed.
+  REV-21 N/A No rendered numeral, template or screen is changed.
+  REV-22 N/A No privacy invariant or protected data behavior is changed.
+  REV-23 N/A No product or custodian import is changed.
+  REV-24 N/A No bilingual view or number is changed.
+  REV-25 PASS The test files contain no private path, real custodian material, realistic identifier or secret.
+  REV-26 PASS No prohibited product claim is introduced.
+  REV-27 PASS The recorded `cmp AGENTS.md CLAUDE.md` check exited 0.
+  REV-28 N/A No synthetic identifier is introduced.
+  REV-29 N/A No attribute or fact about a real named place is introduced.
+  REV-38 N/A No gateway or serving-plane code is changed.
+FINDINGS:
+  F1 (REV-11)
+    File: scripts/tests/test_preflight_rows.py
+    Line: 658-782
+    Wrong: The approved R10 plan requires echoing marker output in every failing state of R03, R08 and R09, but this table omits the timed-out Git and cmd.exe states. Their existing timeout tests use silent stubs, so a regression that includes the partial stdout or stderr retained after `TimeoutExpired` would pass. This breaks REV-11's planted-violation requirement and the approved R10 proof.
+    Fix: Add `r08_timeout` and `r09_timeout` cases using Git and cmd.exe stubs that echo the marker to both streams, sleep for 60 seconds and run with a 0.5-second limit; assert their exact timeout lines and that neither line contains the marker or recorded environment values. Run `uv run --locked python -m unittest discover -s scripts/tests -p 'test_preflight_rows.py' -v` and the recorded full suite.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+The lead judged every finding valid: part 1 F1 (a relative PATH entry) and F2 (a NUL character from a decoded URL field reached the child and crashed preflight), part 2 F1 and F2 (tests passed their own TMPDIR value to tempfile; the cause was the lead's brief wording, and the fix was made as a class, the live module included), part 3 F1 (the timed-out states of R10). Proposed items: part 1 P1 is hardening for document 17; part 2 P1 is the file-size target, not a verdict item.
+
+#### Addition to the task log of S0-T08
+
+- Build round 3: the same builder, after review round 1: a program found through a relative PATH entry starts by its absolute path (part 1, F1); a decoded user, password or database holding a NUL character is refused with a fixed reason before any child starts (part 1, F2); the timed-out git and cmd.exe states in R10 (part 3, F1); tests and the live module take their temporary folders from tempfile with the environment's settings (part 2, F1 and F2, as a class); red runs seen for the path, NUL and folder changes
+
+#### Evidence for the work commit of fix round 2 `34aefe0f9467f50420255806bb5d0e76993e5f1d`
+
+The eleven commands of part A at the commit that follows review round 1, command 13 again against the project's Compose service, which the lead started before it and stopped after it.
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    34aefe0f9467f50420255806bb5d0e76993e5f1d
+Command:   ./eii test --seed 2026111208
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    868 passed, 0 failed, 0 skipped (the total: line of six suites)
+Seed:      2026111208
+Notes:     The project's runner: the six suites with the new tests in python-guards; the seed is fixed by the command.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    34aefe0f9467f50420255806bb5d0e76993e5f1d
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    188 passed, 0 failed, 0 skipped (ran 188 tests, OK)
+Seed:      none
+Notes:     Every Python guard test, the 43 of this task's five collected modules among them (criteria 2 to 5, OPS-06, OPS-09, OPS-17, BE-87).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    34aefe0f9467f50420255806bb5d0e76993e5f1d
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The lint check on the new files (S0-T04).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    34aefe0f9467f50420255806bb5d0e76993e5f1d
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "46 files already formatted"
+Seed:      none
+Notes:     The format check on the new files (S0-T04).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    34aefe0f9467f50420255806bb5d0e76993e5f1d
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 42 source files"
+Seed:      none
+Notes:     The strict type check on the new files (S0-T04).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    34aefe0f9467f50420255806bb5d0e76993e5f1d
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 116 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    34aefe0f9467f50420255806bb5d0e76993e5f1d
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    34aefe0f9467f50420255806bb5d0e76993e5f1d
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    34aefe0f9467f50420255806bb5d0e76993e5f1d
+Command:   root=$PWD; copy=$(mktemp -d) && git ls-files -z | xargs -0 cp --parents -t "$copy" && rc=0 && ctl=0 && : >"$copy/red.log"; (cd "$copy" && UV_PROJECT_ENVIRONMENT="$root/.venv" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p 'test_preflight_*.py' >"$copy/ctl.log" 2>&1) || ctl=$?; (printf '\ndef select_store(pg, docker):\n    return Selection(Line("PASS", "postgresql", "planted"), "postgres")\n' >> "$copy/scripts/preflight_store.py" && printf '\ndef up_decision(environ, report):\n    return 0, ""\n' >> "$copy/scripts/preflight.py" && cd "$copy" && UV_PROJECT_ENVIRONMENT="$root/.venv" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p 'test_preflight_*.py' -v >"$copy/red.log" 2>&1) || rc=$?; miss=0; for t in test_selection_table test_foundation_preflight_exits_zero test_up_decision; do grep -q "^FAIL: $t " "$copy/red.log" || miss=1; done; if grep -q '_FailedTest' "$copy/red.log"; then miss=1; fi; if [ "$miss" -ne 0 ]; then rc=9; fi; if [ "$ctl" -ne 0 ]; then rc=8; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The red run of TST-161: with a planted select_store that always selects PostgreSQL and a planted up_decision that always allows, the three named tests fail and the unmodified control passes.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    34aefe0f9467f50420255806bb5d0e76993e5f1d
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','e5f065d556a037febdbc82191db46c2a696adb02...34aefe0f9467f50420255806bb5d0e76993e5f1d'],check=True,capture_output=True,text=True).stdout.splitlines(); a={'infra/compose.yaml','scripts/preflight.py','scripts/preflight_proc.py','scripts/preflight_store.py','scripts/preflight_database.py','scripts/preflight_rows.py','scripts/tests/preflight_stubs.py','scripts/tests/test_preflight_proc.py','scripts/tests/test_preflight_database.py','scripts/tests/test_preflight_store.py','scripts/tests/test_preflight_rows.py','scripts/tests/test_preflight_run.py','scripts/tests/live_preflight_server.py','PROGRESS.md','TASKS.md'}; o=[x for x in p if x not in a]; print(len(p),o); sys.exit(1 if o or len(p)!=15 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "15 []"
+Seed:      none
+Notes:     Part A, later-round form of the scope command (TST-163): the 13 paths of part A and the two ledger files of the round-1 ledger commit, which lies inside the range.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    34aefe0f9467f50420255806bb5d0e76993e5f1d
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'live_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped (ran 4 tests, OK)
+Seed:      none
+Notes:     The live module against the project's Compose service on 127.0.0.1:55440, started before and stopped after this command by the lead (criterion 3 with a real server, BE-87).
+```
+
+#### S0-T08: independent review, round 2
+
+Reviewed commit `0f06c57a187fdea482b4d7454f3c2eb6869dd502`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/10, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43222334758 ). Reviewer: OpenAI GPT-5.6 Sol (high), through the Cursor command-line tool, read-only; a later round in three parts. Each verdict is copied unchanged from its first line (REV-09); all three are also posted on the pull request.
+
+#### S0-T08: independent review, round 2, part 1 of 3: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T08 part 1 (pull request 10)
+COMMIT: 0f06c57a187fdea482b4d7454f3c2eb6869dd502
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED scripts/preflight_proc.py now makes the located program absolute; P08 proves a relative PATH entry still runs the originally located executable from another working folder.
+  F2 FIXED scripts/preflight_database.py rejects decoded NULs before DbTarget construction; D02 and D05 cover user, password and database and prove no child starts.
+CHECKS:
+  REV-10 PASS All five part-A criteria remain mapped to recorded Compose, collected-test, live-service and preflight evidence; the two corrected behaviors have planted regression cases.
+  REV-11 PASS The lead recorded 43 preflight tests with no surviving mutants, 188 Python guard tests and 868 project tests passing; head checks exited 0; CI succeeded: https://github.com/albarami/economic-investment-intelligence/actions/runs/43222334758
+  REV-12 PASS The later-round scope proof reports the 13 part-A paths plus PROGRESS.md and TASKS.md; the head-only diff contains those two ledger files.
+  REV-13 PASS The changed implementation, tests and ledger contain no placeholder or fixed result standing in for delivered behavior.
+  REV-14 PASS The changed lines contain no secret or real custodian data; documentation and tree checks pass.
+  REV-15 PASS The patch adds strict regression coverage and weakens no assertion, threshold, test count, tolerance or enforcement.
+  REV-16 PASS Program lookup is stable across the child working-directory change, malformed decoded database fields fail without raising, and the approved probe behavior is preserved.
+  REV-17 PASS PROGRESS.md and TASKS.md record the review and fix round; the documentation check reports 116 text files and 47 Markdown files checked with exit 0.
+  REV-18 OPEN P1 Closed command forms, exact child environments and process-group limits remain enforced; executable authentication is documented hardening outside the acceptance criteria.
+  REV-19 PASS The owner-approved part-A cut and deferred parts B and C remain unchanged.
+  REV-20 N/A This patch introduces no displayed figure, fact object or lineage.
+  REV-21 N/A This patch introduces no screen, template or rendered prose.
+  REV-22 N/A This patch changes no privacy parameter, partition, treatment or release invariant.
+  REV-23 PASS The changed scripts import no custodian package and alter no product package metadata.
+  REV-24 N/A This patch introduces no English or Arabic view.
+  REV-25 PASS The patch contains no private path, personal identity, e-mail address, realistic identifier, real custodian material or secret; check_docs exits 0.
+  REV-26 PASS No prohibited product, privacy, endorsement, forecast or lookup claim appears.
+  REV-27 PASS The recorded cmp AGENTS.md CLAUDE.md check exits 0.
+  REV-28 N/A This patch introduces no synthetic entity or person identifier.
+  REV-29 N/A This patch introduces no fact about a real named place or business.
+  REV-38 PASS No serving-plane code imports eii_gateway or reads gateway provider or key settings.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-18) hardening: document 17 — scripts/preflight_proc.py authenticates the selected executable by closed basename and arguments, not by executable identity; deliberate PATH replacement remains outside this task’s acceptance criteria.
+```
+
+#### S0-T08: independent review, round 2, part 2 of 3: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T08 part 2 (pull request 10)
+COMMIT: 0f06c57a187fdea482b4d7454f3c2eb6869dd502
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 FIXED scripts/tests/test_preflight_database.py removes the os import and all eight dir= arguments; SUITE passed 43 tests at the fix commit and the head suite passed 188 tests.
+  F2 FIXED scripts/tests/test_preflight_store.py removes the os import and dir= argument; SUITE passed 43 tests at the fix commit and the head suite passed 188 tests.
+CHECKS:
+  REV-10 PASS D01-D12 and S01-S03 remain covered; the NUL cases verify fixed failure reasons and no child execution; SUITE, MUTANTS and the four live tests passed.
+  REV-11 PASS The lead recorded ./eii test --seed 2026111208 exit 0 and 188 unittest tests at the exact head; CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43222334758
+  REV-12 PASS The round patch changes only the two assigned preflight test files; the head delta contains only PROGRESS.md and TASKS.md.
+  REV-13 PASS No placeholder, stub standing in for delivered behavior, TODO, FIXME or fixed-success assertion was added.
+  REV-14 PASS The patch uses synthetic dummy values and loopback addresses; it contains no secret or real custodian data.
+  REV-15 PASS The patch removes environment-sensitive temporary-directory overrides and adds strict NUL rejection assertions; MUTANTS reports no survivors.
+  REV-16 OPEN P1 The tests follow the approved probe tables and fail-closed behavior; only the non-verdict file-size hardening item remains.
+  REV-17 PASS The owner-approved split defers shared documentation to part B; the head documentation check examined 116 text files and exited 0.
+  REV-18 PASS NUL-bearing URL fields fail before either child starts, password material remains hidden, and the environment-boundary tests pass.
+  REV-19 PASS The patch stays within part A test remediation and reopens no settled decision.
+  REV-20 N/A The patch adds no displayed fact, provenance object, lineage or calculation.
+  REV-21 N/A The patch adds no rendered numeral, model prose, catalogue entry or Fact chip.
+  REV-22 N/A The patch changes no privacy rule, parameter, treatment, register or attack test.
+  REV-23 N/A The patch adds no product import or package dependency.
+  REV-24 N/A The patch changes no English or Arabic view.
+  REV-25 PASS Inspection finds no private identity, real custodian material, secret, prohibited identifier or private path.
+  REV-26 PASS The added test strings make no prohibited product, privacy, endorsement, forecast or lookup claim.
+  REV-27 PASS The head evidence records cmp AGENTS.md CLAUDE.md exit 0.
+  REV-28 N/A The patch creates no synthetic domain identifier.
+  REV-29 N/A The patch assigns no attribute to a real named place or business.
+  REV-38 N/A The patch adds no gateway import, provider setting, serving-plane code or runtime call.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-16) hardening: document 17 — scripts/tests/test_preflight_database.py remains above the 500-line house target; file size is explicitly non-rejecting.
+```
+
+#### S0-T08: independent review, round 2, part 3 of 3: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: S0-T08 part 3 (pull request 10)
+COMMIT: 0f06c57a187fdea482b4d7454f3c2eb6869dd502
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F1 NOT FIXED The timeout stubs write without flushing before SIGKILL, so the new R10 cases do not actually supply partial marker output.
+CHECKS:
+  REV-10 PASS Q1-Q5 remain mapped to recorded tests and checks.
+  REV-11 FAIL F1; the lead’s 43-test and 188-test runs exited 0 and CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43222334758, but R10’s timeout-output violations are not effectively planted.
+  REV-12 PASS The patch changes only the three assigned preflight test files.
+  REV-13 PASS The patch contains no placeholder, stub standing in for delivered behavior or fixed result.
+  REV-14 PASS Tests use generated dummy values and synthetic temporary repositories only.
+  REV-15 PASS No assertion, threshold, skip or configuration was weakened.
+  REV-16 FAIL F1; the approved R10 proof is still incomplete.
+  REV-17 N/A Documentation is deferred to approved part B and this part changes tests only.
+  REV-18 PASS No secret, unsafe command or real-data handling appears in the patch.
+  REV-19 PASS The approved part A cut and deferred parts B and C remain respected.
+  REV-20 N/A No displayed figure, fact object or lineage behavior is changed.
+  REV-21 N/A No rendered numeral, template or screen is changed.
+  REV-22 N/A No privacy invariant or protected-data behavior is changed.
+  REV-23 N/A No product or custodian import is changed.
+  REV-24 N/A No bilingual view or number is changed.
+  REV-25 PASS The test changes contain no private path, real custodian material, realistic identifier or secret.
+  REV-26 PASS No prohibited product claim is introduced.
+  REV-27 PASS The recorded `cmp AGENTS.md CLAUDE.md` exited 0.
+  REV-28 N/A No synthetic identifier is introduced.
+  REV-29 N/A No attribute or fact about a real named place is introduced.
+  REV-38 N/A No gateway or serving-plane code is changed.
+FINDINGS:
+  F1 (REV-11; kind a)
+    File: scripts/tests/preflight_stubs.py
+    Line: 64-88
+    Wrong: The stub writes the echo payload and marker without a newline or flush, then sleeps. When the timeout path sends SIGKILL, the pipe-buffered output is discarded. The added `r08_timeout` and `r09_timeout` cases therefore pass without exercising retained partial stdout or stderr, so the earlier finding and the approved R10 planted-violation requirement remain unsatisfied.
+    Fix: Flush both `sys.stdout` and `sys.stderr` after writing `STDOUT` and `STDERR` and before sleeping; add an assertion through the child runner that a timed-out echo stub returns the marker in both partial streams. Run `uv run --locked python -m unittest discover -s scripts/tests -p 'test_preflight_proc.py' -v`, `uv run --locked python -m unittest discover -s scripts/tests -p 'test_preflight_rows.py' -v` and `./eii test --seed 2026111208`.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+Parts 1 and 2 were approved. The lead judged part 3's F1 valid: the stub program wrote without a flush before sleeping, so a time-out lost its output and the time-out cases of R10 had no partial output to keep out of the lines. Proposed items: part 1 P1 is hardening for document 17; part 2 P1 is the file-size target.
+
+#### Addition to the task log of S0-T08
+
+- Build round 4: the same builder, after review round 2: the stub program flushes its output before it sleeps, so a time-out keeps partial output (part 3, F1); a run_child sub-case sees the marker in both partial streams, and the time-out cases of R10 see it in the child output while the rows keep it out (red run seen before the flush)
+
+#### Evidence for the work commit of fix round 3 `ffd672a75427283836b6e1911c01e131a3231860`
+
+The eleven commands of part A at the commit that follows review round 2, command 13 again against the project's Compose service, which the lead started before it and stopped after it.
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    ffd672a75427283836b6e1911c01e131a3231860
+Command:   ./eii test --seed 2026111208
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    868 passed, 0 failed, 0 skipped (the total: line of six suites)
+Seed:      2026111208
+Notes:     The project's runner: the six suites with the new tests in python-guards; the seed is fixed by the command.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    ffd672a75427283836b6e1911c01e131a3231860
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    188 passed, 0 failed, 0 skipped (ran 188 tests, OK)
+Seed:      none
+Notes:     Every Python guard test, the 43 of this task's five collected modules among them (criteria 2 to 5, OPS-06, OPS-09, OPS-17, BE-87).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    ffd672a75427283836b6e1911c01e131a3231860
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The lint check on the new files (S0-T04).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    ffd672a75427283836b6e1911c01e131a3231860
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "46 files already formatted"
+Seed:      none
+Notes:     The format check on the new files (S0-T04).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    ffd672a75427283836b6e1911c01e131a3231860
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 42 source files"
+Seed:      none
+Notes:     The strict type check on the new files (S0-T04).
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    ffd672a75427283836b6e1911c01e131a3231860
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 116 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    ffd672a75427283836b6e1911c01e131a3231860
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    ffd672a75427283836b6e1911c01e131a3231860
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    ffd672a75427283836b6e1911c01e131a3231860
+Command:   root=$PWD; copy=$(mktemp -d) && git ls-files -z | xargs -0 cp --parents -t "$copy" && rc=0 && ctl=0 && : >"$copy/red.log"; (cd "$copy" && UV_PROJECT_ENVIRONMENT="$root/.venv" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p 'test_preflight_*.py' >"$copy/ctl.log" 2>&1) || ctl=$?; (printf '\ndef select_store(pg, docker):\n    return Selection(Line("PASS", "postgresql", "planted"), "postgres")\n' >> "$copy/scripts/preflight_store.py" && printf '\ndef up_decision(environ, report):\n    return 0, ""\n' >> "$copy/scripts/preflight.py" && cd "$copy" && UV_PROJECT_ENVIRONMENT="$root/.venv" uv run --locked --no-sync python -B -m unittest discover -s scripts/tests -p 'test_preflight_*.py' -v >"$copy/red.log" 2>&1) || rc=$?; miss=0; for t in test_selection_table test_foundation_preflight_exits_zero test_up_decision; do grep -q "^FAIL: $t " "$copy/red.log" || miss=1; done; if grep -q '_FailedTest' "$copy/red.log"; then miss=1; fi; if [ "$miss" -ne 0 ]; then rc=9; fi; if [ "$ctl" -ne 0 ]; then rc=8; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The red run of TST-161: with a planted select_store that always selects PostgreSQL and a planted up_decision that always allows, the three named tests fail and the unmodified control passes.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    ffd672a75427283836b6e1911c01e131a3231860
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','e5f065d556a037febdbc82191db46c2a696adb02...ffd672a75427283836b6e1911c01e131a3231860'],check=True,capture_output=True,text=True).stdout.splitlines(); a={'infra/compose.yaml','scripts/preflight.py','scripts/preflight_proc.py','scripts/preflight_store.py','scripts/preflight_database.py','scripts/preflight_rows.py','scripts/tests/preflight_stubs.py','scripts/tests/test_preflight_proc.py','scripts/tests/test_preflight_database.py','scripts/tests/test_preflight_store.py','scripts/tests/test_preflight_rows.py','scripts/tests/test_preflight_run.py','scripts/tests/live_preflight_server.py','PROGRESS.md','TASKS.md'}; o=[x for x in p if x not in a]; print(len(p),o); sys.exit(1 if o or len(p)!=15 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "15 []"
+Seed:      none
+Notes:     Part A, later-round form of the scope command (TST-163): the 13 paths of part A and the two ledger files of the round-1 ledger commit, which lies inside the range.
+```
+
+```text
+### S0-T08 — Compose and store preflight
+Commit:    ffd672a75427283836b6e1911c01e131a3231860
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'live_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped (ran 4 tests, OK)
+Seed:      none
+Notes:     The live module against the project's Compose service on 127.0.0.1:55440, started before and stopped after this command by the lead (criterion 3 with a real server, BE-87).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
