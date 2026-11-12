@@ -205,6 +205,7 @@ def probe_config(
             "code_dir": str(fx.root / "core" / "src"),
             "interpreter_dir": str(interpreter.real),
             "inside_dir": str(fx.root / "scripts" / "sandbox_inside"),
+            "extensions_dir": str(fx.root / "data" / "engine_extensions"),
         }
     )
 
@@ -351,6 +352,17 @@ def swap_source(fx: Fixture, kind: str) -> None:
     raise AssertionError(f"unknown swap {kind}")
 
 
+def _drop_remount(argv: list[str], destination: str) -> None:
+    """Remove the ``--remount-ro`` pair whose destination is ``destination``."""
+    index = 0
+    while index < len(argv) - 1:
+        if argv[index] == "--remount-ro" and argv[index + 1] == destination:
+            del argv[index : index + 2]
+            return
+        index += 1
+    raise AssertionError(f"no --remount-ro {destination}")
+
+
 def mutate(argv: Sequence[str], kind: str, fx: Fixture) -> list[str]:
     """Return a copy of an argument list with exactly one planted change."""
     found = list(argv)
@@ -367,8 +379,9 @@ def mutate(argv: Sequence[str], kind: str, fx: Fixture) -> list[str]:
             raise AssertionError("cache bind is not read-only")
         found[index - 2] = "--bind-fd"
     elif kind == "no-remount-ro":
-        index = found.index("--remount-ro")
-        del found[index : index + 2]
+        _drop_remount(found, "/")
+    elif kind == "no-extension-remount-ro":
+        _drop_remount(found, str(fx.root / "data" / "engine_extensions"))
     elif kind == "no-clearenv":
         found.remove("--clearenv")
     elif kind == "bind-repo":

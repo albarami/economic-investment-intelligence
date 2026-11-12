@@ -79,6 +79,11 @@ class SentinelRules(unittest.TestCase):
             ("bind-outside", ["read_outside"], ["read_outside ok"]),
             ("cache-writable", ["write_cache"], ["write_cache ok"]),
             ("no-remount-ro", ["write_root"], ["write_root ok"]),
+            (
+                "no-extension-remount-ro",
+                ["write_extensions"],
+                ["write_extensions ok"],
+            ),
             ("no-clearenv", ["env"], None),
             ("bind-repo", ["hidden"], ["hidden 0 ok"]),
         ]
@@ -117,7 +122,7 @@ class SentinelRules(unittest.TestCase):
                     self.assertTrue(
                         (fx.root / "data" / "public_cache" / "new.txt").is_file()
                     )
-        self.assertEqual(len(labels), 7)
+        self.assertEqual(len(labels), 8)
 
     def test_network_attempts_table(self) -> None:
         with (

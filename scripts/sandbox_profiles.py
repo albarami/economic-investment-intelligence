@@ -28,8 +28,9 @@ ISOLATION = (
 # 0.9.0-1ubuntu0.3 have both options; the noble release build does not.
 READ_ONLY_BIND = "--ro-bind-fd"
 WRITABLE_BIND = "--bind-fd"
-# The extension folder is not mounted: the launcher makes its folders in the
-# in-memory root and binds each checked file from its descriptor into them.
+# The extension folder is an in-memory mount of its own (--tmpfs). The launcher
+# makes the version and platform folders inside it (--dir) and binds each
+# checked file from its descriptor, then seals the mount (--remount-ro).
 MAKE_FOLDER = "--dir"
 # Read-only system folders that the interpreter's loader and C libraries need,
 # and the link the loader path goes through (found by removing one at a time).

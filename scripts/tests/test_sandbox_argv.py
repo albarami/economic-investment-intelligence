@@ -108,13 +108,13 @@ class ArgvRules(unittest.TestCase):
         profile, layout, interpreter, descriptors = golden_layout("build-world")
         argv = launch.build_argv(profile, layout, interpreter, COMMAND, descriptors)
         self.assertEqual(argv, golden.GOLDEN_WORLD)
-        self.assertEqual(len(argv), 88)
+        self.assertEqual(len(argv), 90)
 
     def test_golden_command_line_build_release(self) -> None:
         profile, layout, interpreter, descriptors = golden_layout("build-release")
         argv = launch.build_argv(profile, layout, interpreter, COMMAND, descriptors)
         self.assertEqual(argv, golden.GOLDEN_RELEASE)
-        self.assertEqual(len(argv), 88)
+        self.assertEqual(len(argv), 90)
 
     def test_forbidden_options_never_appear(self) -> None:
         lists = [golden.GOLDEN_WORLD, golden.GOLDEN_RELEASE]
@@ -169,22 +169,26 @@ class ArgvRules(unittest.TestCase):
                 str(CODE / "data" / "releases" / ".staging" / "b1"),
             ],
         )
-        made = [
-            str(EXTENSIONS),
+        inner = [
             str(EXTENSIONS / "v2.0.0"),
             str(EXTENSIONS / "v2.0.0" / "linux_amd64"),
         ]
+        extension = str(EXTENSIONS)
         for operations, argv in (
             (world, golden.GOLDEN_WORLD),
             (release, golden.GOLDEN_RELEASE),
         ):
-            self.assertEqual(operations["--dir"], made)
+            self.assertEqual(operations["--dir"], inner)
             cache = argv.index(str(CODE / "data" / "public_cache"))
             first_file = argv.index(files[0])
-            self.assertLess(argv.index(made[0]), first_file)
-            self.assertGreater(argv.index(made[0]), cache)
-            self.assertNotIn(str(EXTENSIONS), operations["--ro-bind-fd"])
-            self.assertNotIn(str(EXTENSIONS), operations["--bind-fd"])
+            last_file = argv.index(files[-1])
+            mount = argv.index(extension)
+            seal = argv.index(extension, mount + 1)
+            self.assertLess(mount, first_file)
+            self.assertGreater(mount, cache)
+            self.assertGreater(seal, last_file)
+            self.assertNotIn(extension, operations["--ro-bind-fd"])
+            self.assertNotIn(extension, operations["--bind-fd"])
             numbers = [
                 argv[index + 1]
                 for index, token in enumerate(argv)
@@ -194,9 +198,9 @@ class ArgvRules(unittest.TestCase):
             self.assertEqual(len(set(numbers)), 14)
             self.assertTrue(all(token.isdecimal() for token in numbers))
             self.assertEqual(set(operations["--symlink"]), {"/lib64", str(ALIAS)})
-            self.assertEqual(operations["--tmpfs"], ["/tmp"])
+            self.assertEqual(operations["--tmpfs"], ["/tmp", extension])
             self.assertEqual(operations["--dev"], ["/dev"])
-            self.assertEqual(operations["--remount-ro"], ["/"])
+            self.assertEqual(operations["--remount-ro"], [extension, "/"])
             self.assertEqual(operations["--chdir"], ["/tmp"])
             names = {token for token in argv if token.startswith("--")}
             self.assertEqual(

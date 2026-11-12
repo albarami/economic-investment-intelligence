@@ -354,12 +354,18 @@ class ExtensionTreeRules(unittest.TestCase):
                 )
             finally:
                 launch.close_all(opened)
-            self.assertEqual(len(argv), 72)
+            self.assertEqual(len(argv), 74)
             cache = str(tree.cache)
             index = argv.index(cache)
             self.assertEqual(
-                argv[index + 1 : index + 4],
-                ["--dir", str(tree.extensions), "--ro-bind-fd"],
+                argv[index + 1 : index + 6],
+                [
+                    "--tmpfs",
+                    str(tree.extensions),
+                    "--remount-ro",
+                    str(tree.extensions),
+                    "--ro-bind-fd",
+                ],
             )
         self.assertEqual(labels, list("abcdefghi"))
 

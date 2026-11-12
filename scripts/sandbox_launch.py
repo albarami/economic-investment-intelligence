@@ -3,10 +3,11 @@
 ``run_in_sandbox`` is the one entry point that ``build-world`` and
 ``build-release`` use. Every mount source is opened once, checked on its open
 descriptor and handed to bubblewrap by descriptor, so the object that was
-checked is the object that is mounted. The extension folder is not mounted:
-its files are opened and hashed through descriptors (``extension_tree``) and
-bound one by one into folders that bubblewrap makes in the sandbox, so nothing
-else of the host folder is visible. The proofs are in ``sandbox_check``.
+checked is the object that is mounted. The extension folder is an in-memory
+mount of its own: its files are opened and hashed through descriptors
+(``extension_tree``) and bound one by one into it, and the mount is then made
+read-only, so nothing else of the host folder is visible. The proofs are in
+``sandbox_check``.
 """
 
 from __future__ import annotations
@@ -370,7 +371,7 @@ def build_argv(
     argv += bind(tables.READ_ONLY_BIND, layout.cache, str(layout.cache))
     files = extension_files(layout)
     given = [path for path in files if path in descriptors]
-    argv += [tables.MAKE_FOLDER, str(layout.extensions)]
+    argv += ["--tmpfs", str(layout.extensions)]
     if given and given != files:
         shown = ", ".join(str(path) for path in given)
         raise SandboxError(f"only some extension files have a descriptor: {shown}")
@@ -379,6 +380,7 @@ def build_argv(
             argv += [tables.MAKE_FOLDER, str(part)]
         for path in files:
             argv += bind(tables.READ_ONLY_BIND, path, str(path))
+    argv += ["--remount-ro", str(layout.extensions)]
     if profile.scenario and layout.scenario is not None:
         argv += bind(tables.READ_ONLY_BIND, layout.scenario, tables.SCENARIO_INSIDE)
     argv += bind(tables.WRITABLE_BIND, layout.vault, str(layout.vault))

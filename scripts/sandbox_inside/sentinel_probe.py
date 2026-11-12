@@ -157,6 +157,9 @@ def single_attempts(config: dict[str, Any]) -> dict[str, Action]:
         "write_inside": lambda: _write_clean(
             str(Path(key("inside_dir")) / CLEAN_FILE)
         )(),
+        "write_extensions": lambda: _write_clean(
+            str(Path(key("extensions_dir")) / CLEAN_FILE)
+        )(),
         "tcp_loopback": lambda: _tcp(LOOPBACK, int(config["port"]))(),
         "unix_abstract": lambda: _abstract(key("abstract"))(),
         "tcp_unrouted": _tcp(*UNROUTED_ADDRESS),
@@ -174,6 +177,7 @@ WRITES = (
     "write_code",
     "write_interpreter",
     "write_inside",
+    "write_extensions",
 )
 
 

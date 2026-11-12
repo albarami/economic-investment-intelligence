@@ -35,6 +35,7 @@ MODES = [
     "write_code",
     "write_interpreter",
     "write_inside",
+    "write_extensions",
 ]
 MODE_LINES = [
     "write_cache error OSError EROFS",
@@ -46,6 +47,7 @@ MODE_LINES = [
     "write_code error OSError EROFS",
     "write_interpreter error OSError EROFS",
     "write_inside error OSError EROFS",
+    "write_extensions error OSError EROFS",
 ]
 
 

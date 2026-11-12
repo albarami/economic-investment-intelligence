@@ -146,6 +146,7 @@ class ProbeRules(unittest.TestCase):
                 "write_code",
                 "write_interpreter",
                 "write_inside",
+                "write_extensions",
             ),
         )
         self.assertEqual(probe.FD_RANGE, range(3, 1024))
