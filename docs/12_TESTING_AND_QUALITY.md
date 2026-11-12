@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft v0.2, corrected after independent review on 2026-11-11 (see PROGRESS.md) |
-| Date | 2026-11-11 |
+| Status | Draft v0.2, corrected after independent review on 2026-11-11 (see PROGRESS.md); amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md) |
+| Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Define every kind of test, the CI pipeline, the evidence that proves each slice gate, and the definition of done. |
 | Read first | [01_PROJECT_BRIEF.md](01_PROJECT_BRIEF.md), [02_ARCHITECTURE.md](02_ARCHITECTURE.md), [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md), [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md) |
@@ -376,7 +376,7 @@ Gates are the slice gates of [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.
 | TST-161 | New behaviour has tests, and each new guard has its teeth (TST-04). Where practical, the test was seen failing before the code that makes it pass. |
 | TST-162 | `./eii test` and `python3 scripts/check_docs.py` exited 0 in the lead's own run on the final commit, and CI is green on the same commit. |
 | TST-163 | Only files in the task's scope changed; documents affected by the change are updated in the same pull request. |
-| TST-164 | The [PROGRESS.md](../PROGRESS.md) entry of section 6.3 exists, and the independent reviewer returned APPROVED under [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md). |
+| TST-164 | The [PROGRESS.md](../PROGRESS.md) entry of section 6.3 exists, and the independent reviewer returned APPROVED under [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md), or the commit counts as APPROVED under its REV-40. |
 
 ### 6.2 A slice is done when
 
@@ -385,8 +385,8 @@ Gates are the slice gates of [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.
 | TST-165 | Every task of the slice is done. |
 | TST-166 | Every gate item of section 5 has its evidence recorded against one commit, the slice's final commit. |
 | TST-167 | Every gate item passes its named test. A technical alternative is acceptable only when it preserves the same user-visible capability, passes the same assertion and has an owner-approved decision record. No fallback is permitted for sandbox enforcement, store parity or any security check. A revised performance target requires an owner-approved decision record and a measured result against that revised target. |
-| TST-168 | [OPEN_ITEMS.md](../OPEN_ITEMS.md) is updated, including every random failure seen in the slice. |
-| TST-169 | The independent reviewer returned APPROVED on the slice as a whole. |
+| TST-168 | [OPEN_ITEMS.md](../OPEN_ITEMS.md) is updated, including every random failure seen in the slice, and every proposed open item of the slice's reviews is closed by the slice's follow-up task (REV-41 of [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md)); the gate is not passed while one is open. |
+| TST-169 | The independent reviewer returned APPROVED on the slice as a whole, or the gate counts as APPROVED under REV-40 of [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md); where a gate item of section 5 names an independent APPROVED, this is what it means. The first review of a slice gate is a full review; its later rounds follow REV-39 and REV-40. |
 
 ### 6.3 How evidence is recorded in PROGRESS.md
 
