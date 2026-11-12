@@ -2,17 +2,69 @@
 
 from __future__ import annotations
 
+import hashlib
+import re
 import shutil
 import tempfile
 import unittest
 from collections.abc import Callable
 from pathlib import Path
+from unittest.mock import patch
 
 import ci_support as support
 import ci_workflow_rules as rules
 
 
 class WorkflowRules(unittest.TestCase):
+    def test_pinned_text_of_the_three_workflows(self) -> None:
+        self.assertEqual(set(rules.PINNED_SHA256), rules.WORKFLOW_NAMES)
+        for name in rules.WORKFLOW_NAMES:
+            with self.subTest(name=name):
+                digest = hashlib.sha256(
+                    (support.WORKFLOW_DIR / name).read_bytes()
+                ).hexdigest()
+                self.assertEqual(rules.PINNED_SHA256[name], digest)
+
+    def test_removed_test_command_is_refused_even_as_its_own_reference(self) -> None:
+        home, _env = support.temp_home(self)
+        folder = support.workflow_fixture(home)
+        path = folder / "ci.yml"
+        lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+        kept = [line for line in lines if "./eii test" not in line]
+        self.assertEqual(len(lines) - len(kept), 1)
+        path.write_text("".join(kept), encoding="utf-8")
+        with patch.object(rules, "WORKFLOW_DIR", folder):
+            problems = rules.validate(folder)
+        self.assertTrue(
+            any(
+                item.startswith("required-steps:") and "ci.yml" in item
+                for item in problems
+            ),
+            problems,
+        )
+
+    def test_action_pin_must_be_exact(self) -> None:
+        for mutation in ("trailing-character", "local-action"):
+            with self.subTest(mutation=mutation):
+                home, _env = support.temp_home(self)
+                folder = support.workflow_fixture(home)
+                path = folder / "ci.yml"
+                text = path.read_text(encoding="utf-8")
+                if mutation == "trailing-character":
+                    planted, count = re.subn(
+                        r"(uses:\s*\S+@[0-9a-f]{40})",
+                        r"\g<1>x",
+                        text,
+                        count=1,
+                    )
+                else:
+                    planted, count = re.subn(
+                        r"(uses:\s*)\S+", r"\g<1>./local-action", text, count=1
+                    )
+                self.assertEqual(count, 1)
+                path.write_text(planted, encoding="utf-8")
+                self.assertTrue(rules.rule_problems("no-weakeners", folder))
+
     def test_real_files_pass(self) -> None:
         self.assertEqual(rules.validate(support.WORKFLOW_DIR), [])
 
@@ -52,6 +104,14 @@ class WorkflowRules(unittest.TestCase):
 
     def test_unchanged_sandbox_file(self) -> None:
         self.assertEqual(rules.sandbox_unchanged(support.WORKFLOW_DIR), [])
+        home, _env = support.temp_home(self)
+        folder = support.workflow_fixture(home)
+        path = folder / "sandbox.yml"
+        path.write_text(
+            path.read_text(encoding="utf-8") + "# planted comment\n",
+            encoding="utf-8",
+        )
+        self.assertTrue(rules.sandbox_unchanged(folder))
 
     def test_one_plant_per_rule(self) -> None:
         home = Path(tempfile.mkdtemp())

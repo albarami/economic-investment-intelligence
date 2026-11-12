@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import sys
 import unittest
+from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
@@ -25,10 +26,39 @@ class PlantHarness(unittest.TestCase):
         self.assertEqual(tuple(case.check for case in cases.CASES), cases.CLASSES)
 
     def test_one_case_per_guard(self) -> None:
-        guards = [case.check for case in cases.CASES]
-        self.assertEqual(len(guards), len(set(guards)))
-        planted = [*guards, guards[0]]
-        self.assertNotEqual(len(planted), len(set(planted)))
+        plants.validate_cases(cases.CASES)
+        planted = (
+            *cases.CASES[:-1],
+            replace(cases.CASES[-1], check=cases.CASES[0].check),
+        )
+        with self.assertRaises(plants.PlantError):
+            plants.validate_cases(planted)
+
+    def test_broken_case_table_stops_the_run_before_any_case(self) -> None:
+        planted = (
+            *cases.CASES[:-1],
+            replace(cases.CASES[-1], check=cases.CASES[0].check),
+        )
+        with patch.object(cases, "CASES", planted):
+            with patch.object(plants, "run_case") as run_case:
+                with self.assertRaises(plants.PlantError):
+                    plants.run_all(support.ROOT, {}, io.StringIO(), io.StringIO())
+        run_case.assert_not_called()
+
+    def test_copy_destination_that_resolves_to_the_root_is_refused(self) -> None:
+        for destination_kind in ("root", "symlink", "parent"):
+            with self.subTest(destination_kind=destination_kind):
+                home, env = support.temp_home(self)
+                root = support.history_repo(home, env, shallow=False)
+                link = home / "root-link"
+                link.symlink_to(root, target_is_directory=True)
+                destination = {
+                    "root": root,
+                    "symlink": link,
+                    "parent": root.parent,
+                }[destination_kind]
+                with self.assertRaises(plants.PlantError):
+                    plants.make_copy(root, destination, env)
 
     def test_clean_before_plant(self) -> None:
         home, env = support.temp_home(self)
@@ -132,9 +162,19 @@ class PlantHarness(unittest.TestCase):
         text = out.getvalue()
         self.assertIn("plants: 12 cases, 12 blocked, 0 failed", text)
         self.assertIn("RESULT: PASSED", text)
-        with patch.object(plants, "run_case", return_value="planted copy passed"):
-            status_fail = plants.run_all(support.ROOT, {}, io.StringIO(), io.StringIO())
+        out_fail = io.StringIO()
+        err_fail = io.StringIO()
+        with patch.object(
+            plants,
+            "run_case",
+            side_effect=[None] * (len(cases.CASES) - 1) + ["planted copy passed"],
+        ):
+            status_fail = plants.run_all(support.ROOT, {}, out_fail, err_fail)
         self.assertEqual(status_fail, 1)
+        self.assertIn("plants: 12 cases, 11 blocked, 1 failed", out_fail.getvalue())
+        self.assertIn("RESULT: FAILED", out_fail.getvalue())
+        self.assertIn("FAIL plant", err_fail.getvalue())
+        self.assertIn(cases.CASES[-1].name, err_fail.getvalue())
 
     def test_usage(self) -> None:
         status, _stdout, stderr = support.run_module("ci_plants.py", ["wrong"])

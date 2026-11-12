@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import re
 from pathlib import Path
 from typing import Any
@@ -11,6 +12,12 @@ import yaml  # type: ignore[import-untyped]
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW_DIR = ROOT / ".github/workflows"
 WORKFLOW_NAMES = frozenset({"ci.yml", "docs.yml", "sandbox.yml"})
+# A workflow file change changes its pin in the same commit, so it is seen in review.
+PINNED_SHA256 = {
+    "ci.yml": "c9b417eec3ce31796593fbde7b02ee089418e0761a9f14ee4fd6f8d4547ef0c2",
+    "docs.yml": "9c3ed0f74b8106e6797d5d010f9da20d4166d52a6f693d195a9920d0e95727a6",
+    "sandbox.yml": "e33d0f21d42874da8d944d65b3824fff44ceaba4f17a538e06df9d8c087852e3",
+}
 RULES = (
     "workflow-files",
     "events-and-permissions",
@@ -27,7 +34,7 @@ REQUIRED_CHECKS: tuple[tuple[str, str, str], ...] = (
     ("sandbox.yml", "sandbox-proof", "sandbox proof"),
 )
 RUNNER = "ubuntu-24.04"
-PIN_RE = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+@[0-9a-f]{40}")
+PIN_RE = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+@[0-9a-f]{40}$")
 FORBIDDEN_TOKENS = (
     "continue-on-error",
     "retry:",
@@ -39,7 +46,6 @@ FORBIDDEN_TOKENS = (
 )
 RUN_WEAKENERS = ("|| true", "set +e", "||true")
 SCANNER_FETCH = "uv run --locked python scripts/hooks_gitleaks.py fetch"
-SANDBOX_REFERENCE_TEXT = (WORKFLOW_DIR / "sandbox.yml").read_text(encoding="utf-8")
 
 _WEAKENER_STEP_RE = re.compile(r"(?m)^\s*continue-on-error:\s*true\s*$")
 
@@ -94,7 +100,20 @@ def _load_workflows(workflows_dir: Path) -> dict[str, Any] | None:
 
 
 def _reference_workflows() -> dict[str, Any]:
+    """Load job diagnostics; PINNED_SHA256 defines the closed text reference."""
     return _load_workflows(WORKFLOW_DIR) or {}
+
+
+def pinned_text_problems(workflows_dir: Path) -> list[str]:
+    """Refuse missing workflow files or bytes differing from the closed pins."""
+    problems: list[str] = []
+    for name in sorted(WORKFLOW_NAMES):
+        path = workflows_dir / name
+        if not path.is_file():
+            problems.append(f"{name}: pinned workflow file is missing")
+        elif hashlib.sha256(path.read_bytes()).hexdigest() != PINNED_SHA256[name]:
+            problems.append(f"{name}: workflow text differs from its pin")
+    return problems
 
 
 def check_workflow_files(workflows_dir: Path) -> list[str]:
@@ -178,7 +197,7 @@ def check_required_jobs(workflows: dict[str, Any]) -> list[str]:
 def check_required_steps(
     workflows: dict[str, Any], reference: dict[str, Any]
 ) -> list[str]:
-    """Rule 4: ordered steps equal the closed reference table."""
+    """Rule 4 job diagnostics; the closed reference is text pinned by SHA-256."""
     problems: list[str] = []
     for filename in WORKFLOW_NAMES:
         document = workflows.get(filename)
@@ -314,7 +333,7 @@ def check_no_weakeners(raw_texts: dict[str, str]) -> list[str]:
                 problems.append(f"{name}: softened run command {token!r}")
         for value in re.findall(r"(?m)^\s*(?:- )?uses:\s*(\S+)", text):
             action = _strip_action_ref(value)
-            if "@" in action and not PIN_RE.match(action):
+            if not PIN_RE.match(action):
                 problems.append(f"{name}: action not pinned by commit: {action}")
     return problems
 
@@ -326,9 +345,10 @@ def rule_problems(
     ref = reference if reference is not None else _reference_workflows()
     if rule == "workflow-files":
         return check_workflow_files(workflows_dir)
+    pinned = pinned_text_problems(workflows_dir) if rule == "required-steps" else []
     workflows = _load_workflows(workflows_dir)
     if workflows is None:
-        return ["workflow files are missing or not valid YAML"]
+        return [*pinned, "workflow files are missing or not valid YAML"]
     raw_texts = {
         name: (workflows_dir / name).read_text(encoding="utf-8")
         for name in WORKFLOW_NAMES
@@ -338,7 +358,7 @@ def rule_problems(
     if rule == "required-jobs":
         return check_required_jobs(workflows)
     if rule == "required-steps":
-        return check_required_steps(workflows, ref)
+        return [*pinned, *check_required_steps(workflows, ref)]
     if rule == "no-weakeners":
         return check_no_weakeners(raw_texts)
     return [f"unknown rule {rule!r}"]
@@ -364,7 +384,7 @@ def sandbox_unchanged(workflows_dir: Path) -> list[str]:
     path = workflows_dir / "sandbox.yml"
     if not path.is_file():
         return ["sandbox.yml is missing"]
-    if path.read_text(encoding="utf-8") != SANDBOX_REFERENCE_TEXT:
+    if hashlib.sha256(path.read_bytes()).hexdigest() != PINNED_SHA256["sandbox.yml"]:
         return ["sandbox.yml changed from the S0-T07 reference"]
     return []
 

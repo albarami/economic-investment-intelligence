@@ -188,6 +188,27 @@ class HistoryScan(unittest.TestCase):
         self.assertIn("RESULT: PASSED", out.getvalue())
         self.assertNotIn("FAIL secret", err.getvalue())
 
+    def test_known_text_after_a_carriage_return_is_not_left_out(self) -> None:
+        home, env = support.temp_home(self)
+        repo = support.history_repo(home, env, shallow=False)
+        line = support.known_ledger_line()
+        (repo / "PROGRESS.md").write_bytes(
+            ("x\r" + line + "\nsecond line\n").encode("utf-8")
+        )
+        support.git(env, repo, "add", "PROGRESS.md")
+        support.git(env, repo, "commit", "-q", "-m", "chore: carriage return")
+        commit = history.run_git(repo, env, "rev-parse", "HEAD")
+        for number in (2, 1):
+            with self.subTest(number=number):
+                entry = {
+                    "File": "PROGRESS.md",
+                    "RuleID": "generic-api-key",
+                    "Commit": commit,
+                    "StartLine": number,
+                    "EndLine": number,
+                }
+                self.assertFalse(history.finding_is_known(repo, env, entry))
+
     def test_known_line_in_other_file_fails(self) -> None:
         home, env = support.temp_home(self)
         line = support.known_ledger_line()

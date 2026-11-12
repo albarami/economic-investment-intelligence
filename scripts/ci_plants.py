@@ -57,6 +57,16 @@ class PlantError(Exception):
     """A harness failure whose message is safe to print."""
 
 
+def validate_cases(case_list: Sequence[cases.Case]) -> None:
+    """Require the closed guard order, unique case names and registered plants."""
+    if tuple(case.check for case in case_list) != cases.CLASSES:
+        raise PlantError("case guards differ from the closed guard order")
+    if len({case.name for case in case_list}) != len(case_list):
+        raise PlantError("case names are not unique")
+    if any(case.plant not in cases.PLANTS for case in case_list):
+        raise PlantError("case plant is not registered")
+
+
 def child_environment(parent: Mapping[str, str]) -> dict[str, str]:
     """Build a child environment from a closed allow-list."""
     kept = {name: parent[name] for name in PASS_THROUGH if name in parent}
@@ -121,6 +131,10 @@ def make_copy(
     environment: Mapping[str, str],
 ) -> Path:
     """Create one committed scratch copy."""
+    root = root.resolve()
+    destination = destination.resolve()
+    if root.is_relative_to(destination):
+        raise PlantError("copy destination is the root or contains the root")
     for name in listed_files(root, environment):
         source = root / name
         target = destination / name
@@ -248,6 +262,7 @@ def run_all(
     err: TextIO,
 ) -> int:
     """Run every planted case."""
+    validate_cases(cases.CASES)
     controls: dict[tuple[str, str], tuple[int, str]] = {}
     blocked = failed = 0
     with tempfile.TemporaryDirectory(prefix="eii-plants-") as raw:

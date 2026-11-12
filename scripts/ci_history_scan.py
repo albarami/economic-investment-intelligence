@@ -71,6 +71,26 @@ def run_git(root: Path, environ: Mapping[str, str], *args: str) -> str:
     return done.stdout.removesuffix("\n")
 
 
+def read_blob(root: Path, environ: Mapping[str, str], commit: str, file: str) -> bytes:
+    """Read one git blob without translating line endings."""
+    try:
+        done = subprocess.run(
+            ["git", "-C", str(root), "show", f"{commit}:{file}"],
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            env=dict(environ),
+            timeout=GIT_TIMEOUT_SECONDS,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise wrapper.Failure(
+            f"git show did not run ({type(error).__name__})"
+        ) from error
+    if done.returncode != 0:
+        raise wrapper.Failure(f"git show failed (exit {done.returncode})")
+    return done.stdout
+
+
 def commit_bounds(root: Path, environ: Mapping[str, str]) -> tuple[int, int]:
     """Return the minimum listed-commit count and total reachable commits."""
     if run_git(root, environ, "rev-parse", "--is-shallow-repository") != "false":
@@ -158,13 +178,17 @@ def finding_is_known(
     ):
         return False
     try:
-        blob = run_git(root, environ, "show", f"{commit}:{file}")
+        blob = read_blob(root, environ, commit, file)
     except wrapper.Failure:
         return False
-    lines = blob.splitlines()
+    lines = blob.split(b"\n")
     if start < 1 or start > len(lines):
         return False
-    return known_ledger_entry(file, rule, line_digest(lines[start - 1]))
+    try:
+        line = lines[start - 1].decode("utf-8", errors="strict")
+    except UnicodeDecodeError:
+        return False
+    return known_ledger_entry(file, rule, line_digest(line))
 
 
 def classify_findings(
