@@ -877,6 +877,16 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - NEEDED: the three cases of text that does not verify, and the case of a word outside a verified anchor, as committed sub-cases of the claim-word test.
 - CLOSED BY: S0-T15
 
+### PO-S0-09 — Five rows of the pin record repeat one section anchor
+
+- ID: PO-S0-09
+- TYPE: OPEN
+- RAISED BY: independent review of the S0-T12 follow-up (Google Gemini 4 Carbon), 2026-11-12, proposed item P1
+- CONCERNS: REV-16 (house consistency: a target, never a verdict finding)
+- EVIDENCE: the rows `@deck.gl/core`, `@deck.gl/layers`, `@deck.gl/geo-layers`, `@deck.gl/extensions` and `@deck.gl/maplibre` of `pins.toml` hold the `cite` value `docs/10_FRONTEND.md section "Stack and pins"; docs/10_FRONTEND.md section "Stack and pins"`: the two lines that the old values named lie in one section, so the conversion wrote the same anchor twice. The row `maplibre-gl` cites its table row first and the section second.
+- NEEDED: each of the five rows cites the table row of its package in that section first, or the repeated anchor is written once.
+- CLOSED BY: S0-T15
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).
