@@ -4873,6 +4873,187 @@ Seed:      none
 Notes:     Part-A form of the scope command (TST-163): the fourteen paths of part A; the five shared documents of part B (README.md, AGENTS.md, CLAUDE.md, docs/README.md, OPEN_ITEMS.md) follow in a later change.
 ```
 
+#### S0-T13: independent review, round 1: REJECTED
+
+Reviewed commit `5ba3f4a4b2c83416c2a8ec5db67ee93861e839dd`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/13 , with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43238720561 ). Reviewer: Zhipu AI GLM-5.3 High, through the Devin command-line tool, read-only; a full review. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S0-T13 part A (pull request 13)
+COMMIT: 5ba3f4a4b2c83416c2a8ec5db67ee93861e839dd
+REVIEWER: Devin command-line tool, GLM-5.3 High (Zhipu AI)
+CHECKS:
+  REV-10 FAIL Criterion 3 is met only through the plan's construct (D4: each S1 confirmation field "with its pack source (file and line)"), and two fields cite a line that holds a different statement: web/REFERENCE_NOTES.md:152 cites TASKS.md line 154 (the heading of S1-T01; the load trial is the acceptance criteria of S1-T02, line 163) and docs/REFERENCE_NOTES.md:158 cites TASKS.md line 173 (the Requirements row of S1-T03; the first two-store parity query is S1-T05, line 182). Findings F1, F2. Criteria 1 and 2 are met: every library section has a Pages table of official addresses, and every statement row carries READ (with a quotation the lead's second reader found on its page, 102 rows, 0 problems), OBSERVED (24 runs reproduced) or PACK ("not verified") provenance; the claim-word rule is enforced and planted.
+  REV-11 PASS Lead's run on the head: `./eii test --seed 1794000000` exit 0, 985 passed, 0 failed, 0 skipped; `python3 scripts/check_docs.py` exit 0 ("checked 150 text files, 49 Markdown files: OK"); `uv run --locked python scripts/check_reference_notes.py` exit 0 ("checked 2 files, 6 libraries, 357 rows: OK"); CI green on the head: https://github.com/albarami/economic-investment-intelligence/actions/runs/43238720561. The 30 new tests were read: each of the check's 23 rules has at least one planted violation, no skip, no weakened assertion.
+  REV-12 PASS The lead's scope command on the work commit returned "14 [] []": only the fourteen planned paths (two notes files, five scripts, five test files, the two files of the layout check); the head adds only PROGRESS.md and TASKS.md (ledger commit); nothing under data/; no unrelated reformatting.
+  REV-13 PASS No TODO, FIXME, NotImplementedError, empty body or fixed return value in the delivered files (read in full; grep over the new files: no match); every figure in the notes carries a READ, OBSERVED or PACK source and a date.
+  REV-14 PASS No secret, .env or key file in the diff; no real custodian record, field, file or count; the Claude section records that no key, request or account existed.
+  REV-15 PASS The layout change strictly strengthens: REFERENCE_NOTES.md moves from the deferred NOTE list into REQUIRED_FILES (a missing file now fails with `FAIL missing-file`), the deferred list, its constant and NOTE branch are removed as dead code, count 31 to 32; the only removed test ("deferred file present") covered a state that can no longer occur; new missing/empty/folder rows cover the new file; the Python check and its tests are new; no lint or type suppression anywhere (grep clean).
+  REV-16 FAIL The notes break their own sourcing convention and AGENTS.md rule 7 (a fact without a complete source chain is not a fact): docs/REFERENCE_NOTES.md:19 and :90 cite docs/02_ARCHITECTURE.md line 500 for statements that live on line 501; :109 and :155 cite line 501 for the serving-store row on line 502; :149 (S14) attributes the C-collation half of its claim to lines that do not contain it. Findings F3, F4, F5. Otherwise the work matches the plan (NOTES-LITERAL compared every file byte for byte: "files that differ from the plan: []"), the red run of TST-161 is recorded, and pinned names are used exactly.
+  REV-17 OPEN P1 Part B of this task (AGENTS.md/CLAUDE.md rule 44 and README.md's command list, the docs/README.md index, OPEN_ITEMS.md OI-41 and the missing OI-85 to OI-89) is deferred by the owner's note of 2026-11-12; on the head `python3 scripts/check_docs.py` exits 0 and PROGRESS.md holds the task log and the evidence entries in the section 6.3 format.
+  REV-18 PASS The check opens only the two notes files, pins.toml and cited pack paths (closed to docs/*.md, docs/decisions/*.md, AGENTS.md, TASKS.md, OPEN_ITEMS.md) as regular files, refusing links and folders (planted); it writes nothing and starts no process (test_no_side_effects compares digests before and after); no secrets, no model SQL, nothing from the custodian plane.
+  REV-19 PASS Nothing on the dropped or later lists is built; no component decision or decision record is removed; the DES-25 and DES-45 assignment follows the owner's decision of 2026-11-11 and is recorded in the ledger commit.
+  REV-20 N/A The change adds agent documentation and a checking script; it introduces no fact object, release table or rendered number (every number in the notes carries a source and date, subject to the findings above).
+  REV-21 N/A No screen, card, template or model prose is added; the notes are not product output.
+  REV-22 N/A No partition, parameter set, treatment, audit or custodian-plane file is touched; nothing under data/.
+  REV-23 PASS No file under product/, core/ or custodian/ changed, and the import-boundary tests of the suite passed on the head (`./eii test` exit 0; python-guards 303 passed, python-product 2 passed).
+  REV-24 N/A No user-facing or Arabic strings were added.
+  REV-25 PASS `python3 scripts/check_docs.py` exits 0 on the head; the notes hold no private individual (Owner: "Project owner (see OPEN_ITEMS.md)"), e-mail, absolute local path, run of exactly eight or eleven digits, named-product comparison or ministry mention.
+  REV-26 PASS No prohibited claim anywhere in the notes; every unverified pack statement says "not verified"; nothing claims custodian data, real-place facts, certified privacy, endorsement, a forecast or a lookup.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exit 0 on the head (lead's run).
+  REV-28 N/A No synthetic identifiers are introduced.
+  REV-29 N/A No fact about a real named place or business; the subjects of every row are software libraries.
+  REV-38 PASS No reference to eii_gateway, EII_DECISION_PROVIDER or JEV_PRO_API_KEY in the new files (grep: no match); the check reads no environment variable and no configuration file (the CLI test runs it with an empty environment and a hostile PYTHONPATH control).
+FINDINGS:
+  F1 (REV-10)
+    File: web/REFERENCE_NOTES.md
+    Line: 152
+    Wrong: The Slice S1 confirmation field "load trial of 110,000 hexagons and 50,000 particles" cites "TASKS.md line 154", which is the heading of task S1-T01; the load trial is the acceptance criteria of S1-T02 at TASKS.md line 163 (also line 225). The field's pack source does not point at the pack statement, breaking the plan's D4 definition of the field and AGENTS.md rule 7.
+    Fix: Change the Pack source cell to "TASKS.md line 163"; prove with `uv run --locked python scripts/check_reference_notes.py` (exit 0) and by reading TASKS.md line 163, which must contain the 110,000-hexagon and 50,000-particle criteria.
+  F2 (REV-10)
+    File: docs/REFERENCE_NOTES.md
+    Line: 158
+    Wrong: The PostgreSQL 18 Slice S1 confirmation field "first parity query on both stores" cites "TASKS.md line 173", which is the Requirements row of S1-T03; the first two-store parity query is task S1-T05 at TASKS.md line 182 (goal) and line 184 (acceptance criteria).
+    Fix: Change the Pack source cell to "TASKS.md line 182"; prove with the same check (exit 0) and by reading TASKS.md line 182.
+  F3 (REV-16)
+    File: docs/REFERENCE_NOTES.md
+    Line: 19 and 90
+    Wrong: The DuckDB opening line cites "docs/02_ARCHITECTURE.md line 500" for the embedded reader, and PACK row S24 ("postgres_execute takes one statement per call") has the same line as its Source; line 500 is the "Python and packaging" row, and both statements live on line 501 ("Build engine and embedded reader | DuckDB ... postgres_execute takes one statement per call"). The citations resolve to an unrelated line, breaking the notes' own "the pack line is given" convention and AGENTS.md rule 7.
+    Fix: Change "docs/02_ARCHITECTURE.md line 500" to "docs/02_ARCHITECTURE.md line 501" in both places (the opening line and the Source cell of S24); prove with the check (exit 0) and by reading docs/02_ARCHITECTURE.md line 501.
+  F4 (REV-16)
+    File: docs/REFERENCE_NOTES.md
+    Line: 109 and 155
+    Wrong: The PostgreSQL 18 opening line ("Used here as the serving store ... docs/02_ARCHITECTURE.md line 501") and the Slice S1 confirmation field "exact pin of PostgreSQL 18 and the PostGIS 3.6 line" cite line 501, which is the DuckDB row; the serving-store row holding the PostgreSQL 18 pin and the PostGIS 3.6 line is line 502.
+    Fix: Change both citations to "docs/02_ARCHITECTURE.md line 502"; prove with the check (exit 0) and by reading docs/02_ARCHITECTURE.md line 502.
+  F5 (REV-16)
+    File: docs/REFERENCE_NOTES.md
+    Line: 149 (and the coverage row at line 273)
+    Wrong: PACK row S14 says the pack states that "text columns use the C collation" and cites docs/08_BACKEND.md line 217 and docs/13_DEPLOYMENT_AND_OPERATIONS.md line 155; both lines state only the extension limit (PostGIS and the built-in procedural language). The C-collation statement is on docs/02_ARCHITECTURE.md line 411 (the line S27 cites). Half of the row's claim is therefore attributed to lines that do not contain it.
+    Fix: Add "docs/02_ARCHITECTURE.md line 411" to the Source cell of S14 and to the Pack source cell of the matching coverage row at line 273; prove with the check (exit 0) and by reading docs/02_ARCHITECTURE.md line 411.
+PROPOSED OPEN ITEMS:
+  P1 (REV-17) TST-163, documents updated in the same pull request: part A leaves the shared documents stale until part B of this task, as the owner's note of 2026-11-12 allows — README.md line 25 and AGENTS.md/CLAUDE.md rule 44 still list eleven commands and not `uv run --locked python scripts/check_reference_notes.py`; docs/README.md lists neither notes file; OPEN_ITEMS.md line 428 (OI-41 DONE SO FAR) still says "REFERENCE_NOTES.md (S0-T13) is named as deferred, not created"; the open items OI-85 to OI-89 do not exist yet.
+  P2 (REV-16) plan style rule (lesson 29: no code file over 500 lines, test files specified below 500 lines each): test_reference_notes_form.py (919 lines), test_reference_notes_rows.py (1378) and test_reference_notes_assigned.py (1783) exceed it, and scripts/tests/reference_notes_support.py (396) exceeds its 170-to-230 estimate; the owner's note of 2026-11-12 says file size never rejects, so the lead should either record the owner's ruling for these files or split them in part B.
+  P3 (REV-11) hardening: document 17 — the form check's pack-cite rule verifies only that a cited line exists, so a citation naming an existing but wrong line passes (all five findings passed it); the plan assigns the pack lines to the reviewer, and a hardening option for a later change is to extend the second-reader protocol to read every cited pack line once at write time.
+```
+
+The lead, Claude Fable 5.2, judged the five findings valid: each names a citation of a pack line that holds another statement. The lead then read all 81 lines that the two notes cite: the four citations into docs/02_ARCHITECTURE.md were one line low and the two into TASKS.md nine lines low, because lines were added above them after the notes were written; every other citation holds its statement. The builder corrected them all, the two that the review did not list included (row S27 of the DuckDB section and the confirmation field of the extension directory): lines 411, 501, 502 and 700 of document 02, lines 163 and 182 of TASKS.md, and line 411 added to the sources of row S14. Proposed items: P1 (the shared documents) is part B of this task; P2 (file sizes) is answered by the owner's rule that file length is a target and never a failure; P3 (the form check proves that a cited line exists, not what it says) is hardening for document 17, and until then every cited line is read again whenever the pack's line numbers move, first when the version-1 documentation merges.
+
+#### Addition to the task log of S0-T13
+
+- Build round 5: the same builder, after review round 1: the pack citations of the two notes corrected as the lead's list gives them; the form check and the 30 tests pass
+
+#### Evidence for the work commit of fix round 1 `441edb504b2c8816b2ee19994fbb73b63ca02b8e`
+
+The recorded commands of the plan at the commit that follows fix round 1, command 9 (the red run, which this round does not touch) left out and command 10 in its later-round form.
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    441edb504b2c8816b2ee19994fbb73b63ca02b8e
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The two notes files agree with the closed tables and pins.toml: criteria 1 and 3; FE-02.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    441edb504b2c8816b2ee19994fbb73b63ca02b8e
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_reference_notes_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    30 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The 30 tests of the four new test files: criteria 1 to 3; DES-25 and DES-45 (the rules weights and icon-licence).
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    441edb504b2c8816b2ee19994fbb73b63ca02b8e
+Command:   ./eii test --seed 1794000000
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    985 passed, 0 failed, 0 skipped
+Seed:      1794000000
+Notes:     The project's own test command, which runs them in the suite python-guards.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    441edb504b2c8816b2ee19994fbb73b63ca02b8e
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 150 text files, 49 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    441edb504b2c8816b2ee19994fbb73b63ca02b8e
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    441edb504b2c8816b2ee19994fbb73b63ca02b8e
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The agent files are identical.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    441edb504b2c8816b2ee19994fbb73b63ca02b8e
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 57 components: OK"
+Seed:      none
+Notes:     The version check of S0-T12 still passes with the new files.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    441edb504b2c8816b2ee19994fbb73b63ca02b8e
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['node','web/scripts/check-layout.mjs'],capture_output=True,text=True); l=p.stdout.splitlines(); sys.exit(0 if p.returncode==0 and l[-1:]==['checked 32 entries: OK'] and not any(x.startswith('NOTE') for x in l) and p.stderr=='' else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The layout check requires the web notes file and prints no NOTE line (FE-02).
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    441edb504b2c8816b2ee19994fbb73b63ca02b8e
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','171869a8a614a9720e78f59913b2b57a0f23ed1a...441edb504b2c8816b2ee19994fbb73b63ca02b8e'],check=True,capture_output=True,text=True).stdout.splitlines(); req={'web/REFERENCE_NOTES.md','docs/REFERENCE_NOTES.md','scripts/reference_notes_tables.py','scripts/reference_notes_parse.py','scripts/reference_notes_report.py','scripts/reference_notes_assigned.py','scripts/check_reference_notes.py','scripts/tests/reference_notes_support.py','scripts/tests/test_reference_notes_form.py','scripts/tests/test_reference_notes_rows.py','scripts/tests/test_reference_notes_real.py','scripts/tests/test_reference_notes_assigned.py','web/scripts/check-layout.mjs','web/scripts/tests/check-layout.node-test.mjs','PROGRESS.md','TASKS.md'}; o=[x for x in p if x not in req|{'web/README.md'}]; m=[x for x in req if x not in p]; print(len(p),o,m); sys.exit(1 if o or m else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "16 [] []"
+Seed:      none
+Notes:     Later-round form of the scope command (TST-163): the fourteen paths of part A and the two ledger files of the first ledger commit, which lies inside the range; the five shared documents of part B follow in a later change.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

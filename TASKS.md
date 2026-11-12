@@ -133,7 +133,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: dependency reference notes under `docs/` assigned to this task only.
 - Depends: S0-T12.
 - Requirements: FE-02, PLN-10, PLN-18, TST-01, DES-25, DES-45.
-- Delivery: routine; personas Platform; status in review (pull request 13; its shared documents follow as part B).
+- Delivery: routine; personas Platform; status in review (pull request 13, round 2; its shared documents follow as part B).
 ### S0-T14 — GitHub repository settings
 - Goal: Enable secret scanning, push protection and branch protection under OI-13.
 - Acceptance criteria: [ ] each setting is queried after change; [ ] evidence records the result; [ ] no repository file or git setting is changed by the task.
