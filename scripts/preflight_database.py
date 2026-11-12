@@ -82,12 +82,20 @@ def parse_database_url(value: str) -> DbTarget | str:
     if not rest or "/" in rest:
         return "no database name"
     password = unquote(parts.password) if parts.password is not None else None
+    user_dec = unquote(user)
+    database_dec = unquote(rest)
+    if (
+        "\x00" in user_dec
+        or (password is not None and "\x00" in password)
+        or "\x00" in database_dec
+    ):
+        return "user, password or database holds a NUL character"
     return DbTarget(
         hostname,
         port,
-        unquote(user),
+        user_dec,
         password,
-        unquote(rest),
+        database_dec,
     )
 
 

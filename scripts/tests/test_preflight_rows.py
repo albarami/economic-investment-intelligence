@@ -78,9 +78,7 @@ class Rows(unittest.TestCase):
         for label in labels:
             with self.subTest(label=label):
                 ran.append(label)
-                with tempfile.TemporaryDirectory(
-                    dir=os.environ.get("TMPDIR", "/tmp"),
-                ) as tmp:
+                with tempfile.TemporaryDirectory() as tmp:
                     root = Path(tmp) / "root"
                     scratch = Path(tmp) / "scratch"
                     root.mkdir()
@@ -286,7 +284,7 @@ class Rows(unittest.TestCase):
             "and the tile, glyph and font hash check is not built in slice S0"
         )
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
             for label in labels:
                 with self.subTest(label=label):
@@ -416,7 +414,7 @@ class Rows(unittest.TestCase):
         git_bin = shutil.which("git")
         if git_bin is None:
             self.fail("git not found on PATH")
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
             for label in labels:
                 with self.subTest(label=label):
@@ -477,7 +475,7 @@ class Rows(unittest.TestCase):
             "git_timeout",
         ]
         stub_ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
             for label in stub_labels:
                 with self.subTest(label=label):
@@ -594,7 +592,7 @@ class Rows(unittest.TestCase):
             "bad_output",
         ]
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             root = folder / "root"
             root.mkdir()
@@ -666,9 +664,11 @@ class Rows(unittest.TestCase):
             "r08_status128",
             "r09_status1",
             "r09_bad_output",
+            "r08_timeout",
+            "r09_timeout",
         ]
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
             for label in labels:
                 with self.subTest(label=label):
@@ -750,6 +750,17 @@ class Rows(unittest.TestCase):
                                 stdout=marker,
                                 stderr=marker,
                             )
+                        elif label == "r08_timeout":
+                            stubs.write_stub(
+                                stub_dir,
+                                "git",
+                                sleep=60.0,
+                                echo=True,
+                                stdout=marker,
+                                stderr=marker,
+                            )
+                            limit = 0.5
+                            args = (root, env, limit)
                         else:
                             stubs.write_stub(
                                 stub_dir,
@@ -771,6 +782,17 @@ class Rows(unittest.TestCase):
                                 stdout=marker,
                                 stderr=marker,
                             )
+                        elif label == "r09_timeout":
+                            stubs.write_stub(
+                                stub_dir,
+                                "cmd.exe",
+                                sleep=60.0,
+                                echo=True,
+                                stdout=marker,
+                                stderr=marker,
+                            )
+                            limit = 0.5
+                            args = (root, env, limit)
                         else:
                             stubs.write_stub(
                                 stub_dir,
@@ -782,6 +804,16 @@ class Rows(unittest.TestCase):
                             )
                     line = func(*args)
                     text = line.text()
+                    if label == "r08_timeout":
+                        self.assertEqual(
+                            text,
+                            "FAIL env-not-tracked: git gave no answer within 0.5 s",
+                        )
+                    elif label == "r09_timeout":
+                        self.assertEqual(
+                            text,
+                            "WARN wsl-interop: cmd.exe gave no answer within 0.5 s",
+                        )
                     self.assertNotIn(marker, text)
                     skip_env = frozenset({"C", "1", "false", os.devnull})
                     for call in stubs.calls(stub_dir):
@@ -802,9 +834,7 @@ class Rows(unittest.TestCase):
         for label in labels:
             with self.subTest(label=label):
                 ran.append(label)
-                with tempfile.TemporaryDirectory(
-                    dir=os.environ.get("TMPDIR", "/tmp"),
-                ) as tmp:
+                with tempfile.TemporaryDirectory() as tmp:
                     root = Path(tmp) / "root"
                     scratch = Path(tmp) / "scratch"
                     stub_dir = Path(tmp) / "stubs"

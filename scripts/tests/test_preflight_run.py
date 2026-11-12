@@ -121,7 +121,7 @@ class Preflight(unittest.TestCase):
 
     def test_foundation_preflight_exits_zero(self) -> None:
         """U01: foundation preflight is WARN-heavy but exits 0."""
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             env, root, api_port, _db = _env0(Path(tmp))
             report = preflight_mod.run_preflight(root, env, api_port=api_port)
             want = self._u01_lines(api_port)
@@ -141,7 +141,7 @@ class Preflight(unittest.TestCase):
             "cmd_missing",
         ]
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
             for label in labels:
                 with self.subTest(label=label):
@@ -228,7 +228,7 @@ class Preflight(unittest.TestCase):
     def test_configured_release_mode(self) -> None:
         """U03: configured release dir yields not_built FAIL rows."""
         not_built = "not_built (EII_RELEASE_DIR is set, and this check is not built in slice S0)"
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             env, root, api_port, _ = _env0(Path(tmp))
             env["EII_RELEASE_DIR"] = "data/releases/x"
             report = preflight_mod.run_preflight(root, env, api_port=api_port)
@@ -357,7 +357,7 @@ class Preflight(unittest.TestCase):
         """U05: embedded mode skips or softens PostgreSQL."""
         labels = ["embedded_true", "docker_false"]
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             for label in labels:
                 with self.subTest(label=label):
                     ran.append(label)
@@ -435,7 +435,7 @@ class Preflight(unittest.TestCase):
         ran: list[str] = []
         real = proc.run_child
         recorded: list[tuple[str, tuple[str, ...]]] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
             for label, expect_names, opts in scenarios:
                 with self.subTest(label=label):
@@ -532,7 +532,7 @@ class Preflight(unittest.TestCase):
         key = stubs.dummy("key")
         password = stubs.dummy("pw")
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             for label in labels:
                 with self.subTest(label=label):
                     ran.append(label)
@@ -684,7 +684,7 @@ class Preflight(unittest.TestCase):
             "wsl-interop",
         )
         self.assertEqual(preflight_mod.CHECKS, literal)
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             env, root, api_port, _ = _env0(Path(tmp))
             report = preflight_mod.run_preflight(root, env, api_port=api_port)
             checks = tuple(line.check for line in report.lines)
@@ -709,7 +709,7 @@ class Preflight(unittest.TestCase):
 
     def test_every_probe_gets_the_limit(self) -> None:
         """U12: run_child spy sees PROBE_TIMEOUT_S on every program."""
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             env, root, api_port, db_port = _env0(Path(tmp))
             stub_dir = Path(tmp) / "stubs"
             stubs.write_stub(

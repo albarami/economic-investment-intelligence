@@ -51,7 +51,7 @@ class LiveServer(unittest.TestCase):
 
     def test_service_answers_and_passes(self) -> None:
         """V01: healthy service yields PASS postgresql."""
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             scratch = Path(tmp)
             sel = database.check_postgres(
                 os.environ,
@@ -85,7 +85,7 @@ class LiveServer(unittest.TestCase):
         )
         env = dict(os.environ)
         env["EII_DATABASE_URL"] = swapped
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             scratch = Path(tmp)
             sel = database.check_postgres(env, scratch, 5.0, docker=False)
             self.assertEqual(sel.store, "none")
@@ -108,7 +108,7 @@ class LiveServer(unittest.TestCase):
         env = dict(os.environ)
         env["EII_DATABASE_URL"] = stubs.database_url(None, CLOSED_PORT)
         start = time.monotonic()
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             scratch = Path(tmp)
             sel = database.check_postgres(env, scratch, 5.0, docker=False)
         self.assertLess(time.monotonic() - start, 5.0)
@@ -122,7 +122,7 @@ class LiveServer(unittest.TestCase):
 
     def test_docker_reachable_read_only(self) -> None:
         """V04: docker info is read-only and folds into store line."""
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             scratch = Path(tmp)
             docker = database.probe_docker(os.environ, scratch, 5.0)
             if docker.kind != "reachable":

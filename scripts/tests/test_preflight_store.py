@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import sys
 import tempfile
 import unittest
@@ -159,9 +158,7 @@ class StoreSelection(unittest.TestCase):
         for label in labels:
             with self.subTest(label=label):
                 ran.append(label)
-                with tempfile.TemporaryDirectory(
-                    dir=os.environ.get("TMPDIR", "/tmp"),
-                ) as tmp:
+                with tempfile.TemporaryDirectory() as tmp:
                     folder = Path(tmp)
                     stubs.write_stub(folder, "pg_isready")
                     stubs.write_stub(folder, "psql", stdout="180006|3.6.4\n")

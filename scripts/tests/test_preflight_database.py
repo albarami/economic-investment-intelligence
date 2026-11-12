@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 import stat
 import sys
 import tempfile
@@ -136,7 +135,11 @@ class DatabaseProbe(unittest.TestCase):
             "mysql_percent",
             "no_user_no_at",
             "two_hosts_no_at",
+            "user_nul",
+            "password_nul",
+            "database_nul",
         ]
+        nul_reason = "user, password or database holds a NUL character"
         dummy = stubs.dummy("z")
         reasons = [
             "scheme is not postgresql or postgres",
@@ -156,9 +159,13 @@ class DatabaseProbe(unittest.TestCase):
             "scheme is not postgresql or postgres",
             "no user",
             "more than one host",
+            nul_reason,
+            nul_reason,
+            nul_reason,
         ]
         h = _host()
         at = "@" + h
+        port = 55440
         urls = [
             f"mysql://{h}:1/eii",
             _pg_url("eii_app", 1, "eii") + "?host=evil",
@@ -177,6 +184,9 @@ class DatabaseProbe(unittest.TestCase):
             "mysql://u:p%@" + "h:1/db",
             f"postgresql://{h}:1/eii",
             "postgresql://h1:1,h2:2/eii",
+            f"postgresql://eii_app%00{at}:{port}/eii",
+            f"postgresql://eii_app:%00{at}:{port}/eii",
+            f"postgresql://eii_app{at}:{port}/eii%00",
         ]
         ran: list[str] = []
         for label, url, reason in zip(labels, urls, reasons, strict=True):
@@ -251,9 +261,15 @@ class DatabaseProbe(unittest.TestCase):
             "host_refused",
             "status_2_stderr",
             "unset_url",
+            "user_nul",
+            "password_nul",
+            "database_nul",
         ]
+        nul_reason = "user, password or database holds a NUL character"
+        h = _host()
+        at = "@" + h
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             sock = stubs.loopback_socket()
             port = sock.getsockname()[1]
@@ -266,6 +282,24 @@ class DatabaseProbe(unittest.TestCase):
                     case_dir = folder / label
                     case_dir.mkdir()
                     where = f"127.0.0.1:{port}"
+                    if label in ("user_nul", "password_nul", "database_nul"):
+                        stubs.write_stub(case_dir, "pg_isready")
+                        stubs.write_stub(case_dir, "psql")
+                        if label == "user_nul":
+                            url = f"postgresql://eii_app%00{at}:{port}/eii"
+                        elif label == "password_nul":
+                            url = f"postgresql://eii_app:%00{at}:{port}/eii"
+                        else:
+                            url = f"postgresql://eii_app{at}:{port}/eii%00"
+                        env = {"PATH": str(case_dir), "EII_DATABASE_URL": url}
+                        outcome = database.probe_postgres(env, case_dir, 0.5)
+                        self.assertEqual(outcome.kind, "fail")
+                        self.assertEqual(
+                            outcome.reason,
+                            f"EII_DATABASE_URL is not a valid connection string ({nul_reason})",
+                        )
+                        self.assertEqual(stubs.calls(case_dir), [])
+                        continue
                     if label == "unset_url":
                         env = {"PATH": str(case_dir)}
                     elif label == "host_refused":
@@ -440,7 +474,7 @@ class DatabaseProbe(unittest.TestCase):
             "garbage",
         ]
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             sock = stubs.loopback_socket()
             port = sock.getsockname()[1]
@@ -549,7 +583,7 @@ class DatabaseProbe(unittest.TestCase):
             "170005|\n",
         ]
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             sock = stubs.loopback_socket()
             port = sock.getsockname()[1]
@@ -622,7 +656,7 @@ class DatabaseProbe(unittest.TestCase):
         }
         password = stubs.dummy("p")
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             sock = stubs.loopback_socket()
             port = sock.getsockname()[1]
@@ -719,7 +753,7 @@ class DatabaseProbe(unittest.TestCase):
             "two_lines",
         ]
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             for label in labels:
                 with self.subTest(label=label):
@@ -775,7 +809,7 @@ class DatabaseProbe(unittest.TestCase):
         """D10: docker child env pass-through."""
         labels = ["all_present", "path_only"]
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             home = str(folder / "home")
             docker_cfg = str(folder / "docker")
@@ -821,7 +855,7 @@ class DatabaseProbe(unittest.TestCase):
 
     def test_silent_listener_gets_no_answer(self) -> None:
         """D11: connect to a silent listener times out."""
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             listener = stubs.loopback_socket()
             port = listener.getsockname()[1]
@@ -844,7 +878,7 @@ class DatabaseProbe(unittest.TestCase):
 
     def test_no_client_program(self) -> None:
         """D12: empty PATH yields absent PostgreSQL."""
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             empty = folder / "empty"
             empty.mkdir()

@@ -23,7 +23,7 @@ class ChildRunner(unittest.TestCase):
 
     def test_real_limit_kills_sleeping_child(self) -> None:
         """P01: default limit ends a long sleep."""
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             program = stubs.write_stub(folder, "pg_isready", sleep=60.0)
             env = {"PATH": str(folder), "LANG": "C", "LC_ALL": "C"}
@@ -39,7 +39,7 @@ class ChildRunner(unittest.TestCase):
 
     def test_injected_limit_kills_the_whole_group(self) -> None:
         """P02: a short limit kills the grandchild process group."""
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             pid_file = folder / "grandchild.pid"
             program = stubs.write_stub(
@@ -75,7 +75,7 @@ class ChildRunner(unittest.TestCase):
 
     def test_status_and_streams_are_exact(self) -> None:
         """P05: stdout, stderr and status pass through."""
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             program = stubs.write_stub(
                 folder,
@@ -98,7 +98,7 @@ class ChildRunner(unittest.TestCase):
         labels = ["missing", "not_executable", "enoexec"]
         errors = ["ENOENT", "EACCES", "ENOEXEC"]
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             for label, expected in zip(labels, errors, strict=True):
                 with self.subTest(label=label):
@@ -125,7 +125,7 @@ class ChildRunner(unittest.TestCase):
 
     def test_child_receives_exactly_its_environment(self) -> None:
         """P07: only the passed env dict reaches the child."""
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             program = stubs.write_stub(folder, "pg_isready", echo=True)
             env = {"PATH": str(folder), "LANG": "C"}
@@ -144,16 +144,46 @@ class ChildRunner(unittest.TestCase):
 
     def test_arguments_reach_the_child_literally(self) -> None:
         """P08: argv is not interpreted by a shell."""
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
-            folder = Path(tmp)
-            program = stubs.write_stub(folder, "pg_isready")
-            host = "a;touch${IFS}x"
-            args = ["-h", host, "-p", "1", "-t", "5"]
-            env = {"PATH": str(folder)}
-            proc.run_child(str(program), args, env, folder)
-            recorded = stubs.calls(folder)[0]["argv"]
-            self.assertEqual(recorded, [str(program), *args])
-            self.assertFalse((folder / "x").exists())
+        labels = ["shell_metacharacters", "relative_path_entry"]
+        ran: list[str] = []
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            for label in labels:
+                with self.subTest(label=label):
+                    ran.append(label)
+                    if label == "shell_metacharacters":
+                        folder = base / "shell"
+                        folder.mkdir()
+                        program = stubs.write_stub(folder, "pg_isready")
+                        host = "a;touch${IFS}x"
+                        args = ["-h", host, "-p", "1", "-t", "5"]
+                        env = {"PATH": str(folder)}
+                        proc.run_child(str(program), args, env, folder)
+                        recorded = stubs.calls(folder)[0]["argv"]
+                        self.assertEqual(recorded, [str(program), *args])
+                        self.assertFalse((folder / "x").exists())
+                    else:
+                        stub_bin = base / "bin"
+                        work_dir = base / "work"
+                        stub_bin.mkdir()
+                        work_dir.mkdir()
+                        stubs.write_stub(stub_bin, "pg_isready", echo=True)
+                        prev = os.getcwd()
+                        try:
+                            os.chdir(base)
+                            env = {"PATH": "bin"}
+                            found = proc.find_program("pg_isready", env)
+                            assert found is not None
+                            proc.run_child(
+                                found,
+                                ["-h", "h", "-p", "1", "-t", "5"],
+                                env,
+                                work_dir,
+                            )
+                        finally:
+                            os.chdir(prev)
+                        self.assertEqual(len(stubs.calls(stub_bin)), 1)
+        self.assertEqual(ran, labels)
 
     def test_refused_commands_never_start(self) -> None:
         """P09: closed-list refusal leaves no calls log."""
@@ -188,7 +218,7 @@ class ChildRunner(unittest.TestCase):
             ("npm", ["ci"]),
         ]
         ran: list[str] = []
-        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/tmp")) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             for label, (name, args) in zip(labels, commands, strict=True):
                 with self.subTest(label=label):

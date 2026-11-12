@@ -96,7 +96,10 @@ def command_allowed(name: str, args: Sequence[str]) -> bool:
 
 def find_program(name: str, environ: Mapping[str, str]) -> str | None:
     """Locate a program on PATH."""
-    return shutil.which(name, path=environ.get("PATH", ""))
+    found = shutil.which(name, path=environ.get("PATH", ""))
+    if found is None:
+        return None
+    return os.path.abspath(found)
 
 
 def child_env(
