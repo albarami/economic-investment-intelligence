@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import copy
-import shutil
 import tomllib
 from collections.abc import Callable
 from pathlib import Path
@@ -11,16 +10,10 @@ from typing import Any
 
 import workspace_guard as guard
 
-EXPECTED_PYPROJECT_FIELDS = 34
-EXPECTED_PYPROJECT_PLANTS = 44
-EXPECTED_PACKAGE_LOCK_PLANTS = 8
-EXPECTED_WIDE_LOCK_PLANTS = 14
-COUNT_EVERY_PLACE = 176
-COUNT_LOCK_EDGES = 80
-COUNT_WIDE = 42
-COUNT_PATHS = 20
-COUNT_SPELLINGS = 10
-COUNT_PYPROJECT_CASES = 8
+EXPECTED_PYPROJECT_FIELDS, EXPECTED_PYPROJECT_PLANTS = 34, 44
+EXPECTED_PACKAGE_LOCK_PLANTS, EXPECTED_WIDE_LOCK_PLANTS = 8, 14
+COUNT_EVERY_PLACE, COUNT_LOCK_EDGES, COUNT_WIDE = 176, 80, 42
+COUNT_PATHS, COUNT_SPELLINGS, COUNT_PYPROJECT_CASES = 20, 10, 8
 MEMBERS = ("core", "custodian", "product")
 NAMES = ("eii-core", "eii-custodian", "eii-product")
 NOT_VALID = "not = [valid"
@@ -133,22 +126,21 @@ def _plant_dg(t: str, _f: str, data: dict[str, Any]) -> None:
     _put(data, "dependency-groups", {"g": [t]})
 
 
-def _plant_override(t: str, f: str, data: dict[str, Any], mode: int) -> None:
+def _plant_scoped(
+    t: str,
+    f: str,
+    data: dict[str, Any],
+    mode: int,
+    dotted: str,
+) -> None:
     if mode == 0:
-        _put(data, "tool.uv.override-dependencies", [t])
-    elif mode == 1:
-        _put(data, "tool.uv.override-dependencies", [{"package": {"name": t}, "dependencies": [f]}])
+        _put(data, dotted, [t])
+        return
+    if mode == 1:
+        row = [{"package": {"name": t}, "dependencies": [f]}]
     else:
-        _put(data, "tool.uv.override-dependencies", [{"package": {"name": f}, "dependencies": [t]}])
-
-
-def _plant_exclude(t: str, f: str, data: dict[str, Any], mode: int) -> None:
-    if mode == 0:
-        _put(data, "tool.uv.exclude-dependencies", [t])
-    elif mode == 1:
-        _put(data, "tool.uv.exclude-dependencies", [{"package": {"name": t}, "dependencies": [f]}])
-    else:
-        _put(data, "tool.uv.exclude-dependencies", [{"package": {"name": f}, "dependencies": [t]}])
+        row = [{"package": {"name": f}, "dependencies": [t]}]
+    _put(data, dotted, row)
 
 
 def _plant_depmeta(
@@ -169,11 +161,15 @@ def _plant_depmeta(
 
 
 def _plant_conflicts(t: str, f: str, data: dict[str, Any]) -> None:
-    _put(data, "tool.uv.conflicts", [[{"package": t, "extra": "x"}, {"package": f, "extra": "y"}]])
+    pair = [{"package": t, "extra": "x"}, {"package": f, "extra": "y"}]
+    _put(data, "tool.uv.conflicts", [pair])
 
 
 def _plant_map(t: str, f: str, data: dict[str, Any], dotted: str) -> None:
-    _put(data, dotted, {t: "2020-01-01T00:00:00Z" if dotted.endswith("exclude-newer-package") else {"k": "v"}})
+    if dotted.endswith("exclude-newer-package"):
+        _put(data, dotted, {t: "2020-01-01T00:00:00Z"})
+    else:
+        _put(data, dotted, {t: {"k": "v"}})
 
 
 def _plant_extra_build(
@@ -201,9 +197,15 @@ for label, parts in (
     ("build-system.requires", ["build-system", "requires"]),
     ("tool.uv.dev-dependencies", ["tool", "uv", "dev-dependencies"]),
     ("tool.uv.constraint-dependencies", ["tool", "uv", "constraint-dependencies"]),
-    ("tool.uv.build-constraint-dependencies", ["tool", "uv", "build-constraint-dependencies"]),
+    (
+        "tool.uv.build-constraint-dependencies",
+        ["tool", "uv", "build-constraint-dependencies"],
+    ),
     ("tool.uv.no-binary-package", ["tool", "uv", "no-binary-package"]),
-    ("tool.uv.no-build-isolation-package", ["tool", "uv", "no-build-isolation-package"]),
+    (
+        "tool.uv.no-build-isolation-package",
+        ["tool", "uv", "no-build-isolation-package"],
+    ),
     ("tool.uv.no-build-package", ["tool", "uv", "no-build-package"]),
     ("tool.uv.no-sources-package", ["tool", "uv", "no-sources-package"]),
     ("tool.uv.reinstall-package", ["tool", "uv", "reinstall-package"]),
@@ -215,27 +217,28 @@ PYPROJECT_PLANTS += [
     ("dependency-groups", _plant_dg),
     ("tool.uv.sources", _plant_sources),
 ]
-for mode in range(3):
-    PYPROJECT_PLANTS.append(
-        (
-            "tool.uv.override-dependencies",
-            lambda t, f, d, m=mode: _plant_override(t, f, d, m),
-        ),
-    )
-for mode in range(3):
-    PYPROJECT_PLANTS.append(
-        (
-            "tool.uv.exclude-dependencies",
-            lambda t, f, d, m=mode: _plant_exclude(t, f, d, m),
-        ),
-    )
-for mode in range(2):
-    PYPROJECT_PLANTS.append(
-        (
-            "tool.uv.dependency-metadata",
-            lambda t, f, d, m=mode: _plant_depmeta(t, f, d, m),
-        ),
-    )
+def _mode_plants(
+    label: str,
+    fn: Callable[[str, str, dict[str, Any], int], None],
+    modes: int,
+) -> None:
+    for mode in range(modes):
+        PYPROJECT_PLANTS.append(
+            (label, lambda t, f, d, m=mode: fn(t, f, d, m)),
+        )
+
+
+_mode_plants(
+    "tool.uv.override-dependencies",
+    lambda t, f, d, m: _plant_scoped(t, f, d, m, "tool.uv.override-dependencies"),
+    3,
+)
+_mode_plants(
+    "tool.uv.exclude-dependencies",
+    lambda t, f, d, m: _plant_scoped(t, f, d, m, "tool.uv.exclude-dependencies"),
+    3,
+)
+_mode_plants("tool.uv.dependency-metadata", _plant_depmeta, 2)
 PYPROJECT_PLANTS += [
     ("tool.uv.conflicts", _plant_conflicts),
     (
@@ -247,13 +250,7 @@ PYPROJECT_PLANTS += [
         lambda t, f, d: _plant_map(t, f, d, "tool.uv.exclude-newer-package"),
     ),
 ]
-for mode in range(3):
-    PYPROJECT_PLANTS.append(
-        (
-            "tool.uv.extra-build-dependencies",
-            lambda t, f, d, m=mode: _plant_extra_build(t, f, d, m),
-        ),
-    )
+_mode_plants("tool.uv.extra-build-dependencies", _plant_extra_build, 3)
 PYPROJECT_PLANTS.append(
     (
         "tool.uv.extra-build-variables",
@@ -278,10 +275,16 @@ for key in PIP_KEYS:
             PYPROJECT_PLANTS.append(
                 (
                     dotted,
-                    lambda t, f, d, m=mode, dt=dotted: _plant_extra_build(t, f, d, m, dt),
+                    lambda t, f, d, m=mode, dt=dotted: _plant_extra_build(
+                        t, f, d, m, dt,
+                    ),
                 ),
             )
-    elif key in ("config-settings-package", "exclude-newer-package", "extra-build-variables"):
+    elif key in (
+        "config-settings-package",
+        "exclude-newer-package",
+        "extra-build-variables",
+    ):
         dotted = f"tool.uv.pip.{key}"
         PYPROJECT_PLANTS.append(
             (
@@ -295,7 +298,11 @@ for key in PIP_KEYS:
 
 
 def apply_pyproject_plant(
-    data: dict[str, Any], label: str, target: str, filler: str = FILLER, rep: int = 0,
+    data: dict[str, Any],
+    label: str,
+    target: str,
+    filler: str = FILLER,
+    rep: int = 0,
 ) -> None:
     """Merge one pyproject plant into a parsed member file."""
     matches = [fn for lab, fn in PYPROJECT_PLANTS if lab == label]
@@ -310,7 +317,11 @@ def package_entry(lock: dict[str, Any], name: str) -> dict[str, Any]:
             for entry in block:
                 if isinstance(entry, dict) and entry.get("name") == name:
                     return entry
-    entry: dict[str, Any] = {"name": name, "version": "0.0.0", "source": {"editable": "x"}}
+    entry: dict[str, Any] = {
+        "name": name,
+        "version": "0.0.0",
+        "source": {"editable": "x"},
+    }
     pkg = lock.setdefault("package", [])
     if not isinstance(pkg, list):
         pkg = []
@@ -375,7 +386,12 @@ def _lock_rep(entry: dict[str, Any], t: str, mode: int) -> None:
 PACKAGE_LOCK_PLANTS = list(range(8))
 
 
-def apply_package_lock_plant(lock: dict[str, Any], rep: int, source: str, target: str) -> None:
+def apply_package_lock_plant(
+    lock: dict[str, Any],
+    rep: int,
+    source: str,
+    target: str,
+) -> None:
     """Apply one package-level lock plant."""
     entry = package_entry(lock, source)
     if rep == 7:
@@ -399,130 +415,56 @@ WIDE_LOCK_PLANTS: list[tuple[str, int]] = [
 ]
 
 
+def _manifest_triple(target: str, filler: str, rep: int) -> object:
+    if rep == 0:
+        return [{"name": target}]
+    if rep == 1:
+        row = {"package": {"name": target}, "dependencies": [filler]}
+        return [row]
+    row = {"package": {"name": filler}, "dependencies": [target]}
+    return [row]
+
+
 def apply_wide_lock_plant(
-    lock: dict[str, Any], field: str, target: str, rep: int, filler: str = FILLER,
+    lock: dict[str, Any],
+    field: str,
+    target: str,
+    rep: int,
+    filler: str = FILLER,
 ) -> None:
-    """Apply one workspace-wide lock field plant."""
     man = lock.setdefault("manifest", {})
     if field == "manifest.constraints":
         man["constraints"] = [{"name": target}]
-    elif field == "manifest.overrides":
-        if rep == 0:
-            man["overrides"] = [{"name": target}]
-        elif rep == 1:
-            man["overrides"] = [{"package": {"name": target}, "dependencies": [filler]}]
+    elif field in ("manifest.overrides", "manifest.excludes"):
+        key = field.split(".", 1)[1]
+        if rep == 0 and field == "manifest.excludes":
+            man[key] = [target]
         else:
-            man["overrides"] = [{"package": {"name": filler}, "dependencies": [target]}]
-    elif field == "manifest.excludes":
-        if rep == 0:
-            man["excludes"] = [target]
-        elif rep == 1:
-            man["excludes"] = [{"package": {"name": target}, "dependencies": [filler]}]
-        else:
-            man["excludes"] = [{"package": {"name": filler}, "dependencies": [target]}]
+            man[key] = _manifest_triple(target, filler, rep)
     elif field == "manifest.build-constraints":
         man["build-constraints"] = [{"name": target}]
     elif field == "manifest.dependency-metadata":
         if rep == 0:
             man["dependency-metadata"] = [{"name": target}]
         else:
-            man["dependency-metadata"] = [{"name": filler, "requires-dist": [target]}]
+            row = {"name": filler, "requires-dist": [target]}
+            man["dependency-metadata"] = [row]
     elif field == "manifest.dependency-groups":
         man["dependency-groups"] = {"g": [{"name": target}]}
     elif field == "manifest.requirements":
         man["requirements"] = [{"name": target}]
     elif field == "conflicts":
-        lock["conflicts"] = [[{"package": target, "extra": "x"}, {"package": filler, "extra": "y"}]]
+        pair = [{"package": target, "extra": "x"}, {"package": filler, "extra": "y"}]
+        lock["conflicts"] = [pair]
     elif field == "options.exclude-newer-package":
         opts = lock.setdefault("options", {})
         opts.setdefault("exclude-newer-package", {})[target] = "2020-01-01T00:00:00Z"
 
 
-def _root_name_case(name: str, field: str) -> tuple[str, Callable[[Path], None], list[str]]:
-    if field == "project.dependencies":
-        plant = edit("pyproject.toml", adds(name))
-    else:
-        plant = edit("pyproject.toml", put("dependency-groups", {"dev": [name]}))
-    norm = guard.normalise(name)
-    line = f"FAIL root-clean: pyproject.toml: {field} names {norm}"
-    return (f"root {field} {name}", plant, [line])
-
-
-ROOT_NAMING_CASES = [
-    _root_name_case(n, f) for n in NAMES for f in ("project.dependencies", "dependency-groups")
-]
-
-ROOT_FLAG_CASES = [
-    ("name other", edit("pyproject.toml", put("project.name", "other")),
-     ["FAIL root-clean: pyproject.toml: name is other expected eii-workspace"]),
-    ("package true", edit("pyproject.toml", put("tool.uv.package", True)),
-     ["FAIL root-clean: pyproject.toml: tool.uv.package is not false"]),
-    ("package removed", edit("pyproject.toml", pop("tool.uv.package")),
-     ["FAIL root-clean: pyproject.toml: tool.uv.package is not false"]),
-    ("Eii_Workspace", edit("pyproject.toml", put("project.name", "Eii_Workspace")), []),
-]
-
-SOURCE_CASES = [
-    ("custodian removed", edit("custodian/pyproject.toml", pop("tool.uv.sources")),
-     ["FAIL workspace-source: custodian/pyproject.toml: eii-core is not taken from the workspace"]),
-    ("product removed", edit("product/pyproject.toml", pop("tool.uv.sources")),
-     ["FAIL workspace-source: product/pyproject.toml: eii-core is not taken from the workspace"]),
-    ("custodian string", edit("custodian/pyproject.toml", put("tool.uv.sources", "eii-core")),
-     ["FAIL workspace-source: custodian/pyproject.toml: eii-core is not taken from the workspace"]),
-    ("product string", edit("product/pyproject.toml", put("tool.uv.sources", "eii-core")),
-     ["FAIL workspace-source: product/pyproject.toml: eii-core is not taken from the workspace"]),
-    ("custodian path", edit("custodian/pyproject.toml", put("tool.uv.sources", {"eii-core": {"path": "../core"}})),
-     ["FAIL workspace-source: custodian/pyproject.toml: eii-core is not taken from the workspace"]),
-    ("product path", edit("product/pyproject.toml", put("tool.uv.sources", {"eii-core": {"path": "../core"}})),
-     ["FAIL workspace-source: product/pyproject.toml: eii-core is not taken from the workspace"]),
-    ("custodian Eii_Core", edit("custodian/pyproject.toml", put("tool.uv.sources", {"Eii_Core": {"workspace": True}})), []),
-    ("product Eii_Core", edit("product/pyproject.toml", put("tool.uv.sources", {"Eii_Core": {"workspace": True}})), []),
-    ("custodian mixed", edit("custodian/pyproject.toml", put("tool.uv.sources", {"eii-core": {"workspace": True}, "Eii_Core": {"path": "../core"}})),
-     ["FAIL workspace-source: custodian/pyproject.toml: eii-core is not taken from the workspace"]),
-    ("product mixed", edit("product/pyproject.toml", put("tool.uv.sources", {"eii-core": {"workspace": True}, "Eii_Core": {"path": "../core"}})),
-     ["FAIL workspace-source: product/pyproject.toml: eii-core is not taken from the workspace"]),
-]
-
-MEMBER_LIST_CASES = [
-    ("gateway", edit("pyproject.toml", put("tool.uv.workspace.members", ["core", "custodian", "product", "gateway"])),
-     ["FAIL members: pyproject.toml: members are core, custodian, gateway, product expected core, custodian, product"]),
-    ("drop product", edit("pyproject.toml", put("tool.uv.workspace.members", ["core", "custodian"])),
-     ["FAIL members: pyproject.toml: members are core, custodian expected core, custodian, product"]),
-    ("dup core", edit("pyproject.toml", put("tool.uv.workspace.members", ["core", "core", "custodian", "product"])),
-     ["FAIL members: pyproject.toml: members are core, core, custodian, product expected core, custodian, product"]),
-    ("empty", edit("pyproject.toml", put("tool.uv.workspace.members", [])),
-     ["FAIL members: pyproject.toml: members are <none> expected core, custodian, product"]),
-    ("members string", edit("pyproject.toml", put("tool.uv.workspace", {"members": "core"})),
-     ["FAIL members: pyproject.toml: members are <none> expected core, custodian, product"]),
-    ("workspace string", edit("pyproject.toml", put("tool.uv.workspace", "members")),
-     ["FAIL members: pyproject.toml: members are <none> expected core, custodian, product"]),
-    ("exclude", edit("pyproject.toml", put("tool.uv.workspace", {"members": ["core", "custodian", "product"], "exclude": ["core"]})),
-     ["FAIL members: pyproject.toml: exclude is not empty"]),
-]
-
-LAYOUT_CASES = [
-    ("core layout", lambda root: (shutil.rmtree(root / "core/src", ignore_errors=True), (root / "core/eii_core").mkdir(parents=True, exist_ok=True), (root / "core/eii_core/__init__.py").write_text('__version__ = "0.0.0"\n')),
-     ["FAIL package-layout: core/src/eii_core/__init__.py: missing"]),
-    ("custodian init", lambda root: (root / "custodian/src/eii_custodian/__init__.py").unlink(),
-     ["FAIL package-layout: custodian/src/eii_custodian/__init__.py: missing"]),
-    ("product bad name", edit("product/pyproject.toml", put("project.name", "eii-productx")),
-     ["FAIL package-layout: product/pyproject.toml: name is eii-productx expected eii-product"]),
-    ("Eii_Product", edit("product/pyproject.toml", put("project.name", "Eii_Product")), []),
-    ("core init dir", lambda root: ((root / "core/src/eii_core/__init__.py").unlink(missing_ok=True), (root / "core/src/eii_core/__init__.py").mkdir(parents=True)),
-     ["FAIL package-layout: core/src/eii_core/__init__.py: missing"]),
-    ("no project", edit("product/pyproject.toml", lambda d: d.pop("project", None)),
-     ["FAIL package-layout: product/pyproject.toml: name is <none> expected eii-product"]),
-    ("core deleted", lambda root: (root / "core/pyproject.toml").unlink(),
-     ["FAIL package-layout: core/pyproject.toml: missing or not valid TOML"]),
-]
-
-LOCK_MEMBER_CASES = [
-    ("drop product", lambda lock: lock.setdefault("manifest", {}).update({"members": ["eii-core", "eii-custodian", "eii-workspace"]}),
-     ["FAIL lock: uv.lock: manifest.members are eii-core, eii-custodian, eii-workspace expected eii-core, eii-custodian, eii-product, eii-workspace"]),
-    ("add gateway", lambda lock: lock.setdefault("manifest", {}).update({"members": ["eii-core", "eii-custodian", "eii-gateway", "eii-product", "eii-workspace"]}),
-     ["FAIL lock: uv.lock: manifest.members are eii-core, eii-custodian, eii-gateway, eii-product, eii-workspace expected eii-core, eii-custodian, eii-product, eii-workspace"]),
-    ("members string", lambda lock: lock.setdefault("manifest", {}).update({"members": "eii-core"}),
-     ["FAIL lock: uv.lock: manifest.members are <none> expected eii-core, eii-custodian, eii-product, eii-workspace"]),
-    ("Eii_Product", lambda lock: lock.setdefault("manifest", {}).update({"members": ["eii-core", "eii-custodian", "Eii_Product", "eii-workspace"]}), []),
-]
-
+from workspace_fields_tables import (  # noqa: E402
+    LAYOUT_CASES, LOCK_MEMBER_CASES, MEMBER_LIST_CASES, OUTPUT_ORDER_A,
+    OUTPUT_ORDER_B, OUTPUT_ORDER_C, ROOT_FLAG_CASES, ROOT_NAMING_CASES,
+    SOURCE_CASES, invalid_pyproject_cases, plant_output_order_a,
+    plant_output_order_b, plant_output_order_c, plant_registry_forbidden_edge,
+    write_toml,
+)

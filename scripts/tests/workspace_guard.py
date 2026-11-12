@@ -1,12 +1,13 @@
-"""Workspace metadata guard for the uv workspace (stdlib only, not collected as tests)."""
+"""Workspace metadata guard for the uv workspace (stdlib only, not a test module)."""
 
 from __future__ import annotations
 
-import json
 import re
-import tomllib
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
+
+import workspace_toml
+from workspace_toml import dump_toml
 
 ROOT_DIST = "eii-workspace"
 MEMBER_ROWS: tuple[tuple[str, str, str], ...] = (
@@ -92,27 +93,13 @@ FILE_URI_RE = re.compile(r"(?:^|[+=\s])(file:)", re.IGNORECASE)
 
 
 def normalise(name: str) -> str:
-    """Lower-case a distribution name and collapse separator runs to hyphens.
-
-    Args:
-        name: Raw name text.
-
-    Returns:
-        Normalised distribution name.
-    """
+    """Lower-case a name and collapse ``-``, ``_`` and ``.`` runs to hyphens."""
     lowered = name.lower()
     return re.sub(r"[-_.]+", "-", lowered)
 
 
 def requirement_name(text: str) -> str | None:
-    """Extract the leading requirement name token from a PEP 508 string.
-
-    Args:
-        text: Requirement string.
-
-    Returns:
-        Normalised name, or None when no name token is present.
-    """
+    """Return the leading PEP 508 name token, normalised, or ``None``."""
     match = NAME_RE.match(text)
     if not match:
         return None
@@ -120,14 +107,7 @@ def requirement_name(text: str) -> str | None:
 
 
 def names_in(value: object) -> set[str]:
-    """Collect distribution names carried by a parsed TOML value.
-
-    Args:
-        value: Parsed TOML value.
-
-    Returns:
-        Set of normalised names found recursively.
-    """
+    """Collect normalised distribution names from a parsed TOML value."""
     found: set[str] = set()
     if isinstance(value, str):
         parsed = requirement_name(value)
@@ -145,15 +125,6 @@ def names_in(value: object) -> set[str]:
 
 def _fail(rule: str, path: str, detail: str) -> str:
     return f"FAIL {rule}: {path}: {detail}"
-
-
-def _load_toml(path: Path) -> dict[str, Any] | None:
-    if not path.is_file():
-        return None
-    try:
-        return tomllib.loads(path.read_text(encoding="utf-8"))
-    except tomllib.TOMLDecodeError:
-        return None
 
 
 def _dig(data: dict[str, Any], dotted: str) -> object | None:
@@ -215,18 +186,12 @@ def _rule_root_clean(
     name_val = _dig(data, "project.name")
     if not isinstance(name_val, str) or normalise(name_val) != normalise(ROOT_DIST):
         shown = name_val if isinstance(name_val, str) else "<none>"
-        lines.append(
-            _fail(
-                "root-clean",
-                "pyproject.toml",
-                f"name is {shown} expected {ROOT_DIST}",
-            ),
-        )
+        detail = f"name is {shown} expected {ROOT_DIST}"
+        lines.append(_fail("root-clean", "pyproject.toml", detail))
     package_flag = _dig(data, "tool.uv.package")
     if package_flag is not False:
-        lines.append(
-            _fail("root-clean", "pyproject.toml", "tool.uv.package is not false"),
-        )
+        detail = "tool.uv.package is not false"
+        lines.append(_fail("root-clean", "pyproject.toml", detail))
     forbidden = MEMBER_NAMES
     lines.extend(
         _pyproject_field_lines("root-clean", "pyproject.toml", data, forbidden),
@@ -238,82 +203,50 @@ def _rule_package_layout(root: Path) -> list[str]:
     lines: list[str] = []
     for mdir, dist, module in MEMBER_ROWS:
         rel = f"{mdir}/pyproject.toml"
-        pdata = _load_toml(root / rel)
+        pdata = workspace_toml.load_toml(root / rel)
         if pdata is None:
-            lines.append(
-                _fail(
-                    "package-layout",
-                    rel,
-                    "missing or not valid TOML",
-                ),
-            )
+            lines.append(_fail("package-layout", rel, "missing or not valid TOML"))
             continue
         pname = _dig(pdata, "project.name")
         if not isinstance(pname, str) or normalise(pname) != dist:
             shown = pname if isinstance(pname, str) else "<none>"
-            lines.append(
-                _fail(
-                    "package-layout",
-                    rel,
-                    f"name is {shown} expected {dist}",
-                ),
-            )
+            detail = f"name is {shown} expected {dist}"
+            lines.append(_fail("package-layout", rel, detail))
         init_rel = f"{mdir}/src/{module}/__init__.py"
         if not (root / init_rel).is_file():
             lines.append(_fail("package-layout", init_rel, "missing"))
     return lines
 
 
-def _rule_workspace_source(root: Path, bad_members: set[str]) -> list[str]:
+def _rule_workspace_source(root: Path) -> list[str]:
+    miss = "eii-core is not taken from the workspace"
     lines: list[str] = []
     for mdir, dist, _module in MEMBER_ROWS:
         if mdir not in ("custodian", "product"):
             continue
-        if mdir in bad_members:
-            continue
         rel = f"{mdir}/pyproject.toml"
-        pdata = _load_toml(root / rel)
+        pdata = workspace_toml.load_toml(root / rel)
         if pdata is None:
             continue
         sources = _dig(pdata, "tool.uv.sources")
         if not isinstance(sources, dict):
-            lines.append(
-                _fail(
-                    "workspace-source",
-                    rel,
-                    "eii-core is not taken from the workspace",
-                ),
-            )
+            lines.append(_fail("workspace-source", rel, miss))
             continue
         core_keys = [k for k in sources if normalise(str(k)) == "eii-core"]
         if not core_keys:
-            lines.append(
-                _fail(
-                    "workspace-source",
-                    rel,
-                    "eii-core is not taken from the workspace",
-                ),
-            )
+            lines.append(_fail("workspace-source", rel, miss))
             continue
         bad = any(sources[k] != {"workspace": True} for k in core_keys)
         if bad:
-            lines.append(
-                _fail(
-                    "workspace-source",
-                    rel,
-                    "eii-core is not taken from the workspace",
-                ),
-            )
+            lines.append(_fail("workspace-source", rel, miss))
     return lines
 
 
-def _rule_dependency_edge(root: Path, bad_members: set[str]) -> list[str]:
+def _rule_dependency_edge(root: Path) -> list[str]:
     lines: list[str] = []
     for mdir, dist, _module in MEMBER_ROWS:
-        if mdir in bad_members:
-            continue
         rel = f"{mdir}/pyproject.toml"
-        pdata = _load_toml(root / rel)
+        pdata = workspace_toml.load_toml(root / rel)
         if pdata is None:
             continue
         forbidden = FORBIDDEN_BY_MEMBER[dist]
@@ -380,7 +313,8 @@ def _rule_lock(data: dict[str, Any] | None) -> list[str]:
         name = _pkg_name(entry)
         if name is not None:
             by_name[name] = entry
-    missing = [n for n in ("eii-core", "eii-custodian", "eii-product") if n not in by_name]
+    need = ("eii-core", "eii-custodian", "eii-product")
+    missing = [n for n in need if n not in by_name]
     if missing:
         for name in missing:
             lines.append(_fail("lock", "uv.lock", f"package {name} is not listed"))
@@ -396,13 +330,8 @@ def _rule_lock(data: dict[str, Any] | None) -> list[str]:
         listed = ", ".join(sorted(normalise(str(m)) for m in members_raw))
     expected = ", ".join(EXPECTED_MANIFEST_MEMBERS)
     if listed != expected:
-        lines.append(
-            _fail(
-                "lock",
-                "uv.lock",
-                f"manifest.members are {listed} expected {expected}",
-            ),
-        )
+        detail = f"manifest.members are {listed} expected {expected}"
+        lines.append(_fail("lock", "uv.lock", detail))
 
     observed: set[tuple[str, str]] = set()
     for entry in _package_tables(data):
@@ -419,17 +348,11 @@ def _rule_lock(data: dict[str, Any] | None) -> list[str]:
                 observed.add((src, tgt))
 
     for edge in sorted(observed - ALLOWED_LOCK_EDGES):
-        lines.append(
-            _fail(
-                "lock",
-                "uv.lock",
-                f"edge {edge[0]} -> {edge[1]} is not allowed",
-            ),
-        )
+        a, b = edge
+        lines.append(_fail("lock", "uv.lock", f"edge {a} -> {b} is not allowed"))
     for edge in sorted(ALLOWED_LOCK_EDGES - observed):
-        lines.append(
-            _fail("lock", "uv.lock", f"edge {edge[0]} -> {edge[1]} is missing"),
-        )
+        a, b = edge
+        lines.append(_fail("lock", "uv.lock", f"edge {a} -> {b} is missing"))
 
     for field in WORKSPACE_WIDE_LOCK_FIELDS:
         value = _dig(data, field)
@@ -490,111 +413,27 @@ def _rule_lock_paths(data: dict[str, Any] | None) -> list[str]:
 
 
 def check_lock_data(data: dict[str, Any]) -> list[str]:
-    """Apply lock rules to parsed lock data.
-
-    Args:
-        data: Parsed ``uv.lock`` content.
-
-    Returns:
-        Failure lines for rules ``lock`` and ``lock-paths``.
-    """
+    """Apply ``lock`` and ``lock-paths`` rules to parsed lock data."""
     lines = _rule_lock(data)
     lines.extend(_rule_lock_paths(data))
     return lines
 
 
 def check_workspace(root: Path) -> list[str]:
-    """Validate workspace metadata under ``root``.
-
-    Args:
-        root: Repository or fixture root.
-
-    Returns:
-        Failure lines in rule order, empty when clean.
-    """
-    root_data = _load_toml(root / "pyproject.toml")
+    """Validate workspace metadata under ``root``; return ordered failure lines."""
+    root_data = workspace_toml.load_toml(root / "pyproject.toml")
     member_lines, members_invalid = _rule_members(root, root_data)
     lines: list[str] = list(member_lines)
     lines.extend(_rule_root_clean(root_data, members_invalid))
     lines.extend(_rule_package_layout(root))
 
-    bad_members: set[str] = set()
-    for mdir, _dist, _mod in MEMBER_ROWS:
-        rel = f"{mdir}/pyproject.toml"
-        if _load_toml(root / rel) is None:
-            bad_members.add(mdir)
+    lines.extend(_rule_workspace_source(root))
+    lines.extend(_rule_dependency_edge(root))
 
-    lines.extend(_rule_workspace_source(root, bad_members))
-    lines.extend(_rule_dependency_edge(root, bad_members))
-
-    lock_path = root / "uv.lock"
-    lock_data: dict[str, Any] | None = None
-    if lock_path.is_file():
-        try:
-            lock_data = tomllib.loads(lock_path.read_text(encoding="utf-8"))
-        except tomllib.TOMLDecodeError:
-            lock_data = None
-    else:
-        lock_data = None
-
+    lock_data = workspace_toml.load_toml(root / "uv.lock")
     if lock_data is None:
         lines.append(_fail("lock", "uv.lock", "missing or not valid TOML"))
     else:
         lines.extend(_rule_lock(lock_data))
         lines.extend(_rule_lock_paths(lock_data))
     return lines
-
-
-def _dump_scalar(value: object) -> str:
-    if isinstance(value, bool):
-        return "true" if value else "false"
-    if isinstance(value, int) and not isinstance(value, bool):
-        return str(value)
-    if isinstance(value, str):
-        return json.dumps(value)
-    raise TypeError(type(value))
-
-
-def _dump_inline(value: object) -> str:
-    if isinstance(value, dict):
-        parts = [f"{json.dumps(str(k))} = {_dump_inline(v)}" for k, v in value.items()]
-        return "{ " + ", ".join(parts) + " }"
-    if isinstance(value, list):
-        return "[ " + ", ".join(_dump_inline(v) for v in value) + " ]"
-    return _dump_scalar(value)
-
-
-def dump_toml(data: dict[str, Any]) -> str:
-    """Write a subset of TOML used by the metadata tests.
-
-    Args:
-        data: Table to serialise.
-
-    Returns:
-        TOML text.
-
-    Raises:
-        TypeError: When a value type is not supported.
-    """
-    lines: list[str] = []
-    nested: list[tuple[str, dict[str, Any]]] = []
-
-    def emit_table(table: dict[str, Any], prefix: str) -> None:
-        scalars: list[str] = []
-        for key, value in table.items():
-            if isinstance(value, dict):
-                nested.append((f"{prefix}.{key}" if prefix else key, value))
-            elif isinstance(value, list):
-                inline = _dump_inline(value)
-                scalars.append(f"{key} = {inline}")
-            else:
-                scalars.append(f"{key} = {_dump_scalar(value)}")
-        for line in scalars:
-            lines.append(line)
-
-    emit_table(data, "")
-    while nested:
-        path, table = nested.pop(0)
-        lines.append(f"[{path}]")
-        emit_table(table, path)
-    return "\n".join(lines) + "\n"

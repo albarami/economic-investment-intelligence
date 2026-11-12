@@ -67,6 +67,14 @@ PYPROJECTS: tuple[str, ...] = (
     "product/pyproject.toml",
 )
 
+_PATH_ERR = "absolute path or file URI"
+
+
+def _lock_path_lines(data: dict[str, object]) -> list[str]:
+    prefix = "FAIL lock-paths"
+    return [line for line in guard.check_lock_data(data) if line.startswith(prefix)]
+
+
 ROUND_TRIP_SAMPLE: dict[str, object] = {
     "inline_tables": [{"a": 1}, {"b": 2}],
     "nested_inline": [[{"c": 3}]],
@@ -198,7 +206,7 @@ class WorkspaceMetadata(unittest.TestCase):
             with self.subTest(spelling=spelling):
                 count += 1
                 self.restore_members(root)
-                data = tomllib.loads((root / "product/pyproject.toml").read_text(encoding="utf-8"))
+                data = fields.read_toml(root / "product/pyproject.toml")
                 deps = data.setdefault("project", {}).setdefault("dependencies", [])
                 if not isinstance(deps, list):
                     deps = []
@@ -216,8 +224,9 @@ class WorkspaceMetadata(unittest.TestCase):
         with self.subTest(spelling="sources key"):
             count += 1
             self.restore_members(root)
-            data = tomllib.loads((root / "product/pyproject.toml").read_text(encoding="utf-8"))
-            src = data.setdefault("tool", {}).setdefault("uv", {}).setdefault("sources", {})
+            data = fields.read_toml(root / "product/pyproject.toml")
+            uv = data.setdefault("tool", {}).setdefault("uv", {})
+            src = uv.setdefault("sources", {})
             if isinstance(src, dict):
                 src["Eii_Custodian"] = {"workspace": True}
             (root / "product/pyproject.toml").write_text(
@@ -240,7 +249,7 @@ class WorkspaceMetadata(unittest.TestCase):
             path.write_text(guard.dump_toml(data), encoding="utf-8")
         root_data = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
         fields._put(root_data, "dependency-groups", {"dev": ["requests"]})
-        (root / "pyproject.toml").write_text(guard.dump_toml(root_data), encoding="utf-8")
+        fields.write_toml(root / "pyproject.toml", root_data)
         self.assertEqual(guard.check_workspace(root), [])
 
     def test_root_naming_a_member_fails(self) -> None:
@@ -257,33 +266,14 @@ class WorkspaceMetadata(unittest.TestCase):
 
     def test_member_list_wrong_fails(self) -> None:
         n = self.check_cases(list(fields.MEMBER_LIST_CASES))
-        self.assertEqual(n, 7)
+        self.assertEqual(n, 8)
 
     def test_layout_fails(self) -> None:
         n = self.check_cases(list(fields.LAYOUT_CASES))
         self.assertEqual(n, 7)
 
     def test_missing_and_unparsable_pyproject_fail(self) -> None:
-        cases = [
-            ("root deleted", lambda r: (r / "pyproject.toml").unlink(), [
-                "FAIL members: pyproject.toml: missing or not valid TOML",
-            ]),
-            ("root bad", lambda r: (r / "pyproject.toml").write_text(fields.NOT_VALID), [
-                "FAIL members: pyproject.toml: missing or not valid TOML",
-            ]),
-        ]
-        for mdir in fields.MEMBERS:
-            cases.append((
-                f"{mdir} deleted",
-                lambda r, d=mdir: (r / d / "pyproject.toml").unlink(),
-                [f"FAIL package-layout: {mdir}/pyproject.toml: missing or not valid TOML"],
-            ))
-            cases.append((
-                f"{mdir} bad",
-                lambda r, d=mdir: (r / d / "pyproject.toml").write_text(fields.NOT_VALID),
-                [f"FAIL package-layout: {mdir}/pyproject.toml: missing or not valid TOML"],
-            ))
-        n = self.check_cases(cases)  # type: ignore[arg-type]
+        n = self.check_cases(fields.invalid_pyproject_cases())  # type: ignore[arg-type]
         self.assertEqual(n, fields.COUNT_PYPROJECT_CASES)
 
     def test_forbidden_edge_in_lock(self) -> None:
@@ -293,8 +283,8 @@ class WorkspaceMetadata(unittest.TestCase):
                 with self.subTest(source=source, target=target, rep=rep):
                     count += 1
                     data = mutated_lock(
-                        lambda lock, s=source, t=target, r=rep: fields.apply_package_lock_plant(
-                            lock, r, s, t,
+                        lambda lock, s=source, t=target, r=rep: (
+                            fields.apply_package_lock_plant(lock, r, s, t)
                         ),
                     )
                     expected = [
@@ -309,7 +299,6 @@ class WorkspaceMetadata(unittest.TestCase):
                 data = mutated_lock(lambda lock, n=name: fields.drop_core_edge(lock, n))
                 expected = [f"FAIL lock: uv.lock: edge {name} -> eii-core is missing"]
                 self.assertEqual(guard.check_lock_data(data), expected)
-        self.assertEqual(2, 2)
 
     def test_package_missing_in_lock(self) -> None:
         expected = ["FAIL lock: uv.lock: package eii-product is not listed"]
@@ -332,7 +321,9 @@ class WorkspaceMetadata(unittest.TestCase):
         )
         self.assertEqual(guard.check_lock_data(data), [])
         n += 1
-        data = mutated_lock(lambda lock: lock.setdefault("package", []).append({"name": 1}))
+        data = mutated_lock(
+            lambda lock: lock.setdefault("package", []).append({"name": 1}),
+        )
         self.assertEqual(guard.check_lock_data(data), [])
         n += 1
         self.assertEqual(n, 4)
@@ -348,8 +339,8 @@ class WorkspaceMetadata(unittest.TestCase):
                 with self.subTest(field=field, rep=rep, target=target):
                     count += 1
                     data = mutated_lock(
-                        lambda lock, f=field, r=rep, t=target: fields.apply_wide_lock_plant(
-                            lock, f, t, r,
+                        lambda lock, f=field, r=rep, t=target: (
+                            fields.apply_wide_lock_plant(lock, f, t, r)
                         ),
                     )
                     expected = [f"FAIL lock: uv.lock: {field} names {target}"]
@@ -359,35 +350,27 @@ class WorkspaceMetadata(unittest.TestCase):
     def test_absolute_path_in_lock_fails(self) -> None:
         count = 0
         base = tomllib.loads((REPO_ROOT / "uv.lock").read_text(encoding="utf-8"))
-        idx = next(
-            i for i, e in enumerate(base.get("package", [])) if e.get("name") == "eii-core"
-        )
+        packages = base.get("package", [])
+        idx = next(i for i, e in enumerate(packages) if e.get("name") == "eii-core")
         for value in BAD_PATHS:
             with self.subTest(where="source", value=value):
                 count += 1
-                data = mutated_lock(lambda lock, v=value: (
-                    next(e for e in lock["package"] if e.get("name") == "eii-core").__setitem__(
-                        "source", {"editable": v},
-                    )
-                ))
-                expected = [
-                    f"FAIL lock-paths: uv.lock: package[{idx}].source.editable: "
-                    "absolute path or file URI",
-                ]
-                self.assertEqual(
-                    [l for l in guard.check_lock_data(data) if l.startswith("FAIL lock-paths")],
-                    expected,
-                )
+                def plant_src(lock: dict[str, object], v: str = value) -> None:
+                    pkg = lock["package"]
+                    row = next(e for e in pkg if e.get("name") == "eii-core")
+                    row["source"] = {"editable": v}
+
+                data = mutated_lock(plant_src)
+                path_key = f"package[{idx}].source.editable"
+                expected = [f"FAIL lock-paths: uv.lock: {path_key}: {_PATH_ERR}"]
+                self.assertEqual(_lock_path_lines(data), expected)
             with self.subTest(where="requires-python", value=value):
                 count += 1
-                data = mutated_lock(lambda lock, v=value: lock.__setitem__("requires-python", v))
-                expected = [
-                    "FAIL lock-paths: uv.lock: requires-python: absolute path or file URI",
-                ]
-                self.assertEqual(
-                    [l for l in guard.check_lock_data(data) if l.startswith("FAIL lock-paths")],
-                    expected,
+                data = mutated_lock(
+                    lambda lock, v=value: lock.__setitem__("requires-python", v),
                 )
+                expected = [f"FAIL lock-paths: uv.lock: requires-python: {_PATH_ERR}"]
+                self.assertEqual(_lock_path_lines(data), expected)
         self.assertEqual(count, fields.COUNT_PATHS)
 
     def test_missing_and_unparsable_lock_fail(self) -> None:
@@ -403,7 +386,10 @@ class WorkspaceMetadata(unittest.TestCase):
             ]),
         ]
         n = self.check_cases(cases)  # type: ignore[arg-type]
-        self.assertEqual(n, 3)
+        none_line = ["FAIL lock: uv.lock: missing or not valid TOML"]
+        parsed_none = guard.check_lock_data(None)  # type: ignore[arg-type]
+        self.assertEqual(parsed_none, none_line)
+        self.assertEqual(n + 1, 4)
 
     def test_helper_changes_nothing(self) -> None:
         root = self.fresh()
@@ -434,74 +420,22 @@ class WorkspaceMetadata(unittest.TestCase):
             [l for l in guard.check_lock_data(data) if "edge" in l and "requests" in l],
             [],
         )
+        data = mutated_lock(fields.plant_registry_forbidden_edge)
+        fail_edge = "FAIL lock: uv.lock: edge"
+        has_edge = [l for l in guard.check_lock_data(data) if l.startswith(fail_edge)]
+        self.assertEqual(has_edge, [])
 
     def test_output_order(self) -> None:
         root = self.fresh()
-        root_data = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
-        ws = root_data.setdefault("tool", {}).setdefault("uv", {}).setdefault("workspace", {})
-        ws["exclude"] = ["core"]
-        root_data["project"]["name"] = "other"
-        (root / "pyproject.toml").write_text(guard.dump_toml(root_data), encoding="utf-8")
-        (root / "product/src/eii_product/__init__.py").unlink()
-        cust = tomllib.loads((root / "custodian/pyproject.toml").read_text(encoding="utf-8"))
-        cust.get("tool", {}).pop("uv", None)
-        (root / "custodian/pyproject.toml").write_text(guard.dump_toml(cust), encoding="utf-8")
-        core = tomllib.loads((root / "core/pyproject.toml").read_text(encoding="utf-8"))
-        fields._extend(core, ["build-system", "requires"], "eii-product")
-        (root / "core/pyproject.toml").write_text(guard.dump_toml(core), encoding="utf-8")
-        lock = tomllib.loads((root / "uv.lock").read_text(encoding="utf-8"))
-        fields.drop_core_edge(lock, "eii-product")
-        lock["requires-python"] = "/w/core"
-        (root / "uv.lock").write_text(guard.dump_toml(lock), encoding="utf-8")
-        expected_a = [
-            "FAIL members: pyproject.toml: exclude is not empty",
-            "FAIL root-clean: pyproject.toml: name is other expected eii-workspace",
-            "FAIL package-layout: product/src/eii_product/__init__.py: missing",
-            "FAIL workspace-source: custodian/pyproject.toml: "
-            "eii-core is not taken from the workspace",
-            "FAIL dependency-edge: core/pyproject.toml: build-system.requires names eii-product",
-            "FAIL lock: uv.lock: edge eii-product -> eii-core is missing",
-            "FAIL lock-paths: uv.lock: requires-python: absolute path or file URI",
-        ]
-        self.assertEqual(guard.check_workspace(root), expected_a)
+        fields.plant_output_order_a(root)
+        self.assertEqual(guard.check_workspace(root), fields.OUTPUT_ORDER_A)
 
-        data = mutated_lock(lambda lock: lock.setdefault("package", []).reverse())
-        man = data.setdefault("manifest", {})
-        man["members"] = ["eii-core", "eii-custodian", "eii-product"]
-        fields.add_dependency(data, "eii-custodian", "eii-product")
-        fields.add_dependency(data, "eii-product", "eii-custodian")
-        fields.drop_core_edge(data, "eii-custodian")
-        fields.drop_core_edge(data, "eii-product")
-        expected_b = [
-            "FAIL lock: uv.lock: manifest.members are eii-core, eii-custodian, eii-product "
-            "expected eii-core, eii-custodian, eii-product, eii-workspace",
-            "FAIL lock: uv.lock: edge eii-custodian -> eii-product is not allowed",
-            "FAIL lock: uv.lock: edge eii-product -> eii-custodian is not allowed",
-            "FAIL lock: uv.lock: edge eii-custodian -> eii-core is missing",
-            "FAIL lock: uv.lock: edge eii-product -> eii-core is missing",
-        ]
-        self.assertEqual(guard.check_lock_data(data), expected_b)
+        data = mutated_lock(fields.plant_output_order_b)
+        self.assertEqual(guard.check_lock_data(data), fields.OUTPUT_ORDER_B)
 
         root = self.fresh()
-        core = tomllib.loads((root / "core/pyproject.toml").read_text(encoding="utf-8"))
-        fields._extend(core, ["project", "dependencies"], "eii-product")
-        fields._extend(core, ["project", "dependencies"], "eii-custodian")
-        fields._extend(core, ["build-system", "requires"], "eii-custodian")
-        (root / "core/pyproject.toml").write_text(guard.dump_toml(core), encoding="utf-8")
-        cus = tomllib.loads((root / "custodian/pyproject.toml").read_text(encoding="utf-8"))
-        fields._extend(cus, ["project", "dependencies"], "eii-product")
-        (root / "custodian/pyproject.toml").write_text(guard.dump_toml(cus), encoding="utf-8")
-        prod = tomllib.loads((root / "product/pyproject.toml").read_text(encoding="utf-8"))
-        fields._extend(prod, ["project", "dependencies"], "eii-custodian")
-        (root / "product/pyproject.toml").write_text(guard.dump_toml(prod), encoding="utf-8")
-        expected_c = [
-            "FAIL dependency-edge: core/pyproject.toml: project.dependencies names eii-custodian",
-            "FAIL dependency-edge: core/pyproject.toml: project.dependencies names eii-product",
-            "FAIL dependency-edge: core/pyproject.toml: build-system.requires names eii-custodian",
-            "FAIL dependency-edge: custodian/pyproject.toml: project.dependencies names eii-product",
-            "FAIL dependency-edge: product/pyproject.toml: project.dependencies names eii-custodian",
-        ]
-        self.assertEqual(guard.check_workspace(root), expected_c)
+        fields.plant_output_order_c(root)
+        self.assertEqual(guard.check_workspace(root), fields.OUTPUT_ORDER_C)
 
 
 if __name__ == "__main__":

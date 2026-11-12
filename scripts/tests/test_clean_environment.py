@@ -13,18 +13,14 @@ from unittest.mock import patch
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-# UV_NO_CONFIG=1 also ignores uv settings in a pyproject.toml [tool.uv] table; a task that
-# adds such a setting revisits this (OI-40).
+# UV_NO_CONFIG=1 also ignores uv settings in a pyproject.toml [tool.uv] table;
+# a task that adds such a setting revisits this (OI-40).
 
 UV = shutil.which("uv")
+SYNC_OFFLINE = ("sync", "--all-packages", "--locked", "--no-editable", "--offline")
 FROM_PARENT = (
-    "PATH",
-    "HOME",
-    "LANG",
-    "LC_ALL",
-    "TMPDIR",
-    "XDG_DATA_HOME",
-    "UV_PYTHON_INSTALL_DIR",
+    "PATH", "HOME", "LANG", "LC_ALL",
+    "XDG_DATA_HOME", "UV_PYTHON_INSTALL_DIR",
 )
 
 ALONE: dict[str, tuple[int, str]] = {
@@ -35,6 +31,12 @@ ALONE: dict[str, tuple[int, str]] = {
 }
 
 
+def child_tmp(cache: Path) -> str:
+    folder = cache.parent / "child-tmp"
+    folder.mkdir(parents=True, exist_ok=True)
+    return str(folder)
+
+
 def child_env(cache: Path, project_env: Path | None = None) -> dict[str, str]:
     """Build the allow-listed child environment for uv calls."""
     env: dict[str, str] = {}
@@ -42,6 +44,10 @@ def child_env(cache: Path, project_env: Path | None = None) -> dict[str, str]:
         value = os.environ.get(name)
         if value is not None:
             env[name] = value
+    tmp = child_tmp(cache)
+    env["TMPDIR"] = tmp
+    env["TMP"] = tmp
+    env["TEMP"] = tmp
     env["UV_CACHE_DIR"] = str(cache)
     env["UV_NO_CONFIG"] = "1"
     if project_env is not None:
@@ -49,7 +55,19 @@ def child_env(cache: Path, project_env: Path | None = None) -> dict[str, str]:
     return env
 
 
-def run(args: list[str], cwd: Path, env: dict[str, str]) -> subprocess.CompletedProcess[str]:
+def with_process_tmp(env: dict[str, str], cache: Path) -> dict[str, str]:
+    """Copy ``env`` and point process temp dirs under ``cache``'s parent."""
+    out = dict(env)
+    tmp = child_tmp(cache)
+    out["TMPDIR"] = tmp
+    out["TMP"] = tmp
+    out["TEMP"] = tmp
+    return out
+
+
+def run(
+    args: list[str], cwd: Path, env: dict[str, str],
+) -> subprocess.CompletedProcess[str]:
     """Run a command and capture output."""
     return subprocess.run(
         args,
@@ -140,7 +158,7 @@ class CleanEnvironment(unittest.TestCase):
         copy_workspace(cls.ws)
         cls.lock_before = (cls.ws / "uv.lock").read_bytes()
         cls.sync = run(
-            [UV, "sync", "--all-packages", "--locked", "--no-editable", "--offline"],
+            [UV, *SYNC_OFFLINE],
             cls.ws,
             child_env(cls.cache, cls.env),
         )
@@ -297,7 +315,7 @@ class CleanEnvironment(unittest.TestCase):
             e["XDG_CONFIG_HOME"] = str(hostile)
             e["XDG_CONFIG_DIRS"] = str(hostile)
             subject = run(
-                [UV, "sync", "--all-packages", "--locked", "--no-editable", "--offline"],
+                [UV, *SYNC_OFFLINE],
                 ws,
                 e,
             )
@@ -327,17 +345,17 @@ class CleanEnvironment(unittest.TestCase):
             e2["XDG_CONFIG_HOME"] = str(hostile)
             e2["XDG_CONFIG_DIRS"] = str(hostile)
             tooth1 = run(
-                [UV, "sync", "--all-packages", "--locked", "--no-editable", "--offline"],
+                [UV, *SYNC_OFFLINE],
                 ws,
                 e2,
             )
             self.assertEqual(tooth1.returncode, 2, tooth1.stderr)
             self.assertIn("--no-build", tooth1.stderr)
 
-            parent = dict(os.environ)
+            parent = with_process_tmp(dict(os.environ), cache3)
             parent["UV_CACHE_DIR"] = str(cache3)
             tooth2 = run(
-                [UV, "sync", "--all-packages", "--locked", "--no-editable", "--offline"],
+                [UV, *SYNC_OFFLINE],
                 ws3,
                 parent,
             )
@@ -351,9 +369,12 @@ class CleanEnvironment(unittest.TestCase):
                 alone_count += 1
                 folder = root / f"alone-{name}"
                 folder.mkdir()
-                merged = {**snapshot, "UV_CACHE_DIR": str(folder), name: h[name]}
+                merged = with_process_tmp(
+                    {**snapshot, "UV_CACHE_DIR": str(folder), name: h[name]},
+                    folder,
+                )
                 proc = run(
-                    [UV, "sync", "--all-packages", "--locked", "--no-editable", "--offline"],
+                    [UV, *SYNC_OFFLINE],
                     ws3,
                     merged,
                 )
