@@ -8358,6 +8358,605 @@ Seed:      none
 Notes:     The work commit changes 25 paths against the base, every one a document: the record, 17 numbered documents, the glossary, the documents index, the agent files, README.md, TASKS.md and OPEN_ITEMS.md (TST-163).
 ```
 
+#### Decision record 0019: independent review, round 1
+
+Reviewed commit `5f196fd3369ca291e58c54ab52b94884cfbaf755`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/17 , with CI green on it (workflow docs, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43267941317 ; workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43267940956 ). Reviewer: OpenAI GPT-5.6 Sol (high), through the Cursor command-line tool, read-only; a full review in nine parts. All nine parts REJECTED, with 39 findings in all. Each verdict is copied unchanged from its first line (REV-09).
+
+#### Decision record 0019: independent review, round 1, part 1 of 9: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: D0019 part p01 (pull request 17)
+COMMIT: 5f196fd3369ca291e58c54ab52b94884cfbaf755
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 FAIL F1-F6 show decision 0019 is not implemented consistently across the amended documents.
+  REV-11 PASS The lead ran `python3 scripts/check_docs.py` and `./eii test --seed 2026111224` on this head: exit 0; 1059 passed, 0 failed, 0 skipped. CI passed: https://github.com/albarami/economic-investment-intelligence/actions/runs/43267941317 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43267940956 .
+  REV-12 PASS The diff contains 25 documentation paths, all within the decision-record amendment scope; this part contains only its assigned files.
+  REV-13 PASS No placeholder implementation, stub, mock substitute or invented figure is introduced; unresolved choices are explicitly recorded as open items.
+  REV-14 PASS Inspection and the documentation check found no secret, key value or real custodian record.
+  REV-15 PASS No test, CI configuration, threshold, tolerance or assertion changed; the checklist amendment is authorized by decision 0019.
+  REV-16 FAIL F1-F5 contradict pinned decisions, source access and operational behavior.
+  REV-17 FAIL F1-F6 leave OPEN_ITEMS.md, the deployment documents, the runbook and the documentation index inconsistent.
+  REV-18 PASS The amended rules keep both keys environment-only, prohibit storing traffic responses and require hand-written test fixtures.
+  REV-19 FAIL F1, F2 and F5 reopen behavior already settled by decision 0019.
+  REV-20 PASS The amended text keeps provenance and evidence status separate and specifies tested-code calculation and complete lineage for forecasts, estimates and base rates.
+  REV-21 N/A This documentation-only commit implements no screen, template or Fact-chip renderer.
+  REV-22 PASS The only presence/pay exception is the fixed published-row function authorized by decision 0019; all other privacy invariants remain stated.
+  REV-23 N/A No product or custodian package code or import metadata changes.
+  REV-24 N/A No bilingual implementation or rendered numeric view changes.
+  REV-25 PASS The documentation check passed and inspection found no private path, personal name, e-mail address, secret, realistic identifier or prohibited comparison.
+  REV-26 PASS The amended documents retain the bans on venture-success forecasts, verdicts, probabilities, confidence claims and advice.
+  REV-27 PASS The lead’s `cmp AGENTS.md CLAUDE.md` run on this head exited 0.
+  REV-28 PASS No synthetic identifier is added; the full test run passed with no skipped test.
+  REV-29 PASS Named real places and businesses retain Public facts only; estimates and competitor shares remain area- or aggregate-subject outputs.
+  REV-38 PASS The documentation adds no serving-plane gateway route or run-time gateway use; the full boundary test run passed.
+FINDINGS:
+  F1 (REV-19)
+    File: OPEN_ITEMS.md
+    Place: OI-103, lines 813-820
+    Wrong: OI-103 allows `./eii build-public` to fail when `EARTHDATA_API_KEY` is absent, although decision 0019 item 16 and the same item’s WHY clause say no command needs either key.
+    Fix: Limit the unresolved choice to whether absence produces a warning or a silent omission; in both cases `build-public` must continue successfully without the night-lights layer. Remove “failed step”, retain exit 6 only for an unavailable network, and run `python3 scripts/check_docs.py`.
+  F2 (REV-19)
+    File: docs/13_DEPLOYMENT_AND_OPERATIONS.md
+    Place: Open questions and assumptions, line 424
+    Wrong: The open choice again permits a failed night-lights step when the key is absent, contradicting OPS-71 and decision 0019 item 16.
+    Fix: State that absence may produce either a warning or a silent omission of the layer, but cannot fail `build-public`; then run `python3 scripts/check_docs.py`.
+  F3 (REV-16)
+    File: docs/16_DEMO_RUNBOOK.md
+    Place: Section 6, prepared answer “Where do popular times…”, line 401
+    Wrong: The answer says the further places dataset waits until the owner supplies access. Decision 0019 item 21 and OPS-72 say `places_fsq` is fetched from a public Source Cooperative copy without an account.
+    Fix: Replace “once the owner supplies access” with wording that identifies the public Source Cooperative copy as readable without an account; reserve owner access only for choosing a newer publisher-portal release. Run `python3 scripts/check_docs.py`.
+  F4 (REV-17)
+    File: docs/16_DEMO_RUNBOOK.md
+    Place: Section 2 health example, lines 82-98; step F1, lines 153-157
+    Wrong: The health example and F1 omit `traffic`, although OPS-30 adds it as a required health field and RUN-03 requires every field to appear.
+    Fix: Add `"traffic": "simulated"` to the healthy JSON example and require `traffic: simulated` in F1 for the guided story; then run `python3 scripts/check_docs.py`.
+  F5 (REV-19)
+    File: docs/16_DEMO_RUNBOOK.md
+    Place: Open points from decisions 0016, 0017 and 0019, line 526
+    Wrong: This reopens whether the traffic provider is a prepared Next step, while decision 0019 item 17 and RUN-18 already settle that the guided story runs with simulated traffic and the live provider is available only for hand-over.
+    Fix: Remove the traffic provider from this open choice. State that only the 3D view’s staging remains open and that any live-provider hand-over is configured at process start, outside the guided story. Run `python3 scripts/check_docs.py`.
+  F6 (REV-17)
+    File: docs/README.md
+    Place: Numbered documents, line 50
+    Wrong: The index says document 16 was amended by decisions 0016, 0017 and 0019, but that document’s status line also names decision 0018.
+    Fix: Change the row to “amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12” and run `python3 scripts/check_docs.py`.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision record 0019: independent review, round 1, part 2 of 9: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: D0019 part p02 (pull request 17)
+COMMIT: 5f196fd3369ca291e58c54ab52b94884cfbaf755
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 FAIL F1, F2 and F3 show that the amended brief does not faithfully implement decision 0019.
+  REV-11 PASS Lead run: `python3 scripts/check_docs.py`, exit 0; 1059 tests passed with exit 0; CI green at https://github.com/albarami/economic-investment-intelligence/actions/runs/43267941317 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43267940956 .
+  REV-12 PASS The supplied part diff contains only docs/01_PROJECT_BRIEF.md and docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md, with no data files.
+  REV-13 PASS No placeholder, stub, invented figure or mock implementation stands in for the documentation work.
+  REV-14 PASS No secret or real custodian record, field, file or count appears in the part.
+  REV-15 PASS No test, threshold, tolerance or guard is weakened; the amendments add planted checks.
+  REV-16 FAIL F1 gives base rates the wrong mandatory display form, contrary to the pinned form in decision 0019 items 7 and 25.
+  REV-17 PASS Both assigned documents are amended, the decision record exists, and the documentation check exits 0.
+  REV-18 PASS Keys remain environment-only, provider responses remain unstored, and the generator sandbox receives neither key.
+  REV-19 FAIL F1 contradicts rather than implements the settled base-rate decision.
+  REV-20 FAIL F2 assigns the base rate the Observed status inherited from C2, while REV-20 requires every base rate to be Inferred.
+  REV-21 PASS BRF-05, BRF-84 and BRF-94 retain Fact-chip rendering, complete source chains and application-owned display rules.
+  REV-22 PASS BRF-86 and SYN-85 retain suppression, whole-unit, no-new-table, no-new-dimension and attack-suite protections.
+  REV-23 N/A This documentation-only part changes no product import or package metadata.
+  REV-24 N/A This documentation-only part implements no bilingual view or new Arabic string.
+  REV-25 PASS No private path, personal name, e-mail address, secret, realistic identifier or named product comparison appears; provider names are attribution.
+  REV-26 FAIL F3 omits the suppression required to prevent a singleton competitor’s share from being disclosed.
+  REV-27 PASS The lead recorded `cmp AGENTS.md CLAUDE.md`, exit 0.
+  REV-28 PASS The amendments retain the five synthetic identifier forms and extend real-name collision inputs.
+  REV-29 FAIL F3 omits two required singleton safeguards from BRF-92.
+  REV-38 N/A This documentation-only part changes no gateway or serving-plane implementation.
+FINDINGS:
+  F1 (REV-16)
+    File: docs/01_PROJECT_BRIEF.md
+    Place: In brief and BRF-40, BRF-49 and section 14, lines 18, 341, 393 and 410
+    Wrong: These passages require every base rate to carry an “interval or range, method and source.” Decision 0019 items 7 and 25 instead require a base rate to carry its counts and period. The generic wording contradicts BRF-94 and makes a conforming base rate violate the brief.
+    Fix: Separate the forms everywhere: require a forecast’s backtest interval, measured error, method and source; an estimate’s low, middle and high cases, main drivers and required simulated-input label; and a base rate’s numerator, denominator and period. Run `python3 scripts/check_docs.py` and review all four passages for identical meaning.
+  F2 (REV-20)
+    File: docs/01_PROJECT_BRIEF.md
+    Place: BRF-85, line 166
+    Wrong: The class cell assigns the base rate the evidence status of method card C2, which is Observed. REV-20 requires a base rate to be an Inferred fact.
+    Fix: Replace “evidence status as for the churn rate of method card C2” with “evidence status Inferred”, then run `python3 scripts/check_docs.py`.
+  F3 (REV-29)
+    File: docs/01_PROJECT_BRIEF.md
+    Place: BRF-92, line 187
+    Wrong: BRF-92 says to merge a singleton competitor cell but omits decision 0019 item 9’s two terminal safeguards: suppress the split when a singleton remains after merging, and state no competitors’ share when there is only one competitor overall. Without them, one competitor’s share can be inferred.
+    Fix: Add that when one competitor remains after all merges, no category-or-distance split is shown and only the outlet and combined competitors’ shares appear; when only one competitor exists overall, show only the outlet’s share and state no competitors’ share. Retain method card C34’s singleton fixtures as the proving tests and run `python3 scripts/check_docs.py`.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision record 0019: independent review, round 1, part 3 of 9: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: D0019 part p03 (pull request 17)
+COMMIT: 5f196fd3369ca291e58c54ab52b94884cfbaf755
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 FAIL C31’s evidence status and C32’s no-pay-band calculation do not meet the amended requirements.
+  REV-11 PASS Lead ran `python3 scripts/check_docs.py` with exit 0 and `./eii test --seed 2026111224` with 1,059 passed, 0 failed and 0 skipped; CI passed at https://github.com/albarami/economic-investment-intelligence/actions/runs/43267941317 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43267940956 .
+  REV-12 PASS The part diff contains only docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md and docs/07_ECONOMIC_METHODS.md.
+  REV-13 PASS The changed text contains no placeholder implementation or invented Public figure; worked examples are identified as fixtures.
+  REV-14 PASS The part diff contains no secret, key value or real custodian data.
+  REV-15 PASS No test, CI configuration, threshold, tolerance or attack size is weakened; the privacy amendments are bounded by decision 0019.
+  REV-16 FAIL MTH-58/C31 contradict the amended REV-20 status rule, and C32 cannot implement decision 0019 item 11 from its stated inputs.
+  REV-17 PASS Both affected documents and decision cross-references are updated; the lead’s documentation check exited 0.
+  REV-18 PASS The traffic-provider text keeps keys environment-only, stores no response and sends no protected release figure.
+  REV-19 PASS The amendments implement decision 0019’s permitted forecasts, estimates, scenarios, Public sources and traffic switch without reopening another settled feature.
+  REV-20 FAIL F1 and F2: one fact kind has the wrong evidence status, and C32 cannot derive its claimed no-pay-band population.
+  REV-21 N/A This documentation-only part adds no rendered component or implementation whose Fact-chip structure can be audited.
+  REV-22 PASS PRV-41 and PRV-126 retain one bounded presence-and-pay exception over published rows; no release table, presence-key dimension, treatment rule, threshold or attack size is weakened.
+  REV-23 N/A This documentation-only part changes no imports or product package metadata.
+  REV-24 N/A This part adds method specifications, not implemented bilingual views or fact identifiers.
+  REV-25 PASS The changed text contains no private path, personal name, e-mail address, realistic identifier, secret or named-product comparison; provider names are source attribution.
+  REV-26 PASS Forecasts, estimates, base rates and scenarios retain their required ranges, methods, sources and caveats; prohibited venture-success forecasts, verdicts, probabilities, confidence claims and advice remain forbidden.
+  REV-27 PASS The lead’s `cmp AGENTS.md CLAUDE.md` run exited 0.
+  REV-28 N/A This part introduces fixture labels but no synthetic establishment, entity, group, person or salary-file identifier.
+  REV-29 PASS Named venues and competitors retain Public facts only; estimates use `area` subjects, and no named competitor receives a displayed share, estimate, rank or fit.
+  REV-38 N/A This part adds no gateway or serving-plane code.
+FINDINGS:
+  F1 (REV-20)
+    File: docs/07_ECONOMIC_METHODS.md
+    Place: MTH-58 and C31 “Provenance and status”, lines 53 and 1654
+    Wrong: MTH-58 and C31 classify a base rate as `observed`, while the amended REV-20 requires every base rate to be an Inferred fact. This gives the new fact kind the wrong evidence status.
+    Fix: Change MTH-58 and C31 to classify every base-rate fact, including its companion facts, as `inferred`; align the dependent contract requirement and add a fixture that rejects an `observed` base rate, then show `python3 scripts/check_docs.py` passing.
+  F2 (REV-20)
+    File: docs/07_ECONOMIC_METHODS.md
+    Place: C32 Inputs and Formula and MTH-103, lines 1673-1695 and 1709
+    Wrong: C32 multiplies the full worker and resident presence counts by pay-band shares defined only over covered earners. Those shares exhaust each full presence count, so people without wage records are assigned pay bands even though decision 0019 item 11 and PRV-126 require them to have no band and be shown as such. The stated inputs contain no no-wage-record share from which the required category can be computed.
+    Fix: Add the published no-wage-record share for workers and residents on the same unit to C32’s required inputs under the existing side-count protections; compute each band from the covered portion only and compute an explicit no-pay-band count from the remaining portion, including low and high bounds. If any required share is unavailable or suppressed, return its status instead of allocating the full presence count. Amend PRV-126 and MTH-103 consistently and add a fixture with a positive no-wage-record share proving that band counts exclude it and the no-band count is returned; then show `python3 scripts/check_docs.py` passing.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision record 0019: independent review, round 1, part 4 of 9: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: D0019 part p04 (pull request 17)
+COMMIT: 5f196fd3369ca291e58c54ab52b94884cfbaf755
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 FAIL F1-F6 show that the new contracts are incomplete or inconsistent.
+  REV-11 PASS Lead documentation check exited 0; 1059 tests passed with exit 0; CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43267941317 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43267940956 .
+  REV-12 PASS The part diff changes only docs/03_DATA_CONTRACTS.md.
+  REV-13 PASS No placeholder, stub or invented result stands in for delivered documentation.
+  REV-14 PASS The diff contains no secret or custodian data; named Public sources are attribution.
+  REV-15 PASS No test, threshold, tolerance, assertion or CI configuration changes in this part.
+  REV-16 FAIL F2, F3 and F6 leave required tables, fact contracts and the provider note incomplete.
+  REV-17 FAIL F2, F4 and F5 contradict cited pack documents despite the documentation check exiting 0.
+  REV-18 PASS Keys remain environment-only, provider responses are not persisted, and the changed text adds no unsafe data path.
+  REV-19 FAIL F5 leaves a settled PRV-126 partition and lineage question open.
+  REV-20 FAIL F1-F5 break the required evidence status, lineage or complete typed-fact rules.
+  REV-21 N/A This documentation part changes no rendered template, claim or component.
+  REV-22 FAIL F5 makes the C32 exception inconsistent with DAT-94 and leaves its protected-family lineage unresolved.
+  REV-23 N/A This documentation-only part adds no product or custodian import.
+  REV-24 N/A This part changes no rendered English or Arabic view; new Arabic catalogue sentences remain marked pending review.
+  REV-25 PASS No private path, personal identity, e-mail address, realistic synthetic identifier, secret or prohibited product comparison appears.
+  REV-26 PASS Forecasts, estimates, base rates and scenarios retain the decision's caveats and no prohibited success forecast, verdict, probability, confidence claim or advice appears.
+  REV-27 PASS The lead recorded cmp AGENTS.md CLAUDE.md exit 0.
+  REV-28 PASS No new synthetic identifier imitates a real identifier; the documented forms remain visibly synthetic.
+  REV-29 PASS Named real places receive Public facts only; estimates and scenario shares remain attached to area subjects.
+  REV-38 N/A The part adds no typed-decision gateway or serving-plane gateway use.
+FINDINGS:
+  F1 (REV-20)
+    File: docs/03_DATA_CONTRACTS.md
+    Place: DAT-159 and Open questions and assumptions item 37, lines 943 and 1596-1598
+    Wrong: DAT-159 assigns base rates evidence status observed, while REV-20 requires a base rate to be Inferred. The fact schema also does not make base_rate_not_your_chance force Inferred.
+    Fix: change DAT-159 and assumption 37 to inferred; add base_rate_not_your_chance to the schema condition that forces evidence_status inferred; change the conformance fixture to reject an observed base-rate fact.
+  F2 (REV-20)
+    File: docs/03_DATA_CONTRACTS.md
+    Place: sections 7.2 and 7.3 and DAT-158, lines 510-579, 674 and 942
+    Wrong: section 7.2 names no release table for Public-series forecasts although cited MTH-02 requires document 03 to name it. The fact_lineage shape also has no fields for the series, candidate model, horizon, interval ends, backtest error or backtest-point count required by decision 0019 item 5 and DAT-158, and cannot represent request-time lineage for a released-series forecast.
+    Fix: add the named Public forecast table with a primary key and typed series, geography, forecast period, horizon, model, method version, value, interval, error, point-count, caption-count and source fields; define an equivalent typed, non-persisted calculation-lineage record for request-time released-series forecasts; bind every companion fact's lineage_ref to that record and add fixtures rejecting each missing field.
+  F3 (REV-20)
+    File: docs/03_DATA_CONTRACTS.md
+    Place: DAT-157 to DAT-162 and the closed metric-key table, lines 707 and 942-978
+    Wrong: the closed metric-key list omits required numeric facts: C31's interval ends, C32's low and high counts and no-band count, C33's driver swings and their rank companions, C35's break-even point, and the C36-C38 busyness, radiance and population facts. Those numbers therefore have no complete typed semantic identity under DAT-93.
+    Fix: add explicit metric keys, units, value constraints and closed qualifiers for every omitted fact; require C32 qualifiers for segment, band or no-band state and estimate/low/high; add planted fixtures proving every required companion is present and every unknown key or qualifier fails.
+  F4 (REV-20)
+    File: docs/03_DATA_CONTRACTS.md
+    Place: DAT-157, DAT-147 and Open questions and assumptions, lines 707, 1072 and 1639-1642
+    Wrong: DAT-157 sends an area radiance figure through DAT-147, making it an apportioned Inferred fact, and the open item leaves its aggregation unsettled. C36/MTH-109 instead fixes the area result as the observed mean of frame-cell values whose centres lie inside the area, each counted once.
+    Fix: specify that exact centre-in-cell mean in DAT-157 and the area-fact rules, with Public provenance, observed status, calculated and night_lights_not_activity caveats, and no apportioned_from; add the C36 4, 10, 7 and NO_DATA regression; remove the settled open question.
+  F5 (REV-22)
+    File: docs/03_DATA_CONTRACTS.md
+    Place: DAT-94, DAT-160 and Open questions and assumptions, lines 936, 944 and 1654-1656
+    Wrong: DAT-94 says ratio statistics are the only exception to one protected home family, while DAT-160 calls C32 another exception and leaves its partition and lineage unresolved. PRV-126 already fixes wp_all_quartile and rp_all_quartile and grants the decision's exception to PRV-41.
+    Fix: define C32 explicitly in DAT-94 as the one closed presence/pay case, naming presence_count plus one protected band family per segment from wp_all_quartile or rp_all_quartile and their lineage roles; reject every other such combination; update DAT-160 with those exact partitions and remove the stale open item.
+  F6 (REV-16)
+    File: docs/03_DATA_CONTRACTS.md
+    Place: section 9.2 provider_note and DAT-163, lines 1058 and 1073
+    Wrong: provider_note is prose rather than a typed closed contract: it gives no field names, provider enum, request shape, timestamp type, hash pattern or attribution field.
+    Fix: define provider_note as an additionalProperties-false object with provider fixed to tomtom, a typed resolved point and minutes request containing no key, retrieved_at as timestamp, response_sha256 as 64 lowercase hexadecimal characters and attribution fixed to © TomTom; require each field and add missing, extra, malformed and secret-bearing fixtures.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision record 0019: independent review, round 1, part 5 of 9: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: D0019 part p05 (pull request 17)
+COMMIT: 5f196fd3369ca291e58c54ab52b94884cfbaf755
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 FAIL F1-F3 Decision 0019 is incompletely implemented in ARC-138, ARC-139 and PUB-104.
+  REV-11 PASS Lead ran `python3 scripts/check_docs.py` with exit 0 and `./eii test --seed 2026111224` with 1059 passed, 0 failed and 0 skipped; CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43267941317 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43267940956 .
+  REV-12 PASS The part diff contains only docs/02_ARCHITECTURE.md and docs/04_PUBLIC_DATA_PACK.md.
+  REV-13 PASS The reviewed documents contain no implementation placeholder, stub or invented substitute for required work.
+  REV-14 PASS The diff contains no secret value or custodian record; named public sources and publishers are permitted attribution.
+  REV-15 PASS No test, CI configuration, threshold or assertion is changed; the amended requirements add planted violations.
+  REV-16 PASS Pinned source ids, tables, card names, reason keys and `EII_TRAFFIC_PROVIDER` spellings match the brief.
+  REV-17 PASS Both affected part documents are amended, decision 0019 exists, and the lead’s documentation check exited 0.
+  REV-18 PASS ARC-135, ARC-136, PUB-95 and PUB-96 keep keys in the environment, the browser on its own origin and live responses out of storage and logs.
+  REV-19 PASS The additions are authorized by accepted decision 0019 and do not remove an earlier component decision.
+  REV-20 FAIL F2-F3 The architecture and public-data requirements do not state the required Inferred evidence status for all new base-rate and estimate facts.
+  REV-21 PASS ARC-75, PUB-80 and the calculation-layer requirements retain Fact-chip-only numerals, deterministic calculations and catalogue-rendered prose.
+  REV-22 PASS ARC-137 preserves the single PRV-126 presence/pay exception, published-row requirement, snapped units and prohibition on every other combination.
+  REV-23 N/A This documentation-only change alters no imports or package metadata.
+  REV-24 N/A This documentation-only change implements no bilingual view or fact-identifier rendering.
+  REV-25 PASS The reviewed files contain no private path, personal name, e-mail address, secret, realistic synthetic identifier or prohibited product comparison.
+  REV-26 PASS The documents retain the bans on venture-success forecasts, verdicts, probabilities, confidence claims, advice and untested forecasts or estimates.
+  REV-27 PASS The lead recorded `cmp AGENTS.md CLAUDE.md` exiting 0.
+  REV-28 N/A No synthetic record or instantiated synthetic identifier is added by these documentation changes.
+  REV-29 FAIL F1 ARC-139 omits the required suppression when competitor grouping still identifies one real competitor.
+  REV-38 PASS The typed-decision gateway remains offline-only and absent from serving and run time in ARC-80 to ARC-82.
+FINDINGS:
+  F1 (REV-29)
+    File: docs/02_ARCHITECTURE.md
+    Place: ARC-139, line 541
+    Wrong: ARC-139 requires a single-competitor cell to be merged but omits decision 0019 item 9’s two terminal rules: if one competitor remains after merging, the category-and-distance split must disappear; if only one competitor exists overall, no competitors’ share may be stated. The current requirement therefore permits output that discloses the share of one real competitor, contrary to REV-29.
+    Fix: After the merge rule, require that a remaining singleton removes the split and leaves only the outlet share and competitors’ combined share, and that one competitor overall leaves only the outlet share with no competitors’ share. Add planted tests for both terminal cases.
+  F2 (REV-20)
+    File: docs/02_ARCHITECTURE.md
+    Place: ARC-138 and ARC-139, lines 540-541
+    Wrong: ARC-138 assigns Inferred status to forecasts but not base rates, and ARC-139 assigns Inferred status to scenarios but not the site estimate. REV-20 requires every forecast, base rate and estimate to be an Inferred fact with stated provenance and caveats.
+    Fix: State in ARC-138 that each base rate has Public provenance, Inferred evidence status and `base_rate_not_your_chance`; state in ARC-139 that the site estimate has the least-real provenance of its inputs, Inferred evidence status and `estimate_on_simulated_inputs` whenever applicable. Align the cited C31 status and add fact-contract tests rejecting any other status.
+  F3 (REV-20)
+    File: docs/04_PUBLIC_DATA_PACK.md
+    Place: PUB-104, line 610
+    Wrong: PUB-104 defines the new base-rate facts without stating their provenance, Inferred evidence status or caveat key, although PUB-103 supplies those fields for forecasts and REV-20 requires them for base rates.
+    Fix: Add that every emitted base rate has Public provenance, Inferred evidence status and caveat key `base_rate_not_your_chance`, and require a regression test that rejects a base-rate fact with a different class, status or missing caveat.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision record 0019: independent review, round 1, part 6 of 9: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: D0019 part p06 (pull request 17)
+COMMIT: 5f196fd3369ca291e58c54ab52b94884cfbaf755
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 FAIL F1 F2 F3 F4 F5 Decision 0019 is not implemented faithfully in all assigned contracts.
+  REV-11 PASS Lead ran python3 scripts/check_docs.py with exit 0; CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43267941317 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43267940956.
+  REV-12 PASS The part diff changes only docs/08_BACKEND.md and docs/09_AI_ASSISTANT.md.
+  REV-13 PASS No implementation placeholder, invented figure or mock substitute appears in the part.
+  REV-14 PASS No secret, key value or real custodian data appears in the part.
+  REV-15 PASS The part changes no test or CI configuration and weakens no existing threshold, tolerance or assertion.
+  REV-16 PASS Pinned tool, table, setting, decline-class and reason-key names are spelled exactly.
+  REV-17 PASS Both affected documents and decision references are updated; the lead's documentation check exited 0.
+  REV-18 PASS The contracts keep keys environment-only, prohibit storing provider responses and require hand-made test fixtures.
+  REV-19 PASS No settled decision is reopened beyond the replacements expressly made by decision 0019.
+  REV-20 FAIL F1 F2 F3 Base-rate evidence status, population-grid evidence status and night-light arithmetic are inconsistent with binding requirements.
+  REV-21 PASS New numerals are specified as Fact-chip slots or facts, with template scanning and structural validation retained.
+  REV-22 PASS The sole presence/pay exception remains a fixed function of published rows and adds no release table or presence dimension.
+  REV-23 N/A This documentation-only part changes no imports or package metadata.
+  REV-24 N/A This documentation-only part adds no rendered bilingual views; the contracts retain identical fact identifiers and Western digits.
+  REV-25 PASS No private path, personal name, e-mail address, realistic identifier or prohibited comparison appears.
+  REV-26 FAIL F5 The amended decline class does not cover every named-real-entity claim that remains prohibited.
+  REV-27 PASS The lead recorded cmp AGENTS.md CLAUDE.md exiting 0.
+  REV-28 PASS References to synthetic identifiers use only the allowed forms or their validation pattern.
+  REV-29 FAIL F4 The assistant catalogue omits the singleton protections required for competitor shares.
+  REV-38 PASS The serving-plane gateway prohibition and import boundary remain explicit.
+FINDINGS:
+  F1 (REV-20)
+    File: docs/08_BACKEND.md; docs/09_AI_ASSISTANT.md
+    Place: BE-121, line 330; Base rates, line 230; AI-122, line 262
+    Wrong: These contracts classify base rates as Observed, while REV-20 requires every base rate to be an Inferred fact.
+    Fix: Change BE-121 to evidence status `inferred`, change the Base rates family and AI-122 to Inferred, require the contract and validator tests to assert that status, and run python3 scripts/check_docs.py.
+  F2 (REV-20)
+    File: docs/08_BACKEND.md
+    Place: BE-110, line 323
+    Wrong: The population-grid whole-cell sum is labelled Inferred, contradicting BE-126 and cited method requirement MTH-58, which classify it as Observed.
+    Fix: Replace “Public, Inferred” with “Public, Observed” in BE-110 and run python3 scripts/check_docs.py.
+  F3 (REV-20)
+    File: docs/08_BACKEND.md
+    Place: night_lights tool contract, line 605
+    Wrong: The tool returns “summed” radiance, contradicting BE-125, AI-125, method card C36 and the settled reading that area radiance is the mean of frame-cell values.
+    Fix: Specify the arithmetic mean of the included frame-cell values, never a sum; add a tool fixture with unequal cell values that asserts the mean; run python3 scripts/check_docs.py.
+  F4 (REV-29)
+    File: docs/09_AI_ASSISTANT.md
+    Place: Catchment-share scenario, line 232; AI-123, line 264
+    Wrong: The catalogue requires outlet and competitor shares and mentions only widening a singleton cell. It omits decision 0019 item 9’s rules that a remaining singleton suppresses the split and that one competitor overall suppresses every competitor share.
+    Fix: Add both conditional rules to the family and AI-123; require validator/harness cases that omit the split when a singleton remains and omit the competitor share when only one competitor exists; run python3 scripts/check_docs.py.
+  F5 (REV-26)
+    File: docs/09_AI_ASSISTANT.md
+    Place: AI-117, line 261; forecast_not_offered, line 322; Must-decline set, line 488
+    Wrong: The rules omit ranks and fits and omit named real places and buildings from the amended decline case, although decision 0019 item 1 keeps every estimate, share, score, rank or fit for a named real place, building or business prohibited.
+    Fix: Add rank and fit to AI-117; define `forecast_not_offered` to cover every forecast, estimate, share, score, rank or fit attributed to a named real place, building or business; mirror that scope in the must-decline set with representative bilingual cases; run python3 scripts/check_docs.py.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision record 0019: independent review, round 1, part 7 of 9: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: D0019 part p07 (pull request 17)
+COMMIT: 5f196fd3369ca291e58c54ab52b94884cfbaf755
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 FAIL F1 FE-137 does not faithfully implement method card C36.
+  REV-11 PASS Lead ran python3 scripts/check_docs.py, exit 0, and ./eii test --seed 2026111224, exit 0; CI green: https://github.com/albarami/economic-investment-intelligence/actions/runs/43267941317 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43267940956
+  REV-12 PASS The part diff contains only docs/10_FRONTEND.md and docs/11_DESIGN_DIRECTION.md.
+  REV-13 PASS No placeholder, stub, mock substitute or invented figure is introduced.
+  REV-14 PASS No secret or custodian record, field, file or count appears.
+  REV-15 PASS No test, assertion, threshold, tolerance or CI configuration is weakened.
+  REV-16 FAIL F1 FE-137 contradicts the pinned C36 calculation and status.
+  REV-17 PASS The affected front-end and design documents are amended; the lead’s documentation check exited 0.
+  REV-18 PASS Keys remain environment-only, the browser remains same-origin, and live traffic responses are not stored.
+  REV-19 PASS The changes implement decision 0019 without reopening a dropped feature outside that decision.
+  REV-20 FAIL F1 FE-137 substitutes apportioning and Inferred status for C36’s whole-frame-cell mean and Public Observed status.
+  REV-21 PASS Fact-chip-only numerals, closed templates, accounting-gate fallback and provenance-audit requirements remain structural.
+  REV-22 PASS The C32 exception, snap rules, suppression handling and protected 3D-unit rules preserve the stated privacy invariants.
+  REV-23 N/A This documentation-only part changes no product or custodian imports.
+  REV-24 PASS Western digits, identical fact identifiers and numeral parity remain required in both languages.
+  REV-25 PASS No private path, personal name, e-mail, secret, realistic identifier or named product comparison is introduced; source names are attribution.
+  REV-26 PASS Forecast, estimate, base-rate and scenario wording retains the required limits and contains no prohibited verdict, probability, confidence or advice claim.
+  REV-27 PASS The lead recorded cmp AGENTS.md CLAUDE.md exiting 0.
+  REV-28 PASS The only synthetic identifier shown is the permitted visibly synthetic form SYN-E-7F3K2Q.
+  REV-29 PASS Named real places and businesses retain Public facts only; estimates and scenarios use area subjects and competitor aggregates.
+  REV-38 PASS The serving plane retains only the permitted Proof-room lineage sentence and no gateway panel, score or run-time call.
+FINDINGS:
+  F1 (REV-20)
+    File: docs/10_FRONTEND.md
+    Place: FE-137, line 560
+    Wrong: FE-137 says a night-lights value for a drawn shape is apportioned under FE-109 and marked Inferred. Method card C36 and MTH-109 instead require the Public, Observed mean of the frame-cell radiance values whose centres lie inside the area, with each cell counted once and no apportioning. This specifies the wrong calculation, evidence status and lineage.
+    Fix: Replace FE-137’s final sentence with the C36 rule: for any drawn shape, return the Public, Observed mean of pub_night_lights frame-cell values whose centres lie inside it, counting each cell once, splitting nothing and performing no C18 apportioning; name C36 and the area in lineage. Require a front-end fixture with cell values 4 and 10 that renders 7 as Public and Observed without an apportioned label, then run python3 scripts/check_docs.py.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision record 0019: independent review, round 1, part 8 of 9: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: D0019 part p08 (pull request 17)
+COMMIT: 5f196fd3369ca291e58c54ab52b94884cfbaf755
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 FAIL Decision 0019 rules lack complete, accurate test requirements; see F1 to F4.
+  REV-11 FAIL Lead suite passed with 1059 passed, 0 failed and 0 skipped, and CI passed at https://github.com/albarami/economic-investment-intelligence/actions/runs/43267941317 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43267940956, but required planted violations are missing; see F3 and F4.
+  REV-12 PASS The supplied part diff changes only docs/12_TESTING_AND_QUALITY.md.
+  REV-13 PASS No placeholder, stub, mock release table or invented figure stands in for delivered work.
+  REV-14 PASS The part contains no secret or real custodian data; documentation and CI checks passed.
+  REV-15 PASS No existing threshold, tolerance, assertion, attack size or privacy test is weakened beyond decision 0019.
+  REV-16 FAIL Pinned subject and reason-key requirements are not used consistently; see F2 and F3.
+  REV-17 PASS The documentation check examined 190 text files and exited 0; the affected testing document is amended.
+  REV-18 PASS The key, provider, storage, sandbox and egress requirements retain planted violations in TST-234 to TST-236.
+  REV-19 PASS Every changed capability is authorized by accepted decision 0019.
+  REV-20 FAIL Evidence-status and subject requirements are inconsistent or incomplete; see F1 and F2.
+  REV-21 PASS TST-228 to TST-244 preserve Fact-chip, closed-template and application-owned wording rules.
+  REV-22 PASS TST-26, TST-123, TST-203 and TST-232 preserve the privacy invariants and limit presence-by-pay-band to PRV-126.
+  REV-23 N/A This documentation-only part changes no imports or package metadata.
+  REV-24 PASS TST-216, TST-217 and TST-244 require English/Arabic coverage with the same governed facts.
+  REV-25 PASS The documentation check and both CI workflows passed; no prohibited repository content appears in the part.
+  REV-26 PASS TST-74, TST-113, TST-219 and TST-233 retain the prohibited-claim guards while allowing only decision 0019’s governed figures.
+  REV-27 PASS The lead’s `cmp AGENTS.md CLAUDE.md` exited 0.
+  REV-28 PASS No synthetic identifier is introduced or relaxed, and TST-143 remains in force.
+  REV-29 PASS TST-230, TST-231 and TST-233 reject estimates, shares, scores, ranks, fits and forecasts for named real businesses.
+  REV-38 PASS TST-155 retains provider-none operation and the gateway import boundary; this part adds no serving-plane gateway path.
+FINDINGS:
+  F1 (REV-20)
+    File: docs/12_TESTING_AND_QUALITY.md
+    Place: TST-229, TST-230, TST-237, TST-238 and TST-240, lines 224-225 and 232-235
+    Wrong: TST-229 says the base rate inherits card C2’s status and calls that status Inferred, while cited MTH-58 says C2 and C31 are Observed and amended REV-20 requires a base rate to be Inferred. TST-230 does not test the site estimate’s required Inferred status, and the new Public fact tests omit their Observed status. This leaves provenance class and evidence status inconsistent and incompletely guarded.
+    Fix: State directly that forecasts, base rates and site estimates are Inferred; require wrong-status planted fixtures for each. State and test Observed status for the direct or fixed-arithmetic Public facts in TST-237, TST-238 and TST-240. Amend the conflicting C2/C31 status text elsewhere in the pack to match, then run `python3 scripts/check_docs.py`.
+  F2 (REV-20)
+    File: docs/12_TESTING_AND_QUALITY.md
+    Place: TST-230, line 225
+    Wrong: TST-230 permits the selected pin itself as the estimate’s subject. Decision 0019 item 8 and card C33 require an `area` subject even when the user starts from a pin; no other subject accepts this Simulated/Inferred estimate.
+    Fix: Replace the opening with “The subject is the `area` formed from the area or pin that the user chose,” and add a planted estimate with a pin or any non-`area` subject that fact and claim validation must reject.
+  F3 (REV-11)
+    File: docs/12_TESTING_AND_QUALITY.md
+    Place: TST-227 and TST-244, lines 222 and 239
+    Wrong: The tests omit card C30’s negative-value rule and the pinned reason key `forecast_below_zero`: a point forecast below zero must return `NO_DATA`, while a negative interval end is shown as zero and marked. The closed catalogue list consequently omits one of the three fixed reason keys.
+    Fix: Add `forecast_below_zero` to TST-244. Extend TST-227 with fixtures for a negative point forecast and a negative interval end, plus planted variants that emit a negative point, use another reason key, clamp without the required mark or display the unclamped interval end; each variant must fail.
+  F4 (REV-11)
+    File: docs/12_TESTING_AND_QUALITY.md
+    Place: TST-228, line 223
+    Wrong: TST-228 has the positive “1 of 3” regression but no planted arithmetic violation that includes each error in the range used to assess itself. Decision 0019 item 4 requires leave-one-out ranges, and TST-04 requires teeth beside every guard.
+    Fix: Add a planted caption calculation that includes each origin’s own error in its comparison range and require it to fail against the leave-one-out result; retain the passing 1-of-3 control.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision record 0019: independent review, round 1, part 9 of 9: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: D0019 part p09 (pull request 17)
+COMMIT: 5f196fd3369ca291e58c54ab52b94884cfbaf755
+REVIEWER: OpenAI GPT-5.6 Sol
+CHECKS:
+  REV-10 FAIL F2, F3, F4, F5, F6, F7 task requirements and acceptance criteria do not fully implement decision 0019.
+  REV-11 PASS Lead ran `python3 scripts/check_docs.py`, exit 0; CI green: https://github.com/albarami/economic-investment-intelligence/actions/runs/43267941317 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43267940956
+  REV-12 PASS The supplied part diff contains only docs/14_IMPLEMENTATION_PLAN.md and TASKS.md.
+  REV-13 PASS No placeholder or stub stands in for delivered documentation work.
+  REV-14 PASS Full part diff contains no secret, key value or real custodian data.
+  REV-15 FAIL F4 and F5 omit required protective and refusal checks.
+  REV-16 FAIL F1, F2, F3, F5, F8, F9 contradict or incompletely implement pinned decisions and requirements.
+  REV-17 PASS Decision 0019 exists, affected plan documents were amended, and the documentation check exited 0.
+  REV-18 PASS Secret handling, no-storage traffic handling and release boundaries remain stated.
+  REV-19 FAIL F1 and F8 contradict settled decision-0019 source and network boundaries.
+  REV-20 FAIL F6 and F7 give incomplete or conflicting evidence-status and calculation requirements.
+  REV-21 PASS New numerical outputs are required to use Fact chips and closed catalogue templates.
+  REV-22 PASS The sole presence-and-pay exception remains product-plane only, adds no release table or key dimension and remains in the attack suite.
+  REV-23 N/A This documentation-only part changes no imports or serving-plane code.
+  REV-24 PASS New cards require bilingual visual coverage and Fact-chip rendering.
+  REV-25 PASS No private path, personal name, e-mail address, realistic identifier, secret or prohibited comparison appears.
+  REV-26 PASS The text retains the bans on venture-success forecasts, verdicts, probabilities, confidence claims and advice to act.
+  REV-27 PASS Lead `cmp AGENTS.md CLAUDE.md` exited 0.
+  REV-28 N/A This part introduces no synthetic record identifier.
+  REV-29 FAIL F4 omits the mandatory singleton safeguards that prevent disclosure of one competitor's share.
+  REV-38 PASS The gateway remains offline-only and absent from serving runtime.
+FINDINGS:
+  F1 (REV-16)
+    File: docs/14_IMPLEMENTATION_PLAN.md
+    Place: PLN-28 and section 10 “slice S2”, lines 58, 185, 307-311 and 348
+    Wrong: the plan says every decision-0019 source has a table and registry row and specifically says the live traffic provider has registry entries. Decision 0019 item 17 and PUB-95 require no source-registry row, no table and no cached file for `traffic_tomtom_flow` or `traffic_tomtom_range`.
+    Fix: distinguish the five build-public sources from the live provider throughout these lines; state that the provider is listed in document 04 for terms and attribution but has no registry row, table or cached file.
+  F2 (REV-16)
+    File: docs/14_IMPLEMENTATION_PLAN.md
+    Place: PLN-26, line 56
+    Wrong: the no-ID fallback names decisions 0016 and 0017 but omits decision 0019, contradicting TASKS.md queue rules and leaving its new requirements outside PLN-26.
+    Fix: change the clause to “decision 0016, decision 0017 or decision 0019”.
+  F3 (REV-16)
+    File: TASKS.md
+    Place: Requirements rows for S2-T14 to S2-T17, S3-T14, S6-T14 to S6-T17, S6-T19, S6-T04, S7-T14, S7-T15 and S8-T03; lines 318-339, 449, 681-704, 738-744, 850-858 and 914
+    Wrong: these tasks omit the requirement IDs that directly define the sources, contracts and cards, contrary to PLN-26.
+    Fix: add PUB-96 to PUB-100 to S2-T14; PUB-97, PUB-98 and PUB-102 to S2-T15; PUB-98 and PUB-101 to S2-T16; PUB-103 to S2-T17; MTH-109 to MTH-111, PUB-99 to PUB-101 and AI-125 to AI-126 to S3-T14; MTH-99, MTH-100, DAT-158, PUB-103 and AI-121 to S6-T14; MTH-101, MTH-102, DAT-159, PUB-104 and AI-122 to S6-T15; MTH-103, MTH-104, DAT-160 and AI-124 to S6-T16; MTH-105, MTH-106, DAT-161 and AI-123 to S6-T17; PUB-95, PUB-96 and AI-127 to S6-T19; AI-121 to AI-127 to S6-T04; MTH-107, DAT-162 and AI-123 to S7-T14; MTH-108, DAT-162 and AI-123 to S7-T15; and DAT-158 to DAT-162 plus AI-121 to AI-127 to S8-T03.
+  F4 (REV-29)
+    File: TASKS.md
+    Place: S7-T14 “Catchment-share scenario”, lines 845-850
+    Wrong: the acceptance criteria require an initial singleton-cell merge but omit decision 0019 item 9’s two terminal safeguards. A remaining singleton cell can reveal one competitor’s share by subtraction, and a one-competitor list must state no competitors’ share.
+    Fix: require no split when a singleton remains after all merges, showing only outlet and aggregate-competitor shares; with one competitor overall, show only the outlet share and no competitor share. Add regression tests for both cases.
+  F5 (REV-16)
+    File: TASKS.md
+    Place: S6-T14 and S6-T04, lines 678-681 and 740-744
+    Wrong: the pinned `NO_DATA` reason `forecast_below_zero` is absent, so the forecast task and catalogue task do not cover the required refusal for a negative forecast of a non-negative series.
+    Fix: require S6-T14 to return `NO_DATA` with `forecast_below_zero` in that case, add the reason to S6-T04’s closed template states, and add a planted regression.
+  F6 (REV-20)
+    File: TASKS.md
+    Place: S3-T14, S6-T15 and S6-T17, lines 443-449, 684-689 and 698-704
+    Wrong: REV-20 requires a base rate to be Inferred, but S6-T15 explicitly marks it `observed`; C36 and C37 omit evidence status; C33 omits its Inferred status and least-real provenance.
+    Fix: require C31 to be Inferred; require C36 and C37 to be Public/Observed; require C33 to be Inferred with the least-real class of its inputs; align the cited contracts and card requirements in the owning parts.
+  F7 (REV-20)
+    File: TASKS.md
+    Place: S2-T14 and S3-T14, lines 313-318 and 443-449
+    Wrong: neither task pins C36’s arithmetic: the frame-cell value is the mean of kept pixel values, and an area is the mean of the frame-cell values whose centres lie inside it. The current text permits another aggregation.
+    Fix: state both means, exclude fill and poor-quality pixels, split no pixel, return `NO_DATA` rather than zero when no value exists, and add the MTH-109 fixture regression.
+  F8 (REV-19)
+    File: docs/14_IMPLEMENTATION_PLAN.md
+    Place: PLN-28, line 58
+    Wrong: PLN-28 says no command may need the network, while decision 0019 permits `./eii build-public` to fetch the new sources and TASKS.md specifies exit 6 for unavailable network.
+    Fix: say no test, gate or guided story needs the network and no test, gate, command or guided story needs either key; retain `./eii build-public` and the opt-in API provider as the stated network-opening paths.
+  F9 (REV-16)
+    File: docs/14_IMPLEMENTATION_PLAN.md
+    Place: section 14 “Parallel work”, line 516
+    Wrong: the plan says S6-T17 follows S6-T15, but TASKS.md does not declare that dependency and decision 0019 item 8 does not make the site estimate depend on base rates.
+    Fix: remove S6-T15 from S6-T17’s sequence so the plan matches TASKS.md.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision record 0019: fix round 1
+
+- The lead ruled on the findings in one sheet, so that every document says the same thing. A base rate is Observed (counts over a stated period, with its own caveat key); the site estimate is Inferred, of the least-real class of its inputs; the night-lights figure of an area is the mean of the frame-cell values, Public and Observed. People present by pay band keeps its formula, and the text no longer says that people with no wage record get no band: the band shares are those of the unit's covered earners, and the caveat says what the figure assumes. Every forecast is computed at request time by eii_core.calc from released rows, like a projection, with no forecast table; the metric keys of the new figures are in the data contracts. The catchment split states its two end cases wherever it states the merge rule. A public build without the night-lights key continues and leaves the layer out. The refusal of a forecast, estimate, share, score, rank or fit for a named real place, building, business, owner or person is one case of the decline class. Every other finding is fixed as its Fix line says, in the narrowest form.
+- The owner's answer of 2026-11-12 on the places copy is applied in the same round and closes OI-96: the copy dated 2025-01-10 is used for version 1 as it is and is shown with its date; no account is opened and no newer release is fetched for now; where a place of the copy disagrees with OpenStreetMap or Overture, the newer source wins. Item 21 of the record and PUB-102 say how that acts: in the de-duplication the record of the newer source is kept; OpenStreetMap points are still not merged, and where the reviewer's cross-check against them disagrees with the copy, the reviewer follows OpenStreetMap. TST-239 and task S2-T15 carry the planted duplicate pair.
+- Editors, each on its own files and from the rulings: Devin command-line tool, `glm-5-3-high` (Zhipu AI), the data contracts; Cursor command-line tool, `grok-4.7-high` (xAI), the methods, the privacy document and the record; Devin, `kimi-k3-1-pro-medium` (Moonshot AI), the back end and the assistant; Cursor, `composer-2.5` (Cursor), testing, the reviewer checklist, the runbook, operations, the open items, the documents index and the glossary; Devin, `deepseek-v4-1-flash-1017-high` (DeepSeek), TASKS.md and the implementation plan; Antigravity, `gemini-4-carbon-high` (Google), the brief, the architecture, the public data pack, the front end and the design direction; and Devin, `swe-2-high` (Cognition), the 23 passages of the owner's answer on the places copy.
+- The lead's own changes: four wordings that two editors had touched outside any finding were restored; the phrase "interval or range" in summaries became "interval, range or counts" in 27 places by the lead's script; one row of the front-end document gained the end case of the catchment split by reference.
+- Lead's checks: the documentation check; the agent files unchanged; searches for the statements that the rulings replace (none left outside the history lines of the closed item OI-96).
+
+#### Evidence for the fix commit `d14fbccc422792f612c73e1105318732a3a23a8f`
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    d14fbccc422792f612c73e1105318732a3a23a8f
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 190 text files, 54 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the 21 files of the fix round (TST-140).
+```
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    d14fbccc422792f612c73e1105318732a3a23a8f
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    d14fbccc422792f612c73e1105318732a3a23a8f
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The agent files are not changed by the fix round and stay byte-identical (REV-27).
+```
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    d14fbccc422792f612c73e1105318732a3a23a8f
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     Every anchor that the reference notes cite still exists after the fix round.
+```
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    d14fbccc422792f612c73e1105318732a3a23a8f
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 57 components: OK"
+Seed:      none
+Notes:     The version check still passes; the anchors that the pin record cites still exist.
+```
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    d14fbccc422792f612c73e1105318732a3a23a8f
+Command:   ./eii test --seed 2026111224
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1059 passed, 0 failed, 0 skipped
+Seed:      2026111224
+Notes:     The project's own test command with a given seed; the change adds no code.
+```
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    d14fbccc422792f612c73e1105318732a3a23a8f
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','5f196fd3369ca291e58c54ab52b94884cfbaf755..d14fbccc422792f612c73e1105318732a3a23a8f'],check=True,capture_output=True,text=True).stdout.splitlines(); o=[x for x in p if not (x.startswith('docs/') or x in ('OPEN_ITEMS.md','README.md','TASKS.md'))]; print(len(p),o); sys.exit(1 if o or len(p)!=21 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "21 []"
+Seed:      none
+Notes:     The fix commit changes 21 paths against the reviewed commit, every one a document (TST-163).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
