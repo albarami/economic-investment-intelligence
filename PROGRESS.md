@@ -7238,6 +7238,210 @@ Seed:      none
 Notes:     Later-round form of the scope command (TST-163): the fourteen paths of part A and the two ledger files of the first ledger commit, which lies inside the range; the five shared documents of part B follow in a later change.
 ```
 
+#### Version-1 documentation (pull request 6): independent review, round 6
+
+Reviewed commit `ee8884a1ef00132d2e3908d706ceb4b19cbf0c6e`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/6 , with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43240633822 ). Reviewer: OpenAI GPT-5.6 Sol (high), through the Cursor command-line tool, read-only; a later round of parts 1 and 2 under decision record 0018 (parts 3 to 10 were approved in round 5 and their files did not change afterwards). Each verdict is copied unchanged from its first line (REV-09); both are also posted on the pull request.
+
+#### Version-1 documentation (pull request 6): independent review, round 6, part 1 of 10: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: D0016 part p01 (pull request 6)
+COMMIT: ee8884a1ef00132d2e3908d706ceb4b19cbf0c6e
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F15 FIXED OPEN_ITEMS.md line 29 now says the owner must enable the supplied go-live key and set the cost limits.
+  F16 FIXED docs/15_REVIEWER_CHECKLIST.md line 144 now says the main model key is supplied for go-live and unused during the build, with the template writer and recorded provider used throughout the build.
+CHECKS:
+  REV-10 PASS The assigned documents implement decisions 0016, 0017 and 0018 and the binding owner notes; F15 and F16 are fixed exactly as required.
+  REV-11 PASS The lead ran `python3 scripts/check_docs.py` at exit 0 and `./eii test --seed 2026111222` at exit 0 on the exact head; 953 tests passed with no failures or skips; CI succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43240633822
+  REV-12 PASS The supplied round diff changes only OPEN_ITEMS.md, docs/15_REVIEWER_CHECKLIST.md and the review ledger in PROGRESS.md.
+  REV-13 N/A This documentation-only part delivers no implementation or release data in which a placeholder or mock could substitute for required work.
+  REV-14 PASS The reviewed changes contain no secret, private identifier or real custodian record.
+  REV-15 PASS No test, assertion, threshold, tolerance, attack size, lint setting or CI control is weakened.
+  REV-16 PASS The corrected key-status wording follows decision 0018 item 12 and the approved standards.
+  REV-17 PASS OPEN_ITEMS.md and docs/15_REVIEWER_CHECKLIST.md are current with decision 0018, and the exact-head documentation check exited 0.
+  REV-18 PASS Secrets remain environmental, keyed build calls remain prohibited as governed, and the gateway remains outside stage and run time.
+  REV-19 PASS The changes implement the settled main-model-key decision without reopening the separately governed gateway-key decision.
+  REV-20 PASS The changed text introduces no ungoverned figure or incomplete lineage route.
+  REV-21 PASS The assigned documents retain Fact-chip rendering and application-owned screen prose.
+  REV-22 PASS No privacy invariant, treatment, threshold or attack requirement is weakened.
+  REV-23 N/A No product or custodian package code or metadata changes occur.
+  REV-24 N/A No Arabic interface string or numeric-rendering implementation changes occur.
+  REV-25 PASS No private path, personal name, e-mail address, secret, realistic identifier or prohibited comparison appears.
+  REV-26 PASS The part makes no prohibited certification, endorsement, lookup, forecast, confidence or action-verdict claim.
+  REV-27 PASS The lead’s exact-head `cmp AGENTS.md CLAUDE.md` exited 0.
+  REV-28 N/A No synthetic record identifier or fictional firm name is introduced.
+  REV-29 PASS Real named entities remain Public-only and named synthetic firms remain Synthetic-only.
+  REV-38 PASS The gateway remains offline and absent from serving and run-time planes; decision 0014 and OI-18 continue to govern its provider key separately.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Version-1 documentation (pull request 6): independent review, round 6, part 2 of 10: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: D0016 part p02 (pull request 6)
+COMMIT: ee8884a1ef00132d2e3908d706ceb4b19cbf0c6e
+REVIEWER: OpenAI GPT-5.6 Sol
+EARLIER FINDINGS:
+  F4 FIXED docs/14_IMPLEMENTATION_PLAN.md line 781 now limits the prohibition to the API keys named by decision 0018 item 12 and leaves the typed-decision gateway key governed by decision 0014 and OI-18.
+CHECKS:
+  REV-10 PASS The sole earlier defect is fixed exactly, and the part implements the three decision records.
+  REV-11 PASS The lead recorded `./eii test --seed 2026111222` exit 0 with 953 passed, 0 failed and 0 skipped, `python3 scripts/check_docs.py` exit 0, and exact-head CI success at https://github.com/albarami/economic-investment-intelligence/actions/runs/43240633822
+  REV-12 PASS The supplied part diff since e12fa5c changes only docs/14_IMPLEMENTATION_PLAN.md; TASKS.md and the decision records are unchanged.
+  REV-13 PASS No placeholder, stub, invented figure or mock substitute appears in the changed requirement text.
+  REV-14 PASS No secret, key value or real custodian record, field, file or count appears.
+  REV-15 PASS No threshold, tolerance, assertion, attack size, test or CI control is weakened.
+  REV-16 PASS The corrected assumption follows decision 0018 item 12 and the plan and task standards remain aligned.
+  REV-17 PASS The affected plan is current, and the lead recorded `python3 scripts/check_docs.py` exit 0 on the exact head.
+  REV-18 PASS The corrected wording keeps the named API keys unused during the build and introduces no unsafe serving-plane access or data flow.
+  REV-19 PASS The corrected wording implements the settled distinction between the uncommitted `.env` API keys and the typed-decision gateway key without reopening decisions 0016, 0017 or 0018.
+  REV-20 PASS The changed line introduces no figure; the municipality pay tasks retain the required partition mappings and two-family lineage for mean wage.
+  REV-21 PASS No model-written screen prose or ungoverned displayed numeral is introduced.
+  REV-22 PASS The municipality pay units and stayer-index tasks retain the required laminar partitions, thresholds and audit limits without weakening privacy controls.
+  REV-23 PASS No product-to-custodian import or boundary relaxation is introduced.
+  REV-24 PASS No bilingual numeral-parity requirement is changed.
+  REV-25 PASS No private path, personal name, e-mail address, realistic identifier, secret or prohibited comparison appears.
+  REV-26 PASS No prohibited claim, forecast, verdict, probability, confidence claim or advice appears.
+  REV-27 PASS The lead recorded `cmp AGENTS.md CLAUDE.md` exit 0 on the exact head.
+  REV-28 PASS No synthetic identifier rule is changed or violated.
+  REV-29 PASS No Synthetic or Simulated attribute is attached to a real named place or business.
+  REV-38 PASS The gateway remains offline and outside serving and run-time planes; decision 0014 and OI-18 continue to govern its key.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Version-1 documentation (pull request 6): merge record
+
+- All ten parts are approved: parts 3 to 10 in round 5 on `e12fa5c6bb66a7b68ad5c6501dfd982e08122a1e`, parts 1 and 2 in round 6 on `ee8884a1ef00132d2e3908d706ceb4b19cbf0c6e`; round 6 proposed no item.
+- Tree proof on the approved head (ruling L-29), run by the lead on 2026-11-12 before the merge: every path of the head's tree is as in the fix commit of round 5 `dd0dd23e92ba547882da7ade5f515b763ee1ac21`, except the ledger file; output "TREE-IS-WORK ok: 199 paths at ee8884a1ef00132d2e3908d706ceb4b19cbf0c6e", exit code 0. On the same head `./eii test --seed 2026111222`: exit code 0, "total: 953 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/6 was squash-merged on 2026-11-12 at the head `ee8884a1ef00132d2e3908d706ceb4b19cbf0c6e`; merge commit `9dfd7e820093540355cd60c085e53a618e53ad39` on main, with the same tree as the head. CI on the merge commit: workflow `docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43241551654 .
+- Decision records 0016, 0017 and 0018 are accepted with this merge. Two points of them are put to the owner: OI-18 (whether the key of the typed-decision gateway may be used during the build) and the sector view of journey D5 (national Public mean pay and trends; no middle ranges by sector).
+
+#### S0-T13: base update and re-pointed citations (before review round 2)
+
+Review round 2 was not started on the head `655e70c780ae7faa07914af395c769726aaa4aa7`: the version-1 documentation merged first and moved the pack lines that the notes cite. Base update `ca3c6ae8c8aa3c075f591c8d65e2ae6a976a80db`: main at `9dfd7e820093540355cd60c085e53a618e53ad39` merged into the branch; in `PROGRESS.md` the two sides' changes do not overlap, proven line by line against the merge base by the lead's merge script; `TASKS.md` merged without conflict; the merged tree differs from main only in the 16 files of this pull request. The lead's script then matched the text of every cited pack line in the new documents: ten citations did not move, 70 moved, and one cited line (the spike questions of document 10) was extended and keeps what the notes cite. The builder applied the lead's map of 71 rows in one pass; the lead's check compared all 162 uses: each cites the line that holds the same text as before.
+
+#### Addition to the task log of S0-T13
+
+- Build round 6: the same builder, after the base update: the pack citations of the two notes re-pointed from the lead's map; no other word changes; the form check and the 30 tests pass
+
+#### Evidence for the work commit after the base update `17546dcc7e7c176e0de05b3dde7dddc26c9fda83`
+
+The recorded commands of the plan, command 9 (the red run) left out and command 10 in its later-round form against the new base.
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    17546dcc7e7c176e0de05b3dde7dddc26c9fda83
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The two notes files agree with the closed tables and pins.toml: criteria 1 and 3; FE-02.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    17546dcc7e7c176e0de05b3dde7dddc26c9fda83
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_reference_notes_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    30 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The 30 tests of the four new test files: criteria 1 to 3; DES-25 and DES-45 (the rules weights and icon-licence).
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    17546dcc7e7c176e0de05b3dde7dddc26c9fda83
+Command:   ./eii test --seed 1794000000
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    985 passed, 0 failed, 0 skipped
+Seed:      1794000000
+Notes:     The project's own test command, which runs them in the suite python-guards.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    17546dcc7e7c176e0de05b3dde7dddc26c9fda83
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 154 text files, 53 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    17546dcc7e7c176e0de05b3dde7dddc26c9fda83
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    17546dcc7e7c176e0de05b3dde7dddc26c9fda83
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The agent files are identical.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    17546dcc7e7c176e0de05b3dde7dddc26c9fda83
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 57 components: OK"
+Seed:      none
+Notes:     The version check of S0-T12 still passes with the new files.
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    17546dcc7e7c176e0de05b3dde7dddc26c9fda83
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['node','web/scripts/check-layout.mjs'],capture_output=True,text=True); l=p.stdout.splitlines(); sys.exit(0 if p.returncode==0 and l[-1:]==['checked 32 entries: OK'] and not any(x.startswith('NOTE') for x in l) and p.stderr=='' else 1)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The layout check requires the web notes file and prints no NOTE line (FE-02).
+```
+
+```text
+### S0-T13 — New-library reference notes
+Commit:    17546dcc7e7c176e0de05b3dde7dddc26c9fda83
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','9dfd7e820093540355cd60c085e53a618e53ad39...17546dcc7e7c176e0de05b3dde7dddc26c9fda83'],check=True,capture_output=True,text=True).stdout.splitlines(); req={'web/REFERENCE_NOTES.md','docs/REFERENCE_NOTES.md','scripts/reference_notes_tables.py','scripts/reference_notes_parse.py','scripts/reference_notes_report.py','scripts/reference_notes_assigned.py','scripts/check_reference_notes.py','scripts/tests/reference_notes_support.py','scripts/tests/test_reference_notes_form.py','scripts/tests/test_reference_notes_rows.py','scripts/tests/test_reference_notes_real.py','scripts/tests/test_reference_notes_assigned.py','web/scripts/check-layout.mjs','web/scripts/tests/check-layout.node-test.mjs','PROGRESS.md','TASKS.md'}; o=[x for x in p if x not in req|{'web/README.md'}]; m=[x for x in req if x not in p]; print(len(p),o,m); sys.exit(1 if o or m else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "16 [] []"
+Seed:      none
+Notes:     Later-round form of the scope command (TST-163): the fourteen paths of part A and the two ledger files of the first ledger commit, which lies inside the range; the five shared documents of part B follow in a later change.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
