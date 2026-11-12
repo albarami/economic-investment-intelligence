@@ -8253,6 +8253,111 @@ Seed:      none
 Notes:     The work commit changes exactly the twelve paths of part B against the base (TST-163).
 ```
 
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources: record of the change
+
+- Kind of change: documentation only (decision record 0019 and the amendments it makes to the pack); it belongs to no task of TASKS.md and adds the tasks that build what it decides
+- Writer persona: senior technical editor of the pack, with a principal privacy engineer for the privacy rules and a senior quantitative methods engineer for the method cards
+- Reviewer persona: principal reviewer of specifications, privacy rules and calculation methods
+- Source of the decisions: the owner's decisions and answers of 2026-11-12 (project records held by the owner)
+- Reading of the pack before the record: eleven Claude Sonnet readers (Anthropic), one per group of documents, listed every passage that the decisions change and every existing rule that binds the new work
+- Record written by: the lead (Anthropic, Claude Fable 5.2), who settled each place where the owner's words met an existing rule and wrote the rule texts of item 25
+- Pack edits: Claude Opus editors (Anthropic) for 06_PRIVACY_AND_DISCLOSURE_CONTROL.md and 07_ECONOMIC_METHODS.md, Claude Sonnet editors (Anthropic) for the other groups, on disjoint files, in two passes: the record as first written, then the owner's evening answers (forecasts of the released monthly statistics with PRV-54 amended; the catchment split by category and distance band; the places source read from its public copy)
+- Third pass by the lead, after reading the rule texts, the privacy document and the nine new method cards in full: a forecast of a released series is computed in the product plane at request time; a catchment split in which a single competitor is still left after the merges is not shown; the reason key `forecast_below_zero` joins the contracts; the caption of a forecast range counts each past value against the range that the other past errors give, because a range from the smallest to the largest error holds every past value by construction; night-time radiance for an area is the mean of card C36 in every document
+- Reviewer maker and model: Cursor command-line tool, `gpt-5.6-sol-high` (OpenAI), read-only, in parts (a maker that wrote none of it)
+- Skills and rules: the lead used project-orientation, task-standards, github-flow and strict-reviewer; each editor received the record, the lead's sheet of fixed names and class rules, and the list of passages of its own files
+- Branch: `docs/decision-0019`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/17
+- Base: the edits were made on main at `103884cb79d7c2e935ebcc42b7f788bca6f510d2` and moved onto main at `55321cbf77b87295045325d99a3ff914a6ce9ce4` by a three-way apply; OPEN_ITEMS.md and docs/README.md conflicted and were resolved by the lead's script as both sides (OI-80 to OI-89, then OI-96 to OI-103; the amended status cells and the two rows of the reference notes); the lead's script proved for every file that the change on the new base equals the change as edited
+- Lead's checks before the review: every new requirement ID is defined once and every ID cited in an added line is defined; no line citation and no run of exactly eight or eleven digits is added; the arithmetic of the worked examples of cards C30, C33 and C34 recomputed by hand
+- Verdict: PENDING (the verdicts and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4 (system) and 3.14.6 (uv); git 2.53.0; uv 0.11.31; Node 22.22.3; npm 10.9.8
+
+#### Evidence for the work commit `86e4dfca22b3a2e4931b8bba14bc9dea03ba2e42`
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    86e4dfca22b3a2e4931b8bba14bc9dea03ba2e42
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 190 text files, 54 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the record and the 24 amended files (TST-140).
+```
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    86e4dfca22b3a2e4931b8bba14bc9dea03ba2e42
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    86e4dfca22b3a2e4931b8bba14bc9dea03ba2e42
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     Rules 4, 10, 24, 25 and 33 changed in both agent files; they stay byte-identical (REV-27).
+```
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    86e4dfca22b3a2e4931b8bba14bc9dea03ba2e42
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes cite the pack by anchors; every anchor still exists after this change of the pack, with no citation edited (the owner's rule of 2026-11-12; decision 0019 item 26).
+```
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    86e4dfca22b3a2e4931b8bba14bc9dea03ba2e42
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 57 components: OK"
+Seed:      none
+Notes:     The version check still passes on the amended tree.
+```
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    86e4dfca22b3a2e4931b8bba14bc9dea03ba2e42
+Command:   ./eii test --seed 2026111223
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    1059 passed, 0 failed, 0 skipped
+Seed:      2026111223
+Notes:     The project's own test command with a given seed: every network-free suite; the change adds no code.
+```
+
+```text
+### Decision record 0019 — forecasts, estimates and scenarios; six self-serve sources
+Commit:    86e4dfca22b3a2e4931b8bba14bc9dea03ba2e42
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','55321cbf77b87295045325d99a3ff914a6ce9ce4...86e4dfca22b3a2e4931b8bba14bc9dea03ba2e42'],check=True,capture_output=True,text=True).stdout.splitlines(); o=[x for x in p if not (x.startswith('docs/') or x in ('AGENTS.md','CLAUDE.md','OPEN_ITEMS.md','README.md','TASKS.md'))]; print(len(p),o); sys.exit(1 if o or len(p)!=25 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "25 []"
+Seed:      none
+Notes:     The work commit changes 25 paths against the base, every one a document: the record, 17 numbered documents, the glossary, the documents index, the agent files, README.md, TASKS.md and OPEN_ITEMS.md (TST-163).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
