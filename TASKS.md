@@ -17,7 +17,7 @@ Tasks in slice S4 through slice S11 are coarser and are refined at the preceding
 - Acceptance evidence records the command or check, result, full commit hash and review verdict.
 - Files outside the task's scope are read-only.
 - Parallel tasks must have disjoint writable scopes; otherwise the lead serializes them.
-- A task may be built ahead in a worktree on the pushed head of one base task that is still in review, in a fix round or in CI, when the lead's checks are green on that head and its open findings do not change what the new task builds on; one level only. It is not pushed and gets no pull request before its base is merged and it is rebased onto the base branch; then every check is rerun.
+- A task may be built ahead in a worktree on the pushed head of one base task that is still in review, in a fix round or in CI, when the lead's checks are green on that head and its open findings do not change what the new task builds on; one level only. It is not pushed and gets no pull request before its base is merged and it is rebased onto `main`; then every check is rerun.
 - Each slice ends with a follow-up task before its gate that closes every proposed open item of the slice's reviews (REV-41); it is the last task of each slice below.
 - All tasks start with status `queued`.
 - Requirement references below are to IDs defined in the numbered documentation pack; this file defines no requirement IDs.

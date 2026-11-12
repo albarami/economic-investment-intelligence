@@ -63,7 +63,7 @@ The lead reproduces the decisive checks before merge.
 ## 3. Branch, pull request and evidence protocol
 
 1. The lead marks one queued task active and records its writable file scope.
-2. The builder creates a task branch from the current green base branch, or, when the lead builds a task ahead under [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md), works in a worktree on the pushed head of its one base task; a task built ahead is rebased onto the base branch, and every check is rerun, before it is pushed.
+2. The builder creates a task branch from the current green base branch, or, when the lead builds a task ahead under [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md), works in a worktree on the pushed head of its one base task; a task built ahead is rebased onto `main`, and every check is rerun, before it is pushed.
 3. The builder works test-first where behaviour changes and commits with a Conventional Commit message.
 4. The lead confirms no other active task owns any file in that scope.
 5. The lead grants the single push slot; only that branch pushes.

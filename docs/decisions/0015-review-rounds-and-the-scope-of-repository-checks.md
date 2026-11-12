@@ -41,7 +41,7 @@ What the repository's own checks defend against
 
 Building ahead
 
-16. A task may be built in a worktree on the pushed head of one base task that is still in review, in a fix round or in CI, when the lead's checks are green on that head and its open findings do not change what the new task builds on. One level only: never on a task that is itself built ahead. Nothing built ahead is pushed or gets a pull request before its base is merged and it is rebased onto the base branch; then every check is rerun and the review sees that head.
+16. A task may be built in a worktree on the pushed head of one base task that is still in review, in a fix round or in CI, when the lead's checks are green on that head and its open findings do not change what the new task builds on. One level only: never on a task that is itself built ahead. Nothing built ahead is pushed or gets a pull request before its base is merged and it is rebased onto `main`; then every check is rerun and the review sees that head.
 
 ## Evidence
 
@@ -49,7 +49,7 @@ Building ahead
 
 ## Consequences
 
-- Document 15: REV-05, REV-06, REV-08 and REV-33 are amended, REV-39 to REV-42 state points 1 to 14, and the verdict format gains the mark OPEN, the block PROPOSED OPEN ITEMS and, after round 1, the block EARLIER FINDINGS.
+- Document 15: REV-05, REV-06, REV-08 and REV-33 are amended and REV-39 to REV-42 are added; together they state points 1 to 14, and the verdict format gains the mark OPEN, the block PROPOSED OPEN ITEMS and, after round 1, the block EARLIER FINDINGS.
 - Document 14: the sentences on re-review and steps 2, 8, 9 and 10 of the protocol follow points 2, 9 and 16.
 - Document 12: TST-164, TST-168 and TST-169 follow points 9 to 12.
 - TASKS.md: the queue rules state points 2, 12 and 16, each slice lists its follow-up task, and the criterion of the final reviews follows point 9.
