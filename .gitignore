@@ -34,3 +34,13 @@ Thumbs.db
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Keys and certificates
+*.pem
+*.key
+
+# More generated files
+*.egg-info/
+.coverage.*
+*.tsbuildinfo
+.eslintcache

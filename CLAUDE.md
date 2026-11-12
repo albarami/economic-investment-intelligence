@@ -86,7 +86,7 @@
 
 ## Commands and information locations
 
-44. Today run only `python3 scripts/check_docs.py`. The `./eii` commands are created in slice S0; update this section when they exist and never claim they run now.
+44. Today run only `python3 scripts/check_docs.py`, `python3 scripts/check_tree.py` and `python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v`. The `./eii` commands are created in slice S0; update this section when they exist and never claim they run now.
 45. Use pinned command behaviour: preflight only probes; only `db-up`/`db-down` start/stop the database; `up` never starts one or reloads over a mismatched schema.
 
 | Information | Canonical location |
