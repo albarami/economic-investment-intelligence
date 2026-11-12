@@ -126,7 +126,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: lock files, version files and dependency constraints.
 - Depends: S0-T02, S0-T03.
 - Requirements: FE-03, TST-153, PLN-15, TST-43, BE-13.
-- Delivery: hard; personas Platform; status in review (pull request 9; part B after the open documentation pull requests merge).
+- Delivery: hard; personas Platform; status in review (pull request 9, round 2; part B after the open documentation pull requests merge).
 ### S0-T13 — New-library reference notes
 - Goal: Give agents verified official-reference notes for libraries newer than most model training data.
 - Acceptance criteria: [ ] each named newer library has an official-documentation pointer; [ ] no API behaviour is asserted from memory; [ ] slice S1 confirmation fields exist.

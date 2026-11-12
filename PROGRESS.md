@@ -3142,6 +3142,283 @@ Seed:      none
 Notes:     The strict type check on the new files (S0-T04).
 ```
 
+#### S0-T12: independent review, round 1
+
+Reviewed commit `4f251782e4d17eb15174e1738862c46c8a9df095`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/9, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43212789859 ). Reviewer: Google Gemini 4 Carbon (high), through the Antigravity command-line tool, read-only; a full review in three parts (the check, the record and the ledger; the record, manifest and npm tests; the toolchain, inputs, git and real-tree tests). Each verdict is copied unchanged from its first line (REV-09); all three are also posted on the pull request.
+
+#### S0-T12: independent review, round 1, part 1 of 3: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: S0-T12 part 1 (pull request 9)
+COMMIT: 4f251782e4d17eb15174e1738862c46c8a9df095
+REVIEWER: Google, Gemini 4 Carbon (High)
+CHECKS:
+  REV-10 FAIL Criteria 1 and 2 pass (PROGRESS.md records uv lock --check exit 0 and cd web && npm ci exit 0 at work commit 8eb4546cee5807aec05f6c05be1cba4d0ada38f6, EVIDENCE.md blocks LOCKS-UNCHANGED and PLANT scratch resolutions exit 0, and BLOCK RECORD confirms all 57 rows in pins.toml carry valid labels, retreats and spike_result), but criterion 3 ("unsupported version drift fails a check") fails on F1: when [tool.uv] is absent from root pyproject.toml, scripts/check_versions.py emits no input failure, skips all Python version-field, build-backend, manifest, lock, state and unscanned rules, and prints "checked 57 components: OK" with exit code 0 even when Python manifests or uv.lock have unsupported version drift.
+  REV-11 PASS PROGRESS.md records 11 commands run by lead (local) at work commit 8eb4546cee5807aec05f6c05be1cba4d0ada38f6 all with exit code 0, including ./eii test (876 passed, 0 failed, 0 skipped, seed 1794484229), unittest over test_versions_*.py (51 passed, 0 failed, 0 skipped), the TST-161 red run, and python3 scripts/check_docs.py; EVIDENCE.md HEAD-DIFF proves head 4f251782e4d17eb15174e1738862c46c8a9df095 adds only PROGRESS.md and TASKS.md, Sitting 4 re-runs ./eii test (876 passed, 0 failed, 0 skipped, exit 0) and python3 scripts/check_docs.py (exit 0) on 4f251782e4d17eb15174e1738862c46c8a9df095, and CI is green on the same commit at https://github.com/albarami/economic-investment-intelligence/actions/runs/43212789859 ; I did not re-run commands myself because the review brief forbids shell commands.
+  REV-12 PASS Part 1 changes only .nvmrc, pins.toml, pyproject.toml (one line), scripts/check_versions.py, scripts/versions_inputs.py, scripts/versions_record.py, scripts/versions_tools.py, PROGRESS.md and TASKS.md; EVIDENCE.md blocks SCOPE (bad: []) and LOCKS-UNCHANGED ([]) confirm nothing outside the planned Part A and ledger files changed, nothing under data/ was touched, and there is no unrelated reformatting.
+  REV-13 PASS Line-by-line inspection of all four check modules, pins.toml, .nvmrc and pyproject.toml shows no TODO, FIXME, NotImplementedError, empty function body, placeholder return value or invented figure.
+  REV-14 PASS No secret, .env file, private key or real custodian record, field name, file name or count appears anywhere in the diff; python3 scripts/check_docs.py exited 0 on head 4f251782e4d17eb15174e1738862c46c8a9df095 (gitleaks arrives in queued task S0-T06).
+  REV-15 PASS pyproject.toml adds only required-version = "==0.11.31" under [tool.uv]; no existing test, threshold, tolerance, Hypothesis setting, ruff rule, mypy strictness or workflow file is weakened, and no skip, expected-failure mark or lint/type suppression comment appears in the diff (BLOCK STYLE problems: []).
+  REV-16 FAIL pins.toml, .nvmrc, pyproject.toml, module boundaries, constants, CLI grammar and 17-rule ordering match PLAN.md, except F1: scripts/versions_inputs.py members_of returns (None, None) when [tool.uv] is absent instead of returning the missing-members detail required by PLAN.md lines 129 and 135, suppressing all Python rules and rule 17 without reporting an input failure (also see P1 and P2).
+  REV-17 PASS PROGRESS.md (append-only S0-T05 verdicts and merge record plus S0-T12 task log and 11 evidence entries) and TASKS.md (S0-T05 marked done; S0-T12 updated with TST-43, BE-13 and Part A/B review status) are current and verified by BLOCK LEDGER (ledger problems: []) and python3 scripts/check_docs.py (exit 0) on 4f251782e4d17eb15174e1738862c46c8a9df095; README.md, rule 44 of AGENTS.md and CLAUDE.md, and OPEN_ITEMS.md (OI-40, OI-54 to OI-57) are deferred to Part B until the open documentation pull requests merge.
+  REV-18 PASS Child process environments in versions_inputs.git_environment and versions_tools.probe_environment are allow-lists built from {}, subprocess calls use argument lists without a shell, read_input and _cite_item reject symbolic links and non-regular files with lstat() and reject path traversal, and rule 17 takes candidates from git ls-files without walking ignored directories (BLOCK NOWALK problems: []).
+  REV-19 PASS Nothing on the dropped or later lists is built, no architecture or approved decision record is reopened or replaced, and recording sqlglot and @hey-api/openapi-ts with state = "recorded" without installing them respects the slice S0 cut order.
+  REV-20 N/A This foundation version-pinning task introduces no economic fact, displayed figure, lineage chain or calculation function.
+  REV-21 N/A This task adds no user-interface screen, Fact chip, catalogue template or assistant answer pipeline.
+  REV-22 N/A This task touches no privacy partition, parameter set, disclosure-control rule, adversarial audit, manifest or freeze logic.
+  REV-23 N/A This task modifies no file or package metadata under product/ and introduces no import of eii_custodian.
+  REV-24 N/A This task adds no English or Arabic user-facing view, string or numeral.
+  REV-25 PASS No absolute local path, personal name, e-mail address, realistic identifier, bare run of eight or eleven digits, secret or named product comparison appears in the diff, and python3 scripts/check_docs.py and python3 scripts/check_tree.py both exited 0 on head 4f251782e4d17eb15174e1738862c46c8a9df095.
+  REV-26 PASS No comment, docstring, pin note or ledger entry makes any prohibited claim regarding real custodian data, formal privacy certification, real-place synthetic figures, ministry endorsement, forecasts or entity lookup.
+  REV-27 PASS Neither AGENTS.md nor CLAUDE.md is modified in Part A, and cmp AGENTS.md CLAUDE.md exited 0 on head 4f251782e4d17eb15174e1738862c46c8a9df095 (EVIDENCE.md line 559).
+  REV-28 N/A This task generates no synthetic world record or SYN-* identifier.
+  REV-29 N/A This task attaches no fact or attribute to any real named place or business.
+  REV-38 PASS No serving-plane or run-time code is added, eii_gateway is imported nowhere, and the typed-decision-provider entry in pins.toml is a static external record row that never reads EII_DECISION_PROVIDER or JEV_PRO_API_KEY.
+FINDINGS:
+  F1 (REV-10)
+    File: scripts/versions_inputs.py
+    Line: 244-248
+    Wrong: When root pyproject.toml has no [tool] table or has [tool] (such as [tool.ruff]) without a [tool.uv] subtable, shape_pyproject returns [] (because uv_present is False on line 222) and members_of returns (None, None) on lines 246-247 because uv is None. In scripts/check_versions.py lines 192-199 (_read_tree), neither 'if members_detail is not None:' nor 'elif members is not None:' executes: no FAIL input line is emitted, docs["pyproject.toml"] is never populated, no member pyproject.toml is read, and flags["members"] stays False, which suppresses all Python version-field (including tool.uv.required-version and project.requires-python), build-backend, manifest-form, manifest-unrecorded, manifest-version, lock-source, lock-entry, lock-version and state checks as well as rule 17 (unscanned). Removing [tool.uv] from pyproject.toml therefore lets unsupported Python version drift and unscanned watched files pass scripts/check_versions.py with "checked 57 components: OK" and exit code 0, breaking S0-T12 criterion 3 ("unsupported version drift fails a check", TASKS.md line 125) and PLAN.md lines 129 and 135 (suppress the members line only when tool.uv is present and not a table; when tool.uv.workspace.members is missing, emit 'FAIL input: pyproject.toml: tool.uv.workspace.members is not a list of strings').
+    Fix: In scripts/versions_inputs.py, replace lines 244-248 with:
+        tool = doc.get("tool", {})
+        if not isinstance(tool, dict):
+            return None, None
+        uv = tool.get("uv", {})
+        if not isinstance(uv, dict):
+            return None, None
+        workspace = uv.get("workspace")
+      Add planted cases in scripts/tests/test_versions_inputs.py for root pyproject.toml with [project] only (no [tool]) and with [tool.ruff] only (no [tool.uv]), asserting exit status 1 and 'FAIL input: pyproject.toml: tool.uv.workspace.members is not a list of strings', while keeping the existing 'tool = 1' and '[tool] uv = 1' cases asserting only 'FAIL input: pyproject.toml: tool.uv is not a table'. Prove with: uv run --locked python -m unittest discover -s scripts/tests -p 'test_versions_*.py' -v, ./eii test, uv run --locked ruff check ., uv run --locked ruff format --check ., and uv run --locked mypy.
+PROPOSED OPEN ITEMS:
+  P1 (REV-16) Root pyproject.toml always included in _python_docs (PLAN.md lines 154 and 204; hardening: document 17): In scripts/check_versions.py lines 410 and 418, _python_docs checks '"members" not in docs.get("pyproject.toml", {})' and excludes '"members"'; if root pyproject.toml contains a top-level 'members' key alongside a valid '[tool.uv.workspace]', _python_docs silently omits root pyproject.toml from project.requires-python, workspace-name and manifest checks. Replace line 410 with 'if "pyproject.toml" in docs:' and remove '"members",' on line 418.
+  P2 (REV-16) Escape unquoted input strings with _show in all FAIL lines (PLAN.md line 125; hardening: document 17): In scripts/check_versions.py lines 496, 582, 591, 598, 641 and 649, unquoted input strings (name in npm manifest-unrecorded, raw_name and version in uv.lock lock-source and lock-version, and key and version in web/package-lock.json lock-version) are interpolated raw instead of through _show(...), so a crafted newline or non-ASCII character in those lock or manifest fields breaks the single-line ASCII FAIL format while still exiting 1.
+```
+
+#### S0-T12: independent review, round 1, part 2 of 3: APPROVED
+
+```text
+VERDICT: APPROVED
+TASK: S0-T12 part 2 (pull request 9)
+COMMIT: 4f251782e4d17eb15174e1738862c46c8a9df095
+REVIEWER: Google Gemini 4 Carbon (High)
+CHECKS:
+  REV-10 PASS All three S0-T12 criteria are met with recorded evidence: lock resolution via uv lock --check (exit 0), npm ci in EARLIER/LEDGER (exit 0), LOCKS-UNCHANGED ([]), and RESOLVE-PY/RESOLVE-NPM in PLANT (exit 0) plus lock rules 12-14 tested in scripts/tests/test_versions_manifests.py and scripts/tests/test_versions_npm.py; pin and retreat labelling via BLOCK RECORD (57 components, exit 0) and rules 2-5 tested in scripts/tests/test_versions_record.py; unsupported version drift failing via all 30 tests in this part (13 + 12 + 5) within the 51-test version suite (exit 0) and BLOCK PLANT (plants not detected: [], exit 0).
+  REV-11 PASS Lead's runs in .overnight/EVIDENCE.md at work commit 8eb4546cee5807aec05f6c05be1cba4d0ada38f6 and head 4f251782e4d17eb15174e1738862c46c8a9df095 show ./eii test exit 0 (876 passed, 0 failed, 0 skipped across 6 suites), unittest test_versions_*.py exit 0 (51 passed, 0 skipped), python3 scripts/check_docs.py exit 0, TESTFIRST/STUB-RED/TREE-RED/MUTANTS exit 0, LEDGER exit 0 (11 commands recorded, ledger problems: []), and CI workflow docs (check-docs) green on 4f251782e4d17eb15174e1738862c46c8a9df095 at https://github.com/albarami/economic-investment-intelligence/actions/runs/43212789859 ; every rule in part 2 (rules 1-15) has planted violations asserting exact failure lines.
+  REV-12 PASS Part 2 touches only the four assigned files (scripts/tests/versions_support.py, scripts/tests/test_versions_record.py, scripts/tests/test_versions_manifests.py, scripts/tests/test_versions_npm.py), nothing under data/, and BLOCK SCOPE (bad: []), BLOCK LOCKS-UNCHANGED ([]), and BLOCK HEAD-DIFF all exit 0 against main e5f065d556a037febdbc82191db46c2a696adb02.
+  REV-13 PASS Line-by-line review of all 2,040 diff lines found no TODO, FIXME, NotImplementedError, empty bodies, or placeholder assertions; the shell version stubs in scripts/tests/versions_support.py are deterministic test fixtures specified by the plan for toolchain probe testing.
+  REV-14 PASS No secret, key, .env file, or real custodian record, field name, file name, or count appears anywhere in the four files; python3 scripts/check_docs.py exited 0 on 4f251782e4d17eb15174e1738862c46c8a9df095.
+  REV-15 PASS All four files are new test modules with zero lint or type suppression comments, zero skips or expected-failure marks, zero retries, and exact full-output assertions; existing suites remain at 876 passed, 0 failed, 0 skipped.
+  REV-16 PASS Implementation matches .overnight/PLAN.md (12-component scratch git fixture and helpers in scripts/tests/versions_support.py, 13 tests in RecordRules, 12 tests in ManifestRules, 5 tests in NpmRules, top-level check_versions import, tempfile cleanup, -> None annotations, no test-method docstrings) and AGENTS.md standards, with ruff check, ruff format --check, mypy, and NOWALK all exiting 0; the four builder rulings align with rules 2, 7, 11, 12, and 13 and the plan's test table.
+  REV-17 PASS For Part A, TASKS.md and PROGRESS.md are updated in ledger commit 4f251782e4d17eb15174e1738862c46c8a9df095 (BLOCK LEDGER: ledger problems: [], python3 scripts/check_docs.py exit 0), while README.md, AGENTS.md, CLAUDE.md, and OPEN_ITEMS.md are explicitly deferred to Part B after the open documentation pull requests merge.
+  REV-18 PASS Subprocesses in scripts/tests/versions_support.py invoke executables as argument lists without a shell and pass closed allow-list environments (git_env() with GIT_CONFIG_GLOBAL and GIT_CONFIG_SYSTEM set to os.devnull, and explicit PATH dicts), using only tempfile.TemporaryDirectory() for scratch data.
+  REV-19 PASS The test suite enforces the settled Python 3.14, uv 0.11.31, Node 22 (>=22.12.0 <23), and npm 10.9.x pins and slice S1 confirmation fields without reopening any architectural decision or slice order.
+  REV-20 N/A This commit adds repository version-pin guard tests under scripts/tests/ and introduces no economic calculations, release tables, or displayed fact objects.
+  REV-21 N/A This commit adds Python test modules under scripts/tests/ and touches no UI component, brief template, catalogue, or answer pipeline.
+  REV-22 N/A This commit adds dependency and toolchain version-pin tests under scripts/tests/ and leaves all privacy partitions, parameter sets, treatments, audits, and freeze logic untouched.
+  REV-23 PASS No file under product/ or product package metadata is modified, none of the four test files imports eii_custodian, and suite python-guards (196 passed) and suite python-product (2 passed) exit 0 in .overnight/EVIDENCE.md.
+  REV-24 N/A This commit adds repository guard test scripts under scripts/tests/ and introduces no English or Arabic user-facing views or strings.
+  REV-25 PASS Line-by-line inspection confirms no local machine path, personal name, e-mail address (planted URL requirements space the @ sign and use example.invalid; git identity uses fixture), real custodian reference, ministry endorsement, product comparison, bare 8- or 11-digit run, secret, or unlicensed public file; python3 scripts/check_docs.py exited 0.
+  REV-26 PASS None of the strings, comments, or docstrings in the four files makes or implies any prohibited claim regarding real custodian data, real places, footfall, certified privacy, existing public services, ministry endorsement, forecasts, or entity lookup.
+  REV-27 PASS cmp AGENTS.md CLAUDE.md and python3 scripts/check_docs.py both exited 0 on head commit 4f251782e4d17eb15174e1738862c46c8a9df095 (.overnight/EVIDENCE.md lines 553-560).
+  REV-28 N/A This commit uses generic package fixture names (alpha, beta, gamma, delta, zeta, left, right, @scope/pkg, service) in version-pin tests and defines no synthetic custodian entity, person, or salary-file identifiers.
+  REV-29 N/A This commit adds version-pin test modules under scripts/tests/ and references no geographic places, buildings, or businesses.
+  REV-38 PASS None of the four files imports eii_gateway or reads EII_DECISION_PROVIDER or JEV_PRO_API_KEY, and no serving-plane or gateway/ file is touched.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T12: independent review, round 1, part 3 of 3: REJECTED
+
+```text
+VERDICT: REJECTED
+TASK: S0-T12 part 3 (pull request 9)
+COMMIT: 4f251782e4d17eb15174e1738862c46c8a9df095
+REVIEWER: Google Gemini 4 Carbon (High)
+CHECKS:
+  REV-10 PASS All three acceptance criteria of S0-T12 map to recorded runs and tests: criterion 1 (`lock files resolve`) by `uv lock --check` exit 0, `cd web && npm ci` exit 0, `LOCKS-UNCHANGED` (`[]`) and `PLANT` primary/retreat resolutions exit 0; criterion 2 (`exact and retreat pins are labelled`) by `uv run --locked python scripts/check_versions.py` exit 0 (`checked 57 components: OK`) and `RECORD` exit 0; criterion 3 (`unsupported version drift fails a check`) by the 51 tests in `scripts/tests/test_versions_*.py` exit 0, `./eii test` exit 0 (876 passed, 0 skipped) and `PLANT` (`plants not detected: []`) in `PROGRESS.md` and `.overnight/EVIDENCE.md`.
+  REV-11 FAIL The lead recorded exit 0 on work commit `8eb4546cee5807aec05f6c05be1cba4d0ada38f6` (`PROGRESS.md`) and re-ran on head `4f251782e4d17eb15174e1738862c46c8a9df095` (`.overnight/EVIDENCE.md`) for `./eii test` (876 passed, 0 failed, 0 skipped), `uv run --locked python -m unittest discover -s scripts/tests -p 'test_versions_*.py' -v` (51 passed, 0 skipped) and `python3 scripts/check_docs.py` (exit 0), with CI workflow `docs` (`check-docs`) green at https://github.com/albarami/economic-investment-intelligence/actions/runs/43212789859 (reviewer ran no commands per the read-only brief); however, `test_git_surroundings_do_not_change_the_result` has a vacuous control tooth for `HOME` and `XDG_CONFIG_HOME` and `test_git_listing_failures` omits command-line exit-code `1` checks; see F1 and F2.
+  REV-12 PASS This part's diff adds only the five planned test files under `scripts/tests/` (`versions_support.py`, `test_versions_toolchain.py`, `test_versions_inputs.py`, `test_versions_git.py`, `test_versions_real.py`); blocks `SCOPE` (part A form), `LOCKS-UNCHANGED` and `HEAD-DIFF` exited 0, nothing under `data/` is touched, and there is no unrelated reformatting.
+  REV-13 OPEN P1 None of the five files contains `TODO`, `FIXME`, `NotImplementedError`, an empty function body, mock release data or a fixed return value standing in for real work; one redundant fixture write immediately overwritten on the next lines in `scripts/tests/test_versions_toolchain.py` is recorded outside the verdict as P1.
+  REV-14 PASS No secret, `.env` file, key material, or real custodian record, field name, file name or count appears anywhere in the five files; `python3 scripts/check_docs.py` and `python3 scripts/check_tree.py` exited 0 on the head (`.overnight/EVIDENCE.md`).
+  REV-15 PASS All five files in this part are newly added; no existing test, CI configuration, lint or type setting, threshold or assertion is weakened, no skip or expected-failure mark is used, and no `# noqa` or `# type: ignore` comment is introduced (`ruff check .`, `ruff format --check .` and `mypy` all exited 0).
+  REV-16 FAIL `versions_support.py`, `test_versions_toolchain.py`, `test_versions_inputs.py` and `test_versions_real.py` follow the approved plan, pinned names, type-check rules and closed-set repository-read rules, but `scripts/tests/test_versions_git.py` departs from the approved `PLAN.md` `test_versions_git.py` specification in three tests; see F1, F2 and F3.
+  REV-17 PASS For part A (`README.md`, rule 44 of `AGENTS.md` and `CLAUDE.md`, and `OPEN_ITEMS.md` OI-54 to OI-57 belong to part B after the open documentation pull requests merge), `PROGRESS.md` and `TASKS.md` are updated on the head commit, blocks `LEDGER-LIST` and `LEDGER` exited 0 (`ledger problems: []`), and `python3 scripts/check_docs.py` exited 0 on the head.
+  REV-18 PASS Subprocess environments in `versions_support.py`, `test_versions_toolchain.py` and `test_versions_git.py` use explicit allow-lists without `shell=True`, temporary trees use `tempfile.TemporaryDirectory()` only, no ignored or repository-outside path is walked (`NOWALK` exited 0), and no secret, SQL or serving path is touched.
+  REV-19 PASS Nothing on the dropped or later lists is built, no architecture or decision record is reopened, and slice S1 pin confirmation (`spike_result = "not yet run"`) is left to S1-T08 as planned.
+  REV-20 N/A This part adds developer version-pin guard tests only and introduces no product fact, displayed figure, lineage reference or calculation.
+  REV-21 N/A This part adds no user-interface screen, card, Fact chip, catalogue template or assistant pipeline output.
+  REV-22 N/A This part changes no privacy partition, parameter set, disclosure treatment, adversarial audit, release manifest or freeze logic.
+  REV-23 N/A This part adds test modules under `scripts/tests/` only and modifies nothing under `product/` or package dependency metadata.
+  REV-24 N/A This part adds no English or Arabic interface view, localized string or displayed numeral.
+  REV-25 PASS None of the five files contains an absolute local path, personal name, e-mail address (git test identity uses `"fixture"`, test URLs use `example.invalid`), real custodian name, ministry internal plan, named product comparison, bare eight- or eleven-digit run or secret, and `python3 scripts/check_docs.py` exited 0 on the head.
+  REV-26 PASS No comment, docstring or string in the five files makes any prohibited claim regarding real custodian data, real-place synthetic or simulated facts, privacy certification, public-service inferiority, ministry endorsement, forecasts or firm/person lookup.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exited 0 on the head `4f251782e4d17eb15174e1738862c46c8a9df095` (`.overnight/EVIDENCE.md`), and this part modifies neither file.
+  REV-28 N/A This part introduces no synthetic world record or `SYN-*` identifier.
+  REV-29 N/A This part introduces no real named place or business record or attribute.
+  REV-38 PASS None of the five files imports `eii_gateway` or reads `EII_DECISION_PROVIDER` or `JEV_PRO_API_KEY`, and no serving-plane or run-time code is added (`"gateway/pyproject.toml"` appears only as an unscanned path string in `test_versions_git.py`).
+FINDINGS:
+  F1 (REV-11)
+    File: scripts/tests/test_versions_git.py
+    Line: 270-322
+    Wrong: In `GitRules.test_git_surroundings_do_not_change_the_result`, lines 270-277 append `[core]\n\texcludesFile = <home/ignore>` to `root / ".git" / "config"` before the first control (`bare`, lines 303-313) runs on that same `root`, and `bare` also sets `"GIT_CONFIG_GLOBAL": os.devnull`. Because repository-local `core.excludesFile` overrides `$XDG_CONFIG_HOME/git/ignore` and `GIT_CONFIG_GLOBAL=os.devnull` suppresses `$HOME/.gitconfig`, the `bare` control tests `root/.git/config` a second time instead of testing `HOME` or `XDG_CONFIG_HOME`: deleting both `home/.gitconfig` (lines 264-268) and `home/.config/git/ignore` (line 269) leaves the test passing. That breaks the approved plan's control requirement (`PLAN.md` `test_versions_git.py` row 4: separate controls with only `HOME`/`XDG_CONFIG_HOME` versus only the repository's `core.excludesFile`, proving each hostile personal or repository git input would change the listing if it reached git), `REV-11` (teeth for personal-git-configuration isolation under `REV-42`) and `REV-16`.
+    Fix: Save `original_config = config.read_text(encoding="utf-8")` before appending `core.excludesFile` at line 271. After the `base.cli` assertions (line 302), write `original_config` back to `config` before running the personal-configuration controls: (1) run `self._listed(root, bare, switches=False)` with `bare` (`PATH`, `LANG="C"`, `GIT_CONFIG_GLOBAL=os.devnull`, `GIT_CONFIG_SYSTEM=os.devnull`, `HOME=str(home)`, `XDG_CONFIG_HOME=str(home / ".config")`) on the clean `root/.git/config` and assert `"extra/package.json"` is absent and `"pins.toml"` is present (proving `home/.config/git/ignore` via `XDG_CONFIG_HOME`); (2) run `self._listed(root, home_only, switches=False)` on the clean `root/.git/config` with `home_only = {"PATH": os.environ.get("PATH", ""), "LANG": "C", "GIT_CONFIG_SYSTEM": os.devnull, "HOME": str(home), "XDG_CONFIG_HOME": str(home / "empty")}` (no `GIT_CONFIG_GLOBAL`) and assert `"extra/package.json"` is absent and `"pins.toml"` is present (proving `home/.gitconfig` via `HOME`); (3) re-write `original_config + "\n[core]\n\texcludesFile = " + str(home / "ignore") + "\n"` to `config` before running `repo_only` and `moved`. Confirm that removing `home/.config/git/ignore` fails control (1) and removing `home/.gitconfig` fails control (2), then restore both and run `uv run --locked python -m unittest discover -s scripts/tests -p 'test_versions_*.py' -v`, `uv run --locked ruff check .`, `uv run --locked mypy` and `./eii test`, each exiting 0.
+  F2 (REV-16)
+    File: scripts/tests/test_versions_git.py
+    Line: 164-257
+    Wrong: `GitRules.test_git_listing_failures` checks command-line exit status only for `(h)` (`base.cli` status `0`, lines 230-232) and calls only in-process `base.run` or `list_candidates` for `(a)` to `(g)`, `(i)` and `(j)`. That omits the approved plan's requirement (`PLAN.md` "Inputs", "The candidate list of rule 17" and `test_versions_git.py` row 3: `The statuses of the command line are 1 for (a) to (g), (i), (j) and 0 for (h)`), leaving `check_versions.py` CLI exit status `1` (as opposed to usage status `2`) untested on git-listing failures (`REV-16`, `REV-11`).
+    Fix: Add a helper on `GitRules` (for example `_expect_cli_fail(self, target: Path, path: str, expected: list[str]) -> None`) that runs `proc = base.cli(["--root", str(target)], {"PATH": path})` and asserts `proc.returncode == 1`, `proc.stderr == ""` and `proc.stdout.splitlines() == expected`, and call it alongside the existing assertions in `(a)`, `(b)`, `(c)` (for `root` with `.git` removed), `(e)`, `(f)`, `(g)`, `(i)` and `(j)`. In `(d)` (lines 203-208), populate `sub = root / "sub"` with `base.make_tree(sub)`, remove `sub / ".git"` with `shutil.rmtree` and recreate an empty `(sub / ".git").mkdir()`, then assert both `base.versions_inputs.list_candidates(sub, {"PATH": path}) == (None, "root is not the top of a git work tree")` and `self._expect_cli_fail(sub, path, ["FAIL input: git: root is not the top of a git work tree", S1])`. Run `uv run --locked python -m unittest discover -s scripts/tests -p 'test_versions_*.py' -v`, `uv run --locked ruff check .`, `uv run --locked mypy` and `./eii test`, each exiting 0.
+  F3 (REV-16)
+    File: scripts/tests/test_versions_git.py
+    Line: 368-421
+    Wrong: `GitRules.test_git_child_is_the_allow_list` omits two assertions specified in `PLAN.md` (`test_versions_git.py` row 5): (1) lines 400-405 inspect only `_env_keys(chunk)` on `env_chunks[:2]`, discarding the variable values written by the two `git` child processes instead of checking that both child environments have `GIT_CONFIG_GLOBAL` and `GIT_CONFIG_SYSTEM` equal to `os.devnull`, `LANG` equal to `"C"` and `PATH` equal to `path`; (2) lines 368-370 discard the return value of `run_checks` and never verify that `the listing of the stub run is the one of the real git` (leaving the `if switches:` branch of `_listed` at lines 460-461 unused). Breaks `REV-16`.
+    Fix: At line 368 capture `lines, _count = base.check_versions.run_checks(root, interpreter=base.GOOD_INTERPRETER, environ=hostile)` and assert `lines == [base.SUMMARY_OK]`. Assert `len(chunks) == 3` and `chunks[2] == ""`, assert `len(env_chunks) == 3` and `env_chunks[2] == ""`, and for both `chunk` items in `env_chunks[:2]` parse `{k: v for line in chunk.splitlines() if "=" in line for k, v in [line.split("=", 1)] if k not in base.SHELL_ENV_KEYS}` and assert it equals `{"GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull, "LANG": "C", "PATH": path}`. After reading `args_file` and `env_file` (after line 405), assert `base.versions_inputs.list_candidates(root, hostile) == (self._listed(root, base.git_env(), switches=True), None)`. Run `uv run --locked python -m unittest discover -s scripts/tests -p 'test_versions_*.py' -v`, `uv run --locked ruff check .`, `uv run --locked mypy` and `./eii test`, each exiting 0.
+PROPOSED OPEN ITEMS:
+  P1 (REV-13) No dead code (house style): `scripts/tests/test_versions_toolchain.py` line 171 calls `base.make_tool(Path(path), "uv", "#!/no/such/interpreter\nexit 0\n")` and lines 173-175 immediately overwrite `Path(path) / "uv"` (`# make_tool already wrote a shebang; replace the whole file.`); remove line 171 and the left-over comment on line 172.
+```
+
+The lead judged every finding valid: part 1 F1 (without [tool.uv] the check skipped every Python rule silently, against the plan's input rule) and part 3 F1 to F3 (a control of the git-surroundings test, the command line's status for the listing failures, the child environments compared by value). The proposed items part 1 P1 and P2 and part 3 P1 are plan conformance (the root file always judged; every input string escaped in a FAIL line, as the plan's output rule says; a dead fixture write) and were fixed in the same round rather than carried.
+
+#### Addition to the task log of S0-T12
+
+- Build round 3: the same builder, after review round 1: a root pyproject.toml without [tool] or [tool.uv] gives the input line instead of a silent skip (part 1, F1); every input string of a FAIL line escaped as the plan says and the root file always judged (part 1, P2 and P1); the git tests with separate controls for HOME and XDG_CONFIG_HOME, the command line status of the listing failures and the child environments compared by value (part 3, F1 to F3); a dead fixture write removed (part 3, P1); red runs seen for the input, escape and control changes
+
+#### Evidence for the work commit of fix round 2 `cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c`
+
+The eleven commands of the plan at the commit that follows review round 1.
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 57 components: OK"
+Seed:      none
+Notes:     The real tree agrees with pins.toml: criteria 1 to 3, TST-153.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_versions_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    51 passed, 0 failed, 0 skipped (ran 51 tests, OK)
+Seed:      none
+Notes:     The 51 tests of the seven new files: criterion 3, TST-153.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c
+Command:   copy=$(mktemp -d); st=9; git ls-files -z | xargs -0 cp --parents -t "$copy" && rm "$copy/scripts/check_versions.py" "$copy/scripts/versions_record.py" "$copy/scripts/versions_tools.py" "$copy/scripts/versions_inputs.py" && st=0; rc=0; if [ "$st" -eq 0 ]; then (cd "$copy" && python3 -B -m unittest discover -s scripts/tests -p 'test_versions_*.py' >"$copy/red.log" 2>&1) || rc=$?; else rc=$st; fi; if [ "$rc" -eq 1 ]; then n=$(grep -c 'Failed to import test module' "$copy/red.log") || n=0; test "$n" -eq 7 || rc=8; m=$(grep -c "No module named 'check_versions'" "$copy/red.log") || m=0; test "$m" -eq 7 || rc=7; fi; rm -rf "$copy"; test "$rc" -eq 1
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The red run of TST-161: with the four modules removed from a copy of the tracked files, the seven new test files fail to import and name check_versions.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 19 packages in 0.99ms"
+Seed:      none
+Notes:     The Python lock file resolves for the workspace: criterion 1.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c
+Command:   cd web && npm ci
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Run `npm audit` for details."
+Seed:      none
+Notes:     The npm lock file installs exactly: criterion 1 (it changes web/node_modules only).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c
+Command:   ./eii test
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    876 passed, 0 failed, 0 skipped (the total: line of six suites)
+Seed:      1794486903
+Notes:     The whole runner, which includes the new tests through the suite python-guards; the seed is the one it printed.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 116 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The lint check on the new files (S0-T04).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "46 files already formatted"
+Seed:      none
+Notes:     The format check on the new files (S0-T04).
+```
+
+```text
+### S0-T12 — Version and retreat pins
+Commit:    cbd2cdfb7c7ee1bb0cf6729966e546cd5963125c
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 42 source files"
+Seed:      none
+Notes:     The strict type check on the new files (S0-T04).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
