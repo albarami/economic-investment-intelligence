@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { test } from 'node:test';
+import { after, test as declareTest } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -77,9 +78,55 @@ const FORBIDDEN_CONFIGS = [
   'vite.config.cts',
 ];
 
+const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-test-check-layout-'));
+const currentTest = new AsyncLocalStorage();
+after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+function bindTest(t) {
+  const own = t.test.bind(t);
+  t.test = (name, options, fn) => {
+    if (typeof options === 'function') {
+      fn = options;
+      options = undefined;
+    }
+    const wrapped = (sub) => currentTest.run(sub, () => {
+      bindTest(sub);
+      return fn(sub);
+    });
+    if (options === undefined) return own(name, wrapped);
+    return own(name, options, wrapped);
+  };
+}
+
+function test(name, options, fn) {
+  if (typeof options === 'function') {
+    fn = options;
+    options = undefined;
+  }
+  const wrapped = (t) => currentTest.run(t, () => {
+    bindTest(t);
+    return fn(t);
+  });
+  if (options === undefined) return declareTest(name, wrapped);
+  return declareTest(name, options, wrapped);
+}
+
+function tempDir(prefix) {
+  const dir = fs.mkdtempSync(path.join(root, prefix));
+  currentTest.getStore().after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  return dir;
+}
+
+function childTemp(home) {
+  const dir = path.join(home, 'tmp');
+  fs.mkdirSync(dir);
+  return dir;
+}
+
 function cleanEnv(extra) {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-env-'));
-  const base = { PATH: process.env.PATH, HOME: home, TMPDIR: home, LANG: 'C' };
+  const home = tempDir('eii-env-');
+  const tmp = childTemp(home);
+  const base = { PATH: process.env.PATH, HOME: home, TMPDIR: tmp, TMP: tmp, TEMP: tmp, LANG: 'C' };
   return { ...base, ...extra };
 }
 
@@ -91,7 +138,7 @@ function run(args, env) {
 }
 
 function makeFixture() {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-layout-'));
+  const root = tempDir('eii-layout-');
   for (const dir of REQUIRED_DIRECTORIES) {
     fs.mkdirSync(path.join(root, dir), { recursive: true });
   }
@@ -333,14 +380,14 @@ test('extra entry allowed', () => {
 
 test('usage', async (t) => {
   await t.test('root is not a directory', () => {
-    const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'eii-file-')), 'root');
+    const file = path.join(tempDir('eii-file-'), 'root');
     fs.writeFileSync(file, 'x\n');
     const result = run(['--root', file]);
     assert.equal(result.status, 2, result.stdout);
     assert.ok(result.stdout.startsWith('USAGE: '));
   });
   await t.test('root absent', () => {
-    const missing = path.join(os.tmpdir(), 'eii-absent-root');
+    const missing = path.join(root, 'eii-absent-root');
     const result = run(['--root', missing]);
     assert.equal(result.status, 2, result.stdout);
     assert.ok(result.stdout.startsWith('USAGE: '));
@@ -358,8 +405,8 @@ test('usage', async (t) => {
 });
 
 test('internal error', () => {
-  const root = path.join(os.tmpdir(), 'n'.repeat(LONG_NAME_LENGTH));
-  const result = run(['--root', root]);
+  const longName = path.join(root, 'n'.repeat(LONG_NAME_LENGTH));
+  const result = run(['--root', longName]);
   assert.equal(result.status, 1);
   assert.equal(result.stdout, 'FAIL internal-error: ENAMETOOLONG: name too long, stat\n');
   assert.equal(result.stdout.includes('    at '), false);

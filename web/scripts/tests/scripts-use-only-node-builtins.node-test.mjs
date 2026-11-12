@@ -1,9 +1,13 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { collectReferences, tokenize } from '../import-tokenizer.mjs';
+
+const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-test-scripts-use-only-node-builtins-'));
+after(() => fs.rmSync(root, { recursive: true, force: true }));
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SCRIPTS = path.resolve(HERE, '..');

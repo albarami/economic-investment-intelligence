@@ -1,8 +1,12 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
+
+const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-test-shell-document-'));
+after(() => fs.rmSync(root, { recursive: true, force: true }));
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WEB = path.resolve(HERE, '..', '..');

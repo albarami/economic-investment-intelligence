@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { test } from 'node:test';
+import { after, test as declareTest } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { resolveViteBin } from '../check-dev-server.mjs';
 
@@ -14,9 +15,55 @@ const LONG_NAME_LENGTH = 300;
 const MAX_PORT = 65535;
 const PAGE = '<!doctype html><script type="module" src="/main.js"></script>\n';
 
+const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-test-check-dev-server-'));
+const currentTest = new AsyncLocalStorage();
+after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+function bindTest(t) {
+  const own = t.test.bind(t);
+  t.test = (name, options, fn) => {
+    if (typeof options === 'function') {
+      fn = options;
+      options = undefined;
+    }
+    const wrapped = (sub) => currentTest.run(sub, () => {
+      bindTest(sub);
+      return fn(sub);
+    });
+    if (options === undefined) return own(name, wrapped);
+    return own(name, options, wrapped);
+  };
+}
+
+function test(name, options, fn) {
+  if (typeof options === 'function') {
+    fn = options;
+    options = undefined;
+  }
+  const wrapped = (t) => currentTest.run(t, () => {
+    bindTest(t);
+    return fn(t);
+  });
+  if (options === undefined) return declareTest(name, wrapped);
+  return declareTest(name, options, wrapped);
+}
+
+function tempDir(prefix) {
+  const dir = fs.mkdtempSync(path.join(root, prefix));
+  currentTest.getStore().after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  return dir;
+}
+
+function childTemp(home) {
+  const dir = path.join(home, 'tmp');
+  fs.mkdirSync(dir);
+  return dir;
+}
+
 function cleanEnv(extra) {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-env-'));
-  const base = { PATH: process.env.PATH, HOME: home, TMPDIR: home, LANG: 'C' };
+  const home = tempDir('eii-env-');
+  const tmp = childTemp(home);
+  const base = { PATH: process.env.PATH, HOME: home, TMPDIR: tmp, TMP: tmp, TEMP: tmp, LANG: 'C' };
   return { ...base, ...extra };
 }
 
@@ -28,7 +75,7 @@ function run(args) {
 }
 
 function tempRoot() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'eii-dev-'));
+  return tempDir('eii-dev-');
 }
 
 function writer(root) {
@@ -256,7 +303,7 @@ test('symlink run', () => {
   const root = tempRoot();
   fs.writeFileSync(path.join(root, 'package.json'), '{"scripts":{"dev":"vite"}}\n');
   fs.writeFileSync(path.join(root, 'index.html'), PAGE);
-  const linkParent = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-link-'));
+  const linkParent = tempDir('eii-link-');
   const link = path.join(linkParent, 'scripts');
   fs.symlinkSync(path.join(WEB, 'scripts'), link);
   const result = spawnSync(
@@ -287,8 +334,8 @@ test('usage', async (t) => {
 });
 
 test('internal error', () => {
-  const root = path.join(os.tmpdir(), 'n'.repeat(LONG_NAME_LENGTH));
-  const result = run(['--root', root]);
+  const longName = path.join(root, 'n'.repeat(LONG_NAME_LENGTH));
+  const result = run(['--root', longName]);
   assert.equal(result.status, 1);
   assert.equal(result.stdout, 'FAIL internal-error: ENAMETOOLONG: name too long, stat\n');
   assert.equal(`${result.stdout}${result.stderr}`.includes('    at '), false);
