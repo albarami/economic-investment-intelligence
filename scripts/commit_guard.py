@@ -20,7 +20,13 @@ import sys
 from collections.abc import Mapping
 from urllib.parse import parse_qsl, unquote, urlsplit
 
-SECRET_NAMES = ("ANTHROPIC_API_KEY", "JEV_PRO_API_KEY", "EII_DATABASE_URL")
+SECRET_NAMES = (
+    "ANTHROPIC_API_KEY",
+    "JEV_PRO_API_KEY",
+    "TOMTOM_API_KEY",
+    "EARTHDATA_API_KEY",
+    "EII_DATABASE_URL",
+)
 DATABASE_URL_NAME = "EII_DATABASE_URL"
 DATABASE_SCHEMES = frozenset({"postgres", "postgresql"})
 QUERY_SECRET_KEYS = frozenset({"password", "passfile"})

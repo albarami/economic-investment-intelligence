@@ -131,6 +131,8 @@ class Preflight(unittest.TestCase):
             "PASS bubblewrap-sandbox: bubblewrap is present and the sandbox test passes",
             f"PASS api-port: 127.0.0.1:{api_port} is free",
             "PASS model-key: absent",
+            "PASS traffic-provider-key: absent; EII_TRAFFIC_PROVIDER simulated",
+            "PASS night-lights-key: absent",
             "PASS env-not-tracked: .env is not tracked by git",
             "PASS wsl-interop: cmd.exe printed a Windows version",
             "store: embedded",
@@ -237,14 +239,14 @@ class Preflight(unittest.TestCase):
                     elif label == "port_held":
                         want[11] = f"FAIL api-port: 127.0.0.1:{api_port} is in use"
                     elif label == "env_staged":
-                        want[13] = "FAIL env-not-tracked: .env is tracked by git"
+                        want[15] = "FAIL env-not-tracked: .env is tracked by git"
                     elif label == "pg_no_answer":
                         want[4] = (
                             f"WARN postgresql: no answer on 127.0.0.1:{db_port} "
                             "(pg_isready exit status 2); store embedded; Docker not reachable"
                         )
                     elif label == "cmd_missing":
-                        want[14] = "WARN wsl-interop: cmd.exe not found on PATH"
+                        want[16] = "WARN wsl-interop: cmd.exe not found on PATH"
                     self.assertEqual(report.text_lines(), want)
                     if label in (
                         "python",
@@ -277,6 +279,28 @@ class Preflight(unittest.TestCase):
             self.assertEqual(texts[7], f"FAIL embedded-reader: {not_built}")
             self.assertEqual(texts[9], f"WARN recorded-replays: {not_built}")
             self.assertEqual(report.status, 1)
+
+    def test_unknown_traffic_provider_keeps_failure_in_foundation(self) -> None:
+        """R3: the planted invalid switch fails even without a release."""
+        unknown = stubs.dummy("unknown")
+        with tempfile.TemporaryDirectory() as tmp:
+            env, root, api_port, _ = _env0(Path(tmp))
+            env["EII_TRAFFIC_PROVIDER"] = unknown
+            report = preflight_mod.run_preflight(root, env, api_port=api_port)
+            want = self._u01_lines(api_port)
+            want[13] = (
+                "FAIL traffic-provider-key: "
+                "EII_TRAFFIC_PROVIDER must be simulated or tomtom"
+            )
+            self.assertEqual(report.text_lines(), want)
+            self.assertEqual(report.status, 1)
+            self.assertNotIn(unknown, "\n".join(report.text_lines()))
+            self.assertEqual(preflight_mod.up_decision(env, report)[0], 4)
+            env["EII_RELEASE_DIR"] = "data/releases/x"
+            self.assertEqual(
+                preflight_mod.up_decision(env, report),
+                (1, "a check failed: traffic-provider-key"),
+            )
 
     def test_up_decision(self) -> None:
         """U04: up_decision exit codes."""
@@ -557,7 +581,7 @@ class Preflight(unittest.TestCase):
         )
 
     def test_no_secret_in_any_line(self) -> None:
-        """U07: secrets stay in env, not in lines or argv."""
+        """U07 / OPS-07: all three dummy keys stay out of output and argv."""
         labels = [
             "good",
             "psql_echo",
@@ -569,6 +593,9 @@ class Preflight(unittest.TestCase):
             "url_query",
         ]
         key = stubs.dummy("key")
+        traffic_key = stubs.dummy("traffic")
+        night_key = stubs.dummy("night")
+        keys = (key, traffic_key, night_key)
         password = stubs.dummy("pw")
         ran: list[str] = []
         with tempfile.TemporaryDirectory() as tmp:
@@ -579,6 +606,8 @@ class Preflight(unittest.TestCase):
                     case.mkdir()
                     env, root, api_port, db_port = _env0(case)
                     env["ANTHROPIC_API_KEY"] = key
+                    env["TOMTOM_API_KEY"] = traffic_key
+                    env["EARTHDATA_API_KEY"] = night_key
                     stub_dir = case / "stubs"
                     url = stubs.database_url(password, db_port)
                     if label == "url_only":
@@ -635,18 +664,25 @@ class Preflight(unittest.TestCase):
                             if path.exists():
                                 path.unlink()
                             stubs.write_stub(stub_dir, name, echo=True, status=9)
-                    report = preflight_mod.run_preflight(
-                        root, env, api_port=api_port, limit=0.5
+                    out, err = io.StringIO(), io.StringIO()
+                    with mock.patch("sys.stdout", out), mock.patch("sys.stderr", err):
+                        report = preflight_mod.run_preflight(
+                            root, env, api_port=api_port, limit=0.5
+                        )
+                    blob = (
+                        "\n".join(report.text_lines()) + out.getvalue() + err.getvalue()
                     )
-                    blob = "\n".join(report.text_lines())
-                    self.assertNotIn(key, blob)
+                    for dummy_key in keys:
+                        self.assertNotIn(dummy_key, blob)
                     self.assertNotIn(password, blob)
                     self.assertNotIn(env["EII_DATABASE_URL"], blob)
                     quoted_pw = urllib.parse.quote(password, safe="")
                     self.assertNotIn(quoted_pw, blob)
                     for call in stubs.calls(stub_dir):
                         self.assertNotIn(password, json.dumps(call["argv"]))
-                        self.assertNotIn(key, json.dumps(call["env"]))
+                        for dummy_key in keys:
+                            self.assertNotIn(dummy_key, json.dumps(call["env"]))
+                            self.assertNotIn(dummy_key, json.dumps(call["argv"]))
                         others = {
                             k: v
                             for k, v in call["env"].items()
@@ -655,15 +691,17 @@ class Preflight(unittest.TestCase):
                         self.assertNotIn(password, json.dumps(others))
                         if call["program"] == "psql" and "PGPASSWORD" in call["env"]:
                             self.assertEqual(call["env"]["PGPASSWORD"], password)
-                    main_out = io.StringIO()
+                    main_out, main_err = io.StringIO(), io.StringIO()
                     with (
                         mock.patch.object(preflight_mod, "ROOT", root),
                         mock.patch.dict(os.environ, env, clear=True),
                         mock.patch("sys.stdout", main_out),
+                        mock.patch("sys.stderr", main_err),
                     ):
                         preflight_mod.main([])
-                    main_blob = main_out.getvalue()
-                    self.assertNotIn(key, main_blob)
+                    main_blob = main_out.getvalue() + main_err.getvalue()
+                    for dummy_key in keys:
+                        self.assertNotIn(dummy_key, main_blob)
                     self.assertNotIn(password, main_blob)
                     self.assertNotIn(quoted_pw, main_blob)
                     self.assertNotIn(env["EII_DATABASE_URL"], main_blob)
@@ -723,6 +761,8 @@ class Preflight(unittest.TestCase):
             "bubblewrap-sandbox",
             "api-port",
             "model-key",
+            "traffic-provider-key",
+            "night-lights-key",
             "env-not-tracked",
             "wsl-interop",
         )
