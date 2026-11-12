@@ -150,11 +150,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: routine; personas Platform; status done (pull request 23, merged 2026-11-13).
 ### S0-T15 — Review follow-up for slice S0
 - Goal: Close every proposed open item that the reviews of slice S0 entered in `OPEN_ITEMS.md`, before the slice S0 gate.
-- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
+- Acceptance criteria: [x] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [x] the reviewer checks every closure; [x] no item is deferred out of this task; [x] no item of the slice is left open.
 - Scope: the files the closures change, and `OPEN_ITEMS.md`.
 - Depends: every other task of slice S0.
 - Requirements: REV-41, TST-168.
-- Delivery: routine; personas as the items require; status in review (part A merged in pull request 20 on 2026-11-12; part B in pull request 25).
+- Delivery: routine; personas as the items require; status done (part A, pull request 20, merged 2026-11-12; part B, pull request 25, merged 2026-11-13).
 
 ## slice S1 — Technical spike
 
