@@ -778,7 +778,7 @@ The open points of decisions 0016 and 0017 are settled at the gates that PLN-25 
 - ASSUMPTION ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)): the incentive packages are optional scenario inputs of the break-even calculator, tagged "your inputs" with their source page; they never change a Public figure (S7-T01).
 - ASSUMPTION ([decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md)): at each plan's one refresh, above all S0-T06, S0-T07, S0-T11, S0-T12 and S0-T14, hardening beyond a task's acceptance criterion moves out of the plan into [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) with the review, plan or document that raised it, and is not built now.
 - ASSUMPTION ([decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md)): the break pass of a build brief is bounded by the owner's note of 2026-11-12: only the test files that cover the broken code run after each break, about 15 minutes in all, then one full run.
-- ASSUMPTION ([decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md)): the main model key (OI-01) is supplied for go-live and is not used during the build; no model, research or review service is called through any key, and the assistant stays in template mode (BRF-23).
+- ASSUMPTION ([decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md)): the main model key (OI-01) is supplied for go-live and is not used during the build; no model, research or review service is called through any of the API keys in the uncommitted `.env` file that decision 0018 item 12 names, and the assistant stays in template mode (BRF-23). Decision 0014 and OI-18 govern the key of the typed-decision gateway unchanged.
 
 ## Sources
 

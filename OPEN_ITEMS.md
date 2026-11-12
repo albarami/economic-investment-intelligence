@@ -26,7 +26,7 @@
 - ID: OI-01
 - TYPE: OPEN
 - NEEDED: At go-live only: the owner's decision to switch the live adapter on, with any spend caps set then. During the build the key is not used.
-- WHY: Live-model evaluation and operation cannot be claimed until the key and cost limits exist.
+- WHY: Live-model evaluation and operation cannot be claimed until the owner enables the supplied go-live key and sets the cost limits.
 - DONE SO FAR: The template writer and recorded provider are used throughout the build; no build, CI or slice gate calls a keyed model service, and live-model runs (prepared recordings refreshed live, model-returned briefs, a full live run) form a go-live gate enabled by an owner decision after this item is closed.
 - OPTIONS: **Recommendation:** keep the template writer and the recorded provider for the whole build; the live adapter and its evaluation gates wait for the owner's go-live decision.
 - NEEDED BY: go-live (not before; the build runs in template mode).
