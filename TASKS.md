@@ -73,11 +73,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: routine; personas Platform; status done (pull request 5, merged 2026-11-12).
 ### S0-T05 — Test runners
 - Goal: Make `./eii test` run every network-free Python and web pull-request suite.
-- Acceptance criteria: [ ] suite counts are printed; [ ] a failing fixture makes the command non-zero; [ ] clean suites exit zero.
+- Acceptance criteria: [x] suite counts are printed; [x] a failing fixture makes the command non-zero; [x] clean suites exit zero.
 - Scope: test configuration, test bootstrap files, `scripts/` test runner.
 - Depends: S0-T02, S0-T03.
 - Requirements: TST-15, TST-01, PLN-14, FE-95.
-- Delivery: routine; personas Platform; status in review (pull request 7).
+- Delivery: routine; personas Platform; status done (pull request 7, merged 2026-11-12).
 ### S0-T06 — Pre-commit hooks
 - Goal: Run formatting, lint, documentation, secret and identifier checks before commits.
 - Acceptance criteria: [ ] hooks install from repository configuration; [ ] generated forbidden tokens are caught; [ ] a commit guard refuses any staged value equal to a non-empty local secret without printing the value; [ ] clean staged files pass.
@@ -125,8 +125,8 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Acceptance criteria: [ ] lock files resolve; [ ] exact and retreat pins are labelled; [ ] unsupported version drift fails a check.
 - Scope: lock files, version files and dependency constraints.
 - Depends: S0-T02, S0-T03.
-- Requirements: FE-03, TST-153, PLN-15.
-- Delivery: hard; personas Platform; status queued.
+- Requirements: FE-03, TST-153, PLN-15, TST-43, BE-13.
+- Delivery: hard; personas Platform; status in review (pull request 9, round 2; part B after the open documentation pull requests merge).
 ### S0-T13 — New-library reference notes
 - Goal: Give agents verified official-reference notes for libraries newer than most model training data.
 - Acceptance criteria: [ ] each named newer library has an official-documentation pointer; [ ] no API behaviour is asserted from memory; [ ] slice S1 confirmation fields exist.
