@@ -1,0 +1,33 @@
+{
+  "name": "eii-web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22.12.0 <23"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --strictPort",
+    "build": "tsc --noEmit && vite build",
+    "check": "npm run check:layout && npm run check:versions && npm run check:boundary && npm run check:hosts",
+    "check:layout": "node scripts/check-layout.mjs",
+    "check:versions": "node scripts/check-exact-versions.mjs",
+    "check:boundary": "node scripts/check-import-boundary.mjs",
+    "check:hosts": "node scripts/check-no-third-party-hosts.mjs",
+    "check:hosts:dist": "node scripts/check-no-third-party-hosts.mjs --dist",
+    "check:dev": "node scripts/check-dev-server.mjs",
+    "test:checks": "node --test \"scripts/tests/*.node-test.mjs\""
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.3.0",
+    "typescript": "6.0.3",
+    "vite": "8.3.8"
+  }
+}

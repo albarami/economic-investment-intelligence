@@ -1679,6 +1679,441 @@ Seed:      none
 Notes:     Later-round form of the scope command: the branch changes exactly the twenty-two paths of the task and the two ledger files of its first ledger commit, twenty-four in all (TST-163).
 ```
 
+#### S0-T02: independent review, round 3: APPROVED
+
+Reviewed commit `9b091780a94960b9f02092dbc85c5b92d8ef19f1`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/4, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43162701835 ). Reviewer: Zhipu AI GLM-5.3 High, through the Devin command-line tool, read-only; a later round under REV-39. The verdict is copied unchanged (REV-09) except for one run number, which the reviewer wrote as a bare eleven-digit number that the documentation check forbids (AGENTS.md rule 9); it is written here as the run's full link. The unchanged verdict is posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S0-T02
+COMMIT: 9b091780a94960b9f02092dbc85c5b92d8ef19f1
+REVIEWER: Devin command-line tool, GLM-5.3 High (Zhipu AI)
+EARLIER FINDINGS:
+  F5 FIXED scripts/tests/workspace_fields_tables.py line 328 now reads `"""Registry-sourced workspace row with a forbidden edge (judged by name)."""`, the exact wording my fix named; my full read of the file finds no remaining claim that the guard ignores registry-sourced rows, and the suite is green (81 passed at f6a2975 and on this head, EVIDENCE.md).
+  F6 FIXED scripts/tests/workspace_fields_tables.py line 265 now reads `"""Build sub-cases for missing or unparsable workspace pyproject.toml files."""`, the exact wording my fix named; it accurately covers all nine sub-cases (root deleted, root bad, the six member cases and core utf16), and the suite is green (81 passed at f6a2975 and on this head, EVIDENCE.md).
+CHECKS:
+  REV-10 PASS The three acceptance criteria still map to the round-1 tests and recorded runs; the fix touches only the two docstrings the findings named; suite 81 passed, 0 failed, 0 skipped at f6a2975 and again on this head (EVIDENCE.md, the eight ledger entries, head re-runs, CI run https://github.com/albarami/economic-investment-intelligence/actions/runs/43162701835 ).
+  REV-11 PASS Lead's own runs on this exact head: `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` exit 0 (81 passed, 0 skipped) and `python3 scripts/check_docs.py` exit 0 (EVIDENCE.md, "Recorded commands 1 to 5 again on the head"); CI green on the head; planted violations re-proven at f6a2975 by recorded command 7; no skips; my own re-run is not possible under this review's read-only no-command brief, so I rely on the recorded runs, which I checked against CI.
+  REV-12 PASS The fix commit changes only the two docstring lines of scripts/tests/workspace_fields_tables.py, a task file; the third ledger commit changes only PROGRESS.md (HEAD-DIFF block); the later-round scope command at f6a2975 exits 0 with output "24 [] []" (the twenty-two task paths plus the two ledger files); nothing under data/.
+  REV-13 PASS The changed code lines are two accurate docstrings; the changed ledger lines record evidence; no TODO, FIXME, NotImplementedError, empty body or fixed return value standing in for real work.
+  REV-14 PASS No secret, `.env`, key file or real custodian record, field, file name or count in DIFF.patch; `python3 scripts/check_docs.py` exit 0 on the head; my line-by-line read of the diff found none.
+  REV-15 PASS The fix only corrects documentation text in the test tables; no threshold, tolerance, assertion, example count, skip or suppression changes; the ledger adds evidence only; the DOCS-EXACT/DOCS-SINCE pair is disclosed in EVIDENCE.md and still proves the six documents' texts (exact at 51c1651, and only the one added OPEN_ITEMS.md section since).
+  REV-16 PASS F5 and F6 are fixed exactly as written, so no docstring now misdescribes delivered behaviour; all pinned names, file texts, the fix scope and the twenty-four-path branch scope match the plan and AGENTS.md.
+  REV-17 PASS PROGRESS.md holds the round-2 verdict compared identical to EARLIER_VERDICT.md except the one disclosed substitution of the bare run number for its full link, which AGENTS.md rule 9 requires and which the round-2 verdict itself notes stands after "runs/"; build round 6 and the eight evidence entries for f6a2975 are recorded; the DOCS, DOCS-EXACT and DOCS-SINCE blocks exit 0; `python3 scripts/check_docs.py` exit 0 on the head.
+  REV-18 PASS The changed lines carry no secrets, no SQL or query text, no generators, no record-level logging; they are docstrings and ledger text.
+  REV-19 PASS Nothing on the dropped or later lists is built; the fixes apply the round-2 corrections as written under decision 0015; no component decision is removed or replaced.
+  REV-20 N/A This diff adds no fact object, displayed figure, provenance or lineage code; the changed lines are test docstrings and ledger text.
+  REV-21 N/A No screen, template, numeral or Fact-chip implementation changes.
+  REV-22 N/A No privacy partition, parameter set, treatment or audit implementation changes.
+  REV-23 PASS Unchanged by this diff for what exists: product/pyproject.toml still names only eii-core, and the dependency-edge rules plus the strengthened lock rule prove no eii-custodian edge in product metadata or in uv.lock.
+  REV-24 N/A No English or Arabic application view and no new Arabic strings exist in this diff.
+  REV-25 PASS `python3 scripts/check_docs.py` exit 0 on the head; my read of the new ledger lines finds no private path, personal name, e-mail, secret or real custodian data; the 11-digit CI run id appears only inside the run's full URL, never bare.
+  REV-26 PASS The new text records the review, the fixes and the evidence only and makes none of the prohibited claims.
+  REV-27 PASS AGENTS.md and CLAUDE.md are untouched by this diff and `cmp AGENTS.md CLAUDE.md` exits 0 on the head (EVIDENCE.md).
+  REV-28 N/A No synthetic identifier of the five `SYN-` forms and no identifier digit run is added.
+  REV-29 N/A No attribute or fact about a real named place or business is added.
+  REV-38 N/A No serving-plane or run-time code changes; nothing reads EII_DECISION_PROVIDER or JEV_PRO_API_KEY; `gateway/` is untouched and not a workspace member.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S0-T02: merge record
+
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/4 was squash-merged on 2026-11-12 at the approved head `9b091780a94960b9f02092dbc85c5b92d8ef19f1`; merge commit `5ddb81229d6b480b250721ef0fd34d073333bd2f` on main.
+- CI on the merge commit: workflow `docs`, job `check-docs`, triggered by the push: success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43162965792 .
+- The task log of S0-T02 above is complete with this record: verdict APPROVED in review round 3.
+
+### S0-T03 — Web application skeleton: task log
+
+- Builder persona: senior bilingual product engineer
+- Reviewer persona: principal design, accessibility and data-visualisation reviewer
+- Planner maker and model: Anthropic: versions 1 to 3 by a Claude Sonnet subagent; version 4 by the lead; version 5 corrected after a dry run by the lead with Claude subagents
+- Plan reviewer maker and model: Devin command-line tool, `glm-5-3-high` (Zhipu AI), read-only: round 1 REJECTED (five findings), round 2 REJECTED (one finding), round 3 APPROVED; the corrections of version 5 were not seen by an external plan reviewer: on 2026-11-12 the owner decided that this task gets no further plan review
+- Builder maker and model: Cursor command-line tool, `grok-4.7-medium` (xAI)
+- Reviewer maker and model: Antigravity command-line tool, `gemini-4-carbon-high` (Google), review only
+- Skills and brief rules: the lead used project-orientation, task-standards, test-driven-development, verification-before-completion, github-flow and strict-reviewer; the builder's tool has no skills, so its brief gave the rules: the persona, an exact reading list, the plan above the builder's taste, tests first with a recorded red run, a planted violation for every check, standard Node modules only in the checks, no placeholder, no file outside `web/`, no weakened check, temporary folders created and removed by each test inside the run's temporary folder, and a report of only the results it saw
+- Branch: `task/S0-T03-web-skeleton`
+- Pull request: https://github.com/albarami/economic-investment-intelligence/pull/3
+- Evidence: the entries below, one per command, in the format of section 6.3 of docs/12_TESTING_AND_QUALITY.md. The work is split in two parts: PART A (everything under `web/`) is recorded here at its tested commit, commands 1 to 6 and 9 to 12 of the plan; commands 7 and 8 (the commands of S0-T02, which need S0-T02 merged) and 13 (the scope of all fifty-three paths, which needs PART B) are recorded, with all thirteen again, at the PART B commit, after S0-T02 merges
+- Verdict: PENDING (the verdict and the merge record are entered by the next pull request)
+- Environment of the lead's runs: Linux 6.6 (WSL2); Python 3.14.4; git 2.53.0; Node 22.22.3; npm 10.9.8
+- Build round 1: Cursor command-line tool, `grok-4.7-medium` (xAI): PART A, the forty-nine paths under `web/`, tests first (a red run with 541 of 542 tests failing), built ahead on the pushed head of pull request 1 and rebased onto the base branch after S0-T01 merged
+- Build round 2: the same builder: every test makes its own temporary folder inside the run's temporary folder and removes it when done (owner's note of 2026-11-12)
+
+#### Evidence for the PART A commit `4afd91b003508f21ab84ef7a65e36894fbd1062f`
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cd web && npm ci
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "found 0 vulnerabilities"
+Seed:      none
+Notes:     The lock file and `package.json` agree (`npm ci` refuses otherwise); FE-01.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cd web && npm run build
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "✓ built in 97ms"
+Seed:      none
+Notes:     The production build, acceptance criterion 2.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cd web && npm run check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 18 files: OK"
+Seed:      none
+Notes:     Layout, exact versions, import boundary and host scan of the sources (FE-01, FE-05, FE-07, DES-24).
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cd web && npm run check:hosts:dist
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 20 files: OK"
+Seed:      none
+Notes:     The host scan of the build output (criterion 3).
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cd web && npm run check:dev
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "PASS dev-server http://127.0.0.1:33099/"
+Seed:      none
+Notes:     The development server starts, is answered by the server the check started, and is stopped (criterion 1); the proof that no process is left is the DEV-GONE block, in the evidence file.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cd web && npm run test:checks
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    598 passed, 0 failed, 0 skipped (tests 598, cancelled 0, todo 0)
+Seed:      none
+Notes:     The whole web check suite; `./eii test` does not exist before S0-T05 and S0-T09, so this is the only runner; the counts are those the run printed.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 64 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    4afd91b003508f21ab84ef7a65e36894fbd1062f
+Command:   copy=$(mktemp -d); git ls-files -z web | xargs -0 cp --parents -t "$copy"; ln -s "$PWD/web/node_modules" "$copy/web/node_modules"; ctl=0; (cd "$copy/web" && node --test "scripts/tests/*.node-test.mjs" >"$copy/ctl.log" 2>&1) || ctl=$?; rm -f "$copy"/web/scripts/*.mjs; rc=0; (cd "$copy/web" && node --test --test-reporter=tap "scripts/tests/*.node-test.mjs" >"$copy/red.log" 2>&1) || rc=$?; miss=0; grep -q '^# fail [1-9]' "$copy/red.log" || miss=1; for f in "$copy"/web/scripts/tests/check-*.node-test.mjs; do ok=0; (cd "$copy/web" && node --test "scripts/tests/$(basename "$f")" >/dev/null 2>&1) || ok=1; test "$ok" -eq 1 || miss=1; done; rm -rf "$copy"; test "$ctl" -eq 0 && test "$rc" -ne 0 && test "$miss" -eq 0
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The line succeeds only if the control passes (the full copy passes the suite), the copy without the scripts fails the suite, and each check's test files fail on their own (TST-161).
+```
+
+#### S0-T03: independent review, round 1: REJECTED
+
+Reviewed commit `a43a58bdb4f083a6f81db69246b9cd849291aa99`, the head of pull request https://github.com/albarami/economic-investment-intelligence/pull/3 with PART A, with CI green on it (run https://github.com/albarami/economic-investment-intelligence/actions/runs/43160582655 ). Reviewer: Google Gemini 4 Carbon (High), through the Antigravity command-line tool, review only; a full review. The verdict is copied unchanged (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S0-T03
+COMMIT: a43a58bdb4f083a6f81db69246b9cd849291aa99
+REVIEWER: Google, Gemini 4 Carbon (High)
+CHECKS:
+  REV-10 FAIL Criteria 1 and 2 are evidenced on 4afd91b003508f21ab84ef7a65e36894fbd1062f and re-run on a43a58bdb4f083a6f81db69246b9cd849291aa99 (npm run check:dev exit 0 with DEV-GONE exit 0; npm run build exit 0 with DIST-PRE and DIST exit 0), and the shell itself has no third-party host, but the host scan guarding criterion 3 (FE-05, DES-24) misses comma-preceded protocol-relative srcset URLs after a non-dotted candidate (F4; see also P1).
+  REV-11 FAIL Lead runs on 4afd91b003508f21ab84ef7a65e36894fbd1062f and head re-runs in .overnight/EVIDENCE.md show cd web && npm run test:checks exit 0 (598 passed, 0 failed, 0 skipped; ./eii test arrives in S0-T05 and S0-T09), python3 scripts/check_docs.py exit 0, TST-161 red-run control exit 0, and CI docs job check-docs green (https://github.com/albarami/economic-investment-intelligence/actions/runs/43160582655/job/130990529187), but nine clean test cases omit the required OK or PASS summary-line assertion so silent exit 0 passes (F5, F6, F7, F8), and planted tests are missing for the guard bypasses in F1, F2, F3, and F4.
+  REV-12 PASS Block SCOPE-A (49 paths under web/, outside [], missing []) on 4afd91b003508f21ab84ef7a65e36894fbd1062f and the head diff (PROGRESS.md and TASKS.md only on a43a58bdb4f083a6f81db69246b9cd849291aa99) confirm only in-scope PART A and ledger files changed and nothing under data/ was touched (TST-163).
+  REV-13 PASS Full diff inspection confirms no TODO, FIXME, stub, commented-out code, mock data, or invented figure; the empty main landmark in web/src/app/App.tsx and the 21 .gitkeep markers are the specified S0-T03 application shell with no feature UI.
+  REV-14 PASS No .env, key file, secret, or real custodian artefact appears in .overnight/DIFF.patch or web/package-lock.json; python3 scripts/check_docs.py exited 0, block LOCKSCAN exited 0 (lock hits: []), and local hooks passed (gitleaks arrives in S0-T06).
+  REV-15 FAIL Existing checks and CI were not weakened and test skips are 0, but the new PART A guards and tests have false-pass holes: extensionless imports and tsconfig paths escaping web/ through a symbolic link pass check-import-boundary.mjs (F1), backslash/drive-letter tsconfig paths on Linux and string-valued compilerOptions.paths pass check-import-boundary.mjs (F2), string literals in import.meta.glob arrays and side-effect import '.' bypass collectReferences (F3), comma-separated protocol-relative srcset URLs after non-dotted entries bypass protocolHits (F4), and nine clean test cases pass on silent exit 0 without an OK or PASS line (F5, F6, F7, F8).
+  REV-16 FAIL Exact package pins (FE-01), directory layout (FE-07), child-environment allow-lists, and file sizes (max 479 lines) follow the plan, but check-import-boundary.mjs fails falsely when --root traverses a symbolic link (breaking REV-42 and F1), mishandles malformed and Windows-style tsconfig.json entries (F2), omits token-type checks in import-tokenizer.mjs (F3), misses comma-separated protocol-relative srcset entries in host-scan-rules.mjs (F4), omits mandatory OK/PASS assertions in clean tests (F5, F6, F7, F8), and leaks up to 100 exit listeners with MaxListenersExceededWarning in stopChild (F9).
+  REV-17 PASS web/README.md, TASKS.md, and PROGRESS.md are updated for PART A and python3 scripts/check_docs.py exited 0 on a43a58bdb4f083a6f81db69246b9cd849291aa99; root README.md, rule 44 of AGENTS.md/CLAUDE.md, and OPEN_ITEMS.md belong to PART B after S0-T02 merges per the plan.
+  REV-18 PASS The shell handles no secrets, database connections, SQL, model calls, or user inputs; check-exact-versions.mjs rejects install lifecycle scripts, check-dev-server.mjs binds to 127.0.0.1 with --strictPort and probes busy ports before launch, and child processes receive explicit allow-list environments verified by scripts-use-only-node-builtins.node-test.mjs.
+  REV-19 PASS The React, TypeScript, and Vite shell and S0 task split respect docs/01_PROJECT_BRIEF.md, docs/02_ARCHITECTURE.md, docs/14_IMPLEMENTATION_PLAN.md, and decision 0015 without reopening any settled decision.
+  REV-20 N/A Does not apply to this commit because PART A delivers only the feature-free web/ shell (a static document title and an empty main landmark) and build/tree check scripts, with no fact objects, lineage references, calculations, or displayed numbers.
+  REV-21 N/A Does not apply to this commit because the web/ shell renders no numerals, Fact chips, cards, claim templates, or assistant pipeline stages, and the numeral lint rules belong to S0-T04.
+  REV-22 N/A Does not apply to this commit because PART A touches only web/, PROGRESS.md, and TASKS.md and neither implements nor alters custodian partitions, privacy parameter sets, disclosure rules, freeze logic, or proof-room endpoints.
+  REV-23 FAIL Applies to web/ as part of the serving/experience plane and to its new import-boundary guard web/scripts/check-import-boundary.mjs: product/ is untouched and web/ sources and package.json do not import custodian or eii_custodian, but check-import-boundary.mjs has bypasses allowing imports or tsconfig paths to escape web/ into ../custodian via symlinks, backslashes, or glob arrays (F1, F2, F3).
+  REV-24 N/A Does not apply to this commit because the web/ shell has no feature UI, no Arabic view or localized strings (web/src/i18n holds only .gitkeep), no fact identifiers, and no rendered numbers.
+  REV-25 PASS python3 scripts/check_docs.py exited 0 on a43a58bdb4f083a6f81db69246b9cd849291aa99, block LOCKSCAN exited 0 on web/package-lock.json, and diff review confirms no local paths, personal names, e-mails, secrets, bare 8- or 11-digit runs, named product comparisons, or unlicenced public files.
+  REV-26 PASS Diff review of all files under web/, TASKS.md, and PROGRESS.md confirms none of the prohibited claims (real custodian data, Synthetic/Simulated facts on real places, named-building footfall, certified/formal privacy, public-service inferiority, ministry endorsement, forecasts, or entity lookup) appear.
+  REV-27 PASS AGENTS.md and CLAUDE.md are untouched in PART A, cmp AGENTS.md CLAUDE.md exited 0 on 4afd91b003508f21ab84ef7a65e36894fbd1062f and a43a58bdb4f083a6f81db69246b9cd849291aa99, and python3 scripts/check_docs.py reported no agent-file mismatch.
+  REV-28 N/A Does not apply to this commit because the web/ shell and its Node check scripts define no synthetic establishment, legal-entity, employer-group, person, or salary-file identifiers and do not touch the synthetic world build.
+  REV-29 N/A Does not apply to this commit because the web/ shell renders only the working title and an empty main landmark and attaches no attributes or footfall figures to any real named place, business, or building.
+  REV-38 FAIL Applies to web/ as a serving-plane package named by REV-38 and to its import-boundary check web/scripts/check-import-boundary.mjs: the shell renders no gateway text, score, badge, or panel, reads neither EII_DECISION_PROVIDER nor JEV_PRO_API_KEY, and rejects bare gateway/eii_gateway specifiers, but check-import-boundary.mjs has bypasses allowing relative/symlink, tsconfig, or glob references to escape web/ into ../gateway (F1, F2, F3).
+FINDINGS:
+  F1 (REV-15)
+    File: web/scripts/check-import-boundary.mjs
+    Line: 101-117
+    Wrong: locate(fromDir, spec) calls fs.realpathSync(resolved) only when fs.existsSync(resolved) is true on the full leaf path and otherwise returns path.normalize(resolved), while isInside(root, target) always compares against fs.realpathSync(root). First, when an existing symbolic link inside web/ (for example src/linked pointing outside web/ to ../custodian or ../gateway) is used by a standard extensionless TypeScript import such as import { value } from '../linked/secret' (where secret.ts exists on disk) or by tsconfig.json paths/include such as "./src/linked/*", fs.existsSync(resolved) is false, locate skips realpathSync on the symlinked ancestor src/linked, and the check falsely exits 0 (breaking FE-07, REV-11, REV-15, REV-23, and REV-38). Second, when --root (or os.tmpdir(), such as /var -> /private/var or a linked worktree/checkout path) traverses a symbolic link, web/src/main.tsx's import { App } from './app/App' does not exist without .tsx, so locate returns the unresolved symlink prefix while isInside uses fs.realpathSync(root), falsely failing outside-web on the clean shell (breaking REV-16, REV-42, and the plan's "outside DIR after resolving" rule).
+    Fix: Add a helper resolveRealAncestor(target) that resolves path.resolve(target) by walking up path.dirname(current) while !fs.existsSync(current) (collecting skipped basename segments), resolves the deepest existing ancestor with fs.realpathSync(current), and re-joins the collected tail segments; in locate(fromDir, spec), compute const baseDir = resolveRealAncestor(fromDir) and return resolveRealAncestor(path.resolve(baseDir, spec)). In web/scripts/tests/check-import-boundary.node-test.mjs, add planted tests for (a) an extensionless import '../linked/secret' through a directory symlink out of web/ (expects exit 1, FAIL outside-web), (b) a tsconfig.json compilerOptions.paths entry ['./src/linked/*'] through that symlink (expects exit 1, FAIL tsconfig-outside), and (c) running the check against a symlink pointing to WEB via --root (expects exit 0 and final OK line), proved by cd web && npm run test:checks.
+  F2 (REV-15)
+    File: web/scripts/check-import-boundary.mjs
+    Line: 239-263
+    Wrong: tsconfig.json checking has two false-pass/wrong-rule defects breaking FE-07, REV-11, REV-15, REV-16, REV-23, REV-38, and the plan's tsconfig-json and tsconfig-outside rules: (1) entryOutside(root, entry) does not reject backslashes and passes /^[A-Za-z]:[\\/]/ to path.resolve(entry); on Linux/WSL, "include": ["..\\..\\core"] resolves via locate as a single filename inside root and exits 0 even though TypeScript normalises backslashes to slashes and includes ../../core outside web/, and "include": ["C:/core"] resolves relative to process.cwd() so running from web/ (cwd === root) resolves to <root>/C:/core and exits 0; (2) tsconfigTypeError(config) checks isObject(options.paths) without validating that each paths value is an array of strings and without validating element types of include, exclude, files, array extends, references ({ path: string }), rootDirs, and typeRoots, so {"compilerOptions":{"paths":{"a":1}}} crashes at line 296 with FAIL internal-error: TypeError instead of FAIL tsconfig-json, {"compilerOptions":{"paths":{"a":".."}} } iterates characters '.', '.' and falsely exits 0, and {"references":["../core"]} or {"include":[1]} falsely exits 0.
+    Fix: In tsconfigTypeError(config), reject non-string elements in include, exclude, files, options.rootDirs, options.typeRoots, and array config.extends; reject any element of config.references that is not isObject(item) with typeof item.path === 'string'; and reject any value in Object.values(options.paths) that is not an Array of strings, returning a detail string reported as FAIL tsconfig-json: tsconfig.json: <detail>. In entryOutside(root, entry), return true immediately when entry.includes('\\') || /^[A-Za-z]:[\\/]/.test(entry), and otherwise compute const resolved = locate(root, entry) and return !isInside(root, resolved). Add planted tests in web/scripts/tests/check-import-boundary.node-test.mjs for "include": ["..\\..\\core"] and "include": ["C:/core"] (with cwd set to root, expecting exit 1 and FAIL tsconfig-outside) and for "paths": {"a": 1}, "paths": {"a": ".."}, "references": ["../core"], and "include": [1] (expecting exit 1 and FAIL tsconfig-json: tsconfig.json), proved by cd web && npm run test:checks.
+  F3 (REV-15)
+    File: web/scripts/import-tokenizer.mjs
+    Line: 240-284
+    Wrong: collectReferences checks token .value without checking token .type on punctuation and keyword lookaheads. Inside import.meta.glob([']', '../../../core/x']), the string token { type: 'string', value: ']' } matches item.value === ']' at line 252, decrements depth to 0, and breaks before '../../../core/x' is collected, allowing a forbidden outside-web glob import to exit 0 (breaking FE-07, REV-11, REV-15, REV-16, REV-23, REV-38, and the plan's import.meta.glob array rule). Likewise, a side-effect import '.' has { type: 'string', value: '.' } at index + 1, matches line 240, and hits continue at line 261 without collecting the import; and import '(' matches line 263 and emits non-literal-import instead of collecting '(' (lines 242, 247, 251, 274, and 282-283 have the same unchecked .value comparisons).
+    Fix: Add helpers isPunct(tok, value) (tok?.type === 'punct' && tok.value === value) and isWord(tok, value) (tok?.type === 'word' && tok.value === value) in web/scripts/import-tokenizer.mjs and use them at lines 240, 242, 247, 251, 252, 263, 274, and 282-283 so string/template tokens never match syntax punctuation or keywords. Add planted cases in web/scripts/tests/check-import-boundary-forms.node-test.mjs for import.meta.glob([']', '../../../core/x']) (expects exit 1, FAIL outside-web) and side-effect import '.' / import '(' handling, proved by cd web && npm run test:checks.
+  F4 (REV-10)
+    File: web/scripts/host-scan-rules.mjs
+    Line: 62-79
+    Wrong: In protocolHits(text), the host character class [^\s/\\?#:'"`<>]+ on line 65 does not exclude ',' or ')'. In a valid HTML srcset without a space before the comma where an earlier candidate has no dot in its host segment, such as <img srcset="//cdn,//host.example/x">, the first regex match consumes "cdn," including the comma, skips it because it has no dot, and advances pattern.lastIndex past the comma; the second candidate //host.example/x then has no preceding delimiter from PROTOCOL_PRECEDING and passes both check-no-third-party-hosts.mjs and step 8 of check-dev-server.mjs with exit 0 (breaking acceptance criterion 3, FE-05, DES-24, REV-10, REV-11, REV-15, REV-16, and the plan's "srcset entry after a comma" rule).
+    Fix: Exclude ',' and ')' from the host capture class on line 65 (([^\s/\\?#:'"`<>,)]+)) and add ',' and ')' to HOST_STOP on line 21. Add planted failing subtests in web/scripts/tests/check-no-third-party-hosts-forms.node-test.mjs for '<img srcset="//cdn,//host.example/x">' and 'a { background: url(//host.example); }' asserting exit 1 and FAIL protocol-relative-url, proved by cd web && npm run test:checks.
+  F5 (REV-11)
+    File: web/scripts/tests/check-dev-server-fake.node-test.mjs
+    Line: 204-305
+    Wrong: Four clean test blocks — 'bin field, string form' (lines 204-212), 'bin field, object form' (lines 214-225), 'terminate signal ignored' (lines 227-234), and all four subtests of 'content types' (lines 296-305) — assert result.status === 0 without asserting that stdout is non-empty and ends with the PASS summary line. In 'bin field, string form', 'bin field, object form', and 'content types', remember(dir) is a no-op when pid is absent, so a script that silently exits 0 passes those six tests with no other assertion, breaking REV-11, REV-15, REV-16, and the plan's teeth rule ("Every clean case asserts exit 0, that standard output is non-empty and ends with the summary line (OK or PASS), so that a silent exit 0 cannot pass").
+    Fix: In each of those four clean test blocks in web/scripts/tests/check-dev-server-fake.node-test.mjs, add assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/) after checking result.status === 0, and run cd web && npm run test:checks.
+  F6 (REV-11)
+    File: web/scripts/tests/check-dev-server-surroundings.node-test.mjs
+    Line: 196-234
+    Wrong: Three clean runs — 'child environment' (lines 196-207), 'child environment, a name absent in the parent' (lines 209-217), and the fake-server run inside 'hostile surroundings' (lines 228-234) — assert status === 0 without asserting that stdout ends with the PASS dev-server summary line (and lines 222 and 227 match /^PASS dev-server/m anywhere in stdout rather than on the final line), breaking REV-11, REV-15, REV-16, and the plan's clean-case teeth rule.
+    Fix: Assert assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/) on result in 'child environment' and 'child environment, a name absent in the parent', and on clean, again, and fake in 'hostile surroundings', and run cd web && npm run test:checks.
+  F7 (REV-11)
+    File: web/scripts/tests/check-dev-server.node-test.mjs
+    Line: 114-149
+    Wrong: The clean test 'absent package.json uses the default flags' asserts result.status === 0 and argv contents without asserting that result.stdout is non-empty and ends with the PASS dev-server summary line, breaking REV-11, REV-15, REV-16, and the plan's clean-case teeth rule.
+    Fix: Add assert.match(result.stdout.trim().split('\n').at(-1), /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/) after line 145 in web/scripts/tests/check-dev-server.node-test.mjs (and tighten lines 101 and 111 to match the trimmed final line as well), and run cd web && npm run test:checks.
+  F8 (REV-11)
+    File: web/scripts/tests/check-layout.node-test.mjs
+    Line: 224-231
+    Wrong: The clean test 'deferred file present' asserts result.status === 0 and notes.length === 1 without asserting that result.stdout ends with the summary line 'checked <n> entries: OK', breaking REV-11, REV-15, REV-16, and the plan's clean-case teeth rule.
+    Fix: Add assert.match(result.stdout.trim().split('\n').at(-1), /^checked \d+ entries: OK$/) after line 230 in web/scripts/tests/check-layout.node-test.mjs, and run cd web && npm run test:checks.
+  F9 (REV-16)
+    File: web/scripts/dev-server-process.mjs
+    Line: 124-145
+    Wrong: stopChild(child) polls in a 50 ms while loop up to STOP_WAIT_MS (5000 ms), calling child.once('exit', ...) on every iteration without removing the listener when the 50 ms timer resolves first. When a child ignores SIGTERM (as in 'terminate signal ignored'), 100 'exit' listeners accumulate on child, exceeding Node's default MaxListeners (10) and writing MaxListenersExceededWarning to stderr, breaking REV-16 and the plan's bounded-wait cleanup rule in "Development server check" step 9 and "Tests" process hygiene.
+    Fix: Remove STOP_POLL_MS (line 13) and replace the while loop in stopChild (lines 127-137) with a single Promise that returns immediately if child.exitCode !== null || child.signalCode !== null, otherwise registers one onExit handler with child.once('exit', onExit) and one setTimeout(..., STOP_WAIT_MS) timer where onExit calls clearTimeout(timer) and the timer callback calls child.removeListener('exit', onExit) before resolving. Prove it by asserting assert.equal(result.stderr, '') in test('terminate signal ignored') in web/scripts/tests/check-dev-server-fake.node-test.mjs and running cd web && npm run test:checks.
+PROPOSED OPEN ITEMS:
+  P1 (REV-10) FE-05 and DES-24 (acceptance criterion 3, built-JavaScript host rule in web/scripts/host-scan-rules.mjs lines 21 and 31-55): following the plan's exact rule ("text after the separators up to the first of / \ ? # :, a quote, <, > or white space"), readHost stops at ':' and does not check for URL userinfo before an at-sign in the authority, so a URL in dist/*.js starting with https://www.w3.org:443 followed by an at-sign and a third-party dotted host yields readHost === 'www.w3.org', matches INERT_HOSTS, and passes check-no-third-party-hosts.mjs --dist while addressing the third-party host.
+```
+
+All nine findings were judged valid by the lead and applied as written by the same builder, of another maker than the reviewer, each with a planted test seen failing first. The proposed item P1 (a URL whose user part names an allowed host can hide a third-party host in built JavaScript) is hardening against deliberate evasion: by the owner's note of 2026-11-12 it goes to `docs/17_DEPLOYMENT_HARDENING.md` with its origin, recorded by the version-1 documentation pull request, and is not built now.
+
+#### Addition to the task log of S0-T03
+
+- Build round 3: Cursor command-line tool, `grok-4.7-medium` (xAI): PART B (README.md, rule 44 of AGENTS.md and CLAUDE.md, OI-41 to OI-43), after main with S0-T02 was merged into the branch; commit `4597ff7054db11da872ade0bc1ce5a4e6705452c`.
+- Build round 4: the same builder: the nine findings of review round 1, each with a planted test seen failing first (17 tests).
+- Build round 5: the same builder: a pass that broke each condition of the code of round 4, one break at a time (owner's rule of 2026-11-12); it ran all 104 breaks and stopped at its time limit before closing gaps; the code it broke was restored byte for byte.
+- Build round 6: the same builder: of the 55 breaks no test had caught, 52 are closed by five new tests in four new test files and 3 are judged equivalent with reasons; 620 tests.
+- Build round 7: the same builder: one test file over the house limit of 500 lines after formatting was split by the lead's decision, the link tests into a new test file and the tsconfig tests into the type-check test file; no assertion changed.
+
+#### Evidence for the corrected work commit `2c47a105ee321e580ba40432a11f35eb8e584399`
+
+All thirteen commands of the plan, at the commit that follows the fix round; command 13 in its later-round form.
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    2c47a105ee321e580ba40432a11f35eb8e584399
+Command:   cd web && npm ci
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "found 0 vulnerabilities"
+Seed:      none
+Notes:     The lock file and `package.json` agree (`npm ci` refuses otherwise); FE-01.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    2c47a105ee321e580ba40432a11f35eb8e584399
+Command:   cd web && npm run build
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "✓ built in 102ms"
+Seed:      none
+Notes:     The production build, acceptance criterion 2.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    2c47a105ee321e580ba40432a11f35eb8e584399
+Command:   cd web && npm run check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 18 files: OK"
+Seed:      none
+Notes:     Layout, exact versions, import boundary and host scan of the sources (FE-01, FE-05, FE-07, DES-24).
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    2c47a105ee321e580ba40432a11f35eb8e584399
+Command:   cd web && npm run check:hosts:dist
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 20 files: OK"
+Seed:      none
+Notes:     The host scan of the build output (criterion 3).
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    2c47a105ee321e580ba40432a11f35eb8e584399
+Command:   cd web && npm run check:dev
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "PASS dev-server http://127.0.0.1:44137/"
+Seed:      none
+Notes:     The development server starts, is answered by the server the check started, and is stopped (criterion 1); the proof that no process is left is the DEV-GONE block, in the evidence file.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    2c47a105ee321e580ba40432a11f35eb8e584399
+Command:   cd web && npm run test:checks
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    620 passed, 0 failed, 0 skipped (tests 620, cancelled 0, todo 0)
+Seed:      none
+Notes:     The whole web check suite after the fix round of review round 1 and the break pass; `./eii test` does not exist before S0-T05 and S0-T09, so this is the only runner; the counts are those the run printed.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    2c47a105ee321e580ba40432a11f35eb8e584399
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 4 packages in 11ms"
+Seed:      none
+Notes:     The lock check of S0-T02 still passes with this branch.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    2c47a105ee321e580ba40432a11f35eb8e584399
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    81 passed, 0 failed, 0 skipped (ran 81 tests)
+Seed:      none
+Notes:     The suite of S0-T01 and S0-T02 still passes with this branch.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    2c47a105ee321e580ba40432a11f35eb8e584399
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 77 text files, 47 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    2c47a105ee321e580ba40432a11f35eb8e584399
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    2c47a105ee321e580ba40432a11f35eb8e584399
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    2c47a105ee321e580ba40432a11f35eb8e584399
+Command:   copy=$(mktemp -d); git ls-files -z web | xargs -0 cp --parents -t "$copy"; ln -s "$PWD/web/node_modules" "$copy/web/node_modules"; ctl=0; (cd "$copy/web" && node --test "scripts/tests/*.node-test.mjs" >"$copy/ctl.log" 2>&1) || ctl=$?; rm -f "$copy"/web/scripts/*.mjs; rc=0; (cd "$copy/web" && node --test --test-reporter=tap "scripts/tests/*.node-test.mjs" >"$copy/red.log" 2>&1) || rc=$?; miss=0; grep -q '^# fail [1-9]' "$copy/red.log" || miss=1; for f in "$copy"/web/scripts/tests/check-*.node-test.mjs; do ok=0; (cd "$copy/web" && node --test "scripts/tests/$(basename "$f")" >/dev/null 2>&1) || ok=1; test "$ok" -eq 1 || miss=1; done; rm -rf "$copy"; test "$ctl" -eq 0 && test "$rc" -ne 0 && test "$miss" -eq 0
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; no output
+Seed:      none
+Notes:     The line succeeds only if the control passes (the full copy passes the suite), the copy without the scripts fails the suite, and each check's test files fail on their own (TST-161).
+```
+
+```text
+### S0-T03 — Web application skeleton
+Commit:    2c47a105ee321e580ba40432a11f35eb8e584399
+Command:   python3 -c "import subprocess,sys; p=subprocess.run(['git','diff','--name-only','--no-renames','5ddb81229d6b480b250721ef0fd34d073333bd2f...2c47a105ee321e580ba40432a11f35eb8e584399'],check=True,capture_output=True,text=True).stdout.splitlines(); d='state api facts i18n stage brief cards controls seats rooms story pack shell styles'.split(); t='unit component e2e visual audit fixtures'.split(); s='check-layout check-exact-versions check-import-boundary check-no-third-party-hosts check-dev-server import-tokenizer host-scan-rules dev-server-process'.split(); u='check-layout check-exact-versions check-exact-versions-lock check-import-boundary check-import-boundary-forms check-no-third-party-hosts check-no-third-party-hosts-forms check-dev-server check-dev-server-fake check-dev-server-surroundings scripts-use-only-node-builtins shell-document check-host-boundaries check-import-form-guards check-tsconfig-types check-stop-child check-import-boundary-links'.split(); a={'README.md','AGENTS.md','CLAUDE.md','OPEN_ITEMS.md','PROGRESS.md','TASKS.md','web/README.md','web/package.json','web/package-lock.json','web/vite.config.ts','web/tsconfig.json','web/index.html','web/src/main.tsx','web/src/app/App.tsx','web/eslint-rules/.gitkeep'}|{'web/src/%s/.gitkeep'%x for x in d}|{'web/tests/%s/.gitkeep'%x for x in t}|{'web/scripts/%s.mjs'%x for x in s}|{'web/scripts/tests/%s.node-test.mjs'%x for x in u}; o=[x for x in p if x not in a]; m=sorted(a-set(p)); print(len(p),o,m); sys.exit(1 if o or m or len(p)!=len(set(p)) or len(a)!=60 or len(p)!=60 else 0)"
+Exit code: 0
+Date:      2026-11-12
+Run by:    lead (local)
+Counts:    not a test suite; output "60 [] []"
+Seed:      none
+Notes:     Later-round form of the scope command: the branch changes the fifty-three planned paths, the 5 test files added in the fix round and the break pass, and the two ledger files, and nothing else (TST-163).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
