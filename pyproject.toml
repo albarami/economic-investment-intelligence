@@ -1,0 +1,12 @@
+[project]
+name = "eii-workspace"
+version = "0.0.0"
+description = "Root of the uv workspace for the three EII Python packages (scaffolding only)."
+requires-python = ">=3.14"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["core", "custodian", "product"]

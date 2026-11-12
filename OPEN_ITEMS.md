@@ -14,9 +14,10 @@
 - ASSUMPTION means work may use the stated default, but the named owner must confirm or replace it.
 - PENDING means review or correction work has not yet supplied evidence.
 - The recommendation is the safe default, not a new decision. A material change needs a decision record.
-- Items OI-01 to OI-18 carry the master decisions; OI-19 onwards come from the written pack.
+- Items OI-01 to OI-18 carry the master decisions; OI-19 to OI-38 come from the written pack and its review.
 - OI-36 to OI-38 record what the review of 2026-11-11 left open: an objection of two reviewers that was not accepted for version 1, and two sets of last corrections that another maker has not yet read.
 - OI-35 records which parameter set is exported. A lead ruling of 2026-11-11 sets the default to A; the owner or a data owner may overrule it before the slice S1 gate.
+- OI-39 onwards are raised during the build.
 
 ## OI-01 — Main model key and spend cap
 
@@ -398,9 +399,53 @@
 - OPTIONS: **Recommendation:** make this confirmation part of the independent review of the slice S0 gate; the reviewer reads the corrected passages, not the whole pack again.
 - NEEDED BY: slice S0 gate review.
 
+## OI-39 — Shape of the Python workspace
+
+- ID: OI-39
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm or replace two assumptions: the shape of the Python workspace, and the two dependency edges `eii-custodian -> eii-core` and `eii-product -> eii-core`, declared before any shared code exists.
+- WHY: The pack pins Python 3.14 managed with `uv` as one workspace of `core`, `custodian` and `product` (docs/02_ARCHITECTURE.md lines 499 and 522) but does not say how that Python request is written in the workspace metadata and in `.python-version`. The documents read for this task (docs/02_ARCHITECTURE.md sections 7 and 8, docs/08_BACKEND.md section 2, docs/12_TESTING_AND_QUALITY.md TST-60) do not describe the workspace root, the package version or where the metadata tests live. The pack requires code shared by the two Python planes to live only in `core/` (ARC-01, docs/02_ARCHITECTURE.md line 112) and forbids every other edge (ARC-06, docs/02_ARCHITECTURE.md line 186; BE-01 to BE-03, docs/08_BACKEND.md lines 64 to 66); this permits, but does not require, the two edges to `eii-core` before any shared code exists.
+- DONE SO FAR: A non-package root `eii-workspace` (`[tool.uv] package = false`, no dependencies, no build system) with the three members `core`, `custodian` and `product`; `gateway/` is not a member. Each member uses the `src` layout (docs/08_BACKEND.md line 29, itself an assumption), version `0.0.0` and `requires-python = ">=3.14"`; `.python-version` holds `3.14`. `eii-custodian` and `eii-product` each declare `dependencies = ["eii-core"]` with `eii-core = { workspace = true }` in `[tool.uv.sources]`; `eii-core` declares no dependency. No sub-module exists yet. The guard and its tests are three standard-library files under `scripts/tests/` (`workspace_guard.py`, `workspace_fields.py` and `test_workspace_metadata.py`) and the clean-environment tests a fourth. The two edges, and the absence of every other edge between the three packages, are proved by `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` (test `test_real_workspace_passes`, rules `workspace-source`, `dependency-edge` and `lock`) and by `uv lock --check`.
+- OPTIONS: **Recommendation:** keep; a version scheme is decided when the first release is built, and per-package tests move to pytest in a later task. Alternatives: declare no dependency until the first import of `eii_core` exists (the two `[tool.uv.sources]` tables and the guard's two expected lock edges are then removed in that change); make `gateway/` a fourth member; or use a root without a `[project]` table.
+- NEEDED BY: slice S0 gate.
+
+## OI-40 — uv version and build-backend bound
+
+- ID: OI-40
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm, and an exact `uv` pin at task S0-T12.
+- WHY: The pack says `uv` is pinned at slice S0 but gives no number (docs/02_ARCHITECTURE.md line 499), and the preflight row for locked dependencies requires that nothing is downloaded (docs/13_DEPLOYMENT_AND_OPERATIONS.md line 71).
+- DONE SO FAR: The build machine has uv 0.11.31. All three members declare `requires = ["uv_build>=0.11.31,<0.12"]`. Tests in scripts/tests/test_clean_environment.py check the lock and install the members with an empty cache and --offline, without a download. uv itself is not pinned in this task. The metadata guard's table of dependency-bearing fields and the child environment of the clean-environment tests were written for uv 0.11.31; that child environment sets `UV_NO_CONFIG=1`, which also makes uv ignore settings written in a `pyproject.toml` `[tool.uv]` table, so a task that adds such a setting revisits it. The uv documentation on configuration files names a project-level `uv.toml`, which takes precedence over the `[tool.uv]` table of a `pyproject.toml` in the same folder; the metadata guard does not read such a file, the clean-environment tests switch it off with `UV_NO_CONFIG=1`, and task S0-T12 (version pins) is the place to forbid or scan it.
+- OPTIONS: **Recommendation:** task S0-T12 pins uv to the version on the build machine, keeps the bound in step with it, and re-checks the table of dependency-bearing fields and the child environment whenever the pin changes. Alternative: raise the bound together with an upgrade of uv on the build machine, once the owner approves that upgrade.
+- NEEDED BY: task S0-T12; confirmed at slice S1.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
+
+## Proposed open items from reviews
+
+Each item below was proposed by an independent reviewer outside the verdict ([REV-41](docs/15_REVIEWER_CHECKLIST.md)). The follow-up task of its slice closes it before the slice gate, by a fix or by one line saying why it is not valid or is out of scope under REV-42 ([decision 0015](docs/decisions/0015-review-rounds-and-the-scope-of-repository-checks.md)).
+
+### PO-S0-01 — Count list of the S0-T02 plan against the delivered sub-cases
+
+- ID: PO-S0-01
+- TYPE: OPEN
+- RAISED BY: independent review round 1 of S0-T02 (Zhipu AI GLM-5.3 High), 2026-11-12, proposed item P1
+- CONCERNS: REV-16 (the work follows the plan)
+- EVIDENCE: `test_member_list_wrong_fails` runs 8 sub-cases where the plan's count list says 7, `test_missing_and_unparsable_lock_fail` counts 4 where it says 3, `test_lock_ignores_self_and_third_party_edges` runs three blocks with no count assertion where it says 2, and `test_output_order` asserts no count where it says 3; the ledger says only that sub-cases were added. The plan is a project record held by the owner, not in this repository.
+- NEEDED: the plan record states the delivered sub-cases and counts, or the additions are annotated.
+- CLOSED BY: S0-T15
+
+### PO-S0-02 — Suppression comments ahead of the checks of S0-T04
+
+- ID: PO-S0-02
+- TYPE: OPEN
+- RAISED BY: independent review round 1 of S0-T02 (Zhipu AI GLM-5.3 High), 2026-11-12, proposed item P2
+- CONCERNS: REV-15 (no check weakened)
+- EVIDENCE: `scripts/tests/workspace_fields.py` carries `# noqa: E402` for the bottom import that the split into two modules needs, and `scripts/tests/test_workspace_metadata.py` carries several `# type: ignore[...]` comments; no check that runs today is weakened.
+- NEEDED: S0-T04 confirms that its ruff selection accepts that import without the suppression and that each type-ignore marker matches its type checker, or removes them.
+- CLOSED BY: S0-T15
 
 ## Sources
 
