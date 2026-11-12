@@ -381,7 +381,7 @@ class WorkspaceMetadata(unittest.TestCase):
             ("bad", lambda r: (r / "uv.lock").write_text(fields.NOT_VALID), [
                 "FAIL lock: uv.lock: missing or not valid TOML",
             ]),
-            ("utf16", lambda r: (r / "uv.lock").write_bytes(b"\\xff\\xfe"), [
+            ("utf16", lambda r: (r / "uv.lock").write_bytes(b"\xff\xfe"), [
                 "FAIL lock: uv.lock: missing or not valid TOML",
             ]),
         ]
@@ -421,9 +421,10 @@ class WorkspaceMetadata(unittest.TestCase):
             [],
         )
         data = mutated_lock(fields.plant_registry_forbidden_edge)
-        fail_edge = "FAIL lock: uv.lock: edge"
-        has_edge = [l for l in guard.check_lock_data(data) if l.startswith(fail_edge)]
-        self.assertEqual(has_edge, [])
+        self.assertEqual(
+            guard.check_lock_data(data),
+            ["FAIL lock: uv.lock: edge eii-core -> eii-custodian is not allowed"],
+        )
 
     def test_output_order(self) -> None:
         root = self.fresh()

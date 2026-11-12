@@ -14,7 +14,7 @@ def load_toml(path: Path) -> dict[str, Any] | None:
         return None
     try:
         return tomllib.loads(path.read_text(encoding="utf-8"))
-    except tomllib.TOMLDecodeError:
+    except (UnicodeDecodeError, tomllib.TOMLDecodeError):
         return None
 
 

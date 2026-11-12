@@ -19,10 +19,12 @@ NAMES = wf.NAMES
 
 
 def write_toml(path: Path, data: dict[str, Any]) -> None:
+    """Rewrite one TOML file through the guard's writer."""
     path.write_text(guard.dump_toml(data), encoding="utf-8")
 
 
 def read_toml(path: Path) -> dict[str, Any]:
+    """Load one TOML file via the shared test helper."""
     return wf.read_toml(path)
 
 
@@ -260,6 +262,7 @@ _TOML_INVALID = "FAIL members: pyproject.toml: missing or not valid TOML"
 def invalid_pyproject_cases() -> list[
     tuple[str, Callable[[Path], None], list[str]]
 ]:
+    """Build sub-cases for missing or unparsable member pyproject.toml files."""
     bad = "missing or not valid TOML"
     cases: list[tuple[str, Callable[[Path], None], list[str]]] = [
         ("root deleted", lambda r: (r / "pyproject.toml").unlink(), [_TOML_INVALID]),
@@ -281,10 +284,16 @@ def invalid_pyproject_cases() -> list[
             lambda r, d=mdir: (r / d / "pyproject.toml").write_text(wf.NOT_VALID),
             [line],
         ))
+    cases.append((
+        "core utf16",
+        lambda r: (r / "core" / "pyproject.toml").write_bytes(b"\xff\xfe"),
+        _layout("core/pyproject.toml", bad),
+    ))
     return cases
 
 
 def plant_output_order_a(root: Path) -> None:
+    """Plant multiple workspace violations to assert stable check order."""
     root_data = read_toml(root / "pyproject.toml")
     tool = root_data.setdefault("tool", {}).setdefault("uv", {})
     ws = tool.setdefault("workspace", {})
@@ -305,6 +314,7 @@ def plant_output_order_a(root: Path) -> None:
 
 
 def plant_output_order_b(data: dict[str, Any]) -> None:
+    """Mutate lock data to exercise lock-rule output ordering."""
     data.setdefault("package", []).reverse()
     man = data.setdefault("manifest", {})
     man["members"] = ["eii-core", "eii-custodian", "eii-product"]
@@ -357,6 +367,7 @@ OUTPUT_ORDER_C = [
 
 
 def plant_output_order_c(root: Path) -> None:
+    """Plant forbidden dependency edges across member pyproject.toml files."""
     core = read_toml(root / "core/pyproject.toml")
     wf._extend(core, ["project", "dependencies"], "eii-product")
     wf._extend(core, ["project", "dependencies"], "eii-custodian")

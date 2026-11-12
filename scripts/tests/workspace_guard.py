@@ -338,9 +338,6 @@ def _rule_lock(data: dict[str, Any] | None) -> list[str]:
         name = _pkg_name(entry)
         if name is None or name not in WORKSPACE_PKGS:
             continue
-        source = entry.get("source")
-        if isinstance(source, dict) and "registry" in source:
-            continue
         for src, tgt in _edges_from_pkg(entry):
             if src == tgt:
                 continue

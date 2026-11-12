@@ -32,6 +32,7 @@ ALONE: dict[str, tuple[int, str]] = {
 
 
 def child_tmp(cache: Path) -> str:
+    """Return a dedicated child temp directory beside the uv cache."""
     folder = cache.parent / "child-tmp"
     folder.mkdir(parents=True, exist_ok=True)
     return str(folder)
