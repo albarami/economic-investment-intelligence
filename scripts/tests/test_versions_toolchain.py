@@ -236,13 +236,11 @@ class ToolchainRules(unittest.TestCase):
         )
 
     def test_internal_error_is_reported(self) -> None:
-        import check_versions
-
         root, path = base.ready(self)
         out = __import__("io").StringIO()
         err = __import__("io").StringIO()
         with patch("versions_tools.check_toolchain", side_effect=RuntimeError("boom")):
-            code = check_versions.main(
+            code = base.check_versions.main(
                 ["--root", str(root)],
                 out=out,
                 err=err,
@@ -335,9 +333,7 @@ class Surroundings(unittest.TestCase):
                     "npm": "printf '%s\\n' '10.9.8'\n",
                 }[name],
             )
-        import check_versions
-
-        lines, _count = check_versions.run_checks(
+        lines, _count = base.check_versions.run_checks(
             root,
             interpreter=base.GOOD_INTERPRETER,
             environ={

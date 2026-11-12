@@ -162,8 +162,6 @@ class GitRules(unittest.TestCase):
             )
 
     def test_git_listing_failures(self) -> None:
-        import versions_inputs
-
         root, path = base.ready(self)
         git_link = Path(path) / "git"
         if git_link.exists() or git_link.is_symlink():
@@ -191,19 +189,21 @@ class GitRules(unittest.TestCase):
         )
         with patch("subprocess.run", side_effect=AssertionError):
             self.assertEqual(
-                versions_inputs.list_candidates(root, {"PATH": path}),
+                base.versions_inputs.list_candidates(root, {"PATH": path}),
                 (None, "root is not the top of a git work tree"),
             )
         intact, intact_path = base.ready(self)
         with patch("subprocess.run", side_effect=AssertionError):
             self.assertEqual(
-                versions_inputs.list_candidates(intact / "core", {"PATH": intact_path}),
+                base.versions_inputs.list_candidates(
+                    intact / "core", {"PATH": intact_path}
+                ),
                 (None, "root is not the top of a git work tree"),
             )
         root, path = base.ready(self)
         (root / "sub" / ".git").mkdir(parents=True)
         self.assertEqual(
-            versions_inputs.list_candidates(root / "sub", {"PATH": path}),
+            base.versions_inputs.list_candidates(root / "sub", {"PATH": path}),
             (None, "root is not the top of a git work tree"),
         )
         root, path = base.ready(self)
@@ -291,9 +291,7 @@ class GitRules(unittest.TestCase):
             "GIT_CONFIG_KEY_0": "core.excludesFile",
             "GIT_CONFIG_VALUE_0": str(home / "ignore"),
         }
-        import check_versions
-
-        lines, _count = check_versions.run_checks(
+        lines, _count = base.check_versions.run_checks(
             root, interpreter=base.GOOD_INTERPRETER, environ=hostile
         )
         self.assertEqual(
@@ -334,8 +332,6 @@ class GitRules(unittest.TestCase):
         self.assertEqual(listed, ["zzz.txt"])
 
     def test_git_child_is_the_allow_list(self) -> None:
-        import versions_inputs
-
         root, path = base.ready(self)
         bindir = Path(path)
         git_link = bindir / "git"
@@ -369,9 +365,7 @@ class GitRules(unittest.TestCase):
             "GIT_CONFIG_KEY_0": "core.excludesFile",
             "GIT_CONFIG_VALUE_0": "home/ignore",
         }
-        import check_versions
-
-        check_versions.run_checks(
+        base.check_versions.run_checks(
             root, interpreter=base.GOOD_INTERPRETER, environ=hostile
         )
         self.assertTrue(args_file.is_file())
@@ -410,14 +404,14 @@ class GitRules(unittest.TestCase):
                 {"GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM", "LANG", "PATH"},
             )
         self.assertEqual(
-            set(versions_inputs.git_environment({})),
+            set(base.versions_inputs.git_environment({})),
             {"GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM", "LANG"},
         )
         self.assertEqual(
-            set(versions_inputs.git_environment({"PATH": "p"})),
+            set(base.versions_inputs.git_environment({"PATH": "p"})),
             {"GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM", "LANG", "PATH"},
         )
-        wide = versions_inputs.git_environment(hostile)
+        wide = base.versions_inputs.git_environment(hostile)
         self.assertEqual(
             set(wide), {"GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM", "LANG", "PATH"}
         )

@@ -29,10 +29,8 @@ class RealTree(unittest.TestCase):
         self.assertTrue(last.endswith("components: OK"))
 
     def test_planted_drift_in_a_copy_of_the_real_tree(self) -> None:
-        import versions_record
-
         self.assertTrue((REPO / "pins.toml").is_file())
-        components, failures, _count = versions_record.load_record(REPO)
+        components, failures, _count = base.versions_record.load_record(REPO)
         self.assertEqual(failures, [])
         rows = {item.name: item for item in components}
         rels = self._closed_set(rows)
@@ -142,9 +140,7 @@ class RealTree(unittest.TestCase):
 
 
 def _exact(pin: str) -> bool:
-    import versions_record
-
-    return versions_record.version_matches(pin, pin)
+    return base.versions_record.version_matches(pin, pin)
 
 
 def _bump(pin: str) -> str:

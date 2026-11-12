@@ -12,14 +12,14 @@ import unittest
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
-_SCRIPTS = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_SCRIPTS))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-_TMP = Path(__file__).resolve().parents[2] / ".overnight" / "tmp"
-_TMP.mkdir(parents=True, exist_ok=True)
-os.environ.setdefault("TMPDIR", str(_TMP))
-os.environ.setdefault("TMP", str(_TMP))
-os.environ.setdefault("TEMP", str(_TMP))
+import check_versions as check_versions
+import versions_inputs as versions_inputs
+import versions_record as versions_record
+import versions_tools as versions_tools
+
+_SCRIPTS = Path(__file__).resolve().parent.parent
 
 _GIT_FOUND = shutil.which("git")
 if _GIT_FOUND is None:
@@ -388,8 +388,6 @@ def run(
     path: str = "",
 ) -> list[str]:
     """Run the check in-process and return its output lines."""
-    import check_versions
-
     lines, _count = check_versions.run_checks(
         root, interpreter=interpreter, environ={"PATH": path}
     )

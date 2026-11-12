@@ -672,8 +672,6 @@ class RecordRules(unittest.TestCase):
         )
 
     def test_version_matches_table(self) -> None:
-        import versions_record
-
         newline = "2.0.0\n"
         wide = "\uff12.0.0"
         cases = (
@@ -708,7 +706,7 @@ class RecordRules(unittest.TestCase):
         for entry, version, expected in cases:
             with self.subTest(entry=entry, version=version):
                 self.assertEqual(
-                    versions_record.version_matches(entry, version), expected
+                    base.versions_record.version_matches(entry, version), expected
                 )
 
     def _plant_input(self, root: Path, rel: str, kind: str) -> None:
