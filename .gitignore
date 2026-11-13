@@ -44,3 +44,6 @@ Thumbs.db
 .coverage.*
 *.tsbuildinfo
 .eslintcache
+
+# Offline decision evidence; synthetic replay fixtures live under scripts/tests/
+evals/typed_decisions/runs/*.json

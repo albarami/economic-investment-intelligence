@@ -1,0 +1,44 @@
+[
+  {
+    "case_id": "synthetic-case",
+    "input_sha256": "ed995d67bf7905fab2a2f908ef545a1b5b8cc0f9f17ba856be93b895f0494c40",
+    "order": [
+      "no",
+      "yes"
+    ],
+    "label": "yes",
+    "scores": {
+      "yes": 0.92,
+      "no": 0.08
+    },
+    "tokens": 0
+  },
+  {
+    "case_id": "synthetic-choice",
+    "input_sha256": "ed995d67bf7905fab2a2f908ef545a1b5b8cc0f9f17ba856be93b895f0494c40",
+    "order": [
+      "synthetic-beta",
+      "synthetic-alpha"
+    ],
+    "label": "synthetic-alpha",
+    "scores": {
+      "synthetic-alpha": 0.92,
+      "synthetic-beta": 0.08
+    },
+    "tokens": 0
+  },
+  {
+    "case_id": "synthetic-choice",
+    "input_sha256": "ed995d67bf7905fab2a2f908ef545a1b5b8cc0f9f17ba856be93b895f0494c40",
+    "order": [
+      "synthetic-alpha",
+      "synthetic-beta"
+    ],
+    "label": "synthetic-alpha",
+    "scores": {
+      "synthetic-alpha": 0.92,
+      "synthetic-beta": 0.08
+    },
+    "tokens": 0
+  }
+]

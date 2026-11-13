@@ -14,24 +14,27 @@ ROOT_DIST = "eii-workspace"
 MEMBER_ROWS: tuple[tuple[str, str, str], ...] = (
     ("core", "eii-core", "eii_core"),
     ("custodian", "eii-custodian", "eii_custodian"),
+    ("gateway", "eii-gateway", "eii_gateway"),
     ("product", "eii-product", "eii_product"),
 )
 MEMBER_DIRS: tuple[str, ...] = tuple(r[0] for r in MEMBER_ROWS)
 MEMBER_NAMES: frozenset[str] = frozenset(r[1] for r in MEMBER_ROWS)
 FORBIDDEN_BY_MEMBER: dict[str, frozenset[str]] = {
-    "eii-core": frozenset({"eii-custodian", "eii-product"}),
-    "eii-custodian": frozenset({"eii-product"}),
-    "eii-product": frozenset({"eii-custodian"}),
+    "eii-gateway": frozenset({"eii-core", "eii-custodian", "eii-product"}),
+    "eii-core": frozenset({"eii-custodian", "eii-product", "eii-gateway"}),
+    "eii-custodian": frozenset({"eii-product", "eii-gateway"}),
+    "eii-product": frozenset({"eii-custodian", "eii-gateway"}),
 }
 ALLOWED_LOCK_EDGES: frozenset[tuple[str, str]] = frozenset(
     {("eii-custodian", "eii-core"), ("eii-product", "eii-core")},
 )
 WORKSPACE_PKGS: frozenset[str] = frozenset(
-    {"eii-workspace", "eii-core", "eii-custodian", "eii-product"},
+    {"eii-workspace", "eii-core", "eii-custodian", "eii-gateway", "eii-product"},
 )
 EXPECTED_MANIFEST_MEMBERS: tuple[str, ...] = (
     "eii-core",
     "eii-custodian",
+    "eii-gateway",
     "eii-product",
     "eii-workspace",
 )
@@ -315,7 +318,7 @@ def _rule_lock(data: dict[str, Any] | None) -> list[str]:
         name = _pkg_name(entry)
         if name is not None:
             by_name[name] = entry
-    need = ("eii-core", "eii-custodian", "eii-product")
+    need = ("eii-core", "eii-custodian", "eii-gateway", "eii-product")
     missing = [n for n in need if n not in by_name]
     if missing:
         for name in missing:
@@ -360,7 +363,7 @@ def _rule_lock(data: dict[str, Any] | None) -> list[str]:
         hits = sorted(
             n
             for n in names_in(value)
-            if n in {"eii-core", "eii-custodian", "eii-product"}
+            if n in {"eii-core", "eii-custodian", "eii-gateway", "eii-product"}
         )
         for target in hits:
             lines.append(_fail("lock", "uv.lock", f"{field} names {target}"))

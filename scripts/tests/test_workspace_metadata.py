@@ -21,6 +21,12 @@ FORBIDDEN_EDGES: tuple[tuple[str, str], ...] = (
     ("core", "eii-product"),
     ("custodian", "eii-product"),
     ("product", "eii-custodian"),
+    ("core", "eii-gateway"),
+    ("custodian", "eii-gateway"),
+    ("product", "eii-gateway"),
+    ("gateway", "eii-core"),
+    ("gateway", "eii-custodian"),
+    ("gateway", "eii-product"),
 )
 
 LOCK_EDGES: tuple[tuple[str, str], ...] = (
@@ -34,6 +40,14 @@ LOCK_EDGES: tuple[tuple[str, str], ...] = (
     ("eii-core", "eii-workspace"),
     ("eii-custodian", "eii-workspace"),
     ("eii-product", "eii-workspace"),
+    ("eii-core", "eii-gateway"),
+    ("eii-custodian", "eii-gateway"),
+    ("eii-product", "eii-gateway"),
+    ("eii-workspace", "eii-gateway"),
+    ("eii-gateway", "eii-core"),
+    ("eii-gateway", "eii-custodian"),
+    ("eii-gateway", "eii-product"),
+    ("eii-gateway", "eii-workspace"),
 )
 
 SPELLINGS: tuple[str, ...] = (
@@ -66,6 +80,7 @@ PYPROJECTS: tuple[str, ...] = (
     "core/pyproject.toml",
     "custodian/pyproject.toml",
     "product/pyproject.toml",
+    "gateway/pyproject.toml",
 )
 
 _PATH_ERR = "absolute path or file URI"
@@ -255,7 +270,7 @@ class WorkspaceMetadata(unittest.TestCase):
 
     def test_root_naming_a_member_fails(self) -> None:
         n = self.check_cases(list(tables.ROOT_NAMING_CASES))
-        self.assertEqual(n, 6)
+        self.assertEqual(n, 8)
 
     def test_root_name_and_package_flag_fail(self) -> None:
         n = self.check_cases(list(tables.ROOT_FLAG_CASES))

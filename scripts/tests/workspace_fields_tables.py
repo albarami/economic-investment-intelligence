@@ -134,7 +134,7 @@ SOURCE_CASES = [
     ),
 ]
 
-_EXP = "core, custodian, product"
+_EXP = "core, custodian, gateway, product"
 
 
 def _members(listed: str) -> list[str]:
@@ -144,8 +144,8 @@ def _members(listed: str) -> list[str]:
 MEMBER_LIST_CASES = [
     (
         "gateway",
-        edit("pyproject.toml", put("tool.uv.workspace.members", [*MEMBERS, "gateway"])),
-        _members("core, custodian, gateway, product"),
+        edit("pyproject.toml", put("tool.uv.workspace.members", [*MEMBERS, "extra"])),
+        _members("core, custodian, extra, gateway, product"),
     ),
     (
         "drop product",
@@ -250,7 +250,7 @@ LAYOUT_CASES = [
     ),
 ]
 
-_LOCK_EXP = "eii-core, eii-custodian, eii-product, eii-workspace"
+_LOCK_EXP = "eii-core, eii-custodian, eii-gateway, eii-product, eii-workspace"
 
 
 def _lock_members(listed: str) -> list[str]:
@@ -356,7 +356,7 @@ OUTPUT_ORDER_A = [
 
 OUTPUT_ORDER_B = [
     "FAIL lock: uv.lock: manifest.members are eii-core, eii-custodian, "
-    "eii-product expected eii-core, eii-custodian, eii-product, eii-workspace",
+    "eii-product expected eii-core, eii-custodian, eii-gateway, eii-product, eii-workspace",
     "FAIL lock: uv.lock: edge eii-custodian -> eii-product is not allowed",
     "FAIL lock: uv.lock: edge eii-product -> eii-custodian is not allowed",
     "FAIL lock: uv.lock: edge eii-custodian -> eii-core is missing",
@@ -406,6 +406,7 @@ LOCK_MEMBER_CASES = [
                 "members": [
                     "eii-core",
                     "eii-custodian",
+                    "eii-extra",
                     "eii-gateway",
                     "eii-product",
                     "eii-workspace",
@@ -413,7 +414,7 @@ LOCK_MEMBER_CASES = [
             },
         ),
         _lock_members(
-            "eii-core, eii-custodian, eii-gateway, eii-product, eii-workspace",
+            "eii-core, eii-custodian, eii-extra, eii-gateway, eii-product, eii-workspace",
         ),
     ),
     (
@@ -424,7 +425,15 @@ LOCK_MEMBER_CASES = [
     (
         "Eii_Product",
         lambda lock: lock.setdefault("manifest", {}).update(
-            {"members": ["eii-core", "eii-custodian", "Eii_Product", "eii-workspace"]},
+            {
+                "members": [
+                    "eii-core",
+                    "eii-custodian",
+                    "eii-gateway",
+                    "Eii_Product",
+                    "eii-workspace",
+                ]
+            },
         ),
         [],
     ),
