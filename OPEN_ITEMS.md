@@ -983,6 +983,26 @@
 - OPTIONS: **Recommendation:** leave it. Alternative: a later owner-approved settings task sets it to false.
 - NEEDED BY: any change of the required number of approving reviews; not a blocker.
 
+## OI-115 — The browser half of FE-56 is carried by the map spikes
+
+- ID: OI-115
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm that the browser-level test of FE-56 is carried by the tasks that render a map and is checked at the slice S1 gate.
+- WHY: FE-56 spans the server and the browser: with the network disabled except for the local server every layer renders, and an end-to-end test blocks every non-same-origin request. Task S1-T04 serves one tile artefact and renders no map; the browser tool is installed by task S1-T01 (OI-48).
+- DONE SO FAR: Task S1-T04 proves the server's half over HTTP on the loopback interface: `test_the_api_app_serves_the_tile_and_the_status` in `product/tests/test_tiles_range.py` finds no cross-origin permission header, no redirect and no absolute address in a tile response, and the same check fails against an application built in the test with a wildcard cross-origin header.
+- OPTIONS: **Recommendation:** the slice S1 gate checks the browser half on the pages of tasks S1-T01 and S1-T02; the run with the live traffic provider on waits for the task that builds the provider's adapter (S6-T19). Alternative: a decision record narrows FE-56 for slice S1.
+- NEEDED BY: slice S1 gate.
+
+## OI-116 — The server packages of the API are installed through the root development group
+
+- ID: OI-116
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm that `fastapi` and `uvicorn` stay in the root dependency group `dev` until task S3-T08 builds the API and declares them in the product manifest, and to confirm `uvicorn` as the server program that runs the FastAPI process.
+- WHY: `eii_product.api` imports FastAPI, and the product manifest declares `eii_core` only: the clean-environment guard of task S0-T02 installs the three packages offline from an empty cache, so a member manifest cannot gain a third-party dependency in this slice (OI-60). The technology stack of `docs/02_ARCHITECTURE.md` names FastAPI and no server program, and the tests of the spike need one to speak HTTP to a real process.
+- DONE SO FAR: Both packages are pinned exactly in the root group `dev` and recorded in `pins.toml`: `fastapi` in the series the pack names, `uvicorn` with the label ASSUMPTION at the release that was current on 2026-11-13. `import eii_product` stays free of FastAPI; only `eii_product.api` imports it. The rows `pmtiles` and `@protomaps/basemaps` of `pins.toml` name S1-T04 as their first use; this task installs neither, because it serves a synthetic byte artefact and renders no map.
+- OPTIONS: **Recommendation:** keep both packages in the root group through slice S1; task S3-T08 declares them in `product/pyproject.toml` together with the change of the clean-environment guard; task S1-T08 confirms the two pins and corrects the first use of the two map rows. Alternative: a decision record names another server program.
+- NEEDED BY: slice S1 pin confirmation (S1-T08); task S3-T08.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
