@@ -209,11 +209,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas Platform; status queued.
 ### S1-T07 — Offline typed-decision gateway
 - Goal: Build the provider-neutral gateway contract, `none`, recorded and configured providers, decision records, data policy and import boundary.
-- Acceptance criteria: [ ] default `none` opens no network; [ ] forbidden data classes are blocked; [ ] records use the closed schema; [ ] serving packages cannot import the gateway.
+- Acceptance criteria: [x] default `none` opens no network; [x] forbidden data classes are blocked; [x] records use the closed schema; [x] serving packages cannot import the gateway.
 - Scope: `gateway/`, gateway-only tooling under `scripts/`, gateway contract tests.
 - Depends: S0-T02, S0-T10.
 - Requirements: DAT-126, BE-102, AI-98, PLN-20.
-- Delivery: hard; personas AI; status queued.
+- Delivery: hard; personas AI; status in review (pull request 29).
 ### S1-T11 — Road-assignment and hourly traffic spike
 - Goal: Assign one hourly origin-destination fixture to the routing graph with one fixed volume-delay rule, and animate the resulting link speeds through the day on the map.
 - Acceptance criteria: [ ] the assignment is tested code that reads only a synthetic fixture and repeats exactly on identical inputs; [ ] one fixed volume-delay rule is used, with every parameter in configuration; [ ] the hourly link speeds feed a drive-time area that changes with the hour; [ ] the animated road layer carries the Simulated mark; [ ] the S1-T02 trace is repeated with the road layer animated, and its result is recorded; [ ] any library the assignment needs gets its exact and retreat pins through S1-T08.

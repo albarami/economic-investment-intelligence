@@ -14156,6 +14156,239 @@ Seed:      none
 Notes:     The fix commit has a Conventional Commit subject.
 ```
 
+### S1-T07 — Offline typed-decision gateway: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/29 )
+
+- What the task builds (slice S1): the provider-neutral contract of the offline typed-decision gateway of [decision 0014](docs/decisions/0014-typed-decision-gateway.md), behind the stage only: `gateway/` becomes the fourth workspace member, `eii_gateway`, used by tooling under `scripts/` and `evals/` and by nothing under `core/`, `custodian/` or `product/` (BE-102, DAT-126). Its answers are decision evidence only. No provider was called and no key was used during the build (OI-01, OI-18)
+- Class of the work (the owner's note of 2026-11-12 on value and cost): standard; it computes and shows no number
+- Plan: a short plan by Cursor Composer 2.5 (through the Cursor command-line tool), read by the lead; the lead's rulings R1 to R6 of the build brief override it where they differ. No separate plan review (the owner's rule for Standard tasks)
+- Builder maker and model: Codex command-line tool, `gpt-6-astra` (OpenAI): one build and one short completion pass after the lead's check
+- Reviewer maker and model: Cursor command-line tool, `grok-4.7-high` (xAI), read-only (a maker that neither planned nor built); a full review
+- Branch: `task/S1-T07-gateway`
+- What was built: in `gateway/src/eii_gateway/`: the closed vocabulary (five decision classes each with its one permitted effect, three kinds, six outcomes) and the request of tooling-owned inputs; the data policy; memo keys by hash and the two fixed, hash-derived option orders of a choice; the thresholds for ordering and flagging; the record schema with the exact field set of DAT-126, validated on write and on read; the record store that writes only under `evals/typed_decisions/runs/`; the setting `EII_DECISION_PROVIDER`, default `none`; three providers (`none`, which does no input or output and reads no key; a recorded provider that replays hand-written synthetic fixtures; a standard-library adapter of the configured provider); and the facade that applies the policy, the token cap, the memo, the two orders and the fallback, and writes one record for every admitted call. Beside it: a consumer guard (`scripts/gateway_import_guard.py`) with its planted consumers, 24 contract tests under `scripts/tests/gateway/` and three guard tests
+- The rulings (the build brief): R1, the adapter of the configured provider uses the standard library only, is written and never called, and says in its module text that its request shape is unverified; no test, command or import path of the default suite reaches it. R2, the tests stay under `scripts/tests/` and `./eii test` gains no suite. R3, no section is added to the reference notes; the fixtures of the recorded provider are tiny, hand-written and visibly synthetic. R4, `gateway/` is the fourth member with no third-party dependency; the clean-environment guard, the metadata guard and the import-boundary tests keep their meaning and are extended to the fourth member where they hold the list of members. R5, rules 26 to 32 of AGENTS.md bind every line
+- The four acceptance criteria and their tests. (1) Default `none` opens no network: `test_none_never_opens_socket` (socket construction and connection replaced by a failing stand-in while the package is imported and a request is decided; the outcome is `DISABLED` with the fallback, one record is written, and the adapter module is not imported) and `test_none_ignores_jev_key`. (2) Forbidden data classes are blocked: `test_visitor_typed_blocked` (seven declared classes outside the four cleared ones, each refused before a provider is constructed, with nothing written) and `test_cleared_classes_and_class_restrictions`. (3) Records use the closed schema: the six tests of `test_decision_record_schema.py` (the exact field set, unknown and missing fields, malformed values on write and on read, a folder other than the runs folder, a later human disposition). (4) Serving packages cannot import the gateway: the unchanged three-plane guard with its 34 tests, one gateway test beside them, and the new consumer guard with planted consumers in five folders and three import forms
+- The lead's ruling on the first disagreement the builder reported and stopped on (recorded for the owner as OI-117): item 6 of decision 0014 says that every call writes a decision record, item 8 that the gateway refuses every input class but the four cleared ones, and the closed schema admits only those four in `input_class`. A refused request is therefore not a call: the gateway raises before a provider is constructed and before anything is stored, for a class outside the four and for a cleared class that the decision class does not accept. Nothing of a refused input is kept, not even its hash. No record holds the outcome `BLOCKED_BY_DATA_POLICY` in version 1; the alternative reading is written in the item
+- Two further points the builder reported, both accepted: the pin row of the provider stays `recorded`, because the version check requires that state of an external row (the plan had suggested another word); and the adapter's request shape is unverified, since ruling R1 forbids any call. The files under `evals/typed_decisions/runs/` are ignored by git (the plan's rule), so the output of a run is committed only by a deliberate act; this is the second half of OI-117
+- Existing guards that changed, and why none is weaker (REV-15): the clean-environment guard, the workspace-metadata guard with its field tables and the support of the Python checks now name four members instead of three; the forbidden dependency edges gain every edge between the gateway and the three planes in both directions; the planted "extra member" of the field tables, which had been called `gateway`, is now a member that does not exist. No assertion was removed
+- Red runs before the code: `test_none_never_opens_socket` with "ModuleNotFoundError: No module named 'eii_gateway'"; later `test_later_human_disposition_is_readable` with "automated records cannot supply human disposition" (the schema lets a person add a disposition later), then fixed
+- The builder's break pass, as it reports: 392 generated breaks, 361 caught at once; tests were added for the 31 that survived; of 39 follow-up breaks 37 were caught and two were left unexercised because exercising them would import the adapter, which ruling R1 forbids; six more for the disposition rule, all caught
+- What the lead's check found, and what the builder then changed in one short pass: (1) `scripts/tests/test_gateway_import_guard.py` could not be run on its own ("ModuleNotFoundError: No module named 'gateway_import_guard'": it relied on another test module to put `scripts/` on the import path); it now follows the convention of the other guard tests. (2) With the facade changed to accept a choice when only one of the two option orders was answered, every test still passed; `test_choice_missing_second_answer_applies_fallback_and_writes_record` now fails on that break (the builder saw 'DECIDED' where 'UNAVAILABLE' was expected, and restored)
+- The lead's own breaks (eight run, each file restored): a forbidden class added to the cleared list; the policy check moved after the construction of the provider; `question_route` freed from team questions; the default provider changed to the adapter; a zero token cap no longer stopping the configured provider; records allowed outside the runs folder; the memo replay switched off; a choice accepted on one order. Seven were caught by a named contract test at once; the eighth is the point (2) above and is caught since the completion pass
+- The lead entered, in the work commit: one sentence in the status paragraph of README.md and the corrected layout sentence (`gateway/` is no longer scaffolding); OI-117 in OPEN_ITEMS.md; two sentences of `gateway/README.md` that had pointed to the builder's report now name OI-117 and this file
+- Not measured, said plainly: no provider answer, latency, accuracy or token use; the request shape of the adapter; the requalification of task S1-T08. The synthetic scores of the recorded fixtures are fixture values, not measurements
+- Hardening listed, not built (the plan and the builder's return): confirming the endpoint, the wire schema, the route identity and the meaning of the token cap before any authorised live use; memo arbitration between processes and an index of the runs folder; a redirect policy, retry and rate limits and an operational audit for the adapter; the full human-labelled qualification and its drift intervals (S1-T08 and later); the sign-off check of the release build for activity mappings; a wider static resolution of consumers outside the three planes
+
+#### Evidence for the work commit `5e46ca1352db6c767b4dfc7de2fe22871b1f3df7`
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   ./eii test --seed 2026111314
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1203 passed, 0 failed, 0 skipped
+Seed:      2026111314
+Notes:     The whole test command with provider `none`: the guard suite discovers the 24 contract tests of the gateway, the three tests of its consumer guard and the one gateway test beside the import-boundary tests; `./eii test` gains no suite (ruling R2).
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   uv run --locked python -m unittest discover -s scripts/tests/gateway -t scripts/tests -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    24 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Criteria 1, 2 and 3 by the contract tests of the gateway, 24 in six modules: `test_none_provider_network.py` (2: no socket is constructed or connected and no key is read with the default provider), `test_data_policy.py` (3: classes outside the four cleared ones are refused before a provider is built and nothing is written; the class restrictions; the closed classes, kinds and effects), `test_decision_record_schema.py` (6: the exact field set of DAT-126, malformed values on write and on read, the runs folder only, a later human disposition), `test_recorded_provider.py` (8: replay, the first stored answer, the two option orders, a missing second answer), `test_contract_edges.py` (4) and `test_import_boundary_gateway.py` (1).
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_gateway_import_guard.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    3 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Criterion 4, the new consumer guard, run on its own: the real tree holds no consumer of `eii_gateway` outside `scripts/`, `evals/` and `gateway/`; planted consumers in five folders, each in three import forms, are refused; tooling and internal imports pass.
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    35 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Criterion 4, the three-plane guard of task S0-T10, unchanged, with its 34 tests, and the one gateway test that this pattern also finds (`scripts/tests/gateway/test_import_boundary_gateway.py`): 35 in all.
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_clean_environment.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    7 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The clean-environment guard, now with four members: the four packages install offline from an empty cache and nothing else is installed (ruling R4; no third-party dependency).
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_workspace_metadata.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    22 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The workspace-metadata guard with the fourth member: every dependency edge between the gateway and the three planes is forbidden in both directions, in the manifests and in the lock.
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 31 packages in 0.99ms"
+Seed:      none
+Notes:     The lock file matches the manifests; it gained the local package `eii-gateway` and nothing else.
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 59 components: OK"
+Seed:      none
+Notes:     The version check; no pin row changed (the provider's row stays `recorded`).
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes and their check are unchanged by this task (ruling R3).
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint, with `gateway/src` among the source folders.
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "156 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 152 source files"
+Seed:      none
+Notes:     Strict types, with `gateway/src` among the checked folders; no ignore comment and no relaxed setting.
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 241 text files, 55 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with `gateway/README.md`, the two sentences of README.md and OI-117.
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree, with the new ignore rule for the run records.
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical; this task adds no command, so neither changes.
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','07aab1a8ed08fb7e08456925dec72fdc89442357...5e46ca1352db6c767b4dfc7de2fe22871b1f3df7'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:gateway/pyproject.toml A:gateway/src/eii_gateway/__init__.py A:gateway/src/eii_gateway/facade.py A:gateway/src/eii_gateway/memo.py A:gateway/src/eii_gateway/policy.py A:gateway/src/eii_gateway/providers/__init__.py A:gateway/src/eii_gateway/providers/base.py A:gateway/src/eii_gateway/providers/jev_provider.py A:gateway/src/eii_gateway/providers/none_provider.py A:gateway/src/eii_gateway/providers/recorded_provider.py A:gateway/src/eii_gateway/records.py A:gateway/src/eii_gateway/schema.py A:gateway/src/eii_gateway/settings.py A:gateway/src/eii_gateway/thresholds.py A:gateway/src/eii_gateway/types.py A:scripts/gateway_import_guard.py A:scripts/tests/gateway/__init__.py A:scripts/tests/gateway/fixtures/recorded/synthetic.json A:scripts/tests/gateway/support.py A:scripts/tests/gateway/test_contract_edges.py A:scripts/tests/gateway/test_data_policy.py A:scripts/tests/gateway/test_decision_record_schema.py A:scripts/tests/gateway/test_import_boundary_gateway.py A:scripts/tests/gateway/test_none_provider_network.py A:scripts/tests/gateway/test_recorded_provider.py A:scripts/tests/test_gateway_import_guard.py M:.gitignore M:OPEN_ITEMS.md M:README.md M:gateway/README.md M:pyproject.toml M:scripts/tests/pychecks_support.py M:scripts/tests/test_clean_environment.py M:scripts/tests/test_workspace_metadata.py M:scripts/tests/workspace_fields.py M:scripts/tests/workspace_fields_tables.py M:scripts/tests/workspace_guard.py M:uv.lock'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "38 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope (REV-12): the package under `gateway/` (manifest, README, fourteen modules), the consumer guard and its test, the contract tests with their support and one fixture file, the six guard files extended to the fourth member, the root manifest with its lock, the ignore file, and the two shared documents the lead entered (README.md, OPEN_ITEMS.md).
+```
+
+```text
+### S1-T07 — Offline typed-decision gateway
+Commit:    5e46ca1352db6c767b4dfc7de2fe22871b1f3df7
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','07aab1a8ed08fb7e08456925dec72fdc89442357..5e46ca1352db6c767b4dfc7de2fe22871b1f3df7'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit has a Conventional Commit subject.
+```
+
+#### S1-T07: correction of the task log: the reviewer
+
+- The task log above names the Cursor command-line tool with `grok-4.7-high` (xAI) as the reviewer. That review was started on the head `e8d32adc55da51c9646f2b7290949ebb7236e53b` and ended after 37 seconds with a connection error of the tool, before any answer (its whole output: three lines "Connection lost, reconnecting", then "RetriableError: [unavailable] Error"). No verdict exists from it. The owner's rule for the tools is that a job that failed on an error is not started again on the same tool
+- The review is therefore given by Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only: a maker that neither planned nor built the task; a full review. The line of the task log is not edited (TST-171). From this task on a task log names the reviewer as planned, and the record of the verdict names the reviewer that gave it
+
 #### S1-T04: independent review, round 2: APPROVED
 
 Reviewed commit `2e8bcac0c2f5cad5effbdc161d238309c58af209`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/28 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43339006721; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43339006720; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43339006798 ). Reviewer: OpenAI GPT-5.6 Sol (effort high), through the Codex command-line tool, read-only, the reviewer of round 1 (it names itself more shortly in its verdict); a later round, limited as REV-39 says. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.

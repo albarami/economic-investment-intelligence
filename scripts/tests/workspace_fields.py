@@ -12,10 +12,10 @@ import workspace_guard as guard
 
 EXPECTED_PYPROJECT_FIELDS, EXPECTED_PYPROJECT_PLANTS = 34, 44
 EXPECTED_PACKAGE_LOCK_PLANTS, EXPECTED_WIDE_LOCK_PLANTS = 8, 14
-COUNT_EVERY_PLACE, COUNT_LOCK_EDGES, COUNT_WIDE = 176, 80, 42
-COUNT_PATHS, COUNT_SPELLINGS, COUNT_PYPROJECT_CASES = 20, 10, 9
-MEMBERS: tuple[str, ...] = ("core", "custodian", "product")
-NAMES: tuple[str, ...] = ("eii-core", "eii-custodian", "eii-product")
+COUNT_EVERY_PLACE, COUNT_LOCK_EDGES, COUNT_WIDE = 440, 144, 56
+COUNT_PATHS, COUNT_SPELLINGS, COUNT_PYPROJECT_CASES = 20, 10, 11
+MEMBERS: tuple[str, ...] = ("core", "custodian", "gateway", "product")
+NAMES: tuple[str, ...] = ("eii-core", "eii-custodian", "eii-gateway", "eii-product")
 NOT_VALID = "not = [valid"
 FILLER = "filler"
 PIP_KEYS = (
