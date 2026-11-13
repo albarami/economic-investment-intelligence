@@ -1271,7 +1271,7 @@
 - TYPE: OPEN
 - NEEDED: Confirm the age bands of movement aggregates against the operator's format when its data arrives. This is not a question for the owner.
 - WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 16 sets `age_band` to `15-24`, `25-34`, `35-44`, `45-54`, `55-64` and `65+`, chosen so that a public source's five-year age groups sum into them exactly. The band edges are held in one configuration value, so they can be remapped without changing the generator or the screens.
-- DONE SO FAR: The bands are the closed list of item 16. People under 15 are not carried.
+- DONE SO FAR: The bands are the closed list of item 16; visitors under 15 are counted in the age split's `other` value.
 - OPTIONS: **Recommendation:** keep the bands until the operator's data arrives, then remap the one configuration value if the format differs.
 - NEEDED BY: when the operator's data arrives; not a blocker for version 1.
 
