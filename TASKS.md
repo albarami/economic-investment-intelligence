@@ -220,14 +220,14 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: assignment spike code and fixtures, a road-layer page under `web/spikes/` and its trace.
 - Depends: S1-T02, S1-T03.
 - Requirements: ARC-88, SYN-53, SYN-54, DES-50, TST-132, SYN-79, MTH-88, MTH-89, MTH-90, PRV-124, TST-213.
-- Delivery: hard; personas Simulation; status queued.
+- Delivery: hard; personas Simulation; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/38).
 ### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
 - Goal: Make the serve command of the performance spike store a posted trace, and make the page show its WebGL renderer as soon as it loads and refuse a software or remote renderer, or a capped frame rate, on screen before the orbit in the gate profile.
 - Acceptance criteria: [x] a test starts the development server of the serve command and posts a trace, which is stored, and a malformed post is refused in JSON; [x] the page shows the unmasked renderer at load; [x] in the gate profile a software or remote renderer, and a frame rate capped below the gate's need, are refused on screen before the orbit, and nothing is posted, with one planted case each; [x] no count, budget, profile or threshold of the gate changes.
 - Scope: `web/spikes/performance/` (the server, the page, the trace judgement, their tests and the spike's README).
 - Depends: S1-T02.
 - Requirements: TST-132, FE-88, PLN-07.
-- Delivery: routine; personas Frontend; status in review (pull request 35). Added by a re-plan of 2026-11-13: the owner's first native run could not be stored (the development server answered the trace's post with an empty 404) and ran through a remote session capped at 30 frames a second; S1-T12 records its traces with the fixed page.
+- Delivery: routine; personas Frontend; status done (pull request 35, merged 2026-11-13). Added by a re-plan of 2026-11-13: the owner's first native run could not be stored (the development server answered the trace's post with an empty 404) and ran through a remote session capped at 30 frames a second; S1-T12 records its traces with the fixed page.
 ### S1-T12 — Native frame-rate traces of the map spikes
 - Goal: Record, in a browser that runs natively on the host of the build machine, the frame-rate trace of the pinned hexagon and particle load, and the same trace with the road layer animated.
 - Acceptance criteria: [ ] the trace records 60 frames per second on the build machine; [ ] the S1-T02 trace is repeated with the road layer animated, and its result is recorded.
