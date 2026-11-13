@@ -37,7 +37,7 @@
 
 ## Consequences
 
-- Slice S4's world build attaches generated employees, wages and residence to register companies; S4-T02 and S4-T03 are re-planned to it; the name generator of S4-T11 is not needed for companies and stays parked.
+- Slice S4's world build attaches generated employees, wages and residence to register companies; S4-T02 and S4-T03 are re-planned to it; the name generator built ahead and parked is not needed for companies and stays parked.
 - Slice S5's release builder releases the new subject's employee count and the area aggregates; the firm-list release of PRV-125 is replaced by the register-company list.
 - The tests that guarded named synthetic firms (TST-207, TST-233 and their kin) move to the new subject, each keeping a planted violation; none is deleted.
 - The map's establishment points open the company card; firm counts and density come from the register.

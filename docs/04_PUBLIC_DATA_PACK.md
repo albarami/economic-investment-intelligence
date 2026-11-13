@@ -35,9 +35,10 @@
   series that the same code also forecasts.
 - [Decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) adds two
   Public sources: the public business register (`biz_register`) and the financial centre's public
-  register (`fc_register`). Their companies are the register companies. Neither is fetched: the
-  file of public records is collected outside the build, kept outside the repository and read only
-  through `EII_REGISTER_FILE`. Firm counts and firm density come from the register.
+  register (`fc_register`). Their companies are the register companies. Neither is fetched: each
+  register's file of public records is collected outside the build, kept outside the repository and
+  read only through its own setting, `EII_REGISTER_FILE` for `biz_register` and
+  `EII_FC_REGISTER_FILE` for `fc_register`. Firm counts and firm density come from the register.
 - A source without stated reuse terms is validation-only: no value, derived share, title or
   geometry from it enters a release. The only exceptions are the two investment sources, the
   census map layers and `busy_gmaps`, used by the owner's decisions of 2026-11-12 for this personal
@@ -129,10 +130,11 @@ at the first fetch". The two ids of the live traffic provider (`traffic_tomtom_f
 [Decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) adds two source
 ids after them: `biz_register`, the public business register, and `fc_register`, the financial
 centre's public register. They are Public sources, but no fetcher reads them. The owner's advisor
-collects the file of public records as a visitor's browser receives it; the file is kept outside the
-repository and read only through the setting `EII_REGISTER_FILE`, by the lead's own shell (the world
-build run there included), the release build and the running product. It is never committed, and
-never put in a brief, a fixture, a worker tool's or a reviewer's hands; tests and continuous
+collects each register's file of public records as a visitor's browser receives it; each file is
+kept outside the repository and read only through its own setting, `EII_REGISTER_FILE` for
+`biz_register` and `EII_FC_REGISTER_FILE` for `fc_register`, by the lead's own shell (the world
+build run there included), the release build and the running product, each read-only. Neither file
+is ever committed, or put in a brief, a fixture, a worker tool's or a reviewer's hands; tests and continuous
 integration use an invented stand-in of the same shape (decision 0022 items 1 and 8). Their
 publisher citation, licence, retrieval date, hash and columns are recorded in `source_registry`
 when the file is first read (open questions below). Terms of a publisher that forbid the use made
@@ -224,7 +226,7 @@ here switch its source off, and the owner is told.
 | `worldpop_qat_agesex` | WorldPop age and sex structures, 100 m grids, Qatar | WorldPop | inside `./eii build-public`; pages `https://hub.worldpop.org/project/categories?id=8` and `https://hub.worldpop.org/geodata/listing?id=138`, read 2026-11-12; file URL, host and year to be recorded at the first fetch | CC BY 4.0 (DOI 10.5258/SOTON/WP00841) |
 | `weather_openmeteo` | Open-Meteo historical weather, hourly | Open-Meteo | inside `./eii build-public`, into the public cache as a hashed file; documentation `https://open-meteo.com/en/docs/historical-weather-api`, terms `https://open-meteo.com/en/terms` and licence page `https://open-meteo.com/en/licence`, read 2026-11-12; host, location and variables to be recorded at the first fetch | free interface for non-commercial use (`licence_basis: provider_terms`); data CC BY 4.0, with the attribution the publisher asks for |
 | `biz_register` | Public establishment records of the public business register: each field its public card shows, person names excluded ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)) | to be recorded in `source_registry` when the file is first read | not fetched: one file collected by the owner's advisor as a visitor's browser receives it, kept outside the repository and read only through `EII_REGISTER_FILE`; no fetcher for the register's site is in the repository (decision 0022 item 1) | to be recorded when the file is first read; terms that forbid the use made here switch the source off |
-| `fc_register` | Public company records of the financial centre's public register, under the same rules as `biz_register` ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 1) | to be recorded in `source_registry` when the file is first read | as `biz_register`: not fetched, read only through `EII_REGISTER_FILE` | to be recorded when the file is first read; terms that forbid the use made here switch the source off |
+| `fc_register` | Public company records of the financial centre's public register, under the same rules as `biz_register` ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 1) | to be recorded in `source_registry` when the file is first read | as `biz_register`: not fetched; a file of its own, kept outside the repository and opened read-only only through `EII_FC_REGISTER_FILE` (decision 0022 item 1) | to be recorded when the file is first read; terms that forbid the use made here switch the source off |
 
 The `.../` prefix in census and boundary rows is
 `https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/`. A portal identifier is
