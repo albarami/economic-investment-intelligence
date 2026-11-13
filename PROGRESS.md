@@ -16908,6 +16908,61 @@ Seed:      2026111397
 Notes:     The whole test command on the build machine.
 ```
 
+### D0022 — the fix round after review round 1 (pull request https://github.com/albarami/economic-investment-intelligence/pull/37)
+
+- Review round 1 (OpenAI, through Codex) returned REJECTED with five findings, F1 to F5; the lead briefed one fix round (a Claude Opus 5.5 agent of the lead, persona: principal technical editor of specification documents) with X1 to X6: F1, a withheld count keeps its row (`employee_count` nullable, `suppression_reason_code` `CARRIED_FORWARD`) in DAT-140, the column table, PRV-67, PRV-125, TST-207, document 12 section 5.1 and TASKS.md S5-T10; F2, only the attached employment, wage and residence records and what is derived from them are generated, and an unpublished register field is taken only from the register files or is absent (SYN-16 plants a generated `licence_status`); F3, the financial centre's register is read through `EII_FC_REGISTER_FILE` everywhere, with its own configuration row in document 13; F4, the claim catalogue and PRV-118 accept the list rank, fit and rank-stability facts of DAT-145 in the register-company list templates only; F5, a registration number may appear in card and list responses, pages and exports (ARC-03) and is a hit in a model request, egress record, ledger row or log; X6, decision 0022 names the parked name generator without a task number.
+- The lead read the whole word diff against each finding's Fix, ran the documentation check with the local private pattern list too (exit 0), the tree check (exit 0), `cmp AGENTS.md CLAUDE.md` (exit 0) and a scan of the diff for runs of eight or eleven digits (none), then committed the work as 77fc27f9fb62449bddd8f7f7dffba747cd719239.
+
+#### Evidence for the work commit `77fc27f9fb62449bddd8f7f7dffba747cd719239`
+
+```text
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached
+Commit:    77fc27f9fb62449bddd8f7f7dffba747cd719239
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 305 text files, 60 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check at the work commit: every required file, every requirement identifier unique and defined, every link and anchor resolves.
+```
+
+```text
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached
+Commit:    77fc27f9fb62449bddd8f7f7dffba747cd719239
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached
+Commit:    77fc27f9fb62449bddd8f7f7dffba747cd719239
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     AGENTS.md and CLAUDE.md are byte-identical after the amendment of rules 3, 8, 10 and 24.
+```
+
+```text
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached
+Commit:    77fc27f9fb62449bddd8f7f7dffba747cd719239
+Command:   ./eii test --seed 2026111403
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1376 passed, 0 failed, 0 skipped
+Seed:      2026111403
+Notes:     The whole test command on the build machine.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
