@@ -15,8 +15,8 @@ from eii_custodian.publicdata.fetch.checks import (
     period_failure,
     schema_failure,
 )
-from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, RegistryError
+from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 from eii_custodian.publicdata.fetch.transport import (
     ATTEMPT_LIMIT,
     BACKOFF_S,
@@ -301,7 +301,7 @@ def _terms(entry: Entry, reader: Read) -> Prepared:
         terms, failure = _call(entry, entry.terms_url, reader)
         if failure is not None or terms is None:
             return _failed(entry, failure)
-        terms_hash = sha256_hex(terms.body)
+        terms_hash = terms_text_sha256(terms.body)
         if _forbids(entry, terms.body):
             return _failed(
                 entry,
@@ -350,7 +350,7 @@ def read_recorded_terms(
     if failure is not None or terms is None:
         return RecordedTerms("", False, failure)
     return RecordedTerms(
-        sha256_hex(terms.body),
+        terms_text_sha256(terms.body),
         _phrase_present(terms.body, entry.terms_forbid),
         None,
     )

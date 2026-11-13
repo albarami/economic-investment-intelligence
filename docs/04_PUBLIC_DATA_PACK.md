@@ -344,7 +344,7 @@ landing_url: https://www.data.gov.qa/explore/dataset/electricity-total-consumpti
 licence_id: CC-BY-4.0          # one of the ids in section 4
 licence_basis: dataset         # dataset | portal_terms | none_stated | owner_decision (PUB-12) | provider_terms (PUB-95, PUB-97)
 licence_url: https://www.data.gov.qa/pages/license/annexes
-terms_sha256: null             # owner_decision, or a publisher that is not a portal (PUB-97): hash of the terms or licence page as read at fetch
+terms_sha256: null             # owner_decision, or a publisher that is not a portal (PUB-97): SHA-256 of the terms or licence page's normalised visible text (scripts, styles, comments and tags removed; entities decoded; white space collapsed; Unicode NFC). The build log records terms_fingerprint visible_text beside it; a previous raw-byte digest has no such kind and is not compared
 decision_record: null          # owner_decision only: the record that grants the use (0017 for the investment sources and the census map layers; 0019 for busy_gmaps)
 public_splits: []              # split dimensions this Public source may carry: sex, nationality (PUB-90)
 commit_allowed: false          # true only for small derived configs and fixtures

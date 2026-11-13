@@ -11,6 +11,10 @@ import pytest
 from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+from eii_custodian.publicdata.fetch.terms_text import (
+    FINGERPRINT_VISIBLE_TEXT,
+    terms_text_sha256,
+)
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault
 
 PORTAL = "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/planted-slug/exports/json"
@@ -338,7 +342,8 @@ def test_recorded_phrase_switches_the_source_off_and_the_build_continues(
             "reason": "terms read at fetch forbid the use",
             "retrieved_utc": "2026-11-13T08:00:00Z",
             "switched_off": True,
-            "terms_sha256": sha256_hex(terms_body),
+            "terms_sha256": terms_text_sha256(terms_body),
+            "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
             "terms_url": TERMS,
         }
     ]
@@ -431,7 +436,8 @@ def test_watched_row_with_the_old_forbidding_words_is_fetched(
         {
             "key": watched.key,
             "retrieved_utc": "2026-11-13T08:00:00Z",
-            "terms_sha256": sha256_hex(OLD_FORBIDDING_WORDS),
+            "terms_sha256": terms_text_sha256(OLD_FORBIDDING_WORDS),
+            "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
             "terms_url": watched.terms_url,
         }
     ]
@@ -451,6 +457,7 @@ def test_changed_terms_hash_is_logged_and_the_row_is_still_fetched(
                 "key": watched.key,
                 "retrieved_utc": "2026-11-12T08:00:00Z",
                 "terms_sha256": "a" * 64,
+                "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
                 "terms_url": watched.terms_url,
             }
         ],
@@ -479,7 +486,8 @@ def test_changed_terms_hash_is_logged_and_the_row_is_still_fetched(
         {
             "key": watched.key,
             "retrieved_utc": "2026-11-13T08:00:00Z",
-            "terms_sha256": sha256_hex(terms_body),
+            "terms_sha256": terms_text_sha256(terms_body),
+            "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
             "terms_url": watched.terms_url,
         }
     ]
@@ -500,6 +508,7 @@ def test_skipped_watched_row_hashes_terms_and_does_not_switch_off(
                 "key": watched.key,
                 "retrieved_utc": "2026-11-12T08:00:00Z",
                 "terms_sha256": "b" * 64,
+                "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
                 "terms_url": watched.terms_url,
             }
         ],
@@ -532,7 +541,8 @@ def test_skipped_watched_row_hashes_terms_and_does_not_switch_off(
         {
             "key": watched.key,
             "retrieved_utc": "2026-11-13T08:00:00Z",
-            "terms_sha256": sha256_hex(OLD_FORBIDDING_WORDS),
+            "terms_sha256": terms_text_sha256(OLD_FORBIDDING_WORDS),
+            "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
             "terms_url": watched.terms_url,
         }
     ]

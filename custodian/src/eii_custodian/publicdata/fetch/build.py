@@ -31,6 +31,7 @@ from eii_custodian.publicdata.fetch.report import (
     skip_line,
     terms_changed_line,
 )
+from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
 from eii_custodian.publicdata.fetch.transport import Transport
 from eii_custodian.publicdata.stage import run_stage
 
@@ -270,6 +271,7 @@ def _switch_off_on_terms(
             "key": entry.key,
             "terms_url": entry.terms_url,
             "terms_sha256": read.sha256,
+            "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
             "retrieved_utc": clock(),
             "reason": reason,
             "switched_off": True,
@@ -335,12 +337,13 @@ def _record_watched_terms(
     lines: list[str],
     terms: list[dict[str, object]],
 ) -> None:
-    """Record the terms hash and retrieval time. A changed hash is named."""
+    """Record the visible-text fingerprint. A changed fingerprint of this kind is named."""
     terms.append(
         {
             "key": entry.key,
             "retrieved_utc": retrieved,
             "terms_sha256": digest,
+            "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
             "terms_url": entry.terms_url,
         }
     )
@@ -350,7 +353,11 @@ def _record_watched_terms(
 
 
 def _previous_term_hashes(cache: Path) -> dict[str, str]:
-    """Return each key's terms hash from the previous build log, when one exists."""
+    """Return visible-text fingerprints from the previous build log.
+
+    A row with no ``terms_fingerprint`` of ``visible_text`` was hashed from
+    raw page bytes and is not compared.
+    """
     path = cache / LOG_NAME
     if not path.is_file():
         return {}
@@ -369,7 +376,13 @@ def _previous_term_hashes(cache: Path) -> dict[str, str]:
             continue
         key = item.get("key")
         digest = item.get("terms_sha256")
-        if isinstance(key, str) and isinstance(digest, str) and digest:
+        kind = item.get("terms_fingerprint")
+        if (
+            isinstance(key, str)
+            and isinstance(digest, str)
+            and digest
+            and kind == FINGERPRINT_VISIBLE_TEXT
+        ):
             found[key] = digest
     return found
 
