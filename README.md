@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Slice S0 (foundation) in progress; no feature code yet; scope amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| Status | Slice S0 (foundation) in progress; no feature code yet; scope amended by decisions 0016, 0017 and 0019 on 2026-11-12 and by decision 0022 on 2026-11-13 |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Introduce a fully synthetic, public proof-of-concept design and its reading path. |
