@@ -15496,6 +15496,188 @@ Seed:      none
 Notes:     Both commits have a Conventional Commit subject.
 ```
 
+#### S1-T01: independent review, round 1: REJECTED (pull request https://github.com/albarami/economic-investment-intelligence/pull/32 )
+
+Reviewed commit `5ba79fe494f241350d190f10132f2daf9bf4691b`, the head of the pull request at that time, with all six required checks green on it (`check-docs` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43346718090/job/131627720923; `planted-failures` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43346717951/job/131627720067; `sandbox proof` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43346717924/job/131627720246; `secret-scan` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43346717951/job/131627720627; `static-checks` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43346717951/job/131627720428; `tests` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43346717951/job/131627720577). Reviewer: OpenAI GPT-5.6 Sol, through the Codex command-line tool, read-only; a maker that neither planned nor built the task; a full review of the pull request's whole change against main. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S1-T01 (pull request 32)
+COMMIT: 5ba79fe494f241350d190f10132f2daf9bf4691b
+REVIEWER: OpenAI GPT-5
+CHECKS:
+  REV-10 FAIL F1 FE-56 and ruling R9 require the browser test to fail whenever a non-same-origin request is attempted; the ordinary-page helper aborts such requests but discards the record without asserting it.
+  REV-11 PASS The lead's head run `./eii test --seed 2026111333` exited 0 with 1296 passed and no skips, the documentation check exited 0, and hosted `tests` passed at https://github.com/albarami/economic-investment-intelligence/actions/runs/43346717951/job/131627720577.
+  REV-12 PASS The base diff contains the 56 recorded implementation paths plus PROGRESS.md and TASKS.md; the separate baseline commit contains exactly the three image files.
+  REV-13 PASS The page, server, renderer, recorder, verifier and browser tests are implemented without placeholders, stubs or invented product figures.
+  REV-14 PASS The change uses an explicitly synthetic fixture and no custodian data or secret; hosted `secret-scan` passed at https://github.com/albarami/economic-investment-intelligence/actions/runs/43346717951/job/131627720627.
+  REV-15 PASS No threshold, tolerance or assertion was loosened; there is no skip, retry or expected failure. The three CI-generated baselines were added alone in commit d98de43d4856fd9b34b6ddcd29a87b7c359696bb.
+  REV-16 FAIL F1 The implementation otherwise follows the rulings and pins, but its ordinary browser-test path does not implement ruling R9's requirement that any foreign-origin request make the test fail.
+  REV-17 PASS The task log, task ledger, open items, command documentation, pin registry and spike READMEs are updated; the head documentation check exited 0.
+  REV-18 PASS The current page serves a self-only content security policy, blocks foreign routes, keeps the browser keyless, and installs system libraries only in CI; no data-handling or secret path was introduced.
+  REV-19 PASS The spike implements the assigned joint and leaves the live-provider half of FE-56 to OI-115 without reopening a settled decision.
+  REV-20 N/A The spike displays no product fact or numerical economic figure requiring provenance and lineage.
+  REV-21 N/A The synthetic spike displays no numeral or product claim requiring a Fact chip.
+  REV-22 PASS No privacy invariant, parameter, treatment, attack or protected release code changed.
+  REV-23 PASS No product import of custodian code was added; the passing head suite includes the existing boundary guards.
+  REV-24 PASS New Arabic strings and all three images remain `pending native review`; the digit and direction guards pass. This shell-only review could not display the images, but all three baseline SHA-256 digests match the baseline commit message, `evidence/run.json`, and their evidence-image counterparts; glyphs.spec.ts lines 81-110 define the three corresponding views.
+  REV-25 PASS The fixture explicitly says its geometry and names are invented, contains no real custodian record, secret, private path, realistic identifier or named-product comparison, and the public-repository checks passed.
+  REV-26 PASS The documents limit the result to this synthetic spike and state its unmeasured limits; no prohibited product, privacy, endorsement, forecast, lookup or action claim appears.
+  REV-27 PASS The lead's `cmp AGENTS.md CLAUDE.md` on the head exited 0 and the documentation check passed.
+  REV-28 PASS The fixture introduces no custodian-type synthetic identifier, registration-like value, or bare eight- or eleven-digit identifier; its internal feature keys are invented word tokens.
+  REV-29 PASS Every displayed place name and shape belongs to the explicitly synthetic fixture; no attribute is attached to a real named place or business.
+  REV-38 PASS The change adds no serving-plane gateway import, provider setting, decision record, live gateway call or gateway-derived screen text.
+FINDINGS:
+  F1 (REV-10)
+    File: web/spikes/glyphs/tests/glyphs.spec.ts
+    Place: `arm` and `open`, lines 37-61; compare the planted remote-font test at lines 128-142
+    Wrong: `arm` records and aborts a foreign-origin request, but `open` never examines `seen`. Consequently an ordinary Arabic, English or overlap test can remain green after attempting a non-same-origin request whenever the blocked resource is nonessential. The planted test confirms the opposite predicate—`judgeRequests(...).ok` is expected to be false—without connecting that result to the normal rendering path. This breaks FE-56, ruling R9, REV-10 and REV-16.
+    Fix: make the shared ordinary-page helper fail after page settlement when any captured request is non-same-origin, including the CSP-blocked planted URL, while retaining route abortion. Add a planted Playwright test that opens `?lang=en&plant=remote-font` through that same guarded helper and proves it rejects with `assets.invalid`; then show `npm --prefix web run test:spike:glyphs` and `./eii test --seed N` exiting 0 with the restored normal fixture.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+- The lead's judgement: the finding is valid. The first build brief ruled that every request of the page goes to its own origin and that the test fails on any other (ruling R9); the helper `open` of `web/spikes/glyphs/tests/glyphs.spec.ts` collected the requests and never judged them, so the rule was proved only by the one test that plants a remote font, not by the ordinary tests. Nothing was argued away
+- F1, fixed by the builder (Cursor command-line tool, `grok-4.7-high`, xAI) in one round, in that one file. The planted test `the ordinary page helper rejects a remote font attempt` was written first: it opens the English page with the planted remote font through the helper and requires the helper to reject with a message that names the foreign host; before the change it failed, because the helper resolved. The helper now records every request of the page and, after the page has settled, gives the list to the existing pure function `judgeRequests` with the page's origin and throws its detail when any request is not same-origin; the route still aborts such a request. The builder's runs showed that the content security policy stops the planted font before the route sees it, so the helper listens to the page's request event as well: without that listener the planted test fails
+- The lead's own two breaks on the fix, each restored: with the line that throws on a bad verdict removed, the planted test fails; with the listener of the request event removed, the planted test fails. The browser suite holds ten tests and all pass with the fixture as committed, so no ordinary view of the page asks another origin for anything
+- The test `a remote font attempt is blocked` is unchanged. No page, server, guard, workflow, baseline image or document changed in the fix commit
+- What the reviewer said about the images, recorded as it stands: its tool reads through a shell and could not display the three baselines; it compared their three digests with the message of the baselines commit, with `web/spikes/glyphs/evidence/run.json` and with the evidence images, and read the three tests that define the views (its check REV-24). The lead has looked at all three images. The native reading of the five names and of the images is the owner's and stays recorded as pending
+- Round 2 goes to the same reviewer, limited as REV-39 says: the finding, defects in the lines changed since the reviewed commit, and the checks that are never limited
+
+#### Evidence for the work commit `e8931c5e25e41a270736611f3b455d02945a1f70`
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    e8931c5e25e41a270736611f3b455d02945a1f70
+Command:   npm --prefix web run test:spike:glyphs
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "  10 passed (4.5s)" (browser tests of the glyph spike)
+Seed:      none
+Notes:     Finding F1 at the fix commit: ten browser tests pass, among them the new `the ordinary page helper rejects a remote font attempt` and the unchanged `a remote font attempt is blocked`. Outside the hosted job the three pixel comparisons do not run, and the suite says so.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    e8931c5e25e41a270736611f3b455d02945a1f70
+Command:   python3 -I -c "import pathlib,re; t=pathlib.Path('web/spikes/glyphs/tests/glyphs.spec.ts').read_text(encoding='utf-8'); print(len(re.findall(r'test\\.(skip|fixme|only)|eslint-disable|@ts-ignore|@ts-expect-error', t)), t.count('judgeRequests(seen'), t.count('if (!verdict.ok) throw new Error(verdict.detail);'))"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "0 2 1" (skips or suppression comments in the file; calls of the request judge on the collected list; the line of the helper that throws on a bad verdict)
+Seed:      none
+Notes:     The test file holds no skip and no suppression comment (REV-15); the collected requests are judged in two places, the helper of the ordinary tests and the unchanged planted test, and the helper throws on a bad verdict.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    e8931c5e25e41a270736611f3b455d02945a1f70
+Command:   ./eii test --seed 2026111336
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1296 passed, 0 failed, 0 skipped
+Seed:      2026111336
+Notes:     The whole test command at the fix commit; the browser tests run inside it through the web checks.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    e8931c5e25e41a270736611f3b455d02945a1f70
+Command:   npm --prefix web run lint
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "> eslint --max-warnings 0 ." (exit code decides)
+Seed:      none
+Notes:     Web lint at the fix commit: exit code 0.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    e8931c5e25e41a270736611f3b455d02945a1f70
+Command:   npm --prefix web run format:check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Web format check.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    e8931c5e25e41a270736611f3b455d02945a1f70
+Command:   npm --prefix web run typecheck
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "> tsc --noEmit" (exit code decides)
+Seed:      none
+Notes:     Web type check at the fix commit: exit code 0.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    e8931c5e25e41a270736611f3b455d02945a1f70
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 275 text files, 57 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check at the fix commit.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    e8931c5e25e41a270736611f3b455d02945a1f70
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    e8931c5e25e41a270736611f3b455d02945a1f70
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    e8931c5e25e41a270736611f3b455d02945a1f70
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','5ba79fe494f241350d190f10132f2daf9bf4691b...e8931c5e25e41a270736611f3b455d02945a1f70'],check=True,capture_output=True,text=True).stdout.splitlines()); w='M:web/spikes/glyphs/tests/glyphs.spec.ts'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "1 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope of the fix commit (REV-12): the one test file; the page, the server, the guards, the workflow, the baselines and the documents are unchanged.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    e8931c5e25e41a270736611f3b455d02945a1f70
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','5ba79fe494f241350d190f10132f2daf9bf4691b..e8931c5e25e41a270736611f3b455d02945a1f70'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The fix commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
