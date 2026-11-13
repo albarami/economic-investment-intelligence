@@ -16854,6 +16854,60 @@ Seed:      2026111393
 Notes:     The whole test command on the build machine.
 ```
 
+### D0022 — a correction after the ledger: the root README (pull request https://github.com/albarami/economic-investment-intelligence/pull/37 )
+
+- After the ledger commit the lead's scan for leftover terms found the root README still describing named synthetic firms (the businesses paragraph and the rows of journeys D3 and D4). The lead corrected the three lines to decision 0022 in commit 9005f997a0d06518fcdaf4ed962bf1b84b45f3d0; the documentation check passed, with the local private pattern list too. The earlier decision records keep their wording, as rule 46 asks.
+
+#### Evidence for the work commit `9005f997a0d06518fcdaf4ed962bf1b84b45f3d0`
+
+```text
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached
+Commit:    9005f997a0d06518fcdaf4ed962bf1b84b45f3d0
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 305 text files, 60 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check at the work commit: every required file, every requirement identifier unique and defined, every link and anchor resolves.
+```
+
+```text
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached
+Commit:    9005f997a0d06518fcdaf4ed962bf1b84b45f3d0
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached
+Commit:    9005f997a0d06518fcdaf4ed962bf1b84b45f3d0
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     AGENTS.md and CLAUDE.md are byte-identical after the amendment of rules 3, 8, 10 and 24.
+```
+
+```text
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached
+Commit:    9005f997a0d06518fcdaf4ed962bf1b84b45f3d0
+Command:   ./eii test --seed 2026111397
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1376 passed, 0 failed, 0 skipped
+Seed:      2026111397
+Notes:     The whole test command on the build machine.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
