@@ -2,15 +2,15 @@
 
 | | |
 |---|---|
-| Status | Draft v0.2, created by decisions 0016 and 0017 and amended by decisions 0018 and 0019 on 2026-11-12 |
-| Date | 2026-11-12 |
+| Status | Draft v0.2, created by decisions 0016 and 0017 and amended by decisions 0018 and 0019 on 2026-11-12, and by decision 0022 on 2026-11-13 |
+| Date | 2026-11-13 |
 | Owner | albarami |
 | Purpose | List what a deployment on real records must add beyond the demonstrator, so that no version 1 capability is read as ready for real data. |
-| Read first | [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md), [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) |
+| Read first | [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md), [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) |
 
 ## In brief
 
-- Nothing is built yet. Version 1 is a demonstrator on fully synthetic custodian-type records, simulated mobility and cited Public data. It reads no real custodian record and no real mobility feed (AGENTS.md rules 3 and 4); the one live outside source at run time is the optional traffic provider, off by default ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 17).
+- Nothing is built yet. Version 1 is a demonstrator on synthetic custodian-type labour and residence records attached to the real companies of the public registers ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)), simulated mobility and cited Public data. It reads no real custodian record, except the calibration table of the owner's note, read only by the world build, and no real mobility feed (AGENTS.md rules 3 and 4); the one live outside source at run time is the optional traffic provider, off by default ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 17).
 - This document lists what a deployment on real records must add. Each item is a precondition of that deployment, not a version 1 feature. Nothing here says that the product exists, that it passes a gate or that version 1 meets any item.
 - The version 1 controls are the floor. A deployment adds controls; it never relaxes one (AGENTS.md rule 12).
 - Six areas: real footfall counts from a telecom feed; differencing across periods, the forecast of a real protected series included; firm-level release of real register fields; query auditing and rate limits for drawn areas; the sources, the traffic provider included, that stay on if the product is ever hosted publicly or for a commercial purpose; and the governance of real custodian data, where document 13 already covers several points.
@@ -20,7 +20,7 @@
 
 | ID | Requirement |
 |---|---|
-| DHA-01 | This document applies only to a deployment that reads real custodian records, a real mobility feed or real register fields about named firms. Version 1 does none of these (BRF-37, BRF-38). The optional traffic provider and the published relative busyness of named venues are neither a custodian record nor a mobility feed; section 6 covers their hosting. |
+| DHA-01 | This document applies only to a deployment that reads real custodian records, a real mobility feed or real custodian figures about named firms. Version 1 does none of these (BRF-37, BRF-38): it shows the fields that the public business register and the financial centre's public register publish for each register company, which are Public, and the employee count of the synthetic labour and residence records attached to it; the one real custodian-type input, the calibration table of the owner's note, is a table of totals read only by the world build ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)). The optional traffic provider and the published relative busyness of named venues are neither a custodian record nor a mobility feed; section 6 covers their hosting. |
 | DHA-02 | Each requirement that concerns a deployment is met, with its evidence recorded, before that deployment reads its first real record. No document, screen or presentation says that version 1 meets one. |
 | DHA-03 | A deployment keeps every version 1 privacy invariant, security control, test, attack size and tolerance (AGENTS.md rule 12; TST-03). Where a requirement below and a version 1 rule differ, the stricter one applies. |
 | DHA-04 | Each requirement below becomes work only through a decision record and the normal task, review and evidence workflow ([README.md](README.md), "Identifiers and change control"). |
@@ -57,14 +57,14 @@ Version 1 holds one protected window with monthly periods inside it. Each month 
 
 ## 4. Firm-level release of real register fields
 
-Version 1 names only synthetic firms. A named synthetic firm shows a fictional name, activity, size band and area, carries the Synthetic mark and never shows its wages, wage bill or headcount; lists obey the minimum, dominance and complement rules of any protected figure (decision 0016 item 12). Real businesses appear only from public places data, public listings and the investment sources of [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) (decision 0016 item 13).
+Version 1 shows register companies, the real companies of the public business register and of the financial centre's public register ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)); named synthetic firms are retired. A company's card shows every field the register publishes for it, person names excluded, which are Public, and its employee count from the synthetic labour and residence records attached to it; its wages and other labour and residence details appear only as released aggregates under the disclosure rules of document 06. Lists of prospects, partners and suppliers show register companies ordered by tested code over criteria the user can see and change, never by wages. Other real businesses appear only from public places data, public listings and the investment sources of [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) (decision 0016 item 13). A deployment that attaches real custodian records to the register companies would release real company-level figures, and needs this section first.
 
 | ID | Requirement |
 |---|---|
-| DHA-30 | Releasing any register field about a real, named firm needs a recorded legal basis for that field and that use, confirmed in writing by the data owner before the first such release. The pack gives no legal advice (document 06, section 17). |
-| DHA-31 | Every named list is reviewed before release, by a reviewer whose role is recorded, against the list rules and the linkage attack. The review record is kept with the release. A list that lets a reader infer a firm's wages, wage bill or headcount, alone or with any released figure, is not released. |
-| DHA-32 | The version 1 list rules stay the floor: no wage, wage-bill or headcount column; the same minimum, dominance and complement rules as any protected figure; the firm-list linkage attack recovers nothing (TST-207, TST-222). |
-| DHA-33 | No Synthetic, Simulated or apportioned figure, and no estimate, share or score, is attached to a real named firm (AGENTS.md rules 8 and 24; BRF-42; [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 8 and 9). |
+| DHA-30 | Releasing any field of real custodian records about a real, named firm, an employee count from real attached records included, needs a recorded legal basis for that field and that use, confirmed in writing by the data owner before the first such release. The fields that the public registers publish are Public facts and not such a release; their terms of use are recorded with their source ([04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md), [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)). The pack gives no legal advice (document 06, section 17). |
+| DHA-31 | Every named list is reviewed before release, by a reviewer whose role is recorded, against the list rules and the linkage attack. The review record is kept with the release. A list that lets a reader infer a firm's wages, wage bill or any labour or residence detail beyond an employee count released under DHA-30, alone or with any released figure, is not released; without that basis a firm's headcount stays protected too. |
+| DHA-32 | The version 1 list rules stay the floor ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)): the register-company list holds the employee count and no wage, wage-bill, pay-band or other labour or residence column; a company's wage on a card or in a list fails, and so does a released aggregate that isolates one company; every released aggregate keeps the minimum, dominance and complement rules with every employee count as attacker knowledge; the register-company linkage attack recovers nothing (TST-207, TST-222). |
+| DHA-33 | No Synthetic, Simulated or apportioned figure, and no estimate, share or score, is attached to a real named firm (AGENTS.md rules 8 and 24; BRF-42; [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 8 and 9), except, in version 1, the employee count of a register company's attached records on its card ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 4); in a deployment, a company-level figure from real records follows DHA-30 to DHA-32. |
 
 ## 5. Drawn areas: query auditing and rate limits
 
@@ -152,6 +152,8 @@ Hardening points raised during the build that go beyond a task's acceptance crit
 - OPEN: the rate-limit values, the audit review interval and the role that reviews flagged sequences, set with the data owner (DHA-41, DHA-42).
 - OPEN: the legal basis for any firm-level release, including whether a firm named in a list is told and may object, decided with the data owner (DHA-30).
 - OPEN: which sources stay on if the product is ever hosted publicly or for a commercial purpose (DHA-50 to DHA-53, DHA-85 to DHA-87).
+- OPEN (decision 0022): whether a deployment that attaches real custodian records shows each register company's real employee count on its card, decided with the data owner under DHA-30.
+- OPEN (decision 0022): whether the two public registers stay on if the product is ever hosted publicly or for a commercial purpose belongs to the decision of DHA-50; their terms are recorded when the register file is first read.
 - The entries of section 9 stay unbuilt until a decision record or a real-records deployment makes them work.
 - The items of section 8 stay open as real-deployment items; [OPEN_ITEMS.md](../OPEN_ITEMS.md) keeps their history.
 
@@ -160,6 +162,7 @@ Hardening points raised during the build that go beyond a task's acceptance crit
 - [Decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md), 2026-11-12: the priority rule and the register of section 9.
 - [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), 2026-11-12: the provider, the relative-busyness source, the weather source and the forecast of a real protected series, whose real-deployment consequences DHA-84 to DHA-87 list.
 - [Decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) and [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), 2026-11-12: the version 1 scope and the public data additions whose real-deployment consequences this document lists.
+- [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md), 2026-11-13: the register companies and the attached synthetic records that DHA-01 and section 4 now describe.
 - [Decision 0002](decisions/0002-three-planes-and-the-release-boundary.md) and [decision 0007](decisions/0007-disclosure-control-by-pooling-and-stable-treatment.md): the release boundary and the stable treatment that a deployment keeps.
 - [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) (sections 9 and 17), [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md) (sections 2 and 11), [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md) and [OPEN_ITEMS.md](../OPEN_ITEMS.md).
 - No external source was used.

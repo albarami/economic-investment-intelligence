@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Slice S0 (foundation) in progress; no feature code yet; scope amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| Status | Slice S0 (foundation) in progress; no feature code yet; scope amended by decisions 0016, 0017 and 0019 on 2026-11-12 and by decision 0022 on 2026-11-13 |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Introduce a fully synthetic, public proof-of-concept design and its reading path. |
@@ -144,7 +144,7 @@ The map comes first; the journeys, services and cases are built on it.
 - **Who is there through the day.** Estimated people around this location, hour by hour, as counts with a range, split into workers, residents and visitors, with crowd density, the summer switch and three event days (National Day, a day in Ramadan, a major match). Never the footfall of a named building or business. For a whole release unit, a day type and an hour, the simulated workers and residents present are also shown by pay band, marked Inferred and Simulated and never called spending.
 - **Traffic.** Simulated congestion by hour on the real road network, animated through the day, with drive-time areas that change with the hour. With the optional live provider switched on (off by default), live flow tiles and traffic-aware drive-time areas appear with the provider's attribution; nothing of a response is stored.
 - **Pay, the distinctive layer.** Separate worker and resident pay cards with coverage and the housing split; six area-level indicators for covered earners, with monthly periods so that "what changed" and wage trends work, and the average never shown alone; a labour-market view whose projections are marked as projections and whose forecasts follow the rules below.
-- **The businesses.** Real businesses from public places data and public listings, public tenders where a public source exists, and announced investment projects from the FDI dashboard of the national investment promotion agency, whose capex and jobs keep the source's note that they are estimates. Named synthetic firms appear as prospects, partners and suppliers, always marked Synthetic. Openings and closures are shown over time.
+- **The businesses.** Real businesses from public places data and public listings, public tenders where a public source exists, and announced investment projects from the FDI dashboard of the national investment promotion agency, whose capex and jobs keep the source's note that they are estimates. The companies of the public registers are real; their labour and residence records are synthetic and attached to them, and prospects, partners and suppliers are register companies (decision 0022). Openings and closures are shown over time.
 - **Public evidence with source chains.** Licences, zone utilities, transit, property sales with deal counts, building permits, employer scale, industrial capacity, visitor counts of named public places, official splits by sex or nationality as Public facts, population by age and sex from a published grid (whole cells summed over a chosen area), and the agency's sector, opportunity, incentive, set-up and law pages. Every figure shows its source and retrieval date.
 - **Forecasts, base rates and estimates.** Forecasts of a closed list of published series (licence issues and cancellations, property prices, hotel demand, prices, imports, announced investment and the construction pipeline), each with an interval built from its own backtest and its measured backtest error; entry and closure base rates from the Public licence tables, with their counts and period, and no survival figure until a Public source links a cancellation to its issue; and a site demand and revenue estimate for a chosen area, as a low, a middle and a high case with its main drivers, labelled "estimate on simulated inputs" while an input is simulated. All of it is computed by tested code; nothing is estimated for a named real building or business.
 
@@ -154,8 +154,8 @@ Seven decision journeys, each ending with its own answer:
 |---|---|
 | D1 Whether to enter Qatar | The market entry pack: market profile, customers and competitors, local income context, candidate areas, workforce context and next actions |
 | D2 Which location fits (the flagship) | The location choice for a drawn or travel-time area, with the best-location ranking and its reverse |
-| D3 Where to find customers | A targeted territory and a prospect list of named synthetic firms by sector and size band |
-| D4 Whom to partner with | Named synthetic firms ranked by fit, real businesses from public listings, public tenders where a public source exists, and a structured qualification route |
+| D3 Where to find customers | A targeted territory and a prospect list of register companies by sector and size band |
+| D4 Whom to partner with | Register companies ranked by fit, real businesses from public listings, public tenders where a public source exists, and a structured qualification route |
 | D5 How to organise staffing | Pay by occupation with middle ranges and earner counts (Synthetic), where such workers live, trends, national mean pay and wage trends by economic activity (Public) and the labour-market view |
 | D6 Where to grow in Qatar | Openings and closures over time, cluster change and a second-site comparison (shared reach and overlap, never lost sales) |
 | D7 How to serve the region | Travel times from an area to the ports, the airport, the free zones and the land routes, complementary firms and the import context |

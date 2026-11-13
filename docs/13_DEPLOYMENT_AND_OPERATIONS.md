@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12 |
-| Date | 2026-11-12 |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12, and by decision 0022 on 2026-11-13 |
+| Date | 2026-11-13 |
 | Owner | albarami |
 | Purpose | How the EII proof of concept is installed, started, frozen, run on stage, recovered, backed up and later deployed. |
-| Read first | [02_ARCHITECTURE.md](02_ARCHITECTURE.md), [08_BACKEND.md](08_BACKEND.md), [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md), [16_DEMO_RUNBOOK.md](16_DEMO_RUNBOOK.md), [decisions/0014-typed-decision-gateway.md](decisions/0014-typed-decision-gateway.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) |
+| Read first | [02_ARCHITECTURE.md](02_ARCHITECTURE.md), [08_BACKEND.md](08_BACKEND.md), [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md), [16_DEMO_RUNBOOK.md](16_DEMO_RUNBOOK.md), [decisions/0014-typed-decision-gateway.md](decisions/0014-typed-decision-gateway.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) |
 
 ## In brief
 
@@ -63,6 +63,8 @@ Configuration (names pinned in [02_ARCHITECTURE.md](02_ARCHITECTURE.md); values 
 | `TOMTOM_API_KEY` | key or absent | Owner, session only | Never printed; absent means simulated congestion by hour only; needed by no test, gate, command or story (OPS-71) |
 | `EARTHDATA_API_KEY` | key or absent | Owner, build environment only | Read by the fetcher of `./eii build-public` for the night-lights source; never printed, never in a work tree, brief or sandbox (OPS-71) |
 | `EII_DECISION_PROVIDER` | `none` or `jev`, default `none` | Build/evaluation environment | No stage or run-time use in v1 |
+| `EII_REGISTER_FILE` | path to the register file outside the repository, or absent | Owner, in the lead's own shell | The file of public records of the public business register, source `biz_register` ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 1); read, read-only, by the world build and the release build run from the lead's own shell and by the running product; the path and the file's content are never printed and never put in the repository, a brief, a fixture, a log or a worker tool's or reviewer's environment; tests and continuous integration use an invented stand-in register |
+| `EII_FC_REGISTER_FILE` | path to the financial centre's register file outside the repository, or absent | Owner, in the lead's own shell | The file of public company records of the financial centre's public register, source `fc_register`, a file of its own ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 1); read, read-only, by the same readers as `EII_REGISTER_FILE` and under the same rules: the path and the file's content are never printed and never put in the repository, a brief, a fixture, a log or a worker tool's or reviewer's environment; tests and continuous integration use an invented stand-in of the same shape |
 | `JEV_PRO_API_KEY` | key or absent | Owner, build/evaluation only | Never required by `up`, preflight, freeze or any gate; never printed |
 
 ## 3. Prerequisites and how each is checked
@@ -430,6 +432,7 @@ Open items from the master design that touch this document: OI-01 (API key and s
 
 - Project decision record 0014, "Typed-decision gateway", [decisions/0014-typed-decision-gateway.md](decisions/0014-typed-decision-gateway.md), 2026-11-11.
 - Project decision record 0019, "Forecasts, estimates and scenarios by tested code; six self-serve sources; citations by stable anchor": [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), 2026-11-12. TomTom, Traffic API documentation and pricing page, https://docs.tomtom.com/traffic-api/ and https://docs.tomtom.com/pricing , read 2026-11-12 (free allowance; the developer terms page was not read).
+- Project decision record 0022, "Real register companies with a synthetic labour and residence world attached": [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md), 2026-11-13, for the settings `EII_REGISTER_FILE` and `EII_FC_REGISTER_FILE`.
 - Project decision records 0016 and 0017, "Version 1 covers the whole initiative" and "Public data additions, public splits by sex and nationality, and investment sources": [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) and [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), 2026-11-12.
 - Qatar Open Data Portal, Explore API v2.1, https://www.data.gov.qa/api/explore/v2.1/ (CC BY 4.0; also served at `www.data.qa`), retrieved 2026-11-12 as recorded in decision 0017.
 - National investment promotion agency, FDI Projects dashboard, https://fdiprojects.invest.qa/ (data from fDi Markets), read 2026-11-12 as recorded in decision 0017; and its site, https://www.invest.qa/ , whose sector, opportunity, incentive, set-up and law pages the fetcher reads under the publisher's terms recorded at fetch.
