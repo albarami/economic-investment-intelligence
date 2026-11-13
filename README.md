@@ -24,9 +24,9 @@ Only figures marked Public describe Qatar. Synthetic and Simulated figures demon
 
 ## Current status
 
-This repository contains a documentation pack, the [typed-decision qualification set](evals/typed_decisions/README.md) under `evals/`, the scaffolding of the pinned repository layout (slice S0, task S0-T01) and one `uv` workspace with three package skeletons, `eii_core`, `eii_custodian` and `eii_product` (slice S0, task S0-T02). Each skeleton holds a version string and a small test of its own. The tile spike of slice S1 (task S1-T04) serves one synthetic tile artefact with byte ranges from `product/src/eii_product/api/` and tests it over HTTP on the loopback interface. There is no feature code yet, and no product, release, privacy engine, assistant or interface is claimed to work.
+This repository contains a documentation pack, the [typed-decision qualification set](evals/typed_decisions/README.md) under `evals/`, the scaffolding of the pinned repository layout (slice S0, task S0-T01) and one `uv` workspace with three package skeletons, `eii_core`, `eii_custodian` and `eii_product` (slice S0, task S0-T02). Each skeleton holds a version string and a small test of its own. The tile spike of slice S1 (task S1-T04) serves one synthetic tile artefact with byte ranges from `product/src/eii_product/api/` and tests it over HTTP on the loopback interface. The store spike of slice S1 (task S1-T05) runs one named query on PostgreSQL and on DuckDB from `scripts/store_spike.py` and compares the two complete, ordered results; its live command needs the project's database service and never starts it. There is no feature code yet, and no product, release, privacy engine, assistant or interface is claimed to work.
 
-Twenty-six project commands run from the repository root today: `./eii test`, `./eii preflight`, `./eii up`, the documentation check, the tree check, the lock check, the guard tests on their own, the three Python checks (lint, format and type), the version check, the reference-notes check, the seven sandbox and engine-extension commands (environment, fetch, verify, two launcher checks, the runner facts and the proof of the sandbox tests), the three commit-hook commands (fetch and verify the secret scanner, validate the hook configuration), the two continuous-integration commands (the full-history secret scan and the planted-failure harness), the formatter in write mode and, only after a change to a `pyproject.toml`, the command that rewrites the lock file. Python 3.14 and `uv` are needed for all but the documentation check and the tree check. Two commands change files and are run only to apply the formatter: `uv run --locked ruff format .` here and `npm run format` in `web/`; the lint, format-check and type-check commands only read.
+Twenty-eight project commands run from the repository root today: `./eii test`, `./eii preflight`, `./eii up`, the documentation check, the tree check, the lock check, the guard tests on their own, the three Python checks (lint, format and type), the version check, the reference-notes check, the seven sandbox and engine-extension commands (environment, fetch, verify, two launcher checks, the runner facts and the proof of the sandbox tests), the three commit-hook commands (fetch and verify the secret scanner, validate the hook configuration), the two continuous-integration commands (the full-history secret scan and the planted-failure harness), the two live commands of the store spike (the run on both stores and its planted divergence), the formatter in write mode and, only after a change to a `pyproject.toml`, the command that rewrites the lock file. Python 3.14 and `uv` are needed for all but the documentation check and the tree check. Two commands change files and are run only to apply the formatter: `uv run --locked ruff format .` here and `npm run format` in `web/`; the lint, format-check and type-check commands only read.
 
 ```sh
 ./eii test
@@ -53,6 +53,8 @@ uv run --locked python scripts/hooks_gitleaks.py verify
 uv run --locked pre-commit validate-config .pre-commit-config.yaml
 uv run --locked python scripts/ci_history_scan.py scan
 uv run --locked python scripts/ci_plants.py run
+uv run --locked python scripts/tests/live_store_spike.py
+uv run --locked python scripts/tests/live_store_spike.py --diverge
 uv run --locked ruff format .
 uv lock
 ```
@@ -105,6 +107,8 @@ The two CI helper commands are read-only with respect to this checkout. `uv run 
 ## Database service and preflight
 
 `infra/compose.yaml` defines this project's PostgreSQL 18 with PostGIS 3.6 service, pinned by image digest, published on the loopback address only on the port of `EII_DATABASE_URL` (documented default `127.0.0.1:55440`), and isolated under Compose project `eii-poc`. Only `./eii db-up` and `./eii db-down` start or stop it. `./eii preflight` only probes, and `./eii up` never starts a database.
+
+The store spike of task S1-T05 is the first query that both stores answer. `uv run --locked python scripts/tests/live_store_spike.py` reads the address of `EII_DATABASE_URL` (the loopback address only), creates one temporary table inside a transaction that it rolls back, runs the one named query of `scripts/store_spike.sql` on PostgreSQL and on a temporary DuckDB file opened read-only, and compares both complete, ordered results with a fixed synthetic expectation and with each other. It exits 0 on a match, 1 when the address, a driver or an engine is missing, 2 on a wrong argument and 3 on a difference; with `--diverge` it changes one integer in the DuckDB copy and must exit 3. It never starts or stops the service. Its offline tests run in the guard suite with a real DuckDB and a mocked PostgreSQL, and are not the two-store proof.
 
 The live probe module under `scripts/tests/` fails rather than skips when the service is down. The lead alone arranges the service state for that module; ordinary tests do not start or stop a container.
 
