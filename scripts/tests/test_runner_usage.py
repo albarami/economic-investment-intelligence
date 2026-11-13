@@ -71,6 +71,10 @@ class RunnerUsage(unittest.TestCase):
         words = shlex.split(package["scripts"]["test:checks"])
         web = next(suite for suite in run_tests.SUITES if suite.name == "web-checks")
         self.assertEqual(web.args[-1], words[-1])
+        spike = "spikes/glyphs/tests/*.node-test.mjs"
+        script_globs = tuple(word for word in words if word.endswith(".mjs"))
+        self.assertIn(spike, script_globs)
+        self.assertEqual(web.args, script_globs)
         expected = (
             "python-guards",
             "python-core",

@@ -112,6 +112,21 @@ jobs:
       - name: Check the development server
         run: npm run check:dev
         working-directory: web
+      - name: Install the spike browser
+        run: npm run spike:glyphs:install-browser
+        working-directory: web
+      - name: Capture spike screenshots
+        run: npm run spike:glyphs:capture
+        working-directory: web
+      - name: Upload spike screenshots
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: spike-glyph-screenshots
+          path: data/glyph-captures/
+          if-no-files-found: error
+      - name: Compare spike screenshots
+        run: npm run test:spike:glyphs
+        working-directory: web
       - name: Run all tests
         run: ./eii test --seed 2026111201
 
