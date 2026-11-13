@@ -74,6 +74,8 @@ def _reader(transport: Transport, sleep: Callable[[float], None]) -> Read:
             try:
                 response = transport(url)
             except TransportFault as exc:
+                if exc.kind == "blocked_host":
+                    raise
                 fault = exc
                 if attempt < MAX_RETRIES:
                     sleep(BACKOFF_S[attempt])
@@ -118,6 +120,10 @@ def _call(
         if exc.kind == "unreachable":
             return None, AttemptFailure(
                 6, exc.url, "unreachable", "reachable host", "unreachable"
+            )
+        if exc.kind == "blocked_host":
+            return None, AttemptFailure(
+                1, exc.url, "blocked_host", "allow-listed host", exc.url
             )
         return None, AttemptFailure(
             1, exc.url, "http_status", "http success", "http status"

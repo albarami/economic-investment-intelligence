@@ -14,7 +14,7 @@ import re
 import unicodedata
 from pathlib import Path
 
-from eii_custodian.publicdata.fetch.build import run_build
+from eii_custodian.publicdata.fetch.build import BuildOutcome, run_build
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.transport import Response
@@ -142,6 +142,85 @@ def test_changed_terms_sentence_prints_the_terms_line(tmp_path: Path) -> None:
     assert notice in outcome.lines
     assert loaded["terms"][0]["terms_sha256"] == _visible_sha256(CHANGED)
     assert loaded["terms"][0]["terms_sha256"] != _visible_sha256(VISIBLE)
+
+
+SERVED_GOV = "https://www.data.gov.qa/invented-page"
+SERVED_QA = "https://www.data.qa/invented-page"
+PAGE_ALPHA = b"<html>invented dashboard alpha</html>"
+PAGE_BETA = b"<html>invented dashboard beta</html>"
+STAMP_FIRST = "2026-11-13T08:00:00Z"
+STAMP_SECOND = "2026-11-13T09:00:00Z"
+
+
+def test_second_build_names_its_own_page_host_and_terms(tmp_path: Path) -> None:
+    """Two cached receipts cannot decide the later PASS line, host or terms."""
+    _expect_second_receipt(
+        tmp_path / "alpha-then-beta",
+        earlier=(SERVED_GOV, PAGE_ALPHA, VISIBLE, STAMP_FIRST),
+        later=(SERVED_QA, PAGE_BETA, CHANGED, STAMP_SECOND),
+    )
+    _expect_second_receipt(
+        tmp_path / "beta-then-alpha",
+        earlier=(SERVED_QA, PAGE_BETA, CHANGED, STAMP_FIRST),
+        later=(SERVED_GOV, PAGE_ALPHA, VISIBLE, STAMP_SECOND),
+    )
+
+
+def _expect_second_receipt(
+    cache: Path,
+    *,
+    earlier: tuple[str, bytes, str, str],
+    later: tuple[str, bytes, str, str],
+) -> None:
+    """The second run's page, host, terms hash and retrieval time are the ones named."""
+    watched = _watched()
+    _run_pair(cache, earlier)
+    outcome = _run_pair(cache, later)
+    served, page, sentence, stamp = later
+    digest = sha256_hex(page)
+    host = served.split("/", 3)[2]
+    notice = f"TERMS {watched.key} changed since the last build ({watched.terms_url})"
+    passed = f"PASS {watched.key} sha256={digest} host={host}"
+    loaded = json.loads((cache / "build-log.json").read_text(encoding="utf-8"))
+    metas = sorted(
+        path.name
+        for path in (cache / watched.key).iterdir()
+        if path.name.endswith(".meta.json")
+    )
+    assert metas == sorted(
+        (
+            f"{sha256_hex(earlier[1])}.meta.json",
+            f"{digest}.meta.json",
+        )
+    )
+    assert [line for line in outcome.lines if line.startswith("PASS ")] == [passed]
+    assert notice in outcome.lines
+    assert [line for line in loaded["lines"] if line.startswith("PASS ")] == [passed]
+    assert notice in loaded["lines"]
+    assert loaded["terms"] == [
+        {
+            "key": watched.key,
+            "retrieved_utc": stamp,
+            "terms_sha256": _visible_sha256(sentence),
+            "terms_fingerprint": "visible_text",
+            "terms_url": watched.terms_url,
+        }
+    ]
+
+
+def _run_pair(cache: Path, spec: tuple[str, bytes, str, str]) -> BuildOutcome:
+    """Fetch one watched page and its terms page, served from spec's host."""
+    served, page, sentence, stamp = spec
+    terms = _page(token="token-one", nonce="nonce-one", sentence=sentence)
+
+    def transport(url: str) -> Response:
+        if url == TERMS:
+            return _ok(url, terms)
+        if url == PAGE:
+            return Response(final_url=served, body=page, hops=())
+        raise AssertionError(url)
+
+    return run_build((_watched(),), transport, cache, lambda: stamp, _sleep)
 
 
 def test_raw_byte_previous_log_does_not_print_a_false_terms_line(

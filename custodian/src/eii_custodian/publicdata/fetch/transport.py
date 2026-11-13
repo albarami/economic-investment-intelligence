@@ -30,7 +30,7 @@ class Response:
 
 
 class TransportFault(Exception):
-    """A retryable transport failure. kind is unreachable or http."""
+    """A transport failure. kind is unreachable, http or blocked_host."""
 
     def __init__(self, kind: str, url: str) -> None:
         self.kind = kind

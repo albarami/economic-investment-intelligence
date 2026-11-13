@@ -546,7 +546,7 @@ QiG Tower, Sendian Tower. The slice S2 builder may add candidates; each needs a 
 
 ## 10. Regression examples (master design section 9)
 
-Each row is a test in `custodian/publicdata/tests/` marked `public_data`. These tests run at the end
+Each row is a test in `custodian/tests/` marked `public_data`. These tests run at the end
 of every `./eii build-public` against the cached files and block the build on failure. Census rows
 run only there, because their files are never committed (PUB-13). Comparisons use unrounded source
 values and round only at the end. When an upstream revision changes an expected value, the build

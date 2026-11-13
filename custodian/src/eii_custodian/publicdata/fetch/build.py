@@ -69,6 +69,16 @@ class BuildOutcome:
     failure: FetchFailure | None
 
 
+@dataclass(frozen=True)
+class _Fetched:
+    """Digest, host, retrieval time and terms hash of the receipt this run wrote."""
+
+    digest: str
+    fetch_host: str
+    retrieved_utc: str
+    terms_sha256: str
+
+
 def utc_now() -> str:
     """Return the current UTC time as the retrieval timestamp."""
     return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -82,8 +92,20 @@ def fetch_entry(
     sleep: Sleeper,
 ) -> FetchFailure | None:
     """Fetch one row. An unlisted host is refused before the transport is called."""
+    _fetched, failure = _fetch_row(entry, transport, cache, clock, sleep)
+    return failure
+
+
+def _fetch_row(
+    entry: Entry,
+    transport: Transport,
+    cache: Path,
+    clock: Clock,
+    sleep: Sleeper,
+) -> tuple[_Fetched | None, FetchFailure | None]:
+    """Fetch one row and return the receipt values this run wrote."""
     if entry.url and not approve(entry.url).ok:
-        return FetchFailure(
+        return None, FetchFailure(
             1,
             entry.source_id,
             entry.url,
@@ -92,7 +114,7 @@ def fetch_entry(
             entry.url,
         )
     if entry.terms_url and not approve(entry.terms_url).ok:
-        return FetchFailure(
+        return None, FetchFailure(
             1,
             entry.source_id,
             entry.terms_url,
@@ -103,11 +125,11 @@ def fetch_entry(
     try:
         prepared = prepare(entry, transport, sleep)
     except OSError:
-        return FetchFailure(
+        return None, FetchFailure(
             1, entry.source_id, entry.url, "write_failed", "stored file", "write failed"
         )
     if prepared.failure is not None:
-        return FetchFailure(
+        return None, FetchFailure(
             prepared.failure.code,
             entry.source_id,
             prepared.failure.url,
@@ -116,13 +138,14 @@ def fetch_entry(
             prepared.failure.observed,
         )
     digest = sha256_hex(prepared.body)
+    retrieved = clock()
     sidecar = sidecar_for(
         entry,
         digest=digest,
         nbytes=len(prepared.body),
         fetch_url=prepared.fetch_url,
         fetch_host=prepared.fetch_host,
-        retrieved_utc=clock(),
+        retrieved_utc=retrieved,
         publisher=prepared.publisher,
         source_modified=prepared.source_modified,
         row_count=prepared.row_count,
@@ -140,7 +163,7 @@ def fetch_entry(
             sidecar,
         )
     except OSError:
-        return FetchFailure(
+        return None, FetchFailure(
             1,
             entry.source_id,
             prepared.fetch_url,
@@ -148,7 +171,10 @@ def fetch_entry(
             "stored file",
             "write failed",
         )
-    return None
+    return (
+        _Fetched(digest, prepared.fetch_host, retrieved, prepared.terms_sha256),
+        None,
+    )
 
 
 def run_build(
@@ -186,7 +212,7 @@ def run_build(
             _write_citation(entry, cache, clock())
             lines.append(citation_line(entry.key))
             continue
-        result = fetch_entry(entry, transport, cache, clock, sleep)
+        fetched, result = _fetch_row(entry, transport, cache, clock, sleep)
         if result is not None:
             if result.check == "terms_forbid":
                 lines.append(owner_line(entry.key, entry.terms_url))
@@ -202,10 +228,17 @@ def run_build(
             )
             failure = result
             break
-        if entry.terms_watch:
-            _record_watched_fetch(entry, cache, previous, lines, terms)
-        digest = _stored_digest(cache, entry.key)
-        lines.append(pass_line(entry.key, digest, _stored_host(cache, entry.key)))
+        assert fetched is not None
+        if entry.terms_watch and fetched.terms_sha256:
+            _record_watched_terms(
+                entry,
+                fetched.terms_sha256,
+                fetched.retrieved_utc,
+                previous,
+                lines,
+                terms,
+            )
+        lines.append(pass_line(entry.key, fetched.digest, fetched.fetch_host))
     if failure is None:
         stage = run_stage(cache)
         for figure_id in stage.missing:
@@ -313,22 +346,6 @@ def _watch_skipped_terms(
     return None
 
 
-def _record_watched_fetch(
-    entry: Entry,
-    cache: Path,
-    previous: dict[str, str],
-    lines: list[str],
-    terms: list[dict[str, object]],
-) -> None:
-    """Record the terms hash already stored beside a fetched watched row."""
-    side = _stored_sidecar(cache, entry.key)
-    digest = side.get("terms_sha256")
-    retrieved = side.get("retrieved_utc")
-    if not isinstance(digest, str) or not isinstance(retrieved, str):
-        return
-    _record_watched_terms(entry, digest, retrieved, previous, lines, terms)
-
-
 def _record_watched_terms(
     entry: Entry,
     digest: str,
@@ -387,16 +404,6 @@ def _previous_term_hashes(cache: Path) -> dict[str, str]:
     return found
 
 
-def _stored_sidecar(cache: Path, key: str) -> dict[str, object]:
-    folder = cache_directory(cache, key)
-    for path in folder.iterdir():
-        if path.name.endswith(".meta.json"):
-            loaded: object = json.loads(path.read_text(encoding="utf-8"))
-            if isinstance(loaded, dict):
-                return {str(name): value for name, value in loaded.items()}
-    return {}
-
-
 def _write_citation(entry: Entry, cache: Path, retrieved: str) -> None:
     sidecar = sidecar_for(
         entry,
@@ -412,28 +419,6 @@ def _write_citation(entry: Entry, cache: Path, retrieved: str) -> None:
         switched_off=False,
     )
     commit_citation(cache_directory(cache, entry.key), sidecar)
-
-
-def _stored_digest(cache: Path, key: str) -> str:
-    folder = cache_directory(cache, key)
-    for path in folder.iterdir():
-        if path.name.endswith(".meta.json"):
-            loaded = json.loads(path.read_text(encoding="utf-8"))
-            digest = loaded.get("sha256")
-            if isinstance(digest, str):
-                return digest
-    return ""
-
-
-def _stored_host(cache: Path, key: str) -> str:
-    folder = cache_directory(cache, key)
-    for path in folder.iterdir():
-        if path.name.endswith(".meta.json"):
-            loaded = json.loads(path.read_text(encoding="utf-8"))
-            host = loaded.get("fetch_host")
-            if isinstance(host, str):
-                return host
-    return ""
 
 
 def _write_log(cache: Path, lines: list[str], terms: list[dict[str, object]]) -> None:

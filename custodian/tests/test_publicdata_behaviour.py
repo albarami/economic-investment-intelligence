@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import http.client
+import io
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -15,7 +17,11 @@ from eii_custodian.publicdata.fetch.terms_text import (
     FINGERPRINT_VISIBLE_TEXT,
     terms_text_sha256,
 )
-from eii_custodian.publicdata.fetch.transport import Response, TransportFault
+from eii_custodian.publicdata.fetch.transport import (
+    Response,
+    TransportFault,
+    open_https,
+)
 
 PORTAL = "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/planted-slug/exports/json"
 META = PORTAL[: -len("/exports/json")]
@@ -140,6 +146,52 @@ def test_redirect_to_an_unlisted_host_stores_nothing(tmp_path: Path) -> None:
     assert list(tmp_path.rglob("*")) == [] or all(
         path.is_dir() for path in tmp_path.rglob("*")
     )
+    assert [path for path in tmp_path.rglob("*") if path.is_file()] == []
+
+
+def test_redirect_guard_blocks_an_unlisted_host_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A redirect off the allow-list fails at once and names the blocked address."""
+    blocked = "https://evil.example/landed"
+    payload = (
+        "HTTP/1.1 302 Found\r\n"
+        f"Location: {blocked}\r\n"
+        "Content-Length: 0\r\n"
+        "Connection: close\r\n"
+        "\r\n"
+    ).encode("ascii")
+    attempts: list[str] = []
+
+    class _ScriptedSocket:
+        def sendall(self, data: bytes) -> None:
+            return None
+
+        def send(self, data: bytes) -> int:
+            return len(data)
+
+        def makefile(
+            self, mode: str = "rb", *_args: object, **_kwargs: object
+        ) -> io.BytesIO:
+            return io.BytesIO(payload)
+
+        def close(self) -> None:
+            return None
+
+    def connect(connection: http.client.HTTPSConnection) -> None:
+        attempts.append(connection.host)
+        connection.sock = _ScriptedSocket()
+
+    monkeypatch.setattr(http.client.HTTPSConnection, "connect", connect)
+    sleeps: list[float] = []
+    failure = fetch_entry(_entry(), open_https, tmp_path, _clock, sleeps.append)
+    assert failure is not None
+    assert failure.check == "blocked_host"
+    assert failure.observed == blocked
+    assert failure.url == blocked
+    assert failure.expected == "allow-listed host"
+    assert len(attempts) == 1
+    assert sleeps == []
     assert [path for path in tmp_path.rglob("*") if path.is_file()] == []
 
 
