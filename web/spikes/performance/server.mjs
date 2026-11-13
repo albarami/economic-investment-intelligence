@@ -40,9 +40,32 @@ export function sinkAllowed(sink, evidenceDir) {
   return true;
 }
 
+const TRACE_NAME_ATTEMPTS = 4;
+
 function evidenceId() {
   const hex = randomBytes(4).toString('hex');
   return `r${hex.slice(0, 4)}x${hex.slice(4)}`;
+}
+
+function traceNames(options, layerSet) {
+  if (typeof options.traceName === 'function') return options.traceName;
+  return () => `${layerSet}.${evidenceId()}.json`;
+}
+
+function exclusiveTrace(sink, body, nextName) {
+  const text = `${JSON.stringify(body)}\n`;
+  fs.mkdirSync(sink, { recursive: true });
+  for (let attempt = 0; attempt < TRACE_NAME_ATTEMPTS; attempt += 1) {
+    const name = nextName();
+    try {
+      fs.writeFileSync(path.join(sink, name), text, { flag: 'wx' });
+      return { ok: true, name };
+    } catch (error) {
+      if (error.code === 'EEXIST') continue;
+      throw error;
+    }
+  }
+  return { ok: false, failure: 'trace-name-collision' };
 }
 
 function classify(pathname) {
@@ -157,13 +180,19 @@ async function receiveTrace(request, response, options) {
     sendJson(response, 400, { ok: false, failure: 'unknown-layer-set' });
     return;
   }
-  const name = `${body.layerSet}.${evidenceId()}.json`;
-  fs.mkdirSync(options.sink, { recursive: true });
-  fs.writeFileSync(path.join(options.sink, name), `${JSON.stringify(body)}\n`);
+  const stored = exclusiveTrace(
+    options.sink,
+    body,
+    traceNames(options, body.layerSet),
+  );
+  if (!stored.ok) {
+    sendJson(response, 400, { ok: false, failure: stored.failure });
+    return;
+  }
   const qualification = validateGate(body, body.layerSet, null);
   sendJson(response, 200, {
     ok: true,
-    path: publicPath(options.native, name),
+    path: publicPath(options.native, stored.name),
     qualification: qualification.ok ? 'pass' : qualification.failure,
   });
 }

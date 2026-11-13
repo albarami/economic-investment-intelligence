@@ -9,4 +9,6 @@ export type FrameSummary =
     }
   | { ok: false; failure: string };
 
+export function readUnmaskedRenderer(context: unknown): string;
+
 export function summariseFrames(timestamps: number[]): FrameSummary;

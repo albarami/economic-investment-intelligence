@@ -18,6 +18,7 @@ import {
   SHARE_MINIMUM,
   WALL_CSS_HEIGHT,
   WALL_CSS_WIDTH,
+  readUnmaskedRenderer,
   summariseFrames,
   validateGate,
 } from '../trace.mjs';
@@ -188,6 +189,72 @@ test('a complete native trace passes the gate', () => {
     { ...captureRecord(), browser: 'edge' },
   );
   assert.equal(edge.ok, true, edge.failure);
+});
+
+test('a native trace on the Microsoft Basic Render Driver is refused as a software renderer', () => {
+  const result = validateGate(
+    gateTrace((trace) => ({
+      ...trace,
+      webglRenderer: 'Microsoft Basic Render Driver',
+    })),
+    LAYER,
+    captureRecord(),
+  );
+  assert.equal(result.failure, 'software-renderer');
+});
+
+test('a native trace whose renderer names WARP as its own word is refused', () => {
+  const warped = validateGate(
+    gateTrace((trace) => ({
+      ...trace,
+      webglRenderer: 'ANGLE (synthetic, D3D11 WARP)',
+    })),
+    LAYER,
+    captureRecord(),
+  );
+  assert.equal(warped.failure, 'software-renderer');
+});
+
+test('a renderer word that merely contains the letters warp still passes the gate', () => {
+  const inside = validateGate(
+    gateTrace((trace) => ({
+      ...trace,
+      webglRenderer: 'Synthetic warping adapter',
+    })),
+    LAYER,
+    captureRecord(),
+  );
+  assert.equal(inside.ok, true, inside.failure);
+});
+
+test('the renderer reading returns the unmasked value when it differs from the masked one', () => {
+  const masked = 'Masked synthetic renderer';
+  const unmasked = 'Unmasked synthetic adapter';
+  const context = {
+    RENDERER: 0x1f01,
+    getExtension(name) {
+      if (name !== 'WEBGL_debug_renderer_info') return null;
+      return { UNMASKED_RENDERER_WEBGL: 0x9246 };
+    },
+    getParameter(parameter) {
+      if (parameter === 0x1f01) return masked;
+      if (parameter === 0x9246) return unmasked;
+      return null;
+    },
+  };
+  assert.notEqual(masked, unmasked);
+  assert.equal(readUnmaskedRenderer(context), unmasked);
+  const hidden = {
+    RENDERER: 0x1f01,
+    getExtension() {
+      return null;
+    },
+    getParameter(parameter) {
+      if (parameter === 0x1f01) return masked;
+      return unmasked;
+    },
+  };
+  assert.equal(readUnmaskedRenderer(hidden), '');
 });
 
 test('a headless Windows user agent is refused as non-native', () => {
@@ -564,6 +631,84 @@ test('a post just above the body limit is refused by name and writes nothing', a
     await started.close();
     fs.rmSync(root, { recursive: true, force: true });
   }
+});
+
+const KEPT_TRACE = Buffer.from('synthetic-kept-trace\n');
+const COLLIDING_NAME = 'hexagons-particles.rcollxkept.json';
+const FRESH_NAME = 'hexagons-particles.rfreshxkept.json';
+
+async function withTraceName(traceName, check) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-perf-name-'));
+  const sink = path.join(root, 'sink');
+  const evidence = path.join(root, 'evidence');
+  fs.mkdirSync(sink);
+  fs.mkdirSync(evidence);
+  fs.writeFileSync(path.join(sink, COLLIDING_NAME), KEPT_TRACE);
+  fs.writeFileSync(path.join(root, 'index.html'), '<p>synthetic spike</p>\n');
+  const started = await startStaticServer({
+    mode: 'development',
+    root,
+    sink,
+    evidenceDir: evidence,
+    native: false,
+    traceName,
+  });
+  assert.equal(started.ok, true, started.failure);
+  try {
+    await check({ origin: started.origin, sink });
+  } finally {
+    await started.close();
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+
+test('a colliding trace name leaves the existing file unchanged and writes another name', async () => {
+  let calls = 0;
+  await withTraceName(
+    () => {
+      calls += 1;
+      return calls === 1 ? COLLIDING_NAME : FRESH_NAME;
+    },
+    async ({ origin, sink }) => {
+      const posted = await ask(origin, {
+        method: 'POST',
+        path: '/__perf/trace',
+        body: JSON.stringify(slowTrace()),
+      });
+      assert.equal(posted.status, 200, posted.body);
+      const receipt = JSON.parse(posted.body);
+      assert.equal(receipt.path, FRESH_NAME);
+      assert.notEqual(receipt.path, COLLIDING_NAME);
+      assert.deepEqual(
+        fs.readFileSync(path.join(sink, COLLIDING_NAME)),
+        KEPT_TRACE,
+      );
+      const saved = JSON.parse(
+        fs.readFileSync(path.join(sink, FRESH_NAME), 'utf8'),
+      );
+      assert.equal(saved.layerSet, LAYER);
+    },
+  );
+});
+
+test('a generator that always collides is refused by name and writes nothing', async () => {
+  await withTraceName(
+    () => COLLIDING_NAME,
+    async ({ origin, sink }) => {
+      const refused = await ask(origin, {
+        method: 'POST',
+        path: '/__perf/trace',
+        body: JSON.stringify(slowTrace()),
+      });
+      assert.equal(refused.status, 400);
+      assert.equal(JSON.parse(refused.body).failure, 'trace-name-collision');
+      assert.deepEqual(fs.readdirSync(sink), [COLLIDING_NAME]);
+      assert.deepEqual(
+        fs.readFileSync(path.join(sink, COLLIDING_NAME)),
+        KEPT_TRACE,
+      );
+    },
+  );
 });
 
 test('a test server cannot write the native evidence directory', async () => {

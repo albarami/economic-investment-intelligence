@@ -15,6 +15,7 @@ import {
   WALL_CSS_WIDTH,
 } from './config.mjs';
 import { placeParticles } from './geometry.mjs';
+import { readUnmaskedRenderer } from './trace.mjs';
 
 const LAND = '#c5d0c8';
 const HEX_COLOR: [number, number, number, number] = [32, 96, 112, 230];
@@ -210,11 +211,7 @@ export async function mountScene(input: {
     hexagonInstances: counts.hexagonInstances,
     particleInstances: counts.particleInstances,
     bearing: () => map.getBearing(),
-    renderer: () => {
-      const context = canvas.getContext('webgl2');
-      if (!context) return '';
-      return String(context.getParameter(context.RENDERER));
-    },
+    renderer: () => readUnmaskedRenderer(canvas.getContext('webgl2')),
     step: (elapsed, bearing, freeze) => {
       if (!freeze) placeParticles(input.particles, elapsed);
       tick = elapsed;

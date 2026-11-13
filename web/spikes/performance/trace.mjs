@@ -69,7 +69,13 @@ const PERCENTILE_KEYS = ['p50', 'p95', 'p99'];
 
 const CAPTURE_KEYS = ['role', 'host', 'browser', 'tracePath', 'sha256'];
 
-const SOFTWARE_RENDERERS = ['swiftshader', 'llvmpipe', 'software'];
+const SOFTWARE_RENDERERS = [
+  'swiftshader',
+  'llvmpipe',
+  'software',
+  'microsoft basic render driver',
+];
+const WARP_WORD = /(?:^|[^a-z0-9])warp(?:[^a-z0-9]|$)/;
 
 function fail(failure) {
   return { ok: false, failure };
@@ -192,6 +198,24 @@ function positive(value) {
   return typeof value === 'number' && Number.isFinite(value) && value > 0;
 }
 
+export function readUnmaskedRenderer(context) {
+  if (
+    context === null ||
+    typeof context !== 'object' ||
+    typeof context.getExtension !== 'function' ||
+    typeof context.getParameter !== 'function'
+  ) {
+    return '';
+  }
+  const extension = context.getExtension('WEBGL_debug_renderer_info');
+  if (extension === null || typeof extension !== 'object') return '';
+  const token = extension.UNMASKED_RENDERER_WEBGL;
+  if (typeof token !== 'number') return '';
+  const value = context.getParameter(token);
+  if (typeof value !== 'string' || value.trim() === '') return '';
+  return value;
+}
+
 function judgeRenderer(renderer) {
   if (typeof renderer !== 'string' || renderer.trim() === '') {
     return 'missing-renderer';
@@ -200,6 +224,7 @@ function judgeRenderer(renderer) {
   for (const needle of SOFTWARE_RENDERERS) {
     if (folded.includes(needle)) return 'software-renderer';
   }
+  if (WARP_WORD.test(folded)) return 'software-renderer';
   return '';
 }
 
