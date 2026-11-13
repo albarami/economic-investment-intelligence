@@ -10,6 +10,7 @@ import {
   PROFILE_SMOKE,
   PROVENANCE,
   SEED,
+  EMPTY_CANVAS_PROBE_MS,
   SMOKE_MS,
   WALL_CSS_HEIGHT,
   WALL_CSS_WIDTH,
@@ -19,10 +20,23 @@ import { generateHexagons, generateParticles } from './geometry.mjs';
 import { mountScene, webglFailure } from './layers';
 import notices from './notices.json' with { type: 'json' };
 import { recordOrbit } from './recorder';
-import { summariseFrames } from './trace.mjs';
+import {
+  judgeEmptyCanvas,
+  judgeRenderer,
+  readUnmaskedRenderer,
+  summariseFrames,
+} from './trace.mjs';
 
 const LOCK_PLACEHOLDER = `sha256:${'ab'.repeat(32)}`;
 const ORBIT_TURN = 120;
+const NONE_AVAILABLE = 'none is available';
+const PLANTED_SOFTWARE_RENDERER = 'Microsoft Basic Render Driver';
+const PLANTED_REMOTE_RENDERER = 'Microsoft Remote Display Adapter';
+const PASSING_PLANTED_RENDERER = 'Synthetic passing adapter';
+const CAPPED_INTERVAL_MS = 1000 / 30;
+const SIXTY_INTERVAL_MS = 16.67;
+// Above the 16.7 ms frame budget, so a planted slow scene is recorded rather than treated as the environment.
+const SLOW_SCENE_INTERVAL_MS = 50;
 
 type Spike = {
   phase: string;
@@ -128,6 +142,102 @@ function readProfile(params: URLSearchParams, plant: string): string {
   return params.get('profile') === PROFILE_SMOKE ? PROFILE_SMOKE : PROFILE_GATE;
 }
 
+function environmentGate(profile: string, plant: string): boolean {
+  if (profile !== PROFILE_GATE) return false;
+  return (
+    plant === '' ||
+    plant === 'software-renderer' ||
+    plant === 'remote-renderer' ||
+    plant === 'capped-frame-rate' ||
+    plant === 'slow-scene'
+  );
+}
+
+function plantedRenderer(real: string, plant: string): string {
+  if (plant === 'software-renderer') return PLANTED_SOFTWARE_RENDERER;
+  if (plant === 'remote-renderer') return PLANTED_REMOTE_RENDERER;
+  if (plant === 'capped-frame-rate' || plant === 'slow-scene') {
+    return PASSING_PLANTED_RENDERER;
+  }
+  return real;
+}
+
+function rendererLine(value: string): string {
+  return value.trim() === '' ? NONE_AVAILABLE : value;
+}
+
+function refuse(name: string, rate?: number): void {
+  spike.failure = name;
+  spike.phase = 'failed';
+  show(
+    '#map-failure',
+    rate === undefined ? `refused: ${name}` : `refused: ${name} ${rate}`,
+  );
+}
+
+async function showRenderer(value: string): Promise<void> {
+  show('#renderer', rendererLine(value));
+  spike.webglRenderer = value;
+  spike.phase = 'renderer';
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => resolve());
+  });
+}
+
+function probeContext(container: HTMLElement): {
+  renderer: string;
+  close: () => void;
+} {
+  const canvas = document.createElement('canvas');
+  canvas.width = 2;
+  canvas.height = 2;
+  container.append(canvas);
+  const context = canvas.getContext('webgl2');
+  return {
+    renderer: readUnmaskedRenderer(context),
+    close() {
+      context?.getExtension('WEBGL_lose_context')?.loseContext();
+      canvas.remove();
+    },
+  };
+}
+
+function plantedTimestamps(intervalMs: number, durationMs: number): number[] {
+  const steps = Math.round(durationMs / intervalMs);
+  const stamps: number[] = [];
+  for (let index = 0; index <= steps; index += 1) {
+    stamps.push(index * intervalMs);
+  }
+  return stamps;
+}
+
+function liveTimestamps(durationMs: number): Promise<number[]> {
+  return new Promise((resolve) => {
+    const stamps: number[] = [];
+    let origin = -1;
+    const tick = (now: number) => {
+      if (origin < 0) origin = now;
+      stamps.push(now);
+      if (now - origin >= durationMs) {
+        resolve(stamps);
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
+async function emptyCanvasTimestamps(plant: string): Promise<number[]> {
+  if (plant === 'capped-frame-rate') {
+    return plantedTimestamps(CAPPED_INTERVAL_MS, EMPTY_CANVAS_PROBE_MS);
+  }
+  if (plant === 'slow-scene') {
+    return plantedTimestamps(SIXTY_INTERVAL_MS, EMPTY_CANVAS_PROBE_MS);
+  }
+  return liveTimestamps(EMPTY_CANVAS_PROBE_MS);
+}
+
 async function start(): Promise<void> {
   const params = new URLSearchParams(window.location.search);
   const plant = params.get('plant') ?? '';
@@ -159,6 +269,24 @@ async function start(): Promise<void> {
   }
   const cap = plant === 'ignore-cap' ? window.devicePixelRatio : CAP_VALUE;
   spike.cap = cap;
+  let environmentShown = false;
+  if (environmentGate(spike.profile, plant)) {
+    const probe = probeContext(container);
+    const held = plantedRenderer(probe.renderer, plant);
+    probe.close();
+    await showRenderer(held);
+    environmentShown = true;
+    const rendererRefusal = judgeRenderer(held);
+    if (rendererRefusal !== '') {
+      refuse(rendererRefusal);
+      return;
+    }
+    const verdict = judgeEmptyCanvas(await emptyCanvasTimestamps(plant));
+    if (!verdict.ok) {
+      refuse(verdict.failure, verdict.framesPerSecond);
+      return;
+    }
+  }
   const cells = generateHexagons().slice();
   const particles = generateParticles(cells).slice();
   if (plant === 'omit-hexagon') cells.pop();
@@ -203,11 +331,24 @@ async function start(): Promise<void> {
     spike.cssHeight = scene.canvas.clientHeight;
     spike.bufferWidth = scene.canvas.width;
     spike.bufferHeight = scene.canvas.height;
-    spike.webglRenderer = plant === 'missing-renderer' ? '' : scene.renderer();
+    if (plant === 'missing-renderer') {
+      await showRenderer(scene.renderer());
+      spike.webglRenderer = '';
+    } else if (!environmentShown) {
+      await showRenderer(scene.renderer());
+    }
     const duration =
-      plant === 'missing-renderer'
+      plant === 'missing-renderer' || plant === 'slow-scene'
         ? SMOKE_MS
         : (profileDuration(spike.profile) ?? SMOKE_MS);
+    if (plant === 'slow-scene') {
+      const timestamps = plantedTimestamps(SLOW_SCENE_INTERVAL_MS, duration);
+      for (const elapsed of timestamps) {
+        scene.step(elapsed, (elapsed / duration) * ORBIT_TURN, false);
+      }
+      void finish(scene, particles, flags, plant, timestamps);
+      return;
+    }
     recordOrbit({
       durationMs: duration,
       onFrame: (elapsed) => {

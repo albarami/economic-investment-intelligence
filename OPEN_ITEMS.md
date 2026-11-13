@@ -1063,6 +1063,16 @@
 - OPTIONS: **Recommendation:** keep the re-plan; the owner runs `npm --prefix web run spike:performance:serve` from the repository root, opens the printed address in Chrome or Edge on Windows and leaves the page open until it shows a path; the lead then commits the trace with its capture record. Alternative: the owner allows the build to start the host browser itself with a temporary profile.
 - NEEDED BY: the slice S1 gate (through S1-T12 and S1-T08).
 
+## OI-125 — One random failure of the performance page's smoke orbit
+
+- ID: OI-125
+- TYPE: OPEN
+- NEEDED: The cause of one failure of the browser test of the performance page's smoke orbit, or a record that it did not recur over a stated number of runs.
+- WHY: AGENTS.md rule 39: a random failure is recorded, and a green re-run alone does not close it.
+- DONE SO FAR: During task S1-T13 (2026-11-13), the builder's browser run of the smoke orbit, before its page change, failed once on the existing assertion that the map's bearing at the end of the orbit differs from its bearing at the start: both were 0. The same test passed on the immediate re-run and in every later full run of that task, including the lead's runs at the work commit. No code was changed because of it. A smoke orbit lasts 400 milliseconds in a headless browser that draws in software; a camera that has not yet moved by the end of so short an orbit would give exactly this result.
+- OPTIONS: **Recommendation:** count the failures of this assertion over the next ten local runs of the spike's tests and record the count here; if it recurs, make the smoke orbit wait for the first camera movement before it ends, never loosen the assertion.
+- NEEDED BY: the slice S1 gate.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.

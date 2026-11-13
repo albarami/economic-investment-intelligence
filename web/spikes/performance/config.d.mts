@@ -16,6 +16,7 @@ export const FRAME_BUDGET_MS: number;
 export const SHARE_MINIMUM: number;
 export const ORBIT_MS: number;
 export const SMOKE_MS: number;
+export const EMPTY_CANVAS_PROBE_MS: number;
 export const SCENE_CENTER: [number, number];
 export const SCENE_ZOOM: number;
 export function profileDuration(profile: string): number | null;

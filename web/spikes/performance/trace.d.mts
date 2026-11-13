@@ -11,4 +11,16 @@ export type FrameSummary =
 
 export function readUnmaskedRenderer(context: unknown): string;
 
+export function judgeRenderer(renderer: string): string;
+
+export const EMPTY_CANVAS_MAX_MEDIAN_MS: number;
+
+export type EmptyCanvasVerdict = {
+  ok: boolean;
+  failure: string;
+  framesPerSecond: number;
+};
+
+export function judgeEmptyCanvas(timestamps: number[]): EmptyCanvasVerdict;
+
 export function summariseFrames(timestamps: number[]): FrameSummary;

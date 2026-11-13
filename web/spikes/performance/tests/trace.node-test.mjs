@@ -227,6 +227,39 @@ test('a renderer word that merely contains the letters warp still passes the gat
   assert.equal(inside.ok, true, inside.failure);
 });
 
+test('a native trace on a remote display adapter is refused by name', () => {
+  const result = validateGate(
+    gateTrace((trace) => ({
+      ...trace,
+      webglRenderer: 'Microsoft Remote Display Adapter',
+    })),
+    LAYER,
+    captureRecord(),
+  );
+  assert.equal(result.failure, 'remote-renderer');
+  const shouted = validateGate(
+    gateTrace((trace) => ({
+      ...trace,
+      webglRenderer: 'ANGLE (Synthetic, REMOTE Adapter)',
+    })),
+    LAYER,
+    captureRecord(),
+  );
+  assert.equal(shouted.failure, 'remote-renderer');
+});
+
+test('a renderer word that merely contains the letters remote still passes the gate', () => {
+  const inside = validateGate(
+    gateTrace((trace) => ({
+      ...trace,
+      webglRenderer: 'Synthetic preremoteadapter',
+    })),
+    LAYER,
+    captureRecord(),
+  );
+  assert.equal(inside.ok, true, inside.failure);
+});
+
 test('the renderer reading returns the unmasked value when it differs from the masked one', () => {
   const masked = 'Masked synthetic renderer';
   const unmasked = 'Unmasked synthetic adapter';
@@ -709,6 +742,61 @@ test('a generator that always collides is refused by name and writes nothing', a
       );
     },
   );
+});
+
+test('the server and the evidence command refuse a remote display adapter', async () => {
+  const remote = gateTrace((trace) => ({
+    ...trace,
+    webglRenderer: 'Microsoft Remote Display Adapter',
+  }));
+  const evidence = plantEvidence(remote);
+  assert.equal(
+    verifyEvidence({ ...evidence, git: () => 'clean' }).failure,
+    'remote-renderer',
+  );
+  fs.rmSync(evidence.root, { recursive: true, force: true });
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-perf-remote-'));
+  const sink = path.join(root, 'sink');
+  const evidenceDir = path.join(root, 'evidence');
+  fs.mkdirSync(evidenceDir);
+  fs.writeFileSync(path.join(root, 'index.html'), '<p>synthetic spike</p>\n');
+  const started = await startStaticServer({
+    mode: 'development',
+    root,
+    sink,
+    evidenceDir,
+    native: false,
+  });
+  assert.equal(started.ok, true, started.failure);
+  try {
+    const before = await ask(started.origin, {
+      method: 'GET',
+      path: '/__perf/posts',
+    });
+    assert.equal(before.status, 200);
+    assert.equal(before.body, '0');
+    const posted = await ask(started.origin, {
+      method: 'POST',
+      path: '/__perf/trace',
+      body: JSON.stringify(remote),
+    });
+    assert.equal(posted.status, 200, posted.body);
+    const receipt = JSON.parse(posted.body);
+    assert.equal(receipt.ok, true);
+    assert.equal(receipt.qualification, 'remote-renderer');
+    const after = await ask(started.origin, {
+      method: 'GET',
+      path: '/__perf/posts',
+    });
+    assert.equal(after.body, '1');
+    const saved = JSON.parse(
+      fs.readFileSync(path.join(sink, receipt.path), 'utf8'),
+    );
+    assert.equal(saved.webglRenderer, 'Microsoft Remote Display Adapter');
+  } finally {
+    await started.close();
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('a test server cannot write the native evidence directory', async () => {

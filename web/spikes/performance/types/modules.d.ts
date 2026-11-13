@@ -37,4 +37,5 @@ interface SpikeDiagnostics {
 
 interface Window {
   __spike?: SpikeDiagnostics;
+  __rendererSeenBeforeOrbit?: boolean;
 }

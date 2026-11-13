@@ -12,6 +12,7 @@ const SPIKE = path.dirname(fileURLToPath(import.meta.url));
 export const MAX_BODY_BYTES = 2000000;
 const PAGE_ROUTES = new Set(['/en/_perf', '/ar/_perf']);
 const TRACE_ROUTE = '/__perf/trace';
+const POSTS_ROUTE = '/__perf/posts';
 const LAYER_SET_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -70,6 +71,7 @@ function exclusiveTrace(sink, body, nextName) {
 
 function classify(pathname) {
   if (PAGE_ROUTES.has(pathname)) return 'page';
+  if (pathname === POSTS_ROUTE) return 'posts';
   if (pathname === TRACE_ROUTE) return 'trace';
   if (pathname.startsWith('/@') || pathname.startsWith('/node_modules/')) {
     return 'asset';
@@ -219,6 +221,11 @@ function serveStatic(root, urlPath, response) {
   });
 }
 
+function tracePosts(options) {
+  if (typeof options.tracePosts !== 'number') options.tracePosts = 0;
+  return options.tracePosts;
+}
+
 function handle(request, response, options, next) {
   const url = new URL(request.url ?? '/', 'http://127.0.0.1');
   const kind = classify(url.pathname);
@@ -226,11 +233,25 @@ function handle(request, response, options, next) {
     send(response, 404, 'unknown-route', 'text/plain; charset=utf-8');
     return;
   }
+  if (kind === 'posts') {
+    if (request.method !== 'GET') {
+      send(response, 405, 'method-not-allowed', 'text/plain; charset=utf-8');
+      return;
+    }
+    send(
+      response,
+      200,
+      String(tracePosts(options)),
+      'text/plain; charset=utf-8',
+    );
+    return;
+  }
   if (kind === 'trace') {
     if (request.method !== 'POST') {
       send(response, 405, 'method-not-allowed', 'text/plain; charset=utf-8');
       return;
     }
+    options.tracePosts = tracePosts(options) + 1;
     void receiveTrace(request, response, options);
     return;
   }
@@ -248,6 +269,30 @@ function handle(request, response, options, next) {
     return;
   }
   serveStatic(options.root, url.pathname, response);
+}
+
+function requestPathname(request) {
+  try {
+    return new URL(request.url ?? '/', 'http://127.0.0.1').pathname;
+  } catch {
+    return '';
+  }
+}
+
+function tracePlugin(options) {
+  return {
+    name: 'eii-performance-trace',
+    configureServer(server) {
+      server.middlewares.use((request, response, next) => {
+        const pathname = requestPathname(request);
+        if (pathname !== TRACE_ROUTE && pathname !== POSTS_ROUTE) {
+          next();
+          return;
+        }
+        handle(request, response, options, next);
+      });
+    },
+  };
 }
 
 function listen(server) {
@@ -293,9 +338,7 @@ export async function startViteServer(options) {
     configFile: path.join(SPIKE, 'vite.config.ts'),
     server: { host: '127.0.0.1', port: 0, strictPort: false },
     logLevel: 'silent',
-  });
-  vite.middlewares.use((request, response, next) => {
-    handle(request, response, options, next);
+    plugins: [tracePlugin(options)],
   });
   await vite.listen();
   const bound = vite.httpServer?.address();
