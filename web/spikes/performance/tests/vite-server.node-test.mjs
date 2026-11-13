@@ -214,6 +214,25 @@ test('the development server refuses a trace posted from another origin', async 
   });
 });
 
+test('the development server refuses a malformed trace post in JSON', async () => {
+  await withViteServer(async ({ origin, sink, root, nativeBefore }) => {
+    const posted = await ask(origin, {
+      method: 'POST',
+      path: '/__perf/trace',
+      body: '{',
+    });
+    assert.equal(posted.status, 400, posted.body);
+    assert.match(posted.type, /application\/json/);
+    assert.equal(posted.body, '{"ok":false,"failure":"malformed-payload"}');
+    const refusal = JSON.parse(posted.body);
+    assert.equal(refusal.ok, false);
+    assert.equal(refusal.failure, 'malformed-payload');
+    assert.deepEqual(filesUnder(sink), []);
+    assert.deepEqual(filesUnder(root), []);
+    assert.deepEqual(filesUnder(NATIVE_EVIDENCE), nativeBefore);
+  });
+});
+
 test('the development server still serves the page and its module', async () => {
   await withViteServer(async ({ origin }) => {
     const page = await ask(origin, { method: 'GET', path: '/en/_perf' });
