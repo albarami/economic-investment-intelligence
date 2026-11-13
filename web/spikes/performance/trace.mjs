@@ -1,8 +1,10 @@
+import roadData from './road-data.json' with { type: 'json' };
 /**
  * Closed performance-trace contract.
  * Percentiles and the share under the frame budget are computed here and nowhere else.
  */
 import {
+  isRoadSet,
   CAP_LABEL,
   CAP_VALUE,
   CONTRACT,
@@ -180,9 +182,19 @@ function shapeOf(value) {
     closed(value.canvas, ['cssWidth', 'cssHeight']),
     closed(value.drawingBuffer, ['width', 'height']),
     closed(value.cap, ['value', 'label']),
-    closed(value.counts, ['hexagons', 'particles']),
+    closed(
+      value.counts,
+      isRoadSet(value.layerSet)
+        ? ['hexagons', 'particles', 'roads']
+        : ['hexagons', 'particles'],
+    ),
     closed(value.camera, ['completed']),
-    closed(value.animation, ['active']),
+    closed(
+      value.animation,
+      isRoadSet(value.layerSet)
+        ? ['active', 'playbackActive', 'reducedMotion', 'hoursShown']
+        : ['active'],
+    ),
     closed(value.interruptions, ['visibilityLost', 'resized', 'contextLost']),
   ];
   for (const item of nested) {
@@ -331,7 +343,8 @@ function qualify(trace, fresh, descriptor, capture) {
   const spec = LAYER_SETS[descriptor];
   if (
     trace.counts.hexagons !== spec.hexagons ||
-    trace.counts.particles !== spec.particles
+    trace.counts.particles !== spec.particles ||
+    (isRoadSet(descriptor) && trace.counts.roads !== spec.roads)
   ) {
     return 'reduced-counts';
   }
@@ -354,6 +367,18 @@ function qualify(trace, fresh, descriptor, capture) {
   ) {
     return 'dimension-mismatch';
   }
+  if (isRoadSet(descriptor)) {
+    if (trace.animation.playbackActive !== true) return 'road-playback-stopped';
+    if (trace.animation.reducedMotion !== false) return 'road-reduced-motion';
+    const hours = trace.animation.hoursShown;
+    if (
+      !Array.isArray(hours) ||
+      hours.length === 0 ||
+      hours.length > roadData.hours.length ||
+      hours.some((hour, index) => hour !== roadData.hours[index])
+    )
+      return 'road-hours-invalid';
+  }
   if (trace.profile === PROFILE_SMOKE) return 'smoke-profile';
   if (trace.profile !== PROFILE_GATE) return 'unknown-profile';
   if (trace.camera.completed !== true) return 'incomplete-orbit';
@@ -366,7 +391,8 @@ function qualify(trace, fresh, descriptor, capture) {
   const native = judgeNative(capture, trace.userAgent);
   if (native) return native;
   if (fresh.durationMs < ORBIT_MS) return 'short-orbit';
-  if (fresh.shareUnderBudget < SHARE_MINIMUM) return 'frame-rate';
+  if (!isRoadSet(descriptor) && fresh.shareUnderBudget < SHARE_MINIMUM)
+    return 'frame-rate';
   return '';
 }
 

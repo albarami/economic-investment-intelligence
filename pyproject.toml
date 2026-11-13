@@ -23,6 +23,8 @@ engine = [
   "shapely==2.2.0",
 ]
 
+mutation = ["mutmut==3.8.1"]
+
 [tool.uv]
 package = false
 required-version = "==0.11.31"

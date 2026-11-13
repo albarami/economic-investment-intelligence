@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 |
+| Status | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12 and by decision 0021 on 2026-11-13 |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Specify how the custodian plane generates the fully synthetic records, their monthly periods and the simulated presence and flow feeds, how the case sample files are made, what each parameter rests on, and how the result is checked, sealed and reproduced. |
@@ -572,7 +572,7 @@ What the released flows hold, and what they leave out:
 
 | ID | Requirement | Verified by |
 |---|---|---|
-| SYN-53 | Assigned link speeds by hour must be applied to the routing graph used for `drive` areas, by the mechanism chosen at slice S1 (time-dependent edge speeds in the routing engine, or per-edge scaling of edge times). Read the current Valhalla documentation before choosing. | slice S1 decision record |
+| SYN-53 | Assigned link speeds by hour must be applied to the routing graph used for `drive` areas, by the mechanism chosen at slice S1 (time-dependent edge speeds in the routing engine, or per-edge scaling of edge times). Read the current Valhalla documentation before choosing. Chosen: a speed on each edge, with one routing graph for each distinct set of whole link speeds ([decision 0021](decisions/0021-one-speed-for-a-link-and-an-hour.md)). | slice S1 decision record |
 | SYN-54 | Every link speed, and every drive area that depends on an hour's link speeds, carries the Simulated class through the least-real rule. The assignment is unchanged by the provider switch; a traffic-aware drive-time area of the live provider does not depend on assigned link speeds and is not one of these areas (section 14.1). | provenance audit |
 | SYN-55 | No proprietary congestion figure is stored in the repository or the release except the single plausibility value in section 16, cited. | reviewer |
 | SYN-79 | The assignment must read released hourly flows only, never the vault, a feed row or a protected row. It is a method of [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md), not a generator of this document, and its parameters are fixed there. Link speeds carry a fixed note that flows withheld by the disclosure controls are left out; no withheld amount is released. | release test; provenance audit |

@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import NotRequired, TypedDict, cast
 
 
 class Node(TypedDict):
@@ -16,6 +16,9 @@ class Edge(TypedDict):
     target: str
     length_m: float
     drive_kph: float
+    road_class: NotRequired[str]
+    oneway: NotRequired[bool]
+    posted_speed: NotRequired[str | None]
 
 
 class RoadFixture(TypedDict):

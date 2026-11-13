@@ -3,5 +3,19 @@
   "arabic": {
     "text": "عرض اصطناعي. امتداد مخترع. بلا اسم مكان.",
     "review": "pending native review"
+  },
+  "simulated": {
+    "english": "Simulated",
+    "arabic": {
+      "text": "محاكاة",
+      "review": "pending native review"
+    }
+  },
+  "pause": {
+    "english": "Pause motion",
+    "arabic": {
+      "text": "إيقاف الحركة مؤقتًا",
+      "review": "pending native review"
+    }
   }
 }

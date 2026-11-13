@@ -8,6 +8,16 @@
   <body>
     <header class="chrome">
       <p id="notice"></p>
+      <p id="road-legend" hidden>
+        <span id="road-sample" aria-hidden="true"></span>
+        <span id="road-mark"></span>
+      </p>
+      <button id="pause-motion" type="button" aria-pressed="false" hidden>
+        Pause motion
+      </button>
+      <span class="hour-reference" data-kind="reference"
+        ><span id="hour-current"></span><span id="hour-next"></span
+      ></span>
       <p id="pending">native frame-rate gate pending</p>
       <p id="renderer"></p>
     </header>

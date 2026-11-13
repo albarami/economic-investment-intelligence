@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@deck.gl/core": "9.4.1",
+    "@deck.gl/extensions": "9.4.1",
     "@deck.gl/geo-layers": "9.4.1",
     "@deck.gl/layers": "9.4.1",
     "@deck.gl/maplibre": "9.4.1",
@@ -49,6 +50,7 @@
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@playwright/test": "1.65.0",
+    "@stryker-mutator/core": "10.1.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.3.0",

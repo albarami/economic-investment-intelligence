@@ -52,12 +52,27 @@ def generate(path: Path, factor: float = 1.0) -> bytes:
         speed = format(edge["drive_kph"] * factor, "g")
         strings.extend((speed, f"SYN-WAY-{index}"))
         encoded = integer(1, index)
-        encoded += message(2, b"".join(varint(key) for key in (1, 3, 4)))
+        keys = [1, 3, 4]
+        values = [2, len(strings) - 2, len(strings) - 1]
+        if "road_class" in edge:
+            strings.append(edge["road_class"])
+            values[0] = len(strings) - 1
+        if "posted_speed" in edge:
+            posted = edge["posted_speed"]
+            if posted is None:
+                del keys[1]
+                del values[1]
+            else:
+                strings.append(posted)
+                values[1] = len(strings) - 1
+        if edge.get("oneway", False):
+            strings.extend(("oneway", "yes"))
+            keys.append(len(strings) - 2)
+            values.append(len(strings) - 1)
+        encoded += message(2, b"".join(varint(key) for key in keys))
         encoded += message(
             3,
-            b"".join(
-                varint(value) for value in (2, len(strings) - 2, len(strings) - 1)
-            ),
+            b"".join(varint(value) for value in values),
         )
         start, end = nodes[edge["source"]], nodes[edge["target"]]
         encoded += message(8, varint(signed(start)) + varint(signed(end - start)))

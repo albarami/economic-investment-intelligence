@@ -1,0 +1,134 @@
+{
+  "note": "Invented released leaves for the whole stored day. Withheld origin SYN-U-03 is absent.",
+  "unit": "vehicle trips per hour",
+  "rows": [
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 5,
+      "summer": false,
+      "estimate": "100"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 6,
+      "summer": false,
+      "estimate": "300"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 7,
+      "summer": false,
+      "estimate": "1200"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 8,
+      "summer": false,
+      "estimate": "1800"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 9,
+      "summer": false,
+      "estimate": "800"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 10,
+      "summer": false,
+      "estimate": "300"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 11,
+      "summer": false,
+      "estimate": "200"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 12,
+      "summer": false,
+      "estimate": "200"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 13,
+      "summer": false,
+      "estimate": "200"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 14,
+      "summer": false,
+      "estimate": "300"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 15,
+      "summer": false,
+      "estimate": "600"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 16,
+      "summer": false,
+      "estimate": "1200"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 17,
+      "summer": false,
+      "estimate": "1600"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 18,
+      "summer": false,
+      "estimate": "800"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 19,
+      "summer": false,
+      "estimate": "300"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-03",
+      "day_type": "weekday",
+      "hour": 20,
+      "summer": false,
+      "estimate": "100"
+    }
+  ]
+}

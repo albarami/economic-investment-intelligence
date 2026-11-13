@@ -1,0 +1,19 @@
+{
+  "pin": "SYN-N-W",
+  "walk_kph": 5.0,
+  "cutoff_seconds": 0.0,
+  "radius_m": 0.0,
+  "nodes": [
+    {"id": "SYN-N-W", "lat": 0.0, "lon": -0.01},
+    {"id": "SYN-N-C", "lat": 0.0, "lon": 0.0},
+    {"id": "SYN-N-E", "lat": 0.0, "lon": 0.01},
+    {"id": "SYN-N-N", "lat": 0.01, "lon": 0.0},
+    {"id": "SYN-N-S", "lat": -0.01, "lon": 0.0}
+  ],
+  "edges": [
+    {"source": "SYN-N-W", "target": "SYN-N-C", "length_m": 1113, "drive_kph": 60, "road_class": "secondary"},
+    {"source": "SYN-N-C", "target": "SYN-N-E", "length_m": 1113, "drive_kph": 60, "road_class": "secondary"},
+    {"source": "SYN-N-C", "target": "SYN-N-N", "length_m": 1113, "drive_kph": 60, "road_class": "secondary"},
+    {"source": "SYN-N-C", "target": "SYN-N-S", "length_m": 1113, "drive_kph": 60, "road_class": "secondary"}
+  ]
+}

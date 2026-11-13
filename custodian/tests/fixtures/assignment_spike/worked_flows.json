@@ -1,0 +1,22 @@
+{
+  "note": "Invented C25 worked example.",
+  "unit": "vehicle trips per hour",
+  "rows": [
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-02",
+      "day_type": "weekday",
+      "hour": 8,
+      "summer": false,
+      "estimate": "500"
+    },
+    {
+      "origin_unit_id": "SYN-U-01",
+      "destination_unit_id": "SYN-U-02",
+      "day_type": "weekday",
+      "hour": 9,
+      "summer": false,
+      "estimate": "3000"
+    }
+  ]
+}

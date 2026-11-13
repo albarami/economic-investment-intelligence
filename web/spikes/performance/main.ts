@@ -1,3 +1,7 @@
+import roadData from './road-data.json' with { type: 'json' };
+import { generateRoads } from './roads.mjs';
+import { createPlayback } from './road-playback';
+import { ROAD_LOADS, isRoadSet } from './config.mjs';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
 import {
@@ -40,11 +44,25 @@ const SLOW_SCENE_INTERVAL_MS = 50;
 
 type Spike = {
   phase: string;
+  roadInstances: number;
+  roadDashEnabled: boolean;
+  layerSet: string;
+  hoursShown: number[];
+  paused: boolean;
+  reducedMotion: boolean;
+  motionElapsed: number;
+  motionFrames: number;
+  currentPosition: number;
+  roadStates: ReturnType<
+    Awaited<ReturnType<typeof mountScene>>['roadSnapshot']
+  >[];
+  hourStepsMs: number[];
   failure: string;
   hexagonInstances: number;
   particleInstances: number;
   hex: boolean;
   particle: boolean;
+  road: boolean;
   bearingStart: number;
   bearingEnd: number;
   positionStart: number;
@@ -68,11 +86,23 @@ type Spike = {
 
 const spike: Spike = {
   phase: 'loading',
+  roadInstances: 0,
+  roadDashEnabled: false,
+  layerSet: LAYER_SET_HEXAGONS_PARTICLES,
+  hoursShown: [],
+  paused: false,
+  reducedMotion: false,
+  motionElapsed: 0,
+  motionFrames: 0,
+  currentPosition: 0,
+  roadStates: [],
+  hourStepsMs: [],
   failure: '',
   hexagonInstances: 0,
   particleInstances: 0,
   hex: false,
   particle: false,
+  road: false,
   bearingStart: 0,
   bearingEnd: 0,
   positionStart: 0,
@@ -95,6 +125,7 @@ const spike: Spike = {
 };
 
 window.__spike = spike;
+let playback: ReturnType<typeof createPlayback> | undefined;
 
 function show(id: string, text: string): void {
   const node = document.querySelector(id);
@@ -246,6 +277,31 @@ async function start(): Promise<void> {
   document.documentElement.dir = arabic ? 'rtl' : 'ltr';
   show('#notice', arabic ? notices.arabic.text : notices.english);
   spike.profile = readProfile(params, plant);
+  spike.layerSet = params.get('layers') ?? LAYER_SET_HEXAGONS_PARTICLES;
+  const roadsEnabled = isRoadSet(spike.layerSet);
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (roadsEnabled) {
+    playback = createPlayback(reduced.matches);
+    show(
+      '#road-mark',
+      arabic ? notices.simulated.arabic.text : notices.simulated.english,
+    );
+    document.querySelector('#road-legend')?.removeAttribute('hidden');
+    const pause = document.querySelector<HTMLButtonElement>('#pause-motion')!;
+    pause.hidden = false;
+    pause.textContent = arabic
+      ? notices.pause.arabic.text
+      : notices.pause.english;
+    pause.onclick = () => {
+      playback!.toggle();
+      pause.setAttribute('aria-pressed', String(playback!.paused));
+    };
+    reduced.addEventListener('change', (event) => {
+      playback!.reduced = event.matches;
+      playback!.interrupted = true;
+    });
+    if (plant === 'pause-playback') playback.toggle();
+  }
   spike.textPixelRatio = window.devicePixelRatio;
   spike.devicePixelRatio = window.devicePixelRatio;
   spike.windowWidth = window.innerWidth;
@@ -292,12 +348,19 @@ async function start(): Promise<void> {
   if (plant === 'omit-hexagon') cells.pop();
   if (plant === 'omit-particle') particles.pop();
   const isolate = params.get('isolate');
+  const roads = roadsEnabled
+    ? generateRoads(roadData, ROAD_LOADS[spike.layerSet]!)
+    : undefined;
+  if (plant === 'omit-road') roads?.pop();
   try {
     const scene = await mountScene({
       container,
       cap,
       cells,
       particles,
+      roads,
+      playback,
+      plant,
       showHexagons: plant !== 'hide-hexagons' && isolate !== 'particles',
       showParticles: plant !== 'hide-particles' && isolate !== 'hexagons',
     });
@@ -323,8 +386,11 @@ async function start(): Promise<void> {
     const colors = scene.sample();
     spike.hexagonInstances = scene.hexagonInstances;
     spike.particleInstances = scene.particleInstances;
+    spike.roadInstances = scene.roadInstances;
+    spike.roadDashEnabled = scene.roadDashEnabled;
     spike.hex = colors.hex;
     spike.particle = colors.particle;
+    spike.road = colors.road;
     spike.bearingStart = scene.bearing();
     spike.positionStart = particles[0]?.position[0] ?? 0;
     spike.cssWidth = scene.canvas.clientWidth;
@@ -341,10 +407,50 @@ async function start(): Promise<void> {
       plant === 'missing-renderer' || plant === 'slow-scene'
         ? SMOKE_MS
         : (profileDuration(spike.profile) ?? SMOKE_MS);
+    let lastHour: number | undefined;
+    let lastHourTime: number | undefined;
+    const draw = (elapsed: number, bearing: number) => {
+      playback?.tick(elapsed);
+      scene.step(
+        playback?.elapsed ?? elapsed,
+        playback?.paused || playback?.reduced ? scene.bearing() : bearing,
+        plant === 'freeze' ||
+          playback?.paused === true ||
+          playback?.reduced === true,
+      );
+      if (playback) {
+        spike.motionFrames++;
+        spike.motionElapsed = playback.elapsed;
+        spike.currentPosition = particles[0]!.position[0];
+        spike.paused = playback.paused;
+        spike.reducedMotion = playback.reduced;
+        spike.hoursShown = [...playback.hoursShown];
+        const snapshot = scene.roadSnapshot();
+        const previous = spike.roadStates.at(-1);
+        if (
+          !previous ||
+          previous.hour !== snapshot.hour ||
+          previous.nextHour !== snapshot.nextHour
+        )
+          spike.roadStates.push(snapshot);
+        if (snapshot.hour !== lastHour) {
+          if (lastHourTime !== undefined)
+            spike.hourStepsMs.push(performance.now() - lastHourTime);
+          lastHourTime = performance.now();
+          lastHour = snapshot.hour;
+        }
+        const first = document.querySelector<HTMLElement>('#hour-current')!;
+        const next = document.querySelector<HTMLElement>('#hour-next')!;
+        first.textContent = String(snapshot.hour).padStart(2, '0') + ':00';
+        next.textContent = String(snapshot.nextHour).padStart(2, '0') + ':00';
+        first.style.opacity = String(1 - snapshot.blend);
+        next.style.opacity = String(snapshot.blend);
+      }
+    };
     if (plant === 'slow-scene') {
       const timestamps = plantedTimestamps(SLOW_SCENE_INTERVAL_MS, duration);
       for (const elapsed of timestamps) {
-        scene.step(elapsed, (elapsed / duration) * ORBIT_TURN, false);
+        draw(elapsed, (elapsed / duration) * ORBIT_TURN);
       }
       void finish(scene, particles, flags, plant, timestamps);
       return;
@@ -352,14 +458,18 @@ async function start(): Promise<void> {
     recordOrbit({
       durationMs: duration,
       onFrame: (elapsed) => {
-        scene.step(
-          elapsed,
-          (elapsed / duration) * ORBIT_TURN,
-          plant === 'freeze',
-        );
+        draw(elapsed, (elapsed / duration) * ORBIT_TURN);
       },
       onDone: (timestamps) => {
         void finish(scene, particles, flags, plant, timestamps);
+        if (playback) {
+          const start = timestamps[0]!;
+          const tick = (now: number) => {
+            draw(now - start, scene.bearing());
+            requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
       },
     });
   } catch (error) {
@@ -373,7 +483,7 @@ async function finish(
   scene: {
     bearing: () => number;
     canvas: HTMLCanvasElement;
-    sample: () => { hex: boolean; particle: boolean };
+    sample: () => { hex: boolean; particle: boolean; road: boolean };
   },
   particles: { position: [number, number] }[],
   flags: { visibilityLost: boolean; resized: boolean; contextLost: boolean },
@@ -393,13 +503,14 @@ async function finish(
   const colors = scene.sample();
   spike.hex = spike.hex || colors.hex;
   spike.particle = spike.particle || colors.particle;
+  spike.road = spike.road || colors.road;
   spike.shareUnderBudget = summary.ok ? summary.shareUnderBudget : null;
   const trace = {
     contract: CONTRACT,
     version: CONTRACT_VERSION,
     provenance: PROVENANCE,
     seed: SEED,
-    layerSet: LAYER_SET_HEXAGONS_PARTICLES,
+    layerSet: spike.layerSet,
     profile: spike.profile,
     codeCommit: 'page',
     lockSha256: LOCK_PLACEHOLDER,
@@ -413,6 +524,7 @@ async function finish(
     counts: {
       hexagons: spike.hexagonInstances,
       particles: spike.particleInstances,
+      ...(playback ? { roads: spike.roadInstances } : {}),
     },
     timestamps: used,
     summary: {
@@ -422,7 +534,16 @@ async function finish(
       shareUnderBudget,
     },
     camera: { completed: spike.bearingEnd !== spike.bearingStart },
-    animation: { active: spike.positionEnd !== spike.positionStart },
+    animation: {
+      active: spike.positionEnd !== spike.positionStart,
+      ...(playback
+        ? {
+            playbackActive: !playback.interrupted && !playback.paused,
+            reducedMotion: playback.reduced,
+            hoursShown: [...playback.hoursShown],
+          }
+        : {}),
+    },
     interruptions: flags,
   };
   if (plant === 'fail-submit') {

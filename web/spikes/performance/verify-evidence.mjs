@@ -1,3 +1,8 @@
+import {
+  LAYER_SETS,
+  LAYER_SET_HEXAGONS_PARTICLES,
+  isRoadSet,
+} from './config.mjs';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -58,7 +63,13 @@ function hashFile(file) {
 }
 
 export function verifyEvidence(options) {
-  const capturePath = path.join(options.evidenceDir, 'native-capture.md');
+  const selected = options.descriptor ?? LAYER_SET_HEXAGONS_PARTICLES;
+  if (!Object.hasOwn(LAYER_SETS, selected))
+    return { ok: false, failure: 'unknown-layer-set' };
+  const capturePath = path.join(
+    options.evidenceDir,
+    isRoadSet(selected) ? `native-capture.${selected}.md` : 'native-capture.md',
+  );
   if (!fs.existsSync(capturePath)) {
     return { ok: false, failure: 'missing-native-trace' };
   }
@@ -93,7 +104,7 @@ export function verifyEvidence(options) {
   } catch {
     return { ok: false, failure: 'malformed-payload' };
   }
-  const descriptor = options.descriptor ?? trace.layerSet;
+  const descriptor = selected;
   return validateGate(trace, descriptor, {
     role: parsed.record.role,
     host: parsed.record.host,
@@ -108,13 +119,18 @@ function main() {
   const result = verifyEvidence({
     root,
     evidenceDir: path.join(SPIKE, 'evidence'),
+    descriptor: process.argv[2] ?? LAYER_SET_HEXAGONS_PARTICLES,
   });
   if (!result.ok) {
     console.error(`FAIL ${result.failure}`);
     process.exitCode = 1;
     return;
   }
-  console.log('native frame-rate gate passed');
+  console.log(
+    isRoadSet(process.argv[2])
+      ? 'native road result recorded'
+      : 'native frame-rate gate passed',
+  );
 }
 
 if (

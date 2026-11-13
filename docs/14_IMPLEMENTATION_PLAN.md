@@ -281,7 +281,7 @@ OI-02 remains open, so the estimates must not be converted to a demonstration da
 - S1-T09 — Fix `export_parameter_set` = `A` and the presence and flow parameters of PRV-59 in the rules configuration before the first world build, and record the number of monthly periods shown first.
 - S1-T10 — Close every proposed open item of the slice's reviews before the gate (REV-41).
 
-**Parallel work.** T01–T04 own separate spike fixtures; T05 owns store spike files; T06 owns sandbox fixtures; T07 owns `gateway/`; T11 owns the assignment spike fixtures and follows T02 and T03; T12 follows T02 and T11 and owns the native trace files; T08 follows T02 to T07, T11 and T12 and owns run artefacts. Shared dependency pins are edited only by T08. T09 follows T08 and owns the rules configuration. T10 runs last.
+**Parallel work.** T01–T04 own separate spike fixtures; T05 owns store spike files; T06 owns sandbox fixtures; T07 owns `gateway/`; T11 owns the assignment spike fixtures and follows T02 and T03; T12 follows T02 and T11 and owns the native trace files; T08 follows T02 to T07 and T11 and owns run artefacts (T12 waits for the owner at the console and closes with the gate's addendum, by a re-plan of 2026-11-13). Shared dependency pins are confirmed only by T08; a task that installs a package adds its row at the exact and retreat pins its brief names, for T08 to confirm. T09 follows T08 and owns the rules configuration. T10 runs last.
 
 **Gate: all statements must be true.**
 - Arabic labels render with self-hosted glyphs.
@@ -834,4 +834,4 @@ The open points of decisions 0016, 0017 and 0019 are settled at the gates that P
 - Product and architecture: [01](01_PROJECT_BRIEF.md), [02](02_ARCHITECTURE.md), [03](03_DATA_CONTRACTS.md), [04](04_PUBLIC_DATA_PACK.md) and [05](05_SYNTHETIC_WORLD_AND_SIMULATION.md).
 - Rules and build design: [06](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [07](07_ECONOMIC_METHODS.md), [08](08_BACKEND.md), [09](09_AI_ASSISTANT.md) and [10](10_FRONTEND.md).
 - Quality and operation: [11](11_DESIGN_DIRECTION.md), [12](12_TESTING_AND_QUALITY.md), [13](13_DEPLOYMENT_AND_OPERATIONS.md), [15](15_REVIEWER_CHECKLIST.md), [16](16_DEMO_RUNBOOK.md) and [17](17_DEPLOYMENT_HARDENING.md).
-- Decision records [0001](decisions/0001-fully-synthetic-records-real-public-data.md) to [0020](decisions/0020-freeze-bundle-check-and-project-database-port.md); [decision 0013](decisions/0013-one-deep-journey-before-breadth.md) is superseded by [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md). No external source was used directly in this plan.
+- Decision records [0001](decisions/0001-fully-synthetic-records-real-public-data.md) to [0021](decisions/0021-one-speed-for-a-link-and-an-hour.md); [decision 0013](decisions/0013-one-deep-journey-before-breadth.md) is superseded by [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md). No external source was used directly in this plan.
