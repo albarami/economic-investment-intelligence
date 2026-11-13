@@ -16784,6 +16784,184 @@ Notes:     The one work commit has a Conventional Commit subject.
 - F1: OI-122 now records the further re-plan of 2026-11-13 (S1-T12 waits for the owner at the console; S1-T08 and S1-T10 no longer depend on it; the pin fields that the frame rate decides close with the addendum of the slice S1 gate) and its NEEDED BY names that addendum.
 - Both findings concern records only; they are corrected in this commit and checked by the lead's script (ruling L-65 (3), from the owner's note of 2026-11-13).
 
+### S2-T01 — Public fetchers and source receipts: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/36 )
+
+- Built ahead of slice S2 on the owner's decision of 2026-11-13 (ruling L-89 of the run): the task is the root of slice S2, it is built and reviewed now, and it is not merged before S1-T08 is merged and the slice S1 gate has passed (PLN-02 stays the merge rule). The pull request is a draft that says so in its first line. A change that S1-T08's pin ruling or the gate brings goes in one small commit with a confirmation review of that commit.
+- What was built: one fetch engine behind a transport seam, so that `./eii build-public` is the only command that opens a public-source connection and every test drives the engine with hand-made bytes; an allow-list of the hosts that PUB-03 names, checked on every request and every redirect; a committed registry `custodian/publicdata/sources.yaml` of 138 rows (twelve citation-only rows, seven ArcGIS map layers, the portal datasets keyed by source and slug as PUB-85 asks, the five rows of decision 0019 that later tasks fetch, and no row for either traffic source); receipts under the uncommitted `data/public_cache/` (each file named by its SHA-256, with a sidecar `<sha256>.meta.json` that holds the URL, publisher, licence, retrieval date, hash and serving host); a closed set of licence bases, in which only `none_stated` is validation-only and refused for a release slot; the `nightly_live_fetch` flag, false for `busy_gmaps` and `ntl_blackmarble`; and a check of the publisher's terms for the investment sources that switches a source off, naming it, when the terms read at fetch forbid the use. The command clears its environment before it starts, so no key can reach a line, a log or a file.
+- Personas: builder, a senior data-engineering persona for public-data pipelines with strict provenance; reviewer, a strict independent reviewer of another maker (not xAI), who edits nothing. Builder: the Cursor command-line tool, `grok-4.7-high` (xAI), in seven passes; skills it loaded, as it reported them: task-standards, project-orientation, test-driven-development, systematic-debugging, sanad-provenance, verification-before-completion, muhasabah-gate. Lead: Anthropic (Claude Opus 5.5). The short plan was written ahead by another tool and read by the lead; it holds six approach decisions and four open questions, answered by the lead's rulings L1 to L7 in the first brief.
+- Pass 1, the build (the engine, the registry, the command, 28 custodian tests): every criterion with a red and a green test, and the planted violations of the return. The lead's first real fetch, from the lead's own shell with no key in its environment, failed at its first portal row with `licence_mismatch` and stored nothing.
+- Pass 2, licence string forms: the portal states the licence as `CC BY` and gives the version only in the licence address, so the matcher that required `4.0` in the text would have refused every one of the 104 portal rows (the lead read the metadata of all of them: each states `CC BY` with the address of version 4.0). A row whose registry licence is `CC-BY-4.0` now passes only when the portal states `CC BY` with the address of version 4.0; any other statement is `licence_mismatch`. Both statements as read are kept in the sidecar. The same pass made every FAIL line, and the build log, name the check with the expected and the observed value. The build still stops at its first failed row, as PUB-06 says (the builder quoted the rule: a failed check fails the build). The second real fetch stored twelve portal rows with receipts and stopped at `util_elec`.
+- Pass 3, publisher letter case: the portal writes `KAHRAMAA` where the registry says `Kahramaa`. The lead compared all 95 fetchable portal rows with the portal's metadata: 93 exact, two differ by letter case only, none are a different publisher. The publisher check now compares after Unicode case folding and after collapsing runs of white space; a different publisher still fails with both names; the receipt keeps the portal's own words. The third real fetch stored twenty-four rows and stopped at `bnd_district_2020`.
+- Pass 4, the ArcGIS layer id. Root cause, by systematic debugging: the fetcher asked every map service for layer 0. The lead listed the seven services (evidence/S2-T01.arcgis-layers.txt): each has exactly one layer, six at id 0 and `District_2020` at id 12 (`District_Boundary_2020`, 781 features, as document 04 states). The layer-0 query of `District_2020` returns an ArcGIS error object (code 400, "Invalid URL") with no count, and the count reader refused it, which is the right fail-closed behaviour. The fix: every `paged_layer` row now carries a required integer `layer` with no default; the loader refuses a missing, string, boolean, float or negative layer and a `layer` on any other kind of row; the count and page addresses use it. Document 04 gains one sentence on the `bnd_district_2020` row.
+- Pass 5, the publisher's terms (criterion 8; ruling L-122). The lead read the investment sources' terms of use on 2026-11-13 at the address the sites link to, `https://www.invest.qa/en/terms-and-conditions?tab=terms-of-use` (the served page holds the text): they allow copies for personal and non-commercial use while viewing, and say the material "should not be copied or modified or re-produced in whole or in part without" the publisher's prior written permission and an acknowledgement of the source. The rows `fdi_projects` and `investqa_pages` now name that page in `terms_url` and the forbidding words in a new field `terms_forbid` (the loader refuses an empty list, a non-string, an empty string, or the field without a terms address). At each fetch the build reads the terms page first, records its SHA-256 and retrieval time in the build log, and compares after case folding and collapsing white space: while the words are present the source is switched off (nothing of it fetched or stored, the line `OWNER <key> switched off: terms read at fetch forbid the use (<address>)`); when they are absent it is also switched off, because the terms changed since they were read; either way the build continues for every other source and the switch-off alone does not make the command fail. The owner decides the basis of use (OI-128). Six tests, red then green, among them a planted phrase in different case across a line break and a page without the phrase.
+- Pass 6, the owner's basis of use (ruling L-126). The owner had decided on 2026-11-12, in his words: "This is a personal internal project: use both sources fully, no permission needed." His specific decision takes precedence over the general switch-off, so both rows now record that decision in a `basis_note` and keep the terms page watched (`terms_watch`): the build reads and hashes it at every fetch and prints `TERMS <key> changed since the last build (<address>)` when it has changed, and the sources are fetched either way; rows with forbidding terms of their own keep the switch-off; the loader refuses the two settings together. OI-128 closes as the owner's decision; criterion 8 is amended to name the two sources beside `busy_gmaps`.
+- Pass 7, a stable terms fingerprint. The first watched run printed a TERMS line for both sources. Root cause, found by the lead: the terms page carries a per-request security token in a meta tag, so the hash of its raw bytes differed on every request (two fetches two seconds apart differed only there). The fingerprint is now the SHA-256 of the page's normalised visible text; a previous build log of the older kind is not compared. Three planted tests, red then green.
+- The provider terms of the optional live traffic layer (ruling L-121): the lead read the provider's full terms on 2026-11-13 (the page renders only in a browser and was rendered in the repository's headless browser): the free plan is "for Evaluation Use only", "internal evaluation and testing by you"; storing results is prohibited except in a client under the result's cache-control headers; the notices its interfaces generate are kept. Document 04's two provider rows and the stale lines of documents 02, 03, 04 and 13 now say so; showing the layer outside internal evaluation is the owner's decision (OI-130).
+- The real fetches, all from the lead's own shell with no key, at the working tree as it stood: (1) exit 1 at `lic_active`, `licence_mismatch`, nothing stored; (2) exit 1 at `util_elec`, `publisher_mismatch`, twelve rows stored; (3) exit 1 at `bnd_district_2020`, `short_total` (the count was unreadable), twenty-four rows stored; (4) exit 0, 117 PASS lines (every portal row and all seven map layers, each with a receipt), every SKIP with its named reason, and six coverage lines `not_measured` (PUB-68 to PUB-73) as designed, because the parsers that would measure them are later tasks. (5) after pass 5: exit 0, 116 PASS, both investment sources switched off; (6) after pass 6: exit 0, 117 PASS, both sources fetched or skipped as designed, a TERMS line on each (the token above); (7) and (8) at the work commit 9271cb8e6afa89dedc20d395f557606f05dfb261, after pass 7, twice in a row: exit 0, 117 PASS, no TERMS and no OWNER line on either run (the second run is the evidence of record, evidence/S2-T01.build-public.work3.run2.txt). The earlier evidence files are evidence/S2-T01.build-public.txt and the files with the suffixes r2, r3 and r4. Nothing fetched is committed.
+- The lead's whole test command at the last head: `./eii test --seed 2026111382` passed 1,410 tests in 6 suites, 0 failed, 0 skipped (evidence/S2-T01.r3.eii-test.txt). The builder's own whole runs of the third and fourth passes failed three and two guards that are not this task's: two tests of the version check ran with Node 24 first on the path instead of the pinned 22, and one sandbox timing test failed once under machine load (OI-129); the lead's runs, with the pinned Node, passed.
+- Skipped at the first fetch, each with a named reason and none a failure (rule L2 of the brief): twenty-one rows. Nine portal rows whose publisher or licence the pack still marks "to be confirmed at slice S2" (`publisher_or_licence_unconfirmed`, among them `wage_sector`, `zone_population`, `accident` and `bnd_muni_2025`); the census workbook (`schema_unconfirmed`); `worldpop_qat_2020`, `bnd_hdx` and `cls_isic4` (`direct_url_unconfirmed`); `investqa_pages` (`page_list_unconfirmed`); the Overture rows `places_ovt` and `bldg_ovt` (`overture_bucket_not_opened`, no bucket is opened by this task); and five rows owned by later fetchers: `busy_gmaps` (S2-T16), `ntl_blackmarble`, `worldpop_qat_agesex` and `weather_openmeteo` (S2-T14) and `places_fsq` (S2-T15).
+- Open points: (a) PyYAML 6.0.3 is in the root development group only, with the retreat 6.0.2 (OI-127). (b) The two investment sources are used by the owner's decision of 2026-11-12 (OI-128, closed); showing the live traffic layer outside internal evaluation is the owner's decision too (OI-130). (c) An informative message for an ArcGIS error object is listed as hardening and not built: today the count reader refuses it with `short_total`, observed `unreadable`. (d) Also listed as hardening and not built: conditional re-fetch, response-size and time caps, a per-host delay, the twenty-figure draw of the section 10 stage, and the nightly job that reads `nightly_live_fetch`. (e) The section 10 stage compares a figure file with the published anchors and records `not_measured` when the file is absent; it does not compute the ratios, which belong to the parsers. (f) The reviewer is asked to read the criterion 8 reading below.
+- Criterion 8 (as amended by the owner's decision, L-126) is met by passes 5 to 7: both investment rows record the publisher's terms page as read at fetch (address, visible-text fingerprint, retrieval time) and the basis of use, the owner's decision of 2026-11-12 in his words; the page is fingerprinted at every fetch and a change is logged, without switching the sources off; rows whose terms forbid the use and have no such decision are switched off and named; `busy_gmaps` stays on.
+- Not built, by design: the optional traffic provider of decision 0019 item 17 (task S6-T19), and any live call by a test.
+
+#### Evidence for the work commit `9271cb8e6afa89dedc20d395f557606f05dfb261`
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    9271cb8e6afa89dedc20d395f557606f05dfb261
+Command:   uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    46 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The custodian suite at the work commit: 46 tests pass, among them the public-data tests of this task (the four files test_publicdata_fetch.py, test_publicdata_registry.py, test_publicdata_licence.py and test_publicdata_behaviour.py, and the section 10 stage test of custodian/publicdata/tests); each planted violation of the return has a named test that fails when the guard is broken.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    9271cb8e6afa89dedc20d395f557606f05dfb261
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    565 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The guard tests of scripts/tests: 565 tests, none failed or skipped; the command tests of the placeholder table now treat build-public as a real command.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    9271cb8e6afa89dedc20d395f557606f05dfb261
+Command:   ./eii build-public
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; first output line "PASS lic_active sha256=4cfecf94fcf2346613b236dfb6a5af32bfc24c46209fcf7c61c9c05b1db37056 host=www.data.gov.qa"
+Seed:      none
+Notes:     The lead's real fetch at the work commit, the second of two runs in a row, from its own shell with no key in its environment: exit 0; 117 PASS lines with receipts (every portal row, all seven map layers among them bnd_district_2020 through its layer 12, and fdi_projects); investqa_pages skipped for its unconfirmed page list; no TERMS line (the terms page's visible-text fingerprint unchanged since the first run) and no OWNER line; every SKIP with its named reason; nothing fetched is committed.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    9271cb8e6afa89dedc20d395f557606f05dfb261
+Command:   ./eii test --seed 2026111383
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1421 passed, 0 failed, 0 skipped
+Seed:      2026111383
+Notes:     The whole test command on the build machine, outside any sandbox: 6 suites; the python-custodian suite holds the 35 custodian tests of this task.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    9271cb8e6afa89dedc20d395f557606f05dfb261
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    9271cb8e6afa89dedc20d395f557606f05dfb261
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "201 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    9271cb8e6afa89dedc20d395f557606f05dfb261
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 185 source files"
+Seed:      none
+Notes:     Strict types; the PyYAML import carries the one type-ignore mark that two existing checks use.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    9271cb8e6afa89dedc20d395f557606f05dfb261
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 326 text files, 59 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with the README sentence on build-public, rule 44, document 04 (the layer id), the open items and TASKS.md as this task changes them.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    9271cb8e6afa89dedc20d395f557606f05dfb261
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    9271cb8e6afa89dedc20d395f557606f05dfb261
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The lock file agrees with the manifests after pyyaml 6.0.3 joined the root development group.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    9271cb8e6afa89dedc20d395f557606f05dfb261
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 64 components: OK"
+Seed:      none
+Notes:     The version check with the new row pyyaml of pins.toml.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    9271cb8e6afa89dedc20d395f557606f05dfb261
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes are unchanged by this task.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    9271cb8e6afa89dedc20d395f557606f05dfb261
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after rule 44 lost build-public from its list of placeholders.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
