@@ -200,6 +200,69 @@ class OutputRules(unittest.TestCase):
         self.assertEqual(len(seen), 5)
         self.assertEqual(len(labels), 4)
 
+    def test_check_enforcement_prints_success_and_blocks_each_part(self) -> None:
+        names = [
+            sandbox_check.VERSION,
+            sandbox_check.OUTSIDE,
+            sandbox_check.WORLD_SENTINEL,
+            sandbox_check.WORLD_MOUNTS,
+            sandbox_check.RELEASE_SENTINEL,
+            sandbox_check.RELEASE_MOUNTS,
+            sandbox_check.EXTENSIONS,
+        ]
+        clean = tuple(
+            sandbox_check.Component(
+                name, (), "bubblewrap 0.11.1" if name == sandbox_check.VERSION else ""
+            )
+            for name in names
+        )
+
+        def run(argv: list[str]) -> tuple[int, str, str]:
+            out, err = io.StringIO(), io.StringIO()
+            with patch.object(sys, "stdout", out), patch.object(sys, "stderr", err):
+                status = sandbox_check.main(argv)
+            return status, out.getvalue(), err.getvalue()
+
+        success = "\n".join(
+            [
+                "version: bubblewrap 0.11.1",
+                "outside: OK",
+                "profile build-world sentinel: OK",
+                "profile build-world mounts: OK",
+                "profile build-release sentinel: OK",
+                "profile build-release mounts: OK",
+                "extensions: OK",
+                "sandbox enforcement: OK",
+            ]
+        )
+        with patch.object(sandbox_check, "collect_enforcement", lambda: clean):
+            status, out, err = run(["check-enforcement"])
+        self.assertEqual((status, err, out), (0, "", success + "\n"))
+        labels = []
+        for name in names:
+            labels.append(name)
+            faulted = tuple(
+                sandbox_check.Component(item.name, ("broken",), item.detail)
+                if item.name == name
+                else item
+                for item in clean
+            )
+            held = faulted
+            with patch.object(
+                sandbox_check, "collect_enforcement", lambda kept=held: kept
+            ):
+                status, out, err = run(["check-enforcement"])
+            self.assertEqual(err, "")
+            self.assertEqual(status, 1)
+            lines = out.splitlines()
+            self.assertEqual(lines[-1], "sandbox enforcement: FAILED")
+            self.assertIn(f"FAIL {name}: broken", lines)
+            if name == sandbox_check.VERSION:
+                self.assertNotIn("version: bubblewrap 0.11.1", lines)
+            else:
+                self.assertNotIn(f"{name}: OK", lines)
+        self.assertEqual(len(labels), 7)
+
     def test_runner_steps_judge_deciding_commands_exactly(self) -> None:
         labels: list[str] = []
         for kind in ("status", "stderr", "twice", "extra"):
