@@ -160,7 +160,24 @@ def prepare(
     case: cases.Case,
     environment: Mapping[str, str],
 ) -> None:
-    """Prepare untracked scanner and web dependencies when a case needs them."""
+    """Prepare engine, scanner and web dependencies when a case needs them."""
+    if case.command == cases.MYPY:
+        status, output = execute(
+            [
+                "uv",
+                "sync",
+                "--managed-python",
+                "--all-packages",
+                "--locked",
+                "--group",
+                "engine",
+            ],
+            copy,
+            environment,
+            SETUP_TIMEOUT_SECONDS,
+        )
+        if status != 0:
+            raise PlantError(f"engine sync failed (status {status}): {tail(output)}")
     if case.scanner:
         source = root / SCANNER_FOLDER
         if not source.is_dir():

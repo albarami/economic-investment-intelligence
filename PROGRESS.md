@@ -14697,6 +14697,440 @@ Seed:      none
 Notes:     The one work commit has a Conventional Commit subject.
 ```
 
+#### S1-T04: independent review, round 2: APPROVED
+
+Reviewed commit `2e8bcac0c2f5cad5effbdc161d238309c58af209`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/28 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43339006721; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43339006720; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43339006798 ). Reviewer: OpenAI GPT-5.6 Sol (effort high), through the Codex command-line tool, read-only, the reviewer of round 1 (it names itself more shortly in its verdict); a later round, limited as REV-39 says. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T04 (pull request 28), round 2
+COMMIT: 2e8bcac0c2f5cad5effbdc161d238309c58af209
+REVIEWER: OpenAI GPT-5
+EARLIER FINDINGS:
+  F1 FIXED The multipart test parses the boundary, requires exactly two parts and pairs each Content-Range with its complete expected payload; the planted swap failed and the restored suite passed.
+  F2 FIXED The invalid-range test asserts the complete empty 416 body and both complete pinned 400 bodies; the planted wrong body failed and the restored suite passed.
+  F3 FIXED The shared stop helper asserts thread termination, all five server teardowns use it, and the planted surviving-thread test proves the assertion has teeth.
+  F4 FIXED PROGRESS.md appends a TST-171 correction naming all three inaccurate statements and records the correct original and fixed test counts.
+  F5 FIXED TASKS.md now records status "in review (pull request 28)" rather than claiming the pull request merged.
+CHECKS:
+  REV-10 PASS All three acceptance criteria map to passing tests: full response, exact single- and multi-range bytes, and safe invalid-range responses; the lead recorded 1185 passed on the head.
+  REV-11 PASS The lead recorded ./eii test --seed 2026111323 with exit 0, 1185 passed, 0 failed and 0 skipped on the head; hosted tests succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43339006721/job/131602333042.
+  REV-12 PASS The fix commit changes only product/tests/test_tiles_range.py; the ledger changes only PROGRESS.md and TASKS.md, and the application code is unchanged.
+  REV-13 PASS The implemented tile route and tests remain complete; the fix adds substantive assertions and no placeholder, stub or mock substitute.
+  REV-14 PASS The patch contains no secret or real custodian data, and hosted secret-scan succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43339006721/job/131602333009.
+  REV-15 PASS The test diff adds stronger exact assertions and a planted lifecycle violation, with no skip, expected failure, retry, suppression or weakened check; the recorded scan found zero suppressions, skips or expected failures.
+  REV-16 PASS The unchanged implementation and strengthened tests continue to follow S1-T04, ruling L-56 and the slice S1 range-request spike scope.
+  REV-17 PASS PROGRESS.md appends the required correction, TASKS.md now states the truthful review status, and the lead's head documentation check exited 0; hosted check-docs succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43339006720/job/131602332774.
+  REV-18 PASS Application security and data handling are unchanged; the strengthened teardown assertions and previously passing containment tests introduce no security or data-handling defect.
+  REV-19 PASS No settled decision or build order is changed; the patch is limited to review fixes and their ledger record.
+  REV-20 N/A This spike adds no economic fact, displayed metric, forecast, estimate or application-schema calculation.
+  REV-21 N/A This spike adds no screen, Fact chip, catalogue claim, model prose or rendered product numeral.
+  REV-22 PASS The patch changes no privacy rule, parameter set, treatment, export register, window key or attack test.
+  REV-23 PASS Product application code is unchanged, no custodian import is added, and the full suite passed.
+  REV-24 N/A No bilingual view, Arabic string or displayed number is added.
+  REV-25 PASS The head documentation and tree checks exited 0, hosted secret-scan succeeded, and the patch adds no private path, realistic identifier, real data or prohibited comparison.
+  REV-26 PASS The patch adds no prohibited product claim, forecast, endorsement, lookup capability, verdict or advice.
+  REV-27 PASS The lead recorded cmp AGENTS.md CLAUDE.md with exit code 0 on the head.
+  REV-28 N/A No synthetic establishment, legal-entity, employer-group, person or salary-file identifier is introduced.
+  REV-29 N/A No Synthetic or Simulated attribute is attached to a real named place or business.
+  REV-38 PASS The patch adds no gateway import, provider-setting read, score, badge, panel or live gateway call.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S1-T04: merge record
+
+- The lead's checks on the merged head `2e8bcac0c2f5cad5effbdc161d238309c58af209` before the merge (ruling L-29): "TREE-IS-WORK ok: 278 paths at 2e8bcac0c2f5cad5effbdc161d238309c58af209", exit code 0; `./eii test --seed 2026111323`: exit code 0, "total: 1185 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/28 was squash-merged on 2026-11-13 at that head; merge commit `4a43f91c1a8491e97394c808a28af0586b407acf` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43340273654; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43340273777; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43340273608 .
+
+
+- The task log of S1-T04 is complete with this record: REJECTED in round 1 (five findings, all valid, fixed or corrected in one round), APPROVED in round 2; no proposed item. TASKS.md marks the task done with this ledger.
+
+### S1-T05 — First two-store parity query: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/30 )
+
+- What the task proves (slice S1, the technical spike): one portable named query is answered by PostgreSQL 18 and by DuckDB 2.0 with identical normalised output, and a deliberate difference fails (BE-20 to BE-24 for the normalisation; TST-41 and TST-42 for the comparison and its stated rounding; TST-167: no fallback for store parity). It is a spike under `scripts/`, not the query registry or the store selector of the product
+- Class of the work (the owner's note of 2026-11-12 on value and cost): standard; store parity is a control with no fallback, and the lead ran the two-store proof itself
+- Plan: a short plan in the owner's new form (83 lines) by OpenAI GPT-6 Astra (through the Codex command-line tool), read by the lead; the lead's rulings R1 to R5 of the build brief override it where they differ. No separate plan review
+- Builder maker and model: Codex command-line tool, `gpt-6-astra` (OpenAI): one build; no completion pass was needed
+- Reviewer, as planned: Cursor command-line tool, `grok-4.7-high` (xAI), read-only (a maker that neither planned nor built); the record of the verdict names the reviewer that gave it
+- Branch: `task/S1-T05-store-parity`
+- What was built: `scripts/store_spike.py` (the one named query, the translation of its bound list parameter for each driver, strict parameter names and types, two independent adapters); `scripts/store_spike.sql` (one portable SELECT with a bound list, a grouped integer sum, a decimal control, explicit placing of NULL and a unique final sort key); `scripts/store_spike_normalise.py` (integers exact; non-integral numbers as decimals at six places, half to even, a binary float first through its shortest text; text in NFC; dates; a comparison of fixture identity, columns, row count, row order, value types and every field, whose message names positions only); `scripts/store_spike_fixture.py` (fourteen fixed synthetic rows with an independent expectation computed in Python; the database address from `EII_DATABASE_URL` only and on the loopback address only; a temporary PostgreSQL table with C-collated text inside a transaction that is rolled back; a temporary DuckDB file written, closed and opened again read-only with external access off and the configuration locked); `scripts/tests/test_store_spike.py` (31 offline tests: a real DuckDB, a mocked PostgreSQL) and `scripts/tests/live_store_spike.py` (the two-store command)
+- The rulings (the build brief): R1, the spike stays under `scripts/`, and `psycopg[binary]` at its recorded pin joins the root dependency group `engine` (only the word `state` of its pin row changes). R2, the reference notes are not changed; what was measured is listed below for task S1-T08. R3, the live commands need the project's database service, which only the lead starts and stops: the builder wrote them and their tests and did not run them. R4, a test that needs PostgreSQL is never skipped and never answered by one store: the offline tests prove binding, normalisation, comparison and every refusal, and only the live command proves the two engines
+- The three acceptance criteria. (1) Both adapters answer: the lead's live run with the service up, below: both engines match the independent expectation and each other for the full list, the empty list, a list of one unit and a list whose one element carries quotation marks. (2) Rounding is explicit: `store_spike_normalise.py` states it in code (six places, `ROUND_HALF_EVEN`, integers never rounded) and the offline tests `test_half_even_positive_negative_even_odd`, `test_decimal_comparison_is_after_rounding`, `test_float_uses_repr_before_rounding` and `test_large_decimal_does_not_use_ambient_precision` prove it. (3) A deliberate divergence fails parity: the lead's live run with `--diverge`, exit code 3 after a passing baseline; offline, `test_deliberate_integer_divergence_fails` and `test_complete_result_plants`
+- The lead's live runs at the work commit, with this project's Compose service on the loopback port of decision record 0020, started and stopped by the lead with `./eii db-up` and `./eii db-down`, every docker call scoped to this project, other projects' containers not touched. The password is read from the lead's secret file into the environment of the run only; the output was searched for it before anything was kept. In order: the variable unset, exit 1 ("database environment missing"); the service down, exit 1 ("engine operation failed", no pass line); the service up, exit 0; the same command twice more with byte-identical output; `--diverge`, exit 3 ("field mismatch row=4 column=3" after the passing baseline); a wrong argument, exit 2; a count of tables named `spike_control` outside temporary schemas: 0; the service down again, exit 1. The engines that answered: PostgreSQL server version number 180006, DuckDB 2.0.0, driver psycopg 3.3.8. The role was the service's superuser, which exists from the first start; the application role is built in slice S3
+- The lead's own breaks (twelve; each file restored): the comparison made blind to row order; rounding half up; no NFC; an integer and an equal decimal taken as the same; no row-count check; an unknown query name accepted; a parameter of another type accepted; an address off the loopback interface accepted; the DuckDB reader opened for writing; the live command returning success on a mismatch; the live command printing a driver's error text; NULL sorted first in the query. All twelve are caught by named offline tests
+- The builder's break pass, as it reports: 150 breaks; three survived at first (the configuration lock of the reader, one of the two C collations, fixture values changed without changing their order) and each now fails a test that was added
+- Red run before the code: `test_deliberate_integer_divergence_fails` could not import the comparison module. One test design was corrected by the builder and said so: a first float value did not tell `Decimal(float)` from `Decimal(repr(float))`; the value 0.0000025 does
+- Measured, for the pin confirmation of task S1-T08: DuckDB 2.0.0 and PostgreSQL 18.6 return the same order for text sorted by byte value (C collation on the PostgreSQL side), including a composed and a decomposed accented label, an Arabic label, ties and NULL placed last; named parameters with a bound list work on both drivers (`%(name)s` with `ANY` for psycopg, `$name` for DuckDB), the empty list included; the registry's current release of psycopg on 2026-11-13 is 3.3.9, one patch above the recorded pin, which this task does not change. The reference-note fields "text ordering by byte value, by the parity query" and "first parity query on both stores" are supported by these runs
+- In the builder's tool sandbox the full test command could not pass (a nested cache that is read-only there makes one command test fail, and the commit-hook tests cannot stage); the lead ran every command at the work commit, below. This is the tool's sandbox, not a random failure of the repository: the same commands pass on the build machine and in CI
+- Shared documents, entered by the lead in the work commit: rule 44 of AGENTS.md and CLAUDE.md (the live command and its form with `--diverge`); README.md (one sentence of the status paragraph, the count and the list of the root commands, two lines of the command block, one paragraph on the spike); one sentence added to OI-111 (the driver is installed; preflight still uses the client programs)
+- Hardening listed, not built (the builder's return): the production roles, the release loading, a full query registry with a portability lint and full-table digests (slices S3 and later); connection pooling, concurrency and soak tests, a database in CI; a connection policy that constrains inherited client-library configuration and credential-file defaults
+- With this ledger: the closing record of pull request 28 above, and the status of S1-T04 in TASKS.md set to done (the lead's rule since that review: a task is marked done by the ledger after its merge)
+
+#### Evidence for the work commit `476a62069b77139ffc99bfd466aa2bb8cd43a6aa`
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   uv run --locked python scripts/tests/live_store_spike.py
+Exit code: 1
+Date:      2026-11-13
+Run by:    lead (local), the project's database service down
+Counts:    not a test suite; first output line "FAIL store-spike: engine operation failed"
+Seed:      none
+Notes:     The service down and a valid address in the environment: the command fails with its fixed line and prints no pass line. There is no skip and no answer from one store (TST-167).
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   uv run --locked python scripts/tests/live_store_spike.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local), the project's database service started by the lead with ./eii db-up
+Counts:    not a test suite; first output line "PASS store-spike: both engines match" (then one line of evidence: the versions of both engines and of the driver, the hashes of the fixture and of the query, 14 fixture rows, 7 result rows in order)
+Seed:      none
+Notes:     Criterion 1, both adapters answer. PostgreSQL (server version number 180006) and DuckDB 2.0.0 each match the independent expectation, and each other, for the full list, the empty list, one unit and an element with quotation marks. Run twice more with byte-identical output; afterwards no table of the spike exists outside temporary schemas.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   uv run --locked python scripts/tests/live_store_spike.py --diverge
+Exit code: 3
+Date:      2026-11-13
+Run by:    lead (local), the project's database service up
+Counts:    not a test suite; first output line "PASS store-spike: both engines match" (the passing baseline first; the last line is "FAIL store-spike: field mismatch row=4 column=3")
+Seed:      none
+Notes:     Criterion 3, a deliberate divergence fails parity: after the passing baseline one integer of the DuckDB copy is changed, and the comparison fails with exit code 3 and names the position only.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_store_spike.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    31 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Criterion 2, rounding is explicit, and the offline half of the others: 31 tests with a real DuckDB and a mocked PostgreSQL: normalisation (integers exact; six places, half to even; a float through its shortest text; NFC; dates; refusals of unsupported and non-finite values), the comparison with its planted differences, the parameter and query refusals, the loopback-only address, the read-only reader with external access off and the configuration locked, C collation on both text columns, clean-up on success and on failure, no driver text or address in any output, and the orchestration of the live command.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   ./eii test --seed 2026111315
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1216 passed, 0 failed, 0 skipped
+Seed:      2026111315
+Notes:     The whole test command on the build machine; the 31 offline tests run in its guard suite. The live command is not part of it and needs the service.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 46 packages in 0.88ms"
+Seed:      none
+Notes:     The lock file matches the manifests after the driver joined the root group `engine`.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 60 components: OK"
+Seed:      none
+Notes:     The version check with the row `psycopg` installed at its recorded pin.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes and their check are unchanged by this task (ruling R2).
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "142 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 136 source files"
+Seed:      none
+Notes:     Strict types; both drivers bring their own type information, so no stub file was needed.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 226 text files, 55 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with rule 44 of both agent files, the README and the added sentence of OI-111.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after the same insertion in rule 44 of each.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','4a43f91c1a8491e97394c808a28af0586b407acf...476a62069b77139ffc99bfd466aa2bb8cd43a6aa'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:scripts/store_spike.py A:scripts/store_spike.sql A:scripts/store_spike_fixture.py A:scripts/store_spike_normalise.py A:scripts/tests/live_store_spike.py A:scripts/tests/test_store_spike.py M:AGENTS.md M:CLAUDE.md M:OPEN_ITEMS.md M:README.md M:pins.toml M:pyproject.toml M:uv.lock'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "13 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope (REV-12): the four files of the spike under `scripts/`, its two test files, the root manifest with its lock and the pin record, and the four shared documents the lead entered (AGENTS.md, CLAUDE.md, README.md, OPEN_ITEMS.md).
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    476a62069b77139ffc99bfd466aa2bb8cd43a6aa
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','4a43f91c1a8491e97394c808a28af0586b407acf..476a62069b77139ffc99bfd466aa2bb8cd43a6aa'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit has a Conventional Commit subject.
+```
+
+#### S1-T05: the update of the branch with main, the first hosted run (two checks red) and the fix (pull request https://github.com/albarami/economic-investment-intelligence/pull/30 )
+
+- The update of the branch with main. When the offline gateway (pull request 29) merged, this branch conflicted with main in two files, and GitHub runs no check on a pull request that conflicts. The branch was therefore updated before its review: merge commit `d2a0b4786dbea50c37ae65efc525deade84b31c6`. PROGRESS.md by the lead's script that keeps every line of both sides, main's first; README.md by the lead's script that takes main's file and applies this task's recorded edits again. The lead's proof that the update changed nothing by itself:
+
+```text
+base update d2a0b4786dbea50c37ae65efc525deade84b31c6: branch side 916720866382b295944e5662401e8b49532ed32a, main side 034f0805a2638bca27a737789327428d2652395f, merge base 4a43f91c1a8491e97394c808a28af0586b407acf
+  branch only: 9
+  main only: 34
+  neither: 261
+  both, git's own merge: (4, ['OPEN_ITEMS.md', 'TASKS.md', 'pyproject.toml', 'uv.lock'])
+  both, resolved by the lead's script: (2, ['PROGRESS.md', 'README.md'])
+  FAIL: (0, [])
+```
+
+- The first hosted run, on that merge commit: the job `static-checks` failed at its step "Check Python types" ( https://github.com/albarami/economic-investment-intelligence/actions/runs/43341801140/job/131611634543 ) and the job `planted-failures` at "Plant one violation per CI guard" ( https://github.com/albarami/economic-investment-intelligence/actions/runs/43341801140/job/131611634504 ). The other four required checks were not affected
+- The cause, reproduced by the lead on the build machine in a fresh default environment (`UV_PROJECT_ENVIRONMENT` set to a new temporary folder, `UV_OFFLINE=1`, then `uv run --locked mypy`): "Found 8 errors in 4 files (checked 160 source files)", each "Cannot find implementation or library stub for module named" `duckdb` or `psycopg`. The two jobs ran the Python checks in the default environment, which holds the dependency group `dev` only; the store spike imports the two drivers, which live in the group `engine`. The builder's runs and the lead's runs had passed because both environments had been synced with that group, as rule 44 describes for the sandbox tests; the job `tests` syncs it too and was green
+- The lead's ruling: the type check must see the real, pinned drivers. No stub file for a library that ships its own types, no ignore comment, no relaxed setting, and the four files stay inside the type check. The environment of the two jobs gains what the code imports: each gets the step that the job `tests` has, with the same name and the same command, directly after the Node installation. No check command changes; no `if:` and no `continue-on-error`; the permissions are unchanged. This is not a check edited to pass: the check, its command and its strictness are what they were, and it now reads the packages that the lock file pins
+- The fix (the builder of the task, OpenAI GPT-6 Astra through Codex; fix commit `cee42d321edf231c229376da710cab0bfc34d62e`): the two steps in `.github/workflows/ci.yml` with the pinned text of the workflow; and `scripts/ci_plants.py`, because the planted-failure harness type-checks in scratch copies that have an environment of their own: it now syncs the same locked group in each such copy before the unchanged check, and a failed sync stops the case before the check. Two tests of the harness were written first and seen failing (`test_type_check_prepares_engine_in_each_scratch_copy`, `test_failed_engine_sync_stops_before_type_check`)
+- The proof is the hosted run on the fix commit: `static-checks` success ( https://github.com/albarami/economic-investment-intelligence/actions/runs/43343669406/job/131617738657 ), `planted-failures` success ( https://github.com/albarami/economic-investment-intelligence/actions/runs/43343669406/job/131617739369 )
+- The documents (the lead, commit `dd22c099a0b59fae5feb9c9467f99232d2c58f78`): rule 44 of AGENTS.md and CLAUDE.md now says that the command which syncs the group `engine` makes the environment of the sandbox tests and of the type check; README.md says what the two jobs and the harness do
+- What the lead changes in its own checks: a head is also type-checked the way the hosted static job does it, in an environment made from the lock file alone with the groups that job syncs, so that a difference between the build machine's environment and the hosted one shows before the push
+- Task S1-T03 imports packages of the same group in product code and merges after this pull request for that reason
+
+#### Evidence for the work commit `dd22c099a0b59fae5feb9c9467f99232d2c58f78`
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_ci_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    39 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The workflow tests and the harness tests at the fix commit, 39: the pinned text of the changed workflow matches its file, the rules of the three workflows hold (no weakener, the required jobs and steps), and the two new tests of the harness (the engine group is synced in the clean and in the planted scratch copy of the type check; a failed sync stops the case before the check).
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   uv run --locked python scripts/ci_plants.py run
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "RESULT: PASSED" (twelve planted violations, each blocked by its guard)
+Seed:      none
+Notes:     The planted-failure harness on the build machine: every one of the twelve planted violations is blocked, the type-check plant among them after the sync of the engine group in its scratch copies.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   python3 -I -c "import hashlib,pathlib; h=hashlib.sha256(pathlib.Path('.github/workflows/ci.yml').read_bytes()).hexdigest(); t=pathlib.Path('scripts/tests/ci_workflow_rules.py').read_text(encoding='utf-8'); y=pathlib.Path('.github/workflows/ci.yml').read_text(encoding='utf-8'); print(h in t, y.count('uv sync --managed-python --all-packages --locked --group engine'), y.count('continue-on-error'), y.count('if:'))"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "True 3 0 0" (the pin of the workflow's text matches the file; the sync command stands in three jobs; no continue-on-error; no if)
+Seed:      none
+Notes:     The workflow file: its pinned hash matches, the engine sync is a step of three jobs (the test job as before, the static job and the planted-failure job now), and the file holds no `continue-on-error` and no `if:`.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   ./eii test --seed 2026111330
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1245 passed, 0 failed, 0 skipped
+Seed:      2026111330
+Notes:     The whole test command at the head of the fix round.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "166 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 160 source files"
+Seed:      none
+Notes:     Strict types in the environment that rule 44 describes (synced with the group `engine`); the same check passes in the hosted static job on the fix commit (the task log above).
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 252 text files, 55 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with the changed sentences of rule 44 and of the README.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after the same change of rule 44 in each.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','d2a0b4786dbea50c37ae65efc525deade84b31c6...dd22c099a0b59fae5feb9c9467f99232d2c58f78'],check=True,capture_output=True,text=True).stdout.splitlines()); w='M:.github/workflows/ci.yml M:AGENTS.md M:CLAUDE.md M:README.md M:scripts/ci_plants.py M:scripts/tests/ci_workflow_rules.py M:scripts/tests/test_ci_plants.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "7 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope of the two commits of the fix round (REV-12): the workflow file, the pin of its text, the harness and its test; then the three documents.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','d2a0b4786dbea50c37ae65efc525deade84b31c6..dd22c099a0b59fae5feb9c9467f99232d2c58f78'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Both commits of the fix round have a Conventional Commit subject.
+```
+
 #### S1-T06: independent review: APPROVED
 
 Reviewed commit `525ec462a16bea11c45dc9330965c08108a9c534`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/31 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43343517078; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43343517071; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43343517221 ). Reviewer: Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only; a maker that neither planned nor built the task; a full review. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.

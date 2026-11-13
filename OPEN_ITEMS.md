@@ -949,7 +949,7 @@
 - TYPE: ASSUMPTION
 - NEEDED: The owner to confirm that preflight continues to use the PostgreSQL client programs until slice S1 decides the driver pin.
 - WHY: `docs/13_DEPLOYMENT_AND_OPERATIONS.md` section "Prerequisites and how each is checked" names `pg_isready` and a version query; `docs/02_ARCHITECTURE.md` section "Technology stack", row "PostgreSQL driver", leaves the driver to slice S1.
-- DONE SO FAR: Preflight runs `pg_isready` and then one `psql` query. The password reaches only the `psql` child environment. A missing `pg_isready` or no answer selects embedded with a warning; an answering server whose checks cannot be completed is a failure, never a fallback. The S0-T08 task log records all four live tests against this project's service.
+- DONE SO FAR: Preflight runs `pg_isready` and then one `psql` query. The password reaches only the `psql` child environment. A missing `pg_isready` or no answer selects embedded with a warning; an answering server whose checks cannot be completed is a failure, never a fallback. The S0-T08 task log records all four live tests against this project's service. Task S1-T05 installs the driver `psycopg` 3.3.8 through the root dependency group `engine` for the store spike; preflight still uses the client programs, and task S1-T08 confirms the driver's pin.
 - OPTIONS: **Recommendation:** keep the client programs through slice S0 and decide together with the driver pin at slice S1. Alternative: a separately scoped dependency and licence change adds the driver earlier.
 - NEEDED BY: slice S1 gate.
 
