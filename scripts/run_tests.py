@@ -51,7 +51,11 @@ SUITES: tuple[Suite, ...] = (
         "web-checks",
         "node",
         "web",
-        ("scripts/tests/*.node-test.mjs", "spikes/glyphs/tests/*.node-test.mjs"),
+        (
+            "scripts/tests/*.node-test.mjs",
+            "spikes/glyphs/tests/*.node-test.mjs",
+            "spikes/performance/tests/*.node-test.mjs",
+        ),
         1800,
     ),
     Suite("web-unit", "vitest", "web", (), 600),

@@ -15924,6 +15924,559 @@ Seed:      none
 Notes:     The fix commit has a Conventional Commit subject.
 ```
 
+#### S1-T03: independent review: APPROVED
+
+Reviewed commit `07043a0cc3d1f2f3e15e19204fb69eecdbfdfd8a`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/33 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43348281291; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43348281255; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43348281292 ). xAI Grok 4.7, through the Cursor command-line tool, read-only; a maker that neither planned nor built the task; a full review of the pull request against main, on its head (the reviewer names itself in its own words in the verdict) The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T03 (pull request 33)
+COMMIT: 07043a0cc3d1f2f3e15e19204fb69eecdbfdfd8a
+REVIEWER: SpaceXAI Grok 4.7
+CHECKS:
+  REV-10 PASS All five criteria of TASKS.md S1-T03 map to tests, and the head run records them. (1) `test_routing_opens_no_server` builds each distinct factor with `valhalla_build_tiles` first, then routes every walk and drive hour with Python socket construction, `create_connection` and `Popen` replaced by failing stand-ins; `engine.scaled_isochrone` calls only that finite builder and an in-process `Actor`, and no path calls `valhalla_service`. (2) The hour enters only as the fixture factor: drive selects `factors[hour]`, `extract.generate` writes that multiple into each way's `maxspeed`, and one tile set is cached per factor. `test_drive_isochrone_changes_with_the_hour` ties outline equality to factor equality, requires a changed table to change the drive outline, and requires the walk outline to stay put; `test_walk_always_uses_unscaled_tiles` requires factor 1.0 for every walk hour. The recorded file shows hours 7–9 (factor 0.5) on a smaller ring than the factor-1.0 hours, and every walk hour on one ring. The lead's plants B1 and B2 were caught. (3) `Area.exact` keeps the closed drawn ring, the analytical `Circle`, and the engine ring with only latitude and longitude exchanged (`test_each_shape_is_kept_exactly`, `test_exact_ring_is_the_engine_polygon`); the recorded drive ring is that vertex list beside a separate cell list. (4) `snap_polygon` uses centre containment at the frame's resolutions and intersects with the frame, `snap_radius` keeps frame cells whose centres lie within the radius of the pin cell's centre, and an empty result raises (`test_snapped_output_holds_only_whole_frame_cells`, `test_center_containment_keeps_entire_cell`, `test_radius_includes_boundary_and_uses_pin_cell_center`, `test_empty_snap_is_refused`); plants B6, B7 and B8 were caught. (5) `test_deterministic_fixtures_pass` clears the actor cache, compares two fresh computations, and compares them with `expected_outputs.json`; `test_pbf_reproduces_committed_fixture` matches the committed extract byte for byte and to the manifest size and digest.
+  REV-11 PASS On the head, the lead ran `./eii test --seed 2026111334` with exit 0 (1294 passed, 0 failed, 0 skipped) and `python3 scripts/check_docs.py` with exit 0. Hosted checks on this commit succeeded: tests https://github.com/albarami/economic-investment-intelligence/actions/runs/43348281291/job/131632817732 and check-docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43348281255/job/131632817823. The lead's twelve planted faults were each caught by a named test and the restored suite passed; the product suite added no skip.
+  REV-12 PASS The work commit changes the 25 paths named in the task log (the spike package, the h3 stub, three test modules, six fixture files, the root manifest, the lock, the pin record, the product README, README.md and OPEN_ITEMS.md). The ledger commit adds the task log and sets S1-T05 to done. Nothing under `data/` is changed.
+  REV-13 PASS The routing, snap and shape functions return the engine ring, the drawn ring, the circle or the frame cells. `expected_outputs.json` is the primary-engine recording that a fresh computation must equal. `product/src/h3.pyi` is the type stub for a library that ships none; the tests run the installed library. No TODO, FIXME, NotImplementedError or empty body is in the new product code.
+  REV-14 PASS The patch contains the invented lattice (provenance Synthetic, origin "Invented lattice; no downloaded geography") and no `.env`, key or custodian record. The hosted secret scan succeeded: https://github.com/albarami/economic-investment-intelligence/actions/runs/43348281291/job/131632818148.
+  REV-15 PASS No existing test, threshold, skip, expected-failure mark, lint rule or visual baseline is loosened. The new tests are additions. The only type-check change is `follow_untyped_imports` for `valhalla` and `valhalla.*`; `strict` stays true, and the new product sources contain no ignore comment. Ruling L-59's removed assertions are the retreat's travel-time attribute, its one-edge hull refusal and a duplicate empty-network assertion, each named in the round-5 report; the five criterion tests still catch the lead's plants.
+  REV-16 PASS The spike follows TASKS.md S1-T03 and rulings L-58 and L-59: pyvalhalla in process, per-edge scaling by one tile set per distinct factor, empty network refused before the builder, engine polygon kept with the coordinate exchange, retreat code absent from the lock (`osmnx` and `networkx` are not locked; `shapely` 2.2.0 is the test dependency and pulls `numpy`). Pins keep the recorded versions; only `state` and `first_use` change for the packages this task installs.
+  REV-17 OPEN P1 README.md, product/README.md, the spike README, OPEN_ITEMS.md (OI-22 and OI-120) and PROGRESS.md are updated in this pull request, and `python3 scripts/check_docs.py` exited 0 on the head. The SYN-53 decision record is deferred to the slice gate by the task brief. The manifest gap from build ruling R1 is not yet an open item.
+  REV-18 PASS The new code reads no secret and stores no provider response. It sends no model query and does not change application roles, base-table grants or logs.
+  REV-19 PASS pyvalhalla stays the routing engine; the recorded retreat was not taken. No dropped-scope feature, component decision or slice-gate order is changed. The hour mechanism is recorded as assumption OI-120 for the decision record at the slice gate.
+  REV-20 N/A The spike shows no number to a user and adds no fact, release figure or displayed numeral; the rings and cell lists are fixture geometry.
+  REV-21 N/A No screen, template, Fact chip, catalogue claim or model-written prose is added.
+  REV-22 PASS No partition, parameter set, treatment, export, window key or attack test is changed. Snapping returns whole frame cells and does not replace them with a parent outline.
+  REV-23 PASS The new modules do not import `eii_custodian`, the product manifest gains no custodian dependency, and the head suite, including the import-boundary guards, passed.
+  REV-24 N/A No English or Arabic product view is added.
+  REV-25 PASS The fixture names no person, address, e-mail, private path or real custodian file, and it contains no eight-digit or eleven-digit identifier. Node labels are `SYN-N-<row>-<column>` on a lattice from latitude -0.01 to 0.01 and longitude -0.01 to 0.01. Documentation and secret checks on the head passed.
+  REV-26 PASS The README and the task log call the work a fixture spike and state that a real road network, the release graph and many tile sets are not proven. No forecast, score, footfall, endorsement, lookup or go/no-go wording is added.
+  REV-27 PASS The lead's `cmp AGENTS.md CLAUDE.md` on the head exited 0. This task does not edit either file.
+  REV-28 N/A The spike adds no establishment, legal-entity, employer-group, person or salary-file identifier; `SYN-N-` and `SYN-WAY-` are labels of the invented road fixture.
+  REV-29 N/A The lattice is labelled invented and synthetic and names no real place or business, so no Synthetic or Simulated attribute is attached to one.
+  REV-38 PASS The patch adds no import of `eii_gateway`, no read of `EII_DECISION_PROVIDER` or `JEV_PRO_API_KEY`, and no score, badge, panel or run-time gateway call.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17) product manifest for the area-tool slice (build ruling R1; the same kind of gap as OI-116 for FastAPI) `engine.py` imports `valhalla`, and `shapes.py` and `snap.py` import `h3`, while `product/pyproject.toml` does not declare them. Both packages sit in the root `engine` group. The product README states that home; OI-120 and OI-60 do not record that the area-tool slice must declare them or keep the engine-group exception.
+```
+
+#### S1-T03: merge record
+
+- The lead's checks on the merged head `07043a0cc3d1f2f3e15e19204fb69eecdbfdfd8a` before the merge (ruling L-29): "TREE-IS-WORK ok: 331 paths at 07043a0cc3d1f2f3e15e19204fb69eecdbfdfd8a", exit code 0; `./eii test --seed 2026111334`: exit code 0, "total: 1294 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/33 was squash-merged on 2026-11-13 at that head; merge commit `1bd5a373b5805727bc395c3a2381e2db36e7c587` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43350581577; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43350581487; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43350581579 .
+
+- The task log of S1-T03 is complete with this record: six build rounds before the review, none of them a review round; APPROVED in its one review round, no finding; one proposed open item (P1, on REV-17), entered as PO-S1-06 with this ledger and closed by the follow-up task S1-T10. TASKS.md marks the task done with this ledger.
+
+#### S1-T01: independent review, round 2: APPROVED
+
+Reviewed commit `2fdf85099ae3f653e3653b095efd528c8ec7a715`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/32 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43352295650; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43352295598; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43352295603 ). OpenAI GPT-5.6 Sol, through the Codex command-line tool, read-only; the reviewer of round 1; a later round under REV-39 to REV-43, on the head of the pull request (the branch had been updated with main a second time before this round: the proof is below) The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T01 (pull request 32), round 2
+COMMIT: 2fdf85099ae3f653e3653b095efd528c8ec7a715
+REVIEWER: OpenAI GPT-5
+EARLIER FINDINGS:
+  F1 FIXED `open` now records page requests, judges them after settlement and throws the verdict detail; the new planted test requires rejection naming `assets.invalid`, both lead breaks caught removal of either part, and the ten-test browser suite exited 0.
+CHECKS:
+  REV-10 PASS All three task criteria retain their tests and recorded evidence; the ordinary helper now enforces FE-56, ten browser tests passed, and hosted `tests`, including the three pixel comparisons, passed at https://github.com/albarami/economic-investment-intelligence/actions/runs/43352295650/job/131646002335.
+  REV-11 PASS The lead ran `./eii test --seed 2026111338` on the head with exit 0, 1335 passed and no skips, and the documentation check with exit 0; all hosted checks are green, including `tests` at https://github.com/albarami/economic-investment-intelligence/actions/runs/43352295650/job/131646002335.
+  REV-12 PASS The task’s fix changes only `web/spikes/glyphs/tests/glyphs.spec.ts`; the recorded base-update proof reports no failed path, and the other brought-in files belong to the separately reviewed S1-T03 task.
+  REV-13 PASS The added listener, verdict check and planted browser test are complete executable checks, with no placeholder, stub or fixed substitute.
+  REV-14 PASS The fix adds no secret or real data, and hosted `secret-scan` passed at https://github.com/albarami/economic-investment-intelligence/actions/runs/43352295650/job/131646002080.
+  REV-15 PASS The patch adds thirteen test lines without removing or loosening an assertion, adding a skip or suppression, or changing a baseline; the lead’s scan returned zero skips or suppressions, and both planted breaks failed as required.
+  REV-16 PASS The shared ordinary-page helper now implements ruling R9 by rejecting every captured non-same-origin request after settlement while retaining route abortion.
+  REV-17 PASS The fix and its evidence are recorded in PROGRESS.md, no other task document required a content change, and the head documentation check exited 0.
+  REV-18 PASS The changed test path retains route abortion and adds independent observation of CSP-blocked requests; it introduces no secret, data-handling path or serving-plane change.
+  REV-19 PASS The fix implements the accepted ruling within S1-T01 and reopens no settled decision.
+  REV-20 N/A The spike adds no product fact or numerical economic figure requiring provenance and lineage.
+  REV-21 N/A The synthetic spike adds no rendered product numeral, claim or Fact-chip requirement.
+  REV-22 PASS No privacy invariant, parameter, treatment, protected release or attack code changed.
+  REV-23 PASS No product or package import changed, and the complete head suite passed with the existing boundary guards intact.
+  REV-24 PASS The bilingual page and three baselines are unchanged; hosted `tests` ran the three pixel comparisons successfully at https://github.com/albarami/economic-investment-intelligence/actions/runs/43352295650/job/131646002335, while native reading remains recorded as pending.
+  REV-25 PASS The fix contains only a reserved planted host and test logic, with no private path, personal identifier, realistic identifier, secret or named-product comparison; the public-repository and secret checks passed.
+  REV-26 PASS The fix adds only request-enforcement test text and no prohibited product, privacy, endorsement, forecast, lookup, verdict or action claim.
+  REV-27 PASS The lead’s head `cmp AGENTS.md CLAUDE.md` exited 0 and the documentation check passed.
+  REV-28 PASS The fix introduces no synthetic custodian identifier or bare eight- or eleven-digit identifier.
+  REV-29 PASS The fix attaches no attribute to a real named place or business; the displayed fixture remains explicitly synthetic.
+  REV-38 PASS The fix adds no gateway import, provider-setting read, run-time call or gateway-derived screen text.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S1-T01: merge record
+
+- The lead's checks on the merged head `2fdf85099ae3f653e3653b095efd528c8ec7a715` before the merge (ruling L-29): "TREE-IS-WORK ok: 372 paths at 2fdf85099ae3f653e3653b095efd528c8ec7a715", exit code 0; `./eii test --seed 2026111338`: exit code 0, "total: 1335 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/32 was squash-merged on 2026-11-13 at that head; merge commit `24600eb01fd67887b2d51e19513b4c1d5433df1d` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43353459097; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43353459353; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43353459148 .
+
+- The lead's proof of the second update of the branch with main (merge commit `2fdf85099ae3f653e3653b095efd528c8ec7a715`, the reviewed and merged head):
+
+```text
+base update 2fdf85099ae3f653e3653b095efd528c8ec7a715: branch side a561f9410f8fbcc1c17cd7a24cfa1260f8b4e76f, main side 1bd5a373b5805727bc395c3a2381e2db36e7c587, merge base 3c318ab08c72d617fd8c5d5586894577238eefe4
+  branch only: 53
+  main only: 22
+  neither: 292
+  both, git's own merge: (2, ['TASKS.md', 'pins.toml'])
+  both, resolved by the lead's script: (3, ['OPEN_ITEMS.md', 'PROGRESS.md', 'README.md'])
+  FAIL: (0, [])
+```
+
+- The task log of S1-T01 is complete with this record: one build and two completion passes before the first push; the first hosted run red by design until the baselines made by the hosted job were committed; REJECTED in review round 1 with one finding, fixed; APPROVED in round 2, no finding, no proposed item. The native reading of the five Arabic names and of the three images is the owner's and stays recorded as pending. TASKS.md marks the task done with this ledger.
+
+### S1-T02 — Map load and frame-rate spike: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/34 )
+
+- What the task proves (slice S1, the technical spike): the pinned MapLibre GL JS 6.17.0 and deck.gl 9.4.1 draw 110,000 hexagons and 50,000 moving particles on one map, and the page records its own frame times so that the frame rate can be measured where the pack asks for it, in a browser that runs natively on the host (TST-132, FE-88). The page under `web/spikes/performance/` is development-only and synthetic: an invented extent with no place name, a fixed seed, no basemap of a real place. It is not feature UI
+- Class of the work (the owner's note of 2026-11-12 on value and cost): standard
+- Plan: a short plan by OpenAI GPT-6 Astra (through the Codex command-line tool), read by the lead; the lead's rulings of the build brief and of one completion pass override it where they differ. No separate plan review
+- Builder maker and model: Cursor command-line tool, `grok-4.7-high` (xAI): one build and one completion pass after the lead's check
+- Reviewer, as planned: Devin command-line tool, Moonshot AI Kimi K3.1 Pro, read-only (a maker that neither planned nor built); the record of the verdict names the reviewer that gave it
+- Branch: `task/S1-T02-performance`
+- A re-plan made with this pull request (the lead's ruling of 2026-11-13; OI-122 for the owner). TST-132 asks that the frame rate is measured in a browser that runs natively on the host of the build machine, because a browser inside WSL can fall back to software rendering. The build agents do not start a program of the host, so the third criterion of this task ("the trace records 60 frames per second on the build machine") and the fifth of S1-T11 need one action of the owner. Left where they were, they would keep both spikes unmerged, and the rest of the slice behind them, although everything else of them is built, tested and reviewed. The two criteria moved word for word to the new task S1-T12, which depends on S1-T02 and S1-T11; S1-T08 depends on S1-T12 as well, so no pin that the frame rate decides is confirmed before the traces exist (FE-89). The slice gate statement is unchanged. TASKS.md and the task list of document 14 changed in the work commit. Nothing about frames per second is claimed by this task
+- What was built: the page (one interleaved overlay on WebGL2 with a hexagon layer and a particle layer over a synthetic map, a scripted orbit, a recorder of raw frame timestamps); the trace contract as pure functions (closed shape; percentiles by nearest rank and the share of frame intervals strictly under 16.7 ms computed from the raw timestamps, never taken from the page's own summary; the gate: the full counts, the wall canvas of 1920 by 1080 at a pixel-ratio cap of 1, the gate profile of thirty seconds, no lost visibility, resize or lost context, a hardware renderer, a native browser on the host with its capture record, at least 95% of frames under the budget); a loopback server that prints one address, checks the origin and the size of a post, validates it and writes the trace under a name it makes itself; the evidence command; a test that the production build holds nothing of the spike
+- The two acceptance criteria of this task after the re-plan. (1) 110,000 hexagons render: the browser tests `the smoke orbit draws both layers and records a trace` (the layer reports 110,000 drawn instances and the canvas holds pixels of the hexagon class), `isolating hexagons leaves the hex canvas nonblank`, `omitting one hexagon lowers the drawn count` and `hiding the hexagon layer reports no hexagon instances`, and the Node test `the hexagon generator returns the gate count at one resolution`. (2) 50,000 particles render: the same smoke test for the particle layer, `isolating particles leaves the particle canvas nonblank`, `omitting one particle lowers the drawn count`, `hiding the particle layer reports no particle instances`, `a frozen clock leaves the first particle in place` and the Node test `particles move with time and repeat the same seed`. The browser tests run a short orbit at the full counts inside `./eii test`; they assert counts and the trace contract, never a frame rate
+- The evidence command today: it fails with `missing-native-trace`, exit code 1, and writes nothing (recorded below). No placeholder trace and no capture record exist
+- The lead's check of the build found four gaps, closed in one completion pass. The new Arabic notice of the page was not marked as pending native review (REV-24): it now sits in a small data file with its mark, the README lists it for the owner's reading, and a test fails without the mark. The ordinary browser tests did not fail on a request to another origin when it was blocked before any response, the same gap as finding F1 of the review of pull request 32: one helper now opens the page for every test, records every request of the page and fails with the foreign address after the page has finished, and a planted test goes through that helper. And two rules had no test that failed when they were broken (the lead's breaks): a user agent that names a headless browser must not count as native, and a post above the size limit must be refused; each has its test now
+- The lead's own breaks (eight; each file restored): a software renderer accepted; a short orbit accepted; reduced counts accepted; a trace with lost visibility accepted; any origin accepted by the server; the layer-set name not checked before the file name is built: these six were caught at once. A headless user agent accepted as native, and the size limit of a post removed: not caught at first, caught after the completion pass by `a headless Windows user agent is refused as non-native` and `a post just above the body limit is refused by name and writes nothing`
+- Packages: `@deck.gl/geo-layers` 9.4.1 and `h3-js` 4.5.0 at the pins of the pack; the lead read both against the registry on 2026-11-13 (the versions exist, the lock file's integrity values equal the registry's). The hexagon package brings 92 further packages into the lock file, all from the registry; none reaches the production build, which a test checks
+- Measured, for the pin confirmation of task S1-T08 (the reference notes are not changed by this task): with MapLibre GL JS 6.17.0 the pixel-ratio cap is the map's own pixel ratio: at a cap of 1 the drawing buffer is 1920 by 1080 at a device pixel ratio of 2, and the overlay's own property is ignored in interleaved mode, as the notes' row on that mode says. deck.gl 9.4.1 draws 110,000 hexagons through `H3HexagonLayer` (with `highPrecision` off) and 50,000 points through `ScatterplotLayer` in one interleaved overlay in the headless shell; no frame-rate statement follows from that. `h3-js` 4.5.0 gives the 110,000 cells of a disk at one resolution with no pentagon. The 17 browser tests take about five minutes on the build machine; the time of the hosted job is recorded with the first hosted run of this pull request. Pages the builder read on 2026-11-13: the MapLibre page of the map options, the deck.gl pages of the two layers and of performance, the H3 page on traversal, the Playwright page of the page's request event; the published page of the overlay for MapLibre was not found, and the installed type file was read instead
+- Shared documents, entered by the lead in the work commit: rule 44 of AGENTS.md and CLAUDE.md (three commands that run from `web/`); README.md; one sentence added to OI-113 (the dependency alert); the new assumptions OI-121 (the pixel-ratio cap) and OI-122 (the native traces as task S1-T12); the proposed items PO-S1-06 (from the review of pull request 33) and PO-S1-07 (the lead's own, on the request judges of the two map spikes); TASKS.md and document 14 for the re-plan
+- For the owner: the Arabic notice "عرض اصطناعي. امتداد مخترع. بلا اسم مكان." waits for a native reading; the capture itself is task S1-T12 (the steps are in the spike's README)
+- Hardening listed, not built (the builder's return): a wider matrix of browsers, graphics cards and displays; traces attested from outside the repository
+- With this ledger: the closing records of pull requests 33 and 32 above, and the status of S1-T03 and S1-T01 in TASKS.md set to done
+
+#### Evidence for the work commit `19f9024a77f85cb7786eccf27fa3871efa5ef1ff`
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   bash -c "set -o pipefail; npm --prefix web run test:spike:performance 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)), \"|\", \" \".join(re.findall(r\"[0-9]+ passed \\([0-9.]+m?s?\\)\", t)[:1]))'"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 22 # pass 22 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 17 passed (4.9m)" (the totals of the Node test runner and of the browser run inside it)
+Seed:      none
+Notes:     The two acceptance criteria by their named tests (the task log maps each criterion to its tests): 22 Node tests of the spike pass, one of which runs the 17 browser tests in the headless shell at the full counts of 110,000 hexagons and 50,000 particles. They assert counts and the trace contract, and no frame rate.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   npm --silent --prefix web run spike:performance:verify-evidence
+Exit code: 1
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; first output line "FAIL missing-native-trace"
+Seed:      none
+Notes:     The evidence command before any native trace exists: it fails with the name of the missing trace and writes nothing. The frame-rate measurement is task S1-T12 and is pending; this task claims nothing about frames per second.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   npm --prefix web run test:spike:glyphs
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "  10 passed (3.9s)" (browser tests of the glyph spike)
+Seed:      none
+Notes:     The glyph spike of task S1-T01 is unchanged by this task and its ten browser tests pass on the work commit.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   ./eii test --seed 2026111345
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1357 passed, 0 failed, 0 skipped
+Seed:      2026111345
+Notes:     The whole test command on the build machine; the Node tests of the performance spike run in its suite of web checks, the browser tests among them.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   npm --prefix web run build
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "✓ built in 77ms" (the production build)
+Seed:      none
+Notes:     The production build; the test `production.node-test.mjs` of the spike, which runs in the web checks, proves that the built files hold nothing of the spike (FE-88).
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   npm --prefix web run check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 18 files: OK"
+Seed:      none
+Notes:     The web layout, version, boundary and host checks.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   npm --prefix web run check:hosts:dist
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 20 files: OK"
+Seed:      none
+Notes:     The host check on the built files.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   npm --prefix web run lint
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "> eslint --max-warnings 0 ." (exit code decides)
+Seed:      none
+Notes:     Web lint: exit code 0.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   npm --prefix web run format:check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Web format check.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   npm --prefix web run typecheck
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "> tsc --noEmit" (exit code decides)
+Seed:      none
+Notes:     Web type check: exit code 0.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 63 components: OK"
+Seed:      none
+Notes:     The version check with the rows `@deck.gl/geo-layers` and `h3-js` installed.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes and their check are unchanged by this task.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint of the Python files (the runner's suite table changed).
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "180 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 171 source files"
+Seed:      none
+Notes:     Strict types.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 304 text files, 59 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with the spike's README, rule 44, the README, the open items, TASKS.md and document 14 as the re-plan changed them.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after rule 44 gained the three commands.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','24600eb01fd67887b2d51e19513b4c1d5433df1d...19f9024a77f85cb7786eccf27fa3871efa5ef1ff'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:web/spikes/performance/README.md A:web/spikes/performance/build-page.mjs A:web/spikes/performance/config.d.mts A:web/spikes/performance/config.mjs A:web/spikes/performance/geometry.d.mts A:web/spikes/performance/geometry.mjs A:web/spikes/performance/index.html A:web/spikes/performance/layers.ts A:web/spikes/performance/main.ts A:web/spikes/performance/notices.json A:web/spikes/performance/playwright.config.ts A:web/spikes/performance/recorder.ts A:web/spikes/performance/server.mjs A:web/spikes/performance/style.css A:web/spikes/performance/tests/geometry.node-test.mjs A:web/spikes/performance/tests/notices.node-test.mjs A:web/spikes/performance/tests/performance.spec.ts A:web/spikes/performance/tests/production.node-test.mjs A:web/spikes/performance/tests/run.mjs A:web/spikes/performance/tests/run.node-test.mjs A:web/spikes/performance/tests/trace.node-test.mjs A:web/spikes/performance/tests/typecheck.node-test.mjs A:web/spikes/performance/trace.d.mts A:web/spikes/performance/trace.mjs A:web/spikes/performance/tsconfig.json A:web/spikes/performance/types/modules.d.ts A:web/spikes/performance/verify-evidence.mjs A:web/spikes/performance/vite.config.ts M:AGENTS.md M:CLAUDE.md M:OPEN_ITEMS.md M:README.md M:TASKS.md M:docs/14_IMPLEMENTATION_PLAN.md M:pins.toml M:scripts/run_tests.py M:scripts/tests/test_runner_usage.py M:web/README.md M:web/eslint.config.js M:web/package-lock.json M:web/package.json'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "41 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope (REV-12): the spike folder, the web manifest with its lock, the lint configuration's ignore list, the runner's suite table with its test, the pin record, web/README.md, and the shared documents the lead entered (AGENTS.md, CLAUDE.md, README.md, OPEN_ITEMS.md, TASKS.md, document 14).
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    19f9024a77f85cb7786eccf27fa3871efa5ef1ff
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','24600eb01fd67887b2d51e19513b4c1d5433df1d..19f9024a77f85cb7786eccf27fa3871efa5ef1ff'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit has a Conventional Commit subject.
+```
+
+#### S1-T02: independent review, round 1: REJECTED (pull request https://github.com/albarami/economic-investment-intelligence/pull/34 )
+
+Reviewed commit `f640a044197466210d34b9ad8f92acbbb37b3ac1`, the head of the pull request at that time, with all six required checks green on it (`check-docs` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282432/job/131668686277; `planted-failures` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282439/job/131668686467; `sandbox proof` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282524/job/131668686376; `secret-scan` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282439/job/131668686527; `static-checks` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282439/job/131668686355; `tests` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282439/job/131668686082). Reviewer: Moonshot AI Kimi K3.1 Pro, through the Devin command-line tool, read-only; a maker that neither planned nor built the task; a full review of the pull request's whole change against main. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S1-T02 (pull request 34)
+COMMIT: f640a044197466210d34b9ad8f92acbbb37b3ac1
+REVIEWER: Moonshot AI Kimi K3.1 Pro
+CHECKS:
+  REV-10 PASS Both remaining acceptance criteria map to full-count browser tests: layer instance counts and isolated canvas-pixel classes prove drawing; omission, hidden-layer, blank-renderer and frozen-clock plants exercise the failure modes. The lead recorded 22 Node tests and 17 browser tests passing, with no frame-rate claim.
+  REV-11 PASS On the exact head, the lead ran `./eii test --seed 2026111346`, exit 0 with 1357 passed and none skipped, and `python3 scripts/check_docs.py`, exit 0. Hosted `tests` also succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282439/job/131668686082. New guards have recorded planted failures.
+  REV-12 PASS The work commit changes the recorded 41 in-scope paths and the ledger changes only PROGRESS.md and TASKS.md; nothing under `data/` changed. The other tasks' closing records in PROGRESS.md are excluded by the brief.
+  REV-13 PASS The spike contains executable generators, layers, recorder, server and validators rather than stubs or invented results. Browser placeholders for commit and lock are replaced by the native server before storage; no native trace or capture fixture is delivered as evidence.
+  REV-14 PASS No secret, `.env`, real custodian record or private data appears in the patch; hosted `secret-scan` succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282439/job/131668686527.
+  REV-15 PASS No existing assertion, threshold, tolerance, count, lint rule or baseline was weakened. Playwright retains `retries: 0`, the full counts run in every browser invocation, and no skip or expected-failure mark was added.
+  REV-16 FAIL The implementation otherwise follows the rulings and permitted re-plan, but the renderer check does not establish the hardware-accelerated native measurement required by TST-132 and the Performance budgets section; see F1.
+  REV-17 PASS TASKS.md, document 14, both READMEs, OPEN_ITEMS.md and PROGRESS.md reflect the spike and re-plan, and the head documentation check exited 0. OI-121 and OI-122 record the cap and native-trace assumptions; the later owner response is expressly outside this head.
+  REV-18 FAIL The server validates origin, size and payload and protects the native directory from the test server, but a generated-name collision can overwrite an existing trace; see F2.
+  REV-19 PASS The re-plan uses TASKS.md Queue rules' next-free-number and named-split provisions, moves both criteria word for word to S1-T12, adds the S1-T08 dependency and leaves the slice gate statement unchanged. No settled component decision is reopened.
+  REV-20 N/A The change adds development-only spike measurements rather than product facts or release figures; the technical frame calculations are deterministically implemented and tested in `trace.mjs`.
+  REV-21 N/A The development-only `_perf` spike adds no product brief, Fact-chip screen, claim catalogue or model-written prose; its diagnostics are covered by the route exemption rather than the product numeral pipeline.
+  REV-22 PASS No partition, privacy parameter, treatment, export, protected window or attack test changed, and the complete head suite passed without reduced attack sizes.
+  REV-23 PASS The patch adds no custodian import or product dependency; the head boundary checks and complete test suite passed.
+  REV-24 PASS `notices.json` marks the Arabic notice `pending native review`, the page reads that marked value, and `notices.node-test.mjs` plants removal of the mark. Both routes use the same diagnostics and no model approval is recorded.
+  REV-25 PASS The synthetic extent names no real place, person or private path and introduces no realistic custodian identifier or named-product comparison. Documentation, tree and hosted secret checks passed on the head.
+  REV-26 PASS The page and documents consistently say `native frame-rate gate pending`; no frame rate, forecast, endorsement, lookup, go/no-go or other prohibited claim is asserted.
+  REV-27 PASS The lead's `cmp AGENTS.md CLAUDE.md` on the head exited 0, and the documentation check reported no agent-file failure.
+  REV-28 N/A No establishment, legal-entity, employer-group, person or salary-file identifier is introduced; random trace filenames are not custodian identifiers.
+  REV-29 N/A The invented, unnamed extent attaches no Synthetic or Simulated attribute to a real named place or business.
+  REV-38 PASS No gateway import, provider-setting read, run-time gateway call or gateway-derived screen text was added; the serving-boundary checks passed.
+FINDINGS:
+  F1 (REV-16)
+    File: web/spikes/performance/layers.ts
+    Place: `mountScene(...).renderer`, lines 213-217; `judgeRenderer` in `web/spikes/performance/trace.mjs`, lines 195-203
+    Wrong: The gate does not establish hardware-accelerated WebGL2 as TST-132 and the Performance budgets section require. `context.RENDERER` can be masked, while `judgeRenderer` accepts every nonempty renderer except strings containing three substrings. In particular, a native Windows software renderer such as `Microsoft Basic Render Driver` passes, so a software measurement can qualify as the native gate.
+    Fix: Record `UNMASKED_RENDERER_WEBGL` through `WEBGL_debug_renderer_info`, returning `missing-renderer` when no unmasked value is available, and reject Windows software renderers including `Microsoft Basic Render Driver` as `software-renderer`. Add a planted gate case for that renderer and a focused test whose masked and unmasked context values differ, then prove them with `node --test spikes/performance/tests/trace.node-test.mjs` and `npm --prefix web run test:spike:performance`.
+  F2 (REV-18)
+    File: web/spikes/performance/server.mjs
+    Place: `evidenceId` and `receiveTrace`, lines 43-46 and 160-162
+    Wrong: The filename contains only 32 random bits and `fs.writeFileSync` uses its default truncating mode. A collision therefore overwrites an existing trace instead of preserving the recorded native measurement, violating the server's trace-evidence data-handling requirement.
+    Fix: Create the file exclusively with `{ flag: 'wx' }` and, on `EEXIST`, generate a fresh server-side name or reject without changing the existing file. Make the ID generator injectable for a planted collision test that asserts the original bytes remain unchanged and no existing path is reused; prove it with `node --test spikes/performance/tests/trace.node-test.mjs` and `npm --prefix web run test:spike:performance`.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+- The lead's judgement: both findings are valid and both concern the work, not its records. F1: TST-132 and the section "Performance budgets" ask for a measurement on hardware-accelerated WebGL2; the page recorded the browser's general renderer string, which a browser may mask, and the gate refused only three names, so a trace taken on the Windows software driver could have qualified as the native gate trace. F2: the server that receives a trace created its file with an ordinary write under a name with 32 random bits, so a second trace with the same name would have replaced the first measurement. Nothing was argued away
+- F1, fixed by the builder (Cursor command-line tool, `grok-4.7-high`, xAI) in one round. Tests first: a native trace whose renderer is `Microsoft Basic Render Driver` qualified as the gate trace before the change (the assertion saw no failure); a reader of the renderer did not exist. Now the page reads the unmasked renderer through the extension `WEBGL_debug_renderer_info` (the function `readUnmaskedRenderer` of `web/spikes/performance/trace.mjs`, called from `layers.ts`); when the extension or the value is absent the recorded renderer is empty and the gate refuses the trace as `missing-renderer`; the gate refuses the Windows software driver by its name and a renderer that names WARP as a word of its own, in any letter case, as `software-renderer`. Four new tests: the Windows driver; WARP as a word; a renderer that only contains those letters inside another word is not refused for it; the masked and the unmasked value of a planted context differ and the reader returns the unmasked one. The builder read the specification of the extension at the Khronos registry on 2026-11-13
+- F2, fixed in the same round. Tests first: with a planted name generator, a second trace took the name of an existing file and replaced it, and a generator that always collides was answered with success. Now the file is created exclusively (`wx`); on a name that exists the server asks for a fresh name, four times at most, and then refuses the trace as `trace-name-collision` with status 400; an existing file is never opened for writing. Two new tests: a colliding name leaves the existing bytes unchanged and the trace is stored under another name; a generator that always collides is refused by name and writes nothing
+- What the headless test browser reports, recorded as the builder observed it: its unmasked renderer names a software rasteriser, so a trace taken there can never qualify as the gate trace; the short orbit of the tests still qualifies as the smoke profile, as before, and that assertion is unchanged
+- The lead's own seven breaks on the fix, each restored: the Windows driver removed from the refused list; the WARP test removed; the reader falling back to the masked value when the extension is absent; the reader reading the masked value; the file written without exclusive creation; a collision not retried: each fails a named test. One break changes nothing a test can see and is equivalent: a blank unmasked value passed on by the reader, because the gate itself refuses a blank renderer as `missing-renderer`
+- The fix commit changes five files, all under `web/spikes/performance/` (the page's renderer reading, the trace module with its type declaration, the server, the Node test file: 208 lines added, 10 removed). No count, budget, threshold, browser test, workflow or document changed. The evidence command still fails with `missing-native-trace`: no native trace exists, and none is claimed
+- OI-122 now records the owner's word of 2026-11-13: the re-plan that makes the native traces task S1-T12 is accepted as a stated assumption of the proof of concept; the trace itself is still owed by the owner
+- How this round's evidence was taken: the fix commit was pushed alone at first, so the hosted checks ran on it; the lead then ran the recorded commands at the fix commit, the whole test command among them with a seed of its own, and wrote this ledger. (A note of the owner on test time, which would have let the ledger cite the hosted run in place of the local run, was in force for about ten minutes, from 07:21 to 07:31, and was withdrawn by the owner in full; a local run that was stopped in that interval left no record, and every run recorded here was made in full afterwards.)
+- Round 2 goes to the same reviewer, limited as REV-39 says: the two findings, defects in the lines changed since the reviewed commit, and the checks that are never limited
+
+#### Evidence for the work commit `96be1a028c2e9fc600e6b604afec97905e348cb3`
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   npm --prefix web run lint
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "> eslint --max-warnings 0 ." (exit code decides)
+Seed:      none
+Notes:     Web lint at the fix commit: exit code 0.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   npm --prefix web run format:check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Web format check.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   npm --prefix web run typecheck
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "> tsc --noEmit" (exit code decides)
+Seed:      none
+Notes:     Web type check at the fix commit: exit code 0.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 304 text files, 59 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check at the fix commit.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','f640a044197466210d34b9ad8f92acbbb37b3ac1...96be1a028c2e9fc600e6b604afec97905e348cb3'],check=True,capture_output=True,text=True).stdout.splitlines()); w='M:web/spikes/performance/layers.ts M:web/spikes/performance/server.mjs M:web/spikes/performance/tests/trace.node-test.mjs M:web/spikes/performance/trace.d.mts M:web/spikes/performance/trace.mjs'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "5 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope of the fix commit (REV-12): five files of the spike; the browser tests, the configuration, the counts, the workflow and the documents are unchanged.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','f640a044197466210d34b9ad8f92acbbb37b3ac1..96be1a028c2e9fc600e6b604afec97905e348cb3'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The fix commit has a Conventional Commit subject.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   npm --silent --prefix web run spike:performance:verify-evidence
+Exit code: 1
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; first output line "FAIL missing-native-trace"
+Seed:      none
+Notes:     The evidence command at the fix commit: it still fails with the name of the missing trace and writes nothing. The frame-rate measurement is task S1-T12 and is pending.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   bash -c "set -o pipefail; npm --prefix web run test:spike:performance 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)), \"|\", \" \".join(re.findall(r\"[0-9]+ passed \\([0-9.]+m?s?\\)\", t)[:1]))'"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 28 # pass 28 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 17 passed (5.4m)" (the totals of the Node test runner and of the browser run inside it)
+Seed:      none
+Notes:     The two findings at the fix commit: 28 Node tests of the spike pass (22 before the fix: four new tests of the renderer reading and its judgement, two of the exclusive write), one of which runs the 17 unchanged browser tests in the headless shell at the full counts. They assert counts and the trace contract, and no frame rate.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   ./eii test --seed 2026111352
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1363 passed, 0 failed, 0 skipped
+Seed:      2026111352
+Notes:     The whole test command at the fix commit, with a seed of its own; the Node and browser tests of the spike run inside it through the web checks.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

@@ -171,21 +171,21 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: `web/spikes/glyphs/`, local font and glyph spike assets.
 - Depends: S0-T03, S0-T12.
 - Requirements: FE-46, FE-56, FE-57, DES-24, DES-10.
-- Delivery: hard; personas Frontend; status in review (pull request 32).
+- Delivery: hard; personas Frontend; status done (pull request 32, merged 2026-11-13).
 ### S1-T02 — Map load and frame-rate spike
 - Goal: Measure the pinned hexagon and particle load in a native host browser.
-- Acceptance criteria: [ ] 110,000 hexagons render; [ ] 50,000 particles render; [ ] the trace records 60 frames per second on the build machine.
+- Acceptance criteria: [x] 110,000 hexagons render; [x] 50,000 particles render. The criterion on the native trace moved to task S1-T12 by a re-plan of 2026-11-13.
 - Scope: `web/spikes/performance/` and performance scripts.
 - Depends: S1-T01.
 - Requirements: TST-132, FE-88, PLN-07.
-- Delivery: hard; personas Frontend; status queued.
+- Delivery: hard; personas Frontend; status in review (pull request 34).
 ### S1-T03 — Isochrone, drawn-shape and grid spike
 - Goal: Convert in-process walk and drive isochrones at different hours of day, a free-drawn polygon and a radius into exact shapes and into whole snapped grid cells.
 - Acceptance criteria: [x] routing has no server; [x] the drive isochrone changes with the hour through a fixture speed table, by the time-of-day mechanism this spike chooses; [x] each shape is also kept exactly, for Public and Simulated layers; [x] the snapped output contains only whole frame cells; [x] deterministic fixtures pass.
 - Scope: routing and area spike under `product/` and its fixtures.
 - Depends: S0-T02.
 - Requirements: ARC-88, BE-82, PRV-10, SYN-53.
-- Delivery: hard; personas Backend; status in review (pull request 33).
+- Delivery: hard; personas Backend; status done (pull request 33, merged 2026-11-13).
 ### S1-T04 — Tile range-request spike
 - Goal: Serve one local tile artefact with correct byte-range behaviour.
 - Acceptance criteria: [x] full request succeeds; [x] valid ranges return expected bytes; [x] invalid ranges fail safely.
@@ -216,16 +216,23 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas AI; status done (pull request 29, merged 2026-11-13).
 ### S1-T11 — Road-assignment and hourly traffic spike
 - Goal: Assign one hourly origin-destination fixture to the routing graph with one fixed volume-delay rule, and animate the resulting link speeds through the day on the map.
-- Acceptance criteria: [ ] the assignment is tested code that reads only a synthetic fixture and repeats exactly on identical inputs; [ ] one fixed volume-delay rule is used, with every parameter in configuration; [ ] the hourly link speeds feed a drive-time area that changes with the hour; [ ] the animated road layer carries the Simulated mark; [ ] the S1-T02 trace is repeated with the road layer animated, and its result is recorded; [ ] any library the assignment needs gets its exact and retreat pins through S1-T08.
+- Acceptance criteria: [ ] the assignment is tested code that reads only a synthetic fixture and repeats exactly on identical inputs; [ ] one fixed volume-delay rule is used, with every parameter in configuration; [ ] the hourly link speeds feed a drive-time area that changes with the hour; [ ] the animated road layer carries the Simulated mark; [ ] any library the assignment needs gets its exact and retreat pins through S1-T08. The criterion on the repeated native trace moved to task S1-T12 by a re-plan of 2026-11-13.
 - Scope: assignment spike code and fixtures, a road-layer page under `web/spikes/` and its trace.
 - Depends: S1-T02, S1-T03.
 - Requirements: ARC-88, SYN-53, SYN-54, DES-50, TST-132, SYN-79, MTH-88, MTH-89, MTH-90, PRV-124, TST-213.
 - Delivery: hard; personas Simulation; status queued.
+### S1-T12 — Native frame-rate traces of the map spikes
+- Goal: Record, in a browser that runs natively on the host of the build machine, the frame-rate trace of the pinned hexagon and particle load, and the same trace with the road layer animated.
+- Acceptance criteria: [ ] the trace records 60 frames per second on the build machine; [ ] the S1-T02 trace is repeated with the road layer animated, and its result is recorded.
+- Scope: the trace files and the native-capture record under `web/spikes/performance/evidence/`.
+- Depends: S1-T02, S1-T11.
+- Requirements: TST-132, FE-88, FE-89, PLN-07.
+- Delivery: routine; personas Frontend; status queued. Split from S1-T02 and S1-T11 by a re-plan of 2026-11-13: the native trace needs one action of the owner on the host, and the two criteria are moved here word for word.
 ### S1-T08 — Typed-decision requalification and pin ruling
 - Goal: Re-run `evals/typed_decisions/` in both fixed option orders, compare the stated intervals and confirm exact and retreat pins.
 - Acceptance criteria: [ ] the full set runs; [ ] the admitted measurement is reproduced within its stated intervals; [ ] every choice case runs in both hash-derived option orders and is accepted only when both agree; [ ] results and route identity are recorded; [ ] drift triggers requalification; [ ] any accepted alternative has a decision record.
 - Scope: `evals/typed_decisions/`, slice S1 spike report and dependency pin decision.
-- Depends: S1-T02, S1-T03, S1-T04, S1-T05, S1-T06, S1-T07, S1-T11.
+- Depends: S1-T02, S1-T03, S1-T04, S1-T05, S1-T06, S1-T07, S1-T11, S1-T12.
 - Requirements: FE-03, TST-155, AI-98, TST-167, PLN-15.
 - Delivery: hard; personas AI; status queued.
 ### S1-T09 — Exported set, presence and flow parameters, and months shown first
