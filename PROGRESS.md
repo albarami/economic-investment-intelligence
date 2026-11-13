@@ -13868,6 +13868,11 @@ Seed:      none
 Notes:     The one work commit has a Conventional Commit subject.
 ```
 
+#### S1-T07: correction of the task log: the reviewer
+
+- The task log above names the Cursor command-line tool with `grok-4.7-high` (xAI) as the reviewer. That review was started on the head `e8d32adc55da51c9646f2b7290949ebb7236e53b` and ended after 37 seconds with a connection error of the tool, before any answer (its whole output: three lines "Connection lost, reconnecting", then "RetriableError: [unavailable] Error"). No verdict exists from it. The owner's rule for the tools is that a job that failed on an error is not started again on the same tool
+- The review is therefore given by Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only: a maker that neither planned nor built the task; a full review. The line of the task log is not edited (TST-171). From this task on a task log names the reviewer as planned, and the record of the verdict names the reviewer that gave it
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
