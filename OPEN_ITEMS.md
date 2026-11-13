@@ -1251,6 +1251,26 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - NEEDED: the file and the prefix join the two lists, with one planted violation each; or one line saying why not.
 - CLOSED BY: S1-T10
 
+### PO-S1-04 — No test compares the tables of the documents with the lists the code holds
+
+- ID: PO-S1-04
+- TYPE: OPEN
+- RAISED BY: the lead, 2026-11-13, from the cause of the rejected first round of the slice S0 gate
+- CONCERNS: OPS-06; OPS-71; TST-141
+- EVIDENCE: The first round of the slice S0 gate was rejected because `CHECKS` of `scripts/preflight.py` held fifteen of the seventeen rows of the preflight table of document 13, and `.env.example`, `ENV_EXAMPLE_NAMES` of `scripts/check_tree.py` and `SECRET_NAMES` of `scripts/commit_guard.py` lacked the variables that decision 0019 had added to the variable tables. Each list was right when its task was built and went stale when a later decision changed its table. No test reads a table and its list together, so nothing failed.
+- NEEDED: for each of these lists, one test that reads the table of the document and the list in the code and fails on any difference, with one planted violation each; or one line saying why not.
+- CLOSED BY: S1-T10
+
+### PO-S1-05 — The hardening lists of the slice S1 spikes are not in the register of document 17
+
+- ID: PO-S1-05
+- TYPE: OPEN
+- RAISED BY: the lead, 2026-11-13, with the ledger of task S1-T04
+- CONCERNS: TASKS.md, section "Queue rules" (hardening beyond an acceptance criterion is listed, not built); document 17, section 9
+- EVIDENCE: Six tasks of slice S1 are built at the same time, so no builder edits document 17. Each task log of the slice in [PROGRESS.md](PROGRESS.md) records, in its line "Hardening listed, not built", the points its plan and its builder set aside.
+- NEEDED: one entry of the hardening register for each point of those lines that is not needed in version 1, each with its origin; or one line saying why a point needs no entry.
+- CLOSED BY: S1-T10
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).

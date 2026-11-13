@@ -188,11 +188,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas Backend; status queued.
 ### S1-T04 — Tile range-request spike
 - Goal: Serve one local tile artefact with correct byte-range behaviour.
-- Acceptance criteria: [ ] full request succeeds; [ ] valid ranges return expected bytes; [ ] invalid ranges fail safely.
+- Acceptance criteria: [x] full request succeeds; [x] valid ranges return expected bytes; [x] invalid ranges fail safely.
 - Scope: tile spike API, fixture and tests only.
 - Depends: S0-T03, S0-T05.
 - Requirements: OPS-30, FE-56, FE-58, TST-167.
-- Delivery: routine; personas Backend; status queued.
+- Delivery: routine; personas Backend; status done (pull request 28, merged 2026-11-13).
 ### S1-T05 — First two-store parity query
 - Goal: Run one portable named query against PostgreSQL and DuckDB with identical normalised output.
 - Acceptance criteria: [ ] both adapters answer; [ ] rounding is explicit; [ ] a deliberate divergence fails parity.
