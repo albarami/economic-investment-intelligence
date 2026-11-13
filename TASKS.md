@@ -192,7 +192,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: tile spike API, fixture and tests only.
 - Depends: S0-T03, S0-T05.
 - Requirements: OPS-30, FE-56, FE-58, TST-167.
-- Delivery: routine; personas Backend; status done (pull request 28, merged 2026-11-13).
+- Delivery: routine; personas Backend; status in review (pull request 28).
 ### S1-T05 — First two-store parity query
 - Goal: Run one portable named query against PostgreSQL and DuckDB with identical normalised output.
 - Acceptance criteria: [ ] both adapters answer; [ ] rounding is explicit; [ ] a deliberate divergence fails parity.

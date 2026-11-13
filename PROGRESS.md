@@ -13953,6 +13953,209 @@ Seed:      none
 Notes:     The one work commit has a Conventional Commit subject.
 ```
 
+#### S1-T04: independent review, round 1: REJECTED (pull request https://github.com/albarami/economic-investment-intelligence/pull/28 )
+
+Reviewed commit `7df4db8e9f97c992b2cae8e8ce3f888da62f4f67`, the head of the pull request at that time, with all six required checks green on it (`check-docs` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43336315931/job/131593268824; `planted-failures` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43336316131/job/131593269269; `sandbox proof` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43336315932/job/131593269538; `secret-scan` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43336316131/job/131593269162; `static-checks` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43336316131/job/131593269198; `tests` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43336316131/job/131593268886 ). Reviewer: OpenAI GPT-5.6 Sol (effort high), through the Codex command-line tool, read-only; a full review; a maker that neither planned nor built the task (it names itself more shortly in its verdict). The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S1-T04 (pull request 28)
+COMMIT: 7df4db8e9f97c992b2cae8e8ce3f888da62f4f67
+REVIEWER: OpenAI GPT-5
+CHECKS:
+  REV-10 FAIL The six single-range cases assert exact headers and bytes, but the valid multi-range case does not associate each payload with its part, and the invalid-range case does not prove the recorded claim that no file content was returned.
+  REV-11 FAIL The lead recorded 1184 passed, 0 failed and 0 skipped on the head, and hosted tests succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43336316131/job/131593268886, but four auxiliary server threads are joined without asserting that they stopped.
+  REV-12 PASS The work commit's recorded scope check reports exactly the 12 planned paths, and the ledger adds only OPEN_ITEMS.md, PROGRESS.md and TASKS.md.
+  REV-13 PASS The delivered route, resolver, status rule and tests are implemented; the provisional health path is explicitly scoped to the spike and is not a placeholder for an acceptance criterion.
+  REV-14 PASS The synthetic fixture is visibly synthetic, the documentation scan passed, and the hosted secret scan succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43336316131/job/131593269162.
+  REV-15 PASS The patch adds assertions and planted violations without skips, expected failures, retries, suppressions, weakened thresholds or removed checks.
+  REV-16 PASS The implementation follows rulings R1-R5 and L-56: one FastAPI process serves the artefact, the status path is provisional, the browser half is deferred through OI-115, and the exact pins are in the root dev group.
+  REV-17 FAIL TASKS.md falsely records pull request 28 as merged, and PROGRESS.md overstates the number of task tests and HTTP tests.
+  REV-18 PASS The closed name form, resolved containment check and regular-file check refuse encoded separators, absolute-looking names, links leaving the folder and directories; the planted violations are recorded.
+  REV-19 PASS No settled architectural decision is removed or replaced; OI-115 and OI-116 record the two deferred choices.
+  REV-20 N/A This spike adds no economic fact, displayed metric, forecast, estimate or application-schema calculation.
+  REV-21 N/A This spike adds no screen, Fact chip, catalogue claim, model prose or rendered product numeral.
+  REV-22 PASS The patch changes no privacy rule, parameter set, treatment, export register, window key or attack test.
+  REV-23 PASS The product code imports neither eii_custodian nor data/vault; the recorded full suite and unchanged import-boundary guards pass.
+  REV-24 N/A No bilingual view, Arabic string or displayed number is added.
+  REV-25 PASS The documentation and tree checks passed, and the patch contains no secret, private path, real custodian data, realistic identifier or prohibited comparison.
+  REV-26 PASS The patch makes no claim of real custodian data, certified privacy, endorsement, uncomputed forecast, lookup capability or go/no-go advice.
+  REV-27 PASS The lead recorded cmp AGENTS.md CLAUDE.md with exit code 0 on both the work commit and the head.
+  REV-28 N/A No synthetic establishment, legal-entity, employer-group, person or salary-file identifier is introduced.
+  REV-29 N/A No Synthetic or Simulated attribute is attached to a real named place or business.
+  REV-38 PASS The patch adds no eii_gateway import, provider-setting read, score, badge, panel or live gateway call.
+FINDINGS:
+  F1 (REV-10)
+    File: product/tests/test_tiles_range.py
+    Place: test_valid_ranges_return_the_expected_bytes, lines 112-145
+    Wrong: The multi-range assertions only establish that both Content-Range strings and both two-byte sequences occur somewhere in the multipart body. Swapping the two payloads between parts, duplicating one part while placing the missing bytes elsewhere, or otherwise breaking the header-to-payload association can still pass. This does not prove the second acceptance criterion for the valid two-range request accepted by ruling L-56.
+    Fix: Parse the boundary from Content-Type, require exactly two multipart parts, and assert each part's Content-Range header and complete payload as the pairs bytes 0-1 with SPIKE_BYTES[0:2] and bytes 4-5 with SPIKE_BYTES[4:6], with no extra part. Plant a swapped or incorrect part and record that the test fails, restore it, then run ./eii test --seed N with exit 0.
+  F2 (REV-10)
+    File: product/tests/test_tiles_range.py
+    Place: test_invalid_ranges_fail_safely_and_the_server_survives, lines 148-175
+    Wrong: Each invalid response is checked only for absence of SPIKE_BYTES[:32]. A response containing any other fixture slice would pass, while PROGRESS.md line 13821 records “no file content” as evidence for the third acceptance criterion and ruling L-56 relies on that property. The claimed measurement is therefore not shown.
+    Fix: Assert the complete expected error body for the pinned 416 and 400 responses, in addition to their statuses and required Content-Range header, so any returned fixture slice changes the body and fails. Demonstrate a planted wrong-body failure, restore it, run ./eii test --seed N with exit 0, and append the required correction to PROGRESS.md rather than rewriting the earlier evidence row.
+  F3 (REV-11)
+    File: product/tests/test_tiles_range.py
+    Place: cleanup in test_regular_files_with_invalid_tile_names_return_404, test_a_tile_named_directory_returns_404_not_5xx, test_requests_outside_the_tile_directory_are_refused and test_the_api_app_serves_the_tile_and_the_status, lines 220-222, 264-266, 315-317 and 380-382
+    Wrong: These four auxiliary servers set should_exit and join with a timeout but never assert that their threads stopped. Only the module fixture asserts thread death. A surviving server can therefore leak beyond teardown while every test remains green, contrary to the review brief's required server-lifecycle check.
+    Fix: After every auxiliary join, assert not thread.is_alive(), preferably through one shared teardown helper also used by the module fixture. Plant one lifecycle failure to show the assertion catches it, restore it, and run ./eii test --seed N with exit 0.
+  F4 (REV-17)
+    File: PROGRESS.md
+    Place: S1-T04 task log and evidence notes, lines 13787, 13809 and 13821
+    Wrong: The task added eight tests, of which seven use a real HTTP server and one is the pure tile-status test. The recorded product-suite count of ten includes two pre-existing package tests. The ledger instead says ten task tests all speak HTTP, calls all ten “of this task”, and labels seven tests as remaining after the three acceptance tests while naming only the five remaining task tests. This overclaims what was built and measured.
+    Fix: Append a correction identifying these three statements and recording the accurate counts: eight task tests, seven HTTP tests, one pure status test, and ten total product-suite tests including two pre-existing package tests. Run python3 scripts/check_docs.py with exit 0 and record that result.
+  F5 (REV-17)
+    File: TASKS.md
+    Place: S1-T04 delivery status, line 195
+    Wrong: The reviewed commit is the head of pull request 28 and has not merged, but the status says “merged 2026-11-13”. This is a false workflow claim.
+    Fix: Change the status to in review for pull request 28; mark it merged only in a later ledger after the merge exists. Run python3 scripts/check_docs.py with exit 0.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+- The lead's judgement: all five findings are valid. F1 to F3 are in the test file and were fixed by the builder (Cursor composer-2.5) in one round; F4 and F5 are the lead's own slips in the records and are corrected here. No finding was argued away
+- F1, fixed: the answer to the request for two ranges is parsed by the boundary of its `Content-Type`; the test requires exactly two parts and compares the list of pairs (the `Content-Range` of a part, its complete payload) with `bytes 0-1/2048` and the first two bytes, `bytes 4-5/2048` and bytes four and five. The builder saw the test fail with the two expected pairs swapped, and restored
+- F2, fixed: the complete body of each rejected answer is asserted beside its status: empty for 416 (with `Content-Range: bytes */2048`), and the fixed texts of the pinned Starlette for the two 400 answers ("Range header: range must be requested" for `bytes=abc`, "Range header: start must be less than end" for `bytes=9-2`). A returned slice of the file would change the body and fail. The builder saw the test fail with a changed literal, and restored
+- F3, fixed: one helper sets `should_exit`, joins the thread and asserts that it is not alive; the module fixture and the four tests that start a server of their own use it. A new test, `test_stop_uvicorn_server_rejects_threads_that_survive_join`, hands the helper a thread that waits on an event nobody sets and requires the assertion error. The builder had typed that call with a suppression comment; the lead replaced the comment by a two-line protocol type for the helper's first argument, so the file holds no suppression (the lead's one edit; lint, format, strict types and the eleven tests pass)
+- F4, corrected here; the earlier entries stay as they were written (TST-171). Three statements of the first ledger of this task counted wrongly: the line "What was built" of the task log said that ten tests in `product/tests/` speak HTTP to a real server; the note of the entry of `./eii test --seed 2026111311` spoke of "the ten product tests of this task"; and the note of the entry of `uv run --locked python -m pytest product/tests -v -p no:cacheprovider` said "The other seven" and then named five. The right counts at the first work commit `f2a42479d6c1efce3bb030e72c309ba9ff6bde7a`: the product suite held ten tests, of which eight were this task's (seven in `product/tests/test_tiles_range.py`, all over HTTP against a real server, and one pure test of the status rule in `product/tests/test_tiles_status.py`) and two were the tests of the package skeleton from task S0-T02 (`product/tests/test_product_package.py`). Beside the three tests of the acceptance criteria the task therefore had five further tests, not seven. At the fix commit the task has nine tests (the helper's own test is the ninth and uses no HTTP) and the product suite eleven. The description and the squash message of the pull request carry the right counts
+- F5, corrected here: the status of the task in TASKS.md said "done (pull request 28, merged 2026-11-13)" on a head that was not merged. It now says "in review (pull request 28)". From this task on, the status of a task says "in review" inside its own pull request, and the ledger of the next pull request sets it to done together with the closing record of the merge (the lead's rule for the rest of the run; the acceptance boxes are ticked in the task's own pull request, where the evidence for them is)
+- Round 2 goes to the same reviewer, limited as REV-39 says: the five findings, defects in the lines changed since the reviewed commit, and the checks that are never limited
+
+#### Evidence for the work commit `92b0aa13cc68539a67c8928833d3bf84d182f073`
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   ./eii test --seed 2026111322
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1185 passed, 0 failed, 0 skipped
+Seed:      2026111322
+Notes:     The whole test command at the fix commit; the product suite holds eleven tests: nine of this task and the two of the package skeleton.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   uv run --locked python -m pytest product/tests -v -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Findings F1 to F3 at the fix commit, by name: `test_valid_ranges_return_the_expected_bytes` (F1: exactly two parts, each with its own `Content-Range` and its complete payload), `test_invalid_ranges_fail_safely_and_the_server_survives` (F2: the complete body of the 416 answer and of both 400 answers), `test_stop_uvicorn_server_rejects_threads_that_survive_join` and the five tests that now stop their server through the shared helper (F3). Eleven tests: eight in `test_tiles_range.py`, one in `test_tiles_status.py`, two in `test_product_package.py`. The summary line holds no warning.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   python3 -I -c "import re,pathlib; t=pathlib.Path('product/tests/test_tiles_range.py').read_text(encoding='utf-8'); print(len(re.findall(r'type: *ignore|noqa|pytest\\.mark\\.(skip|xfail)', t)), t.count('_stop_uvicorn_server('))"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "0 7" (suppression comments, skips or expected failures in the file; uses of the stop helper, its definition included)
+Seed:      none
+Notes:     The test file holds no suppression comment, skip or expected failure (REV-15), and the stop helper is defined once and called six times: by the module fixture, by the four tests with a server of their own and by the helper's own test.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "137 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 131 source files"
+Seed:      none
+Notes:     Strict types; the helper takes a small protocol type, with no ignore comment.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 220 text files, 55 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check at the fix commit.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','7df4db8e9f97c992b2cae8e8ce3f888da62f4f67...92b0aa13cc68539a67c8928833d3bf84d182f073'],check=True,capture_output=True,text=True).stdout.splitlines()); w='M:product/tests/test_tiles_range.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "1 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope of the fix commit (REV-12): the one test file; the application code is unchanged.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','7df4db8e9f97c992b2cae8e8ce3f888da62f4f67..92b0aa13cc68539a67c8928833d3bf84d182f073'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The fix commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
