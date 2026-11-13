@@ -16778,6 +16778,12 @@ Seed:      none
 Notes:     The one work commit has a Conventional Commit subject.
 ```
 
+#### S1-T13: correction of two records, after review round 1 (findings F1 and F2)
+
+- F2: the task log of S1-T13 above says that the builder worked "in two passes", and the evidence of the commit subjects says "The one work commit has a Conventional Commit subject". Both are superseded by this entry: the builder (the Cursor command-line tool, `grok-4.7-high`) worked in three passes (the server; the renderer and the empty canvas; a small third pass that added the test of a malformed post to the development server), and the work is two commits, `75bc9faaa7eb6e4f494ca8385a62288edae36280` and `c41aba27ba01c9363ebcb7630cf3c2394295cbb8`. Both subjects are Conventional Commits: `git log --format=%s 546df8525ad0a4a74423c4f7bcff1f73c93e5859..c41aba27ba01c9363ebcb7630cf3c2394295cbb8`, exit code 0, prints "test(web): the development server refuses a malformed trace post in JSON (S1-T13)" and "feat(web): the performance page saves native traces and refuses a software or remote renderer at once (S1-T13)".
+- F1: OI-122 now records the further re-plan of 2026-11-13 (S1-T12 waits for the owner at the console; S1-T08 and S1-T10 no longer depend on it; the pin fields that the frame rate decides close with the addendum of the slice S1 gate) and its NEEDED BY names that addendum.
+- Both findings concern records only; they are corrected in this commit and checked by the lead's script (ruling L-65 (3), from the owner's note of 2026-11-13).
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
