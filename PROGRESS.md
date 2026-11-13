@@ -16287,6 +16287,196 @@ Seed:      none
 Notes:     The one work commit has a Conventional Commit subject.
 ```
 
+#### S1-T02: independent review, round 1: REJECTED (pull request https://github.com/albarami/economic-investment-intelligence/pull/34 )
+
+Reviewed commit `f640a044197466210d34b9ad8f92acbbb37b3ac1`, the head of the pull request at that time, with all six required checks green on it (`check-docs` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282432/job/131668686277; `planted-failures` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282439/job/131668686467; `sandbox proof` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282524/job/131668686376; `secret-scan` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282439/job/131668686527; `static-checks` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282439/job/131668686355; `tests` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282439/job/131668686082). Reviewer: Moonshot AI Kimi K3.1 Pro, through the Devin command-line tool, read-only; a maker that neither planned nor built the task; a full review of the pull request's whole change against main. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S1-T02 (pull request 34)
+COMMIT: f640a044197466210d34b9ad8f92acbbb37b3ac1
+REVIEWER: Moonshot AI Kimi K3.1 Pro
+CHECKS:
+  REV-10 PASS Both remaining acceptance criteria map to full-count browser tests: layer instance counts and isolated canvas-pixel classes prove drawing; omission, hidden-layer, blank-renderer and frozen-clock plants exercise the failure modes. The lead recorded 22 Node tests and 17 browser tests passing, with no frame-rate claim.
+  REV-11 PASS On the exact head, the lead ran `./eii test --seed 2026111346`, exit 0 with 1357 passed and none skipped, and `python3 scripts/check_docs.py`, exit 0. Hosted `tests` also succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282439/job/131668686082. New guards have recorded planted failures.
+  REV-12 PASS The work commit changes the recorded 41 in-scope paths and the ledger changes only PROGRESS.md and TASKS.md; nothing under `data/` changed. The other tasks' closing records in PROGRESS.md are excluded by the brief.
+  REV-13 PASS The spike contains executable generators, layers, recorder, server and validators rather than stubs or invented results. Browser placeholders for commit and lock are replaced by the native server before storage; no native trace or capture fixture is delivered as evidence.
+  REV-14 PASS No secret, `.env`, real custodian record or private data appears in the patch; hosted `secret-scan` succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43359282439/job/131668686527.
+  REV-15 PASS No existing assertion, threshold, tolerance, count, lint rule or baseline was weakened. Playwright retains `retries: 0`, the full counts run in every browser invocation, and no skip or expected-failure mark was added.
+  REV-16 FAIL The implementation otherwise follows the rulings and permitted re-plan, but the renderer check does not establish the hardware-accelerated native measurement required by TST-132 and the Performance budgets section; see F1.
+  REV-17 PASS TASKS.md, document 14, both READMEs, OPEN_ITEMS.md and PROGRESS.md reflect the spike and re-plan, and the head documentation check exited 0. OI-121 and OI-122 record the cap and native-trace assumptions; the later owner response is expressly outside this head.
+  REV-18 FAIL The server validates origin, size and payload and protects the native directory from the test server, but a generated-name collision can overwrite an existing trace; see F2.
+  REV-19 PASS The re-plan uses TASKS.md Queue rules' next-free-number and named-split provisions, moves both criteria word for word to S1-T12, adds the S1-T08 dependency and leaves the slice gate statement unchanged. No settled component decision is reopened.
+  REV-20 N/A The change adds development-only spike measurements rather than product facts or release figures; the technical frame calculations are deterministically implemented and tested in `trace.mjs`.
+  REV-21 N/A The development-only `_perf` spike adds no product brief, Fact-chip screen, claim catalogue or model-written prose; its diagnostics are covered by the route exemption rather than the product numeral pipeline.
+  REV-22 PASS No partition, privacy parameter, treatment, export, protected window or attack test changed, and the complete head suite passed without reduced attack sizes.
+  REV-23 PASS The patch adds no custodian import or product dependency; the head boundary checks and complete test suite passed.
+  REV-24 PASS `notices.json` marks the Arabic notice `pending native review`, the page reads that marked value, and `notices.node-test.mjs` plants removal of the mark. Both routes use the same diagnostics and no model approval is recorded.
+  REV-25 PASS The synthetic extent names no real place, person or private path and introduces no realistic custodian identifier or named-product comparison. Documentation, tree and hosted secret checks passed on the head.
+  REV-26 PASS The page and documents consistently say `native frame-rate gate pending`; no frame rate, forecast, endorsement, lookup, go/no-go or other prohibited claim is asserted.
+  REV-27 PASS The lead's `cmp AGENTS.md CLAUDE.md` on the head exited 0, and the documentation check reported no agent-file failure.
+  REV-28 N/A No establishment, legal-entity, employer-group, person or salary-file identifier is introduced; random trace filenames are not custodian identifiers.
+  REV-29 N/A The invented, unnamed extent attaches no Synthetic or Simulated attribute to a real named place or business.
+  REV-38 PASS No gateway import, provider-setting read, run-time gateway call or gateway-derived screen text was added; the serving-boundary checks passed.
+FINDINGS:
+  F1 (REV-16)
+    File: web/spikes/performance/layers.ts
+    Place: `mountScene(...).renderer`, lines 213-217; `judgeRenderer` in `web/spikes/performance/trace.mjs`, lines 195-203
+    Wrong: The gate does not establish hardware-accelerated WebGL2 as TST-132 and the Performance budgets section require. `context.RENDERER` can be masked, while `judgeRenderer` accepts every nonempty renderer except strings containing three substrings. In particular, a native Windows software renderer such as `Microsoft Basic Render Driver` passes, so a software measurement can qualify as the native gate.
+    Fix: Record `UNMASKED_RENDERER_WEBGL` through `WEBGL_debug_renderer_info`, returning `missing-renderer` when no unmasked value is available, and reject Windows software renderers including `Microsoft Basic Render Driver` as `software-renderer`. Add a planted gate case for that renderer and a focused test whose masked and unmasked context values differ, then prove them with `node --test spikes/performance/tests/trace.node-test.mjs` and `npm --prefix web run test:spike:performance`.
+  F2 (REV-18)
+    File: web/spikes/performance/server.mjs
+    Place: `evidenceId` and `receiveTrace`, lines 43-46 and 160-162
+    Wrong: The filename contains only 32 random bits and `fs.writeFileSync` uses its default truncating mode. A collision therefore overwrites an existing trace instead of preserving the recorded native measurement, violating the server's trace-evidence data-handling requirement.
+    Fix: Create the file exclusively with `{ flag: 'wx' }` and, on `EEXIST`, generate a fresh server-side name or reject without changing the existing file. Make the ID generator injectable for a planted collision test that asserts the original bytes remain unchanged and no existing path is reused; prove it with `node --test spikes/performance/tests/trace.node-test.mjs` and `npm --prefix web run test:spike:performance`.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+- The lead's judgement: both findings are valid and both concern the work, not its records. F1: TST-132 and the section "Performance budgets" ask for a measurement on hardware-accelerated WebGL2; the page recorded the browser's general renderer string, which a browser may mask, and the gate refused only three names, so a trace taken on the Windows software driver could have qualified as the native gate trace. F2: the server that receives a trace created its file with an ordinary write under a name with 32 random bits, so a second trace with the same name would have replaced the first measurement. Nothing was argued away
+- F1, fixed by the builder (Cursor command-line tool, `grok-4.7-high`, xAI) in one round. Tests first: a native trace whose renderer is `Microsoft Basic Render Driver` qualified as the gate trace before the change (the assertion saw no failure); a reader of the renderer did not exist. Now the page reads the unmasked renderer through the extension `WEBGL_debug_renderer_info` (the function `readUnmaskedRenderer` of `web/spikes/performance/trace.mjs`, called from `layers.ts`); when the extension or the value is absent the recorded renderer is empty and the gate refuses the trace as `missing-renderer`; the gate refuses the Windows software driver by its name and a renderer that names WARP as a word of its own, in any letter case, as `software-renderer`. Four new tests: the Windows driver; WARP as a word; a renderer that only contains those letters inside another word is not refused for it; the masked and the unmasked value of a planted context differ and the reader returns the unmasked one. The builder read the specification of the extension at the Khronos registry on 2026-11-13
+- F2, fixed in the same round. Tests first: with a planted name generator, a second trace took the name of an existing file and replaced it, and a generator that always collides was answered with success. Now the file is created exclusively (`wx`); on a name that exists the server asks for a fresh name, four times at most, and then refuses the trace as `trace-name-collision` with status 400; an existing file is never opened for writing. Two new tests: a colliding name leaves the existing bytes unchanged and the trace is stored under another name; a generator that always collides is refused by name and writes nothing
+- What the headless test browser reports, recorded as the builder observed it: its unmasked renderer names a software rasteriser, so a trace taken there can never qualify as the gate trace; the short orbit of the tests still qualifies as the smoke profile, as before, and that assertion is unchanged
+- The lead's own seven breaks on the fix, each restored: the Windows driver removed from the refused list; the WARP test removed; the reader falling back to the masked value when the extension is absent; the reader reading the masked value; the file written without exclusive creation; a collision not retried: each fails a named test. One break changes nothing a test can see and is equivalent: a blank unmasked value passed on by the reader, because the gate itself refuses a blank renderer as `missing-renderer`
+- The fix commit changes five files, all under `web/spikes/performance/` (the page's renderer reading, the trace module with its type declaration, the server, the Node test file: 208 lines added, 10 removed). No count, budget, threshold, browser test, workflow or document changed. The evidence command still fails with `missing-native-trace`: no native trace exists, and none is claimed
+- OI-122 now records the owner's word of 2026-11-13: the re-plan that makes the native traces task S1-T12 is accepted as a stated assumption of the proof of concept; the trace itself is still owed by the owner
+- How this round's evidence was taken: the fix commit was pushed alone at first, so the hosted checks ran on it; the lead then ran the recorded commands at the fix commit, the whole test command among them with a seed of its own, and wrote this ledger. (A note of the owner on test time, which would have let the ledger cite the hosted run in place of the local run, was in force for about ten minutes, from 07:21 to 07:31, and was withdrawn by the owner in full; a local run that was stopped in that interval left no record, and every run recorded here was made in full afterwards.)
+- Round 2 goes to the same reviewer, limited as REV-39 says: the two findings, defects in the lines changed since the reviewed commit, and the checks that are never limited
+
+#### Evidence for the work commit `96be1a028c2e9fc600e6b604afec97905e348cb3`
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   npm --prefix web run lint
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "> eslint --max-warnings 0 ." (exit code decides)
+Seed:      none
+Notes:     Web lint at the fix commit: exit code 0.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   npm --prefix web run format:check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Web format check.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   npm --prefix web run typecheck
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "> tsc --noEmit" (exit code decides)
+Seed:      none
+Notes:     Web type check at the fix commit: exit code 0.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 304 text files, 59 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check at the fix commit.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','f640a044197466210d34b9ad8f92acbbb37b3ac1...96be1a028c2e9fc600e6b604afec97905e348cb3'],check=True,capture_output=True,text=True).stdout.splitlines()); w='M:web/spikes/performance/layers.ts M:web/spikes/performance/server.mjs M:web/spikes/performance/tests/trace.node-test.mjs M:web/spikes/performance/trace.d.mts M:web/spikes/performance/trace.mjs'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "5 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope of the fix commit (REV-12): five files of the spike; the browser tests, the configuration, the counts, the workflow and the documents are unchanged.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','f640a044197466210d34b9ad8f92acbbb37b3ac1..96be1a028c2e9fc600e6b604afec97905e348cb3'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The fix commit has a Conventional Commit subject.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   npm --silent --prefix web run spike:performance:verify-evidence
+Exit code: 1
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; first output line "FAIL missing-native-trace"
+Seed:      none
+Notes:     The evidence command at the fix commit: it still fails with the name of the missing trace and writes nothing. The frame-rate measurement is task S1-T12 and is pending.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   bash -c "set -o pipefail; npm --prefix web run test:spike:performance 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)), \"|\", \" \".join(re.findall(r\"[0-9]+ passed \\([0-9.]+m?s?\\)\", t)[:1]))'"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 28 # pass 28 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 17 passed (5.4m)" (the totals of the Node test runner and of the browser run inside it)
+Seed:      none
+Notes:     The two findings at the fix commit: 28 Node tests of the spike pass (22 before the fix: four new tests of the renderer reading and its judgement, two of the exclusive write), one of which runs the 17 unchanged browser tests in the headless shell at the full counts. They assert counts and the trace contract, and no frame rate.
+```
+
+```text
+### S1-T02 — Map load and frame-rate spike
+Commit:    96be1a028c2e9fc600e6b604afec97905e348cb3
+Command:   ./eii test --seed 2026111352
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1363 passed, 0 failed, 0 skipped
+Seed:      2026111352
+Notes:     The whole test command at the fix commit, with a seed of its own; the Node and browser tests of the spike run inside it through the web checks.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
