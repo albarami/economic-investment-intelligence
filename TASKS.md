@@ -171,21 +171,21 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: `web/spikes/glyphs/`, local font and glyph spike assets.
 - Depends: S0-T03, S0-T12.
 - Requirements: FE-46, FE-56, FE-57, DES-24, DES-10.
-- Delivery: hard; personas Frontend; status in review (pull request 32).
+- Delivery: hard; personas Frontend; status done (pull request 32, merged 2026-11-13).
 ### S1-T02 — Map load and frame-rate spike
 - Goal: Measure the pinned hexagon and particle load in a native host browser.
-- Acceptance criteria: [ ] 110,000 hexagons render; [ ] 50,000 particles render. The criterion on the native trace moved to task S1-T12 by a re-plan of 2026-11-13.
+- Acceptance criteria: [x] 110,000 hexagons render; [x] 50,000 particles render. The criterion on the native trace moved to task S1-T12 by a re-plan of 2026-11-13.
 - Scope: `web/spikes/performance/` and performance scripts.
 - Depends: S1-T01.
 - Requirements: TST-132, FE-88, PLN-07.
-- Delivery: hard; personas Frontend; status queued.
+- Delivery: hard; personas Frontend; status in review (pull request 34).
 ### S1-T03 — Isochrone, drawn-shape and grid spike
 - Goal: Convert in-process walk and drive isochrones at different hours of day, a free-drawn polygon and a radius into exact shapes and into whole snapped grid cells.
 - Acceptance criteria: [x] routing has no server; [x] the drive isochrone changes with the hour through a fixture speed table, by the time-of-day mechanism this spike chooses; [x] each shape is also kept exactly, for Public and Simulated layers; [x] the snapped output contains only whole frame cells; [x] deterministic fixtures pass.
 - Scope: routing and area spike under `product/` and its fixtures.
 - Depends: S0-T02.
 - Requirements: ARC-88, BE-82, PRV-10, SYN-53.
-- Delivery: hard; personas Backend; status in review (pull request 33).
+- Delivery: hard; personas Backend; status done (pull request 33, merged 2026-11-13).
 ### S1-T04 — Tile range-request spike
 - Goal: Serve one local tile artefact with correct byte-range behaviour.
 - Acceptance criteria: [x] full request succeeds; [x] valid ranges return expected bytes; [x] invalid ranges fail safely.
