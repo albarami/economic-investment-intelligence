@@ -45,12 +45,17 @@ async function arm(page: Page, seen: string[]): Promise<void> {
 
 async function open(page: Page, query: string): Promise<SpikeDiagnostics> {
   const seen: string[] = [];
+  page.on('request', (request) => {
+    seen.push(request.url());
+  });
   await arm(page, seen);
   await page.goto(`/${query}`);
   await page.waitForFunction(() => {
     const spike = window.__spike;
     return spike !== undefined && (spike.ready || spike.failure !== '');
   });
+  const verdict = judgeRequests(seen, new URL(page.url()).origin);
+  if (!verdict.ok) throw new Error(verdict.detail);
   const spike = await page.evaluate(() => window.__spike);
   return (
     spike ?? {
@@ -140,6 +145,14 @@ test('a remote font attempt is blocked', async ({ page }) => {
   const verdict = judgeRequests(seen, new URL(page.url()).origin);
   expect(verdict.ok).toBe(false);
   expect(verdict.detail).toContain('assets.invalid');
+});
+
+test('the ordinary page helper rejects a remote font attempt', async ({
+  page,
+}) => {
+  await expect(open(page, '?lang=en&plant=remote-font')).rejects.toThrow(
+    /assets\.invalid/,
+  );
 });
 
 test('the server sends a same-origin content security policy', async ({
