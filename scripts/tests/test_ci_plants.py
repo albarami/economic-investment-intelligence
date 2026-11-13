@@ -18,6 +18,43 @@ import ci_plants as plants
 
 
 class PlantHarness(unittest.TestCase):
+    def test_type_check_prepares_engine_in_each_scratch_copy(self) -> None:
+        home, env = support.temp_home(self)
+        case = next(case for case in cases.CASES if case.command == cases.MYPY)
+        for name in ("clean", "planted"):
+            with self.subTest(copy=name):
+                copy = home / name
+                with patch.object(plants, "execute", return_value=(0, "synced")) as run:
+                    plants.prepare(copy, support.ROOT, case, env)
+                run.assert_called_once_with(
+                    [
+                        "uv",
+                        "sync",
+                        "--managed-python",
+                        "--all-packages",
+                        "--locked",
+                        "--group",
+                        "engine",
+                    ],
+                    copy,
+                    env,
+                    plants.SETUP_TIMEOUT_SECONDS,
+                )
+
+    def test_failed_engine_sync_stops_before_type_check(self) -> None:
+        home, env = support.temp_home(self)
+        case = next(case for case in cases.CASES if case.command == cases.MYPY)
+        with patch.object(plants, "make_copy", return_value=home / "copy"):
+            with patch.object(plants, "execute", return_value=(1, "sync failed")):
+                with patch.object(
+                    plants, "run_check", return_value=(1, "failed")
+                ) as check:
+                    reason = plants.run_case(
+                        case, support.ROOT, home / "scratch", env, {}
+                    )
+        check.assert_not_called()
+        self.assertIn("engine sync failed (status 1)", reason or "")
+
     def test_exact_twelve_cases(self) -> None:
         self.assertEqual(len(cases.CASES), 12)
         self.assertEqual(len(cases.CLASSES), 12)

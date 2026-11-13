@@ -35,6 +35,8 @@ jobs:
         with:
           node-version-file: .nvmrc
           package-manager-cache: false
+      - name: Sync the locked environment with the engine group
+        run: uv sync --managed-python --all-packages --locked --group engine
       - name: Print tool versions
         run: uv --version && node --version && npm --version && git --version
       - name: Check the tree
@@ -160,6 +162,8 @@ jobs:
         with:
           node-version-file: .nvmrc
           package-manager-cache: false
+      - name: Sync the locked environment with the engine group
+        run: uv sync --managed-python --all-packages --locked --group engine
       - name: Install web dependencies
         run: npm ci
         working-directory: web
