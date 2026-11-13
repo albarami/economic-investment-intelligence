@@ -192,14 +192,14 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: tile spike API, fixture and tests only.
 - Depends: S0-T03, S0-T05.
 - Requirements: OPS-30, FE-56, FE-58, TST-167.
-- Delivery: routine; personas Backend; status in review (pull request 28).
+- Delivery: routine; personas Backend; status done (pull request 28, merged 2026-11-13).
 ### S1-T05 — First two-store parity query
 - Goal: Run one portable named query against PostgreSQL and DuckDB with identical normalised output.
-- Acceptance criteria: [ ] both adapters answer; [ ] rounding is explicit; [ ] a deliberate divergence fails parity.
+- Acceptance criteria: [x] both adapters answer; [x] rounding is explicit; [x] a deliberate divergence fails parity.
 - Scope: store spike adapters, one SQL file and parity fixture.
 - Depends: S0-T08, S0-T12.
 - Requirements: BE-26, TST-40, PLN-19.
-- Delivery: hard; personas Backend; status queued.
+- Delivery: hard; personas Backend; status in review (pull request 30).
 ### S1-T06 — Sandbox enforcement spike
 - Goal: Confirm the production sandbox boundary on the build machine without a fallback.
 - Acceptance criteria: [x] sentinel read and network attempts fail; [x] mount list matches policy; [x] any enforcement failure blocks the task.
