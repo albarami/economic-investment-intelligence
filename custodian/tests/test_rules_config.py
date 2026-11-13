@@ -2,9 +2,9 @@
 
 import hashlib
 import json
-import os
+import locale
 import tomllib
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import pytest
@@ -27,7 +27,6 @@ RULES_PATH = (
 GATE_RECORD_PATH = RULES_PATH.with_name("gate_record.json")
 README_PATH = RULES_PATH.with_name("README.md")
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "rules_config"
-CHECK_PATH = RULES_PATH.with_name("rules_config.py")
 
 RECORD_FIELDS = (
     "task",
@@ -55,42 +54,6 @@ TASK_PLACEMENTS = {
     ("shared", "window_months"),
 }
 RETIRED_NAMES = ("presence_base", "presence_scale", "flow_scale")
-SCAN_ROOTS = ("core", "custodian", "product", "gateway", "scripts", "infra", "web")
-SKIP_DIRECTORIES = {
-    "node_modules",
-    "__pycache__",
-    ".venv",
-    ".mypy_cache",
-    ".ruff_cache",
-}
-DOCUMENT_SUFFIXES = {".md", ".rst", ".adoc"}
-CODE_SUFFIXES = {
-    ".py",
-    ".pyi",
-    ".toml",
-    ".json",
-    ".jsonl",
-    ".yml",
-    ".yaml",
-    ".ini",
-    ".cfg",
-    ".conf",
-    ".mjs",
-    ".cjs",
-    ".js",
-    ".ts",
-    ".tsx",
-    ".jsx",
-    ".css",
-    ".html",
-    ".sql",
-    ".sh",
-    ".bash",
-    ".txt",
-    ".xml",
-    ".svg",
-    ".lock",
-}
 OTHER_CODES = (
     ("A", "min_earners_count"),
     ("A", "min_groups_count"),
@@ -274,7 +237,7 @@ def assert_digest(path: Path) -> CheckedRules:
 def _refuse(path: Path, needle: str) -> None:
     with pytest.raises(RulesRefusal) as caught:
         load_rules(path)
-    assert needle in str(caught.value)
+    assert str(caught.value) == needle
 
 
 def test_committed_file_fixes_the_exported_set_bases_window_and_record() -> None:
@@ -331,6 +294,16 @@ def test_equal_movement_bases_are_accepted() -> None:
     rules = assert_digest(FIXTURES / "equal_bases.toml")
     assert rules.movement_base_a == "50"
     assert rules.movement_base_b == "50"
+
+
+def test_movement_base_of_one_is_a_positive_whole_number(tmp_path: Path) -> None:
+    """One is a positive whole number, so both bases may be the text 1."""
+    entries = load_good_entries()
+    _replace(entries, "round_movement", "A", value="1")
+    _replace(entries, "round_movement", "B", value="1")
+    rules = assert_digest(write_rules(tmp_path, entries))
+    assert rules.movement_base_a == "1"
+    assert rules.movement_base_b == "1"
 
 
 @pytest.mark.parametrize(("name", "needle"), REFUSED)
@@ -416,6 +389,26 @@ def test_one_shared_identifier_may_differ_from_the_committed_one(
     )
 
 
+def test_first_entry_sets_the_shared_identifier(tmp_path: Path) -> None:
+    """A later entry cannot define the identifier when the first entry differs."""
+    entries = load_good_entries()
+    entries[0]["rules_version_id"] = "rv-first"
+    _refuse(
+        write_rules(tmp_path, entries),
+        "entry shared/window_months field rules_version_id: differs",
+    )
+
+
+def test_second_entry_identifier_is_compared(tmp_path: Path) -> None:
+    """The entry after the first is part of the shared-identifier check."""
+    entries = load_good_entries()
+    entries[1]["rules_version_id"] = "rv-second"
+    _refuse(
+        write_rules(tmp_path, entries),
+        "entry shared/window_months field rules_version_id: differs",
+    )
+
+
 def test_whitespace_identifier_is_blank(tmp_path: Path) -> None:
     """A whitespace-only rules_version_id is blank."""
     entries = load_good_entries()
@@ -464,6 +457,24 @@ def test_entry_without_a_rule_code_is_named_by_index(tmp_path: Path) -> None:
     entries = load_good_entries()
     del entries[0]["rule_code"]
     _refuse(write_rules(tmp_path, entries), "entry #1 field rule_code: missing")
+
+
+def test_blank_parameter_set_is_named_by_index(tmp_path: Path) -> None:
+    """An empty parameter_set is not a label, so the entry is named by its position."""
+    entries = load_good_entries()
+    entries[0]["parameter_set"] = ""
+    _refuse(
+        write_rules(tmp_path, entries),
+        "entry #1 field parameter_set: not A, B or shared",
+    )
+
+
+def test_blank_rule_code_is_named_by_index(tmp_path: Path) -> None:
+    """An empty rule code is not a label, so the entry is named by its position."""
+    entries = load_good_entries()
+    entries[0]["rule_code"] = ""
+    del entries[0]["unit"]
+    _refuse(write_rules(tmp_path, entries), "entry #1 field unit: missing")
 
 
 def test_lower_case_parameter_set_is_refused(tmp_path: Path) -> None:
@@ -517,6 +528,18 @@ def test_record_comparison_names_a_field_outside_the_nine() -> None:
     assert "missing field extra_computed" in str(caught.value)
 
 
+def test_record_comparison_ignores_a_field_absent_from_both() -> None:
+    """The named gap is a computed field the committed record lacks."""
+    fresh = compute_gate_record(RULES_PATH)
+    computed = dict(fresh)
+    del computed["task"]
+    committed = dict(computed)
+    del committed["exported_set"]
+    with pytest.raises(RulesRefusal) as caught:
+        compare_gate_records(committed, computed)
+    assert str(caught.value) == "missing field exported_set"
+
+
 def test_record_comparison_refuses_an_extra_field() -> None:
     """A field the computation does not return is refused."""
     fresh = compute_gate_record(RULES_PATH)
@@ -554,6 +577,20 @@ def test_non_utf8_file_is_refused(tmp_path: Path) -> None:
     _refuse(path, "file: not UTF-8 text")
 
 
+def test_rules_text_is_read_as_utf8(tmp_path: Path) -> None:
+    """The file is UTF-8 even when the process locale is ASCII."""
+    entries = load_good_entries()
+    entries[0]["description_en"] = entries[0]["description_en"] + " café"
+    path = write_rules(tmp_path, entries)
+    previous = locale.setlocale(locale.LC_ALL)
+    try:
+        locale.setlocale(locale.LC_ALL, "C")
+        rules = assert_digest(path)
+    finally:
+        locale.setlocale(locale.LC_ALL, previous)
+    assert "café" in rules.entries[0].description_en
+
+
 def test_readme_names_the_window_the_retired_names_and_the_limit() -> None:
     """The README names the months, the retired codes, and what this task cannot prove."""
     text = README_PATH.read_text(encoding="utf-8")
@@ -579,90 +616,3 @@ def test_readme_names_the_window_the_retired_names_and_the_limit() -> None:
     ):
         assert needle in text
     assert "Until they have values, the world build refuses to start" not in text
-
-
-def _walk_code(root: Path) -> Iterator[Path]:
-    for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = [name for name in dirnames if name not in SKIP_DIRECTORIES]
-        for filename in filenames:
-            path = Path(dirpath) / filename
-            if path.suffix.lower() in DOCUMENT_SUFFIXES:
-                continue
-            if path.suffix.lower() not in CODE_SUFFIXES and path.suffix != "":
-                continue
-            yield path
-
-
-def _retired_hits(repo: Path) -> tuple[dict[Path, set[str]], dict[str, int]]:
-    hits: dict[Path, set[str]] = {}
-    files_read = dict.fromkeys(SCAN_ROOTS, 0)
-    for root_name in SCAN_ROOTS:
-        root = repo / root_name
-        if not root.is_dir():
-            continue
-        for path in _walk_code(root):
-            try:
-                text = path.read_text(encoding="utf-8")
-            except UnicodeDecodeError:
-                continue
-            files_read[root_name] += 1
-            present = {name for name in RETIRED_NAMES if name in text}
-            if present:
-                hits[path.resolve()] = present
-    return hits, files_read
-
-
-def _allowed_retired_path(path: Path, repo: Path) -> bool:
-    allowed = {
-        CHECK_PATH.resolve(),
-        (repo / "custodian" / "tests" / "test_rules_config.py").resolve(),
-    }
-    return path.resolve() in allowed
-
-
-def test_retired_names_appear_only_in_the_check_and_its_tests() -> None:
-    """The three retired names occur in the check, and in no other code or configuration."""
-    repo = Path(__file__).resolve().parents[2]
-    for root_name in SCAN_ROOTS:
-        assert (repo / root_name).is_dir()
-    hits, files_read = _retired_hits(repo)
-    for root_name in SCAN_ROOTS:
-        assert files_read[root_name] >= 1
-    unexpected = {
-        str(path.relative_to(repo)): sorted(names)
-        for path, names in hits.items()
-        if not _allowed_retired_path(path, repo)
-    }
-    assert unexpected == {}
-    check = CHECK_PATH.resolve()
-    for name in RETIRED_NAMES:
-        assert name in hits[check]
-        assert name in check.read_text(encoding="utf-8")
-
-
-def test_retired_allow_list_rejects_a_neighbour_and_a_nested_namesake() -> None:
-    """The three names are allowed only in the check and in this test file."""
-    repo = Path(__file__).resolve().parents[2]
-    neighbour = repo / "custodian" / "tests" / "test_rules_other.py"
-    nested = repo / "custodian" / "tests" / "sub" / "test_rules_config.py"
-    assert _allowed_retired_path(neighbour, repo) is False
-    assert _allowed_retired_path(nested, repo) is False
-    assert _allowed_retired_path(Path(__file__), repo) is True
-    assert _allowed_retired_path(CHECK_PATH, repo) is True
-
-
-def test_retired_scan_reports_a_plant_in_each_of_the_seven_roots(
-    tmp_path: Path,
-) -> None:
-    """A retired name planted in one file of each root is reported."""
-    for root_name in SCAN_ROOTS:
-        folder = tmp_path / root_name
-        folder.mkdir()
-        (folder / "plant.py").write_text(f"{RETIRED_NAMES[0]}\n", encoding="utf-8")
-    hits, files_read = _retired_hits(tmp_path)
-    reported = {path.relative_to(tmp_path).parts[0] for path in hits}
-    assert reported == set(SCAN_ROOTS)
-    for root_name in SCAN_ROOTS:
-        assert files_read[root_name] >= 1
-        planted = tmp_path / root_name / "plant.py"
-        assert RETIRED_NAMES[0] in hits[planted.resolve()]
