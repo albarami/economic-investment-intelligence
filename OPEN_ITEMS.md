@@ -243,7 +243,7 @@
 - TYPE: OPEN
 - NEEDED: Prove exact dependency pins and retreats, sandbox mounts and extension paths, speed-factor routing, text parity, map textures and watermark, Arabic glyphs, tabular figures, pixel-ratio cap, and remaining asset licences.
 - WHY: These are uncertain joints, not established implementation facts.
-- DONE SO FAR: Candidate mechanisms and named spike tests are documented. Task S1-T01 proved the Arabic glyph route and the label order on a synthetic page: five invented names drawn from local font files through the style's font faces, one hexagon under the first label layer. The other proofs named above are not proved by that spike.
+- DONE SO FAR: Candidate mechanisms and named spike tests are documented. Task S1-T03 proved speed-factor routing on a synthetic road extract: the routing engine in process, one set of tiles for each distinct hourly factor, the drive area changing with the hour (OI-120). Task S1-T01 proved the Arabic glyph route and the label order on a synthetic page: five invented names drawn from local font files through the style's font faces, one hexagon under the first label layer. The other proofs named above are not proved by that spike.
 - OPTIONS: **Recommendation:** test each at slices S0 and S1 and record decisions. No fallback is permitted for sandbox enforcement, store parity or security checks.
 - NEEDED BY: slices S0 and S1 before dependent interface and release work.
 
@@ -1032,6 +1032,16 @@
 - DONE SO FAR: The three screenshot tests run their structural, request and font assertions everywhere, inside `./eii test` too. Pixels are compared only by the hosted job `tests`, in a step of its own, against the baselines under `web/spikes/glyphs/tests/baselines/`. The same job first makes the three captures with the suite's own capture and uploads them; the lead commits them as baselines in a commit of their own. A missing or differing baseline fails the hosted step and names the file. The owner's native reading of the five Arabic names and the three images is recorded in `web/spikes/glyphs/evidence/visual-review.md`, which says pending until then.
 - OPTIONS: **Recommendation:** keep. Alternative: compare pixels on the build machine too, with a second set of baselines made there.
 - NEEDED BY: slice S1 gate (FE-46, FE-57).
+
+## OI-120 — The hour mechanism of drive areas and two choices of the routing spike
+
+- ID: OI-120
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm the mechanism that the routing spike chose for SYN-53, which the lead writes into a decision record at the slice S1 gate; and two smaller choices: `shapely` as a dependency of the spike's tests only, and the type check following the routing engine's own type files.
+- WHY: SYN-53 leaves the choice to slice S1 ("time-dependent edge speeds in the routing engine, or per-edge scaling of edge times"). ARC-88 names pyvalhalla as the engine that routes in process; the technology stack names another library only as a retreat "chosen in writing at slice S1 only if needed". The pack names no geometry library for tests, and the routing package ships type files without the marker that makes a type checker read them.
+- DONE SO FAR: Task S1-T03 routes in process with pyvalhalla 3.9.1 on a synthetic road extract that its own generator writes; the retreat was not needed and is not installed. Routing tiles are built by the builder program that the package ships (about a quarter of a second for the fixture). The hour of day is handled by per-edge scaling: one set of tiles for each distinct hourly speed factor, built from the same extract with every way's speed multiplied by the factor; equal factors share one set. Measured on the fixture: the drive area changes with the factor, equal factors give equal areas, the walk area does not change. Predicted speeds inside the engine were tried first and are not used: with a departure time the engine answered without a timezone database, but two hours with the same factor gave different outlines, and the cause is not confirmed. `shapely` 2.2.0 (the registry's current release on 2026-11-13) is installed through the root dependency group `engine` and imported only by the spike's tests, for geometric assertions that do not come from the engine. The type check reads the engine's shipped type files through one setting for that package; no error is suppressed.
+- OPTIONS: **Recommendation:** keep all three; decide the number of tile sets of a release (one for each distinct factor of the simulated day) when task S1-T11 fixes the speed bands. Alternatives: predicted speeds inside the engine, once the difference for equal factors is understood and a timezone database is part of the build; a pure-Python containment test instead of `shapely`.
+- NEEDED BY: slice S1 gate (the decision record of SYN-53); task S1-T11.
 
 ## Change control
 

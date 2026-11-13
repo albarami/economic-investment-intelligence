@@ -17,7 +17,10 @@ dev = [
 ]
 engine = [
   "duckdb==2.0.0",
+  "h3==4.5.0",
   "psycopg[binary]==3.3.8",
+  "pyvalhalla==3.9.1",
+  "shapely==2.2.0",
 ]
 
 [tool.uv]
@@ -41,6 +44,10 @@ python_version = "3.14"
 strict = true
 files = "scripts,core/src,custodian/src,product/src,gateway/src"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/scripts:$MYPY_CONFIG_FILE_DIR/core/src:$MYPY_CONFIG_FILE_DIR/custodian/src:$MYPY_CONFIG_FILE_DIR/product/src:$MYPY_CONFIG_FILE_DIR/gateway/src"
+
+[[tool.mypy.overrides]]
+module = ["valhalla", "valhalla.*"]
+follow_untyped_imports = true
 
 [tool.pytest]
 strict = true
