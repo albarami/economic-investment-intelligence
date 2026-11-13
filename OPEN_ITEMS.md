@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 (see PROGRESS.md) |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 and by decision 0023 on 2026-11-13 (see PROGRESS.md) |
 | Date | 2026-11-12 |
 | Owner | albarami |
 | Purpose | Track every unresolved owner decision, assumption, pending correction and technical unknown without implying closure. |
@@ -21,6 +21,7 @@
 - OI-35 records which parameter set is exported. A lead ruling of 2026-11-11 sets the default to A; the owner or a data owner may overrule it before the slice S1 gate.
 - OI-39 onwards are raised during the build.
 - OI-96 (closed by the owner's answer of 2026-11-12) and the items after it record the points of [decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md): the age of the places copy, the Public source for the survival base rate, the Public source of each forecast series without a table, the provider's rule on storing responses, the sources that are off under a public or commercial hosting, the size of the public-total inventory with the two gridded Public tables, the subject of a district series and the build without the night-lights key.
+- OI-132 to OI-146 record the open points of [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md). The owner's pending questions are the satellite provider's attribution in committed text, whether road traffic is part of the movement source, the attributes of the movement records, the gaps N1, N3, N4, N6 and N7 of the decision question bank (hiring and leaving flows, rents, an events calendar, supplier certifications and school capacity), whether the competition-adjusted ratio of talent available near this site may be computed (OI-140) and who keeps the monthly register snapshots (OI-141). The others are the register file's fields still to confirm (OI-142), the look's task S3-T15 (OI-143), the recovery tracker and the Qatarization planner (OI-144), and two assumptions: the age profile of people living here (OI-145) and prices per square foot (OI-146). The decision also updates OI-08 (items 12 and 15), OI-27 (item 15, a product for companies), OI-97 (item 12), OI-98 (items 8 and 12) and OI-102 (items 6 and 8).
 
 ## OI-01 — Main model key (supplied for go-live; not used during the build)
 
@@ -104,6 +105,8 @@
 - DONE SO FAR: Live rows default to “this session”, seeded history to Synthetic, and no company identity is shown. The minimum is two for the two-company demonstration; this is demonstration configuration, not a disclosure threshold.
 - OPTIONS: **Recommendation:** keep the labels and the demonstration minimum of two; any other value needs an owner decision and must not be presented as a privacy rule.
 - NEEDED BY: slice S9 oversight and database tests.
+- UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12: the ledger starts empty and holds only questions asked, so no seeded history exists and its Synthetic label falls away (S9-T03).
+- UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 15: the product is for companies only. The oversight seat leaves version 1 with its screen and roll-ups (S9-T04), its read functions (S9-T01) and its badge, and the ledger stays only as the internal question log, with no screen. So no screen shows the live-row label or a demand aggregate, and the read function this item was to align leaves with the seat; the company read functions and their separation tests stay. The distinct-organisation minimum stays open for one use: a roll-up of the question log made for the evaluation shows no company identity and only groups of at least that minimum ([06_PRIVACY_AND_DISCLOSURE_CONTROL.md](docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-66). It is now needed before the first such roll-up.
 
 ## OI-09 — Native Arabic reviewer
 
@@ -299,6 +302,7 @@
 - OPTIONS: **Recommendation:** keep the disclosure and limited scope unless the owner adds work by decision record.
 - NEEDED BY: slice S3 company interface; backlog review after slice S11.
 - CLOSED: 2026-11-12, by the owner's decisions of that day, recorded in [decision 0016](docs/decisions/0016-version-1-covers-the-whole-initiative.md): serving the region (journey D7) is in version 1; a cross-country entry comparison stays out of version 1. The company-seat recording notice keeps its draft wording, the documented default.
+- UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 15: the oversight seat and its roll-up leave version 1, so the notice no longer discloses oversight recording. The company seat states that its questions are recorded in the internal question log, which no screen shows ([01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), section "Open questions and assumptions", ASSUMPTION 4).
 
 ## OI-28 — Pilot request and lawful real-data path
 
@@ -822,6 +826,7 @@
 - DONE SO FAR: Task S6-T15 builds the base rates of card C31 and promises no survival figure. No survival figure is computed from the Synthetic births and closures.
 - OPTIONS: **Recommendation:** keep the survival base rate at `NO_DATA` until a Public source carries the link; invent no value. Alternative: leave the survival base rate out of the product.
 - NEEDED BY: any proposal to show a survival base rate; not a version 1 blocker.
+- UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12: the Synthetic births and closures are withdrawn. The openings and closures of register companies are Public counts from the register's own dates and monthly snapshots ([03_DATA_CONTRACTS.md](docs/03_DATA_CONTRACTS.md) DAT-164), and no rate, net change or survival figure is computed from them ([07_ECONOMIC_METHODS.md](docs/07_ECONOMIC_METHODS.md) MTH-85), so they do not close this item.
 
 ## OI-98 — Public source of each forecast series without a table
 
@@ -832,6 +837,7 @@
 - DONE SO FAR: Task S2-T17 records, for each series, the source table that the pack holds or that it holds none; a series without a table is not forecast. The hotel series is also the open point of OI-21 and OI-23.
 - OPTIONS: **Recommendation:** record each missing source at the slice S2 gate or keep the series open and unforecast; invent no value and add no source without its licence.
 - NEEDED BY: slice S2 gate (S2-T17, PLN-25); slice S6 (S6-T14).
+- UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) items 8 and 12: the list gains the quarterly median price per square foot of method card C41 by district and use, a series of its own beside the property prices of card C14, whose table `pub_property_quarter` comes from the sales bulletins fetched in S2-T19 ([03_DATA_CONTRACTS.md](docs/03_DATA_CONTRACTS.md) DAT-167), so it is not a series without a table. The establishments of an area by month are now a Public count of register companies, not a released synthetic series; whether their forecast joins the list is fixed with the list at the slice that builds card C30 ([02_ARCHITECTURE.md](docs/02_ARCHITECTURE.md) ARC-138).
 
 ## OI-99 — The traffic provider's rule on storing responses
 
@@ -872,6 +878,7 @@
 - DONE SO FAR: Documents 03, 08 and 09 carry the same OPEN line.
 - OPTIONS: **Recommendation:** fix the subject at slice S2 together with documents 03, 08 and 09, without adding an attribute to a real place.
 - NEEDED BY: slice S2 gate (S2-T17); slice S6 (S6-T14).
+- UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) items 6 and 8: the property price measures of method card C41 (the price per square foot by district, use and quarter, and its forecast) and the count of the financial centre's firms in a district where its register gives no building ([09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) AI-137) take the same subject once it is fixed, as the open questions of document 09 record; this also bears on S6-T10.
 
 ## OI-103 — Public build without the night-lights key
 
@@ -1092,6 +1099,156 @@
 - DONE SO FAR: Nothing is changed; a lock file changes only inside a task that owns it (rule 44 of [AGENTS.md](AGENTS.md)). Neither fixed release lies inside the range its parent asks for, so raising either needs an override in `web/package.json`. The built page of the application shell was searched for both packages and holds neither; the spike's own built page was not searched.
 - OPTIONS: **Recommendation:** in task S1-T08, search the spike's built page for both parsers; raise `fflate` to 0.7.5 by an override if the spike's tests stay green with it; keep the `image-size` alert open with its reason (no page loads a texture image; its fixed release is a new major version that its parent does not accept) unless a test shows the override harmless. Alternative: leave both until the map layers of slice S3 choose their loaders.
 - NEEDED BY: slice S1 gate; not a blocker.
+
+## OI-132 — The satellite imagery provider's attribution in committed text
+
+- ID: OI-132
+- TYPE: OPEN (owner)
+- NEEDED: The owner's attribution note for the imagery provider whose key is `ESRI_API_KEY`: how the provider may be named in committed text and on screen, and the wording of its credit.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item A7 adds a satellite mode that shows the provider's satellite imagery with the attribution its imagery style carries, and AGENTS.md rules 5 and 15 ask for every source to be cited and for no existing product to be named in comparison. Until the note is in force, committed text names the provider only "the imagery provider" or by its setting.
+- DONE SO FAR: Document 04 records, under its source registry, that the provider's row is added when the note is in force; document 13 holds the setting (OPS-73); documents 10 and 11 show the satellite credits only inside the collapsed map credits while that mode is on.
+- OPTIONS: **Recommendation:** keep the provider unnamed in committed text; take the credit at run time from the provider's imagery style and show it only inside the collapsed map credits while the satellite mode is on; add the registry row of document 04 when the owner's note is in force.
+- NEEDED BY: task S3-T16 (the satellite mode).
+
+## OI-133 — Whether road traffic is part of the movement source
+
+- ID: OI-133
+- TYPE: OPEN (owner)
+- NEEDED: The owner's confirmation that the road traffic of method card C25 (the hourly link volumes, speed ratios and drive times by hour) is kept as part of the movement source.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12 builds synthetic records only for the confirmed sources; it keeps the road traffic of card C25 as part of the movement source and asks the owner to confirm. The lead's audit gave three options: derive traffic from the movement sources by the same assignment (it needs the open rule that turns trips into vehicle trips, document 05 Q7, and keeps capacities and delay parameters as assumptions); the optional live traffic provider of decision 0019 (it stores nothing and can fill no hourly table, ranking or travel time by hour); or keep the assignment as a method test only and show Public drive times at free flow, leaving out hour-varying drive times, the traffic animation and hourly access scores.
+- DONE SO FAR: The decision keeps the first option until the owner answers. The S1-T11 spike assigns a synthetic flow fixture and is unaffected.
+- OPTIONS: **Recommendation:** keep traffic as part of the movement source, derived from the released hourly flows, with the trips-to-vehicles rule stated as an assumption; if the owner declines, fall back to free-flow drive times and drop the hour-varying parts.
+- NEEDED BY: the slice S4 gate (S4-T08); it bears on S5-T09, S6-T07, S6-T08, S6-T13, S6-T20, S7-T11 and S10-T03.
+
+## OI-134 — The attributes of the movement records: age, nationality and gender
+
+- ID: OI-134
+- TYPE: OPEN (owner)
+- NEEDED: Which of age, nationality and gender the confirmed movement sources (the mobile operator's presence data and the national crowd-management system's data) hold, at the grain the pack plans.
+- WHY: Under [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12, synthetic records follow the real formats and an attribute the confirmed source does not plausibly hold is not generated. AGENTS.md rule 10 bars any sex or gender attribute on synthetic or protected records, and nationality enters only in the two forms of decision 0022.
+- DONE SO FAR: No movement contract of document 03 carries any of the three. The lead's audit found no sex or gender attribute planned inside a confirmed source; a real-data adapter must drop such a column before the vault, and the conformance schema test already refuses one.
+- OPTIONS: **Recommendation:** generate none of the three on movement records. Gender stays barred whatever the source holds. Age or nationality on movement records would need the owner's confirmation that the source holds them and, for nationality, a new decision record amending rule 10.
+- NEEDED BY: the slice S4 contracts (S4-T01, S4-T04).
+
+## OI-135 — Hiring and leaving flows (the decision question bank's gap N1)
+
+- ID: OI-135
+- TYPE: OPEN (owner)
+- NEEDED: The owner's word on whether hiring and leaving flows are built, and how, in the session on the design of value extraction.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) items A9 and A10 record them as a gap of the question bank and as an analysis that waits for that session; no machine-learning work is added beyond the plan's tested forecasts, estimates and ranking.
+- DONE SO FAR: Not built. The questions of the bank that need them are recorded as gaps (AI-129).
+- OPTIONS: **Recommendation:** leave them out of version 1 until the owner's session decides; any later build is an analysis of the attached employment records released under document 06.
+- NEEDED BY: the owner's session on value extraction.
+
+## OI-136 — Rents (the decision question bank's gap N3)
+
+- ID: OI-136
+- TYPE: OPEN (owner)
+- NEEDED: The owner's word on a source of rents, or a confirmation that rents stay the user's own input.
+- WHY: No open rent source exists (document 04 section 12). [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12 forbids synthetic rents or tenancies; the 2026 guide land prices and the recorded sale prices are prices and are never relabelled as rents.
+- DONE SO FAR: Break-even and the "how sure" runs of S6-T21 take only the user's own rent, or the guide and recorded prices labelled as prices.
+- OPTIONS: **Recommendation:** keep the user's rent as the only rent in version 1.
+- NEEDED BY: before any rent figure is offered.
+
+## OI-137 — An events calendar (the decision question bank's gap N4)
+
+- ID: OI-137
+- TYPE: OPEN (owner)
+- NEEDED: The owner's word on a public source of an events calendar.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item A9 records it as a gap that waits for the owner's word and is not built now.
+- DONE SO FAR: The simulation keeps its three event days of document 05; no calendar of named events is shown.
+- OPTIONS: **Recommendation:** leave it out until a public source is named and registered in document 04.
+- NEEDED BY: before any question of the bank that needs it is answered.
+
+## OI-138 — Supplier certifications (the decision question bank's gap N6)
+
+- ID: OI-138
+- TYPE: OPEN (owner)
+- NEEDED: The owner's word on a public source of supplier certifications.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item A9 records it as a gap that waits for the owner's word and is not built now; no synthetic data stands in for it (item 12).
+- DONE SO FAR: The partner and supplier finder shows no certification; the structured qualification route stays as document 09 states it.
+- OPTIONS: **Recommendation:** leave it out until a public source is named and registered in document 04.
+- NEEDED BY: before any question of the bank that needs it is answered.
+
+## OI-139 — School capacity (the decision question bank's gap N7)
+
+- ID: OI-139
+- TYPE: OPEN (owner)
+- NEEDED: The owner's word on a public source of school capacity.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12 forbids synthetic school capacity, and item A9 records it as a gap that waits for the owner's word.
+- DONE SO FAR: Only the published students by municipality (`students_muni`) are shown, as Public facts with source and year.
+- OPTIONS: **Recommendation:** leave it out until a public source is named and registered in document 04.
+- NEEDED BY: before any question of the bank that needs it is answered.
+
+## OI-140 — Whether the competition-adjusted ratio of talent available near this site may be computed
+
+- ID: OI-140
+- TYPE: OPEN (owner)
+- NEEDED: The owner's answer: may the competition-adjusted ratio of the two-step floating catchment (PySAL `access`, BSD-3), the talent pool within reach over the competing demand within reach, be computed from the two released tables as an exception to PRV-30 and PRV-18 of [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md)?
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 1 first planned method card C39 with that ratio. The review of the decision's sweep found that the ratio divides one protected family by another, which PRV-30 does not allow, and reads the competing jobs on work units chosen by travel time instead of by the snap, which PRV-18 does not allow. AGENTS.md rule 12 forbids weakening a privacy invariant on the lead's authority, so the lead's ruling L-160 of 2026-11-14 recast card C39 and left the exception to the owner.
+- DONE SO FAR: Card C39 shows two released figures side by side within 15, 30 and 45 minutes' drive: the talent pool (residents by occupation and pay band within reach) and the competing demand (jobs of the same occupations within reach). Each catchment snaps to whole release units, and PRV-18 and PRV-30 stay as they are. PRV-127 is a guard that refuses any ratio of the two figures; a planted ratio, a planted read on units chosen by travel time and a planted figure on an unsnapped outline each fail.
+- OPTIONS: **Recommendation:** keep the two figures side by side, with no ratio. If the owner wants the ratio, a new decision record must amend PRV-30 and PRV-18. It must also say how the work units of the competing demand are chosen, because the release's unit-to-unit travel times hold `px_base` unit pairs only ([03_DATA_CONTRACTS.md](docs/03_DATA_CONTRACTS.md) DAT-153), and keep the rule that no choice of units depends on a protected value (PRV-19).
+- NEEDED BY: task S6-T20; not a blocker, because the side-by-side form needs no exception.
+
+## OI-141 — Who keeps the monthly register snapshots
+
+- ID: OI-141
+- TYPE: OPEN (owner)
+- NEEDED: The owner to name who keeps a snapshot of each register file each month, from 2026-11, beside that file outside the repository.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) items 12 and 13 count the openings and closures of register companies from the register's own dates and from its monthly snapshots, and the "what changed this month" card of item 13 reads the snapshots too. The snapshot route needs two kept snapshots: while the snapshot of a month or of the month before it is not kept, that route gives `NO_DATA` with the reason key `snapshot_not_kept` ([03_DATA_CONTRACTS.md](docs/03_DATA_CONTRACTS.md) DAT-164).
+- DONE SO FAR: Documents 02, 03 and 13 record that the snapshots lie beside each register file outside the repository and are found through the same settings, `EII_REGISTER_FILE` and `EII_FC_REGISTER_FILE`, so no setting is added. The naming that tells the months apart is still to be fixed, without printing a path or committing a file name. Until two snapshots are kept, the openings and closures rest on the register's own dates alone.
+- OPTIONS: **Recommendation:** the owner keeps them, or names who does, since he holds the register files outside the repository: once a month, a copy of each file beside it, under the naming that the first task reading them fixes. A month that is missed stays `NO_DATA` on the snapshot route and is never filled in.
+- NEEDED BY: 2026-11, the first month to be kept; then S5-T10 and S7-T10, which read the snapshot route, and the "what changed this month" card of item 13 if its task is named.
+
+## OI-142 — The register file's fields for groups, the address type and the dates
+
+- ID: OI-142
+- TYPE: OPEN
+- NEEDED: At the first read of each register file, confirmation of the fields that show the main-and-branch structure, the registered-address type, and the registration and cancellation dates.
+- WHY: Under [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12, the employer groups of the dominance rules are the main-and-branch structure that the register shows, the address type is taken from the register files, and openings and closures come from the register's own dates. Where a file does not show a field, the decision's fallback applies: each registration is its own legal entity and group, the address type is absent, and a company with no date is counted in no month ([03_DATA_CONTRACTS.md](docs/03_DATA_CONTRACTS.md) DAT-164). [Decision 0022](docs/decisions/0022-real-register-companies-with-a-synthetic-world.md) left the same fields open.
+- DONE SO FAR: Documents 03 and 05 state each rule and its fallback, and document 06 states the employer group (PRV-07); the dominance rules and their planted tests run on these groups unchanged. Tests and continuous integration use the invented stand-in register.
+- OPTIONS: **Recommendation:** confirm the fields when the file is first read, without committing the file, a field value or a path, and record only which fields exist.
+- NEEDED BY: task S4-T02 (the register and employment world), whose amendment applies these rules.
+
+## OI-143 — The look's task S3-T15 is not in TASKS.md
+
+- ID: OI-143
+- TYPE: OPEN
+- NEEDED: The lead to enter the look's task S3-T15 in [TASKS.md](TASKS.md), or to record that S3-T16 keeps the map-mode switch.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 7 names the look's mode-switch task S3-T15, which is not in TASKS.md.
+- DONE SO FAR: Until S3-T15 enters, S3-T16 carries the map-mode switch and the modes of item 7, satellite and photorealistic 3D, as the open questions of [14_IMPLEMENTATION_PLAN.md](docs/14_IMPLEMENTATION_PLAN.md) and OPS-74 of [13_DEPLOYMENT_AND_OPERATIONS.md](docs/13_DEPLOYMENT_AND_OPERATIONS.md) record.
+- OPTIONS: **Recommendation:** keep the switch and the two modes in S3-T16; if S3-T15 enters TASKS.md first, move them there by a one-line amendment that cites decision 0023 item 7.
+- NEEDED BY: the start of S3-T16.
+
+## OI-144 — The recovery tracker and the Qatarization planner have no task yet
+
+- ID: OI-144
+- TYPE: OPEN (owner)
+- NEEDED: For the recovery tracker, what it is, the journey that carries it and the task that builds it, from the owner's records. For the Qatarization planner, the task that builds it in journey D5.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 15 keeps both for companies. It describes the Qatarization planner as a company tool of journey D5 under the cases of item 1: which roles Qataris hold in the private sector, at what pay, and where the talent is by district. It names the recovery tracker only. Neither has a task in TASKS.md, and the recovery tracker has no passage in the pack.
+- DONE SO FAR: Documents 01, 09, 10 and 14 record the gap in their open questions. The cases of item 1 already bind the planner's figures: group statistics only, through the release rules, with Qatari and non-Qatari splits only where the cell passes (BRF-96, AI-133, FE-150).
+- OPTIONS: **Recommendation:** build neither until its passage and task are recorded. The planner then follows the cases of item 1 and the release rules of document 06. The recovery tracker's passage is written from the owner's description, through a decision record if it adds scope to version 1 (AGENTS.md rule 46).
+- NEEDED BY: for the planner, before the journey D5 tasks of slice S7 (S7-T03, S7-T08) are planned; for the recovery tracker, before any work on it.
+
+## OI-145 — The age profile of people living here as its own Public component
+
+- ID: OI-145
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm that the age profile of people living here is shown as its own Public component after the two blocks of the site answer, not inside the people-living-here block.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 11, the owner's expectation of 2026-11-13, puts the age profile in the people-living-here block. No synthetic or protected record may carry age ([05_SYNTHETIC_WORLD_AND_SIMULATION.md](docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md) SYN-13), so that block, built from protected records, cannot hold it.
+- DONE SO FAR: The decision record and documents 01, 08 and 09 record the assumption: the age profile is the Public population by age over the area of the living block (method card C38), shown as its own component after the two blocks and never in one component, calculation or chart with a protected or Simulated figure (BRF-108, AI-131, FE-146). A planted age profile inside either block fails a component test (FE-146).
+- OPTIONS: **Recommendation:** keep it as its own Public component. Inside the block it would share a component with protected figures, which [decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 22 forbids for the population grid, and a protected age split would need an age attribute that SYN-13 forbids.
+- NEEDED BY: tasks S6-T02 and S8-T01, which set the site answer's order.
+
+## OI-146 — Prices per square foot beside the median per square metre
+
+- ID: OI-146
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm that the property price measures of [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 8 are stated per square foot, as he asked, while the median sale price per square metre of method card C14 stays as it is.
+- WHY: Item 8 asks for the price per square foot by district, use and quarter, and card C14 already shows the median per square metre. The decision record keeps both and relates them only by the exact conversion of one foot to 0.3048 metres.
+- DONE SO FAR: Card C41 states its measures per square foot and converts areas by that exact conversion (MTH-116). Its quarterly series is a series of its own, never joined to the series of card C14 (card C30).
+- OPTIONS: **Recommendation:** keep both, each labelled with its unit. Alternative: the owner chooses one unit for every price on screen, by a decision record.
+- NEEDED BY: task S6-T10, which builds the property price measures.
 
 ## Change control
 
