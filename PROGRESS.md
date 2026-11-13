@@ -14654,6 +14654,175 @@ Seed:      none
 Notes:     The one work commit has a Conventional Commit subject.
 ```
 
+#### S1-T05: the update of the branch with main, the first hosted run (two checks red) and the fix (pull request https://github.com/albarami/economic-investment-intelligence/pull/30 )
+
+- The update of the branch with main. When the offline gateway (pull request 29) merged, this branch conflicted with main in two files, and GitHub runs no check on a pull request that conflicts. The branch was therefore updated before its review: merge commit `d2a0b4786dbea50c37ae65efc525deade84b31c6`. PROGRESS.md by the lead's script that keeps every line of both sides, main's first; README.md by the lead's script that takes main's file and applies this task's recorded edits again. The lead's proof that the update changed nothing by itself:
+
+```text
+base update d2a0b4786dbea50c37ae65efc525deade84b31c6: branch side 916720866382b295944e5662401e8b49532ed32a, main side 034f0805a2638bca27a737789327428d2652395f, merge base 4a43f91c1a8491e97394c808a28af0586b407acf
+  branch only: 9
+  main only: 34
+  neither: 261
+  both, git's own merge: (4, ['OPEN_ITEMS.md', 'TASKS.md', 'pyproject.toml', 'uv.lock'])
+  both, resolved by the lead's script: (2, ['PROGRESS.md', 'README.md'])
+  FAIL: (0, [])
+```
+
+- The first hosted run, on that merge commit: the job `static-checks` failed at its step "Check Python types" ( https://github.com/albarami/economic-investment-intelligence/actions/runs/43341801140/job/131611634543 ) and the job `planted-failures` at "Plant one violation per CI guard" ( https://github.com/albarami/economic-investment-intelligence/actions/runs/43341801140/job/131611634504 ). The other four required checks were not affected
+- The cause, reproduced by the lead on the build machine in a fresh default environment (`UV_PROJECT_ENVIRONMENT` set to a new temporary folder, `UV_OFFLINE=1`, then `uv run --locked mypy`): "Found 8 errors in 4 files (checked 160 source files)", each "Cannot find implementation or library stub for module named" `duckdb` or `psycopg`. The two jobs ran the Python checks in the default environment, which holds the dependency group `dev` only; the store spike imports the two drivers, which live in the group `engine`. The builder's runs and the lead's runs had passed because both environments had been synced with that group, as rule 44 describes for the sandbox tests; the job `tests` syncs it too and was green
+- The lead's ruling: the type check must see the real, pinned drivers. No stub file for a library that ships its own types, no ignore comment, no relaxed setting, and the four files stay inside the type check. The environment of the two jobs gains what the code imports: each gets the step that the job `tests` has, with the same name and the same command, directly after the Node installation. No check command changes; no `if:` and no `continue-on-error`; the permissions are unchanged. This is not a check edited to pass: the check, its command and its strictness are what they were, and it now reads the packages that the lock file pins
+- The fix (the builder of the task, OpenAI GPT-6 Astra through Codex; fix commit `cee42d321edf231c229376da710cab0bfc34d62e`): the two steps in `.github/workflows/ci.yml` with the pinned text of the workflow; and `scripts/ci_plants.py`, because the planted-failure harness type-checks in scratch copies that have an environment of their own: it now syncs the same locked group in each such copy before the unchanged check, and a failed sync stops the case before the check. Two tests of the harness were written first and seen failing (`test_type_check_prepares_engine_in_each_scratch_copy`, `test_failed_engine_sync_stops_before_type_check`)
+- The proof is the hosted run on the fix commit: `static-checks` success ( https://github.com/albarami/economic-investment-intelligence/actions/runs/43343669406/job/131617738657 ), `planted-failures` success ( https://github.com/albarami/economic-investment-intelligence/actions/runs/43343669406/job/131617739369 )
+- The documents (the lead, commit `dd22c099a0b59fae5feb9c9467f99232d2c58f78`): rule 44 of AGENTS.md and CLAUDE.md now says that the command which syncs the group `engine` makes the environment of the sandbox tests and of the type check; README.md says what the two jobs and the harness do
+- What the lead changes in its own checks: a head is also type-checked the way the hosted static job does it, in an environment made from the lock file alone with the groups that job syncs, so that a difference between the build machine's environment and the hosted one shows before the push
+- Task S1-T03 imports packages of the same group in product code and merges after this pull request for that reason
+
+#### Evidence for the work commit `dd22c099a0b59fae5feb9c9467f99232d2c58f78`
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_ci_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    39 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The workflow tests and the harness tests at the fix commit, 39: the pinned text of the changed workflow matches its file, the rules of the three workflows hold (no weakener, the required jobs and steps), and the two new tests of the harness (the engine group is synced in the clean and in the planted scratch copy of the type check; a failed sync stops the case before the check).
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   uv run --locked python scripts/ci_plants.py run
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "RESULT: PASSED" (twelve planted violations, each blocked by its guard)
+Seed:      none
+Notes:     The planted-failure harness on the build machine: every one of the twelve planted violations is blocked, the type-check plant among them after the sync of the engine group in its scratch copies.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   python3 -I -c "import hashlib,pathlib; h=hashlib.sha256(pathlib.Path('.github/workflows/ci.yml').read_bytes()).hexdigest(); t=pathlib.Path('scripts/tests/ci_workflow_rules.py').read_text(encoding='utf-8'); y=pathlib.Path('.github/workflows/ci.yml').read_text(encoding='utf-8'); print(h in t, y.count('uv sync --managed-python --all-packages --locked --group engine'), y.count('continue-on-error'), y.count('if:'))"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "True 3 0 0" (the pin of the workflow's text matches the file; the sync command stands in three jobs; no continue-on-error; no if)
+Seed:      none
+Notes:     The workflow file: its pinned hash matches, the engine sync is a step of three jobs (the test job as before, the static job and the planted-failure job now), and the file holds no `continue-on-error` and no `if:`.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   ./eii test --seed 2026111330
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1245 passed, 0 failed, 0 skipped
+Seed:      2026111330
+Notes:     The whole test command at the head of the fix round.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "166 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 160 source files"
+Seed:      none
+Notes:     Strict types in the environment that rule 44 describes (synced with the group `engine`); the same check passes in the hosted static job on the fix commit (the task log above).
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 252 text files, 55 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with the changed sentences of rule 44 and of the README.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after the same change of rule 44 in each.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','d2a0b4786dbea50c37ae65efc525deade84b31c6...dd22c099a0b59fae5feb9c9467f99232d2c58f78'],check=True,capture_output=True,text=True).stdout.splitlines()); w='M:.github/workflows/ci.yml M:AGENTS.md M:CLAUDE.md M:README.md M:scripts/ci_plants.py M:scripts/tests/ci_workflow_rules.py M:scripts/tests/test_ci_plants.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "7 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope of the two commits of the fix round (REV-12): the workflow file, the pin of its text, the harness and its test; then the three documents.
+```
+
+```text
+### S1-T05 — First two-store parity query
+Commit:    dd22c099a0b59fae5feb9c9467f99232d2c58f78
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','d2a0b4786dbea50c37ae65efc525deade84b31c6..dd22c099a0b59fae5feb9c9467f99232d2c58f78'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Both commits of the fix round have a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
