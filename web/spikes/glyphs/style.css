@@ -1,0 +1,46 @@
+html,
+body {
+  margin: 0;
+  block-size: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background: #d5dde2;
+}
+
+.chrome {
+  padding-block: 12px;
+  padding-inline: 16px;
+  min-block-size: 3.2em;
+}
+
+.chrome-latin {
+  margin: 0;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.chrome-arabic {
+  margin: 0;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  letter-spacing: 0;
+  line-height: 1.6;
+}
+
+.map-failure {
+  margin: 0;
+  padding-block: 8px;
+  padding-inline: 16px;
+  color: #6b1d1d;
+  background: #f3d6d6;
+}
+
+#map {
+  flex: 1;
+  min-block-size: 0;
+}
+
+#map canvas {
+  display: block;
+}

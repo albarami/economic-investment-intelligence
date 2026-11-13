@@ -47,7 +47,13 @@ SUITES: tuple[Suite, ...] = (
     Suite("python-core", "pytest", ".", ("core/tests",), 600),
     Suite("python-custodian", "pytest", ".", ("custodian/tests",), 600),
     Suite("python-product", "pytest", ".", ("product/tests",), 600),
-    Suite("web-checks", "node", "web", ("scripts/tests/*.node-test.mjs",), 1800),
+    Suite(
+        "web-checks",
+        "node",
+        "web",
+        ("scripts/tests/*.node-test.mjs", "spikes/glyphs/tests/*.node-test.mjs"),
+        1800,
+    ),
     Suite("web-unit", "vitest", "web", (), 600),
 )
 

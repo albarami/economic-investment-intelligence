@@ -1,0 +1,128 @@
+{
+  "requests": [
+    {
+      "url": "/?lang=ar",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/index-CnHuJRlU.js",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/index-DZoyii5r.css",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/ibm-plex-sans-latin-400-normal-CDDApCn2.woff2",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/maplibre-gl-worker-DTh23QKw.js",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/ibm-plex-sans-arabic-arabic-400-normal-CyU-ddYS.woff2",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/ibm-plex-sans-arabic-latin-400-normal-Bo5KPYvw.woff2",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/noto-sans-arabic-arabic-400-normal-AAMxebZb.woff2",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/noto-sans-latin-400-normal-BTkUljjl.woff2",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/?lang=en",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/index-CnHuJRlU.js",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/index-DZoyii5r.css",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/ibm-plex-sans-latin-400-normal-CDDApCn2.woff2",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/maplibre-gl-worker-DTh23QKw.js",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/noto-sans-latin-400-normal-BTkUljjl.woff2",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/?lang=ar&frame=overlap",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/index-CnHuJRlU.js",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/index-DZoyii5r.css",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/ibm-plex-sans-latin-400-normal-CDDApCn2.woff2",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/maplibre-gl-worker-DTh23QKw.js",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/ibm-plex-sans-arabic-arabic-400-normal-CyU-ddYS.woff2",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/ibm-plex-sans-arabic-latin-400-normal-Bo5KPYvw.woff2",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/noto-sans-arabic-arabic-400-normal-AAMxebZb.woff2",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/noto-sans-latin-400-normal-BTkUljjl.woff2",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/?lang=en&plant=remote-font",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/index-CnHuJRlU.js",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/index-DZoyii5r.css",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/ibm-plex-sans-latin-400-normal-CDDApCn2.woff2",
+      "decision": "same-origin"
+    },
+    {
+      "url": "https://assets.invalid/font.woff2",
+      "decision": "blocked"
+    },
+    {
+      "url": "/assets/maplibre-gl-worker-DTh23QKw.js",
+      "decision": "same-origin"
+    },
+    {
+      "url": "/assets/noto-sans-latin-400-normal-BTkUljjl.woff2",
+      "decision": "same-origin"
+    }
+  ]
+}

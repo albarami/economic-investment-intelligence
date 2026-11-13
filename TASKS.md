@@ -167,11 +167,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 
 ### S1-T01 — Arabic glyph and label-order spike
 - Goal: Prove self-hosted Arabic glyphs render with hexagons below labels.
-- Acceptance criteria: [ ] Arabic labels render from local assets; [ ] hexagons do not cover labels; [ ] visual evidence is recorded.
+- Acceptance criteria: [x] Arabic labels render from local assets; [x] hexagons do not cover labels; [x] visual evidence is recorded.
 - Scope: `web/spikes/glyphs/`, local font and glyph spike assets.
 - Depends: S0-T03, S0-T12.
 - Requirements: FE-46, FE-56, FE-57, DES-24, DES-10.
-- Delivery: hard; personas Frontend; status queued.
+- Delivery: hard; personas Frontend; status in review (pull request 32).
 ### S1-T02 — Map load and frame-rate spike
 - Goal: Measure the pinned hexagon and particle load in a native host browser.
 - Acceptance criteria: [ ] 110,000 hexagons render; [ ] 50,000 particles render; [ ] the trace records 60 frames per second on the build machine.
@@ -206,7 +206,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: sandbox implementation and slice S1 enforcement evidence.
 - Depends: S0-T11.
 - Requirements: ARC-09, SYN-01, TST-61.
-- Delivery: hard; personas Platform; status in review (pull request 31).
+- Delivery: hard; personas Platform; status done (pull request 31, merged 2026-11-13).
 ### S1-T07 — Offline typed-decision gateway
 - Goal: Build the provider-neutral gateway contract, `none`, recorded and configured providers, decision records, data policy and import boundary.
 - Acceptance criteria: [x] default `none` opens no network; [x] forbidden data classes are blocked; [x] records use the closed schema; [x] serving packages cannot import the gateway.
