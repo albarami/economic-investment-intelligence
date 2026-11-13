@@ -178,7 +178,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: `web/spikes/performance/` and performance scripts.
 - Depends: S1-T01.
 - Requirements: TST-132, FE-88, PLN-07.
-- Delivery: hard; personas Frontend; status in review (pull request 34).
+- Delivery: hard; personas Frontend; status done (pull request 34, merged 2026-11-13).
 ### S1-T03 — Isochrone, drawn-shape and grid spike
 - Goal: Convert in-process walk and drive isochrones at different hours of day, a free-drawn polygon and a radius into exact shapes and into whole snapped grid cells.
 - Acceptance criteria: [x] routing has no server; [x] the drive isochrone changes with the hour through a fixture speed table, by the time-of-day mechanism this spike chooses; [x] each shape is also kept exactly, for Public and Simulated layers; [x] the snapped output contains only whole frame cells; [x] deterministic fixtures pass.
@@ -221,18 +221,25 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S1-T02, S1-T03.
 - Requirements: ARC-88, SYN-53, SYN-54, DES-50, TST-132, SYN-79, MTH-88, MTH-89, MTH-90, PRV-124, TST-213.
 - Delivery: hard; personas Simulation; status queued.
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+- Goal: Make the serve command of the performance spike store a posted trace, and make the page show its WebGL renderer as soon as it loads and refuse a software or remote renderer, or a capped frame rate, on screen before the orbit in the gate profile.
+- Acceptance criteria: [x] a test starts the development server of the serve command and posts a trace, which is stored, and a malformed post is refused in JSON; [x] the page shows the unmasked renderer at load; [x] in the gate profile a software or remote renderer, and a frame rate capped below the gate's need, are refused on screen before the orbit, and nothing is posted, with one planted case each; [x] no count, budget, profile or threshold of the gate changes.
+- Scope: `web/spikes/performance/` (the server, the page, the trace judgement, their tests and the spike's README).
+- Depends: S1-T02.
+- Requirements: TST-132, FE-88, PLN-07.
+- Delivery: routine; personas Frontend; status in review (pull request 35). Added by a re-plan of 2026-11-13: the owner's first native run could not be stored (the development server answered the trace's post with an empty 404) and ran through a remote session capped at 30 frames a second; S1-T12 records its traces with the fixed page.
 ### S1-T12 — Native frame-rate traces of the map spikes
 - Goal: Record, in a browser that runs natively on the host of the build machine, the frame-rate trace of the pinned hexagon and particle load, and the same trace with the road layer animated.
 - Acceptance criteria: [ ] the trace records 60 frames per second on the build machine; [ ] the S1-T02 trace is repeated with the road layer animated, and its result is recorded.
 - Scope: the trace files and the native-capture record under `web/spikes/performance/evidence/`.
-- Depends: S1-T02, S1-T11.
+- Depends: S1-T02, S1-T11, S1-T13.
 - Requirements: TST-132, FE-88, FE-89, PLN-07.
-- Delivery: routine; personas Frontend; status queued. Split from S1-T02 and S1-T11 by a re-plan of 2026-11-13: the native trace needs one action of the owner on the host, and the two criteria are moved here word for word.
+- Delivery: routine; personas Frontend; status waiting for the owner at the console. Split from S1-T02 and S1-T11 by a re-plan of 2026-11-13: the native trace needs one action of the owner on the host, and the two criteria are moved here word for word. By the owner's note of 2026-11-13, nothing waits for it: the slice S1 gate runs on everything else and records this trace as its one open item, closed by a short addendum when the owner takes it at the PC itself; it is taken before any slice S3 task that depends on map performance is reviewed.
 ### S1-T08 — Typed-decision requalification and pin ruling
 - Goal: Re-run `evals/typed_decisions/` in both fixed option orders, compare the stated intervals and confirm exact and retreat pins.
 - Acceptance criteria: [ ] the full set runs; [ ] the admitted measurement is reproduced within its stated intervals; [ ] every choice case runs in both hash-derived option orders and is accepted only when both agree; [ ] results and route identity are recorded; [ ] drift triggers requalification; [ ] any accepted alternative has a decision record.
 - Scope: `evals/typed_decisions/`, slice S1 spike report and dependency pin decision.
-- Depends: S1-T02, S1-T03, S1-T04, S1-T05, S1-T06, S1-T07, S1-T11, S1-T12.
+- Depends: S1-T02, S1-T03, S1-T04, S1-T05, S1-T06, S1-T07, S1-T11. (S1-T12 was dropped from this list by a re-plan of 2026-11-13: the native trace waits for the owner at the console; the pin fields it decides stay open and close with the addendum of the slice S1 gate.)
 - Requirements: FE-03, TST-155, AI-98, TST-167, PLN-15.
 - Delivery: hard; personas AI; status queued.
 ### S1-T09 — Exported set, presence and flow parameters, and months shown first
@@ -246,7 +253,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Goal: Close every proposed open item that the reviews of slice S1 entered in `OPEN_ITEMS.md`, before the slice S1 gate.
 - Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
 - Scope: the files the closures change, and `OPEN_ITEMS.md`.
-- Depends: every other task of slice S1.
+- Depends: every other task of slice S1 except S1-T12, which waits for the owner at the console (re-plan of 2026-11-13).
 - Requirements: REV-41, TST-168.
 - Delivery: routine; personas as the items require; status queued.
 

@@ -76,6 +76,13 @@ const SOFTWARE_RENDERERS = [
   'microsoft basic render driver',
 ];
 const WARP_WORD = /(?:^|[^a-z0-9])warp(?:[^a-z0-9]|$)/;
+const REMOTE_WORD = /(?:^|[^a-z0-9])remote(?:[^a-z0-9]|$)/;
+// Reaches 60 when the median frame interval is at most 17.5 ms.
+// A 60 Hz interval is 16.67 ms and a 59.94 Hz interval is 16.68 ms, so both pass.
+// A 50 Hz interval is 20 ms and a 30 Hz interval is 33.33 ms, so both are refused.
+// Chosen once as the tolerance for "reaches 60", not fitted to a measured trace.
+export const EMPTY_CANVAS_MAX_MEDIAN_MS = 17.5;
+const RATE_HUNDREDTHS = 100;
 
 function fail(failure) {
   return { ok: false, failure };
@@ -216,7 +223,7 @@ export function readUnmaskedRenderer(context) {
   return value;
 }
 
-function judgeRenderer(renderer) {
+export function judgeRenderer(renderer) {
   if (typeof renderer !== 'string' || renderer.trim() === '') {
     return 'missing-renderer';
   }
@@ -225,7 +232,46 @@ function judgeRenderer(renderer) {
     if (folded.includes(needle)) return 'software-renderer';
   }
   if (WARP_WORD.test(folded)) return 'software-renderer';
+  if (REMOTE_WORD.test(folded)) return 'remote-renderer';
   return '';
+}
+
+function medianInterval(intervals) {
+  const sorted = [...intervals].sort((left, right) => left - right);
+  const mid = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 1) return sorted[mid];
+  return (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+function measuredFramesPerSecond(medianMs) {
+  return Math.round((1000 / medianMs) * RATE_HUNDREDTHS) / RATE_HUNDREDTHS;
+}
+
+export function judgeEmptyCanvas(timestamps) {
+  if (!Array.isArray(timestamps) || timestamps.length < 2) {
+    return { ok: false, failure: 'capped-frame-rate', framesPerSecond: 0 };
+  }
+  const intervals = [];
+  for (let index = 1; index < timestamps.length; index += 1) {
+    const previous = timestamps[index - 1];
+    const current = timestamps[index];
+    if (
+      typeof previous !== 'number' ||
+      typeof current !== 'number' ||
+      !Number.isFinite(previous) ||
+      !Number.isFinite(current) ||
+      !(current > previous)
+    ) {
+      return { ok: false, failure: 'capped-frame-rate', framesPerSecond: 0 };
+    }
+    intervals.push(current - previous);
+  }
+  const medianMs = medianInterval(intervals);
+  const framesPerSecond = measuredFramesPerSecond(medianMs);
+  if (medianMs <= EMPTY_CANVAS_MAX_MEDIAN_MS) {
+    return { ok: true, failure: '', framesPerSecond };
+  }
+  return { ok: false, failure: 'capped-frame-rate', framesPerSecond };
 }
 
 function judgeNative(capture, userAgent) {

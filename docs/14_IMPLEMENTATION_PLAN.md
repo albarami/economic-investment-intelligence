@@ -275,6 +275,7 @@ OI-02 remains open, so the estimates must not be converted to a demonstration da
 - S1-T06 — Prove sandbox enforcement with no fallback.
 - S1-T07 — Build the offline typed-decision gateway contract, providers, records, policy and boundaries.
 - S1-T11 — Assign one hourly origin-destination fixture to the routing graph with one fixed volume-delay rule, and animate the hourly link speeds on the map.
+- S1-T13 — Make the serve command of the performance spike store native traces, and make its page show the renderer at load and refuse a software or remote renderer, or a capped frame rate, at once (added by a re-plan of 2026-11-13).
 - S1-T12 — Record the two native frame-rate traces of the map spikes on the host of the build machine (split from S1-T02 and S1-T11).
 - S1-T08 — Requalify `evals/typed_decisions/`, reproduce the admitted measurement within its stated intervals, run every choice case in both fixed option orders, confirm pins and record any accepted alternative.
 - S1-T09 — Fix `export_parameter_set` = `A` and the presence and flow parameters of PRV-59 in the rules configuration before the first world build, and record the number of monthly periods shown first.

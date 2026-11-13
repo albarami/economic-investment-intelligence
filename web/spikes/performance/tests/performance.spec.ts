@@ -31,6 +31,12 @@ function foreignRequest(url: string, origin: string): string {
   return '';
 }
 
+async function tracePosts(page: Page): Promise<number> {
+  const response = await page.request.get('/__perf/posts');
+  expect(response.ok()).toBe(true);
+  return Number(await response.text());
+}
+
 async function open(page: Page, path: string): Promise<Spike> {
   const seen: string[] = [];
   page.on('request', (request) => {
@@ -49,6 +55,27 @@ async function open(page: Page, path: string): Promise<Spike> {
 test('the smoke orbit draws both layers and records a trace', async ({
   page,
 }) => {
+  await page.addInitScript(() => {
+    const see = () => {
+      const text = document.querySelector('#renderer')?.textContent ?? '';
+      if (text.length > 0 && window.__spike?.phase === 'renderer') {
+        window.__rendererSeenBeforeOrbit = true;
+      }
+    };
+    const arm = () => {
+      if (!document.documentElement) return;
+      new MutationObserver(see).observe(document.documentElement, {
+        subtree: true,
+        childList: true,
+        characterData: true,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', arm);
+    } else {
+      arm();
+    }
+  });
   const spike = await open(page, '/en/_perf?profile=smoke');
   expect(spike.phase).toBe('done');
   expect(spike.failure).toBe('');
@@ -77,10 +104,15 @@ test('the smoke orbit draws both layers and records a trace', async ({
   await expect(page.locator('#notice')).toHaveText(
     'Synthetic fixture. Invented extent. No place name.',
   );
+  await expect(page.locator('#renderer')).toHaveText(spike.webglRenderer);
+  expect(await page.evaluate(() => window.__rendererSeenBeforeOrbit)).toBe(
+    true,
+  );
 });
 
 test('the Arabic route uses the Arabic notice', async ({ page }) => {
-  await open(page, '/ar/_perf?profile=smoke');
+  const spike = await open(page, '/ar/_perf?profile=smoke');
+  await expect(page.locator('#renderer')).toHaveText(spike.webglRenderer);
   await expect(page.locator('#notice')).toHaveText(
     'عرض اصطناعي. امتداد مخترع. بلا اسم مكان.',
   );
@@ -198,4 +230,103 @@ test('the no-webgl2 plant names the failure without a map', async ({
   expect(spike.phase).toBe('failed');
   expect(spike.failure).toBe('webgl2-unavailable');
   await expect(page.locator('#map-failure')).toHaveText('webgl2-unavailable');
+});
+
+async function expectEarlyRefusal(
+  page: Page,
+  path: string,
+  refusal: string,
+  renderer: string,
+): Promise<void> {
+  const before = await tracePosts(page);
+  const seen: string[] = [];
+  page.on('request', (request) => {
+    seen.push(request.url());
+  });
+  await page.goto(path);
+  await expect(page.locator('#map-failure')).toHaveText(refusal, {
+    timeout: 8000,
+  });
+  await expect(page.locator('#renderer')).toHaveText(renderer);
+  const after = await tracePosts(page);
+  expect(after).toBe(before);
+  const origin = new URL(page.url()).origin;
+  for (const url of seen) {
+    const foreign = foreignRequest(url, origin);
+    if (foreign !== '') throw new Error(`non-same-origin request: ${foreign}`);
+  }
+  expect(
+    seen.filter((url) => new URL(url).pathname === '/__perf/trace'),
+  ).toEqual([]);
+  const spike = await page.evaluate(() => window.__spike);
+  if (spike === undefined) throw new Error('spike diagnostics are absent');
+  expect(spike.phase).toBe('failed');
+  expect(spike.profile).toBe('gate');
+  expect(spike.hexagonInstances).toBe(0);
+  expect(spike.particleInstances).toBe(0);
+  expect(spike.bearingEnd).toBe(spike.bearingStart);
+  expect(spike.savedPath).toBe('');
+  expect(spike.submitFailure).toBe('');
+  expect(await page.locator('#map canvas').count()).toBe(0);
+}
+
+test('a planted software renderer is refused before the orbit', async ({
+  page,
+}) => {
+  await expectEarlyRefusal(
+    page,
+    '/en/_perf?plant=software-renderer',
+    'refused: software-renderer',
+    'Microsoft Basic Render Driver',
+  );
+});
+
+test('a planted remote renderer is refused before the orbit', async ({
+  page,
+}) => {
+  await expectEarlyRefusal(
+    page,
+    '/en/_perf?plant=remote-renderer',
+    'refused: remote-renderer',
+    'Microsoft Remote Display Adapter',
+  );
+});
+
+test('a planted capped empty canvas is refused before the layers load', async ({
+  page,
+}) => {
+  await expectEarlyRefusal(
+    page,
+    '/en/_perf?plant=capped-frame-rate',
+    'refused: capped-frame-rate 30',
+    'Synthetic passing adapter',
+  );
+});
+
+test('a planted slow full scene with an empty canvas at 60 is stored', async ({
+  page,
+}) => {
+  const before = await tracePosts(page);
+  await page.goto('/en/_perf?plant=slow-scene');
+  await expect(page.locator('#renderer')).toHaveText(
+    'Synthetic passing adapter',
+    { timeout: 8000 },
+  );
+  const spike = await ready(page);
+  expect(spike.phase).toBe('done');
+  expect(spike.failure).toBe('');
+  expect(spike.profile).toBe('gate');
+  expect(spike.hexagonInstances).toBe(HEXAGONS);
+  expect(spike.particleInstances).toBe(PARTICLES);
+  expect(spike.bearingEnd).not.toBe(spike.bearingStart);
+  expect(spike.positionEnd).not.toBe(spike.positionStart);
+  expect(spike.shareUnderBudget).toBe(0);
+  expect(spike.submitFailure).toBe('');
+  expect(spike.savedPath.length).toBeGreaterThan(0);
+  expect(spike.qualification).not.toBe('');
+  expect(spike.qualification).not.toBe('pass');
+  expect(spike.qualification).not.toBe('capped-frame-rate');
+  await expect(page.locator('#map-failure')).toBeHidden();
+  const after = await tracePosts(page);
+  expect(after).toBe(before + 1);
 });

@@ -18,6 +18,8 @@ export const FRAME_BUDGET_MS = 16.7;
 export const SHARE_MINIMUM = 0.95;
 export const ORBIT_MS = 30000;
 export const SMOKE_MS = 400;
+/** Empty-canvas frame count, about two seconds, before the map and its layers load. */
+export const EMPTY_CANVAS_PROBE_MS = 2000;
 export const SCENE_CENTER = [0.02, 0.02];
 export const SCENE_ZOOM = 9;
 

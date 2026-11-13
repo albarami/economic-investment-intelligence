@@ -16477,6 +16477,313 @@ Seed:      2026111352
 Notes:     The whole test command at the fix commit, with a seed of its own; the Node and browser tests of the spike run inside it through the web checks.
 ```
 
+#### S1-T02: independent review, round 2: APPROVED
+
+Reviewed commit `887a77901bd498f7e16d0fc9162c13af0c76ecc4`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/34 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43367679965; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43367679973; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43367679950 ). Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only; the reviewer of round 1; a later round under REV-39 to REV-43, on the head of the pull request. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T02 (pull request 34), round 2
+COMMIT: 887a77901bd498f7e16d0fc9162c13af0c76ecc4
+REVIEWER: Moonshot AI Kimi K3.1 Pro
+EARLIER FINDINGS:
+  F1 FIXED `layers.ts` line 214 now records `readUnmaskedRenderer`; `trace.mjs` lines 201-217 require the unmasked extension value without a masked fallback, and lines 72-78 and 219-228 reject Microsoft Basic Render Driver and WARP. Tests at lines 194-258 cover the differing masked/unmasked values, absent extension, both Windows software renderers and the non-word `warping` control; the recorded 28 Node and 17 browser tests passed.
+  F2 FIXED `server.mjs` lines 55-69 create traces with `{ flag: 'wx' }`, retry collisions and refuse persistent collisions without modifying an existing file; lines 183-197 return the stored name or failure. Tests at lines 665-712 prove unchanged original bytes, storage under a fresh name and named refusal with no additional file; all 28 Node tests passed.
+CHECKS:
+  REV-10 PASS The remaining criteria map to the unchanged full-count browser assertions for 110,000 hexagons and 50,000 particles, including drawing and failure-mode plants. The fix work commit recorded 28 Node tests and 17 browser tests passing; the head tree matches that work and `./eii test --seed 2026111354` passed all 1363 tests. The native-trace criterion remains assigned to S1-T12 under the owner-accepted re-plan.
+  REV-11 PASS On the exact head, the lead ran `./eii test --seed 2026111354`, exit 0 with 1363 passed, 0 failed and 0 skipped, and `python3 scripts/check_docs.py`, exit 0. Hosted `tests` succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43367679965/job/131695829537 and `planted-failures` succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43367679965/job/131695829473. The six new tests and seven recorded lead breaks exercise the fixes.
+  REV-12 PASS The scope command at the fix commit exited 0 with `5 [] []`: only the five performance-spike files changed. The head ledger changes only OPEN_ITEMS.md and PROGRESS.md; nothing under `data/` or outside the task scope changed.
+  REV-13 PASS The renderer reader, exclusive writer and their tests are executable implementations, not stubs or fixed results. No native trace or invented frame-rate result was added; evidence verification still exits 1 with `missing-native-trace`.
+  REV-14 PASS No secret, `.env`, real custodian record or private data appears in the fix or ledger patch. Hosted `secret-scan` succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43367679965/job/131695829508.
+  REV-15 PASS The patch adds assertions and failure cases without lowering a count, budget or threshold, removing an assertion, adding a skip or retry, or changing browser configuration. The head suite and hosted planted-failures check passed.
+  REV-16 PASS The page now records the unmasked renderer, missing values cannot qualify as the gate trace, and the named Windows software renderers are rejected case-insensitively. Focused tests and the lead's planted breaks prove the required behaviour.
+  REV-17 PASS PROGRESS.md records the review, fix, commands and evidence, while OI-122 now records the owner's 2026-11-13 acceptance of the re-plan and the still-pending native trace. The head documentation check exited 0.
+  REV-18 PASS Exclusive creation with collision retry preserves prior trace bytes and persistent collisions return `trace-name-collision`; both planted collision tests passed. Existing origin, payload and native-directory protections remain intact.
+  REV-19 PASS No settled component decision or build-order rule changed. OI-122 records owner acceptance of the native-trace re-plan, and no new decision was introduced by the code fix.
+  REV-20 N/A The change concerns development-only spike measurements, not product facts or release figures; its technical frame calculations remain deterministic and tested in `trace.mjs`.
+  REV-21 N/A The development-only `_perf` spike adds no product brief, Fact-chip screen, claim catalogue or model-written prose; its diagnostics remain outside the product numeral pipeline.
+  REV-22 PASS No partition, privacy parameter, treatment, export, protected window or attack test changed, and the complete head suite passed with no reduced attack sizes or skips.
+  REV-23 PASS The patch adds no custodian import or product dependency; the head boundary checks and complete test suite passed.
+  REV-24 PASS The existing Arabic notice remains marked `pending native review`, both routes share the diagnostics, and the fix adds no Arabic string or numeric parity divergence. The head suite passed.
+  REV-25 PASS The patch introduces no private path, personal name, real custodian identifier, secret or named-product comparison. Head documentation and tree checks exited 0, and hosted secret scanning succeeded.
+  REV-26 PASS No frame-rate, forecast, endorsement, lookup, go/no-go or other prohibited claim was added. The native frame-rate measurement remains expressly pending in S1-T12.
+  REV-27 PASS The lead's head `cmp AGENTS.md CLAUDE.md` exited 0, and the head documentation check reported no agent-file failure.
+  REV-28 N/A No establishment, legal-entity, employer-group, person or salary-file identifier was introduced; trace filenames are not custodian identifiers.
+  REV-29 N/A The unnamed synthetic extent and development trace changes attach no Synthetic or Simulated attribute to a real named place or business.
+  REV-38 PASS No gateway import, provider-setting read, run-time gateway call or gateway-derived screen text was added; the head serving-boundary checks and complete suite passed.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S1-T02: merge record
+
+- The lead's checks on the merged head `887a77901bd498f7e16d0fc9162c13af0c76ecc4` before the merge (ruling L-29): "TREE-IS-WORK ok: 400 paths at 887a77901bd498f7e16d0fc9162c13af0c76ecc4", exit code 0; `./eii test --seed 2026111354`: exit code 0, "total: 1363 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/34 was squash-merged on 2026-11-13 at that head; merge commit `546df8525ad0a4a74423c4f7bcff1f73c93e5859` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43369241128; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43369241239; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43369241170 .
+
+
+- The task log of S1-T02 is complete with this record: one build and one completion pass before the first push; REJECTED in review round 1 with two findings (F1, the unmasked renderer, on REV-16; F2, the exclusive creation of a trace file, on REV-18), both fixed in one fix round; APPROVED in round 2, no finding, no proposed item. The native traces of the frame-rate gate belong to task S1-T12 (the split the owner accepted on 2026-11-13), which waits for the owner at the console; the defect of the serve command that the owner's first native run found is fixed by task S1-T13. TASKS.md marks the task done with this ledger.
+
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/35 )
+
+- Added to slice S1 by a re-plan of 2026-11-13 (ruling L-80 of the run, amended the same morning by the owner's note on the early frame-rate check). The owner's first native run of the performance page ended with "share 0, frames 947, malformed-payload": the serve command's development server answered the page's trace post with an empty 404, so nothing was stored; and the run went through a Remote Desktop session, which holds Windows to 30 frames a second (the owner's own diagnosis, with the Microsoft article he cited). The task makes the serve command store a posted trace, and makes the page show its renderer at load and refuse at once what cannot pass the gate. The native trace itself stays with S1-T12, waiting for the owner at the console.
+- Personas: builder, a senior frontend tooling and measurement-page engineer; reviewer, a principal frontend reviewer of another maker. Builder: the Cursor command-line tool, `grok-4.7-high` (xAI), in two passes; skills it loaded, as it reported them: task-standards, project-orientation, test-driven-development, systematic-debugging, sanad-provenance, verification-before-completion, muhasabah-gate. Lead: Anthropic (Claude Opus 5.5); the version-matched documentation of Vite 8.3.5 read through Context7 and the builder's reading of the installed Vite 8.3.8 agree: "The `configureServer` hook is called before internal middlewares are installed, so the custom middlewares will run before internal middlewares by default."
+- Root cause, confirmed in the installed Vite 8.3.8 by the builder: a middleware added with `vite.middlewares.use` after `createServer` sits behind Vite's not-found handler, which answers a POST with status 404 and an empty body; the page itself loaded through Vite's own fallback to `index.html`, so the spike's handler never ran. The browser tests of S1-T02 serve a built page through the static server, which is why no test had seen it.
+- The fix: the trace handler is a plugin whose `configureServer` hook installs it before Vite's middlewares, for the trace route alone (and the small read-only route that counts trace posts for the tests); every other request reaches Vite unchanged; origin, size limit, JSON, judgement, layer-set name, exclusive write and the protection of the native evidence folder are unchanged.
+- The page: it shows the unmasked renderer as soon as it has a WebGL2 context. In the gate profile it refuses on screen, with no layer loaded and nothing posted: a missing or software renderer (as before, now at once), a renderer that names a remote display adapter (`remote-renderer`, the word "remote" as a word of its own in any letter case; the trace judgement, the server and the evidence command refuse it too), and an empty canvas whose median frame interval over about two seconds is above 17.5 ms (`capped-frame-rate`, with the measured frames a second): a 60 Hz display (16.67 ms) and 59.94 Hz pass, 50 Hz and 30 Hz are refused; the threshold is one named constant, set before the tests ran. An environment that reaches 60 goes on: a slow full scene runs its orbit and its failing trace is stored (the owner's rule: a genuine performance failure is never refused as a bad environment). The smoke profile of the tests runs as before.
+- Tests: four for the development server (a posted trace stored, a malformed post refused with 400 and a JSON body naming `malformed-payload`, a post from another origin refused with 403, the page and its module still served; each red first with the fault planted); six for the empty-canvas judgement at its edges; trace, server and evidence tests for `remote-renderer` (a renderer that only contains the letters still passes); browser tests for each planted refusal (software, remote, capped) with no layers and no post, and for a planted slow scene on an environment at 60, which is stored. 41 Node tests with 21 browser tests. The malformed-post test came in a third, small pass and a second work commit: the lead found, while writing this ledger, that the task's first criterion (written by the lead) asks for it on the development server and only the static server had one.
+- The lead's own breaks, each restored (evidence/S1-T13.lead-breaks.txt): the remote refusal removed; the empty-canvas threshold loosened to 25 ms; "remote" matched inside another word: each fails a named test.
+- A random failure, recorded as AGENTS.md rule 39 asks (OI-125): one browser run of the smoke orbit, before the page change, failed the existing assertion that the bearing changes during the orbit (both ends 0); it passed on the immediate re-run and in every later run. Nothing was changed because of it.
+- Not built: a live test of the empty-canvas probe with real frame timing on an unplanted page (the headless shell draws in software and is refused before the probe; the probe's judgement is tested in Node and through the page's planted timestamps).
+
+#### Evidence for the work commit `c41aba27ba01c9363ebcb7630cf3c2394295cbb8`
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   bash -c "set -o pipefail; npm --prefix web run test:spike:performance 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)), \"|\", \" \".join(re.findall(r\"[0-9]+ passed \\([0-9.]+m?s?\\)\", t)[:1]))'"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 41 # pass 41 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 21 passed (5.7m)" (the totals of the Node test runner and of the browser run inside it)
+Seed:      none
+Notes:     The task's tests at the work commit: 41 Node tests of the spike pass, one of which runs the 21 browser tests in the headless shell at the full counts (among them the planted refusals and the slow scene); the new files vite-server.node-test.mjs (four tests, among them the malformed post refused in JSON) and environment.node-test.mjs (six) run inside the Node runner.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   npm --silent --prefix web run spike:performance:verify-evidence
+Exit code: 1
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; first output line "FAIL missing-native-trace"
+Seed:      none
+Notes:     The evidence command at the work commit: it still fails with the name of the missing trace and writes nothing; the native trace is task S1-T12, waiting for the owner at the console.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   npm --prefix web run test:spike:glyphs
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "  10 passed (4.5s)" (browser tests of the glyph spike)
+Seed:      none
+Notes:     The glyph spike of task S1-T01 is unchanged by this task and its ten browser tests pass on the work commit.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   ./eii test --seed 2026111366
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1376 passed, 0 failed, 0 skipped
+Seed:      2026111366
+Notes:     The whole test command on the build machine; the Node tests of the performance spike run in its suite of web checks, the browser tests among them.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   npm --prefix web run build
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "✓ built in 82ms" (the production build)
+Seed:      none
+Notes:     The production build; the test `production.node-test.mjs` of the spike, which runs in the web checks, proves that the built files hold nothing of the spike (FE-88).
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   npm --prefix web run check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 18 files: OK"
+Seed:      none
+Notes:     The web layout, version, boundary and host checks.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   npm --prefix web run check:hosts:dist
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 20 files: OK"
+Seed:      none
+Notes:     The host check on the built files.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   npm --prefix web run lint
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "> eslint --max-warnings 0 ." (exit code decides)
+Seed:      none
+Notes:     Web lint: exit code 0.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   npm --prefix web run format:check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Web format check.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   npm --prefix web run typecheck
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "> tsc --noEmit" (exit code decides)
+Seed:      none
+Notes:     Web type check: exit code 0.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 63 components: OK"
+Seed:      none
+Notes:     The version check with the rows `@deck.gl/geo-layers` and `h3-js` installed.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes and their check are unchanged by this task.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint of the Python files (the runner's suite table changed).
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "180 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 171 source files"
+Seed:      none
+Notes:     Strict types.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 304 text files, 59 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with the spike's README, rule 44, the README, the open items, TASKS.md and document 14 as the re-plan changed them.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after rule 44 gained the three commands.
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','546df8525ad0a4a74423c4f7bcff1f73c93e5859...c41aba27ba01c9363ebcb7630cf3c2394295cbb8'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:web/spikes/performance/tests/environment.node-test.mjs A:web/spikes/performance/tests/vite-server.node-test.mjs M:OPEN_ITEMS.md M:README.md M:TASKS.md M:docs/14_IMPLEMENTATION_PLAN.md M:web/spikes/performance/README.md M:web/spikes/performance/config.d.mts M:web/spikes/performance/config.mjs M:web/spikes/performance/index.html M:web/spikes/performance/main.ts M:web/spikes/performance/server.mjs M:web/spikes/performance/style.css M:web/spikes/performance/tests/performance.spec.ts M:web/spikes/performance/tests/trace.node-test.mjs M:web/spikes/performance/trace.d.mts M:web/spikes/performance/trace.mjs M:web/spikes/performance/types/modules.d.ts'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "18 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope of the work commit (REV-12): the performance spike's server, page, trace judgement, tests and README, and the records the re-plan changes (TASKS.md, document 14, README.md, OPEN_ITEMS.md).
+```
+
+```text
+### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
+Commit:    c41aba27ba01c9363ebcb7630cf3c2394295cbb8
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','546df8525ad0a4a74423c4f7bcff1f73c93e5859..c41aba27ba01c9363ebcb7630cf3c2394295cbb8'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit has a Conventional Commit subject.
+```
+
+#### S1-T13: correction of two records, after review round 1 (findings F1 and F2)
+
+- F2: the task log of S1-T13 above says that the builder worked "in two passes", and the evidence of the commit subjects says "The one work commit has a Conventional Commit subject". Both are superseded by this entry: the builder (the Cursor command-line tool, `grok-4.7-high`) worked in three passes (the server; the renderer and the empty canvas; a small third pass that added the test of a malformed post to the development server), and the work is two commits, `75bc9faaa7eb6e4f494ca8385a62288edae36280` and `c41aba27ba01c9363ebcb7630cf3c2394295cbb8`. Both subjects are Conventional Commits: `git log --format=%s 546df8525ad0a4a74423c4f7bcff1f73c93e5859..c41aba27ba01c9363ebcb7630cf3c2394295cbb8`, exit code 0, prints "test(web): the development server refuses a malformed trace post in JSON (S1-T13)" and "feat(web): the performance page saves native traces and refuses a software or remote renderer at once (S1-T13)".
+- F1: OI-122 now records the further re-plan of 2026-11-13 (S1-T12 waits for the owner at the console; S1-T08 and S1-T10 no longer depend on it; the pin fields that the frame rate decides close with the addendum of the slice S1 gate) and its NEEDED BY names that addendum.
+- Both findings concern records only; they are corrected in this commit and checked by the lead's script (ruling L-65 (3), from the owner's note of 2026-11-13).
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
