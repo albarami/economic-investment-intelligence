@@ -275,11 +275,12 @@ OI-02 remains open, so the estimates must not be converted to a demonstration da
 - S1-T06 — Prove sandbox enforcement with no fallback.
 - S1-T07 — Build the offline typed-decision gateway contract, providers, records, policy and boundaries.
 - S1-T11 — Assign one hourly origin-destination fixture to the routing graph with one fixed volume-delay rule, and animate the hourly link speeds on the map.
+- S1-T12 — Record the two native frame-rate traces of the map spikes on the host of the build machine (split from S1-T02 and S1-T11).
 - S1-T08 — Requalify `evals/typed_decisions/`, reproduce the admitted measurement within its stated intervals, run every choice case in both fixed option orders, confirm pins and record any accepted alternative.
 - S1-T09 — Fix `export_parameter_set` = `A` and the presence and flow parameters of PRV-59 in the rules configuration before the first world build, and record the number of monthly periods shown first.
 - S1-T10 — Close every proposed open item of the slice's reviews before the gate (REV-41).
 
-**Parallel work.** T01–T04 own separate spike fixtures; T05 owns store spike files; T06 owns sandbox fixtures; T07 owns `gateway/`; T11 owns the assignment spike fixtures and follows T02 and T03; T08 follows T02 to T07 and T11 and owns run artefacts. Shared dependency pins are edited only by T08. T09 follows T08 and owns the rules configuration. T10 runs last.
+**Parallel work.** T01–T04 own separate spike fixtures; T05 owns store spike files; T06 owns sandbox fixtures; T07 owns `gateway/`; T11 owns the assignment spike fixtures and follows T02 and T03; T12 follows T02 and T11 and owns the native trace files; T08 follows T02 to T07, T11 and T12 and owns run artefacts. Shared dependency pins are edited only by T08. T09 follows T08 and owns the rules configuration. T10 runs last.
 
 **Gate: all statements must be true.**
 - Arabic labels render with self-hosted glyphs.

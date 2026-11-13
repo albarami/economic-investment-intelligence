@@ -20,7 +20,12 @@ const apiOnly = {
 };
 
 export default defineConfig([
-  globalIgnores(['dist/', 'node_modules/', 'spikes/glyphs/dist/']),
+  globalIgnores([
+    'dist/',
+    'node_modules/',
+    'spikes/glyphs/dist/',
+    'spikes/performance/dist/',
+  ]),
   {
     files: ['**/*.{js,mjs,cjs,jsx}'],
     extends: [js.configs.recommended],

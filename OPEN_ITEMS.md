@@ -969,7 +969,7 @@
 - TYPE: OPEN
 - NEEDED: The owner to say whether the lock file is raised before the slice S0 gate or with the next change of the web dependencies.
 - WHY: GitHub reports one open alert of medium severity for the package `minimatch` in `web/package-lock.json` (a possible denial of service through a pattern; fixed in its version 11.0.1). The package is a transitive dependency of the lint tools, in development scope only: it runs on the build machine and in CI and is never served.
-- DONE SO FAR: Nothing is changed. A lock file changes only inside a task that owns it, and `npm install --package-lock-only` runs only after a change to `web/package.json` (rule 44 of [AGENTS.md](AGENTS.md)).
+- DONE SO FAR: Nothing is changed. A lock file changes only inside a task that owns it, and `npm install --package-lock-only` runs only after a change to `web/package.json` (rule 44 of [AGENTS.md](AGENTS.md)). Tasks S1-T01 and S1-T02 changed the web dependencies (2026-11-13), and the lock file was read again: the package is at 10.2.6 and is needed only by the lint tool and its TypeScript parser, which accept the 10 series only, so no change of the lock file within their ranges reaches the fixed release 11.0.1. The alert stays open; task S1-T08 looks at it again when it confirms the pins.
 - OPTIONS: **Recommendation:** raise it in the follow-up task of the slice if a fixed version resolves without a change of the pinned lint tools; otherwise with the first task that changes the web dependencies. Alternative: leave it until slice S1 confirms the web pins.
 - NEEDED BY: slice S1 gate; not a blocker.
 
@@ -1042,6 +1042,26 @@
 - DONE SO FAR: Task S1-T03 routes in process with pyvalhalla 3.9.1 on a synthetic road extract that its own generator writes; the retreat was not needed and is not installed. Routing tiles are built by the builder program that the package ships (about a quarter of a second for the fixture). The hour of day is handled by per-edge scaling: one set of tiles for each distinct hourly speed factor, built from the same extract with every way's speed multiplied by the factor; equal factors share one set. Measured on the fixture: the drive area changes with the factor, equal factors give equal areas, the walk area does not change. Predicted speeds inside the engine were tried first and are not used: with a departure time the engine answered without a timezone database, but two hours with the same factor gave different outlines, and the cause is not confirmed. `shapely` 2.2.0 (the registry's current release on 2026-11-13) is installed through the root dependency group `engine` and imported only by the spike's tests, for geometric assertions that do not come from the engine. The type check reads the engine's shipped type files through one setting for that package; no error is suppressed.
 - OPTIONS: **Recommendation:** keep all three; decide the number of tile sets of a release (one for each distinct factor of the simulated day) when task S1-T11 fixes the speed bands. Alternatives: predicted speeds inside the engine, once the difference for equal factors is understood and a timezone database is part of the build; a pure-Python containment test instead of `shapely`.
 - NEEDED BY: slice S1 gate (the decision record of SYN-53); task S1-T11.
+
+## OI-121 — The pixel-ratio cap of the map canvas in the performance spike
+
+- ID: OI-121
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm or replace the cap of the map canvas at 1 device pixel for each CSS pixel on the wall canvas of 1920 by 1080.
+- WHY: FE-71 and DES-139 leave the value of the pixel-ratio cap to the frame-rate spike. The gate of task S1-T02 is measured at one cap; searching for a cap that passes would change the measurement.
+- DONE SO FAR: The page sets the cap to 1 through the map's own pixel ratio, labels it ASSUMPTION, records it on every trace and does not search it; text stays at the display's own pixel ratio. In the browser tests the drawing buffer is 1920 by 1080 at a device pixel ratio of 2. The reference notes say that the cap reaches the overlay through another property; in the interleaved mode this project uses, the map owns the canvas and the map's pixel ratio is what the buffer followed (measured; task S1-T08 corrects the notes).
+- OPTIONS: **Recommendation:** keep the cap at 1 until a native trace of task S1-T12 passes or fails with it; if it fails, FE-89 and the retreat pins decide what is tried, and the sizes are never reduced.
+- NEEDED BY: task S1-T12 (the native trace); slice S1 pin confirmation (S1-T08).
+
+## OI-122 — The native frame-rate traces are a task of their own and wait for one action of the owner
+
+- ID: OI-122
+- TYPE: ASSUMPTION
+- NEEDED: The owner to take the trace (the steps are in `web/spikes/performance/README.md`), and to confirm the re-plan that makes the two native traces task S1-T12, or to ask for the two criteria to return to S1-T02 and S1-T11.
+- WHY: TST-132 asks that the frame-rate check is measured in a browser that runs natively on the host of the build machine, because a browser inside WSL can fall back to software rendering. The build agents do not start programs of the host. The third criterion of S1-T02 and the fifth of S1-T11 therefore need a person, and they would hold both spikes unmerged while everything else of them is built, tested and reviewed.
+- DONE SO FAR: A re-plan of 2026-11-13, made with the pull request of S1-T02: the two criteria moved word for word to the new task S1-T12, which depends on S1-T02 and S1-T11; S1-T08 depends on S1-T12 as well, so the pins that the frame rate decides (FE-89) are not confirmed before the traces exist. The slice S1 gate is unchanged: it still needs the frame-rate statement. The page records the trace by itself; the evidence command passes only on a committed native trace of the gate profile with a hardware renderer and at least 95% of frames under 16.7 ms, and it fails with `missing-native-trace` until then. No placeholder trace exists and nothing is claimed.
+- OPTIONS: **Recommendation:** keep the re-plan; the owner runs `npm --prefix web run spike:performance:serve` from the repository root, opens the printed address in Chrome or Edge on Windows and leaves the page open until it shows a path; the lead then commits the trace with its capture record. Alternative: the owner allows the build to start the host browser itself with a temporary profile.
+- NEEDED BY: the slice S1 gate (through S1-T12 and S1-T08).
 
 ## Change control
 
@@ -1309,6 +1329,26 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: TASKS.md, section "Queue rules" (hardening beyond an acceptance criterion is listed, not built); document 17, section 9
 - EVIDENCE: Six tasks of slice S1 are built at the same time, so no builder edits document 17. Each task log of the slice in [PROGRESS.md](PROGRESS.md) records, in its line "Hardening listed, not built", the points its plan and its builder set aside.
 - NEEDED: one entry of the hardening register for each point of those lines that is not needed in version 1, each with its origin; or one line saying why a point needs no entry.
+- CLOSED BY: S1-T10
+
+### PO-S1-06 — The product manifest does not declare the routing engine and the grid library that the areas spike imports
+
+- ID: PO-S1-06
+- TYPE: OPEN
+- RAISED BY: the reviewer of task S1-T03 (xAI Grok 4.7, through the Cursor command-line tool), 2026-11-13, point P1 of its verdict on pull request 33 (REV-17)
+- CONCERNS: BE-82; ARC-88; OI-60; OI-116
+- EVIDENCE: `product/src/eii_product/areas_spike/engine.py` imports `valhalla`, and `shapes.py` and `snap.py` of the same package import `h3`, while `product/pyproject.toml` declares neither: both packages sit in the root dependency group `engine` (the build ruling of the task, for the reason OI-60 gives). `product/README.md` states that home. No open item records that the task which builds the area tool must declare them in the product manifest or keep the exception; OI-116 records the same kind of gap for FastAPI only.
+- NEEDED: one sentence in an open item (OI-116 or OI-120) that names the task which declares `pyvalhalla` and `h3` in `product/pyproject.toml` together with the change of the clean-environment guard, or one line saying why the root group stays their home.
+- CLOSED BY: S1-T10
+
+### PO-S1-07 — The request judges of the two map spikes pass a scheme they do not know
+
+- ID: PO-S1-07
+- TYPE: OPEN
+- RAISED BY: the lead, 2026-11-13, at its check of task S1-T02
+- CONCERNS: FE-56; OI-115
+- EVIDENCE: `requestDecision` of `web/spikes/glyphs/guards.mjs` and `foreignRequest` of `web/spikes/performance/tests/performance.spec.ts` judge an address that begins with `http://` or `https://` by its origin and treat `data:` and `blob:` as local; an address with any other scheme is counted as same-origin. The content security policy of both spike servers stops such a request, and the browser tool does not report a WebSocket through the request event that the tests record, so no test sees one.
+- NEEDED: both judges count a scheme outside `http`, `https`, `data` and `blob` as foreign, with one planted case each; or one line saying why not.
 - CLOSED BY: S1-T10
 
 ## Sources

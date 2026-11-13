@@ -72,8 +72,10 @@ class RunnerUsage(unittest.TestCase):
         web = next(suite for suite in run_tests.SUITES if suite.name == "web-checks")
         self.assertEqual(web.args[-1], words[-1])
         spike = "spikes/glyphs/tests/*.node-test.mjs"
+        performance = "spikes/performance/tests/*.node-test.mjs"
         script_globs = tuple(word for word in words if word.endswith(".mjs"))
         self.assertIn(spike, script_globs)
+        self.assertIn(performance, script_globs)
         self.assertEqual(web.args, script_globs)
         expected = (
             "python-guards",
