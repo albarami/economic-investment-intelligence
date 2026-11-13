@@ -13640,6 +13640,522 @@ PROPOSED OPEN ITEMS:
 - The documentation check on the commit that carries this correction is part of the lead's checks on the head; they are entered by the next ledger, as for every head
 - The designated reviewer's verdict of round 2 is entered by the next ledger commit
 
+#### Slice S0 gate — Foundation: review round 2, designated reviewer: APPROVED on the commit before the correction (pull request https://github.com/albarami/economic-investment-intelligence/pull/26 )
+
+Reviewed commit `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, a head of the gate-record pull request, with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831189; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831268; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831184 ). Designated reviewer: Google Gemini (model `GEMINI_4_CARBON` of the Abacus command-line tool, read-only; it names itself otherwise in its verdict), the controls and the gate's proof. The verdict is copied unchanged from its first line (REV-09) and was posted on the pull request. It names the full hash of the commit it read, and that commit had ceased to be the head when the verdict came back: the lead had pushed the correction of the second reviewer's finding F3 while this review was still running. A verdict counts only on the head and by its full hash (REV-02), so this approval was not used for the merge; both reviewers were asked for a final confirmation on the head.
+
+```text
+VERDICT: APPROVED
+TASK: S0-GATE (pull request 26, round 2)
+COMMIT: 154f1101e78d17ee53d88a9b21bc8e7e16c63a1a
+REVIEWER: Google Gemini 3.1 Pro
+EARLIER FINDINGS:
+  F1 FIXED `scripts/preflight.py` (`CHECKS` and `run_preflight`) and `scripts/preflight_rows.py` (`traffic_provider_key_row` and `night_lights_key_row`) now run all 17 checks of `docs/13_DEPLOYMENT_AND_OPERATIONS.md` in table order, reporting `present` or `absent` and `EII_TRAFFIC_PROVIDER` (`simulated` default or `tomtom`) without printing any key, echoing an invalid switch value (`FAIL traffic-provider-key: EII_TRAFFIC_PROVIDER must be simulated or tomtom`, keeping `FAIL` severity in foundation mode), or opening any socket or subprocess; `scripts/tests/test_preflight_rows.py` and `scripts/tests/test_preflight_run.py` (`test_no_secret_in_any_output`) verify all three keys (`ANTHROPIC_API_KEY`, `TOMTOM_API_KEY`, `EARTHDATA_API_KEY`) and `./eii preflight` exited 0 with all 17 rows on `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78`.
+  F2 FIXED `.env.example` and `ENV_NAMES` in `scripts/check_tree.py` now list the 11 empty variable names of `docs/02_ARCHITECTURE.md` section 8 (`EII_TRAFFIC_PROVIDER`, `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` included), `SECRET_NAMES` in `scripts/commit_guard.py` adds `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` with staged-value refusal tests in `scripts/tests/test_hooks_guard.py` (`test_new_key_staged_value_refused`) that weaken no existing refusal, `README.md` and `OPEN_ITEMS.md` (OI-92, OI-110) match, and `TASKS.md` S0-T12 names pull requests 9, 12 and 18.
+GATE STATEMENTS:
+  1 PASS `./eii preflight` exited 0 on `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` (`store: embedded`) with all 17 table rows in order, reporting `WARN not_configured` on `release`, `load-receipt`, `embedded-reader` and `recorded-replays`, `WARN no_freeze_bundle` on `tiles-glyphs-fonts`, `WARN` on absent `postgresql`, and `PASS` at normal severity on the remaining 11 checks (`traffic-provider-key` and `night-lights-key` included), while `test_foundation_mode_keeps_traffic_provider_fail_severity` proves `FAIL` severity is preserved in foundation mode.
+  2 PASS `./eii test --seed 2026111309` on `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` and `./eii test --seed 2026111317` on head `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a` both exited 0 with 1176 passed, 0 failed, 0 skipped across 6 suites (`python-guards` 494, `python-core` 2, `python-custodian` 2, `python-product` 2, `web-checks` 675, `web-unit` 1).
+  3 PASS `python3 scripts/check_docs.py` exited 0 on both `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` and head `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a` (`checked 215 text files, 55 Markdown files: OK`).
+  4 PASS Import-boundary and workspace-metadata suites passed locally (`test_import_boundary_*.py` 34 tests OK; `test_workspace_metadata.py` 22 tests OK), sandbox suites and proofs passed locally (`test_sandbox_*.py` 65 tests OK; `sandbox_check.py check` and `check-extensions` exit 0; `ci_sandbox.py prove` 19 cases PASSED), and hosted CI jobs `tests` and `sandbox proof` succeeded on `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` (https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476793) and on `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a` (https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831189 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831184).
+  5 PASS `hooks_gitleaks.py verify` (gitleaks 8.30.1), `test_hooks_*.py` (64 tests OK, covering the 5-secret commit guard), `check_docs.py` (identifier and secret-pattern scan across 215 files), `ci_history_scan.py scan` (27 commits scanned, RESULT: PASSED, exit 0), and the hosted `secret-scan` and `check-docs` jobs on both commits all exited 0.
+  6 PASS `uv run --locked python scripts/ci_plants.py run` exited 0 (`plants: 12 cases, 12 blocked, 0 failed`, `RESULT: PASSED`), `test_ci_*.py` passed (37 tests OK), and the hosted `planted-failures` job succeeded on `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` and `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`.
+  7 PASS `uv run --locked python scripts/ci_history_scan.py scan` scanned all 27 commits with 0 unapproved findings (leaving out only the 4 findings on the 2 hash-pinned dummy-plant ledger lines of OI-108), `check_docs.py` exited 0 across all tracked files, and no custodian-type record or secret exists in the repository.
+  8 PASS Under `EII_DECISION_PROVIDER=none bwrap --dev-bind / / --unshare-net --die-with-parent`, both `./eii test --seed 2026111310` (1176 passed, 0 failed, 0 skipped, exit 0) and `./eii preflight` (all 17 rows in order, `store: embedded`, exit 0) succeeded with outbound network disabled.
+CHECKS:
+  REV-10 PASS Every task S0-T01 through S0-T16 is complete and merged with checked criteria in `TASKS.md`, all 19 `PO-S0-*` items are closed in `OPEN_ITEMS.md` (Command 34: `19 []`), S0-T16 was independently approved by a third maker (SpaceXAI, Grok 4.7), and all 8 slice S0 gate statements pass with recorded outputs on `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` and `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a` (TST-168, TST-169, TST-170, TST-171).
+  REV-11 PASS `./eii test` (1176 passed, 0 failed, 0 skipped), `python3 scripts/check_docs.py` (215 text files, 55 Markdown files), static and web checks, and all 6 required hosted GitHub Actions checks (`check-docs`, `static-checks`, `tests`, `secret-scan`, `planted-failures`, `sandbox proof`) passed on `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a` (runs https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831189, https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831268, https://github.com/albarami/economic-investment-intelligence/actions/runs/43329831184), with planted-violation tests for the new preflight row and commit-guard keys.
+  REV-12 PASS Between `64e988fa65c964d26a83d25ed71a6cc45d7229d4` and `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a` only the 11 scoped files of S0-T16 plus `PROGRESS.md` changed, the merge commit `6857afe38c5e150f2823ff8625170ba9b42bf44d` introduced 0 stray edits (`FAIL: (0, [])`), and nothing under `data/` is tracked (`check_tree.py` exited 0).
+  REV-13 PASS `traffic_provider_key_row`, `night_lights_key_row` and the 5-name `SECRET_NAMES` tuple in `scripts/commit_guard.py` implement full deterministic checks with runtime-generated test secrets and no `TODO`, `FIXME`, stubbed pass or placeholder outside the documented S0 command skeletons of OPS-26.
+  REV-14 PASS `.env.example` holds only empty `NAME=` lines, all test secrets are generated at run time via `stubs.dummy` and `support.random_value`, GitHub secret scanning and push protection are queried as `enabled`, and no secret or custodian record is committed.
+  REV-15 PASS No assertion, guard, timeout or check was weakened in `.overnight/DIFF.patch`: `test_preflight_rows.py` and `test_hooks_guard.py` only add tests, `test_preflight_run.py` updates exact 17-line expectations and expands `test_no_secret_in_any_output` from one key to all three keys, and `SECRET_NAMES` strictly adds two guarded secret names with 0 skips, retries or `continue-on-error`.
+  REV-16 PASS Preflight row names, order and pass/fail conditions match `docs/13_DEPLOYMENT_AND_OPERATIONS.md` (OPS-06, OPS-07, OPS-70, OPS-71) and `docs/02_ARCHITECTURE.md` section 8 (ARC-97, ARC-98), `./eii preflight` only probes, `./eii up` still refuses with exit 4 when `EII_RELEASE_DIR` is unset, and `pins.toml` and reference notes pass `check_versions.py` (59 components) and `check_reference_notes.py` (357 rows).
+  REV-17 PASS `README.md`, `TASKS.md` (S0-T01 to S0-T16 done, S0-GATE in review round 2), `OPEN_ITEMS.md` (OI-92 and OI-110 updated; all 19 `PO-S0-*` closed; 28 S0-gate assumptions and OI-38 recorded for owner confirmation) and `PROGRESS.md` (append-only evidence rows with full commit hashes, seeds and exit codes; round 1 verdicts preserved verbatim) are current and consistent.
+  REV-18 PASS Secrets are read only from `.env` or the supplied environment and never echoed on stdout, stderr, child `argv` or child `env`; `traffic_provider_key_row` rejects unknown `EII_TRAFFIC_PROVIDER` values with a constant message that omits the input; no network call is made or response stored; sandbox profiles block forbidden reads and network access locally and in CI.
+  REV-19 PASS The foundation scaffolding and S0-T16 changes add no dropped item, preserve every architectural component decision, and implement only the closed variable and preflight tables of decisions 0019 and 0020.
+  REV-20 N/A Slice S0 builds repository, toolchain, preflight, hook, CI and sandbox scaffolding only; no economic metric, fact, forecast, estimate or SQL read function exists yet.
+  REV-21 N/A The web package is the feature-free React/TypeScript/Vite shell of S0-T03; no Fact chip, catalogue claim, assistant template or data visual is rendered in slice S0.
+  REV-22 PASS No privacy rule, threshold, noise parameter, parameter set evaluation, `window_key` formula or attack test is weakened or altered in slice S0.
+  REV-23 PASS `product/` contains no import of `eii_custodian` or `eii_gateway` and no reference to `data/vault/`, verified statically and in fresh interpreters by the 34 import-boundary tests and 22 workspace-metadata tests.
+  REV-24 N/A Slice S0 adds no bilingual product views, charts or new user-facing Arabic strings.
+  REV-25 PASS `python3 scripts/check_docs.py`, `scripts/ci_history_scan.py scan`, `web` host checks (`npm run check` and `npm run check:hosts:dist`) and inspection of `.overnight/DIFF.patch` confirm no private path, personal name, e-mail address, bare 8- or 11-digit run, real identifier or product comparison (`tomtom` is the documented configuration literal of decision 0019).
+  REV-26 PASS Neither the documentation nor the S0 scripts make any prohibited claim of real custodian data, synthetic or simulated facts on real places, certified privacy, ministry endorsement, uncomputed forecasts or go/no-go verdicts.
+  REV-27 PASS Direct inspection and `cmp AGENTS.md CLAUDE.md` (exit 0 on both `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` and `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`) confirm `AGENTS.md` and `CLAUDE.md` are byte-identical.
+  REV-28 N/A Slice S0 generates no synthetic entity, firm, person, zone or release identifiers (`SYN-*`), while the 8- and 11-digit scanner guard is active and tested.
+  REV-29 N/A Slice S0 defines no release facts, catalogue slots or place/firm/area subjects.
+  REV-38 PASS `gateway/` remains a placeholder skeleton not imported by `core/`, `custodian/` or `product/`, `.env.example` leaves `EII_DECISION_PROVIDER` empty, and both `./eii test` and `./eii preflight` pass with `EII_DECISION_PROVIDER=none` and `--unshare-net`.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Slice S0 gate — Foundation: final confirmation on the head: APPROVED by both reviewers (pull request https://github.com/albarami/economic-investment-intelligence/pull/26 )
+
+Reviewed commit `1e4d2ac3c6713693572d09b45cd746054f12f38c`, the head of the gate-record pull request, with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43331005640; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43331005642; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43331005673 ). The head differs from `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a` in this file only: the appended verdict of the second reviewer and the correction of one entry of S0-T16. Both verdicts are copied unchanged from their first line (REV-09) and were posted on the pull request.
+
+Designated reviewer (REV-43): Google Gemini (model `GEMINI_4_CARBON` of the Abacus command-line tool, read-only; it names itself otherwise in its verdict). This verdict is the independent APPROVED of the slice (TST-165, gate item 5).
+
+```text
+VERDICT: APPROVED
+TASK: slice S0 gate, round 2, final confirmation (pull request 26)
+COMMIT: 1e4d2ac3c6713693572d09b45cd746054f12f38c
+REVIEWER: Google Gemini 3.1 Pro
+EARLIER FINDINGS:
+  F1 FIXED Unchanged from `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a` (no code or test file differs in `.overnight/DIFF.patch`): `scripts/preflight.py` (`CHECKS` and `run_preflight`) and `scripts/preflight_rows.py` (`traffic_provider_key_row` and `night_lights_key_row`) run all 17 checks of `docs/13_DEPLOYMENT_AND_OPERATIONS.md` in table order without printing any key, echoing an invalid `EII_TRAFFIC_PROVIDER` value, or making any call; `scripts/tests/test_preflight_rows.py` and `scripts/tests/test_preflight_run.py` (`test_no_secret_in_any_line`) verify all three dummy keys (`ANTHROPIC_API_KEY`, `TOMTOM_API_KEY`, `EARTHDATA_API_KEY`); and `./eii preflight` exited 0 with all 17 rows on `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78`.
+  F2 FIXED Unchanged from `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`: `.env.example` and `ENV_EXAMPLE_NAMES` in `scripts/check_tree.py` list the 11 empty `NAME=` variable names of `docs/02_ARCHITECTURE.md` section 8 (`EII_TRAFFIC_PROVIDER`, `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` included), `SECRET_NAMES` in `scripts/commit_guard.py` and `scripts/tests/test_hooks_guard.py` (`test_new_key_staged_value_refused`) refuse staged local values of both new keys without printing them, `README.md` and `OPEN_ITEMS.md` (OI-92, OI-110) match, and `TASKS.md` line 136 names pull requests 9, 12 and 18 for S0-T12.
+  F3 (the second reviewer's) FIXED `.overnight/DIFF.patch` modifies only `PROGRESS.md` by appending 56 lines (`13587`–`13642`) with 0 lines removed or altered, leaving the earlier entry at line 12204 untouched as TST-171 requires. The appended correction accurately maps every one of the five acceptance criteria of `TASKS.md` line 160 for S0-T16 (`260c43c768dfb81895997a202b543f1da0edeb1a`) to its recorded evidence in `PROGRESS.md`: (1) 17-check preflight and non-calling, non-printing `traffic-provider-key` and `night-lights-key` rows to `uv run --locked python -m unittest discover -s scripts/tests -p 'test_preflight_*.py' -v` (52 passed, lines 12196–12205), `./eii preflight` (17 lines plus `store: embedded`, exit 0, lines 12172–12181) and the planted unknown `EII_TRAFFIC_PROVIDER` check (exit 1 from preflight without echoing the value, lines 12184–12193); (2) three-dummy-key output redaction to `test_no_secret_in_any_line` in `scripts/tests/test_preflight_run.py` (lines 583–708), executed by that same `test_preflight_*.py` command; (3) the 11 empty variable names in `.env.example` to `python3 scripts/check_tree.py` (`checked 8 rules: OK`, lines 12232–12241), the 11-name extraction command (lines 12244–12253) and `test_check_tree*.py` (52 passed, lines 12220–12229); (4) commit-guard refusal for `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` without printing to `test_hooks_guard.py` (22 passed, lines 12208–12217); and (5) S0-T12's three pull requests to `TASKS.md` line 136 (pull requests 9, 12 and 18). Inspection of all 17 S0-T16 entries confirms no other note misnumbers an S0-T16 criterion (line 12180 rightly names criterion 1, and line 12216 rightly names criterion 3 of S0-T06 at `TASKS.md` line 90), and `python3 scripts/check_docs.py` exited 0 on `1e4d2ac3c6713693572d09b45cd746054f12f38c`.
+CHECKS:
+  REV-10 PASS Every task S0-T01 through S0-T16 is done and merged, all 19 `PO-S0-*` items are closed in `OPEN_ITEMS.md`, S0-T16's five acceptance criteria now map accurately to their recorded evidence in `PROGRESS.md` (`13633`–`13639`), and every slice S0 gate item of `docs/12_TESTING_AND_QUALITY.md` section 5 holds on final commit `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` as established in my earlier verdict (green 6-job CI across https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476800, https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476700 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43328476793; 17-row foundation `./eii preflight` exit 0; `./eii test --seed 2026111309` exit 0 with 1176 passed, 0 failed, 0 skipped; TST-60/61/62 boundary and 19-case sandbox proofs; TST-140/141/144 scanner teeth and 12/12 `ci_plants.py` blocks; TST-155 `--unshare-net` runs with `EII_DECISION_PROVIDER=none`).
+  REV-11 PASS On head `1e4d2ac3c6713693572d09b45cd746054f12f38c`, the lead ran `./eii test --seed 2026111318` (exit 0; 1176 passed, 0 failed, 0 skipped across 6 suites) and `python3 scripts/check_docs.py` (exit 0; `checked 215 text files, 55 Markdown files: OK`), and all 6 required hosted checks succeeded on this head: https://github.com/albarami/economic-investment-intelligence/actions/runs/43331005640 (`static-checks`, `tests`, `secret-scan`, `planted-failures`), https://github.com/albarami/economic-investment-intelligence/actions/runs/43331005642 (`check-docs`) and https://github.com/albarami/economic-investment-intelligence/actions/runs/43331005673 (`sandbox proof`).
+  REV-12 PASS `.overnight/DIFF.patch` shows that between `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a` and `1e4d2ac3c6713693572d09b45cd746054f12f38c` only `PROGRESS.md` changed (+56 lines, -0 lines), and between slice final commit `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78` and the head only `OPEN_ITEMS.md`, `PROGRESS.md` and `TASKS.md` differ, with nothing under `data/` (`python3 scripts/check_tree.py` exit 0).
+  REV-13 PASS Nothing in code or tests changed since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, where `traffic_provider_key_row`, `night_lights_key_row` and `commit_guard.py` were verified free of stubs, `TODO`s or mock stand-ins, and the 56 lines appended to `PROGRESS.md` contain none.
+  REV-14 PASS Inspection of the 56 added lines in `.overnight/DIFF.patch` finds no secret, key value or custodian-type material, and `check_docs.py` (exit 0) and the hosted `secret-scan` job in https://github.com/albarami/economic-investment-intelligence/actions/runs/43331005640 passed on `1e4d2ac3c6713693572d09b45cd746054f12f38c`, alongside the 27-commit `ci_history_scan.py scan` verified in my earlier verdict.
+  REV-15 PASS No test, CI workflow, lint rule, timeout or threshold changed since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, where line-by-line review of the test and guard diffs confirmed 0 weakened assertions, skips or retries.
+  REV-16 PASS Nothing in commands, configuration or pins changed since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, and on `1e4d2ac3c6713693572d09b45cd746054f12f38c` `check_versions.py` (`checked 59 components: OK`), `check_reference_notes.py` (`checked 2 files, 6 libraries, 357 rows: OK`), `ruff check .`, `ruff format --check .` and `mypy` all exited 0; the appended correction follows TST-171 and REV-43.
+  REV-17 PASS `PROGRESS.md` appends the second reviewer's round-2 verdict on `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a` verbatim (REV-09), states accurately who reviewed which commit, what was found and what the lead judged under REV-43, corrects the S0-T16 line-12204 criterion cross-reference without editing any earlier entry (TST-171), and passes `python3 scripts/check_docs.py` (exit 0 locally and in https://github.com/albarami/economic-investment-intelligence/actions/runs/43331005642).
+  REV-18 PASS Nothing in runtime, build, hook or sandbox code changed since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, where environment-only secret handling, non-echoing failure messages and `bubblewrap` isolation were verified, and the appended ledger text introduces no data-handling issue.
+  REV-19 PASS Nothing in architecture, slice order or settled decisions changed since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, where compliance with decisions 0015 through 0020 was verified.
+  REV-20 N/A Nothing changed outside `PROGRESS.md` since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, and slice S0 builds foundation scaffolding with no economic fact, lineage chain or calculation.
+  REV-21 N/A Nothing changed outside `PROGRESS.md` since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, and slice S0 ships only the feature-free web shell of S0-T03 with no Fact chip, claim template or rendered product numeral.
+  REV-22 PASS Nothing changed outside `PROGRESS.md` since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, leaving all privacy rules, parameter sets, `window_key` definitions and attack sizes untouched.
+  REV-23 PASS Nothing changed outside `PROGRESS.md` since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, and `./eii test --seed 2026111318` re-ran and passed all 494 `python-guards` tests (the 34 import-boundary and 22 workspace-metadata tests included) on `1e4d2ac3c6713693572d09b45cd746054f12f38c`.
+  REV-24 N/A Nothing changed outside `PROGRESS.md` since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, and slice S0 adds no bilingual product view or user-facing Arabic string.
+  REV-25 PASS Direct inspection of the 56 appended lines in `.overnight/DIFF.patch` and `python3 scripts/check_docs.py` (exit 0 on `1e4d2ac3c6713693572d09b45cd746054f12f38c` locally and in https://github.com/albarami/economic-investment-intelligence/actions/runs/43331005642) confirm no absolute local path, personal name, e-mail address, bare 8- or 11-digit run, real custodian field, secret or named-product comparison.
+  REV-26 PASS The 56 appended lines in `PROGRESS.md` record only review findings and S0-T16 test-evidence mappings and make no prohibited claim under `docs/01_PROJECT_BRIEF.md` section 13 or `AGENTS.md` rules 24 and 25, while everything else is unchanged from `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`.
+  REV-27 PASS Neither `AGENTS.md` nor `CLAUDE.md` changed since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, and `cmp AGENTS.md CLAUDE.md` and `python3 scripts/check_docs.py` both exited 0 on `1e4d2ac3c6713693572d09b45cd746054f12f38c`.
+  REV-28 N/A Nothing changed outside `PROGRESS.md` since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, and slice S0 generates no `SYN-*` synthetic entity, establishment, person or salary-file identifier.
+  REV-29 N/A Nothing changed outside `PROGRESS.md` since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, and slice S0 attaches no attribute, figure or slot to any place or business subject.
+  REV-38 PASS Nothing in `gateway/`, `core/`, `custodian/`, `product/` or `web/` changed since `154f1101e78d17ee53d88a9b21bc8e7e16c63a1a`, where import-boundary isolation and `--unshare-net` execution with `EII_DECISION_PROVIDER=none` were verified.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+Second reviewer: Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only, the records. Its finding F3 is FIXED.
+
+```text
+VERDICT: APPROVED
+TASK: slice S0 gate, round 2, final confirmation (pull request 26)
+COMMIT: 1e4d2ac3c6713693572d09b45cd746054f12f38c
+REVIEWER: Moonshot AI Kimi K3.1 Pro Medium
+EARLIER FINDINGS:
+  F1 FIXED Unchanged since the previous verdict; the seventeen preflight rows, implementation, tests and OI-110 evidence cited there remain unaffected by this ledger-only diff.
+  F2 FIXED Unchanged since the previous verdict; TASKS.md and the gate table still name pull requests 9, 12 and 18, and DIFF.patch changes neither record.
+  F3 FIXED DIFF.patch lines 55-64 appends a correction naming the S0-T16 entry by task, commit and command while leaving the earlier entry unedited. It correctly maps criteria 1 and 2 to the preflight evidence, criterion 3 to the tree-check and eleven-name evidence, criterion 4 to the commit-guard evidence, and criterion 5 to the S0-T12 status; EVIDENCE.md sections 2 and 3 confirm those mappings. EVIDENCE.md section 1 records `python3 scripts/check_docs.py` exit 0 on this head, so the requested verification satisfies TST-170 without a self-referential ledger entry.
+CHECKS:
+  REV-10 PASS Gates 1-4 remain PASS on the evidence in the previous verdict. All six hosted checks succeed on this head: https://github.com/albarami/economic-investment-intelligence/actions/runs/43331005640, https://github.com/albarami/economic-investment-intelligence/actions/runs/43331005642, https://github.com/albarami/economic-investment-intelligence/actions/runs/43331005673. Gate 5 is now PASS because F3 is fixed and the designated reviewer confirms this head. TST-165 through TST-168 remain PASS on the earlier evidence.
+  REV-11 PASS EVIDENCE.md section 1 records lint, formatting, mypy, documentation, tree, version and reference checks, byte-identity and `./eii test --seed 2026111318` passing on this head, with 1176 passed, 0 failed and 0 skipped. The six hosted checks are green at the three full run links under REV-10. The reviewer ran no commands under the read-only brief.
+  REV-12 PASS EVIDENCE.md records exactly one changed path, PROGRESS.md, with 56 additions and no removals; DIFF.patch contains only the copied verdict and its correction.
+  REV-13 PASS No implementation or test result changed; the added verdict copy agrees with PREVIOUS_VERDICT.md and the correction agrees with EVIDENCE.md sections 2 and 3.
+  REV-14 PASS Unchanged from the previous verdict's history-scan evidence; the added review and correction text contains no secret or custodian material, and the head's secret-scan job succeeds in https://github.com/albarami/economic-investment-intelligence/actions/runs/43331005640.
+  REV-15 PASS Unchanged from the previous verdict; DIFF.patch adds no test, skip, suppression, retry, tolerance or assertion change.
+  REV-16 PASS Unchanged from the previous verdict's seventeen-row, provider-switch and probe-only evidence; no preflight behaviour changed.
+  REV-17 PASS The appended correction resolves the false criterion cross-references without rewriting the earlier entry, and the documentation check passes on this head.
+  REV-18 PASS Unchanged from the previous verdict; the added lines introduce no provider connection, secret storage or response storage.
+  REV-19 PASS Unchanged from the previous verdict; the correction settles the record-numbering defect and reopens no settled decision.
+  REV-20 N/A Unchanged from the previous verdict; no economic fact, displayed figure, forecast, estimate or calculation was added.
+  REV-21 N/A Unchanged from the previous verdict; no product screen, claim template, model prose or rendered numeral changed.
+  REV-22 N/A Unchanged from the previous verdict; no privacy partition, parameter set, treatment, export, window key or attack-suite behaviour changed.
+  REV-23 PASS Unchanged from the previous verdict's 34 import-boundary and 22 workspace-metadata results; this ledger-only diff adds no product-to-custodian edge.
+  REV-24 N/A Unchanged from the previous verdict; no English or Arabic product view or bilingual numeral changed.
+  REV-25 PASS EVIDENCE.md section 1 records the documentation check passing on this head; the added lines contain no private path, personal details, realistic identifier, secret or prohibited comparison.
+  REV-26 PASS Unchanged from the previous verdict; the copied verdict and correction make no prohibited custodian, real-place, certification, endorsement, forecast, lookup or go/no-go claim.
+  REV-27 PASS EVIDENCE.md section 1 records `cmp AGENTS.md CLAUDE.md` exit 0 on this head, and neither agent file changed.
+  REV-28 N/A Unchanged from the previous verdict; no synthetic establishment, entity, group, person or salary-file identifier was introduced.
+  REV-29 N/A Unchanged from the previous verdict; no Synthetic or Simulated attribute, figure or fit was attached to a real named place or business.
+  REV-38 PASS Unchanged from the previous verdict's provider-none and offline evidence; the added ledger lines introduce no gateway import, runtime provider read, score, badge, panel or live call.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Slice S0 gate — Foundation: merge record
+
+- The lead's checks on the merged head `1e4d2ac3c6713693572d09b45cd746054f12f38c` before the merge (ruling L-29): "TREE-IS-WORK ok: 272 paths at 1e4d2ac3c6713693572d09b45cd746054f12f38c", exit code 0; `python3 scripts/check_docs.py`: exit code 0, "checked 215 text files, 55 Markdown files: OK" (the documentation check on the commit that carries the correction, as the record of the correction says); `cmp AGENTS.md CLAUDE.md`: exit code 0; `./eii test --seed 2026111318`: exit code 0, "total: 1176 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/26 was squash-merged on 2026-11-13 at that head; merge commit `07aab1a8ed08fb7e08456925dec72fdc89442357` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43332549370; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43332549685; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43332549375 .
+- The gate of slice S0 is passed with this record: all sixteen tasks done, the evidence of round 2 against the one final commit `e6151a74649078bdb8d496c3cb4d84f3ebdc8e78`, the proposed items of the slice closed, and the independent APPROVED of the designated reviewer on the head (TST-165 to TST-168). The gate took two rounds and one gate-fix task (S0-T16, TST-169). The three proposed items of the gate's reviews (PO-S1-01, closed by the gate-fix task; PO-S1-02 and PO-S1-03, open) belong to the follow-up task of slice S1 (REV-41).
+- What the lead changes at the next gate: the two reviewers ran in parallel and the lead corrected the record as soon as the faster one returned, which moved the head under the designated reviewer. At the next gate a correction that changes records only waits for the designated reviewer's verdict, or the faster records lens runs first.
+
+### S1-T04 — Tile range-request spike: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/28 )
+
+- What the task proves (slice S1, the technical spike): the FastAPI process serves one local tile artefact with HTTP byte ranges and no separate tile server (FE-58; the server half of FE-56; the `tiles` value of the health page, OPS-30). The artefact is 2,048 bytes of visibly synthetic text, not a map extract; the real extract is fetched later by the asset pipeline and served by the same route
+- Class of the work (the owner's note of 2026-11-12 on value and cost): standard product code
+- Plan: a short plan by DeepSeek V4.1 Flash (through the Devin command-line tool), read by the lead; the lead's rulings L-54 and L-56 override it where they differ. No separate plan review (the owner's rule for Standard tasks)
+- Builder maker and model: Cursor command-line tool, `composer-2.5` (Cursor): one build and two short completion passes after the lead's check
+- Reviewer maker and model: Codex command-line tool, `gpt-5.6-sol` (OpenAI), read-only (a maker that neither planned nor built); a full review
+- Branch: `task/S1-T04-tile-range`
+- What was built: `product/src/eii_product/api/` with `tiles.py` (the closed name form, the resolver that refuses anything outside the configured folder, the three-valued status rule, the router) and `app.py` (the application factory; the folder is an argument, so the module reads no environment variable); the fixture `product/tests/fixtures/tiles/spike.tile`; ten tests in `product/tests/` that speak HTTP to a real server on the loopback interface. `import eii_product` stays free of FastAPI. The route `GET /tiles` is provisional until task S3-T08 serves the health page, and says so in the module
+- The rulings (L-54): `fastapi` and `uvicorn` are installed through the root dependency group `dev` with exact pins and the product manifest does not change, because the clean-environment guard of S0-T02 installs the three packages offline from an empty cache (OI-60); the gap is the new item OI-116. The browser half of FE-56 is not built here; it is carried by the tasks that render a map (the new item OI-115). The reference notes are not changed by this task; what it measured is listed below for task S1-T08
+- The ruling L-56 on the one disagreement the builder reported and stopped on: the plan expected a malformed or a multi-range header to give the whole file or 416. The pinned FastAPI with Starlette answers 400 to `bytes=abc` and to `bytes=9-2`, and 206 with two parts to `bytes=0-1,4-5`. Accepted: RFC 9110, section 14.2, says "A server that supports range requests MAY ignore or reject a Range header field that contains an invalid ranges-specifier", and section 14.1.1 says "An int-range is invalid if the last-pos value is present and less than the first-pos" (www.rfc-editor.org, read on 2026-11-13). A rejection with no file content, after which the server answers the next request, is a safe failure, which is the third acceptance criterion. The request for two ranges is a valid request and is asserted as one, with the content of both parts. The plan's expectation was written before any run; the criterion decides
+- Red run before the code: `test_full_request_returns_the_pinned_fixture` against an application with no tile route: 404 where 200 was expected
+- What the lead's check found, and what the builder then changed in two short passes: (1) the digest of the fixture was computed from the file itself, so the plan's pin had no teeth: size and digest are now literals, and the builder saw the test fail with one changed digit; (2) the status of the fixture folder is asserted as exactly `ok`; (3) the builder had pinned `uvicorn` 0.34.3, a release of June 2025, and written "pypi 2026-11-13" as its source; the registry's own record names 0.54.0 as the current release, and with the old one the tests printed a deprecation warning of Python 3.14 three times. The pin is now the current release, the lock was made again, and the summary line of the tests is clean; (4) the name rule and the regular-file check of the route had no test: two tests were added, and the builder saw each fail with its check removed
+- The lead's own breaks of `tiles.py` (nine; the file restored and compared byte for byte): before the second pass five were caught; after it eight are caught, each by a named test. The ninth, the explicit media type removed, is equivalent on this machine: the library's guess for the unknown ending gives the same `Content-Type`
+- Measured, for the pin confirmation of task S1-T08 (the reference notes hold no field for these): FastAPI 0.162.5 resolves on Python 3.14 with Starlette 1.10.0; a satisfiable single range gives 206 with `Content-Range` and the exact bytes, and an end beyond the file is clamped; a range that starts at the file's size gives 416 with `Content-Range: bytes */2048`; malformed and reversed ranges give 400; a request for two ranges gives 206 `multipart/byteranges`; uvicorn 0.54.0 runs in a thread that is not the main thread and stops through `should_exit`. Pages the builder read on 2026-11-13: the Starlette page on responses (file response), the FastAPI page on custom responses, and the source of `uvicorn/config.py` and `uvicorn/server.py` in the uvicorn repository (its documentation site answered with an error at that time)
+- Shared documents, entered by the lead in the work commit because six tasks of the slice are built at once: one sentence in README.md; the new items OI-115 and OI-116 in OPEN_ITEMS.md; the builder's own files name OI-116
+- Hardening listed, not built (the plan's section 8 and the builder's return): conditional requests (`If-Range`, `ETag`, `Last-Modified`) and `HEAD`; `Cache-Control` and a tile address versioned by the release hash; a content security policy header on the page that loads tiles; seat authorisation on the tile route; a tile allow-list read from the release manifest; a policy for multipart ranges beyond what was observed; ranges over a compressed transfer encoding; serving the built front end and the glyphs from the same application; a size cap and a timeout on the tile route; a server socket handed over already bound instead of a free port chosen and closed first (the lead's addition, for the tests)
+- With this ledger, because it is the first of slice S1: the closing record of the slice S0 gate above, and two proposed items of the lead's own in OPEN_ITEMS.md: PO-S1-04 (no test compares the tables of the documents with the lists the code holds: the cause of the gate's rejected first round) and PO-S1-05 (the hardening lists of the slice's task logs go into the register of document 17 with the follow-up task)
+
+#### Evidence for the work commit `f2a42479d6c1efce3bb030e72c309ba9ff6bde7a`
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    f2a42479d6c1efce3bb030e72c309ba9ff6bde7a
+Command:   ./eii test --seed 2026111311
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1184 passed, 0 failed, 0 skipped
+Seed:      2026111311
+Notes:     The whole test command with the ten product tests of this task inside its product suite; the guard suite still installs the three packages offline from an empty cache (the clean-environment guard), which is why the two server packages sit in the root group `dev` (OI-116).
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    f2a42479d6c1efce3bb030e72c309ba9ff6bde7a
+Command:   uv run --locked python -m pytest product/tests -v -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The three acceptance criteria by their named tests, over HTTP against a real server on the loopback interface. Criterion 1: `test_full_request_returns_the_pinned_fixture` (200, the type, the length, `Accept-Ranges: bytes`, the body equal to the fixture pinned by size and digest). Criterion 2: `test_valid_ranges_return_the_expected_bytes` (six single ranges with exact `Content-Range`, length and bytes, and one request for two ranges with both parts). Criterion 3: `test_invalid_ranges_fail_safely_and_the_server_survives` (416 for a range that starts at the file's size; 400 for a malformed and for a reversed range; no file content; the next request answers 200). The other seven: names outside the closed form, a folder named like a tile, a path or a link that leaves the folder (404 each); the status rule with its three values; no cross-origin header, redirect or absolute address, with the same check failing against a planted wildcard header. The summary line holds no warning.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    f2a42479d6c1efce3bb030e72c309ba9ff6bde7a
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 43 packages in 0.93ms"
+Seed:      none
+Notes:     The lock file matches the manifests after the two packages joined the root group `dev`.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    f2a42479d6c1efce3bb030e72c309ba9ff6bde7a
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 60 components: OK"
+Seed:      none
+Notes:     The version check with the row `fastapi` installed and the new row `uvicorn`; a manifest and the lock name both.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    f2a42479d6c1efce3bb030e72c309ba9ff6bde7a
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes and their check are unchanged by this task (the lead's ruling L-54).
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    f2a42479d6c1efce3bb030e72c309ba9ff6bde7a
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint, the new module and tests included.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    f2a42479d6c1efce3bb030e72c309ba9ff6bde7a
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "137 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    f2a42479d6c1efce3bb030e72c309ba9ff6bde7a
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 131 source files"
+Seed:      none
+Notes:     Strict types, with the FastAPI routes as decorated functions; no ignore comment and no relaxed setting.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    f2a42479d6c1efce3bb030e72c309ba9ff6bde7a
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 220 text files, 55 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with the sentence of README.md, the status line of product/README.md and the two new open items.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    f2a42479d6c1efce3bb030e72c309ba9ff6bde7a
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    f2a42479d6c1efce3bb030e72c309ba9ff6bde7a
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical; this task adds no command, so neither changes.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    f2a42479d6c1efce3bb030e72c309ba9ff6bde7a
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','07aab1a8ed08fb7e08456925dec72fdc89442357...f2a42479d6c1efce3bb030e72c309ba9ff6bde7a'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:product/src/eii_product/api/__init__.py A:product/src/eii_product/api/app.py A:product/src/eii_product/api/tiles.py A:product/tests/fixtures/tiles/spike.tile A:product/tests/test_tiles_range.py A:product/tests/test_tiles_status.py M:OPEN_ITEMS.md M:README.md M:pins.toml M:product/README.md M:pyproject.toml M:uv.lock'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "12 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope (REV-12): the six files of the spike (two modules and the package marker, the fixture, two test files), the root manifest with its lock and the pin record, the module's README, and the two shared documents the lead entered (README.md, OPEN_ITEMS.md).
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    f2a42479d6c1efce3bb030e72c309ba9ff6bde7a
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','07aab1a8ed08fb7e08456925dec72fdc89442357..f2a42479d6c1efce3bb030e72c309ba9ff6bde7a'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit has a Conventional Commit subject.
+```
+
+#### S1-T04: independent review, round 1: REJECTED (pull request https://github.com/albarami/economic-investment-intelligence/pull/28 )
+
+Reviewed commit `7df4db8e9f97c992b2cae8e8ce3f888da62f4f67`, the head of the pull request at that time, with all six required checks green on it (`check-docs` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43336315931/job/131593268824; `planted-failures` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43336316131/job/131593269269; `sandbox proof` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43336315932/job/131593269538; `secret-scan` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43336316131/job/131593269162; `static-checks` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43336316131/job/131593269198; `tests` success https://github.com/albarami/economic-investment-intelligence/actions/runs/43336316131/job/131593268886 ). Reviewer: OpenAI GPT-5.6 Sol (effort high), through the Codex command-line tool, read-only; a full review; a maker that neither planned nor built the task (it names itself more shortly in its verdict). The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S1-T04 (pull request 28)
+COMMIT: 7df4db8e9f97c992b2cae8e8ce3f888da62f4f67
+REVIEWER: OpenAI GPT-5
+CHECKS:
+  REV-10 FAIL The six single-range cases assert exact headers and bytes, but the valid multi-range case does not associate each payload with its part, and the invalid-range case does not prove the recorded claim that no file content was returned.
+  REV-11 FAIL The lead recorded 1184 passed, 0 failed and 0 skipped on the head, and hosted tests succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43336316131/job/131593268886, but four auxiliary server threads are joined without asserting that they stopped.
+  REV-12 PASS The work commit's recorded scope check reports exactly the 12 planned paths, and the ledger adds only OPEN_ITEMS.md, PROGRESS.md and TASKS.md.
+  REV-13 PASS The delivered route, resolver, status rule and tests are implemented; the provisional health path is explicitly scoped to the spike and is not a placeholder for an acceptance criterion.
+  REV-14 PASS The synthetic fixture is visibly synthetic, the documentation scan passed, and the hosted secret scan succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43336316131/job/131593269162.
+  REV-15 PASS The patch adds assertions and planted violations without skips, expected failures, retries, suppressions, weakened thresholds or removed checks.
+  REV-16 PASS The implementation follows rulings R1-R5 and L-56: one FastAPI process serves the artefact, the status path is provisional, the browser half is deferred through OI-115, and the exact pins are in the root dev group.
+  REV-17 FAIL TASKS.md falsely records pull request 28 as merged, and PROGRESS.md overstates the number of task tests and HTTP tests.
+  REV-18 PASS The closed name form, resolved containment check and regular-file check refuse encoded separators, absolute-looking names, links leaving the folder and directories; the planted violations are recorded.
+  REV-19 PASS No settled architectural decision is removed or replaced; OI-115 and OI-116 record the two deferred choices.
+  REV-20 N/A This spike adds no economic fact, displayed metric, forecast, estimate or application-schema calculation.
+  REV-21 N/A This spike adds no screen, Fact chip, catalogue claim, model prose or rendered product numeral.
+  REV-22 PASS The patch changes no privacy rule, parameter set, treatment, export register, window key or attack test.
+  REV-23 PASS The product code imports neither eii_custodian nor data/vault; the recorded full suite and unchanged import-boundary guards pass.
+  REV-24 N/A No bilingual view, Arabic string or displayed number is added.
+  REV-25 PASS The documentation and tree checks passed, and the patch contains no secret, private path, real custodian data, realistic identifier or prohibited comparison.
+  REV-26 PASS The patch makes no claim of real custodian data, certified privacy, endorsement, uncomputed forecast, lookup capability or go/no-go advice.
+  REV-27 PASS The lead recorded cmp AGENTS.md CLAUDE.md with exit code 0 on both the work commit and the head.
+  REV-28 N/A No synthetic establishment, legal-entity, employer-group, person or salary-file identifier is introduced.
+  REV-29 N/A No Synthetic or Simulated attribute is attached to a real named place or business.
+  REV-38 PASS The patch adds no eii_gateway import, provider-setting read, score, badge, panel or live gateway call.
+FINDINGS:
+  F1 (REV-10)
+    File: product/tests/test_tiles_range.py
+    Place: test_valid_ranges_return_the_expected_bytes, lines 112-145
+    Wrong: The multi-range assertions only establish that both Content-Range strings and both two-byte sequences occur somewhere in the multipart body. Swapping the two payloads between parts, duplicating one part while placing the missing bytes elsewhere, or otherwise breaking the header-to-payload association can still pass. This does not prove the second acceptance criterion for the valid two-range request accepted by ruling L-56.
+    Fix: Parse the boundary from Content-Type, require exactly two multipart parts, and assert each part's Content-Range header and complete payload as the pairs bytes 0-1 with SPIKE_BYTES[0:2] and bytes 4-5 with SPIKE_BYTES[4:6], with no extra part. Plant a swapped or incorrect part and record that the test fails, restore it, then run ./eii test --seed N with exit 0.
+  F2 (REV-10)
+    File: product/tests/test_tiles_range.py
+    Place: test_invalid_ranges_fail_safely_and_the_server_survives, lines 148-175
+    Wrong: Each invalid response is checked only for absence of SPIKE_BYTES[:32]. A response containing any other fixture slice would pass, while PROGRESS.md line 13821 records “no file content” as evidence for the third acceptance criterion and ruling L-56 relies on that property. The claimed measurement is therefore not shown.
+    Fix: Assert the complete expected error body for the pinned 416 and 400 responses, in addition to their statuses and required Content-Range header, so any returned fixture slice changes the body and fails. Demonstrate a planted wrong-body failure, restore it, run ./eii test --seed N with exit 0, and append the required correction to PROGRESS.md rather than rewriting the earlier evidence row.
+  F3 (REV-11)
+    File: product/tests/test_tiles_range.py
+    Place: cleanup in test_regular_files_with_invalid_tile_names_return_404, test_a_tile_named_directory_returns_404_not_5xx, test_requests_outside_the_tile_directory_are_refused and test_the_api_app_serves_the_tile_and_the_status, lines 220-222, 264-266, 315-317 and 380-382
+    Wrong: These four auxiliary servers set should_exit and join with a timeout but never assert that their threads stopped. Only the module fixture asserts thread death. A surviving server can therefore leak beyond teardown while every test remains green, contrary to the review brief's required server-lifecycle check.
+    Fix: After every auxiliary join, assert not thread.is_alive(), preferably through one shared teardown helper also used by the module fixture. Plant one lifecycle failure to show the assertion catches it, restore it, and run ./eii test --seed N with exit 0.
+  F4 (REV-17)
+    File: PROGRESS.md
+    Place: S1-T04 task log and evidence notes, lines 13787, 13809 and 13821
+    Wrong: The task added eight tests, of which seven use a real HTTP server and one is the pure tile-status test. The recorded product-suite count of ten includes two pre-existing package tests. The ledger instead says ten task tests all speak HTTP, calls all ten “of this task”, and labels seven tests as remaining after the three acceptance tests while naming only the five remaining task tests. This overclaims what was built and measured.
+    Fix: Append a correction identifying these three statements and recording the accurate counts: eight task tests, seven HTTP tests, one pure status test, and ten total product-suite tests including two pre-existing package tests. Run python3 scripts/check_docs.py with exit 0 and record that result.
+  F5 (REV-17)
+    File: TASKS.md
+    Place: S1-T04 delivery status, line 195
+    Wrong: The reviewed commit is the head of pull request 28 and has not merged, but the status says “merged 2026-11-13”. This is a false workflow claim.
+    Fix: Change the status to in review for pull request 28; mark it merged only in a later ledger after the merge exists. Run python3 scripts/check_docs.py with exit 0.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+- The lead's judgement: all five findings are valid. F1 to F3 are in the test file and were fixed by the builder (Cursor composer-2.5) in one round; F4 and F5 are the lead's own slips in the records and are corrected here. No finding was argued away
+- F1, fixed: the answer to the request for two ranges is parsed by the boundary of its `Content-Type`; the test requires exactly two parts and compares the list of pairs (the `Content-Range` of a part, its complete payload) with `bytes 0-1/2048` and the first two bytes, `bytes 4-5/2048` and bytes four and five. The builder saw the test fail with the two expected pairs swapped, and restored
+- F2, fixed: the complete body of each rejected answer is asserted beside its status: empty for 416 (with `Content-Range: bytes */2048`), and the fixed texts of the pinned Starlette for the two 400 answers ("Range header: range must be requested" for `bytes=abc`, "Range header: start must be less than end" for `bytes=9-2`). A returned slice of the file would change the body and fail. The builder saw the test fail with a changed literal, and restored
+- F3, fixed: one helper sets `should_exit`, joins the thread and asserts that it is not alive; the module fixture and the four tests that start a server of their own use it. A new test, `test_stop_uvicorn_server_rejects_threads_that_survive_join`, hands the helper a thread that waits on an event nobody sets and requires the assertion error. The builder had typed that call with a suppression comment; the lead replaced the comment by a two-line protocol type for the helper's first argument, so the file holds no suppression (the lead's one edit; lint, format, strict types and the eleven tests pass)
+- F4, corrected here; the earlier entries stay as they were written (TST-171). Three statements of the first ledger of this task counted wrongly: the line "What was built" of the task log said that ten tests in `product/tests/` speak HTTP to a real server; the note of the entry of `./eii test --seed 2026111311` spoke of "the ten product tests of this task"; and the note of the entry of `uv run --locked python -m pytest product/tests -v -p no:cacheprovider` said "The other seven" and then named five. The right counts at the first work commit `f2a42479d6c1efce3bb030e72c309ba9ff6bde7a`: the product suite held ten tests, of which eight were this task's (seven in `product/tests/test_tiles_range.py`, all over HTTP against a real server, and one pure test of the status rule in `product/tests/test_tiles_status.py`) and two were the tests of the package skeleton from task S0-T02 (`product/tests/test_product_package.py`). Beside the three tests of the acceptance criteria the task therefore had five further tests, not seven. At the fix commit the task has nine tests (the helper's own test is the ninth and uses no HTTP) and the product suite eleven. The description and the squash message of the pull request carry the right counts
+- F5, corrected here: the status of the task in TASKS.md said "done (pull request 28, merged 2026-11-13)" on a head that was not merged. It now says "in review (pull request 28)". From this task on, the status of a task says "in review" inside its own pull request, and the ledger of the next pull request sets it to done together with the closing record of the merge (the lead's rule for the rest of the run; the acceptance boxes are ticked in the task's own pull request, where the evidence for them is)
+- Round 2 goes to the same reviewer, limited as REV-39 says: the five findings, defects in the lines changed since the reviewed commit, and the checks that are never limited
+
+#### Evidence for the work commit `92b0aa13cc68539a67c8928833d3bf84d182f073`
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   ./eii test --seed 2026111322
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1185 passed, 0 failed, 0 skipped
+Seed:      2026111322
+Notes:     The whole test command at the fix commit; the product suite holds eleven tests: nine of this task and the two of the package skeleton.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   uv run --locked python -m pytest product/tests -v -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Findings F1 to F3 at the fix commit, by name: `test_valid_ranges_return_the_expected_bytes` (F1: exactly two parts, each with its own `Content-Range` and its complete payload), `test_invalid_ranges_fail_safely_and_the_server_survives` (F2: the complete body of the 416 answer and of both 400 answers), `test_stop_uvicorn_server_rejects_threads_that_survive_join` and the five tests that now stop their server through the shared helper (F3). Eleven tests: eight in `test_tiles_range.py`, one in `test_tiles_status.py`, two in `test_product_package.py`. The summary line holds no warning.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   python3 -I -c "import re,pathlib; t=pathlib.Path('product/tests/test_tiles_range.py').read_text(encoding='utf-8'); print(len(re.findall(r'type: *ignore|noqa|pytest\\.mark\\.(skip|xfail)', t)), t.count('_stop_uvicorn_server('))"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "0 7" (suppression comments, skips or expected failures in the file; uses of the stop helper, its definition included)
+Seed:      none
+Notes:     The test file holds no suppression comment, skip or expected failure (REV-15), and the stop helper is defined once and called six times: by the module fixture, by the four tests with a server of their own and by the helper's own test.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "137 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 131 source files"
+Seed:      none
+Notes:     Strict types; the helper takes a small protocol type, with no ignore comment.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 220 text files, 55 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check at the fix commit.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','7df4db8e9f97c992b2cae8e8ce3f888da62f4f67...92b0aa13cc68539a67c8928833d3bf84d182f073'],check=True,capture_output=True,text=True).stdout.splitlines()); w='M:product/tests/test_tiles_range.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "1 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope of the fix commit (REV-12): the one test file; the application code is unchanged.
+```
+
+```text
+### S1-T04 — Tile range-request spike
+Commit:    92b0aa13cc68539a67c8928833d3bf84d182f073
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','7df4db8e9f97c992b2cae8e8ce3f888da62f4f67..92b0aa13cc68539a67c8928833d3bf84d182f073'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The fix commit has a Conventional Commit subject.
+```
+
 ### S1-T07 — Offline typed-decision gateway: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/29 )
 
 - What the task builds (slice S1): the provider-neutral contract of the offline typed-decision gateway of [decision 0014](docs/decisions/0014-typed-decision-gateway.md), behind the stage only: `gateway/` becomes the fourth workspace member, `eii_gateway`, used by tooling under `scripts/` and `evals/` and by nothing under `core/`, `custodian/` or `product/` (BE-102, DAT-126). Its answers are decision evidence only. No provider was called and no key was used during the build (OI-01, OI-18)
