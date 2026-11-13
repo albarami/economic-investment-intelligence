@@ -9,11 +9,31 @@ declare module 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url' {
 
 interface SpikeDiagnostics {
   phase: string;
+  roadInstances: number;
+  roadDashEnabled: boolean;
+  layerSet: string;
+  hoursShown: number[];
+  paused: boolean;
+  reducedMotion: boolean;
+  motionElapsed: number;
+  motionFrames: number;
+  currentPosition: number;
+  roadStates: {
+    hour: number;
+    nextHour: number;
+    blend: number;
+    bands: string[];
+    nextBands: string[];
+    trigger: number;
+    stableData: boolean;
+  }[];
+  hourStepsMs: number[];
   failure: string;
   hexagonInstances: number;
   particleInstances: number;
   hex: boolean;
   particle: boolean;
+  road: boolean;
   bearingStart: number;
   bearingEnd: number;
   positionStart: number;

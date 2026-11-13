@@ -1,3 +1,9 @@
+import type { AccessorFunction, Color } from '@deck.gl/core';
+import roadData from './road-data.json' with { type: 'json' };
+import { roadLayer } from './road-layer';
+import { drawnRoadCount, type Road } from './roads.mjs';
+import { ROAD_COLORS, VOLUME_BANDS } from './config.mjs';
+import type { Playback } from './road-playback';
 import { H3HexagonLayer } from '@deck.gl/geo-layers';
 import { ScatterplotLayer } from '@deck.gl/layers';
 import { MapLibreOverlay } from '@deck.gl/maplibre';
@@ -36,10 +42,22 @@ export type Scene = {
   canvas: HTMLCanvasElement;
   hexagonInstances: number;
   particleInstances: number;
+  roadInstances: number;
+  roadDashEnabled: boolean;
+  roads: Road[];
+  roadSnapshot: () => {
+    hour: number;
+    nextHour: number;
+    blend: number;
+    bands: string[];
+    nextBands: string[];
+    trigger: number;
+    stableData: boolean;
+  };
   step: (elapsed: number, bearing: number, freeze: boolean) => void;
   bearing: () => number;
   renderer: () => string;
-  sample: () => { hex: boolean; particle: boolean };
+  sample: () => { hex: boolean; particle: boolean; road: boolean };
   onContextLost: (notify: () => void) => void;
 };
 
@@ -115,6 +133,13 @@ function drawnCount(
 }
 
 function pixelKind(red: number, green: number, blue: number): string {
+  // Opaque road interiors must match a stored band colour exactly.
+  if (
+    ROAD_COLORS.some(
+      (color) => color[0] === red && color[1] === green && color[2] === blue,
+    )
+  )
+    return 'road';
   if (red > 160 && green < 150 && blue < 120) return 'particle';
   if (blue > red + 20 && green > red && blue < 190) return 'hex';
   return 'other';
@@ -127,6 +152,9 @@ export async function mountScene(input: {
   particles: Particle[];
   showHexagons: boolean;
   showParticles: boolean;
+  roads?: Road[];
+  playback?: Playback;
+  plant?: string;
 }): Promise<Scene> {
   configureWorker();
   const map = new Map({
@@ -169,6 +197,7 @@ export async function mountScene(input: {
   });
   const cells = input.cells;
   const particles = input.particles;
+  let roadLayers: ReturnType<typeof roadLayer>[] = [];
   const build = (nextTick: number) => {
     const hexLayer = new H3HexagonLayer<string>({
       id: 'synthetic-hexagons',
@@ -192,7 +221,29 @@ export async function mountScene(input: {
       getFillColor: PARTICLE_COLOR,
       updateTriggers: { getPosition: nextTick },
     });
-    return [hexLayer, particleLayer] as const;
+    if (input.roads && input.playback) {
+      const state = input.playback.state;
+      // Two opacity endpoints share one immutable payload and alternate slots.
+      roadLayers = [
+        roadLayer(
+          input.roads,
+          roadData.hours[state.index]!,
+          1,
+          state.index % 2,
+          input.plant ?? '',
+        ),
+      ];
+      roadLayers.push(
+        roadLayer(
+          input.roads,
+          roadData.hours[state.next]!,
+          state.blend,
+          (state.index + 1) % 2,
+          input.plant ?? '',
+        ),
+      );
+    }
+    return [hexLayer, particleLayer, ...roadLayers] as const;
   };
   let tick = 0;
   const overlay = new MapLibreOverlay({
@@ -210,6 +261,41 @@ export async function mountScene(input: {
     canvas,
     hexagonInstances: counts.hexagonInstances,
     particleInstances: counts.particleInstances,
+    roadInstances: roadLayers[0] ? drawnRoadCount(roadLayers[0]) : 0,
+    roadDashEnabled: roadLayers[0]?.props.extensions?.length === 1,
+    roads: input.roads ?? [],
+    roadSnapshot: () => {
+      const state = input.playback!.state;
+      const hour = roadData.hours[state.index]!;
+      const nextHour = roadData.hours[state.next]!;
+      // Read the actual accessor and update trigger held by the layer.
+      const layer = roadLayers[0]!;
+      const sample = [
+        ...(input.roads ?? []).slice(0, roadData.roads.links.length * 2),
+        ...(input.roads ?? []).slice(-roadData.roads.links.length),
+      ];
+      const heldBands = (held: typeof layer) =>
+        sample.map((road) => {
+          const color = (held.props.getColor as AccessorFunction<Road, Color>)(
+            road,
+            { index: sample.indexOf(road), data: input.roads!, target: [] },
+          );
+          return VOLUME_BANDS[
+            ROAD_COLORS.findIndex((candidate) =>
+              candidate.every((value, index) => value === color[index]),
+            )
+          ]!;
+        });
+      return {
+        hour,
+        nextHour,
+        blend: state.blend,
+        bands: heldBands(layer),
+        nextBands: heldBands(roadLayers[1] ?? layer),
+        trigger: layer.props.updateTriggers!.getColor as number,
+        stableData: roadLayers.every((held) => held.props.data === input.roads),
+      };
+    },
     bearing: () => map.getBearing(),
     renderer: () => readUnmaskedRenderer(canvas.getContext('webgl2')),
     step: (elapsed, bearing, freeze) => {
@@ -236,12 +322,14 @@ export async function mountScene(input: {
 function sample(canvas: HTMLCanvasElement): {
   hex: boolean;
   particle: boolean;
+  road: boolean;
 } {
   const context = canvas.getContext('webgl2');
-  if (!context) return { hex: false, particle: false };
+  if (!context) return { hex: false, particle: false, road: false };
   const pixel = new Uint8Array(4);
   let hex = false;
   let particle = false;
+  let road = false;
   const columns = 16;
   const rows = 16;
   for (let row = 0; row < rows; row += 1) {
@@ -258,11 +346,12 @@ function sample(canvas: HTMLCanvasElement): {
         pixel,
       );
       const kind = pixelKind(pixel[0] ?? 0, pixel[1] ?? 0, pixel[2] ?? 0);
+      if (kind === 'road') road = true;
       if (kind === 'hex') hex = true;
       if (kind === 'particle') particle = true;
     }
   }
-  return { hex, particle };
+  return { hex, particle, road };
 }
 
 export function webglFailure(error: unknown): string {

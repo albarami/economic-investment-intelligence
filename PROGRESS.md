@@ -16963,6 +16963,452 @@ Seed:      2026111403
 Notes:     The whole test command on the build machine.
 ```
 
+#### S1-T13: independent review: REJECTED on records only, merged under ruling L-86
+
+Reviewed commit `a78bd431bcc34c25583c65d457c88dd7a1a7fbd5`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/35 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43384756438; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43384756465; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43384756444 ). Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only; a maker that neither planned nor built the task; a full review of the pull request against main, on the head of its ledger commit. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: REJECTED
+TASK: S1-T13 (pull request 35)
+COMMIT: a78bd431bcc34c25583c65d457c88dd7a1a7fbd5
+REVIEWER: Moonshot AI Kimi K3.1 Pro Medium
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+CHECKS:
+  REV-10 PASS The Vite-server tests prove trace storage and JSON malformed-post refusal; browser tests prove renderer display, three early refusals with no orbit or post, and storage of a planted slow full scene. Existing counts, 16.7 ms budget, 0.95 share, 30-second orbit and cap remain unchanged.
+  REV-11 PASS On the exact head the lead recorded `./eii test --seed 2026111368`, exit 0 with 1376 passed and none failed or skipped, and `python3 scripts/check_docs.py`, exit 0. Hosted tests succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43384756438/job/131750509041 and planted-failures at https://github.com/albarami/economic-investment-intelligence/actions/runs/43384756438/job/131750509294. The work-commit run recorded 41 Node and 21 browser tests passing, with red-first and lead-break evidence.
+  REV-12 PASS The 18 work files are confined to the performance spike and the re-plan records; the ledger adds PROGRESS.md and TASKS.md. Nothing under `data/` or unrelated code changed.
+  REV-13 PASS The server plugin, environment judgement and page paths are executable implementations with behavioural tests. No native trace or measured native result was invented; evidence verification still reports `missing-native-trace`.
+  REV-14 PASS No secret, `.env`, real custodian record or private data appears in the patch. Hosted secret scanning succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43384756438/job/131750509322.
+  REV-15 PASS The patch adds assertions and planted failures without removing or loosening an existing assertion, count, budget, gate threshold, tolerance or profile. No skip, retry or suppression was added.
+  REV-16 PASS The implementation follows the re-plan: `configureServer` intercepts only the trace and post-count routes, the unplanted gate judges its real renderer before loading layers, and a passing empty-canvas environment proceeds to the full measured orbit.
+  REV-17 FAIL F1 and F2: OI-122 retains dependency statements contradicted by the current TASKS.md re-plan, and PROGRESS.md contradicts itself about the numbers of builder passes and work commits.
+  REV-18 PASS Existing origin, payload, exclusive-write and native-evidence protections remain intact; the added post-count route exposes only an aggregate attempt count and no record-level data.
+  REV-19 PASS TASKS.md implements ruling L-82: S1-T12 waits for the owner, S1-T08 no longer depends on it, and S1-T10 excludes it. No settled component decision was reopened.
+  REV-20 N/A This is a development-only performance spike, not a product fact or release figure; its technical frame calculations remain deterministic and tested in `trace.mjs`.
+  REV-21 N/A The development-only `_perf` spike adds no product brief, Fact-chip screen, claim catalogue or model-written prose.
+  REV-22 PASS No privacy partition, parameter set, treatment, export, protected window or attack test changed, and the complete head suite passed without reduced sizes or skips.
+  REV-23 PASS The patch adds no custodian import or product dependency; the head boundary checks and complete suite passed.
+  REV-24 PASS English and Arabic routes share the renderer diagnostic, the Arabic test asserts the same value, digits remain Western, and the existing Arabic notice remains `pending native review`.
+  REV-25 PASS The patch introduces no private absolute path, personal name, e-mail address, realistic custodian identifier, secret or named-product comparison; documentation, tree and hosted secret checks passed.
+  REV-26 PASS No prohibited claim was added. The native frame-rate measurement remains expressly pending and no measured native result is claimed.
+  REV-27 PASS The lead's head `cmp AGENTS.md CLAUDE.md` exited 0 and the head documentation check passed.
+  REV-28 N/A No establishment, legal-entity, employer-group, person or salary-file identifier was introduced.
+  REV-29 N/A The unnamed synthetic extent and development traces attach no Synthetic or Simulated attribute to a real named place or business.
+  REV-38 PASS No gateway import, provider-setting read, run-time gateway call or gateway-derived screen text was added; the serving-boundary checks and complete suite passed.
+FINDINGS:
+  F1 (REV-17)
+    File: OPEN_ITEMS.md
+    Place: OI-122, lines 1062-1064
+    Wrong: OI-122 still says that S1-T08 depends on S1-T12 and that the native traces are needed through S1-T08. TASKS.md now removes that dependency under ruling L-82 and leaves only the pin fields to close with the gate addendum, so the affected open item is not current.
+    Fix: Update OI-122's DONE SO FAR and NEEDED BY text to record that S1-T12 waits for the owner, S1-T08 and S1-T10 no longer wait for it, and the open pin fields close with the slice-gate addendum. Run `python3 scripts/check_docs.py` and verify that OI-122 agrees with the S1-T08, S1-T10 and S1-T12 entries in TASKS.md.
+  F2 (REV-17)
+    File: PROGRESS.md
+    Place: S1-T13 task log and Conventional Commit evidence, lines 16530, 16534 and 16778
+    Wrong: The task log says the builder worked in two passes, then records a third small pass and a second work commit, while the evidence note says there was one work commit. The ledger's pass and commit-count evidence is internally inconsistent.
+    Fix: Append a correction to the S1-T13 log stating the actual three builder passes and two work commits and identifying the earlier count statements as superseded. Run `git log --format=%s 546df8525ad0a4a74423c4f7bcff1f73c93e5859..c41aba27ba01c9363ebcb7630cf3c2394295cbb8` to verify both work-commit subjects and `python3 scripts/check_docs.py`, recording their real exit codes.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S1-T13: merge record
+
+- The lead's ruling on the verdict (ruling L-86, from the owner's note of 2026-11-13; also posted on the pull request):
+
+```text
+Lead's ruling on the round-1 verdict of pull request 35 (S1-T13), under the owner's rule on record-only findings
+
+The verdict of Moonshot AI Kimi K3.1 Pro (round 1, on a78bd431bcc34c25583c65d457c88dd7a1a7fbd5) passes every check of the
+work (REV-10 to REV-16, REV-18 to REV-29 and REV-38). Its one FAIL, REV-17, rests on two findings, and both concern
+records only:
+- F1: OI-122 in OPEN_ITEMS.md still said that S1-T08 depends on S1-T12; the further re-plan of 2026-11-13 had removed
+  that dependency.
+- F2: the task log in PROGRESS.md said "two passes" and "one work commit"; there were three passes and two work commits.
+
+Both are true and both are corrected. Under the owner's rule (ruling L-65 (3), confirmed for this pull request by the
+owner's note of 2026-11-13, ruling L-86), a finding that concerns only a record is corrected in the next commit and
+checked by the lead or a script; it does not reject the task and goes to no reviewer round.
+
+- The correction: one commit, 17520c88230fb8a5392f87bf395e37a7afce1a4a, on top of the reviewed head. It changes
+  OPEN_ITEMS.md (two lines inside OI-122: its DONE SO FAR records the further re-plan; its NEEDED BY names the addendum
+  of the slice S1 gate) and PROGRESS.md (six added lines: a correction entry; nothing earlier is rewritten). No code,
+  test or other document changes.
+- The lead's script check: only those two files changed; no line removed from PROGRESS.md; the changed lines of
+  OPEN_ITEMS.md lie inside OI-122; the documents check passes (exit 0).
+- The merge is pinned to 17520c88230fb8a5392f87bf395e37a7afce1a4a once its required checks are green (ruling L-65 (1)).
+```
+
+- The records commit `17520c88230fb8a5392f87bf395e37a7afce1a4a` against the reviewed head `a78bd431bcc34c25583c65d457c88dd7a1a7fbd5` (the full diff is kept beside the verdict in the run's records):
+
+```text
+ OPEN_ITEMS.md | 4 ++--
+ PROGRESS.md   | 6 ++++++
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+```
+
+- The lead's script check of that commit:
+
+```text
+S1-T13 records-only correction, checked by the lead's script, 2026-11-13 10:32
+$ git diff --name-only a78bd431bcc34c25583c65d457c88dd7a1a7fbd5 (working tree)
+OPEN_ITEMS.md
+PROGRESS.md
+$ PROGRESS.md: lines removed (must be 0): 0
+$ OPEN_ITEMS.md: changed lines lie inside the section of OI-122 only:
+@@ -1062 +1062 @@
+@@ -1064 +1064 @@
+  new lines 1062..1062 inside OI-122 (1056..1065): True
+  new lines 1064..1064 inside OI-122 (1056..1065): True
+RESULT: OK
+$ python3 scripts/check_docs.py
+checked 304 text files, 59 Markdown files: OK
+exit 0
+```
+
+- CI on the records commit: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43386553735; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43386553708; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43386553813 .
+
+- The lead's checks on the merged head `17520c88230fb8a5392f87bf395e37a7afce1a4a` before the merge (ruling L-29): "TREE-IS-WORK ok: 402 paths at 17520c88230fb8a5392f87bf395e37a7afce1a4a", exit code 0; `./eii test --seed 2026111370`: exit code 0, "total: 1376 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/35 was squash-merged on 2026-11-13 at that head; merge commit `764f7760c39045575bb2dab7e19b4d8f3a7c8cf3` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43388147578; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43388147562; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43388147680 .
+
+### S1-T11 — Road-assignment and hourly traffic spike: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/38 )
+
+- Plan: the lead's short plan (75 lines, six decisions; delivery hard, class Deep). Its one design review: Moonshot AI Kimi K3.1 Pro through Devin, REJECTED with seven findings; ruling L-60 accepted six (every version-1 parameter of card C25 with a source that was read and no unsourced fallback; parameters proved by exact row values; one exact fixture for each tie and edge rule; rows in the shape of the data contract; privacy invariance down to the outline of every hour; provenance and lineage in the file's header) and one in part (Pause motion and stored hours only; the keyboard stepping of the product's Hour control is not in the task's requirements). The lead read the sources of the parameters itself (decision record 0021, Sources).
+- Personas: builder, a senior simulation and transport-modelling engineer; reviewer, a principal transport-modelling and numerical-methods reviewer of another maker. Builder: the Codex command-line tool, `gpt-6-astra` (OpenAI), in every pass. Skills the builder reported loading in its later passes: task-standards, project-orientation, sanad-provenance, muhasabah-gate (and github-flow, strict-reviewer, al-muhasibi where it said so); the rules of test-driven development, systematic debugging and verification before completion were pasted into its briefs (ruling L-77).
+- Round 1: the assignment (all-or-nothing on free-flow shortest paths, the one volume-delay rule in exact arithmetic, rows in the contract's shape, the privacy invariance down to every hour's outline) and the product side that routes on per-edge speeds; a completion pass answered ruling L-62 and the first internal review (16 agents: four lenses and twelve second readers, Claude Opus 5.5; ten findings confirmed, nearly all tests that could not fail). The owner's rule of 2026-11-13 (one speed and one time for a link and an hour; the 10 km/h floor) gave a floor pass, whose own internal review (8 agents: four Claude Opus 5.5 lenses, four Claude Sonnet second readers; 814,475 tokens; 41 findings, all confirmed) showed four ways in which a user could still see two speeds or two times (ruling L-74).
+- The accuracy pass (rulings L-74, L-78, L-81 and L-83 to L-85): four attempts stopped on rules of the lead's that the engine's measurements contradicted (an exact zero turn cost; exact agreement node by node between the engine's outline and its routes; a never-negative residual; a 34 s bound fixed before the coordinates moved), each answered by a ruling, and a closing attempt built all of it: the method makes one whole speed for a link and an hour; the floor and the class speeds are checked against the engine's limits; lengths are the engine's whole-metre lengths (the fixture coordinates moved); loading by great-circle distance; a route itemises its link times and one line of turns at junctions; the turn costs and the outline's distance from the route times are measured and pinned with the bounds the card states. The owner's note of 09:34 closed the spike's accuracy work.
+- Round 2 (the page; built ahead on the pushed head of pull request 34 under point 16 of decision 0015, one level): the animated road layer on the performance page with the Simulated mark, Pause and reduced motion, the hour labels, and two road loads for the trace (100,000 and 250,000 links). The two halves were joined by the lead (no path changed by both but `pins.toml`, merged by hand); the whole test command on the joined tree passed outside any sandbox (seed 2026111367: 1,797 passed, 0 failed).
+- Mutation testing (the owner's note of 2026-11-13; ruling L-76): mutmut 3.8.1 from each package's folder through `scripts/mutation.py`: the six assignment modules 988 mutants, 985 killed, three explained as equivalent; the product's traffic module 907 mutants, 901 killed, six explained (the lead's own runs before the commit gave the same counts, both exit 0) (`scripts/mutation_explained.toml`). StrykerJS 10.1.1 through `scripts/mutation_web.py` on the eleven web modules of the performance spike, in one full run at normal priority, the runner bounding Stryker's workers times the Node test files in flight by the processors (ruling L-116; the machine's one-minute load rose from 1.41 to 70.18 during the run from other work): 2,362 mutants, 2,085 killed, 193 survived, 84 timed out, none reported without coverage (coverage analysis is off: the whole Node suite runs for each mutant). Every timed-out mutant was replayed alone, each attempt starting below a one-minute load of eight with the run's own timeout: two were killed and 82 still time out (each hangs the tests), reported apart and never counted as killed. The runner's first exit was 1 (survivors not yet explained); the ledger `scripts/mutation_explained.toml` then received one exact entry and a one-line reason for each of the 193 survivors (browser-only paths marked as coverage gaps, not as equivalence), and the runner's own matcher accepts all 193 (exit 0). The ledger also keeps 49 entries for mutants that survived the earlier run and are killed in this one, each naming its killing test.
+- Round 3 and its two continuations: the workspace was moved onto main after pull request 35 (three conflicts resolved, both sides kept); the 23 points of the internal review given to the builder (among them: the pinned turn costs re-measured against the exact link sums and extended to every movement the card states; a one-link route whose time disagrees is refused; whole-metre lengths in both planes; the page's mark tested as visible in every state; the hour fade keeps an unchanged road's colour) and the situation rule (a link's speed for a dial situation is the whole speed from the mean of its hourly times). The round was stopped by the old wall-clock limit while still working (ruling L-108 replaced that limit by an idle stop); the measured turn shift at the crossing (0.151661 s) exceeded the 0.15 s bound the lead had set, and ruling L-109 set the bound at 0.2 s, stated on the card with the measured value. Continuation C: the bound, the outline maximum over every row (34.004059 s over 221 rows with route times, within the unchanged 40 s), and the web mutation runs. Continuation D: the browser run of the spike made to fit the whole test command's unchanged 1,800-second limit by sharing scene loads (1,692 s to about 1,230 s; every test, planted case, count and timeout kept), the mutation runner's bounded parallelism with its tests, and the clean mutation run above.
+- The internal review before round 3 (Deep class): five lenses (Claude Opus 5.5), each with a second reader (Claude Sonnet 5.5), about 1.87 million tokens: 58 points, 56 confirmed, none high, two refuted by their second readers; 23 went to the builder (round 3), the documents' points were the lead's (decision 0021, card C25, the contract). The external review (one reviewer of another maker) decides the task.
+- Decision record 0021 (amendment 8 to the first pack) and the shared texts (card C25, documents 03 and 05, the index, document 14, OI-120, OI-123 and OI-126) are entered by the lead with this task.
+- Measured, for the pin confirmation of task S1-T08: pyvalhalla 3.9.1 stores an edge's speed as a whole number of km/h and drops a fraction (a posted 35.5 is stored as 35); it ignores a posted speed below 10 and above 140 in the way `test_installed_speed_limits` pins (9 and 255 take the class default; 141 is stored as 140); it reports an edge's length in whole metres and a route's time to the millisecond; it adds turn costs at junctions that no costing option tried removes; per-edge speeds reach its routing graph with one graph for each distinct set of whole link speeds (six for the 24 hours of the hourly fixture). mutmut 3.8.1 drives both Python packages' suites from each package's folder (it needs fork). StrykerJS 10.1.1 (`@stryker-mutator/core`, Node 22 or later) runs the web modules' tests through the command runner, one mutation run at a time; `@deck.gl/extensions` 9.4.1 is installed for the road layer's path extension, as round 2 uses it.
+- Not built: the keyboard stepping of the product's Hour control (not in the task's requirements); the product's own use of the itemised route and of the area legend (slice S3, as the owner said).
+
+#### Evidence for the work commit `59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c`
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    232 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The custodian plane's tests of the assignment spike (exact arithmetic, the whole speed, the floor, the parameters, loading and paths, the situation rule).
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   uv run --locked python -m pytest product/tests -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    231 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The product plane's tests: the reader of the released rows, the one speed and time of a link and an hour, the itemised route, the areas by hour, the installed engine's limits.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   uv run --locked python -m pytest scripts/tests -q -p no:cacheprovider -k "assignment"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "13 passed, 570 deselected, 5 subtests passed in 17.00s" (the selected cross-plane tests: 13 tests with 5 subtests, every other test of the folder deselected by name)
+Seed:      none
+Notes:     The cross-plane tests and measurements: lengths, single links and routes, route identity, pinned turn costs, the outline entries, the invariance of the rows.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   uv run --locked --group mutation python scripts/mutation.py custodian/src/eii_custodian/assignment_spike/assign.py custodian/src/eii_custodian/assignment_spike/delay.py custodian/src/eii_custodian/assignment_spike/inputs.py custodian/src/eii_custodian/assignment_spike/params.py custodian/src/eii_custodian/assignment_spike/paths.py custodian/src/eii_custodian/assignment_spike/run.py 2>&1 | python3 -I -c 'import sys,re; print(" ".join(m.split("/")[-1] for m in re.findall(r"(?m)^\S+\.py: made=\d+ killed=\d+ survived=\d+ timed_out=\d+ not_covered=\d+ incomplete=\d+", sys.stdin.read())))'
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "assign.py: made=39 killed=39 survived=0 timed_out=0 not_covered=0 incomplete=0 delay.py: made=76 killed=73 survived=3 timed_out=0 not_covered=0 incomplete=0 inputs.py: made=360 killed=360 survived=0 timed_out=0 not_covered=0 incomplete=0 params.py: made=248 killed=248 survived=0 timed_out=0 not_covered=0 incomplete=0 paths.py: made=91 killed=91 survived=0 timed_out=0 not_covered=0 incomplete=0 run" (the per-module counts of mutmut)
+Seed:      none
+Notes:     mutmut 3.8.1 on the six assignment modules, from the package's folder in a temporary copy; every survivor is in scripts/mutation_explained.toml with its reason, and the runner exits non-zero on any survivor without one.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   uv run --locked --group mutation python scripts/mutation.py product/src/eii_product/areas_spike/traffic.py 2>&1 | python3 -I -c 'import sys,re; print(" ".join(m.split("/")[-1] for m in re.findall(r"(?m)^\S+\.py: made=\d+ killed=\d+ survived=\d+ timed_out=\d+ not_covered=\d+ incomplete=\d+", sys.stdin.read())))'
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "traffic.py: made=907 killed=901 survived=6 timed_out=0 not_covered=0 incomplete=0" (the counts of mutmut)
+Seed:      none
+Notes:     mutmut 3.8.1 on the product's traffic module; every survivor explained in the same ledger.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   python3 -I -c "import json,hashlib; e=json.load(open('.overnight/d-production-before.json')); bad=[f for f,h in e.items() if hashlib.sha256(open(f,'rb').read()).hexdigest()!=h]; print(len(e),'sources;',len(e)-len(bad),'identical to the full StrykerJS run;','differ:',bad,end=' ')" && python3 .overnight/d3-ledger-check.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "14 sources; 14 identical to the full StrykerJS run; differ: [] Exact survivor ledger: 193 entries matched; exit 0" (the source identity and the ledger match)
+Seed:      none
+Notes:     StrykerJS 10.1.1 on the eleven web modules (ruling L-144): the builder's full run in its workspace (2,362 mutants: 2,085 killed, 193 survived, 84 timed out, none reported without coverage; the 84 timeouts replayed alone: 2 killed, 82 still time out) is not repeated here; at the work commit the lead checks that the fourteen runtime sources are byte-identical (SHA-256) to those the run mutated and that the committed ledger accepts all 193 survivors through the runner's own matcher. The lead's own full web run at the work commit follows on a quiet machine and is recorded in the next ledger.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   bash -c "set -o pipefail; npm --prefix web run test:spike:performance 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)), \"|\", \" \".join(re.findall(r\"[0-9]+ passed \\([0-9.]+m?s?\\)\", t)[:1]))'"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 114 # pass 114 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 41 passed (19.4m)" (the totals of the Node test runner and of the browser run inside it)
+Seed:      none
+Notes:     The task's tests at the work commit: every Node test of the spike passes (the count of tests equals the count passed), and one of them runs the 41 browser tests in the headless shell at the full counts (among them the planted refusals, the slow scene and the road layer's mark, legend and hour fade).
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   npm --silent --prefix web run spike:performance:verify-evidence
+Exit code: 1
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; first output line "FAIL missing-native-trace"
+Seed:      none
+Notes:     The evidence command at the work commit: it still fails with the name of the missing trace and writes nothing; the native trace is task S1-T12, waiting for the owner at the console.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   npm --prefix web run test:spike:glyphs
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "  10 passed (3.9s)" (browser tests of the glyph spike)
+Seed:      none
+Notes:     The glyph spike of task S1-T01 is unchanged by this task and its ten browser tests pass on the work commit.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   ./eii test --seed 2026111409
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1879 passed, 0 failed, 0 skipped
+Seed:      2026111409
+Notes:     The whole test command on the build machine; the Node tests of the performance spike run in its suite of web checks, the browser tests among them.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   npm --prefix web run build
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "✓ built in 92ms" (the production build)
+Seed:      none
+Notes:     The production build; the test `production.node-test.mjs` of the spike, which runs in the web checks, proves that the built files hold nothing of the spike (FE-88).
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   npm --prefix web run check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 18 files: OK"
+Seed:      none
+Notes:     The web layout, version, boundary and host checks.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   npm --prefix web run check:hosts:dist
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 20 files: OK"
+Seed:      none
+Notes:     The host check on the built files.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   npm --prefix web run lint
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "> eslint --max-warnings 0 ." (exit code decides)
+Seed:      none
+Notes:     Web lint: exit code 0.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   npm --prefix web run format:check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Web format check.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   npm --prefix web run typecheck
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "> tsc --noEmit" (exit code decides)
+Seed:      none
+Notes:     Web type check: exit code 0.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 65 components: OK"
+Seed:      none
+Notes:     The version check with the rows `@deck.gl/geo-layers` and `h3-js` installed.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes and their check are unchanged by this task.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint of the Python files (the runner's suite table changed).
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "217 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 192 source files"
+Seed:      none
+Notes:     Strict types.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 362 text files, 61 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with the spike's README, rule 44, the README, the open items, TASKS.md and document 14 as the re-plan changed them.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after rule 44 gained the three commands.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 61 packages in 1ms" (exit code decides)
+Seed:      none
+Notes:     The lock file matches the manifests with the mutation group.
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','764f7760c39045575bb2dab7e19b4d8f3a7c8cf3...59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/src/eii_custodian/assignment_spike/README.md A:custodian/src/eii_custodian/assignment_spike/__init__.py A:custodian/src/eii_custodian/assignment_spike/__main__.py A:custodian/src/eii_custodian/assignment_spike/assign.py A:custodian/src/eii_custodian/assignment_spike/delay.py A:custodian/src/eii_custodian/assignment_spike/inputs.py A:custodian/src/eii_custodian/assignment_spike/params.py A:custodian/src/eii_custodian/assignment_spike/paths.py A:custodian/src/eii_custodian/assignment_spike/run.py A:custodian/tests/fixtures/assignment_spike/hourly_flows.json A:custodian/tests/fixtures/assignment_spike/hourly_roads.json A:custodian/tests/fixtures/assignment_spike/parameters_v1.json A:custodian/tests/fixtures/assignment_spike/protected_standin.json A:custodian/tests/fixtures/assignment_spike/withheld_standin.json A:custodian/tests/fixtures/assignment_spike/worked_flows.json A:custodian/tests/fixtures/assignment_spike/worked_parameters.json A:custodian/tests/fixtures/assignment_spike/worked_roads.json A:custodian/tests/test_assignment_completion.py A:custodian/tests/test_assignment_floor.py A:custodian/tests/test_assignment_inputs.py A:custodian/tests/test_assignment_mutation.py A:custodian/tests/test_assignment_rules.py A:custodian/tests/test_assignment_spike.py A:custodian/tests/test_assignment_whole_speed.py A:docs/decisions/0021-one-speed-for-a-link-and-an-hour.md A:product/src/eii_product/areas_spike/traffic.py A:product/tests/fixtures/areas_spike/assignment/hourly_parameters.json A:product/tests/fixtures/areas_spike/assignment/hourly_roads.json A:product/tests/fixtures/areas_spike/assignment/hourly_rows.json A:product/tests/fixtures/areas_spike/assignment/junction_roads.json A:product/tests/fixtures/areas_spike/assignment/worked_parameters.json A:product/tests/fixtures/areas_spike/assignment/worked_roads.json A:product/tests/fixtures/areas_spike/assignment/worked_rows.json A:product/tests/test_traffic_areas.py A:product/tests/test_traffic_canonical.py A:product/tests/test_traffic_completion.py A:product/tests/test_traffic_contract.py A:product/tests/test_traffic_engine_limits.py A:product/tests/test_traffic_floor.py A:product/tests/test_traffic_mutation.py A:product/tests/test_traffic_route_parts.py A:product/tests/test_traffic_speed_document.py A:scripts/mutation.py A:scripts/mutation_explained.toml A:scripts/mutation_web.py A:scripts/tests/assignment_area_measurement.py A:scripts/tests/mutation_runner.py A:scripts/tests/mutation_web_runner.py A:scripts/tests/test_assignment_area_times.py A:scripts/tests/test_assignment_invariance.py A:scripts/tests/test_assignment_junctions.py A:scripts/tests/test_assignment_lengths.py A:scripts/tests/test_assignment_measurements.py A:scripts/tests/test_assignment_route_identity.py A:scripts/tests/test_mutation_web_concurrency.py A:web/spikes/performance/build-road-data.mjs A:web/spikes/performance/road-data.json A:web/spikes/performance/road-layer.ts A:web/spikes/performance/road-playback.ts A:web/spikes/performance/roads.d.mts A:web/spikes/performance/roads.mjs A:web/spikes/performance/tests/layers.node-test.mjs A:web/spikes/performance/tests/module-harness.mjs A:web/spikes/performance/tests/mutation-evidence.node-test.mjs A:web/spikes/performance/tests/mutation-fixtures.mjs A:web/spikes/performance/tests/mutation-geometry.node-test.mjs A:web/spikes/performance/tests/mutation-page.node-test.mjs A:web/spikes/performance/tests/mutation-server.node-test.mjs A:web/spikes/performance/tests/mutation-trace.node-test.mjs A:web/spikes/performance/tests/page-harness.mjs A:web/spikes/performance/tests/page.node-test.mjs A:web/spikes/performance/tests/road-playback.node-test.mjs A:web/spikes/performance/tests/road-trace.node-test.mjs A:web/spikes/performance/tests/roads.node-test.mjs M:AGENTS.md M:CLAUDE.md M:OPEN_ITEMS.md M:PROGRESS.md M:README.md M:docs/03_DATA_CONTRACTS.md M:docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md M:docs/07_ECONOMIC_METHODS.md M:docs/14_IMPLEMENTATION_PLAN.md M:docs/README.md M:pins.toml M:product/src/eii_product/areas_spike/README.md M:product/src/eii_product/areas_spike/extract.py M:product/src/eii_product/areas_spike/road.py M:product/src/h3.pyi M:pyproject.toml M:uv.lock M:web/README.md M:web/package-lock.json M:web/package.json M:web/spikes/performance/README.md M:web/spikes/performance/config.d.mts M:web/spikes/performance/config.mjs M:web/spikes/performance/geometry.mjs M:web/spikes/performance/index.html M:web/spikes/performance/layers.ts M:web/spikes/performance/main.ts M:web/spikes/performance/notices.json M:web/spikes/performance/playwright.config.ts M:web/spikes/performance/server.mjs M:web/spikes/performance/style.css M:web/spikes/performance/tests/notices.node-test.mjs M:web/spikes/performance/tests/performance.spec.ts M:web/spikes/performance/tests/production.node-test.mjs M:web/spikes/performance/tests/run.mjs M:web/spikes/performance/trace.mjs M:web/spikes/performance/types/modules.d.ts M:web/spikes/performance/verify-evidence.mjs'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "112 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The paths the work commit changes against its base, exactly the task's scope (112 paths: the assignment and traffic code, their tests and fixtures, the web spike, the mutation runners and ledger, pins, the lock file and the shared documents).
+```
+
+```text
+### S1-T11 — Road-assignment and hourly traffic spike
+Commit:    59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','764f7760c39045575bb2dab7e19b4d8f3a7c8cf3..59fe1e374efa7a3a69071e1b66cc2cdd922bfe1c'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
@@ -16974,3 +17420,27 @@ Notes:     The whole test command on the build machine.
 - The documentation files linked from [docs/README.md](docs/README.md).
 - Typed-decision qualification set and aggregate result files under `evals/typed_decisions/`, measured by the lead on 2026-11-11.
 - [Decision 0014](docs/decisions/0014-typed-decision-gateway.md) for the measurement's limits and permitted use.
+
+## S1-T11 — continuation D measurements and test-runner changes
+
+- Base commit: `764f7760c39045575bb2dab7e19b4d8f3a7c8cf3`; continuation D is an uncommitted workspace change on top of the joined task tree. No staging, commit or push was performed.
+- Personas: senior test-performance engineer; strict test-integrity reviewer perspective for self-audit. This continuation is not the independent review required by AGENTS rule 35. Skills: project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer and muhasabah-gate; equivalent local planning, RED/GREEN and verification rules follow the task brief.
+- Environment: Node v22.22.3; network disabled for commands; temporary copies stay in the workspace; no database service changes. The mutation machine reports 32 processors and normal process priority zero. No other test workload of this builder ran alongside the full mutation job. Machine-wide exclusivity could not be observed from the isolated process namespace.
+- Browser baseline: `node web/spikes/performance/tests/run.mjs`, exit 0, 41 passed, Playwright wall 1692.482 seconds. One-minute load before/after: 3.54 / 24.50. First shared-fixture candidate: same command, exit 0, 41 passed, Playwright wall 1077.341 seconds; load 3.10 / 13.66. This candidate misses the under-twelve-minute target. These are headless test timings, not native frame-rate evidence.
+- Browser RED: all fifteen restructured tests failed their planted assertions, exit 1. Temporary test-only injections were restored. All named tests, original plants, assertions and timeouts remain. Self-audit subsequently restored a separate fresh English paused-visibility scene so that this check still observes its first pause; final evidence is appended after verification.
+- Runner RED: `uv run --locked python -m pytest scripts/tests/test_mutation_web_concurrency.py -q`, exit 1, six cases failed on the missing Node concurrency bound. GREEN: the same test plus `scripts/tests/mutation_web_runner.py`, exit 0, twelve passed. Formula: workers = min(4, processors); Node files = max(1, processors // workers), with unknown processors treated as one.
+- Type-check correction: the first `uv run --locked mypy` exited 1 with three module re-export errors in the new regression test. Fully qualified patch targets corrected them; the subsequent mypy and six-case concurrency check exited 0. Ruff, docs, web lint and browser type-check commands also exited 0 at that snapshot.
+- Full mutation command: `uv run --locked python scripts/mutation_web.py web/spikes/performance/{trace,roads,build-road-data,config,geometry,server,verify-evidence}.mjs web/spikes/performance/{main,layers,road-layer,road-playback}.ts`. It ran once at normal priority, wall 3040.618 seconds; wrapper exit 1 because survivor explanations were missing at the snapshot, Stryker exit 0. Counts: 2362 made, 2085 killed, 193 survived, 84 timed out, zero no-coverage, compile errors or runtime errors. Loads before/after: 1.41 / 70.18. Timeouts are not kills. Exact survivor explanations are in `scripts/mutation_explained.toml`; coverage gaps are explicitly identified. No production source was changed to kill a mutant.
+- Detailed per-test/per-module measurements, planted diagnostics, exact commands, tails and isolated replay records are in the local continuation return and run logs. They are uncommitted execution artifacts, not new product facts. The required final seed and result will be appended below after its single execution.
+
+- Environment clarification: commands used `UV_OFFLINE=1` and made no network requests; this is not a claim that operating-system networking was disabled. Stryker retains `coverageAnalysis: off`, so its zero no-coverage status count is not a complete-coverage claim.
+
+- Timeout replay completion: all 84 exact replacements ran once in separate temporary copies, sequentially and at normal priority, each starting below one-minute load eight. The unchanged budget was 8.2695 seconds. The clean baseline passed 113 Node tests (exit 0). Replay launcher exit 0, wall including load waits 1905.199 seconds: two killed, 82 still timed out, zero survivors and zero replay errors. Combined accounting is 2087 killed, 193 survived and 82 timed out out of 2362; the raw full-run counts and exit above remain unchanged. The separate exact-survivor ledger audit passed, exit 0, with all 193 survivors explained. Residual timeouts remain timeouts, not kills.
+
+- Corrected browser fixture RED/GREEN: delaying the pause until the final stored hour failed the new pre-final-hour guard (exit 1); hiding the fresh paused-scene legend failed the retained visibility assertion (exit 1). Both temporary injections were restored. The three clean affected tests then passed, exit 0, wall 312.402 seconds, with load 25.78 / 31.24. This is correctness evidence at elevated load, not the below-eight-load timing target. Final browser formatting, type-check and lint passed.
+
+- Final static verification: `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `uv run --locked mypy`, `python3 scripts/check_docs.py`, `python3 scripts/check_tree.py` and `npm --prefix web run format:check` each exited 0. Mypy checked 192 source files; the tree guard checked eight rules. The final assertion inventory matched all original registrations, plant keys and per-test timeout literals, with no matcher count reduced. Fourteen runtime source hashes remained unchanged from the continuation's initial snapshot; the two agent files remained byte-identical.
+
+- Required final run: `./eii test --seed 2026111388` executed exactly once, exit 1, wall 1394.619 seconds. Runner counts: 1877 passed, two failed, zero skipped across six suites. Python guards: 582 passed and one failed; core: two passed; custodian: 232 passed; product: 231 passed; web-checks: 829 passed and one failed; web-unit: one passed. No rerun replaced this evidence.
+- Final performance browser: all 41 tests passed, with zero skipped or flaky tests. Comparable launcher-measured browser wall 1227.994 seconds, versus 1692.482 seconds in D1; final Playwright JSON duration 1227.424 seconds. Observed web-checks completion interval 1230.182 seconds, below the unchanged 1800-second limit by 569.818 seconds. The under-twelve-minute target remains unmet. The final launcher waited 777.110 seconds before starting at load 7.50; ending load was 14.50, so sustained below-eight load is not claimed.
+- Final failures: the command exit-table test's nested launcher could not initialize uv's default home cache under the closed suite environment and read-only boundary; the glyph missing-baseline test failed with EXDEV while renaming its baseline into the suite temporary directory. Both are open in OPEN_ITEMS. Neither the environment boundary nor any test or baseline was weakened, and no baseline was refreshed. Only evidence files were finalized after the single D4 run.

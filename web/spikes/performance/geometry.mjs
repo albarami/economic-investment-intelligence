@@ -19,7 +19,7 @@ const MOTION_PERIOD_MS = 4000;
 
 let hexagonCache;
 
-function random(seed) {
+export function random(seed) {
   let state = seed >>> 0;
   return () => {
     state = (state + 0x6d2b79f5) >>> 0;

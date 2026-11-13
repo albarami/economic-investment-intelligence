@@ -1,0 +1,67 @@
+{
+  "note": "Invented synthetic fixture; no real place. SYN-U-03 origin group is withheld.",
+  "nodes": [
+    {
+      "id": "SYN-N-0-0",
+      "lat": "0",
+      "lon": "0"
+    },
+    {
+      "id": "SYN-N-0-1",
+      "lat": "0",
+      "lon": "0.01"
+    },
+    {
+      "id": "SYN-N-0-2",
+      "lat": "0",
+      "lon": "0.02"
+    }
+  ],
+  "links": [
+    {
+      "link_id": "SYN-L-001",
+      "source": "SYN-N-0-0",
+      "target": "SYN-N-0-1",
+      "length_m": "1113",
+      "road_class": "residential"
+    },
+    {
+      "link_id": "SYN-L-002",
+      "source": "SYN-N-0-1",
+      "target": "SYN-N-0-0",
+      "length_m": "1113",
+      "road_class": "residential"
+    },
+    {
+      "link_id": "SYN-L-003",
+      "source": "SYN-N-0-1",
+      "target": "SYN-N-0-2",
+      "length_m": "1113",
+      "road_class": "secondary"
+    },
+    {
+      "link_id": "SYN-L-004",
+      "source": "SYN-N-0-2",
+      "target": "SYN-N-0-1",
+      "length_m": "1113",
+      "road_class": "secondary"
+    }
+  ],
+  "units": [
+    {
+      "unit_id": "SYN-U-01",
+      "lat": "0",
+      "lon": "0"
+    },
+    {
+      "unit_id": "SYN-U-02",
+      "lat": "0",
+      "lon": "0.01"
+    },
+    {
+      "unit_id": "SYN-U-03",
+      "lat": "0",
+      "lon": "0.02"
+    }
+  ]
+}

@@ -4,9 +4,11 @@ A development page that draws 110,000 synthetic hexagons and 50,000 synthetic pa
 
 ## Strings that wait for the owner's native reading
 
+- محاكاة `pending native review`
+- إيقاف الحركة مؤقتًا `pending native review`
 - عرض اصطناعي. امتداد مخترع. بلا اسم مكان. `pending native review`
 
-The two notices live in `notices.json`. The page reads them from that file. A model does not change the mark to approved.
+The notices and provenance words live in `notices.json`. The page reads them from that file. A model does not change the mark to approved.
 
 The map canvas is 1920 by 1080 CSS pixels. Its pixel ratio is capped at 1 device pixel per CSS pixel. That cap is an assumption: it is held constant, recorded on the trace, and never searched. Text on the page stays at the display's own pixel ratio.
 
@@ -15,8 +17,8 @@ The map canvas is 1920 by 1080 CSS pixels. Its pixel ratio is capped at 1 device
 From the repository root, with Node 22 first on `PATH`. The headless shell is the one the glyph spike already fetched. This spike does not install a browser.
 
 - `npm --prefix web run spike:glyphs:install-browser` is the prerequisite when the shell is missing. It needs the network once. A missing browser fails the suite and names this command.
-- `npm --prefix web run test:spike:performance` runs the Node tests. The browser tests build the page into a temporary folder, assert the two counts and the recorder contract, and do not assert a frame rate.
-- `npm --prefix web run spike:performance:serve` starts a loopback server and prints one address. Open that address in Windows Chrome or Edge on the host. When the page does not refuse the environment, it runs a 30-second orbit itself, shows the result, and posts the trace. The server writes the file under `web/spikes/performance/evidence/`.
+- `npm --prefix web run test:spike:performance` runs the Node tests. The browser tests build the page into a temporary folder, assert the layer counts (two, or three with roads) and the recorder contract, and do not assert a frame rate.
+- `npm --prefix web run spike:performance:serve` starts a loopback server and prints three addresses (original set, first road load, full street load; see Road trace hand-off). Open the first in Windows Chrome or Edge on the host. When the page does not refuse the environment, it runs a 30-second orbit itself, shows the result, and posts the trace. The server writes the file under `web/spikes/performance/evidence/`.
 - `npm --prefix web run spike:performance:verify-evidence` checks a committed native trace. Until the owner commits one, it fails with `missing-native-trace` and writes nothing.
 
 `./eii test` runs these Node tests with the other web checks. Those runs use a short orbit. They report counts. They do not decide the frame-rate gate. The native frame-rate gate is pending.
@@ -29,7 +31,7 @@ The evidence command also needs `web/spikes/performance/evidence/native-capture.
 
 ## Trace
 
-The contract name is `eii.performance-trace`, version 1, provenance Synthetic. The layer set name is `hexagons-particles`. A gate profile runs for 30 seconds. A smoke profile runs for 400 milliseconds and is refused by the name `smoke-profile`. The share is the unrounded count of frame intervals strictly under 16.7 milliseconds, divided by the interval count. The gate needs that share to be at least 0.95 on a native Windows trace. Percentiles and the share come from `summariseFrames` in `trace.mjs`. The page does not compute them itself.
+The contract name is `eii.performance-trace`, version 1, provenance Synthetic. The original layer set is `hexagons-particles`; the road sets are described below. A gate profile runs for 30 seconds. A smoke profile runs for 400 milliseconds and is refused by the name `smoke-profile`. The share is the unrounded count of frame intervals strictly under 16.7 milliseconds, divided by the interval count. The gate needs that share to be at least 0.95 on a native Windows trace. Percentiles and the share come from `summariseFrames` in `trace.mjs`. The page does not compute them itself.
 
 The server accepts a well-formed trace and stores it even when the gate later refuses it. The evidence command is what qualifies the stored file. A test server cannot write the native evidence directory. The serve command's server stores a posted trace, and the test `the development server stores a posted smoke trace from the page origin` in `tests/vite-server.node-test.mjs` proves it.
 
@@ -44,3 +46,58 @@ As soon as the page has a WebGL2 context, and before the orbit starts, it shows 
 The gate profile refuses on screen at once, does not run the orbit, and posts nothing, when the renderer is missing, a software renderer, the Windows software driver, or WARP (`refused: missing-renderer` or `refused: software-renderer`), or when the renderer names a remote display adapter as its own word (`refused: remote-renderer`). Before the map and its layers load, the same profile counts frames on the empty canvas for about two seconds. If that empty canvas does not reach 60 frames a second, the page shows `refused: capped-frame-rate` with the measured frames a second. It does not load the layers and it posts nothing. If the empty canvas reaches 60 and the full scene does not, the orbit runs and the trace is stored, and the gate judges that trace. A slow full scene is not refused as a bad environment.
 
 If the page refuses, sit at the computer, not through Remote Desktop. Use Chrome at 100% zoom with Energy Saver off.
+## Hourly road sets (S1-T11 round two)
+
+`hexagons-particles-roads` adds the recorded fixture links and an invented load of 100,000 short links. `hexagons-particles-roads-250k` uses 250,000 load links. Both retain the original hexagons and particles. These are load sizes fixed by the owner on 2026-11-13, based on his counts of ways: 24,367 motorway to tertiary; 76,703 including residential; 122,720 including service roads. Attribution of that basis: **OpenStreetMap contributors, counted by the owner through the Overpass service**. Ways are not links; the second load represents a full street network. This is the owner's supplied sizing basis, not a public dataset imported by the page or an independently verified count. No figure about a place appears on the page.
+
+`build-road-data.mjs` reads only the recorded product fixtures `hourly_rows.json` and `hourly_roads.json` under `product/tests/fixtures/areas_spike/assignment/`. Run `node web/spikes/performance/build-road-data.mjs` from the repository root to regenerate `road-data.json`. The Node test regenerates it and compares bytes, including the provenance, evidence status, caveat, withheld-flow note and source hashes. No assignment is calculated in the browser. The road load uses the same seeded generator as the original geometry and cycles through the fixture links' classes and hourly bands. It has no names.
+
+One payload holds all stored hours. The paths and their data array remain the same throughout playback; `getColor` update triggers select a stored hour. Width follows road class. Colour follows the closed volume-band keys of the round-one parameter file, with the first band for a missing row. Equal consecutive stored band states stay equal. Two persistent path passes keep the outgoing hour opaque and draw the incoming hour over it at the blend opacity during a cross-fade; a zero-opacity pass retains its data but is not drawn; no band or width is interpolated. Road counts count rendered links once, excluding the path tessellator's invalid terminal padding and the second opacity pass.
+
+Both passes use `PathStyleExtension` with static dashes (DES-67). The legend combines a dashed sample with `Simulated` or `محاكاة`; the Arabic word remains **pending native review** in `notices.json`. The assignment's speeds, ratios and volumes never appear as numerals. Hour labels are marked `reference`.
+
+The configuration names `HOUR_HOLD_MS` for `--eii-hour-hold` (2,500 ms, the `--eii-dur-fly-medium` starting assumption) and `SCENE_MS` for `--eii-dur-scene` (800 ms), from the design document's Motion section. Playback records the hours actually displayed, proceeds in stored order and stops at the last hour. A delayed frame does not skip stored hours. Pause motion stops playback, particles and camera turn; pressing it again resumes. Reduced motion prevents playback, particle motion and camera turn. The page does **not** build arrow-key stepping, manual stepping under reduced motion, or the placement of Play and Pause on the product's Hour control. Those belong to the map foundation (FE-106, DES-51, DES-168).
+
+### Road trace hand-off (S1-T12)
+
+The serve command now prints three addresses: original set, first road load, full street load. Open them in that order in the owner's native browser. The same recorder, server and trace contract are used. Each road trace records all three counts, whether playback was uninterrupted, the reduced-motion state and the displayed hour sequence. Keep motion running and reduced motion off throughout the orbit. Every original qualification still applies, except the road sets record the frame-budget share without imposing a pass threshold. A headless smoke run establishes no native frame-rate result.
+
+For each road set, commit its trace and its own capture file alongside it:
+
+- `native-capture.hexagons-particles-roads.md`
+- `native-capture.hexagons-particles-roads-250k.md`
+
+Use the same capture fields documented above and the digest of that specific trace. Then run `npm --prefix web run spike:performance:verify-evidence -- hexagons-particles-roads` and `npm --prefix web run spike:performance:verify-evidence -- hexagons-particles-roads-250k`. Without an argument the evidence command still checks the original set and `native-capture.md`. Missing captures fail with `missing-native-trace`. No native trace is taken by this task.
+
+Run the local web mutation check with `uv run --locked python scripts/mutation_web.py web/spikes/performance/{trace,roads,build-road-data,config,geometry,server,verify-evidence}.mjs web/spikes/performance/{main,layers,road-layer,road-playback}.ts`; it runs the Node tests without the browser suite in a temporary copy and refuses unexplained survivors.
+
+## Browser test fixtures
+
+The browser suite keeps each named assertion test and each distinct plant. Tests
+with the same initial language, motion setting and road load share a page within
+a default-mode group; a failure does not skip later tests, and selecting one test
+still creates its fixture. Each group closes its page before the next one starts.
+The uninterrupted road scene records the full stored-hour cycle. A separate fresh
+English scene supplies one real pause/resume observation to both the hour-clock
+and particle tests, with a guard that the pause starts before the final hour.
+Initial reduced-motion scenes remain separate in both languages. Independent DOM
+assertions run together. Layer counts, frame waits, viewport, pixel ratios and
+all timeout values remain unchanged. The list reporter gives individual test
+durations; shared scene setup durations are printed separately and included in
+the measured browser wall time.
+
+The mutation runner sets `workers = min(4, processors)` and passes
+`--test-concurrency=max(1, processors // workers)` to Node in every mutant's test
+command, so the product of worker count and test files in flight does not exceed
+the processor count. An unavailable processor count conservatively uses one.
+Run only one mutation job on the machine, at normal priority. Killed, survived,
+timed-out, uncovered and error counts remain separate. The runner prints exact
+locations and replacements for timed-out mutants as well as survivors, so every
+timeout can be replayed alone at normal load before interpreting it as evidence.
+
+English paused visibility uses its own fresh scene so it checks the first pause,
+as the original test did. It does not reuse the second pause after a clock test.
+The JSON reporter also writes `test-results/performance-timings.json` relative to this spike's
+Playwright configuration directory, allowing the repository test run's individual
+browser durations and overall Playwright duration to be inspected without a
+second full browser run.

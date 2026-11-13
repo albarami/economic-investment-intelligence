@@ -1,0 +1,141 @@
+{
+  "alpha": {
+    "value": "0.15",
+    "unit": "none",
+    "source": "The volume-delay form of the Bureau of Public Roads (1964), Traffic Assignment Manual, as the methods document cites it; the values as commonly used: Boyles, Lownes and Unnikrishnan, Transportation Network Analysis, Volume I, version 1.0 (2025), section 1.5.1: 'It is common to use \u03b1 = 0.15 and \u03b2 = 4' (https://arxiv.org/html/2502.05182)",
+    "read": "2026-11-13",
+    "status": "as published"
+  },
+  "beta": {
+    "value": "4",
+    "unit": "none",
+    "source": "The volume-delay form of the Bureau of Public Roads (1964), Traffic Assignment Manual, as the methods document cites it; the values as commonly used: Boyles, Lownes and Unnikrishnan, Transportation Network Analysis, Volume I, version 1.0 (2025), section 1.5.1: 'It is common to use \u03b1 = 0.15 and \u03b2 = 4' (https://arxiv.org/html/2502.05182)",
+    "read": "2026-11-13",
+    "status": "as published"
+  },
+  "speeds": {
+    "motorway": {
+      "value": "105",
+      "unit": "kilometres per hour",
+      "source": "The default speed by road class of the routing engine's graph builder (the table `default_speed` of the file lua/graph.lua in the engine's source repository, branch master)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: not measured for Qatar; project choice on a published basis: a road without a posted speed gets the routing engine's own default for its class, so that free-flow drive times and the assignment agree"
+    },
+    "trunk": {
+      "value": "90",
+      "unit": "kilometres per hour",
+      "source": "The default speed by road class of the routing engine's graph builder (the table `default_speed` of the file lua/graph.lua in the engine's source repository, branch master)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: not measured for Qatar; project choice on a published basis: a road without a posted speed gets the routing engine's own default for its class, so that free-flow drive times and the assignment agree"
+    },
+    "primary": {
+      "value": "75",
+      "unit": "kilometres per hour",
+      "source": "The default speed by road class of the routing engine's graph builder (the table `default_speed` of the file lua/graph.lua in the engine's source repository, branch master)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: not measured for Qatar; project choice on a published basis: a road without a posted speed gets the routing engine's own default for its class, so that free-flow drive times and the assignment agree"
+    },
+    "secondary": {
+      "value": "60",
+      "unit": "kilometres per hour",
+      "source": "The default speed by road class of the routing engine's graph builder (the table `default_speed` of the file lua/graph.lua in the engine's source repository, branch master)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: not measured for Qatar; project choice on a published basis: a road without a posted speed gets the routing engine's own default for its class, so that free-flow drive times and the assignment agree"
+    },
+    "tertiary": {
+      "value": "50",
+      "unit": "kilometres per hour",
+      "source": "The default speed by road class of the routing engine's graph builder (the table `default_speed` of the file lua/graph.lua in the engine's source repository, branch master)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: not measured for Qatar; project choice on a published basis: a road without a posted speed gets the routing engine's own default for its class, so that free-flow drive times and the assignment agree"
+    },
+    "residential": {
+      "value": "35",
+      "unit": "kilometres per hour",
+      "source": "The default speed by road class of the routing engine's graph builder (the table `default_speed` of the file lua/graph.lua in the engine's source repository, branch master)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: not measured for Qatar; project choice on a published basis: a road without a posted speed gets the routing engine's own default for its class, so that free-flow drive times and the assignment agree"
+    }
+  },
+  "capacities": {
+    "motorway": {
+      "value": "4000",
+      "unit": "vehicle trips per hour for one direction",
+      "source": "Default lanes in each direction times default capacity per lane of the OpenStreetMap network reader of the open-source transport simulation MATSim (the calls `setHighwayDefaults` of the file matsim/src/main/java/org/matsim/core/utils/io/OsmNetworkReader.java in its source repository, branch master, the branch of the code without the option `useVspAdjustments`)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: project choice of a published default table; not measured for Qatar; one capacity for each class, because a road link of the data contract has no lane count"
+    },
+    "trunk": {
+      "value": "2000",
+      "unit": "vehicle trips per hour for one direction",
+      "source": "Default lanes in each direction times default capacity per lane of the OpenStreetMap network reader of the open-source transport simulation MATSim (the calls `setHighwayDefaults` of the file matsim/src/main/java/org/matsim/core/utils/io/OsmNetworkReader.java in its source repository, branch master, the branch of the code without the option `useVspAdjustments`)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: project choice of a published default table; not measured for Qatar; one capacity for each class, because a road link of the data contract has no lane count"
+    },
+    "primary": {
+      "value": "1500",
+      "unit": "vehicle trips per hour for one direction",
+      "source": "Default lanes in each direction times default capacity per lane of the OpenStreetMap network reader of the open-source transport simulation MATSim (the calls `setHighwayDefaults` of the file matsim/src/main/java/org/matsim/core/utils/io/OsmNetworkReader.java in its source repository, branch master, the branch of the code without the option `useVspAdjustments`)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: project choice of a published default table; not measured for Qatar; one capacity for each class, because a road link of the data contract has no lane count"
+    },
+    "secondary": {
+      "value": "1000",
+      "unit": "vehicle trips per hour for one direction",
+      "source": "Default lanes in each direction times default capacity per lane of the OpenStreetMap network reader of the open-source transport simulation MATSim (the calls `setHighwayDefaults` of the file matsim/src/main/java/org/matsim/core/utils/io/OsmNetworkReader.java in its source repository, branch master, the branch of the code without the option `useVspAdjustments`)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: project choice of a published default table; not measured for Qatar; one capacity for each class, because a road link of the data contract has no lane count"
+    },
+    "tertiary": {
+      "value": "600",
+      "unit": "vehicle trips per hour for one direction",
+      "source": "Default lanes in each direction times default capacity per lane of the OpenStreetMap network reader of the open-source transport simulation MATSim (the calls `setHighwayDefaults` of the file matsim/src/main/java/org/matsim/core/utils/io/OsmNetworkReader.java in its source repository, branch master, the branch of the code without the option `useVspAdjustments`)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: project choice of a published default table; not measured for Qatar; one capacity for each class, because a road link of the data contract has no lane count"
+    },
+    "residential": {
+      "value": "600",
+      "unit": "vehicle trips per hour for one direction",
+      "source": "Default lanes in each direction times default capacity per lane of the OpenStreetMap network reader of the open-source transport simulation MATSim (the calls `setHighwayDefaults` of the file matsim/src/main/java/org/matsim/core/utils/io/OsmNetworkReader.java in its source repository, branch master, the branch of the code without the option `useVspAdjustments`)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: project choice of a published default table; not measured for Qatar; one capacity for each class, because a road link of the data contract has no lane count"
+    }
+  },
+  "band_count": {
+    "value": "4",
+    "unit": "none",
+    "source": "Federal Highway Administration, Traffic Signal Timing Manual, chapter 3, Table 3-2, 'Volume-to-capacity ratio threshold descriptions for the Quick Estimation Method' (https://ops.fhwa.dot.gov/publications/fhwahop08024/chapter3.htm)",
+    "read": "2026-11-13",
+    "status": "ASSUMPTION: project choice; thresholds published for signalised intersections, applied to road links as display bands; a ratio exactly on an edge belongs to the upper band, as the method card rules"
+  },
+  "band_edges": [
+    {
+      "value": "0.85",
+      "unit": "none",
+      "source": "Federal Highway Administration, Traffic Signal Timing Manual, chapter 3, Table 3-2, 'Volume-to-capacity ratio threshold descriptions for the Quick Estimation Method' (https://ops.fhwa.dot.gov/publications/fhwahop08024/chapter3.htm)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: project choice; thresholds published for signalised intersections, applied to road links as display bands; a ratio exactly on an edge belongs to the upper band, as the method card rules"
+    },
+    {
+      "value": "0.95",
+      "unit": "none",
+      "source": "Federal Highway Administration, Traffic Signal Timing Manual, chapter 3, Table 3-2, 'Volume-to-capacity ratio threshold descriptions for the Quick Estimation Method' (https://ops.fhwa.dot.gov/publications/fhwahop08024/chapter3.htm)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: project choice; thresholds published for signalised intersections, applied to road links as display bands; a ratio exactly on an edge belongs to the upper band, as the method card rules"
+    },
+    {
+      "value": "1.00",
+      "unit": "none",
+      "source": "Federal Highway Administration, Traffic Signal Timing Manual, chapter 3, Table 3-2, 'Volume-to-capacity ratio threshold descriptions for the Quick Estimation Method' (https://ops.fhwa.dot.gov/publications/fhwahop08024/chapter3.htm)",
+      "read": "2026-11-13",
+      "status": "ASSUMPTION: project choice; thresholds published for signalised intersections, applied to road links as display bands; a ratio exactly on an edge belongs to the upper band, as the method card rules"
+    }
+  ],
+  "speed_floor_kph": {
+    "value": "10",
+    "unit": "kilometres per hour",
+    "source": "The routing engine ignores a posted speed below 10 kilometres per hour (its documentation page 'Speeds': 'Values below 10 kph are ignored in lua'; measured on the installed version by task S1-T11); by the owner's decision of 2026-11-13 this is the floor of every released link speed.",
+    "read": "2026-11-13",
+    "status": "project rule by the owner's decision"
+  }
+}

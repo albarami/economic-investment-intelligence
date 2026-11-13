@@ -17,6 +17,9 @@ const MARKERS = [
   '/en/_perf',
   '/ar/_perf',
   'hexagons-particles',
+  'simulated-roads-',
+  'traffic_simulated',
+  'SYN-L-001',
 ];
 
 export function findSpikeMarkers(text) {
@@ -53,6 +56,8 @@ function get(port, route) {
 
 test('a planted marker is found without a build', () => {
   assert.deepEqual(findSpikeMarkers('route /en/_perf'), ['/en/_perf']);
+  for (const marker of ['simulated-roads-', 'traffic_simulated', 'SYN-L-001'])
+    assert.deepEqual(findSpikeMarkers(marker), [marker]);
 });
 
 test('the production build contains no spike route or contract', async () => {

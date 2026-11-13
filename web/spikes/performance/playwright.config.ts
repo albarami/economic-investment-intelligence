@@ -9,7 +9,10 @@ export default defineConfig({
   retries: 0,
   workers: 1,
   timeout: 180_000,
-  reporter: 'line',
+  reporter: [
+    ['list'],
+    ['json', { outputFile: 'test-results/performance-timings.json' }],
+  ],
   use: {
     ...devices['Desktop Chrome'],
     baseURL,

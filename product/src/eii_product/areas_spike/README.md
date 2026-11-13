@@ -75,3 +75,63 @@ metadata were inspected locally on the same date.
 
 The local Actor docstring describes configuration files and in-process actions;
 the H3 docstring states centre containment and no guaranteed output order.
+
+## Directional traffic spike, round one
+
+Task S1-T11 adds `traffic.py`, which consumes the recorded C25 traffic rows,
+the road fixture named by their digest and the byte-identical parameter-method
+snapshot named by their digest. It imports no custodian code. The reader refuses
+incomplete headers, unexpected row fields, mismatched digests and unknown
+traffic_hourly keys (day type, hour and summer). Each directed link becomes its own one-way extract way with
+its road class and hourly speed. Existing extract calls retain their original
+bytes and the earlier area tests and fixtures are unchanged.
+
+The existing engine cache accepts the road document containing each edge's
+speed; equal whole-speed vectors therefore share a tile set. Hourly drive areas
+carry Simulated and observed; free-flow areas carry Public and observed. Walk
+always uses the unscaled graph. The outline is the engine polygon and protected
+selection still uses the existing whole-cell snap function.
+
+The parameter snapshots supply whole free-flow speeds and the configured floor.
+Both planes refuse fractional speeds, speeds above the named engine maximum,
+a fractional floor, a floor below the named engine minimum, and class speeds
+below the floor. The custodian rounds the rule speed half-up before flooring,
+timing and releasing its ratio. The product reconstructs the same whole speed
+and refuses a noncanonical ratio or a speed below the snapshot floor, naming
+the file and link. It never raises a released speed itself.
+
+The fixtures use the routing graph's measured metre lengths: worked coordinates
+move to preserve the method-card lengths; hourly coordinates stay fixed. Unit
+loading in the method uses great-circle distance and lower-node-id ties, with
+L-74 R8's fallback sphere because the engine's constant was not identified.
+Every whole speed of each parameter class has a ratio round-trip proof.
+
+A screen takes link speeds from `Traffic.link_speed`, link times from
+`Traffic.link_minutes`, route times and their breakdown from `Traffic.route`,
+and areas from `Traffic.area` only. Routes accept day type and summer, identify
+links from the decoded engine shape, and return exact link minutes plus one
+junction-seconds line. The total is the exact sum of those parts. L-83 R5 treats
+residuals within one printed millisecond per link as zero, rounds larger positive
+residuals half-up to milliseconds, and refuses larger negative disagreements.
+Only `Traffic.route_for_measurement` exposes the raw engine answer.
+Drive-time outlines include turn costs at junctions and are drawn from an
+engine grid; measured entry-time deviations are recorded in the task return.
+
+Hours are JSON integers; lookups retain day type, hour and summer. Drive requests
+the hour's whole-speed document and walk requests the free-flow document. Shape
+matching is fixture-only: straight links and one directed edge per node pair;
+real release graphs need their own edge-identity treatment in S5-T09.
+
+L-84 compares exact link sums across the planes and pins junction costs separately.
+Day-route residuals after itemised junction seconds must remain within one printed
+millisecond per link. The outline test retains its turn-shift check and applies
+the absolute bound of forty seconds fixed by L-85. Both recorded rows files match
+fresh assignment bytes; the task return records the single regeneration.
+Package-local mutation runs exclude cross-plane tests; equivalent survivors
+require exact entries in the committed explanation ledger.
+The return carries the measurements and checks;
+independent review remains with the lead and round two supplies the road page.
+
+Routes return `link_ids`, `link_minutes`, `junction_seconds`, `minutes`, a latitude/longitude `line`, `provenance`, `evidence_status` and `caveat`; areas return `exact`, `cells`, `provenance`, `evidence_status` and `caveat`, with `traffic_simulated` on hourly drives and no caveat at free flow or on walks.
+A single-link route refuses a positive discrepancy above its printed resolution because it crosses no junction.
+Run local mutation checks with `uv run --locked --group mutation python scripts/mutation.py product/src/eii_product/areas_spike/traffic.py`.
