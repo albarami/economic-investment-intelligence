@@ -769,7 +769,10 @@ class ArgvRules(unittest.TestCase):
             status, out, err = streams(sandbox_check.main, argv)
             self.assertEqual(status, 2)
             self.assertEqual(out, "")
-            self.assertEqual(err, "sandbox_check: usage: check | check-extensions\n")
+            self.assertEqual(
+                err,
+                "sandbox_check: usage: check | check-extensions | check-enforcement\n",
+            )
 
     def _operations(self, argv: list[str]) -> dict[str, list[str]]:
         found: dict[str, list[str]] = {}

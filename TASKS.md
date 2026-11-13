@@ -202,18 +202,18 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas Backend; status in review (pull request 30).
 ### S1-T06 — Sandbox enforcement spike
 - Goal: Confirm the production sandbox boundary on the build machine without a fallback.
-- Acceptance criteria: [ ] sentinel read and network attempts fail; [ ] mount list matches policy; [ ] any enforcement failure blocks the task.
+- Acceptance criteria: [x] sentinel read and network attempts fail; [x] mount list matches policy; [x] any enforcement failure blocks the task.
 - Scope: sandbox implementation and slice S1 enforcement evidence.
 - Depends: S0-T11.
 - Requirements: ARC-09, SYN-01, TST-61.
-- Delivery: hard; personas Platform; status queued.
+- Delivery: hard; personas Platform; status in review (pull request 31).
 ### S1-T07 — Offline typed-decision gateway
 - Goal: Build the provider-neutral gateway contract, `none`, recorded and configured providers, decision records, data policy and import boundary.
 - Acceptance criteria: [x] default `none` opens no network; [x] forbidden data classes are blocked; [x] records use the closed schema; [x] serving packages cannot import the gateway.
 - Scope: `gateway/`, gateway-only tooling under `scripts/`, gateway contract tests.
 - Depends: S0-T02, S0-T10.
 - Requirements: DAT-126, BE-102, AI-98, PLN-20.
-- Delivery: hard; personas AI; status in review (pull request 29).
+- Delivery: hard; personas AI; status done (pull request 29, merged 2026-11-13).
 ### S1-T11 — Road-assignment and hourly traffic spike
 - Goal: Assign one hourly origin-destination fixture to the routing graph with one fixed volume-delay rule, and animate the resulting link speeds through the day on the map.
 - Acceptance criteria: [ ] the assignment is tested code that reads only a synthetic fixture and repeats exactly on identical inputs; [ ] one fixed volume-delay rule is used, with every parameter in configuration; [ ] the hourly link speeds feed a drive-time area that changes with the hour; [ ] the animated road layer carries the Simulated mark; [ ] the S1-T02 trace is repeated with the road layer animated, and its result is recorded; [ ] any library the assignment needs gets its exact and retreat pins through S1-T08.

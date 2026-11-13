@@ -14389,6 +14389,314 @@ Notes:     The one work commit has a Conventional Commit subject.
 - The task log above names the Cursor command-line tool with `grok-4.7-high` (xAI) as the reviewer. That review was started on the head `e8d32adc55da51c9646f2b7290949ebb7236e53b` and ended after 37 seconds with a connection error of the tool, before any answer (its whole output: three lines "Connection lost, reconnecting", then "RetriableError: [unavailable] Error"). No verdict exists from it. The owner's rule for the tools is that a job that failed on an error is not started again on the same tool
 - The review is therefore given by Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only: a maker that neither planned nor built the task; a full review. The line of the task log is not edited (TST-171). From this task on a task log names the reviewer as planned, and the record of the verdict names the reviewer that gave it
 
+#### S1-T07: independent review: APPROVED
+
+Reviewed commit `192371328efe1b59390e3bf941c014df37f429bf`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/29 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43339333973; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43339334089; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43339334085 ). Reviewer: Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only; a maker that neither planned nor built the task; a full review. Its first answer on the same head (APPROVED, no finding) left out the line of check REV-14 and was not recorded; the lead asked for the complete verdict, which this is. The review planned through the Cursor tool had ended on a connection error before any answer (the correction above). The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T07 (pull request 29)
+COMMIT: 192371328efe1b59390e3bf941c014df37f429bf
+REVIEWER: Moonshot AI Kimi K3.1 Pro (medium)
+CHECKS:
+  REV-10 PASS All four acceptance criteria map to passing tests: socket/key isolation for default `none`; refusal of forbidden and class-incompatible inputs before dispatch or persistence; exact DAT-126 fields with read/write validation and fixed runs storage; and planted import-boundary violations. The head suite passed 1203 tests with none skipped.
+  REV-11 PASS On the exact head, the lead ran `./eii test --seed 2026111324` and `python3 scripts/check_docs.py`, both exit 0. Hosted checks succeeded on the head: tests https://github.com/albarami/economic-investment-intelligence/actions/runs/43339333973/job/131603417135 ; check-docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43339334089/job/131603416825 ; planted-failures https://github.com/albarami/economic-investment-intelligence/actions/runs/43339333973/job/131603417010 ; sandbox proof https://github.com/albarami/economic-investment-intelligence/actions/runs/43339334085/job/131603416816 ; secret-scan https://github.com/albarami/economic-investment-intelligence/actions/runs/43339333973/job/131603417128 ; static-checks https://github.com/albarami/economic-investment-intelligence/actions/runs/43339333973/job/131603416739 . New guards have planted violations, including the initially missed one-order choice case.
+  REV-12 PASS The recorded scope check returned `38 [] []`; the work changes are confined to the gateway, its tooling/tests, fourth-member guard wiring, root metadata/lock, ignore rule and required shared documents. The ledger changes only PROGRESS.md and TASKS.md; nothing under `data/` changed.
+  REV-13 PASS The default, recorded and configured-provider paths are implemented rather than stubbed; the explicitly unverified adapter is required by R1 and makes no qualification claim. Fixtures are small, hand-authored and visibly synthetic, with no invented measurements.
+  REV-14 PASS The hosted secret-scan succeeded on the exact head at https://github.com/albarami/economic-investment-intelligence/actions/runs/43339333973/job/131603417128 . The diff contains no `.env`, key file, credential value, real custodian record or real custodian field/file/count; `SYNTHETIC_UNUSED` is only a test sentinel.
+  REV-15 PASS The six existing guard files extend three workspace members to four, rename the former extra-member plant to an actually extra member and update expected counts/messages accordingly. Existing dependency prohibitions remain and gateway edges are added; no assertion, threshold, attack size or test was removed or loosened.
+  REV-16 PASS The implementation follows decision 0014, R1-R6 and L-57: five closed classes, default `none`, offline-only effects, fixed thresholds and memoisation, no third-party dependency, no new `./eii test` suite and no unverified provider claim. The missing-second-answer and standalone-guard defects found by the lead were corrected with regression evidence.
+  REV-17 PASS gateway/README.md, root README.md, OI-117, TASKS.md and PROGRESS.md describe the implemented contract, unresolved record-reading choice and unmeasured provider properties without claiming live qualification. On the head, `python3 scripts/check_docs.py` exited 0 with `checked 241 text files, 55 Markdown files: OK`.
+  REV-18 PASS `JEV_PRO_API_KEY` is read only inside the explicitly selected adapter; the default path does not import that adapter. Provider exception text, credentials and raw input text are not persisted, records contain hashes rather than raw input, and no application decision table or serving integration was added.
+  REV-19 PASS The change implements the accepted offline-gateway decision without reopening component or build-order decisions. The refused-request interpretation and run-record retention choice are transparently preserved in OI-117 rather than silently altering DAT-126.
+  REV-20 N/A No product fact or displayed figure is introduced; the synthetic fixture scores are offline ranking signals that decision 0014 expressly excludes from facts and user-facing numbers.
+  REV-21 N/A The change adds no screen, card, rendered template, Fact chip or model-written prose.
+  REV-22 PASS No privacy partition, parameter set, treatment, release rule, privacy test or attack suite changed; the complete head test run passed without skips.
+  REV-23 PASS The original three-plane import guard and its tests remain unchanged, and the import-boundary discovery passed 35 tests, including the new planted `eii_core -> eii_gateway` violation.
+  REV-24 N/A No English or Arabic view, displayed numeral or Arabic string was added or changed.
+  REV-25 PASS The diff adds no private local path, personal name, e-mail address, realistic entity identifier, prohibited product comparison or secret. The head documentation check and hosted secret-scan both succeeded.
+  REV-26 PASS The added code strings and documents claim neither real custodian data nor live provider verification, qualification, accuracy, authority, endorsement or a prohibited recommendation; adapter limitations and synthetic-fixture status are explicit.
+  REV-27 PASS Neither agent file changed, and the lead's `cmp AGENTS.md CLAUDE.md` on the exact head exited 0; the documentation check also passed.
+  REV-28 N/A No synthetic establishment, legal-entity, employer-group, person or salary-file identifier is introduced; test case names and option labels are visibly synthetic non-entity fixtures.
+  REV-29 N/A No real named place or business, or any attribute attached to one, is introduced.
+  REV-38 PASS The unchanged three-plane guard forbids `eii_gateway` and scans serving source trees for both environment names. The new consumer guard rejects planted imports in `core`, `custodian`, `product`, `web` and `infra`, while the real-tree guards pass; no runtime consumer, screen output or application table was added.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S1-T07: merge record
+
+- The branch was updated with main when its turn to merge came (the owner's rule of 2026-11-12): merge commit `e6a39a575c09f3e71e06bf032b26a54047276505`, the head that was merged. Where both sides had appended at the same place the lead's scripts keep every line of both sides, main's first, and refuse any overlap. The lead's proof that the update changed nothing by itself (for every path: the branch's blob where main did not change it, main's blob where the branch did not, git's own three-way merge, or the scripted resolution):
+
+```text
+base update e6a39a575c09f3e71e06bf032b26a54047276505: branch side 192371328efe1b59390e3bf941c014df37f429bf, main side 4a43f91c1a8491e97394c808a28af0586b407acf, merge base 07aab1a8ed08fb7e08456925dec72fdc89442357
+  branch only: 34
+  main only: 8
+  neither: 256
+  both, git's own merge: (3, ['TASKS.md', 'pyproject.toml', 'uv.lock'])
+  both, resolved by the lead's script: (3, ['OPEN_ITEMS.md', 'PROGRESS.md', 'README.md'])
+  FAIL: (0, [])
+```
+
+- CI on the updated head: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43340643427; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43340643497; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43340643464 .
+
+- The lead's checks on the merged head `e6a39a575c09f3e71e06bf032b26a54047276505` before the merge (ruling L-29): "TREE-IS-WORK ok: 304 paths at e6a39a575c09f3e71e06bf032b26a54047276505", exit code 0; `./eii test --seed 2026111325`: exit code 0, "total: 1212 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/29 was squash-merged on 2026-11-13 at that head; merge commit `034f0805a2638bca27a737789327428d2652395f` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43341434249; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43341433932; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43341434250 .
+
+
+- The task log of S1-T07 is complete with this record: APPROVED in its one review round, no finding, no proposed item. TASKS.md marks the task done with this ledger.
+
+### S1-T06 — Sandbox enforcement spike: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/31 )
+
+- What the task proves (slice S1, the technical spike): the production boundary of the generator sandbox holds on the build machine, with no fallback (ARC-09, SYN-01, TST-61; rule 12 of AGENTS.md). The launcher and its profile tables of task S0-T11 are unchanged; this task adds the proof
+- Class of the work (the owner's note of 2026-11-12 on value and cost): standard, moved up in care because sandbox enforcement is a security control with no fallback: beside the builder's break pass the lead planted four violations in the real launcher and saw the new command fail on each
+- Plan: a short plan by OpenAI GPT-5.6 Sol (written on 2026-11-12 through the Cursor command-line tool, before the owner limited that tool to other models), read by the lead; the lead's rulings R1 to R5 of the build brief override it where they differ. No separate plan review
+- Builder maker and model: Cursor command-line tool, `grok-4.7-high` (xAI): one build; no completion pass was needed
+- Reviewer, as planned: Devin command-line tool, Moonshot AI Kimi K3.1 Pro, read-only (a maker that neither planned nor built); the record of the verdict names the reviewer that gave it
+- Branch: `task/S1-T06-sandbox-enforcement`
+- What was built: the command `uv run --locked python scripts/sandbox_check.py check-enforcement`, which runs seven parts and prints one line for each, then `sandbox enforcement: OK` or `sandbox enforcement: FAILED`: the bubblewrap version; the probe outside the sandbox (the sentinel file is readable there and a local connection succeeds: the tooth of TST-61); for each of the profiles `build-world` and `build-release` the same probe inside the sandbox (the sentinel unreadable, a loopback connection and an abstract socket refused) and the judgement of the profile's mount list; the offline load of the engine extensions inside the sandbox. A part that fails prints `FAIL`, its name and what differs, and the command exits 1; a part that does not run is a failure. And `scripts/sandbox_policy.py`: it reduces the argument list that the launcher generates to roles and modes (file descriptors and host paths are not compared) and judges it against a closed sequence that is written in the module and not read from the profile tables, so a change of a table that moves, adds or drops a mount fails the judge
+- The three acceptance criteria. (1) Sentinel read and network attempts fail: the lines `profile build-world sentinel: OK` and `profile build-release sentinel: OK` of the command below, with the outside probe as their tooth. (2) Mount list matches policy: the lines `profile build-world mounts: OK` and `profile build-release mounts: OK`; the nine tests of `scripts/tests/test_sandbox_policy.py` with their planted mismatches. (3) Any enforcement failure blocks the task: the command exits 1 when any part fails (`test_check_enforcement_prints_success_and_blocks_each_part` and `test_check_enforcement_reports_policy_and_blocks_failure`), and the lead's four planted violations in the real launcher, below
+- The rulings (the build brief): R1, OI-61 and OI-62 are confirmed as far as the proof passes and nothing is redesigned. R2, the pin record and the technology-stack rows of document 02 are not changed here; the version that passed is listed below for task S1-T08; document 05 is this task's own and records the mount list that was confirmed. R3 and R4, the texts for the shared documents and the hardening points go to the lead. R5, there is exactly one launcher; the policy module starts no process, and no check may pass by not running
+- The lead's planted violations in the real launcher, each followed by the command (the files restored afterwards; evidence in the review pack): a read-only path bind of `/etc` added to the argument list: exit 1, "unrecognised: extra path-read-only mount, expected absent" for both profiles; the network namespace no longer unshared: exit 1, the sentinel part of both profiles fails because the loopback connection succeeds; the vault mounted read-only: exit 1, "vault: mode read-only, expected writable"; the root not sealed: exit 1, "root sealing: missing, expected sealed". The lead's seven breaks of the report and of the policy (the exit status forced to 0; a failed part not counted; the extension load reported without running; the mount judgement's problems dropped; a role outside the policy not reported; the closed table changed; the order not judged) are each caught by a named test
+- The builder's break pass, as it reports: every condition of the new code broken once and caught, with one planted option added for a branch that had no test (an option outside the table of argument counts)
+- Existing tests that changed (REV-15): one expectation of `scripts/tests/test_sandbox_argv.py` now reads the usage line with the third command name; `scripts/tests/test_sandbox_output.py` gained one test. No assertion was removed or loosened
+- Red run before the code: `test_check_enforcement_reports_policy_and_blocks_failure`: the command name was refused as a usage error with exit 2
+- Measured, for the pin confirmation of task S1-T08: bubblewrap 0.11.1 on the build machine (Ubuntu 26.04, kernel 6.6 under WSL2; AppArmor not enabled there); the engine-extension folder `data/engine_extensions/`, whose check passes and whose files load offline inside the sandbox. The installed manual page of that bubblewrap does not describe the two descriptor-bind options that the launcher uses; its `--help` output does. The reference-note field "path of the project-local extension directory" is supported by these runs. `uv run --locked python scripts/ci_sandbox.py facts` exits 1 on the build machine because a package of the hosted runner's AppArmor profiles is not installed there; that command belongs to the hosted runner and is not part of this proof
+- Shared documents, entered by the lead in the work commit: rule 44 of AGENTS.md and CLAUDE.md (the new command); README.md (one sentence of the status paragraph, the count and the list of the root commands, one line of the command block, one paragraph on the proof); one sentence added to each of OI-61 and OI-62 (what was confirmed and what stays open)
+- Hardening listed, not built (the plan's section 8 and the builder's return): authenticating the bubblewrap executable beyond its path and version; protecting mounted inputs against a host process that changes them while the sandbox runs; bounds for the in-memory scratch and extension mounts once budgets are measured; refusing writable ancestor folders under temporary mounts; separation against root, the kernel and a compromised sandbox runtime
+- With this ledger: the closing record of pull request 29 above, and the status of S1-T07 in TASKS.md set to done
+
+#### Evidence for the work commit `663711f032b8eb2b943b6915bad992c6a28df313`
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   uv run --locked python scripts/sandbox_check.py check-enforcement
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox enforcement: OK" (the last of eight lines: the bubblewrap version, the outside probe, the sentinel part and the mount part of each profile, the extensions, each OK)
+Seed:      none
+Notes:     Criteria 1, 2 and 3 on the build machine. The eight lines: `version: bubblewrap 0.11.1`, `outside: OK`, `profile build-world sentinel: OK`, `profile build-world mounts: OK`, `profile build-release sentinel: OK`, `profile build-release mounts: OK`, `extensions: OK`, `sandbox enforcement: OK`; exit code 0. With any part failing the last line reads `sandbox enforcement: FAILED` and the exit code is 1 (the tests of the next two entries, and the lead's four planted violations in the task log).
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_sandbox_policy.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Criterion 2 and the invented rules of the policy, nine tests: the enforcement report with its seven parts blocks on a failing part; both profiles reduce to the closed sequence; descriptors and temporary paths become roles; planted mismatches each name their role (a wrong mode, a missing mount, an extra path bind of the checkout, a missing sealing, a scenario or a staging folder where the profile has none, the network not unshared); the profile's own flags are not the policy; the order of the mounts is part of it; the parse edges, an unknown option among them; a layout that cannot be opened is a failure; the policy starts no process.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_sandbox_output.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Criterion 3: the success lines are fixed, and each part that fails gives a `FAIL` line and exit code 1 (`test_check_enforcement_prints_success_and_blocks_each_part` is the test this task added to the four that existed).
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_sandbox_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    75 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole family of sandbox tests, 75: the 65 of task S0-T11 (the sentinel and network teeth of TST-61 among them) and the ten this task adds; none is skipped.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   uv run --locked python scripts/sandbox_check.py check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox: OK"
+Seed:      none
+Notes:     The first of the two commands that existed still prints its fixed line.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   uv run --locked python scripts/sandbox_check.py check-extensions
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox: OK"
+Seed:      none
+Notes:     The second of the two commands that existed still prints its fixed line.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   uv run --locked python scripts/engine_extensions.py verify
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "engine extensions: OK"
+Seed:      none
+Notes:     The engine-extension folder of the build machine passes its check; the fetch command was not run.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   ./eii test --seed 2026111312
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1222 passed, 0 failed, 0 skipped
+Seed:      2026111312
+Notes:     The whole test command on the build machine; the ten new tests run in its guard suite.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 44 packages in 0.95ms"
+Seed:      none
+Notes:     The lock file is unchanged by this task and matches the manifests.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 60 components: OK"
+Seed:      none
+Notes:     The version check; no pin row changed (ruling R2).
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes and their check are unchanged by this task.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "163 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 157 source files"
+Seed:      none
+Notes:     Strict types, the new policy module included; no ignore comment and no relaxed setting.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 248 text files, 55 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with the new subsection of document 05, rule 44 of both agent files, the README and the two open items.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after the same insertion in rule 44 of each.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','034f0805a2638bca27a737789327428d2652395f...663711f032b8eb2b943b6915bad992c6a28df313'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:scripts/sandbox_policy.py A:scripts/tests/test_sandbox_policy.py M:AGENTS.md M:CLAUDE.md M:OPEN_ITEMS.md M:README.md M:docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md M:scripts/sandbox_check.py M:scripts/tests/test_sandbox_argv.py M:scripts/tests/test_sandbox_output.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "10 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope (REV-12): the policy module and its test, the check command and its two changed test files, document 05, and the four shared documents the lead entered (AGENTS.md, CLAUDE.md, README.md, OPEN_ITEMS.md). The launcher and the profile tables are not in the list.
+```
+
+```text
+### S1-T06 — Sandbox enforcement spike
+Commit:    663711f032b8eb2b943b6915bad992c6a28df313
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','034f0805a2638bca27a737789327428d2652395f..663711f032b8eb2b943b6915bad992c6a28df313'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit has a Conventional Commit subject.
+```
+
 #### S1-T04: independent review, round 2: APPROVED
 
 Reviewed commit `2e8bcac0c2f5cad5effbdc161d238309c58af209`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/28 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43339006721; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43339006720; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43339006798 ). Reviewer: OpenAI GPT-5.6 Sol (effort high), through the Codex command-line tool, read-only, the reviewer of round 1 (it names itself more shortly in its verdict); a later round, limited as REV-39 says. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
