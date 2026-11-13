@@ -1113,6 +1113,16 @@
 - OPTIONS: **Recommendation:** keep the live layer for the owner's own evaluation and show the simulated traffic in every demonstration; if the owner wants the live layer in a demonstration, take a plan whose terms allow that use first.
 - NEEDED BY: task S6-T19.
 
+## OI-131 — Public split declarations of the registry rows
+
+- ID: OI-131
+- TYPE: OPEN
+- NEEDED: The registry rows of Public split tables declare the split dimensions their tables carry (DAT-141, PUB-90).
+- WHY: Review round 1 of S2-T01 found that the six `active_nat_occ_act` rows declare a nationality split but not the sex split their table `pub_active_nationality_occupation` carries, and that `sec_hr_comp_occ`, `wage_bands_priv`, `ref_min_wage` and the three `visitors_markets` rows declare no split on tables that are Public split tables.
+- DONE SO FAR: Recorded at the review of S2-T01; S2-T01 builds the fetchers and the registry, not the split tables.
+- OPTIONS: **Recommendation:** task S2-T11, which builds the Public split tables, sets each row's `public_splits` to the dimensions of its table and adds a test that compares the registry with the table contracts.
+- NEEDED BY: task S2-T11.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.

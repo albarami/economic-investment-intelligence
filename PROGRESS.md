@@ -16962,6 +16962,170 @@ Seed:      none
 Notes:     The two agent files are byte-identical after rule 44 lost build-public from its list of placeholders.
 ```
 
+### S2-T01 — the fix round after review round 1 (pull request https://github.com/albarami/economic-investment-intelligence/pull/36 )
+
+- Review round 1 (another maker, read-only) rejected on one finding: after a source changed, the build re-read the cache folder in unordered directory order and could record an older receipt's digest, host, retrieval time and terms fingerprint. The fix round (the same builder, Cursor command-line tool, `grok-4.7-high`, xAI) carries the run's own values from the fetch into the build log, the PASS line and the watched-terms record, with a test of two consecutive builds in both payload orders. It also took two of the reviewer's proposed points: a redirect to a host off the allow-list now fails on the first attempt as `blocked_host`; the two section-10 stage tests moved into `custodian/tests`, so the whole test command runs them (custodian 50). The builder had also changed the gateway import guard to skip a listed path that is missing; that change was outside the brief and loosened a fail-closed guard, and the lead reverted it before the commit. The lead corrected PUB-12 to name the two investment sources beside `busy_gmaps` (the reviewer's point P4).
+- Corrections to the task log of the first ledger (appended, never rewritten): its "What was built" describes the switch-off of the investment sources, which passes 6 and 7 replaced by the owner's basis of use and a watched terms page; the real fetches recorded twelve coverage lines `not_measured` (PUB-62 to PUB-73), not six; the lead's whole test at the last head before that ledger was seed 2026111382 with 1,410 passed, and the ledger's own run was seed 2026111383 with 1,421 passed; the custodian suite then held 46 tests, now 50.
+- The real fetch at the fix round's work commit 0773f79fa312191999d1fd958f08dd62e25edcb4: exit 0, 117 PASS, no TERMS and no OWNER line.
+
+#### Evidence for the work commit `0773f79fa312191999d1fd958f08dd62e25edcb4`
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    0773f79fa312191999d1fd958f08dd62e25edcb4
+Command:   uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    50 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The custodian suite at the fix round work commit: 50 tests pass, among them the test of two consecutive builds in both payload orders, the blocked redirect and the two stage tests now collected.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    0773f79fa312191999d1fd958f08dd62e25edcb4
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    565 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The guard tests of scripts/tests: 565 tests, none failed or skipped; the command tests of the placeholder table now treat build-public as a real command.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    0773f79fa312191999d1fd958f08dd62e25edcb4
+Command:   ./eii build-public
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; first output line "PASS lic_active sha256=4cfecf94fcf2346613b236dfb6a5af32bfc24c46209fcf7c61c9c05b1db37056 host=www.data.gov.qa"
+Seed:      none
+Notes:     The lead's real fetch at the fix round work commit, from its own shell with no key: exit 0, 117 PASS, no TERMS and no OWNER line.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    0773f79fa312191999d1fd958f08dd62e25edcb4
+Command:   ./eii test --seed 2026111400
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1425 passed, 0 failed, 0 skipped
+Seed:      2026111400
+Notes:     The whole test command on the build machine, outside any sandbox: 6 suites; the python-custodian suite holds the 35 custodian tests of this task.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    0773f79fa312191999d1fd958f08dd62e25edcb4
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    0773f79fa312191999d1fd958f08dd62e25edcb4
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "200 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    0773f79fa312191999d1fd958f08dd62e25edcb4
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 185 source files"
+Seed:      none
+Notes:     Strict types; the PyYAML import carries the one type-ignore mark that two existing checks use.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    0773f79fa312191999d1fd958f08dd62e25edcb4
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 325 text files, 59 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with the README sentence on build-public, rule 44, document 04 (the layer id), the open items and TASKS.md as this task changes them.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    0773f79fa312191999d1fd958f08dd62e25edcb4
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    0773f79fa312191999d1fd958f08dd62e25edcb4
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The lock file agrees with the manifests after pyyaml 6.0.3 joined the root development group.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    0773f79fa312191999d1fd958f08dd62e25edcb4
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 64 components: OK"
+Seed:      none
+Notes:     The version check with the new row pyyaml of pins.toml.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    0773f79fa312191999d1fd958f08dd62e25edcb4
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes are unchanged by this task.
+```
+
+```text
+### S2-T01 — Public fetchers and source receipts
+Commit:    0773f79fa312191999d1fd958f08dd62e25edcb4
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after rule 44 lost build-public from its list of placeholders.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
