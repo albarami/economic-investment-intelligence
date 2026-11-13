@@ -67,6 +67,23 @@ The sentinel test itself (a probe generator that tries to open a file outside th
 
 ASSUMPTION: "public inputs only" is read as "no data input other than the public cache". Code, the calibration manifest and the scenario are authored configuration that contains no custodian data, so mounting them does not break rule zero.
 
+### Semantic mounts confirmed on the build machine
+
+Slice S1 task S1-T06 confirmed the mount list below on the build machine. The enforcement proof fails when the argument list a profile generates does not match it. File descriptors and host paths are not part of the comparison: the proof names roles. An extra mount is a failure on its own.
+
+Both `build-world` and `build-release`:
+
+- The user, ipc, pid, network, uts and cgroup namespaces are unshared. The cgroup namespace is the try form. The process dies with its parent, starts a new session and clears the environment, then sets home to the scratch mount, turns bytecode writing off, puts the virtual environment's interpreter on the path and names the profile.
+- Devices are a device mount. Scratch is an in-memory temporary mount and the working directory.
+- Read-only: the two system library folders, the loader link, the uv interpreter, the virtual environment, `core/src`, `custodian/src`, `scripts/sandbox_inside` and `data/public_cache/`.
+- The engine extensions are an in-memory mount of their own under `data/engine_extensions/`. The version folder and the platform folder are created inside it. The pinned `h3` and `spatial` files and their info files are bound read-only from the descriptors that were checked, and the mount is then sealed read-only. The home directory is not mounted, and the checkout is not mounted as a whole.
+- The vault folder is the writable host path. The root is sealed read-only after that mount. A path bind is not accepted in place of a descriptor bind.
+
+The profiles differ in two mounts:
+
+- `build-world` also mounts the decrypted scenario file read-only, and it has no release staging folder.
+- `build-release` also mounts one release staging folder writable, and it has no scenario file.
+
 ## 3. The calibration manifest
 
 The manifest is one YAML file, `custodian/worldgen/calibration_manifest.yaml` (ASSUMPTION: path). Each entry has these fields:

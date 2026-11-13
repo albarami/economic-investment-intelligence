@@ -1,10 +1,11 @@
 """Proofs of the generator sandbox: bubblewrap and the engine extensions.
 
 ``check_bubblewrap`` and ``check_extensions`` are the entry points of the
-preflight rows for bubblewrap and for DuckDB extensions. The command line of
-this module is ``check`` and ``check-extensions``. Every program they start is
-judged by ``output_problems``: exit status 0, nothing on standard error and
-exactly the expected lines, each once and in order.
+preflight rows for bubblewrap and for DuckDB extensions. The command line of this module is ``check``, ``check-extensions`` and
+``check-enforcement``. Every program they start is judged by
+``output_problems``: exit status 0, nothing on standard error and exactly the
+expected lines, each once and in order. ``check-enforcement`` also judges the
+argument list of each profile and returns non-zero when any part fails.
 """
 
 from __future__ import annotations
@@ -23,6 +24,7 @@ from pathlib import Path
 
 import extension_tree
 import sandbox_launch as launch
+import sandbox_policy
 import sandbox_profiles as tables
 
 ROOT = launch.ROOT
@@ -52,6 +54,31 @@ LOAD_LINES = (
     "LOCK autoinstall error InvalidInputException locked",
 )
 Expected = str | re.Pattern[str]
+VERSION = "version"
+OUTSIDE = "outside"
+WORLD_SENTINEL = "profile build-world sentinel"
+WORLD_MOUNTS = "profile build-world mounts"
+RELEASE_SENTINEL = "profile build-release sentinel"
+RELEASE_MOUNTS = "profile build-release mounts"
+EXTENSIONS = "extensions"
+ENFORCEMENT_OK = "sandbox enforcement: OK"
+ENFORCEMENT_FAILED = "sandbox enforcement: FAILED"
+_USAGE = "sandbox_check: usage: check | check-extensions | check-enforcement"
+
+
+@dataclasses.dataclass(frozen=True)
+class Component:
+    """One part of the enforcement proof.
+
+    Attributes:
+        name: The label printed for this part.
+        problems: Failure texts; empty when the part passed.
+        detail: The version line, set only when ``name`` is ``version`` and it passed.
+    """
+
+    name: str
+    problems: tuple[str, ...]
+    detail: str = ""
 
 
 def _shown(line: Expected) -> str:
@@ -228,24 +255,40 @@ def check_bubblewrap() -> list[str]:
         both profiles block each attempt, every run exactly as expected.
     """
     problems = version_problems()
+    for component in sentinel_components():
+        problems.extend(component.problems)
+    return problems
+
+
+def sentinel_components() -> tuple[Component, Component, Component]:
+    """Run the outside tooth and both profiles. Each part is its own component.
+
+    Returns:
+        The outside probe, then ``build-world``, then ``build-release``. A part
+        that does not run carries a problem; it is never reported as passed.
+    """
+    outside: list[str] = []
+    world: list[str] = []
+    release: list[str] = []
+    buckets = {"build-world": world, "build-release": release}
     attempts = list(INSIDE_LINES)
     with tempfile.TemporaryDirectory() as tmp, listeners() as (port, abstract):
         base = Path(tmp).resolve()
         make_folders(base, tables.PROFILES[0])
         config = probe_config(base, port, abstract)
         probe = str(ROOT / PROBE)
-        outside = subprocess.run(
+        ran = subprocess.run(
             [sys.executable, "-I", "-B", probe, config, *attempts],
             env={},
             capture_output=True,
             text=True,
             check=False,
         )
-        problems += output_problems(
+        outside += output_problems(
             "outside the sandbox",
-            outside.returncode,
-            outside.stdout,
-            outside.stderr,
+            ran.returncode,
+            ran.stdout,
+            ran.stderr,
             [f"{attempt} ok" for attempt in attempts],
         )
         for profile in tables.PROFILES:
@@ -257,16 +300,117 @@ def check_bubblewrap() -> list[str]:
                     launch.python_command(probe, config, *attempts),
                 )
             except launch.SandboxError as error:
-                problems.append(f"profile {profile.name}: {error}")
+                buckets[profile.name].append(f"profile {profile.name}: {error}")
                 continue
-            problems += output_problems(
+            buckets[profile.name] += output_problems(
                 f"profile {profile.name}",
                 result.returncode,
                 result.stdout,
                 result.stderr,
                 [f"{attempt} {want}" for attempt, want in INSIDE_LINES.items()],
             )
-    return problems
+    return (
+        Component(OUTSIDE, tuple(outside)),
+        Component(WORLD_SENTINEL, tuple(world)),
+        Component(RELEASE_SENTINEL, tuple(release)),
+    )
+
+
+def _production_layout(base: Path, profile: tables.Profile) -> launch.Layout:
+    """Return a fixture layout whose extension folder is the project-local one."""
+    made = make_folders(base, profile)
+    return dataclasses.replace(made, extensions=ROOT / EXTENSIONS_DEFAULT)
+
+
+def mount_component(profile_name: str, layout: launch.Layout) -> Component:
+    """Judge the argument list the profile generates. This starts no sandbox.
+
+    Args:
+        profile_name: ``build-world`` or ``build-release``.
+        layout: The host folders, including the real extension folder.
+
+    Returns:
+        A component whose problems name each mount that disagrees with the policy.
+        A layout that cannot be opened is a problem, not a pass.
+    """
+    name = WORLD_MOUNTS if profile_name == "build-world" else RELEASE_MOUNTS
+    try:
+        profile = launch.profile_named(profile_name)
+        interpreter = launch.interpreter_for(launch.current_venv())
+        descriptors = launch.open_sources(profile, layout, interpreter)
+    except launch.SandboxError as error:
+        return Component(name, (str(error),))
+    try:
+        argv = launch.build_argv(
+            profile,
+            layout,
+            interpreter,
+            launch.python_command(str(ROOT / PROBE)),
+            descriptors,
+        )
+    except launch.SandboxError as error:
+        return Component(name, (str(error),))
+    finally:
+        launch.close_all(descriptors)
+    judgement = sandbox_policy.judge(
+        sandbox_policy.PolicyInput(profile, layout, interpreter, argv)
+    )
+    return Component(name, judgement.problems)
+
+
+def collect_enforcement() -> tuple[Component, ...]:
+    """Run every enforcement part. A part that is not run is not a success.
+
+    Returns:
+        Version, outside tooth, both sentinel runs, both mount judgements and
+        the offline extension load, in that order.
+    """
+    version_issues = version_problems()
+    detail = "" if version_issues else bubblewrap_version()
+    outside, world, release = sentinel_components()
+    with tempfile.TemporaryDirectory() as tmp:
+        base = Path(tmp).resolve()
+        world_mounts = mount_component(
+            "build-world", _production_layout(base, tables.PROFILES[0])
+        )
+        release_mounts = mount_component(
+            "build-release", _production_layout(base, tables.PROFILES[1])
+        )
+    return (
+        Component(VERSION, tuple(version_issues), detail),
+        outside,
+        world,
+        world_mounts,
+        release,
+        release_mounts,
+        Component(EXTENSIONS, tuple(check_extensions())),
+    )
+
+
+def render_enforcement(components: Sequence[Component]) -> tuple[int, str]:
+    """Render the enforcement report.
+
+    Args:
+        components: The parts, in the order they ran.
+
+    Returns:
+        The exit status (0 only when every part's problem list is empty) and
+        the whole report, including the final line.
+    """
+    lines: list[str] = []
+    failed = False
+    for component in components:
+        if component.problems:
+            failed = True
+            for problem in component.problems:
+                lines.append(f"FAIL {component.name}: {problem}")
+            continue
+        if component.name == VERSION:
+            lines.append(f"version: {component.detail}")
+            continue
+        lines.append(f"{component.name}: OK")
+    lines.append(ENFORCEMENT_FAILED if failed else ENFORCEMENT_OK)
+    return (1 if failed else 0), "\n".join(lines) + "\n"
 
 
 def check_extensions(extensions: Path | None = None) -> list[str]:
@@ -317,7 +461,7 @@ def bubblewrap_version() -> str:
 
 
 def main(argv: Sequence[str]) -> int:
-    """Run ``check`` or ``check-extensions``.
+    """Run ``check``, ``check-extensions`` or ``check-enforcement``.
 
     Args:
         argv: The arguments after the program name.
@@ -325,9 +469,13 @@ def main(argv: Sequence[str]) -> int:
     Returns:
         0 when no problem was found, 1 when one was, 2 for a usage error.
     """
-    if list(argv) not in (["check"], ["check-extensions"]):
-        print("sandbox_check: usage: check | check-extensions", file=sys.stderr)
+    if list(argv) not in (["check"], ["check-extensions"], ["check-enforcement"]):
+        print(_USAGE, file=sys.stderr)
         return EXIT_USAGE
+    if argv[0] == "check-enforcement":
+        status, text = render_enforcement(collect_enforcement())
+        sys.stdout.write(text)
+        return status
     if argv[0] == "check":
         print(bubblewrap_version())
         problems = check_bubblewrap()
