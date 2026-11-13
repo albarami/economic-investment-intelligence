@@ -983,6 +983,16 @@
 - OPTIONS: **Recommendation:** leave it. Alternative: a later owner-approved settings task sets it to false.
 - NEEDED BY: any change of the required number of approving reviews; not a blocker.
 
+## OI-117 — A refused gateway request leaves no decision record, and run records are not committed by default
+
+- ID: OI-117
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm two readings of the record contract that the gateway of task S1-T07 implements, or to replace either.
+- WHY: Item 6 of [decision 0014](docs/decisions/0014-typed-decision-gateway.md) says that every call writes a decision record, and its item 8 says that the gateway code refuses every input class but the four cleared ones. The closed record schema of `docs/03_DATA_CONTRACTS.md` (section 12.1, DAT-126) admits only those four classes in `input_class`, so a refused class cannot be written without a false label, and a hash of refused text would itself be a trace of it. The same schema lists the outcome `BLOCKED_BY_DATA_POLICY`. The pack does not say whether the records of an offline run are committed.
+- DONE SO FAR: The lead ruled on 2026-11-13 that a refused request is not a call. The gateway raises `DataPolicyBlocked` with the text `BLOCKED_BY_DATA_POLICY` before a provider is constructed and before anything is stored: for a declared input class outside the four, and for a cleared class that the decision class does not accept (`question_route` and `router_miss_finder` take team questions only, `string_parity` project text only). No record holds that outcome in version 1; every admitted call writes one record. Files under `evals/typed_decisions/runs/` are ignored by git, so the output of a run is committed only by a deliberate act; the tests write under temporary folders.
+- OPTIONS: **Recommendation:** keep both readings. Alternative for the first: a request in a cleared class that its decision class does not accept writes a record with the outcome `BLOCKED_BY_DATA_POLICY`, with a rule that such a record is never replayed from the memo. Alternative for the second: the records of named runs are committed as evidence.
+- NEEDED BY: slice S1 gate; the requalification of task S1-T08.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.

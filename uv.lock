@@ -10,6 +10,7 @@ resolution-markers = [
 members = [
     "eii-core",
     "eii-custodian",
+    "eii-gateway",
     "eii-product",
     "eii-workspace",
 ]
@@ -135,6 +136,11 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [{ name = "eii-core", editable = "core" }]
+
+[[package]]
+name = "eii-gateway"
+version = "0.0.0"
+source = { editable = "gateway" }
 
 [[package]]
 name = "eii-product"

@@ -103,7 +103,7 @@ def copy_workspace(dst: Path) -> None:
     """Copy workspace inputs into ``dst``."""
     for name in ("pyproject.toml", ".python-version", "uv.lock"):
         shutil.copy2(REPO_ROOT / name, dst / name)
-    for member in ("core", "custodian", "product"):
+    for member in ("core", "custodian", "gateway", "product"):
         shutil.copytree(
             REPO_ROOT / member,
             dst / member,
@@ -131,7 +131,7 @@ def observe(envdir: Path, work: Path, env: dict[str, str]) -> list[list[object]]
     )
     rows: list[list[object]] = []
     env_resolved = envdir.resolve()
-    for module in ("eii_core", "eii_custodian", "eii_product"):
+    for module in ("eii_core", "eii_custodian", "eii_gateway", "eii_product"):
         proc = run(
             [str(env_python(envdir)), "-I", "-c", code, module],
             work,
@@ -227,6 +227,7 @@ class CleanEnvironment(unittest.TestCase):
             ("eii_core", "core"),
             ("eii_custodian", "custodian"),
             ("eii_product", "product"),
+            ("eii_gateway", "gateway"),
         ):
             with self.subTest(module=module):
                 proc = run(
@@ -262,7 +263,7 @@ class CleanEnvironment(unittest.TestCase):
             child_env(cache),
         )
         self.assertEqual(proc.returncode, 0, proc.stderr)
-        for module in ("eii_core", "eii_custodian", "eii_product"):
+        for module in ("eii_core", "eii_custodian", "eii_gateway", "eii_product"):
             with self.subTest(module=module):
                 imp = run(
                     [str(env_python(bare)), "-I", "-c", f"import {module}"],
@@ -272,7 +273,7 @@ class CleanEnvironment(unittest.TestCase):
                 self.assertNotEqual(imp.returncode, 0)
                 self.assertIn("ModuleNotFoundError", imp.stderr)
 
-    def test_uv_pip_list_names_the_three_packages(self) -> None:
+    def test_uv_pip_list_names_the_four_packages(self) -> None:
         proc = run(
             [
                 UV,
@@ -289,7 +290,9 @@ class CleanEnvironment(unittest.TestCase):
         )
         self.assertEqual(proc.returncode, 0, proc.stderr)
         names = {row["name"] for row in json.loads(proc.stdout)}
-        self.assertEqual(names, {"eii-core", "eii-custodian", "eii-product"})
+        self.assertEqual(
+            names, {"eii-core", "eii-custodian", "eii-gateway", "eii-product"}
+        )
 
     def test_hostile_surroundings_do_not_change_the_result(self) -> None:
         tmp = tempfile.TemporaryDirectory()
@@ -369,7 +372,9 @@ class CleanEnvironment(unittest.TestCase):
                 e,
             )
             names = {row["name"] for row in json.loads(pip.stdout)}
-            self.assertEqual(names, {"eii-core", "eii-custodian", "eii-product"})
+            self.assertEqual(
+                names, {"eii-core", "eii-custodian", "eii-gateway", "eii-product"}
+            )
             self.assertEqual(observe(self.env, work, e), clean)
 
             e2 = child_env(cache2, env2)

@@ -1,0 +1,10 @@
+[project]
+name = "eii-gateway"
+version = "0.0.0"
+description = "Offline typed-decision evidence for explicit build and evaluation tooling."
+requires-python = ">=3.14"
+dependencies = []
+
+[build-system]
+requires = ["uv_build>=0.11.31,<0.12"]
+build-backend = "uv_build"
