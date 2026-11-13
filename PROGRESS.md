@@ -16784,6 +16784,76 @@ Notes:     The one work commit has a Conventional Commit subject.
 - F1: OI-122 now records the further re-plan of 2026-11-13 (S1-T12 waits for the owner at the console; S1-T08 and S1-T10 no longer depend on it; the pin fields that the frame rate decides close with the addendum of the slice S1 gate) and its NEEDED BY names that addendum.
 - Both findings concern records only; they are corrected in this commit and checked by the lead's script (ruling L-65 (3), from the owner's note of 2026-11-13).
 
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/37 )
+
+- The owner decided on 2026-11-13, in notes he pasted himself, that the public business register is public data (its establishments are real in this project), that the financial centre's public register is public data under the same rules, that the employment, wage and residence records stay synthetic but are generated in the real records' tables, fields and formats (the nationality group included), attached to the register companies by registration number and treated everywhere as real, and that a company's card shows every field its publisher shows plus its employee count, with wages and the other labour and residence details kept in the analyses, the ministry view and the company's own records. AGENTS rules 8, 10 and 24 are amended to match; OI-92 and OI-108 are approved as proposed.
+- The register files are kept outside the repository and are read only through a setting by the lead's own shell, the release build and the running product; they are never committed, briefed, put in a fixture or given to a worker or a reviewer; tests use invented stand-ins. No fetcher for either site is written.
+- Personas: editor, a principal technical editor of specification documents with privacy, provenance and release rules; reviewer, a principal privacy and specification reviewer of another maker, who edits nothing. The decision record was drafted by the lead (Anthropic, Claude Opus 5.5, rule 41: privacy rules to the top model). An inventory of the passages it touches was made by a read-only search agent (Anthropic, Claude Sonnet 5.5). A first sweep pass on another tool (Cognition, swe-2-high) stopped without changes on a tool error; the sweep was then done in two passes by Claude Opus 5.5 agents of the lead, which split the documents among forks under one set of written conventions. Skills they reported: task-standards, project-orientation, sanad-provenance, muhasabah-gate.
+- What changed: the decision record; AGENTS.md and CLAUDE.md rules 3, 8, 10 and 24 and their Status and Date rows (byte-identical); documents 01 to 17, the glossary, TASKS.md, OPEN_ITEMS.md and the two READMEs swept to the decision, about 220 anchors, every requirement identifier kept, one requirement withdrawn with its reason (SYN-84), `register_company` and `register_company_list` in place of `synthetic_firm` and `firm_list`, and 67 "OPEN (decision 0022)" lines for what the decision leaves to the tasks that own it (among them births and closures, the employer-group structure, the licensed-versus-operating strip, and how pay by sector meets the disclosure rules). The lead added the second register's own setting `EII_FC_REGISTER_FILE` and the root README's status row.
+- Not changed: the earlier decision records (rule 46: the new record states what it amends); the disclosure rules of document 06 for everything the decision does not open.
+
+#### Evidence for the work commit `0b34f138fdf83b6959191d4da445de5aa61b7a82`
+
+```text
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached
+Commit:    0b34f138fdf83b6959191d4da445de5aa61b7a82
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 305 text files, 60 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check at the work commit: every required file, every requirement identifier unique and defined, every link and anchor resolves.
+```
+
+```text
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached
+Commit:    0b34f138fdf83b6959191d4da445de5aa61b7a82
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached
+Commit:    0b34f138fdf83b6959191d4da445de5aa61b7a82
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     AGENTS.md and CLAUDE.md are byte-identical after the amendment of rules 3, 8, 10 and 24.
+```
+
+```text
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached
+Commit:    0b34f138fdf83b6959191d4da445de5aa61b7a82
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    564 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The scripts' tests, among them the guards that read the documents.
+```
+
+```text
+### D0022 — Decision 0022: real register companies with a synthetic labour and residence world attached
+Commit:    0b34f138fdf83b6959191d4da445de5aa61b7a82
+Command:   ./eii test --seed 2026111393
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1376 passed, 0 failed, 0 skipped
+Seed:      2026111393
+Notes:     The whole test command on the build machine.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
