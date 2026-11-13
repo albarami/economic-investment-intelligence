@@ -12,7 +12,9 @@
 
 Every statement in a table has one kind. READ: an official page, read on the date given, whose quoted words support the statement and nothing more. OBSERVED: a command run on the date given with the package and version named; the command and its output are in the Runs table of the section, and no browser was used. PACK: the pack says it, the pack anchor is given, and it could be neither read nor observed here, so the statement says "not verified". A page can change after its date: quoted words are searched for again when the notes are checked.
 
-The last section of each file lists the statements of the pack about these libraries and where each stands: a row of these notes, or "not covered" with the reason. The notes name a series, not a pin. Exact pins and retreat pins are the rows of `pins.toml`, which a check compares with the manifests; the table at the end of each section lists what slice S1 still has to confirm, and every value in it is "not yet confirmed". The notes make no claim that a library works in this project: no row says so, because no run of this project's own code exists yet. `scripts/check_reference_notes.py` checks the form of these notes (sections, kinds, sources, allowed addresses, dates, the confirmation tables and the coverage table), that each anchor exists in the cited file and not what the anchored text says, and nothing about whether a quotation is still on its page.
+The last section of each file lists the statements of the pack about these libraries and where each stands: a row of these notes, or "not covered" with the reason. The notes name a series, not a pin. Exact pins and retreat pins are the rows of `pins.toml`, which a check compares with the manifests; the table at the end of each section lists what slice S1 still has to confirm, with unmeasured fields marked "not yet confirmed". A value beginning "confirmed: " records only the measurement named in its PROGRESS.md task-log heading; it does not confirm untested retreats or broader capabilities. The notes make no claim that a library works in this project: no row says so, because the original READ and OBSERVED rows describe the S0-T13 date; the S1 confirmation fields now cite later project measurements. `scripts/check_reference_notes.py` checks the form of these notes (sections, kinds, sources, allowed addresses, dates, the confirmation tables and the coverage table), that each anchor exists in the cited file and not what the anchored text says, and nothing about whether a quotation is still on its page.
+
+The MapLibre GL JS and deck.gl spike-result fields, the load trial of 110,000 hexagons and 50,000 particles, and the pixel-ratio cap value remain "not yet confirmed" for the same reason: "waits for the native trace of task S1-T12, which the owner takes at the console; closes with the addendum of the slice S1 gate" (TASKS.md S1-T08 and S1-T12; owner ruling L-82).
 
 The section "Confirmations assigned to this task" is not about a library. It records what was observed in the files of the two Fontsource packages for IBM Plex Sans and IBM Plex Sans Arabic (the weights of DES-25, docs/11_DESIGN_DIRECTION.md DES-25) and in the package that holds the Carbon icons, with the licence of that package and of its repository (DES-45, docs/11_DESIGN_DIRECTION.md DES-45). It adds no package to a manifest and pins nothing: the two font packages are rows of `pins.toml`, and the pack says that the icons are vendored locally with their licence recorded in the repository and names no slice for it. A row of the font table is the files of one subset at one weight; nothing is said about glyph coverage or font features.
 
@@ -90,8 +92,8 @@ Setup, in an empty folder: three sub-folders `v6`, `v5` and `mb`, each with a `p
 |---|---|---|---|
 | exact pin, last 5.x release and right-to-left plugin for the retreat | not yet confirmed | maplibre-gl, @mapbox/mapbox-gl-rtl-text | docs/10_FRONTEND.md section "Stack and pins" |
 | spike result that chose between pin and retreat | not yet confirmed | maplibre-gl | docs/10_FRONTEND.md FE-03 |
-| Arabic glyph route (glyph files or font-faces) | not yet confirmed | - | docs/10_FRONTEND.md section "The basemap" |
-| hexagons under labels | not yet confirmed | - | docs/10_FRONTEND.md FE-46 |
+| Arabic glyph route (glyph files or font-faces) | confirmed: MapLibre 6.17.0 shaped the five fixture names through local font-faces without the plugin; native reading still owed; PROGRESS.md heading "S1-T01 — Arabic glyph and label-order spike: task log" | - | docs/10_FRONTEND.md section "The basemap" |
+| hexagons under labels | confirmed: one hexagon rendered below the first label layer; PROGRESS.md heading "S1-T01 — Arabic glyph and label-order spike: task log" | - | docs/10_FRONTEND.md FE-46 |
 | pixel-ratio cap value | not yet confirmed | - | docs/10_FRONTEND.md section "Layouts, presenter mode and big-screen rules" |
 | watermark mechanism | not yet confirmed | - | docs/10_FRONTEND.md section "Open questions and assumptions" |
 
@@ -150,7 +152,7 @@ Same setup and folders as the Runs table of the MapLibre section.
 | style extensions through H3HexagonLayer | not yet confirmed | - | docs/10_FRONTEND.md section "Map layers" |
 | method for moving dashes | not yet confirmed | - | docs/10_FRONTEND.md section "Open questions and assumptions" |
 | load trial of 110,000 hexagons and 50,000 particles | not yet confirmed | - | TASKS.md S1-T02 |
-| no code path enables WebGPU | not yet confirmed | - | docs/10_FRONTEND.md FE-04 |
+| no code path enables WebGPU | confirmed: the glyph spike used WebGL2 and enabled no WebGPU path; PROGRESS.md heading "S1-T01 — Arabic glyph and label-order spike: task log" | - | docs/10_FRONTEND.md FE-04 |
 
 ## deck.gl MapLibre module
 
@@ -202,8 +204,8 @@ Same setup and folders as the Runs table of the MapLibre section.
 | Field | Value | Rows in pins.toml | Pack source |
 |---|---|---|---|
 | exact pin and the retreat that replaces the module | not yet confirmed | @deck.gl/maplibre, @deck.gl/mapbox | docs/10_FRONTEND.md section "Stack and pins" |
-| interleaved mode with the pinned MapLibre on WebGL2 | not yet confirmed | - | docs/10_FRONTEND.md FE-04 |
-| layers under labels through beforeId | not yet confirmed | - | docs/10_FRONTEND.md section "Map layers" |
+| interleaved mode with the pinned MapLibre on WebGL2 | confirmed: one MapLibreOverlay of deck.gl 9.4.1 interleaved with MapLibre 6.17.0 on WebGL2; PROGRESS.md heading "S1-T01 — Arabic glyph and label-order spike: task log" | - | docs/10_FRONTEND.md FE-04 |
+| layers under labels through beforeId | confirmed: the overlay layer inserted before the first label; insertion before style load appeared after first idle; PROGRESS.md heading "S1-T01 — Arabic glyph and label-order spike: task log" | - | docs/10_FRONTEND.md section "Map layers" |
 
 ## Confirmations assigned to this task
 

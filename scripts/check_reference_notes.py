@@ -44,6 +44,7 @@ from reference_notes_tables import (
     KINDS,
     LIBRARIES,
     LINKS,
+    MEASURED,
     NOT_COVERED,
     PINS,
     TABLES,
@@ -113,7 +114,7 @@ def check_confirmation(
         elif name in seen:
             report.fail("confirmation", n, f'repeated field "{name}"')
         seen.add(name)
-        if value != CONFIRMED:
+        if value != CONFIRMED and MEASURED.fullmatch(value) is None:
             report.fail(
                 "confirmation",
                 n,

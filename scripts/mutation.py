@@ -3,6 +3,8 @@
 Usage: python scripts/mutation.py MODULE [MODULE ...]
 Each package runs from its own folder with source_paths=["src/"] and its own
 tests/ only. Cross-plane scripts/tests/ are not part of a package run.
+The four typed-decision modules run from the copy's root with evals/ as their
+source root and scripts/tests/test_requalify.py as their test selection.
 No hosted hook.
 mutmut's metadata and show command are read using the pinned 3.8.1 format.
 """
@@ -21,6 +23,10 @@ from tempfile import TemporaryDirectory
 from time import perf_counter
 
 ROOT = Path(__file__).resolve().parents[1]
+EVAL_MODULES = {
+    "evals/typed_decisions/" + name + ".py"
+    for name in ("interval", "reproduction", "route", "requalify")
+}
 
 
 def judge(survivors: list[dict[str, str]], ledger: Path) -> int:
@@ -47,10 +53,17 @@ def command(folder: Path, *arguments: str) -> subprocess.CompletedProcess[str]:
 
 
 def run_copy(
-    folder: Path, modules: list[str], tests: list[str], ledger: Path, prefix: str = ""
+    folder: Path,
+    modules: list[str],
+    tests: list[str],
+    ledger: Path,
+    prefix: str = "",
+    *,
+    source_roots: list[str] | None = None,
 ) -> tuple[int, list[dict[str, str]]]:
     """Operate only inside an already disposable folder; always delete mutants."""
-    source_roots = ["src/"]
+    if source_roots is None:
+        source_roots = ["src/"]
     # The entire git-listed copy is safe to copy again; no ignored files enter it.
     extra = sorted(path.name for path in folder.iterdir() if path.name != "mutants")
     config = folder / "pyproject.toml"
@@ -184,10 +197,14 @@ def main() -> int:
     if any(module not in files for module in args.modules):
         parser.error("Every module must be a git-listed file")
     if any(
-        Path(module).parts[:2] not in {("custodian", "src"), ("product", "src")}
+        module not in EVAL_MODULES
+        and Path(module).parts[:2] not in {("custodian", "src"), ("product", "src")}
         for module in args.modules
     ):
-        parser.error("Every module must be inside custodian/src or product/src")
+        parser.error(
+            "Every module must be inside custodian/src or product/src "
+            "or one of the four typed-decision modules"
+        )
     with TemporaryDirectory(prefix="synthetic-mutation-") as temporary:
         folder = Path(temporary)
         for name in sorted(files):
@@ -198,9 +215,20 @@ def main() -> int:
                 target = folder / name
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(source, target)
-        return run_packages(
-            folder, args.modules, ROOT / "scripts/mutation_explained.toml"
-        )
+        ledger = ROOT / "scripts/mutation_explained.toml"
+        evals = [module for module in args.modules if module in EVAL_MODULES]
+        packages = [module for module in args.modules if module not in EVAL_MODULES]
+        if evals:
+            code, _survivors = run_copy(
+                folder,
+                evals,
+                ["scripts/tests/test_requalify.py"],
+                ledger,
+                source_roots=["evals/"],
+            )
+            if code:
+                return code
+        return run_packages(folder, packages, ledger)
 
 
 if __name__ == "__main__":

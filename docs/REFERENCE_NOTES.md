@@ -12,7 +12,7 @@
 
 Every statement in a table has one kind. READ: an official page, read on the date given, whose quoted words support the statement and nothing more. OBSERVED: a command run on the date given with the package and version named; the command and its output are in the Runs table of the section. PACK: the pack says it, the pack anchor is given, and it could be neither read nor observed here, so the statement says "not verified". A page can change after its date: quoted words are searched for again when the notes are checked.
 
-The last section of each file lists the statements of the pack about these libraries and where each stands: a row of these notes, or "not covered" with the reason. The notes name a series, not a pin. Exact pins and retreat pins are the rows of `pins.toml`, which a check compares with the manifests; the table at the end of each section lists what slice S1 still has to confirm, and every value in it is "not yet confirmed". No PostgreSQL server was started and no request was sent to the Claude API for these notes (no key, no account), so every PostgreSQL and Claude API row is READ or PACK. The notes make no claim that a library works in this project: no run of this project's own code exists yet. `scripts/check_reference_notes.py` checks the form of these notes (sections, kinds, sources, allowed addresses, dates, the confirmation tables and the coverage table), that each anchor exists in the cited file and not what the anchored text says, and nothing about whether a quotation is still on its page.
+The last section of each file lists the statements of the pack about these libraries and where each stands: a row of these notes, or "not covered" with the reason. The notes name a series, not a pin. Exact pins and retreat pins are the rows of `pins.toml`, which a check compares with the manifests; the table at the end of each section lists what slice S1 still has to confirm, with unmeasured fields marked "not yet confirmed". A value beginning "confirmed: " records only the measurement named in its PROGRESS.md task-log heading; it does not confirm untested retreats or broader capabilities. No PostgreSQL server was started and no request was sent to the Claude API for these notes (no key, no account), so every PostgreSQL and Claude API row is READ or PACK. The notes make no claim that a library works in this project: the original READ and OBSERVED rows describe the S0-T13 date; the S1 confirmation fields now cite later project measurements. `scripts/check_reference_notes.py` checks the form of these notes (sections, kinds, sources, allowed addresses, dates, the confirmation tables and the coverage table), that each anchor exists in the cited file and not what the anchored text says, and nothing about whether a quotation is still on its page.
 
 ## DuckDB 2.0
 
@@ -96,10 +96,10 @@ Setup, in an empty folder: `uv venv --python 3.14 venv`, then `uv pip install --
 
 | Field | Value | Rows in pins.toml | Pack source |
 |---|---|---|---|
-| exact pin, or the retreat series chosen instead | not yet confirmed | duckdb | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Decision" item 3 |
-| path of the project-local extension directory | not yet confirmed | - | docs/02_ARCHITECTURE.md section "Open questions and assumptions" item 2 |
+| exact pin, or the retreat series chosen instead | confirmed: DuckDB 2.0.0 returned the parity result; 1.5.x retreat not tried; PROGRESS.md heading "S1-T05 — First two-store parity query: task log" | duckdb | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Decision" item 3 |
+| path of the project-local extension directory | confirmed: data/engine_extensions/ verified and loaded offline inside the sandbox; PROGRESS.md heading "S1-T06 — Sandbox enforcement spike: task log" | - | docs/02_ARCHITECTURE.md section "Open questions and assumptions" item 2 |
 | need for geometry_always_xy | not yet confirmed | - | docs/03_DATA_CONTRACTS.md section "Logical types" |
-| text ordering by byte value, by the parity query | not yet confirmed | - | docs/02_ARCHITECTURE.md section "The portable SQL subset (minimum rules)" |
+| text ordering by byte value, by the parity query | confirmed: DuckDB 2.0.0 and PostgreSQL 18.6 returned identical byte-sorted text including accents, Arabic, ties and NULL last; PROGRESS.md heading "S1-T05 — First two-store parity query: task log" | - | docs/02_ARCHITECTURE.md section "The portable SQL subset (minimum rules)" |
 | threading guidance of the 2.0 Python interface | not yet confirmed | - | docs/08_BACKEND.md BE-12 |
 | copy mechanism from DuckDB to PostgreSQL | not yet confirmed | - | docs/08_BACKEND.md section "The loader (`./eii load-release`)" |
 | files written by 2.0 when the retreat series is chosen | not yet confirmed | duckdb | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" |
@@ -155,7 +155,7 @@ Used here as the serving store, with PostGIS and no other extension (docs/02_ARC
 | exact pin of PostgreSQL 18 and the PostGIS 3.6 line | not yet confirmed | postgresql, postgis | docs/02_ARCHITECTURE.md section "Technology stack" row "Serving store" |
 | image digest of the PostGIS image | not yet confirmed | postgis-image | docs/13_DEPLOYMENT_AND_OPERATIONS.md section "Compose service definition (in words)" item 1 |
 | data directory and volume path of that image | not yet confirmed | postgis-image | docs/13_DEPLOYMENT_AND_OPERATIONS.md section "Compose service definition (in words)" item 4 |
-| first parity query on both stores | not yet confirmed | - | TASKS.md S1-T05 |
+| first parity query on both stores | confirmed: DuckDB 2.0.0 and PostgreSQL 18.6 returned the same parity query result; PROGRESS.md heading "S1-T05 — First two-store parity query: task log" | - | TASKS.md S1-T05 |
 
 ## Claude API
 
