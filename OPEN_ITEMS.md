@@ -21,7 +21,7 @@
 - OI-35 records which parameter set is exported. A lead ruling of 2026-11-11 sets the default to A; the owner or a data owner may overrule it before the slice S1 gate.
 - OI-39 onwards are raised during the build.
 - OI-96 (closed by the owner's answer of 2026-11-12) and the items after it record the points of [decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md): the age of the places copy, the Public source for the survival base rate, the Public source of each forecast series without a table, the provider's rule on storing responses, the sources that are off under a public or commercial hosting, the size of the public-total inventory with the two gridded Public tables, the subject of a district series and the build without the night-lights key.
-- OI-132 to OI-146 record the open points of [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md). The owner's pending questions are the satellite provider's attribution in committed text, whether road traffic is part of the movement source, the attributes of the movement records, the gaps N1, N3, N4, N6 and N7 of the decision question bank (hiring and leaving flows, rents, an events calendar, supplier certifications and school capacity), whether the competition-adjusted ratio of talent available near this site may be computed (OI-140) and who keeps the monthly register snapshots (OI-141). The others are the register file's fields still to confirm (OI-142), the look's task S3-T15 (OI-143), the recovery tracker and the Qatarization planner (OI-144), and two assumptions: the age profile of people living here (OI-145) and prices per square foot (OI-146). The decision also updates OI-08 (items 12 and 15), OI-27 (item 15, a product for companies), OI-97 (item 12), OI-98 (items 8 and 12) and OI-102 (items 6 and 8).
+- OI-132 to OI-148 record the open points of [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md). The owner's pending questions are the satellite provider's attribution in committed text, whether road traffic is part of the movement source, the gaps N1, N3, N4, N6 and N7 of the decision question bank (hiring and leaving flows, rents, an events calendar, supplier certifications and school capacity), who keeps the monthly register snapshots (OI-141), and whether a commute line from a whole home municipality to the site's snapped catchment meets the district-pair case (OI-147, with card C39's form as the default). The owner's answer of 2026-11-14 settles the talent ratio (OI-140) and the movement splits (OI-134, item 16). OI-148 confirms the age bands against the operator's format when its data arrives, and is not an owner question. The others are the register file's fields still to confirm (OI-142), the look's task S3-T15 (OI-143), the recovery tracker and the Qatarization planner (OI-144), and two assumptions: the age profile of people living here (OI-145) and prices per square foot (OI-146). The decision also updates OI-08 (items 12 and 15), OI-27 (item 15, a product for companies), OI-97 (item 12), OI-98 (items 8 and 12) and OI-102 (items 6 and 8).
 
 ## OI-01 — Main model key (supplied for go-live; not used during the build)
 
@@ -100,13 +100,14 @@
 
 - ID: OI-08
 - TYPE: OPEN
-- NEEDED: Approve the live-row label, confirm the distinct-organisation minimum for demand aggregates, and align the canonical read function.
+- NEEDED: Confirm the distinct-organisation minimum for a roll-up of the internal question log made for the evaluation, which shows no company identity and only groups of at least that minimum ([06_PRIVACY_AND_DISCLOSURE_CONTROL.md](docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-66). The live-row label and the demand-aggregate use left with the oversight seat (item 15).
 - WHY: Oversight must show demand without exposing company identity or small-group behaviour.
 - DONE SO FAR: Live rows default to “this session”, seeded history to Synthetic, and no company identity is shown. The minimum is two for the two-company demonstration; this is demonstration configuration, not a disclosure threshold.
 - OPTIONS: **Recommendation:** keep the labels and the demonstration minimum of two; any other value needs an owner decision and must not be presented as a privacy rule.
-- NEEDED BY: slice S9 oversight and database tests.
+- NEEDED BY: before the first roll-up of the question log made for the evaluation.
 - UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12: the ledger starts empty and holds only questions asked, so no seeded history exists and its Synthetic label falls away (S9-T03).
 - UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 15: the product is for companies only. The oversight seat leaves version 1 with its screen and roll-ups (S9-T04), its read functions (S9-T01) and its badge, and the ledger stays only as the internal question log, with no screen. So no screen shows the live-row label or a demand aggregate, and the read function this item was to align leaves with the seat; the company read functions and their separation tests stay. The distinct-organisation minimum stays open for one use: a roll-up of the question log made for the evaluation shows no company identity and only groups of at least that minimum ([06_PRIVACY_AND_DISCLOSURE_CONTROL.md](docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-66). It is now needed before the first such roll-up.
+- UPDATE: 2026-11-14: NEEDED and NEEDED BY are narrowed to that remaining use. The oversight screen, its live-row label and its demand aggregates stay withdrawn by item 15. Nothing earlier in this item is deleted.
 
 ## OI-09 — Native Arabic reviewer
 
@@ -1123,12 +1124,14 @@
 ## OI-134 — The attributes of the movement records: age, nationality and gender
 
 - ID: OI-134
-- TYPE: OPEN (owner)
+- TYPE: CLOSED (was OPEN)
 - NEEDED: Which of age, nationality and gender the confirmed movement sources (the mobile operator's presence data and the national crowd-management system's data) hold, at the grain the pack plans.
 - WHY: Under [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12, synthetic records follow the real formats and an attribute the confirmed source does not plausibly hold is not generated. AGENTS.md rule 10 bars any sex or gender attribute on synthetic or protected records, and nationality enters only in the two forms of decision 0022.
 - DONE SO FAR: No movement contract of document 03 carries any of the three. The lead's audit found no sex or gender attribute planned inside a confirmed source; a real-data adapter must drop such a column before the vault, and the conformance schema test already refuses one.
 - OPTIONS: **Recommendation:** generate none of the three on movement records. Gender stays barred whatever the source holds. Age or nationality on movement records would need the owner's confirmation that the source holds them and, for nationality, a new decision record amending rule 10.
 - NEEDED BY: the slice S4 contracts (S4-T01, S4-T04).
+- UPDATE: 2026-11-14, by the owner's words and his advisor's decision under his delegation, recorded in [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 16: movement aggregates carry age band, gender and nationality group as one-way splits. The bar on sex or gender still holds for the worker, residence and company records and for anything derived from them; movement aggregates are the one exception. The age bands are confirmed against the operator's format when its data arrives (OI-148), which is not an owner question.
+- CLOSED: 2026-11-14, by decision 0023 item 16. The earlier text is kept.
 
 ## OI-135 — Hiring and leaving flows (the decision question bank's gap N1)
 
@@ -1183,12 +1186,14 @@
 ## OI-140 — Whether the competition-adjusted ratio of talent available near this site may be computed
 
 - ID: OI-140
-- TYPE: OPEN (owner)
+- TYPE: CLOSED (was OPEN)
 - NEEDED: The owner's answer: may the competition-adjusted ratio of the two-step floating catchment (PySAL `access`, BSD-3), the talent pool within reach over the competing demand within reach, be computed from the two released tables as an exception to PRV-30 and PRV-18 of [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md)?
 - WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 1 first planned method card C39 with that ratio. The review of the decision's sweep found that the ratio divides one protected family by another, which PRV-30 does not allow, and reads the competing jobs on work units chosen by travel time instead of by the snap, which PRV-18 does not allow. AGENTS.md rule 12 forbids weakening a privacy invariant on the lead's authority, so the lead's ruling L-160 of 2026-11-14 recast card C39 and left the exception to the owner.
 - DONE SO FAR: Card C39 shows two released figures side by side within 15, 30 and 45 minutes' drive: the talent pool (residents by occupation and pay band within reach) and the competing demand (jobs of the same occupations within reach). Each catchment snaps to whole release units, and PRV-18 and PRV-30 stay as they are. PRV-127 is a guard that refuses any ratio of the two figures; a planted ratio, a planted read on units chosen by travel time and a planted figure on an unsnapped outline each fail.
 - OPTIONS: **Recommendation:** keep the two figures side by side, with no ratio. If the owner wants the ratio, a new decision record must amend PRV-30 and PRV-18. It must also say how the work units of the competing demand are chosen, because the release's unit-to-unit travel times hold `px_base` unit pairs only ([03_DATA_CONTRACTS.md](docs/03_DATA_CONTRACTS.md) DAT-153), and keep the rule that no choice of units depends on a protected value (PRV-19).
 - NEEDED BY: task S6-T20; not a blocker, because the side-by-side form needs no exception.
+- UPDATE: 2026-11-14, by the owner's answer of that day, recorded in [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 1: yes. Card C39 keeps its two released figures side by side within 10, 20 and 30 minutes' drive and adds a third, qualified people within reach per competing job within reach, the quotient of those two released figures for the same occupation group and the same cut-off, shown to one decimal. It is computed only from the two released tables. It is the only exception to PRV-30 and PRV-18. PRV-127 refuses any other ratio of two protected families and any ratio computed before release. The two-step floating catchment is not used. Where an input is withheld the reason key is `ratio_input_withheld`; where no competing job is within reach the reason key is `no_competing_jobs`.
+- CLOSED: 2026-11-14, by the owner's answer, recorded in decision 0023 item 1. The earlier text is kept.
 
 ## OI-141 — Who keeps the monthly register snapshots
 
@@ -1249,6 +1254,26 @@
 - DONE SO FAR: Card C41 states its measures per square foot and converts areas by that exact conversion (MTH-116). Its quarterly series is a series of its own, never joined to the series of card C14 (card C30).
 - OPTIONS: **Recommendation:** keep both, each labelled with its unit. Alternative: the owner chooses one unit for every price on screen, by a decision record.
 - NEEDED BY: task S6-T10, which builds the property price measures.
+
+## OI-147 — Whether a commute line from a home municipality to the site's snapped catchment meets the district-pair case
+
+- ID: OI-147
+- TYPE: OPEN (owner)
+- NEEDED: The owner's confirmation.
+- WHY: `home_area_share` is released only per `ha_work_count` work unit and `ha_home` municipality (PRV-40), and a district-pair table would need a new rules version and re-audit (PRV-34). Card C39 already draws each line from one whole home municipality of `ha_home` to the site's catchment snapped on `ha_work_count`, an exact sum of published `home_area_share` rows ([decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 1).
+- DONE SO FAR: Version 1 meets the case "commute lines only as totals between district pairs that pass the minimums" by that form: each end is an area, the home end is never finer than a municipality, and every total passes the minimums. The quoted case and its planted violation stay as written.
+- OPTIONS: **Recommendation:** keep card C39's form, which is the default. Otherwise the work end is snapped from the district outline on `ha_work_count`. The home end stays a whole municipality in either case.
+- NEEDED BY: S6-T20, not a blocker. Until the owner answers, no line is drawn in any other form.
+
+## OI-148 — The age bands against the operator's format, for when its data arrives
+
+- ID: OI-148
+- TYPE: OPEN
+- NEEDED: Confirm the age bands of movement aggregates against the operator's format when its data arrives. This is not a question for the owner.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 16 sets `age_band` to `15-24`, `25-34`, `35-44`, `45-54`, `55-64` and `65+`, chosen so that a public source's five-year age groups sum into them exactly. The band edges are held in one configuration value, so they can be remapped without changing the generator or the screens.
+- DONE SO FAR: The bands are the closed list of item 16. People under 15 are not carried.
+- OPTIONS: **Recommendation:** keep the bands until the operator's data arrives, then remap the one configuration value if the format differs.
+- NEEDED BY: when the operator's data arrives; not a blocker for version 1.
 
 ## Change control
 
