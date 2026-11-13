@@ -14697,6 +14697,371 @@ Seed:      none
 Notes:     The one work commit has a Conventional Commit subject.
 ```
 
+#### S1-T06: independent review: APPROVED
+
+Reviewed commit `525ec462a16bea11c45dc9330965c08108a9c534`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/31 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43343517078; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43343517071; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43343517221 ). Reviewer: Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only; a maker that neither planned nor built the task; a full review. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T06 (pull request 31)
+COMMIT: 525ec462a16bea11c45dc9330965c08108a9c534
+REVIEWER: Moonshot AI Kimi K3.1 Pro (medium)
+CHECKS:
+  REV-10 PASS The recorded enforcement command exited 0 with the outside tooth, both sentinel components, both mount judgements and the extension load OK. Each report component has a failure test, and four planted launcher violations made the command exit 1.
+  REV-11 PASS On the exact head, the lead ran `./eii test --seed 2026111328`, exit 0 with 1222 passed and none skipped, and `python3 scripts/check_docs.py`, exit 0. Hosted tests succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43343517078/job/131617236318 and sandbox proof at https://github.com/albarami/economic-investment-intelligence/actions/runs/43343517221/job/131617236400. New guards have planted violations.
+  REV-12 PASS The work commit changes exactly the ten recorded in-scope files; the ledger changes only PROGRESS.md and TASKS.md. Neither the launcher, profile tables nor anything under `data/` changed.
+  REV-13 PASS The command, independent policy and tests are fully implemented; no placeholder, stub, fallback or invented measurement appears.
+  REV-14 PASS Hosted secret-scan succeeded on the exact head at https://github.com/albarami/economic-investment-intelligence/actions/runs/43343517078/job/131617237032. The diff contains no secret, `.env`, key file or real custodian data.
+  REV-15 PASS The existing argv test only extends the usage expectation with the new command, and the output test adds a blocking test. No sandbox test was removed, skipped or loosened; the recorded family run passed all 75 tests, including the prior 65.
+  REV-16 PASS The implementation follows R1-R5: one existing launcher, an independent non-executing policy, the documented blocking command, no pin or architecture edits, and hardening left unbuilt.
+  REV-17 PASS Document 05, both agent files, README, OI-61, OI-62, TASKS.md and PROGRESS.md record the implementation, measurements and remaining limits. The head documentation check exited 0.
+  REV-18 PASS The proof uses the existing cleared-environment bubblewrap launcher, introduces no secret handling, egress, custodian-data path or application-role change, and preserves sandbox enforcement without fallback.
+  REV-19 PASS The change performs the assigned S1-T06 spike without reopening component, privacy, build-order or fallback decisions.
+  REV-20 N/A No product fact, displayed figure or release-table number is introduced; test counts and tool versions are evidence records, not product facts.
+  REV-21 N/A No screen, card, Fact chip, rendered brief or model-written prose changed.
+  REV-22 PASS No privacy partition, parameter set, treatment, release rule, privacy test or attack suite changed; the complete head suite passed without skips.
+  REV-23 PASS No product import or dependency on custodian code was added, and the existing import-boundary guards ran in the passing head suite.
+  REV-24 N/A No English or Arabic view, displayed numeral or Arabic string changed.
+  REV-25 PASS The diff adds no private path, personal name, e-mail address, realistic synthetic identifier, prohibited comparison or secret; documentation and hosted secret-scan checks passed on the head.
+  REV-26 PASS The added documentation limits its claims to the measured sandbox proof and remaining open limits; no prohibited product, privacy, endorsement, forecast or lookup claim appears.
+  REV-27 PASS The lead's `cmp AGENTS.md CLAUDE.md` on the exact head exited 0, and the documentation check passed.
+  REV-28 N/A No synthetic establishment, legal-entity, employer-group, person or salary-file identifier is introduced.
+  REV-29 N/A No real named place or business, or attribute attached to one, is introduced.
+  REV-38 PASS No serving-plane gateway import, runtime provider setting, decision record table or screen output was added; the existing boundary guards ran in the passing head suite.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S1-T06: merge record
+
+- The lead's checks on the merged head `525ec462a16bea11c45dc9330965c08108a9c534` before the merge (ruling L-29): "TREE-IS-WORK ok: 306 paths at 525ec462a16bea11c45dc9330965c08108a9c534", exit code 0; `./eii test --seed 2026111328`: exit code 0, "total: 1222 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/31 was squash-merged on 2026-11-13 at that head; merge commit `6538a7d701a47ade9c9b32318b81d0037f8b4372` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43344869442; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43344869356; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43344869228 .
+
+
+- The task log of S1-T06 is complete with this record: APPROVED in its one review round, no finding, no proposed item. TASKS.md marks the task done with this ledger.
+
+### S1-T01 — Arabic glyph and label-order spike: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/32 )
+
+- What the task proves (slice S1, the technical spike): on the pinned MapLibre GL JS 6.17.0 and deck.gl 9.4.1, Arabic map labels are drawn as connected, correctly ordered words from self-hosted font files, and a data hexagon lies under the labels (FE-46, FE-57; DES-10, DES-24). The page under `web/spikes/glyphs/` is synthetic and says so: invented geometry over an invented box, five invented place names in Arabic and in English, no real place, no basemap of a real place, no tile download. It is not feature UI
+- Class of the work (the owner's note of 2026-11-12 on value and cost): standard; it is the first task that puts a browser test and a visual comparison into the project
+- Plan: a plan by Moonshot AI Kimi K3.1 Pro (through the Devin command-line tool), read by the lead; the lead's rulings R1 to R9 of the build brief and the rulings of two completion passes override it where they differ. No separate plan review
+- Builder maker and model: Cursor command-line tool, `grok-4.7-high` (xAI): one build and two completion passes after the lead's check
+- Reviewer, as planned: Codex command-line tool, `gpt-5.6-sol` (OpenAI), read-only (a maker that neither planned nor built); the record of the verdict names the reviewer that gave it
+- Branch: `task/S1-T01-glyphs`
+- What was built: the page (its style with font faces, the synthetic fixture, one interleaved overlay on WebGL2 with a polygon layer placed before the first label layer, the worker served locally); a loopback server with a same-origin content security policy; guards as pure functions with their own tests; nine browser tests with the pinned Playwright 1.65.0 and its headless shell; an evidence recorder (three screenshots, the request log, the asset manifest) and its checker; four licence texts of the fonts. The browser tests run inside `./eii test` through the web checks and build the page themselves into a temporary folder, so no stale build can be tested
+- The three acceptance criteria. (1) Arabic labels render from local assets: the tests `Arabic labels render from local assets`, `English labels render from the same local fixture`, `a remote font attempt is blocked`, `four local licence texts are served` and `an omitted Arabic face fails font readiness`; the request log of the recorder holds same-origin paths only and one planted remote address, blocked. (2) Hexagons do not cover labels: the test `hexagons sit below the first label layer` (one overlay, interleaved, the layer's `beforeId` equal to the first label layer, no WebGPU) and the screenshot of that view. (3) Visual evidence is recorded: the three screenshots, the request log and the asset manifest under `web/spikes/glyphs/evidence/`, checked by the evidence command; the native review of the five names and the three images is the owner's and is recorded as pending, and nothing written by a model is recorded as an approval
+- The lead's rulings that changed after the first build, each for a cost the build made visible. (a) The browser lives in the uncommitted folder `data/tools/playwright/` at the repository root, as the project's other fetched tools do, and only the headless shell is fetched: inside the installed package folder it took 701 MB in every checkout and was deleted by every `npm ci`; it now takes 288 MB and is fetched once. (b) TST-91: pixels are compared only in the hosted job, and the baselines come from the suite's own capture in that job, not from the recorder's separate screenshot call. (c) The suite and the recorder build the page themselves: the hosted job had no step that built it and would have stopped. (d) `./eii test` gives the web suite an allow-list environment without the variable `CI`, so a comparison inside it would never have run in the hosted job: the allow-list is not widened, and the hosted job compares in a step of its own (`npm run test:spike:glyphs`, where the runner's `CI=true` reaches the suite). (e) The browser installer installs system libraries only in the CI environment: on any other machine no command of this project changes anything outside the repository (the lead's own edit, then covered by the builder with a test)
+- What the lead's look at the first screenshots found: in the Arabic page the English notice showed its full stop on the wrong side, because the sentence inherited the page's direction. It is now an isolated left-to-right element inside the paragraph, with an assertion that fails without it; the evidence was recorded again
+- The baselines (TST-91, TST-92). The first hosted run of the pull request, on the work commit, made the three captures, uploaded them and stopped at the comparison step, which named the missing files: https://github.com/albarami/economic-investment-intelligence/actions/runs/43345530556 . The lead copied the three files of that run's artifact unchanged into `web/spikes/glyphs/tests/baselines/`, in a commit of their own (`d98de43d4856fd9b34b6ddcd29a87b7c359696bb`). Each is byte-identical to the evidence screenshot of the same view that the recorder wrote on the build machine (the digests are in that commit's message), so on this page the hosted runner and the build machine draw the same pixels
+- Measured, for the pin confirmation of task S1-T08 (the reference notes are not changed by this task): with MapLibre GL JS 6.17.0 the five Arabic names are shaped and ordered from local font files through the style's font faces, without the right-to-left plugin and without glyph files in the older format; the library's own type notes still say that shaping across cluster boundaries needs that plugin, so this is a statement about these five names until the owner's reading, not about every Arabic string. One `MapLibreOverlay` of deck.gl 9.4.1 in interleaved mode on WebGL2 draws a layer before the first label layer; its first insertion happens before the style has loaded, and the layer group appears after the first idle. No code path enables WebGPU. The registry's current release of `maplibre-gl` on 2026-11-13 is 6.18.0, one minor above the pack's pin, which this task does not change. Pages the builder read on 2026-11-13: the Playwright pages on CI and on browsers, the release page of the upload action, the MapLibre style specification on font faces, the deck.gl page of its MapLibre module, the registry pages of the two Noto font packages
+- Not built here: the half of FE-56 with the live traffic provider on, which belongs to the task that builds the provider's adapter (OI-115). A wider matrix of browsers, operating systems and pixel ratios is listed as hardening
+- Shared documents, entered by the lead in the work commit: rule 44 of AGENTS.md and CLAUDE.md (four commands that run from `web/`); README.md; one sentence added to each of OI-22, OI-43, OI-48, OI-88 and OI-89; the new assumptions OI-118 (the two font packages of the map labels; where the browser lives) and OI-119 (pixels are compared in the hosted job only). The builder had edited the two agent files and the README in its second pass, against the brief; the lead took those edits out and entered the texts by its recorded edits
+- Hardening listed, not built (the builder's return): a wider matrix of browsers, operating systems, font rendering and device pixel ratios, with a visual comparison of Arabic shaping beyond the pinned browser
+- With this ledger: the closing record of pull request 31 above, and the status of S1-T06 in TASKS.md set to done
+
+#### Evidence for the work commit `d98de43d4856fd9b34b6ddcd29a87b7c359696bb`
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   npm --prefix web run test:spike:glyphs
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "  9 passed (3.4s)" (nine browser tests; before them the suite prints that no pixel was compared)
+Seed:      none
+Notes:     Criteria 1 and 2 on the build machine, as `./eii test` runs the suite (the variable `CI` not set): nine browser tests pass, among them `Arabic labels render from local assets`, `hexagons sit below the first label layer`, `a remote font attempt is blocked` and `an omitted Arabic face fails font readiness`. The suite builds the page into a temporary folder first and prints that no pixel was compared.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   CI=true npm --prefix web run test:spike:glyphs
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "  9 passed (3.5s)" (the same nine tests with the pixel comparison against the committed baselines)
+Seed:      none
+Notes:     The pixel comparison, run directly with `CI=true` as the hosted step runs it: the three screenshot tests compare with the committed baselines and pass on the build machine too, which agrees with the byte-identical files of the next entry. The hosted job's own step is the comparison that counts (TST-91).
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   python3 -I -c "import hashlib,pathlib; e=pathlib.Path('web/spikes/glyphs/evidence'); b=pathlib.Path('web/spikes/glyphs/tests/baselines'); n=['arabic-labels','english-labels','hexagons-below-labels']; print(sum(hashlib.sha256((e/(x+'.png')).read_bytes()).digest()==hashlib.sha256((b/(x+'-chromium-linux.png')).read_bytes()).digest() for x in n), len(list(b.iterdir())))"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "3 3" (evidence screenshots byte-identical to their baselines; files in the baselines folder)
+Seed:      none
+Notes:     The three baselines made by the hosted job are byte-identical to the three evidence screenshots that the recorder wrote on the build machine; the baselines folder holds exactly three files.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   npm --prefix web run spike:glyphs:verify-evidence
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "visual review: pending native review"
+Seed:      none
+Notes:     Criterion 3: the evidence record is complete (three images whose digests match the run record, the request log with the planted remote address blocked, the asset manifest, the review record), and the checker reports the state of the native review, which is pending; it accepts no other state than pending or approved.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   ./eii test --seed 2026111316
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1263 passed, 0 failed, 0 skipped
+Seed:      2026111316
+Notes:     The whole test command on the build machine: the web checks hold the Node tests of the spike, which run the nine browser tests; no pixel is compared inside `./eii test`, on any machine.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_ci_*.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    37 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The workflow tests: the pinned text of the changed workflow matches its file, every action is pinned by a full commit hash (the upload action among them), and no workflow holds a weakener; the four new steps of the job `tests` carry no `if:` and no `continue-on-error`.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_runner_usage.py' -v
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    3 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The runner's table and the package script select the same test files, the spike's Node tests among them.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   uv run --locked python scripts/ci_plants.py run
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "RESULT: PASSED" (twelve planted violations, each blocked)
+Seed:      none
+Notes:     The planted-failure harness stays green with the changed workflow and web package.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   npm --prefix web run build
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "✓ built in 121ms"
+Seed:      none
+Notes:     The production build of the application shell; the spike is not part of it.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   npm --prefix web run check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 18 files: OK"
+Seed:      none
+Notes:     The four structure checks of `web/` (layout, exact versions, import boundary, no third-party hosts).
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   npm --prefix web run check:hosts:dist
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 20 files: OK"
+Seed:      none
+Notes:     No third-party host in the built output.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   npm --prefix web run lint
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     ESLint with no warning allowed.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   npm --prefix web run format:check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Format check of `web/`.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   npm --prefix web run typecheck
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The type check of the shell; the spike's own project is type-checked by one of its Node tests.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 44 packages in 1ms"
+Seed:      none
+Notes:     The Python lock is unchanged by this task.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 62 components: OK"
+Seed:      none
+Notes:     The version check with the nine web packages of the spike installed at their pins and the two new rows of the Noto font packages.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes and their check are unchanged by this task (ruling R5).
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "163 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 157 source files"
+Seed:      none
+Notes:     Strict types.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 269 text files, 57 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with the spike's two README files, rule 44 of both agent files, the root README and the open items.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after the same insertion in rule 44 of each.
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','6538a7d701a47ade9c9b32318b81d0037f8b4372...d98de43d4856fd9b34b6ddcd29a87b7c359696bb'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:web/spikes/glyphs/README.md A:web/spikes/glyphs/browser-home.mjs A:web/spikes/glyphs/build-page.mjs A:web/spikes/glyphs/evidence/arabic-labels.png A:web/spikes/glyphs/evidence/asset-manifest.json A:web/spikes/glyphs/evidence/english-labels.png A:web/spikes/glyphs/evidence/hexagons-below-labels.png A:web/spikes/glyphs/evidence/network.json A:web/spikes/glyphs/evidence/run.json A:web/spikes/glyphs/evidence/visual-review.md A:web/spikes/glyphs/fixtures.ts A:web/spikes/glyphs/fonts.ts A:web/spikes/glyphs/guards.mjs A:web/spikes/glyphs/index.html A:web/spikes/glyphs/install-browser.mjs A:web/spikes/glyphs/main.ts A:web/spikes/glyphs/map.ts A:web/spikes/glyphs/names.json A:web/spikes/glyphs/playwright.config.ts A:web/spikes/glyphs/public/licences/ibm-plex-sans-OFL.txt A:web/spikes/glyphs/public/licences/ibm-plex-sans-arabic-OFL.txt A:web/spikes/glyphs/public/licences/noto-sans-OFL.txt A:web/spikes/glyphs/public/licences/noto-sans-arabic-OFL.txt A:web/spikes/glyphs/record.mjs A:web/spikes/glyphs/server.mjs A:web/spikes/glyphs/style.css A:web/spikes/glyphs/system-libraries.mjs A:web/spikes/glyphs/tests/baselines/arabic-labels-chromium-linux.png A:web/spikes/glyphs/tests/baselines/english-labels-chromium-linux.png A:web/spikes/glyphs/tests/baselines/hexagons-below-labels-chromium-linux.png A:web/spikes/glyphs/tests/evidence.node-test.mjs A:web/spikes/glyphs/tests/glyphs.spec.ts A:web/spikes/glyphs/tests/guards.node-test.mjs A:web/spikes/glyphs/tests/install-browser.node-test.mjs A:web/spikes/glyphs/tests/run.mjs A:web/spikes/glyphs/tests/run.node-test.mjs A:web/spikes/glyphs/tests/typecheck.node-test.mjs A:web/spikes/glyphs/tsconfig.json A:web/spikes/glyphs/types/modules.d.ts A:web/spikes/glyphs/verify-evidence.mjs A:web/spikes/glyphs/vite.config.ts M:.github/workflows/ci.yml M:AGENTS.md M:CLAUDE.md M:OPEN_ITEMS.md M:README.md M:pins.toml M:scripts/run_tests.py M:scripts/tests/ci_workflow_rules.py M:scripts/tests/test_ci_workflows.py M:scripts/tests/test_runner_usage.py M:web/.prettierignore M:web/README.md M:web/eslint.config.js M:web/package-lock.json M:web/package.json'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "56 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope of the two commits (REV-12): the spike folder with its tests, evidence and, in the second commit, the three baselines; the web manifest, lock and two ignore lists; the test runner's table and its test; the workflow with the pin of its text and the list of pinned actions; the pin record; `web/README.md`; and the four shared documents the lead entered (AGENTS.md, CLAUDE.md, README.md, OPEN_ITEMS.md).
+```
+
+```text
+### S1-T01 — Arabic glyph and label-order spike
+Commit:    d98de43d4856fd9b34b6ddcd29a87b7c359696bb
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','6538a7d701a47ade9c9b32318b81d0037f8b4372..d98de43d4856fd9b34b6ddcd29a87b7c359696bb'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Both commits have a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
