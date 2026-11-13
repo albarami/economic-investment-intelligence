@@ -294,15 +294,38 @@ FORBID_PHRASE = (
 )
 
 
-def test_investment_sources_record_the_terms_that_forbid_the_use() -> None:
-    """Both investment rows name the terms address and the phrase read on 2026-11-13."""
+OWNER_BASIS_NOTE = (
+    "Owner decision of 2026-11-12: "
+    '"This is a personal internal project: use both sources fully, '
+    'no permission needed."'
+)
+
+
+def test_investment_sources_record_the_owner_decision_and_watch_terms() -> None:
+    """Both rows keep the terms page and the owner's words, and do not switch off."""
     by_id = {entry.source_id: entry for entry in load_registry()}
     for source_id in ("fdi_projects", "investqa_pages"):
         entry = by_id[source_id]
         assert entry.terms_url == TERMS_OF_USE
-        assert entry.terms_forbid == (FORBID_PHRASE,)
+        assert entry.terms_forbid == ()
+        assert entry.terms_watch is True
+        assert entry.basis_note == OWNER_BASIS_NOTE
         assert entry.licence_basis == "owner_decision"
         assert entry.decision_record == "0017"
+
+
+def test_loader_refuses_terms_watch_and_terms_forbid_together(tmp_path: Path) -> None:
+    """A row cannot both watch the terms page and switch off on a recorded phrase."""
+
+    def both(document: dict[str, object]) -> None:
+        row = _row(document, "roads_osm")
+        row["terms_url"] = TERMS_OF_USE
+        row["terms_forbid"] = [FORBID_PHRASE]
+        row["terms_watch"] = True
+        row["basis_note"] = OWNER_BASIS_NOTE
+
+    with pytest.raises(RegistryError, match="terms_watch and terms_forbid together"):
+        load_registry(_mutated(tmp_path, "both.yaml", both))
 
 
 def test_loader_refuses_a_bad_terms_forbid(tmp_path: Path) -> None:

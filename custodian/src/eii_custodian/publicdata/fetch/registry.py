@@ -46,6 +46,8 @@ FIELDS = frozenset(
         "url",
         "terms_url",
         "terms_forbid",
+        "terms_watch",
+        "basis_note",
         "landing_url",
         "nightly_live_fetch",
         "public_splits",
@@ -139,6 +141,8 @@ class Entry:
     licence_url: str = ""
     layer: int | None = None
     terms_forbid: tuple[str, ...] = ()
+    terms_watch: bool = False
+    basis_note: str = ""
 
 
 def registry_path() -> Path:
@@ -220,6 +224,14 @@ def _entry(row: object) -> Entry:
     if commit and basis == "none_stated":
         raise RegistryError("none_stated cannot be committed")
     terms_forbid = _terms_forbid(row)
+    terms_watch = _terms_watch(row)
+    basis_note = _basis_note(row)
+    if terms_watch and terms_forbid:
+        raise RegistryError("terms_watch and terms_forbid together")
+    if terms_watch and basis_note.strip() == "":
+        raise RegistryError("terms_watch set without basis_note")
+    if terms_watch and _text(row, "terms_url").strip() == "":
+        raise RegistryError("terms_watch set without terms_url")
     return Entry(
         key=_text(row, "key"),
         source_id=source_id,
@@ -251,7 +263,29 @@ def _entry(row: object) -> Entry:
         licence_url=_optional_text(row, "licence_url"),
         layer=layer,
         terms_forbid=terms_forbid,
+        terms_watch=terms_watch,
+        basis_note=basis_note,
     )
+
+
+def _terms_watch(row: dict[object, object]) -> bool:
+    """Return whether the row watches its terms page without switching off."""
+    if "terms_watch" not in row:
+        return False
+    value = row["terms_watch"]
+    if not isinstance(value, bool):
+        raise RegistryError("terms_watch is not a boolean")
+    return value
+
+
+def _basis_note(row: dict[object, object]) -> str:
+    """Return the basis-of-use note. Absent means none was recorded."""
+    if "basis_note" not in row or row["basis_note"] is None:
+        return ""
+    value = row["basis_note"]
+    if not isinstance(value, str) or value.strip() == "":
+        raise RegistryError("basis_note is not text")
+    return value
 
 
 def _terms_forbid(row: dict[object, object]) -> tuple[str, ...]:

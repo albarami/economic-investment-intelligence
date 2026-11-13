@@ -302,7 +302,7 @@ def _terms(entry: Entry, reader: Read) -> Prepared:
         if failure is not None or terms is None:
             return _failed(entry, failure)
         terms_hash = sha256_hex(terms.body)
-        if _forbids(entry.source_id, terms.body):
+        if _forbids(entry, terms.body):
             return _failed(
                 entry,
                 AttemptFailure(
@@ -325,8 +325,8 @@ def _terms(entry: Entry, reader: Read) -> Prepared:
     )
 
 
-def _forbids(source_id: str, body: bytes) -> bool:
-    if source_id == "busy_gmaps":
+def _forbids(entry: Entry, body: bytes) -> bool:
+    if entry.source_id == "busy_gmaps" or entry.terms_watch:
         return False
     text = body.decode("utf-8", errors="replace").casefold()
     return _FORBIDDEN in text or _FORBIDDEN_ALT in text

@@ -29,6 +29,7 @@ from eii_custodian.publicdata.fetch.report import (
     owner_line,
     pass_line,
     skip_line,
+    terms_changed_line,
 )
 from eii_custodian.publicdata.fetch.transport import Transport
 from eii_custodian.publicdata.stage import run_stage
@@ -159,6 +160,7 @@ def run_build(
     """Fetch each row in order, then run the public_data stage."""
     lines: list[str] = []
     terms: list[dict[str, object]] = []
+    previous = _previous_term_hashes(cache)
     failure: FetchFailure | None = None
     for entry in entries:
         if entry.terms_forbid:
@@ -166,6 +168,15 @@ def run_build(
             if stopped is not None:
                 failure = stopped
                 break
+            continue
+        if entry.terms_watch and entry.skip_reason:
+            stopped = _watch_skipped_terms(
+                entry, transport, sleep, clock, lines, terms, previous
+            )
+            if stopped is not None:
+                failure = stopped
+                break
+            lines.append(skip_line(entry.key, entry.skip_reason))
             continue
         if entry.skip_reason:
             lines.append(skip_line(entry.key, entry.skip_reason))
@@ -190,6 +201,8 @@ def run_build(
             )
             failure = result
             break
+        if entry.terms_watch:
+            _record_watched_fetch(entry, cache, previous, lines, terms)
         digest = _stored_digest(cache, entry.key)
         lines.append(pass_line(entry.key, digest, _stored_host(cache, entry.key)))
     if failure is None:
@@ -263,6 +276,112 @@ def _switch_off_on_terms(
         }
     )
     return None
+
+
+def _watch_skipped_terms(
+    entry: Entry,
+    transport: Transport,
+    sleep: Sleeper,
+    clock: Clock,
+    lines: list[str],
+    terms: list[dict[str, object]],
+    previous: dict[str, str],
+) -> FetchFailure | None:
+    """Read and hash the terms page of a watched row that this task does not fetch."""
+    read = read_recorded_terms(entry, transport, sleep)
+    if read.failure is not None:
+        lines.append(
+            fail_line(
+                entry.key,
+                read.failure.url,
+                read.failure.check,
+                read.failure.expected,
+                read.failure.observed,
+            )
+        )
+        return FetchFailure(
+            read.failure.code,
+            entry.source_id,
+            read.failure.url,
+            read.failure.check,
+            read.failure.expected,
+            read.failure.observed,
+        )
+    _record_watched_terms(entry, read.sha256, clock(), previous, lines, terms)
+    return None
+
+
+def _record_watched_fetch(
+    entry: Entry,
+    cache: Path,
+    previous: dict[str, str],
+    lines: list[str],
+    terms: list[dict[str, object]],
+) -> None:
+    """Record the terms hash already stored beside a fetched watched row."""
+    side = _stored_sidecar(cache, entry.key)
+    digest = side.get("terms_sha256")
+    retrieved = side.get("retrieved_utc")
+    if not isinstance(digest, str) or not isinstance(retrieved, str):
+        return
+    _record_watched_terms(entry, digest, retrieved, previous, lines, terms)
+
+
+def _record_watched_terms(
+    entry: Entry,
+    digest: str,
+    retrieved: str,
+    previous: dict[str, str],
+    lines: list[str],
+    terms: list[dict[str, object]],
+) -> None:
+    """Record the terms hash and retrieval time. A changed hash is named."""
+    terms.append(
+        {
+            "key": entry.key,
+            "retrieved_utc": retrieved,
+            "terms_sha256": digest,
+            "terms_url": entry.terms_url,
+        }
+    )
+    prior = previous.get(entry.key)
+    if prior is not None and prior != digest:
+        lines.append(terms_changed_line(entry.key, entry.terms_url))
+
+
+def _previous_term_hashes(cache: Path) -> dict[str, str]:
+    """Return each key's terms hash from the previous build log, when one exists."""
+    path = cache / LOG_NAME
+    if not path.is_file():
+        return {}
+    try:
+        loaded: object = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    if not isinstance(loaded, dict):
+        return {}
+    rows = loaded.get("terms")
+    if not isinstance(rows, list):
+        return {}
+    found: dict[str, str] = {}
+    for item in rows:
+        if not isinstance(item, dict):
+            continue
+        key = item.get("key")
+        digest = item.get("terms_sha256")
+        if isinstance(key, str) and isinstance(digest, str) and digest:
+            found[key] = digest
+    return found
+
+
+def _stored_sidecar(cache: Path, key: str) -> dict[str, object]:
+    folder = cache_directory(cache, key)
+    for path in folder.iterdir():
+        if path.name.endswith(".meta.json"):
+            loaded: object = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                return {str(name): value for name, value in loaded.items()}
+    return {}
 
 
 def _write_citation(entry: Entry, cache: Path, retrieved: str) -> None:

@@ -3296,11 +3296,11 @@ sources:
     licence_basis: "owner_decision"
     licence_url: ""
     decision_record: "0017"
+    basis_note: 'Owner decision of 2026-11-12: "This is a personal internal project: use both sources fully, no permission needed."'
     fetch_host: "fdiprojects.invest.qa"
     url: "https://fdiprojects.invest.qa/"
     terms_url: "https://www.invest.qa/en/terms-and-conditions?tab=terms-of-use"
-    terms_forbid:
-      - "should not be copied or modified or re-produced in whole or in part without"
+    terms_watch: true
     landing_url: "https://fdiprojects.invest.qa/"
     nightly_live_fetch: true
     public_splits: []
@@ -3323,11 +3323,11 @@ sources:
     licence_basis: "owner_decision"
     licence_url: ""
     decision_record: "0017"
+    basis_note: 'Owner decision of 2026-11-12: "This is a personal internal project: use both sources fully, no permission needed."'
     fetch_host: "www.invest.qa"
     url: "https://www.invest.qa/"
     terms_url: "https://www.invest.qa/en/terms-and-conditions?tab=terms-of-use"
-    terms_forbid:
-      - "should not be copied or modified or re-produced in whole or in part without"
+    terms_watch: true
     landing_url: "https://www.invest.qa/"
     nightly_live_fetch: true
     public_splits: []

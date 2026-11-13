@@ -32,6 +32,11 @@ def owner_changed_line(key: str, terms_url: str) -> str:
     return f"OWNER {key} switched off: {REASON_CHANGED}; read them again ({terms_url})"
 
 
+def terms_changed_line(key: str, terms_url: str) -> str:
+    """Return the line when a watched terms page differs from the previous build."""
+    return f"TERMS {key} changed since the last build ({terms_url})"
+
+
 def citation_line(key: str) -> str:
     """Return the line for a citation-only row."""
     return f"PASS {key} sha256=CITATION_ONLY host="

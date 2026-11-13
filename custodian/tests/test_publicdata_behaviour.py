@@ -10,7 +10,7 @@ import pytest
 
 from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
-from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault
 
 PORTAL = "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/planted-slug/exports/json"
@@ -394,6 +394,174 @@ def test_terms_changed_since_they_were_read_switches_the_source_off(
     loaded = json.loads((cache / "build-log.json").read_text(encoding="utf-8"))
     assert loaded["terms"][0]["reason"] == "terms changed since they were read"
     assert loaded["terms"][0]["switched_off"] is True
+
+
+OLD_FORBIDDING_WORDS = (
+    b"the material SHOULD\nnot be copied or modified or "
+    b"re-produced in whole or in part without:\npermission. "
+    b"The page forbids the use made here."
+)
+
+
+def test_watched_row_with_the_old_forbidding_words_is_fetched(
+    tmp_path: Path,
+) -> None:
+    """A watched row is stored when the terms page still holds the old words."""
+    watched = _watched_entry()
+    page = b"<html>invented dashboard</html>"
+    seen: list[str] = []
+
+    def transport(url: str) -> Response:
+        seen.append(url)
+        if url == watched.terms_url:
+            return _ok(url, OLD_FORBIDDING_WORDS)
+        if url == watched.url:
+            return _ok(url, page)
+        raise AssertionError(url)
+
+    outcome = run_build((watched,), transport, tmp_path, _clock, _sleep)
+    assert outcome.failure is None
+    assert not any(line.startswith("OWNER ") for line in outcome.lines)
+    assert not any(line.startswith("TERMS ") for line in outcome.lines)
+    assert seen == [watched.url, watched.terms_url]
+    stored = _stored_page(tmp_path, watched.key)
+    assert stored.read_bytes() == page
+    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    assert loaded["terms"] == [
+        {
+            "key": watched.key,
+            "retrieved_utc": "2026-11-13T08:00:00Z",
+            "terms_sha256": sha256_hex(OLD_FORBIDDING_WORDS),
+            "terms_url": watched.terms_url,
+        }
+    ]
+
+
+def test_changed_terms_hash_is_logged_and_the_row_is_still_fetched(
+    tmp_path: Path,
+) -> None:
+    """A terms hash that differs from the previous build log is named, and stored."""
+    watched = _watched_entry()
+    page = b"<html>invented dashboard</html>"
+    terms_body = b"Invented terms page for a watched row."
+    previous = {
+        "lines": [],
+        "terms": [
+            {
+                "key": watched.key,
+                "retrieved_utc": "2026-11-12T08:00:00Z",
+                "terms_sha256": "a" * 64,
+                "terms_url": watched.terms_url,
+            }
+        ],
+    }
+    (tmp_path / "build-log.json").write_text(json.dumps(previous), encoding="utf-8")
+    seen: list[str] = []
+
+    def transport(url: str) -> Response:
+        seen.append(url)
+        if url == watched.terms_url:
+            return _ok(url, terms_body)
+        if url == watched.url:
+            return _ok(url, page)
+        raise AssertionError(url)
+
+    outcome = run_build((watched,), transport, tmp_path, _clock, _sleep)
+    notice = f"TERMS {watched.key} changed since the last build ({watched.terms_url})"
+    assert outcome.failure is None
+    assert notice in outcome.lines
+    assert not any(line.startswith("OWNER ") for line in outcome.lines)
+    assert seen == [watched.url, watched.terms_url]
+    assert _stored_page(tmp_path, watched.key).read_bytes() == page
+    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    assert notice in loaded["lines"]
+    assert loaded["terms"] == [
+        {
+            "key": watched.key,
+            "retrieved_utc": "2026-11-13T08:00:00Z",
+            "terms_sha256": sha256_hex(terms_body),
+            "terms_url": watched.terms_url,
+        }
+    ]
+
+
+def test_skipped_watched_row_hashes_terms_and_does_not_switch_off(
+    tmp_path: Path,
+) -> None:
+    """The skipped investment row is still hashed, named on a change, and left off."""
+    by_id = {entry.source_id: entry for entry in load_registry()}
+    watched = by_id["investqa_pages"]
+    assert watched.terms_watch is True
+    assert watched.skip_reason != ""
+    previous = {
+        "lines": [],
+        "terms": [
+            {
+                "key": watched.key,
+                "retrieved_utc": "2026-11-12T08:00:00Z",
+                "terms_sha256": "b" * 64,
+                "terms_url": watched.terms_url,
+            }
+        ],
+    }
+    (tmp_path / "build-log.json").write_text(json.dumps(previous), encoding="utf-8")
+    seen: list[str] = []
+
+    def transport(url: str) -> Response:
+        seen.append(url)
+        if url == watched.terms_url:
+            return _ok(url, OLD_FORBIDDING_WORDS)
+        raise AssertionError(url)
+
+    outcome = run_build((watched,), transport, tmp_path, _clock, _sleep)
+    notice = f"TERMS {watched.key} changed since the last build ({watched.terms_url})"
+    assert outcome.failure is None
+    assert notice in outcome.lines
+    assert not any(line.startswith("OWNER ") for line in outcome.lines)
+    assert any(line.startswith("SKIP ") for line in outcome.lines)
+    assert seen == [watched.terms_url]
+    stored = [
+        path
+        for path in tmp_path.rglob("*")
+        if path.is_file() and path.name != "build-log.json"
+    ]
+    assert stored == []
+    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    assert notice in loaded["lines"]
+    assert loaded["terms"] == [
+        {
+            "key": watched.key,
+            "retrieved_utc": "2026-11-13T08:00:00Z",
+            "terms_sha256": sha256_hex(OLD_FORBIDDING_WORDS),
+            "terms_url": watched.terms_url,
+        }
+    ]
+
+
+def _watched_entry() -> Entry:
+    """A planted row that watches its terms page and is never switched off."""
+    return replace(
+        _entry(),
+        key="watched_source",
+        source_id="watched_source",
+        kind="terms_page",
+        extension="html",
+        url=PAGE,
+        terms_url=TERMS,
+        terms_watch=True,
+        fetch_host="fdiprojects.invest.qa",
+        landing_url=PAGE,
+    )
+
+
+def _stored_page(folder: Path, key: str) -> Path:
+    found = [
+        path
+        for path in (folder / key).rglob("*")
+        if path.is_file() and not path.name.endswith(".meta.json")
+    ]
+    assert len(found) == 1
+    return found[0]
 
 
 def test_short_total_row_count_schema_and_period(tmp_path: Path) -> None:

@@ -1083,15 +1083,15 @@
 - OPTIONS: **Recommendation:** keep the package in the root group through slice S2; the task that first runs `build-public` or the registry from an environment without the `dev` group declares `pyyaml` in the custodian manifest and changes the clean-environment guard in the same pull request. Alternative: keep the registry in JSON, which needs no package, at the cost of comments and a harder review of 138 rows.
 - NEEDED BY: slice S2 pin confirmation; the first task that loads the registry outside the root development group.
 
-## OI-128 — The investment sources are switched off on their terms until the owner decides
+## OI-128 — The investment sources are used by the owner's decision of 2026-11-12
 
 - ID: OI-128
-- TYPE: OPEN
-- NEEDED: The owner's decision on the two investment sources `fdi_projects` and `investqa_pages`: ask the publisher for written permission (with the acknowledgement its terms ask for), or decide another basis of use.
-- WHY: Criterion 8 of task S2-T01: terms read at fetch that forbid the use switch the source off, with a message naming it so that the owner is told. The publisher's terms of use, read by the lead on 2026-11-13 at `https://www.invest.qa/en/terms-and-conditions?tab=terms-of-use`, allow copies for personal and non-commercial use while viewing and say that the material "should not be copied or modified or re-produced in whole or in part without" the publisher's prior written permission and an acknowledgement of the source. The product reproduces project records in part.
-- DONE SO FAR: Both rows name that terms page and the forbidding words; at each fetch the build reads and hashes the page and, while the words are present (or the page has changed since it was read), switches both sources off: nothing of them is stored, an OWNER line names each, and the build continues for every other source.
-- OPTIONS: **Recommendation:** the owner asks the publisher for written permission for a private proof-of-concept demonstration, with the acknowledgement its terms ask for on every screen that shows the records. Alternative: leave both sources off; the investment cards then show their "not measured" state.
-- NEEDED BY: task S2-T12 (the investment-source parsers); the slice S2 gate.
+- TYPE: CLOSED
+- NEEDED: Nothing; recorded so that the basis of use of the two investment sources is visible beside their terms.
+- WHY: Criterion 8 of task S2-T01 asks the registry to record the publisher's terms as read at fetch and the basis of use. The publisher's terms of use, read on 2026-11-13 at `https://www.invest.qa/en/terms-and-conditions?tab=terms-of-use`, allow copies for personal and non-commercial use while viewing and ask for the publisher's prior written permission and an acknowledgement of the source before the material is copied, modified or reproduced. The owner had decided on 2026-11-12, for this personal internal project: "use both sources fully, no permission needed."
+- DONE SO FAR: Both rows (`fdi_projects`, `investqa_pages`) name the terms page and record the owner's decision of 2026-11-12, in his words, as the basis of use. At every fetch the build reads the terms page, records its SHA-256 and retrieval time, and logs a line when the page has changed since the previous build; the sources are not switched off. The fetched data stays under `data/` and never enters the repository or a committed fixture; tests use synthetic pages shaped like the real ones. Every figure keeps its source and retrieval date (PUB-87, PUB-88).
+- OPTIONS: Closed by the owner's decision.
+- NEEDED BY: none.
 
 ## OI-129 — One sandbox timing test failed once under machine load
 
