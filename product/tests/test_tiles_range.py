@@ -11,6 +11,7 @@ import threading
 import time
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Protocol
 
 import pytest
 from fastapi import FastAPI
@@ -44,6 +45,65 @@ def _route_paths(application: FastAPI) -> set[str]:
         if path is not None:
             paths.add(path)
     return paths
+
+
+def _boundary_from_content_type(content_type: str) -> str:
+    for segment in content_type.split(";"):
+        piece = segment.strip()
+        if piece.lower().startswith("boundary="):
+            value = piece.split("=", 1)[1].strip()
+            if value.startswith('"') and value.endswith('"'):
+                return value[1:-1]
+            return value
+    raise AssertionError(f"multipart response has no boundary in {content_type!r}")
+
+
+def _multipart_byterange_parts(
+    content_type: str,
+    body: bytes,
+) -> list[tuple[str, bytes]]:
+    boundary = _boundary_from_content_type(content_type)
+    delimiter = f"--{boundary}".encode("ascii")
+    close = f"--{boundary}--".encode("ascii")
+    assert body.startswith(delimiter + b"\r\n"), (
+        "multipart body must start with the boundary"
+    )
+    assert body.endswith(close), "multipart body must end with the closing boundary"
+    inner = body[len(delimiter) : -len(close)]
+    raw_parts = inner.split(b"\r\n" + delimiter + b"\r\n")
+    parts: list[tuple[str, bytes]] = []
+    for raw in raw_parts:
+        chunk = raw.lstrip(b"\r\n")
+        if not chunk:
+            continue
+        header_end = chunk.find(b"\r\n\r\n")
+        assert header_end != -1, "each multipart part must have a header block"
+        headers_blob = chunk[:header_end]
+        payload = chunk[header_end + 4 :]
+        if payload.endswith(b"\r\n"):
+            payload = payload[:-2]
+        content_range: str | None = None
+        for line in headers_blob.split(b"\r\n"):
+            if line.lower().startswith(b"content-range:"):
+                content_range = line.split(b":", 1)[1].strip().decode("ascii")
+        assert content_range is not None, "each multipart part must carry Content-Range"
+        parts.append((content_range, payload))
+    return parts
+
+
+class _Stoppable(Protocol):
+    should_exit: bool
+
+
+def _stop_uvicorn_server(
+    server: _Stoppable,
+    thread: threading.Thread,
+    *,
+    join_timeout: float = 10,
+) -> None:
+    server.should_exit = True
+    thread.join(timeout=join_timeout)
+    assert not thread.is_alive()
 
 
 def _request(
@@ -90,9 +150,7 @@ def tile_server() -> Iterator[int]:
 
     yield port
 
-    server.should_exit = True
-    thread.join(timeout=10)
-    assert not thread.is_alive()
+    _stop_uvicorn_server(server, thread)
 
 
 def test_full_request_returns_the_pinned_fixture(tile_server: int) -> None:
@@ -126,11 +184,14 @@ def test_valid_ranges_return_the_expected_bytes(tile_server: int) -> None:
         headers={"Range": "bytes=0-1,4-5"},
     )
     assert status == 206
-    assert headers.get("content-type", "").startswith("multipart/byteranges")
-    assert b"bytes 0-1/2048" in body
-    assert b"bytes 4-5/2048" in body
-    assert SPIKE_BYTES[0:2] in body
-    assert SPIKE_BYTES[4:6] in body
+    content_type = headers.get("content-type", "")
+    assert content_type.startswith("multipart/byteranges")
+    parts = _multipart_byterange_parts(content_type, body)
+    assert len(parts) == 2
+    assert parts == [
+        ("bytes 0-1/2048", SPIKE_BYTES[0:2]),
+        ("bytes 4-5/2048", SPIKE_BYTES[4:6]),
+    ]
 
     for range_header, content_range, length, expected in cases:
         status, headers, body = _request(
@@ -154,9 +215,14 @@ def test_invalid_ranges_fail_safely_and_the_server_survives(tile_server: int) ->
     )
     assert status == 416
     assert headers.get("content-range") == f"bytes */{SPIKE_SIZE}"
+    assert body == b""
     assert SPIKE_BYTES[:32] not in body
 
-    for bad in ("bytes=abc", "bytes=9-2"):
+    bad_bodies = {
+        "bytes=abc": b"Range header: range must be requested",
+        "bytes=9-2": b"Range header: start must be less than end",
+    }
+    for bad in bad_bodies:
         status, _, body = _request(
             tile_server,
             "GET",
@@ -164,6 +230,7 @@ def test_invalid_ranges_fail_safely_and_the_server_survives(tile_server: int) ->
             headers={"Range": bad},
         )
         assert status == 400, bad
+        assert body == bad_bodies[bad]
         assert SPIKE_BYTES[:32] not in body
 
         ok_status, _, ok_body = _request(tile_server, "GET", "/tiles/spike.tile")
@@ -218,8 +285,7 @@ def test_regular_files_with_invalid_tile_names_return_404(tile_server: int) -> N
                 assert secret_other_end not in body
                 assert SPIKE_BYTES[:32] not in body
         finally:
-            server.should_exit = True
-            thread.join(timeout=5)
+            _stop_uvicorn_server(server, thread, join_timeout=5)
 
 
 def test_a_tile_named_directory_returns_404_not_5xx(tile_server: int) -> None:
@@ -262,8 +328,7 @@ def test_a_tile_named_directory_returns_404_not_5xx(tile_server: int) -> None:
             assert status < 500
             assert b"nested-bytes" not in body
         finally:
-            server.should_exit = True
-            thread.join(timeout=5)
+            _stop_uvicorn_server(server, thread, join_timeout=5)
 
 
 def test_requests_outside_the_tile_directory_are_refused(tile_server: int) -> None:
@@ -313,8 +378,21 @@ def test_requests_outside_the_tile_directory_are_refused(tile_server: int) -> No
                 assert status == 404
                 assert secret not in body
             finally:
-                server.should_exit = True
-                thread.join(timeout=5)
+                _stop_uvicorn_server(server, thread, join_timeout=5)
+
+
+def test_stop_uvicorn_server_rejects_threads_that_survive_join() -> None:
+    hang = threading.Event()
+    thread = threading.Thread(target=hang.wait, daemon=True)
+    thread.start()
+
+    class _Bare:
+        should_exit = False
+
+    with pytest.raises(AssertionError):
+        _stop_uvicorn_server(_Bare(), thread, join_timeout=0.05)
+    hang.set()
+    thread.join(timeout=1)
 
 
 def _response_has_forbidden_headers(status: int, headers: dict[str, str]) -> None:
@@ -378,8 +456,7 @@ def test_the_api_app_serves_the_tile_and_the_status(tile_server: int) -> None:
             with pytest.raises(AssertionError):
                 _response_has_forbidden_headers(st, hdrs)
         finally:
-            server.should_exit = True
-            thread.join(timeout=5)
+            _stop_uvicorn_server(server, thread, join_timeout=5)
 
     paths = _route_paths(create_app(FIXTURE_DIR))
     assert "/tiles/{name}" in paths
