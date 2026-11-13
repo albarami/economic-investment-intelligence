@@ -778,7 +778,7 @@ OPEN items raised by decisions 0016, 0017 and 0019 that touch this document:
 - OPEN: the public source of tenders is confirmed at slice S2; without one, tenders are not shown.
 - OPEN: the page structure of the FDI dashboard and of the agency's pages is confirmed at slice S2, against a synthetic test page of the same shape.
 - ASSUMPTION: the files of the places copy of [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 21 that cover Qatar are found through the dataset's own metadata file; the task that builds the fetcher confirms it.
-- OPEN: the traffic provider's developer terms on storing responses could not be read on 2026-11-12; nothing is stored (ARC-135).
+- OPEN: the traffic provider's terms, read on 2026-11-13, prohibit storing results and license the free plan for internal evaluation and testing only; nothing is stored (ARC-135); showing the live layer outside internal evaluation is the owner's decision (OI-130).
 - OPEN: the Public source that links a licence cancellation to its issue, without which the survival base rate returns `NO_DATA` with `no_denominator` (ARC-138; card C31).
 - OPEN: performance targets for drawn areas, hourly layers, the 24-hour animation, the optional 3D view, rankings and the case files are set when the slices that build them are planned ([14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md)) and measured under ARC-115.
 

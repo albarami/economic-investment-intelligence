@@ -419,7 +419,7 @@ ASSUMPTIONS made in this document:
 OPEN items raised by decisions 0016, 0017 and 0019 that touch this document:
 
 - OPEN: the page structure of the FDI dashboard and of the agency's pages, the agency's page list and where each publisher states its terms are confirmed at slice S2, against a synthetic test page of the same shape (OPS-66).
-- OPEN: the traffic provider's developer terms, which could not be read on 2026-11-12, and so its rule on storing responses; nothing is stored (OPS-70).
+- OPEN: the traffic provider's terms, read on 2026-11-13, prohibit storing results and license the free plan for internal evaluation and testing only; nothing is stored (OPS-70); showing the live layer outside internal evaluation is the owner's decision (OI-130).
 - ASSUMPTION: the files of the places copy of [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 21 that cover Qatar are found through the dataset's own metadata file; the task that builds the fetcher confirms it.
 - OPEN: whether absence of `EARTHDATA_API_KEY` produces a warning that names the key and the layer left out, or a silent omission of the night-lights layer, is fixed by the task that builds that fetcher; in either case `build-public` continues successfully without the layer, and exit 6 stays for an unavailable network only (OPS-71).
 - OPEN: the release size with the hourly presence and traffic tables, the monthly periods and the public additions is measured when the slices that build them run; the disk estimate of section 12 is revised then.

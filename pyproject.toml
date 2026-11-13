@@ -12,6 +12,7 @@ dev = [
   "mypy==2.4.1",
   "pre-commit==4.7.0",
   "pytest==9.2.0",
+  "pyyaml==6.0.3",
   "ruff==0.17.4",
   "uvicorn==0.54.0",
 ]
@@ -72,4 +73,5 @@ markers = [
   "sandbox: needs bubblewrap; it is never skipped",
   "nightly: not part of the pull-request run",
   "live_model: needs a live model key; with none it is skipped with the reason OI-01",
+  "public_data: section 10 regression stage on hand-made fixtures",
 ]

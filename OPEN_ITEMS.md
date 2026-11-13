@@ -1073,6 +1073,46 @@
 - OPTIONS: **Recommendation:** count the failures of this assertion over the next ten local runs of the spike's tests and record the count here; if it recurs, make the smoke orbit wait for the first camera movement before it ends, never loosen the assertion.
 - NEEDED BY: the slice S1 gate.
 
+## OI-127 — PyYAML is installed through the root development group
+
+- ID: OI-127
+- TYPE: ASSUMPTION
+- NEEDED: Confirmation, by the first task that installs `eii_custodian` outside the root dependency group `dev`, that `pyyaml` moves into the custodian manifest `custodian/pyproject.toml` in that task's pull request.
+- WHY: The source registry of task S2-T01 is the committed file `custodian/publicdata/sources.yaml`, and the PyYAML package reads it. A member manifest cannot gain a third-party dependency while the clean-environment guard of task S0-T02 installs the members offline from an empty cache (OI-60, OI-116). PyYAML has no type stubs, so the one import carries the same `type: ignore[import-untyped]` mark that two existing checks already use.
+- DONE SO FAR: `pyyaml` 6.0.3 is pinned exactly in the root group `dev` and in `pins.toml` with the retreat 6.0.2 and the label ASSUMPTION. The loader calls `yaml.safe_load` only; a test fails if the loader source holds `yaml.load` or lacks `safe_load`. No other package was added.
+- OPTIONS: **Recommendation:** keep the package in the root group through slice S2; the task that first runs `build-public` or the registry from an environment without the `dev` group declares `pyyaml` in the custodian manifest and changes the clean-environment guard in the same pull request. Alternative: keep the registry in JSON, which needs no package, at the cost of comments and a harder review of 138 rows.
+- NEEDED BY: slice S2 pin confirmation; the first task that loads the registry outside the root development group.
+
+## OI-128 — The investment sources are switched off on their terms until the owner decides
+
+- ID: OI-128
+- TYPE: OPEN
+- NEEDED: The owner's decision on the two investment sources `fdi_projects` and `investqa_pages`: ask the publisher for written permission (with the acknowledgement its terms ask for), or decide another basis of use.
+- WHY: Criterion 8 of task S2-T01: terms read at fetch that forbid the use switch the source off, with a message naming it so that the owner is told. The publisher's terms of use, read by the lead on 2026-11-13 at `https://www.invest.qa/en/terms-and-conditions?tab=terms-of-use`, allow copies for personal and non-commercial use while viewing and say that the material "should not be copied or modified or re-produced in whole or in part without" the publisher's prior written permission and an acknowledgement of the source. The product reproduces project records in part.
+- DONE SO FAR: Both rows name that terms page and the forbidding words; at each fetch the build reads and hashes the page and, while the words are present (or the page has changed since it was read), switches both sources off: nothing of them is stored, an OWNER line names each, and the build continues for every other source.
+- OPTIONS: **Recommendation:** the owner asks the publisher for written permission for a private proof-of-concept demonstration, with the acknowledgement its terms ask for on every screen that shows the records. Alternative: leave both sources off; the investment cards then show their "not measured" state.
+- NEEDED BY: task S2-T12 (the investment-source parsers); the slice S2 gate.
+
+## OI-129 — One sandbox timing test failed once under machine load
+
+- ID: OI-129
+- TYPE: OPEN
+- NEEDED: The cause of one failure of `test_die_with_parent` in `scripts/tests/test_sandbox_mounts.py`, or a record that it did not recur over a stated number of runs.
+- WHY: AGENTS.md rule 39: a random failure is recorded, and a green re-run alone does not close it.
+- DONE SO FAR: During task S2-T01 (2026-11-13), the builder's whole test run at seed 2026111377 failed this test once with "a sandboxed process outlived its driver", while the machine was loaded (a load average of 74 on 32 processors, ruling L-106 of the run). The same test passed in the lead's whole runs at seeds 2026111378 and 2026111382, which ran at lower priority and finished with 0 failed. In the same builder run, two tests of the version check failed because that tool's shell had Node 24 first on its path instead of the pinned 22; that is an environment fault and not a random failure, and the lead's runs with Node 22 passed. No code was changed because of either.
+- OPTIONS: **Recommendation:** count the failures of this test over the next ten local runs and record the count here; if it recurs, make the test wait for the process group to end for a stated time before it judges, never loosen the assertion that the process does not outlive its driver.
+- NEEDED BY: the slice S2 gate.
+
+## OI-130 — Showing the live traffic layer outside internal evaluation
+
+- ID: OI-130
+- TYPE: OPEN
+- NEEDED: The owner's decision whether the optional live traffic layer (decision 0019, task S6-T19) is shown to anyone outside his own evaluation and testing.
+- WHY: The provider's terms, read by the lead in full on 2026-11-13 (`https://docs.tomtom.com/legal/terms-and-conditions`; no date or version on the page), license the free plan "for Evaluation Use only", defined as "internal evaluation and testing by you of the Licensed Products"; a demonstration to a ministry is not clearly internal evaluation.
+- DONE SO FAR: Document 04 records the terms on the two provider rows: Evaluation Use only; caching or storing results prohibited except in a client under the result's cache-control headers and never to serve several users (nothing is stored, as decision 0019 already says); the logos and copyright notices the provider's interfaces generate are kept, and other attribution comes from the provider's copyright interface; the page says nothing on showing the layer beside other map data. The layer stays off by default.
+- OPTIONS: **Recommendation:** keep the live layer for the owner's own evaluation and show the simulated traffic in every demonstration; if the owner wants the live layer in a demonstration, take a plan whose terms allow that use first.
+- NEEDED BY: task S6-T19.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.

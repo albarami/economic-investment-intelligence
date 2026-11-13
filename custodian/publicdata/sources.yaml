@@ -1,0 +1,3467 @@
+# Source registry for document 04 section 2.
+# A decision 0017 family row is keyed source_id/slug (PUB-85).
+# traffic_tomtom_flow and traffic_tomtom_range have no row (PUB-95).
+# A paged_layer row requires layer: a non-negative integer ArcGIS layer id, with no default.
+# Any other kind refuses layer.
+sources:
+  - key: "lic_active"
+    source_id: "lic_active"
+    slug: "moci-active-certificates-by-municipality-and-business-activity"
+    kind: "portal_dataset"
+    title_en: "Active certificates by municipality and business activity"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/moci-active-certificates-by-municipality-and-business-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/moci-active-certificates-by-municipality-and-business-activity/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_licence_active"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 13189
+    row_count_max: 13189
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "lic_cancelled"
+    source_id: "lic_cancelled"
+    slug: "moci-canceled-certificates-by-municipality-and-business-activity"
+    kind: "portal_dataset"
+    title_en: "Cancelled certificates by municipality and business activity"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/moci-canceled-certificates-by-municipality-and-business-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/moci-canceled-certificates-by-municipality-and-business-activity/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_licence_cancelled"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 40472
+    row_count_max: 40472
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "lic_issued"
+    source_id: "lic_issued"
+    slug: "moci-issued-certificates-by-municipality-and-business-activity"
+    kind: "portal_dataset"
+    title_en: "Issued certificates by municipality and business activity (incomplete)"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/moci-issued-certificates-by-municipality-and-business-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/moci-issued-certificates-by-municipality-and-business-activity/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_licence_issued"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 8259
+    row_count_max: 8259
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "cus_imp_2025"
+    source_id: "cus_imp_2025"
+    slug: "qatar-imports-2025-2026"
+    kind: "portal_dataset"
+    title_en: "Qatar Imports 2025-2026"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/qatar-imports-2025-2026/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/qatar-imports-2025-2026/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_customs_import"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 252048
+    row_count_max: 252048
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "cus_imp_2019"
+    source_id: "cus_imp_2019"
+    slug: "qatar-imports-2019-2024-copy"
+    kind: "portal_dataset"
+    title_en: "Qatar Imports 2019-2024"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/qatar-imports-2019-2024-copy/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/qatar-imports-2019-2024-copy/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_customs_import"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 830494
+    row_count_max: 830494
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "sec_hr_ind"
+    source_id: "sec_hr_ind"
+    slug: "hotels-and-restaurants-statistics-economic-indicators-in-hotels-and-restaurants-by-activity1"
+    kind: "portal_dataset"
+    title_en: "Hotels and restaurants: economic indicators by activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-economic-indicators-in-hotels-and-restaurants-by-activity1/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-economic-indicators-in-hotels-and-restaurants-by-activity1/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_sector_accounts"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "open"
+    skip_reason: ""
+    extension: "json"
+  - key: "sec_hr_goods"
+    source_id: "sec_hr_goods"
+    slug: "hotels-and-restaurants-statistics-estimates-of-intermediate-goods-value-in-hotels-and-restaurants-by0"
+    kind: "portal_dataset"
+    title_en: "Hotels and restaurants: intermediate goods by type"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-estimates-of-intermediate-goods-value-in-hotels-and-restaurants-by0/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-estimates-of-intermediate-goods-value-in-hotels-and-restaurants-by0/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_sector_accounts"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "sec_hr_serv"
+    source_id: "sec_hr_serv"
+    slug: "hotels-and-restaurants-statistics-estimates-of-intermediate-services-value-in-hotels-and-restaurants0"
+    kind: "portal_dataset"
+    title_en: "Hotels and restaurants: intermediate services by type"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-estimates-of-intermediate-services-value-in-hotels-and-restaurants0/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-estimates-of-intermediate-services-value-in-hotels-and-restaurants0/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_sector_accounts"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "sec_hr_size"
+    source_id: "sec_hr_size"
+    slug: "hotels-and-restaurants-number-establishments-employees-by-size-of-establishment-economic-activity"
+    kind: "portal_dataset"
+    title_en: "Hotels and restaurants: establishments and employees by size"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-number-establishments-employees-by-size-of-establishment-economic-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-number-establishments-employees-by-size-of-establishment-economic-activity/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_sector_accounts", "pub_establishment_size"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "sec_hr_comp_occ"
+    source_id: "sec_hr_comp_occ"
+    slug: "hotels-and-restaurants-statistics-estimates-of-compensation-in-hotels-and-restaurants-by-occupation1"
+    kind: "portal_dataset"
+    title_en: "Hotels and restaurants: compensation by occupation"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-estimates-of-compensation-in-hotels-and-restaurants-by-occupation1/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-estimates-of-compensation-in-hotels-and-restaurants-by-occupation1/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_wage_table"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "wage_occ"
+    source_id: "wage_occ"
+    slug: "workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q1"
+    kind: "portal_dataset"
+    title_en: "Workers in paid employment and monthly average wage by gender and occupation"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q1/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q1/"
+    nightly_live_fetch: true
+    public_splits: ["sex"]
+    commit_allowed: false
+    release_tables: ["pub_wage_table"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "open"
+    skip_reason: ""
+    extension: "json"
+  - key: "wage_act"
+    source_id: "wage_act"
+    slug: "workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q"
+    kind: "portal_dataset"
+    title_en: "Workers in paid employment and monthly average wage by gender and economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q/"
+    nightly_live_fetch: true
+    public_splits: ["sex"]
+    commit_allowed: false
+    release_tables: ["pub_wage_table"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "open"
+    skip_reason: ""
+    extension: "json"
+  - key: "wage_sector"
+    source_id: "wage_sector"
+    slug: "workers-in-paid-employment-and-average-monthly-wage-by-gender-and-sector"
+    kind: "portal_dataset"
+    title_en: "Workers in paid employment and average monthly wage by gender and sector"
+    publisher: "to be confirmed at slice S2"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/workers-in-paid-employment-and-average-monthly-wage-by-gender-and-sector/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/workers-in-paid-employment-and-average-monthly-wage-by-gender-and-sector/"
+    nightly_live_fetch: true
+    public_splits: ["sex"]
+    commit_allowed: false
+    release_tables: ["pub_wage_table"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "publisher_or_licence_unconfirmed"
+    extension: "json"
+  - key: "wage_bands_priv"
+    source_id: "wage_bands_priv"
+    slug: "average-monthly-wage-q-r-for-workers-in-private-sector-in-qatar-2021-2025"
+    kind: "portal_dataset"
+    title_en: "Average monthly wage for workers in the private sector"
+    publisher: "to be confirmed at slice S2"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/average-monthly-wage-q-r-for-workers-in-private-sector-in-qatar-2021-2025/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/average-monthly-wage-q-r-for-workers-in-private-sector-in-qatar-2021-2025/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_wage_table"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "publisher_or_licence_unconfirmed"
+    extension: "json"
+  - key: "work_hours_act"
+    source_id: "work_hours_act"
+    slug: "employed-persons-15-years-and-above-and-average-work-hours-by-gender-and-economic-activity"
+    kind: "portal_dataset"
+    title_en: "Employed persons and average work hours by gender and economic activity"
+    publisher: "to be confirmed at slice S2"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/employed-persons-15-years-and-above-and-average-work-hours-by-gender-and-economic-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/employed-persons-15-years-and-above-and-average-work-hours-by-gender-and-economic-activity/"
+    nightly_live_fetch: true
+    public_splits: ["sex"]
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "publisher_or_licence_unconfirmed"
+    extension: "json"
+  - key: "util_elec"
+    source_id: "util_elec"
+    slug: "electricity-total-consumption-by-zone-number"
+    kind: "portal_dataset"
+    title_en: "Electricity total consumption by zone number"
+    publisher: "Kahramaa"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/electricity-total-consumption-by-zone-number/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/electricity-total-consumption-by-zone-number/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_zone_utility"]
+    caveat_keys: ["proxy_not_population", "partial_latest_year"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "util_water"
+    source_id: "util_water"
+    slug: "water-total-consumption-by-zone-number"
+    kind: "portal_dataset"
+    title_en: "Water total consumption by zone number"
+    publisher: "Kahramaa"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/water-total-consumption-by-zone-number/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/water-total-consumption-by-zone-number/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_zone_utility"]
+    caveat_keys: ["proxy_not_population", "partial_latest_year"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "transit_monthly"
+    source_id: "transit_monthly"
+    slug: "public-transport-users"
+    kind: "portal_dataset"
+    title_en: "Public Transport Users"
+    publisher: "Ministry of Transport"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/public-transport-users/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/public-transport-users/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_transit_monthly"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "hotel_segment"
+    source_id: "hotel_segment"
+    slug: "accommodation-data-by-segment-date-and-key-metrics-supply-demand-occupancy-adr-revpar"
+    kind: "portal_dataset"
+    title_en: "Accommodation data by segment (supply, demand, occupancy, ADR, RevPAR)"
+    publisher: "Qatar Tourism"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/accommodation-data-by-segment-date-and-key-metrics-supply-demand-occupancy-adr-revpar/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/accommodation-data-by-segment-date-and-key-metrics-supply-demand-occupancy-adr-revpar/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_hotel_monthly"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "cpi_group"
+    source_id: "cpi_group"
+    slug: "consumer-price-index-cpi-by-expenditure-group-monthly"
+    kind: "portal_dataset"
+    title_en: "Consumer price index by expenditure group, monthly"
+    publisher: "to be confirmed at slice S2"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/consumer-price-index-cpi-by-expenditure-group-monthly/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/consumer-price-index-cpi-by-expenditure-group-monthly/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_price_index"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "publisher_or_licence_unconfirmed"
+    extension: "json"
+  - key: "prop_sales"
+    source_id: "prop_sales"
+    slug: "weekly-real-estates-sales-bulletin"
+    kind: "portal_dataset"
+    title_en: "Weekly Real Estates Sales Bulletin"
+    publisher: "Ministry of Justice"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/weekly-real-estates-sales-bulletin/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/weekly-real-estates-sales-bulletin/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_property_sale"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 26719
+    row_count_max: 26719
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "pop_muni"
+    source_id: "pop_muni"
+    slug: "population-and-labour-force-by-municipality"
+    kind: "portal_dataset"
+    title_en: "Population and labour force by municipality"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-and-labour-force-by-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/population-and-labour-force-by-municipality/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_population_municipality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "zone_population"
+    source_id: "zone_population"
+    slug: "population-area-and-population-density-per-square-kilometers-by-zone"
+    kind: "portal_dataset"
+    title_en: "Population, area and population density by zone"
+    publisher: "to be confirmed at slice S2"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-area-and-population-density-per-square-kilometers-by-zone/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/population-area-and-population-density-per-square-kilometers-by-zone/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "publisher_or_licence_unconfirmed"
+    extension: "json"
+  - key: "est_census"
+    source_id: "est_census"
+    slug: "number-of-business-establishments-by-economic-activity-in-census-2010-2020"
+    kind: "portal_dataset"
+    title_en: "Number of business establishments by economic activity in census (2010, 2020)"
+    publisher: "to be confirmed at slice S2"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-business-establishments-by-economic-activity-in-census-2010-2020/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-business-establishments-by-economic-activity-in-census-2010-2020/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_census_national"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "publisher_or_licence_unconfirmed"
+    extension: "json"
+  - key: "census_hh_type_2020"
+    source_id: "census_hh_type_2020"
+    slug: "population-by-type-of-household-gender-and-place-of-residence-on-the-census-night-december-2020"
+    kind: "portal_dataset"
+    title_en: "Population by type of household, gender and place of residence on the census night, December 2020"
+    publisher: "to be confirmed at slice S2"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-by-type-of-household-gender-and-place-of-residence-on-the-census-night-december-2020/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/population-by-type-of-household-gender-and-place-of-residence-on-the-census-night-december-2020/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "publisher_or_licence_unconfirmed"
+    extension: "json"
+  - key: "accident"
+    source_id: "accident"
+    slug: "accident"
+    kind: "portal_dataset"
+    title_en: "Accident"
+    publisher: "to be confirmed at slice S2"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/accident/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/accident/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "publisher_or_licence_unconfirmed"
+    extension: "json"
+  - key: "census_2020_workbook"
+    source_id: "census_2020_workbook"
+    slug: ""
+    kind: "https_file"
+    title_en: "Census 2020 detailed results workbook, Tables 1, 2, 151 and 152"
+    publisher: "Planning and Statistics Authority"
+    licence_id: "none-stated"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: "web.archive.org"
+    url: "https://web.archive.org/web/20240422094401/https://www.psa.gov.qa/Style%20Library/PSA/CensusDetailedResults/documents/Qatar_Census_2022_Final_Results.xlsx"
+    terms_url: ""
+    landing_url: "https://web.archive.org/web/20240422094401/https://www.psa.gov.qa/Style%20Library/PSA/CensusDetailedResults/documents/Qatar_Census_2022_Final_Results.xlsx"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "schema_unconfirmed"
+    extension: "xlsx"
+  - key: "worldpop_qat_2020"
+    source_id: "worldpop_qat_2020"
+    slug: ""
+    kind: "https_file"
+    title_en: "Constrained 100 m gridded population, 2020"
+    publisher: "WorldPop"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
+    decision_record: ""
+    fetch_host: "data.worldpop.org"
+    url: "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/QAT/v1/100m/constrained/"
+    terms_url: ""
+    landing_url: "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/QAT/v1/100m/constrained/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "direct_url_unconfirmed"
+    extension: "tif"
+  - key: "census_zone_sector"
+    source_id: "census_zone_sector"
+    slug: ""
+    kind: "paged_layer"
+    layer: 0
+    title_en: "Census 2020 employed population by major economic sector, by zone"
+    publisher: "statistics authority public map service"
+    licence_id: "none-stated"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0017"
+    fetch_host: "services7.arcgis.com"
+    url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Population_by_Major_Economic_Sectors_by_Zone_2020_WFL1/FeatureServer"
+    terms_url: ""
+    landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Population_by_Major_Economic_Sectors_by_Zone_2020_WFL1/FeatureServer"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_census_zone"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "census_zone_occ"
+    source_id: "census_zone_occ"
+    slug: ""
+    kind: "paged_layer"
+    layer: 0
+    title_en: "Census 2020 employed population by occupation, by zone"
+    publisher: "statistics authority public map service"
+    licence_id: "none-stated"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0017"
+    fetch_host: "services7.arcgis.com"
+    url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Employed_Population_by_Occupation_by_Zone_2020_WFL1/FeatureServer"
+    terms_url: ""
+    landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Employed_Population_by_Occupation_by_Zone_2020_WFL1/FeatureServer"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_census_zone"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "census_zone_hh"
+    source_id: "census_zone_hh"
+    slug: ""
+    kind: "paged_layer"
+    layer: 0
+    title_en: "Census 2020 residence for households, by zone"
+    publisher: "statistics authority public map service"
+    licence_id: "none-stated"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0017"
+    fetch_host: "services7.arcgis.com"
+    url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Residence_for_Households_by_Zone_2020_WFL1/FeatureServer"
+    terms_url: ""
+    landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Residence_for_Households_by_Zone_2020_WFL1/FeatureServer"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_census_zone"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "census_zone_lab"
+    source_id: "census_zone_lab"
+    slug: ""
+    kind: "paged_layer"
+    layer: 0
+    title_en: "Census 2020 residence for workers (labourer groups), by zone"
+    publisher: "statistics authority public map service"
+    licence_id: "none-stated"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0017"
+    fetch_host: "services7.arcgis.com"
+    url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Residence_for_Workers_Labourer_Groups_by_Zone_2020_WFL1/FeatureServer"
+    terms_url: ""
+    landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Residence_for_Workers_Labourer_Groups_by_Zone_2020_WFL1/FeatureServer"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_census_zone"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "census_district_pop"
+    source_id: "census_district_pop"
+    slug: ""
+    kind: "paged_layer"
+    layer: 0
+    title_en: "Census 2020 population, district level"
+    publisher: "statistics authority public map service"
+    licence_id: "none-stated"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0017"
+    fetch_host: "services7.arcgis.com"
+    url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Population_2020_District_Level/FeatureServer"
+    terms_url: ""
+    landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Population_2020_District_Level/FeatureServer"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_census_district"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "bnd_zone_2020"
+    source_id: "bnd_zone_2020"
+    slug: ""
+    kind: "paged_layer"
+    layer: 0
+    title_en: "Zone_Boundary_2020 (map layer)"
+    publisher: "statistics authority public map service"
+    licence_id: "none-stated"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0017"
+    fetch_host: "services7.arcgis.com"
+    url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Zone_Boundary_2020/FeatureServer"
+    terms_url: ""
+    landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Zone_Boundary_2020/FeatureServer"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "bnd_district_2020"
+    source_id: "bnd_district_2020"
+    slug: ""
+    kind: "paged_layer"
+    layer: 12
+    title_en: "District_2020 (map layer)"
+    publisher: "statistics authority public map service"
+    licence_id: "none-stated"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0017"
+    fetch_host: "services7.arcgis.com"
+    url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/District_2020/FeatureServer"
+    terms_url: ""
+    landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/District_2020/FeatureServer"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "bnd_hdx"
+    source_id: "bnd_hdx"
+    slug: ""
+    kind: "https_file"
+    title_en: "Qatar Subnational Administrative Boundaries (COD-AB)"
+    publisher: "HDX, source Planning and Statistics Authority"
+    licence_id: "CC-BY-IGO"
+    licence_basis: "dataset"
+    licence_url: "https://data.humdata.org/dataset/cod-ab-qat"
+    decision_record: ""
+    fetch_host: "data.humdata.org"
+    url: ""
+    terms_url: ""
+    landing_url: "https://data.humdata.org/dataset/cod-ab-qat"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["zone", "municipality", "gazetteer"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "direct_url_unconfirmed"
+    extension: "json"
+  - key: "bnd_muni_2025"
+    source_id: "bnd_muni_2025"
+    slug: "municipalities-in-qatar-2025"
+    kind: "portal_dataset"
+    title_en: "Municipalities in Qatar 2025"
+    publisher: "to be confirmed at slice S2"
+    licence_id: "portal-terms"
+    licence_basis: "portal_terms"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/municipalities-in-qatar-2025/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/municipalities-in-qatar-2025/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["municipality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "publisher_or_licence_unconfirmed"
+    extension: "json"
+  - key: "bnd_geob"
+    source_id: "bnd_geob"
+    slug: ""
+    kind: "https_file"
+    title_en: "geoBoundaries Qatar ADM1, ADM2 (fallback only)"
+    publisher: "geoBoundaries"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
+    decision_record: ""
+    fetch_host: "www.geoboundaries.org"
+    url: "https://www.geoboundaries.org/api/current/gbOpen/QAT/ALL/"
+    terms_url: ""
+    landing_url: "https://www.geoboundaries.org/api/current/gbOpen/QAT/ALL/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["zone"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "places_ovt"
+    source_id: "places_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture Places, release 2026-10-21.0, schema 2.0.0"
+    publisher: "Overture Maps Foundation (per-record sources)"
+    licence_id: "CDLA-Permissive-2.0"
+    licence_basis: "dataset"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
+    url: "s3://overturemaps-us-west-2/release/2026-10-21.0/theme=places/type=place/"
+    terms_url: ""
+    landing_url: "https://stac.overturemaps.org/2026-10-21.0/catalog.json"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_place"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "overture_bucket_not_opened"
+    extension: "parquet"
+  - key: "bldg_ovt"
+    source_id: "bldg_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture Buildings, release 2026-10-21.0 (named showcase buildings only)"
+    publisher: "Overture Maps Foundation"
+    licence_id: "ODbL"
+    licence_basis: "dataset"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
+    url: "s3://overturemaps-us-west-2/release/2026-10-21.0/theme=buildings/"
+    terms_url: ""
+    landing_url: "s3://overturemaps-us-west-2/release/2026-10-21.0/theme=buildings/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["gazetteer"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "overture_bucket_not_opened"
+    extension: "parquet"
+  - key: "roads_osm"
+    source_id: "roads_osm"
+    slug: ""
+    kind: "https_file"
+    title_en: "OpenStreetMap Qatar extract (road network)"
+    publisher: "OpenStreetMap contributors"
+    licence_id: "ODbL-1.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.openstreetmap.org/copyright"
+    decision_record: ""
+    fetch_host: "download.openstreetmap.fr"
+    url: "https://download.openstreetmap.fr/extracts/asia/qatar-latest.osm.pbf"
+    terms_url: ""
+    landing_url: "https://download.openstreetmap.fr/extracts/asia/qatar-latest.osm.pbf"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "pbf"
+  - key: "cls_isic4"
+    source_id: "cls_isic4"
+    slug: ""
+    kind: "https_file"
+    title_en: "ISIC Rev.4 structure (English titles)"
+    publisher: "United Nations Statistics Division"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: "unstats.un.org"
+    url: ""
+    terms_url: ""
+    landing_url: "https://unstats.un.org/unsd/classifications/Econ"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "direct_url_unconfirmed"
+    extension: "json"
+  - key: "ref_min_wage"
+    source_id: "ref_min_wage"
+    slug: ""
+    kind: "citation_only"
+    title_en: "Qatar minimum wage (Law No. 17 of 2020), reference page"
+    publisher: "International Labour Organization"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: "https://www.ilo.org/resource/news/qatar-adopts-non-discriminatory-minimum-wage"
+    terms_url: ""
+    landing_url: "https://www.ilo.org/resource/news/qatar-adopts-non-discriminatory-minimum-wage"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_wage_table"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: ""
+  - key: "ref_wps_report"
+    source_id: "ref_wps_report"
+    slug: ""
+    kind: "citation_only"
+    title_en: "Wage Protection Systems in the Gulf Cooperation Council Countries, November 2025"
+    publisher: "International Labour Organization"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: "https://www.ilo.org/sites/default/files/2025-11/ILO_Beirut_Wage-Protection_Report_R10.pdf"
+    terms_url: ""
+    landing_url: "https://www.ilo.org/sites/default/files/2025-11/ILO_Beirut_Wage-Protection_Report_R10.pdf"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: ""
+  - key: "ref_expansion_method"
+    source_id: "ref_expansion_method"
+    slug: ""
+    kind: "citation_only"
+    title_en: "Mobility study methodology v3"
+    publisher: "Spanish Ministry of Transport"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: "https://ropenspain.github.io/spanishoddata/codebooks/mitma_-_estudio_movilidad_covid-19_informe_metodologico_v3_en.pdf"
+    terms_url: ""
+    landing_url: "https://ropenspain.github.io/spanishoddata/codebooks/mitma_-_estudio_movilidad_covid-19_informe_metodologico_v3_en.pdf"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: ""
+  - key: "ref_gov_hours"
+    source_id: "ref_gov_hours"
+    slug: ""
+    kind: "citation_only"
+    title_en: "Flexible working system for the government sector"
+    publisher: "The Peninsula"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: "https://thepeninsulaqatar.com/article/04/09/2024/cgb-announces-flexible-remote-work-system-for-qatar-government-sector"
+    terms_url: ""
+    landing_url: "https://thepeninsulaqatar.com/article/04/09/2024/cgb-announces-flexible-remote-work-system-for-qatar-government-sector"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: ""
+  - key: "ref_friday_closure"
+    source_id: "ref_friday_closure"
+    slug: ""
+    kind: "citation_only"
+    title_en: "Services exempted from closure during Friday prayers"
+    publisher: "The Peninsula"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: "https://thepeninsulaqatar.com/article/17/08/2025/over-10-services-in-qatar-exempted-from-closure-during-friday-prayers-gazette"
+    terms_url: ""
+    landing_url: "https://thepeninsulaqatar.com/article/17/08/2025/over-10-services-in-qatar-exempted-from-closure-during-friday-prayers-gazette"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: ""
+  - key: "ref_transit_hours"
+    source_id: "ref_transit_hours"
+    slug: ""
+    kind: "citation_only"
+    title_en: "Metro and tram service hours from 1 January"
+    publisher: "Qatar Tribune"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: "https://qatar-tribune.com/article/156642/front/metro-tram-service-hours-extended-from-january-1"
+    terms_url: ""
+    landing_url: "https://qatar-tribune.com/article/156642/front/metro-tram-service-hours-extended-from-january-1"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: ""
+  - key: "ref_summer_work"
+    source_id: "ref_summer_work"
+    slug: ""
+    kind: "citation_only"
+    title_en: "Regulated outdoor summer working hours from 1 June"
+    publisher: "The Peninsula"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: "https://www.thepeninsulaqatar.com/article/31/05/2026/regulated-outdoor-summer-working-hours-come-into-force-on-june-1-in-qatar"
+    terms_url: ""
+    landing_url: "https://www.thepeninsulaqatar.com/article/31/05/2026/regulated-outdoor-summer-working-hours-come-into-force-on-june-1-in-qatar"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: ""
+  - key: "ref_truck_hours"
+    source_id: "ref_truck_hours"
+    slug: ""
+    kind: "citation_only"
+    title_en: "Restriction on trucks and large buses within Doha"
+    publisher: "The Peninsula"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: "https://thepeninsulaqatar.com/article/01/06/2024/restriction-on-movement-of-trucks-and-large-buses-within-doha:-traffic-department"
+    terms_url: ""
+    landing_url: "https://thepeninsulaqatar.com/article/01/06/2024/restriction-on-movement-of-trucks-and-large-buses-within-doha:-traffic-department"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: ""
+  - key: "ref_ramadan_public_hours"
+    source_id: "ref_ramadan_public_hours"
+    slug: ""
+    kind: "citation_only"
+    title_en: "Reduced public-sector hours during Ramadan"
+    publisher: "Qatar News Agency"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: "https://qna.org.qa/en/News-Area/News/2026-2/16/qatar-sets-reduced-working-hours-for-public-sector-during-ramadan"
+    terms_url: ""
+    landing_url: "https://qna.org.qa/en/News-Area/News/2026-2/16/qatar-sets-reduced-working-hours-for-public-sector-during-ramadan"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: ""
+  - key: "ref_ramadan_private_hours"
+    source_id: "ref_ramadan_private_hours"
+    slug: ""
+    kind: "citation_only"
+    title_en: "Ramadan working hours for the private sector"
+    publisher: "The Peninsula"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: "https://s.thepeninsula.qa/article/14/02/2026/ministry-of-labour-announces-ramadan-working-hours-for-private-sector"
+    terms_url: ""
+    landing_url: "https://s.thepeninsula.qa/article/14/02/2026/ministry-of-labour-announces-ramadan-working-hours-for-private-sector"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: ""
+  - key: "ref_ramadan_transit_hours"
+    source_id: "ref_ramadan_transit_hours"
+    slug: ""
+    kind: "citation_only"
+    title_en: "Metro and tram Ramadan hours"
+    publisher: "The Peninsula"
+    licence_id: "unconfirmed"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: "https://s.thepeninsula.qa/article/17/02/2026/doha-metro-and-lusail-tram-announce-operating-hours-in-ramadan"
+    terms_url: ""
+    landing_url: "https://s.thepeninsula.qa/article/17/02/2026/doha-metro-and-lusail-tram-announce-operating-hours-in-ramadan"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: ""
+  - key: "ref_traffic_index"
+    source_id: "ref_traffic_index"
+    slug: ""
+    kind: "citation_only"
+    title_en: "Doha Traffic Index 2025"
+    publisher: "TomTom"
+    licence_id: "proprietary"
+    licence_basis: "none_stated"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: "https://www.tomtom.com/traffic-index/city/doha/"
+    terms_url: ""
+    landing_url: "https://www.tomtom.com/traffic-index/city/doha/"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: ""
+  - key: "prop_resi_units/weekly-residential-units-sales-bulletin"
+    source_id: "prop_resi_units"
+    slug: "weekly-residential-units-sales-bulletin"
+    kind: "portal_dataset"
+    title_en: "Residential unit sales, weekly bulletin"
+    publisher: "Ministry of Justice"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/weekly-residential-units-sales-bulletin/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/weekly-residential-units-sales-bulletin/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_property_resi"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 570
+    row_count_max: 570
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum"
+    source_id: "visits_museum"
+    slug: "visitors-of-museums-and-exhibition-by-month-and-museum"
+    kind: "portal_dataset"
+    title_en: "Visitors of museums and exhibitions by month and museum"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/visitors-of-museums-and-exhibition-by-month-and-museum/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/visitors-of-museums-and-exhibition-by-month-and-museum/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_venue_visits"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1372
+    row_count_max: 1372
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "visits_phcc/phcc-patient-visits-by-health-center-and-region"
+    source_id: "visits_phcc"
+    slug: "phcc-patient-visits-by-health-center-and-region"
+    kind: "portal_dataset"
+    title_en: "Patient visits by health centre and region"
+    publisher: "Primary Health Care Corporation"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/phcc-patient-visits-by-health-center-and-region/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/phcc-patient-visits-by-health-center-and-region/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_venue_visits"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 35
+    row_count_max: 35
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "permits_muni/total-building-permits-issued-by-municipality-and-type-of-building-type-of-permit"
+    source_id: "permits_muni"
+    slug: "total-building-permits-issued-by-municipality-and-type-of-building-type-of-permit"
+    kind: "portal_dataset"
+    title_en: "Building permits and completion certificates"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/total-building-permits-issued-by-municipality-and-type-of-building-type-of-permit/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/total-building-permits-issued-by-municipality-and-type-of-building-type-of-permit/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_building_permits"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 264
+    row_count_max: 264
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "permits_muni/total-building-completion-certificates-issued-by-municipality-and-type-of-building-type-of"
+    source_id: "permits_muni"
+    slug: "total-building-completion-certificates-issued-by-municipality-and-type-of-building-type-of"
+    kind: "portal_dataset"
+    title_en: "Building permits and completion certificates"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/total-building-completion-certificates-issued-by-municipality-and-type-of-building-type-of/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/total-building-completion-certificates-issued-by-municipality-and-type-of-building-type-of/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_building_permits"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 240
+    row_count_max: 240
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-daayen-municipality"
+    source_id: "permits_muni"
+    slug: "building-permits-issued-by-type-of-permit-and-month-al-daayen-municipality"
+    kind: "portal_dataset"
+    title_en: "Building permits and completion certificates"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-daayen-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-daayen-municipality/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_building_permits"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 288
+    row_count_max: 288
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-khor-and-al-thakhira-municipality"
+    source_id: "permits_muni"
+    slug: "building-permits-issued-by-type-of-permit-and-month-al-khor-and-al-thakhira-municipality"
+    kind: "portal_dataset"
+    title_en: "Building permits and completion certificates"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-khor-and-al-thakhira-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-khor-and-al-thakhira-municipality/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_building_permits"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 288
+    row_count_max: 288
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-rayyan-municipality"
+    source_id: "permits_muni"
+    slug: "building-permits-issued-by-type-of-permit-and-month-al-rayyan-municipality"
+    kind: "portal_dataset"
+    title_en: "Building permits and completion certificates"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-rayyan-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-rayyan-municipality/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_building_permits"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 288
+    row_count_max: 288
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-shahhaniya-municipality"
+    source_id: "permits_muni"
+    slug: "building-permits-issued-by-type-of-permit-and-month-al-shahhaniya-municipality"
+    kind: "portal_dataset"
+    title_en: "Building permits and completion certificates"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-shahhaniya-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-shahhaniya-municipality/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_building_permits"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 252
+    row_count_max: 252
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-shamal-municipality"
+    source_id: "permits_muni"
+    slug: "building-permits-issued-by-type-of-permit-and-month-al-shamal-municipality"
+    kind: "portal_dataset"
+    title_en: "Building permits and completion certificates"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-shamal-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-shamal-municipality/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_building_permits"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 288
+    row_count_max: 288
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality"
+    source_id: "permits_muni"
+    slug: "building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality"
+    kind: "portal_dataset"
+    title_en: "Building permits and completion certificates"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_building_permits"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 288
+    row_count_max: 288
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-doha-municipality"
+    source_id: "permits_muni"
+    slug: "building-permits-issued-by-type-of-permit-and-month-doha-municipality"
+    kind: "portal_dataset"
+    title_en: "Building permits and completion certificates"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-doha-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-doha-municipality/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_building_permits"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 288
+    row_count_max: 288
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-umm-slal-municipality"
+    source_id: "permits_muni"
+    slug: "building-permits-issued-by-type-of-permit-and-month-umm-slal-municipality"
+    kind: "portal_dataset"
+    title_en: "Building permits and completion certificates"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-umm-slal-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-umm-slal-municipality/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_building_permits"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 288
+    row_count_max: 288
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "est_size_act/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-two"
+    source_id: "est_size_act"
+    slug: "number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-two"
+    kind: "portal_dataset"
+    title_en: "Establishments and employees by size of establishment and activity, with compensation"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-two/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-two/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_establishment_size"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 556
+    row_count_max: 556
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "est_size_act/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-wholesale-and-retail-trade-four-digits"
+    source_id: "est_size_act"
+    slug: "number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-wholesale-and-retail-trade-four-digits"
+    kind: "portal_dataset"
+    title_en: "Establishments and employees by size of establishment and activity, with compensation"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-wholesale-and-retail-trade-four-digits/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-wholesale-and-retail-trade-four-digits/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_establishment_size"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1840
+    row_count_max: 1840
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "est_size_act/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-transport"
+    source_id: "est_size_act"
+    slug: "number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-transport"
+    kind: "portal_dataset"
+    title_en: "Establishments and employees by size of establishment and activity, with compensation"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-transport/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-transport/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_establishment_size"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 356
+    row_count_max: 356
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "est_size_act/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-social-and-personal-services-two-digits"
+    source_id: "est_size_act"
+    slug: "number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-social-and-personal-services-two-digits"
+    kind: "portal_dataset"
+    title_en: "Establishments and employees by size of establishment and activity, with compensation"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-social-and-personal-services-two-digits/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-social-and-personal-services-two-digits/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_establishment_size"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 316
+    row_count_max: 316
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "est_size_act/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-energy"
+    source_id: "est_size_act"
+    slug: "number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-energy"
+    kind: "portal_dataset"
+    title_en: "Establishments and employees by size of establishment and activity, with compensation"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-energy/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-energy/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_establishment_size"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 2912
+    row_count_max: 2912
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "est_size_act/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-one"
+    source_id: "est_size_act"
+    slug: "number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-one"
+    kind: "portal_dataset"
+    title_en: "Establishments and employees by size of establishment and activity, with compensation"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-one/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-one/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_establishment_size"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 160
+    row_count_max: 160
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "est_size_act/establishments-employees-and-compensation-of-employees-by-economic-activity-business-services"
+    source_id: "est_size_act"
+    slug: "establishments-employees-and-compensation-of-employees-by-economic-activity-business-services"
+    kind: "portal_dataset"
+    title_en: "Establishments and employees by size of establishment and activity, with compensation"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/establishments-employees-and-compensation-of-employees-by-economic-activity-business-services/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/establishments-employees-and-compensation-of-employees-by-economic-activity-business-services/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_establishment_size"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 324
+    row_count_max: 324
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-basic-metals"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-basic-metals"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-basic-metals/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-basic-metals/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-basic-pharmaceutical-products-and-pharmaceutical-preparations"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-basic-pharmaceutical-products-and-pharmaceutical-preparations"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-basic-pharmaceutical-products-and-pharmaceutical-preparations/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-basic-pharmaceutical-products-and-pharmaceutical-preparations/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-beverages"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-beverages"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-beverages/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-beverages/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-chemicals-and-chemical-products"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-chemicals-and-chemical-products"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-chemicals-and-chemical-products/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-chemicals-and-chemical-products/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-coke-and-refined-petroleum-products"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-coke-and-refined-petroleum-products"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-coke-and-refined-petroleum-products/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-coke-and-refined-petroleum-products/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-computer-electronic-and-optical-products"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-computer-electronic-and-optical-products"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-computer-electronic-and-optical-products/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-computer-electronic-and-optical-products/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 7
+    row_count_max: 7
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-electrical-equipment"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-electrical-equipment"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-electrical-equipment/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-electrical-equipment/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-fabricated-metal-products-except-machinery-and-equipment"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-fabricated-metal-products-except-machinery-and-equipment"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-fabricated-metal-products-except-machinery-and-equipment/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-fabricated-metal-products-except-machinery-and-equipment/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-food-products"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-food-products"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-food-products/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-food-products/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-furniture"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-furniture"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-furniture/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-furniture/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-leather-and-related-products"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-leather-and-related-products"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-leather-and-related-products/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-leather-and-related-products/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-machinery-and-equipment-nec"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-machinery-and-equipment-nec"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-machinery-and-equipment-nec/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-machinery-and-equipment-nec/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-manufacture-of-wood-and-of-products-of-wood-and-cork-except-furniture-manufacture"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-manufacture-of-wood-and-of-products-of-wood-and-cork-except-furniture-manufacture"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-manufacture-of-wood-and-of-products-of-wood-and-cork-except-furniture-manufacture/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-manufacture-of-wood-and-of-products-of-wood-and-cork-except-furniture-manufacture/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-motor-vehicles-trailers-and-semi-trailers"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-motor-vehicles-trailers-and-semi-trailers"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-motor-vehicles-trailers-and-semi-trailers/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-motor-vehicles-trailers-and-semi-trailers/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-other-non-metallic-mineral-products"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-other-non-metallic-mineral-products"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-other-non-metallic-mineral-products/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-other-non-metallic-mineral-products/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-other-transport-equipment"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-other-transport-equipment"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-other-transport-equipment/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-other-transport-equipment/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-paper-and-paper-products"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-paper-and-paper-products"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-paper-and-paper-products/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-paper-and-paper-products/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-rubber-and-plastics-products"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-rubber-and-plastics-products"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-rubber-and-plastics-products/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-rubber-and-plastics-products/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-textiles"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-textiles"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-textiles/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-textiles/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/manufacture-of-wearing-apparel"
+    source_id: "mfg_industry"
+    slug: "manufacture-of-wearing-apparel"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "Ministry of Commerce and Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-wearing-apparel/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-wearing-apparel/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 14
+    row_count_max: 14
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "mfg_industry/main-manufacturing-products"
+    source_id: "mfg_industry"
+    slug: "main-manufacturing-products"
+    kind: "portal_dataset"
+    title_en: "Manufacturing industries and main manufacturing products"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/main-manufacturing-products/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/main-manufacturing-products/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_manufacturing"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 35
+    row_count_max: 35
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "trade_wr/purchases-sales-and-stocks-during-the-year-by-type-of-trade-wholesale-and-retail-trade-all"
+    source_id: "trade_wr"
+    slug: "purchases-sales-and-stocks-during-the-year-by-type-of-trade-wholesale-and-retail-trade-all"
+    kind: "portal_dataset"
+    title_en: "Purchases, sales and stocks during the year by type of trade, wholesale and retail"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/purchases-sales-and-stocks-during-the-year-by-type-of-trade-wholesale-and-retail-trade-all/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/purchases-sales-and-stocks-during-the-year-by-type-of-trade-wholesale-and-retail-trade-all/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_trade_wr"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 864
+    row_count_max: 864
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "pop_muni_age/population-by-municipality-and-age-groups"
+    source_id: "pop_muni_age"
+    slug: "population-by-municipality-and-age-groups"
+    kind: "portal_dataset"
+    title_en: "Population by municipality and age groups"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-by-municipality-and-age-groups/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/population-by-municipality-and-age-groups/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_population_age"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1584
+    row_count_max: 1584
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "hotels_muni/hotels-and-hotel-apartments-by-municipality"
+    source_id: "hotels_muni"
+    slug: "hotels-and-hotel-apartments-by-municipality"
+    kind: "portal_dataset"
+    title_en: "Hotels and hotel apartments by municipality"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-hotel-apartments-by-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-hotel-apartments-by-municipality/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_hotels_municipality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 48
+    row_count_max: 48
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "trade_logistics/annual-certificates-of-origin-by-type-and-importing-country"
+    source_id: "trade_logistics"
+    slug: "annual-certificates-of-origin-by-type-and-importing-country"
+    kind: "portal_dataset"
+    title_en: "Certificates of origin; arriving vessels"
+    publisher: "Qatar Chamber of Commerce & Industry"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/annual-certificates-of-origin-by-type-and-importing-country/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/annual-certificates-of-origin-by-type-and-importing-country/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_trade_logistics"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1162
+    row_count_max: 1162
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "trade_logistics/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-previous-port"
+    source_id: "trade_logistics"
+    slug: "arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-previous-port"
+    kind: "portal_dataset"
+    title_en: "Certificates of origin; arriving vessels"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-previous-port/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-previous-port/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_trade_logistics"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1890
+    row_count_max: 1890
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "trade_logistics/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-registration-hamad-port0"
+    source_id: "trade_logistics"
+    slug: "arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-registration-hamad-port0"
+    kind: "portal_dataset"
+    title_en: "Certificates of origin; arriving vessels"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-registration-hamad-port0/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-registration-hamad-port0/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_trade_logistics"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 717
+    row_count_max: 717
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "est_census_2015_muni/distribution-of-business-establishments-and-employees-by-municipalities-according-to-census-2015"
+    source_id: "est_census_2015_muni"
+    slug: "distribution-of-business-establishments-and-employees-by-municipalities-according-to-census-2015"
+    kind: "portal_dataset"
+    title_en: "Business establishments and employees by municipality, census 2015"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/distribution-of-business-establishments-and-employees-by-municipalities-according-to-census-2015/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/distribution-of-business-establishments-and-employees-by-municipalities-according-to-census-2015/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_census_2015_municipality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 8
+    row_count_max: 8
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "lf_muni_sex/female-population-and-labour-force-by-municipality"
+    source_id: "lf_muni_sex"
+    slug: "female-population-and-labour-force-by-municipality"
+    kind: "portal_dataset"
+    title_en: "Population, labour force, employed and unemployed persons by sex and municipality"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/female-population-and-labour-force-by-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/female-population-and-labour-force-by-municipality/"
+    nightly_live_fetch: true
+    public_splits: ["sex"]
+    commit_allowed: false
+    release_tables: ["pub_labour_sex_municipality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 240
+    row_count_max: 240
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "lf_muni_sex/male-population-and-labour-force-by-municipality"
+    source_id: "lf_muni_sex"
+    slug: "male-population-and-labour-force-by-municipality"
+    kind: "portal_dataset"
+    title_en: "Population, labour force, employed and unemployed persons by sex and municipality"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/male-population-and-labour-force-by-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/male-population-and-labour-force-by-municipality/"
+    nightly_live_fetch: true
+    public_splits: ["sex"]
+    commit_allowed: false
+    release_tables: ["pub_labour_sex_municipality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 240
+    row_count_max: 240
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "lf_muni_sex/employed-persons-15-years-and-above-by-gender-and-municipality"
+    source_id: "lf_muni_sex"
+    slug: "employed-persons-15-years-and-above-by-gender-and-municipality"
+    kind: "portal_dataset"
+    title_en: "Population, labour force, employed and unemployed persons by sex and municipality"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/employed-persons-15-years-and-above-by-gender-and-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/employed-persons-15-years-and-above-by-gender-and-municipality/"
+    nightly_live_fetch: true
+    public_splits: ["sex"]
+    commit_allowed: false
+    release_tables: ["pub_labour_sex_municipality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 96
+    row_count_max: 96
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "lf_muni_sex/unemployed-persons-15-years-and-above-by-gender-and-municipality"
+    source_id: "lf_muni_sex"
+    slug: "unemployed-persons-15-years-and-above-by-gender-and-municipality"
+    kind: "portal_dataset"
+    title_en: "Population, labour force, employed and unemployed persons by sex and municipality"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/unemployed-persons-15-years-and-above-by-gender-and-municipality/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/unemployed-persons-15-years-and-above-by-gender-and-municipality/"
+    nightly_live_fetch: true
+    public_splits: ["sex"]
+    commit_allowed: false
+    release_tables: ["pub_labour_sex_municipality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 96
+    row_count_max: 96
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "pop_muni_age_sex/females-population-by-municipality-and-age-groups-december-2020"
+    source_id: "pop_muni_age_sex"
+    slug: "females-population-by-municipality-and-age-groups-december-2020"
+    kind: "portal_dataset"
+    title_en: "Population by municipality, age group and sex"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/females-population-by-municipality-and-age-groups-december-2020/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/females-population-by-municipality-and-age-groups-december-2020/"
+    nightly_live_fetch: true
+    public_splits: ["sex"]
+    commit_allowed: false
+    release_tables: ["pub_population_age_sex"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1440
+    row_count_max: 1440
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "pop_muni_age_sex/males-population-by-municipality-and-age-groups-december-2020"
+    source_id: "pop_muni_age_sex"
+    slug: "males-population-by-municipality-and-age-groups-december-2020"
+    kind: "portal_dataset"
+    title_en: "Population by municipality, age group and sex"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/males-population-by-municipality-and-age-groups-december-2020/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/males-population-by-municipality-and-age-groups-december-2020/"
+    nightly_live_fetch: true
+    public_splits: ["sex"]
+    commit_allowed: false
+    release_tables: ["pub_population_age_sex"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1440
+    row_count_max: 1440
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "active_sex_age_act/economically-active-females-15-years-and-above-by-age-group-and-economic-activity"
+    source_id: "active_sex_age_act"
+    slug: "economically-active-females-15-years-and-above-by-age-group-and-economic-activity"
+    kind: "portal_dataset"
+    title_en: "Economically active females and males by age group and economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-females-15-years-and-above-by-age-group-and-economic-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-females-15-years-and-above-by-age-group-and-economic-activity/"
+    nightly_live_fetch: true
+    public_splits: ["sex"]
+    commit_allowed: false
+    release_tables: ["pub_active_sex_age"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1551
+    row_count_max: 1551
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "active_sex_age_act/economically-active-males-15-years-and-above-by-age-group-and-economic-activity"
+    source_id: "active_sex_age_act"
+    slug: "economically-active-males-15-years-and-above-by-age-group-and-economic-activity"
+    kind: "portal_dataset"
+    title_en: "Economically active females and males by age group and economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-males-15-years-and-above-by-age-group-and-economic-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-males-15-years-and-above-by-age-group-and-economic-activity/"
+    nightly_live_fetch: true
+    public_splits: ["sex"]
+    commit_allowed: false
+    release_tables: ["pub_active_sex_age"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1617
+    row_count_max: 1617
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "active_nat_occ_act/economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity"
+    source_id: "active_nat_occ_act"
+    slug: "economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity"
+    kind: "portal_dataset"
+    title_en: "Economically active Qatari and non-Qatari population by occupation and economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_active_nationality_occupation"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1269
+    row_count_max: 1269
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "active_nat_occ_act/economically-active-non-qatari-males-15-years-and-above-by-occupation-and-economic-activity"
+    source_id: "active_nat_occ_act"
+    slug: "economically-active-non-qatari-males-15-years-and-above-by-occupation-and-economic-activity"
+    kind: "portal_dataset"
+    title_en: "Economically active Qatari and non-Qatari population by occupation and economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-non-qatari-males-15-years-and-above-by-occupation-and-economic-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-non-qatari-males-15-years-and-above-by-occupation-and-economic-activity/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_active_nationality_occupation"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1323
+    row_count_max: 1323
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "active_nat_occ_act/economically-active-non-qatari-population-15-years-and-above-by-occupation-and-economic-activity"
+    source_id: "active_nat_occ_act"
+    slug: "economically-active-non-qatari-population-15-years-and-above-by-occupation-and-economic-activity"
+    kind: "portal_dataset"
+    title_en: "Economically active Qatari and non-Qatari population by occupation and economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-non-qatari-population-15-years-and-above-by-occupation-and-economic-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-non-qatari-population-15-years-and-above-by-occupation-and-economic-activity/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_active_nationality_occupation"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1323
+    row_count_max: 1323
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "active_nat_occ_act/economically-active-qatari-females-15-years-and-above-by-occupation-and-economic-activity"
+    source_id: "active_nat_occ_act"
+    slug: "economically-active-qatari-females-15-years-and-above-by-occupation-and-economic-activity"
+    kind: "portal_dataset"
+    title_en: "Economically active Qatari and non-Qatari population by occupation and economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-qatari-females-15-years-and-above-by-occupation-and-economic-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-qatari-females-15-years-and-above-by-occupation-and-economic-activity/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_active_nationality_occupation"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1206
+    row_count_max: 1206
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "active_nat_occ_act/economically-active-qatari-males-15-years-and-above-by-occupation-and-economic-activity"
+    source_id: "active_nat_occ_act"
+    slug: "economically-active-qatari-males-15-years-and-above-by-occupation-and-economic-activity"
+    kind: "portal_dataset"
+    title_en: "Economically active Qatari and non-Qatari population by occupation and economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-qatari-males-15-years-and-above-by-occupation-and-economic-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-qatari-males-15-years-and-above-by-occupation-and-economic-activity/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_active_nationality_occupation"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1440
+    row_count_max: 1440
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "active_nat_occ_act/economically-active-qatari-population-15-years-and-above-by-occupation-and-economic-activity"
+    source_id: "active_nat_occ_act"
+    slug: "economically-active-qatari-population-15-years-and-above-by-occupation-and-economic-activity"
+    kind: "portal_dataset"
+    title_en: "Economically active Qatari and non-Qatari population by occupation and economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-qatari-population-15-years-and-above-by-occupation-and-economic-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-qatari-population-15-years-and-above-by-occupation-and-economic-activity/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_active_nationality_occupation"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1440
+    row_count_max: 1440
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity"
+    source_id: "comp_nat_act"
+    slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity"
+    kind: "portal_dataset"
+    title_en: "Employees and compensation of employees by nationality and main economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_compensation_nationality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 72
+    row_count_max: 72
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-building"
+    source_id: "comp_nat_act"
+    slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-building"
+    kind: "portal_dataset"
+    title_en: "Employees and compensation of employees by nationality and main economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-building/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-building/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_compensation_nationality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 72
+    row_count_max: 72
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-business"
+    source_id: "comp_nat_act"
+    slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-business"
+    kind: "portal_dataset"
+    title_en: "Employees and compensation of employees by nationality and main economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-business/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-business/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_compensation_nationality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 556
+    row_count_max: 556
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy"
+    source_id: "comp_nat_act"
+    slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy"
+    kind: "portal_dataset"
+    title_en: "Employees and compensation of employees by nationality and main economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_compensation_nationality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 2872
+    row_count_max: 2872
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy0"
+    source_id: "comp_nat_act"
+    slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy0"
+    kind: "portal_dataset"
+    title_en: "Employees and compensation of employees by nationality and main economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy0/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy0/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_compensation_nationality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1040
+    row_count_max: 1040
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy1"
+    source_id: "comp_nat_act"
+    slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy1"
+    kind: "portal_dataset"
+    title_en: "Employees and compensation of employees by nationality and main economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy1/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy1/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_compensation_nationality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 2904
+    row_count_max: 2904
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-one"
+    source_id: "comp_nat_act"
+    slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-one"
+    kind: "portal_dataset"
+    title_en: "Employees and compensation of employees by nationality and main economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-one/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-one/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_compensation_nationality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 160
+    row_count_max: 160
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social"
+    source_id: "comp_nat_act"
+    slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social"
+    kind: "portal_dataset"
+    title_en: "Employees and compensation of employees by nationality and main economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_compensation_nationality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1092
+    row_count_max: 1092
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social0"
+    source_id: "comp_nat_act"
+    slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social0"
+    kind: "portal_dataset"
+    title_en: "Employees and compensation of employees by nationality and main economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social0/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social0/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_compensation_nationality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1072
+    row_count_max: 1072
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social1"
+    source_id: "comp_nat_act"
+    slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social1"
+    kind: "portal_dataset"
+    title_en: "Employees and compensation of employees by nationality and main economic activity"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social1/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social1/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_compensation_nationality"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1092
+    row_count_max: 1092
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "students_muni/students-by-level-of-education-municipality-gender-type-of-education-and-nationality-2025-2026"
+    source_id: "students_muni"
+    slug: "students-by-level-of-education-municipality-gender-type-of-education-and-nationality-2025-2026"
+    kind: "portal_dataset"
+    title_en: "Students by level of education, municipality, sex, type of education and nationality"
+    publisher: "Ministry of Education and Higher Education"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/students-by-level-of-education-municipality-gender-type-of-education-and-nationality-2025-2026/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/students-by-level-of-education-municipality-gender-type-of-education-and-nationality-2025-2026/"
+    nightly_live_fetch: true
+    public_splits: ["sex", "nationality"]
+    commit_allowed: false
+    release_tables: ["pub_students"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 1570
+    row_count_max: 1570
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "visitors_markets/hotel-guests-by-nationality-hotel-rating-and-hotel-stays"
+    source_id: "visitors_markets"
+    slug: "hotel-guests-by-nationality-hotel-rating-and-hotel-stays"
+    kind: "portal_dataset"
+    title_en: "Hotel guests by nationality, hotel rating and stays; visitor arrivals"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotel-guests-by-nationality-hotel-rating-and-hotel-stays/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/hotel-guests-by-nationality-hotel-rating-and-hotel-stays/"
+    nightly_live_fetch: true
+    public_splits: ["nationality"]
+    commit_allowed: false
+    release_tables: ["pub_visitor_markets"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 192
+    row_count_max: 192
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "visitors_markets/visitor-arrivals-by-mode-of-entry"
+    source_id: "visitors_markets"
+    slug: "visitor-arrivals-by-mode-of-entry"
+    kind: "portal_dataset"
+    title_en: "Hotel guests by nationality, hotel rating and stays; visitor arrivals"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/visitor-arrivals-by-mode-of-entry/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/visitor-arrivals-by-mode-of-entry/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_visitor_markets"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 3
+    row_count_max: 3
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "visitors_markets/visitor-arrivals-by-region"
+    source_id: "visitors_markets"
+    slug: "visitor-arrivals-by-region"
+    kind: "portal_dataset"
+    title_en: "Hotel guests by nationality, hotel rating and stays; visitor arrivals"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/visitor-arrivals-by-region/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/visitor-arrivals-by-region/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_visitor_markets"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 6
+    row_count_max: 6
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "visitors_markets/visitor-arrivals-trends-by-mode-of-transport-air-land-sea"
+    source_id: "visitors_markets"
+    slug: "visitor-arrivals-trends-by-mode-of-transport-air-land-sea"
+    kind: "portal_dataset"
+    title_en: "Hotel guests by nationality, hotel rating and stays; visitor arrivals"
+    publisher: "Qatar Tourism"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    decision_record: ""
+    fetch_host: "www.data.gov.qa"
+    url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/visitor-arrivals-trends-by-mode-of-transport-air-land-sea/exports/json"
+    terms_url: ""
+    landing_url: "https://www.data.gov.qa/explore/dataset/visitor-arrivals-trends-by-mode-of-transport-air-land-sea/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_visitor_markets"]
+    caveat_keys: []
+    columns: []
+    row_count_min: 20
+    row_count_max: 20
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+  - key: "fdi_projects"
+    source_id: "fdi_projects"
+    slug: ""
+    kind: "terms_page"
+    title_en: "FDI projects dashboard: announced investment projects, data from fDi Markets"
+    publisher: "National investment promotion agency"
+    licence_id: "publisher-terms"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0017"
+    fetch_host: "fdiprojects.invest.qa"
+    url: "https://fdiprojects.invest.qa/"
+    terms_url: "https://www.invest.qa/en/terms-and-conditions?tab=terms-of-use"
+    terms_forbid:
+      - "should not be copied or modified or re-produced in whole or in part without"
+    landing_url: "https://fdiprojects.invest.qa/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["fdi_projects"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "html"
+  - key: "investqa_pages"
+    source_id: "investqa_pages"
+    slug: ""
+    kind: "terms_page"
+    title_en: "Sector, opportunity, incentive, set-up and law pages"
+    publisher: "National investment promotion agency"
+    licence_id: "publisher-terms"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0017"
+    fetch_host: "www.invest.qa"
+    url: "https://www.invest.qa/"
+    terms_url: "https://www.invest.qa/en/terms-and-conditions?tab=terms-of-use"
+    terms_forbid:
+      - "should not be copied or modified or re-produced in whole or in part without"
+    landing_url: "https://www.invest.qa/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_investqa_record"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "page_list_unconfirmed"
+    extension: "html"
+  - key: "busy_gmaps"
+    source_id: "busy_gmaps"
+    slug: ""
+    kind: "terms_page"
+    title_en: "Google Maps popular times: relative busyness by hour of named venues"
+    publisher: "Google"
+    licence_id: "none-stated"
+    licence_basis: "owner_decision"
+    licence_url: "https://policies.google.com/terms"
+    decision_record: "0019"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    landing_url: "https://support.google.com/business/answer/6263531"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_venue_busyness"]
+    caveat_keys: ["relative_busyness_not_people"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "fetcher_owned_by_S2-T16"
+    extension: "html"
+  - key: "ntl_blackmarble"
+    source_id: "ntl_blackmarble"
+    slug: ""
+    kind: "https_file"
+    title_en: "NASA Black Marble VNP46A3: night-time lights, monthly"
+    publisher: "NASA"
+    licence_id: "NASA-guidance"
+    licence_basis: "dataset"
+    licence_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-information-policy"
+    decision_record: ""
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_night_lights"]
+    caveat_keys: ["night_lights_not_activity"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "fetcher_owned_by_S2-T14"
+    extension: "h5"
+  - key: "places_fsq"
+    source_id: "places_fsq"
+    slug: ""
+    kind: "https_file"
+    title_en: "Foursquare Open Source Places (public copy on Source Cooperative)"
+    publisher: "Foursquare"
+    licence_id: "Apache-2.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.apache.org/licenses/LICENSE-2.0"
+    decision_record: ""
+    fetch_host: "data.source.coop"
+    url: "https://data.source.coop/fused/fsq-os-places/"
+    terms_url: ""
+    landing_url: "https://data.source.coop/fused/fsq-os-places/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_place_fsq"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "fetcher_owned_by_S2-T15"
+    extension: "parquet"
+  - key: "worldpop_qat_agesex"
+    source_id: "worldpop_qat_agesex"
+    slug: ""
+    kind: "https_file"
+    title_en: "WorldPop age and sex structures, 100 m grids, Qatar"
+    publisher: "WorldPop"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
+    decision_record: ""
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
+    nightly_live_fetch: true
+    public_splits: ["sex"]
+    commit_allowed: false
+    release_tables: ["pub_pop_agesex_grid"]
+    caveat_keys: ["grid_cells_summed"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "fetcher_owned_by_S2-T14"
+    extension: "tif"
+  - key: "weather_openmeteo"
+    source_id: "weather_openmeteo"
+    slug: ""
+    kind: "https_file"
+    title_en: "Open-Meteo historical weather, hourly"
+    publisher: "Open-Meteo"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "provider_terms"
+    licence_url: "https://open-meteo.com/en/licence"
+    decision_record: ""
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    landing_url: "https://open-meteo.com/en/docs/historical-weather-api"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "fetcher_owned_by_S2-T14"
+    extension: "json"
