@@ -15131,6 +15131,252 @@ Seed:      none
 Notes:     Both commits of the fix round have a Conventional Commit subject.
 ```
 
+#### S1-T05: independent review: APPROVED
+
+Reviewed commit `a97b4c7f52dada824fd5f5b7291850afa357d0d4`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/30 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43344949525; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43344949677; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43344949544 ). Reviewer: Moonshot AI Kimi K3.1 Pro (medium), through the Devin command-line tool, read-only; a maker that neither planned nor built the task; a full review of the pull request's whole change against main, on its final head (the branch had been updated with main twice before the review, each time because it conflicted with main: the two proofs are in the task log above and in the pack of the review). The task log names another reviewer as planned; this record names the one that gave the verdict. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T05 (pull request 30)
+COMMIT: a97b4c7f52dada824fd5f5b7291850afa357d0d4
+REVIEWER: Moonshot AI Kimi K3.1 Pro Medium
+CHECKS:
+  REV-10 PASS Both engines matched the independent expectation and each other in the recorded live run; six-place half-even rounding is implemented and tested; the post-baseline DuckDB integer divergence exited 3 with a position-only diagnostic.
+  REV-11 PASS The lead ran ./eii test --seed 2026111332 on the head with exit 0, 1255 passed, 0 failed and 0 skipped, and python3 scripts/check_docs.py with exit 0; the 31 focused tests and twelve planted breaks passed. CI is green on the head: https://github.com/albarami/economic-investment-intelligence/actions/runs/43344949525, https://github.com/albarami/economic-investment-intelligence/actions/runs/43344949677 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43344949544.
+  REV-12 PASS The net change contains only the spike, its tests and dependencies, the required CI fix, shared documentation and ledger files; nothing under data/ and no unrelated reformatting.
+  REV-13 PASS The adapters, portable query, normalisation, fixtures and live command are complete; the mocked PostgreSQL offline tests supplement rather than replace the recorded real two-engine proof.
+  REV-14 PASS The patch contains only synthetic control records and no secret or real custodian data; the head secret-scan succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43344949525/job/131621936889.
+  REV-15 PASS The CI fix only adds the same locked engine-group sync before the unchanged strict mypy command and in type-check scratch copies; no assertion, threshold, tolerance, permission or failure handling was weakened, and no skip or retry was added.
+  REV-16 PASS The work follows the S1-T05 spike scope and rulings, uses the recorded psycopg pin, keeps production registry work out of scope, and implements BE-20 to BE-25 without a one-store fallback.
+  REV-17 PASS AGENTS.md, CLAUDE.md, README.md, OPEN_ITEMS.md OI-111, PROGRESS.md and TASKS.md record the change and its evidence; the head documentation check exited 0 and check-docs succeeded at https://github.com/albarami/economic-investment-intelligence/actions/runs/43344949677/job/131621937582.
+  REV-18 PASS The database target comes only from EII_DATABASE_URL and must be 127.0.0.1; PostgreSQL uses a rolled-back temporary-table transaction, DuckDB is read-only with external access disabled and configuration locked, temporary files are removed, and diagnostics redact addresses, credentials and driver exceptions.
+  REV-19 PASS No settled decision, prohibited scope, component choice or build-order rule is reopened; the dependency state change follows ruling R1 and pin confirmation remains with S1-T08.
+  REV-20 N/A The change adds only synthetic spike measurements and test calculations, not product facts, release-table figures or displayed economic numbers requiring fact lineage.
+  REV-21 N/A No screen, Fact chip, catalogue claim, model-written prose or rendered product numeral is added.
+  REV-22 PASS No privacy partition, parameter set, treatment, export, privacy invariant or attack test is changed.
+  REV-23 PASS No product import of custodian code or product metadata dependency is added, and the complete head test suite passed with the import-boundary checks intact.
+  REV-24 N/A No English or Arabic product view, bilingual number or Arabic string is added.
+  REV-25 PASS The patch adds no private path, personal name, e-mail address, realistic registration, prohibited comparison or secret; the documentation, tree and hosted secret checks passed.
+  REV-26 PASS The documentation presents only a synthetic technical spike, expressly disclaims a working product, and adds no prohibited data, forecast, endorsement, lookup, verdict or advice claim.
+  REV-27 PASS Both agent files receive the same rule 44 edit, and the lead recorded cmp AGENTS.md CLAUDE.md exiting 0 on the head.
+  REV-28 N/A No synthetic establishment, legal-entity, employer-group, person or salary-file identifier is introduced; the spike's visibly synthetic unit labels are not custodian identifiers and contain no bare eight- or eleven-digit identifier.
+  REV-29 N/A No real named place or business, or any Synthetic or Simulated attribute attached to one, is introduced.
+  REV-38 PASS The patch adds no gateway import, provider-setting read, runtime call, score, badge or panel and leaves the serving plane unchanged.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S1-T05: merge record
+
+- The lead's checks on the merged head `a97b4c7f52dada824fd5f5b7291850afa357d0d4` before the merge (ruling L-29): "TREE-IS-WORK ok: 312 paths at a97b4c7f52dada824fd5f5b7291850afa357d0d4", exit code 0; `./eii test --seed 2026111332`: exit code 0, "total: 1255 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/30 was squash-merged on 2026-11-13 at that head; merge commit `3c318ab08c72d617fd8c5d5586894577238eefe4` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43346035362; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43346035320; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43346035344 .
+
+
+- The lead's proof of the second update of the branch with main (merge commit `a97b4c7f52dada824fd5f5b7291850afa357d0d4`, the reviewed and merged head):
+
+```text
+base update a97b4c7f52dada824fd5f5b7291850afa357d0d4: branch side 69ce6e0f054ed903e1b711665932b73ca9442a14, main side 6538a7d701a47ade9c9b32318b81d0037f8b4372, merge base 034f0805a2638bca27a737789327428d2652395f
+  branch only: 13
+  main only: 6
+  neither: 287
+  both, git's own merge: (2, ['OPEN_ITEMS.md', 'TASKS.md'])
+  both, resolved by the lead's script: (4, ['AGENTS.md', 'CLAUDE.md', 'PROGRESS.md', 'README.md'])
+  FAIL: (0, [])
+```
+
+- The task log of S1-T05 is complete with this record: one red hosted run before the review (the type check without the engine group), fixed and recorded; APPROVED in its one review round, no finding, no proposed item. TASKS.md marks the task done with this ledger.
+
+### S1-T03 — Isochrone, drawn-shape and grid spike: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/33 )
+
+- What the task proves (slice S1, the technical spike): walk and drive areas at different hours of the day, a free-drawn polygon and a radius are each kept as an exact shape and turned into whole frame cells, with routing inside the process and no server (ARC-88, BE-82, PRV-10, SYN-53). Everything is fixture-only: an invented road network of 81 nodes and 144 edges, a table of 24 hourly speed factors with two distinct values, a frame of cells at two resolutions. It is a spike under `product/src/eii_product/areas_spike/`, not the area builder of the product
+- Class of the work (the owner's note of 2026-11-12 on value and cost): standard; the spike shows no number to a user, and the choice it makes for SYN-53 goes into a decision record at the slice gate
+- Plan: a plan by Zhipu AI GLM-5.3 (through the Devin command-line tool), read by the lead; the lead's rulings of the build brief and the rulings L-58 and L-59 override it where they differ. No separate plan review
+- Builder maker and model: Codex command-line tool, `gpt-6-astra` (OpenAI): six rounds in all, told plainly below
+- Reviewer, as planned: Cursor command-line tool, `grok-4.7-high` (xAI), read-only (a maker that neither planned nor built); the record of the verdict names the reviewer that gave it
+- Branch: `task/S1-T03-areas`
+- How the build went, because it decides what the spike measured. Round 1 installed the pinned routing engine, found no call of its Python interface that builds a routing graph, and built the task on the written retreat (another library, with a convex hull as the area). The lead did not accept that: the official README of the engine's Python package says that the wheel ships the graph builder as a program, and the technology stack allows the retreat "only if needed". Round 2: a generator of the spike writes the synthetic road network as an extract in the format the builder reads (a few protocol-buffer messages in compressed blocks, written by hand, no new package); the shipped builder makes routing tiles from it in about a quarter of a second; the engine reads them in process and routes on them. Round 3 tried the two hour mechanisms that SYN-53 names. Rounds 4 and 5 put the engine behind the functions the tests call, replaced the tests that had described the retired mechanism, and removed the retreat with its dependencies. Round 6 moved the generator from the test tree into the package and turned two assert statements of the engine module into explicit refusals (the lead's two points of structure)
+- The hour mechanism the spike chooses for SYN-53 (ruling L-58; OI-120 for the owner; the decision record is the lead's to write at the slice gate): per-edge scaling of edge times. One set of tiles is built for each distinct hourly speed factor, from the same extract with every way's speed multiplied by the factor; equal factors share one set; walking always uses the unscaled set. Predicted speeds inside the engine were tried first and are not used: the tool that adds them ran, and requests with a departure time were answered without a timezone database, but two hours with the same factor gave different outlines, and the cause is not confirmed
+- What may change when the engine changes (ruling L-59): the five acceptance criteria and the properties a user could see do not change. Three assertions of round 1 described the retired mechanism and were replaced or removed, each named in the builder's report: the per-edge travel-time attribute (replaced by `test_cutoff_keeps_reached_place_inside_and_far_place_outside`: a named place that the road reaches within the cutoff is inside the area, one beyond it is outside); the refusal of a one-edge network, which was the degenerate case of the convex hull (replaced by `test_single_road_has_engine_polygon`); a doubled assertion of the empty network (kept once, as `test_empty_network_refused_before_builder`). The recorded output of the spike had been made in round 1 from the retreat and had never been committed; it was recorded once from the primary engine, in a step of its own
+- The five acceptance criteria and their tests. (1) Routing has no server: `test_routing_opens_no_server` (the tile sets are prepared first; then socket creation, connection and process creation are replaced by failing stand-ins for every hour of the fixture table). (2) The drive area changes with the hour through a fixture speed table: `test_drive_isochrone_changes_with_the_hour` (different factors give different areas, equal factors equal areas, a changed table changes the result, the walk area does not change), `test_walk_always_uses_unscaled_tiles`, `test_equal_factors_reuse_tiles`. (3) Each shape is also kept exactly: `test_each_shape_is_kept_exactly`, `test_exact_ring_is_the_engine_polygon` (the routed area is the engine's own ring, with only the order of the two coordinates exchanged), `test_circle_away_from_equator`. (4) The snapped output contains only whole frame cells: `test_snapped_output_holds_only_whole_frame_cells`, `test_center_containment_keeps_entire_cell`, `test_radius_includes_boundary_and_uses_pin_cell_center`, `test_empty_snap_is_refused`. (5) Deterministic fixtures pass: `test_deterministic_fixtures_pass` (two fresh computations are equal and equal the recorded output), `test_pbf_reproduces_committed_fixture` (the generator reproduces the committed extract byte for byte, pinned by size and digest), `test_bundled_builder_and_actor_read_graph`
+- The lead's own breaks (twelve; each file restored; run again on the final code): the factor applied to walking; the factor not applied to driving; the cutoff doubled; the two coordinates of the engine's ring not exchanged; an empty network not refused; the snap keeping cells outside the frame; an empty snap returned; the radius excluding the cell on its boundary; a failed tile build ignored; an unknown mode routed; a drawn ring left in its given orientation; a non-positive factor accepted. All twelve are caught by named tests
+- Dependencies: `h3` 4.5.0 and `pyvalhalla` 3.9.1 at the pins of the pack, and `shapely` 2.2.0 (a new row of the pin record with the label ASSUMPTION; the registry's current release on 2026-11-13), all in the root dependency group `engine` (ruling L-54; the product manifest does not change). `shapely` is imported only by the spike's tests, for containment and validity assertions that do not come from the engine; `numpy` is installed because it needs it. `h3` ships no type information and has a minimal stub file for the calls used; the routing package ships type files without the marker a type checker looks for, so one setting of the type check makes it read them for that package; no error is suppressed and no setting is relaxed. The type check passes in a fresh environment made as the hosted static job makes it (that job syncs the group `engine` since pull request 30)
+- Measured, for the pin confirmation of task S1-T08: pyvalhalla 3.9.1 on Python 3.14 builds tiles from a synthetic extract with the program the wheel ships (`python -m valhalla valhalla_build_tiles`) and routes on them in process; the tool that adds predicted speeds takes its folder as a positional argument in this version, where the documentation page read on 2026-11-13 names an option; the area request with an empty list of speed types uses the speed that was tagged on each way. Pages the builder read on 2026-11-13: the engine's pages on its Python bindings and on the area request, and the grid library's reference
+- Not proven by the spike, said plainly: a real road network, the routing graph that a release manifest lists, and the build time, size and memory of many tile sets
+- Shared documents, entered by the lead in the work commit: one sentence in README.md; one sentence added to OI-22; the new assumption OI-120. The lead also re-applied the builder's changes of the root manifest, of the pin record and of the product README on the main branch of the time by a recorded script (three other tasks had merged since the build began) and made the lock file again
+- Hardening listed, not built (the builder's returns): integration with a real public road extract and the release graph; bounds on resources and time for many tile sets; areas with holes or several parts; the production identifiers and release-unit snapping of an area
+- With this ledger: the closing record of pull request 30 above, and the status of S1-T05 in TASKS.md set to done
+
+#### Evidence for the work commit `d2921268f3a3c3f5bca27b22f28263a42cafbf9c`
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   uv run --locked python -m pytest product/tests -v -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    50 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The five acceptance criteria by their named tests (the task log maps each criterion to its tests). The product suite holds 50 collected tests: 39 of this task (30 in `test_areas_spike.py`, 7 in `test_scaled_adapter.py`, 2 in `test_valhalla_fixture.py`; parametrised cases count singly), 9 of the tile spike and 2 of the package skeleton. The summary line holds no warning.
+```
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   python3 -I -c "import pathlib,re; bad=[str(p) for p in pathlib.Path('product/src').rglob('*.py') if re.search(r'runpy|osmnx|networkx|convex_hull', p.read_text(encoding='utf-8')) or re.search(r'(?m)^\s*assert ', p.read_text(encoding='utf-8'))]; print(len(bad), sorted(p.name for p in pathlib.Path('product/tests/fixtures/areas_spike').iterdir()))"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "0 ['expected_outputs.json', 'frame_cells.json', 'pbf_manifest.json', 'road_network.json', 'road_network.osm.pbf', 'speed_table.json']" (files under product/src that run a file by path, name the retired retreat or check with an assert statement; the files of the fixture folder)
+Seed:      none
+Notes:     The two points of structure of the last round and the removal of the retreat: no file of the product source runs a file by path, names the retired libraries or uses an assert statement as a check; the fixture folder holds six data files and no code.
+```
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   ./eii test --seed 2026111313
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    1294 passed, 0 failed, 0 skipped
+Seed:      2026111313
+Notes:     The whole test command on the build machine; the 39 tests of this task run in its product suite and need no network: the tile builder is a program of the installed package.
+```
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 51 packages in 1ms"
+Seed:      none
+Notes:     The lock file matches the manifests after `h3`, `pyvalhalla` and `shapely` joined the root group `engine`.
+```
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 61 components: OK"
+Seed:      none
+Notes:     The version check with the rows `h3`, `pyvalhalla` and `numpy` installed and the new row `shapely`; the rows of the retired retreat are as they were.
+```
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes and their check are unchanged by this task.
+```
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "180 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 171 source files"
+Seed:      none
+Notes:     Strict types: the routing engine through its own shipped type files, the grid library through a minimal stub file; no ignore comment.
+```
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 271 text files, 56 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with the spike's README, the product README, the sentence of the root README and the open items.
+```
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical; this task adds no command, so neither changes.
+```
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','3c318ab08c72d617fd8c5d5586894577238eefe4...d2921268f3a3c3f5bca27b22f28263a42cafbf9c'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:product/src/eii_product/areas_spike/README.md A:product/src/eii_product/areas_spike/__init__.py A:product/src/eii_product/areas_spike/engine.py A:product/src/eii_product/areas_spike/extract.py A:product/src/eii_product/areas_spike/hour_speeds.py A:product/src/eii_product/areas_spike/road.py A:product/src/eii_product/areas_spike/router.py A:product/src/eii_product/areas_spike/shapes.py A:product/src/eii_product/areas_spike/snap.py A:product/src/h3.pyi A:product/tests/fixtures/areas_spike/expected_outputs.json A:product/tests/fixtures/areas_spike/frame_cells.json A:product/tests/fixtures/areas_spike/pbf_manifest.json A:product/tests/fixtures/areas_spike/road_network.json A:product/tests/fixtures/areas_spike/road_network.osm.pbf A:product/tests/fixtures/areas_spike/speed_table.json A:product/tests/test_areas_spike.py A:product/tests/test_scaled_adapter.py A:product/tests/test_valhalla_fixture.py M:OPEN_ITEMS.md M:README.md M:pins.toml M:product/README.md M:pyproject.toml M:uv.lock'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; output "25 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Scope (REV-12): the spike package (eight modules and its README), the stub file of the grid library, three test files, six fixture files, the root manifest with its lock and the pin record, the product README, and the two shared documents the lead entered (README.md, OPEN_ITEMS.md).
+```
+
+```text
+### S1-T03 — Isochrone, drawn-shape and grid spike
+Commit:    d2921268f3a3c3f5bca27b22f28263a42cafbf9c
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','3c318ab08c72d617fd8c5d5586894577238eefe4..d2921268f3a3c3f5bca27b22f28263a42cafbf9c'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-13
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
