@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 and by decision 0023 on 2026-11-13 (see PROGRESS.md) |
-| Date | 2026-11-12 |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 and by decision 0023 on 2026-11-13, and by decision 0026 on 2026-11-14 (see PROGRESS.md) |
+| Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | Track every unresolved owner decision, assumption, pending correction and technical unknown without implying closure. |
 | Read first | [docs/README.md](docs/README.md), [PROGRESS.md](PROGRESS.md) |
@@ -53,6 +53,8 @@
 - DONE SO FAR: The candidate sources and reconciliation steps are documented; affected display cards stay blocked. The site demand and revenue estimate and the revenue range of the user's outlet ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 8 and 10) read the survey figures and stay off screen while this item is open.
 - OPTIONS: **Recommendation:** follow the documented reconciliation and default to the named production-value and occupation tables only after sign-off. Otherwise leave the figures hidden.
 - NEEDED BY: slice S2 reconciliation; slice S7 methods and affected story scenes.
+- UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): Restaurant production value is not a field of the present datasets and is neither derived nor shown. It is no longer a default or a reconciliation candidate. Reconciliation R1 is closed on that basis in the reconciliation record of task S2-T03, which is not merged yet. The wage-table reconciliation remains. Card C4 keeps shares of output computed from published figures only (item 12).
+
 
 ## OI-04 — Census map-layer licence
 
@@ -64,6 +66,8 @@
 - OPTIONS: **Recommendation:** obtain and record written confirmation; until then keep the source validation-only and use the finest separately licensed geography for coverage and boundary geometry.
 - NEEDED BY: slice S2 public frame and coverage data.
 - CLOSED: 2026-11-12, by the owner's note of that day, recorded in [decision 0017](docs/decisions/0017-public-data-additions-and-public-splits.md): the census map layers of the statistics authority's public map service are used in this internal project. The written licence question for any use beyond it is a real-deployment item in [docs/17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md), section "Items moved from OPEN_ITEMS.md".
+- UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): The earlier validation-only restriction no longer holds in version 1. Census map layers follow the same rule as every public source: visitor-readable sources are used and shown in full, with the publisher's terms recorded in its own words with the date read and the basis of use in document 04. Nothing from a source not under an open licence is committed. The frame's geometry still comes from the licensed boundary source and the census map layers are joined by keys. Document 17 keeps the one list of permissions or licences needed before real use; nothing on it holds back version 1 (items 1 to 5 and 9).
+
 
 ## OI-05 — Product and Arabic names
 
@@ -261,6 +265,8 @@
 - DONE SO FAR: Defaults are no restricted survey figures, owner nominations before slice S4, assumed hotel occupancy until sourced, and documented draft eligibility rules.
 - OPTIONS: **Recommendation:** keep conservative defaults until evidence and reviewers exist; reconcile differences by decision record before the full world build.
 - NEEDED BY: slice S4 world and validation scorecard.
+- UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): the consent question is replaced: transport-survey summaries readable as a visitor are used in version 1 whatever their reuse terms, their terms recorded in the publisher's own words with the date read in document 04 and any permission needed for real use listed in document 17; what stays open is the mapping of published parameters to the manifest entries (document 05, Q1).
+
 
 ## OI-24 — Privacy-audit scope
 
@@ -841,6 +847,9 @@
 - OPTIONS: **Recommendation:** record each missing source at the slice S2 gate or keep the series open and unforecast; invent no value and add no source without its licence.
 - NEEDED BY: slice S2 gate (S2-T17, PLN-25); slice S6 (S6-T14).
 - UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) items 8 and 12: the list gains the quarterly median price per square foot of method card C41 by district and use, a series of its own beside the property prices of card C14, whose table `pub_property_quarter` comes from the sales bulletins fetched in S2-T19 ([03_DATA_CONTRACTS.md](docs/03_DATA_CONTRACTS.md) DAT-167), so it is not a series without a table. The establishments of an area by month are now a Public count of register companies, not a released synthetic series; whether their forecast joins the list is fixed with the list at the slice that builds card C30 ([02_ARCHITECTURE.md](docs/02_ARCHITECTURE.md) ARC-138).
+- UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): The earlier licence condition is replaced: any source readable as a visitor under item 2 may be used, with the publisher's terms recorded in its own words with the date read and the basis of use in document 04. A source with no open licence covering the use uses `owner_decision`, the owner's decision for a personal, local project. Invent no value; a missing table or insufficient backtest still prevents a forecast (items 1 to 3).
+- UPDATE: 2026-11-14, by decision 0026 item 3 and ruling L-221: `provider_terms` stays for a provider's interface used under that provider's own terms (PUB-95 and PUB-97); `owner_decision` applies to every other source with no open licence covering the use.
+
 
 ## OI-99 — The traffic provider's rule on storing responses
 
@@ -861,6 +870,8 @@
 - DONE SO FAR: Version 1 runs locally as a personal internal project; the three sources are used on the owner's decision of 2026-11-12 or within their free terms, and what a public or commercial hosting would have to settle for each is listed in the section "Public and investment sources if hosted publicly" of [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md). The three sources stay off until the owner decides.
 - OPTIONS: **Recommendation:** keep the three sources off under any public or commercial hosting until the owner records another choice in a decision record; a source whose terms, read at a fetch, forbid the use made here is switched off and the owner is told, except `busy_gmaps`, which the owner decided to use.
 - NEEDED BY: any public or commercial hosting; not a version 1 blocker.
+- UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): The earlier local switch-off rule and the `busy_gmaps` exception are replaced: no source is switched off or limited in version 1 because of its terms. The publisher's actual terms, including those of `busy_gmaps`, are recorded in its own words with the date read in document 04; the earlier summary is not a finding that no terms exist. Document 17 keeps one list for every source whose terms require permission or a licence before real use, with the publisher's words and date read, filled as terms are read. Real use means access outside the owner's organisation, publication of a page showing source records or commercial use. Nothing on the list holds back version 1. The existing going-live rule for the three sources stays and points to that list (items 1 to 4).
+
 
 ## OI-101 — Size of the public-total inventory with the two gridded Public tables
 
@@ -1291,12 +1302,34 @@
 ## OI-150 — The feed minimum of the conformance suite under parameter set B
 
 - ID: OI-150
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - NEEDED: The owner's or a data owner's decision on which text holds under parameter set B: the conformance test that rejects a count-table row below the minimum of the active parameter set, or the feed rule of 20 panel devices with set B's 30 applied only by the privacy engine.
 - WHY: TST-32 ([12](docs/12_TESTING_AND_QUALITY.md)) asks the conformance suite to reject a row of `presence_hourly` or `od_hourly` below the minimum panel devices of the active parameter set. DAT-60 ([03](docs/03_DATA_CONTRACTS.md)) and SYN-57 ([05](docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md)) fix the feed minimum at 20 and leave set B's 30 to the privacy engine. Under set B the two differ for rows of 20 to 29 panel devices, and the kept cell of the split feed tables (decision 0023 item 16) follows the count table.
 - DONE SO FAR: Found by the lead's re-read of the sweep of [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md). Nothing is changed: lowering the test's bar would weaken a privacy test, which no agent does on its own authority (AGENTS rule 12). The exported set is A (task S1-T09), under which both texts say 20, so nothing differs today.
 - OPTIONS: **Default until decided:** the stricter text stands (TST-32 as written). Option A: keep TST-32 and state in DAT-60 and SYN-57 that under set B the simulator omits rows below 30. Option B: set the conformance minimum to the feed rule of 20 and leave 30 to the release, tested by TST-203.
 - NEEDED BY: before parameter set B is ever evaluated on a feed (slice S5); not a blocker of slices S2 to S4.
+- UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): CLOSED, decided: Option A. TST-32 stands as written. DAT-60 and SYN-57 say that the simulator omits rows of the count tables `presence_hourly` and `od_hourly` under the minimum panel devices of the active parameter set, 20 under set A and 30 under set B, before conformance. Nothing else about the two sets changes (item 11).
+
+
+## OI-151 — Greater Doha as five whole municipalities
+
+- ID: OI-151
+- TYPE: ASSUMPTION
+- NEEDED: The owner's confirmation or replacement of the lead's assumption that Greater Doha is, for version 1, five whole municipalities, named in the frame's review file of task S2-T02.
+- WHY: The frame's resolution boundary (resolution 9 inside Greater Doha, 8 elsewhere) and every use of the name on a screen or a card depend on it. [Decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) item 10 keeps the assumption for version 1 and rules that the definition is shown wherever the name appears.
+- DONE SO FAR: The advisor decided under the owner's delegation on 2026-11-14 that the five-municipality reading stays for version 1 and that this item stays open as a record point. The review file is built by task S2-T02; until that task merges, the pack refers to "the five municipalities of the frame's review file" and lists no names.
+- OPTIONS: **Default until decided:** five whole municipalities. Otherwise the owner names another set of whole municipalities or a drawn boundary, and the frame is rebuilt.
+- NEEDED BY: the slice S2 gate (the frame), and before any screen shows the name (slice S3).
+
+## OI-157 — The caveat key `national_average` on card C33 after the survey benchmark left it
+
+- ID: OI-157
+- TYPE: OPEN
+- NEEDED: Decide whether card C33 (site demand and revenue estimate) keeps the caveat key `national_average`.
+- WHY: [Decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) item 12 withdraws the survey's output per establishment, which was the only survey figure card C33 showed. The card's list of caveats in [07](docs/07_ECONOMIC_METHODS.md) still names `national_average`, which described that figure. A caveat with no figure behind it says something the card no longer shows.
+- DONE SO FAR: Found by the lead's sweep of decision 0026. Left as it stands: the key is part of the card's closed list and of the tests that read it, and the card stays off screen while OI-03 is open.
+- OPTIONS: **Recommendation:** remove the key from card C33 when task S6-T17 is planned, with its test rows. Otherwise keep it and name the figure it covers.
+- NEEDED BY: the plan of task S6-T17 (slice S6).
 
 ## OI-155 — Forms that render as a listed name without being its text
 

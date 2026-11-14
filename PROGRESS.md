@@ -19117,6 +19117,495 @@ Seed:      none
 Notes:     The guard test on the corrected tree, before the commit: with the status line of S1-T08 back at its text on main, every test of the file passes.
 ```
 
+#### D0023: independent review, round 3 (the second confirmation), in seven parts: APPROVED
+
+Reviewed commit `5a41758430dfe905a503dd576181d6938a620118`, a commit of pull request https://github.com/albarami/economic-investment-intelligence/pull/41 that was still local when it was reviewed (the owner's decision of 2026-11-14: the review runs while the ledger and the hosted checks follow); it has no hosted run of its own, and the hosted checks ran on the pushed head named below. The reviewer was OpenAI GPT-6 Astra through Codex, in seven parts, each on the same commit. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: D0023 part 1 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED TST-245 and TST-209 retain the cited aggregate movement-anchor exception and reject segmentation of worker, residence or company records, person-level output and joining keys.
+  F2 FIXED The glossary’s Map mode, FE-140, DES-206 and TST-248 retain the hidden satellite control when ESRI_API_KEY is absent and preserve the other disabled states.
+  F3 FIXED Decision 0023 item 16, C15, MTH-52 and the open passages in documents 09 and 10 retain backend access to flow splits while deferring their presentation.
+CHECKS:
+  REV-10 PASS The changed decision and glossary passages match the supplied rulings on nationality, movement anchors, feed retention, release pooling and source terms. The implementation remains assigned to the tasks identified under the decision’s Consequences and PLN-29.
+  REV-11 PASS Recorded evidence only; this reviewer ran no tests. EVIDENCE.md records the lead’s documentation check on this exact commit, exit 0, including the private-pattern check. REV-36 applies to this documentation-only change; hosted checks follow.
+  REV-12 PASS The base-to-head diff lists documentation and agent-rule files only. No code, configuration or data file changes.
+  REV-13 PASS README.md’s Current status and the decision’s Consequences distinguish specifications and queued implementation from working product capabilities.
+  REV-14 PASS No secret, real custodian record, register row or calibration value appears in the inspected changes. EVIDENCE.md records the private-pattern documentation check exiting 0.
+  REV-15 PASS No executable test or CI configuration changes. The revised test requirements preserve release minimums, rounding and recovery rejection; TST-32 retains its active-set threshold as ruling L-188 requires.
+  REV-16 PASS The reviewed changes follow decision 0023 and rulings L-182, L-185 and L-188. The glossary distinguishes the register’s Public establishment nationality from protected worker statistics and movement aggregates.
+  REV-17 OPEN P2 The method-test matrix is corrected, but the inaccurate historical ledger statement still awaits its promised appended correction.
+  REV-18 PASS Decision 0023 item 16 and the glossary keep split feed rows inside the custodian plane. AGENTS rules 11–15 retain the release boundary, privacy controls and secret-handling restrictions.
+  REV-19 PASS The Amended passages section explicitly records the movement-anchor exception to decision 0017 item 5 while preserving decision 0019 item 22’s collapsed population-grid use, as ruling L-188 requires.
+  REV-20 PASS AGENTS rules 5–7 and 16–19 retain deterministic calculations and complete source chains. The revised anchor passages name the two configured sources; item 1 retains both released inputs in the talent ratio’s lineage.
+  REV-21 N/A This part changes specifications only; it delivers no rendered screen, executable template or Fact-chip implementation.
+  REV-22 PASS Item 16 and the glossary preserve release minimums, pooling order, complementary suppression and rounding. Below-minimum split feed values remain available for pooling, never leave the custodian plane, and contribute to complete split totals. Movement splits still sum snapped whole units without apportionment.
+  REV-23 N/A No product import or package metadata changes; AGENTS rule 11 remains intact.
+  REV-24 N/A This part delivers no executable bilingual view or Arabic translation.
+  REV-25 PASS The inspected changes introduce no private path, personal identifier, prohibited comparison or committed source payload. EVIDENCE.md records a successful documentation check with the owner’s private patterns.
+  REV-26 PASS The reviewed decision and glossary retain group-only talent answers, simulation labels, the prohibition on named-business footfall and the prohibition on advice to act.
+  REV-27 PASS The reviewer’s read-only git diff --no-ext-diff --no-index -- AGENTS.md CLAUDE.md returned exit 0 with no differences. EVIDENCE.md also records cmp exiting 0.
+  REV-28 PASS No realistic synthetic identifier, real registration or register row is introduced. AGENTS rule 9 retains visibly synthetic identifiers and collision rejection.
+  REV-29 PASS AGENTS rule 8 preserves the register-company exception’s limits. Item 16 and the glossary prohibit attributing visitor splits to named buildings or businesses.
+  REV-38 PASS AGENTS rules 26–32 retain the offline gateway boundary. The patch introduces no serving-plane gateway integration.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P2 (REV-17) record — Carried forward, partly resolved. Document 12’s method-test matrix now includes the missing references for C16, C39 and C41. PROGRESS.md’s D0023 “review round 1 and the corrections” entry still incorrectly says that matrix was corrected in that earlier round. Under AGENTS rule 38, append the correction promised in RULINGS.md, identifying commit 91af084fc01eb92a653b3a7952d8a7f6303fc313 as the matrix fix; preserve the original evidence row.
+
+--- PART 2 OF 7 (the same reviewer, the same commit; its verdict unchanged) ---
+
+VERDICT: APPROVED
+TASK: D0023 part 2 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED Section 7.3 retains nullable registered_cell in pub_register_snapshot. DAT-164 and TST-214 retain the preceding-snapshot location and the regression for a closure absent from both the later snapshot and pub_register_company.
+  F2 FIXED Section 9’s caveat catalogue and DAT-164 now require each route’s own caveat exclusively. TST-214 specifies passing route combinations and failures for missing or incorrect caveats, including either register caveat on register_without_date.
+  F3 FIXED DAT-60 and SYN-57 restrict pre-conformance omission to the two count tables. DAT-169, SYN-89 and PRV-58/PRV-134 retain below-minimum split values for pooling inside the custodian plane. S4-T08 and TST-260 specify the generator-to-release regression, complete totals and rejection of premature omission.
+CHECKS:
+  REV-10 PASS The assigned documentation corrections implement decision 0023 and rulings L-182, L-185 and L-188; F2 and F3 have matching regression specifications.
+  REV-11 PASS Under REV-36, .overnight/EVIDENCE.md records the lead’s python3 scripts/check_docs.py exiting 0 on the reviewed commit, including the private-pattern check. No tests or checks were rerun by this reviewer; hosted checks follow.
+  REV-12 PASS git diff --stat main...HEAD lists documentation files only, with no data or executable changes; this part concerns the assigned contracts, simulation and privacy specifications.
+  REV-13 N/A No executable implementation is delivered by this documentation-only change.
+  REV-14 PASS No secret, real custodian value, register row or calibration-table value found in the inspected changes; EVIDENCE.md records the private-pattern documentation check exiting 0.
+  REV-15 PASS No executable test or CI configuration changes. The revised split-feed requirements preserve release minimums, rounding and pooling order; TST-32 retains its stronger set-B requirement under L-188.
+  REV-16 OPEN P3 PRV-111 and DAT-165 retain the distinct make_area and talent-tool cut-offs. DAT-11 retains an older, inconsistent release-table list.
+  REV-17 OPEN P2 The TST-197 matrix is corrected; the promised appended correction to the earlier task log remains for the following ledger commit.
+  REV-18 PASS DAT-112 and DAT-114 retain company-scoped access without oversight functions; DAT-61 and DAT-169 prohibit person-level movement identifiers and joining keys.
+  REV-19 PASS The examined amendments follow decision 0023 and the supplied rulings. The TST-32 and S1-T14 dispositions remain as L-188 directs.
+  REV-20 PASS DAT-164 separates dates and snapshot evidence and caveats. DAT-169 preserves complete split counts through pooling and computes shares only from released values; DAT-91 retains the deterministic provenance rule.
+  REV-21 N/A No rendering implementation changes; the Fact-chip and closed-template requirements remain specified.
+  REV-22 PASS PRV-58 and PRV-134 apply the existing panel minimum after split pooling, retain complete-parent publication requirements and forbid release of untreated split rows. No release minimum, rounding base or attack size is reduced.
+  REV-23 N/A No product import or package dependency changes occur in this documentation-only patch.
+  REV-24 N/A No bilingual screen implementation changes; document 03 section 9 retains pending native review for new Arabic caveat sentences.
+  REV-25 PASS No prohibited private path, personal identifier or named product comparison found in the inspected changes; the recorded documentation check passes.
+  REV-26 PASS PRV-60 retains movement’s simulated status, named-place attribution prohibition and absence of a person-level privacy claim. DAT-165 retains the talent-answer restrictions.
+  REV-27 PASS Read-only git diff --no-index -- AGENTS.md CLAUDE.md exited 0 with no differences; EVIDENCE.md also records cmp exiting 0.
+  REV-28 PASS DAT-12 to DAT-15 and SYN-19 retain the synthetic identifier forms, collision requirements and invented stand-in register fixtures.
+  REV-29 PASS DAT-145 and DAT-168 retain the restrictions on attributes attached to real named subjects; SYN-16 prohibits unauthorized generated company attributes.
+  REV-38 N/A No gateway implementation, serving-plane dependency or runtime gateway setting changes occur in this part.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P2 (REV-17) record: The TST-197 matrix now includes MTH-118/MTH-119 for C16, MTH-122 for C39 and MTH-121 for C41. PROGRESS.md’s “review round 1 and the corrections” entry still incorrectly says that matrix was corrected in the earlier commits. Append the correction promised by RULINGS.md in the following ledger commit; preserve the original entry.
+  P3 (REV-16) docs/03_DATA_CONTRACTS.md DAT-11’s conformance-test column permits registration_number only in register_company_list and pub_register_company, whereas section 7.3 and DAT-83 also permit pub_register_snapshot. This inconsistency already exists at the previously reviewed commit and is outside this confirmation’s rejecting kinds. Add pub_register_snapshot to DAT-11’s list so it agrees with DAT-83; retain rejection for every other table.
+
+--- PART 3 OF 7 (the same reviewer, the same commit; its verdict unchanged) ---
+
+VERDICT: APPROVED
+TASK: D0023 part 3 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED TST-245 and TST-209 retain SYN-89’s cited movement-anchor exception and reject record segmentation, other split inputs and person-level joins.
+  F2 FIXED C15 and MTH-52 retain backend availability of flow splits, person-trip semantics and deferral of every flow-split display.
+  F3 FIXED C22, MTH-85 and TST-214 retain separate dates-route and snapshot-route wording, including the earlier-or-absent registration-date fixture.
+  F4 FIXED DAT-164 and the caveat-key table now require each route’s own caveat exclusively; C22, BE-140, the openings_closures output contract and the What changed catalogue agree. MTH-85 and TST-214 require passing and failing caveat fixtures, including neither register caveat on register_without_date.
+CHECKS:
+  REV-10 PASS The reviewed corrections match the brief’s scope and rulings A–O. TST-197 now includes the missing methods for C16, C39 and C41; MTH-85 and TST-214 specify the required caveat regressions.
+  REV-11 PASS EVIDENCE.md records the lead’s python3 scripts/check_docs.py exit 0 on this exact commit, satisfying REV-36; hosted checks follow. No builds or tests were run during this review.
+  REV-12 PASS git diff --stat main...HEAD lists documentation only; the confirmation diff for this part changes only its two assigned documents.
+  REV-13 PASS The reviewed passages specify future methods and explicitly labelled fixtures, without presenting them as implemented capabilities or measured product results.
+  REV-14 PASS No secret, real custodian record or register row found in the reviewed changes. EVIDENCE.md records the lead’s documentation check with private patterns exiting 0.
+  REV-15 PASS The confirmation diff preserves attack sizes and release thresholds. TST-260 adds guards; TST-32’s split-feed exception follows decision 0023 item 16 and retains release controls.
+  REV-16 OPEN P3 TST-250 follows the selected-area ruling, and C38 follows SYN-85’s collapsed-grid rule. TST-32 retains the acknowledged set-B discrepancy under L-188.
+  REV-17 OPEN P2 The affected method, contract, catalogue and test passages agree; the earlier ledger correction remains pending as EVIDENCE.md and RULINGS.md state.
+  REV-18 PASS TST-260 keeps split-feed rows inside the custodian plane; TST-245 retains record boundaries; TST-248 and TST-249 retain key isolation and response-storage prohibitions.
+  REV-19 PASS The reviewed changes implement the recorded decisions and rulings without reopening them.
+  REV-20 PASS C22 preserves Public provenance, Observed status and route-specific source claims. MTH-08 requires complete lineage; TST-214 rejects incorrect caveats and unsupported snapshot-date claims.
+  REV-21 PASS MTH-01 and MTH-10 retain deterministic calculations, application-owned templates and structural numeral controls; TST-250 retains Fact-chip requirements.
+  REV-22 PASS TST-260 preserves pooling, complementary suppression, released-value minimums and recoverability guards. TST-21 retains structural enumeration and counted fuzz coverage; TST-204 retains whole-unit movement splits.
+  REV-23 N/A This documentation-only part introduces no package import or product dependency.
+  REV-24 N/A No rendered view or translation is implemented; TST-250 retains English and Arabic verification requirements.
+  REV-25 PASS No prohibited private path, personal name, realistic identifier or named-product comparison found in the reviewed patch and referenced corrections.
+  REV-26 PASS C15 retains the named-business footfall prohibition; C22 distinguishes snapshot membership from event dates; MTH-10 retains prohibited-wording controls.
+  REV-27 PASS Reviewer ran git diff --no-ext-diff --no-index -- AGENTS.md CLAUDE.md: exit 0, no differences.
+  REV-28 PASS TST-31 and TST-245 retain invented stand-in registers and reject generated groups linking real registrations; the changed fixtures introduce no realistic identifiers.
+  REV-29 PASS The reviewed changes attach no invented attribute to a named place or business; C15 uses area subjects and C22 uses Public register inputs.
+  REV-38 N/A This documentation-only part introduces no serving-plane gateway integration or runtime provider call.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P2 (REV-17) record — Carry forward the pending correction to PROGRESS.md’s “D0023 — review round 1 and the corrections” entry, which incorrectly attributes the TST-197 matrix fix to that round. Append the actual round-three correction in the promised ledger without rewriting the earlier entry; the matrix itself is now fixed.
+  P3 (REV-16) TST-32 still applies the active parameter-set minimum at count-feed conformance, whereas DAT-60 and SYN-57 specify 20 there and apply set B’s 30 at release. Retain the stronger text pending the owner’s resolution through OI-150, as L-188 directs; this is not a rejection or authorization to lower the test threshold.
+
+--- PART 4 OF 7 (the same reviewer, the same commit; its verdict unchanged) ---
+
+VERDICT: APPROVED
+TASK: D0023 part 4 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED AI-100 and AI-133 retain the MTH-122 exception, both-family lineage and rejection of withheld-input, zero-denominator and unauthorized ratios.
+  F2 FIXED AI-106, AI-138, AI-51 and split_not_offered admit the three separate movement views without range slots.
+  F3 FIXED BE-111, BE-58, area_evidence and TST-204 retain whole-unit movement sums and rejection of fractional apportionment.
+  F4 FIXED area_evidence and GET /api/layers/{layer} retain closed split_kinds arguments, empty defaults and positive and negative contract cases.
+  F5 FIXED Backend section 7, AI-131 and TST-250 reject the near-worker/wider-resident pairing.
+  F6 FIXED AI-51 and split_not_offered preserve both authorized nationality forms. AI-51 explicitly passes the Public establishment-nationality card field while rejecting unauthorized attributes and movement-record joins.
+  F7 FIXED Backend section 7 and the assistant site_check bundle assign both headlines to the selected drive area. TST-250 requires drive-15 headlines, register figures, presence and public context on that area and rejects substitution of walk 5.
+CHECKS:
+  REV-10 PASS The reviewed backend and assistant corrections implement the requirements in RULINGS.md; F6 and F7 are fixed, with their positive and planted negative cases documented.
+  REV-11 PASS Under REV-36, EVIDENCE.md records the lead's python3 scripts/check_docs.py on this exact commit exiting 0, including the private-pattern check; hosted checks follow. No tests were run during this review.
+  REV-12 PASS git diff --name-only a9db6c8 HEAD lists documentation, rules, indexes and ledgers only; the assigned changes concern decision 0023.
+  REV-13 PASS No executable implementation is delivered. BE-123 requires user-entered spending ranges, and BE-76 prohibits generated question history.
+  REV-14 PASS No secret or real custodian record appears in the assigned changes; EVIDENCE.md records the lead's documentation check with private patterns exiting 0.
+  REV-15 PASS Executable tests and CI are unchanged. AI-138 retains pooling, complementary suppression and rejection of movement-record joins; the new nationality exceptions preserve AGENTS rule 10.
+  REV-16 PASS Backend section 7, AI-131 and TST-250 agree on headline-area selection; BE-110, AI-109 and AI-51 distinguish permitted nationality attributes from unavailable statistical breakdowns.
+  REV-17 OPEN P1 The documents and TST-197 matrix are corrected; the earlier inaccurate ledger statement still awaits its announced appended correction.
+  REV-18 PASS BE-36 preserves company isolation. BE-135 to BE-139 retain server-held credentials, offline controls and provider-response non-storage.
+  REV-19 PASS The inspected corrections implement decision 0023 and rulings L-182, L-185 and L-188 without reopening a settled decision.
+  REV-20 PASS BE-104 retains complete source chains and deterministic calculations. BE-140 and the assistant's What changed family require route-specific register caveats and exclude both caveats from register_without_date.
+  REV-21 PASS AI-33 and AI-35 to AI-51 retain Fact chips, closed catalogue validation, the accounting gate and template fallback. Movement counts have their explicit range-slot exception.
+  REV-22 PASS BE-111, BE-58 and AI-103 retain snapped whole-unit movement sums. AI-138 preserves pooling and suppression; TST-260 rejects recoverable values and splits published for withheld parent groups.
+  REV-23 N/A This documentation-only pull request changes no executable imports or package dependencies.
+  REV-24 PASS AI-85, AI-86 and AI-120 retain identical Western numerals and native review of prepared Arabic strings; no rendered bilingual implementation is delivered.
+  REV-25 PASS No prohibited private path, personal identifier or product comparison appears in the assigned changes; the recorded private-pattern documentation check exits 0.
+  REV-26 PASS BE-132, BE-134 and AI-133 to AI-138 retain group-only talent answers, qualified estimates and prohibitions on named-business estimates, probabilities and advice to act.
+  REV-27 PASS Read-only git diff --no-index -- AGENTS.md CLAUDE.md exited 0 with no differences; EVIDENCE.md also records cmp exiting 0.
+  REV-28 PASS The assigned changes introduce no realistic synthetic identifiers, register rows or generated company names.
+  REV-29 PASS BE-113, BE-59, AI-108 and AI-137 retain company-card restrictions and Public-only tower counts; establishment nationality remains a published Public attribute.
+  REV-38 PASS BE-102 and AI-98 retain the offline-only gateway boundary; AI-128 excludes visitor transcripts from the gateway.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17; record; carried forward) The D0023 review-round-1 entry in PROGRESS.md still says the method-test matrix was corrected in that round. The matrix is now corrected, but the historical statement remains inaccurate. Append the correction in the following ledger, as RULINGS.md and EVIDENCE.md specify, preserving the original entry under AGENTS rule 38.
+
+--- PART 5 OF 7 (the same reviewer, the same commit; its verdict unchanged) ---
+
+VERDICT: APPROVED
+TASK: D0023 part 5 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED FE-100 and REV-20 retain the MTH-122 exception, both released inputs and families in lineage, and refusal for withheld inputs or a zero denominator.
+  F2 FIXED FE-109, FE-154, DES-99, DES-174, DES-214 and REV-22 retain whole-unit movement splits and exclude exact-shape apportionment captions.
+  F3 FIXED FE-154 and DES-214 retain returned categories only, the “under 15 or pooled” label, and published, pooled and withheld component cases.
+  F4 FIXED FE-23, DES-167, DES-72 and DES-194 exempt movement-split counts from ranges and reject invented ranges.
+  F5 FIXED REV-16 and REV-22 retain C39’s separate catchments, enumeration in every calling playbook and refusal above 30 minutes.
+  F6 FIXED Document 10’s Trust centre description confines the owner-decision basis to the GIS layers and requires covering terms for the tender source.
+  F7 FIXED FE-153 and DES-212 retain zoning outlines, permitted-use words and rejection of categorical fill.
+  F8 FIXED FE-140 and DES-206 retain hidden satellite controls without ESRI_API_KEY and distinguish the disabled states when the key is present.
+CHECKS:
+  REV-10 PASS The actual assigned-part diff matches .overnight/DIFF.part.txt. DES-187 implements rulings C/K; both document 13 corrections implement ruling N. Earlier substantive fixes remain intact.
+  REV-11 PASS Under REV-36, .overnight/EVIDENCE.md records the lead’s python3 scripts/check_docs.py exiting 0 on this exact commit, including with private patterns. hosted checks follow; merge awaits all six. No tests were run during this review.
+  REV-12 PASS The base-to-head stat contains documentation only. Since the previous review, this part changes only DES-187 and two attribution-status passages in document 13; no executable or data files changed.
+  REV-13 PASS The changes remain specifications and status corrections. TASKS.md and PLN-29 assign implementation to future tasks; the changes claim no implemented feature or passing component test.
+  REV-14 PASS No secret value, custodian record, register row or calibration value appears in the reviewed changes. The lead records the private-pattern documentation check exiting 0.
+  REV-15 PASS No executable test, CI configuration or baseline changed. DES-187 preserves the record restrictions while stating the approved movement exception; the operational controls remain unchanged.
+  REV-16 PASS DES-187 distinguishes the three permitted nationality forms as rulings C/K require. OPS-73 preserves server-only keys, storage prohibitions and operation without the optional provider.
+  REV-17 OPEN P3 Earlier P4 is corrected in OPS-73 and document 13’s Open questions. The TST-197 matrix is corrected; P3’s appended historical-ledger correction remains scheduled for the following ledger.
+  REV-18 PASS OPS-73 retains server-only provider access and prohibits storing tiles, search results or keys. FE-149 and REV-18 retain company separation and exclude oversight access.
+  REV-19 PASS The three changed passages implement the supplied rulings without reopening a settled decision. The remaining S1-T14 documentation-guard work stays deferred as L-188 directs.
+  REV-20 PASS FE-100 and REV-20 preserve complete lineage and the narrow talent-ratio exception. FE-154 and DES-214 require released counts and computed shares without invented categories or ranges.
+  REV-21 PASS FE-154 and DES-214 retain Fact chips for split counts and shares. FE-78 retains catalogue rendering and the accounting gate; no rendered implementation is introduced.
+  REV-22 PASS REV-22 retains structural closure, attack sizes and stable treatment. DES-187 allows movement nationality only as released aggregates, never joined to records; whole-unit split requirements remain intact.
+  REV-23 N/A This documentation-only change introduces no product imports or package changes.
+  REV-24 N/A No bilingual implementation or translated catalogue is delivered; DES-186 retains Arabic review and DES-119 retains numerical parity.
+  REV-25 PASS The reviewed changes introduce no private path, personal identifier, secret value or prohibited comparison. OPS-73 records the permitted attribution locations without introducing the provider’s name.
+  REV-26 PASS DES-187 retains the honesty lines and prohibited claims. Runbook scene 7 retains aggregate-only talent evidence, visible ranking criteria and next tests without a verdict.
+  REV-27 PASS HEAD stores AGENTS.md and CLAUDE.md as identical Git blob b1592f29453c826beb044e27f17fe99d4a4a2f84. The lead also records cmp exiting 0.
+  REV-28 PASS No synthetic identifier, realistic registration or register row is introduced. REV-28 retains the allowed identifier forms and collision requirements.
+  REV-29 PASS DES-187 distinguishes the register’s Public establishment nationality from released worker statistics and movement aggregates. FE-150 and FE-153 retain the restrictions on named businesses and Public source attributes.
+  REV-38 PASS The frontend Proof room specification, DES-136 and OPS-55 retain only the fixed gateway lineage sentence and prohibit gateway panels and runtime use.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P3 (REV-17) record — Carry forward only the historical-ledger correction: PROGRESS.md’s D0023 review-round-1 entry incorrectly attributes the TST-197 matrix correction to that round. The current matrix now includes MTH-118/MTH-119 for C16, MTH-122 for C39 and MTH-121 for C41. Append the promised correction in the following ledger without rewriting the original entry, as .overnight/RULINGS.md and .overnight/EVIDENCE.md specify.
+
+--- PART 6 OF 7 (the same reviewer, the same commit; its verdict unchanged) ---
+
+VERDICT: APPROVED
+TASK: D0023 part 6 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED PUB-90 preserves SYN-89’s two cited movement anchors, distinguishes the other nationality groups derived from simulated people, and requires the population grid to be collapsed across age and sex. TST-209 retains the passing movement-anchor case and rejects joins to worker, residence or company records.
+  F2 FIXED ARC-129, BRF-58 and BRF-73 retain whole-unit aggregation for movement splits without apportionment. TST-204 retains the planted apportioned-split rejection and identical split counts and shares for outlines selecting the same units.
+CHECKS:
+  REV-10 PASS The assigned passages agree with decision 0023 and rulings L-182, L-185 and L-188 on nationality, movement anchors, feed counts, source terms and attribution-note status.
+  REV-11 PASS Under REV-36, .overnight/EVIDENCE.md records the lead’s python3 scripts/check_docs.py exiting 0 on this exact commit, including with the private pattern list; hosted checks follow. Merge awaits the six hosted checks. No tests were run in this review.
+  REV-12 PASS git diff --name-only main...HEAD lists documentation and ledgers only. The assigned changes concern decision 0023 and its corrections; no code or data file changes appear.
+  REV-13 PASS The assigned patch changes specifications, not executable implementations, and introduces no invented measurement or substitute release output.
+  REV-14 PASS No credential, real custodian record, register row or calibration-table value appears in the assigned changes. The recorded documentation check with the private pattern list exits 0.
+  REV-15 PASS No executable test or CI configuration changes occur. The movement clarification preserves release minima, rounding and pooling; TST-204 and TST-209 retain their planted violations.
+  REV-16 PASS The component descriptions and amended requirements follow the rulings: feed splits contain counts and panel_devices; shares follow release pooling; establishment nationality remains a Public company attribute.
+  REV-17 OPEN P1 The affected specifications and TST-197 matrix are corrected. The earlier ledger statement still awaits its promised appended correction.
+  REV-18 PASS ARC-28 and ARC-30 preserve company isolation and fixed read functions. PUB-109 retains server-side keys, same-origin provider routes and the prohibition on storing responses.
+  REV-19 PASS The changes implement the accepted decisions and supplied rulings without reopening them. PUB-12 retains its existing exception and distinguishes the tender source’s requirement for covering terms.
+  REV-20 PASS ARC-120, ARC-123 and PUB-19 retain deterministic calculations and complete source chains. PUB-90 identifies the permitted movement anchors and preserves the collapsed-grid restriction.
+  REV-21 N/A This part delivers no rendered component or template; the architecture retains Fact-chip rendering and closed catalogues.
+  REV-22 PASS ARC-129 retains whole-unit movement splits. Its revised simulator description agrees with SYN-89 and DAT-169: feed counts stay inside the custodian plane, with shares computed after release pooling and no release control reduced.
+  REV-23 PASS ARC-02 and ARC-03 retain the verified-release boundary and restrictions on record-level data. No executable import changes occur.
+  REV-24 N/A This part delivers no Arabic strings or bilingual implementation.
+  REV-25 PASS The assigned changes contain no private path, personal identifier, secret or prohibited comparison. Provider attribution follows the received note; fetched source data remains uncommitted.
+  REV-26 PASS BRF-43 to BRF-50, BRF-82 and ARC-129 retain the prohibited-claim restrictions. Movement figures remain area aggregates, never named-place footfall.
+  REV-27 PASS .overnight/EVIDENCE.md records cmp AGENTS.md CLAUDE.md exiting 0 on this commit, alongside the passing documentation check.
+  REV-28 PASS The assigned changes introduce no realistic synthetic identifier or register identifier; BRF-31 retains the name-collision requirement.
+  REV-29 PASS The nationality correction permits only the establishment nationality published by the register. BRF-63, ARC-131 and PUB-92 retain the restrictions on other company attributes and named-place figures.
+  REV-38 PASS ARC-80 to ARC-82 retain the offline-only gateway, provider-none operation and serving-plane import prohibition.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17; record; carried from round 2) PROGRESS.md, “D0023 — Decision 0023: ten additions and the data rule: review round 1 and the corrections”, still states that the method-test matrix was corrected in that round. The matrix is now corrected: C16 includes MTH-118 and MTH-119, C39 includes MTH-122, and C41 includes MTH-121. Complete the appended historical correction in the follow-up ledger commit promised by .overnight/RULINGS.md and .overnight/EVIDENCE.md, preserving the earlier entry.
+
+--- PART 7 OF 7 (the same reviewer, the same commit; its verdict unchanged) ---
+
+VERDICT: APPROVED
+TASK: D0023 part 7 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED TASKS.md S4-T10 and both files’ S4 gates retain the DAT-169 movement exception, the permitted DAT-141 nationality fields and the positive and negative schema cases.
+  F2 FIXED S4-T04 and S4-T08 require feed counts and panel_devices only; shares follow release pooling, suppression, treatment and rounding.
+  F3 FIXED S2-T01 and S2-T19 restrict decision_record: 0023 source admission to PUB-105 GIS layers.
+  F4 FIXED S2-T01 and document 14 section 10 retain the named API-provider exceptions with environment keys, offline controls, storage restrictions and fixture-only tests.
+  F5 FIXED S2-T11 now permits SYN-89’s cited aggregate movement anchors while prohibiting worker, residence and company segmentation, joins, protected composites and tabulated apportionment. It requires TST-209’s passing anchor and failing record and joining-key cases.
+  F6 FIXED S2-T19, document 14 section 10 and both S2 gates preserve PUB-12/PUB-13 admission bases. They require the GIS fixture without reuse terms to pass, the uncovered tender fixture to fail and the GIS fixture with prohibitive terms to fail.
+CHECKS:
+  REV-10 PASS The assigned corrections satisfy the earlier findings and the applicable PLN-29 requirements; revised criteria include their planted cases.
+  REV-11 PASS Under REV-36, .overnight/EVIDENCE.md records the lead’s python3 scripts/check_docs.py on the reviewed commit exiting 0, including the private-pattern check; hosted checks follow. The full suite follows with the ledger. No tests were run during this read-only review.
+  REV-12 PASS The main-to-head diff stat contains documentation files only; the assigned changes are TASKS.md and docs/14_IMPLEMENTATION_PLAN.md, with no data files.
+  REV-13 PASS The changed passages specify queued implementation work; they deliver no executable placeholder, fabricated figure or hand-written release table.
+  REV-14 PASS No secret or real record appears in the inspected changes; the recorded head documentation check with private patterns exited 0.
+  REV-15 PASS No executable test, CI configuration, tolerance or baseline changed. The revised criteria retain release minimums and add planted violations.
+  REV-16 PASS The task criteria follow rulings A–O: named movement anchors, retained split-feed values, route-specific caveats and the selected headline area.
+  REV-17 OPEN P1 The operative corrections agree with their referenced requirements; the earlier inaccurate ledger statement still awaits its promised appended correction.
+  REV-18 PASS S2-T01 and S2-T19 preserve provider boundaries, secret-handling restrictions, documented source admission and refusal on prohibitive terms.
+  REV-19 PASS The revised source and movement criteria implement the accepted decisions without reopening them; slice order remains unchanged.
+  REV-20 N/A This documentation-only part implements no calculation or fact object.
+  REV-21 N/A No rendered screen, executable template or numeral-lint implementation changes.
+  REV-22 PASS S4-T04, S4-T08 and S5-T09 retain small split-feed values inside the custodian plane for PRV-134 pooling; release minimums, suppression and share-denominator requirements remain explicit.
+  REV-23 N/A Documentation-only changes introduce no product or custodian imports.
+  REV-24 N/A No implemented bilingual view or Arabic translation changes.
+  REV-25 PASS The inspected changes contain no prohibited private path, personal identifier or product comparison; source and provider references serve attribution or configuration.
+  REV-26 PASS S6-T20 retains aggregate-only talent answers and their limitations; S6-T21 forbids verdicts, probability claims, confidence claims and advice to act.
+  REV-27 PASS Read-only git diff --no-index -- AGENTS.md CLAUDE.md exited 0 with no differences; the lead also records cmp exiting 0.
+  REV-28 PASS S4-T01 retains the pinned synthetic identifier forms; the inspected changes introduce no realistic identifiers or register rows.
+  REV-29 PASS S8-T03 retains Public-only real-place slots and register-company limits; S6-T20 prohibits employer names beside talent pools or flows.
+  REV-38 PASS Document 14 PLN-20 retains the offline gateway boundary; S8-T10 expressly prevents confirmed voice transcripts from reaching it.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17; record) PROGRESS.md’s D0023 round-one corrections log, line 17504, still attributes the method-test matrix correction to that earlier round. The matrix is now corrected, and .overnight/RULINGS.md identifies commit 91af084fc01eb92a653b3a7952d8a7f6303fc313 as its actual correction. Append the promised ledger correction naming the inaccurate entry and actual fix commit; do not rewrite the earlier entry.
+```
+
+#### D0023: merge record
+
+- The branch was updated with main when its turn to merge came (the owner's rule of 2026-11-12): merge commit `0a29e209199d0ff780c1c3bbea52ac212a3d4c74`, the head that was merged. Where both sides had appended at the same place the lead's scripts keep every line of both sides, main's first, and refuse any overlap. The lead's proof that the update changed nothing by itself (for every path: the branch's blob where main did not change it, main's blob where the branch did not, git's own three-way merge, or the scripted resolution):
+
+```text
+base update 0a29e209199d0ff780c1c3bbea52ac212a3d4c74: branch side 620dfd66c431b6b22791870442ec620d4e72f266, main side f0ee2f3c39a480501edb28bc85c33546e61ba5b9, merge base a9db6c85d19c1035377dfbc9fde8959fcc86cff7
+  branch only: 23
+  main only: 46
+  neither: 451
+  both, git's own merge: (2, ['OPEN_ITEMS.md', 'TASKS.md'])
+  both, resolved by the lead's script: (1, ['PROGRESS.md'])
+  FAIL: (0, [])
+```
+
+- CI on the updated head: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43563678323; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43563678294; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43563678272 .
+
+- The lead's checks on the merged head `0a29e209199d0ff780c1c3bbea52ac212a3d4c74` before the merge (ruling L-29): "TREE-IS-WORK ok: 523 paths at 0a29e209199d0ff780c1c3bbea52ac212a3d4c74", exit code 0; `./eii test --seed 2026111438`: exit code 0, "total: 1998 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/41 was squash-merged on 2026-11-14 at that head; merge commit `e45dbb34397a462b93506d85714700c88917b92d` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43566276352; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43566276405; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43566276404 .
+
+### D0026 — Decision 0026: public sources used in full locally: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/44 )
+
+- What it is: decision record 0026 and its sweep of the pack. The owner's decisions of 2026-11-14, as the lead recorded them from his advisor's notes of 09:57, 10:02 and 10:03: version 1 is a personal, local project, so every source that a visitor can read without signing in is used and shown in full, whoever owns it; reuse terms no longer switch a source off; the terms are still read and recorded in the publisher's own words with the date read; what needs a permission before real use goes on one list in document 17; nothing of a source without an open licence is committed. With it, four decisions the advisor took under the owner's delegation that morning: an investment project is shown in full with its source and the page's own caveat; Greater Doha stays five whole municipalities for version 1 (open item OI-151); the feed minimum follows the active parameter set (OI-150 closed, Option A); the restaurants' production value, which the publisher no longer publishes, is neither derived nor shown, and card C4 computes its shares from published figures.
+- Class: Deep (it changes which public data the product may show and one privacy text). Lead: Anthropic (Claude Fable 5.2): the wording every changed passage had to meet (twelve items and seven addenda), every ruling, the combination of the editors' work and this ledger.
+- First pass: an inventory of the pack by seven read-only readers and one critic (the lead's agents, Claude Opus 5.5 and Claude Fable 5.2): 366 passages in 23 files state, repeat or depend on a replaced rule. Six editors of another maker (OpenAI GPT-6 Astra through Codex), each on its own documents, entered the wording; one of them wrote the record. Work commit 099ff42.
+- The lead's sweep: seven read-only verifiers (Claude Opus 5.5), one for each group of the wording, read the whole pack after that edit and reported 80 points; the lead judged 79 valid and one not (the column list of the investment source, which task S2-T12 writes). The heaviest: the first edit had lifted the display holds of open item OI-03 on cards C3, C4, C33 and C35, which the decision does not lift; the withdrawn survey benchmark was still promised in seven documents and two tasks; the lead's own wording had left out the fourth basis of use (`provider_terms`); a missing terms record was still a build failure in two tasks and a slice gate. Four editors (the same maker) entered the points; the lead added the tender portal's terms, which it read on 2026-11-14, and completed the record's list of changed requirement rows by a script that compares each row with main. Work commit 6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad.
+- AGENTS.md, CLAUDE.md and document 06 are not changed: wherever a rule asks for a source's licence, the registry's record of what the publisher states together with the basis of use is that element (the record's Consequences).
+- The repository's checks cannot see whether a passage is true to the owner's decision: that is the reviewer's judgement, with the wording and the lead's rulings in the pack. The documentation check also ran with the owner's private pattern list on every commit of the branch (the commit hook).
+- Open items: OI-150 is closed by the record; OI-151 (Greater Doha) and OI-157 (a caveat key of card C33 that has no figure behind it any more) are entered with this ledger.
+- Not in this pull request: any code. The tasks that build on the changed rules (S2-T12, S2-T13, S2-T19) carry them in their own pull requests; decision records 0024 (task S1-T14) and 0025 (task S2-T03) arrive with those tasks.
+
+#### Evidence for the work commit `6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad`
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 410 text files, 65 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the record and every amended document: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical; the record does not change them.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   bash -c "git diff --name-only e45dbb34397a462b93506d85714700c88917b92d HEAD -- AGENTS.md CLAUDE.md docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md | wc -l"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (the agent rules and document 06 are unchanged)
+Seed:      none
+Notes:     The record states that AGENTS.md, CLAUDE.md and document 06 are not changed; this row proves it on the committed tree.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   bash -c "grep -hciE 'under 20 panel|below 20 panel|admitted geography|admits to the local release' docs/0*.md docs/1*.md docs/GLOSSARY.md TASKS.md | paste -sd+ | bc"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no document of the pack keeps the fixed feed minimum of 20 or the admission of a source by a record)
+Seed:      none
+Notes:     Two of the replaced rules, searched by their words in the documents of the pack, the glossary and the tasks (decision records are history and are not searched).
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   ./eii test --seed 2026111444
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1998 passed, 0 failed, 0 skipped
+Seed:      2026111444
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','e45dbb34397a462b93506d85714700c88917b92d..6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two work commits have Conventional Commit subjects.
+```
+
+### D0026 — Decision 0026, public sources used in full locally: the independent review in three rounds and its two fixes (pull request https://github.com/albarami/economic-investment-intelligence/pull/44 )
+
+- Review round 1 (2026-11-14): xAI Grok 4.7 through the Cursor command-line tool read the change in four parts on the ledger head 0c72119: part 2 (the public data pack and going live) APPROVED with no finding; parts 1, 3 and 4 REJECTED with one finding each, and one proposed point. The lead read each against the pack and judged all four valid: three sentences still carried a withdrawn rule (BRF-93 took the revenue cases from the survey's shares of output; assumption (39) of document 03 named two withdrawn indicators of the establishment-size table; the asset table of document 10 called the 2020 boundary layers shown in full), and one source gloss of document 05 described a source's terms before they were read.
+- The first fix (the editors' maker, OpenAI GPT-6 Astra through Codex; the reviewer's own sentences word for word; five passages in five files, among them the three passages added to the record's own lists): commit e513d31. The lead read the whole diff and ran the documentation check with the owner's private list, the tree check and the comparison of the two agent files.
+- Review round 2 (the confirmation, same reviewer, on e513d31): the three findings and the proposed point CLOSED; REJECTED with three new findings of the same kind: BE-124, TST-231 and the goal of task S7-T15 still said that the low, middle and high revenue cases come from the published survey shares. Valid: the fixer's search had looked for the words of round 1 and missed these three.
+- The second fix (applied by the lead, mechanically, with the reviewer's three replacement sentences word for word): commit 496ae3d. The lead then searched every tracked file for a sentence that ties the revenue range or its three cases to the survey or to shares and read each match: what remains is the acceptance criterion of S7-T15 (which gives the published shares to card C4's break-even point only), document 09's hold while open item OI-03 is open, and decision record 0019, which is history and is not edited.
+- Review round 3 (the second confirmation, same reviewer, on 496ae3d): APPROVED, the three findings closed, no finding, no proposed item.
+- The lead's check of the record's lists of passages against the real change flags five requirement identifiers as listed under "changed" although their own rows did not change (PUB-24, PUB-95, PUB-103, BE-57, BE-117): each is named in a passage that did change (a table row or an assumption that cites it), so the lists are true as written; the check compares rows only.
+- Evidence: the commands below at the second fix commit.
+
+#### Evidence for the work commit `496ae3d3235fce64783461a47d66318017efa263`
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 410 text files, 65 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the record and every amended document: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical; the record does not change them.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   bash -c "git diff --name-only e45dbb34397a462b93506d85714700c88917b92d HEAD -- AGENTS.md CLAUDE.md docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md | wc -l"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (the agent rules and document 06 are unchanged)
+Seed:      none
+Notes:     The record states that AGENTS.md, CLAUDE.md and document 06 are not changed; this row proves it on the committed tree. (Compared with the commit of main the branch started from.)
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   bash -c "grep -hciE 'under 20 panel|below 20 panel|admitted geography|admits to the local release' docs/0*.md docs/1*.md docs/GLOSSARY.md TASKS.md | paste -sd+ | bc"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no document of the pack keeps the fixed feed minimum of 20 or the admission of a source by a record)
+Seed:      none
+Notes:     Two of the replaced rules, searched by their words in the documents of the pack, the glossary and the tasks (decision records are history and are not searched).
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   ./eii test --seed 2026111448
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1998 passed, 0 failed, 0 skipped
+Seed:      2026111448
+Notes:     The whole test command on the build machine with a fresh seed, at the second fix commit.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','0c7211908da3baac688d69e63559f0b8ceaded90..496ae3d3235fce64783461a47d66318017efa263'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two fix commits of the review rounds have Conventional Commit subjects.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
