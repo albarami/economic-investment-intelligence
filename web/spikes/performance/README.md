@@ -102,8 +102,39 @@ static pause button, not a general replacement for Playwright actions. Small-pag
 browser tests plant absent, hidden, disabled, inert, covered, moving and zero-area
 controls, direct and inherited ARIA-disabled controls, an explicit ARIA-enabled
 override, interception after preparation, and an offscreen control that must be
-scrolled into view. Original scene assertions and full rendering loads remain.
-The suite keeps one worker.
+scrolled into view. Each named assertion stays. The suite keeps one worker.
+Tests whose assertions do not read the canvas size, the viewport, the device
+pixel ratio, or a qualification decided after the canvas check load the same
+page with the map style at 480 by 270 CSS pixels. The page source stays 1920 by
+1080. The full wall is kept for the trace-contract smoke test, the pixel-ratio
+cap, the nonblank canvas checks, the gate qualifications decided after the
+canvas size, the uninterrupted road trace, the paused-playback plant, the full
+street load of 250,000 links, the English pause scene, and the Arabic
+reduced-motion scene. The English pause scene is the trusted click on the live
+scene. The Arabic reduced-motion scene is opened through the page helper, so
+the foreign-request check and the readiness wait both run, and the render
+finishes at the full wall. That scene is what covers Arabic and reduced motion
+together at the full size: `roads mark and legend are visible ar reduced`.
+The English reduced-motion scene, the Arabic playing road scene, and the Arabic
+notice route stay on the small map.
+A node test reads every call that takes a canvas choice, after comments are
+stripped. FULL and SMALL are different values, and the small-map helper shrinks
+the style only for SMALL. The set of small-map call sites equals a closed list,
+as the set of full-wall call sites does. A test body that reads a size field or
+a qualification decided after the canvas check cannot use a canvas other than
+the full wall. Switching a listed scene, hiding a full call in a comment, or
+adding a size-reading test on the small map fails that test.
+The two remote-asset refusal tests close as soon as the refusal is seen. Their
+purpose is the refusal. The completion of those two planted scenes is no longer
+waited for. A foreign address seen before the page commits is refused by the
+helper's scan after readiness, and a node test reaches that scan.
+An unhidden small-map scene asserts that the hexagon sample and the particle
+sample are present, and an unhidden small-map road scene asserts that the road
+sample is present, so a blank sample on the small map can fail.
+The small-map road plants that expect reduced-counts rely on the count check
+being decided before the canvas check. A node test pins that order.
+A foreign request rejects the page helper as soon as the request is seen once
+the page URL is http. The rejection text is unchanged.
 The JSON reporter also writes `test-results/performance-timings.json` relative to this spike's
 Playwright configuration directory, allowing the repository test run's individual
 browser durations and overall Playwright duration to be inspected without a
