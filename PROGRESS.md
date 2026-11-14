@@ -18864,6 +18864,259 @@ Seed:      none
 Notes:     The two fix commits between the reviewed base and the work commit have Conventional Commit subjects.
 ```
 
+#### S1-T08: independent review, round 2 (the confirmation): APPROVED
+
+Reviewed commit `d02c57fcbcfec57255d868888c09afad5e80c364`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/39 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43559250007; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43559249969; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43559249967 ). The reviewer was Moonshot AI Kimi K3.1 Pro through Abacus. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+COMMIT: d02c57fcbcfec57255d868888c09afad5e80c364
+VERDICT: APPROVED
+SKILLS: strict-reviewer; code-review unavailable because its SKILL.md is not installed
+FINDINGS: none
+CHECKS
+1 PASS — No calculation or comparison code changed; the only new code guards pin records.
+2 PASS — No privacy thresholds, parameters, treatments or privacy-sensitive paths changed.
+3 PASS — No gateway, adapter, model or assistant behavior changed.
+4 PASS — No templates, Fact chips, screen numerals or UI code changed.
+5 PASS — Existing provenance fields and citations were preserved; new registry metadata names sources and retrieval dates.
+6 PASS — No forbidden or ignored paths were touched; the guard reads only repository records.
+REV-01 PASS — The new guard has focused coverage, and the recorded head suite passed 2,104 tests.
+REV-02 PASS — No scope creep or unrelated hardening was found in the task’s own changes.
+REV-03 PASS — The TOML, reference tables and unittest module follow existing repository conventions.
+REV-04 PASS — Test names, assertions and failure messages are clear; no unused implementation was added.
+REV-05 PASS — The work commit contains exactly the four permitted task files; the remaining supplied changes are the ledger and identified base update.
+REV-06 PASS — No environment installation, compilation, service action or prohibited-path access was introduced.
+REV-07 PASS — The evidence records RED with 10 failures, GREEN with 10 passing tests, and a planted violation for every guard rule.
+REV-08 PASS — All 15 recorded commands have real output and exit code 0; head checks also record exit 0.
+REV-09 PASS — The Conventional Commit check passed, and the added ledger commit has a conventional subject.
+REV-10 PASS — The ledger records commits, commands, exit codes, counts, seeds, environments and evidence locations.
+REV-11 PASS — All six required hosted checks are recorded green on d02c57f, including the previously failing tests job.
+EARLIER FINDINGS
+FINDING 1 — FIXED: the original hosted tests job had timed out in web-checks; its rerun passed, and all six required checks are green on the reviewed head.
+FINDING 2 — FIXED: all 65 pin rows now have exactly one ruling (18 confirmed, 33 confirmed by use, 14 not installed); 64 have written retreats and the remaining row gives its no-retreat reason, with a 10-test planted guard.
+ONE-LINE: Checked the complete supplied diff, pin and reference records, guard implementation and ledger evidence; independently reread files but did not rerun commands or fetch CI and registry pages.
+```
+
+#### S1-T08: merge record
+
+- The branch was updated with main when its turn to merge came (the owner's rule of 2026-11-12): merge commit `39c7a2beb1c1b468e551ed12a291d7ce82f4da75`, the head that was merged. Where both sides had appended at the same place the lead's scripts keep every line of both sides, main's first, and refuse any overlap. The lead's proof that the update changed nothing by itself (for every path: the branch's blob where main did not change it, main's blob where the branch did not, git's own three-way merge, or the scripted resolution):
+
+```text
+base update 39c7a2beb1c1b468e551ed12a291d7ce82f4da75: branch side d02c57fcbcfec57255d868888c09afad5e80c364, main side e45dbb34397a462b93506d85714700c88917b92d, merge base f0ee2f3c39a480501edb28bc85c33546e61ba5b9
+  branch only: 27
+  main only: 21
+  neither: 479
+  both, git's own merge: (3, ['AGENTS.md', 'CLAUDE.md', 'TASKS.md'])
+  both, resolved by the lead's script: (2, ['OPEN_ITEMS.md', 'PROGRESS.md'])
+  FAIL: (0, [])
+```
+
+- CI on the updated head: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43566601764; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43566601737; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43566601758 .
+
+- The lead's checks on the merged head `39c7a2beb1c1b468e551ed12a291d7ce82f4da75` before the merge (ruling L-29): "TREE-IS-WORK ok: 532 paths at 39c7a2beb1c1b468e551ed12a291d7ce82f4da75", exit code 0; `./eii test --seed 2026111440`: exit code 0, "total: 2104 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/39 was squash-merged on 2026-11-14 at that head; merge commit `31d0012e9f9d059bdf334b09615159f3ceadaa99` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43574349158; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43574349161; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43574349108 .
+
+### S1-T16 — The time limit of the web checks on the hosted runner: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/45 )
+
+- What it is: the limit of the suite `web-checks` in the whole test command is 3,000 s on GitHub's hosted runner and stays 1,800 s everywhere else, by the owner's decision of 2026-11-14 ([decision 0027](docs/decisions/0027-hosted-web-checks-time-limit.md)). One shared definition of a hosted runner (`scripts/ci_environment.py`), used by the test command and by the sandbox proof, which keeps its behaviour. The timeout line prints the limit in force. No other suite's limit, and no test, assertion, bound, suite list or workflow changes.
+- Why: the same passing web checks take from about 1,030 s to more than 1,800 s on hosted runners of different speed (the lead's reading of the hosted logs). Runs ended on the limit with every test green, twice on the main branch; the main run of the commit this task stands on passed with the suite finishing four seconds inside the limit.
+- Class: routine. Added by the owner's decision; TST-03 asks for a decision record before a tolerance is widened, and decision record 0027 is that record.
+- Builders: Moonshot AI Kimi K3.1 Pro through Abacus wrote the change and its tests and then ended on its time limit without a report (it had started the whole test command against its brief; the lead ended that left-over run). OpenAI GPT-6 Astra through Codex finished it: the comment at the limit, which stated a rule nobody had decided, now states the owner's decision; the two missing planted environment cases were added; the run list and a break pass of five breaks, each caught. The lead wrote the decision record, the index row and the task entry.
+- Planted cases: neither variable set, each one alone, both set with another value in one of them (the limit stays 1,800 s each time), and both at the hosted values (3,000 s); every other suite's limit is the same in both environments, asserted suite by suite; a hosted timeout prints 3,000 s.
+- The way back: the hosted value is a stopgap. It is removed when task S1-T15 has made the suite fast enough on slow hosted runners (open item OI-158, entered with this ledger).
+- Not in this pull request: any change of a test or of the workflow; the tests job's own limit of 90 minutes is unchanged.
+
+#### Evidence for the work commit `a8c6385fb32266a1d8ca457ceeb8227818d21372`
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   bash -c "set -o pipefail; uv run --locked python -m unittest discover -s scripts/tests -p 'test_runner_usage.py' 2>&1 | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 4 tests in 0.506s  OK" (the usage tests of the test command, the environment table among them)
+Seed:      none
+Notes:     The planted environment cases: the limit of the web checks is 1,800 s with neither variable, with one of the two and with another value in one of them, and 3,000 s with both at the hosted values; every other suite's limit is the same in every case.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   bash -c "set -o pipefail; uv run --locked python -m unittest discover -s scripts/tests -p 'test_runner_failures.py' 2>&1 | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 10 tests in 13.063s  OK" (the failure tests of the test command)
+Seed:      none
+Notes:     A hosted timeout launches the suite with 3,000 s and prints that limit in the unchanged failure line.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   bash -c "set -o pipefail; uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' 2>&1 >/dev/null | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 799 tests in 261.309s  OK" (the guard tests on their own (the test report alone))
+Seed:      none
+Notes:     Every guard test of the repository, the sandbox proof's tests among them, with the shared definition of a hosted runner.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   ./eii test --seed 2026111445
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    2217 passed, 0 failed, 0 skipped
+Seed:      2026111445
+Notes:     The whole test command on the build machine with a fresh seed (the local limit of 1,800 s applies here).
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint of the Python files.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "231 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 205 source files"
+Seed:      none
+Notes:     Strict types, the new shared module included.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 423 text files, 66 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with decision record 0027, its index row and the task entry.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical (unchanged by this task).
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   bash -c "git diff --name-only 8c4175dc48cee032125cd309754fbfebf35d724e HEAD -- .github web custodian core product | wc -l"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no workflow file, web test or package source is changed)
+Seed:      none
+Notes:     The task changes the test command's scripts, their tests and three record files only: no workflow, no browser test, no package.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','8c4175dc48cee032125cd309754fbfebf35d724e...a8c6385fb32266a1d8ca457ceeb8227818d21372'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:docs/decisions/0027-hosted-web-checks-time-limit.md A:scripts/ci_environment.py M:TASKS.md M:docs/README.md M:scripts/ci_sandbox.py M:scripts/run_tests.py M:scripts/tests/test_runner_failures.py M:scripts/tests/test_runner_usage.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "8 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The paths the work commit changes against the base.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','8c4175dc48cee032125cd309754fbfebf35d724e..a8c6385fb32266a1d8ca457ceeb8227818d21372'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
+```
+
+### S1-T16 — a correction after the ledger: the status line of S1-T08 (pull request https://github.com/albarami/economic-investment-intelligence/pull/45 )
+
+- The ledger commit `08ba45df68b39a022aae96876443a3c0f73e0fa8` set the status line of task S1-T08 in `TASKS.md` to done (its pull request 39 is merged). The lead's whole test on that head then failed in one guard test and passed everywhere else: `scripts/tests/test_pin_rulings.py`, `test_every_pin_has_a_ruling_and_retreat`, with the fault "@mapbox/mapbox-gl-rtl-text: not-installed ruling names a completed task". The work commit is not involved: the same test passed in the ledger's run at the work commit, where the status line still said in review.
+- Cause, read in the test: the guard that S1-T08 delivered requires the words "retreat ruling S1-T08: none exists: " in the note of every pin that has no retreat, and it refuses a pin that is not installed when its note names a completed task anywhere. The one pin that is not installed and has no retreat therefore fails as soon as S1-T08 itself is marked done. The guard contradicts itself; the record of the pin is right.
+- The correction belongs to the guard, not to the records. This task changes no test (the owner's note of 2026-11-14, decision record 0027), so the guard is not corrected here: the status line of S1-T08 is taken back to its text on main in this commit, and the correction of the guard, with the status line, goes to the review follow-up of slice S1 (task S1-T10) as open item OI-159. Until then `TASKS.md` shows S1-T08 as in review although its pull request is merged; this entry and OI-159 say so.
+- The failing run is kept as evidence. After the correction the guard test passes again on this tree, and the lead's whole test on the corrected head is recorded with the closing record of this pull request.
+
+#### Evidence for the correction (the ledger head `08ba45df68b39a022aae96876443a3c0f73e0fa8` and this commit)
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    08ba45df68b39a022aae96876443a3c0f73e0fa8
+Command:   ./eii test --seed 2026111447
+Exit code: 1
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    2216 passed, 1 failed, 0 skipped
+Seed:      2026111447
+Notes:     The whole test command on the ledger head. One failure, in the suite python-guards: scripts/tests/test_pin_rulings.py::PinRulings::test_every_pin_has_a_ruling_and_retreat ("not-installed ruling names a completed task"); the five other suites passed. A real failure with a known cause, not a random one: see the correction above.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    the commit that holds this correction
+Command:   uv run --locked python -m pytest scripts/tests/test_pin_rulings.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped (and 5 subtests passed)
+Seed:      none
+Notes:     The guard test on the corrected tree, before the commit: with the status line of S1-T08 back at its text on main, every test of the file passes.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

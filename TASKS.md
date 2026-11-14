@@ -256,6 +256,13 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S1-T08.
 - Requirements: PRV-05, PRV-59, PRV-120, SYN-12, PLN-25.
 - Delivery: hard; personas Privacy; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/40).
+### S1-T16 — The time limit of the web checks on the hosted runner
+- Goal: Stop hosted runs from failing on the time limit of the web checks with every test passing, until task S1-T15 has made the suite fast enough on slow runners.
+- Acceptance criteria: [ ] the limit of the suite `web-checks` in the whole test command is 3,000 s on a GitHub-hosted runner and 1,800 s everywhere else, with one shared definition of a hosted runner; [ ] no other suite's limit changes, and no test, assertion, bound, suite list or workflow changes; [ ] the timeout line prints the limit in force; [ ] planted: neither variable set, one of the two set, both set with another value in one of them (1,800 s each time), and both at the hosted values (3,000 s).
+- Scope: `scripts/run_tests.py`, `scripts/ci_environment.py`, `scripts/ci_sandbox.py` (the shared definition only), their tests, and decision record 0027.
+- Depends: S0-T05.
+- Requirements: TST-03, TST-04.
+- Delivery: routine; personas Platform; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/45). Added by the owner's decision of 2026-11-14 ([decision 0027](docs/decisions/0027-hosted-web-checks-time-limit.md)): the same passing web checks take from about 1,030 s to more than 1,800 s on hosted runners of different speed. The hosted value is a stopgap: it is removed, and the limit is 1,800 s everywhere again, when S1-T15 has made the suite fast enough on slow hosted runners (OI-158).
 ### S1-T10 — Review follow-up for slice S1
 - Goal: Close every proposed open item that the reviews of slice S1 entered in `OPEN_ITEMS.md`, before the slice S1 gate.
 - Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.

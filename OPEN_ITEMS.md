@@ -1318,6 +1318,26 @@
 - OPTIONS: **Recommendation:** move to [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) with the slice's follow-up task.
 - NEEDED BY: the follow-up task of slice S1 (S1-T10), which places it.
 
+## OI-158 — The hosted time limit of the web checks goes back to 1,800 seconds
+
+- ID: OI-158
+- TYPE: OPEN
+- NEEDED: Remove the hosted value of 3,000 s from `scripts/run_tests.py`, so that the limit of the suite `web-checks` is 1,800 s everywhere again, once task S1-T15 has made the suite fast enough on slow hosted runners.
+- WHY: [Decision 0027](docs/decisions/0027-hosted-web-checks-time-limit.md) allows the hosted value only as a stopgap. A wider limit finds a hanging run later.
+- DONE SO FAR: Task S1-T16 raises the limit on GitHub's hosted runner only, by the owner's decision of 2026-11-14. Task S1-T15 is in review: its first part gave no gain on hosted runners, and its second part is being built.
+- OPTIONS: **Default:** the pull request that completes S1-T15, or the one after it, removes the hosted value when three hosted runs in a row have finished the suite inside 1,800 s. Otherwise the owner decides to keep a hosted value.
+- NEEDED BY: the slice S1 gate records the state of this item; the removal follows S1-T15.
+
+## OI-159 — The pin-ruling guard refuses the record once S1-T08 is marked done
+
+- ID: OI-159
+- TYPE: OPEN
+- NEEDED: Correct the guard `scripts/tests/test_pin_rulings.py` so that a pin that is not installed is refused only when its not-installed ruling names a completed task, not when the retreat ruling's own attribution ("retreat ruling S1-T08") does; add the planted cases of both; then set the status line of S1-T08 in `TASKS.md` to done.
+- WHY: The guard requires the words "retreat ruling S1-T08: none exists: " in the note of a pin without a retreat and refuses a not-installed pin whose note names a completed task. With S1-T08 marked done, the pin `@mapbox/mapbox-gl-rtl-text` fails both ways. The lead's whole test on the ledger head of pull request 45 found it (seed 2026111447: 2216 passed, 1 failed).
+- DONE SO FAR: The status line of S1-T08 is back at "in review" although pull request 39 is merged, so that the guard passes; the cause is recorded in `PROGRESS.md` under task S1-T16. Nothing of the guard is changed (task S1-T16 changes no test, decision record 0027).
+- OPTIONS: **Default:** the review follow-up of slice S1 (task S1-T10) corrects the guard test-first and sets the status line.
+- NEEDED BY: the slice S1 gate, which reads the status lines of the slice's tasks.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
