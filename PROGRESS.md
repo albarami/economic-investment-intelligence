@@ -17858,6 +17858,200 @@ Seed:      none
 Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
 ```
 
+### S1-T08 — Typed-decision requalification and pin ruling: review round 1 and the fix (pull request https://github.com/albarami/economic-investment-intelligence/pull/39 )
+
+- Review round 1 (2026-11-14): Moonshot Kimi K3.1 Pro through the Abacus command-line tool, on the head d9d69d8: REJECTED with two findings. Its verdict repeats no COMMIT line and numbers some checks outside the checklist; it is kept as returned under a lead's cover note that names the commit of the brief.
+- Finding 1: the hosted `tests` job was red on the reviewed head (the checklist's REV-11 asks for CI green on the same commit). The job had ended on the time limit of the suite `web-checks` (1,800 s), a cause shared by every pull request of that night and given its own task, S1-T15. No change of the patch answers it. The one rerun of that job on d9d69d8 passed (29 min 32 s). The confirmation is asked for on a head whose six required hosted checks are green.
+- Finding 2 (valid; the cause was the lead's own instruction to the builder to leave every unmeasured row "not yet confirmed"): the pin table called its ruling partial; 48 of the 65 rows carried no ruling and most no written retreat, where AGENTS rule 42 and FE-03 ask for exact pins and written retreat pins confirmed at slice S1, and only the fields that the native trace decides may stay open.
+- The fix (work commit e24b0dd; OpenAI GPT-6 Astra through Codex in two passes, the lead's rulings on what the builder left open): every row of `pins.toml` holds one of three rulings in its note: confirmed by a merged spike measurement (18 rows), confirmed by use through a recorded command of a merged task (33), or not installed, with the task or the condition under which it is installed and confirmed (14). 64 rows have a written retreat, each read from its registry on 2026-11-14 with its stated constraints, none tried; one row (the right-to-left plugin of the MapLibre retreat) has none and says why. No pin, kind, state, label, cite or first use changed; nothing was installed; no manifest or lock changed.
+- The lead's rulings on single rows: `react` and its types retreat as pairs with `react-dom` and its types; `python` retreats to 3.13.x (not tried; it needs `requires-python` lowered; five binary pins publish a cp313 wheel and two publish abi3 wheels for CPython 3.12 and later); `gitleaks` to 8.30.0; `postgis` goes with PostgreSQL; `bubblewrap` has none, because sandbox enforcement has no fallback (AGENTS rule 12); `apache-arrow` is not a direct dependency (the lock resolves it under the loader packages; no code imports it).
+- The lead's checks of the builder's first pass: every written retreat exists on its public registry (the lead's own reads; command 3 below); four read-only verifiers (Claude Opus 5.5) then tried to refute every ruling against the records: of 65 row rulings 54 stood, 9 were refuted (a ruling that named a task already merged as the one that installs the component; a tool in daily use called not installed) and 2 were unsure; of 24 reference-note fields 14 stood. The second pass corrected each from the record.
+- The reference notes: each field of behaviour that no slice S1 spike uses names the task that first uses and confirms it. The fields that the native frame rate decides (the choice between pin and retreat of MapLibre GL JS and deck.gl, the load trial, the pixel-ratio cap) wait for task S1-T12. Three PostgreSQL fields (the exact pin with the PostGIS line, the image digest, the volume path) stay "not yet confirmed": their components are in use since S0-T08 and their rows of `pins.toml` hold their rulings, but no slice S1 task log states those facts as a measurement; they close with the record of the slice S1 gate, which takes the lead's reading of the running service.
+- The guard (`scripts/tests/test_pin_rulings.py`, 10 tests): a ruling needs text after its words; a note holds one ruling; the first two forms cite a heading that PROGRESS.md holds; the third form may not name a task whose status in TASKS.md is done or merged; a row without a retreat states its reason. Each rule has a planted case that must fail, and each plant passed the earlier guard before the rule was written (the failing run).
+- Not done here, and where it goes: the native-trace fields (task S1-T12 and the addendum of the slice S1 gate); the three PostgreSQL fields (the record of the slice S1 gate); the root README's list of commands and status paragraph (task S1-T10).
+
+#### Evidence for the work commit `e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5`
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv run --locked python -m unittest scripts.tests.test_pin_rulings -v
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The guard of the pin table: the whole table passes, and each planted fault fails (a bare ruling, an empty reason, two rulings, a missing or unknown ledger heading, a task that is done).
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   bash -c "set -o pipefail; uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' 2>&1 >/dev/null | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 683 tests in 216.575s  OK" (the report of the script tests alone (the tests' own output is not shown))
+Seed:      none
+Notes:     All script tests with the new guard among them.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   python3 <lead>/verify_retreats.py <workspace> <pins.toml of the reviewed head>
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; first output line "retreats checked on their registry: 46; rulings: 18 confirmed, 33 confirmed by use, 14 not installed, 0 without; rows 65; still none recorded: ['@mapbox/mapbox-gl-rtl-text']; PROBLEMS: 0"
+Seed:      none
+Notes:     The lead's own check, with reads of the two public registries and of the Node.js release list: each of the 46 retreats that are versions exists there (45 on the two package registries, one in the Node.js release list); every cited ledger heading exists; no pin, kind, state, label, cite or first use differs from the reviewed head; the three forms count 18, 33 and 14.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 65 components: OK"
+Seed:      none
+Notes:     The version check on the table: 65 components, every retreat in an allowed form, no pin moved.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes after the corrected fields: every anchor they cite exists.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "225 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 200 source files"
+Seed:      none
+Notes:     Types, the new test file included.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 372 text files, 62 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 61 packages in 0.98ms" (exit code decides)
+Seed:      none
+Notes:     The lock is unchanged and consistent.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   ./eii test --seed 2026111434
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1985 passed, 0 failed, 0 skipped
+Seed:      2026111434
+Notes:     The whole test command on the build machine with a fresh seed, at the fix commit.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','d9d69d8cc9d7da97a0e2dce78b03b1e2573226fc...e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:scripts/tests/test_pin_rulings.py M:docs/REFERENCE_NOTES.md M:pins.toml M:web/REFERENCE_NOTES.md'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "4 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The fix changes the pin table, the two reference-notes files and one new test, and nothing else.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','d9d69d8cc9d7da97a0e2dce78b03b1e2573226fc..e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one fix commit between the reviewed head and the work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
