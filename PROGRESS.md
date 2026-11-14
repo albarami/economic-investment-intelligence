@@ -22322,6 +22322,96 @@ Notes:     The two agent files are byte-identical after rule 44 lost build-publi
 - Commands on the tree of this commit, run by the lead on the build machine (Linux under WSL2, the pinned Python through uv, the environment of `uv sync --managed-python --all-packages --locked --group engine`): `uv lock --check` exit 0; `uv run --locked mypy` exit 0, "no issues found in 221 source files"; `uv run --locked ruff check .` exit 0; `uv run --locked ruff format --check .` exit 0, 253 files already formatted; `uv run --locked python scripts/check_versions.py` exit 0, 67 components checked; `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` exit 0, 814 tests ran; `uv run --locked python -m pytest custodian/tests/test_publicdata_registry.py -q -p no:cacheprovider` exit 0, 14 passed. The six hosted checks and the whole test command on the result of merging with main run on the pushed head and are recorded in the pull request.
 - Review: the independent review's APPROVED on the reviewed commit `ba11624657b9bb0a3bf8b3ff66b5bab905dab533` stands for everything else, since the head has moved otherwise only by the two base updates, each with its proof, and by records. This commit gets its own confirmation by the reviewer's maker, limited to it, before the merge; its verdict is recorded in the pull request.
 
+### D0030 — Decision 0030: the frame's grid by index ownership and two nullable keys: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/49 )
+
+- What it is: decision record 0030 and its amendments to the pack (documents only; no code). It is the lead's decision under the owner's delegation, for the owner's confirmation, and its status is Proposed. It records, from ruling L-255 on the one design review of the frame's sixth pass (task S2-T02) and the lead's measurements on the real public boundaries: which H3 cells are stored where the two resolutions meet (item 1); that a point's base cell is found by index, as the stored cell that is the point's resolution-9 cell or that cell's resolution-8 parent, and that none is substituted (item 2); that a resolution-8 cell is drawn as the union of its seven resolution-9 children (item 3); the four proofs of the build (item 4); that a cell's resolution is read from the cell (item 5); a reviewed district-free zone and the two nullable keys `grid_cell.district_key` and `gazetteer.cell`, each with its reason key (items 6 to 9); and a new requirement, PRV-135, directly under PRV-17: a pin without a base cell gets no protected or Simulated figure, only `NO_DATA` with the reason key `point_without_base_cell`, never `SUPPRESSED`, with no snap, no snap report and no privacy receipt (item 10). Once confirmed, it supersedes the resolution clause of decision 0006 item 1 and amends decision 0016 item 6 in part.
+- Why: the first run of the frame on the real boundaries showed that the native hexagons of stored resolution-8 cells overlap stored resolution-9 cells in 442 pairs, so that a lookup of a point's own cell at both resolutions found two cells or none where the index rule owns one (97 and 194 of 318,893 random points); that one zone of the source (zone 99) has no district; and that five district points of the gazetteer have no cell. The pack's words ("8 elsewhere", a district key on every cell, a cell on every gazetteer row, a base cell for every pin) did not cover these cases.
+- Class: Deep (it changes the frame's grid rule and privacy texts of document 06: the new row PRV-135 and amended PRV-20, PRV-111 (g), PRV-122 and PRV-124, each stricter). Lead: Anthropic (Claude Fable 5.2): the rulings L-255, L-280, L-294, L-300, L-305 and L-306, the corrected text of the record, the twelve added passages of ruling L-306, the combination of the editors' work and this ledger.
+- First draft: a workflow of four Claude Opus agents (one drafter, two adversarial readers, one for privacy and disclosure and one for figures, anchors and pack coverage, and one revision; 780,326 tokens, 114 tool calls, about 30 minutes); its revised draft (draft 2) held 63 amendments, the readers' 40 findings applied, 17 open points. The lead ruled the open points (ruling L-280); draft 3 by a Claude Opus helper (153,957 tokens, 18 tool calls).
+- The one design review: first given to Google Gemini 4 Carbon through Abacus, which ended twice without a verdict (paused at its spending check-in, then returned a plan for writing the record; 5,755.58 credits over both parts); moved to OpenAI GPT-6 Astra through Codex (411 s): REJECTED with ten findings, all accepted as written (ruling L-294). Its answers: no amendment lowers a privacy threshold, tier, attack size or tolerance or opens a protected or Simulated read, and both owner points are fairly stated. The findings: geographic validity is checked against the mapped land area, not against stored cell shapes (documents 03, 08 and 10); the output contracts of documents 03, 04 and 08 give no area record, snap report or privacy receipt for a result under PRV-135; AI-52 and the `NO_DATA` row take the DAT-90 reason key; card C12 excludes, lists and counts supply points without a base cell; six quotes and anchors that main's decision 0026 had changed. Draft 4 by a Claude Opus helper (181,169 tokens, 26 tool calls): 84 amendments, every quoted passage checked by script against main at 89f3ca7, all found; its three questions answered in ruling L-300.
+- The editors: a Claude Opus helper wrote the briefs of five editor groups and one common file from draft 4 on the tree of pull request 36's head (167,099 tokens, 19 tool calls), with every present wording counted in that tree and none unappliable (ruling L-305). Five editors of another maker (xAI Grok 4.7 through the Cursor command-line tool), each on its own documents in its own worktree: E1 document 08, 28 of 28 rows (280 s); E2 documents 03 and 05, 20 of 20 (810 s); E3 documents 06, 04 and 12, 22 of 22 (915 s); E4 documents 07, 10, 09 and 11, 21 of 21 (445 s); E5 the documentation index, document 02 and the glossary, 23 of 23 (565 s). None not found, none ambiguous. Their work was joined by patch (disjoint files). The lead's script placed the record's file, with the corrections of ruling L-305 (the evidence files become project records held by the owner; amendment numbers become stable anchors) and its list of amended passages generated from the rows actually applied, and applied the second criterion of S2-T02 in TASKS.md (the record's item 13). One ruling on the join: in PRV-111 item (g) the addition's own full stop before "; and (h)" is dropped.
+- The lead's sweep: a Claude workflow of 31 Claude Opus agents (2,362,182 tokens, 261 tool calls). Five verifiers rebuilt each group's files from the base and the draft and compared them: all 114 rows were applied exactly, with no wrong word and no stray change. Three lenses read the whole pack (the old rule left standing anywhere; agreement of PRV-135, the reason keys and the cited record items across documents; the record's own file). One refuter per finding: 23 findings, 13 stood, all in the amendment list or the record's own text, none in the editing. Ruled in ruling L-306: (1) the exception of PRV-135 is added to twelve normative passages that draft 4 had left out (BRF-04, BRF-58, BRF-73 and the bullet **Area** of document 01; ARC-89 and ARC-90; MTH-56; AI-103; DES-99; REV-22; the glossary entries **Area** and **Drawn area (geofence)**), and documents 01 and 15 get the status clause and their rows of the documents table; (2) summary sentences (the In brief lines, the README's bullet, task goals) give the general rule and are not amended, while the requirement rows carry the exception; (3) six corrections of applied texts, each a fault of the draft (among them DES-60 names the five whole municipalities of the frame's review file again, and PRV-135 names "the candidate depot of card C29" as the record's item 10 does); (4) corrections of the record's own text; (5) the appended UPDATE of OI-151. The lead's script applied them (23 replacements, each asserted once at its anchor) and placed the record again. In all, 132 rows: 114 by the five editors, the record's file and 17 rows by the lead.
+- The check of the lead's own additions: a Claude workflow of 18 Claude Opus agents (1,417,250 tokens, 148 tool calls). All 23 replacements of ruling L-306 and the five changes of the record's text stand once each at their anchors, links resolve and table rows keep their columns. 34 findings: 7 on the additions (3 stood, 4 refuted) and 27 from a second search for the old rule (9 judged: 7 stood, 2 refuted; 18 not judged, the workflow's cap). The refuters ruled one and the same wording both ways, so the lead ruled the class, not the instances (ruling L-308): (1) four additions that left a route open are completed (ARC-89 and ARC-135: the provider adapter is never called for a point with no base cell; BRF-73 and MTH-56: the drive at a chosen hour makes no area); (2) one reading sentence, in the PRV-135 row and in the record's item 10, closes the class of restatements: the rule restricts every statement of the pack that gives an area, a catchment or a point a protected or Simulated figure, a snap, a unit list or an outline by hour of day, and a statement that does not repeat it is read with it; it is stricter, not looser; (3) three closed tool contracts of document 08 are amended, because a builder implements a closed list word for word (`travel_times`, `compare_areas`, `own_records`); (4) no further sentence-by-sentence amendment and no third sweep. The lead's second script applied them (eight replacements, each asserted once at its anchor). In all, 139 rows: 114 by the five editors, the record's file and 24 rows by the lead.
+- The change: 16 tracked files (192 insertions, 130 deletions) and the new record file; the record's list "Amended passages" names 123 passages under 16 files. The edits were made on the tree of pull request 36's head and brought to main after its merge as one patch, which applied without a conflict; the two files that main had changed since (TASKS.md and document 12) keep main's changes. AGENTS.md, CLAUDE.md and decisions 0006 and 0016 are not edited. The words of PRV-10, PRV-17 and PRV-18 are unchanged; PRV-135 only restricts PRV-17, and PRV-20 gains a closing sentence. No privacy threshold, tier, attack size or tolerance changes (the record's item 14).
+- The repository's checks cannot see whether a passage is true to the ruling: that is the reviewer's judgement, with the record and the lead's rulings in the pack. The documentation check also ran with the owner's private pattern list on the joined tree.
+- Open items: OI-151 gets an appended UPDATE with this ledger, because its line WHY still gives the old resolution rule. The two open items that the record names (placing a location without a base cell; a null-district fixture for the generator of SYN-32 and its fidelity check F15) are entered with the ledger of the frame, task S2-T02, as the record's own words say (ruling L-308 (6)), together with the measured limits of the record's item 12.
+- For the owner: the status stays Proposed until the owner confirms the record; every merged record so far reads Accepted, so the pack carries a proposed record until then, and the confirmation is one documents change. Two points are put to him with defaults ("Open questions and assumptions" of the record): the Public layers of the exact outline of a pin without a base cell (default: kept) and a Public supply point without a base cell (default: left out, listed and counted, with a limitation line on the access layer).
+- Not in this pull request: any code. The frame, task S2-T02 (approved on a local commit), follows in its own pull request and builds items 1 to 8. Decision record 0028 renumbers its own two privacy requirements at its turn (they take the next two free numbers after PRV-135), because PRV-135 is now taken (ruling L-305 (2)).
+
+#### Evidence for the work commit `bdd8de0eb7aa193993102a9601029834c6803154`
+
+```text
+### D0030 — Decision 0030: the frame's grid by index ownership and two nullable keys
+Commit:    bdd8de0eb7aa193993102a9601029834c6803154
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 451 text files, 68 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the record and every amended document: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns. It also ran with the owner's private pattern list.
+```
+
+```text
+### D0030 — Decision 0030: the frame's grid by index ownership and two nullable keys
+Commit:    bdd8de0eb7aa193993102a9601029834c6803154
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### D0030 — Decision 0030: the frame's grid by index ownership and two nullable keys
+Commit:    bdd8de0eb7aa193993102a9601029834c6803154
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical; the record does not change them.
+```
+
+```text
+### D0030 — Decision 0030: the frame's grid by index ownership and two nullable keys
+Commit:    bdd8de0eb7aa193993102a9601029834c6803154
+Command:   bash -c "git diff --name-only 907730582b17da16035146ab6e346a6c61fc5ce1 HEAD -- AGENTS.md CLAUDE.md docs/decisions/0006-fixed-grid-and-pin-based-areas.md docs/decisions/0016-version-1-covers-the-whole-initiative.md | wc -l"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (the agent rules and decisions 0006 and 0016 are unchanged)
+Seed:      none
+Notes:     The record states that the agent rules are not changed and that decisions 0006 and 0016 are not edited (rule 46); this row proves it on the committed tree.
+```
+
+```text
+### D0030 — Decision 0030: the frame's grid by index ownership and two nullable keys
+Commit:    bdd8de0eb7aa193993102a9601029834c6803154
+Command:   ./eii test --seed 2026111464
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    2299 passed, 0 failed, 0 skipped
+Seed:      2026111464
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### D0030 — Decision 0030: the frame's grid by index ownership and two nullable keys
+Commit:    bdd8de0eb7aa193993102a9601029834c6803154
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','907730582b17da16035146ab6e346a6c61fc5ce1..bdd8de0eb7aa193993102a9601029834c6803154'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

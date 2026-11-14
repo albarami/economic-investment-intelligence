@@ -1322,6 +1322,7 @@
 - DONE SO FAR: The advisor decided under the owner's delegation on 2026-11-14 that the five-municipality reading stays for version 1 and that this item stays open as a record point. The review file is built by task S2-T02; until that task merges, the pack refers to "the five municipalities of the frame's review file" and lists no names.
 - OPTIONS: **Default until decided:** five whole municipalities. Otherwise the owner names another set of whole municipalities or a drawn boundary, and the frame is rebuilt.
 - NEEDED BY: the slice S2 gate (the frame), and before any screen shows the name (slice S3).
+- UPDATE: 2026-11-15, by [decision 0030](docs/decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) (proposed, for the owner's confirmation): the line WHY above gives the earlier resolution rule. Under items 1 and 5 of decision 0030, a resolution-8 parent is split when the centre of at least one of its resolution-9 children lies in a Greater Doha municipality, and a cell's resolution is read from the cell, never from `in_greater_doha` or its municipality: the frame holds 598 resolution-9 cells outside Greater Doha and no resolution-8 cell inside it. The Greater Doha set still decides which parents are split, so a change of the set needs a new build of the frame and, after a freeze, a new world seed (the record's Consequences). The assumption itself is unchanged (item 14).
 
 ## OI-157 — The caveat key `national_average` on card C33 after the survey benchmark left it
 
