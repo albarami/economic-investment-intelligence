@@ -1260,6 +1260,97 @@ module = "web/spikes/performance/main.ts"
 mutation = "{\"location\": {\"end\": {\"column\": 41, \"line\": 558}, \"start\": {\"column\": 39, \"line\": 558}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"Stryker was here!\\\"\"}"
 reason = "Coverage gap: the empty-summary test checks diagnostic null and trace zeros but not the rendered result text for the null share."
 
+# S1-T09 rules_config: equivalent mutants and refusals no parsed file can reach.
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -24,7 +24,7 @@\n     export_set, base_a, base_b, window = _values(entries)\n     return CheckedRules(\n         entries=entries,\n-        rules_version_id=entries[0].rules_version_id,\n+        rules_version_id=entries[1].rules_version_id,\n         export_parameter_set=export_set,\n         movement_base_a=base_a,\n         movement_base_b=base_b,"
+reason = "The identifier check has already required every entry to carry one identifier, and the required rules leave at least two entries, so the second entry's identifier is the same text as the first."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -11,9 +11,7 @@\n     Raises:\n         RulesRefusal: A field is missing, extra, or different.\n     \"\"\"\n-    missing = [\n-        field for field in RECORD_FIELDS if field in computed and field not in committed\n-    ]\n+    missing = None\n     if not missing:\n         missing = sorted(field for field in computed if field not in committed)\n     if missing:"
+reason = "Replacing the first missing-field list with nothing falls through to the same selection: record fields in record order when the computation has one the committed record lacks, otherwise the sorted name of a computed field."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -17,7 +17,7 @@\n     if not missing:\n         missing = sorted(field for field in computed if field not in committed)\n     if missing:\n-        preferred = [field for field in RECORD_FIELDS if field in missing]\n+        preferred = None\n         name = preferred[0] if preferred else missing[0]\n         raise RulesRefusal(f\"missing field {name}\")\n     extra = sorted(field for field in committed if field not in computed)"
+reason = "The missing-field list is already in record-field order when it contains a record field, and it contains none otherwise, so its first item is the name the preferred list would have chosen."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -18,7 +18,7 @@\n         missing = sorted(field for field in computed if field not in committed)\n     if missing:\n         preferred = [field for field in RECORD_FIELDS if field in missing]\n-        name = preferred[0] if preferred else missing[0]\n+        name = preferred[0] if (preferred) and False else missing[0]\n         raise RulesRefusal(f\"missing field {name}\")\n     extra = sorted(field for field in committed if field not in computed)\n     if extra:"
+reason = "Forcing the name to the first item of the missing-field list chooses the same field, because that list is already in record-field order when it contains a record field and contains none otherwise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -1,6 +1,6 @@\n def _load_document(path: Path) -> dict[str, object]:\n     try:\n-        text = path.read_text(encoding=\"utf-8\")\n+        text = path.read_text(encoding=\"UTF-8\")\n     except UnicodeDecodeError as exc:\n         raise RulesRefusal(\"file: not UTF-8 text\") from exc\n     except OSError as exc:"
+reason = "The names utf-8 and UTF-8 select the same codec, so every byte string is accepted or refused as before."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -10,7 +10,7 @@\n     except tomllib.TOMLDecodeError as exc:\n         raise RulesRefusal(\"file: invalid TOML\") from exc\n     if not isinstance(loaded, dict):\n-        raise RulesRefusal(\"file field rules_version: not a list of entries\")\n+        raise RulesRefusal(None)\n     document: dict[str, object] = {}\n     for key, value in loaded.items():\n         if not isinstance(key, str):"
+reason = "A successful tomllib parse is a dict, so this refusal never runs and changing its message cannot change a result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -10,7 +10,7 @@\n     except tomllib.TOMLDecodeError as exc:\n         raise RulesRefusal(\"file: invalid TOML\") from exc\n     if not isinstance(loaded, dict):\n-        raise RulesRefusal(\"file field rules_version: not a list of entries\")\n+        raise RulesRefusal(\"XXfile field rules_version: not a list of entriesXX\")\n     document: dict[str, object] = {}\n     for key, value in loaded.items():\n         if not isinstance(key, str):"
+reason = "A successful tomllib parse is a dict, so this refusal never runs and changing its message cannot change a result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -10,7 +10,7 @@\n     except tomllib.TOMLDecodeError as exc:\n         raise RulesRefusal(\"file: invalid TOML\") from exc\n     if not isinstance(loaded, dict):\n-        raise RulesRefusal(\"file field rules_version: not a list of entries\")\n+        raise RulesRefusal(\"FILE FIELD RULES_VERSION: NOT A LIST OF ENTRIES\")\n     document: dict[str, object] = {}\n     for key, value in loaded.items():\n         if not isinstance(key, str):"
+reason = "A successful tomllib parse is a dict, so this refusal never runs and changing its message cannot change a result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -14,6 +14,6 @@\n     document: dict[str, object] = {}\n     for key, value in loaded.items():\n         if not isinstance(key, str):\n-            raise RulesRefusal(\"file: field name is not text\")\n+            raise RulesRefusal(None)\n         document[key] = value\n     return document"
+reason = "A successful tomllib parse uses string keys only, so this refusal never runs and changing its message cannot change a result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -14,6 +14,6 @@\n     document: dict[str, object] = {}\n     for key, value in loaded.items():\n         if not isinstance(key, str):\n-            raise RulesRefusal(\"file: field name is not text\")\n+            raise RulesRefusal(\"XXfile: field name is not textXX\")\n         document[key] = value\n     return document"
+reason = "A successful tomllib parse uses string keys only, so this refusal never runs and changing its message cannot change a result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -14,6 +14,6 @@\n     document: dict[str, object] = {}\n     for key, value in loaded.items():\n         if not isinstance(key, str):\n-            raise RulesRefusal(\"file: field name is not text\")\n+            raise RulesRefusal(\"FILE: FIELD NAME IS NOT TEXT\")\n         document[key] = value\n     return document"
+reason = "A successful tomllib parse uses string keys only, so this refusal never runs and changing its message cannot change a result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -11,7 +11,7 @@\n         table: dict[str, object] = {}\n         for key, value in item.items():\n             if not isinstance(key, str):\n-                raise RulesRefusal(f\"file: entry {index} field name is not text\")\n+                raise RulesRefusal(None)\n             table[key] = value\n         entries.append(table)\n     return entries"
+reason = "A successful tomllib parse uses string keys only, so a table entry never has a non-text field name and this refusal never runs."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -1,6 +1,6 @@\n def _canonical_whole(text: str) -> int | None:\n     if not text.isascii() or not text.isdigit():\n         return None\n-    if len(text) > 1 and text.startswith(\"0\"):\n+    if len(text) >= 1 and text.startswith(\"0\"):\n         return None\n     return int(text)"
+reason = "The text 0 is the only value the two bounds treat differently. Callers refuse both a missing parse and the number 0 with the same message: a movement base of 0 is not positive, and a window of 0 is outside 1 to 23."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -17,6 +17,6 @@\n         for entry in selected\n     ]\n     encoded = json.dumps(\n-        payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=True\n+        payload, ensure_ascii=None, separators=(\",\", \":\"), sort_keys=True\n     ).encode(\"utf-8\")\n     return hashlib.sha256(encoded).hexdigest()"
+reason = "json.dumps escapes non-ASCII only when ensure_ascii is true. None is falsy, so it leaves the same UTF-8 bytes as false."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -17,6 +17,6 @@\n         for entry in selected\n     ]\n     encoded = json.dumps(\n-        payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=True\n+        payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=None\n     ).encode(\"utf-8\")\n     return hashlib.sha256(encoded).hexdigest()"
+reason = "The digest rows are already ordered and each object's keys are already written in sorted order, and None is falsy, so leaving the keys unsorted hashes the same bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -17,6 +17,5 @@\n         for entry in selected\n     ]\n     encoded = json.dumps(\n-        payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=True\n-    ).encode(\"utf-8\")\n+        payload, ensure_ascii=False, separators=(\",\", \":\"), ).encode(\"utf-8\")\n     return hashlib.sha256(encoded).hexdigest()"
+reason = "The digest rows are already ordered and each object's keys are already written in sorted order, so the default, which does not sort keys, hashes the same bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -17,6 +17,6 @@\n         for entry in selected\n     ]\n     encoded = json.dumps(\n-        payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=True\n+        payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=False\n     ).encode(\"utf-8\")\n     return hashlib.sha256(encoded).hexdigest()"
+reason = "The digest rows are already ordered and each object's keys are already written in sorted order, so sorting keys or not hashes the same bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -18,5 +18,5 @@\n     ]\n     encoded = json.dumps(\n         payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=True\n-    ).encode(\"utf-8\")\n+    ).encode(\"UTF-8\")\n     return hashlib.sha256(encoded).hexdigest()"
+reason = "The digest rows are already ordered and each object's keys are already written in sorted order, so the default, which does not sort keys, hashes the same bytes."
+
 [[survivors]]
 module = "evals/typed_decisions/requalify.py"
 mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -8,7 +8,7 @@\n         raw is None\n         or not raw.isascii()\n         or not raw.isdecimal()\n-        or len(raw.lstrip(\"0\")) > 7\n+        or len(raw.lstrip(\"0\")) > 8\n     ):\n         raise Refusal(\"invalid token cap\")\n     cap = int(raw.lstrip(\"0\") or \"0\")"
