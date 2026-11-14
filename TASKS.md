@@ -255,7 +255,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: rules configuration and the slice S1 gate check.
 - Depends: S1-T08.
 - Requirements: PRV-05, PRV-59, PRV-120, SYN-12, PLN-25.
-- Delivery: hard; personas Privacy; status queued.
+- Delivery: hard; personas Privacy; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/40).
 ### S1-T10 — Review follow-up for slice S1
 - Goal: Close every proposed open item that the reviews of slice S1 entered in `OPEN_ITEMS.md`, before the slice S1 gate.
 - Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
