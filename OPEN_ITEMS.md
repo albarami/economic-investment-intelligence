@@ -1381,6 +1381,36 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - NEEDED: both judges count a scheme outside `http`, `https`, `data` and `blob` as foreign, with one planted case each; or one line saying why not.
 - CLOSED BY: S1-T10
 
+### PO-S1-09 — Files of the listed set that no pattern reads
+
+- ID: PO-S1-09
+- TYPE: OPEN
+- RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
+- CONCERNS: TST-140; OI-93
+- EVIDENCE: 114 of the 477 files git lists at commit a9db6c8 are never read by any pattern, built-in or private, because their suffix is not on the text list of `scripts/check_docs.py` (75 `.mjs`, 4 `.mts`, `.pyi`, `.env.example`, `uv.lock`, `.nvmrc`, `.python-version`, `.prettierignore`, and binary files); OI-93 does not name `.mjs`. Check 8 of TST-263 reads them only for a listed name.
+- NEEDED: the text list covers every UTF-8 file git lists, or one line saying why not.
+- CLOSED BY: a follow-up task of slice S1
+
+### PO-S1-10 — An unreadable private patterns file is ignored without a message
+
+- ID: PO-S1-10
+- TYPE: OPEN
+- RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
+- CONCERNS: TST-140; REV-25; OI-93
+- EVIDENCE: when `EII_FORBIDDEN_PATTERNS_FILE` is set but names no readable file, `scripts/check_docs.py` ignores it without a message, which silently turns off every private name, including the refusal that TST-263 relies on outside its places.
+- NEEDED: a set but unreadable file fails the check with one line that does not echo the path, with a planted case; or one line saying why not.
+- CLOSED BY: a follow-up task of slice S1
+
+### PO-S1-11 — Scans of the built bundle and the exports need the place rule
+
+- ID: PO-S1-11
+- TYPE: OPEN
+- RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
+- CONCERNS: TST-142; TST-263
+- EVIDENCE: the built web bundle and the exports of TST-142 and decision 0012 will carry the map's credit, so any scan of them with the private list refuses the name unless it applies the same place rule.
+- NEEDED: the task that scans the bundle or the exports states how the credit is judged there, or one line saying why not.
+- CLOSED BY: the task that adds the imagery source
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).

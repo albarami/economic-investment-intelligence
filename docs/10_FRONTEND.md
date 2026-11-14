@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12, and by decision 0022 on 2026-11-13 |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12, and by decision 0022 on 2026-11-13 and decision 0024 on 2026-11-14 |
 | Date | 2026-11-13 |
 | Owner | albarami |
 | Purpose | Tell a builder exactly how the browser application of the EII proof of concept is structured, what each component does, how the map draws provenance, and how the front end is tested. |
@@ -572,7 +572,7 @@ Layer order: basemap fill and line layers, then deck.gl data layers placed benea
 - **Live traffic (optional).** With `EII_TRAFFIC_PROVIDER` at `tomtom`, the key present and the presenter's offline control not set, the API process fetches the provider's flow tiles and traffic-aware drive-time areas and passes them on from its own paths. The browser never holds the key. Nothing of a response is written to disk, to the release or to a log ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 17), and no response of a live service is committed.
 - **No third-party requests at run time.** The style contains no absolute URL to another host. The page sends a Content Security Policy that allows `'self'` (plus `blob:` and `data:` where MapLibre workers and images need them) and nothing else. Telemetry of any kind is absent.
 - **Label check.** Before slice S3 closes, a reviewer checks in both languages how the basemap names the Gulf, neighbouring territories and Qatari districts, and hides or edits labels as needed (design research: a mandatory check, not a known fault).
-- **Attribution.** OpenStreetMap and Protomaps attribution stays visible on the map (ODbL Produced Work); Overture attribution is shown whenever Overture-derived places are on screen, Foursquare Open Source Places attribution whenever its places are on screen, the NASA acknowledgement with the product DOI whenever the night-lights layer is on, and the provider attribution "© TomTom" whenever the live traffic layer is on.
+- **Attribution.** OpenStreetMap and Protomaps attribution stays visible on the map (ODbL Produced Work); Overture attribution is shown whenever Overture-derived places are on screen, Foursquare Open Source Places attribution whenever its places are on screen, the NASA acknowledgement with the product DOI whenever the night-lights layer is on, and the provider attribution "© TomTom" whenever the live traffic layer is on. The satellite imagery provider's credit is written in one line of web code only: `export const MAP_ATTRIBUTION =` followed by one template literal and a semicolon, in `web/src/stage/attribution.ts`, a file that holds nothing else but blank lines and `//` comments; the template literal keeps the line whole under the formatter. The credit is shown as written in both languages and is not in `src/i18n/en.json` or `ar.json` (an exception to the Strings rule of section 8); no translated, transliterated or shortened form of the provider's name is written anywhere. A name of the private list passes there only under TST-263 ([12](12_TESTING_AND_QUALITY.md)).
 
 | ID | Requirement | Slice |
 |---|---|---|

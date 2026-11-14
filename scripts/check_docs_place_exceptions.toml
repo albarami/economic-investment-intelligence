@@ -1,0 +1,22 @@
+# Place-scoped exceptions of scripts/check_docs.py (TST-263, task S1-T14).
+#
+# This file lists digests, never names. Each [[exception]] entry holds exactly
+# three keys: sha256 (the SHA-256 of the name's case-folded text, encoded as
+# UTF-8: 64 lowercase hexadecimal digits), reason (its purpose and authority,
+# never the name) and source_ids (the document 04 source ids whose rows may
+# carry the name). At most one entry is allowed; a second name needs a new owner
+# note and a reviewed change of that limit in scripts/check_docs.py.
+#
+# A listed name passes only in its two places: a source row of document 04
+# section "2. Source registry" whose first-cell ids are all listed here, and the
+# map attribution line of web/src/stage/attribution.ts. Everywhere else it is
+# refused, with or without the private list (check 8, listed-name).
+#
+# The digest stands in for the name but does not hide it: anyone holding a list
+# of candidates can confirm it. No part of the check sees commit messages,
+# branch names or pull-request text; images and other binary files; or
+# translated, transliterated or shortened forms of the name beyond the name
+# parts that check 8 hashes.
+#
+# Committed with no entry: the one real entry is the first commit of the task
+# that adds the imagery source (decision 0024).
