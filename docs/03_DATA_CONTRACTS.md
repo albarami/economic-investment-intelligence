@@ -364,8 +364,8 @@ There is no sex, gender, age or name field on the worker, residence or company t
 DAT-141). Movement aggregates are the one exception ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 16), and they are not these tables.
 The one nationality field of this contract is `nationality_group`, in the format of the real records
 (decision 0022 item 2; rule 10 of AGENTS.md); the other field of decision 0022 item 6 is
-`establishment_nationality` of `business_register.v1` (section 6.1; DAT-141). That closed list is unchanged. Movement aggregates
-use the same names and one more group, `international_visitors`, and only on the split tables of
+`establishment_nationality` of `business_register.v1` (section 6.1; DAT-141). The closed list of `nationality_group` is unchanged. Movement aggregates
+use the same group names and one more group, `international_visitors`, and only on the split tables of
 DAT-169.
 The sector list follows the public Labour Force Survey categories cited in the claims research.
 
