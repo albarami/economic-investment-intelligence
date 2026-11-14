@@ -820,6 +820,30 @@ class NotesRows(unittest.TestCase):
             )
             self.assertEqual(sup.fails(sup.run(root)), [])
 
+    def test_measured_confirmation_form(self) -> None:
+        for value, accepted in (
+            (
+                'confirmed: synthetic measurement; PROGRESS.md heading "S1-T05 — Synthetic parity: task log"',
+                True,
+            ),
+            ("confirmed", False),
+            ("confirmed: ", False),
+            ("confirmed: synthetic measurement", False),
+        ):
+            with self.subTest(value=value):
+
+                def plant(r: Path, v: str = value) -> None:
+                    sup.edit_in(
+                        r,
+                        DOCS,
+                        DOCS_LIB,
+                        f"| {DUCK_FIELD1} | {tables.CONFIRMED} |",
+                        f"| {DUCK_FIELD1} | {v} |",
+                    )
+
+                root = self._plant(plant)
+                self.assertEqual(not sup.fails(sup.run(root)), accepted)
+
     def test_confirmation(self) -> None:
         lib = DOCS_LIB
         field = DUCK_FIELD1

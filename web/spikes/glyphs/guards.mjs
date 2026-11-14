@@ -74,7 +74,7 @@ export function requestDecision(url, origin) {
       return 'blocked';
     }
   }
-  return 'same-origin';
+  return 'blocked';
 }
 
 export function judgeRequests(urls, origin) {

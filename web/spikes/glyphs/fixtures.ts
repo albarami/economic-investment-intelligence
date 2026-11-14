@@ -26,11 +26,11 @@ type Place = {
 };
 
 const COORDINATES: Record<string, LngLat> = {
-  aleph: [0.012, 0.012],
-  bet: [0.018, 0.012],
-  gimel: [0.012, 0.018],
-  dalet: [0.018, 0.018],
-  he: [0.015, 0.015],
+  alif: [0.012, 0.012],
+  ba: [0.018, 0.012],
+  jim: [0.012, 0.018],
+  dal: [0.018, 0.018],
+  ha: [0.015, 0.015],
 };
 
 export type FixtureFeature = {

@@ -59,7 +59,13 @@ export async function runSuite() {
     return 1;
   }
   try {
-    return await launch(server.origin, browsers);
+    const started = performance.now();
+    const status = await launch(server.origin, browsers);
+    console.log(
+      'MEASURED performance browser wall ms',
+      performance.now() - started,
+    );
+    return status;
   } finally {
     await server.close();
     fs.rmSync(outDir, { recursive: true, force: true });

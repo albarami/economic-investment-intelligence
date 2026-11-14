@@ -1,0 +1,11 @@
+{
+  "task": "S1-T09",
+  "rules_version_id": "rv-1.0.0-s1",
+  "exported_set": "A",
+  "movement_base_a": "50",
+  "movement_base_b": "100",
+  "window_months": "23",
+  "first_month": "2024-01",
+  "last_month": "2025-11",
+  "entries_sha256": "79ef0029cdb31dfc93afc78f9e60ce31e9107c9cf9b5c83f2139edb750638bce"
+}

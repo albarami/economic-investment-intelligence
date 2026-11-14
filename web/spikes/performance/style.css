@@ -39,3 +39,25 @@ body {
 #result {
   white-space: pre-wrap;
 }
+
+#road-sample {
+  display: inline-block;
+  width: 3em;
+  border-top: 3px dashed currentColor;
+  vertical-align: middle;
+}
+#pause-motion {
+  min-height: 44px;
+  font: inherit;
+}
+#pause-motion:focus-visible {
+  outline: 3px solid #4e3784;
+  outline-offset: 3px;
+}
+.hour-reference {
+  display: inline-grid;
+  margin-inline: 1em;
+}
+.hour-reference span {
+  grid-area: 1 / 1;
+}

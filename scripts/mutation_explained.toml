@@ -1,0 +1,1412 @@
+# Exact equivalent mutations; L-84 M3. One reason per exact tool diff.
+[[survivors]]
+module = "custodian/src/eii_custodian/assignment_spike/delay.py"
+mutation = "--- src/eii_custodian/assignment_spike/delay.py\n+++ src/eii_custodian/assignment_spike/delay.py\n@@ -1,4 +1,4 @@\n def situation_mean(minutes: tuple[Fraction, ...]) -> Fraction:\n     if not minutes:\n         raise ValueError(\"NO_DATA: empty situation\")\n-    return sum(minutes, Fraction(0)) / len(minutes)\n+    return sum(minutes, ) / len(minutes)"
+reason = "Removing the explicit Fraction zero leaves the same rational sum for nonempty typed inputs; empty inputs are refused before a result is returned."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/assignment_spike/delay.py"
+mutation = "--- src/eii_custodian/assignment_spike/delay.py\n+++ src/eii_custodian/assignment_spike/delay.py\n@@ -1,7 +1,7 @@\n def length_weighted_slowdown(\n     links: tuple[tuple[Fraction, Fraction | None], ...],\n ) -> str:\n-    length = sum((item[0] for item in links), Fraction(0))\n+    length = sum((item[0] for item in links), )\n     if length <= 0:\n         raise ValueError(\"NO_DATA: no road length\")\n     return rounded_ratio("
+reason = "Removing the explicit Fraction zero leaves the same rational sum for nonempty typed inputs; empty inputs are refused before a result is returned."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/assignment_spike/delay.py"
+mutation = "--- src/eii_custodian/assignment_spike/delay.py\n+++ src/eii_custodian/assignment_spike/delay.py\n@@ -10,7 +10,6 @@\n                 distance * (Fraction(1) if ratio is None else ratio)\n                 for distance, ratio in links\n             ),\n-            Fraction(0),\n-        )\n+            )\n         / length\n     )"
+reason = "Removing the explicit Fraction zero leaves the same rational sum for nonempty typed inputs; empty inputs are refused before a result is returned."
+
+[[survivors]]
+module = "product/src/eii_product/areas_spike/traffic.py"
+mutation = "--- src/eii_product/areas_spike/traffic.py\n+++ src/eii_product/areas_spike/traffic.py\n@@ -20,7 +20,7 @@\n     }\n     link_ids = tuple(\n         link_between[\n-            node_at[(round(start[0], 6), round(start[1], 6))],\n+            node_at[(round(start[0], 7), round(start[1], 6))],\n             node_at[(round(end[0], 6), round(end[1], 6))],\n         ]\n         for leg in answer[\"trip\"][\"legs\"]"
+reason = "The installed decoder defaults to precision six: decoded coordinates lie on the six-decimal grid, so rounding them to seven instead of six leaves the lookup coordinates unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/areas_spike/traffic.py"
+mutation = "--- src/eii_product/areas_spike/traffic.py\n+++ src/eii_product/areas_spike/traffic.py\n@@ -20,7 +20,7 @@\n     }\n     link_ids = tuple(\n         link_between[\n-            node_at[(round(start[0], 6), round(start[1], 6))],\n+            node_at[(round(start[0], 6), round(start[1], 7))],\n             node_at[(round(end[0], 6), round(end[1], 6))],\n         ]\n         for leg in answer[\"trip\"][\"legs\"]"
+reason = "The installed decoder defaults to precision six: decoded coordinates lie on the six-decimal grid, so rounding them to seven instead of six leaves the lookup coordinates unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/areas_spike/traffic.py"
+mutation = "--- src/eii_product/areas_spike/traffic.py\n+++ src/eii_product/areas_spike/traffic.py\n@@ -21,7 +21,7 @@\n     link_ids = tuple(\n         link_between[\n             node_at[(round(start[0], 6), round(start[1], 6))],\n-            node_at[(round(end[0], 6), round(end[1], 6))],\n+            node_at[(round(end[0], 7), round(end[1], 6))],\n         ]\n         for leg in answer[\"trip\"][\"legs\"]\n         for start, end in pairwise(decode_polyline(leg[\"shape\"]))"
+reason = "The installed decoder defaults to precision six: decoded coordinates lie on the six-decimal grid, so rounding them to seven instead of six leaves the lookup coordinates unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/areas_spike/traffic.py"
+mutation = "--- src/eii_product/areas_spike/traffic.py\n+++ src/eii_product/areas_spike/traffic.py\n@@ -21,7 +21,7 @@\n     link_ids = tuple(\n         link_between[\n             node_at[(round(start[0], 6), round(start[1], 6))],\n-            node_at[(round(end[0], 6), round(end[1], 6))],\n+            node_at[(round(end[0], 6), round(end[1], 7))],\n         ]\n         for leg in answer[\"trip\"][\"legs\"]\n         for start, end in pairwise(decode_polyline(leg[\"shape\"]))"
+reason = "The installed decoder defaults to precision six: decoded coordinates lie on the six-decimal grid, so rounding them to seven instead of six leaves the lookup coordinates unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/areas_spike/traffic.py"
+mutation = "--- src/eii_product/areas_spike/traffic.py\n+++ src/eii_product/areas_spike/traffic.py\n@@ -29,7 +29,7 @@\n     link_minutes = tuple(\n         self.link_minutes(link, hour, day_type, summer) for link in link_ids\n     )\n-    link_total = sum(link_minutes, Fraction(0))\n+    link_total = sum(link_minutes, )\n     residual = Fraction(str(answer[\"trip\"][\"summary\"][\"time\"])) - link_total * 60\n     # Method card: a route agrees with its itemised total within\n     # n x 0.001 seconds for n links (printed engine resolution)."
+reason = "Integer zero and Fraction zero are additive identities for rational link minutes; even an empty sum is converted through the same rational residual and total expressions."
+
+[[survivors]]
+module = "product/src/eii_product/areas_spike/traffic.py"
+mutation = "--- src/eii_product/areas_spike/traffic.py\n+++ src/eii_product/areas_spike/traffic.py\n@@ -9,7 +9,7 @@\n     day_type: str = \"weekday\",\n     summer: bool = False,\n ) -> TrafficArea:\n-    self.check_hour(day_type, 0 if hour is None else hour, summer)\n+    self.check_hour(day_type, 1 if hour is None else hour, summer)\n     if mode not in {\"drive\", \"walk\"}:\n         raise ValueError(\"Unknown mode\")\n     if minutes <= 0:"
+reason = "For free flow only, this hour is used solely to validate the other fields; zero and one are both valid and neither is forwarded to the actor, which still receives None."
+
+# Web run 199: exact post-snapshot kills, equivalents and explicit coverage limits.
+# Coverage-limit explanations are not killed mutants or claims of equivalence.
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 34, \"line\": 126}, \"start\": {\"column\": 7, \"line\": 125}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Equivalent redundant type predicate: the retained Number.isFinite checks reject non-numbers without coercion; the non-finite-start logical mutant is separately killed by the added test."
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 34, \"line\": 126}, \"start\": {\"column\": 7, \"line\": 125}}, \"mutator\": \"LogicalOperator\", \"replacement\": \"typeof previous !== 'number' && typeof current !== 'number'\"}"
+reason = "Equivalent redundant type predicate: the retained Number.isFinite checks reject non-numbers without coercion; the non-finite-start logical mutant is separately killed by the added test."
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 35, \"line\": 125}, \"start\": {\"column\": 7, \"line\": 125}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Equivalent redundant type predicate: the retained Number.isFinite checks reject non-numbers without coercion; the non-finite-start logical mutant is separately killed by the added test."
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 34, \"line\": 126}, \"start\": {\"column\": 7, \"line\": 126}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Equivalent redundant type predicate: the retained Number.isFinite checks reject non-numbers without coercion; the non-finite-start logical mutant is separately killed by the added test."
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 50, \"line\": 173}, \"start\": {\"column\": 25, \"line\": 173}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Killed after the full-run snapshot by every stored summary field and nested shape is checked independently in web/spikes/performance/tests/mutation-trace.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 35, \"line\": 217}, \"start\": {\"column\": 10, \"line\": 217}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Equivalent redundant type predicate: the retained Number.isFinite checks reject non-numbers without coercion; the non-finite-start logical mutant is separately killed by the added test."
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 33, \"line\": 273}, \"start\": {\"column\": 7, \"line\": 271}}, \"mutator\": \"LogicalOperator\", \"replacement\": \"(typeof previous !== 'number' || typeof current !== 'number') && !Number.isFinite(previous)\"}"
+reason = "Killed after the full-run snapshot by empty-canvas median handles unordered odd and even intervals and exact boundary in web/spikes/performance/tests/mutation-trace.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 34, \"line\": 272}, \"start\": {\"column\": 7, \"line\": 271}}, \"mutator\": \"LogicalOperator\", \"replacement\": \"typeof previous !== 'number' && typeof current !== 'number'\"}"
+reason = "Equivalent redundant type predicate: the retained Number.isFinite checks reject non-numbers without coercion; the non-finite-start logical mutant is separately killed by the added test."
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 34, \"line\": 272}, \"start\": {\"column\": 7, \"line\": 271}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Equivalent redundant type predicate: the retained Number.isFinite checks reject non-numbers without coercion; the non-finite-start logical mutant is separately killed by the added test."
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 35, \"line\": 271}, \"start\": {\"column\": 7, \"line\": 271}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Equivalent redundant type predicate: the retained Number.isFinite checks reject non-numbers without coercion; the non-finite-start logical mutant is separately killed by the added test."
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 34, \"line\": 272}, \"start\": {\"column\": 7, \"line\": 272}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Equivalent redundant type predicate: the retained Number.isFinite checks reject non-numbers without coercion; the non-finite-start logical mutant is separately killed by the added test."
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 61, \"line\": 365}, \"start\": {\"column\": 35, \"line\": 365}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"WALL_CSS_WIDTH / CAP_VALUE\"}"
+reason = "Equivalent at the fixed CAP_VALUE of one: multiplication and division leave the required drawing-buffer dimension unchanged."
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 63, \"line\": 366}, \"start\": {\"column\": 36, \"line\": 366}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"WALL_CSS_HEIGHT / CAP_VALUE\"}"
+reason = "Equivalent at the fixed CAP_VALUE of one: multiplication and division leave the required drawing-buffer dimension unchanged."
+
+[[survivors]]
+module = "web/spikes/performance/trace.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 43, \"line\": 377}, \"start\": {\"column\": 7, \"line\": 377}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Equivalent for dense JSON hour arrays: an overlong list necessarily disagrees with the stored hour sequence at the first extra index, so the retained some comparison refuses it."
+
+[[survivors]]
+module = "web/spikes/performance/build-road-data.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 65, \"line\": 12}, \"start\": {\"column\": 59, \"line\": 12}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Equivalent JSON decoding: an empty readFileSync encoding returns a Buffer, which JSON.parse converts to the same UTF-8 text for these UTF-8 fixture files."
+
+[[survivors]]
+module = "web/spikes/performance/build-road-data.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 66, \"line\": 15}, \"start\": {\"column\": 60, \"line\": 15}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Equivalent JSON decoding: an empty readFileSync encoding returns a Buffer, which JSON.parse converts to the same UTF-8 text for these UTF-8 fixture files."
+
+[[survivors]]
+module = "web/spikes/performance/build-road-data.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 67, \"line\": 37}, \"start\": {\"column\": 3, \"line\": 37}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Import-entry coverage gap: the import-write guard runs through node --eval where argv[1] is absent, while importing from a named script could trigger this mutated equality; no equivalent-behavior claim."
+
+[[survivors]]
+module = "web/spikes/performance/geometry.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 53, \"line\": 56}, \"start\": {\"column\": 9, \"line\": 56}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Fixed-generator invariant: the installed gridDisk over this fixed non-pentagon disk yields unique cells at the requested resolution; the standalone includeCell guard has its own malformed-cell tests."
+
+[[survivors]]
+module = "web/spikes/performance/geometry.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 20, \"line\": 57}, \"start\": {\"column\": 5, \"line\": 57}}, \"mutator\": \"CallExpression\", \"replacement\": \";\"}"
+reason = "Fixed-generator invariant: the installed gridDisk over this fixed non-pentagon disk yields unique cells at the requested resolution; the standalone includeCell guard has its own malformed-cell tests."
+
+[[survivors]]
+module = "web/spikes/performance/geometry.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 37, \"line\": 61}, \"start\": {\"column\": 7, \"line\": 61}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Unreached library-failure path: the fixed installed gridDisk supplies the required count; this mutation changes only the refusal for an unexpectedly short library result, not a measured fixture result."
+
+[[survivors]]
+module = "web/spikes/performance/geometry.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 4, \"line\": 63}, \"start\": {\"column\": 39, \"line\": 61}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "Unreached library-failure path: the fixed installed gridDisk supplies the required count; this mutation changes only the refusal for an unexpectedly short library result, not a measured fixture result."
+
+[[survivors]]
+module = "web/spikes/performance/geometry.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 67, \"line\": 62}, \"start\": {\"column\": 21, \"line\": 62}}, \"mutator\": \"StringLiteral\", \"replacement\": \"``\"}"
+reason = "Unreached library-failure path: the fixed installed gridDisk supplies the required count; this mutation changes only the refusal for an unexpectedly short library result, not a measured fixture result."
+
+[[survivors]]
+module = "web/spikes/performance/geometry.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 59, \"line\": 94}, \"start\": {\"column\": 16, \"line\": 94}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"(timeMs / MOTION_PERIOD_MS % 1 + 1) * 1\"}"
+reason = "Mathematical periodicity and fixture-equivalence: the later modulo removes added whole periods in the sampled animation times; bitwise equivalence for all floating-point clocks and negative-time ranges is not proved."
+
+[[survivors]]
+module = "web/spikes/performance/geometry.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 49, \"line\": 94}, \"start\": {\"column\": 18, \"line\": 94}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"timeMs / MOTION_PERIOD_MS * 1\"}"
+reason = "Mathematical periodicity and fixture-equivalence: the later modulo removes added whole periods in the sampled animation times; bitwise equivalence for all floating-point clocks and negative-time ranges is not proved."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 40, \"line\": 150}, \"start\": {\"column\": 35, \"line\": 150}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"true\"}"
+reason = "HTTP refusal coverage gap in the completed Node mutation run: this changes the wrong-origin/body-read failure response path, which its response assertions do not fully exercise; not equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 4, \"line\": 162}, \"start\": {\"column\": 11, \"line\": 156}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "HTTP refusal coverage gap in the completed Node mutation run: this changes the wrong-origin/body-read failure response path, which its response assertions do not fully exercise; not equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 40, \"line\": 157}, \"start\": {\"column\": 35, \"line\": 157}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"true\"}"
+reason = "HTTP refusal coverage gap in the completed Node mutation run: this changes the wrong-origin/body-read failure response path, which its response assertions do not fully exercise; not equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 25, \"line\": 158}, \"start\": {\"column\": 17, \"line\": 158}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "HTTP cleanup coverage gap: tests assert refusal responses but do not observe pause/destroy or finish-listener cleanup after body rejection; not treated as equivalent resource behavior."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 6, \"line\": 160}, \"start\": {\"column\": 33, \"line\": 158}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "HTTP cleanup coverage gap: tests assert refusal responses but do not observe pause/destroy or finish-listener cleanup after body rejection; not treated as equivalent resource behavior."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 25, \"line\": 159}, \"start\": {\"column\": 7, \"line\": 159}}, \"mutator\": \"CallExpression\", \"replacement\": \";\"}"
+reason = "HTTP cleanup coverage gap: tests assert refusal responses but do not observe pause/destroy or finish-listener cleanup after body rejection; not treated as equivalent resource behavior."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 45, \"line\": 199}, \"start\": {\"column\": 39, \"line\": 199}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Unreachable pass label with current call: validateGate receives null capture and cannot qualify a native trace, so qualification.ok never selects this string."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 64, \"line\": 206}, \"start\": {\"column\": 37, \"line\": 206}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "HTTP diagnostic header coverage gap: status/body are asserted, but the text/plain content-type on this response is not; no equivalent-header claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 71, \"line\": 211}, \"start\": {\"column\": 44, \"line\": 211}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "HTTP diagnostic header coverage gap: status/body are asserted, but the text/plain content-type on this response is not; no equivalent-header claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 71, \"line\": 217}, \"start\": {\"column\": 44, \"line\": 217}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "HTTP diagnostic header coverage gap: status/body are asserted, but the text/plain content-type on this response is not; no equivalent-header claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 41, \"line\": 231}, \"start\": {\"column\": 38, \"line\": 231}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Equivalent request fallback in the tested server flow: both empty and slash URL references resolve to the same root pathname against the fixed loopback base."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 69, \"line\": 234}, \"start\": {\"column\": 42, \"line\": 234}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "HTTP diagnostic header coverage gap: status/body are asserted, but the text/plain content-type on this response is not; no equivalent-header claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 76, \"line\": 239}, \"start\": {\"column\": 49, \"line\": 239}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "HTTP diagnostic header coverage gap: status/body are asserted, but the text/plain content-type on this response is not; no equivalent-header claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 34, \"line\": 246}, \"start\": {\"column\": 7, \"line\": 246}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "HTTP diagnostic header coverage gap: status/body are asserted, but the text/plain content-type on this response is not; no equivalent-header claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 76, \"line\": 252}, \"start\": {\"column\": 49, \"line\": 252}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "HTTP diagnostic header coverage gap: status/body are asserted, but the text/plain content-type on this response is not; no equivalent-header claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 11, \"line\": 268}, \"start\": {\"column\": 7, \"line\": 268}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Static-asset coverage gap in the completed mutation run: this no-next static-asset branch is not fully asserted; not equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 53, \"line\": 272}, \"start\": {\"column\": 3, \"line\": 272}}, \"mutator\": \"CallExpression\", \"replacement\": \";\"}"
+reason = "Static-asset coverage gap in the completed mutation run: this no-next static-asset branch is not fully asserted; not equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 38, \"line\": 277}, \"start\": {\"column\": 35, \"line\": 277}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Equivalent request fallback in the tested server flow: both empty and slash URL references resolve to the same root pathname against the fixed loopback base."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 24, \"line\": 301}, \"start\": {\"column\": 17, \"line\": 301}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Transport failure coverage gap: loopback tests bind successfully and do not induce the server error event before listen; this changes failure cleanup, not a passing bind."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 63, \"line\": 324}, \"start\": {\"column\": 50, \"line\": 324}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Default-argument coverage gap in the mutation fixtures: callers supply development mode explicitly, so mutating the absent-mode default is not exercised there."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 63, \"line\": 336}, \"start\": {\"column\": 50, \"line\": 336}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Default-argument coverage gap in the mutation fixtures: callers supply development mode explicitly, so mutating the absent-mode default is not exercised there."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 40, \"line\": 362}, \"start\": {\"column\": 36, \"line\": 362}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 46, \"line\": 362}, \"start\": {\"column\": 42, \"line\": 362}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 52, \"line\": 362}, \"start\": {\"column\": 48, \"line\": 362}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 2, \"line\": 398}, \"start\": {\"column\": 23, \"line\": 379}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 50, \"line\": 380}, \"start\": {\"column\": 40, \"line\": 380}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 4, \"line\": 388}, \"start\": {\"column\": 41, \"line\": 381}}, \"mutator\": \"ObjectLiteral\", \"replacement\": \"{}\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 17, \"line\": 386}, \"start\": {\"column\": 13, \"line\": 386}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"false\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 18, \"line\": 389}, \"start\": {\"column\": 7, \"line\": 389}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"started.ok\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 18, \"line\": 389}, \"start\": {\"column\": 7, \"line\": 389}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 18, \"line\": 389}, \"start\": {\"column\": 7, \"line\": 389}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 44, \"line\": 390}, \"start\": {\"column\": 19, \"line\": 390}}, \"mutator\": \"StringLiteral\", \"replacement\": \"``\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 4, \"line\": 393}, \"start\": {\"column\": 20, \"line\": 389}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 36, \"line\": 394}, \"start\": {\"column\": 3, \"line\": 394}}, \"mutator\": \"CallExpression\", \"replacement\": \";\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 56, \"line\": 396}, \"start\": {\"column\": 17, \"line\": 396}}, \"mutator\": \"StringLiteral\", \"replacement\": \"``\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 67, \"line\": 402}, \"start\": {\"column\": 3, \"line\": 401}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 2, \"line\": 405}, \"start\": {\"column\": 3, \"line\": 403}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "Native command-entry exclusion: per-mutant tests call server APIs with temporary sinks and do not launch the owner CLI that writes native evidence or awaits shutdown; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 32, \"line\": 21}, \"start\": {\"column\": 21, \"line\": 21}}, \"mutator\": \"MethodExpression\", \"replacement\": \"line\"}"
+reason = "Whitespace coverage gap: fixtures include outer whitespace on field lines but not whitespace-only or indented comment lines; removing this trim changes those untested accepted inputs."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 19, \"line\": 24}, \"start\": {\"column\": 9, \"line\": 24}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Equivalent malformed-key refusal: a missing or leading colon yields an unknown/empty key and is rejected by the retained CAPTURE_KEYS membership check."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 19, \"line\": 24}, \"start\": {\"column\": 9, \"line\": 24}}, \"mutator\": \"EqualityOperator\", \"replacement\": \"split < 0\"}"
+reason = "Equivalent malformed-key refusal: a missing or leading colon yields an unknown/empty key and is rejected by the retained CAPTURE_KEYS membership check."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 47, \"line\": 25}, \"start\": {\"column\": 17, \"line\": 25}}, \"mutator\": \"MethodExpression\", \"replacement\": \"trimmed.slice(0, split)\"}"
+reason = "Whitespace coverage gap: no accepted capture has whitespace between its key and colon; removing key.trim would refuse that form."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 59, \"line\": 79}, \"start\": {\"column\": 7, \"line\": 79}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Redundant refusal for the exercised paths: resolved-directory containment and the later native trace-path check also reject them; first-failure ordering on other malformed paths is not established by this explanation."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 59, \"line\": 79}, \"start\": {\"column\": 7, \"line\": 79}}, \"mutator\": \"LogicalOperator\", \"replacement\": \"path.isAbsolute(relative) && relative.includes('..')\"}"
+reason = "Redundant refusal for the exercised paths: resolved-directory containment and the later native trace-path check also reject them; first-failure ordering on other malformed paths is not established by this explanation."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 4, \"line\": 81}, \"start\": {\"column\": 61, \"line\": 79}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "Redundant refusal for the exercised paths: resolved-directory containment and the later native trace-path check also reject them; first-failure ordering on other malformed paths is not established by this explanation."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 69, \"line\": 89}, \"start\": {\"column\": 31, \"line\": 89}}, \"mutator\": \"ArrowFunction\", \"replacement\": \"() => undefined\"}"
+reason = "Dependency-injection coverage gap: verification fixtures pass a git callback to avoid relying on repository evidence state; gitState itself is tested separately but this default adapter is not."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 52, \"line\": 103}, \"start\": {\"column\": 46, \"line\": 103}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Equivalent JSON decoding: the empty encoding produces a Buffer and JSON.parse converts it to the same UTF-8 trace text."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 40, \"line\": 118}, \"start\": {\"column\": 36, \"line\": 118}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 2, \"line\": 134}, \"start\": {\"column\": 17, \"line\": 117}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 46, \"line\": 118}, \"start\": {\"column\": 42, \"line\": 118}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 4, \"line\": 123}, \"start\": {\"column\": 33, \"line\": 119}}, \"mutator\": \"ObjectLiteral\", \"replacement\": \"{}\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 45, \"line\": 121}, \"start\": {\"column\": 35, \"line\": 121}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 52, \"line\": 118}, \"start\": {\"column\": 48, \"line\": 118}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 64, \"line\": 122}, \"start\": {\"column\": 17, \"line\": 122}}, \"mutator\": \"LogicalOperator\", \"replacement\": \"process.argv[2] && LAYER_SET_HEXAGONS_PARTICLES\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 17, \"line\": 124}, \"start\": {\"column\": 7, \"line\": 124}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"result.ok\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 17, \"line\": 124}, \"start\": {\"column\": 7, \"line\": 124}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 17, \"line\": 124}, \"start\": {\"column\": 7, \"line\": 124}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 4, \"line\": 128}, \"start\": {\"column\": 19, \"line\": 124}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 43, \"line\": 125}, \"start\": {\"column\": 19, \"line\": 125}}, \"mutator\": \"StringLiteral\", \"replacement\": \"``\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 38, \"line\": 131}, \"start\": {\"column\": 9, \"line\": 131}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 40, \"line\": 132}, \"start\": {\"column\": 9, \"line\": 132}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 67, \"line\": 138}, \"start\": {\"column\": 3, \"line\": 137}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 2, \"line\": 141}, \"start\": {\"column\": 3, \"line\": 139}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/verify-evidence.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 10, \"line\": 140}, \"start\": {\"column\": 3, \"line\": 140}}, \"mutator\": \"CallExpression\", \"replacement\": \";\"}"
+reason = "Unexecuted CLI entry path: mutation tests call verifyEvidence and gitState directly, not this command-entry wrapper or its console/exit handling; no CLI mutation-coverage claim."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 19, \"line\": 88}, \"start\": {\"column\": 10, \"line\": 88}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Transient debug-state coverage gap: phase is replaced by renderer/done/failed during startup; the pre-mount/pre-frame value is not fully asserted, so no equivalence on early refusal is claimed."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 25, \"line\": 90}, \"start\": {\"column\": 20, \"line\": 90}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"true\"}"
+reason = "Transient debug-state coverage gap: roadDashEnabled is replaced from the mounted scene; the pre-mount/pre-frame value is not fully asserted, so no equivalence on early refusal is claimed."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 17, \"line\": 92}, \"start\": {\"column\": 15, \"line\": 92}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[\\\"Stryker was here\\\"]\"}"
+reason = "Transient debug-state coverage gap: hoursShown is replaced on the first playback frame; the pre-mount/pre-frame value is not fully asserted, so no equivalence on early refusal is claimed."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 16, \"line\": 93}, \"start\": {\"column\": 11, \"line\": 93}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"true\"}"
+reason = "Transient debug-state coverage gap: paused is replaced on the first playback frame; the pre-mount/pre-frame value is not fully asserted, so no equivalence on early refusal is claimed."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 23, \"line\": 94}, \"start\": {\"column\": 18, \"line\": 94}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"true\"}"
+reason = "Transient debug-state coverage gap: reducedMotion is replaced on the first playback frame; the pre-mount/pre-frame value is not fully asserted, so no equivalence on early refusal is claimed."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 23, \"line\": 26}, \"start\": {\"column\": 14, \"line\": 26}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 71, \"line\": 27}, \"start\": {\"column\": 53, \"line\": 27}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[]\"}"
+reason = "Killed after the full-run snapshot by base layer properties retain flat filled hexagons and pixel particles in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 76, \"line\": 28}, \"start\": {\"column\": 58, \"line\": 28}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[]\"}"
+reason = "Killed after the full-run snapshot by base layer properties retain flat filled hexagons and pixel particles in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 23, \"line\": 67}, \"start\": {\"column\": 7, \"line\": 67}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Browser lifecycle coverage gap: each isolated VM mounts once, so configuring the same worker URL again on a second mount is not observed; this does not establish worker-cache behavior."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 26, \"line\": 69}, \"start\": {\"column\": 22, \"line\": 69}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"false\"}"
+reason = "Browser lifecycle coverage gap: each isolated VM mounts once, so configuring the same worker URL again on a second mount is not observed; this does not establish worker-cache behavior."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 33, \"line\": 74}, \"start\": {\"column\": 16, \"line\": 74}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"lng + EXTENT_SPAN\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 2, \"line\": 85}, \"start\": {\"column\": 43, \"line\": 72}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 33, \"line\": 75}, \"start\": {\"column\": 16, \"line\": 75}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"lng - EXTENT_SPAN\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 34, \"line\": 76}, \"start\": {\"column\": 17, \"line\": 76}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"lat + EXTENT_SPAN\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 4, \"line\": 84}, \"start\": {\"column\": 10, \"line\": 78}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[]\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 34, \"line\": 77}, \"start\": {\"column\": 17, \"line\": 77}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"lat - EXTENT_SPAN\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 18, \"line\": 79}, \"start\": {\"column\": 5, \"line\": 79}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[]\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 18, \"line\": 80}, \"start\": {\"column\": 5, \"line\": 80}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[]\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 18, \"line\": 81}, \"start\": {\"column\": 5, \"line\": 81}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[]\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 18, \"line\": 82}, \"start\": {\"column\": 5, \"line\": 82}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[]\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 18, \"line\": 83}, \"start\": {\"column\": 5, \"line\": 83}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[]\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 21, \"line\": 90}, \"start\": {\"column\": 15, \"line\": 90}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Browser lifecycle coverage gap: the map double observes successful idle cleanup but does not assert removal of the pending idle listener on the error branch."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 69, \"line\": 116}, \"start\": {\"column\": 44, \"line\": 116}}, \"mutator\": \"OptionalChaining\", \"replacement\": \"hexLayer.getSubLayers()\"}"
+reason = "Browser class-shape coverage gap: the Node layer double always defines getSubLayers and returns an array; this removed optional call or altered fallback is not exercised for a layer without that method and is not claimed equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 75, \"line\": 116}, \"start\": {\"column\": 73, \"line\": 116}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[\\\"Stryker was here\\\"]\"}"
+reason = "Browser class-shape coverage gap: the Node layer double always defines getSubLayers and returns an array; this removed optional call or altered fallback is not exercised for a layer without that method and is not claimed equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 37, \"line\": 119}, \"start\": {\"column\": 7, \"line\": 119}}, \"mutator\": \"OptionalChaining\", \"replacement\": \"particleLayer.getSubLayers()\"}"
+reason = "Browser class-shape coverage gap: the Node layer double always defines getSubLayers and returns an array; this removed optional call or altered fallback is not exercised for a layer without that method and is not claimed equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 43, \"line\": 119}, \"start\": {\"column\": 41, \"line\": 119}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[\\\"Stryker was here\\\"]\"}"
+reason = "Browser class-shape coverage gap: the Node layer double always defines getSubLayers and returns an array; this removed optional call or altered fallback is not exercised for a layer without that method and is not claimed equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 17, \"line\": 145}, \"start\": {\"column\": 10, \"line\": 145}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Equivalent internal sentinel: sample only recognises road, hex and particle; both other and the empty string leave all three flags unchanged."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 4, \"line\": 197}, \"start\": {\"column\": 23, \"line\": 160}}, \"mutator\": \"ObjectLiteral\", \"replacement\": \"{}\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 6, \"line\": 183}, \"start\": {\"column\": 12, \"line\": 162}}, \"mutator\": \"ObjectLiteral\", \"replacement\": \"{}\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 31, \"line\": 164}, \"start\": {\"column\": 13, \"line\": 164}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 8, \"line\": 174}, \"start\": {\"column\": 16, \"line\": 165}}, \"mutator\": \"ObjectLiteral\", \"replacement\": \"{}\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 10, \"line\": 173}, \"start\": {\"column\": 17, \"line\": 166}}, \"mutator\": \"ObjectLiteral\", \"replacement\": \"{}\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 26, \"line\": 167}, \"start\": {\"column\": 17, \"line\": 167}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 12, \"line\": 172}, \"start\": {\"column\": 17, \"line\": 168}}, \"mutator\": \"ObjectLiteral\", \"replacement\": \"{}\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 28, \"line\": 169}, \"start\": {\"column\": 19, \"line\": 169}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 71, \"line\": 171}, \"start\": {\"column\": 23, \"line\": 171}}, \"mutator\": \"ObjectLiteral\", \"replacement\": \"{}\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 40, \"line\": 171}, \"start\": {\"column\": 31, \"line\": 171}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 69, \"line\": 171}, \"start\": {\"column\": 55, \"line\": 171}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[]\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 8, \"line\": 182}, \"start\": {\"column\": 15, \"line\": 175}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[]\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 10, \"line\": 181}, \"start\": {\"column\": 9, \"line\": 176}}, \"mutator\": \"ObjectLiteral\", \"replacement\": \"{}\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 23, \"line\": 177}, \"start\": {\"column\": 15, \"line\": 177}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 23, \"line\": 178}, \"start\": {\"column\": 17, \"line\": 178}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 27, \"line\": 179}, \"start\": {\"column\": 19, \"line\": 179}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 40, \"line\": 180}, \"start\": {\"column\": 18, \"line\": 180}}, \"mutator\": \"ObjectLiteral\", \"replacement\": \"{}\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 23, \"line\": 188}, \"start\": {\"column\": 18, \"line\": 188}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"true\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 30, \"line\": 189}, \"start\": {\"column\": 25, \"line\": 189}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"true\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 24, \"line\": 190}, \"start\": {\"column\": 19, \"line\": 190}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"true\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 6, \"line\": 196}, \"start\": {\"column\": 30, \"line\": 193}}, \"mutator\": \"ObjectLiteral\", \"replacement\": \"{}\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 34, \"line\": 194}, \"start\": {\"column\": 30, \"line\": 194}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"false\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 28, \"line\": 195}, \"start\": {\"column\": 20, \"line\": 195}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Killed after the full-run snapshot by map options retain the fixed extent, drawing buffer and noninteractive scene in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 31, \"line\": 203}, \"start\": {\"column\": 11, \"line\": 203}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Killed after the full-run snapshot by base layer properties retain flat filled hexagons and pixel particles in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 22, \"line\": 206}, \"start\": {\"column\": 17, \"line\": 206}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"true\"}"
+reason = "Killed after the full-run snapshot by base layer properties retain flat filled hexagons and pixel particles in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 27, \"line\": 205}, \"start\": {\"column\": 22, \"line\": 205}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"true\"}"
+reason = "Killed after the full-run snapshot by base layer properties retain flat filled hexagons and pixel particles in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 19, \"line\": 207}, \"start\": {\"column\": 15, \"line\": 207}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"false\"}"
+reason = "Killed after the full-run snapshot by base layer properties retain flat filled hexagons and pixel particles in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 21, \"line\": 208}, \"start\": {\"column\": 16, \"line\": 208}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"true\"}"
+reason = "Killed after the full-run snapshot by base layer properties retain flat filled hexagons and pixel particles in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 32, \"line\": 215}, \"start\": {\"column\": 11, \"line\": 215}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Killed after the full-run snapshot by base layer properties retain flat filled hexagons and pixel particles in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 28, \"line\": 218}, \"start\": {\"column\": 20, \"line\": 218}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Killed after the full-run snapshot by base layer properties retain flat filled hexagons and pixel particles in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 38, \"line\": 224}, \"start\": {\"column\": 9, \"line\": 224}}, \"mutator\": \"LogicalOperator\", \"replacement\": \"input.roads || input.playback\"}"
+reason = "Supported-caller invariant: main passes roads and playback together or omits both; changing AND to OR only affects unsupported half-specified scene inputs."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 26, \"line\": 232}, \"start\": {\"column\": 11, \"line\": 232}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"state.index * 2\"}"
+reason = "Killed after the full-run snapshot by composition retains two opacity passes with actual hourly accessors and stable data in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 32, \"line\": 241}, \"start\": {\"column\": 11, \"line\": 241}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"(state.index + 1) * 2\"}"
+reason = "Killed after the full-run snapshot by composition retains two opacity passes with actual hourly accessors and stable data in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 28, \"line\": 233}, \"start\": {\"column\": 26, \"line\": 233}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"Stryker was here!\\\"\"}"
+reason = "Equivalent default plant: both the empty string and this unknown plant name select normal visibility and dash behavior in roadLayer."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 28, \"line\": 242}, \"start\": {\"column\": 11, \"line\": 242}}, \"mutator\": \"LogicalOperator\", \"replacement\": \"input.plant && ''\"}"
+reason = "Browser-only incoming-layer plant gap: this mutation removes a requested incoming dash or hide plant while the outgoing layer still carries it; the Node scene flag inspects the outgoing layer only."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 27, \"line\": 241}, \"start\": {\"column\": 12, \"line\": 241}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"state.index - 1\"}"
+reason = "Killed after the full-run snapshot by composition retains two opacity passes with actual hourly accessors and stable data in web/spikes/performance/tests/layers.node-test.mjs; exact replacement replay exits 1 and restored source passes, so this is separate RED/GREEN evidence rather than a revised Stryker count."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 28, \"line\": 242}, \"start\": {\"column\": 26, \"line\": 242}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"Stryker was here!\\\"\"}"
+reason = "Equivalent default plant: both the empty string and this unknown plant name select normal visibility and dash behavior in roadLayer."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 29, \"line\": 251}, \"start\": {\"column\": 13, \"line\": 251}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[]\"}"
+reason = "Browser-only initial overlay attachment: the Node double receives the later setProps layers even without the initial layer list or addControl call; actual attachment and first paint require the browser suite."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 27, \"line\": 253}, \"start\": {\"column\": 3, \"line\": 253}}, \"mutator\": \"CallExpression\", \"replacement\": \";\"}"
+reason = "Browser-only initial overlay attachment: the Node double receives the later setProps layers even without the initial layer list or addControl call; actual attachment and first paint require the browser suite."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 61, \"line\": 265}, \"start\": {\"column\": 22, \"line\": 265}}, \"mutator\": \"OptionalChaining\", \"replacement\": \"roadLayers[0]?.props.extensions.length\"}"
+reason = "Factory invariant: roadLayer always supplies an extensions array, including the empty array for omit-road-dash, so the removed optional guard cannot affect a constructed road layer."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 30, \"line\": 274}, \"start\": {\"column\": 28, \"line\": 274}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[\\\"Stryker was here\\\"]\"}"
+reason = "Supported-caller invariant: roadSnapshot is called only for a scene with road data, so its nullish empty-array fallback is unreachable in the page flow."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 30, \"line\": 275}, \"start\": {\"column\": 28, \"line\": 275}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[\\\"Stryker was here\\\"]\"}"
+reason = "Supported-caller invariant: roadSnapshot is called only for a scene with road data, so its nullish empty-array fallback is unreachable in the page flow."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 76, \"line\": 281}, \"start\": {\"column\": 13, \"line\": 281}}, \"mutator\": \"ObjectLiteral\", \"replacement\": \"{}\"}"
+reason = "Equivalent unused accessor context: roadLayer.getColor consumes only its road argument and ignores the second context argument and its target array."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 74, \"line\": 281}, \"start\": {\"column\": 72, \"line\": 281}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[\\\"Stryker was here\\\"]\"}"
+reason = "Equivalent unused accessor context: roadLayer.getColor consumes only its road argument and ignores the second context argument and its target array."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 80, \"line\": 296}, \"start\": {\"column\": 21, \"line\": 296}}, \"mutator\": \"MethodExpression\", \"replacement\": \"roadLayers.some(held => held.props.data === input.roads)\"}"
+reason = "Construction invariant: both road layers always receive the identical input.roads object; every, some and a true predicate return the same stable-data flag for that nonempty pair."
+
+[[survivors]]
+module = "web/spikes/performance/layers.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 79, \"line\": 296}, \"start\": {\"column\": 48, \"line\": 296}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Construction invariant: both road layers always receive the identical input.roads object; every, some and a true predicate return the same stable-data flag for that nonempty pair."
+
+# Continuation D: exact survivors of the bounded-concurrency run.
+# Coverage gaps remain survivors and are not claimed equivalent or killed.
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 52, \"line\": 17}, \"start\": {\"column\": 24, \"line\": 17}}, \"mutator\": \"Regex\", \"replacement\": \"/^[a-z0-9]+(?:-[a-z0-9]+)$/\"}"
+reason = "Coverage gap: successful server receipts use hexagons-particles with one hyphen group, accepted by both expressions; no successful receipt with several hyphen groups asserts the changed acceptance boundary."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 61, \"line\": 105}, \"start\": {\"column\": 35, \"line\": 105}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Equivalent redundant origin type check: the retained host type check rejects non-string hosts, and a non-string origin cannot strictly equal the interpolated origin string."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 24, \"line\": 117}, \"start\": {\"column\": 20, \"line\": 117}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"false\"}"
+reason = "Equivalent response after the oversized-body Promise has rejected: later resolve or reject calls cannot change its settled outcome; the flag only avoids those redundant calls."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 25, \"line\": 118}, \"start\": {\"column\": 9, \"line\": 118}}, \"mutator\": \"CallExpression\", \"replacement\": \";\"}"
+reason = "Coverage gap: the oversized-body test asserts rejection but does not measure subsequent stream consumption, so removing pause is not claimed equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 45, \"line\": 119}, \"start\": {\"column\": 26, \"line\": 119}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Equivalent external rejection: receiveTrace discards the internal Error message and always sends the fixed malformed-payload response."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 20, \"line\": 125}, \"start\": {\"column\": 11, \"line\": 125}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Equivalent settled-Promise guard: after oversized-body rejection, a later resolve cannot change the Promise outcome."
+
+[[survivors]]
+module = "web/spikes/performance/server.mjs"
+mutation = "{\"location\": {\"end\": {\"column\": 20, \"line\": 128}, \"start\": {\"column\": 11, \"line\": 128}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Equivalent settled-Promise guard: after oversized-body rejection, another rejection cannot change the Promise outcome."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 14, \"line\": 100}, \"start\": {\"column\": 12, \"line\": 100}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"Stryker was here!\\\"\"}"
+reason = "Coverage gap: the Node page tests inspect this diagnostic after it is overwritten or do not assert its initial empty value; this initial-string mutant is not claimed equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 20, \"line\": 118}, \"start\": {\"column\": 18, \"line\": 118}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"Stryker was here!\\\"\"}"
+reason = "Coverage gap: the Node page tests inspect this diagnostic after it is overwritten or do not assert its initial empty value; this initial-string mutant is not claimed equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 16, \"line\": 120}, \"start\": {\"column\": 14, \"line\": 120}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"Stryker was here!\\\"\"}"
+reason = "Coverage gap: the Node page tests inspect this diagnostic after it is overwritten or do not assert its initial empty value; this initial-string mutant is not claimed equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 20, \"line\": 119}, \"start\": {\"column\": 18, \"line\": 119}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"Stryker was here!\\\"\"}"
+reason = "Coverage gap: the Node page tests inspect this diagnostic after it is overwritten or do not assert its initial empty value; this initial-string mutant is not claimed equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 20, \"line\": 121}, \"start\": {\"column\": 18, \"line\": 121}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"Stryker was here!\\\"\"}"
+reason = "Coverage gap: the Node page tests inspect this diagnostic after it is overwritten or do not assert its initial empty value; this initial-string mutant is not claimed equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 34, \"line\": 132}, \"start\": {\"column\": 7, \"line\": 132}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: show receives existing HTMLElement nodes in the exercised paths; the Node tests do not call it with an absent notice or result node."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 63, \"line\": 230}, \"start\": {\"column\": 7, \"line\": 230}}, \"mutator\": \"OptionalChaining\", \"replacement\": \"context?.getExtension('WEBGL_lose_context').loseContext\"}"
+reason = "Coverage gap: the context double always supplies the lose-context extension when the context exists; a context without that optional extension is not exercised."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 71, \"line\": 282}, \"start\": {\"column\": 37, \"line\": 282}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Coverage gap: the matchMedia double ignores its query, so changing the reduced-motion media expression is invisible to this Node mutation command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 60, \"line\": 289}, \"start\": {\"column\": 5, \"line\": 289}}, \"mutator\": \"OptionalChaining\", \"replacement\": \"document.querySelector('#road-legend').removeAttribute\"}"
+reason = "Equivalent for the fixed spike DOM, which always contains road-legend; a missing-legend DOM is outside these page fixtures."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 38, \"line\": 299}, \"start\": {\"column\": 30, \"line\": 299}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Coverage gap: the media-event double stores a callback without checking the event name, so changing change to an empty string survives."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 31, \"line\": 309}, \"start\": {\"column\": 7, \"line\": 309}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: the Node page suite does not assert remote-asset image creation or its URL; browser host-policy plants are outside the mutation command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 31, \"line\": 309}, \"start\": {\"column\": 7, \"line\": 309}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the Node page suite does not assert remote-asset image creation or its URL; browser host-policy plants are outside the mutation command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 31, \"line\": 309}, \"start\": {\"column\": 7, \"line\": 309}}, \"mutator\": \"EqualityOperator\", \"replacement\": \"plant !== 'remote-asset'\"}"
+reason = "Coverage gap: the Node page suite does not assert remote-asset image creation or its URL; browser host-policy plants are outside the mutation command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 4, \"line\": 312}, \"start\": {\"column\": 33, \"line\": 309}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "Coverage gap: the Node page suite does not assert remote-asset image creation or its URL; browser host-policy plants are outside the mutation command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 31, \"line\": 309}, \"start\": {\"column\": 17, \"line\": 309}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Coverage gap: the Node page suite does not assert remote-asset image creation or its URL; browser host-policy plants are outside the mutation command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 51, \"line\": 311}, \"start\": {\"column\": 17, \"line\": 311}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Coverage gap: the Node page suite does not assert remote-asset image creation or its URL; browser host-policy plants are outside the mutation command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 24, \"line\": 316}, \"start\": {\"column\": 10, \"line\": 316}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Coverage gap: the no-WebGL Node test checks diagnostic refusal but does not assert the visible map-failure node text for that branch."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 46, \"line\": 321}, \"start\": {\"column\": 21, \"line\": 321}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Coverage gap: missingMap is used to expose helpers, but that early return has no direct assertion of its failure text, phase and visible message."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 27, \"line\": 322}, \"start\": {\"column\": 19, \"line\": 322}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Coverage gap: missingMap is used to expose helpers, but that early return has no direct assertion of its failure text, phase and visible message."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 24, \"line\": 323}, \"start\": {\"column\": 10, \"line\": 323}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Coverage gap: missingMap is used to expose helpers, but that early return has no direct assertion of its failure text, phase and visible message."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 37, \"line\": 326}, \"start\": {\"column\": 15, \"line\": 326}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: the page double has devicePixelRatio equal to CAP_VALUE, so the ignore-cap conditional has indistinguishable branches in the Node suite."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 37, \"line\": 326}, \"start\": {\"column\": 15, \"line\": 326}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the page double has devicePixelRatio equal to CAP_VALUE, so the ignore-cap conditional has indistinguishable branches in the Node suite."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 37, \"line\": 326}, \"start\": {\"column\": 15, \"line\": 326}}, \"mutator\": \"EqualityOperator\", \"replacement\": \"plant !== 'ignore-cap'\"}"
+reason = "Coverage gap: the page double has devicePixelRatio equal to CAP_VALUE, so the ignore-cap conditional has indistinguishable branches in the Node suite."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 37, \"line\": 326}, \"start\": {\"column\": 25, \"line\": 326}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Coverage gap: the page double has devicePixelRatio equal to CAP_VALUE, so the ignore-cap conditional has indistinguishable branches in the Node suite."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 44, \"line\": 329}, \"start\": {\"column\": 7, \"line\": 329}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: forcing the environment preflight on is tolerated by the synthetic passing renderer and probe clock; the Node suite does not assert its absence on smoke or diagnostic plants."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 28, \"line\": 334}, \"start\": {\"column\": 24, \"line\": 334}}, \"mutator\": \"BooleanLiteral\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the Node suite checks probe cleanup and renderer display helpers separately but does not assert their call counts in the complete start flow."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 19, \"line\": 332}, \"start\": {\"column\": 5, \"line\": 332}}, \"mutator\": \"CallExpression\", \"replacement\": \";\"}"
+reason = "Coverage gap: the Node suite checks probe cleanup and renderer display helpers separately but does not assert their call counts in the complete start flow."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 43, \"line\": 346}, \"start\": {\"column\": 17, \"line\": 346}}, \"mutator\": \"MethodExpression\", \"replacement\": \"generateHexagons()\"}"
+reason = "Coverage gap: removing the shallow copy can alias generated arrays; the Node suite does not check ownership or mutation of the generator return value."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 53, \"line\": 347}, \"start\": {\"column\": 21, \"line\": 347}}, \"mutator\": \"MethodExpression\", \"replacement\": \"generateParticles(cells)\"}"
+reason = "Coverage gap: removing the shallow copy can alias generated arrays; the Node suite does not check ownership or mutation of the generator return value."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 31, \"line\": 348}, \"start\": {\"column\": 7, \"line\": 348}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: the scene double reports fixed instance counts and the Node suite does not inspect the hexagon or particle omission input; browser omission plants are outside this command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 31, \"line\": 348}, \"start\": {\"column\": 7, \"line\": 348}}, \"mutator\": \"EqualityOperator\", \"replacement\": \"plant !== 'omit-hexagon'\"}"
+reason = "Coverage gap: the scene double reports fixed instance counts and the Node suite does not inspect the hexagon or particle omission input; browser omission plants are outside this command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 31, \"line\": 348}, \"start\": {\"column\": 7, \"line\": 348}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the scene double reports fixed instance counts and the Node suite does not inspect the hexagon or particle omission input; browser omission plants are outside this command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 31, \"line\": 348}, \"start\": {\"column\": 17, \"line\": 348}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Coverage gap: the scene double reports fixed instance counts and the Node suite does not inspect the hexagon or particle omission input; browser omission plants are outside this command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 45, \"line\": 348}, \"start\": {\"column\": 33, \"line\": 348}}, \"mutator\": \"CallExpression\", \"replacement\": \";\"}"
+reason = "Coverage gap: the scene double reports fixed instance counts and the Node suite does not inspect the hexagon or particle omission input; browser omission plants are outside this command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 32, \"line\": 349}, \"start\": {\"column\": 7, \"line\": 349}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the scene double reports fixed instance counts and the Node suite does not inspect the hexagon or particle omission input; browser omission plants are outside this command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 50, \"line\": 349}, \"start\": {\"column\": 34, \"line\": 349}}, \"mutator\": \"CallExpression\", \"replacement\": \";\"}"
+reason = "Coverage gap: the scene double reports fixed instance counts and the Node suite does not inspect the hexagon or particle omission input; browser omission plants are outside this command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 40, \"line\": 354}, \"start\": {\"column\": 30, \"line\": 354}}, \"mutator\": \"OptionalChaining\", \"replacement\": \"roads.pop\"}"
+reason = "Coverage gap: omit-road is exercised with roads enabled only, so removing the optional guard for a roadless omission request survives."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 54, \"line\": 378}, \"start\": {\"column\": 9, \"line\": 378}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the resize test changes width only; a height-only resize is not asserted by the Node page suite."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 57, \"line\": 395}, \"start\": {\"column\": 27, \"line\": 395}}, \"mutator\": \"LogicalOperator\", \"replacement\": \"particles[0]?.position[0] && 0\"}"
+reason = "Coverage gap: page start uses a nonempty particle list with a positive first coordinate; zero and empty-start variants of this fallback are not exercised."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 49, \"line\": 395}, \"start\": {\"column\": 27, \"line\": 395}}, \"mutator\": \"OptionalChaining\", \"replacement\": \"particles[0].position\"}"
+reason = "Coverage gap: page start uses a nonempty particle list with a positive first coordinate; zero and empty-start variants of this fallback are not exercised."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 37, \"line\": 400}, \"start\": {\"column\": 9, \"line\": 400}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the Node page suite does not exercise the missing-renderer plant through start; its browser refusal test is outside this mutation command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 6, \"line\": 403}, \"start\": {\"column\": 39, \"line\": 400}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "Coverage gap: the Node page suite does not exercise the missing-renderer plant through start; its browser refusal test is outside this mutation command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 31, \"line\": 402}, \"start\": {\"column\": 29, \"line\": 402}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"Stryker was here!\\\"\"}"
+reason = "Coverage gap: the Node page suite does not exercise the missing-renderer plant through start; its browser refusal test is outside this mutation command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 33, \"line\": 403}, \"start\": {\"column\": 16, \"line\": 403}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: the Node suite checks probe cleanup and renderer display helpers separately but does not assert their call counts in the complete start flow."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 61, \"line\": 407}, \"start\": {\"column\": 7, \"line\": 407}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: missing-renderer start is untested here and the default page harness already uses smoke duration; these branch changes do not alter asserted durations."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 35, \"line\": 407}, \"start\": {\"column\": 7, \"line\": 407}}, \"mutator\": \"EqualityOperator\", \"replacement\": \"plant !== 'missing-renderer'\"}"
+reason = "Coverage gap: missing-renderer start is untested here and the default page harness already uses smoke duration; these branch changes do not alter asserted durations."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 35, \"line\": 407}, \"start\": {\"column\": 7, \"line\": 407}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: missing-renderer start is untested here and the default page harness already uses smoke duration; these branch changes do not alter asserted durations."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 35, \"line\": 407}, \"start\": {\"column\": 17, \"line\": 407}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"\\\"\"}"
+reason = "Coverage gap: missing-renderer start is untested here and the default page harness already uses smoke duration; these branch changes do not alter asserted durations."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 54, \"line\": 409}, \"start\": {\"column\": 12, \"line\": 409}}, \"mutator\": \"LogicalOperator\", \"replacement\": \"profileDuration(spike.profile) && SMOKE_MS\"}"
+reason = "Coverage gap: supported profile durations are positive and the default harness uses smoke; the Node suite does not assert gate-duration selection through start."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 27, \"line\": 417}, \"start\": {\"column\": 9, \"line\": 417}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the scene double derives position directly from elapsed time, so a paused clock still yields a stationary position when the freeze argument is removed; freeze argument identity is not asserted."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 36, \"line\": 418}, \"start\": {\"column\": 9, \"line\": 417}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the scene double derives position directly from elapsed time, so a paused clock still yields a stationary position when the freeze argument is removed; freeze argument identity is not asserted."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 36, \"line\": 418}, \"start\": {\"column\": 9, \"line\": 417}}, \"mutator\": \"LogicalOperator\", \"replacement\": \"plant === 'freeze' && playback?.paused === true\"}"
+reason = "Coverage gap: the scene double derives position directly from elapsed time, so a paused clock still yields a stationary position when the freeze argument is removed; freeze argument identity is not asserted."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 36, \"line\": 418}, \"start\": {\"column\": 11, \"line\": 418}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the scene double derives position directly from elapsed time, so a paused clock still yields a stationary position when the freeze argument is removed; freeze argument identity is not asserted."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 52, \"line\": 427}, \"start\": {\"column\": 28, \"line\": 427}}, \"mutator\": \"ArrayDeclaration\", \"replacement\": \"[]\"}"
+reason = "Coverage gap: the Node suite checks the trace hours from playback but does not assert the copied window diagnostic hoursShown array."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 48, \"line\": 429}, \"start\": {\"column\": 46, \"line\": 429}}, \"mutator\": \"UnaryOperator\", \"replacement\": \"+1\"}"
+reason = "Coverage gap: sampled page frames change their hour or next-hour values, so the suite does not assert duplicate road-state suppression for successive frames in one interval."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 50, \"line\": 433}, \"start\": {\"column\": 11, \"line\": 431}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: sampled page frames change their hour or next-hour values, so the suite does not assert duplicate road-state suppression for successive frames in one interval."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 68, \"line\": 438}, \"start\": {\"column\": 36, \"line\": 438}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"performance.now() + lastHourTime\"}"
+reason = "Coverage gap: the first recorded hour transition starts at clock zero, making addition and subtraction indistinguishable; no later nonzero-origin transition duration is asserted."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 8, \"line\": 454}, \"start\": {\"column\": 41, \"line\": 452}}, \"mutator\": \"BlockStatement\", \"replacement\": \"{}\"}"
+reason = "Coverage gap: slow-scene checks timestamp and summary fields but not its camera frames, so removing or altering its draw loop survives the Node command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 56, \"line\": 453}, \"start\": {\"column\": 23, \"line\": 453}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"elapsed / duration / ORBIT_TURN\"}"
+reason = "Coverage gap: slow-scene checks timestamp and summary fields but not its camera frames, so removing or altering its draw loop survives the Node command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 42, \"line\": 453}, \"start\": {\"column\": 24, \"line\": 453}}, \"mutator\": \"ArithmeticOperator\", \"replacement\": \"elapsed * duration\"}"
+reason = "Coverage gap: slow-scene checks timestamp and summary fields but not its camera frames, so removing or altering its draw loop survives the Node command."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 21, \"line\": 465}, \"start\": {\"column\": 13, \"line\": 465}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: roadless finish registers the extra callback without executing it in the Node suite; the changed playback guard is not claimed equivalent."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 41, \"line\": 469}, \"start\": {\"column\": 13, \"line\": 469}}, \"mutator\": \"CallExpression\", \"replacement\": \";\"}"
+reason = "Coverage gap: the post-orbit page tests execute only the first continuation callback, so removing scheduling of its successor is not observed."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 38, \"line\": 504}, \"start\": {\"column\": 15, \"line\": 504}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: the scene double always samples all three color families as visible and the Node trace assertions do not independently vary the accumulated visual diagnostics."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 38, \"line\": 504}, \"start\": {\"column\": 15, \"line\": 504}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the scene double always samples all three color families as visible and the Node trace assertions do not independently vary the accumulated visual diagnostics."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 38, \"line\": 504}, \"start\": {\"column\": 15, \"line\": 504}}, \"mutator\": \"LogicalOperator\", \"replacement\": \"spike.hex && colors.hex\"}"
+reason = "Coverage gap: the scene double always samples all three color families as visible and the Node trace assertions do not independently vary the accumulated visual diagnostics."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 53, \"line\": 505}, \"start\": {\"column\": 20, \"line\": 505}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: the scene double always samples all three color families as visible and the Node trace assertions do not independently vary the accumulated visual diagnostics."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 53, \"line\": 505}, \"start\": {\"column\": 20, \"line\": 505}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the scene double always samples all three color families as visible and the Node trace assertions do not independently vary the accumulated visual diagnostics."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 53, \"line\": 505}, \"start\": {\"column\": 20, \"line\": 505}}, \"mutator\": \"LogicalOperator\", \"replacement\": \"spike.particle && colors.particle\"}"
+reason = "Coverage gap: the scene double always samples all three color families as visible and the Node trace assertions do not independently vary the accumulated visual diagnostics."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 41, \"line\": 506}, \"start\": {\"column\": 16, \"line\": 506}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: the scene double always samples all three color families as visible and the Node trace assertions do not independently vary the accumulated visual diagnostics."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 41, \"line\": 506}, \"start\": {\"column\": 16, \"line\": 506}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the scene double always samples all three color families as visible and the Node trace assertions do not independently vary the accumulated visual diagnostics."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 41, \"line\": 506}, \"start\": {\"column\": 16, \"line\": 506}}, \"mutator\": \"LogicalOperator\", \"replacement\": \"spike.road && colors.road\"}"
+reason = "Coverage gap: the scene double always samples all three color families as visible and the Node trace assertions do not independently vary the accumulated visual diagnostics."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 65, \"line\": 536}, \"start\": {\"column\": 26, \"line\": 536}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: serialized camera and animation assertions cover moving scenes; this Node suite does not assert the false serialization case after a frozen scene."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 56, \"line\": 538}, \"start\": {\"column\": 15, \"line\": 538}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"true\"}"
+reason = "Coverage gap: serialized camera and animation assertions cover moving scenes; this Node suite does not assert the false serialization case after a frozen scene."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 36, \"line\": 558}, \"start\": {\"column\": 5, \"line\": 558}}, \"mutator\": \"ConditionalExpression\", \"replacement\": \"false\"}"
+reason = "Coverage gap: the empty-summary test checks diagnostic null and trace zeros but not the rendered result text for the null share."
+
+[[survivors]]
+module = "web/spikes/performance/main.ts"
+mutation = "{\"location\": {\"end\": {\"column\": 41, \"line\": 558}, \"start\": {\"column\": 39, \"line\": 558}}, \"mutator\": \"StringLiteral\", \"replacement\": \"\\\"Stryker was here!\\\"\"}"
+reason = "Coverage gap: the empty-summary test checks diagnostic null and trace zeros but not the rendered result text for the null share."
+
+# S1-T09 rules_config: equivalent mutants and refusals no parsed file can reach.
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -24,7 +24,7 @@\n     export_set, base_a, base_b, window = _values(entries)\n     return CheckedRules(\n         entries=entries,\n-        rules_version_id=entries[0].rules_version_id,\n+        rules_version_id=entries[1].rules_version_id,\n         export_parameter_set=export_set,\n         movement_base_a=base_a,\n         movement_base_b=base_b,"
+reason = "The identifier check has already required every entry to carry one identifier, and the required rules leave at least two entries, so the second entry's identifier is the same text as the first."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -11,9 +11,7 @@\n     Raises:\n         RulesRefusal: A field is missing, extra, or different.\n     \"\"\"\n-    missing = [\n-        field for field in RECORD_FIELDS if field in computed and field not in committed\n-    ]\n+    missing = None\n     if not missing:\n         missing = sorted(field for field in computed if field not in committed)\n     if missing:"
+reason = "Replacing the first missing-field list with nothing falls through to the same selection: record fields in record order when the computation has one the committed record lacks, otherwise the sorted name of a computed field."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -17,7 +17,7 @@\n     if not missing:\n         missing = sorted(field for field in computed if field not in committed)\n     if missing:\n-        preferred = [field for field in RECORD_FIELDS if field in missing]\n+        preferred = None\n         name = preferred[0] if preferred else missing[0]\n         raise RulesRefusal(f\"missing field {name}\")\n     extra = sorted(field for field in committed if field not in computed)"
+reason = "The missing-field list is already in record-field order when it contains a record field, and it contains none otherwise, so its first item is the name the preferred list would have chosen."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -18,7 +18,7 @@\n         missing = sorted(field for field in computed if field not in committed)\n     if missing:\n         preferred = [field for field in RECORD_FIELDS if field in missing]\n-        name = preferred[0] if preferred else missing[0]\n+        name = preferred[0] if (preferred) and False else missing[0]\n         raise RulesRefusal(f\"missing field {name}\")\n     extra = sorted(field for field in committed if field not in computed)\n     if extra:"
+reason = "Forcing the name to the first item of the missing-field list chooses the same field, because that list is already in record-field order when it contains a record field and contains none otherwise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -1,6 +1,6 @@\n def _load_document(path: Path) -> dict[str, object]:\n     try:\n-        text = path.read_text(encoding=\"utf-8\")\n+        text = path.read_text(encoding=\"UTF-8\")\n     except UnicodeDecodeError as exc:\n         raise RulesRefusal(\"file: not UTF-8 text\") from exc\n     except OSError as exc:"
+reason = "The names utf-8 and UTF-8 select the same codec, so every byte string is accepted or refused as before."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -10,7 +10,7 @@\n     except tomllib.TOMLDecodeError as exc:\n         raise RulesRefusal(\"file: invalid TOML\") from exc\n     if not isinstance(loaded, dict):\n-        raise RulesRefusal(\"file field rules_version: not a list of entries\")\n+        raise RulesRefusal(None)\n     document: dict[str, object] = {}\n     for key, value in loaded.items():\n         if not isinstance(key, str):"
+reason = "A successful tomllib parse is a dict, so this refusal never runs and changing its message cannot change a result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -10,7 +10,7 @@\n     except tomllib.TOMLDecodeError as exc:\n         raise RulesRefusal(\"file: invalid TOML\") from exc\n     if not isinstance(loaded, dict):\n-        raise RulesRefusal(\"file field rules_version: not a list of entries\")\n+        raise RulesRefusal(\"XXfile field rules_version: not a list of entriesXX\")\n     document: dict[str, object] = {}\n     for key, value in loaded.items():\n         if not isinstance(key, str):"
+reason = "A successful tomllib parse is a dict, so this refusal never runs and changing its message cannot change a result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -10,7 +10,7 @@\n     except tomllib.TOMLDecodeError as exc:\n         raise RulesRefusal(\"file: invalid TOML\") from exc\n     if not isinstance(loaded, dict):\n-        raise RulesRefusal(\"file field rules_version: not a list of entries\")\n+        raise RulesRefusal(\"FILE FIELD RULES_VERSION: NOT A LIST OF ENTRIES\")\n     document: dict[str, object] = {}\n     for key, value in loaded.items():\n         if not isinstance(key, str):"
+reason = "A successful tomllib parse is a dict, so this refusal never runs and changing its message cannot change a result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -14,6 +14,6 @@\n     document: dict[str, object] = {}\n     for key, value in loaded.items():\n         if not isinstance(key, str):\n-            raise RulesRefusal(\"file: field name is not text\")\n+            raise RulesRefusal(None)\n         document[key] = value\n     return document"
+reason = "A successful tomllib parse uses string keys only, so this refusal never runs and changing its message cannot change a result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -14,6 +14,6 @@\n     document: dict[str, object] = {}\n     for key, value in loaded.items():\n         if not isinstance(key, str):\n-            raise RulesRefusal(\"file: field name is not text\")\n+            raise RulesRefusal(\"XXfile: field name is not textXX\")\n         document[key] = value\n     return document"
+reason = "A successful tomllib parse uses string keys only, so this refusal never runs and changing its message cannot change a result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -14,6 +14,6 @@\n     document: dict[str, object] = {}\n     for key, value in loaded.items():\n         if not isinstance(key, str):\n-            raise RulesRefusal(\"file: field name is not text\")\n+            raise RulesRefusal(\"FILE: FIELD NAME IS NOT TEXT\")\n         document[key] = value\n     return document"
+reason = "A successful tomllib parse uses string keys only, so this refusal never runs and changing its message cannot change a result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -11,7 +11,7 @@\n         table: dict[str, object] = {}\n         for key, value in item.items():\n             if not isinstance(key, str):\n-                raise RulesRefusal(f\"file: entry {index} field name is not text\")\n+                raise RulesRefusal(None)\n             table[key] = value\n         entries.append(table)\n     return entries"
+reason = "A successful tomllib parse uses string keys only, so a table entry never has a non-text field name and this refusal never runs."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -1,6 +1,6 @@\n def _canonical_whole(text: str) -> int | None:\n     if not text.isascii() or not text.isdigit():\n         return None\n-    if len(text) > 1 and text.startswith(\"0\"):\n+    if len(text) >= 1 and text.startswith(\"0\"):\n         return None\n     return int(text)"
+reason = "The text 0 is the only value the two bounds treat differently. Callers refuse both a missing parse and the number 0 with the same message: a movement base of 0 is not positive, and a window of 0 is outside 1 to 23."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -17,6 +17,6 @@\n         for entry in selected\n     ]\n     encoded = json.dumps(\n-        payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=True\n+        payload, ensure_ascii=None, separators=(\",\", \":\"), sort_keys=True\n     ).encode(\"utf-8\")\n     return hashlib.sha256(encoded).hexdigest()"
+reason = "json.dumps escapes non-ASCII only when ensure_ascii is true. None is falsy, so it leaves the same UTF-8 bytes as false."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -17,6 +17,6 @@\n         for entry in selected\n     ]\n     encoded = json.dumps(\n-        payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=True\n+        payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=None\n     ).encode(\"utf-8\")\n     return hashlib.sha256(encoded).hexdigest()"
+reason = "The digest rows are already ordered and each object's keys are already written in sorted order, and None is falsy, so leaving the keys unsorted hashes the same bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -17,6 +17,5 @@\n         for entry in selected\n     ]\n     encoded = json.dumps(\n-        payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=True\n-    ).encode(\"utf-8\")\n+        payload, ensure_ascii=False, separators=(\",\", \":\"), ).encode(\"utf-8\")\n     return hashlib.sha256(encoded).hexdigest()"
+reason = "The digest rows are already ordered and each object's keys are already written in sorted order, so the default, which does not sort keys, hashes the same bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -17,6 +17,6 @@\n         for entry in selected\n     ]\n     encoded = json.dumps(\n-        payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=True\n+        payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=False\n     ).encode(\"utf-8\")\n     return hashlib.sha256(encoded).hexdigest()"
+reason = "The digest rows are already ordered and each object's keys are already written in sorted order, so sorting keys or not hashes the same bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/privacy/rules_config.py"
+mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -18,5 +18,5 @@\n     ]\n     encoded = json.dumps(\n         payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=True\n-    ).encode(\"utf-8\")\n+    ).encode(\"UTF-8\")\n     return hashlib.sha256(encoded).hexdigest()"
+reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same encoder and bytes."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -8,7 +8,7 @@\n         raw is None\n         or not raw.isascii()\n         or not raw.isdecimal()\n-        or len(raw.lstrip(\"0\")) > 7\n+        or len(raw.lstrip(\"0\")) > 8\n     ):\n         raise Refusal(\"invalid token cap\")\n     cap = int(raw.lstrip(\"0\") or \"0\")"
+reason = "An eight-digit decimal cap also exceeds the later five-million cap bound; both paths refuse with the same fixed reason."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -11,7 +11,7 @@\n         or len(raw.lstrip(\"0\")) > 7\n     ):\n         raise Refusal(\"invalid token cap\")\n-    cap = int(raw.lstrip(\"0\") or \"0\")\n+    cap = int(raw.lstrip(\"XX0XX\") or \"0\")\n     if not 1 <= cap <= 5_000_000:\n         raise Refusal(\"invalid token cap\")\n     if planned > cap:"
+reason = "The preceding ASCII decimal guard excludes X, so stripping the character set XX0XX strips exactly the same leading zeroes."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -61,7 +61,7 @@\n         gateway.provider = observed\n         rows = []\n         raw_rows = []\n-        for case, request in zip(cases, requests, strict=True):\n+        for case, request in zip(cases, requests, strict=None):\n             record = gateway.decide(request)\n             if args.provider == \"jev\" and record[\"threshold_outcome\"] in (\n                 \"ERROR\","
+reason = "requests is built one-for-one from cases and only replaced one-for-one before this zip; the two lengths are equal on every path reaching the loop."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -61,7 +61,7 @@\n         gateway.provider = observed\n         rows = []\n         raw_rows = []\n-        for case, request in zip(cases, requests, strict=True):\n+        for case, request in zip(cases, requests, ):\n             record = gateway.decide(request)\n             if args.provider == \"jev\" and record[\"threshold_outcome\"] in (\n                 \"ERROR\","
+reason = "requests is built one-for-one from cases and only replaced one-for-one before this zip; the two lengths are equal on every path reaching the loop."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -61,7 +61,7 @@\n         gateway.provider = observed\n         rows = []\n         raw_rows = []\n-        for case, request in zip(cases, requests, strict=True):\n+        for case, request in zip(cases, requests, strict=False):\n             record = gateway.decide(request)\n             if args.provider == \"jev\" and record[\"threshold_outcome\"] in (\n                 \"ERROR\","
+reason = "requests is built one-for-one from cases and only replaced one-for-one before this zip; the two lengths are equal on every path reaching the loop."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -73,7 +73,7 @@\n                     f\"calls made {observed.calls_made}; tokens used {observed.tokens_used}\"\n                 )\n                 return 4\n-            actual[\"provider\"] = cast(str, record[\"provider_used\"])\n+            actual[\"provider\"] = cast(None, record[\"provider_used\"])\n             actual[\"model\"] = cast(str, record[\"reported_model_id\"])\n             if compare(actual, configured(args.provider)) == \"requalify\":\n                 state = \"requalify\""
+reason = "typing.cast returns its second argument unchanged and does not inspect its type argument; replacing that first argument has no runtime effect."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -74,7 +74,7 @@\n                 )\n                 return 4\n             actual[\"provider\"] = cast(str, record[\"provider_used\"])\n-            actual[\"model\"] = cast(str, record[\"reported_model_id\"])\n+            actual[\"model\"] = cast(None, record[\"reported_model_id\"])\n             if compare(actual, configured(args.provider)) == \"requalify\":\n                 state = \"requalify\"\n             accepted = record[\"threshold_outcome\"] == \"DECIDED\""
+reason = "typing.cast returns its second argument unchanged and does not inspect its type argument; replacing that first argument has no runtime effect."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -118,7 +118,7 @@\n                     correct=accepted and decoded == case[\"expected\"],\n                     outcome=record[\"threshold_outcome\"],\n                     orders=record[\"option_order\"],\n-                    memo_key=record[\"memo_key\"],\n+                    memo_key=None,\n                 )\n             )\n     finally:"
+reason = "This transient memo_key member is removed by committed_aggregate before output and has no other consumer; gateway records are unchanged."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -118,8 +118,7 @@\n                     correct=accepted and decoded == case[\"expected\"],\n                     outcome=record[\"threshold_outcome\"],\n                     orders=record[\"option_order\"],\n-                    memo_key=record[\"memo_key\"],\n-                )\n+                    )\n             )\n     finally:\n         if previous is None:"
+reason = "This transient memo_key member is removed by committed_aggregate before output and has no other consumer; gateway records are unchanged."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -123,7 +123,7 @@\n             )\n     finally:\n         if previous is None:\n-            os.environ.pop(\"EII_DECISION_PROVIDER\", None)\n+            os.environ.pop(\"EII_DECISION_PROVIDER\", )\n         else:\n             os.environ[\"EII_DECISION_PROVIDER\"] = previous\n     comparison = reproduction(args.provider, raw_rows, admitted)"
+reason = "The provider environment name is assigned before entering the try block and no called provider removes it, so this finally block always pops an existing name."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -167,7 +167,7 @@\n         result[\"calls_made\"] = observed.calls_made\n         result[\"tokens_used\"] = observed.tokens_used\n     path.parent.mkdir(parents=True, exist_ok=True)\n-    with path.open(\"x\", encoding=\"utf-8\") as stream:\n+    with path.open(\"x\", encoding=\"UTF-8\") as stream:\n         stream.write(canonical(committed_aggregate(result)) + \"\\n\")\n     print(state)\n     print("
+reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same encoder and bytes."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -165,7 +165,7 @@\n         result[\"calls_made\"] = observed.calls_made\n         result[\"tokens_used\"] = observed.tokens_used\n     path.parent.mkdir(parents=True, exist_ok=True)\n-    with path.open(\"x\", encoding=\"utf-8\") as stream:\n+    with path.open(\"x\", encoding=\"UTF-8\") as stream:\n         stream.write(canonical(committed_aggregate(result)) + \"\\n\")\n     print(state)\n     print("
+reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same encoder and bytes."

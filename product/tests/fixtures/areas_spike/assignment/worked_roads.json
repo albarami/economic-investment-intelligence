@@ -1,0 +1,60 @@
+{
+  "note": "Invented synthetic fixture near the equator; no real place.",
+  "nodes": [
+    {
+      "id": "SYN-N-0-0",
+      "lat": "0.0000000",
+      "lon": "0.0000000"
+    },
+    {
+      "id": "SYN-N-0-2",
+      "lat": "0.0000000",
+      "lon": "0.0898334"
+    },
+    {
+      "id": "SYN-N-1-1",
+      "lat": "0.0297943",
+      "lon": "0.0449167"
+    }
+  ],
+  "links": [
+    {
+      "link_id": "SYN-L-001",
+      "source": "SYN-N-0-0",
+      "target": "SYN-N-0-2",
+      "length_m": "10000",
+      "road_class": "secondary"
+    },
+    {
+      "link_id": "SYN-L-002",
+      "source": "SYN-N-0-0",
+      "target": "SYN-N-1-1",
+      "length_m": "6000",
+      "road_class": "secondary"
+    },
+    {
+      "link_id": "SYN-L-003",
+      "source": "SYN-N-1-1",
+      "target": "SYN-N-0-2",
+      "length_m": "6000",
+      "road_class": "secondary"
+    }
+  ],
+  "units": [
+    {
+      "unit_id": "SYN-U-01",
+      "lat": "0.0000000",
+      "lon": "0.0000000"
+    },
+    {
+      "unit_id": "SYN-U-02",
+      "lat": "0.0000000",
+      "lon": "0.0898334"
+    },
+    {
+      "unit_id": "SYN-U-03",
+      "lat": "0.0297943",
+      "lon": "0.0449167"
+    }
+  ]
+}

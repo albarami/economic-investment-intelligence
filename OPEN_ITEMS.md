@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 (see PROGRESS.md) |
-| Date | 2026-11-12 |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 and by decision 0023 on 2026-11-13, and by decision 0026 on 2026-11-14 (see PROGRESS.md) |
+| Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | Track every unresolved owner decision, assumption, pending correction and technical unknown without implying closure. |
 | Read first | [docs/README.md](docs/README.md), [PROGRESS.md](PROGRESS.md) |
@@ -21,6 +21,7 @@
 - OI-35 records which parameter set is exported. A lead ruling of 2026-11-11 sets the default to A; the owner or a data owner may overrule it before the slice S1 gate.
 - OI-39 onwards are raised during the build.
 - OI-96 (closed by the owner's answer of 2026-11-12) and the items after it record the points of [decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md): the age of the places copy, the Public source for the survival base rate, the Public source of each forecast series without a table, the provider's rule on storing responses, the sources that are off under a public or commercial hosting, the size of the public-total inventory with the two gridded Public tables, the subject of a district series and the build without the night-lights key.
+- OI-132 to OI-148 record the open points of [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md). The owner's pending questions are whether road traffic is part of the movement source, the gaps N1, N3, N4, N6 and N7 of the decision question bank (hiring and leaving flows, rents, an events calendar, supplier certifications and school capacity), who keeps the monthly register snapshots (OI-141), and whether a commute line from a whole home municipality to the site's snapped catchment meets the district-pair case (OI-147, with card C39's form as the default). The owner's attribution note for the imagery provider is received (ruling L-151 records the note and its permitted locations); OI-132 remains for the documentation guard's exception, which task S1-T14 builds. The owner's answer of 2026-11-14 settles the talent ratio (OI-140) and the movement splits (OI-134, item 16). OI-148 confirms the age bands against the operator's format when its data arrives, and is not an owner question. The others are the register file's fields still to confirm (OI-142), the look's task S3-T15 (OI-143), the recovery tracker and the Qatarization planner (OI-144), and two assumptions: the age profile of people living here (OI-145) and prices per square foot (OI-146). The decision also updates OI-08 (items 12 and 15), OI-27 (item 15, a product for companies), OI-97 (item 12), OI-98 (items 8 and 12) and OI-102 (items 6 and 8).
 
 ## OI-01 — Main model key (supplied for go-live; not used during the build)
 
@@ -52,6 +53,8 @@
 - DONE SO FAR: The candidate sources and reconciliation steps are documented; affected display cards stay blocked. The site demand and revenue estimate and the revenue range of the user's outlet ([decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 8 and 10) read the survey figures and stay off screen while this item is open.
 - OPTIONS: **Recommendation:** follow the documented reconciliation and default to the named production-value and occupation tables only after sign-off. Otherwise leave the figures hidden.
 - NEEDED BY: slice S2 reconciliation; slice S7 methods and affected story scenes.
+- UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): Restaurant production value is not a field of the present datasets and is neither derived nor shown. It is no longer a default or a reconciliation candidate. Reconciliation R1 is closed on that basis in the reconciliation record of task S2-T03, which is not merged yet. The wage-table reconciliation remains. Card C4 keeps shares of output computed from published figures only (item 12).
+
 
 ## OI-04 — Census map-layer licence
 
@@ -63,6 +66,8 @@
 - OPTIONS: **Recommendation:** obtain and record written confirmation; until then keep the source validation-only and use the finest separately licensed geography for coverage and boundary geometry.
 - NEEDED BY: slice S2 public frame and coverage data.
 - CLOSED: 2026-11-12, by the owner's note of that day, recorded in [decision 0017](docs/decisions/0017-public-data-additions-and-public-splits.md): the census map layers of the statistics authority's public map service are used in this internal project. The written licence question for any use beyond it is a real-deployment item in [docs/17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md), section "Items moved from OPEN_ITEMS.md".
+- UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): The earlier validation-only restriction no longer holds in version 1. Census map layers follow the same rule as every public source: visitor-readable sources are used and shown in full, with the publisher's terms recorded in its own words with the date read and the basis of use in document 04. Nothing from a source not under an open licence is committed. The frame's geometry still comes from the licensed boundary source and the census map layers are joined by keys. Document 17 keeps the one list of permissions or licences needed before real use; nothing on it holds back version 1 (items 1 to 5 and 9).
+
 
 ## OI-05 — Product and Arabic names
 
@@ -90,7 +95,7 @@
 - TYPE: CLOSED (was OPEN)
 - NEEDED: Owner decision on whether later item L8 may include a clearly fictional list of firms.
 - WHY: A synthetic prospect list can read as a real recommendation and reopens the firm channel.
-- DONE SO FAR: No prospect list is in version 1; firm and owner networks are dropped.
+- DONE SO FAR: No prospect list is in version 1; firm and owner networks are dropped. On 2026-11-13, [decision 0022](docs/decisions/0022-real-register-companies-with-a-synthetic-world.md) replaced named synthetic firms by register companies, the real companies of the public business register: lists of prospects, partners and suppliers show register companies with their card fields and employee counts, ordered by tested code over criteria the user can see and change; networks of firms or owners stay dropped.
 - OPTIONS: **Recommendation:** keep it excluded. Any later list needs an owner-approved decision and a fresh privacy and wording review.
 - NEEDED BY: After slice S11, backlog item L8.
 - CLOSED: 2026-11-12, by the owner's decisions of that day, recorded in [decision 0016](docs/decisions/0016-version-1-covers-the-whole-initiative.md) (item 12): named synthetic firms are allowed in version 1 as prospects, partners and suppliers, always marked Synthetic, with names that never resemble real ones; networks of firms or owners stay dropped.
@@ -99,11 +104,14 @@
 
 - ID: OI-08
 - TYPE: OPEN
-- NEEDED: Approve the live-row label, confirm the distinct-organisation minimum for demand aggregates, and align the canonical read function.
+- NEEDED: Confirm the distinct-organisation minimum for a roll-up of the internal question log made for the evaluation, which shows no company identity and only groups of at least that minimum ([06_PRIVACY_AND_DISCLOSURE_CONTROL.md](docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-66). The live-row label and the demand-aggregate use left with the oversight seat (item 15).
 - WHY: Oversight must show demand without exposing company identity or small-group behaviour.
 - DONE SO FAR: Live rows default to “this session”, seeded history to Synthetic, and no company identity is shown. The minimum is two for the two-company demonstration; this is demonstration configuration, not a disclosure threshold.
 - OPTIONS: **Recommendation:** keep the labels and the demonstration minimum of two; any other value needs an owner decision and must not be presented as a privacy rule.
-- NEEDED BY: slice S9 oversight and database tests.
+- NEEDED BY: before the first roll-up of the question log made for the evaluation.
+- UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12: the ledger starts empty and holds only questions asked, so no seeded history exists and its Synthetic label falls away (S9-T03).
+- UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 15: the product is for companies only. The oversight seat leaves version 1 with its screen and roll-ups (S9-T04), its read functions (S9-T01) and its badge, and the ledger stays only as the internal question log, with no screen. So no screen shows the live-row label or a demand aggregate, and the read function this item was to align leaves with the seat; the company read functions and their separation tests stay. The distinct-organisation minimum stays open for one use: a roll-up of the question log made for the evaluation shows no company identity and only groups of at least that minimum ([06_PRIVACY_AND_DISCLOSURE_CONTROL.md](docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-66). It is now needed before the first such roll-up.
+- UPDATE: 2026-11-14: NEEDED and NEEDED BY are narrowed to that remaining use. The oversight screen, its live-row label and its demand aggregates stay withdrawn by item 15. Nothing earlier in this item is deleted.
 
 ## OI-09 — Native Arabic reviewer
 
@@ -200,12 +208,13 @@
 ## OI-18 — Gateway token cap and key rotation
 
 - ID: OI-18
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - NEEDED: Owner confirmation of the project token cap and a key rotation date, and of whether the gateway's provider key may be used during the build: the owner's note of 2026-11-12 keeps the API keys of the uncommitted `.env` file for go-live and does not name this key ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12).
 - WHY: Offline provider use still needs a hard cost limit and credential hygiene.
 - DONE SO FAR: Default cap is 5 million tokens in total; no agent may purchase, upgrade or renew.
 - OPTIONS: **Recommendation:** confirm or tighten the default and record rotation before provider use; agents never change the subscription. No keyed provider run is made before the owner answers.
 - NEEDED BY: slice S1 gateway qualification and every later provider run.
+- CLOSED: 2026-11-13, by the owner's standing answer of that day: the gateway's provider key may be used for any run the plan calls for, on public or synthetic inputs only, from the lead's own shell and never through a worker tool, a test or CI; the caps are 5 million tokens for one run and 20 million for the build, and what each run used is logged; the key is rotated before go-live and at once if it is ever exposed; no agent purchases, upgrades or renews. The keyed requalification of 2026-11-13 made 340 calls and used 147,969 tokens ([evals/typed_decisions/README.md](evals/typed_decisions/README.md), section "Keyed run of 2026-11-13"). The rule that nothing a user types live goes to the provider stays as [decision 0014](docs/decisions/0014-typed-decision-gateway.md) has it; OI-15 stays open.
 
 ## OI-19 — Independent documentation review and corrections
 
@@ -256,6 +265,8 @@
 - DONE SO FAR: Defaults are no restricted survey figures, owner nominations before slice S4, assumed hotel occupancy until sourced, and documented draft eligibility rules.
 - OPTIONS: **Recommendation:** keep conservative defaults until evidence and reviewers exist; reconcile differences by decision record before the full world build.
 - NEEDED BY: slice S4 world and validation scorecard.
+- UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): the consent question is replaced: transport-survey summaries readable as a visitor are used in version 1 whatever their reuse terms, their terms recorded in the publisher's own words with the date read in document 04 and any permission needed for real use listed in document 17; what stays open is the mapping of published parameters to the manifest entries (document 05, Q1).
+
 
 ## OI-24 — Privacy-audit scope
 
@@ -299,6 +310,7 @@
 - OPTIONS: **Recommendation:** keep the disclosure and limited scope unless the owner adds work by decision record.
 - NEEDED BY: slice S3 company interface; backlog review after slice S11.
 - CLOSED: 2026-11-12, by the owner's decisions of that day, recorded in [decision 0016](docs/decisions/0016-version-1-covers-the-whole-initiative.md): serving the region (journey D7) is in version 1; a cross-country entry comparison stays out of version 1. The company-seat recording notice keeps its draft wording, the documented default.
+- UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 15: the oversight seat and its roll-up leave version 1, so the notice no longer discloses oversight recording. The company seat states that its questions are recorded in the internal question log, which no screen shows ([01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), section "Open questions and assumptions", ASSUMPTION 4).
 
 ## OI-28 — Pilot request and lawful real-data path
 
@@ -379,6 +391,7 @@
 - DONE SO FAR: A lead ruling of 2026-11-11 sets the default `export_parameter_set` to `A`, fixed in the rules configuration at the slice S1 gate, before any world is built; version 1 uses rounded estimated presence counts and flows without `presence_scale` or `flow_scale` (PRV-59, decision 0016). A lead ruling of 2026-11-11 writes that fix into the slice S1 gate. A lead ruling of 2026-11-11 defines `window_key` as the SHA-256 of canonical JSON holding the protected `period` and the four name-ordered `{name, sha256}` pairs for `business_register.v1`, `employment.v1`, `residence.v1` and `wages.v1`, using each feed's manifest `feed_sha256`; nothing else enters it. The register shipped inside an installed application is the allow-list for a frozen release, and `freeze.json` must say complete. The owner or a data owner may overrule the default set.
 - OPTIONS: **Recommendation:** export set A unless the owner or a data owner records another choice before the slice S1 gate. Do not export a second treatment of the same window.
 - NEEDED BY: the slice S1 gate, before the first world build.
+- UPDATE: 2026-11-14: the rules configuration of task S1-T09 records the default exported set A; the owner or a data owner may still overrule it before the slice S1 gate.
 
 ## OI-36 — Layout signals outside the audit acceptance model
 
@@ -764,10 +777,10 @@
 ## OI-92 — Commit guard: secret list, reading `.env`, minimum length
 
 - ID: OI-92
-- TYPE: ASSUMPTION
+- TYPE: CLOSED (was ASSUMPTION)
 - NEEDED: Owner confirmation of the closed list of guarded values, that the guard may read the uncommitted `.env`, and the minimum length of 12 characters with refusal below it.
 - WHY: The pack marks `ANTHROPIC_API_KEY`, `JEV_PRO_API_KEY`, `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` as keys that are never printed and `EII_DATABASE_URL` as holding the application role's password (docs/13_DEPLOYMENT_AND_OPERATIONS.md, section "Environments", rows `ANTHROPIC_API_KEY`, `EII_DATABASE_URL`, `JEV_PRO_API_KEY`, `TOMTOM_API_KEY` and `EARTHDATA_API_KEY`; OPS-07, OPS-14 and OPS-71 in the same file), says running code reads secrets from the process environment and that "setup scripts may read the uncommitted `.env`" (OPS-08 in the same file), and gives no list for a guard, no minimum length and no rule for a short value.
-- DONE SO FAR: The guard judges the five names, four keys and the database URL (for the URL, the password, raw and percent-decoded), from `.env` (read without a byte order mark, with quotes and a trailing comment; a line it cannot read is refused) and the environment, over the content and the path of every staged file, and prints the variable name and, only when it holds no value, the path. A value below 12 characters (for the URL, the password as written or percent-decoded), a database URL that is not a PostgreSQL URL with a host and, when a port is written, a numeric one, and with no at-sign after the host part and no `password` or `passfile` parameter in its query string, or a double-quoted `.env` value that holds a backslash, makes it refuse, because a silent pass would let a one-character value, an unreadable URL or a misread line switch the guard off. A staged submodule entry has no content of its own; its path is judged. The guard reads git's index from the top of the repository. A shorter minimum would refuse ordinary commits, because words such as `postgres` and `secret` occur in many tracked files; 12 is longer than those words and shorter than any real key. The generated database password should be at least 24 characters (set in slice S1, not here). Not covered, by design: the reviewer password (no variable name in the pack), the owner credential (a libpq password file outside the repository), values split over lines, reversed or encoded, `.env.local`.
+- DONE SO FAR: The guard judges the five names, four keys and the database URL (for the URL, the password, raw and percent-decoded), from `.env` (read without a byte order mark, with quotes and a trailing comment; a line it cannot read is refused) and the environment, over the content and the path of every staged file, and prints the variable name and, only when it holds no value, the path. A value below 12 characters (for the URL, the password as written or percent-decoded), a database URL that is not a PostgreSQL URL with a host and, when a port is written, a numeric one, and with no at-sign after the host part and no `password` or `passfile` parameter in its query string, or a double-quoted `.env` value that holds a backslash, makes it refuse, because a silent pass would let a one-character value, an unreadable URL or a misread line switch the guard off. A staged submodule entry has no content of its own; its path is judged. The guard reads git's index from the top of the repository. A shorter minimum would refuse ordinary commits, because words such as `postgres` and `secret` occur in many tracked files; 12 is longer than those words and shorter than any real key. The generated database password should be at least 24 characters (set in slice S1, not here). Not covered, by design: the reviewer password (no variable name in the pack), the owner credential (a libpq password file outside the repository), values split over lines, reversed or encoded, `.env.local`. Closed on 2026-11-13 by the owner's decision of that day: approved as proposed.
 - OPTIONS: **Recommendation:** keep. Alternatives: a minimum of 8 (more collisions with words); judging short values by exact line match; also reading `.env.local`; a pre-push repeat of the guard.
 - NEEDED BY: slice S0 gate.
 
@@ -822,6 +835,7 @@
 - DONE SO FAR: Task S6-T15 builds the base rates of card C31 and promises no survival figure. No survival figure is computed from the Synthetic births and closures.
 - OPTIONS: **Recommendation:** keep the survival base rate at `NO_DATA` until a Public source carries the link; invent no value. Alternative: leave the survival base rate out of the product.
 - NEEDED BY: any proposal to show a survival base rate; not a version 1 blocker.
+- UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12: the Synthetic births and closures are withdrawn. The openings and closures of register companies are Public counts from the register's own dates and monthly snapshots ([03_DATA_CONTRACTS.md](docs/03_DATA_CONTRACTS.md) DAT-164), and no rate, net change or survival figure is computed from them ([07_ECONOMIC_METHODS.md](docs/07_ECONOMIC_METHODS.md) MTH-85), so they do not close this item.
 
 ## OI-98 — Public source of each forecast series without a table
 
@@ -832,6 +846,10 @@
 - DONE SO FAR: Task S2-T17 records, for each series, the source table that the pack holds or that it holds none; a series without a table is not forecast. The hotel series is also the open point of OI-21 and OI-23.
 - OPTIONS: **Recommendation:** record each missing source at the slice S2 gate or keep the series open and unforecast; invent no value and add no source without its licence.
 - NEEDED BY: slice S2 gate (S2-T17, PLN-25); slice S6 (S6-T14).
+- UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) items 8 and 12: the list gains the quarterly median price per square foot of method card C41 by district and use, a series of its own beside the property prices of card C14, whose table `pub_property_quarter` comes from the sales bulletins fetched in S2-T19 ([03_DATA_CONTRACTS.md](docs/03_DATA_CONTRACTS.md) DAT-167), so it is not a series without a table. The establishments of an area by month are now a Public count of register companies, not a released synthetic series; whether their forecast joins the list is fixed with the list at the slice that builds card C30 ([02_ARCHITECTURE.md](docs/02_ARCHITECTURE.md) ARC-138).
+- UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): The earlier licence condition is replaced: any source readable as a visitor under item 2 may be used, with the publisher's terms recorded in its own words with the date read and the basis of use in document 04. A source with no open licence covering the use uses `owner_decision`, the owner's decision for a personal, local project. Invent no value; a missing table or insufficient backtest still prevents a forecast (items 1 to 3).
+- UPDATE: 2026-11-14, by decision 0026 item 3 and ruling L-221: `provider_terms` stays for a provider's interface used under that provider's own terms (PUB-95 and PUB-97); `owner_decision` applies to every other source with no open licence covering the use.
+
 
 ## OI-99 — The traffic provider's rule on storing responses
 
@@ -852,6 +870,8 @@
 - DONE SO FAR: Version 1 runs locally as a personal internal project; the three sources are used on the owner's decision of 2026-11-12 or within their free terms, and what a public or commercial hosting would have to settle for each is listed in the section "Public and investment sources if hosted publicly" of [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md). The three sources stay off until the owner decides.
 - OPTIONS: **Recommendation:** keep the three sources off under any public or commercial hosting until the owner records another choice in a decision record; a source whose terms, read at a fetch, forbid the use made here is switched off and the owner is told, except `busy_gmaps`, which the owner decided to use.
 - NEEDED BY: any public or commercial hosting; not a version 1 blocker.
+- UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): The earlier local switch-off rule and the `busy_gmaps` exception are replaced: no source is switched off or limited in version 1 because of its terms. The publisher's actual terms, including those of `busy_gmaps`, are recorded in its own words with the date read in document 04; the earlier summary is not a finding that no terms exist. Document 17 keeps one list for every source whose terms require permission or a licence before real use, with the publisher's words and date read, filled as terms are read. Real use means access outside the owner's organisation, publication of a page showing source records or commercial use. Nothing on the list holds back version 1. The existing going-live rule for the three sources stays and points to that list (items 1 to 4).
+
 
 ## OI-101 — Size of the public-total inventory with the two gridded Public tables
 
@@ -872,6 +892,7 @@
 - DONE SO FAR: Documents 03, 08 and 09 carry the same OPEN line.
 - OPTIONS: **Recommendation:** fix the subject at slice S2 together with documents 03, 08 and 09, without adding an attribute to a real place.
 - NEEDED BY: slice S2 gate (S2-T17); slice S6 (S6-T14).
+- UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) items 6 and 8: the property price measures of method card C41 (the price per square foot by district, use and quarter, and its forecast) and the count of the financial centre's firms in a district where its register gives no building ([09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) AI-137) take the same subject once it is fixed, as the open questions of document 09 record; this also bears on S6-T10.
 
 ## OI-103 — Public build without the night-lights key
 
@@ -926,10 +947,10 @@
 ## OI-108 — Known ledger lines in the full-history scan
 
 - ID: OI-108
-- TYPE: ASSUMPTION
+- TYPE: CLOSED (was ASSUMPTION)
 - NEEDED: Owner confirmation that the history scan leaves out findings on ledger lines it knows by exact content.
 - WHY: the recorded command of S0-T05 in PROGRESS.md plants two dummy values, the scanner's general rule reports them, the history of the base branch is never rewritten and TST-141 requires the scan over the full history, which the foundation commit must pass.
-- DONE SO FAR: `scripts/ci_history_scan.py` holds a closed `KNOWN_LINES` table with one entry keyed by file, rule and SHA-256 of the line text; the judge reads a temporary JSON report, leaves out only findings that match that line at the reported commit, prints counts when all findings are known and fails on every other finding; four tests plant the violations named in the task brief; no ignore file and no allow-list in the scanner's configuration; tests that plant a shaped token build the value at run time so a new ledger line would be judged like any other.
+- DONE SO FAR: `scripts/ci_history_scan.py` holds a closed `KNOWN_LINES` table with one entry keyed by file, rule and SHA-256 of the line text; the judge reads a temporary JSON report, leaves out only findings that match that line at the reported commit, prints counts when all findings are known and fails on every other finding; four tests plant the violations named in the task brief; no ignore file and no allow-list in the scanner's configuration; tests that plant a shaped token build the value at run time so a new ledger line would be judged like any other. Closed on 2026-11-13 by the owner's decision of that day: approved as proposed.
 - OPTIONS: **Recommendation:** keep. Alternatives: an ignore file with commit fingerprints (the commit hook would honour it too, and it does not hold in a scratch copy); an allow-list in the scanner's configuration (the hook configuration of S0-T06 keeps none); scanning only the commits of the pull request (weaker than TST-141).
 - NEEDED BY: slice S0 gate.
 
@@ -1002,6 +1023,7 @@
 - DONE SO FAR: Both packages are pinned exactly in the root group `dev` and recorded in `pins.toml`: `fastapi` in the series the pack names, `uvicorn` with the label ASSUMPTION at the release that was current on 2026-11-13. `import eii_product` stays free of FastAPI; only `eii_product.api` imports it. The rows `pmtiles` and `@protomaps/basemaps` of `pins.toml` name S1-T04 as their first use; this task installs neither, because it serves a synthetic byte artefact and renders no map.
 - OPTIONS: **Recommendation:** keep both packages in the root group through slice S1; task S3-T08 declares them in `product/pyproject.toml` together with the change of the clean-environment guard; task S1-T08 confirms the two pins and corrects the first use of the two map rows. Alternative: a decision record names another server program.
 - NEEDED BY: slice S1 pin confirmation (S1-T08); task S3-T08.
+- UPDATE: 2026-11-14, by task S1-T10 (PO-S1-06): the same kind of gap holds for `pyvalhalla` and `h3`, which the areas spike of the product imports. Task S3-T04 declares both in `product/pyproject.toml` together with the change of the clean-environment guard; until then both stay in the root group `engine` under OI-60. This adds no answer to the NEEDED above. The earlier text is kept.
 
 ## OI-117 — A refused gateway request leaves no decision record, and run records are not committed by default
 
@@ -1032,6 +1054,7 @@
 - DONE SO FAR: The three screenshot tests run their structural, request and font assertions everywhere, inside `./eii test` too. Pixels are compared only by the hosted job `tests`, in a step of its own, against the baselines under `web/spikes/glyphs/tests/baselines/`. The same job first makes the three captures with the suite's own capture and uploads them; the lead commits them as baselines in a commit of their own. A missing or differing baseline fails the hosted step and names the file. The owner's native reading of the five Arabic names and the three images is recorded in `web/spikes/glyphs/evidence/visual-review.md`, which says pending until then.
 - OPTIONS: **Recommendation:** keep. Alternative: compare pixels on the build machine too, with a second set of baselines made there.
 - NEEDED BY: slice S1 gate (FE-46, FE-57).
+- UPDATE: 2026-11-14, by task S1-T10 (item I8): the five place identifiers and English names of the glyph spike are renamed (alif, ba, jim, dal and ha); the five Arabic strings are unchanged. Every machine-read review mark stays `pending native review`, because the evidence judge accepts a name's approval only together with the review of its image; the spike's README states the owner's approval of the five Arabic strings of 2026-11-13 (FE-57) in prose. The English baseline image is recaptured by the hosted job of pull request 46 and committed in a commit of its own. The review of the three images is still open. The earlier text is kept.
 
 ## OI-120 — The hour mechanism of drive areas and two choices of the routing spike
 
@@ -1039,8 +1062,8 @@
 - TYPE: ASSUMPTION
 - NEEDED: The owner to confirm the mechanism that the routing spike chose for SYN-53, which the lead writes into a decision record at the slice S1 gate; and two smaller choices: `shapely` as a dependency of the spike's tests only, and the type check following the routing engine's own type files.
 - WHY: SYN-53 leaves the choice to slice S1 ("time-dependent edge speeds in the routing engine, or per-edge scaling of edge times"). ARC-88 names pyvalhalla as the engine that routes in process; the technology stack names another library only as a retreat "chosen in writing at slice S1 only if needed". The pack names no geometry library for tests, and the routing package ships type files without the marker that makes a type checker read them.
-- DONE SO FAR: Task S1-T03 routes in process with pyvalhalla 3.9.1 on a synthetic road extract that its own generator writes; the retreat was not needed and is not installed. Routing tiles are built by the builder program that the package ships (about a quarter of a second for the fixture). The hour of day is handled by per-edge scaling: one set of tiles for each distinct hourly speed factor, built from the same extract with every way's speed multiplied by the factor; equal factors share one set. Measured on the fixture: the drive area changes with the factor, equal factors give equal areas, the walk area does not change. Predicted speeds inside the engine were tried first and are not used: with a departure time the engine answered without a timezone database, but two hours with the same factor gave different outlines, and the cause is not confirmed. `shapely` 2.2.0 (the registry's current release on 2026-11-13) is installed through the root dependency group `engine` and imported only by the spike's tests, for geometric assertions that do not come from the engine. The type check reads the engine's shipped type files through one setting for that package; no error is suppressed.
-- OPTIONS: **Recommendation:** keep all three; decide the number of tile sets of a release (one for each distinct factor of the simulated day) when task S1-T11 fixes the speed bands. Alternatives: predicted speeds inside the engine, once the difference for equal factors is understood and a timezone database is part of the build; a pure-Python containment test instead of `shapely`.
+- DONE SO FAR: Task S1-T03 routes in process with pyvalhalla 3.9.1 on a synthetic road extract that its own generator writes; the retreat was not needed and is not installed. Routing tiles are built by the builder program that the package ships (about a quarter of a second for the fixture). The hour of day is handled by per-edge scaling: one set of tiles for each distinct hourly speed factor, built from the same extract with every way's speed multiplied by the factor; equal factors share one set. Measured on the fixture: the drive area changes with the factor, equal factors give equal areas, the walk area does not change. Predicted speeds inside the engine were tried first and are not used: with a departure time the engine answered without a timezone database, but two hours with the same factor gave different outlines, and the cause is not confirmed. `shapely` 2.2.0 (the registry's current release on 2026-11-13) is installed through the root dependency group `engine` and imported only by the spike's tests, for geometric assertions that do not come from the engine. The type check reads the engine's shipped type files through one setting for that package; no error is suppressed. Task S1-T11 carried the mechanism from one factor for all links to a speed for each link: one routing graph for each distinct set of whole link speeds, six for the 24 hours of its fixture day, with equal sets giving equal areas at every pair of hours. [Decision 0021](docs/decisions/0021-one-speed-for-a-link-and-an-hour.md) records the mechanism with the owner's rule of 2026-11-13 on one speed for a link and an hour.
+- OPTIONS: **Recommendation:** keep all three; a release has one routing graph for each distinct set of whole link speeds among its hours, day types and summer settings, and one for each situation (decision 0021). Alternatives: predicted speeds inside the engine, once the difference for equal factors is understood and a timezone database is part of the build; a pure-Python containment test instead of `shapely`.
 - NEEDED BY: slice S1 gate (the decision record of SYN-53); task S1-T11.
 
 ## OI-121 — The pixel-ratio cap of the map canvas in the performance spike
@@ -1063,6 +1086,16 @@
 - OPTIONS: **Recommendation:** keep the re-plan; the owner runs `npm --prefix web run spike:performance:serve` from the repository root, opens the printed address in Chrome or Edge on Windows and leaves the page open until it shows a path; the lead then commits the trace with its capture record. Alternative: the owner allows the build to start the host browser itself with a temporary profile.
 - NEEDED BY: the addendum of the slice S1 gate (through S1-T12), and before any slice S3 task that depends on map performance is reviewed.
 
+## OI-123 — The version-1 parameters of the traffic assignment, fixed at slice S1 with their sources
+
+- ID: OI-123
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm the values below, or to name other values with their sources, before slice S5 builds traffic; and to confirm the rules that [decision 0021](docs/decisions/0021-one-speed-for-a-link-and-an-hour.md) adds to his speed floor as the lead's own: the method's whole speed for a link and an hour (item 2); one length, the routing graph's whole metres (item 4); the loading distance on a sphere and the tie rules (item 5); the printed resolution, the rounding and the refusals of a route (item 6); and the whole speed of a link in a dial situation (item 8), which changes the situation fixture of MTH-90. The speed floor and the itemised turns at junctions are the owner's decisions and need no confirmation. After the first traffic build a change needs a new method version (MTH-04, MTH-89).
+- WHY: Card C25 of `docs/07_ECONOMIC_METHODS.md` and MTH-89 ask that α, β, the free-flow speeds, the capacities and the number and edges of the volume bands are fixed at slice S1, with their sources, before any traffic is built, and never tuned to a published figure. The card named no value. The routing engine stores a link's speed as a whole number of km/h and drops a fraction, so without a whole speed made by the method a user would see two speeds or two times for one link and hour, which the owner's rule of 2026-11-13 forbids.
+- DONE SO FAR: Task S1-T11 fixed the values in the parameter file of the assignment spike, each with its source, the date it was read (2026-11-13) and its status. α 0.15 and β 4: the standard values of the volume-delay form of the Bureau of Public Roads (1964), as an open textbook of network analysis states them (Boyles, Lownes and Unnikrishnan, Transportation Network Analysis, Volume I, section 1.5.1). Free-flow speed by road class, in kilometres per hour: motorway 105, trunk 90, primary 75, secondary 60, tertiary 50, residential 35: the routing engine's own default for a road without a posted speed (the table `default_speed` of the file `lua/graph.lua` in the engine's source repository, and measured on the installed engine), so that free-flow drive times and the assignment agree. Capacity by road class, in vehicle trips per hour for one direction: motorway 4000, trunk 2000, primary 1500, secondary 1000, tertiary 600, residential 600: the default lanes in each direction times the default capacity per lane of the OpenStreetMap network reader of the open-source transport simulation MATSim (ASSUMPTION: a published default table, not measured for Qatar; one capacity for each class, because a road link of the data contract has no lane count). Volume bands: four, with the edges 0.85, 0.95 and 1.00, from Table 3-2 of chapter 3 of the Traffic Signal Timing Manual of the Federal Highway Administration (ASSUMPTION: thresholds published for signalised intersections, applied to road links as display bands). The speed floor is 10 kilometres per hour, by the owner's decision of 2026-11-13. The method makes one whole speed for a link and an hour, the larger of the floor and the rule's speed rounded half-up, times each link by its length over that speed, and releases the ratio of that speed to the free-flow speed rounded half-up to three decimals; the product reads the whole speed back exactly from the released ratio (tested for every whole speed from the floor to each class speed) and refuses a file of rows whose ratio gives back less than the floor or is not the rounded ratio of a whole speed. On the spike's fixture day two link-hours are at the floor by the rule, and four released rows give a whole speed of 10. A dial situation's link takes the speed of its length over the mean of its hourly times, rounded half-up to a whole km/h, so MTH-90's situation fixture becomes 53 km/h and 600/53 minutes. The spike routed between nodes only: how the end links of a route from a point inside a link are timed (an area's pin, a gateway) is left to the slice S3 task that shows such routes, in writing. The engine's turn costs at junctions are kept: a route shows its link times and one line for the turns, and a drive-time area's legend says once that it includes them; the differences between the engine and the method that the spike measured are pinned in tests and stated on card C25 as limits (decision 0021 item 9). Four rules of the spike's own, for task S5-T09 to keep or to change in writing: β is a positive whole number, because the assignment is computed in exact arithmetic; an hour is a whole number from 0 to 23, and text, decimal and boolean values are refused; identifiers are ordered as text by code point, so `SYN-N-0-10` comes before `SYN-N-0-9`, and the real graph needs its own fixed identifier order; trips between two different units that load at the same node stay off the network, like trips within one unit. The spike finds the links of an engine route from the vertices of the route's shape, which holds on its straight synthetic links only; the real graph needs the engine's edge identifiers. By the owner's decision of 2026-11-13, a link's capacity will be the capacity of one lane of its class times the link's lanes in one direction, read from the road extract (a link without a lanes tag taking its class's median); the amendment of decision 0021, card C25 and the road_link contract enters with task S5-T09, before any traffic is built; the values above stand until then.
+- OPTIONS: **Recommendation:** confirm the values and the rules as fixed; decision 0021 records them. Alternatives: the owner or a transport authority supplies free-flow speeds and capacities for Qatar's road classes, with their source, before slice S5; for a situation, the exact mean time instead of the whole speed, with a mark on the screen wherever the engine's time is shown beside it.
+- NEEDED BY: the slice S1 gate; task S5-T09.
+
 ## OI-125 — One random failure of the performance page's smoke orbit
 
 - ID: OI-125
@@ -1072,6 +1105,306 @@
 - DONE SO FAR: During task S1-T13 (2026-11-13), the builder's browser run of the smoke orbit, before its page change, failed once on the existing assertion that the map's bearing at the end of the orbit differs from its bearing at the start: both were 0. The same test passed on the immediate re-run and in every later full run of that task, including the lead's runs at the work commit. No code was changed because of it. A smoke orbit lasts 400 milliseconds in a headless browser that draws in software; a camera that has not yet moved by the end of so short an orbit would give exactly this result.
 - OPTIONS: **Recommendation:** count the failures of this assertion over the next ten local runs of the spike's tests and record the count here; if it recurs, make the smoke orbit wait for the first camera movement before it ends, never loosen the assertion.
 - NEEDED BY: the slice S1 gate.
+
+## OI-126 — Two dependency alerts on runtime packages that the map layers of the performance spike bring in
+
+- ID: OI-126
+- TYPE: OPEN
+- NEEDED: A decision, in task S1-T08's confirmation of the web pins, on each of two alerts: raise the package through the lock file, or keep the alert open with its reason recorded.
+- WHY: GitHub opened two alerts on main on 2026-11-13, when pull request 34 (task S1-T02) merged: `image-size` 0.7.4, severity high (its parser of one icon format can loop without end on a crafted file; versions from 0.6.3 to 2.0.2 are affected, fixed in 2.0.3), and `fflate` 0.7.4, severity medium (its unzip function can loop without end on a malformed archive; versions from 0.7.0 below 0.7.5 are affected, fixed in 0.7.5). Both are transitive dependencies of `@deck.gl/geo-layers` 9.4.1 in `web/package-lock.json`, in runtime scope: `fflate` through `@loaders.gl/3d-tiles` and `@loaders.gl/compression` 4.5.4, which asks for exactly 0.7.4; `image-size` through `@luma.gl/gltf`, `@loaders.gl/textures` 4.4.5 and `texture-compressor` 1.0.2, which accepts the 0.7 series only. The spike uses the hexagon layer of that package; it loads no tile set, model, compressed texture or archive.
+- DONE SO FAR: Nothing is changed; a lock file changes only inside a task that owns it (rule 44 of [AGENTS.md](AGENTS.md)). Neither fixed release lies inside the range its parent asks for, so raising either needs an override in `web/package.json`. The built page of the application shell was searched for both packages and holds neither; the spike's own built page was not searched. On 2026-11-14 task S1-T08 built the performance spike's page with the spike's own build helper and searched its four files for `fflate`, `image-size` and one message string of each parser; none matched (a search of minified text, not proof that no parser code is present). It added the exact override of `fflate` 0.7.5 in `web/package.json`; the lock file changed only that package's version, address and integrity value; the spike's Node and browser tests, the glyph tests, lint, the type check, the production build and the host checks passed with it, so the override is kept and the `fflate` alert is answered. No override of `image-size` was made: its fixed release is a new major version outside the series its parent accepts, and the spike loads no texture image; that alert stays open until the loaders are upgraded or replaced and tested.
+- OPTIONS: **Recommendation:** in task S1-T08, search the spike's built page for both parsers; raise `fflate` to 0.7.5 by an override if the spike's tests stay green with it; keep the `image-size` alert open with its reason (no page loads a texture image; its fixed release is a new major version that its parent does not accept) unless a test shows the override harmless. Alternative: leave both until the map layers of slice S3 choose their loaders.
+- NEEDED BY: slice S1 gate; not a blocker.
+
+## OI-132 — The satellite imagery provider's attribution in committed text
+
+- ID: OI-132
+- TYPE: PENDING (was OPEN (owner))
+- NEEDED: The owner's attribution note for the imagery provider whose key is `ESRI_API_KEY`: how the provider may be named in committed text and on screen, and the wording of its credit.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item A7 adds a satellite mode that shows the provider's satellite imagery with the attribution its imagery style carries, and AGENTS.md rules 5 and 15 ask for every source to be cited and for no existing product to be named in comparison. Until the note is in force, committed text names the provider only "the imagery provider" or by its setting.
+- DONE SO FAR: Document 04 records, under its source registry, that the provider's row is added when the note is in force; document 13 holds the setting (OPS-73); documents 10 and 11 show the satellite credits only inside the collapsed map credits while that mode is on.
+- OPTIONS: **Recommendation:** keep the provider unnamed in committed text; take the credit at run time from the provider's imagery style and show it only inside the collapsed map credits while the satellite mode is on; add the registry row of document 04 when the owner's note is in force.
+- NEEDED BY: task S3-T16 (the satellite mode).
+- UPDATE: 2026-11-14. The owner's attribution note is received. Ruling L-151 records that note and its permitted locations; the owner question is no longer awaited. What remains is the documentation guard's exception. The D0023 entry of PROGRESS.md names task S1-T14 as the work that builds that exception and adds the provider's name in its two allowed places. The earlier text is kept.
+
+## OI-133 — Whether road traffic is part of the movement source
+
+- ID: OI-133
+- TYPE: OPEN (owner)
+- NEEDED: The owner's confirmation that the road traffic of method card C25 (the hourly link volumes, speed ratios and drive times by hour) is kept as part of the movement source.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12 builds synthetic records only for the confirmed sources; it keeps the road traffic of card C25 as part of the movement source and asks the owner to confirm. The lead's audit gave three options: derive traffic from the movement sources by the same assignment (it needs the open rule that turns trips into vehicle trips, document 05 Q7, and keeps capacities and delay parameters as assumptions); the optional live traffic provider of decision 0019 (it stores nothing and can fill no hourly table, ranking or travel time by hour); or keep the assignment as a method test only and show Public drive times at free flow, leaving out hour-varying drive times, the traffic animation and hourly access scores.
+- DONE SO FAR: The decision keeps the first option until the owner answers. The S1-T11 spike assigns a synthetic flow fixture and is unaffected.
+- OPTIONS: **Recommendation:** keep traffic as part of the movement source, derived from the released hourly flows, with the trips-to-vehicles rule stated as an assumption; if the owner declines, fall back to free-flow drive times and drop the hour-varying parts.
+- NEEDED BY: the slice S4 gate (S4-T08); it bears on S5-T09, S6-T07, S6-T08, S6-T13, S6-T20, S7-T11 and S10-T03.
+
+## OI-134 — The attributes of the movement records: age, nationality and gender
+
+- ID: OI-134
+- TYPE: CLOSED (was OPEN)
+- NEEDED: Which of age, nationality and gender the confirmed movement sources (the mobile operator's presence data and the national crowd-management system's data) hold, at the grain the pack plans.
+- WHY: Under [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12, synthetic records follow the real formats and an attribute the confirmed source does not plausibly hold is not generated. AGENTS.md rule 10 bars any sex or gender attribute on synthetic or protected records, and nationality enters only in the two forms of decision 0022.
+- DONE SO FAR: No movement contract of document 03 carries any of the three. The lead's audit found no sex or gender attribute planned inside a confirmed source; a real-data adapter must drop such a column before the vault, and the conformance schema test already refuses one.
+- OPTIONS: **Recommendation:** generate none of the three on movement records. Gender stays barred whatever the source holds. Age or nationality on movement records would need the owner's confirmation that the source holds them and, for nationality, a new decision record amending rule 10.
+- NEEDED BY: the slice S4 contracts (S4-T01, S4-T04).
+- UPDATE: 2026-11-14, by the owner's words and his advisor's decision under his delegation, recorded in [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 16: movement aggregates carry age band, gender and nationality group as one-way splits. The bar on sex or gender still holds for the worker, residence and company records and for anything derived from them; movement aggregates are the one exception. The age bands are confirmed against the operator's format when its data arrives (OI-148), which is not an owner question.
+- CLOSED: 2026-11-14, by decision 0023 item 16. The earlier text is kept.
+
+## OI-135 — Hiring and leaving flows (the decision question bank's gap N1)
+
+- ID: OI-135
+- TYPE: OPEN (owner)
+- NEEDED: The owner's word on whether hiring and leaving flows are built, and how, in the session on the design of value extraction.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) items A9 and A10 record them as a gap of the question bank and as an analysis that waits for that session; no machine-learning work is added beyond the plan's tested forecasts, estimates and ranking.
+- DONE SO FAR: Not built. The questions of the bank that need them are recorded as gaps (AI-129).
+- OPTIONS: **Recommendation:** leave them out of version 1 until the owner's session decides; any later build is an analysis of the attached employment records released under document 06.
+- NEEDED BY: the owner's session on value extraction.
+
+## OI-136 — Rents (the decision question bank's gap N3)
+
+- ID: OI-136
+- TYPE: OPEN (owner)
+- NEEDED: The owner's word on a source of rents, or a confirmation that rents stay the user's own input.
+- WHY: No open rent source exists (document 04 section 12). [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12 forbids synthetic rents or tenancies; the 2026 guide land prices and the recorded sale prices are prices and are never relabelled as rents.
+- DONE SO FAR: Break-even and the "how sure" runs of S6-T21 take only the user's own rent, or the guide and recorded prices labelled as prices.
+- OPTIONS: **Recommendation:** keep the user's rent as the only rent in version 1.
+- NEEDED BY: before any rent figure is offered.
+
+## OI-137 — An events calendar (the decision question bank's gap N4)
+
+- ID: OI-137
+- TYPE: OPEN (owner)
+- NEEDED: The owner's word on a public source of an events calendar.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item A9 records it as a gap that waits for the owner's word and is not built now.
+- DONE SO FAR: The simulation keeps its three event days of document 05; no calendar of named events is shown.
+- OPTIONS: **Recommendation:** leave it out until a public source is named and registered in document 04.
+- NEEDED BY: before any question of the bank that needs it is answered.
+
+## OI-138 — Supplier certifications (the decision question bank's gap N6)
+
+- ID: OI-138
+- TYPE: OPEN (owner)
+- NEEDED: The owner's word on a public source of supplier certifications.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item A9 records it as a gap that waits for the owner's word and is not built now; no synthetic data stands in for it (item 12).
+- DONE SO FAR: The partner and supplier finder shows no certification; the structured qualification route stays as document 09 states it.
+- OPTIONS: **Recommendation:** leave it out until a public source is named and registered in document 04.
+- NEEDED BY: before any question of the bank that needs it is answered.
+
+## OI-139 — School capacity (the decision question bank's gap N7)
+
+- ID: OI-139
+- TYPE: OPEN (owner)
+- NEEDED: The owner's word on a public source of school capacity.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12 forbids synthetic school capacity, and item A9 records it as a gap that waits for the owner's word.
+- DONE SO FAR: Only the published students by municipality (`students_muni`) are shown, as Public facts with source and year.
+- OPTIONS: **Recommendation:** leave it out until a public source is named and registered in document 04.
+- NEEDED BY: before any question of the bank that needs it is answered.
+
+## OI-140 — Whether the competition-adjusted ratio of talent available near this site may be computed
+
+- ID: OI-140
+- TYPE: CLOSED (was OPEN)
+- NEEDED: The owner's answer: may the competition-adjusted ratio of the two-step floating catchment (PySAL `access`, BSD-3), the talent pool within reach over the competing demand within reach, be computed from the two released tables as an exception to PRV-30 and PRV-18 of [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md)?
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 1 first planned method card C39 with that ratio. The review of the decision's sweep found that the ratio divides one protected family by another, which PRV-30 does not allow, and reads the competing jobs on work units chosen by travel time instead of by the snap, which PRV-18 does not allow. AGENTS.md rule 12 forbids weakening a privacy invariant on the lead's authority, so the lead's ruling L-160 of 2026-11-14 recast card C39 and left the exception to the owner.
+- DONE SO FAR: Card C39 shows two released figures side by side within 15, 30 and 45 minutes' drive: the talent pool (residents by occupation and pay band within reach) and the competing demand (jobs of the same occupations within reach). Each catchment snaps to whole release units, and PRV-18 and PRV-30 stay as they are. PRV-127 is a guard that refuses any ratio of the two figures; a planted ratio, a planted read on units chosen by travel time and a planted figure on an unsnapped outline each fail.
+- OPTIONS: **Recommendation:** keep the two figures side by side, with no ratio. If the owner wants the ratio, a new decision record must amend PRV-30 and PRV-18. It must also say how the work units of the competing demand are chosen, because the release's unit-to-unit travel times hold `px_base` unit pairs only ([03_DATA_CONTRACTS.md](docs/03_DATA_CONTRACTS.md) DAT-153), and keep the rule that no choice of units depends on a protected value (PRV-19).
+- NEEDED BY: task S6-T20; not a blocker, because the side-by-side form needs no exception.
+- UPDATE: 2026-11-14, by the owner's answer of that day, recorded in [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 1: yes. Card C39 keeps its two released figures side by side within 10, 20 and 30 minutes' drive and adds a third, qualified people within reach per competing job within reach, the quotient of those two released figures for the same occupation group and the same cut-off, shown to one decimal. It is computed only from the two released tables. It is the only exception to PRV-30 and PRV-18. PRV-127 refuses any other ratio of two protected families and any ratio computed before release. The two-step floating catchment is not used. Where an input is withheld the reason key is `ratio_input_withheld`; where no competing job is within reach the reason key is `no_competing_jobs`.
+- CLOSED: 2026-11-14, by the owner's answer, recorded in decision 0023 item 1. The earlier text is kept.
+
+## OI-141 — Who keeps the monthly register snapshots
+
+- ID: OI-141
+- TYPE: OPEN (owner)
+- NEEDED: The owner to name who keeps a snapshot of each register file each month, from 2026-11, beside that file outside the repository.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) items 12 and 13 count the openings and closures of register companies from the register's own dates and from its monthly snapshots, and the "what changed this month" card of item 13 reads the snapshots too. The snapshot route needs two kept snapshots: while the snapshot of a month or of the month before it is not kept, that route gives `NO_DATA` with the reason key `snapshot_not_kept` ([03_DATA_CONTRACTS.md](docs/03_DATA_CONTRACTS.md) DAT-164).
+- DONE SO FAR: Documents 02, 03 and 13 record that the snapshots lie beside each register file outside the repository and are found through the same settings, `EII_REGISTER_FILE` and `EII_FC_REGISTER_FILE`, so no setting is added. The naming that tells the months apart is still to be fixed, without printing a path or committing a file name. Until two snapshots are kept, the openings and closures rest on the register's own dates alone.
+- OPTIONS: **Recommendation:** the owner keeps them, or names who does, since he holds the register files outside the repository: once a month, a copy of each file beside it, under the naming that the first task reading them fixes. A month that is missed stays `NO_DATA` on the snapshot route and is never filled in.
+- NEEDED BY: 2026-11, the first month to be kept; then S5-T10 and S7-T10, which read the snapshot route, and the "what changed this month" card of item 13 if its task is named.
+
+## OI-142 — The register file's fields for groups, the address type and the dates
+
+- ID: OI-142
+- TYPE: OPEN
+- NEEDED: At the first read of each register file, confirmation of the fields that show the main-and-branch structure, the registered-address type, and the registration and cancellation dates.
+- WHY: Under [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12, the employer groups of the dominance rules are the main-and-branch structure that the register shows, the address type is taken from the register files, and openings and closures come from the register's own dates. Where a file does not show a field, the decision's fallback applies: each registration is its own legal entity and group, the address type is absent, and a company with no date is counted in no month ([03_DATA_CONTRACTS.md](docs/03_DATA_CONTRACTS.md) DAT-164). [Decision 0022](docs/decisions/0022-real-register-companies-with-a-synthetic-world.md) left the same fields open.
+- DONE SO FAR: Documents 03 and 05 state each rule and its fallback, and document 06 states the employer group (PRV-07); the dominance rules and their planted tests run on these groups unchanged. Tests and continuous integration use the invented stand-in register.
+- OPTIONS: **Recommendation:** confirm the fields when the file is first read, without committing the file, a field value or a path, and record only which fields exist.
+- NEEDED BY: task S4-T02 (the register and employment world), whose amendment applies these rules.
+
+## OI-143 — The look's task S3-T15 is not in TASKS.md
+
+- ID: OI-143
+- TYPE: OPEN
+- NEEDED: The lead to enter the look's task S3-T15 in [TASKS.md](TASKS.md), or to record that S3-T16 keeps the map-mode switch.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 7 names the look's mode-switch task S3-T15, which is not in TASKS.md.
+- DONE SO FAR: Until S3-T15 enters, S3-T16 carries the map-mode switch and the modes of item 7, satellite and photorealistic 3D, as the open questions of [14_IMPLEMENTATION_PLAN.md](docs/14_IMPLEMENTATION_PLAN.md) and OPS-74 of [13_DEPLOYMENT_AND_OPERATIONS.md](docs/13_DEPLOYMENT_AND_OPERATIONS.md) record.
+- OPTIONS: **Recommendation:** keep the switch and the two modes in S3-T16; if S3-T15 enters TASKS.md first, move them there by a one-line amendment that cites decision 0023 item 7.
+- NEEDED BY: the start of S3-T16.
+
+## OI-144 — The recovery tracker and the Qatarization planner have no task yet
+
+- ID: OI-144
+- TYPE: OPEN (owner)
+- NEEDED: For the recovery tracker, what it is, the journey that carries it and the task that builds it, from the owner's records. For the Qatarization planner, the task that builds it in journey D5.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 15 keeps both for companies. It describes the Qatarization planner as a company tool of journey D5 under the cases of item 1: which roles Qataris hold in the private sector, at what pay, and where the talent is by district. It names the recovery tracker only. Neither has a task in TASKS.md, and the recovery tracker has no passage in the pack.
+- DONE SO FAR: Documents 01, 09, 10 and 14 record the gap in their open questions. The cases of item 1 already bind the planner's figures: group statistics only, through the release rules, with Qatari and non-Qatari splits only where the cell passes (BRF-96, AI-133, FE-150).
+- OPTIONS: **Recommendation:** build neither until its passage and task are recorded. The planner then follows the cases of item 1 and the release rules of document 06. The recovery tracker's passage is written from the owner's description, through a decision record if it adds scope to version 1 (AGENTS.md rule 46).
+- NEEDED BY: for the planner, before the journey D5 tasks of slice S7 (S7-T03, S7-T08) are planned; for the recovery tracker, before any work on it.
+
+## OI-145 — The age profile of people living here as its own Public component
+
+- ID: OI-145
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm that the age profile of people living here is shown as its own Public component after the two blocks of the site answer, not inside the people-living-here block.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 11, the owner's expectation of 2026-11-13, puts the age profile in the people-living-here block. No synthetic or protected record may carry age ([05_SYNTHETIC_WORLD_AND_SIMULATION.md](docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md) SYN-13), so that block, built from protected records, cannot hold it.
+- DONE SO FAR: The decision record and documents 01, 08 and 09 record the assumption: the age profile is the Public population by age over the area of the living block (method card C38), shown as its own component after the two blocks and never in one component, calculation or chart with a protected or Simulated figure (BRF-108, AI-131, FE-146). A planted age profile inside either block fails a component test (FE-146).
+- OPTIONS: **Recommendation:** keep it as its own Public component. Inside the block it would share a component with protected figures, which [decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 22 forbids for the population grid, and a protected age split would need an age attribute that SYN-13 forbids.
+- NEEDED BY: tasks S6-T02 and S8-T01, which set the site answer's order.
+
+## OI-146 — Prices per square foot beside the median per square metre
+
+- ID: OI-146
+- TYPE: ASSUMPTION
+- NEEDED: The owner to confirm that the property price measures of [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 8 are stated per square foot, as he asked, while the median sale price per square metre of method card C14 stays as it is.
+- WHY: Item 8 asks for the price per square foot by district, use and quarter, and card C14 already shows the median per square metre. The decision record keeps both and relates them only by the exact conversion of one foot to 0.3048 metres.
+- DONE SO FAR: Card C41 states its measures per square foot and converts areas by that exact conversion (MTH-116). Its quarterly series is a series of its own, never joined to the series of card C14 (card C30).
+- OPTIONS: **Recommendation:** keep both, each labelled with its unit. Alternative: the owner chooses one unit for every price on screen, by a decision record.
+- NEEDED BY: task S6-T10, which builds the property price measures.
+
+## OI-147 — Whether a commute line from a home municipality to the site's snapped catchment meets the district-pair case
+
+- ID: OI-147
+- TYPE: OPEN (owner)
+- NEEDED: The owner's confirmation.
+- WHY: `home_area_share` is released only per `ha_work_count` work unit and `ha_home` municipality (PRV-40), and a district-pair table would need a new rules version and re-audit (PRV-34). Card C39 already draws each line from one whole home municipality of `ha_home` to the site's catchment snapped on `ha_work_count`, an exact sum of published `home_area_share` rows ([decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 1).
+- DONE SO FAR: Version 1 meets the case "commute lines only as totals between district pairs that pass the minimums" by that form: each end is an area, the home end is never finer than a municipality, and every total passes the minimums. The quoted case and its planted violation stay as written.
+- OPTIONS: **Recommendation:** keep card C39's form, which is the default. Otherwise the work end is snapped from the district outline on `ha_work_count`. The home end stays a whole municipality in either case.
+- NEEDED BY: S6-T20, not a blocker. Until the owner answers, no line is drawn in any other form.
+
+## OI-148 — The age bands against the operator's format, for when its data arrives
+
+- ID: OI-148
+- TYPE: OPEN
+- NEEDED: Confirm the age bands of movement aggregates against the operator's format when its data arrives. This is not a question for the owner.
+- WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 16 sets `age_band` to `15-24`, `25-34`, `35-44`, `45-54`, `55-64` and `65+`, chosen so that a public source's five-year age groups sum into them exactly. The band edges are held in one configuration value, so they can be remapped without changing the generator or the screens.
+- DONE SO FAR: The bands are the closed list of item 16; visitors under 15 are counted in the age split's `other` value.
+- OPTIONS: **Recommendation:** keep the bands until the operator's data arrives, then remap the one configuration value if the format differs.
+- NEEDED BY: when the operator's data arrives; not a blocker for version 1.
+
+## OI-149 — The reproduced measurement of the typed-decision set beside the admitted one
+
+- ID: OI-149
+- TYPE: OPEN
+- NEEDED: The owner's reading of the reproduced measurement beside the admitted one, without retuning a threshold and without treating this set as fresh human ground truth.
+- WHY: A successful reproduction on this set does not remove the recorded protocol differences and provides no fresh human labels (OI-15; [decision 0014](docs/decisions/0014-typed-decision-gateway.md), Evidence and item 6).
+- DONE SO FAR: The admitted aggregate `results_2026-11-11.json` records 248 correct of 260 with its stated interval [92.1, 97.3]. The keyed aggregate of task S1-T08, `results_2026-11-13T04-19-15-163796.json`, records 250 correct first answers of 260, a rate computed by code of 96.15384615384616%, inside that admitted interval, with its own Wilson interval [93.1, 97.9]; every one of its 340 replies names the pinned model. Its gateway outcomes are 176 DECIDED and 84 BELOW_THRESHOLD, and two decided cases are wrong (A-M-048 and A-M-049). Four protocol differences are recorded in the aggregate: the option orders are hash-derived, the activity labels are sent with the `isic-` prefix, the admitted run was made before the gateway existed, and the adapter cuts the yes/no label at a weight of 0.5. Task S1-T08 changed no threshold, no pin and neither aggregate.
+- OPTIONS: **Recommendation:** keep the reproduction as evidence for this model version, and settle its reading with the fresh human qualification of OI-15; change no threshold and no pin on this comparison alone.
+- NEEDED BY: the fresh human qualification of OI-15; not a blocker of the slice S1 gate.
+
+## OI-150 — The feed minimum of the conformance suite under parameter set B
+
+- ID: OI-150
+- TYPE: CLOSED (was OPEN)
+- NEEDED: The owner's or a data owner's decision on which text holds under parameter set B: the conformance test that rejects a count-table row below the minimum of the active parameter set, or the feed rule of 20 panel devices with set B's 30 applied only by the privacy engine.
+- WHY: TST-32 ([12](docs/12_TESTING_AND_QUALITY.md)) asks the conformance suite to reject a row of `presence_hourly` or `od_hourly` below the minimum panel devices of the active parameter set. DAT-60 ([03](docs/03_DATA_CONTRACTS.md)) and SYN-57 ([05](docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md)) fix the feed minimum at 20 and leave set B's 30 to the privacy engine. Under set B the two differ for rows of 20 to 29 panel devices, and the kept cell of the split feed tables (decision 0023 item 16) follows the count table.
+- DONE SO FAR: Found by the lead's re-read of the sweep of [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md). Nothing is changed: lowering the test's bar would weaken a privacy test, which no agent does on its own authority (AGENTS rule 12). The exported set is A (task S1-T09), under which both texts say 20, so nothing differs today.
+- OPTIONS: **Default until decided:** the stricter text stands (TST-32 as written). Option A: keep TST-32 and state in DAT-60 and SYN-57 that under set B the simulator omits rows below 30. Option B: set the conformance minimum to the feed rule of 20 and leave 30 to the release, tested by TST-203.
+- NEEDED BY: before parameter set B is ever evaluated on a feed (slice S5); not a blocker of slices S2 to S4.
+- UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): CLOSED, decided: Option A. TST-32 stands as written. DAT-60 and SYN-57 say that the simulator omits rows of the count tables `presence_hourly` and `od_hourly` under the minimum panel devices of the active parameter set, 20 under set A and 30 under set B, before conformance. Nothing else about the two sets changes (item 11).
+
+
+## OI-151 — Greater Doha as five whole municipalities
+
+- ID: OI-151
+- TYPE: ASSUMPTION
+- NEEDED: The owner's confirmation or replacement of the lead's assumption that Greater Doha is, for version 1, five whole municipalities, named in the frame's review file of task S2-T02.
+- WHY: The frame's resolution boundary (resolution 9 inside Greater Doha, 8 elsewhere) and every use of the name on a screen or a card depend on it. [Decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) item 10 keeps the assumption for version 1 and rules that the definition is shown wherever the name appears.
+- DONE SO FAR: The advisor decided under the owner's delegation on 2026-11-14 that the five-municipality reading stays for version 1 and that this item stays open as a record point. The review file is built by task S2-T02; until that task merges, the pack refers to "the five municipalities of the frame's review file" and lists no names.
+- OPTIONS: **Default until decided:** five whole municipalities. Otherwise the owner names another set of whole municipalities or a drawn boundary, and the frame is rebuilt.
+- NEEDED BY: the slice S2 gate (the frame), and before any screen shows the name (slice S3).
+
+## OI-157 — The caveat key `national_average` on card C33 after the survey benchmark left it
+
+- ID: OI-157
+- TYPE: OPEN
+- NEEDED: Decide whether card C33 (site demand and revenue estimate) keeps the caveat key `national_average`.
+- WHY: [Decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) item 12 withdraws the survey's output per establishment, which was the only survey figure card C33 showed. The card's list of caveats in [07](docs/07_ECONOMIC_METHODS.md) still names `national_average`, which described that figure. A caveat with no figure behind it says something the card no longer shows.
+- DONE SO FAR: Found by the lead's sweep of decision 0026. Left as it stands: the key is part of the card's closed list and of the tests that read it, and the card stays off screen while OI-03 is open.
+- OPTIONS: **Recommendation:** remove the key from card C33 when task S6-T17 is planned, with its test rows. Otherwise keep it and name the figure it covers.
+- NEEDED BY: the plan of task S6-T17 (slice S6).
+
+## OI-155 — Forms that render as a listed name without being its text
+
+- ID: OI-155
+- TYPE: CLOSED (was PROPOSED (hardening: document 17))
+- NEEDED: A decision whether the documentation check should also refuse forms that a reader sees as a listed name but that are not its text: tags inside the name, a link on half of it, further invisible characters, further escape forms.
+- WHY: The break pass of task S1-T14 showed four such forms passing everywhere. The private list's plain patterns do not catch them either, with or without the place-scoped exception, so the exception weakens nothing here; refusing them is a defence against deliberate evasion beyond the task's criteria ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md)).
+- DONE SO FAR: Recorded with the four demonstrated forms in the task's evidence. Nothing built.
+- OPTIONS: **Recommendation:** move to [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) with the slice's follow-up task; build only if the repository ever takes contributions from outside the run.
+- NEEDED BY: the follow-up task of slice S1 (S1-T10), which places it.
+- CLOSED: 2026-11-14, by S1-T10: placed in section 9 of [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) as DHA-131, with the four forms, with its origin. Nothing built. The earlier text is kept.
+
+## OI-156 — An unreadable folder and a failing file listing narrow the documentation check silently
+
+- ID: OI-156
+- TYPE: CLOSED (was PROPOSED (hardening: document 17))
+- NEEDED: A decision whether the documentation check should fail when a folder cannot be read or when git cannot list the files, instead of scanning less.
+- WHY: The break pass of task S1-T14 showed that a folder without read permission is skipped without a line, and that a failing git listing falls back, without notice, to the walk that leaves out build folders. Both are older than that task and concern the whole check, not its exception; neither occurs on the hosted checks.
+- DONE SO FAR: Recorded with both demonstrations in the task's evidence. Nothing built.
+- OPTIONS: **Recommendation:** move to [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) with the slice's follow-up task.
+- NEEDED BY: the follow-up task of slice S1 (S1-T10), which places it.
+- CLOSED: 2026-11-14, by S1-T10: placed in section 9 of [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) as DHA-132, with its origin. Nothing built. The earlier text is kept.
+
+## OI-158 — The hosted time limit of the web checks goes back to 1,800 seconds
+
+- ID: OI-158
+- TYPE: OPEN
+- NEEDED: Remove the hosted value of 3,000 s from `scripts/run_tests.py`, so that the limit of the suite `web-checks` is 1,800 s everywhere again, once task S1-T15 has made the suite fast enough on slow hosted runners.
+- WHY: [Decision 0027](docs/decisions/0027-hosted-web-checks-time-limit.md) allows the hosted value only as a stopgap. A wider limit finds a hanging run later.
+- DONE SO FAR: Task S1-T16 raises the limit on GitHub's hosted runner only, by the owner's decision of 2026-11-14. Task S1-T15 is in review with both parts (pull request 43): on four processors of the build machine the spike's browser run fell from 1,993 s to 1,294 s (one valid timing). Its criterion on the suite's time (under 1,200 s on four processors, measured twice) is not met; by the re-plan of 2026-11-14 recorded in `PROGRESS.md` under S1-T15 it is moved, unticked and word for word, to task S2-T10, and no further pass is made before the slice S1 gate. What is left of it is part of this item: a further shortening of the browser run that removes or weakens no test, and the second valid timing run.
+- OPTIONS: **Default:** the pull request that completes S1-T15, or the one after it, removes the hosted value when three hosted runs in a row have finished the suite inside 1,800 s. The three runs are counted from the head of pull request 43: that head's run, the main branch's run after its merge, and the next pull request's run. Otherwise the owner decides to keep a hosted value.
+- NEEDED BY: the slice S1 gate records the state of this item; the work is done in task S2-T10, before the slice S2 gate.
+
+## OI-159 — The pin-ruling guard refuses the record once S1-T08 is marked done
+
+- ID: OI-159
+- TYPE: CLOSED (was OPEN)
+- NEEDED: Correct the guard `scripts/tests/test_pin_rulings.py` so that a pin that is not installed is refused only when its not-installed ruling names a completed task, not when the retreat ruling's own attribution ("retreat ruling S1-T08") does; add the planted cases of both; then set the status line of S1-T08 in `TASKS.md` to done.
+- WHY: The guard requires the words "retreat ruling S1-T08: none exists: " in the note of a pin without a retreat and refuses a not-installed pin whose note names a completed task. With S1-T08 marked done, the pin `@mapbox/mapbox-gl-rtl-text` fails both ways. The lead's whole test on the ledger head of pull request 45 found it (seed 2026111447: 2216 passed, 1 failed).
+- DONE SO FAR: The status line of S1-T08 is back at "in review" although pull request 39 is merged, so that the guard passes; the cause is recorded in `PROGRESS.md` under task S1-T16. Nothing of the guard is changed (task S1-T16 changes no test, decision record 0027).
+- OPTIONS: **Default:** the review follow-up of slice S1 (task S1-T10) corrects the guard test-first and sets the status line.
+- NEEDED BY: the slice S1 gate, which reads the status lines of the slice's tasks.
+- CLOSED: 2026-11-14, by S1-T10: the guard refuses a pin that is not installed only when its not-installed ruling names a completed task; the attribution of a retreat ruling does not count. Proved by `test_d_completed_task` (a not-installed ruling naming a completed task still fails) and `test_pending_task_with_completed_retreat_ruling_remains_valid` in `scripts/tests/test_pin_rulings.py`; the status line of S1-T08 in TASKS.md is done. The earlier text is kept.
+
+## OI-160 — One time-out of the full street load on readiness, in a run under load
+
+- ID: OI-160
+- TYPE: OPEN
+- NEEDED: Show that the readiness bound of 170 s in the browser test "roads full street load draws every link and carries the Simulated mark" (`web/spikes/performance/tests/performance.spec.ts`) has a real margin on the runners that run it, or find why it was exceeded once.
+- WHY: In the builder's first measurement of part B of task S1-T15, taken while the build machine was loaded by other runs, that test timed out once on readiness at its bound and passed in the next run. A green re-run alone does not close a random failure (AGENTS rule 39).
+- DONE SO FAR: No bound was changed. The test passed in every run of the lead since: the two timing runs of the browser suite on four processors (the test took 3.5 minutes in the run under load and 2.3 minutes on reserved processors; 54 tests passed in each) and the browser run of the ledger of part B (54 passed).
+- OPTIONS: **Default:** the three hosted runs counted for S1-T15 (the head of pull request 43, the main branch after its merge, the next pull request) are the evidence: the item is closed when the test passed in all three, with the time of the suite `web-checks` in each recorded; a time-out in one of them keeps the item open and its cause is found before any bound moves.
+- NEEDED BY: the slice S1 gate records the state of this item.
+
+## OI-161 — Two dependency alerts on a development-only package that the mutation tester brings in
+
+- ID: OI-161
+- TYPE: OPEN
+- NEEDED: An override in `web/package.json` that raises the package `qs` to a fixed release, with the lock file made again by `npm install --package-lock-only` and the web checks green; or the alerts kept open with their reason recorded.
+- WHY: GitHub's dependency alerts on main name the package `qs` twice (alerts 4 and 7), severity medium, in `web/package-lock.json`. The lock file holds one copy, `qs` 6.15.1, in development scope only: `typed-rest-client` 2.3.1 asks for exactly that version, and `typed-rest-client` comes in through the pinned mutation tester `@stryker-mutator/core` 10.1.1. It runs on the build machine and in CI and is never served. Fixed releases exist; none can lie inside the exact version its parent asks for, so raising it needs an override.
+- DONE SO FAR: Nothing is changed. The lead read the alerts in GitHub's answer to a push on 2026-11-14; they are new since 2026-11-13. A lock file changes only inside a task that owns it, and `npm install --package-lock-only` runs only after a change to `web/package.json` (rule 44 of [AGENTS.md](AGENTS.md)). Task S1-T10 read the structure of the lock file for this entry: one copy of `qs`, one package that asks for it, no override of it.
+- OPTIONS: **Recommendation:** add the override at the next change of `web/package.json`, if the web checks and the tests of the web mutation runner stay green with it; otherwise keep the alerts open with that reason. Alternative: leave them until the pin of the mutation tester is next raised.
+- NEEDED BY: the next change of `web/package.json` or the slice S3 gate, whichever is first; not a blocker.
+
+## OI-162 — The task that builds the register-company table, card and map points
+
+- ID: OI-162
+- TYPE: OPEN
+- NEEDED: The slice and task that build the Public table `pub_register_company`, the company card and the map's establishment points of the register, beside the real business points of S2-T06 and S3-T12 (the OPEN line of [decision 0022](docs/decisions/0022-real-register-companies-with-a-synthetic-world.md) in [14_IMPLEMENTATION_PLAN.md](docs/14_IMPLEMENTATION_PLAN.md)).
+- WHY: The review of pull request 37 (point P1) found that the OPEN lines decision 0022 added to the pack name no task that owns them. The follow-up task of slice S1 (S1-T10, item I12) gave an owner where the plan has one; for this line its builders found no task of TASKS.md that names the three, and the follow-up adds no task.
+- DONE SO FAR: The OPEN line stays in document 14 as it is. No owner is invented. Nothing built.
+- OPTIONS: **Default:** the lead names the owning task in a re-plan, recorded in TASKS.md, before the first task that builds a register-company table, card or map layer starts; the owner is asked only if the allocation needs a new task.
+- NEEDED BY: the slice S2 gate (the public pack and its places).
 
 ## OI-127 — PyYAML is installed through the root development group
 
@@ -1354,62 +1687,101 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 ### PO-S1-02 — The boundary guard's list of environment names does not hold the night-lights key
 
 - ID: PO-S1-02
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: gate review of slice S0, round 1, designated reviewer (Google Gemini), 2026-11-13, proposed item P1
 - CONCERNS: ARC-81, as the reviewer names it (the variables that belong to build and evaluation tooling only)
 - EVIDENCE: `ENV_NAMES` in `scripts/tests/import_boundary_guard.py` holds `EII_DECISION_PROVIDER` and `JEV_PRO_API_KEY`. Document 02 says that `EARTHDATA_API_KEY` belongs to build and evaluation tooling only and is read by the public fetchers of `./eii build-public`; no test refuses a reference to it under `product/` or `core/` (OI-52).
 - NEEDED: the guard refuses a reference to `EARTHDATA_API_KEY` under `product/` and `core/` while `custodian/` may read it, with one planted violation; or one line saying why it is not needed.
 - CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: the import-boundary guard refuses `EARTHDATA_API_KEY` under `product/` and `core/` and allows it in the custodian plane and the tooling; `TOMTOM_API_KEY` stays allowed in the product plane. Proved by `test_earthdata_product_and_core` and `test_earthdata_custodian_and_tooling_tomtom_product_allowed` in `scripts/tests/test_s1_followup.py`.
 
 ### PO-S1-03 — Document 17 and its identifiers are outside the documentation check
 
 - ID: PO-S1-03
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: gate review of slice S0, round 1, designated reviewer (Google Gemini), 2026-11-13, proposed item P3
 - CONCERNS: TST-140
 - EVIDENCE: `REQUIRED_FILES` of `scripts/check_docs.py` does not hold `docs/17_DEPLOYMENT_HARDENING.md`, and `REQUIREMENT_PREFIXES` does not hold `DHA`. An identifier of document 17 that heads two rows therefore passes the check; PO-S0-17 was such a case and was found by hand.
 - NEEDED: the file and the prefix join the two lists, with one planted violation each; or one line saying why not.
 - CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: the documentation check requires `docs/17_DEPLOYMENT_HARDENING.md` and checks the `DHA` identifiers. Proved by `test_hardening_file_required`, `test_duplicate_hardening_identifier` and `test_unknown_hardening_identifier` in `scripts/tests/test_s1_followup.py`.
 
 ### PO-S1-04 — No test compares the tables of the documents with the lists the code holds
 
 - ID: PO-S1-04
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the lead, 2026-11-13, from the cause of the rejected first round of the slice S0 gate
 - CONCERNS: OPS-06; OPS-71; TST-141
 - EVIDENCE: The first round of the slice S0 gate was rejected because `CHECKS` of `scripts/preflight.py` held fifteen of the seventeen rows of the preflight table of document 13, and `.env.example`, `ENV_EXAMPLE_NAMES` of `scripts/check_tree.py` and `SECRET_NAMES` of `scripts/commit_guard.py` lacked the variables that decision 0019 had added to the variable tables. Each list was right when its task was built and went stale when a later decision changed its table. No test reads a table and its list together, so nothing failed.
 - NEEDED: for each of these lists, one test that reads the table of the document and the list in the code and fails on any difference, with one planted violation each; or one line saying why not.
 - CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: `scripts/tests/test_operations_parity.py` reads the tables of document 13 by section heading and column and compares them with `.env.example`, `ENV_EXAMPLE_NAMES` of `scripts/check_tree.py`, `SECRET_NAMES` of `scripts/commit_guard.py` and `CHECKS` of `scripts/preflight.py`, and the code was brought to the document. Proved by `test_document_and_code_inventories`, `test_added_table_row_is_refused` and `test_removed_code_name_is_refused`.
 
 ### PO-S1-05 — The hardening lists of the slice S1 spikes are not in the register of document 17
 
 - ID: PO-S1-05
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the lead, 2026-11-13, with the ledger of task S1-T04
 - CONCERNS: TASKS.md, section "Queue rules" (hardening beyond an acceptance criterion is listed, not built); document 17, section 9
 - EVIDENCE: Six tasks of slice S1 are built at the same time, so no builder edits document 17. Each task log of the slice in [PROGRESS.md](PROGRESS.md) records, in its line "Hardening listed, not built", the points its plan and its builder set aside.
 - NEEDED: one entry of the hardening register for each point of those lines that is not needed in version 1, each with its origin; or one line saying why a point needs no entry.
 - CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: section 9 of [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) holds DHA-103 to DHA-127, DHA-129 and DHA-130, one entry with its origin for each point of the seven lines "Hardening listed, not built" of the slice's task logs that version 1 does not need; each point that version 1 needs belongs to a task of the plan, as the return of the task's correction pass accounts point by point.
 
 ### PO-S1-06 — The product manifest does not declare the routing engine and the grid library that the areas spike imports
 
 - ID: PO-S1-06
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the reviewer of task S1-T03 (xAI Grok 4.7, through the Cursor command-line tool), 2026-11-13, point P1 of its verdict on pull request 33 (REV-17)
 - CONCERNS: BE-82; ARC-88; OI-60; OI-116
 - EVIDENCE: `product/src/eii_product/areas_spike/engine.py` imports `valhalla`, and `shapes.py` and `snap.py` of the same package import `h3`, while `product/pyproject.toml` declares neither: both packages sit in the root dependency group `engine` (the build ruling of the task, for the reason OI-60 gives). `product/README.md` states that home. No open item records that the task which builds the area tool must declare them in the product manifest or keep the exception; OI-116 records the same kind of gap for FastAPI only.
 - NEEDED: one sentence in an open item (OI-116 or OI-120) that names the task which declares `pyvalhalla` and `h3` in `product/pyproject.toml` together with the change of the clean-environment guard, or one line saying why the root group stays their home.
 - CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: the sentence its NEEDED asks for stands in OI-116, as its update of 2026-11-14: task S3-T04 declares `pyvalhalla` and `h3` in `product/pyproject.toml` together with the change of the clean-environment guard; until then both stay in the root group `engine` under OI-60.
 
 ### PO-S1-07 — The request judges of the two map spikes pass a scheme they do not know
 
 - ID: PO-S1-07
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the lead, 2026-11-13, at its check of task S1-T02
 - CONCERNS: FE-56; OI-115
 - EVIDENCE: `requestDecision` of `web/spikes/glyphs/guards.mjs` and `foreignRequest` of `web/spikes/performance/tests/performance.spec.ts` judge an address that begins with `http://` or `https://` by its origin and treat `data:` and `blob:` as local; an address with any other scheme is counted as same-origin. The content security policy of both spike servers stops such a request, and the browser tool does not report a WebSocket through the request event that the tests record, so no test sees one.
 - NEEDED: both judges count a scheme outside `http`, `https`, `data` and `blob` as foreign, with one planted case each; or one line saying why not.
 - CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: both judges count a scheme outside `http`, `https`, `data` and `blob` as foreign. Proved by "unknown request schemes are blocked" in `web/spikes/glyphs/tests/guards.node-test.mjs` and "unknown or file request schemes are refused rather than ignored" in `web/spikes/performance/tests/foreign-request.node-test.mjs`.
+
+### PO-S1-09 — Files of the listed set that no pattern reads
+
+- ID: PO-S1-09
+- TYPE: CLOSED (was OPEN)
+- RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
+- CONCERNS: TST-140; OI-93
+- EVIDENCE: 114 of the 477 files git lists at commit a9db6c8 are never read by any pattern, built-in or private, because their suffix is not on the text list of `scripts/check_docs.py` (75 `.mjs`, 4 `.mts`, `.pyi`, `.env.example`, `uv.lock`, `.nvmrc`, `.python-version`, `.prettierignore`, and binary files); OI-93 does not name `.mjs`. Check 8 of TST-263 reads them only for a listed name.
+- NEEDED: the text list covers every UTF-8 file git lists, or one line saying why not.
+- CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: the documentation check reads every regular file that git lists with the identifier-number rule and the private patterns, so no listed file stays unread; this is wider than the text list the item asks for. Proved by `test_eight_digit_run_in_mjs_and_private_pattern_in_non_utf8` in `scripts/tests/test_s1_followup.py`, whose plants include an `.mjs` file, files that are not UTF-8 and a file of an invented suffix that no list names.
+
+### PO-S1-10 — An unreadable private patterns file is ignored without a message
+
+- ID: PO-S1-10
+- TYPE: CLOSED (was OPEN)
+- RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
+- CONCERNS: TST-140; REV-25; OI-93
+- EVIDENCE: when `EII_FORBIDDEN_PATTERNS_FILE` is set but names no readable file, `scripts/check_docs.py` ignores it without a message, which silently turns off every private name, including the refusal that TST-263 relies on outside its places.
+- NEEDED: a set but unreadable file fails the check with one line that does not echo the path, with a planted case; or one line saying why not.
+- CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: a set private-patterns variable that names a missing path or a folder fails the check with one fixed line that prints no part of the path. Proved by `test_missing_private_pattern_file_fails_closed` and `test_directory_private_pattern_file_fails_closed` in `scripts/tests/test_s1_followup.py`.
+
+### PO-S1-11 — Scans of the built bundle and the exports need the place rule
+
+- ID: PO-S1-11
+- TYPE: CLOSED (was OPEN)
+- RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
+- CONCERNS: TST-142; TST-263
+- EVIDENCE: the built web bundle and the exports of TST-142 and decision 0012 will carry the map's credit, so any scan of them with the private list refuses the name unless it applies the same place rule.
+- NEEDED: the task that scans the bundle or the exports states how the credit is judged there, or one line saying why not.
+- CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: task S3-T16 states in its entry of TASKS.md that its scan of the built bundle and of the rendered page judges the map's credit by the place rule of TST-263. No task of the plan scans an export with the private list, so there is nothing to place for the exports.
 
 ## Sources
 

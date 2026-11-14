@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import json
+import os
 import shlex
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import runner_support as support
 
@@ -90,6 +92,42 @@ class RunnerUsage(unittest.TestCase):
             if index < len(expected) and name == expected[index]:
                 index += 1
         self.assertEqual(index, len(expected))
+
+    def test_web_checks_limit_on_a_hosted_runner(self) -> None:
+        rows: tuple[tuple[dict[str, str], int], ...] = (
+            ({}, 1800),
+            (
+                {
+                    "GITHUB_ACTIONS": "true",
+                    "RUNNER_ENVIRONMENT": "github-hosted",
+                },
+                3000,
+            ),
+            ({"GITHUB_ACTIONS": "true"}, 1800),
+            ({"RUNNER_ENVIRONMENT": "github-hosted"}, 1800),
+            (
+                {"GITHUB_ACTIONS": "false", "RUNNER_ENVIRONMENT": "github-hosted"},
+                1800,
+            ),
+            (
+                {"GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "self-hosted"},
+                1800,
+            ),
+        )
+        for environ, expected in rows:
+            with self.subTest(environ=environ):
+                with patch.dict(os.environ, environ, clear=True):
+                    for suite in run_tests.SUITES:
+                        if suite.name == "web-checks":
+                            self.assertEqual(suite.timeout, 1800)
+                            self.assertEqual(
+                                run_tests.suite_timeout(suite, os.environ), expected
+                            )
+                        else:
+                            self.assertEqual(
+                                run_tests.suite_timeout(suite, os.environ),
+                                suite.timeout,
+                            )
 
     def test_usage_errors(self) -> None:
         rows = (

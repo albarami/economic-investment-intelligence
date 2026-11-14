@@ -1,0 +1,318 @@
+{
+  "header": {
+    "caveat": "traffic_simulated",
+    "evidence_status": "observed",
+    "method": {
+      "id": "C25",
+      "parameters_sha256": "02f7ea7a5ea37ab15166bb3a3e6a59230631e423ed42de0fc25ab6a7d2f31bd9"
+    },
+    "provenance": "Simulated",
+    "sources": {
+      "flow_hourly": "a9300f93cea20320affcd90e3d539ea775c9503730be72dc6bf30a616bc27b57",
+      "road_link": "6c88f131dcc16317304d43d3724472f825a046ebd2cd2da93fb0990d11e6e0e9"
+    },
+    "withheld_note": "Flows withheld by the disclosure controls are left out."
+  },
+  "roads": {
+    "note": "Invented synthetic fixture; no real place. SYN-U-03 origin group is withheld.",
+    "nodes": [
+      { "id": "SYN-N-0-0", "lat": "0", "lon": "0" },
+      { "id": "SYN-N-0-1", "lat": "0", "lon": "0.01" },
+      { "id": "SYN-N-0-2", "lat": "0", "lon": "0.02" }
+    ],
+    "links": [
+      {
+        "link_id": "SYN-L-001",
+        "source": "SYN-N-0-0",
+        "target": "SYN-N-0-1",
+        "length_m": "1113",
+        "road_class": "residential"
+      },
+      {
+        "link_id": "SYN-L-002",
+        "source": "SYN-N-0-1",
+        "target": "SYN-N-0-0",
+        "length_m": "1113",
+        "road_class": "residential"
+      },
+      {
+        "link_id": "SYN-L-003",
+        "source": "SYN-N-0-1",
+        "target": "SYN-N-0-2",
+        "length_m": "1113",
+        "road_class": "secondary"
+      },
+      {
+        "link_id": "SYN-L-004",
+        "source": "SYN-N-0-2",
+        "target": "SYN-N-0-1",
+        "length_m": "1113",
+        "road_class": "secondary"
+      }
+    ],
+    "units": [
+      { "unit_id": "SYN-U-01", "lat": "0", "lon": "0" },
+      { "unit_id": "SYN-U-02", "lat": "0", "lon": "0.01" },
+      { "unit_id": "SYN-U-03", "lat": "0", "lon": "0.02" }
+    ]
+  },
+  "hours": [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+  "rows": [
+    {
+      "day_type": "weekday",
+      "hour": 5,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 6,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 7,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "0.286",
+      "summer": false,
+      "volume_band": "vb4"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 8,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "0.286",
+      "summer": false,
+      "volume_band": "vb4"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 9,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "0.686",
+      "summer": false,
+      "volume_band": "vb4"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 10,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 11,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 12,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 13,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 14,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 15,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "0.857",
+      "summer": false,
+      "volume_band": "vb4"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 16,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "0.286",
+      "summer": false,
+      "volume_band": "vb4"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 17,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "0.286",
+      "summer": false,
+      "volume_band": "vb4"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 18,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "0.686",
+      "summer": false,
+      "volume_band": "vb4"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 19,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 20,
+      "link_id": "SYN-L-001",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 5,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 6,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 7,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "0.767",
+      "summer": false,
+      "volume_band": "vb4"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 8,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "0.383",
+      "summer": false,
+      "volume_band": "vb4"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 9,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "0.950",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 10,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 11,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 12,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 13,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 14,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 15,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "0.983",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 16,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "0.767",
+      "summer": false,
+      "volume_band": "vb4"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 17,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "0.500",
+      "summer": false,
+      "volume_band": "vb4"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 18,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "0.950",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 19,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    },
+    {
+      "day_type": "weekday",
+      "hour": 20,
+      "link_id": "SYN-L-003",
+      "speed_ratio": "1.000",
+      "summer": false,
+      "volume_band": "vb1"
+    }
+  ]
+}

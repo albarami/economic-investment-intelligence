@@ -1,3 +1,4 @@
+import { ROAD_LOADS } from './config.mjs';
 import { createHash, randomBytes } from 'node:crypto';
 import fs from 'node:fs';
 import http from 'node:http';
@@ -391,6 +392,8 @@ async function main() {
     return;
   }
   console.log(started.addressLine);
+  for (const name of Object.keys(ROAD_LOADS))
+    console.log(`${started.addressLine}?layers=${name}`);
   await new Promise(() => {});
 }
 

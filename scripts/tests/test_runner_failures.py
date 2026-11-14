@@ -9,8 +9,9 @@ import tempfile
 import threading
 import time
 import unittest
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
+from unittest.mock import patch
 
 import runner_support as support
 
@@ -168,6 +169,40 @@ class RunnerFailures(unittest.TestCase):
         )
         pid = self._await_pid(pid_path, 20)
         self._await_dead(pid, 5)
+
+    def test_hosted_web_checks_timeout_prints_the_selected_limit(self) -> None:
+        suite = run_tests.Suite("web-checks", "pytest", "web", (), 1800)
+        seen: list[int] = []
+
+        def fake_launch(
+            cmd: Sequence[str], cwd: Path, env: Mapping[str, str], timeout: int
+        ) -> run_tests_exec.Launched:
+            seen.append(timeout)
+            return run_tests_exec.Launched(status=None, output="", timed_out=True)
+
+        original = run_tests_exec.launch
+        run_tests_exec.launch = fake_launch
+        try:
+            with patch.dict(
+                os.environ,
+                {"GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "github-hosted"},
+                clear=True,
+            ):
+                status, out, _err = support.call(
+                    ["--seed", support.FIXTURE_SEED],
+                    (suite,),
+                    self.root,
+                    os.environ,
+                )
+        finally:
+            run_tests_exec.launch = original
+        self.assertEqual(seen, [3000])
+        self.assertEqual(status, 1, out)
+        self.assertIn(
+            "FAIL timeout: web-checks: no result within 3000 s; "
+            "the process group was killed",
+            support.visible(out),
+        )
 
     def test_unknown_kind_is_one_internal_error_line(self) -> None:
         suite = run_tests.Suite("fx-bogus", "bogus", ".", (), 5)

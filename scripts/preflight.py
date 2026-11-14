@@ -30,6 +30,8 @@ CHECKS = (
     "model-key",
     "traffic-provider-key",
     "night-lights-key",
+    "imagery-provider-key",
+    "photorealistic-3d-key",
     "env-not-tracked",
     "wsl-interop",
 )
@@ -106,6 +108,8 @@ def run_preflight(
         out_lines.append(rows.model_key_row(environ))
         out_lines.append(rows.traffic_provider_key_row(environ))
         out_lines.append(rows.night_lights_key_row(environ))
+        out_lines.append(rows.imagery_provider_key_row(environ))
+        out_lines.append(rows.photorealistic_3d_key_row(environ))
         out_lines.append(rows.env_tracked_row(root, environ, limit))
         out_lines.append(rows.wsl_row(root, environ, limit))
 

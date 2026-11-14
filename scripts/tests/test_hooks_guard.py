@@ -475,6 +475,26 @@ class CommitGuard(unittest.TestCase):
         self.assertEqual(stderr, _unparseable(_URL_NAME))
         self._free(stdout + stderr, key, secret)
 
+    def test_register_and_map_keys_are_guarded(self) -> None:
+        for secret_name in (
+            "ESRI_API_KEY",
+            "MAPTILE_API_KEY",
+            "EII_REGISTER_FILE",
+            "EII_FC_REGISTER_FILE",
+        ):
+            with self.subTest(secret_name=secret_name):
+                _home, env, repo, rng = self._start()
+                value = support.random_value(rng, 20)
+                (repo / ".env").write_text(
+                    secret_name + "=" + value + "\n", encoding="utf-8"
+                )
+                self._stage(repo, env, "leak.txt", value.encode("utf-8"))
+                status, stdout, stderr = self._guard(env, repo)
+                self.assertEqual(status, 1)
+                self.assertEqual(stdout, "")
+                self.assertEqual(stderr, _content("leak.txt", secret_name))
+                self._free(stdout + stderr, value)
+
 
 def _rename_statuses(raw: str) -> list[str]:
     parts = raw.split("\0")
