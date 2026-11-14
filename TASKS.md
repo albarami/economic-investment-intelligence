@@ -280,6 +280,13 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S0-T05.
 - Requirements: TST-03, TST-04.
 - Delivery: routine; personas Platform; status done (pull request 45, merged 2026-11-14). Added by the owner's decision of 2026-11-14 ([decision 0027](docs/decisions/0027-hosted-web-checks-time-limit.md)): the same passing web checks take from about 1,030 s to more than 1,800 s on hosted runners of different speed. The hosted value is a stopgap: it is removed, and the limit is 1,800 s everywhere again, when S1-T15 has made the suite fast enough on slow hosted runners (OI-158).
+### S1-T17 — Gate fix for slice S1
+- Goal: Fix the findings of the first review of the slice S1 gate that concern the pack and the open items: the gate item of the optional 3D view stands in the row of the slice that builds it, the return of the hosted time limit has an owning criterion, and two open items state what the hosted runs showed.
+- Acceptance criteria: [x] in the gate table of document 12 (section 5) the clause on the optional 3D view of decision 0019 item 14 and its evidence clause (TST-242) stand in the slice S6 row and no longer in the slice S1 row, as document 14 places the view (PLN-28; the row of its section 6 that names S6-T18 and S6-T19); [x] task S2-T10 holds the criterion that removes the hosted value of 3,000 s, with the runner's files in its scope; [x] OI-158 records that its three-run condition is met and where the removal is owned, and OI-160 is closed on its own default with the three hosted runs; [x] no code, test, bound, workflow or other gate item changes.
+- Scope: `docs/12_TESTING_AND_QUALITY.md` (the two rows of section 5), `OPEN_ITEMS.md`, `PROGRESS.md` and this file.
+- Depends: the first review of the slice S1 gate.
+- Requirements: TST-169, TST-168, PLN-28, REV-33.
+- Delivery: routine; personas Platform; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/48). Added by the first review of the slice S1 gate (TST-169); the statements of the gate record that the same review found wrong are corrected in the gate record's own second round.
 ### S1-T10 — Review follow-up for slice S1
 - Goal: Close every proposed open item that the reviews of slice S1 entered in `OPEN_ITEMS.md`, before the slice S1 gate.
 - Acceptance criteria: [x] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
@@ -424,8 +431,8 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas Methods; status queued.
 ### S2-T10 — Review follow-up for slice S2
 - Goal: Close every proposed open item that the reviews of slice S2 entered in `OPEN_ITEMS.md`, before the slice S2 gate.
-- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open; [ ] the suite `web-checks` finishes in under 1,200 s on four processors, measured twice (moved here word for word from task S1-T15 by a re-plan of 2026-11-14, with open item OI-158: no test, assertion, planted case or bound is removed or weakened for it).
-- Scope: the files the closures change, and `OPEN_ITEMS.md`; for the criterion moved from S1-T15, `web/spikes/performance/tests/`, the spike's browser configuration and its README.
+- Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open; [ ] the suite `web-checks` finishes in under 1,200 s on four processors, measured twice (moved here word for word from task S1-T15 by a re-plan of 2026-11-14, with open item OI-158: no test, assertion, planted case or bound is removed or weakened for it); [ ] the hosted value of 3,000 s is removed from the whole test command, so that the limit of the suite `web-checks` is 1,800 s on every runner again, with the planted cases of task S1-T16 brought to that state (decision 0027 item 4; open item OI-158, whose three-run condition is met; added by the gate-fix task S1-T17).
+- Scope: the files the closures change, and `OPEN_ITEMS.md`; for the criterion moved from S1-T15, `web/spikes/performance/tests/`, the spike's browser configuration and its README; for the hosted time limit, `scripts/run_tests.py`, `scripts/ci_environment.py`, their tests and the sentences of the pack that state the hosted value.
 - Depends: every other task of slice S2.
 - Requirements: REV-41, TST-168.
 - Delivery: routine; personas as the items require; status queued.

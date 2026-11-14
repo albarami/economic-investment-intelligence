@@ -1364,6 +1364,7 @@
 - DONE SO FAR: Task S1-T16 raises the limit on GitHub's hosted runner only, by the owner's decision of 2026-11-14. Task S1-T15 is in review with both parts (pull request 43): on four processors of the build machine the spike's browser run fell from 1,993 s to 1,294 s (one valid timing). Its criterion on the suite's time (under 1,200 s on four processors, measured twice) is not met; by the re-plan of 2026-11-14 recorded in `PROGRESS.md` under S1-T15 it is moved, unticked and word for word, to task S2-T10, and no further pass is made before the slice S1 gate. What is left of it is part of this item: a further shortening of the browser run that removes or weakens no test, and the second valid timing run.
 - OPTIONS: **Default:** the pull request that completes S1-T15, or the one after it, removes the hosted value when three hosted runs in a row have finished the suite inside 1,800 s. The three runs are counted from the head of pull request 43: that head's run, the main branch's run after its merge, and the next pull request's run. Otherwise the owner decides to keep a hosted value.
 - NEEDED BY: the slice S1 gate records the state of this item; the work is done in task S2-T10, before the slice S2 gate.
+- UPDATE: 2026-11-14, by the gate-fix task S1-T17 after the first review of the slice S1 gate: the condition of the default is met. The three hosted runs it counts each finished the suite `web-checks` inside 1,800 s: the head of pull request 43 (731 s; 843 passed, 0 failed, 0 skipped), the main branch after its merge (912 s; 843 passed, 0 failed, 0 skipped) and the head of pull request 46 (937 s; 849 passed, 0 failed, 0 skipped); the main branch after the merge of pull request 46 took 938 s. The removal of the hosted value is now an acceptance criterion of task S2-T10, with the runner's files in its scope. It is a separate thing from that task's criterion on the suite's time on four processors (under 1,200 s, measured twice), which is not met. This item stays open until the removal is merged.
 
 ## OI-159 — The pin-ruling guard refuses the record once S1-T08 is marked done
 
@@ -1379,12 +1380,13 @@
 ## OI-160 — One time-out of the full street load on readiness, in a run under load
 
 - ID: OI-160
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - NEEDED: Show that the readiness bound of 170 s in the browser test "roads full street load draws every link and carries the Simulated mark" (`web/spikes/performance/tests/performance.spec.ts`) has a real margin on the runners that run it, or find why it was exceeded once.
 - WHY: In the builder's first measurement of part B of task S1-T15, taken while the build machine was loaded by other runs, that test timed out once on readiness at its bound and passed in the next run. A green re-run alone does not close a random failure (AGENTS rule 39).
 - DONE SO FAR: No bound was changed. The test passed in every run of the lead since: the two timing runs of the browser suite on four processors (the test took 3.5 minutes in the run under load and 2.3 minutes on reserved processors; 54 tests passed in each) and the browser run of the ledger of part B (54 passed).
 - OPTIONS: **Default:** the three hosted runs counted for S1-T15 (the head of pull request 43, the main branch after its merge, the next pull request) are the evidence: the item is closed when the test passed in all three, with the time of the suite `web-checks` in each recorded; a time-out in one of them keeps the item open and its cause is found before any bound moves.
 - NEEDED BY: the slice S1 gate records the state of this item.
+- CLOSED: 2026-11-14, by the gate-fix task S1-T17, on the item's own default: the test passed in the three hosted runs counted for S1-T15, and the time of the suite `web-checks` in each is recorded: the head of pull request 43 (731 s; 843 passed, 0 failed, 0 skipped), the main branch after its merge (912 s; 843 passed, 0 failed, 0 skipped) and the head of pull request 46 (937 s; 849 passed, 0 failed, 0 skipped). The main branch after the merge of pull request 46 passed too (938 s). No time-out was seen in any of them and no bound was changed. The hosted logs give no time for the one test alone, and the default does not ask for one; the first review of the slice S1 gate found that the gate record had kept the item open for that reason.
 
 ## OI-161 — Two dependency alerts on a development-only package that the mutation tester brings in
 
