@@ -45,12 +45,22 @@ both confidence cutoffs must agree. Ranking signals are private decision evidenc
 never probabilities or facts. Since no supported effect removes an item from human
 view, only the ordering/flagging thresholds of decision 0014 item 6 apply.
 
-The `jev` adapter uses the standard library and is **UNVERIFIED**. It is imported
-only after explicit provider selection and admitted input. Tooling must supply an
-endpoint and a token cap; the default zero cap permits no configured-provider call.
-Only that adapter reads `JEV_PRO_API_KEY`, from the environment. No key or live call
-was used for S1-T07. The HTTP request and response shape and actual cap enforcement
-need S1-T08 confirmation before use (OI-01, OI-18). No default test imports it.
+The `jev` adapter follows the provider's public API reference as read by the lead
+on 2026-11-13: the body contains exactly `model`, `state` and `questions`, and the
+reply supplies `model`, `answers.decision` and `usage.input_tokens` plus
+`usage.output_tokens`; the adapter cuts the yes/no label at weight 0.5.
+It accepts only rubric form 1, never retries or follows redirects, uses a
+30-second timeout, and refuses a call when the remaining token limit is below
+the encoded body's byte count; that cap guard is not a guarantee, and the
+unchanged gateway checks actual usage after the call.
+The caller supplies the address, kept out of the repository by the owner's
+instruction; no default test or command calls the service, loopback tests import
+the adapter only within their explicit test boundary, and the keyed run is made
+by the lead alone under the owner's answer to OI-18.
+
+The adapter reads `JEV_PRO_API_KEY` only from the environment after explicit
+provider selection; the default zero cap permits no configured-provider call.
+No key or live call was used for S1-T07 or this wire-shape pass.
 
 ## Validation
 

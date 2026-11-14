@@ -17860,6 +17860,1752 @@ Seed:      none
 Notes:     The three work commits of this round, between the reviewed head and the work commit, have Conventional Commit subjects.
 ```
 
+#### D0022: independent review, round 2: APPROVED
+
+Reviewed commit `f5a7a2e91efb7bc852ca62299e93e1ef80914bad`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/37 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43479919062; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43479918871; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43479918951 ). Reviewed by OpenAI GPT-6 Astra (xhigh) through the Codex command-line tool, a maker other than the writers (Anthropic). The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: D0022 (pull request 37), round 2
+COMMIT: f5a7a2e91efb7bc852ca62299e93e1ef80914bad
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, project-orientation, task-standards, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED Document 03 section 7.3 and DAT-140 now retain carried-forward rows with null employee_count and CARRIED_FORWARD; equality with DAT-04 applies only to published counts. PRV-67, PRV-125, TST-207, document 12 section 5.1 and TASKS.md S5-T10 agree. Passing withheld rows, failing numeric counts and withholding rather than zero are specified. S5-T10 is the correct task to amend: it owns the list-column criteria; S5-T03 owns closure and adversarial audits.
+  F2 FIXED Document 03 section 6.1 limits generation to attached employment, wage and residence records and their stated derived values. Missing register attributes cannot be invented; address and lifecycle choices remain pending. SYN-16 explicitly requires rejection of a generated licence_status absent from the stand-in register.
+  F3 FIXED The source registry, operations configuration, DAT-12, build inputs and sandbox descriptions consistently route biz_register through EII_REGISTER_FILE and fc_register through EII_FC_REGISTER_FILE. Both files retain read-only restrictions. DAT-12 specifies acceptance of a financial-centre-only stand-in company and rejection of a number absent from both files.
+  F4 FIXED The architecture Claim catalogue row, PRV-118 and SYN-71 permit computed list rank, fit and stability facts only in application-owned register-company list templates. ARC-73 and AI-108 retain model exclusion. DAT-145 retains the accepted list-rank fixture; TST-233 retains rejection of wage-based ranks and Simulated facts.
+  F5 FIXED TST-207 and TST-142 distinguish authorized card/list responses and exports from prohibited model payloads, egress records, ledger rows and logs. PRV-72, PRV-103 and DAT-140 agree. Passing stand-in card responses and failing model-payload copies are specified; canary and synthetic-identifier checks remain on every API response.
+CHECKS:
+  REV-10 OPEN P2 The five substantive corrections satisfy the supplied fix scope and decision 0022; the missing D0022 task and acceptance-criteria entry remains a record item.
+  REV-11 PASS .overnight/EVIDENCE.md section 2 records the lead's documentation check exiting 0 on this exact head and ./eii test --seed 2026111407 exiting 0 with 1376 passed, 0 failed and 0 skipped. Supplied head checks report success: https://github.com/albarami/economic-investment-intelligence/actions/runs/43479918871/job/132073429134 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43479919062/job/132073429314 . No builds or tests were executed during this review.
+  REV-12 OPEN P3 The inspected full-task and round-2 diff statistics contain documentation only, with no data or implementation files. The inherited correction to the round-1 range record remains assigned to S1-T10.
+  REV-13 PASS The patch adds specification corrections and evidence records, with no executable placeholders, fabricated release tables or invented company values.
+  REV-14 PASS No secrets, register rows, real identifiers or calibration values were found in the reviewed patch. Supplied head secret-scan success: https://github.com/albarami/economic-investment-intelligence/actions/runs/43479919062/job/132073428588 .
+  REV-15 PASS No executable tests, CI controls, thresholds, tolerances, attack sizes or skips changed. TST-207 retains the forbidden labour-field and isolating-aggregate plants; the registration-number exception follows ARC-03 while canary and synthetic-identifier checks remain.
+  REV-16 PASS DAT-12, the source registry and operations settings now agree. S5-T10 correctly owns the withholding amendment. The ledger identifies the Anthropic builder, distinct from this OpenAI reviewer.
+  REV-17 OPEN P1,P2 The affected contracts, architecture, privacy, testing and operations documents are updated, and the supplied head documentation check exits 0. The inherited ownership and task-entry records remain outstanding.
+  REV-18 PASS ARC-02, ARC-09, ARC-10 and the operations configuration apply read-only access to both register files. ARC-73 and PRV-103 retain the prohibition on sending register-company rows or identifiers to models.
+  REV-19 PASS The changes stay within decision 0022 and the supplied owner rulings. Section 6.1 removes the overbroad generation permission without deciding the pending address, lifecycle or grouping questions.
+  REV-20 N/A This documentation-only correction adds no executable calculation or rendered numerical fact.
+  REV-21 PASS The Claim catalogue row, PRV-118 and SYN-71 now agree with the list-fact allowance of document 03 section 9.1 and DAT-145; company references remain excluded from brief items.
+  REV-22 PASS DAT-140, PRV-67, PRV-125 and TST-207 now represent required withholding consistently. The forbidden labour columns, company-wage and isolating-aggregate plants, and employee counts as attacker knowledge remain specified.
+  REV-23 N/A No product code, imports or package metadata changed.
+  REV-24 N/A No executable bilingual view or Arabic template was added or changed.
+  REV-25 PASS The reviewed changes contain no prohibited private path, personal contact detail, real register data, calibration value or named-product comparison.
+  REV-26 PASS Decision 0022 and PRV-125 retain the bounded card/list exception, released-aggregate restrictions and prohibition on ordering by company wages or other unreleased values; the fix introduces no broader product claim.
+  REV-27 PASS The read-only comparison git diff --no-index -- AGENTS.md CLAUDE.md returned exit 0 with no differences. The supplied head evidence also records cmp exiting 0.
+  REV-28 PASS DAT-12 preserves synthetic-identifier constraints and adds separate stand-in validation for both registers. TST-143 retains name-collision checks; no real registration, licence or tax number appears in the reviewed patch.
+  REV-29 PASS Section 6.1 and SYN-16 now explicitly forbid generating missing public-register attributes. Company cards remain limited to publisher fields and the released employee count; other labour and residence details remain governed by document 06.
+  REV-38 N/A No gateway implementation, serving-plane import or runtime configuration reader changed.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17) record — Carry forward the missing task owners for OPEN (decision 0022) entries, including document 05 Q12–Q19 and document 14's company-card ownership question. Record their owners through S1-T10, as the brief directs.
+  P2 (REV-10, REV-17) record — TASKS.md still has no D0022 task and acceptance-criteria entry. Record it through S1-T10. The other part of the earlier item is fixed: decision 0022's Consequences no longer cites the nonexistent S4-T11.
+  P3 (REV-12) record — Carry forward the correction to the round-1 review-range description through S1-T10. The full task range begins after 764f7760c39045575bb2dab7e19b4d8f3a7c8cf3; this round's supplied patch correctly begins after 003f3e520f8b2c0b8a286037f3306d95b98e1bd6.
+```
+
+#### D0022: merge record
+
+- The lead's checks on the merged head `f5a7a2e91efb7bc852ca62299e93e1ef80914bad` before the merge (ruling L-29): "TREE-IS-WORK ok: 403 paths at f5a7a2e91efb7bc852ca62299e93e1ef80914bad", exit code 0; `./eii test --seed 2026111407`: exit code 0, "total: 1376 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/37 was squash-merged on 2026-11-13 at that head; merge commit `02b92899ec0fb899b874a75ab7a54e0ff60d5672` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43482440442; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43482440470; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43482440467 .
+
+#### S1-T11: independent review, round 1: APPROVED
+
+Reviewed commit `9a22c2a21d12aca18f147731112dd0da10fb452a`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/38 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43496042762; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43496042799; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43496042998 ). Reviewed by xAI Grok 4.7 (high) through the Cursor command-line tool, a maker that neither planned nor built the task (the builder was OpenAI through Codex; the internal reviews and the lead are Anthropic). The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T11 (pull request 38)
+COMMIT: 9a22c2a21d12aca18f147731112dd0da10fb452a
+REVIEWER: xAI Grok 4.7, through the Cursor command-line tool
+SKILLS LOADED: strict-reviewer; code-review (not available in this tool's skill list)
+CHECKS:
+  REV-10 PASS Criteria (1)–(4) are met by the fixture assignment, the product reader and the road page: identical inputs repeat (canonical rows and the stand-in invariance test); one volume-delay rule with every value in the parameter file; hourly whole speeds feed a drive area that changes with the hour while equal speed vectors share an outline (`test_hourly_areas_marks_reuse_and_walk`); the road legend shows Simulated. Criterion (5): mutmut 3.8.1 retreat 3.8.0, @stryker-mutator/core 10.1.1 retreat 10.0.0, and @deck.gl/extensions 9.4.1 retreat 9.3.12 are in pins.toml. The native-trace criterion is S1-T12; `spike:performance:verify-evidence` exits 1 with `missing-native-trace`. Head `./eii test --seed 2026111410` exit 0.
+  REV-11 PASS On this head the lead recorded `./eii test --seed 2026111410` exit 0 (1879 passed, 0 failed, 0 skipped) and `python3 scripts/check_docs.py` exit 0. Hosted checks on this head succeeded: tests https://github.com/albarami/economic-investment-intelligence/actions/runs/43496042762/job/132129280840 ; planted-failures https://github.com/albarami/economic-investment-intelligence/actions/runs/43496042762/job/132129280383 ; static-checks https://github.com/albarami/economic-investment-intelligence/actions/runs/43496042762/job/132129280858 ; secret-scan https://github.com/albarami/economic-investment-intelligence/actions/runs/43496042762/job/132129281029 ; check-docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43496042799/job/132129280555 ; sandbox proof https://github.com/albarami/economic-investment-intelligence/actions/runs/43496042998/job/132129281016 . New guards have planted refusals. This review ran no shell.
+  REV-12 PASS The task change is the assignment spike, its tests and fixtures, the product traffic reader, the performance-page road layer, pins, the mutation runners and the documents the task names. Nothing under `data/`. EVIDENCE section 2a records the base update with FAIL 0.
+  REV-13 PASS The new modules compute the fixture and read its rows. No TODO, FIXME, NotImplementedError or fixed stand-in result stands in for the assignment.
+  REV-14 PASS Secret-scan on this head succeeded at the link under REV-11. The diff has no `.env`, key, custodian record, register row or calibration value. The roads, flows and units are invented.
+  REV-15 PASS The new tests add bounds and planted refusals. No skip, xfail, noqa, type-ignore, continue-on-error or loosened prior assertion. The 0.2 s and 40 s bounds are the card's sentences under L-109 and L-85.
+  REV-16 OPEN P2 The code matches card C25, decision 0021 items 1–11 and the rulings: one whole speed, the floor, one length, itemised route parts that sum to the total, and the card's bounds. A user does not get two speeds or two times for one link and hour: the product recovers the method's whole speed from the released ratio, `route` returns only the itemised total, and the page paints the stored band of the hour shown.
+  REV-17 OPEN P1 Decision 0021, card C25, documents 03, 05, 07 and 14, the index, OI-123, AGENTS.md and CLAUDE.md are in the pull request. `python3 scripts/check_docs.py` exit 0 on the head. OI-123 puts the lead's rules, including the whole speed (item 2) and the situation's whole speed (item 8), to the owner.
+  REV-18 PASS The assignment reads only the three named fixture files; the stand-in audit fails a forbidden read by name. No traffic-provider call or stored response, and no secret is written into a file.
+  REV-19 PASS Decision 0021 is a new record and removes no component decision. The lane-capacity amendment stays with S5-T09 in OI-123 (L-103). The native trace stays S1-T12.
+  REV-20 PASS Every calculation row's speed and minutes equal `Traffic.link_speed` and `Traffic.link_minutes`. Hourly rows are Simulated and observed with caveat `traffic_simulated`; free-flow is Public and observed. The header carries method C25 and the source digests. The browser paints stored bands and does not compute a speed or a time.
+  REV-21 PASS The road page shows the Simulated mark and the stored hour's band, not a second numeral for a link. New Arabic strings are catalogue notices. Web static checks passed on the head.
+  REV-22 PASS No change to the partition, the parameter sets, treatment or the attack suite. The PRV-124 test keeps rows and every stored outline identical when both stand-ins change.
+  REV-23 PASS `traffic.py` does not import `eii_custodian`. Cross-plane tests live under `scripts/tests` and run the assignment in a subprocess. Hosted tests passed.
+  REV-24 PASS The new Arabic strings are marked pending native review. English and Arabic use the same notice pair. The hour label uses Western digits.
+  REV-25 PASS No private path, e-mail, ministry plan or named-product comparison. The OpenStreetMap way counts stay in a comment and are not shown. No identifier is a bare run of eight or eleven digits.
+  REV-26 PASS The animated layer carries Simulated. The card keeps the simulated-traffic wording and the single area sentence on turn costs. No go/no-go, lookup, footfall or certified-privacy claim.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exit 0 on the head, and the documentation check reported no agent-file failure.
+  REV-28 OPEN P3 The new fixture keys are visibly synthetic and are not registrations. The world-build collision check is not this task's.
+  REV-29 PASS The road note says the fixture is invented and names no real place. No simulated speed is attached to a named place or business.
+  REV-38 PASS The diff adds no import of `eii_gateway` and no read of `EII_DECISION_PROVIDER` or `JEV_PRO_API_KEY`.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17) record Decision 0021, Evidence, line 57, says 999 mutants, 996 killed, and 872 mutants, 866 killed. The task log and the work-commit commands record 988 mutants, 985 killed, three explained, and 907 mutants, 901 killed, six explained. Replace that sentence with the recorded counts.
+  P2 (REV-16) AGENTS.md rule 44 says `scripts/mutation_web.py` replays every timeout. The runner reports `timed_out` apart from killed and does not replay; this task's ledger replayed the 84 timeouts separately (2 killed, 82 still timing out). Either make the runner replay each timeout alone and fail while one is unexplained, or state that the replay is a separate recorded step.
+  P3 (REV-28) SYN-19 and DAT-83 `hourly_roads.json` link ids such as `SYN-L-001` use the legal-entity prefix. Do not copy that prefix into a release column; rename the spike link ids before S5-T09 copies the fixture shape into `road_link`.
+```
+
+#### S1-T11: merge record
+
+- The lead's checks on the merged head `9a22c2a21d12aca18f147731112dd0da10fb452a` before the merge (ruling L-29): "TREE-IS-WORK ok: 477 paths at 9a22c2a21d12aca18f147731112dd0da10fb452a", exit code 0; `./eii test --seed 2026111410`: exit code 0, "total: 1879 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/38 was squash-merged on 2026-11-13 at that head; merge commit `a9db6c85d19c1035377dfbc9fde8959fcc86cff7` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43502644292; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43502644258; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43502644194 .
+
+### S1-T08 — Typed-decision requalification and pin ruling: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/39 )
+
+- Class: Standard (evaluation tooling; it writes counts and intervals for a report, and no number a user of the product sees), with one strict reviewer of a third maker. Plan: xAI Grok 4.7 through the Cursor command-line tool (2026-11-13; 119 lines: the harness and the pin confirmation built at once, the keyed run as one command that waits for the owner's answer to OI-18). Builder: OpenAI GPT-6 Astra through the Codex command-line tool, in seven jobs (the first build; a completion pass; a pass on the provider's request and reply; a pass after the keyed run; a pass on the committed aggregate, started twice because the lead's first test rule for it was wrong and the builder rightly stopped; the last pass after tasks S1-T02, S1-T13 and S1-T11 merged). Skills the builder reported in its last pass: project-orientation, task-standards, github-flow, sanad-provenance, muhasabah-gate; it said plainly that three named development skills were not installed in its session and followed their rules from the brief. Lead: Anthropic (Claude Fable 5.2 until 2026-11-13 about 07:36, Claude Opus 5.5 from then until 2026-11-14 about 01:05, Claude Fable 5.2 from then on): the rulings, the keyed run, the checks, the texts of the shared documents and this ledger. Personas: builder, a senior AI systems engineer who builds evaluation tooling; reviewer, a principal AI safety and evaluation reviewer of another maker.
+- The harness (`evals/typed_decisions/requalify.py`): the whole set of 260 cases through the unchanged gateway, every pick-one case in both hash-derived option orders; expected answers and authors' notes are never sent. The aggregate keeps two blocks apart: the raw first answers, and the gateway's accepted decisions (both orders agree and the thresholds hold). Counts, rates and Wilson intervals come from tested code (`interval.py`); the reproduction judgement and the counts of replies by model from `reproduction.py`; route identity from `route.py`. A changed identity (provider, model, rubric digest, case digest, thresholds, route digest) prints `requalify` and exits 2. The offline forms (provider `none`; a recorded synthetic replay) write only under a temporary folder.
+- What "reproduced within its stated intervals" means here (the lead's ruling on the first build's stop): the admitted aggregate states one interval, for the whole set; the reproduction is judged on the first answers against that one interval, bounds included, and no per-test interval is invented. The aggregate names four protocol differences from the admitted run (hash-derived option orders; activity labels sent with a prefix; the admitted run predates the gateway; the adapter cuts the yes/no label at a weight of 0.5).
+- The provider adapter: the lead read the provider's public interface reference before any keyed call; the adapter's guessed request and reply differed from the documented ones on every member but two, and the service rejects unknown members, so the keyed run would have failed on its first call. The adapter was corrected inside this task, with tests against a server on the loopback address that each test starts: it sends exactly the documented members and headers, parses the reply strictly, counts input plus output tokens, refuses a call whose body is longer than the remaining limit, follows no redirect and never retries. The harness stops at the first provider failure with no aggregate, and refuses a run whose memo keys already have records.
+- The keyed run (2026-11-13, by the lead from its own shell under the owner's recorded answer to OI-18; the key read from the process environment by one command and never printed; the service address passed by the environment and held in the repository only as a digest): exit 0, route `match`, `reproduction_reason=reproduced`. 340 calls and 147,969 tokens against the run's cap of 2,000,000. First answers: 250 correct of 260, 96.2%, interval 93.1 to 97.9; the admitted measurement is 248 of 260 with its stated interval 92.1 to 97.3. Every one of the 340 replies names the pinned model. Under the gateway's own rule 176 cases are decided and 84 fall below the threshold; two decided cases are wrong. The reading of the reproduced measurement beside the admitted one is put to the owner in OI-149; no threshold and no pin changed on it.
+- The committed aggregate and the secret scanner (the lead's ruling): the scanner flagged the 259 memo-key digests of the first result file; one tested function now writes the committed aggregate without the memo keys; the lead compared the converted file with the kept original (equal, the memo keys removed and nothing else) and ran the scanner on a scratch copy (no finding).
+- A reply that names another model (the lead's ruling, then the owner's sharpening): a keyed run stops with the stop line `model drift`; the report counts the replies that name the pinned model and those that name another or none, across both option orders, and only an answer whose first reply names the pinned model enters the first-answer statistics (red first: a planted wrong-model reply made the old summary count 260 answers where 259 were due).
+- The pin ruling: no exact or retreat pin moved and no retreat was tried, so no decision record was needed. The confirmations that the measurements of the merged spikes support are recorded field by field in `pins.toml` and the two reference-notes files (tasks S1-T01 to S1-T06 and S1-T11); the fields that no measurement supports yet stay open by name with their reason, among them those the native frame-rate trace decides (task S1-T12, which waits for the owner at the console). `scripts/check_versions.py` checks 65 components and `scripts/check_reference_notes.py` two files, six libraries and 357 rows.
+- The two dependency alerts of OI-126: the spike's built page was searched for both packages and one message string of each parser (none found; a search of minified text, not a proof); `fflate` is raised to 0.7.5 by an exact override (the lock file changed only that package's version, address and integrity value; the spike's 114 Node tests and 41 browser tests, the glyph tests, lint, the type check, the build and the host checks passed with it); the `image-size` alert stays open with its reason (its fixed release is a new major version outside the series its parent accepts).
+- Mutation testing (the owner's rule of 2026-11-13): `scripts/mutation.py` accepts the four harness modules with `evals/` as their source root and `scripts/tests/test_requalify.py` as their tests; the runner's own tests run the pinned tester on a small invented fixture. The builder's runs: `interval.py` 89 mutants, 86 killed at first and 89 after new tests; `reproduction.py` 153 of 153; `route.py` 62 of 62; `requalify.py` 787 mutants, 723 killed at first, 776 after new tests, and 11 survivors each explained as equivalent in `scripts/mutation_explained.toml`; no timeout and no uncovered mutant. The lead's own runs at the work commit are the rows below.
+- Tests: 93 in `scripts/tests/test_requalify.py`; the guard suite and the type check cover `evals/`. The builder's whole test command failed twice at its tool sandbox's file system (the tool's cache on a read-only folder; the glyph baseline's rename across file systems, a known limit recorded for task S1-T10); the lead's run outside the sandbox is the row below.
+- Acceptance criteria, each with its evidence: the full set runs (the offline forms in the tests; the keyed run's 260 cases); the admitted measurement is reproduced within its stated interval (96.2% inside 92.1 to 97.3); every choice case runs in both hash-derived option orders and is accepted only when both agree (the gateway's rule, unchanged; the aggregate's block of accepted decisions); results and route identity are recorded (the committed aggregate; the route digest); drift triggers requalification (a changed identity exits 2; `model drift` stops a keyed run); any accepted alternative has a decision record (none was accepted: no pin moved).
+- Open items: OI-18 is closed by the owner's standing answer; OI-149 is new (the reading of the reproduced measurement); OI-126 records what was done on the two alerts. OI-15 (fresh human qualification) stays open: this run supplies no fresh human labels.
+- Not built here: the native frame-rate fields (task S1-T12); an upgrade of the loaders behind the `image-size` alert; a fresh human-labelled set.
+
+#### Evidence for the work commit `34bd6e10970100204eb3642a001d42e5d1c2a4c5`
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   uv run --locked python -m unittest scripts.tests.test_requalify -v
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    93 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The task's tests: the arithmetic and the Wilson interval, the reproduction judgement with its closed reasons, the counts of replies by model, route identity and drift, the refusals of a keyed run, the offline forms under temporary folders, the README's figures compared with the committed aggregate.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   uv run --locked python evals/typed_decisions/requalify.py --provider none
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "DISABLED" (the last line: with no provider every decision is disabled)
+Seed:      none
+Notes:     The offline requalification over the whole case set, with no key and no network; it writes only under a temporary folder that it removes.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   python3 -I -c "import json; d=json.load(open('evals/typed_decisions/results_2026-11-13T04-19-15-163796.json')); r=d['raw_answers']['overall']; o=d['gateway_accepted']['outcomes']; print(d['admitted_measurement_reproduced'], d['reproduction_reason'], d['route_status'], d['calls_made'], d['tokens_used'], r['correct'], r['total'], r['ci95'], d['stated_ci95'], o['DECIDED'], o['BELOW_THRESHOLD'])"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "True reproduced match 340 147969 250 260 [93.1, 97.9] [92.1, 97.3] 176 84"
+Seed:      none
+Notes:     The committed aggregate of the keyed run of 2026-11-13, read by code: reproduced, the route matched, 340 calls, the tokens used, 250 correct first answers of 260 with their interval, the admitted interval, and the gateway's outcomes.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   sha256sum evals/typed_decisions/results_2026-11-13T04-19-15-163796.json
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "842ca362ccc9f97408904e824a809e83947ed556ffb66c3079c6da20bbfdcf5f  evals/typed_decisions/results_2026-11-13T04-19-15-163796.json"
+Seed:      none
+Notes:     The committed aggregate is byte for byte the file the lead checked after the keyed run (the memo keys removed and nothing else).
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   bash -c "set -o pipefail; uv run --locked --group mutation python scripts/mutation.py evals/typed_decisions/interval.py 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(m.split(\"/\")[-1] for m in re.findall(r\"(?m)^\S+\.py: made=\d+ killed=\d+ survived=\d+ timed_out=\d+ not_covered=\d+ incomplete=\d+\", t)) or t[-300:])'"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; first output line "interval.py: made=89 killed=89 survived=0 timed_out=0 not_covered=0 incomplete=0"
+Seed:      none
+Notes:     mutmut 3.8.1 on the interval arithmetic: the lead's own run at the work commit, one module per command.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   bash -c "set -o pipefail; uv run --locked --group mutation python scripts/mutation.py evals/typed_decisions/reproduction.py 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(m.split(\"/\")[-1] for m in re.findall(r\"(?m)^\S+\.py: made=\d+ killed=\d+ survived=\d+ timed_out=\d+ not_covered=\d+ incomplete=\d+\", t)) or t[-300:])'"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; first output line "reproduction.py: made=153 killed=153 survived=0 timed_out=0 not_covered=0 incomplete=0"
+Seed:      none
+Notes:     mutmut 3.8.1 on the reproduction judgement and the reply counts: the lead's own run at the work commit.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   bash -c "set -o pipefail; uv run --locked --group mutation python scripts/mutation.py evals/typed_decisions/route.py 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(m.split(\"/\")[-1] for m in re.findall(r\"(?m)^\S+\.py: made=\d+ killed=\d+ survived=\d+ timed_out=\d+ not_covered=\d+ incomplete=\d+\", t)) or t[-300:])'"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; first output line "route.py: made=62 killed=62 survived=0 timed_out=0 not_covered=0 incomplete=0"
+Seed:      none
+Notes:     mutmut 3.8.1 on route identity: the lead's own run at the work commit.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   bash -c "set -o pipefail; uv run --locked --group mutation python scripts/mutation.py evals/typed_decisions/requalify.py 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(m.split(\"/\")[-1] for m in re.findall(r\"(?m)^\S+\.py: made=\d+ killed=\d+ survived=\d+ timed_out=\d+ not_covered=\d+ incomplete=\d+\", t)) or t[-300:])'"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; first output line "requalify.py: made=787 killed=776 survived=11 timed_out=0 not_covered=0 incomplete=0"
+Seed:      none
+Notes:     mutmut 3.8.1 on the harness: the lead's own run at the work commit (about an hour); the command exits 0 because each of the 11 survivors is explained as equivalent in scripts/mutation_explained.toml.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   bash -c "set -o pipefail; uv run --locked --group mutation python -m unittest scripts.tests.mutation_runner 2>&1 >/dev/null | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 7 tests in 8.779s  OK" (the runner's own seven tests (the test report alone; the tool's own output is not shown))
+Seed:      none
+Notes:     The mutation runner's own tests on a small invented fixture: an unexplained survivor fails, an unlisted file and unrelated tests stay out, the fixture's bytes are unchanged.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   ./eii test --seed 2026111418
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1975 passed, 0 failed, 0 skipped
+Seed:      2026111418
+Notes:     The whole test command on the build machine with a fresh seed, outside the builder's tool sandbox (the two file-system failures of that sandbox do not occur here).
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   bash -c "set -o pipefail; npm --prefix web run test:spike:performance 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)), \"|\", \" \".join(re.findall(r\"[0-9]+ passed \\([0-9.]+m?s?\\)\", t)[:1]))'"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 114 # pass 114 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 41 passed (22.6m)" (the totals of the Node test runner and of the browser run inside it)
+Seed:      none
+Notes:     The performance spike's tests with the fflate override in place: every Node test and the 41 browser tests.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   npm --prefix web run test:spike:glyphs
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "  10 passed (4.7s)" (browser tests of the glyph spike)
+Seed:      none
+Notes:     The glyph spike's ten browser tests with the changed lock file.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   npm --prefix web run build
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "✓ built in 127ms" (the production build)
+Seed:      none
+Notes:     The production build with the override.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   npm --prefix web run check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 18 files: OK"
+Seed:      none
+Notes:     The web layout, version, boundary and host checks.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   npm --prefix web run check:hosts:dist
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 20 files: OK"
+Seed:      none
+Notes:     The host check on the built files.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   npm --prefix web run lint
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "> eslint --max-warnings 0 ." (exit code decides)
+Seed:      none
+Notes:     Web lint: exit code 0.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   npm --prefix web run typecheck
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "> tsc --noEmit" (exit code decides)
+Seed:      none
+Notes:     Web type check: exit code 0.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 65 components: OK"
+Seed:      none
+Notes:     The version check on the confirmed pin table: 65 components, no pin moved.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes with their confirmations and the anchors they cite.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint of the Python files.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "224 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 199 source files"
+Seed:      none
+Notes:     Strict types, the harness modules under evals/ included.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 371 text files, 62 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with rule 44, the two README files and the reference notes.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after rule 44 gained the harness's commands.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 61 packages in 1ms" (exit code decides)
+Seed:      none
+Notes:     The lock file matches the manifests.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','a9db6c85d19c1035377dfbc9fde8959fcc86cff7...34bd6e10970100204eb3642a001d42e5d1c2a4c5'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:evals/__init__.py A:evals/typed_decisions/__init__.py A:evals/typed_decisions/interval.py A:evals/typed_decisions/reproduction.py A:evals/typed_decisions/requalify.py A:evals/typed_decisions/results_2026-11-13T04-19-15-163796.json A:evals/typed_decisions/route.py A:scripts/tests/test_requalify.py M:AGENTS.md M:CLAUDE.md M:docs/REFERENCE_NOTES.md M:evals/typed_decisions/README.md M:gateway/README.md M:gateway/src/eii_gateway/providers/jev_provider.py M:pins.toml M:pyproject.toml M:scripts/check_reference_notes.py M:scripts/mutation.py M:scripts/mutation_explained.toml M:scripts/reference_notes_tables.py M:scripts/tests/mutation_runner.py M:scripts/tests/pychecks_support.py M:scripts/tests/test_pychecks_config.py M:scripts/tests/test_pychecks_mypy.py M:scripts/tests/test_reference_notes_rows.py M:web/REFERENCE_NOTES.md M:web/package-lock.json M:web/package.json'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "28 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The paths the work commit changes against its base, exactly the task's scope (28 paths: the harness and its tests, the adapter, the pin table and reference notes, the mutation runner and its ledger, the fflate override, rule 44).
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    34bd6e10970100204eb3642a001d42e5d1c2a4c5
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','a9db6c85d19c1035377dfbc9fde8959fcc86cff7..34bd6e10970100204eb3642a001d42e5d1c2a4c5'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
+```
+
+### S1-T08 — Typed-decision requalification and pin ruling: review round 1 and the fix (pull request https://github.com/albarami/economic-investment-intelligence/pull/39 )
+
+- Review round 1 (2026-11-14): Moonshot Kimi K3.1 Pro through the Abacus command-line tool, on the head d9d69d8: REJECTED with two findings. Its verdict repeats no COMMIT line and numbers some checks outside the checklist; it is kept as returned under a lead's cover note that names the commit of the brief.
+- Finding 1: the hosted `tests` job was red on the reviewed head (the checklist's REV-11 asks for CI green on the same commit). The job had ended on the time limit of the suite `web-checks` (1,800 s), a cause shared by every pull request of that night and given its own task, S1-T15. No change of the patch answers it. The one rerun of that job on d9d69d8 passed (29 min 32 s). The confirmation is asked for on a head whose six required hosted checks are green.
+- Finding 2 (valid; the cause was the lead's own instruction to the builder to leave every unmeasured row "not yet confirmed"): the pin table called its ruling partial; 48 of the 65 rows carried no ruling and most no written retreat, where AGENTS rule 42 and FE-03 ask for exact pins and written retreat pins confirmed at slice S1, and only the fields that the native trace decides may stay open.
+- The fix (work commit e24b0dd; OpenAI GPT-6 Astra through Codex in two passes, the lead's rulings on what the builder left open): every row of `pins.toml` holds one of three rulings in its note: confirmed by a merged spike measurement (18 rows), confirmed by use through a recorded command of a merged task (33), or not installed, with the task or the condition under which it is installed and confirmed (14). 64 rows have a written retreat, each read from its registry on 2026-11-14 with its stated constraints, none tried; one row (the right-to-left plugin of the MapLibre retreat) has none and says why. No pin, kind, state, label, cite or first use changed; nothing was installed; no manifest or lock changed.
+- The lead's rulings on single rows: `react` and its types retreat as pairs with `react-dom` and its types; `python` retreats to 3.13.x (not tried; it needs `requires-python` lowered; five binary pins publish a cp313 wheel and two publish abi3 wheels for CPython 3.12 and later); `gitleaks` to 8.30.0; `postgis` goes with PostgreSQL; `bubblewrap` has none, because sandbox enforcement has no fallback (AGENTS rule 12); `apache-arrow` is not a direct dependency (the lock resolves it under the loader packages; no code imports it).
+- The lead's checks of the builder's first pass: every written retreat exists on its public registry (the lead's own reads; command 3 below); four read-only verifiers (Claude Opus 5.5) then tried to refute every ruling against the records: of 65 row rulings 54 stood, 9 were refuted (a ruling that named a task already merged as the one that installs the component; a tool in daily use called not installed) and 2 were unsure; of 24 reference-note fields 14 stood. The second pass corrected each from the record.
+- The reference notes: each field of behaviour that no slice S1 spike uses names the task that first uses and confirms it. The fields that the native frame rate decides (the choice between pin and retreat of MapLibre GL JS and deck.gl, the load trial, the pixel-ratio cap) wait for task S1-T12. Three PostgreSQL fields (the exact pin with the PostGIS line, the image digest, the volume path) stay "not yet confirmed": their components are in use since S0-T08 and their rows of `pins.toml` hold their rulings, but no slice S1 task log states those facts as a measurement; they close with the record of the slice S1 gate, which takes the lead's reading of the running service.
+- The guard (`scripts/tests/test_pin_rulings.py`, 10 tests): a ruling needs text after its words; a note holds one ruling; the first two forms cite a heading that PROGRESS.md holds; the third form may not name a task whose status in TASKS.md is done or merged; a row without a retreat states its reason. Each rule has a planted case that must fail, and each plant passed the earlier guard before the rule was written (the failing run).
+- Not done here, and where it goes: the native-trace fields (task S1-T12 and the addendum of the slice S1 gate); the three PostgreSQL fields (the record of the slice S1 gate); the root README's list of commands and status paragraph (task S1-T10).
+
+#### Evidence for the work commit `e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5`
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv run --locked python -m unittest scripts.tests.test_pin_rulings -v
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The guard of the pin table: the whole table passes, and each planted fault fails (a bare ruling, an empty reason, two rulings, a missing or unknown ledger heading, a task that is done).
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   bash -c "set -o pipefail; uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' 2>&1 >/dev/null | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 683 tests in 216.575s  OK" (the report of the script tests alone (the tests' own output is not shown))
+Seed:      none
+Notes:     All script tests with the new guard among them.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   python3 <lead>/verify_retreats.py <workspace> <pins.toml of the reviewed head>
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; first output line "retreats checked on their registry: 46; rulings: 18 confirmed, 33 confirmed by use, 14 not installed, 0 without; rows 65; still none recorded: ['@mapbox/mapbox-gl-rtl-text']; PROBLEMS: 0"
+Seed:      none
+Notes:     The lead's own check, with reads of the two public registries and of the Node.js release list: each of the 46 retreats that are versions exists there (45 on the two package registries, one in the Node.js release list); every cited ledger heading exists; no pin, kind, state, label, cite or first use differs from the reviewed head; the three forms count 18, 33 and 14.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 65 components: OK"
+Seed:      none
+Notes:     The version check on the table: 65 components, every retreat in an allowed form, no pin moved.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     The reference notes after the corrected fields: every anchor they cite exists.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "225 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 200 source files"
+Seed:      none
+Notes:     Types, the new test file included.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 372 text files, 62 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 61 packages in 0.98ms" (exit code decides)
+Seed:      none
+Notes:     The lock is unchanged and consistent.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   ./eii test --seed 2026111434
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1985 passed, 0 failed, 0 skipped
+Seed:      2026111434
+Notes:     The whole test command on the build machine with a fresh seed, at the fix commit.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','d9d69d8cc9d7da97a0e2dce78b03b1e2573226fc...e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:scripts/tests/test_pin_rulings.py M:docs/REFERENCE_NOTES.md M:pins.toml M:web/REFERENCE_NOTES.md'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "4 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The fix changes the pin table, the two reference-notes files and one new test, and nothing else.
+```
+
+```text
+### S1-T08 — Typed-decision requalification and pin ruling
+Commit:    e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','d9d69d8cc9d7da97a0e2dce78b03b1e2573226fc..e24b0dd3345f0b0fb7ae15f727e4a05e1cc547a5'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one fix commit between the reviewed head and the work commit has a Conventional Commit subject.
+```
+
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/42 )
+
+- Why: the owner's own notes of 2026-11-13 and 2026-11-14: the satellite imagery provider's name may be committed only in the map attribution line and in the source rows of document 04; the documentation check gains a place-scoped exception for it, reviewed like any other change, with planted cases; the owner's private pattern list stays unchanged. Added to slice S1 by a re-plan of 2026-11-14.
+- Class: Deep (a guard of the public repository). Personas: builder, a senior platform engineer of repository guards; reviewer, a principal platform and supply-chain reviewer of another maker. The work needs the private list's shape and was kept with the lead's own agents (the owner's routing note of 2026-11-14 keeps such work there): design and build on Claude Opus 5.5, the adversarial design review and the break pass on Claude Fable 5.2; skills used: task-standards, brainstorming, al-muhasibi, test-driven-development, verification-before-completion, muhasabah-gate. No agent read the private list and no real name was written anywhere; every test uses invented names built at run time.
+- The design review (adversarial, against a prototype) required fourteen changes, all made: at most one entry in the configuration, because nobody can review which name a digest stands for; a listed-name check (check 8) that runs with or without the private list, so that the hosted checks also refuse the name outside its places; rules for document 04's source rows that follow how Markdown is rendered (fences, comments, headings, line-break trap characters); an attribution file that holds nothing but the one declaration, blank lines and line comments; the entry bound to its own source ids; the script itself read for the private patterns; and the configuration merged with NO entry: the one real entry is the first commit of the task that adds the imagery source, and its digest is typed by a person at a terminal into a command that hides the typing, never passed through a command line, a file or a transcript. Decision record 0024 states it and amends one consequence of decision 0012.
+- The break pass: 58 attempts, each run four ways (the plain script in a copy; the file list a checkout gives; each with and without a private list of invented names): 27 passed wrongly or were refused wrongly; the fix round closed them test-first (29 tests failing, then all passing): a duplicate or hidden registry heading, a pseudo-table, link targets and link names, files that are not valid UTF-8, the name inside longer words, in alternating case, cut by hyphens or invisible characters, character references, script escapes and look-alike letters, and three older checks that printed their token. What stays outside the check is stated in the configuration's header and in TST-263: commit messages, branch names and pull-request text; images and other binary files; translated or shortened forms beyond the parts check 8 hashes.
+- What changed beyond the exception itself, by the design review's findings: the private patterns now read every text file of any suffix, every path and every link target (they read only the documented text suffixes before); with an entry listed the check takes about ten seconds on this tree, and about 0.6 seconds with none.
+- The lead's part: the decision record renumbered to 0024 and the test identifier to TST-263 (decision 0023 is another open pull request); the changed check run on this tree WITH the owner's real private list from the lead's own shell: exit 0, no failure line (counts only; nothing shown); the lead's own breaks at the work commit (the row below): the limit of one entry removed, the digest not case-folded, the two places not enforced, and the line-break trap of the attribution file ignored. The last was not caught at first: that rule had a planted case for document 04 only; a planted case for the attribution file was added (seven trap characters and a control), red with the rule removed and green with it.
+- Three proposed items enter OPEN_ITEMS.md (PO-S1-09 to PO-S1-11): files of the listed set that no pattern read before; a private pattern file that cannot be read being ignored without a message; scans of the built bundle and the exports needing the same place rule.
+- Not built here, by design: the real entry, the provider's rows in document 04 and the attribution file `web/src/stage/attribution.ts`; they come with the task that adds the imagery source, under the rules its TASKS entry states.
+
+#### Evidence for the work commit `9502bc5c66c395d9c7afdae5651bbff86fc38575`
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   uv run --locked python -m pytest scripts/tests/test_check_docs_exceptions.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "91 passed, 34 subtests passed in 8.51s"
+Seed:      none
+Notes:     The task's planted tests, with invented names built at run time: the name passes in its two places and is refused everywhere else, with and without a private list; the configuration's closed form; the rendering traps of document 04 and of the attribution file; check 8 in paths, link targets and files of any suffix; no failure line prints a listed name.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 366 text files, 63 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the repository with the committed configuration, which holds no entry: no exception applies and check 8 has nothing to look for.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   bash -c "grep -c '^\[\[exception\]\]' scripts/check_docs_place_exceptions.toml | cat"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (the committed configuration holds no entry)
+Seed:      none
+Notes:     The configuration is committed with header comments only (decision record 0024): the one real entry is the first commit of the task that adds the imagery source.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   bash <lead>/tmp/S1-T14.lead-breaks.sh
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; first output line "S1-T14 lead breaks, 2026-11-14 04:18, on 9502bc5c66c395d9c7afdae5651bbff86fc38575; check_docs.py sha256 06ffe795fef439479d2821aab72810b56777ded653adb0003d51281d9995bd52"
+Seed:      none
+Notes:     The lead's four breaks of the guard, each failing the task's tests and restored: the limit of one entry removed; the digest not case-folded; the two places not enforced; the line-break trap rule of the attribution file removed.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   bash -c "set -o pipefail; uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' 2>&1 >/dev/null | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 668 tests in 157.790s  OK" (the guard tests on their own (the test report alone))
+Seed:      none
+Notes:     Every guard test of the repository with the changed check, the commit-hook and history-scan tests among them.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   ./eii test --seed 2026111429
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1970 passed, 0 failed, 0 skipped
+Seed:      2026111429
+Notes:     The whole test command on the build machine with a fresh seed.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint of the Python files.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "218 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 193 source files"
+Seed:      none
+Notes:     Strict types, the changed check included.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical (unchanged by this task).
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 61 packages in 1ms" (exit code decides)
+Seed:      none
+Notes:     The lock file matches the manifests (no dependency added).
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','a9db6c85d19c1035377dfbc9fde8959fcc86cff7...9502bc5c66c395d9c7afdae5651bbff86fc38575'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:docs/decisions/0024-one-private-name-in-two-places.md A:scripts/check_docs_place_exceptions.toml A:scripts/tests/test_check_docs_exceptions.py M:OPEN_ITEMS.md M:TASKS.md M:docs/10_FRONTEND.md M:docs/12_TESTING_AND_QUALITY.md M:docs/15_REVIEWER_CHECKLIST.md M:docs/README.md M:scripts/check_docs.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "10 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The paths the work commit changes against its base, exactly the task's scope (10 paths).
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','a9db6c85d19c1035377dfbc9fde8959fcc86cff7..9502bc5c66c395d9c7afdae5651bbff86fc38575'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
+```
+
+### S1-T14 — Place-scoped exception for one name of the private list: review round 1 and the fix (pull request https://github.com/albarami/economic-investment-intelligence/pull/42 )
+
+- Review round 1 (2026-11-14): OpenAI GPT-6 Astra through the Codex command-line tool, with the security lens, on the ledger head 771985e: REJECTED with four findings and one record point. The lead read each finding against the code and judged all four valid as written.
+- Finding 1: the reader's fence state before the registry heading ignored Markdown's list containers, so a registry-looking heading and table inside a top-level code block after a list-contained fence were accepted. Finding 2: a listed symbolic link was read through to its referent (AGENTS rule 13). Finding 3: a private pattern that does not compile, or a file that cannot be read, raised an error whose text could hold a pattern's group name or a path, and the test helper kept only part of standard output. Finding 4: two type-check suppression comments in a test helper. Record point: the permitted forms of the attribution line were stated three ways.
+- The fix, first pass (the lead's agent, Anthropic Claude Opus 5.5; a failing test first for each finding): an indented fence followed by a dedented line is a form the reader does not follow and leaves document 04 with no allowed line (stricter than modelling list containers); a link is scanned as its link text only and its referent is never opened; every read and every compilation fails closed with a fixed line and the tests assert both output streams whole; the helper's keyword arguments are typed; one clause states the attribution forms in TASKS.md, document 10 and TST-263.
+- The break pass after it (the lead's adversary, Anthropic Claude Fable 5.2) got past the fixed guard in nine further ways that no test caught. Seven are within the task's criteria and were fixed in a second pass, each with a failing test first: a tab after a closing fence; an HTML block before the registry heading that holds a fence-looking line; white space that Markdown does not call blank (a no-break space) in four places; a hashbang line in the attribution file; a byte-order mark that cost the private list its first pattern; warnings and uncaught errors that printed the script's path; the built-in patterns not reading a link's target text. Two are hardening beyond the criteria (decision 0018) and are entered as open items OI-155 and OI-156.
+- Verification by the lead: a bounded verification (Anthropic Claude Fable 5.2) replayed the adversary's fourteen saved trees (every one refused, nothing private printed) and removed each new guard once (every fix undone as a whole fails its own test; one single line is an equivalent change and has no deciding test, as recorded; the other got its test). The lead read the production change line by line and ran the changed check on this tree with the owner's real private list from its own shell: exit 0, no failure line.
+- A defect of the fix itself, found by the lead's ledger precheck and corrected in a second fix commit: the test of a link read as its text wrote an absolute link target into the temporary folder, so it passed with that folder in /tmp and failed with it under a home folder (the built-in patterns now read link targets). The link is written with a relative target; the whole file passes in both environments.
+- Evidence: the commands below at the fix commit; the committed configuration still holds no entry.
+
+#### Evidence for the work commit `0e1c5fef6d9572cfd43f6e140b89977180755248`
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   uv run --locked python -m pytest scripts/tests/test_check_docs_exceptions.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "111 passed, 65 subtests passed in 15.15s"
+Seed:      none
+Notes:     The tests of the place-scoped exception with the cases of the review and of the break pass: every finding and every accepted break has a test that failed before its fix.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 411 text files, 64 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the repository itself, with no private list.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   bash -c "grep -c '^\[\[exception\]\]' scripts/check_docs_place_exceptions.toml | cat"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (the committed configuration holds no entry)
+Seed:      none
+Notes:     The committed configuration still holds no entry.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   bash -c "grep -c 'type: ignore\|noqa' scripts/check_docs.py scripts/tests/test_check_docs_exceptions.py | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "scripts/check_docs.py:0 scripts/tests/test_check_docs_exceptions.py:0" (no suppression comment in either file)
+Seed:      none
+Notes:     Finding 4: no type or lint suppression comment is left in the check or its tests.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   bash -c "set -o pipefail; uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' 2>&1 >/dev/null | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 691 tests in 195.900s  OK" (the report of the script tests alone (the tests' own output is not shown))
+Seed:      none
+Notes:     All script tests, the changed ones among them.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   ./eii test --seed 2026111439
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    2109 passed, 0 failed, 0 skipped
+Seed:      2026111439
+Notes:     The whole test command on the build machine with a fresh seed, at the fix commit.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "222 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 196 source files"
+Seed:      none
+Notes:     Type check, with the two suppressions gone.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 61 packages in 1ms" (exit code decides)
+Seed:      none
+Notes:     The lock file is current.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','8975854d20d7de412b9d97cb1db9ce97a5f52ee6...0e1c5fef6d9572cfd43f6e140b89977180755248'],check=True,capture_output=True,text=True).stdout.splitlines()); w='M:TASKS.md M:docs/10_FRONTEND.md M:docs/12_TESTING_AND_QUALITY.md M:scripts/check_docs.py M:scripts/tests/test_check_docs_exceptions.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "5 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The two fix commits touch the check, its tests and the three texts of the record point, and nothing else.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','8975854d20d7de412b9d97cb1db9ce97a5f52ee6..0e1c5fef6d9572cfd43f6e140b89977180755248'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two fix commits between the reviewed base and the work commit have Conventional Commit subjects.
+```
+
+#### S1-T08: independent review, round 2 (the confirmation): APPROVED
+
+Reviewed commit `d02c57fcbcfec57255d868888c09afad5e80c364`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/39 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43559250007; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43559249969; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43559249967 ). The reviewer was Moonshot AI Kimi K3.1 Pro through Abacus. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+COMMIT: d02c57fcbcfec57255d868888c09afad5e80c364
+VERDICT: APPROVED
+SKILLS: strict-reviewer; code-review unavailable because its SKILL.md is not installed
+FINDINGS: none
+CHECKS
+1 PASS — No calculation or comparison code changed; the only new code guards pin records.
+2 PASS — No privacy thresholds, parameters, treatments or privacy-sensitive paths changed.
+3 PASS — No gateway, adapter, model or assistant behavior changed.
+4 PASS — No templates, Fact chips, screen numerals or UI code changed.
+5 PASS — Existing provenance fields and citations were preserved; new registry metadata names sources and retrieval dates.
+6 PASS — No forbidden or ignored paths were touched; the guard reads only repository records.
+REV-01 PASS — The new guard has focused coverage, and the recorded head suite passed 2,104 tests.
+REV-02 PASS — No scope creep or unrelated hardening was found in the task’s own changes.
+REV-03 PASS — The TOML, reference tables and unittest module follow existing repository conventions.
+REV-04 PASS — Test names, assertions and failure messages are clear; no unused implementation was added.
+REV-05 PASS — The work commit contains exactly the four permitted task files; the remaining supplied changes are the ledger and identified base update.
+REV-06 PASS — No environment installation, compilation, service action or prohibited-path access was introduced.
+REV-07 PASS — The evidence records RED with 10 failures, GREEN with 10 passing tests, and a planted violation for every guard rule.
+REV-08 PASS — All 15 recorded commands have real output and exit code 0; head checks also record exit 0.
+REV-09 PASS — The Conventional Commit check passed, and the added ledger commit has a conventional subject.
+REV-10 PASS — The ledger records commits, commands, exit codes, counts, seeds, environments and evidence locations.
+REV-11 PASS — All six required hosted checks are recorded green on d02c57f, including the previously failing tests job.
+EARLIER FINDINGS
+FINDING 1 — FIXED: the original hosted tests job had timed out in web-checks; its rerun passed, and all six required checks are green on the reviewed head.
+FINDING 2 — FIXED: all 65 pin rows now have exactly one ruling (18 confirmed, 33 confirmed by use, 14 not installed); 64 have written retreats and the remaining row gives its no-retreat reason, with a 10-test planted guard.
+ONE-LINE: Checked the complete supplied diff, pin and reference records, guard implementation and ledger evidence; independently reread files but did not rerun commands or fetch CI and registry pages.
+```
+
+#### S1-T08: merge record
+
+- The branch was updated with main when its turn to merge came (the owner's rule of 2026-11-12): merge commit `39c7a2beb1c1b468e551ed12a291d7ce82f4da75`, the head that was merged. Where both sides had appended at the same place the lead's scripts keep every line of both sides, main's first, and refuse any overlap. The lead's proof that the update changed nothing by itself (for every path: the branch's blob where main did not change it, main's blob where the branch did not, git's own three-way merge, or the scripted resolution):
+
+```text
+base update 39c7a2beb1c1b468e551ed12a291d7ce82f4da75: branch side d02c57fcbcfec57255d868888c09afad5e80c364, main side e45dbb34397a462b93506d85714700c88917b92d, merge base f0ee2f3c39a480501edb28bc85c33546e61ba5b9
+  branch only: 27
+  main only: 21
+  neither: 479
+  both, git's own merge: (3, ['AGENTS.md', 'CLAUDE.md', 'TASKS.md'])
+  both, resolved by the lead's script: (2, ['OPEN_ITEMS.md', 'PROGRESS.md'])
+  FAIL: (0, [])
+```
+
+- CI on the updated head: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43566601764; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43566601737; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43566601758 .
+
+- The lead's checks on the merged head `39c7a2beb1c1b468e551ed12a291d7ce82f4da75` before the merge (ruling L-29): "TREE-IS-WORK ok: 532 paths at 39c7a2beb1c1b468e551ed12a291d7ce82f4da75", exit code 0; `./eii test --seed 2026111440`: exit code 0, "total: 2104 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/39 was squash-merged on 2026-11-14 at that head; merge commit `31d0012e9f9d059bdf334b09615159f3ceadaa99` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43574349158; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43574349161; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43574349108 .
+
+### S1-T16 — The time limit of the web checks on the hosted runner: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/45 )
+
+- What it is: the limit of the suite `web-checks` in the whole test command is 3,000 s on GitHub's hosted runner and stays 1,800 s everywhere else, by the owner's decision of 2026-11-14 ([decision 0027](docs/decisions/0027-hosted-web-checks-time-limit.md)). One shared definition of a hosted runner (`scripts/ci_environment.py`), used by the test command and by the sandbox proof, which keeps its behaviour. The timeout line prints the limit in force. No other suite's limit, and no test, assertion, bound, suite list or workflow changes.
+- Why: the same passing web checks take from about 1,030 s to more than 1,800 s on hosted runners of different speed (the lead's reading of the hosted logs). Runs ended on the limit with every test green, twice on the main branch; the main run of the commit this task stands on passed with the suite finishing four seconds inside the limit.
+- Class: routine. Added by the owner's decision; TST-03 asks for a decision record before a tolerance is widened, and decision record 0027 is that record.
+- Builders: Moonshot AI Kimi K3.1 Pro through Abacus wrote the change and its tests and then ended on its time limit without a report (it had started the whole test command against its brief; the lead ended that left-over run). OpenAI GPT-6 Astra through Codex finished it: the comment at the limit, which stated a rule nobody had decided, now states the owner's decision; the two missing planted environment cases were added; the run list and a break pass of five breaks, each caught. The lead wrote the decision record, the index row and the task entry.
+- Planted cases: neither variable set, each one alone, both set with another value in one of them (the limit stays 1,800 s each time), and both at the hosted values (3,000 s); every other suite's limit is the same in both environments, asserted suite by suite; a hosted timeout prints 3,000 s.
+- The way back: the hosted value is a stopgap. It is removed when task S1-T15 has made the suite fast enough on slow hosted runners (open item OI-158, entered with this ledger).
+- Not in this pull request: any change of a test or of the workflow; the tests job's own limit of 90 minutes is unchanged.
+
+#### Evidence for the work commit `a8c6385fb32266a1d8ca457ceeb8227818d21372`
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   bash -c "set -o pipefail; uv run --locked python -m unittest discover -s scripts/tests -p 'test_runner_usage.py' 2>&1 | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 4 tests in 0.506s  OK" (the usage tests of the test command, the environment table among them)
+Seed:      none
+Notes:     The planted environment cases: the limit of the web checks is 1,800 s with neither variable, with one of the two and with another value in one of them, and 3,000 s with both at the hosted values; every other suite's limit is the same in every case.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   bash -c "set -o pipefail; uv run --locked python -m unittest discover -s scripts/tests -p 'test_runner_failures.py' 2>&1 | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 10 tests in 13.063s  OK" (the failure tests of the test command)
+Seed:      none
+Notes:     A hosted timeout launches the suite with 3,000 s and prints that limit in the unchanged failure line.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   bash -c "set -o pipefail; uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' 2>&1 >/dev/null | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 799 tests in 261.309s  OK" (the guard tests on their own (the test report alone))
+Seed:      none
+Notes:     Every guard test of the repository, the sandbox proof's tests among them, with the shared definition of a hosted runner.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   ./eii test --seed 2026111445
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    2217 passed, 0 failed, 0 skipped
+Seed:      2026111445
+Notes:     The whole test command on the build machine with a fresh seed (the local limit of 1,800 s applies here).
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint of the Python files.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "231 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 205 source files"
+Seed:      none
+Notes:     Strict types, the new shared module included.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 423 text files, 66 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with decision record 0027, its index row and the task entry.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical (unchanged by this task).
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   bash -c "git diff --name-only 8c4175dc48cee032125cd309754fbfebf35d724e HEAD -- .github web custodian core product | wc -l"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no workflow file, web test or package source is changed)
+Seed:      none
+Notes:     The task changes the test command's scripts, their tests and three record files only: no workflow, no browser test, no package.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','8c4175dc48cee032125cd309754fbfebf35d724e...a8c6385fb32266a1d8ca457ceeb8227818d21372'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:docs/decisions/0027-hosted-web-checks-time-limit.md A:scripts/ci_environment.py M:TASKS.md M:docs/README.md M:scripts/ci_sandbox.py M:scripts/run_tests.py M:scripts/tests/test_runner_failures.py M:scripts/tests/test_runner_usage.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "8 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The paths the work commit changes against the base.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    a8c6385fb32266a1d8ca457ceeb8227818d21372
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','8c4175dc48cee032125cd309754fbfebf35d724e..a8c6385fb32266a1d8ca457ceeb8227818d21372'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
+```
+
+### S1-T16 — a correction after the ledger: the status line of S1-T08 (pull request https://github.com/albarami/economic-investment-intelligence/pull/45 )
+
+- The ledger commit `08ba45df68b39a022aae96876443a3c0f73e0fa8` set the status line of task S1-T08 in `TASKS.md` to done (its pull request 39 is merged). The lead's whole test on that head then failed in one guard test and passed everywhere else: `scripts/tests/test_pin_rulings.py`, `test_every_pin_has_a_ruling_and_retreat`, with the fault "@mapbox/mapbox-gl-rtl-text: not-installed ruling names a completed task". The work commit is not involved: the same test passed in the ledger's run at the work commit, where the status line still said in review.
+- Cause, read in the test: the guard that S1-T08 delivered requires the words "retreat ruling S1-T08: none exists: " in the note of every pin that has no retreat, and it refuses a pin that is not installed when its note names a completed task anywhere. The one pin that is not installed and has no retreat therefore fails as soon as S1-T08 itself is marked done. The guard contradicts itself; the record of the pin is right.
+- The correction belongs to the guard, not to the records. This task changes no test (the owner's note of 2026-11-14, decision record 0027), so the guard is not corrected here: the status line of S1-T08 is taken back to its text on main in this commit, and the correction of the guard, with the status line, goes to the review follow-up of slice S1 (task S1-T10) as open item OI-159. Until then `TASKS.md` shows S1-T08 as in review although its pull request is merged; this entry and OI-159 say so.
+- The failing run is kept as evidence. After the correction the guard test passes again on this tree, and the lead's whole test on the corrected head is recorded with the closing record of this pull request.
+
+#### Evidence for the correction (the ledger head `08ba45df68b39a022aae96876443a3c0f73e0fa8` and this commit)
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    08ba45df68b39a022aae96876443a3c0f73e0fa8
+Command:   ./eii test --seed 2026111447
+Exit code: 1
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    2216 passed, 1 failed, 0 skipped
+Seed:      2026111447
+Notes:     The whole test command on the ledger head. One failure, in the suite python-guards: scripts/tests/test_pin_rulings.py::PinRulings::test_every_pin_has_a_ruling_and_retreat ("not-installed ruling names a completed task"); the five other suites passed. A real failure with a known cause, not a random one: see the correction above.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    the commit that holds this correction
+Command:   uv run --locked python -m pytest scripts/tests/test_pin_rulings.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped (and 5 subtests passed)
+Seed:      none
+Notes:     The guard test on the corrected tree, before the commit: with the status line of S1-T08 back at its text on main, every test of the file passes.
+```
+
+#### D0023: independent review, round 3 (the second confirmation), in seven parts: APPROVED
+
+Reviewed commit `5a41758430dfe905a503dd576181d6938a620118`, a commit of pull request https://github.com/albarami/economic-investment-intelligence/pull/41 that was still local when it was reviewed (the owner's decision of 2026-11-14: the review runs while the ledger and the hosted checks follow); it has no hosted run of its own, and the hosted checks ran on the pushed head named below. The reviewer was OpenAI GPT-6 Astra through Codex, in seven parts, each on the same commit. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: D0023 part 1 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED TST-245 and TST-209 retain the cited aggregate movement-anchor exception and reject segmentation of worker, residence or company records, person-level output and joining keys.
+  F2 FIXED The glossary’s Map mode, FE-140, DES-206 and TST-248 retain the hidden satellite control when ESRI_API_KEY is absent and preserve the other disabled states.
+  F3 FIXED Decision 0023 item 16, C15, MTH-52 and the open passages in documents 09 and 10 retain backend access to flow splits while deferring their presentation.
+CHECKS:
+  REV-10 PASS The changed decision and glossary passages match the supplied rulings on nationality, movement anchors, feed retention, release pooling and source terms. The implementation remains assigned to the tasks identified under the decision’s Consequences and PLN-29.
+  REV-11 PASS Recorded evidence only; this reviewer ran no tests. EVIDENCE.md records the lead’s documentation check on this exact commit, exit 0, including the private-pattern check. REV-36 applies to this documentation-only change; hosted checks follow.
+  REV-12 PASS The base-to-head diff lists documentation and agent-rule files only. No code, configuration or data file changes.
+  REV-13 PASS README.md’s Current status and the decision’s Consequences distinguish specifications and queued implementation from working product capabilities.
+  REV-14 PASS No secret, real custodian record, register row or calibration value appears in the inspected changes. EVIDENCE.md records the private-pattern documentation check exiting 0.
+  REV-15 PASS No executable test or CI configuration changes. The revised test requirements preserve release minimums, rounding and recovery rejection; TST-32 retains its active-set threshold as ruling L-188 requires.
+  REV-16 PASS The reviewed changes follow decision 0023 and rulings L-182, L-185 and L-188. The glossary distinguishes the register’s Public establishment nationality from protected worker statistics and movement aggregates.
+  REV-17 OPEN P2 The method-test matrix is corrected, but the inaccurate historical ledger statement still awaits its promised appended correction.
+  REV-18 PASS Decision 0023 item 16 and the glossary keep split feed rows inside the custodian plane. AGENTS rules 11–15 retain the release boundary, privacy controls and secret-handling restrictions.
+  REV-19 PASS The Amended passages section explicitly records the movement-anchor exception to decision 0017 item 5 while preserving decision 0019 item 22’s collapsed population-grid use, as ruling L-188 requires.
+  REV-20 PASS AGENTS rules 5–7 and 16–19 retain deterministic calculations and complete source chains. The revised anchor passages name the two configured sources; item 1 retains both released inputs in the talent ratio’s lineage.
+  REV-21 N/A This part changes specifications only; it delivers no rendered screen, executable template or Fact-chip implementation.
+  REV-22 PASS Item 16 and the glossary preserve release minimums, pooling order, complementary suppression and rounding. Below-minimum split feed values remain available for pooling, never leave the custodian plane, and contribute to complete split totals. Movement splits still sum snapped whole units without apportionment.
+  REV-23 N/A No product import or package metadata changes; AGENTS rule 11 remains intact.
+  REV-24 N/A This part delivers no executable bilingual view or Arabic translation.
+  REV-25 PASS The inspected changes introduce no private path, personal identifier, prohibited comparison or committed source payload. EVIDENCE.md records a successful documentation check with the owner’s private patterns.
+  REV-26 PASS The reviewed decision and glossary retain group-only talent answers, simulation labels, the prohibition on named-business footfall and the prohibition on advice to act.
+  REV-27 PASS The reviewer’s read-only git diff --no-ext-diff --no-index -- AGENTS.md CLAUDE.md returned exit 0 with no differences. EVIDENCE.md also records cmp exiting 0.
+  REV-28 PASS No realistic synthetic identifier, real registration or register row is introduced. AGENTS rule 9 retains visibly synthetic identifiers and collision rejection.
+  REV-29 PASS AGENTS rule 8 preserves the register-company exception’s limits. Item 16 and the glossary prohibit attributing visitor splits to named buildings or businesses.
+  REV-38 PASS AGENTS rules 26–32 retain the offline gateway boundary. The patch introduces no serving-plane gateway integration.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P2 (REV-17) record — Carried forward, partly resolved. Document 12’s method-test matrix now includes the missing references for C16, C39 and C41. PROGRESS.md’s D0023 “review round 1 and the corrections” entry still incorrectly says that matrix was corrected in that earlier round. Under AGENTS rule 38, append the correction promised in RULINGS.md, identifying commit 91af084fc01eb92a653b3a7952d8a7f6303fc313 as the matrix fix; preserve the original evidence row.
+
+--- PART 2 OF 7 (the same reviewer, the same commit; its verdict unchanged) ---
+
+VERDICT: APPROVED
+TASK: D0023 part 2 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED Section 7.3 retains nullable registered_cell in pub_register_snapshot. DAT-164 and TST-214 retain the preceding-snapshot location and the regression for a closure absent from both the later snapshot and pub_register_company.
+  F2 FIXED Section 9’s caveat catalogue and DAT-164 now require each route’s own caveat exclusively. TST-214 specifies passing route combinations and failures for missing or incorrect caveats, including either register caveat on register_without_date.
+  F3 FIXED DAT-60 and SYN-57 restrict pre-conformance omission to the two count tables. DAT-169, SYN-89 and PRV-58/PRV-134 retain below-minimum split values for pooling inside the custodian plane. S4-T08 and TST-260 specify the generator-to-release regression, complete totals and rejection of premature omission.
+CHECKS:
+  REV-10 PASS The assigned documentation corrections implement decision 0023 and rulings L-182, L-185 and L-188; F2 and F3 have matching regression specifications.
+  REV-11 PASS Under REV-36, .overnight/EVIDENCE.md records the lead’s python3 scripts/check_docs.py exiting 0 on the reviewed commit, including the private-pattern check. No tests or checks were rerun by this reviewer; hosted checks follow.
+  REV-12 PASS git diff --stat main...HEAD lists documentation files only, with no data or executable changes; this part concerns the assigned contracts, simulation and privacy specifications.
+  REV-13 N/A No executable implementation is delivered by this documentation-only change.
+  REV-14 PASS No secret, real custodian value, register row or calibration-table value found in the inspected changes; EVIDENCE.md records the private-pattern documentation check exiting 0.
+  REV-15 PASS No executable test or CI configuration changes. The revised split-feed requirements preserve release minimums, rounding and pooling order; TST-32 retains its stronger set-B requirement under L-188.
+  REV-16 OPEN P3 PRV-111 and DAT-165 retain the distinct make_area and talent-tool cut-offs. DAT-11 retains an older, inconsistent release-table list.
+  REV-17 OPEN P2 The TST-197 matrix is corrected; the promised appended correction to the earlier task log remains for the following ledger commit.
+  REV-18 PASS DAT-112 and DAT-114 retain company-scoped access without oversight functions; DAT-61 and DAT-169 prohibit person-level movement identifiers and joining keys.
+  REV-19 PASS The examined amendments follow decision 0023 and the supplied rulings. The TST-32 and S1-T14 dispositions remain as L-188 directs.
+  REV-20 PASS DAT-164 separates dates and snapshot evidence and caveats. DAT-169 preserves complete split counts through pooling and computes shares only from released values; DAT-91 retains the deterministic provenance rule.
+  REV-21 N/A No rendering implementation changes; the Fact-chip and closed-template requirements remain specified.
+  REV-22 PASS PRV-58 and PRV-134 apply the existing panel minimum after split pooling, retain complete-parent publication requirements and forbid release of untreated split rows. No release minimum, rounding base or attack size is reduced.
+  REV-23 N/A No product import or package dependency changes occur in this documentation-only patch.
+  REV-24 N/A No bilingual screen implementation changes; document 03 section 9 retains pending native review for new Arabic caveat sentences.
+  REV-25 PASS No prohibited private path, personal identifier or named product comparison found in the inspected changes; the recorded documentation check passes.
+  REV-26 PASS PRV-60 retains movement’s simulated status, named-place attribution prohibition and absence of a person-level privacy claim. DAT-165 retains the talent-answer restrictions.
+  REV-27 PASS Read-only git diff --no-index -- AGENTS.md CLAUDE.md exited 0 with no differences; EVIDENCE.md also records cmp exiting 0.
+  REV-28 PASS DAT-12 to DAT-15 and SYN-19 retain the synthetic identifier forms, collision requirements and invented stand-in register fixtures.
+  REV-29 PASS DAT-145 and DAT-168 retain the restrictions on attributes attached to real named subjects; SYN-16 prohibits unauthorized generated company attributes.
+  REV-38 N/A No gateway implementation, serving-plane dependency or runtime gateway setting changes occur in this part.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P2 (REV-17) record: The TST-197 matrix now includes MTH-118/MTH-119 for C16, MTH-122 for C39 and MTH-121 for C41. PROGRESS.md’s “review round 1 and the corrections” entry still incorrectly says that matrix was corrected in the earlier commits. Append the correction promised by RULINGS.md in the following ledger commit; preserve the original entry.
+  P3 (REV-16) docs/03_DATA_CONTRACTS.md DAT-11’s conformance-test column permits registration_number only in register_company_list and pub_register_company, whereas section 7.3 and DAT-83 also permit pub_register_snapshot. This inconsistency already exists at the previously reviewed commit and is outside this confirmation’s rejecting kinds. Add pub_register_snapshot to DAT-11’s list so it agrees with DAT-83; retain rejection for every other table.
+
+--- PART 3 OF 7 (the same reviewer, the same commit; its verdict unchanged) ---
+
+VERDICT: APPROVED
+TASK: D0023 part 3 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED TST-245 and TST-209 retain SYN-89’s cited movement-anchor exception and reject record segmentation, other split inputs and person-level joins.
+  F2 FIXED C15 and MTH-52 retain backend availability of flow splits, person-trip semantics and deferral of every flow-split display.
+  F3 FIXED C22, MTH-85 and TST-214 retain separate dates-route and snapshot-route wording, including the earlier-or-absent registration-date fixture.
+  F4 FIXED DAT-164 and the caveat-key table now require each route’s own caveat exclusively; C22, BE-140, the openings_closures output contract and the What changed catalogue agree. MTH-85 and TST-214 require passing and failing caveat fixtures, including neither register caveat on register_without_date.
+CHECKS:
+  REV-10 PASS The reviewed corrections match the brief’s scope and rulings A–O. TST-197 now includes the missing methods for C16, C39 and C41; MTH-85 and TST-214 specify the required caveat regressions.
+  REV-11 PASS EVIDENCE.md records the lead’s python3 scripts/check_docs.py exit 0 on this exact commit, satisfying REV-36; hosted checks follow. No builds or tests were run during this review.
+  REV-12 PASS git diff --stat main...HEAD lists documentation only; the confirmation diff for this part changes only its two assigned documents.
+  REV-13 PASS The reviewed passages specify future methods and explicitly labelled fixtures, without presenting them as implemented capabilities or measured product results.
+  REV-14 PASS No secret, real custodian record or register row found in the reviewed changes. EVIDENCE.md records the lead’s documentation check with private patterns exiting 0.
+  REV-15 PASS The confirmation diff preserves attack sizes and release thresholds. TST-260 adds guards; TST-32’s split-feed exception follows decision 0023 item 16 and retains release controls.
+  REV-16 OPEN P3 TST-250 follows the selected-area ruling, and C38 follows SYN-85’s collapsed-grid rule. TST-32 retains the acknowledged set-B discrepancy under L-188.
+  REV-17 OPEN P2 The affected method, contract, catalogue and test passages agree; the earlier ledger correction remains pending as EVIDENCE.md and RULINGS.md state.
+  REV-18 PASS TST-260 keeps split-feed rows inside the custodian plane; TST-245 retains record boundaries; TST-248 and TST-249 retain key isolation and response-storage prohibitions.
+  REV-19 PASS The reviewed changes implement the recorded decisions and rulings without reopening them.
+  REV-20 PASS C22 preserves Public provenance, Observed status and route-specific source claims. MTH-08 requires complete lineage; TST-214 rejects incorrect caveats and unsupported snapshot-date claims.
+  REV-21 PASS MTH-01 and MTH-10 retain deterministic calculations, application-owned templates and structural numeral controls; TST-250 retains Fact-chip requirements.
+  REV-22 PASS TST-260 preserves pooling, complementary suppression, released-value minimums and recoverability guards. TST-21 retains structural enumeration and counted fuzz coverage; TST-204 retains whole-unit movement splits.
+  REV-23 N/A This documentation-only part introduces no package import or product dependency.
+  REV-24 N/A No rendered view or translation is implemented; TST-250 retains English and Arabic verification requirements.
+  REV-25 PASS No prohibited private path, personal name, realistic identifier or named-product comparison found in the reviewed patch and referenced corrections.
+  REV-26 PASS C15 retains the named-business footfall prohibition; C22 distinguishes snapshot membership from event dates; MTH-10 retains prohibited-wording controls.
+  REV-27 PASS Reviewer ran git diff --no-ext-diff --no-index -- AGENTS.md CLAUDE.md: exit 0, no differences.
+  REV-28 PASS TST-31 and TST-245 retain invented stand-in registers and reject generated groups linking real registrations; the changed fixtures introduce no realistic identifiers.
+  REV-29 PASS The reviewed changes attach no invented attribute to a named place or business; C15 uses area subjects and C22 uses Public register inputs.
+  REV-38 N/A This documentation-only part introduces no serving-plane gateway integration or runtime provider call.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P2 (REV-17) record — Carry forward the pending correction to PROGRESS.md’s “D0023 — review round 1 and the corrections” entry, which incorrectly attributes the TST-197 matrix fix to that round. Append the actual round-three correction in the promised ledger without rewriting the earlier entry; the matrix itself is now fixed.
+  P3 (REV-16) TST-32 still applies the active parameter-set minimum at count-feed conformance, whereas DAT-60 and SYN-57 specify 20 there and apply set B’s 30 at release. Retain the stronger text pending the owner’s resolution through OI-150, as L-188 directs; this is not a rejection or authorization to lower the test threshold.
+
+--- PART 4 OF 7 (the same reviewer, the same commit; its verdict unchanged) ---
+
+VERDICT: APPROVED
+TASK: D0023 part 4 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED AI-100 and AI-133 retain the MTH-122 exception, both-family lineage and rejection of withheld-input, zero-denominator and unauthorized ratios.
+  F2 FIXED AI-106, AI-138, AI-51 and split_not_offered admit the three separate movement views without range slots.
+  F3 FIXED BE-111, BE-58, area_evidence and TST-204 retain whole-unit movement sums and rejection of fractional apportionment.
+  F4 FIXED area_evidence and GET /api/layers/{layer} retain closed split_kinds arguments, empty defaults and positive and negative contract cases.
+  F5 FIXED Backend section 7, AI-131 and TST-250 reject the near-worker/wider-resident pairing.
+  F6 FIXED AI-51 and split_not_offered preserve both authorized nationality forms. AI-51 explicitly passes the Public establishment-nationality card field while rejecting unauthorized attributes and movement-record joins.
+  F7 FIXED Backend section 7 and the assistant site_check bundle assign both headlines to the selected drive area. TST-250 requires drive-15 headlines, register figures, presence and public context on that area and rejects substitution of walk 5.
+CHECKS:
+  REV-10 PASS The reviewed backend and assistant corrections implement the requirements in RULINGS.md; F6 and F7 are fixed, with their positive and planted negative cases documented.
+  REV-11 PASS Under REV-36, EVIDENCE.md records the lead's python3 scripts/check_docs.py on this exact commit exiting 0, including the private-pattern check; hosted checks follow. No tests were run during this review.
+  REV-12 PASS git diff --name-only a9db6c8 HEAD lists documentation, rules, indexes and ledgers only; the assigned changes concern decision 0023.
+  REV-13 PASS No executable implementation is delivered. BE-123 requires user-entered spending ranges, and BE-76 prohibits generated question history.
+  REV-14 PASS No secret or real custodian record appears in the assigned changes; EVIDENCE.md records the lead's documentation check with private patterns exiting 0.
+  REV-15 PASS Executable tests and CI are unchanged. AI-138 retains pooling, complementary suppression and rejection of movement-record joins; the new nationality exceptions preserve AGENTS rule 10.
+  REV-16 PASS Backend section 7, AI-131 and TST-250 agree on headline-area selection; BE-110, AI-109 and AI-51 distinguish permitted nationality attributes from unavailable statistical breakdowns.
+  REV-17 OPEN P1 The documents and TST-197 matrix are corrected; the earlier inaccurate ledger statement still awaits its announced appended correction.
+  REV-18 PASS BE-36 preserves company isolation. BE-135 to BE-139 retain server-held credentials, offline controls and provider-response non-storage.
+  REV-19 PASS The inspected corrections implement decision 0023 and rulings L-182, L-185 and L-188 without reopening a settled decision.
+  REV-20 PASS BE-104 retains complete source chains and deterministic calculations. BE-140 and the assistant's What changed family require route-specific register caveats and exclude both caveats from register_without_date.
+  REV-21 PASS AI-33 and AI-35 to AI-51 retain Fact chips, closed catalogue validation, the accounting gate and template fallback. Movement counts have their explicit range-slot exception.
+  REV-22 PASS BE-111, BE-58 and AI-103 retain snapped whole-unit movement sums. AI-138 preserves pooling and suppression; TST-260 rejects recoverable values and splits published for withheld parent groups.
+  REV-23 N/A This documentation-only pull request changes no executable imports or package dependencies.
+  REV-24 PASS AI-85, AI-86 and AI-120 retain identical Western numerals and native review of prepared Arabic strings; no rendered bilingual implementation is delivered.
+  REV-25 PASS No prohibited private path, personal identifier or product comparison appears in the assigned changes; the recorded private-pattern documentation check exits 0.
+  REV-26 PASS BE-132, BE-134 and AI-133 to AI-138 retain group-only talent answers, qualified estimates and prohibitions on named-business estimates, probabilities and advice to act.
+  REV-27 PASS Read-only git diff --no-index -- AGENTS.md CLAUDE.md exited 0 with no differences; EVIDENCE.md also records cmp exiting 0.
+  REV-28 PASS The assigned changes introduce no realistic synthetic identifiers, register rows or generated company names.
+  REV-29 PASS BE-113, BE-59, AI-108 and AI-137 retain company-card restrictions and Public-only tower counts; establishment nationality remains a published Public attribute.
+  REV-38 PASS BE-102 and AI-98 retain the offline-only gateway boundary; AI-128 excludes visitor transcripts from the gateway.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17; record; carried forward) The D0023 review-round-1 entry in PROGRESS.md still says the method-test matrix was corrected in that round. The matrix is now corrected, but the historical statement remains inaccurate. Append the correction in the following ledger, as RULINGS.md and EVIDENCE.md specify, preserving the original entry under AGENTS rule 38.
+
+--- PART 5 OF 7 (the same reviewer, the same commit; its verdict unchanged) ---
+
+VERDICT: APPROVED
+TASK: D0023 part 5 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED FE-100 and REV-20 retain the MTH-122 exception, both released inputs and families in lineage, and refusal for withheld inputs or a zero denominator.
+  F2 FIXED FE-109, FE-154, DES-99, DES-174, DES-214 and REV-22 retain whole-unit movement splits and exclude exact-shape apportionment captions.
+  F3 FIXED FE-154 and DES-214 retain returned categories only, the “under 15 or pooled” label, and published, pooled and withheld component cases.
+  F4 FIXED FE-23, DES-167, DES-72 and DES-194 exempt movement-split counts from ranges and reject invented ranges.
+  F5 FIXED REV-16 and REV-22 retain C39’s separate catchments, enumeration in every calling playbook and refusal above 30 minutes.
+  F6 FIXED Document 10’s Trust centre description confines the owner-decision basis to the GIS layers and requires covering terms for the tender source.
+  F7 FIXED FE-153 and DES-212 retain zoning outlines, permitted-use words and rejection of categorical fill.
+  F8 FIXED FE-140 and DES-206 retain hidden satellite controls without ESRI_API_KEY and distinguish the disabled states when the key is present.
+CHECKS:
+  REV-10 PASS The actual assigned-part diff matches .overnight/DIFF.part.txt. DES-187 implements rulings C/K; both document 13 corrections implement ruling N. Earlier substantive fixes remain intact.
+  REV-11 PASS Under REV-36, .overnight/EVIDENCE.md records the lead’s python3 scripts/check_docs.py exiting 0 on this exact commit, including with private patterns. hosted checks follow; merge awaits all six. No tests were run during this review.
+  REV-12 PASS The base-to-head stat contains documentation only. Since the previous review, this part changes only DES-187 and two attribution-status passages in document 13; no executable or data files changed.
+  REV-13 PASS The changes remain specifications and status corrections. TASKS.md and PLN-29 assign implementation to future tasks; the changes claim no implemented feature or passing component test.
+  REV-14 PASS No secret value, custodian record, register row or calibration value appears in the reviewed changes. The lead records the private-pattern documentation check exiting 0.
+  REV-15 PASS No executable test, CI configuration or baseline changed. DES-187 preserves the record restrictions while stating the approved movement exception; the operational controls remain unchanged.
+  REV-16 PASS DES-187 distinguishes the three permitted nationality forms as rulings C/K require. OPS-73 preserves server-only keys, storage prohibitions and operation without the optional provider.
+  REV-17 OPEN P3 Earlier P4 is corrected in OPS-73 and document 13’s Open questions. The TST-197 matrix is corrected; P3’s appended historical-ledger correction remains scheduled for the following ledger.
+  REV-18 PASS OPS-73 retains server-only provider access and prohibits storing tiles, search results or keys. FE-149 and REV-18 retain company separation and exclude oversight access.
+  REV-19 PASS The three changed passages implement the supplied rulings without reopening a settled decision. The remaining S1-T14 documentation-guard work stays deferred as L-188 directs.
+  REV-20 PASS FE-100 and REV-20 preserve complete lineage and the narrow talent-ratio exception. FE-154 and DES-214 require released counts and computed shares without invented categories or ranges.
+  REV-21 PASS FE-154 and DES-214 retain Fact chips for split counts and shares. FE-78 retains catalogue rendering and the accounting gate; no rendered implementation is introduced.
+  REV-22 PASS REV-22 retains structural closure, attack sizes and stable treatment. DES-187 allows movement nationality only as released aggregates, never joined to records; whole-unit split requirements remain intact.
+  REV-23 N/A This documentation-only change introduces no product imports or package changes.
+  REV-24 N/A No bilingual implementation or translated catalogue is delivered; DES-186 retains Arabic review and DES-119 retains numerical parity.
+  REV-25 PASS The reviewed changes introduce no private path, personal identifier, secret value or prohibited comparison. OPS-73 records the permitted attribution locations without introducing the provider’s name.
+  REV-26 PASS DES-187 retains the honesty lines and prohibited claims. Runbook scene 7 retains aggregate-only talent evidence, visible ranking criteria and next tests without a verdict.
+  REV-27 PASS HEAD stores AGENTS.md and CLAUDE.md as identical Git blob b1592f29453c826beb044e27f17fe99d4a4a2f84. The lead also records cmp exiting 0.
+  REV-28 PASS No synthetic identifier, realistic registration or register row is introduced. REV-28 retains the allowed identifier forms and collision requirements.
+  REV-29 PASS DES-187 distinguishes the register’s Public establishment nationality from released worker statistics and movement aggregates. FE-150 and FE-153 retain the restrictions on named businesses and Public source attributes.
+  REV-38 PASS The frontend Proof room specification, DES-136 and OPS-55 retain only the fixed gateway lineage sentence and prohibit gateway panels and runtime use.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P3 (REV-17) record — Carry forward only the historical-ledger correction: PROGRESS.md’s D0023 review-round-1 entry incorrectly attributes the TST-197 matrix correction to that round. The current matrix now includes MTH-118/MTH-119 for C16, MTH-122 for C39 and MTH-121 for C41. Append the promised correction in the following ledger without rewriting the original entry, as .overnight/RULINGS.md and .overnight/EVIDENCE.md specify.
+
+--- PART 6 OF 7 (the same reviewer, the same commit; its verdict unchanged) ---
+
+VERDICT: APPROVED
+TASK: D0023 part 6 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED PUB-90 preserves SYN-89’s two cited movement anchors, distinguishes the other nationality groups derived from simulated people, and requires the population grid to be collapsed across age and sex. TST-209 retains the passing movement-anchor case and rejects joins to worker, residence or company records.
+  F2 FIXED ARC-129, BRF-58 and BRF-73 retain whole-unit aggregation for movement splits without apportionment. TST-204 retains the planted apportioned-split rejection and identical split counts and shares for outlines selecting the same units.
+CHECKS:
+  REV-10 PASS The assigned passages agree with decision 0023 and rulings L-182, L-185 and L-188 on nationality, movement anchors, feed counts, source terms and attribution-note status.
+  REV-11 PASS Under REV-36, .overnight/EVIDENCE.md records the lead’s python3 scripts/check_docs.py exiting 0 on this exact commit, including with the private pattern list; hosted checks follow. Merge awaits the six hosted checks. No tests were run in this review.
+  REV-12 PASS git diff --name-only main...HEAD lists documentation and ledgers only. The assigned changes concern decision 0023 and its corrections; no code or data file changes appear.
+  REV-13 PASS The assigned patch changes specifications, not executable implementations, and introduces no invented measurement or substitute release output.
+  REV-14 PASS No credential, real custodian record, register row or calibration-table value appears in the assigned changes. The recorded documentation check with the private pattern list exits 0.
+  REV-15 PASS No executable test or CI configuration changes occur. The movement clarification preserves release minima, rounding and pooling; TST-204 and TST-209 retain their planted violations.
+  REV-16 PASS The component descriptions and amended requirements follow the rulings: feed splits contain counts and panel_devices; shares follow release pooling; establishment nationality remains a Public company attribute.
+  REV-17 OPEN P1 The affected specifications and TST-197 matrix are corrected. The earlier ledger statement still awaits its promised appended correction.
+  REV-18 PASS ARC-28 and ARC-30 preserve company isolation and fixed read functions. PUB-109 retains server-side keys, same-origin provider routes and the prohibition on storing responses.
+  REV-19 PASS The changes implement the accepted decisions and supplied rulings without reopening them. PUB-12 retains its existing exception and distinguishes the tender source’s requirement for covering terms.
+  REV-20 PASS ARC-120, ARC-123 and PUB-19 retain deterministic calculations and complete source chains. PUB-90 identifies the permitted movement anchors and preserves the collapsed-grid restriction.
+  REV-21 N/A This part delivers no rendered component or template; the architecture retains Fact-chip rendering and closed catalogues.
+  REV-22 PASS ARC-129 retains whole-unit movement splits. Its revised simulator description agrees with SYN-89 and DAT-169: feed counts stay inside the custodian plane, with shares computed after release pooling and no release control reduced.
+  REV-23 PASS ARC-02 and ARC-03 retain the verified-release boundary and restrictions on record-level data. No executable import changes occur.
+  REV-24 N/A This part delivers no Arabic strings or bilingual implementation.
+  REV-25 PASS The assigned changes contain no private path, personal identifier, secret or prohibited comparison. Provider attribution follows the received note; fetched source data remains uncommitted.
+  REV-26 PASS BRF-43 to BRF-50, BRF-82 and ARC-129 retain the prohibited-claim restrictions. Movement figures remain area aggregates, never named-place footfall.
+  REV-27 PASS .overnight/EVIDENCE.md records cmp AGENTS.md CLAUDE.md exiting 0 on this commit, alongside the passing documentation check.
+  REV-28 PASS The assigned changes introduce no realistic synthetic identifier or register identifier; BRF-31 retains the name-collision requirement.
+  REV-29 PASS The nationality correction permits only the establishment nationality published by the register. BRF-63, ARC-131 and PUB-92 retain the restrictions on other company attributes and named-place figures.
+  REV-38 PASS ARC-80 to ARC-82 retain the offline-only gateway, provider-none operation and serving-plane import prohibition.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17; record; carried from round 2) PROGRESS.md, “D0023 — Decision 0023: ten additions and the data rule: review round 1 and the corrections”, still states that the method-test matrix was corrected in that round. The matrix is now corrected: C16 includes MTH-118 and MTH-119, C39 includes MTH-122, and C41 includes MTH-121. Complete the appended historical correction in the follow-up ledger commit promised by .overnight/RULINGS.md and .overnight/EVIDENCE.md, preserving the earlier entry.
+
+--- PART 7 OF 7 (the same reviewer, the same commit; its verdict unchanged) ---
+
+VERDICT: APPROVED
+TASK: D0023 part 7 of 7 (pull request 41), round 3
+COMMIT: 5a41758430dfe905a503dd576181d6938a620118
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate
+EARLIER FINDINGS:
+  F1 FIXED TASKS.md S4-T10 and both files’ S4 gates retain the DAT-169 movement exception, the permitted DAT-141 nationality fields and the positive and negative schema cases.
+  F2 FIXED S4-T04 and S4-T08 require feed counts and panel_devices only; shares follow release pooling, suppression, treatment and rounding.
+  F3 FIXED S2-T01 and S2-T19 restrict decision_record: 0023 source admission to PUB-105 GIS layers.
+  F4 FIXED S2-T01 and document 14 section 10 retain the named API-provider exceptions with environment keys, offline controls, storage restrictions and fixture-only tests.
+  F5 FIXED S2-T11 now permits SYN-89’s cited aggregate movement anchors while prohibiting worker, residence and company segmentation, joins, protected composites and tabulated apportionment. It requires TST-209’s passing anchor and failing record and joining-key cases.
+  F6 FIXED S2-T19, document 14 section 10 and both S2 gates preserve PUB-12/PUB-13 admission bases. They require the GIS fixture without reuse terms to pass, the uncovered tender fixture to fail and the GIS fixture with prohibitive terms to fail.
+CHECKS:
+  REV-10 PASS The assigned corrections satisfy the earlier findings and the applicable PLN-29 requirements; revised criteria include their planted cases.
+  REV-11 PASS Under REV-36, .overnight/EVIDENCE.md records the lead’s python3 scripts/check_docs.py on the reviewed commit exiting 0, including the private-pattern check; hosted checks follow. The full suite follows with the ledger. No tests were run during this read-only review.
+  REV-12 PASS The main-to-head diff stat contains documentation files only; the assigned changes are TASKS.md and docs/14_IMPLEMENTATION_PLAN.md, with no data files.
+  REV-13 PASS The changed passages specify queued implementation work; they deliver no executable placeholder, fabricated figure or hand-written release table.
+  REV-14 PASS No secret or real record appears in the inspected changes; the recorded head documentation check with private patterns exited 0.
+  REV-15 PASS No executable test, CI configuration, tolerance or baseline changed. The revised criteria retain release minimums and add planted violations.
+  REV-16 PASS The task criteria follow rulings A–O: named movement anchors, retained split-feed values, route-specific caveats and the selected headline area.
+  REV-17 OPEN P1 The operative corrections agree with their referenced requirements; the earlier inaccurate ledger statement still awaits its promised appended correction.
+  REV-18 PASS S2-T01 and S2-T19 preserve provider boundaries, secret-handling restrictions, documented source admission and refusal on prohibitive terms.
+  REV-19 PASS The revised source and movement criteria implement the accepted decisions without reopening them; slice order remains unchanged.
+  REV-20 N/A This documentation-only part implements no calculation or fact object.
+  REV-21 N/A No rendered screen, executable template or numeral-lint implementation changes.
+  REV-22 PASS S4-T04, S4-T08 and S5-T09 retain small split-feed values inside the custodian plane for PRV-134 pooling; release minimums, suppression and share-denominator requirements remain explicit.
+  REV-23 N/A Documentation-only changes introduce no product or custodian imports.
+  REV-24 N/A No implemented bilingual view or Arabic translation changes.
+  REV-25 PASS The inspected changes contain no prohibited private path, personal identifier or product comparison; source and provider references serve attribution or configuration.
+  REV-26 PASS S6-T20 retains aggregate-only talent answers and their limitations; S6-T21 forbids verdicts, probability claims, confidence claims and advice to act.
+  REV-27 PASS Read-only git diff --no-index -- AGENTS.md CLAUDE.md exited 0 with no differences; the lead also records cmp exiting 0.
+  REV-28 PASS S4-T01 retains the pinned synthetic identifier forms; the inspected changes introduce no realistic identifiers or register rows.
+  REV-29 PASS S8-T03 retains Public-only real-place slots and register-company limits; S6-T20 prohibits employer names beside talent pools or flows.
+  REV-38 PASS Document 14 PLN-20 retains the offline gateway boundary; S8-T10 expressly prevents confirmed voice transcripts from reaching it.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17; record) PROGRESS.md’s D0023 round-one corrections log, line 17504, still attributes the method-test matrix correction to that earlier round. The matrix is now corrected, and .overnight/RULINGS.md identifies commit 91af084fc01eb92a653b3a7952d8a7f6303fc313 as its actual correction. Append the promised ledger correction naming the inaccurate entry and actual fix commit; do not rewrite the earlier entry.
+```
+
+#### D0023: merge record
+
+- The branch was updated with main when its turn to merge came (the owner's rule of 2026-11-12): merge commit `0a29e209199d0ff780c1c3bbea52ac212a3d4c74`, the head that was merged. Where both sides had appended at the same place the lead's scripts keep every line of both sides, main's first, and refuse any overlap. The lead's proof that the update changed nothing by itself (for every path: the branch's blob where main did not change it, main's blob where the branch did not, git's own three-way merge, or the scripted resolution):
+
+```text
+base update 0a29e209199d0ff780c1c3bbea52ac212a3d4c74: branch side 620dfd66c431b6b22791870442ec620d4e72f266, main side f0ee2f3c39a480501edb28bc85c33546e61ba5b9, merge base a9db6c85d19c1035377dfbc9fde8959fcc86cff7
+  branch only: 23
+  main only: 46
+  neither: 451
+  both, git's own merge: (2, ['OPEN_ITEMS.md', 'TASKS.md'])
+  both, resolved by the lead's script: (1, ['PROGRESS.md'])
+  FAIL: (0, [])
+```
+
+- CI on the updated head: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43563678323; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43563678294; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43563678272 .
+
+- The lead's checks on the merged head `0a29e209199d0ff780c1c3bbea52ac212a3d4c74` before the merge (ruling L-29): "TREE-IS-WORK ok: 523 paths at 0a29e209199d0ff780c1c3bbea52ac212a3d4c74", exit code 0; `./eii test --seed 2026111438`: exit code 0, "total: 1998 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/41 was squash-merged on 2026-11-14 at that head; merge commit `e45dbb34397a462b93506d85714700c88917b92d` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43566276352; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43566276405; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43566276404 .
+
+### D0026 — Decision 0026: public sources used in full locally: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/44 )
+
+- What it is: decision record 0026 and its sweep of the pack. The owner's decisions of 2026-11-14, as the lead recorded them from his advisor's notes of 09:57, 10:02 and 10:03: version 1 is a personal, local project, so every source that a visitor can read without signing in is used and shown in full, whoever owns it; reuse terms no longer switch a source off; the terms are still read and recorded in the publisher's own words with the date read; what needs a permission before real use goes on one list in document 17; nothing of a source without an open licence is committed. With it, four decisions the advisor took under the owner's delegation that morning: an investment project is shown in full with its source and the page's own caveat; Greater Doha stays five whole municipalities for version 1 (open item OI-151); the feed minimum follows the active parameter set (OI-150 closed, Option A); the restaurants' production value, which the publisher no longer publishes, is neither derived nor shown, and card C4 computes its shares from published figures.
+- Class: Deep (it changes which public data the product may show and one privacy text). Lead: Anthropic (Claude Fable 5.2): the wording every changed passage had to meet (twelve items and seven addenda), every ruling, the combination of the editors' work and this ledger.
+- First pass: an inventory of the pack by seven read-only readers and one critic (the lead's agents, Claude Opus 5.5 and Claude Fable 5.2): 366 passages in 23 files state, repeat or depend on a replaced rule. Six editors of another maker (OpenAI GPT-6 Astra through Codex), each on its own documents, entered the wording; one of them wrote the record. Work commit 099ff42.
+- The lead's sweep: seven read-only verifiers (Claude Opus 5.5), one for each group of the wording, read the whole pack after that edit and reported 80 points; the lead judged 79 valid and one not (the column list of the investment source, which task S2-T12 writes). The heaviest: the first edit had lifted the display holds of open item OI-03 on cards C3, C4, C33 and C35, which the decision does not lift; the withdrawn survey benchmark was still promised in seven documents and two tasks; the lead's own wording had left out the fourth basis of use (`provider_terms`); a missing terms record was still a build failure in two tasks and a slice gate. Four editors (the same maker) entered the points; the lead added the tender portal's terms, which it read on 2026-11-14, and completed the record's list of changed requirement rows by a script that compares each row with main. Work commit 6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad.
+- AGENTS.md, CLAUDE.md and document 06 are not changed: wherever a rule asks for a source's licence, the registry's record of what the publisher states together with the basis of use is that element (the record's Consequences).
+- The repository's checks cannot see whether a passage is true to the owner's decision: that is the reviewer's judgement, with the wording and the lead's rulings in the pack. The documentation check also ran with the owner's private pattern list on every commit of the branch (the commit hook).
+- Open items: OI-150 is closed by the record; OI-151 (Greater Doha) and OI-157 (a caveat key of card C33 that has no figure behind it any more) are entered with this ledger.
+- Not in this pull request: any code. The tasks that build on the changed rules (S2-T12, S2-T13, S2-T19) carry them in their own pull requests; decision records 0024 (task S1-T14) and 0025 (task S2-T03) arrive with those tasks.
+
+#### Evidence for the work commit `6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad`
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 410 text files, 65 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the record and every amended document: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical; the record does not change them.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   bash -c "git diff --name-only e45dbb34397a462b93506d85714700c88917b92d HEAD -- AGENTS.md CLAUDE.md docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md | wc -l"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (the agent rules and document 06 are unchanged)
+Seed:      none
+Notes:     The record states that AGENTS.md, CLAUDE.md and document 06 are not changed; this row proves it on the committed tree.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   bash -c "grep -hciE 'under 20 panel|below 20 panel|admitted geography|admits to the local release' docs/0*.md docs/1*.md docs/GLOSSARY.md TASKS.md | paste -sd+ | bc"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no document of the pack keeps the fixed feed minimum of 20 or the admission of a source by a record)
+Seed:      none
+Notes:     Two of the replaced rules, searched by their words in the documents of the pack, the glossary and the tasks (decision records are history and are not searched).
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   ./eii test --seed 2026111444
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1998 passed, 0 failed, 0 skipped
+Seed:      2026111444
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','e45dbb34397a462b93506d85714700c88917b92d..6f27dc7fe51c6a38a4ab6f09384c861d532eb9ad'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two work commits have Conventional Commit subjects.
+```
+
+### D0026 — Decision 0026, public sources used in full locally: the independent review in three rounds and its two fixes (pull request https://github.com/albarami/economic-investment-intelligence/pull/44 )
+
+- Review round 1 (2026-11-14): xAI Grok 4.7 through the Cursor command-line tool read the change in four parts on the ledger head 0c72119: part 2 (the public data pack and going live) APPROVED with no finding; parts 1, 3 and 4 REJECTED with one finding each, and one proposed point. The lead read each against the pack and judged all four valid: three sentences still carried a withdrawn rule (BRF-93 took the revenue cases from the survey's shares of output; assumption (39) of document 03 named two withdrawn indicators of the establishment-size table; the asset table of document 10 called the 2020 boundary layers shown in full), and one source gloss of document 05 described a source's terms before they were read.
+- The first fix (the editors' maker, OpenAI GPT-6 Astra through Codex; the reviewer's own sentences word for word; five passages in five files, among them the three passages added to the record's own lists): commit e513d31. The lead read the whole diff and ran the documentation check with the owner's private list, the tree check and the comparison of the two agent files.
+- Review round 2 (the confirmation, same reviewer, on e513d31): the three findings and the proposed point CLOSED; REJECTED with three new findings of the same kind: BE-124, TST-231 and the goal of task S7-T15 still said that the low, middle and high revenue cases come from the published survey shares. Valid: the fixer's search had looked for the words of round 1 and missed these three.
+- The second fix (applied by the lead, mechanically, with the reviewer's three replacement sentences word for word): commit 496ae3d. The lead then searched every tracked file for a sentence that ties the revenue range or its three cases to the survey or to shares and read each match: what remains is the acceptance criterion of S7-T15 (which gives the published shares to card C4's break-even point only), document 09's hold while open item OI-03 is open, and decision record 0019, which is history and is not edited.
+- Review round 3 (the second confirmation, same reviewer, on 496ae3d): APPROVED, the three findings closed, no finding, no proposed item.
+- The lead's check of the record's lists of passages against the real change flags five requirement identifiers as listed under "changed" although their own rows did not change (PUB-24, PUB-95, PUB-103, BE-57, BE-117): each is named in a passage that did change (a table row or an assumption that cites it), so the lists are true as written; the check compares rows only.
+- Evidence: the commands below at the second fix commit.
+
+#### Evidence for the work commit `496ae3d3235fce64783461a47d66318017efa263`
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 410 text files, 65 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the record and every amended document: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical; the record does not change them.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   bash -c "git diff --name-only e45dbb34397a462b93506d85714700c88917b92d HEAD -- AGENTS.md CLAUDE.md docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md | wc -l"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (the agent rules and document 06 are unchanged)
+Seed:      none
+Notes:     The record states that AGENTS.md, CLAUDE.md and document 06 are not changed; this row proves it on the committed tree. (Compared with the commit of main the branch started from.)
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   bash -c "grep -hciE 'under 20 panel|below 20 panel|admitted geography|admits to the local release' docs/0*.md docs/1*.md docs/GLOSSARY.md TASKS.md | paste -sd+ | bc"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no document of the pack keeps the fixed feed minimum of 20 or the admission of a source by a record)
+Seed:      none
+Notes:     Two of the replaced rules, searched by their words in the documents of the pack, the glossary and the tasks (decision records are history and are not searched).
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   ./eii test --seed 2026111448
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1998 passed, 0 failed, 0 skipped
+Seed:      2026111448
+Notes:     The whole test command on the build machine with a fresh seed, at the second fix commit.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','0c7211908da3baac688d69e63559f0b8ceaded90..496ae3d3235fce64783461a47d66318017efa263'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two fix commits of the review rounds have Conventional Commit subjects.
+```
+
 #### S1-T09: independent review, round 1: APPROVED
 
 Reviewed commit `33172471b2160c98a5f7605768e6e81a30945910`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/40 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43538019509; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43538019610; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43538019483 ). Reviewed by OpenAI GPT-5.6 Sol (high) through the Codex command-line tool (the verdict is signed "OpenAI GPT-5"), a maker that neither planned nor built the task (the builder was xAI Grok 4.7 through the Cursor command-line tool; the plan, the ruling on its design review and the internal review were the lead's, Anthropic). The hosted tests job passed on this head on its one rerun; three earlier runs on three heads had ended on the time limit of the web checks, a cause shared with other pull requests and given its own task (S1-T15). The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
