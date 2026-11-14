@@ -8,7 +8,7 @@ import re
 from collections.abc import Mapping
 from pathlib import Path
 
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 DIGEST = "sha256:4a43e3c3e5d55b9208240fc71db543b79c638766280c625a425bd0a2390989c4"
 IMAGE = "postgis/postgis@" + DIGEST

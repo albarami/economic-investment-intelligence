@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import contextlib
+import io
 import os
 import unittest
 from pathlib import Path
@@ -13,7 +15,6 @@ UP_TAIL = ("up", "-d", "--wait", "--wait-timeout", "60", "db")
 DOWN_TAIL = ("stop", "db")
 PLACEHOLDER_DETAIL = {
     "down": "not_built (not built yet)",
-    "build-public": "not_built (built by task S2-T01)",
     "build-world": "not_built (not built yet)",
     "build-release": "not_built (not built yet)",
     "load-release": "not_built (built by task S3-T02)",
@@ -209,7 +210,6 @@ class Commands(unittest.TestCase):
             (("up",), 4, "up"),
             (("up", "--embedded"), 4, "up"),
             (("down",), 1, "down"),
-            (("build-public",), 1, "build-public"),
             (("build-world",), 1, "build-world"),
             (("build-release",), 1, "build-release"),
             (("load-release",), 1, "load-release"),
@@ -243,6 +243,47 @@ class Commands(unittest.TestCase):
         self.assertIn("internal fault", planted_err)
         self.assertEqual(support.failure_problems(1, planted_err, meanings[1]), [])
         self.assertNotIn("eii: exit 9:", planted_err)
+
+    def test_build_public_usage_and_unreachable(self) -> None:
+        root = support.make_temp(self, "eii-cmd-public-")
+        code, stdout, stderr = support.run_main(
+            ("build-public", "extra-argument"),
+            {"PATH": ""},
+            root,
+        )
+        self.assertEqual(code, 2, stderr)
+        self.assertEqual(stdout, "")
+        self.assertTrue(stderr.startswith("eii: usage error:"), stderr)
+        self.assertIn("build-public", stderr)
+        import commands.build_public as build_public
+        from eii_custodian.publicdata.fetch.transport import Response, TransportFault
+
+        def unreachable(url: str) -> Response:
+            raise TransportFault("unreachable", url)
+
+        secret = "planted-token-value"
+        stdout_buf = io.StringIO()
+        stderr_buf = io.StringIO()
+        with (
+            contextlib.redirect_stdout(stdout_buf),
+            contextlib.redirect_stderr(stderr_buf),
+        ):
+            code = build_public.run(
+                root,
+                {"PATH": "", "EARTHDATA_API_KEY": secret, "TOMTOM_API_KEY": secret},
+                (),
+                transport=unreachable,
+                sleep=lambda _seconds: None,
+            )
+        stdout = stdout_buf.getvalue()
+        stderr = stderr_buf.getvalue()
+        self.assertEqual(code, 6)
+        self.assertNotIn(secret, stdout)
+        self.assertNotIn(secret, stderr)
+        self.assertIn("unreachable", stderr)
+        for path in root.rglob("*"):
+            if path.is_file():
+                self.assertNotIn(secret, path.read_text(encoding="utf-8"))
 
     def test_down_deletes_nothing(self) -> None:
         folder = support.stub_folder(self)
