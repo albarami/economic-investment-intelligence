@@ -18503,6 +18503,367 @@ Seed:      none
 Notes:     The one fix commit between the reviewed head and the work commit has a Conventional Commit subject.
 ```
 
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/42 )
+
+- Why: the owner's own notes of 2026-11-13 and 2026-11-14: the satellite imagery provider's name may be committed only in the map attribution line and in the source rows of document 04; the documentation check gains a place-scoped exception for it, reviewed like any other change, with planted cases; the owner's private pattern list stays unchanged. Added to slice S1 by a re-plan of 2026-11-14.
+- Class: Deep (a guard of the public repository). Personas: builder, a senior platform engineer of repository guards; reviewer, a principal platform and supply-chain reviewer of another maker. The work needs the private list's shape and was kept with the lead's own agents (the owner's routing note of 2026-11-14 keeps such work there): design and build on Claude Opus 5.5, the adversarial design review and the break pass on Claude Fable 5.2; skills used: task-standards, brainstorming, al-muhasibi, test-driven-development, verification-before-completion, muhasabah-gate. No agent read the private list and no real name was written anywhere; every test uses invented names built at run time.
+- The design review (adversarial, against a prototype) required fourteen changes, all made: at most one entry in the configuration, because nobody can review which name a digest stands for; a listed-name check (check 8) that runs with or without the private list, so that the hosted checks also refuse the name outside its places; rules for document 04's source rows that follow how Markdown is rendered (fences, comments, headings, line-break trap characters); an attribution file that holds nothing but the one declaration, blank lines and line comments; the entry bound to its own source ids; the script itself read for the private patterns; and the configuration merged with NO entry: the one real entry is the first commit of the task that adds the imagery source, and its digest is typed by a person at a terminal into a command that hides the typing, never passed through a command line, a file or a transcript. Decision record 0024 states it and amends one consequence of decision 0012.
+- The break pass: 58 attempts, each run four ways (the plain script in a copy; the file list a checkout gives; each with and without a private list of invented names): 27 passed wrongly or were refused wrongly; the fix round closed them test-first (29 tests failing, then all passing): a duplicate or hidden registry heading, a pseudo-table, link targets and link names, files that are not valid UTF-8, the name inside longer words, in alternating case, cut by hyphens or invisible characters, character references, script escapes and look-alike letters, and three older checks that printed their token. What stays outside the check is stated in the configuration's header and in TST-263: commit messages, branch names and pull-request text; images and other binary files; translated or shortened forms beyond the parts check 8 hashes.
+- What changed beyond the exception itself, by the design review's findings: the private patterns now read every text file of any suffix, every path and every link target (they read only the documented text suffixes before); with an entry listed the check takes about ten seconds on this tree, and about 0.6 seconds with none.
+- The lead's part: the decision record renumbered to 0024 and the test identifier to TST-263 (decision 0023 is another open pull request); the changed check run on this tree WITH the owner's real private list from the lead's own shell: exit 0, no failure line (counts only; nothing shown); the lead's own breaks at the work commit (the row below): the limit of one entry removed, the digest not case-folded, the two places not enforced, and the line-break trap of the attribution file ignored. The last was not caught at first: that rule had a planted case for document 04 only; a planted case for the attribution file was added (seven trap characters and a control), red with the rule removed and green with it.
+- Three proposed items enter OPEN_ITEMS.md (PO-S1-09 to PO-S1-11): files of the listed set that no pattern read before; a private pattern file that cannot be read being ignored without a message; scans of the built bundle and the exports needing the same place rule.
+- Not built here, by design: the real entry, the provider's rows in document 04 and the attribution file `web/src/stage/attribution.ts`; they come with the task that adds the imagery source, under the rules its TASKS entry states.
+
+#### Evidence for the work commit `9502bc5c66c395d9c7afdae5651bbff86fc38575`
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   uv run --locked python -m pytest scripts/tests/test_check_docs_exceptions.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "91 passed, 34 subtests passed in 8.51s"
+Seed:      none
+Notes:     The task's planted tests, with invented names built at run time: the name passes in its two places and is refused everywhere else, with and without a private list; the configuration's closed form; the rendering traps of document 04 and of the attribution file; check 8 in paths, link targets and files of any suffix; no failure line prints a listed name.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 366 text files, 63 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the repository with the committed configuration, which holds no entry: no exception applies and check 8 has nothing to look for.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   bash -c "grep -c '^\[\[exception\]\]' scripts/check_docs_place_exceptions.toml | cat"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (the committed configuration holds no entry)
+Seed:      none
+Notes:     The configuration is committed with header comments only (decision record 0024): the one real entry is the first commit of the task that adds the imagery source.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   bash <lead>/tmp/S1-T14.lead-breaks.sh
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; first output line "S1-T14 lead breaks, 2026-11-14 04:18, on 9502bc5c66c395d9c7afdae5651bbff86fc38575; check_docs.py sha256 06ffe795fef439479d2821aab72810b56777ded653adb0003d51281d9995bd52"
+Seed:      none
+Notes:     The lead's four breaks of the guard, each failing the task's tests and restored: the limit of one entry removed; the digest not case-folded; the two places not enforced; the line-break trap rule of the attribution file removed.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   bash -c "set -o pipefail; uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' 2>&1 >/dev/null | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 668 tests in 157.790s  OK" (the guard tests on their own (the test report alone))
+Seed:      none
+Notes:     Every guard test of the repository with the changed check, the commit-hook and history-scan tests among them.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   ./eii test --seed 2026111429
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1970 passed, 0 failed, 0 skipped
+Seed:      2026111429
+Notes:     The whole test command on the build machine with a fresh seed.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint of the Python files.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "218 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 193 source files"
+Seed:      none
+Notes:     Strict types, the changed check included.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical (unchanged by this task).
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 61 packages in 1ms" (exit code decides)
+Seed:      none
+Notes:     The lock file matches the manifests (no dependency added).
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','a9db6c85d19c1035377dfbc9fde8959fcc86cff7...9502bc5c66c395d9c7afdae5651bbff86fc38575'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:docs/decisions/0024-one-private-name-in-two-places.md A:scripts/check_docs_place_exceptions.toml A:scripts/tests/test_check_docs_exceptions.py M:OPEN_ITEMS.md M:TASKS.md M:docs/10_FRONTEND.md M:docs/12_TESTING_AND_QUALITY.md M:docs/15_REVIEWER_CHECKLIST.md M:docs/README.md M:scripts/check_docs.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "10 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The paths the work commit changes against its base, exactly the task's scope (10 paths).
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    9502bc5c66c395d9c7afdae5651bbff86fc38575
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','a9db6c85d19c1035377dfbc9fde8959fcc86cff7..9502bc5c66c395d9c7afdae5651bbff86fc38575'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
+```
+
+### S1-T14 — Place-scoped exception for one name of the private list: review round 1 and the fix (pull request https://github.com/albarami/economic-investment-intelligence/pull/42 )
+
+- Review round 1 (2026-11-14): OpenAI GPT-6 Astra through the Codex command-line tool, with the security lens, on the ledger head 771985e: REJECTED with four findings and one record point. The lead read each finding against the code and judged all four valid as written.
+- Finding 1: the reader's fence state before the registry heading ignored Markdown's list containers, so a registry-looking heading and table inside a top-level code block after a list-contained fence were accepted. Finding 2: a listed symbolic link was read through to its referent (AGENTS rule 13). Finding 3: a private pattern that does not compile, or a file that cannot be read, raised an error whose text could hold a pattern's group name or a path, and the test helper kept only part of standard output. Finding 4: two type-check suppression comments in a test helper. Record point: the permitted forms of the attribution line were stated three ways.
+- The fix, first pass (the lead's agent, Anthropic Claude Opus 5.5; a failing test first for each finding): an indented fence followed by a dedented line is a form the reader does not follow and leaves document 04 with no allowed line (stricter than modelling list containers); a link is scanned as its link text only and its referent is never opened; every read and every compilation fails closed with a fixed line and the tests assert both output streams whole; the helper's keyword arguments are typed; one clause states the attribution forms in TASKS.md, document 10 and TST-263.
+- The break pass after it (the lead's adversary, Anthropic Claude Fable 5.2) got past the fixed guard in nine further ways that no test caught. Seven are within the task's criteria and were fixed in a second pass, each with a failing test first: a tab after a closing fence; an HTML block before the registry heading that holds a fence-looking line; white space that Markdown does not call blank (a no-break space) in four places; a hashbang line in the attribution file; a byte-order mark that cost the private list its first pattern; warnings and uncaught errors that printed the script's path; the built-in patterns not reading a link's target text. Two are hardening beyond the criteria (decision 0018) and are entered as open items OI-155 and OI-156.
+- Verification by the lead: a bounded verification (Anthropic Claude Fable 5.2) replayed the adversary's fourteen saved trees (every one refused, nothing private printed) and removed each new guard once (every fix undone as a whole fails its own test; one single line is an equivalent change and has no deciding test, as recorded; the other got its test). The lead read the production change line by line and ran the changed check on this tree with the owner's real private list from its own shell: exit 0, no failure line.
+- A defect of the fix itself, found by the lead's ledger precheck and corrected in a second fix commit: the test of a link read as its text wrote an absolute link target into the temporary folder, so it passed with that folder in /tmp and failed with it under a home folder (the built-in patterns now read link targets). The link is written with a relative target; the whole file passes in both environments.
+- Evidence: the commands below at the fix commit; the committed configuration still holds no entry.
+
+#### Evidence for the work commit `0e1c5fef6d9572cfd43f6e140b89977180755248`
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   uv run --locked python -m pytest scripts/tests/test_check_docs_exceptions.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "111 passed, 65 subtests passed in 15.15s"
+Seed:      none
+Notes:     The tests of the place-scoped exception with the cases of the review and of the break pass: every finding and every accepted break has a test that failed before its fix.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 411 text files, 64 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the repository itself, with no private list.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   bash -c "grep -c '^\[\[exception\]\]' scripts/check_docs_place_exceptions.toml | cat"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (the committed configuration holds no entry)
+Seed:      none
+Notes:     The committed configuration still holds no entry.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   bash -c "grep -c 'type: ignore\|noqa' scripts/check_docs.py scripts/tests/test_check_docs_exceptions.py | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "scripts/check_docs.py:0 scripts/tests/test_check_docs_exceptions.py:0" (no suppression comment in either file)
+Seed:      none
+Notes:     Finding 4: no type or lint suppression comment is left in the check or its tests.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   bash -c "set -o pipefail; uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' 2>&1 >/dev/null | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 691 tests in 195.900s  OK" (the report of the script tests alone (the tests' own output is not shown))
+Seed:      none
+Notes:     All script tests, the changed ones among them.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   ./eii test --seed 2026111439
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    2109 passed, 0 failed, 0 skipped
+Seed:      2026111439
+Notes:     The whole test command on the build machine with a fresh seed, at the fix commit.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "222 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 196 source files"
+Seed:      none
+Notes:     Type check, with the two suppressions gone.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 61 packages in 1ms" (exit code decides)
+Seed:      none
+Notes:     The lock file is current.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','8975854d20d7de412b9d97cb1db9ce97a5f52ee6...0e1c5fef6d9572cfd43f6e140b89977180755248'],check=True,capture_output=True,text=True).stdout.splitlines()); w='M:TASKS.md M:docs/10_FRONTEND.md M:docs/12_TESTING_AND_QUALITY.md M:scripts/check_docs.py M:scripts/tests/test_check_docs_exceptions.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "5 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The two fix commits touch the check, its tests and the three texts of the record point, and nothing else.
+```
+
+```text
+### S1-T14 — Place-scoped exception for one name of the private list in the documentation check
+Commit:    0e1c5fef6d9572cfd43f6e140b89977180755248
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','8975854d20d7de412b9d97cb1db9ce97a5f52ee6..0e1c5fef6d9572cfd43f6e140b89977180755248'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two fix commits between the reviewed base and the work commit have Conventional Commit subjects.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

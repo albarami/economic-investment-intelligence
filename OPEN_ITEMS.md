@@ -1298,6 +1298,26 @@
 - OPTIONS: **Default until decided:** the stricter text stands (TST-32 as written). Option A: keep TST-32 and state in DAT-60 and SYN-57 that under set B the simulator omits rows below 30. Option B: set the conformance minimum to the feed rule of 20 and leave 30 to the release, tested by TST-203.
 - NEEDED BY: before parameter set B is ever evaluated on a feed (slice S5); not a blocker of slices S2 to S4.
 
+## OI-155 — Forms that render as a listed name without being its text
+
+- ID: OI-155
+- TYPE: PROPOSED (hardening: document 17)
+- NEEDED: A decision whether the documentation check should also refuse forms that a reader sees as a listed name but that are not its text: tags inside the name, a link on half of it, further invisible characters, further escape forms.
+- WHY: The break pass of task S1-T14 showed four such forms passing everywhere. The private list's plain patterns do not catch them either, with or without the place-scoped exception, so the exception weakens nothing here; refusing them is a defence against deliberate evasion beyond the task's criteria ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md)).
+- DONE SO FAR: Recorded with the four demonstrated forms in the task's evidence. Nothing built.
+- OPTIONS: **Recommendation:** move to [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) with the slice's follow-up task; build only if the repository ever takes contributions from outside the run.
+- NEEDED BY: the follow-up task of slice S1 (S1-T10), which places it.
+
+## OI-156 — An unreadable folder and a failing file listing narrow the documentation check silently
+
+- ID: OI-156
+- TYPE: PROPOSED (hardening: document 17)
+- NEEDED: A decision whether the documentation check should fail when a folder cannot be read or when git cannot list the files, instead of scanning less.
+- WHY: The break pass of task S1-T14 showed that a folder without read permission is skipped without a line, and that a failing git listing falls back, without notice, to the walk that leaves out build folders. Both are older than that task and concern the whole check, not its exception; neither occurs on the hosted checks.
+- DONE SO FAR: Recorded with both demonstrations in the task's evidence. Nothing built.
+- OPTIONS: **Recommendation:** move to [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) with the slice's follow-up task.
+- NEEDED BY: the follow-up task of slice S1 (S1-T10), which places it.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -1585,6 +1605,36 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: `requestDecision` of `web/spikes/glyphs/guards.mjs` and `foreignRequest` of `web/spikes/performance/tests/performance.spec.ts` judge an address that begins with `http://` or `https://` by its origin and treat `data:` and `blob:` as local; an address with any other scheme is counted as same-origin. The content security policy of both spike servers stops such a request, and the browser tool does not report a WebSocket through the request event that the tests record, so no test sees one.
 - NEEDED: both judges count a scheme outside `http`, `https`, `data` and `blob` as foreign, with one planted case each; or one line saying why not.
 - CLOSED BY: S1-T10
+
+### PO-S1-09 — Files of the listed set that no pattern reads
+
+- ID: PO-S1-09
+- TYPE: OPEN
+- RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
+- CONCERNS: TST-140; OI-93
+- EVIDENCE: 114 of the 477 files git lists at commit a9db6c8 are never read by any pattern, built-in or private, because their suffix is not on the text list of `scripts/check_docs.py` (75 `.mjs`, 4 `.mts`, `.pyi`, `.env.example`, `uv.lock`, `.nvmrc`, `.python-version`, `.prettierignore`, and binary files); OI-93 does not name `.mjs`. Check 8 of TST-263 reads them only for a listed name.
+- NEEDED: the text list covers every UTF-8 file git lists, or one line saying why not.
+- CLOSED BY: a follow-up task of slice S1
+
+### PO-S1-10 — An unreadable private patterns file is ignored without a message
+
+- ID: PO-S1-10
+- TYPE: OPEN
+- RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
+- CONCERNS: TST-140; REV-25; OI-93
+- EVIDENCE: when `EII_FORBIDDEN_PATTERNS_FILE` is set but names no readable file, `scripts/check_docs.py` ignores it without a message, which silently turns off every private name, including the refusal that TST-263 relies on outside its places.
+- NEEDED: a set but unreadable file fails the check with one line that does not echo the path, with a planted case; or one line saying why not.
+- CLOSED BY: a follow-up task of slice S1
+
+### PO-S1-11 — Scans of the built bundle and the exports need the place rule
+
+- ID: PO-S1-11
+- TYPE: OPEN
+- RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
+- CONCERNS: TST-142; TST-263
+- EVIDENCE: the built web bundle and the exports of TST-142 and decision 0012 will carry the map's credit, so any scan of them with the private list refuses the name unless it applies the same place rule.
+- NEEDED: the task that scans the bundle or the exports states how the credit is judged there, or one line saying why not.
+- CLOSED BY: the task that adds the imagery source
 
 ## Sources
 
