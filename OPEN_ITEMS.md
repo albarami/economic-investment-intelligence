@@ -1456,6 +1456,16 @@
 - OPTIONS: **Recommendation:** task S2-T11, which builds the Public split tables, sets each row's `public_splits` to the dimensions of its table and adds a test that compares the registry with the table contracts.
 - NEEDED BY: task S2-T11.
 
+## OI-164 — The registry loader does not yet follow decision 0026
+
+- ID: OI-164
+- TYPE: OPEN
+- NEEDED: The registry loader, the terms handling of the fetch and the registry rows follow [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): `owner_decision` is the basis of every source with no open licence covering the use, with no source admitted one by one and no separate decision record; the basis `none_stated` is gone; and terms read at a fetch never switch off a source that a visitor can read, or limit its release or display.
+- WHY: Decision 0026 merged (pull request 44) after task S2-T01 was built and approved. It rewrote two acceptance criteria of that task and named no task for the change of code. At the merge of S2-T01 the loader (`custodian/src/eii_custodian/publicdata/fetch/registry.py`) still admits an `owner_decision` source only when it is listed in `OWNER_DECISION_SOURCES` and names a record of `DECISION_RECORDS`, and keeps the basis `none_stated`, which 19 rows of `custodian/publicdata/sources.yaml` carry and for which `release_refused` refuses every release slot; and the fetch (`_switch_off_on_terms` in `custodian/src/eii_custodian/publicdata/fetch/build.py`) switches a source off when the terms read at a fetch forbid the use.
+- DONE SO FAR: The two criteria are moved, unticked and word for word, from the entry of S2-T01 to the new task S2-T21 in TASKS.md, and S2-T21 is added to what the pack assembly S2-T08 depends on. No code is changed by the move. The 10 sources admitted by name keep working, so no task built ahead is blocked.
+- OPTIONS: **Default:** task S2-T21 changes the loader, the fetch, the rows and their tests before the slice S2 gate; until then the loader stands as built and reviewed.
+- NEEDED BY: the slice S2 gate (task S2-T21, before the pack assembly S2-T08).
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
