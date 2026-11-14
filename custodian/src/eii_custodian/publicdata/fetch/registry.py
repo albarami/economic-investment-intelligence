@@ -150,7 +150,7 @@ def load_registry(path: Path | None = None) -> tuple[Entry, ...]:
     document = read_yaml(path if path is not None else _REGISTRY)
     if not isinstance(document, dict):
         raise RegistryError("registry root is not a map")
-    extra = set(document) - {"sources"}
+    extra = set(document) - {"sources", "forecast_series"}
     if extra:
         raise RegistryError(
             "unknown field " + ",".join(sorted(str(item) for item in extra))
@@ -162,6 +162,10 @@ def load_registry(path: Path | None = None) -> tuple[Entry, ...]:
     keys = [entry.key for entry in entries]
     if len(keys) != len(set(keys)):
         raise RegistryError("duplicate key")
+    if "forecast_series" in document:
+        from .forecast_series import load_forecast_series
+
+        load_forecast_series(document["forecast_series"], entries)
     return entries
 
 

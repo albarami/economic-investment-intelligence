@@ -4209,3 +4209,127 @@ sources:
       USGS 3D Elevation Program Digital Elevation Program.
       Qian Shi, et al. A First High-quality Vector Data of Buildings in East Asian Countries Based on a Comprehensive Large-scale Mapping Framework. Zenodo, 22 July 2023, doi:10.5281/zenodo.8174931. Available under CC BY 4.0.
       Work derived from BTN 2024 ign.es. Available under CC BY 4.0.
+
+# S2-T17 — PUB-103 / C30 source admission, not backtest eligibility.
+forecast_series:
+  - key: licence_issues
+    state: held
+    source_keys: [lic_issued]
+    table: pub_licence_issued
+    period: "2013-04/2025-05"
+    frequency: month
+    past_count: 146
+    subject: ""
+    reason: ""
+    note: "Licence issues by activity and municipality, only covered codes; earlier, broken months exist from 2009-09. Undated rows never enter; continuity at each activity and municipality remains for C30."
+    evidence: "Lead source reading 2026-11-14 Q1; document 04 PUB-103 and section 2.2; document 07 C30."
+  - key: licence_cancellations
+    state: held
+    source_keys: [lic_cancelled]
+    table: pub_licence_cancelled
+    period: "2016-03/2025-05"
+    frequency: month
+    past_count: 111
+    subject: ""
+    reason: ""
+    note: "Licence cancellations by activity and municipality; earlier, broken months exist from 2015-12. Exclude 1,221 undated rows; retain bulk-month flags. Continuity at each activity and municipality remains for C30."
+    evidence: "Lead source reading 2026-11-14 Q2; document 04 PUB-68 and PUB-103; document 07 C30."
+  - key: property_prices
+    state: held
+    source_keys: [prop_sales]
+    table: pub_property_sale
+    period: "2020/2025"
+    frequency: year
+    past_count: 6
+    subject: district
+    reason: ""
+    note: "Six years with data; five complete years (2021 to 2025); 2020 holds July to December only. C30 decides which history counts at each district; no completeness rule added here. Annual medians per square metre with deal counts; never joined to quarterly per-square-foot prices. District is the publisher label with municipality, Public only, never apportioned or an area subject (lead assumption)."
+    evidence: "Lead source reading 2026-11-14 Q5 and ruling L5; document 04 PUB-103; document 07 C14 and C30."
+  - key: hotel_demand_and_room_rates
+    state: held
+    source_keys: [hotel_segment]
+    table: pub_hotel_monthly
+    period: "2014-01/2025-03"
+    frequency: month
+    past_count: 135
+    subject: ""
+    reason: ""
+    note: "One entry because demand and average_daily_rate share every month of every segment; separate demand and adr indicators each retain their own published unit in pub_hotel_monthly (document 03 section 7.2). No measure is derived from the other; units are not inferred here."
+    evidence: "Lead source reading 2026-11-14 Q3; document 04 PUB-103 and section 2.2."
+  - key: consumer_prices
+    state: open
+    source_keys: [cpi_group]
+    table: pub_price_index
+    period: ""
+    frequency: ""
+    past_count: null
+    subject: ""
+    reason: publisher_or_licence_unconfirmed
+    note: "No cache file; publisher unconfirmed, a technical reason. Registry skip remains unchanged."
+    evidence: "Lead source reading 2026-11-14 Q4; document 04 PUB-103."
+  - key: producer_prices
+    state: open
+    source_keys: []
+    table: ""
+    period: ""
+    frequency: ""
+    past_count: null
+    subject: ""
+    reason: no_source_table
+    note: "price_ext is a candidate for S2-T19, not an adopted source."
+    evidence: "Document 04 PUB-103; document 07 C30."
+  - key: imports_by_product
+    state: open
+    source_keys: [cus_imp_2019, cus_imp_2025]
+    table: pub_customs_import
+    period: "2019/2024; 2025-01/2026-02"
+    frequency: month
+    past_count: null
+    subject: ""
+    reason: past_count_not_stated
+    note: "The combined count is not stated; the later file alone holds 14 months. PUB-44 roll-up applies; no inferred combined month count."
+    evidence: "Document 04 section 2.2, PUB-44 and PUB-103; lead ruling L8."
+  - key: announced_investment
+    state: held
+    source_keys: [fdi_projects]
+    table: fdi_projects
+    period: "2017/2025"
+    frequency: year
+    past_count: 9
+    subject: ""
+    reason: ""
+    note: "Complete announcement years only; the running year and undated projects never enter. Sector uses the publisher's top grain (lead assumption). Metadata only; no project record or value committed."
+    evidence: "Lead source reading 2026-11-14 Q6 and ruling L6; document 04 PUB-103; document 07 C30."
+  - key: construction_pipeline
+    state: held
+    source_keys: [permits_muni/total-building-completion-certificates-issued-by-municipality-and-type-of-building-type-of]
+    table: pub_building_permits
+    period: "2021/2023"
+    frequency: year
+    past_count: 3
+    subject: ""
+    reason: ""
+    note: "Annual completion certificates by municipality only, never permit series. C23 and C30 state that three annual points are too short; source admission does not override the backtest."
+    evidence: "Lead source reading 2026-11-14 Q7; document 07 C23 and C30; document 04 PUB-103."
+  - key: expected_households_and_workers
+    state: open
+    source_keys: []
+    table: ""
+    period: ""
+    frequency: ""
+    past_count: null
+    subject: ""
+    reason: no_conversion_parameter_source_table
+    note: "No registered table for conversion parameters; census_hh_type_2020 has no release table."
+    evidence: "Document 04 PUB-103."
+  - key: property_prices_quarterly
+    state: open
+    source_keys: [prop_sales, prop_resi_units/weekly-residential-units-sales-bulletin]
+    table: pub_property_quarter
+    period: ""
+    frequency: ""
+    past_count: null
+    subject: district
+    reason: awaiting_s2_t19_period_frequency_past_count
+    note: "Card C41: median per square foot by district and use, with each quarter's deal count; separate from annual medians per square metre. S2-T19 fetches sources and sets period, frequency and count; Public district label with municipality only, never apportioned."
+    evidence: "TASKS.md S2-T17 amendment; document 04 PUB-103 and PUB-107; document 03 DAT-167."
