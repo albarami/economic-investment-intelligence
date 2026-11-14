@@ -19938,6 +19938,153 @@ Seed:      none
 Notes:     The one work commit of part B has a Conventional Commit subject.
 ```
 
+#### S1-T14: independent review, round 2 (the confirmation): APPROVED
+
+Reviewed commit `cacfb75359207f1e62db957736bce251cc2ba54f`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/42 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43572376111; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43572376113; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43572376095 ). The reviewer is OpenAI GPT-6 through Codex; the change and its fixes were built by the lead's own Claude agents (Anthropic), so the reviewer comes from another maker. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T14 (pull request 42), round 2
+COMMIT: cacfb75359207f1e62db957736bce251cc2ba54f
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate; code-review unavailable; security-review unavailable
+EARLIER FINDINGS:
+  F1 FIXED fenced_lines fails closed on dedentation inside an indented fence. The new single-heading fixture tests the original bypass with and without the private list; neighbouring fence, HTML and whitespace cases also have regression tests.
+  F2 FIXED main and iter_text_files exclude symbolic links from content reads; read_regular refuses links. SymbolicLinks tests spy on file opens, verify the outside referent is never opened, and retain link-name and target scanning.
+  F3 FIXED Pattern compilation and file-read errors produce fixed messages; warnings fail closed; run_guarded sanitizes unexpected exceptions. ConfidentialErrors tests assert complete output streams, failure codes and absence of sensitive text.
+  F4 FIXED Base.all_places has explicit typed keyword parameters and no suppression comments. EVIDENCE.md records mypy exiting 0 on the head.
+CHECKS:
+  REV-10 PASS The acceptance criteria map to passing/refusal fixtures, configuration validation, identifier scans and confidential-error tests. EVIDENCE.md records 111 exception tests passing; the committed configuration contains no entry.
+  REV-11 PASS EVIDENCE.md records the lead’s head runs of ./eii test --seed 2026111442 and python3 scripts/check_docs.py, both exit 0; 2109 tests passed, none failed or skipped. Recorded hosted tests: https://github.com/albarami/economic-investment-intelligence/actions/runs/43572376111/job/132379323332 and documentation check: https://github.com/albarami/economic-investment-intelligence/actions/runs/43572376113/job/132379323337 . This read-only review ran no tests or network checks.
+  REV-12 PASS DIFF.patch confines the task changes to the checker, configuration, tests, affected specification and ledger files. EVIDENCE.md distinguishes the base update from task changes; no task data file changed.
+  REV-13 PASS The checker implements the scoped exception and refusal paths; the empty configuration is required by decision 0024, not an implementation stub.
+  REV-14 PASS No private name, credential or real custodian data appears in the reviewed changes. EVIDENCE.md records successful head secret scanning: https://github.com/albarami/economic-investment-intelligence/actions/runs/43572376111/job/132379323316
+  REV-15 PASS The patch removes both type suppressions, strengthens stream assertions and adds planted refusals without reducing existing assertions, thresholds or test cases.
+  REV-16 PASS The fixes implement S1-T14 and TST-263 within decision 0024. Symlink handling now respects the filesystem boundary identified in F2.
+  REV-17 PASS TASKS.md, documents 10 and 12, PROGRESS.md and OPEN_ITEMS.md reflect the fixes and recorded limits. The earlier conflicting attribution forms are reconciled; the head documentation check is recorded as exit 0.
+  REV-18 PASS The changed read and error paths fail closed without exposing exception details; symbolic-link referents are excluded from content reads. OI-155 and OI-156 retain the separately ruled hardening work.
+  REV-19 PASS Decision 0024 authorizes the two-place exception and empty initial configuration; this round does not reopen that decision.
+  REV-20 N/A The task introduces no displayed economic figure, fact object or calculation lineage.
+  REV-21 N/A The task introduces no application screen, claim template or rendered numeral.
+  REV-22 PASS The task patch changes no privacy parameter, treatment, release mechanism or attack tolerance.
+  REV-23 PASS The task patch changes no product or custodian import or package boundary.
+  REV-24 N/A No bilingual view, translation or displayed numerical value is introduced.
+  REV-25 PASS The earlier rendering-context and error-disclosure defects are fixed. Listed-name refusals remain active outside the two places, built-in patterns also scan link targets, and the configuration contains no real entry.
+  REV-26 PASS The changed tooling and documentation introduce no prohibited product claim.
+  REV-27 PASS EVIDENCE.md records cmp AGENTS.md CLAUDE.md exiting 0 on the reviewed head; neither file is changed by this task.
+  REV-28 PASS The fixtures use invented names and generated scanner tokens; the task introduces no real registration or custodian identifier.
+  REV-29 N/A No attribute, estimate or figure is attached to a real named place or business.
+  REV-38 PASS The task introduces no serving-plane gateway import, setting read or runtime call.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S1-T14: merge record
+
+- The branch was updated with main when its turn to merge came (the owner's rule of 2026-11-12): merge commit `211e2f49c92a1726ca0222ad1347527d85bba68c`, the head that was merged. Where both sides had appended at the same place the lead's scripts keep every line of both sides, main's first, and refuse any overlap. The lead's proof that the update changed nothing by itself (for every path: the branch's blob where main did not change it, main's blob where the branch did not, git's own three-way merge, or the scripted resolution):
+
+```text
+base update 211e2f49c92a1726ca0222ad1347527d85bba68c: branch side cacfb75359207f1e62db957736bce251cc2ba54f, main side 31d0012e9f9d059bdf334b09615159f3ceadaa99, merge base e45dbb34397a462b93506d85714700c88917b92d
+  branch only: 8
+  main only: 29
+  neither: 495
+  both, git's own merge: (2, ['OPEN_ITEMS.md', 'TASKS.md'])
+  both, resolved by the lead's script: (1, ['PROGRESS.md'])
+  FAIL: (0, [])
+```
+
+- CI on the updated head: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43575377419; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43575377331; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43575377343 .
+
+- The lead's checks on the merged head `211e2f49c92a1726ca0222ad1347527d85bba68c` before the merge (ruling L-29): "TREE-IS-WORK ok: 535 paths at 211e2f49c92a1726ca0222ad1347527d85bba68c", exit code 0; `./eii test --seed 2026111446`: exit code 0, "total: 2215 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/42 was squash-merged on 2026-11-14 at that head; merge commit `8c4175dc48cee032125cd309754fbfebf35d724e` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43580684861; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43580684841; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43580684908 .
+
+#### S1-T16: independent review, round 1: APPROVED
+
+Reviewed commit `06afc89e1a30c73f22589c13ecb49ca1a78eded8`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/45 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43585314138; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43585314137; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43585314139 ). The reviewer is xAI Grok 4.7 through the Cursor command-line tool; the change was built by Moonshot AI Kimi K3.1 Pro through Abacus and finished by OpenAI GPT-6 Astra through Codex, and the lead (Anthropic) wrote the decision record, so the reviewer comes from another maker than every writer. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T16 (pull request 45)
+COMMIT: 06afc89e1a30c73f22589c13ecb49ca1a78eded8
+REVIEWER: SpaceXAI Grok 4.7
+SKILLS LOADED: strict-reviewer; code-review not installed in this tool
+CHECKS:
+  REV-10 PASS `suite_timeout` (`scripts/run_tests.py` lines 71-76) returns 3000 only for `web-checks` when `ci_environment.is_hosted_runner` is true, and `suite.timeout` otherwise. The suite table is unchanged: `web-checks` 1800 (line 60), `python-guards` 3600, the three Python package suites 600, `web-unit` 600. One definition, `scripts/ci_environment.py` lines 7-12, requires exact `GITHUB_ACTIONS=true` and `RUNNER_ENVIRONMENT=github-hosted`; `ci_sandbox.install_profile` (line 271) uses that same predicate, and its existing refusal test still rejects an empty environment, one variable, `self-hosted`, `True` and `GitHub-hosted`. A value with different case or extra white space fails the exact comparison, so the 3000 s limit stays on that definition. `test_web_checks_limit_on_a_hosted_runner` (lines 96-130) plants neither variable, each variable alone, `false`/`github-hosted` and `true`/`self-hosted` at 1800, both hosted values at 3000, and every other suite equal to its own base limit on every row. `run_suite` (lines 124-147) passes that integer to launch and prints it. Decision 0027 quotes the owner's note and OI-158 records the return to 1800 s. Lead usage and failure runs at `a8c6385` exited 0.
+  REV-11 PASS On `06afc89e1a30c73f22589c13ecb49ca1a78eded8` the lead's `./eii test --seed 2026111449` exited 0 (2217 passed, 0 failed, 0 skipped) and `python3 scripts/check_docs.py` exited 0. All six hosted checks on that commit succeeded, including tests at 2217 passed, 0 failed, 0 skipped in 1360 s: workflow ci https://github.com/albarami/economic-investment-intelligence/actions/runs/43585314138 ; workflow docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43585314137 ; workflow sandbox https://github.com/albarami/economic-investment-intelligence/actions/runs/43585314139 . The tests job on ledger `08ba45df68b39a022aae96876443a3c0f73e0fa8` failed in the pin-ruling guard and is not this commit: https://github.com/albarami/economic-investment-intelligence/actions/runs/43583101161 . The new tests add the planted rows and the hosted timeout line; the builder's five breaks each made those tests fail and the restored run exited 0. The head run had 0 skipped.
+  REV-12 PASS The work commit changes the eight paths the task names: `scripts/run_tests.py`, `scripts/ci_environment.py`, `scripts/ci_sandbox.py`, the two runner test files, decision 0027, `TASKS.md` and `docs/README.md`. The later commits add `OPEN_ITEMS.md`, `PROGRESS.md` and the S1-T16 status line. The lead's name-only diff of `.github`, `web`, `custodian`, `core` and `product` against `8c4175dc48cee032125cd309754fbfebf35d724e` was 0. No `data/` path is in the diff.
+  REV-13 PASS `is_hosted_runner` and `suite_timeout` return the result of the comparison. The diff adds no TODO, empty body, fixed stand-in or hand-written release figure. The 1,030 s to 1,800 s account is recorded as the lead's reading of the hosted logs.
+  REV-15 PASS The one widened limit is `web-checks` on the shared hosted definition, from 1800 s to 3000 s, and decision 0027 is the TST-03 record for that limit. No other suite limit, assertion, skip, retry, `continue-on-error`, baseline or workflow file changes. Both test diffs only add cases.
+  REV-16 PASS The work matches S1-T16 and rulings 1 to 6: the hosted rule lives in one module, the comment states the 2026-11-14 stopgap and the return when S1-T15 holds, and the four non-hosted plants plus the hosted plant are present. No sentence in `README.md` or the pack states the web-checks limit; the 1,800 in document 07 is a wage example. Seat, preflight, database and freeze behaviour is untouched.
+  REV-17 PASS Decision 0027, its index row, the task entry, OI-158, OI-159 and the PROGRESS entries are in the pull request. On the head, `python3 scripts/check_docs.py` exited 0 (423 text files, 66 Markdown files).
+  REV-18 PASS The new read is the two runner variables the sandbox proof already uses. The diff writes no secret and adds no role, query, stored traffic response or cross-organisation read.
+  REV-19 PASS Decision 0027 is a new owner record, amends no settled decision, and builds none of the dropped scope.
+  REV-20 N/A The commit adds no fact, forecast, estimate or displayed product number; 3000 and 1800 are suite time limits.
+  REV-21 N/A The commit adds no screen, template or rendered numeral.
+  REV-22 PASS No privacy, treatment, window or attack-suite file is in the diff, and the head test run exited 0 with 0 failures.
+  REV-23 PASS `product`, `core` and `custodian` are unchanged against the base. The new import is `ci_environment` inside `scripts/`.
+  REV-24 N/A The commit adds no English or Arabic interface string.
+  REV-25 PASS `python3 scripts/check_docs.py` exited 0 on the head. The diff has no private path, e-mail, custodian record or named-product comparison.
+  REV-26 PASS The decision and task text state a test time limit. They make none of the prohibited claims.
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` exited 0 on the head, and neither file is in the diff.
+  REV-28 N/A The commit adds no synthetic identifier and no register stand-in.
+  REV-29 N/A The commit attaches no attribute to a place, business or register company.
+  REV-38 PASS No file under `gateway/`, `core/`, `custodian/`, `product/` or `web/` changes, and nothing new reads `EII_DECISION_PROVIDER`.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S1-T16: merge record
+
+- The lead's checks on the merged head `06afc89e1a30c73f22589c13ecb49ca1a78eded8` before the merge (ruling L-29): "TREE-IS-WORK ok: 537 paths at 06afc89e1a30c73f22589c13ecb49ca1a78eded8", exit code 0; `./eii test --seed 2026111449`: exit code 0, "total: 2217 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/45 was squash-merged on 2026-11-14 at that head; merge commit `29c660f5c6d12423d4f80bd3a06d1862cb1b6257` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43588262585; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43588262506; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43588262426 .
+
+#### D0026: independent review, round 3 (the second confirmation): APPROVED
+
+Reviewed commit `496ae3d3235fce64783461a47d66318017efa263`, a commit of pull request https://github.com/albarami/economic-investment-intelligence/pull/44 that was still local when it was reviewed (the owner's decision of 2026-11-14: the review runs while the ledger and the hosted checks follow); it has no hosted run of its own, and the hosted checks ran on the pushed head named below. The reviewer is xAI Grok 4.7 through the Cursor command-line tool; the record and its sweep were written by the lead and its Claude agents (Anthropic) with editors of OpenAI, and the two fixes by OpenAI GPT-6 Astra through Codex and by the lead, so the reviewer comes from another maker than every writer. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: D0026 (pull request 44), second confirmation
+COMMIT: 496ae3d3235fce64783461a47d66318017efa263
+REVIEWER: SpaceXAI, Grok 4.7
+ROUND-2 FINDINGS: F1 BE-124: CLOSED. The revenue-range sentence is the replacement word for word, the old sourcing clause is gone, and the row still returns the scenarios, keeps the OI-03 hold and the closed input list.
+F2 TST-231: CLOSED. The revenue-range sentence is the replacement word for word, the old sourcing clause is gone, and the row still requires visible assumptions, the closed input list, the forecast ban, the OI-03 hold and the withdrawn benchmark.
+F3 the goal of S7-T15: CLOSED. The goal is the replacement word for word, and the acceptance criteria still give the published survey shares to card C4's break-even point only.
+FINDINGS: none
+PROPOSED OPEN ITEMS: none
+```
+
+#### D0026: merge record
+
+- After the reviewed commit and before that update the branch gained one commit, the round-two ledger `cd506c62c8cbc65accd510d17e2a74789134a3ae`: PROGRESS.md alone, 96 lines added (`git diff --stat 496ae3d3235fce64783461a47d66318017efa263 cd506c62c8cbc65accd510d17e2a74789134a3ae`). The verdict stands on a head that moved only for records and a base update (the owner's rule of 2026-11-13).
+- The branch was updated with main when its turn to merge came (the owner's rule of 2026-11-12): merge commit `b0b288d54a94494c47cc8747ed62c8c0ba340e24`, the head that was merged. Where both sides had appended at the same place the lead's scripts keep every line of both sides, main's first, and refuse any overlap. The lead's proof that the update changed nothing by itself (for every path: the branch's blob where main did not change it, main's blob where the branch did not, git's own three-way merge, or the scripted resolution):
+
+```text
+base update b0b288d54a94494c47cc8747ed62c8c0ba340e24: branch side cd506c62c8cbc65accd510d17e2a74789134a3ae, main side 29c660f5c6d12423d4f80bd3a06d1862cb1b6257, merge base e45dbb34397a462b93506d85714700c88917b92d
+  branch only: 16
+  main only: 39
+  neither: 476
+  both, git's own merge: (2, ['OPEN_ITEMS.md', 'TASKS.md'])
+  both, resolved by the lead's script: (5, ['PROGRESS.md', 'docs/10_FRONTEND.md', 'docs/12_TESTING_AND_QUALITY.md', 'docs/15_REVIEWER_CHECKLIST.md', 'docs/README.md'])
+  FAIL: (0, [])
+```
+
+- CI on the updated head: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43591338515; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43591338518; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43591338484 .
+
+- The lead's checks on the merged head `b0b288d54a94494c47cc8747ed62c8c0ba340e24` before the merge (ruling L-29): "TREE-IS-WORK ok: 538 paths at b0b288d54a94494c47cc8747ed62c8c0ba340e24", exit code 0; `./eii test --seed 2026111450`: exit code 0, "total: 2217 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/44 was squash-merged on 2026-11-14 at that head; merge commit `ef434efacd01f8097c3db8e23c5dda9a062ef1e7` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43594772958; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43594772957; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43594772956 .
+
+### S1-T15 — The browser run of the performance spike: the base update, the ruling on the first criterion and the count of hosted runs (pull request https://github.com/albarami/economic-investment-intelligence/pull/43 )
+
+- Base update at the branch's turn to merge: main (pull requests 42, 39, 45 and 44) was merged into the branch as `934c10bda4028bbdff0f6fd2732af22f811c7a25`. Two files had changes on both sides: PROGRESS.md (both sides appended at the same place; the lead's script keeps every line of both, main's first) and TASKS.md (this branch's entry of S1-T15 and main's entry of S1-T16 added at the same place; both kept). The lead's proof that the update changed nothing by itself: 16 paths changed by the branch only, 60 by main only, 472 by neither, 2 resolved by the lead's script, 0 failing.
+- The first acceptance criterion is NOT met as written and is not claimed: the spike's browser run on four processors of the build machine took 1,294 s in the lead's one valid timing (1,993 s before the task; 1,587 s in a run under load, an upper bound), against "under 1,200 s, measured twice". Its box stays unticked and its text is unchanged.
+- Ruling of 2026-11-14 on the advisor's note of 16:32 (the lead's ruling L-262): no further pass is spent on that criterion before the slice S1 gate. The task's goal is that the hosted tests job finishes inside its limit; the rest of the speed-up, down to 1,200 s with the second valid timing run, is entered under OI-158 as work after the gate. No test, assertion, bound or limit changes. The task is not marked done by this pull request: after the merge its status line reads merged, with the first criterion open under OI-158.
+- The three hosted runs are counted, not waited for before the merge: the run of this pull request's head, main's own run after the merge, and the next pull request's run, with the time of the suite `web-checks` in each recorded in the next ledger. The change only shortens the browser run, so the main branch cannot be slower after it than before. If one of the three ends on the time limit, OI-160 stays open and no pull request is merged while the main branch's run is red.
+- Random failure recorded (AGENTS rule 39): OI-160, entered with this commit. In the builder's first measurement of part B, taken under load, the full street load timed out once on readiness at its bound of 170 s and passed in the next run. In the lead's two timing runs the same test passed in 3.5 minutes (under load) and 2.3 minutes (reserved processors).
+- Status lines set by this commit, each with the closing record above: S1-T14 done (pull request 42), S1-T16 done (pull request 45). The status line of S1-T08 stays as open item OI-159 says.
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

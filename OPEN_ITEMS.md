@@ -1357,8 +1357,8 @@
 - TYPE: OPEN
 - NEEDED: Remove the hosted value of 3,000 s from `scripts/run_tests.py`, so that the limit of the suite `web-checks` is 1,800 s everywhere again, once task S1-T15 has made the suite fast enough on slow hosted runners.
 - WHY: [Decision 0027](docs/decisions/0027-hosted-web-checks-time-limit.md) allows the hosted value only as a stopgap. A wider limit finds a hanging run later.
-- DONE SO FAR: Task S1-T16 raises the limit on GitHub's hosted runner only, by the owner's decision of 2026-11-14. Task S1-T15 is in review: its first part gave no gain on hosted runners, and its second part is being built.
-- OPTIONS: **Default:** the pull request that completes S1-T15, or the one after it, removes the hosted value when three hosted runs in a row have finished the suite inside 1,800 s. Otherwise the owner decides to keep a hosted value.
+- DONE SO FAR: Task S1-T16 raises the limit on GitHub's hosted runner only, by the owner's decision of 2026-11-14. Task S1-T15 is in review with both parts (pull request 43): on four processors of the build machine the spike's browser run fell from 1,993 s to 1,294 s (one valid timing). Its first criterion (the suite under 1,200 s on four processors, measured twice) is not met and stays unticked; by the ruling of 2026-11-14 recorded in `PROGRESS.md` under S1-T15, no further pass is made before the slice S1 gate, and what is left of that criterion is part of this item: a further shortening of the browser run that removes or weakens no test, and the second valid timing run.
+- OPTIONS: **Default:** the pull request that completes S1-T15, or the one after it, removes the hosted value when three hosted runs in a row have finished the suite inside 1,800 s. The three runs are counted from the head of pull request 43: that head's run, the main branch's run after its merge, and the next pull request's run. Otherwise the owner decides to keep a hosted value.
 - NEEDED BY: the slice S1 gate records the state of this item; the removal follows S1-T15.
 
 ## OI-159 — The pin-ruling guard refuses the record once S1-T08 is marked done
@@ -1370,6 +1370,16 @@
 - DONE SO FAR: The status line of S1-T08 is back at "in review" although pull request 39 is merged, so that the guard passes; the cause is recorded in `PROGRESS.md` under task S1-T16. Nothing of the guard is changed (task S1-T16 changes no test, decision record 0027).
 - OPTIONS: **Default:** the review follow-up of slice S1 (task S1-T10) corrects the guard test-first and sets the status line.
 - NEEDED BY: the slice S1 gate, which reads the status lines of the slice's tasks.
+
+## OI-160 — One time-out of the full street load on readiness, in a run under load
+
+- ID: OI-160
+- TYPE: OPEN
+- NEEDED: Show that the readiness bound of 170 s in the browser test "roads full street load draws every link and carries the Simulated mark" (`web/spikes/performance/tests/performance.spec.ts`) has a real margin on the runners that run it, or find why it was exceeded once.
+- WHY: In the builder's first measurement of part B of task S1-T15, taken while the build machine was loaded by other runs, that test timed out once on readiness at its bound and passed in the next run. A green re-run alone does not close a random failure (AGENTS rule 39).
+- DONE SO FAR: No bound was changed. The test passed in every run of the lead since: the two timing runs of the browser suite on four processors (the test took 3.5 minutes in the run under load and 2.3 minutes on reserved processors; 54 tests passed in each) and the browser run of the ledger of part B (54 passed).
+- OPTIONS: **Default:** the three hosted runs counted for S1-T15 (the head of pull request 43, the main branch after its merge, the next pull request) are the evidence: the item is closed when the test passed in all three, with the time of the suite `web-checks` in each recorded; a time-out in one of them keeps the item open and its cause is found before any bound moves.
+- NEEDED BY: the slice S1 gate records the state of this item.
 
 ## Change control
 
