@@ -21185,6 +21185,786 @@ Seed:      none
 Notes:     Gate statement 12: the rules active on the base branch at the gate: no deletion, no forced push, pull requests only, the six required checks. The identifier of the ruleset is not recorded.
 ```
 
+#### S1-T17: independent review, round 1: APPROVED
+
+Reviewed commit `fe21440a6989f7f63f7493b2f20908988963a470`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/48 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43627551331; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43627551298; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43627551358 ). OpenAI GPT-6 Astra through the Codex command-line tool, a maker that wrote no part of the change. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T17 (pull request 48)
+COMMIT: fe21440a6989f7f63f7493b2f20908988963a470
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer; project-orientation; task-standards; sanad-provenance; muhasabah-gate; code-review unavailable
+CHECKS:
+  REV-10 PASS The patch meets all four S1-T17 criteria: both clauses move unchanged to S6; S2-T10 owns timeout removal and its files; OI-158 remains OPEN with its trigger recorded; OI-160 closes under its unchanged default. EVIDENCE.md section 5 supports the recorded suite times and zero-failure, zero-skip results.
+  REV-11 OPEN P2 Under REV-36, the lead's head-level documentation check exits 0. EVIDENCE.md also records head-level ./eii test --seed 2026111459 exiting 0 with 2250 passed, zero failed and zero skipped. Hosted tests remain pending in the supplied snapshot. No commands were rerun in this read-only review.
+  REV-12 PASS The base-to-head diff changes only OPEN_ITEMS.md, TASKS.md, docs/12_TESTING_AND_QUALITY.md and PROGRESS.md, matching the task scope.
+  REV-13 PASS No delivered code, placeholder implementation or invented product figure appears in the patch.
+  REV-14 PASS Patch inspection finds no secret or real custodian data; the recorded head secret scan passed: https://github.com/albarami/economic-investment-intelligence/actions/runs/43627551331/job/132546722263
+  REV-15 PASS Only the authorised gate clauses move; all remaining gate text, thresholds, tests, assertions and workflows remain unchanged. RULINGS.md section 4 records the owner's approval, quoted substantively unchanged in the task log.
+  REV-16 PASS PLN-28, document 14 section 6 and its S6 gate place the optional view in S6. S2-T10 preserves the separate speed criterion and adds restoration of 1800 seconds everywhere with the S1-T16 planted cases.
+  REV-17 OPEN P1 The affected task, gate table, open items and append-only ledger are updated; document 10 retains an ambiguous S1 spike question about the 3D view.
+  REV-18 PASS The documents-only patch changes no security boundary, data handling, permissions or network behaviour.
+  REV-19 PASS Decision 0019 item 14 remains unchanged; the owner-authorised correction aligns the table with PLN-28. Decision 0027 item 4 remains binding through S2-T10; no present-day 3D test pass is claimed.
+  REV-20 N/A No application fact or calculation changes; operational evidence figures are checked against EVIDENCE.md.
+  REV-21 N/A No screen, template, catalogue or Fact chip changes.
+  REV-22 PASS No privacy configuration, invariant, treatment, audit or attack changes appear in the complete patch.
+  REV-23 N/A No product code, import or package metadata changes.
+  REV-24 N/A No bilingual interface strings or rendered numerical values change.
+  REV-25 PASS The committed patch contains no private path, personal information, secret, real record or prohibited product comparison; the lead records the documentation check with the private patterns list exiting 0.
+  REV-26 PASS The patch makes no prohibited product claim and does not present the future 3D capability as implemented or passing.
+  REV-27 PASS EVIDENCE.md section 2 records cmp AGENTS.md CLAUDE.md exiting 0 on the reviewed head; neither file changes.
+  REV-28 PASS No synthetic identifier, registration number or register row is introduced.
+  REV-29 PASS No attribute or figure is attached to a real named place or business.
+  REV-38 PASS No serving-plane code, gateway import, runtime setting or gateway screen text changes.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17) record — PLN-28 and the corrected gate table place the optional view in S6, but docs/10_FRONTEND.md, “Questions for the spike in slice S1” at line 883, still includes “whether the 3D view holds the frame-rate gate.” Clarify that this measurement belongs to S6-T18/TST-242, preserving the S1 frame-rate configuration as its reference.
+  P2 (REV-11) record — The supplied head evidence reports the hosted tests check as pending, not green: https://github.com/albarami/economic-investment-intelligence/actions/runs/43627551331/job/132546722365 . Record its terminal result against the reviewed head before merge; this verdict does not establish that all hosted checks passed.
+```
+
+#### S1-T17: merge record
+
+- The lead's checks on the merged head `fe21440a6989f7f63f7493b2f20908988963a470` before the merge (ruling L-29): "TREE-IS-WORK ok: 554 paths at fe21440a6989f7f63f7493b2f20908988963a470", exit code 0; `./eii test --seed 2026111459`: exit code 0, "total: 2250 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/48 was squash-merged on 2026-11-14 at that head; merge commit `02355344e771d47db858ba2a22dfd0003d29bda8` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284907; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284828; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284738 .
+- The hosted `tests` job on the reviewed head and on the merge commit each ended with "total: 2250 passed, 0 failed, 0 skipped in 6 suites, 0 with problems" (read from the two job logs by the lead's script).
+- The review's proposed item P2 (a record point, REV-11): the hosted `tests` check was still running when the reviewer read the head evidence. Its terminal result on the reviewed head `fe21440a6989f7f63f7493b2f20908988963a470` was success, after 29 minutes 44 seconds, in the workflow ci run named above; all six required checks were green on that head before the merge.
+- The review's proposed item P1 (a record point, REV-17): one sentence of document 10, section "Open questions and assumptions", still lists the 3D view among the questions for the spike of slice S1, while PLN-28 and the gate table of document 12 place that measurement in slice S6 (S6-T18, under TST-242). The sentence is not changed on the approved head; it is entered as the proposed open item PO-S2-03 by the gate record's commit and is corrected by the review follow-up of slice S2 (REV-41).
+
+#### Slice S1 gate — Technical spike: review round 1: REJECTED (pull request https://github.com/albarami/economic-investment-intelligence/pull/47 )
+
+Reviewed commit `a431ef78b071b7107e0cacd00d318b26046bd32e`, the head of the gate-record pull request at that time; the gate items had been run at `89f3ca770291dde5c8f5eaa262ac4db6e3c66d18`, then the slice's final commit. The six required checks on the reviewed head were still running when the two reviews returned and completed with success afterwards (the `tests` check: https://github.com/albarami/economic-investment-intelligence/actions/runs/43623671324/job/132534685262 ). Two reviewers of two makers with two lenses; both verdicts are copied unchanged (REV-09) and were posted on the pull request.
+
+Designated reviewer: Moonshot AI Kimi K3.1 Pro (model `KIMI_K3_1_PRO` of the Abacus command-line tool, read-only), the controls and the gate's proof. Its text does not use the verdict format of document 15: it has no TASK, COMMIT, REVIEWER and SKILLS LOADED line and no CHECKS list. The job ran in a read-only checkout of exactly the commit named above. A verdict names its commit by the full hash (REV-02), so this text could not have stood as an approval; it is a rejection, and the lead checked each of its five points in the files. The file and line numbers in it refer to the files at the reviewed commit.
+
+```text
+VERDICT: REJECTED
+
+FINDINGS:
+1. **P1 — The optional 3D-view gate item is unproved and cannot be set aside by an assumption.** `docs/12_TESTING_AND_QUALITY.md:457` makes TST-242 part of this slice’s gate, and `docs/15_REVIEWER_CHECKLIST.md:133` requires every item in that row to be reviewed. `PROGRESS.md:20498` admits that no evidence proves it, while `OPEN_ITEMS.md:1424` says it cannot pass at this gate. **Exact fix:** keep this item OPEN and either provide passing TST-242 evidence against the slice’s final commit, or merge an owner-approved, independently reviewed correction moving the clause and its evidence requirement to slice S6, close OI-165, and record that correction in a new gate-record entry before approval.
+
+2. **P1 — Statement 10 is marked True although named gate tests have not passed.** `PROGRESS.md:20462` says “Each item passes its named test. True,” contradicting the open native-trace requirement at `PROGRESS.md:20455` and the unproved 3D clause at `PROGRESS.md:20498`. TST-167 at `docs/12_TESTING_AND_QUALITY.md:521` requires every gate item to pass. **Exact fix:** mark statement 10 OPEN, explicitly identify the outstanding S1-T12 trace and, until corrected, the TST-242 clause, and restrict the passing claims to the tests actually passed. Change it to True only when evidence against the same final commit covers every gate item.
+
+3. **P2 — Statement 14 revives an already-corrected, nonexistent open-item reference.** `PROGRESS.md:20466` cites OI-124 and says the 23-month window still awaits the owner. `PROGRESS.md:20156` records that OI-124 does not exist and that ruling L-101 records the advisor’s acceptance of that window. **Exact fix:** append a correction entry under TST-171 naming the erroneous gate entry, remove the OI-124 reference from the replacement record, and state the window’s recorded acceptance accurately without rewriting earlier evidence rows.
+
+4. **P2 — OI-160’s recorded closure condition is met, but the gate applies a new per-test-time condition.** `OPEN_ITEMS.md:1386` closes the item when the named test passes in three specified hosted runs and the three suite times are recorded. `PROGRESS.md:20495` records four green, zero-skip hosted runs with suite times of 731, 912, 937 and 938 seconds, yet keeps the item open because per-test times are unavailable. **Exact fix:** append a CLOSED update to OI-160 citing the first three qualifying runs and correct the gate record accordingly. If per-test timings are now required, first record a reviewed amendment to OI-160’s closure rule rather than silently substituting one.
+
+5. **P2 — OI-158’s stopgap-removal trigger is met, but removal has no owning acceptance criterion.** `OPEN_ITEMS.md:1365` requires removal of the hosted 3,000-second value after three consecutive hosted suites finish inside 1,800 seconds. `PROGRESS.md:20495` and `PROGRESS.md:20496` record four such runs, while `TASKS.md:427` contains no criterion for restoring 1,800 seconds, as `PROGRESS.md:20496` itself acknowledges. **Exact fix:** record that the three-run trigger is satisfied and add removal of the hosted override, restoration of 1,800 seconds and their tests to S2-T10’s acceptance criteria, or record an owner-approved replacement for OI-158’s default. Update OI-158 to distinguish that removal from the separate under-1,200-second performance work.
+```
+
+Second reviewer: OpenAI GPT-6 Astra (through the Codex command-line tool, read-only), the records.
+
+```text
+VERDICT: APPROVED
+TASK: slice S1 gate (pull request 47)
+COMMIT: a431ef78b071b7107e0cacd00d318b26046bd32e
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer; project-orientation; task-standards; sanad-provenance; muhasabah-gate; code-review unavailable
+CHECKS:
+  REV-10 OPEN P1 P2 P3 P4 TST-165 PASS: TASKS.md marks every retained criterion met except S1-T12, expressly exempted by the brief. Read the task logs and closing records indexed by .overnight/RECORDS.md, the acceptance entries in .overnight/GATE.md, and .overnight/TICKS.md against the tree. Sampled evidence includes glyph rendering/order tests (T01); full-count drawing assertions (T02); server-free routing and whole-cell tests (T03); full/range responses (T04); live parity and explicit rounding (T05); enforcement and mount-policy tests (T06); network isolation and data-policy refusals (T07); full-set and dual-order tests (T08); renderer display and early-refusal tests (T13); scene-size guards and retained-assertion records (T15). Checked all criteria of T09 against rules.toml, gate_record.json, test_rules_config.py and the retired-name tests; T10 against every PO-S1 closure, its task log, follow-up tests and independent review; T11 against assignment tests, hourly-area tests, road browser assertions and pins.toml; T14 against the exception-test classes, empty configuration and the lead’s recorded private-file metadata check; T16 against runner tests, shared hosted-runner definition and its scope evidence. TST-166 PASS: gate evidence names final commit 89f3ca770291dde5c8f5eaa262ac4db6e3c66d18. TST-167 PASS for completed statements; statement 3 OPEN under S1-T12. TST-168 OPEN P1 P2 P4 for record reconciliation; the proposed review items have closure evidence, including PO-S1-08 in the T10 log, and OI-163 preserves the unexplained random failure.
+  REV-11 PASS .overnight/EVIDENCE.md commands 27–29 and the corresponding PROGRESS.md entries record the lead’s two whole-suite runs: exit 0, 2250 passed, zero failed or skipped, seeds 2026111456 and 2026111457; the latter disables networking and selects provider none. Documentation check exits 0. The supplied final-commit CI read records six successful checks, including https://github.com/albarami/economic-investment-intelligence/actions/runs/43613324484/job/132502902159 and https://github.com/albarami/economic-investment-intelligence/actions/runs/43613324518/job/132502901617. No tests or network requests were run by this reviewer; head-only CI is not supplied.
+  REV-12 PASS git diff against the stated base changes only OPEN_ITEMS.md, PROGRESS.md and TASKS.md. The gate-record scope matches .overnight/DIFF.patch; no data or implementation files change.
+  REV-13 PASS Read eii and scripts/commands/{main,table,placeholder}.py. Unbuilt build/load/freeze commands remain explicit placeholders returning 1; the gate does not claim they work. Spike fixtures are identified as invented fixtures rather than completed releases.
+  REV-14 PASS No secret or real custodian record was found in the reviewed records and sampled fixtures. The supplied final-commit secret scan succeeded: https://github.com/albarami/economic-investment-intelligence/actions/runs/43613324484/job/132502902133.
+  REV-15 PASS The gate commit changes no test or threshold. S1-T15’s logs and scene-size tests preserve full-size assertions where required; its unmet timing criterion remains unticked in S2-T10. Decision 0027 explicitly authorizes S1-T16’s hosted timeout change. Native performance remains unmeasured.
+  REV-16 OPEN P3 Task logs and merge records identify different-maker builders and reviewers. Base-update proofs account for moved heads; S1-T13’s records-only correction is explicitly accepted under L-86. S1-T08’s copied review uses the wrong checklist format, a record issue.
+  REV-17 OPEN P1 P2 P3 P4 Read docs/README.md, TASKS.md, AGENTS.md rule 44, eii, command dispatch, script paths, web/package.json, pins.toml and both reference-note files. Listed commands have corresponding implementations or declared placeholders; native-dependent confirmations remain open. The gate’s stale decision reference, 3D-row conflict, review-format discrepancy and timeout follow-up need record corrections.
+  REV-18 PASS The reviewed gateway policy tests block forbidden classes before dispatch or persistence; default-provider tests forbid sockets and key reads. Sandbox enforcement evidence includes outside-probe teeth and blocking failures. No new data-handling path is introduced by this commit.
+  REV-19 OPEN P2 The explicit PLN-28 allocation and S6-T18 place the optional statistical 3D view in S6. I accept that allocation; document 12’s S1 row requires the correction already described by OI-165. No technical alternative or revised native-performance target is claimed.
+  REV-20 PASS For this spike’s numerical outputs, assignment tests check deterministic results, source hashes, parameter hashes and provenance; rules tests recompute the gate-record digest. Requalification records distinguish reproduced measurements from offline exercises. No product economic fact is delivered by the gate record.
+  REV-21 N/A S1 delivers development spike pages and engineering evidence, not product claim templates, rendered briefs or Fact-chip surfaces.
+  REV-22 PASS S1-T09 fixes exported set A and positive movement bases before the placeholder world build exists. Its refusal fixtures cover missing, invalid and wrongly ordered bases. No protected release, treatment audit or privacy claim is asserted as completed.
+  REV-23 PASS No custodian import was found in product source or metadata. The final whole-suite evidence includes the boundary guards; the T10 follow-up strengthens environment-name boundaries.
+  REV-24 PASS Read glyph bilingual assertions, the performance page’s Arabic assertions and the glyph evidence status. Shared fixture identity and layout checks exist; native visual review remains explicitly pending.
+  REV-25 PASS No prohibited private path, personal address, realistic entity identifier or comparison was found in the reviewed change. Documentation and secret-scan evidence pass. Exception tests use invented names and remove the real private-pattern setting from child environments.
+  REV-26 PASS The gate separates synthetic spike capability from product completion, explicitly denies a measured native frame rate, and preserves placeholder status. No prohibited forecast, endorsement, privacy certification or advice claim was found.
+  REV-27 PASS .overnight/EVIDENCE.md command 35 records cmp AGENTS.md CLAUDE.md exiting 0 at the final commit; neither file changes in the gate commit.
+  REV-28 PASS The reviewed fixtures use invented non-person subjects. The T10 task log explicitly reserves renaming assignment road-link identifiers before S5-T09 reuses their shape; no real registration or person record is introduced.
+  REV-29 PASS The sampled map, routing and assignment fixtures use invented extents and subjects. No Synthetic or Simulated attribute is attached to a real named business or place by the reviewed work.
+  REV-38 PASS Read gateway network/data-policy tests and test_gateway_import_guard.py; planted serving consumers are rejected. Searches of serving source found no gateway import or provider-setting read. Evidence commands 10–11 record passing gateway and consumer-guard tests.
+  GATE-1 PASS Arabic labels: glyph browser assertions and evidence commands 23–24.
+  GATE-2 PASS Hexagons below labels: glyph interleaving/order assertions and command 23.
+  GATE-3 OPEN S1-T12: command 1 exits 1 with missing-native-trace; counts and trace-contract tests do not establish native frame rate.
+  GATE-4 PASS Isochrone conversion: test_areas_spike.py and command 12.
+  GATE-5 PASS Exact shapes, hourly routing and whole cells: test_areas_spike.py and command 12.
+  GATE-6 PASS Deterministic assignment and animated hourly speeds: assignment tests, test_hourly_areas_marks_reuse_and_walk, road browser assertions and commands 13–14, 25, 27.
+  GATE-7 PASS Range requests: tile response tests and command 15.
+  GATE-8 PASS Store parity: commands 16–18; baseline exits 0 and deliberate divergence exits 3.
+  GATE-9 PASS Sandbox: commands 19–21 record successful blocking enforcement, policy tests and proof cases.
+  GATE-10 PASS Completed items have named passing evidence; statement 3 retains its explicit exception.
+  GATE-11 PASS No capability alternative was accepted; pins and reference records preserve unconfirmed retreats and native-dependent fields.
+  GATE-12 PASS Parity divergence, sandbox teeth and planted guard failures are recorded in commands 17, 19–22; no fallback is claimed.
+  GATE-13 PASS rules.toml and gate_record.json fix A, movement bases 50 and 100, and rv-1.0.0-s1; commands 2–4 verify values and retired-name refusal.
+  GATE-14 OPEN P1 The chosen 23 months, 2024-01 through 2025-11, are implemented and tested; only the decision-status reference is stale.
+  GATE-3D OPEN P2 Record conflict: PLN-28 and S6-T18 assign this capability to S6; no S1 implementation or TST-242 pass is claimed.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17) record — PROGRESS.md, “Slice S1 gate — Technical spike: gate record”, statement 14, repeats nonexistent OI-124 and says the window still awaits the owner. “S1-T10 — Review follow-up for slice S1: task log”, “Records corrected here”, already records that OI-124 does not exist and cites the advisor’s acceptance under L-101. Append a correction to statement 14 referencing that disposition; correct the stale OI-124 comment in custodian/src/eii_custodian/privacy/rules.toml without changing its values.
+  P2 (REV-19) record — Reconcile docs/12_TESTING_AND_QUALITY.md section 5 with PLN-28 and S6-T18 as OI-165 proposes: move the optional 3D capability and its TST-242 evidence clause to the S6 row through the reviewed document change before the S1 addendum. This is not evidence that the view passes today.
+  P3 (REV-16) record — PROGRESS.md, “S1-T08: independent review, round 2 (the confirmation): APPROVED”, preserves an approval using unrelated numbered checks and REV-01–REV-11 instead of REV-10–REV-29 and REV-38. Preserve the copied verdict and append a reviewer clarification in the repository’s required checklist format for its recorded reviewed commit.
+  P4 (REV-17) record — OPEN_ITEMS.md OI-158 assigns timeout removal to S2-T10, but TASKS.md S2-T10 contains only the transferred speed criterion and excludes the runner files from that criterion’s stated scope. The gate notes acknowledge this gap. Add the assigned timeout-removal obligation and affected runner files to S2-T10, preserving decision 0027’s removal condition and recording how the already-observed hosted runs affect it.
+```
+
+- The lead's judgement (REV-43; each point checked in the files): all five points of the designated reviewer are valid, and its verdict decides
+  - Point 1, the optional 3D view. The slice S1 row of document 12 named the view as a gate item, and REV-33 makes every item of that row an item of the gate review. The first round set the clause aside on the lead's reading, entered as an assumption (OI-165). A gate item is not set aside by an assumption. The second way of the reviewer's exact fix is taken: the gate-fix task S1-T17 moves the clause and its evidence clause to the slice S6 row of document 12, with the owner's approval and its own independent review, merged before the second round
+  - Point 2, statement 10. It read "True" while statement 3 was open. The second round marks it open, with statement 3 and because of it alone
+  - Point 3, statement 14 (also the first half of the second reviewer's P1). OI-124 does not exist and the window of 23 months is accepted; the first round repeated a sentence of the task log of S1-T09 that the task log of S1-T10 had already corrected. The slip was the lead's. It is corrected by the second round's record, and no entry is rewritten (TST-171)
+  - Point 4, OI-160. The item's own default closes it when the named test passed in the three hosted runs it counts, with the time of the suite recorded in each. The first round kept it open for a time of the one test alone, which the default does not ask for. The item is closed by S1-T17
+  - Point 5, OI-158 (also the second reviewer's P4). The three-run condition of its default is met, and the removal of the hosted value had no owning acceptance criterion. S1-T17 records the first in the item and gives task S2-T10 the criterion and the runner's files. The removal itself is a change of the test runner and is not made during the gate
+- The fix: the gate-fix task S1-T17 (pull request 48; TST-169), whose task log and closing record stand above. Its merge moves the slice's final commit, so every gate item is run again at the new final commit, and the record below is a second round of the whole record, not a correction of single lines (TST-166)
+- The second reviewer's proposed items: P2 is point 1 above. The second half of P1 (the first line of `custodian/src/eii_custodian/privacy/rules.toml` is a comment that still names OI-124) and P3 (the copied verdict of the second round of S1-T08 answers another list of checks than REV-10 to REV-29 and REV-38) are true as stated; the lead read both in the files. Neither can be settled by a record of this gate: the first is a file of the custodian package, the second an entry of another task's review. They are entered in OPEN_ITEMS.md by this commit as PO-S2-01 and PO-S2-02, for the follow-up task of slice S2 (REV-41). The designated reviewer proposed none
+
+#### Slice S1 gate — Technical spike: gate record, round 2 (pull request https://github.com/albarami/economic-investment-intelligence/pull/47 )
+
+- Why a second round. The first round of this record (the entry "Slice S1 gate — Technical spike: gate record (pull request https://github.com/albarami/economic-investment-intelligence/pull/47 )" above, at the final commit `89f3ca770291dde5c8f5eaa262ac4db6e3c66d18`) was reviewed by two makers: the second reviewer approved it and the designated reviewer rejected it, on five points that the lead holds valid (the entry on the first review above). The gate-fix task S1-T17 (pull request 48; TST-169) fixed the three points that concern the pack and the open items, with its own independent review (its closing record above). Its merge moved the slice's final commit, so every gate item is run again here and no entry of the first round is counted for this round (TST-166). The two points that concern sentences of the first round's record are corrected by this entry (TST-171; "Corrections" below); no earlier entry is changed
+- The slice's final commit is `02355344e771d47db858ba2a22dfd0003d29bda8`: main after the merge of the gate-fix task S1-T17 (pull request 48). The lead ran every gate item below at this commit (TST-166) in a clean worktree, each command on processors 4 to 31 (`taskset -c 4-31`, the lead's rule for check runs on the build machine); each entry records the command of rule 44 without that prefix, exactly as run inside it (TST-170). The project's database service was up for the two store-spike runs and was neither started nor stopped by the gate
+- The gate, statement by statement (document 14 section "9. slice S1 — Technical spike", word for word), with the entries below that prove each:
+  1. Arabic labels render with self-hosted glyphs. True: entry 23, entry 24.
+  2. Hexagons remain under labels. True: entry 23.
+  3. 110,000 hexagons and 50,000 particles render at 60 frames per second. **Open: closed by the gate's addendum when task S1-T12 records the two native traces.** No frame rate is claimed. What is proved today: `npm run test:spike:performance` (the two layer counts, 110,000 hexagons and 50,000 particles, and the trace contract with its refusals of a software or remote renderer and of a capped frame rate; no frame rate); `npm run spike:performance:verify-evidence` fails with `missing-native-trace`, as it must while no trace is committed (entry 1, entry 25). Waiting for it: the review of every slice S3 task that depends on map performance (TASKS.md S1-T12; OI-122), and the pin fields that the native result decides (the pin record's spike result: native spike results, load trial and pixel-ratio cap). No revised performance target is proposed (TST-167)
+  4. An isochrone is turned into grid cells. True: entry 12.
+  5. Walk and drive isochrones at different hours of day, a free-drawn polygon and a radius are each kept as an exact shape and turned into whole grid cells, deterministically. True: entry 12.
+  6. One hourly origin-destination fixture is assigned to the routing graph with one fixed volume-delay rule, deterministically, and the hourly link speeds animate on the map. True: entry 13, entry 14, entry 25.
+  7. Tiles are served with range requests. True: entry 15.
+  8. PostgreSQL and DuckDB answer one parity query. True: entry 16, entry 17, entry 18.
+  9. The sandbox works. True: entry 19, entry 20, entry 21.
+  10. Each item passes its named test. **Open, with statement 3 and because of it alone.** Every item but statement 3 passes its named test: entry 8, entry 9, entry 10, entry 11, entry 23, entry 25, entry 26, entry 27, entry 28, entry 29, entry 30, entry 31, entry 32, entry 33, entry 34, entry 35, entry 36, entry 37, entry 38, entry 39, entry 40, entry 41, entry 42, entry 43. The whole test command twice, 2250 passed, 0 failed, 0 skipped with seed 2026111460, and 2250 passed, 0 failed, 0 skipped with seed 2026111461 with provider none and the network unshared; every named test of the tasks' criteria above, run alone where the suite allows it. Statement 3 does not: its named test, the check of the committed native trace (`npm run spike:performance:verify-evidence`), fails with `missing-native-trace`, as it must until task S1-T12 records the two native traces. This statement becomes true with the gate's addendum, when evidence against one final commit covers every item (TST-166, TST-167). The first round's record read "True" here (corrected below)
+  11. A technical alternative is accepted only if it keeps the same user-visible capability, passes the same assertion and is recorded as a decision. True: entry 5, entry 6, entry 7, entry 8. Read for it: the pin record's spike result, "S1-T08: 18 confirmed; 33 confirmed by use; 14 not installed; 64 rows with a written retreat. No retreat tried. Native spike results, load trial and pixel-ratio cap: not yet confirmed; waits for the native trace of task S1-T12, which the owner takes at the console; closes with the addendum of the slice S1 gate. Claude OI-01 remains open. Reference-note fields of behaviour that no slice S1 spike uses name the task that first uses and confirms them."; the S1-T08 task log in PROGRESS.md ("any accepted alternative has a decision record (none was accepted: no pin moved)"); the decision records under docs/decisions/, of which 0021 records the owner's rule for link speeds and the hour mechanism of drive areas (SYN-53; OI-120) and none accepts a technical alternative to a gate capability; the pin check and the reference-notes check pass
+  12. No fallback is permitted for sandbox enforcement, store parity or any security check. True: entry 3, entry 10, entry 11, entry 16, entry 17, entry 18, entry 19, entry 20, entry 21, entry 22, entry 26, entry 41, entry 42, entry 48, entry 49. Proved by the planted violations: the divergence that fails store parity with exit code 3, the store-spike tests, the sandbox tests with their teeth, the blocking enforcement command, the proof command of the hosted sandbox job, the planted failures of the CI stages, the gateway's data policy and the reads of the base branch's rules and secret scanning; no fallback exists in any of them
+  13. `export_parameter_set` (default A) and the presence and flow parameters of PRV-59 are fixed in the rules configuration before any world is built (PRV-59, PRV-120; open item OI-35). The name `presence_base` is not used. True: entry 2, entry 3, entry 4. `export_parameter_set` = A, `round_movement` 50 (set A) and 100 (set B) under rules version `rv-1.0.0-s1`; no world has been built (the world build is a placeholder that exits 1). OI-35's default A stands unless the owner or a data owner records another choice
+  14. The number of monthly periods shown first is recorded (PLN-25). True: entry 2. **23 monthly periods, `2024-01` to `2025-11`**: `window_months` in `custodian/src/eii_custodian/privacy/rules.toml`, recorded with its first and last month in `custodian/src/eii_custodian/privacy/gate_record.json`; chosen and explained in PROGRESS.md, "S1-T09 — Exported set, presence and flow parameters, and months shown first: task log" (December 2025 is left incomplete on purpose and the window holds complete months only; SYN-12). The window of 23 months is accepted and no open item holds it: the task log of S1-T10 above ("Records corrected here") records that the question is the one that ruling L-101 of the run records as accepted by the owner's advisor, and that OI-124 does not exist (the first round's record named it here; corrected below)
+- CI on the final commit: the six required checks completed with success: `check-docs` https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284828/job/132555143215; `planted-failures` https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284907/job/132555143406; `sandbox proof` https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284738/job/132555142691; `secret-scan` https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284907/job/132555143397; `static-checks` https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284907/job/132555143232; `tests` https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284907/job/132555143425
+- TST-165, the tasks of the slice. Every task but S1-T12 is done; each pull request below was merged after an APPROVED verdict of a maker other than its builder's and with CI green on the merged head (the closing records in this ledger). S1-T12 waits for the owner at the console by the re-plan of 2026-11-13 and closes with this gate's addendum. S1-T17 is the gate-fix task that the first review of this gate made (TST-169):
+
+| Task | Pull requests and merge commits |
+|---|---|
+| S1-T01 — Arabic glyph and label-order spike | pull request 32, merged 2026-11-13, `24600eb01fd67887b2d51e19513b4c1d5433df1d` |
+| S1-T02 — Map load and frame-rate spike | pull request 34, merged 2026-11-13, `546df8525ad0a4a74423c4f7bcff1f73c93e5859` |
+| S1-T03 — Isochrone, drawn-shape and grid spike | pull request 33, merged 2026-11-13, `1bd5a373b5805727bc395c3a2381e2db36e7c587` |
+| S1-T04 — Tile range-request spike | pull request 28, merged 2026-11-13, `4a43f91c1a8491e97394c808a28af0586b407acf` |
+| S1-T05 — First two-store parity query | pull request 30, merged 2026-11-13, `3c318ab08c72d617fd8c5d5586894577238eefe4` |
+| S1-T06 — Sandbox enforcement spike | pull request 31, merged 2026-11-13, `6538a7d701a47ade9c9b32318b81d0037f8b4372` |
+| S1-T07 — Offline typed-decision gateway | pull request 29, merged 2026-11-13, `034f0805a2638bca27a737789327428d2652395f` |
+| S1-T08 — Typed-decision requalification and pin ruling | pull request 39, merged 2026-11-14, `31d0012e9f9d059bdf334b09615159f3ceadaa99` |
+| S1-T09 — Exported set, presence and flow parameters, and months shown first | pull request 40, merged 2026-11-14, `f0ee2f3c39a480501edb28bc85c33546e61ba5b9` |
+| S1-T10 — Review follow-up for slice S1 | pull request 46, merged 2026-11-14, `89f3ca770291dde5c8f5eaa262ac4db6e3c66d18` |
+| S1-T11 — Road-assignment and hourly traffic spike | pull request 38, merged 2026-11-13, `a9db6c85d19c1035377dfbc9fde8959fcc86cff7` |
+| S1-T12 — Native frame-rate traces of the map spikes | open: the gate's addendum (waits for the owner at the console) |
+| S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once | pull request 35, merged 2026-11-13, `764f7760c39045575bb2dab7e19b4d8f3a7c8cf3` |
+| S1-T14 — Place-scoped exception for one name of the private list in the documentation check | pull request 42, merged 2026-11-14, `8c4175dc48cee032125cd309754fbfebf35d724e` |
+| S1-T15 — The browser run of the performance spike within the hosted time limit | pull request 43, merged 2026-11-14, `ce64beb8c74172e7cec6d629b3d25f43a24733bb` |
+| S1-T16 — The time limit of the web checks on the hosted runner | pull request 45, merged 2026-11-14, `29c660f5c6d12423d4f80bd3a06d1862cb1b6257` |
+| S1-T17 — Gate fix for slice S1 | pull request 48, merged 2026-11-14, `02355344e771d47db858ba2a22dfd0003d29bda8` |
+
+- Documentation changes merged beside the slice, each with its own review: pull request 37 (`docs(decision-0022)`), merged 2026-11-13, `02b92899ec0fb899b874a75ab7a54e0ff60d5672`; pull request 41 (`docs(decision-0023)`), merged 2026-11-14, `e45dbb34397a462b93506d85714700c88917b92d`; pull request 44 (`docs(decision-0026)`), merged 2026-11-14, `ef434efacd01f8097c3db8e23c5dda9a062ef1e7`
+- TST-168, the open items. Every proposed open item of the slice's reviews is closed by the follow-up task S1-T10 (10 of 10; the entry below). The random failure of the smoke-trace run of the performance spike in the speed-up job was entered by the first commit of this record under rule 39 (OI-163) and stays open. The first review of this gate proposed record items; the two that no round of this record can settle are entered by this commit for the follow-up task of slice S2 (PO-S2-01 and PO-S2-02; REV-41), with the one record item that the review of the gate-fix task proposed (PO-S2-03). 21 items of OPEN_ITEMS.md name the slice S1 gate as the time they are needed, each with its type as the entry below printed it at the final commit: OI-18 (CLOSED), OI-34 (OPEN), OI-35 (OPEN), OI-86 (ASSUMPTION), OI-87 (OPEN), OI-88 (ASSUMPTION), OI-111 (ASSUMPTION), OI-112 (ASSUMPTION), OI-113 (OPEN), OI-115 (ASSUMPTION), OI-117 (ASSUMPTION), OI-119 (ASSUMPTION), OI-120 (ASSUMPTION), OI-122 (ASSUMPTION), OI-123 (ASSUMPTION), OI-125 (OPEN), OI-126 (OPEN), OI-149 (OPEN), OI-158 (OPEN), OI-159 (CLOSED), OI-160 (CLOSED). OI-160 is among them as closed (by the gate-fix task S1-T17). This commit closes OI-165, which the first commit of this record entered, adds an update to OI-163 and enters OI-168 (the gate's notes below), and changes none of the others; the assumptions record defaults that the slice's tasks chose and built, for the owner to confirm or replace
+- Corrections of the first round's record (TST-171; the entry "Slice S1 gate — Technical spike: gate record (pull request https://github.com/albarami/economic-investment-intelligence/pull/47 )" above stays as written, and where it differs from this entry, this entry holds):
+  - Statement 10 read "True" there while statement 3 was open. It is open, with statement 3 and because of it alone (above)
+  - Statement 14 said there that whether the window of 23 months stands "is still the owner's to say (OI-124)". OI-124 does not exist, and the window is accepted (above). The slip was the lead's: the first round took the sentence from the task log of S1-T09, which the task log of S1-T10 had already corrected
+  - The note on OI-160 said there that the item "stays open as written" because the hosted logs give no time for its one test. The item's own default does not ask for that time; the item is closed (the notes below)
+  - The note on the hosted limit said there that the entry of task S2-T10 held no acceptance criterion for the removal of the hosted value. It holds one now (the notes below)
+  - The note on the optional 3D view said there that the lead read its clause as standing in the wrong row of document 12 and entered the question as an assumption (OI-165). A gate item is not set aside by an assumption: the row is corrected by a reviewed change with the owner's approval (the notes below)
+- The gate's notes:
+  - The guard-test discovery (813 passed, 0 failed, 0 skipped; 34 ResourceWarning lines, no test failed) prints ResourceWarning lines about the cleanup of temporary folders from one assignment test; no test fails and nothing is suppressed
+  - Ruling L-285 proposes a hardening point for document 17: the test runner restores the default interrupt disposition at its start, so that a launch with an ignored interrupt signal cannot turn the runner's interrupt test into a time-out. It is not entered in document 17 by this commit
+  - OI-158 stays open. The gate-fix task S1-T17 recorded in it that the condition of its default is met: the three hosted runs it counts each finished the suite `web-checks` inside 1,800 seconds (731 s, 912 s and 937 s; the next run of main took 938 s). The removal of the hosted value is now an acceptance criterion of task S2-T10, with the runner's files in its scope. The hosted limit of 3,000 seconds (decision 0027) is still in force: its removal is a change of the test runner and is not made during the gate. A measuring job of 2026-11-14 ran the suite `web-checks` twice on processors 0 to 3: 1,410 s, and 1,295 s with a trial change that was not kept. Neither run was green (one failing test in each), so neither is a measurement of that task's other criterion (under 1,200 s on four processors, measured twice)
+  - OI-160 is closed, by the gate-fix task S1-T17 on the item's own default: the named test passed in the three hosted runs the item counts, with the time of the suite recorded in each. The runs, read from the logs of the hosted `tests` jobs: head of pull request 43 (`6c7d592ad2c60e1a5157c376ffc273097c95e628`): the check passed, 2230 passed, 0 failed, 0 skipped, the suite `web-checks` in 731 s (843 passed, 0 failed, 0 skipped); main after the merge of pull request 43 (`ce64beb8c74172e7cec6d629b3d25f43a24733bb`): the check passed, 2230 passed, 0 failed, 0 skipped, the suite `web-checks` in 912 s (843 passed, 0 failed, 0 skipped); head of pull request 46 (`acb80978b0e33cf8bd5e3a46cbf328776ef63163`): the check passed, 2250 passed, 0 failed, 0 skipped, the suite `web-checks` in 937 s (849 passed, 0 failed, 0 skipped); main after the merge of pull request 46 (`89f3ca770291dde5c8f5eaa262ac4db6e3c66d18`): the check passed, 2250 passed, 0 failed, 0 skipped, the suite `web-checks` in 938 s (849 passed, 0 failed, 0 skipped). No bound was changed
+  - The optional 3D view of decision 0019 item 14 is not an item of this gate. The gate-fix task S1-T17 moved its clause and its evidence clause (TST-242) from the slice S1 row to the slice S6 row of document 12 (section 5), in the same words, with the owner's approval and its own independent review (the closing record of pull request 48 above); document 14 places the view in slice S6 (PLN-28; tasks S6-T18 and S6-T19). The entry below that reads document 12 counts both clauses in both rows at the final commit. Nothing about the view is claimed, and no evidence of TST-242 exists. OI-165 is closed by this commit. One sentence of document 10 still lists the view among the questions for the spike of slice S1 (its section "Open questions and assumptions": "whether the 3D view holds the frame-rate gate"). The reviewer of S1-T17 proposed it as a record item; it is entered by this commit as PO-S2-03 for the follow-up task of slice S2, and the question is answered where the view is built (S6-T18, under TST-242).
+  - A cause of random stops was found on the day of this round and is entered by this commit as OI-168: the pinned mutation tester sends its time-out signal to a process number that may no longer be its own, and the build machine reuses process numbers quickly. One run of the lead's checks of another task was stopped by it; no run of this gate was. From the time it was found, every campaign on the build machine runs in a process-number space of its own, and none shared the machine's space while the commands of this round ran. OI-163, the random failure that the first commit of this record entered, falls in a second in which four such campaigns ran; that is recorded in the item as a likely cause, not a proved one, and the item stays open
+  - The acceptance boxes of four done tasks, which their own ledgers had left unticked (S1-T09, S1-T11, S1-T14 and S1-T16), were ticked by the first commit of this record, with the reading that its note describes; this round ticks no box. Its entries below run the tests that those criteria name again at the new final commit
+  - Statements 3 and 10 are the gate's open items, the second only because of the first (above). Under TST-168 the gate is not passed while they are open
+- Verdict of the gate: PENDING (the second round of the independent full review of the slice, TST-169; then the addendum of S1-T12)
+
+#### Evidence for the final commit `02355344e771d47db858ba2a22dfd0003d29bda8` (round 2)
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   cd web && npm run spike:performance:verify-evidence
+Exit code: 1
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; the expected failure, output line "FAIL missing-native-trace" (no native trace is committed)
+Seed:      none
+Notes:     Gate statement 3 is OPEN. The check of the committed native trace fails as it must while no trace exists: task S1-T12 waits for the owner at the console. This entry proves only that no frame rate is claimed.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   python3 -I -c "import json,tomllib,sys; d='custodian/src/eii_custodian/privacy/'; r=tomllib.load(open(d+'rules.toml','rb'))['rules_version']; g=json.load(open(d+'gate_record.json',encoding='utf-8')); v={(e['parameter_set'],e['rule_code']):e['value'] for e in r}; t=open(d+'rules.toml',encoding='utf-8').read(); got=[v[('shared','export_parameter_set')],v[('A','round_movement')],v[('B','round_movement')],v[('shared','window_months')]]; ok=got==[g['exported_set'],g['movement_base_a'],g['movement_base_b'],g['window_months']] and 'presence_base' not in t; print('export_parameter_set', got[0], 'round_movement A', got[1], 'B', got[2], 'window_months', got[3], 'first', g['first_month'], 'last', g['last_month'], 'rules', g['rules_version_id'], 'record', ok); sys.exit(0 if ok else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "export_parameter_set A round_movement A 50 B 100 window_months 23 first 2024-01 last 2025-11 rules rv-1.0.0-s1 record True"
+Seed:      none
+Notes:     Gate statements 13 and 14: the rules configuration of S1-T09 read against its committed gate record: the exported set A, the movement bases of PRV-59 for sets A and B, the window of monthly periods shown first, its first and last month, and no `presence_base`.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python -m pytest custodian/tests/test_rules_config.py -v -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    116 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Gate statement 13: the check of the rules configuration with its planted refusals (a missing, zero, negative, decimal and non-numeric base on each set, a retired code, a wrong set) and the recomputed digest of the gate record.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_rules_retired_names.py' -v
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    3 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Gate statement 13: the scan of the seven source roots for the retired names `presence_base`, `presence_scale` and `flow_scale`, with a plant in each root.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   python3 -I -c "import tomllib; print(tomllib.load(open('pins.toml','rb'))['spike_result'])"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "S1-T08: 18 confirmed; 33 confirmed by use; 14 not installed; 64 rows with a written retreat. No retreat tried. Native spike results, load trial and pixel-ratio cap: not yet confirmed; waits for the native trace of task S1-T12, which the owner takes at the console; closes with the addendum of the slice S1 gate. Claude OI-01 remains open. Reference-note fields of behaviour that no slice S1 spike uses name the task that first uses and confirms them."
+Seed:      none
+Notes:     Gate statement 11: the pin record's spike result written by S1-T08 (pins.toml, `spike_result`).
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "checked 65 components: OK"
+Seed:      none
+Notes:     Gate statement 11: the pin record against the manifests, the locks and the toolchain, with the pin-ruling guard (OI-159).
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; last line "checked 2 files, 6 libraries, 357 rows: OK"
+Seed:      none
+Notes:     Gate statement 11: the reference notes and the pack anchors they cite.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_requalify.py' -v
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    93 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S1-T08: the requalification harness; a changed route identity exits 2 (drift triggers requalification).
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python evals/typed_decisions/requalify.py --provider none
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "match" then "DISABLED" (the route identity matches; with no provider every decision is disabled)
+Seed:      none
+Notes:     S1-T08 and S1-T07: the whole case set with provider none, no key and no network; the route identity matches.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python -m unittest discover -s scripts/tests/gateway -t scripts/tests -v
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    24 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S1-T07: the gateway contract: provider none opens no network, forbidden data classes are blocked, records use the closed schema, the serving packages cannot import the gateway.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_gateway_import_guard.py' -v
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    3 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S1-T07: the consumer guard of the gateway.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python -m pytest product/tests/test_areas_spike.py -v -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    30 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Gate statements 4 and 5 (S1-T03): in-process routing with no server; the drive isochrone changes with the hour; walk and drive isochrones, a free-drawn polygon and a radius each kept exactly and snapped to whole frame cells; deterministic fixtures.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python -m pytest custodian/tests/test_assignment_*.py -v -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    230 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Gate statement 6 (S1-T11): the assignment of the hourly origin-destination fixture with the one fixed volume-delay rule, its inputs, rules, speed floor, whole speeds, completion and repeat on identical inputs.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python -m pytest scripts/tests -v -p no:cacheprovider -k assignment
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    13 passed, 0 failed, 0 skipped (5 subtests passed); 806 deselected by the name filter
+Seed:      none
+Notes:     Gate statement 6 (S1-T11): the cross-plane tests of the assignment: route identity, junctions, lengths, invariance, area times and measurements. Every other test of the folder is deselected by name and runs in the whole discovery.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python -m pytest product/tests/test_tiles_range.py product/tests/test_tiles_status.py -v -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Gate statement 7 (S1-T04): the full request, valid ranges with the expected bytes, invalid ranges refused safely.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python scripts/tests/live_store_spike.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31), the project's database service up and its loopback address in the environment
+Counts:    not a test suite; first output line "PASS store-spike: both engines match" (then one line of evidence: 14 fixture rows, 7 result rows in order, DuckDB 2.0.0, the driver 3.3.8, the hashes of the fixture and of the query)
+Seed:      none
+Notes:     Gate statement 8 (S1-T05): PostgreSQL and DuckDB each match the independent expectation and each other for the full list, the empty list, one unit and an element with quotation marks. The project's database service was up (the gate neither starts nor stops it).
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python scripts/tests/live_store_spike.py --diverge
+Exit code: 3
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31), the project's database service up and its loopback address in the environment
+Counts:    not a test suite; output line "PASS store-spike: both engines match" (the passing baseline), last line "FAIL store-spike: field mismatch row=4 column=3" (the expected exit code 3)
+Seed:      none
+Notes:     Gate statements 8 and 12 (S1-T05): a deliberate divergence of the DuckDB copy fails parity with exit code 3 after the passing baseline; there is no answer from one store and no fallback.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_store_spike.py' -v
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    31 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Gate statements 8 and 12: the store spike's tests: strict parameters, explicit rounding, the comparison that fails on any difference, and a refused address that is not the project's loopback.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python scripts/sandbox_check.py check-enforcement
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "sandbox enforcement: OK" (the last of 8 lines, each part OK)
+Seed:      none
+Notes:     Gate statements 9 and 12 (S1-T06): the blocking proof of the generator sandbox on the build machine: the bubblewrap version, the outside probe, the sentinel and mount parts of each profile and the extensions; any failing part exits non-zero.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_sandbox_*.py' -v
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    75 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Gate statements 9 and 12 (TST-61, TST-62): the sandbox tests with their teeth: the sentinel read and the network attempt fail inside under both profiles and succeed outside; the mount list matches the policy.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python scripts/ci_sandbox.py prove
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    19 named cases passed, 0 failed, 0 skipped; RESULT: PASSED
+Seed:      none
+Notes:     Gate statements 9 and 12: the proof command of the hosted job `sandbox proof`, run locally.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python scripts/ci_plants.py run
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "plants: 12 cases, 12 blocked, 0 failed", RESULT: PASSED
+Seed:      none
+Notes:     Gate statement 12 (TST-04, TST-144): the planted failures of the CI stages, each built at run time in a scratch copy and each blocked by its stage.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   cd web && npm run test:spike:glyphs
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "10 passed (4.0s)" (the browser tests of the glyph spike, each named test among them)
+Seed:      none
+Notes:     Gate statements 1 and 2 (S1-T01): the browser tests of the glyph spike: Arabic labels render from local assets, the hexagons sit below the first label layer, a remote font is blocked. The pixel comparison runs only in the hosted `tests` job (OI-119), on the final commit in the check runs below.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   cd web && npm run spike:glyphs:verify-evidence
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "visual review: pending native review"
+Seed:      none
+Notes:     Gate statement 1: the recorded visual evidence of the glyph spike; the machine-read review marks stay as the state says.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   cd web && npm run test:spike:performance
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    128 passed, 0 failed, 0 skipped (0 cancelled, 0 todo)
+Seed:      none
+Notes:     Gate statement 6 (S1-T11: the road layer's hourly speeds animate on the map) and what is proved TODAY of statement 3 (S1-T02, S1-T13): the two layer counts (110,000 hexagons, 50,000 particles) and the trace contract with its refusals of a software or remote renderer and of a capped frame rate. No frame rate is measured here.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    813 passed, 0 failed, 0 skipped; 34 ResourceWarning lines, no test failed
+Seed:      none
+Notes:     Gate statements 10 and 12: the whole guard-test discovery of rule 44; none is skipped. ResourceWarning lines are counted and recorded (a gate note).
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   ./eii test --seed 2026111460
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    2250 passed, 0 failed, 0 skipped
+Seed:      2026111460
+Notes:     Gate statement 10 (TST-162, TST-167): the whole test command, every network-free suite, none skipped.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   EII_DECISION_PROVIDER=none bwrap --dev-bind / / --unshare-net --die-with-parent ./eii test --seed 2026111461
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    2250 passed, 0 failed, 0 skipped
+Seed:      2026111461
+Notes:     Gate statement 10 and TST-155: provider none and the network unshared (a new network namespace with loopback only): the complete suite passes, none skipped.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "checked 429 text files, 67 Markdown files: OK"
+Seed:      none
+Notes:     TST-162: the documentation check on the final commit.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "233 files already formatted"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "Success: no issues found in 207 source files"
+Seed:      none
+Notes:     Types (mypy strict).
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The lock matches the manifests.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The agent files are byte-identical.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   cd web && npm run check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; exit code 0; last line "checked 18 files: OK"
+Seed:      none
+Notes:     The web structure checks.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   cd web && npm run lint
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; exit code 0; last line "> eslint --max-warnings 0 ."
+Seed:      none
+Notes:     Web lint.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   cd web && npm run format:check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; exit code 0; last line "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Web format.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   cd web && npm run typecheck
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; exit code 0; last line "> tsc --noEmit"
+Seed:      none
+Notes:     Web types.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   cd web && npm run build
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; exit code 0; last line "✓ built in 106ms"
+Seed:      none
+Notes:     The web build.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   cd web && npm run check:hosts:dist
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; exit code 0; last line "checked 20 files: OK"
+Seed:      none
+Notes:     No host outside the allowed set in the built files.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   cd web && npm run check:dev
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; exit code 0; last line "PASS dev-server http://127.0.0.1:36047/"
+Seed:      none
+Notes:     The development server binds to the local address only.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   cd web && npm run test:checks
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    849 passed, 0 failed, 0 skipped (0 cancelled, 0 todo)
+Seed:      none
+Notes:     The tests of the web checks, the glyph spike's and the performance spike's node tests among them.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   python3 -I -c "import re,sys; t=open('OPEN_ITEMS.md',encoding='utf-8').read(); s=re.split(r'(?m)^(?=### PO-S1-)',t)[1:]; o=[x.split(' ',2)[1] for x in s if '- TYPE: CLOSED (was OPEN)' not in x]; print(len(s), o); sys.exit(1 if o else 0)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "10 []" (proposed items of the slice; those not closed)
+Seed:      none
+Notes:     TST-168: every proposed open item of the slice's reviews is closed (S1-T10).
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   python3 -I -c "import re,sys; t=open('OPEN_ITEMS.md',encoding='utf-8').read(); s=[re.split(r'(?m)^## (?!OI-)',x)[0] for x in re.split(r'(?m)^(?=## OI-[0-9]+ )',t)[1:]]; g=[(x.split(' ',2)[1], re.search(r'(?m)^- TYPE: (\w+)',x).group(1)) for x in s if re.search(r'(?m)^- NEEDED BY: .*S1 gate',x)]; print(len(g), ' '.join(a+':'+b for a,b in g))"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "21 OI-18:CLOSED OI-34:OPEN OI-35:OPEN OI-86:ASSUMPTION OI-87:OPEN OI-88:ASSUMPTION OI-111:ASSUMPTION OI-112:ASSUMPTION OI-113:OPEN OI-115:ASSUMPTION OI-117:ASSUMPTION OI-119:ASSUMPTION OI-120:ASSUMPTION OI-122:ASSUMPTION OI-123:ASSUMPTION OI-125:OPEN OI-126:OPEN OI-149:OPEN OI-158:OPEN OI-159:CLOSED OI-160:CLOSED" (items naming the gate; each identifier with its type)
+Seed:      none
+Notes:     TST-168: the open items that name the slice S1 gate as the time they are needed, with their types (listed for the owner in the gate record above).
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   python3 -I -c "t=open('docs/12_TESTING_AND_QUALITY.md',encoding='utf-8').read().split(chr(10)); r=lambda s:[l for l in t if l.startswith(s)][0]; a,b=r('| slice S1 Technical spike |'),r('| slice S6 The joined door |'); c='the optional 3D view of decision 0019 item 14 passes its named test'; e='TST-242 for the 3D view, with its frame-rate numbers reported'; w=chr(10).join(t); print('S1 row', a.count(c), a.count(e), a.count('3D'), 'S6 row', b.count(c), b.count(e), 'document', w.count(c), w.count(e))"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local, processors 4-31)
+Counts:    not a test suite; output "S1 row 0 0 0 S6 row 1 1 document 1 1" (the clause and its evidence clause: in the slice S1 row, with any other mention of the view; in the slice S6 row; in the whole document)
+Seed:      none
+Notes:     REV-33: the gate table of document 12 (section 5) read at the final commit: the clause on the optional 3D view of decision 0019 item 14 and its evidence clause (TST-242) are counted in the slice S1 row (none, and no other mention of the view), in the slice S6 row (one each) and in the whole document (one each). The gate-fix task S1-T17 moved them; the view is not an item of this gate, and nothing about it is claimed.
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   gh api --method GET "repos/{owner}/{repo}/commits/02355344e771d47db858ba2a22dfd0003d29bda8/check-runs?per_page=100" --jq '{total_count,check_runs:[.check_runs[]|{name,head_sha,status,conclusion,html_url}]|sort_by(.name)}'
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (the GitHub command-line program, from the repository root)
+Counts:    not a test suite; 6 check runs, 6 completed with success, 0 other: check-docs https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284828/job/132555143215; planted-failures https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284907/job/132555143406; sandbox proof https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284738/job/132555142691; secret-scan https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284907/job/132555143397; static-checks https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284907/job/132555143232; tests https://github.com/albarami/economic-investment-intelligence/actions/runs/43630284907/job/132555143425
+Seed:      none
+Notes:     TST-162: CI on the final commit, triggered by the push of the merge: the six required checks, each completed with success on this commit; the hosted `tests` check runs the glyph pixel comparison (OI-119).
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   gh api --method GET repos/{owner}/{repo} --jq '{secret_scanning:.security_and_analysis.secret_scanning.status,secret_scanning_push_protection:.security_and_analysis.secret_scanning_push_protection.status}'
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (the GitHub command-line program, from the repository root)
+Counts:    not a test suite; output {"secret_scanning":"enabled","secret_scanning_push_protection":"enabled"}
+Seed:      none
+Notes:     Gate statement 12: secret scanning and push protection are enabled (read at the gate).
+```
+
+```text
+### Slice S1 gate — Technical spike
+Commit:    02355344e771d47db858ba2a22dfd0003d29bda8
+Command:   gh api --method GET repos/{owner}/{repo}/rules/branches/main --jq '[.[]|{type,ruleset_source_type,parameters:(if .type=="required_status_checks" then {required_status_checks:[.parameters.required_status_checks[]|{context}],strict_required_status_checks_policy:.parameters.strict_required_status_checks_policy} else null end)}]'
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (the GitHub command-line program, from the repository root)
+Counts:    not a test suite; four rule types from the repository's ruleset (deletion, non_fast_forward, pull_request, required_status_checks); required contexts: check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests; strict policy false
+Seed:      none
+Notes:     Gate statement 12: the rules active on the base branch at the gate: no deletion, no forced push, pull requests only, the six required checks. The identifier of the ruleset is not recorded.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

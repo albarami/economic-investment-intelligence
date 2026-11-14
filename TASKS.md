@@ -286,7 +286,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: `docs/12_TESTING_AND_QUALITY.md` (the two rows of section 5), `OPEN_ITEMS.md`, `PROGRESS.md` and this file.
 - Depends: the first review of the slice S1 gate.
 - Requirements: TST-169, TST-168, PLN-28, REV-33.
-- Delivery: routine; personas Platform; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/48). Added by the first review of the slice S1 gate (TST-169); the statements of the gate record that the same review found wrong are corrected in the gate record's own second round.
+- Delivery: routine; personas Platform; status done (pull request 48, merged 2026-11-14). Added by the first review of the slice S1 gate (TST-169); the statements of the gate record that the same review found wrong are corrected in the gate record's own second round.
 ### S1-T10 — Review follow-up for slice S1
 - Goal: Close every proposed open item that the reviews of slice S1 entered in `OPEN_ITEMS.md`, before the slice S1 gate.
 - Acceptance criteria: [x] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [x] the reviewer checks every closure; [x] no item is deferred out of this task; [x] no item of the slice is left open.
