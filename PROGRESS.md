@@ -18049,6 +18049,149 @@ Seed:      none
 Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
 ```
 
+### S1-T15 — The browser run of the performance spike: part B, the review of part A and two verifications (pull request https://github.com/albarami/economic-investment-intelligence/pull/43 )
+
+- Review round 1 of part A (2026-11-14): Moonshot AI Kimi K3.1 Pro through Abacus: REJECTED, because no break pass had been made for part A's optimisations (its builder had been stopped before it). Part A alone also gave no gain on the hosted runners.
+- Part B (xAI Grok 4.7 through Cursor, three passes): most browser tests of the spike draw the map at 480 by 270 CSS pixels; the scenes whose assertions depend on the canvas stay on the full wall; a guard reads the spec and refuses a full scene that would run small. The second pass took back three weakenings of the first (the Arabic reduced-motion scene, the full street load and the pause scene are full again; the small-map plants got positive controls; a foreign request before the page commits is refused after readiness) and added the break pass that part A lacked.
+- The lead's first verification (two Claude verifiers, on the first pass): ten points V1 to V10, all valid, all worked into the second pass. The lead's second verification (one Claude Opus verifier, on the second pass): V1 to V10 hold; every test of the base branch still exists (54 browser tests) and every assertion, bound and timeout is still asserted; the guard was passed in three ways with no test failing (a small-canvas call moved into a full test; a full mode name aliased or redeclared; the default of the page helper). The third pass closed the three, each with a plant that failed first, and pinned the order of the road-trace checks with the drawing buffer shrunk as well.
+- The lead's own runs on the third pass: the three node test files (18 tests) pass; lint, format and type checks exit 0.
+- Timing by the lead, the browser suite alone on four processors (`taskset -c 0-3 node web/spikes/performance/tests/run.mjs`): 1,993 s before this task; run 1 of part B 1,587 s with the machine's load at 10 to 29 (an upper bound, not a measurement); run 2 of part B 1,294 s on processors reserved for it (every other worker moved to the other processors). All 54 tests passed in both runs. In the builder's own first run, taken under load, the full street load timed out once on readiness at its 170-second bound and passed in the next run; it is entered as an open item with this pull request's records, and the three hosted runs in a row are the acceptance evidence.
+- Evidence: the commands below at the commit of part B.
+
+#### Evidence for the work commit `2c29d8a689a3b45aa94d86d54379d93d14a1b225`
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    2c29d8a689a3b45aa94d86d54379d93d14a1b225
+Command:   bash -c "set -o pipefail; npm --prefix web run test:spike:performance 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)), \"|\", \" \".join(re.findall(r\"[0-9]+ passed \\([0-9.]+m?s?\\)\", t)[:1]))'"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 127 # pass 127 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 54 passed (13.3m)" (the totals of the Node test runner and of the browser run inside it)
+Seed:      none
+Notes:     The tests of the performance spike with its browser tests after part B: the totals of the Node test runner (the guard of the scene sizes, the foreign-request scan and the road trace among them) and of the browser run.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    2c29d8a689a3b45aa94d86d54379d93d14a1b225
+Command:   npm --prefix web run lint
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "> eslint --max-warnings 0 ." (exit code decides)
+Seed:      none
+Notes:     Lint of the web code, the new helper and its tests included.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    2c29d8a689a3b45aa94d86d54379d93d14a1b225
+Command:   npm --prefix web run typecheck
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "> tsc --noEmit" (exit code decides)
+Seed:      none
+Notes:     Type check.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    2c29d8a689a3b45aa94d86d54379d93d14a1b225
+Command:   npm --prefix web run format:check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    2c29d8a689a3b45aa94d86d54379d93d14a1b225
+Command:   npm --prefix web run build
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "✓ built in 96ms" (the production build)
+Seed:      none
+Notes:     The production build is unchanged by test files and still builds.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    2c29d8a689a3b45aa94d86d54379d93d14a1b225
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 412 text files, 64 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    2c29d8a689a3b45aa94d86d54379d93d14a1b225
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    2c29d8a689a3b45aa94d86d54379d93d14a1b225
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    2c29d8a689a3b45aa94d86d54379d93d14a1b225
+Command:   ./eii test --seed 2026111451
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    2011 passed, 0 failed, 0 skipped
+Seed:      2026111451
+Notes:     The whole test command on the build machine with a fresh seed, at the commit of part B.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    2c29d8a689a3b45aa94d86d54379d93d14a1b225
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','19dfa158c303b82aa3110b9105eb3ae67b269287...2c29d8a689a3b45aa94d86d54379d93d14a1b225'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:web/spikes/performance/tests/canvas-mode.d.mts A:web/spikes/performance/tests/canvas-mode.mjs A:web/spikes/performance/tests/foreign-request.d.mts A:web/spikes/performance/tests/foreign-request.mjs A:web/spikes/performance/tests/foreign-request.node-test.mjs A:web/spikes/performance/tests/scene-size-bindings.mjs A:web/spikes/performance/tests/scene-size-sites.mjs A:web/spikes/performance/tests/scene-size.mjs A:web/spikes/performance/tests/scene-size.node-test.mjs A:web/spikes/performance/tests/small-map.ts M:web/spikes/performance/README.md M:web/spikes/performance/tests/performance.spec.ts M:web/spikes/performance/tests/road-trace.node-test.mjs'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "13 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Part B touches the spike's browser tests, their helpers and guards and the spike's README, and nothing else.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    2c29d8a689a3b45aa94d86d54379d93d14a1b225
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','19dfa158c303b82aa3110b9105eb3ae67b269287..2c29d8a689a3b45aa94d86d54379d93d14a1b225'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit of part B has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
