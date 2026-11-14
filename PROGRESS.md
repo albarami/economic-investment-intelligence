@@ -17409,6 +17409,202 @@ Seed:      none
 Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
 ```
 
+### S1-T09 — Exported set, presence and flow parameters, and months shown first: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/40 )
+
+- Class: Deep (privacy rules). The lead's short plan: the exported set is A, the default of OI-35; `round_movement` is 50 for set A and 100 for set B; the number of months shown first is `window_months`, 23, January 2024 to November 2025, because December 2025 is left incomplete on purpose and the window holds complete months only (SYN-12, SYN-29, PRV-53).
+- One design review of the plan (OpenAI GPT-5.6 Sol through the Codex command-line tool, 2026-11-13): REJECTED with four findings; it agreed with the two bases and with the window. The lead's ruling on them: three accepted (every entry has exactly the columns of the release table under one rules version identifier; a committed machine-readable gate record with a digest of this task's four entries, recomputed by a test; no entry point and no new command) and one in part (`mob.range_multiple` is an entry of the synthetic world's calibration manifest, not a rule code of the release table, so no code is invented for it; its absence is stated in the module README and put to the owner in OI-124). No second design round.
+- Personas: builder, a senior privacy engineer; reviewer, a principal privacy and disclosure-control reviewer of another maker. Builder: the Cursor command-line tool, `grok-4.7-high` (xAI), in a build pass and two completion passes; skills it reported: project-orientation, task-standards, test-driven development, executing-plans, verification-before-completion. Lead: Anthropic (the plan, the ruling and the open item by Claude Fable 5.2 on 2026-11-13; the move onto main, the checks, the commit and this ledger by Claude Fable 5.2 on 2026-11-14).
+- What the task adds: the package `eii_custodian.privacy` with the rules configuration (`rules.toml`: four entries of `rules_version` under the identifier `rv-1.0.0-s1`), its check (`rules_config.py`, a function; tests call it; there is no command) and the committed gate record (`gate_record.json`: the exported set, both movement bases, the window, its first and last month, and the SHA-256 of the four entries). The check refuses a missing, blank or inconsistent identifier, an unknown or missing field, a code outside the closed lists of DAT-129, a rule on the wrong set, a duplicate, a wrong unit, a base that is missing, not a positive whole number or smaller on set B than on set A, a window outside 1 to 23 months, and the retired rule codes `presence_base`, `presence_scale` and `flow_scale`.
+- Acceptance criteria, each with its evidence: the exported set is A (the entry, the gate record, and a test that a file with set B is accepted and reported as B, so the default is a recorded choice and not a limit of the check); the presence and flow parameters of PRV-59 are positive and recorded (the two `round_movement` entries; the gate record); the name `presence_base` is not used (the check refuses it as a code, and a test scans the seven source roots for the three retired names outside the two files that state the rule, with a plant in each root); a missing or non-positive parameter fails the check (the planted files for a missing base on each set and for a zero, negative, decimal and non-numeric base); the months shown first are chosen among the months of the reference period and recorded (23, `2024-01` to `2025-11`, in the gate record).
+- Tests: 116 in `custodian/tests/test_rules_config.py`, with 38 small files of which 36 each plant one refusal and 2 are accepted, and 3 in `scripts/tests/test_rules_retired_names.py` (the scan of the seven roots); the refusals name the entry and the field, and the completion pass made the tests that had matched half a message require the whole of it.
+- Internal review before the completion pass (2026-11-13; two read-only lenses on the privacy rules with second readers, the lead's own agents, Claude Opus 5.5): the values, the two closed lists, the window and the record hold; four findings were confirmed by a second reader and two refuted, and the lead read eight more. The most important was the lead's own wording: the reason for 50 and 100 had been written as if the pack derived it; it is a judgement by analogy (5 and 10 panel devices at the default expansion factor of 10) plus one fact (a home zone above the expansion cap of 50 is dropped, so one device moves a presence estimate by at most 50). The completion pass did ten points, among them the presence bounds in the two descriptions, the allow-list of the retired-name scan as two exact paths, refusals that name the entry and the field, and a bad base planted for set B; the digest of the four entries changed with the descriptions and the record was computed again.
+- The lead's own breaks, each caught and restored (six at the work commit, the row below: set B below set A; a base changed with the record untouched; a description changed with the record untouched; a code outside the closed lists; a window of 24; a retired code).
+- The owner accepted the bases 50 and 100 as stated assumptions on 2026-11-13. Still his to say (OI-124): whether the window of 23 months stands, and who fixes the cells of the synthetic world's starting table that are dated to slice S1 and carried by no task, `mob.range_multiple` among them; until it has a value the world build refuses to start (SYN-69).
+- Mutation testing of the number module (the owner's rule of 2026-11-13, in force since task S1-T11). The lead's first run at the first work commit could not start: the tester runs a package from a copy of that package alone, and one test of the package walked the seven roots of the repository. A second completion pass (the same builder, 2026-11-14) moved the three scan tests to the cross-plane tests, unchanged in strictness, and then ran the tester: 355 mutants; 322 killed at first, 337 after seven new tests; 18 survivors, each explained as equivalent in `scripts/mutation_explained.toml` (unreachable refusals after a successful parse, two spellings of one codec, orderings that the code already fixes); no timeout and no uncovered mutant. The refusal tests now require the whole message. The lead's own run at the work commit is the row below.
+- The work was complete in its workspace on 2026-11-13 and was moved onto main after tasks S1-T02, S1-T13 and S1-T11 merged; it adds files only, and no file of main changed under it. Not built here: the privacy engine, the exact-set test of DAT-129 and the proof that no world is built with another file (PRV-120, TST-193) belong to the tasks that build the engine, the world and the release.
+
+#### Evidence for the work commit `e77c51b7b35e3f7e374769b493c78654dd17957d`
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   uv run --locked python -m pytest custodian/tests/test_rules_config.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    116 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The task's tests of the check: the four entries, every refusal with its planted file and its whole message, the gate record recomputed from the configuration (116 tests).
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   uv run --locked python -m unittest scripts.tests.test_rules_retired_names -v
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    3 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The scan of the seven source roots for the three retired rule names, in the cross-plane tests: the allow-list of two exact paths, the neighbour and nested-namesake refusals, a plant in each root with the proof that each root was read.
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   python3 -I -c "import json; d=json.load(open('custodian/src/eii_custodian/privacy/gate_record.json')); print(d['task'], d['rules_version_id'], d['exported_set'], d['movement_base_a'], d['movement_base_b'], d['window_months'], d['first_month'], d['last_month'], d['entries_sha256'])"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "S1-T09 rv-1.0.0-s1 A 50 100 23 2024-01 2025-11 79ef0029cdb31dfc93afc78f9e60ce31e9107c9cf9b5c83f2139edb750638bce"
+Seed:      none
+Notes:     The committed gate record of the slice S1 gate evidence: the exported set, both movement bases, the window with its first and last month, and the digest of the four entries.
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   bash <lead>/tmp/S1-T09.lead-breaks.sh
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; first output line "S1-T09 lead breaks, 2026-11-14 02:43, on e77c51b7b35e3f7e374769b493c78654dd17957d plus the task's files; rules.toml sha256 2f36146746cb5f03549d70f9f65e891170fadf2946886bfdb68ac5a4fef62572"
+Seed:      none
+Notes:     The lead's six breaks of the rules file (set B below set A; a base changed with the record untouched; a description changed with the record untouched; a code outside the closed lists; a window of 24; a retired code): each fails the task's tests; the file is restored after each.
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   uv run --locked --group mutation python scripts/mutation.py custodian/src/eii_custodian/privacy/rules_config.py 2>&1 | python3 -I -c 'import sys,re; print(" ".join(m.split("/")[-1] for m in re.findall(r"(?m)^\S+\.py: made=\d+ killed=\d+ survived=\d+ timed_out=\d+ not_covered=\d+ incomplete=\d+", sys.stdin.read())))'
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "rules_config.py: made=355 killed=337 survived=18 timed_out=0 not_covered=0 incomplete=0" (the counts of mutmut)
+Seed:      none
+Notes:     mutmut 3.8.1 on the rules check, in a temporary copy of the package: 355 mutants, 337 killed, 18 survivors each explained as equivalent in scripts/mutation_explained.toml (the command exits non-zero on an unexplained survivor).
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   ./eii test --seed 2026111421
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1998 passed, 0 failed, 0 skipped
+Seed:      2026111421
+Notes:     The whole test command on the build machine with a fresh seed; the custodian suite holds the task's 116 tests and the guard suite the three tests of the retired-name scan.
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint of the Python files.
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "221 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 195 source files"
+Seed:      none
+Notes:     Strict types, the new module included.
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 408 text files, 63 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check with the module README.
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical (unchanged by this task).
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Resolved 61 packages in 1ms" (exit code decides)
+Seed:      none
+Notes:     The lock file matches the manifests (no dependency added).
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','a9db6c85d19c1035377dfbc9fde8959fcc86cff7...e77c51b7b35e3f7e374769b493c78654dd17957d'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/src/eii_custodian/privacy/README.md A:custodian/src/eii_custodian/privacy/__init__.py A:custodian/src/eii_custodian/privacy/gate_record.json A:custodian/src/eii_custodian/privacy/rules.toml A:custodian/src/eii_custodian/privacy/rules_config.py A:custodian/tests/fixtures/rules_config/bad_parameter_set.toml A:custodian/tests/fixtures/rules_config/base_a_missing.toml A:custodian/tests/fixtures/rules_config/base_b_many.toml A:custodian/tests/fixtures/rules_config/base_b_missing.toml A:custodian/tests/fixtures/rules_config/base_b_smaller.toml A:custodian/tests/fixtures/rules_config/base_b_zero.toml A:custodian/tests/fixtures/rules_config/base_decimal.toml A:custodian/tests/fixtures/rules_config/base_negative.toml A:custodian/tests/fixtures/rules_config/base_not_text.toml A:custodian/tests/fixtures/rules_config/base_text.toml A:custodian/tests/fixtures/rules_config/base_zero.toml A:custodian/tests/fixtures/rules_config/blank_version.toml A:custodian/tests/fixtures/rules_config/different_version.toml A:custodian/tests/fixtures/rules_config/empty.toml A:custodian/tests/fixtures/rules_config/entry_not_table.toml A:custodian/tests/fixtures/rules_config/equal_bases.toml A:custodian/tests/fixtures/rules_config/export_b.toml A:custodian/tests/fixtures/rules_config/export_missing.toml A:custodian/tests/fixtures/rules_config/export_on_set_a.toml A:custodian/tests/fixtures/rules_config/export_other.toml A:custodian/tests/fixtures/rules_config/invalid.toml A:custodian/tests/fixtures/rules_config/missing_field.toml A:custodian/tests/fixtures/rules_config/movement_on_shared.toml A:custodian/tests/fixtures/rules_config/not_a_list.toml A:custodian/tests/fixtures/rules_config/rule_code_not_text.toml A:custodian/tests/fixtures/rules_config/rule_twice.toml A:custodian/tests/fixtures/rules_config/unit_not_text.toml A:custodian/tests/fixtures/rules_config/unknown_code.toml A:custodian/tests/fixtures/rules_config/unknown_field.toml A:custodian/tests/fixtures/rules_config/window_24.toml A:custodian/tests/fixtures/rules_config/window_decimal.toml A:custodian/tests/fixtures/rules_config/window_missing.toml A:custodian/tests/fixtures/rules_config/window_on_set_b.toml A:custodian/tests/fixtures/rules_config/window_text.toml A:custodian/tests/fixtures/rules_config/window_zero.toml A:custodian/tests/fixtures/rules_config/wrong_unit_export.toml A:custodian/tests/fixtures/rules_config/wrong_unit_movement.toml A:custodian/tests/fixtures/rules_config/wrong_unit_window.toml A:custodian/tests/test_rules_config.py A:scripts/tests/test_rules_retired_names.py M:scripts/mutation_explained.toml'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "46 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The paths the two work commits change against the base, exactly the task's scope (46 paths: the package, its tests and their small files, the cross-plane scan test, the ledger of explained survivors).
+```
+
+```text
+### S1-T09 — Exported set, presence and flow parameters, and months shown first
+Commit:    e77c51b7b35e3f7e374769b493c78654dd17957d
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','a9db6c85d19c1035377dfbc9fde8959fcc86cff7..e77c51b7b35e3f7e374769b493c78654dd17957d'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two work commits between the base and the work commit have Conventional Commit subjects.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
