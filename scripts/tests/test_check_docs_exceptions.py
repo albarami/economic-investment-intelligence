@@ -9,11 +9,15 @@ into it, runs the copy and asserts the exit code and the exact FAIL lines.
 
 from __future__ import annotations
 
+import builtins
+import contextlib
 import hashlib
+import io
 import os
 import subprocess
 import sys
 import tempfile
+import traceback
 import types
 import unittest
 from collections.abc import Callable
@@ -152,12 +156,42 @@ def config_fail(detail: str) -> str:
     return f"FAIL place-exception-config: {CONFIG}: {detail}"
 
 
+def write_tree(root: Path, files: dict[str, str | bytes]) -> None:
+    for rel, content in files.items():
+        target = root / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if isinstance(content, bytes):
+            target.write_bytes(content)
+        else:
+            target.write_text(content, encoding="utf-8")
+
+
+def fail_lines(stdout: str) -> list[str]:
+    return sorted(line for line in stdout.splitlines() if line.startswith("FAIL"))
+
+
 def run(
     files: dict[str, str | bytes],
     patterns: list[str] | None,
     prepare: Callable[[Path], None] | None = None,
     missing_patterns: bool = False,
 ) -> tuple[int, list[str]]:
+    code, stdout, _ = run_streams(files, patterns, prepare, missing_patterns)
+    return code, fail_lines(stdout)
+
+
+def run_streams(
+    files: dict[str, str | bytes],
+    patterns: list[str] | None,
+    prepare: Callable[[Path], None] | None = None,
+    missing_patterns: bool = False,
+    pattern_bytes: bytes | None = None,
+    env_extra: dict[str, str] | None = None,
+) -> tuple[int, str, str]:
+    """Exit code and the whole standard output and error of one child run.
+
+    ``pattern_bytes`` is written as the pattern file in place of ``patterns``;
+    ``env_extra`` adds variables to the child's environment."""
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp) / "repo"
         for rel, content in files.items():
@@ -175,8 +209,13 @@ def run(
             pattern_file = Path(tmp) / "patterns.txt"
             pattern_file.write_text("\n".join(patterns) + "\n", encoding="utf-8")
             env["EII_FORBIDDEN_PATTERNS_FILE"] = str(pattern_file)
+        if pattern_bytes is not None:
+            pattern_file = Path(tmp) / "patterns.txt"
+            pattern_file.write_bytes(pattern_bytes)
+            env["EII_FORBIDDEN_PATTERNS_FILE"] = str(pattern_file)
         if missing_patterns:
             env["EII_FORBIDDEN_PATTERNS_FILE"] = str(Path(tmp) / "absent.txt")
+        env.update(env_extra or {})
         done = subprocess.run(
             [sys.executable, "scripts/check_docs.py"],
             cwd=root,
@@ -185,15 +224,26 @@ def run(
             text=True,
             check=False,
         )
-    fails = sorted(line for line in done.stdout.splitlines() if line.startswith("FAIL"))
-    return done.returncode, fails
+    return done.returncode, done.stdout, done.stderr
 
 
 PRIVATE = [NAME.lower(), OTHER.lower()]
+# White space that Python strips but CommonMark does not call blank: a no-break
+# space, an ideographic space and the unit separator.
+SPACES = ("\u00a0", "\u3000", "\x1f")
 
 
 class Base(unittest.TestCase):
     maxDiff = None
+
+    def assertStreams(self, stdout: str, stderr: str, expected: list[str]) -> None:
+        """Both whole streams: nothing on standard error, and on standard output
+        the expected FAIL lines and one closing summary line, nothing else."""
+        self.assertEqual(stderr, "")
+        lines = stdout.splitlines()
+        self.assertTrue(lines)
+        self.assertRegex(lines[-1], r"^checked \d+ text files, \d+ Markdown files: ")
+        self.assertEqual(sorted(lines[:-1]), sorted(expected))
 
     def assertRun(
         self,
@@ -202,17 +252,24 @@ class Base(unittest.TestCase):
         expected: list[str],
         prepare: Callable[[Path], None] | None = None,
     ) -> None:
-        code, fails = run(files, patterns, prepare)
-        self.assertEqual(fails, sorted(expected))
+        code, stdout, stderr = run_streams(files, patterns, prepare)
+        self.assertEqual(fail_lines(stdout), sorted(expected))
+        self.assertStreams(stdout, stderr, expected)
         self.assertEqual(code, 1 if expected else 0)
 
-    def all_places(self, files: dict[str, str | bytes], **kw: object) -> list[str]:
+    def all_places(
+        self,
+        files: dict[str, str | bytes],
+        *,
+        extra: int | None = 1,
+        listed: bool = True,
+    ) -> list[str]:
         """The refusal of every occurrence of the name in its two places."""
         text = str(files[DOC04])
-        return refused(DOC04, line_numbers(text, NAME), **kw) + refused(  # type: ignore[arg-type]
-            ATTR,
-            line_numbers(str(files[ATTR]), NAME),
-            **kw,  # type: ignore[arg-type]
+        return refused(
+            DOC04, line_numbers(text, NAME), extra=extra, listed=listed
+        ) + refused(
+            ATTR, line_numbers(str(files[ATTR]), NAME), extra=extra, listed=listed
         )
 
 
@@ -469,6 +526,20 @@ class RefusedElsewhere(Base):
             f'export const MAP_ATTRIBUTION = "© {NAME} imagery";\n`;\n'
         )
         self.only(files, ATTR, NAME)
+
+    def test_hashbang_line_lifts_the_attribution_file(self) -> None:
+        """A back-tick on a hashbang line opens nothing in the language, so the
+        reader would be one template out of step: the file has no allowed line."""
+        files = base()
+        files[ATTR] = (
+            "#!x `\n"
+            "const a = `\n"
+            f'export const MAP_ATTRIBUTION = "© {NAME} imagery";\n'
+            "`; // `\n"
+            'export const MAP_ATTRIBUTION = ["©", "Publisher B"].join(" ");\n'
+        )
+        self.assertRun(files, PRIVATE, refused(ATTR, [3]))
+        self.assertRun(files, None, refused(ATTR, [3], extra=None))
 
     def test_declaration_inside_braces(self) -> None:
         files = base()
@@ -888,6 +959,23 @@ class ReviewedRefusals(Base):
         )
         self.whole_doc04(files)
 
+    def test_dedented_line_ends_a_fence_opened_in_a_list_item(self) -> None:
+        """A dedented line ends the list item and the fence opened inside it; the
+        next fence hides the one registry heading of the file."""
+        files = self.edit("## 2. Source registry", "## 2. Sources")
+        files[DOC04] = str(files[DOC04]).replace(
+            "Scope prose.",
+            "Scope prose.\n\n- sample:\n  ```\n  code\nDedented prose ends the "
+            "list.\n\n```\n\n## 2. Source registry\n\n"
+            + self.table("Listed fence tiles")
+            + "\n\n## end of sample\n```",
+            1,
+        )
+        text = str(files[DOC04])
+        self.assertEqual(text.count("Source registry"), 1)
+        self.assertEqual(text.count("```"), 3)
+        self.whole_doc04(files)
+
     def test_comment_open_across_the_heading(self) -> None:
         files = self.edit("Scope prose.", "Scope prose. <!-- open")
         files[DOC04] = str(files[DOC04]).replace("Fetcher prose.", "Fetcher -->")
@@ -911,6 +999,121 @@ class ReviewedRefusals(Base):
         self.assertRun(
             files, PRIVATE, refused(DOC04, line_numbers(str(files[DOC04]), "Pub |"))
         )
+
+    def hidden_section(self, before: str, after: str = "") -> dict[str, str | bytes]:
+        """The real heading renamed; after 'Scope prose.' the text ``before``,
+        the one registry heading of the file, a table and ``after``."""
+        files = self.edit("## 2. Source registry", "## 2. Sources")
+        files[DOC04] = str(files[DOC04]).replace(
+            "Scope prose.",
+            "Scope prose.\n\n"
+            + before
+            + "## 2. Source registry\n\n"
+            + self.table("Hidden tiles")
+            + "\n\n## end of sample"
+            + after,
+            1,
+        )
+        self.assertEqual(str(files[DOC04]).count("Source registry"), 1)
+        return files
+
+    def test_tab_after_a_closing_fence_closes_it(self) -> None:
+        self.whole_doc04(self.hidden_section("```\nsample\n```\t\n\n```\n\n", "\n```"))
+
+    def test_html_block_before_the_heading_holds_a_fence_line(self) -> None:
+        for opener, closer, fence in (
+            ("<div>", "</div>", "```"),
+            ("<details>", "</details>", "~~~"),
+        ):
+            with self.subTest(opener=opener):
+                files = self.hidden_section(
+                    f"{opener}\n{fence}\n{closer}\n\n{fence}\n\n", "\n" + fence
+                )
+                self.whole_doc04(files)
+
+    def test_no_break_space_tail_on_the_delimiter_row(self) -> None:
+        for space in SPACES:
+            with self.subTest(space=hex(ord(space))):
+                files = self.edit(
+                    "Registry prose.",
+                    "Registry prose.\n\n| source_id | Dataset | Publisher |\n"
+                    f"|---|---|---|{space}\n| `sat_tiles` | Not a table | {NAME} |",
+                )
+                lines = line_numbers(str(files[DOC04]), "Not a table")
+                self.assertEqual(len(lines), 1)
+                self.assertRun(files, PRIVATE, refused(DOC04, lines))
+                self.assertRun(files, None, refused(DOC04, lines, extra=None))
+
+    def test_no_break_space_line_before_a_setext_underline(self) -> None:
+        for space in SPACES:
+            with self.subTest(space=hex(ord(space))):
+                files = self.edit(
+                    "## 3. Fetcher rules",
+                    f"{space}\n===\n\n"
+                    + self.table("After the heading")
+                    + "\n\n## 3. Fetcher rules",
+                )
+                self.whole_doc04(files)
+
+    def test_no_break_space_line_ends_a_list_item_and_its_fence(self) -> None:
+        for space in SPACES:
+            with self.subTest(space=hex(ord(space))):
+                files = self.hidden_section(
+                    f"- sample:\n  ```\n  code\n{space}\n  ```\n\n", "\n```"
+                )
+                self.whole_doc04(files)
+
+    def test_no_break_space_line_inside_an_html_block(self) -> None:
+        for space in SPACES:
+            with self.subTest(space=hex(ord(space))):
+                files = self.edit("## 2. Source registry", "## 2. Sources")
+                files[DOC04] = str(files[DOC04]).replace(
+                    "Scope prose.",
+                    f"Scope prose.\n\n<div>\n{space}\n## 2. Source registry\n{space}\n"
+                    + self.table("Div space tiles")
+                    + "\n\n## end of sample",
+                    1,
+                )
+                self.whole_doc04(files)
+
+    def test_no_break_space_before_the_heading_or_the_table_header(self) -> None:
+        """Each form is decided by one use of CommonMark's blank line alone."""
+        for space in SPACES:
+            with self.subTest(space=hex(ord(space)), where="before the heading"):
+                self.whole_doc04(self.hidden_section(f"{space}\n"))
+            with self.subTest(space=hex(ord(space)), where="before the header"):
+                files = self.edit("## 2. Source registry", "## 2. Sources")
+                files[DOC04] = str(files[DOC04]).replace(
+                    "Scope prose.",
+                    f"Scope prose.\n\n## 2. Source registry\n{space}\n"
+                    + self.table("Header space tiles")
+                    + "\n\n## end of sample",
+                    1,
+                )
+                self.whole_doc04(files)
+            with self.subTest(space=hex(ord(space)), where="after the heading"):
+                files = self.edit(
+                    "## 2. Source registry", "## 2. Source registry" + space
+                )
+                self.whole_doc04(files)
+            with self.subTest(space=hex(ord(space)), where="after a row"):
+                row = f"| `sat_tiles` | Satellite tiles | {NAME} | Open |"
+                files = self.edit(row, row + space)
+                lines = line_numbers(str(files[DOC04]), "Satellite tiles")
+                self.assertRun(files, PRIVATE, refused(DOC04, lines))
+                self.assertRun(files, None, refused(DOC04, lines, extra=None))
+
+    def test_pattern_file_with_byte_order_mark(self) -> None:
+        files = base()
+        files["README.md"] = f"Fixture of {OTHER}.\n"
+        code, stdout, stderr = run_streams(
+            files, None, pattern_bytes=b"\xef\xbb\xbf" + OTHER.lower().encode() + b"\n"
+        )
+        expected = [
+            "FAIL extra-1: README.md:1: extra forbidden pattern: (matched text not shown)"
+        ]
+        self.assertStreams(stdout, stderr, expected)
+        self.assertEqual(code, 1)
 
     def plant(
         self,
@@ -1067,6 +1270,305 @@ class ReviewedRefusals(Base):
             ],
             patterns=PRIVATE,
         )
+
+
+def load_module() -> types.ModuleType:
+    sys.path.insert(0, str(SCRIPT.parent))
+    try:
+        import check_docs
+    finally:
+        sys.path.pop(0)
+    return check_docs
+
+
+class InProcess(Base):
+    """Cases that need a spy: the check's main() runs in this process, on a
+    temporary root, with both output streams captured whole. An exception that
+    escapes main() is written to standard error as the interpreter would."""
+
+    def run_main(
+        self,
+        files: dict[str, str | bytes],
+        patterns: list[str] | None,
+        prepare: Callable[[Path, Path], None] | None = None,
+        patches: Callable[[Path, Path], list[contextlib.AbstractContextManager[object]]]
+        | None = None,
+    ) -> tuple[int, str, str, Path]:
+        check_docs = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root, outside = Path(tmp) / "repo", Path(tmp) / "outside"
+            outside.mkdir()
+            write_tree(root, files)
+            if prepare is not None:
+                prepare(root, outside)
+            env = {k: v for k, v in os.environ.items()}
+            env.pop("EII_FORBIDDEN_PATTERNS_FILE", None)
+            if patterns is not None:
+                pattern_file = outside / "patterns.txt"
+                pattern_file.write_text("\n".join(patterns) + "\n", encoding="utf-8")
+                env["EII_FORBIDDEN_PATTERNS_FILE"] = str(pattern_file)
+            out, err = io.StringIO(), io.StringIO()
+            with contextlib.ExitStack() as stack:
+                stack.enter_context(mock.patch.dict(os.environ, env, clear=True))
+                stack.enter_context(mock.patch.object(check_docs, "ROOT", root))
+                for patch in patches(root, outside) if patches is not None else []:
+                    stack.enter_context(patch)
+                stack.enter_context(contextlib.redirect_stdout(out))
+                stack.enter_context(contextlib.redirect_stderr(err))
+                try:
+                    code = check_docs.main()
+                except Exception:
+                    traceback.print_exc()
+                    code = 1
+            return code, out.getvalue(), err.getvalue(), Path(tmp)
+
+
+class SymbolicLinks(InProcess):
+    def test_link_is_read_as_its_text_and_its_referent_is_never_opened(self) -> None:
+        """A link to a file outside the scanned tree is scanned as its link text;
+        the referent is never opened. A link to a listed regular file adds
+        nothing: that file is scanned through its own entry."""
+        files = base()
+        files["README.md"] = f"Fixture of {NAME}.\n"
+        opened: list[str] = []
+
+        def links(root: Path, outside: Path) -> None:
+            (outside / "secret.md").write_text(f"{NAME} {DIGITS}\n", encoding="utf-8")
+            (root / "docs" / "notes.md").symlink_to(outside / "secret.md")
+            (root / "docs" / "alias.md").symlink_to("../README.md")
+
+        def spies(
+            root: Path, outside: Path
+        ) -> list[contextlib.AbstractContextManager[object]]:
+            def spy(original: Callable[..., object]) -> Callable[..., object]:
+                def opener(target: object, *args: object, **kwargs: object) -> object:
+                    if isinstance(target, (str, bytes, os.PathLike)):
+                        opened.append(os.path.realpath(os.fsdecode(target)))
+                    return original(target, *args, **kwargs)
+
+                return opener
+
+            return [
+                mock.patch.object(io, "open", spy(io.open)),
+                mock.patch.object(builtins, "open", spy(builtins.open)),
+                mock.patch.object(os, "open", spy(os.open)),
+            ]
+
+        code, stdout, stderr, tmp = self.run_main(files, PRIVATE, links, spies)
+        referent = os.path.realpath(tmp / "outside" / "secret.md")
+        self.assertIn(os.path.realpath(tmp / "repo" / "README.md"), opened)
+        self.assertNotIn(referent, opened)
+        expected = refused("README.md", [1])
+        self.assertStreams(stdout, stderr, expected)
+        self.assertEqual(code, 1)
+
+    def test_link_target_meets_the_built_in_patterns(self) -> None:
+        def links(root: Path, outside: Path) -> None:
+            (root / "docs" / "abs.md").symlink_to("/ho" + "me/someone/notes/plan.md")
+            (root / "docs" / "num.md").symlink_to(f"notes {DIGITS}.md")
+
+        code, stdout, stderr, _ = self.run_main(base(), PRIVATE, links)
+        hidden = "(matched text not shown)"
+        self.assertStreams(
+            stdout,
+            stderr,
+            [
+                "FAIL local-path: docs/abs.md: absolute local path in a link "
+                f"target: {hidden}",
+                "FAIL identifier-number: docs/num.md: identifier-shaped number "
+                f"(exactly 8 or 11 digits) in a link target: {hidden}",
+            ],
+        )
+        self.assertEqual(code, 1)
+
+
+INVALID_PATTERN = (
+    "FAIL extra-patterns: a line of EII_FORBIDDEN_PATTERNS_FILE is not a valid "
+    "regular expression"
+)
+INTERNAL = "FAIL internal: the check stopped on an unexpected error (details not shown)"
+
+
+class ConfidentialErrors(InProcess):
+    """Errors fail closed with fixed messages: no exception text, pattern,
+    group name, digest or unredacted path reaches either stream."""
+
+    def assertClosed(self, stdout: str, stderr: str, tmp: Path) -> None:
+        both = (stdout + stderr).casefold()
+        for secret in (NAME, digest(NAME), str(tmp), tempfile.gettempdir()):
+            self.assertNotIn(secret.casefold(), both)
+
+    def test_malformed_private_pattern(self) -> None:
+        for bad in (
+            f"(?P<{NAME}>a)(?P<{NAME}>b)",
+            f"[{NAME}",
+            NAME + "{" + "9" * 12 + "}",
+        ):
+            with self.subTest(bad=bad):
+                code, stdout, stderr = run_streams(base(), [*PRIVATE, bad])
+                self.assertEqual(code, 1)
+                self.assertStreams(
+                    stdout,
+                    stderr,
+                    [
+                        "FAIL extra-patterns: a line of EII_FORBIDDEN_PATTERNS_FILE "
+                        "is not a valid regular expression"
+                    ],
+                )
+                self.assertClosed(stdout, stderr, Path(tempfile.gettempdir()))
+
+    def child(
+        self,
+        files: dict[str, str | bytes],
+        expected: list[str],
+        env_extra: dict[str, str] | None = None,
+    ) -> None:
+        """One child run: nothing on standard error, the fixed lines, exit 1."""
+        code, stdout, stderr = run_streams(files, PRIVATE, env_extra=env_extra)
+        self.assertStreams(stdout, stderr, expected)
+        self.assertEqual(code, 1)
+        self.assertClosed(stdout, stderr, Path(tempfile.gettempdir()))
+
+    def test_pattern_that_compiles_with_a_warning(self) -> None:
+        code, stdout, stderr = run_streams(base(), [*PRIVATE, "[[a]" + OTHER.lower()])
+        self.assertStreams(stdout, stderr, [INVALID_PATTERN])
+        self.assertEqual(code, 1)
+        self.assertClosed(stdout, stderr, Path(tempfile.gettempdir()))
+
+    def test_deeply_nested_configuration(self) -> None:
+        files = base()
+        files[CONFIG] = "x = " + "[" * 30000 + "]" * 30000 + "\n"
+        self.child(
+            files,
+            [config_fail("not valid TOML"), *self.all_places(files, listed=False)],
+        )
+
+    def test_zero_byte_in_a_link_target(self) -> None:
+        files = base()
+        files["README.md"] = "Fixture.\n\n[x](a\x00b.md)\n"
+        self.child(
+            files,
+            [
+                "FAIL link: README.md:3: target cannot be resolved: "
+                "(matched text not shown)"
+            ],
+        )
+
+    def test_link_target_whose_existence_cannot_be_checked(self) -> None:
+        """A link target inside the tree whose existence check raises fails
+        closed with the fixed line; the error text and the path stay hidden."""
+        files = base()
+        files["README.md"] = "Fixture.\n\n[x](TASKS.md)\n"
+        original = Path.exists
+
+        def refuse(path: Path, *, follow_symlinks: bool = True) -> bool:
+            if path.name == "TASKS.md":
+                raise OSError(5, f"{NAME} {path}", str(path))
+            return original(path, follow_symlinks=follow_symlinks)
+
+        def patches(
+            root: Path, outside: Path
+        ) -> list[contextlib.AbstractContextManager[object]]:
+            return [mock.patch.object(Path, "exists", refuse)]
+
+        code, stdout, stderr, tmp = self.run_main(files, PRIVATE, patches=patches)
+        self.assertEqual(stderr, "")
+        self.assertStreams(
+            stdout,
+            stderr,
+            [
+                "FAIL link: README.md:3: target cannot be resolved: "
+                "(matched text not shown)"
+            ],
+        )
+        self.assertEqual(code, 1)
+        self.assertClosed(stdout, stderr, tmp)
+
+    def test_ascii_output_with_a_non_ascii_path(self) -> None:
+        files = base()
+        files["docs/café.md"] = "[x](missing.md)\n"
+        self.child(
+            files,
+            ["FAIL link: docs/caf\\xe9.md:1: target does not exist: missing.md"],
+            env_extra={"PYTHONIOENCODING": "ascii"},
+        )
+
+    def test_unexpected_error_ends_in_one_fixed_line(self) -> None:
+        check_docs = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repo"
+            write_tree(root, base())
+
+            def boom(*args: object) -> None:
+                raise RuntimeError(f"{NAME} {root}")
+
+            out, err = io.StringIO(), io.StringIO()
+            with contextlib.ExitStack() as stack:
+                stack.enter_context(mock.patch.dict(os.environ))
+                os.environ.pop("EII_FORBIDDEN_PATTERNS_FILE", None)
+                stack.enter_context(mock.patch.object(check_docs, "ROOT", root))
+                stack.enter_context(
+                    mock.patch.object(check_docs, "check_requirement_ids", boom)
+                )
+                stack.enter_context(contextlib.redirect_stdout(out))
+                stack.enter_context(contextlib.redirect_stderr(err))
+                code = check_docs.run_guarded()
+            self.assertEqual(code, 2)
+            self.assertEqual(err.getvalue(), "")
+            self.assertEqual(out.getvalue(), INTERNAL + "\n")
+            self.assertClosed(out.getvalue(), err.getvalue(), Path(tmp))
+
+    def test_unreadable_files(self) -> None:
+        """A listed file, the configuration and the agent rules that cannot be
+        read each fail closed; the hidden path stays hidden."""
+        files = base()
+        files[f"docs/{NAME.lower()}-notes.md"] = "Fixture.\n"
+        original = Path.read_bytes
+        hidden_extra = (
+            "FAIL extra-1: (path not shown): extra forbidden pattern in a file or "
+            "folder name: (matched text not shown)"
+        )
+        for unreadable, expected in (
+            (
+                {f"{NAME.lower()}-notes.md", "AGENTS.md"},
+                [
+                    "FAIL agent-files: AGENTS.md or CLAUDE.md cannot be read",
+                    hidden_path(),
+                    hidden_extra,
+                    "FAIL read: (path not shown): cannot be read",
+                    "FAIL read: AGENTS.md: cannot be read",
+                ],
+            ),
+            (
+                {Path(CONFIG).name},
+                [
+                    config_fail("cannot be read"),
+                    f"FAIL read: {CONFIG}: cannot be read",
+                    hidden_extra,
+                    *self.all_places(files, listed=False),
+                ],
+            ),
+        ):
+            with self.subTest(unreadable=sorted(unreadable)):
+
+                def refuse(path: Path, names: set[str] = unreadable) -> bytes:
+                    if path.name in names:
+                        raise PermissionError(13, "Permission denied", str(path))
+                    return original(path)
+
+                def patches(
+                    root: Path,
+                    outside: Path,
+                    refuse: Callable[[Path], bytes] = refuse,
+                ) -> list[contextlib.AbstractContextManager[object]]:
+                    return [mock.patch.object(Path, "read_bytes", refuse)]
+
+                code, stdout, stderr, tmp = self.run_main(
+                    files, PRIVATE, patches=patches
+                )
+                self.assertEqual(code, 1)
+                self.assertStreams(stdout, stderr, expected)
+                self.assertClosed(stdout, stderr, tmp)
 
 
 class FileListing(unittest.TestCase):

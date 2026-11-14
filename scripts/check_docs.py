@@ -36,13 +36,19 @@ Checks
 Which files are scanned: inside a git checkout, the files and symbolic links git
 tracks plus the untracked ones it does not ignore; elsewhere, every file and
 symbolic link under the root except build and cache folders and Zone.Identifier
-files.
+files. A symbolic link is read as its link text only; its referent is never
+opened; the built-in patterns, check 8 and the extra patterns read that text. A
+file or link that cannot be read fails with a fixed line, and an unexpected
+error ends in one fixed ``internal`` line and exit code 2; nothing is written to
+standard error.
 
 Extra forbidden patterns: if the environment variable
 ``EII_FORBIDDEN_PATTERNS_FILE`` is set, the file it names must be readable
 (else one ``extra-patterns`` FAIL, without the path); each non-empty line of it
 that does not start with ``#`` is a regular expression that is also forbidden in
 every UTF-8 file of any suffix, in every listed path and in every link target.
+A line that is not a valid regular expression fails with one fixed
+``extra-patterns`` line; no error text, pattern or path is ever printed.
 The built-in patterns skip ``scripts/check_docs.py``; the extra patterns and
 check 8 read it.
 
@@ -69,12 +75,14 @@ from __future__ import annotations
 
 import hashlib
 import html
+import io
 import os
 import re
 import subprocess
 import sys
 import tomllib
 import unicodedata
+import warnings
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -246,7 +254,7 @@ SECTION_2 = "## 2. Source registry"
 SECTION_2_KEY = "2sourceregistry"
 SECTION_END_RE = re.compile(r"^ {0,3}#{1,2}(?:[ \t]|$)")
 FENCE_OPEN_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
-FENCE_CLOSE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,}) *$")
+FENCE_CLOSE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})[ \t]*$")
 TAG_RE = re.compile(r"<[^>]*>")
 # HTML that can hide lines across blank lines: comments, processing instructions,
 # declarations, CDATA, and the blocks that end only at their closing tag.
@@ -322,12 +330,27 @@ def listed_files() -> list[Path]:
     ]
 
 
+def read_regular(path: Path) -> bytes | None:
+    """The bytes of a regular file, never through a symbolic link; None when it
+    cannot be read. The error is never shown: its text can hold a private path."""
+    if path.is_symlink():
+        return None
+    try:
+        return path.read_bytes()
+    except OSError:
+        return None
+
+
 def is_text_file(path: Path) -> bool:
     return path.suffix.lower() in TEXT_SUFFIXES or path.name in TEXT_NAMES
 
 
 def iter_text_files() -> list[Path]:
-    return [path for path in listed_files() if path.is_file() and is_text_file(path)]
+    return [
+        path
+        for path in listed_files()
+        if not path.is_symlink() and path.is_file() and is_text_file(path)
+    ]
 
 
 def load_place_exceptions(failures: list[str]) -> dict[str, frozenset[str]]:
@@ -340,13 +363,16 @@ def load_place_exceptions(failures: list[str]) -> dict[str, frozenset[str]]:
     path = ROOT / PLACE_CONFIG
     if path.is_symlink() or not path.is_file():
         return fail("missing or not a regular file")
+    raw = read_regular(path)
+    if raw is None:
+        return fail("cannot be read")
     try:
-        text = path.read_bytes().decode("utf-8")
+        text = raw.decode("utf-8")
     except UnicodeDecodeError:
         return fail("not valid UTF-8")
     try:
         data = tomllib.loads(text)
-    except tomllib.TOMLDecodeError:
+    except (tomllib.TOMLDecodeError, RecursionError, ValueError):
         return fail("not valid TOML")
     if set(data) - {"exception"}:
         return fail("unknown top-level key")
@@ -389,19 +415,45 @@ def load_place_exceptions(failures: list[str]) -> dict[str, frozenset[str]]:
     return listed
 
 
-def fenced_lines(lines: list[str]) -> list[bool]:
-    """CommonMark fences: which lines open, sit in or close a fenced block."""
+def indent_width(line: str) -> int:
+    """Columns of leading white space, a tab reaching the next multiple of four."""
+    width = 0
+    for char in line:
+        if char == " ":
+            width += 1
+        elif char == "\t":
+            width += 4 - width % 4
+        else:
+            break
+    return width
+
+
+def blank(line: str) -> bool:
+    """CommonMark's blank line: spaces and tabs only. Python's strip() also
+    removes a no-break space or a unit separator, which CommonMark reads as text."""
+    return not line.strip(" \t")
+
+
+def fenced_lines(lines: list[str]) -> list[bool] | None:
+    """CommonMark fences: which lines open, sit in or close a fenced block.
+
+    None for a form this reader does not follow: inside a fence whose opener is
+    indented, a non-blank line indented less than the opener. Such an opener may
+    sit in a list item, and that line then ends the list item and the fence with
+    it (it may even open the next fence), where a top-level fence goes on."""
     fenced: list[bool] = []
-    fence: tuple[str, int] | None = None
+    fence: tuple[str, int, int] | None = None
     for line in lines:
         if fence is None:
             match = FENCE_OPEN_RE.match(line)
             if match and not (match.group(1)[0] == "`" and "`" in match.group(2)):
-                fence = (match.group(1)[0], len(match.group(1)))
+                fence = (match.group(1)[0], len(match.group(1)), indent_width(line))
                 fenced.append(True)
             else:
                 fenced.append(False)
             continue
+        if fence[2] and not blank(line) and indent_width(line) < fence[2]:
+            return None
         fenced.append(True)
         close = FENCE_CLOSE_RE.match(line)
         if close and close.group(1)[0] == fence[0] and len(close.group(1)) >= fence[1]:
@@ -418,8 +470,8 @@ def heading_key(line: str) -> str:
 
 def table_cells(line: str) -> list[str] | None:
     """The cells of a pipe-delimited row, or None when the line is not one."""
-    parts = CELL_SPLIT_RE.split(line.strip())
-    if len(parts) < 3 or parts[0].strip() or parts[-1].strip():
+    parts = CELL_SPLIT_RE.split(line.strip(" \t"))
+    if len(parts) < 3 or parts[0].strip(" \t") or parts[-1].strip(" \t"):
         return None
     return parts[1:-1]
 
@@ -436,9 +488,10 @@ def doc04_source_rows(text: str, lines: list[str]) -> dict[int, frozenset[str]]:
     start = heads[0]
     fenced = fenced_lines(lines)
     if (
-        fenced[start]
-        or lines[start].rstrip() != SECTION_2
-        or (start and lines[start - 1].strip())
+        fenced is None
+        or fenced[start]
+        or lines[start].rstrip(" \t") != SECTION_2
+        or (start and not blank(lines[start - 1]))
     ):
         return {}
     end = len(lines)
@@ -446,18 +499,19 @@ def doc04_source_rows(text: str, lines: list[str]) -> dict[int, frozenset[str]]:
         if not fenced[index] and SECTION_END_RE.match(lines[index]):
             end = index
             break
-    if any(HTML_OPENER_RE.search(line) for line in lines[:end]):
+    # Any line that starts HTML before the end of section 2: an HTML block that
+    # ends at a blank line can hold a fence-looking line the reader would follow.
+    if any(
+        HTML_OPENER_RE.search(line) or re.match(r"^ {0,3}<", line)
+        for line in lines[:end]
+    ):
         return {}
     for index in range(start + 1, end):
         bare = lines[index].strip()
-        if (
-            fenced[index]
-            or re.match(r"^ {0,3}<", lines[index])
-            or (
-                bare
-                and (set(bare) == {"="} or set(bare) == {"-"})
-                and lines[index - 1].strip()
-            )
+        if fenced[index] or (
+            bare
+            and (set(bare) == {"="} or set(bare) == {"-"})
+            and not blank(lines[index - 1])
         ):
             return {}
     rows: dict[int, frozenset[str]] = {}
@@ -466,13 +520,14 @@ def doc04_source_rows(text: str, lines: list[str]) -> dict[int, frozenset[str]]:
         header = table_cells(lines[index]) if lines[index].startswith("|") else None
         delimiter = (
             table_cells(lines[index + 1])
-            if index + 1 < end and DELIMITER_RE.fullmatch(lines[index + 1].rstrip())
+            if index + 1 < end
+            and DELIMITER_RE.fullmatch(lines[index + 1].rstrip(" \t"))
             else None
         )
         if (
             header is not None
             and header[0].strip() == "source_id"
-            and not lines[index - 1].strip()
+            and blank(lines[index - 1])
             and delimiter is not None
             and len(delimiter) == len(header)
         ):
@@ -498,7 +553,10 @@ def doc04_source_rows(text: str, lines: list[str]) -> dict[int, frozenset[str]]:
 def code_line_starts(text: str) -> list[bool] | None:
     """For each line of TypeScript text: True when it starts outside comments,
     strings, templates and brackets. None for a form this reader does not follow
-    (a slash outside comments, a template substitution, an unclosed construct)."""
+    (a hashbang line, a slash outside comments, a template substitution, an
+    unclosed construct)."""
+    if text.startswith("#!"):
+        return None
     starts = [True]
     state, quote, depth = "code", "", 0
     index, size = 0, len(text)
@@ -765,23 +823,40 @@ def load_extra_patterns(failures: list[str]) -> list[tuple[str, re.Pattern[str],
     if not name:
         return patterns
     try:
-        text = Path(name).read_text(encoding="utf-8")
+        # utf-8-sig: a byte-order mark must not become part of the first pattern.
+        text = Path(name).read_text(encoding="utf-8-sig")
     except (OSError, UnicodeDecodeError):
         # The path is never printed: it can be a private path.
         failures.append(
             "FAIL extra-patterns: EII_FORBIDDEN_PATTERNS_FILE names no readable file"
         )
         return patterns
+    invalid = False
     for number, line in enumerate(text.splitlines(), 1):
         line = line.strip()
         if not line or line.startswith("#"):
             continue
-        patterns.append(
-            (
-                f"extra-{number}",
-                re.compile(line, re.IGNORECASE),
-                "extra forbidden pattern",
-            )
+        try:
+            # A warning would print this file's path and a position in the pattern.
+            with warnings.catch_warnings():
+                warnings.simplefilter("error")
+                compiled = re.compile(line, re.IGNORECASE)
+        except (
+            re.error,
+            OverflowError,
+            RecursionError,
+            ValueError,
+            MemoryError,
+            Warning,
+        ):
+            # Fail closed with a fixed line: the error text can hold the pattern.
+            invalid = True
+            continue
+        patterns.append((f"extra-{number}", compiled, "extra forbidden pattern"))
+    if invalid:
+        failures.append(
+            "FAIL extra-patterns: a line of EII_FORBIDDEN_PATTERNS_FILE is not a "
+            "valid regular expression"
         )
     return patterns
 
@@ -797,11 +872,12 @@ def check_required(failures: list[str]) -> None:
 
 def check_agent_files(failures: list[str]) -> None:
     agents, claude = ROOT / "AGENTS.md", ROOT / "CLAUDE.md"
-    if (
-        agents.is_file()
-        and claude.is_file()
-        and agents.read_bytes() != claude.read_bytes()
-    ):
+    if not (agents.is_file() and claude.is_file()):
+        return
+    first, second = read_regular(agents), read_regular(claude)
+    if first is None or second is None:
+        failures.append("FAIL agent-files: AGENTS.md or CLAUDE.md cannot be read")
+    elif first != second:
         failures.append("FAIL agent-files: AGENTS.md and CLAUDE.md differ")
 
 
@@ -823,7 +899,14 @@ def check_links(
             if not file_part:
                 continue
             shown = NOT_SHOWN if number in sensitive else target
-            resolved = (path.parent / file_part).resolve()
+            unresolved = (
+                f"FAIL link: {rel}:{number}: target cannot be resolved: {NOT_SHOWN}"
+            )
+            try:
+                resolved = (path.parent / file_part).resolve()
+            except (OSError, ValueError):
+                failures.append(unresolved)
+                continue
             try:
                 resolved.relative_to(ROOT)
             except ValueError:
@@ -831,7 +914,12 @@ def check_links(
                     f"FAIL link: {rel}:{number}: points outside the repository: {shown}"
                 )
                 continue
-            if not resolved.exists():
+            try:
+                exists = resolved.exists()
+            except (OSError, ValueError):
+                failures.append(unresolved)
+                continue
+            if not exists:
                 failures.append(
                     f"FAIL link: {rel}:{number}: target does not exist: {shown}"
                 )
@@ -972,12 +1060,24 @@ def check_names_and_links(
         if not path.is_symlink():
             continue
         rel = path.relative_to(ROOT).as_posix()
-        target = os.readlink(path)
+        try:
+            target = os.readlink(path)
+        except OSError:
+            failures.append(f"FAIL read: {show(rel)}: link cannot be read")
+            continue
         if finder is not None and finder.find(target):
             failures.append(
                 f"FAIL listed-name: {show(rel)}: a listed name in a link target: "
                 f"{NOT_SHOWN}"
             )
+        for name, pattern, why in FORBIDDEN:
+            if any(
+                not (name == "email" and match.group(0) in EMAIL_ALLOW)
+                for match in pattern.finditer(target)
+            ):
+                failures.append(
+                    f"FAIL {name}: {show(rel)}: {why} in a link target: {NOT_SHOWN}"
+                )
         for name, pattern, why in extra_patterns:
             if pattern.search(target):
                 failures.append(
@@ -996,13 +1096,18 @@ def main() -> int:
     every = listed_files()
     check_names_and_links(every, extra_patterns, finder if listed else None, failures)
     markdown: dict[Path, list[str]] = {}
-    files = [path for path in every if path.is_file() and is_text_file(path)]
-    for path in every:
-        if not path.is_file():
-            continue
+    # A symbolic link is scanned as its link text only (above); its referent is
+    # never opened: it can lie outside the repository or in an ignored folder. A
+    # listed regular target is scanned through its own entry.
+    regular = [path for path in every if not path.is_symlink() and path.is_file()]
+    files = [path for path in regular if is_text_file(path)]
+    for path in regular:
         text_file = is_text_file(path)
         rel = path.relative_to(ROOT).as_posix()
-        data = path.read_bytes()
+        data = read_regular(path)
+        if data is None:
+            failures.append(f"FAIL read: {show(rel)}: cannot be read")
+            continue
         try:
             text = data.decode("utf-8")
         except UnicodeDecodeError:
@@ -1049,5 +1154,23 @@ def main() -> int:
     return 0 if not failures else 1
 
 
+INTERNAL_FAIL = (
+    "FAIL internal: the check stopped on an unexpected error (details not shown)"
+)
+
+
+def run_guarded() -> int:
+    """main() with nothing on standard error: a character the output cannot
+    encode is escaped, and an unexpected error ends in one fixed line and exit 2
+    (its text and traceback can hold a private path or pattern)."""
+    if isinstance(sys.stdout, io.TextIOWrapper):
+        sys.stdout.reconfigure(errors="backslashreplace")
+    try:
+        return main()
+    except Exception:
+        print(INTERNAL_FAIL)
+        return 2
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_guarded())
