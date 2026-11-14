@@ -1334,7 +1334,16 @@ class SymbolicLinks(InProcess):
 
         def links(root: Path, outside: Path) -> None:
             (outside / "secret.md").write_text(f"{NAME} {DIGITS}\n", encoding="utf-8")
-            (root / "docs" / "notes.md").symlink_to(outside / "secret.md")
+            # A relative link text, so that the result does not depend on where
+            # the temporary folder lives (an absolute one under a home folder
+            # meets the built-in local-path pattern).
+            relative = os.path.relpath(outside / "secret.md", root / "docs")
+            self.assertFalse(os.path.isabs(relative))
+            (root / "docs" / "notes.md").symlink_to(relative)
+            self.assertEqual(
+                (root / "docs" / "notes.md").resolve(),
+                (outside / "secret.md").resolve(),
+            )
             (root / "docs" / "alias.md").symlink_to("../README.md")
 
         def spies(
