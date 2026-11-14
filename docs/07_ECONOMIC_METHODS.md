@@ -19,7 +19,7 @@
 - Figures from the protected record types snap to whole release units, with the snap sentence. Public points and Simulated layers are computed for the exact shape the user draws. A Public statistic or a released Simulated count reaches that shape only through apportioning (C18), and the result is labelled Inferred. Whole cells of the published population grid by age and sex are summed over an area, which is not apportioning (C38).
 - Presence is an estimated count of people with a range, hour by hour (C15, C27). Its seasonal shape is calibrated and checked against published museum visitor counts, and its hour-of-day shape by place category is calibrated to the pooled relative busyness of named venues; no venue's level and no single venue's shape enters it (C26, C37). Traffic is a simple Simulated road assignment (C25) with the default provider; the optional live provider shows flow tiles and traffic-aware drive-time areas, and no figure is read from a tile (C25; ARC-135).
 - Several attractive methods would only return the generator's own assumptions on synthetic data. They are listed under "What would be theatre" and are not built.
-- Qatar has eight municipalities and about 75 usable census zones. That rules out area typologies beyond three types, complexity below national level and hot-spot statistics.
+- Qatar has eight municipalities and a small set of usable census zones, counted from the local source file. That rules out area typologies beyond three types, complexity below national level and hot-spot statistics.
 
 ## 1. Common rules
 
@@ -291,23 +291,20 @@ Tolerance: ± QAR 1 on each money figure; ± 0.1 percentage point on shares. The
 
 **Purpose.** Show what a business in the activity spends per riyal of output, from published survey tables, and let the user test their own rent, seats, average bill and opening days against those norms. Expected covers and a monthly staff cost are optional.
 
-**Inputs.** `pub_sector_accounts`: the National Planning Council hotels-and-restaurants survey tables (economic indicators by activity; intermediate goods; intermediate services; establishments and employees by size), annual 2018 to 2022. slice S2 records which table holds each field. The v1 worked example is restaurants (ISIC 561). ASSUMPTION: other activities in the same surveys use the same functions once their tables pass the slice S2 checks.
+**Inputs.** `pub_sector_accounts`: the National Planning Council hotels-and-restaurants survey tables (economic indicators by activity; intermediate goods; intermediate services; establishments and employees by size), annual 2018 to 2022. Slice S2 records which table holds each field. The production value is not a field of the present datasets and is neither derived nor shown ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md); PUB-64). Tested code computes each goods or services component's share of output as its value divided by its group's total, times the publisher's "percentage of intermediate goods to output" or "percentage of intermediate services to output". Compensation and operating-surplus shares are each the published amount divided by employees and then by the published output per worker ("productivity of employee"), with units aligned. The v1 worked example is restaurants (ISIC 561). ASSUMPTION: other activities in the same surveys use the same functions once their tables pass the slice S2 checks.
 
-**Public norms (2022, restaurants, ISIC 561).** Feasibility review and methods research:
+**Public norms (2022, restaurants, ISIC 561).** Published inputs and shares under [decision 0026](decisions/0026-public-sources-used-in-full-locally.md), replacing the earlier production-value arithmetic:
 
 | Norm | 2022 | Range 2018–2022 |
 |---|---|---|
-| Production value | QAR 6,337,897 thousand | |
 | Establishments / employees | 2,086 / 41,458 | |
-| Output per establishment | QAR 3.04 million (calculated) | QAR 2.44 to 3.04 million |
-| Output per employee | QAR 152,875 (calculated) | |
-| Intermediate goods / services, share of output | 40.6% / 16.5% | |
+| Output per employee | QAR 152,875 (published) | |
+| Intermediate goods / services, published share of output | 40.6% / 16.5% | |
 | Food / beverages, share of output | 29.3% / 5.6% | food 28.0 to 29.3% |
 | Building rent, share of output | 11.6% | 11.6 to 15.1% |
 | Compensation | QAR 1,308,140 thousand (20.6%) | 20.6 to 25.2% |
 | Operating surplus | QAR 1,247,422 thousand (19.7%) | 6.9 to 19.7% |
-| Average annual wage | QAR 31,579 | about 31,500 to 32,800 |
-| Value added per worker | QAR 65,581 | |
+| Average annual wage | QAR 31,579 | |
 
 **User inputs (all stated on the card).**
 
@@ -358,7 +355,7 @@ optional target-surplus scenario (never called break-even):
 | Seat turns per day | 0.6 |
 | With E = 50: maximum rent / minimum bill | QAR 56,340 / QAR 85.20 |
 
-Tolerance: m ± 0.002; money ± 0.5%. A separate arithmetic test checks the norms: 6,337,897 / 2,086 = 3,038.3 thousand; 1,308,140 / 6,337,897 = 20.6%; 1,247,422 / 6,337,897 = 19.7%.
+Tolerance: m ± 0.002; money ± 0.5%. A separate arithmetic test checks the norms from published figures: for 2022, 1,308,140 thousand / 41,458 / 152,875 = 20.6%; 1,247,422 thousand / 41,458 / 152,875 = 19.7%; food 29.3%, beverages 5.6% and building rent 11.6% by the component rule above; goods 40.6% and services 16.5% as published.
 
 **Target-surplus regression (not break-even).** Same illustrative inputs, mode A, `U = 0.197`. In thousandths of output, the rent share is 116 and the surplus share is 197, so `m = 116 + 197 = 313` thousandths (`0.313`), and `m - U = 313 - 197 = 116` thousandths (`0.116`).
 
@@ -403,11 +400,11 @@ the duration the page states is shown beside the second result, or "duration not
 
 **Incentive regression (fixture package, not a real offer).** Mode A, the illustrative inputs above, and a fixture package that takes `a_R = 0.25` off the rent. `R' = 30,000`. Break-even revenue is 30,000 / 0.313 = 95,846.65, shown as QAR 95,847 a month. 95,846.65 / 3,600 = 26.62, so 27 covers a day, and 27 / 60 = 0.45 seat turns. With E = 50, the minimum bill is 30,000 / (50 * 30 * 0.313) = 30,000 / 469.5 = 63.90, and the highest rent before the package is 56,340 / 0.75 = QAR 75,120. Without the package the results are those of the break-even example.
 
-**Scenarios beside the calculator ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 9 and 10).** The catchment-share scenario (C34) and the revenue range of the user's outlet (C35) join this calculator. C35 shows this card's break-even revenue beside its cases and reads the same survey norms, so it stays off screen while OI-03 is open (MTH-29). No output of this card takes a C33, C34 or C35 figure as an input.
+**Scenarios beside the calculator ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 9 and 10).** The catchment-share scenario (C34) and the revenue range of the user's outlet (C35) join this calculator. C35 shows this card's break-even revenue beside its cases and reads the same survey norms (MTH-29). No output of this card takes a C33, C34 or C35 figure as an input.
 
 **Provenance and status.** Norms: Public, `observed`, caveats `calculated`, `national_average`, `world_cup_year`. Calculator outputs: Public (least-real release input), `inferred`, "your inputs" tag. With a package, the Source chain also names the package's page and retrieval date, with caveat `agency_page`. **Compute cost.** Trivial (feasibility review; no time recorded).
 
-**Limits and wording.** National averages over all restaurant types and sizes. 2022 was a World Cup year; the surplus share jumped from about 7% (2018–2019) to 15–20% (2020–2022) for reasons not verified. Mode A treats staff as varying with sales, which flatters very small outlets; mode B exists for that reason. The figure 8,579,462 thousand from an earlier design is a different scope and is not used (OI-03).
+**Limits and wording.** National averages over all restaurant types and sizes. 2022 was a World Cup year; the surplus share jumped from about 7% (2018–2019) to 15–20% (2020–2022) for reasons not verified. Mode A treats staff as varying with sales, which flatters very small outlets; mode B exists for that reason. Reconciliation R1 is closed because production value is not a field of the present datasets; see the reconciliation record of task S2-T03.
 
 - Allowed: "At the sector's 2022 cost shares, your rent needs about 36 covers a day to break even (0.6 turns per seat). Across 2018–2022 the figure ranges from {low} to {high}." Also, for the optional scenario only: "To earn the sector's 2022 surplus share, the same inputs need about {covers} covers a day ({turns} turns per seat)." With a package: "With the package you chose, from its page, the same inputs need about {covers} covers a day to break even while the package lasts." The braces are filled by the Fact chip.
 - Never say: "you will make a profit", "expected revenue", "demand at this site", "capture rate" (allowed only as the name of the user's input in C35), "go" or "no-go" as a verdict, "break-even" for the surplus-share scenario, "you qualify", "you will receive", or "the incentive makes it profitable".
@@ -418,7 +415,7 @@ the duration the page states is shown beside the second result, or "duration not
 | MTH-26 | C4 reproduces the break-even worked example, the norm checks above, and the target-surplus regression (`m - U = 0.116`; revenue QAR 344,827.59 a month; 96 covers a day; 1.6 seat turns; with E = 50, maximum rent QAR 20,880 and minimum bill QAR 229.89). |
 | MTH-27 | C4 lists every user input and every public norm it used, with year and table, in the Source chain (the evidence drawer). |
 | MTH-28 | No code divides a C4 output by presence, footfall or earner counts. C4 never returns a forecast of revenue, demand or capture. It returns the revenue that the user's own inputs would require. The site estimate (C33) and the user's scenarios (C34, C35) are separate cards; none of them is a forecast, and none feeds a C4 output. |
-| MTH-29 | C4 is not displayed until OI-03 is recorded as closed in `OPEN_ITEMS.md`. |
+| MTH-29 | C4 uses only the published inputs and share rules above, never a derived production value. Reconciliation R1 is closed by the absence of that field from the present datasets (the reconciliation record of task S2-T03); the separate wage-table reconciliation of OI-03 does not hold C4 off screen. |
 | MTH-61 | C4 applies only the four parameter keys above (`rent_share`, `rent_amount`, `staff_share`, `staff_amount`), one package at a time and at most one parameter per input, and returns the results with and without the package side by side, with the duration the page states. It reproduces the incentive fixture: QAR 95,847 a month, 27 covers a day and 0.45 seat turns; with E = 50, a minimum bill of QAR 63.90 and a highest rent before the package of QAR 75,120. |
 | MTH-62 | A package parameter is a Public fact from `pub_investqa_record` with its page link and retrieval date, applied only as the user's input, with caveats `your_inputs` and `agency_page`. No package changes a Public norm, no one-off amount is spread over months, and no forecast stated on a page enters the calculator (PUB-88). |
 
@@ -476,7 +473,7 @@ These are heading-level checks of the data and arithmetic only. Italy: 2,311 t =
 
 **Inputs.** `pub_place` (Overture places, release 2026-10-21.0, pinned); co-location pairs stored in `graph_edge` with `clq`, `p`, `q`, `n_focal`, `n_neighbour`. The third places source, `places_fsq`, keeps its own table `pub_place_fsq`, its attribution and a reviewed category mapping, and it is fetched inside `./eii build-public` from the public copy on Source Cooperative, read without an account, only the files that cover Qatar ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 21); the registry records the release used, and its places are shown with that date. Once it is pinned, C6 and the competitor counts of C33 and C34 may read it; a count or a co-location run reads one places table at a time, named in its lineage, and no count adds or merges the two tables. ASSUMPTION: C12, C16 and C17 keep reading `pub_place` only until a reviewed change adds the third source to them.
 
-**Formula.** Radius co-location quotient (CLQ) in the family of Leslie and Kronenfeld (2011), radius r = 250 m, over points in the Greater Doha box (25.18–25.47 N, 51.35–51.65 E) with confidence of at least 0.5. ASSUMPTION: the box, the confidence filter and r follow the research runs; the exact settings of the feasibility review's run were not all recorded.
+**Formula.** Radius co-location quotient (CLQ) in the family of Leslie and Kronenfeld (2011), radius r = 250 m, over points in the research box (25.18–25.47 N, 51.35–51.65 E) with confidence of at least 0.5. ASSUMPTION: the box, the confidence filter and r follow the research runs; the exact settings of the feasibility review's run were not all recorded.
 
 ```
 for each focal point i in A: n_i = other points within r;  n_iB = those of category B
@@ -489,7 +486,7 @@ keep: N_B >= 20, CLQ >= 1.2, q <= 0.05; show at most six, highest CLQ first
 presence at the pin: B is "found" if at least one B point lies within 250 m (straight line)
 ```
 
-**Illustrative note (not a passing regression).** Feasibility review, 2026-11-11, Greater Doha extract, 999 permutations, 5% false-discovery control. Focal set "Italian restaurants including pizza places" (174 points). The seed, release hash, category identifiers, candidate set and expected p and q values were not recorded, so this note is not a passing regression until they are written here (MTH-03). The box and the confidence filter are in the formula above.
+**Illustrative note (not a passing regression).** Feasibility review, 2026-11-11, research-box extract, 999 permutations, 5% false-discovery control. Focal set "Italian restaurants including pizza places" (174 points). The seed, release hash, category identifiers, candidate set and expected p and q values were not recorded, so this note is not a passing regression until they are written here (MTH-03). The box and the confidence filter are in the formula above. This research box is not the version 1 Greater Doha frame, which is the five municipalities of the frame's review file (S2-T02; [decision 0026](decisions/0026-public-sources-used-in-full-locally.md)). Wherever Greater Doha appears on a screen or card, those five municipalities are named beside it once S2-T02 has merged.
 
 | Neighbour category | CLQ |
 |---|---|
@@ -505,7 +502,7 @@ With Italian restaurants only (61 points), no neighbour survives. Tolerance: the
 
 **Limits and wording.** A label permutation tests association beyond category frequency but does not control for overall density, so it supports "found near", not "attract". The open places extract holds about 26,000 Qatar records against about 71,000 establishments, so absence may be a data gap; the coverage of `pub_place_fsq` is counted when it is pinned. The result with pizza included is the only one that survives; the card must say pizza is included.
 
-- Allowed: "In Greater Doha's public places data, Italian restaurants (including pizza places) are found near fast food, coffee shops, cafés, restaurants and fashion stores. Here, 3 of 5 are found within 250 m." For an absent chip: "not found in public places data".
+- Allowed: "In the research box's public places data, Italian restaurants (including pizza places) are found near fast food, coffee shops, cafés, restaurants and fashion stores. Here, 3 of 5 are found within 250 m." For an absent chip: "not found in public places data".
 - Never say: "attract", "draw customers", "missing neighbour", "opportunity", "gap in the market".
 
 | ID | Requirement |
@@ -518,7 +515,7 @@ With Italian restaurants only (61 points), no neighbour survives. Tolerance: the
 
 **Purpose.** For a second door, show how much of its reach is already within the first door's reach.
 
-**Inputs.** Areas from `make_area`. In public-only mode the sets are whole base cells of the fixed frame: `make_area` reads no privacy-derived release unit and no protected or simulated table, and the snap report is technical metadata, not a Synthetic fact. Outside public-only mode, earners mode uses whole release units; residents mode reads no protected table, so it may use the exact drawn or travel-time shapes ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 6). Resident weights come from Census 2020 population in `pub_census_district` (`district_key`, `period`, `indicator`, `value`, `unit`, `source_id`), using count indicator `residents` with unit `persons` (PUB-84), joined to the centroid of `district.geometry`. Covered-earner weights come from `resident_pay` or `worker_pay`. The link times of C25 apply when a dial situation or an hour sets drive times. The district population comes from the census map layer that [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10 admits to the local release (OI-04 closed for version 1); if that layer is switched off (PUB-12), residents mode returns `NO_DATA`.
+**Inputs.** Areas from `make_area`. In public-only mode the sets are whole base cells of the fixed frame: `make_area` reads no privacy-derived release unit and no protected or simulated table, and the snap report is technical metadata, not a Synthetic fact. Outside public-only mode, earners mode uses whole release units; residents mode reads no protected table, so it may use the exact drawn or travel-time shapes ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 6). Resident weights come from Census 2020 population in `pub_census_district` (`district_key`, `period`, `indicator`, `value`, `unit`, `source_id`), using count indicator `residents` with unit `persons` (PUB-84), joined to the centroid of `district.geometry`. Covered-earner weights come from `resident_pay` or `worker_pay`. The link times of C25 apply when a dial situation or an hour sets drive times. The district population comes from the census map layer that [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10 admits to the local release (OI-04 closed for version 1); if that layer is absent from the release, residents mode returns `NO_DATA` with its caveat, never because of its terms ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)).
 
 **Formula.**
 
@@ -540,13 +537,13 @@ if W(A) = 0 or W(B) = 0: NO_DATA, never zero and never a ratio
 
 In earners mode the intersection is itself a set of release units, so the privacy rules of [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) apply to `W(A ∩ B)` and `W(B)`; a failing count makes the share Suppressed. No method asks the privacy engine for a finer unit so that the overlap looks larger (MTH-53).
 
-**Illustrative note (not a passing regression).** Methods research: two points 2.8 km apart in Al Daayen; 10-minute free-flow drive areas held 90,476 and 74,627 Census 2020 residents, and the second lay wholly inside the first (shared 100%); a central Doha point shared 5% at 10 minutes and 48% at 15 minutes with the first. The coordinates, modes, cut-offs, speed regime, input district weights and expected shares are not pinned, so this note is not a passing regression. The slice S7 gate fails until they are written here (MTH-03). An arithmetic test asserts shared(B | A) = 100% when B is a subset of A, 0% when the two sets are disjoint, and `NO_DATA` when either weight is zero.
+**Illustrative note (not a passing regression).** The census district weights and the shared-reach figures computed from them stay in the uncommitted cache (PUB-12). The coordinates, modes, cut-offs, speed regime, input district weights and expected shares are not pinned, so this note is not a passing regression. The slice S7 gate fails until they are pinned locally (MTH-03); committed tests use invented stand-ins. An arithmetic test asserts shared(B | A) = 100% when B is a subset of A, 0% when the two sets are disjoint, and `NO_DATA` when either weight is zero.
 
 **Provenance and status.** Residents mode with free-flow times: Public. Earners mode: Synthetic. Any dial situation: Simulated (least-real rule). Evidence status `observed`; caveat `shared_reach_not_sales`. **Compute cost.** A three-ring drive area in 0.12 s and a routing graph built in 5 s with pyvalhalla 3.9.1 (methods research); the set intersection is trivial.
 
 **Limits and wording.** Free-flow speeds overstate reach; residents are 2020 counts; district centres are coarse.
 
-- Allowed: "About 48 in 100 of the residents within 15 minutes of door B are also within 15 minutes of door A."
+- Allowed: "{share} of the residents within {cut-off} minutes of door B are also within {cut-off} minutes of door A."
 - Never say: "lost sales", "cannibalisation", "the new branch will take N% of customers".
 
 | ID | Requirement |
@@ -558,7 +555,7 @@ In earners mode the intersection is itself a set of release units, so the privac
 
 **Purpose.** Say how much of an area's earners a wage-based figure can see, and how reliable each small-count figure is.
 
-**Inputs.** A private-employer share from a source that may enter the release (PUB-12, PUB-13): zone rows from `pub_census_zone`, a national row from `pub_census_national` (`period`, `indicator`, `value`, `unit`, `source_id`). `zone` names the geography. Any fact's count feeds the reliability mark (section 3). The census map layers state no licence; [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10 admits them to the local release of this internal project, each figure with its source and retrieval date, and closes OI-04 for version 1. If a layer is switched off (PUB-12), no value, derived share, title or geometry from it enters a release.
+**Inputs.** A private-employer share from the public census sources (PUB-12, PUB-13): zone rows from `pub_census_zone`, a national row from `pub_census_national` (`period`, `indicator`, `value`, `unit`, `source_id`). `zone` names the geography. Any fact's count feeds the reliability mark (section 3). The census map layers are used and shown in full on the owner's decision for a personal, local project ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)), each figure with its source, date read and the publisher's caveat. Their terms are recorded in the publisher's own words with the date read in document 04; terms do not limit release or display.
 
 **Formula.**
 
@@ -574,27 +571,27 @@ if no admitted geography holds the share: NO_DATA
 
 ASSUMPTION: the private-employer share is a proxy for wage-protection coverage, as the research states; it is shown as a proxy. "Not measured" is not this gap. It is the coverage label for a person who has no pay in the wage records. An unknown housing class is the separate value `unknown`.
 
-**Validation-file arithmetic.** Methods research, Census 2020. National: 1,617,208 / 2,050,252 = 0.7888, which rounds to 78.9%. The zone figures below are the rounded shares stated with that check. With OI-04 closed for version 1 (decision 0017 item 10), they are regression values for the census layer in the local release (PUB-71).
+**Validation-file arithmetic.** The census counts and derived shares stay in the uncommitted cache, not in this document or a committed fixture (PUB-12; PUB-71). The local data test divides employed residents working for private employers by all employed residents. Committed arithmetic tests use stand-ins of the same shape with invented values.
 
 | Quantity | Value |
 |---|---|
-| National private-employer share | 78.9% |
-| 75 zones with at least 1,000 employed residents | 23% (zone 68) to 99% (zone 57); median 78%; 9 zones below 50% |
-| Zone 69 / zone 70 (Al Daayen) | 72% / 45% |
+| National private-employer share | Pinned from the local source file; not committed |
+| Zone private-employer shares and their range | Pinned from the local source file; not committed |
+| Shares of the selected zones | Pinned from the local source file; not committed |
 
 Tolerance: ± 0.5 percentage point.
 
-**Provenance and status.** Public, `observed`, caveat `coverage_private_proxy`, with the source and retrieval date of the census layer. If the layer is switched off (PUB-12), the bar is `NO_DATA` and the validation figures are not release facts. **Compute cost.** Trivial (methods research; no time recorded).
+**Provenance and status.** Public, `observed`, caveat `coverage_private_proxy`, with the source and retrieval date of the census layer. If no source value is available, the bar is `NO_DATA` with its caveat; source terms are not a reason for absence. **Compute cost.** Trivial (methods research; no time recorded).
 
 **Limits and wording.** Census 2020 is nearly six years old. The share describes residents, not workers in the zone. The card names the geography it used.
 
-- Allowed, with a zone share in the release: "This pay figure covers private-sector earners only. In 2020, about 72 in 100 employed residents of this zone worked for private employers."
-- If the layer is switched off (PUB-12): "The coverage share is not on screen. The census employment layer has no stated licence."
+- Allowed, with a zone share in the release: "This pay figure covers private-sector earners only. In {year}, {share} of employed residents of this zone worked for private employers."
+- If no source value is available: "The coverage share is not available." The card shows the reason and its caveat (MTH-09).
 - Never say: "all earners", "the average resident earns", "complete picture", or "Not measured" for this unpublished workplace gap.
 
 | ID | Requirement |
 |---|---|
-| MTH-39 | Every resident-pay card shows the C8 coverage bar, naming the geography used. The bar uses the finest admitted geography that holds the private-employer share (zone, otherwise municipality, otherwise national; PUB-82): the census map layers enter the local release by [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10, which closes OI-04 for version 1, and a layer that is switched off (PUB-12) gives `NO_DATA`. The worker-pay card returns `NO_DATA` with reason `coverage_by_workplace_not_published`. It does not use the coverage label "Not measured" for that gap. |
+| MTH-39 | Every resident-pay card shows the C8 coverage bar, naming the geography used. The bar uses the finest admitted geography that holds the private-employer share (zone, otherwise municipality, otherwise national; PUB-82): the census map layers enter the local release by [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10, which closes OI-04 for version 1, and a missing source value gives `NO_DATA` with its caveat, never because of source terms ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)). The worker-pay card returns `NO_DATA` with reason `coverage_by_workplace_not_published`. It does not use the coverage label "Not measured" for that gap. |
 | MTH-40 | C8 never interpolates a census share onto grid cells or blends it into a protected figure. |
 
 ### C9 Zone momentum from utility series
@@ -877,7 +874,7 @@ by hour: steps 1 and 2 are repeated with t_ij(h) from C25 for each hour shown
 
 **Worked example (fixture, binary decay: f = 1 within `t0`).** Demand i1 holds 1,000 and i2 holds 3,000; supply points j1 and j2; `t0` is 10 minutes; times are 5 minutes from i1 to j1, 20 from i1 to j2, 8 from i2 to j1 and 9 from i2 to j2. Step 1: `R_j1 = 1 / 4,000 = 0.00025` and `R_j2 = 1 / 3,000`. Step 2: i1 has 2.5 per 10,000; i2 has 0.00025 + 0.000333... = 0.000583..., shown as 5.83 per 10,000. Check: 1,000 × 0.00025 + 3,000 × 0.000583... = 0.25 + 1.75 = 2, the two supply points. With both units wholly inside the area (`w = 1`), the area score over i1 and i2 is 2 / 4,000, shown as 5.0 per 10,000. At a fixture hour when i2 to j2 takes 12 minutes, j2 has no one within reach and is left out; i1 and i2 both have 2.5 per 10,000, and the check sums to 1. Withheld fixture: if the presence group of i2 is withheld, j1 and j2 both have i2 within reach, so both `D_j` are unknown; i1, which reaches j1, gives `BELOW_PANEL_MINIMUM`, and so does the area score, never a score from i1 alone. Grid fixture: with i1 and i2 as grid cells at free flow and a third cell i3 of 1,000 people that reaches neither supply point, the step 1 sums do not change (`D_j1` = 4,000 and `D_j2` = 3,000), i1 and i2 keep 2.5 and 5.83 per 10,000, and i3 has `A_i3` = 0, stored as the score 0. The area score over the three cells is (0.25 + 1.75 + 0) / 5,000 = 0.0004, shown as 4.0 per 10,000; over i3 alone it is 0 / 1,000 = 0; and over an area with no populated cell the weights sum to 0, so it is `NO_DATA`.
 
-**Research note (validation test, outside every release).** Methods research: 777 district centres, 609 official landmark points used only as a test supply layer, a 10-minute drive and a Gaussian decay. The per-resident container ratio and the access score agreed only moderately across 75 zones (Spearman 0.47), and zone 69 fell from 3.40 to 0.66 per 10,000. Compute: 0.016 s once travel times exist; the national matrix runs at about 4,600 pairs per second per process. The district populations are Census 2020 figures with no stated licence (OI-04, closed for version 1 by decision 0017 item 10); this research example stays a validation test and never enters a release.
+**Research note (validation test, outside every release).** The methods research used district centres, official landmark points as a test supply layer, a 10-minute drive and a Gaussian decay. Census inputs and the access figures computed from them stay in the uncommitted cache; committed tests use invented stand-ins (PUB-12). Compute: 0.016 s once travel times exist; the national matrix runs at about 4,600 pairs per second per process. This research example uses a test supply layer, not the card's release inputs; that is why it stays a validation test outside every release. Census sources themselves are used and shown in full under [decision 0026](decisions/0026-public-sources-used-in-full-locally.md), regardless of their terms.
 
 **Provenance and status.** The least-real class of the demand layer, the supply layer and the times: Public for the grid, Public points and free-flow times; Simulated with Simulated residents or any hour's times. Evidence status `observed`, and `inferred` for an area score of the Simulated layer, which uses C18 weights (MTH-58); caveats `calculated`, `access_not_use`.
 
@@ -1023,9 +1020,9 @@ a user's area takes the type whose centre is nearest, with equal weights
 
 **Worked example (fixture, not a finding about a place).** Zones Z1 to Z4 with features f1 = 1, 1, 5, 5 and f2 = 0, 4, 0, 8 scale to z1 = 0, 0, 1, 1 and z2 = 0, 0.5, 0, 1. With reference Z1 and equal weights, d² is 0.5 × 0.25 = 0.125 to Z2 (d = 0.35), 0.5 to Z3 (d = 0.71) and 1.0 to Z4 (d = 1.00), so the order is Z2, Z3, Z4. With the fixture range `δ = 0.25`, every position stays the same; for example, Z3's largest lead over Z2 is 0.375 × (−1) + 0.625 × 0.25 = −0.21875. The type step has a fixture of three well-separated groups of zones, which it must recover exactly.
 
-**Research note (not a regression).** The methods research on census zones found three types moderately stable (silhouette 0.33; bootstrap adjusted Rand index 0.71) and five or six types not (0.56 and 0.51) (section 7). Those runs used Census 2020 zone layers with no stated licence (OI-04), so v1 recomputes the figures on its licensed features and does not reuse them.
+**Research note (not a regression).** The census-based research results stay in the uncommitted cache; committed tests use invented stand-ins (PUB-12; section 7). Version 1 recomputes these research results on the release's own Public features with its recorded settings (MTH-73), for reproducibility; source terms do not exclude the census layers ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)).
 
-**Provenance and status.** Public. Evidence status `inferred`, because the weights are defaults the user can change, as in C11; `your_inputs` is added when the user changed them. Caveats `calculated`, `weights_judgement`, `area_types_limit`, `similar_on_features_only`. **Compute cost.** Not yet timed; 91 zones keep it small.
+**Provenance and status.** Public. Evidence status `inferred`, because the weights are defaults the user can change, as in C11; `your_inputs` is added when the user changed them. Caveats `calculated`, `weights_judgement`, `area_types_limit`, `similar_on_features_only`. **Compute cost.** Not yet timed; the zone count is read from the local source file.
 
 **Limits and wording.** Alike on these features does not mean alike as a market. One extreme zone compresses the others' scaled values. Three types are the most the zones support (section 7).
 
@@ -1564,7 +1561,7 @@ a release unit or release-unit candidate uses C15's sums; every area from make_a
 
 ### C28 Announced investment projects
 
-**Purpose.** Count the announced projects of the FDI projects dashboard, and sum their announced capex and jobs, by sector, source country, year and stated location (journeys D1, D4, D6 and D7, services S1 and S2; decision 0017 item 6).
+**Purpose.** Show each project in full on its card, in lists and on the map, with no field dropped at loading. Count the announced projects of the FDI projects dashboard, and sum their announced capex and jobs, by sector, source country, year and stated location (journeys D1, D4, D6 and D7, services S1 and S2; decision 0017 item 6).
 
 **Inputs.** `fdi_projects`: one record per announced project, with every field as published, and capex in the currency and unit the page states (PUB-87).
 
@@ -1581,16 +1578,16 @@ no figure is computed for one company, and no filter or search runs on a company
 
 **Worked example (fixture).** Three projects in one sector and year, with capex of 10, none stated and 30 in one unit, and jobs of 5, 7 and none stated: the count is 3; capex is 40 from 2 of the 3 projects; jobs are 12 from 2 of the 3. Second fixture: in one group, two projects state capex of 10 and 30 in one unit and a third states 5 in another unit; the group returns two capex sums, 40 from 2 projects in the first unit and 5 from 1 project in the second, never one total.
 
-**Provenance and status.** Public, `observed`, caveats `calculated` and `fdi_estimates` beside every count, capex or jobs figure. Subjects `national`, `municipality` or `sector` for counts; `fdi_project` for one project, with Public slots only. **Compute cost.** Trivial; not separately timed.
+**Provenance and status.** Public, `observed`, caveats `calculated` and `fdi_estimates` beside every count, capex or jobs figure. Subjects `national`, `municipality` or `sector` for counts; `fdi_project` for one project, with Public slots only. Capital and jobs always carry the label "announced estimates". They are never added to measured figures and are never shown beside them without that label. **Compute cost.** Trivial; not separately timed.
 
-**Limits and wording.** The projects are announcements, not realised investment. Capex and jobs are the source's estimates of publicly announced projects; the dashboard does not capture every project, and its data is subject to change.
+**Limits and wording.** The projects are announcements, not realised investment. Capex and jobs are announced estimates. The page's caveat is that the data "includes estimates of publicly announced projects" and "does not capture all investment projects". Each card, list and map legend carries collapsed credits naming the agency as publisher, the data gatherer as the page names it, the date read and a link to the dashboard, with that caveat ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)).
 
-- Allowed: "{n} announced projects in {sector} in {year} (FDI projects dashboard, data from fDi Markets; capex and jobs are the source's estimates of publicly announced projects, and the dashboard does not capture every project)."
+- Allowed: "{n} announced projects in {sector} in {year}." Collapsed credits on each card, list and map legend: "Source: {agency publisher}, FDI Projects dashboard, data from {data gatherer as named on the page}, read {date}, {dashboard link}. The data includes estimates of publicly announced projects and does not capture all investment projects." Capital and jobs are labelled "announced estimates".
 - Never say: "invested", "jobs created", "realised", "{company} invested", "top investors", "investors are flocking".
 
 | ID | Requirement |
 |---|---|
-| MTH-95 | C28 counts and sums `fdi_projects` records only by sector, source country, year and stated location; sums capex only within one `capex_unit`, returning one sum per unit and never a converted total; states how many records each sum covers; computes no figure for one company and offers no company filter (AI-110); keeps `fdi_estimates` beside every capex or jobs figure; joins no synthetic figure; and reproduces the fixtures (3; 40 from 2 of 3; 12 from 2 of 3; and the two capex sums of the second fixture, 40 and 5). |
+| MTH-95 | C28 counts and sums `fdi_projects` records only by sector, source country, year and stated location; sums capex only within one `capex_unit`, returning one sum per unit and never a converted total; states how many records each sum covers; computes no figure for one company and offers no company filter (AI-110); shows each project in full on its card, in lists and on the map, with no field dropped at loading; keeps the full source line and page caveat above on each card, list and map legend; keeps `fdi_estimates` and the label "announced estimates" beside every capex or jobs figure, never adds them to measured figures and never shows them beside measured figures without that label; joins no synthetic figure; and reproduces the fixtures (3; 40 from 2 of 3; 12 from 2 of 3; and the two capex sums of the second fixture, 40 and 5). |
 
 ### C29 Sums over a case sample file
 
@@ -1691,7 +1688,7 @@ each forecast is computed at request time from release tables and is never writt
 
 **Worked example (fixture, not a series about a place).** An annual series (m = 1) of five values, 10, 12, 11, 13 and 14, with h = 1, and a fixture list of two candidates, seasonal naive (with m = 1, the last value) and drift. L = max(2, 2) = 2, so the origins are 2, 3 and 4: three origins, the minimum. Seasonal naive forecasts 12, 11 and 13 against 11, 13 and 14, with errors −1, +2 and +1. Drift forecasts 12 + (12 − 10) / 1 = 14, 11 + (11 − 10) / 2 = 11.5 and 13 + (13 − 10) / 3 = 14 against the same values, with errors −3, +1.5 and 0. The scale is q = (2 + 1 + 2 + 1) / 4 = 1.5. Seasonal naive has MASE (1 + 2 + 1) / 3 / 1.5 = 0.889; drift has (3 + 1.5 + 0) / 3 / 1.5 = 1.000; seasonal naive is chosen. Its forecast for period 6 is 14, with a range of 14 − 1 = 13 to 14 + 2 = 16. The caption counts 1 of 3: the error +1 lies between the other two, −1 and +2, while −1 lies below both of the others and +2 above both. The error is shown as 0.89. With the first four values only, the origins are 2 and 3, two origins, so the answer is `NO_DATA` with `series_too_short`; so is any series of three annual points (C23). Smoothing recursion: with α = 0.5 on 10, 12 and 11, the levels are 10, 11 and 11, so the forecast is 11; the grid choice of α has its own fixture at the slice that builds the card.
 
-**Provenance and status.** The series' class: Public, or Synthetic for a released monthly series; `inferred` (MTH-58); caveat `forecast_backtest_range`, with the series' own caveats (for example `openings_incomplete` on a licence-issue series, the deal count beside a price series, `fdi_estimates` on announced investment) and the reliability mark where a count below 30 enters (MTH-13). Subject and geography: those of the series. A forecast of a released monthly series carries the word "forecast", the Synthetic class and the caveats `synthetic_not_evidence_about_qatar` and `synthetic_change` beside `forecast_backtest_range`; its subject is the `area` of its series, and its origin is the last released month. A forecast of a Public split by sex or nationality stays on the source's own geography and categories and is never combined with another figure (PUB-90). **Compute cost.** Not yet timed.
+**Provenance and status.** The series' class: Public, or Synthetic for a released monthly series; `inferred` (MTH-58); caveat `forecast_backtest_range`, with the series' own caveats (for example `openings_incomplete` on a licence-issue series, the deal count beside a price series, `fdi_estimates` on announced investment, with capital and jobs labelled "announced estimates", never added to measured figures or shown beside them without that label) and the reliability mark where a count below 30 enters (MTH-13). Subject and geography: those of the series. A forecast of a released monthly series carries the word "forecast", the Synthetic class and the caveats `synthetic_not_evidence_about_qatar` and `synthetic_change` beside `forecast_backtest_range`; its subject is the `area` of its series, and its origin is the last released month. A forecast of a Public split by sex or nationality stays on the source's own geography and categories and is never combined with another figure (PUB-90). **Compute cost.** Not yet timed.
 
 **Limits and wording.** A forecast continues the pattern that the chosen candidate found in past values; a shock, a policy change or a turning point that is not in the series is not in the forecast. A short series has few origins, so its range rests on few values. The range is built from the backtest's own errors: it is not a probability or a confidence level, and it is never said to hold for the next value. A forecast chart draws the range as a band with its caption; the projection of C21 keeps its own rules and stays a projection. A forecast of a released monthly series continues the synthetic world's months; it shows the format, not a trend in Qatar. A price forecast is of a median with its deal counts; a forecast of announced investment is of announcements, not realised investment (C28).
 
@@ -1801,10 +1798,10 @@ never apportioned to a drawn outline
 **Inputs.**
 
 - The area or pin the user chose, as an `area` subject. The catchment is snapped to whole release units of PRV-18, shown with the snap sentence, because C32 is never apportioned.
-- The activity, with its row of the hotels-and-restaurants survey (`pub_sector_accounts`, C4), and the opening hours, day types and opening days per month that the user states.
+- The activity and the opening hours, day types and opening days per month that the user states.
 - People present by pay band through the day (C32) for the units of the catchment, and visitors present (C15) as one group with no band.
 - Competitors from public listings of the activity's category (`pub_place`, or `pub_place_fsq` once pinned; one table at a time, C6) as a count and their straight-line distances from the pin or the representative point. A named competitor keeps only its Public facts and its distance, and a register company also its card's employee count, which enters no figure of this card ([06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-65; [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)).
-- The uncertain parameters, each the user's own typed range with no prefill, visible, editable and tagged "your inputs", as the capture rate and average bill of C35 are ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12): the share of the people present in an opening hour who buy in the category, by pay band and for visitors; the spend per purchase by pay band and for visitors, which is never called spending power; and the distance scale `D` of the competition rule. No default range is calibrated or invented, because no confirmed source holds card spending; the survey's output per establishment, 2018 to 2022 (C4), stands beside the result as a Public benchmark only and sets no range. Until the user has entered every range, the estimate returns `NO_DATA` with reason `inputs_not_entered`.
+- The uncertain parameters, each the user's own typed range with no prefill, visible, editable and tagged "your inputs", as the capture rate and average bill of C35 are ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12): the share of the people present in an opening hour who buy in the category, by pay band and for visitors; the spend per purchase by pay band and for visitors, which is never called spending power; and the distance scale `D` of the competition rule. No default range is calibrated or invented, because no confirmed source holds card spending. Until the user has entered every range, the estimate returns `NO_DATA` with reason `inputs_not_entered`.
 - The number of draws `N`, fixed at the slice that builds the card, and the release seed (ASSUMPTION).
 
 **Formula.**
@@ -1830,9 +1827,9 @@ a row that C32 or C15 does not return: the estimate passes its reason through an
 
 **Worked example (fixture, not a finding about a place).** One pay band, one opening hour, no visitors and 30 opening days; 100 people present; the share who buy runs from 0.1 to 0.3 and the spend per purchase from 20 to 40; one competitor at 0.5 km with `D` = 1 km, so σ = 1 / (1 + 0.5) = 2/3. At the middle of both ranges, M = 30 × 2/3 × 100 × 0.2 × 30 = 20 × 600 = 12,000. Swings: the share who buy gives 20 × 300 = 6,000 and 20 × 900 = 18,000, a swing of 12,000; the spend per purchase gives 20 × 400 = 8,000 and 20 × 800 = 16,000, a swing of 8,000; so the share who buy is the first driver. Percentile rule: for ten draws of 1,000, 2,000 .. 10,000, the low case is the value at rank 1 (1,000), the middle at rank 5 (5,000) and the high at rank 9 (9,000).
 
-**Provenance and status.** The least-real class of the inputs, Simulated while presence is simulated (MTH-07); `inferred`, with the "your inputs" tag because every range is the user's own (MTH-06); caveats `estimate_on_simulated_inputs` while any input is Simulated or Synthetic, `your_inputs`, `national_average`, `movement_not_purchases` and `present_by_pay_band_assumed`. Subject `area`. Never written to the release or the ledger. Off in public-only mode, and unavailable while OI-03 keeps the survey figures off screen (MTH-29). **Compute cost.** Not yet timed.
+**Provenance and status.** The least-real class of the inputs, Simulated while presence is simulated (MTH-07); `inferred`, with the "your inputs" tag because every range is the user's own (MTH-06); caveats `estimate_on_simulated_inputs` while any input is Simulated or Synthetic, `your_inputs`, `national_average`, `movement_not_purchases` and `present_by_pay_band_assumed`. Subject `area`. Never written to the release or the ledger. Off in public-only mode. The withdrawn survey benchmark is not shown (MTH-29). **Compute cost.** Not yet timed.
 
-**Limits and wording.** The estimate describes the stated model and ranges, not observed sales. The cases are cases of the model. The survey figures are national averages over all outlets of the activity. The competition rule counts competitors by distance only and ignores their size. While presence is simulated, the estimate shows the format a linked mobility feed would give, not a finding about the place.
+**Limits and wording.** The estimate describes the stated model and ranges, not observed sales. The cases are cases of the model. The competition rule counts competitors by distance only and ignores their size. While presence is simulated, the estimate shows the format a linked mobility feed would give, not a finding about the place.
 
 - Allowed: "Estimate on simulated inputs: with the ranges shown, this model gives an outlet of this activity here a monthly revenue of {low} in its low case, {middle} in its middle case and {high} in its high case. The inputs that move it most are {driver 1} and {driver 2}."
 - Never say: "forecast", "will earn", "expected revenue", "chance", "probability", "confidence", "likely", "spending power", "income present", "purchasing power", "customers will come", any figure for a named competitor, or a share of draws.
@@ -1840,7 +1837,7 @@ a row that C32 or C15 does not return: the estimate passes its reason through an
 | ID | Requirement |
 |---|---|
 | MTH-105 | C33 computes the monthly revenue of the model above over the whole release units of the snapped catchment, from C32's people present by pay band, C15's visitors, the competitor count and distances, and the stated ranges; draws each uncertain parameter from its range with the release seed; returns the 10th, 50th and 90th percentiles of the draws as the low, middle and high cases, by the nearest-rank rule; and returns the main drivers by the one-at-a-time swing, largest first. The same release and inputs return the same cases and drivers. It reproduces the fixture: 12,000 at the middle; swings 12,000 and 8,000; cases 1,000, 5,000 and 9,000 for the ten draws. |
-| MTH-106 | C33 carries the label "estimate on simulated inputs" while any input is Simulated or Synthetic, has subject `area`, and is never an estimate for a named real building or business; no figure for a named competitor is computed for display, shown, stored or logged. The share who buy and the spend per purchase by band are the user's own typed ranges with no prefill, and no range is calibrated or invented by the application ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12); a missing range returns `NO_DATA` with `inputs_not_entered`; the spend per purchase is never called spending power. The estimate is off in public-only mode, is unavailable while OI-03 is open (MTH-29), is never called a forecast, and enters a ranking only under MTH-65. |
+| MTH-106 | C33 carries the label "estimate on simulated inputs" while any input is Simulated or Synthetic, has subject `area`, and is never an estimate for a named real building or business; no figure for a named competitor is computed for display, shown, stored or logged. The share who buy and the spend per purchase by band are the user's own typed ranges with no prefill, and no range is calibrated or invented by the application ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12); a missing range returns `NO_DATA` with `inputs_not_entered`; the spend per purchase is never called spending power. The estimate is off in public-only mode, is never called a forecast, and enters a ranking only under MTH-65. |
 
 ### C34 Catchment-share scenario
 
@@ -1899,13 +1896,13 @@ no share or term is computed for display for one competitor
 
 ### C35 Revenue range of the user's outlet
 
-**Purpose.** In the user's scenario, show low, middle and high monthly revenue cases for the user's outlet beside the break-even point and a Public benchmark ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 10). It is the user's scenario and is never called a forecast.
+**Purpose.** In the user's scenario, show low, middle and high monthly revenue cases for the user's outlet beside the break-even point ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 10). It is the user's scenario and is never called a forecast.
 
 **Inputs.**
 
 - The area the user chose and its estimated people present by hour (C15 for a set of whole units, C18 for an area from `make_area`), all people of complete groups, over the opening hours and the day type that the user states.
 - The user's assumptions, each with a low, a middle and a high value, visible, editable and tagged "your inputs": the capture rate (the share of the people present in each opening hour that the user assumes become covers of the outlet) and the average bill; and the opening days per month (C4's input `D`). These inputs join the closed list of typed scenario inputs ([08_BACKEND.md](08_BACKEND.md)).
-- The Public benchmark: the survey's output per establishment of the activity (C4 norms), its 2022 value and its range across 2018 to 2022, shown per month; and C4's break-even revenue from the user's own C4 inputs.
+- C4's break-even revenue from the user's own C4 inputs.
 
 **Formula.**
 
@@ -1915,23 +1912,22 @@ H        = the sum over the opening hours h of the all-people count present at h
 low      = H_low  * capture rate (low)    * average bill (low)    * days
 middle   = H      * capture rate (middle) * average bill (middle) * days
 high     = H_high * capture rate (high)   * average bill (high)   * days
-benchmark  the survey's output per establishment / 12: the 2022 value and the 2018-2022 range (C4)
 break-even C4's break-even revenue for 2022 from the user's C4 inputs, shown beside the three cases
 any withheld presence group: SUPPRESSED with BELOW_PANEL_MINIMUM, never filled in
 ```
 
 **Worked example (fixture, not a finding about a place).** Two opening hours with 100 (90 to 110) and 200 (180 to 220) people present give H = 300 (270 to 330). With a capture rate of 0.01, 0.02 and 0.03, an average bill of 80, 100 and 120 and 30 days: low = 270 × 0.01 × 80 × 30 = 6,480; middle = 300 × 0.02 × 100 × 30 = 18,000; high = 330 × 0.03 × 120 × 30 = 35,640. Beside them stands C4's break-even revenue for the same user's C4 inputs (QAR 127,796 a month in C4's example).
 
-**Provenance and status.** Simulated, the least-real class of its inputs (MTH-07); `inferred`, "your inputs" tag (MTH-06); caveats `scenario_not_forecast`, `your_inputs`, `national_average` and `movement_not_purchases`. Subject `area`. Never written to the release or the ledger. Off in public-only mode, because its presence input is Simulated, and off screen while OI-03 is open, like the break-even calculator (MTH-29). **Compute cost.** Trivial; not separately timed.
+**Provenance and status.** Simulated, the least-real class of its inputs (MTH-07); `inferred`, "your inputs" tag (MTH-06); caveats `scenario_not_forecast`, `your_inputs`, `national_average` and `movement_not_purchases`. Subject `area`. Never written to the release or the ledger. Off in public-only mode, because its presence input is Simulated. Its break-even point uses C4's published inputs and share rules (MTH-29). **Compute cost.** Trivial; not separately timed.
 
-**Limits and wording.** The capture rate and the average bill are the user's assumptions, and the people present are simulated. The benchmark is a national average over all outlets of the activity. Measures of present size, such as a wage bill (C24), a number of firms or retail sales where a Public table publishes them, are measurements with their own class and are not part of this card.
+**Limits and wording.** The capture rate and the average bill are the user's assumptions, and the people present are simulated. Measures of present size, such as a wage bill (C24), a number of firms or retail sales where a Public table publishes them, are measurements with their own class and are not part of this card.
 
-- Allowed: "Your scenario: with your capture rate and average bill, and the estimated people present here (Simulated), monthly revenue would be {low} in your low case, {middle} in your middle case and {high} in your high case. The sector's 2022 output per establishment was {benchmark} a month, and your break-even revenue is {break-even}. This is your scenario, not a forecast."
+- Allowed: "Your scenario: with your capture rate and average bill, and the estimated people present here (Simulated), monthly revenue would be {low} in your low case, {middle} in your middle case and {high} in your high case. Your break-even revenue is {break-even}. This is your scenario, not a forecast."
 - Never say: "forecast", "expected revenue", "you will make a profit", "will earn", "demand at this site", "go" or "no-go" as a verdict, "chance", "probability", "likely", "customers will come".
 
 | ID | Requirement |
 |---|---|
-| MTH-108 | C35 computes the low, middle and high cases as the presence sum times the user's capture rate, average bill and opening days of the same case, shows them beside the survey benchmark per month and C4's break-even revenue, and reproduces the fixture (6,480; 18,000; 35,640). Every assumption is visible, editable and tagged "your inputs"; the result carries `scenario_not_forecast`, is never called a forecast, is off in public-only mode and off screen while OI-03 is open (MTH-29). The words "capture rate" name only this input of the user: the build-time scan allows them only as the label of that input in this card's templates. |
+| MTH-108 | C35 computes the low, middle and high cases as the presence sum times the user's capture rate, average bill and opening days of the same case, shows them beside C4's break-even revenue, and reproduces the fixture (6,480; 18,000; 35,640). Every assumption is visible, editable and tagged "your inputs"; the result carries `scenario_not_forecast`, is never called a forecast, is off in public-only mode and uses C4's published inputs and share rules for the break-even point (MTH-29). The words "capture rate" name only this input of the user: the build-time scan allows them only as the label of that input in this card's templates. |
 
 ### C36 Night-time radiance by area and month
 
@@ -1969,7 +1965,7 @@ an area, a release unit or an official geography X:
 
 **Purpose.** Show the published relative busyness by hour of a named venue as a Public fact of that venue ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 19). It is a relative index, never a count of people.
 
-**Inputs.** `pub_venue_busyness` from `busy_gmaps`: venue, day of week, hour, relative index from 0 to 100, and retrieval date, for the named venues of a build-time list. The project's own page reader fetches it inside `./eii build-public`, never at run time; the values stay in the uncommitted public cache and never enter the repository or a test fixture, and the source is left out of the nightly live fetch. The publisher states no licence for reuse, and its terms name automated reading; the owner decided on 2026-11-12 to use it in this personal internal project, and decision 0019 names it under PUB-12 with `licence_basis: owner_decision`.
+**Inputs.** `pub_venue_busyness` from `busy_gmaps`: venue, day of week, hour, relative index from 0 to 100, and retrieval date, for the named venues of a build-time list. The project's own page reader fetches it inside `./eii build-public`, never at run time; the values stay in the uncommitted public cache and never enter the repository or a test fixture, and the source is left out of the nightly live fetch. Document 04 records the publisher's terms in its own words with the date read. The basis is `licence_basis: owner_decision`, the owner's decision for a personal, local project ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)), not a source-specific exception. The reader uses only what a visitor's browser receives, at a visitor's pace, without sign-in, a paywall, passing a robot check or calling a back end with a key or token found in its pages.
 
 **Formula.**
 
@@ -2270,7 +2266,7 @@ The distance and the zone test are Public and `observed` (MTH-05), with the cave
 | Geography | Units | Supports | Rules out |
 |---|---|---|---|
 | Municipality | 8 | location quotients, densities, churn rates | complexity and relatedness, clustering, hot-spot statistics, any correlation or regression across municipalities |
-| Census zone | 91, of which 75 have at least 1,000 employed residents | similarity search and three coarse area types (C17), rank correlations | more than three area types: three types were moderately stable (silhouette 0.33; bootstrap adjusted Rand index 0.71), five and six were not (0.56 and 0.51) (methods research) |
+| Census zone | Counted from the local source file; source values are not committed | similarity search and three coarse area types (C17), rank correlations | more than three area types; stability is recomputed on the release features (MTH-73), with source-derived research values kept in the uncommitted cache |
 | Grid cell | about 15,800 at H3 resolution 8 and 110,800 at resolution 9 nationally | protected statistics after pooling | any public statistic blended or apportioned onto cells or release units (PUB-29) |
 
 | ID | Requirement |
@@ -2287,7 +2283,7 @@ ASSUMPTIONS (each also marked where it is used):
 3. C6 is served by `scan_places`; its box, confidence filter and radius follow the research runs, and the seed is not yet recorded (section 2, C6).
 4. C4: opening days default to 30; `U = 0` is break-even and is the default; mode A treats staff as varying with sales; mode B uses the user's staff cost. An incentive package changes only the rent or the staff cost; one package applies at a time, with at most one parameter per input, and a one-off amount is never spread over months (MTH-61, MTH-62).
 5. The 1 GWh base filter for zone rankings (MTH-41). Basket lines follow PUB-42 and PUB-44 (MTH-30).
-6. District population for C7 is read from `pub_census_district` and the centre is the centroid of `district.geometry`. The private-employer share is a proxy for coverage only when that census layer is licensed (C8).
+6. District population for C7 is read from `pub_census_district` and the centre is the centroid of `district.geometry`. The private-employer share is a proxy for coverage whenever that census layer holds it (C8).
 7. C10: the statutory minimum is a rule row in `pub_wage_table`; the staffing area is a 30-minute drive, available only to `staffing_and_pay`; the public wage table is combined across sexes (MTH-24, MTH-44).
 8. The rank-stability sentence states the guaranteed best and worst rank over the box of weights within `δ` of the weights used (MTH-45). It replaces the Dirichlet weight draws of the earlier design, whose share of draws would read as a probability.
 9. C18: counts of people are apportioned by the 2020 population grid as relative weights, other listed counts by area, and Simulated counts by area inside the unit (MTH-74).
@@ -2309,8 +2305,8 @@ ASSUMPTIONS (each also marked where it is used):
 
 Open items from the master design that touch this document:
 
-- OI-03: the two restaurant totals and the two wage-table means. C3, C4, the sector branch of C19, the site estimate of C33 and the revenue range of C35 stay hidden until it is closed (MTH-23, MTH-29, MTH-97, MTH-106, MTH-108).
-- OI-04: closed for version 1 by [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10. The census map layers enter the local release, each figure with its source and retrieval date, so C7 resident weights and C8 shares are release facts; the research examples of C12 and C17 still run outside every release. The coverage bar uses the finest admitted geography and names it, or returns `NO_DATA` (PUB-82). Any use beyond this internal project needs written licence terms ([17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md)).
+- OI-03: reconciliation R1 of the restaurant totals is closed because production value is not a field of the present datasets (the reconciliation record of task S2-T03); the two wage-table means remain a separate reconciliation. C3 and the sector branch of C19 stay hidden until the wage-table reconciliation is closed (MTH-23, MTH-97). C4, C33 and C35 no longer depend on the withdrawn production value (MTH-29, MTH-106, MTH-108).
+- OI-04: closed for version 1 by [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10. The census map layers enter the local release, each figure with its source and retrieval date, so C7 resident weights and C8 shares are release facts; C12's research example uses a test supply layer, and C17 recomputes its research results on the release's own features and recorded settings; neither restriction comes from source terms. The coverage bar uses the finest admitted geography and names it, or returns `NO_DATA` (PUB-82). The single list in [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) records any permission or licence needed for real use, with the publisher's words and date read; it does not hold back version 1.
 - OI-11: privacy thresholds are proposals. C7 earners mode, C10, C15, C19, C39 and C40 inherit the exported tier; they do not set a second threshold. C22 reads no protected figure since [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12.
 
 Open questions:
@@ -2366,7 +2362,7 @@ Qatar Open Data Portal (CC BY), dataset pages under https://www.data.gov.qa/expl
 - Trade by product group (the research example of C13, not used in v1): `trade-data-for-pharmaceutical-products`.
 - Added by [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), CC BY 4.0, metadata retrieved 2026-11-12; every slug is listed in [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) section 2: visitors of museums and exhibitions by month (`visitors-of-museums-and-exhibition-by-month-and-museum`, C26); building permits and completion certificates (`permits_muni`, C23); establishments and employees by size and activity (`est_size_act`, C24); manufacturing industries and main products (`mfg_industry`, C13), including `manufacture-of-basic-pharmaceutical-products-and-pharmaceutical-preparations`; certificates of origin and arriving vessels (`trade_logistics`, C13); labour force by sex and municipality (`lf_muni_sex`, C21); residential unit sales (`weekly-residential-units-sales-bulletin`, C14).
 
-Investment sources, used under the publisher's own terms as read at fetch, on the basis of the owner's decision of 2026-11-12 for this personal internal project ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)):
+Investment sources, used on the owner's decision for a personal, local project ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)); the publisher's terms, including the dashboard footer's reproduction notice, are recorded in document 04 in its own words with the date read:
 
 - FDI Projects dashboard of the national investment promotion agency, data from fDi Markets, read 2026-11-12 (C28): https://fdiprojects.invest.qa/
 - The agency's sector, opportunity, incentive, set-up and law pages (C4 incentive inputs): https://www.invest.qa/
@@ -2374,15 +2370,15 @@ Investment sources, used under the publisher's own terms as read at fetch, on th
 Sources added by [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), pages read 2026-11-12 without any key; [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) holds each with its publisher, licence or terms and retrieval date:
 
 - TomTom Traffic API, live flow tiles and reachable range (`traffic_tomtom_flow`, `traffic_tomtom_range`; C25, off by default; nothing of a response is stored; attribution "© TomTom"): https://docs.tomtom.com/traffic-api/ ; pricing and free allowance: https://docs.tomtom.com/pricing ; copyright: https://developer.tomtom.com/tomtom-orbis-maps/documentation/copyright . The developer terms page needs a login and was not read.
-- Google Maps popular times (`busy_gmaps`; C26, C37): no licence for reuse stated; used on the owner's decision of 2026-11-12 for this personal internal project, with `licence_basis: owner_decision` under PUB-12; the publisher's terms read: https://support.google.com/business/answer/6263531 , https://policies.google.com/terms and https://www.google.com/intl/en/help/terms_maps/ .
+- Google Maps popular times (`busy_gmaps`; C26, C37): terms recorded in the publisher's own words with the date read in document 04; used on the owner's decision for a personal, local project ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)), with `licence_basis: owner_decision`; the publisher's terms read: https://support.google.com/business/answer/6263531 , https://policies.google.com/terms and https://www.google.com/intl/en/help/terms_maps/ .
 - NASA Black Marble VNP46A3, monthly night-time radiance (`ntl_blackmarble`; C36), DOI 10.5067/VIIRS/VNP46A3.002, NASA acknowledged as the source: https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/ ; data and information policy: https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-information-policy
 - Foursquare Open Source Places (`places_fsq`; C6, C33, C34; Apache 2.0): the access page, https://docs.foursquare.com/data-products/docs/access-fsq-os-places ; fetched from the public copy on Source Cooperative, geospatially partitioned GeoParquet read without an account, whose README states the Apache License, Version 2.0 and whose listing holds three dated releases, the newest dated 2025-01-10, and states no update rhythm: https://data.source.coop/fused/fsq-os-places/README.md and https://data.source.coop/fused/fsq-os-places/ . The registry records the release used.
 - WorldPop age and sex structures, 100 m (`worldpop_qat_agesex`; C38; CC BY 4.0; DOI 10.5258/SOTON/WP00841): https://hub.worldpop.org/project/categories?id=8 and https://hub.worldpop.org/geodata/listing?id=138
-- Open-Meteo historical weather (`weather_openmeteo`; C26 weather profiles; free interface for non-commercial use, data CC BY 4.0, with the attribution the publisher asks for): https://open-meteo.com/en/terms , https://open-meteo.com/en/licence and https://open-meteo.com/en/docs/historical-weather-api . Any use beyond this internal project is settled by [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md).
+- Open-Meteo historical weather (`weather_openmeteo`; C26 weather profiles; free interface for non-commercial use, data CC BY 4.0, with the attribution the publisher asks for): https://open-meteo.com/en/terms , https://open-meteo.com/en/licence and https://open-meteo.com/en/docs/historical-weather-api . Any permission or licence needed for real use belongs to the single list in [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md); that list does not hold back version 1.
 
 Other public sources:
 
-- Statistics authority Census 2020 zone and district layers (no licence stated; OI-04): https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Population_by_Major_Economic_Sectors_by_Zone_2020_WFL1/FeatureServer and https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Population_2020_District_Level/FeatureServer
+- Statistics authority Census 2020 zone and district layers (terms recorded in document 04 in the publisher's own words with the date read; basis of use: the owner's decision for a personal, local project, [decision 0026](decisions/0026-public-sources-used-in-full-locally.md); OI-04): https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Population_by_Major_Economic_Sectors_by_Zone_2020_WFL1/FeatureServer and https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Population_2020_District_Level/FeatureServer
 - Overture Maps Foundation places, release 2026-10-21.0 (CDLA Permissive 2.0): https://docs.overturemaps.org/guides/places ; OpenStreetMap Qatar extract (ODbL): https://download.openstreetmap.fr/extracts/asia/qatar-latest.osm.pbf
 - International Labour Organization, "Qatar adopts non-discriminatory minimum wage" (Law No. 17 of 2020), checked 2026-11-11: https://www.ilo.org/resource/news/qatar-adopts-non-discriminatory-minimum-wage
 - United States Department of Justice, Herfindahl–Hirschman Index definition, checked 2026-11-11: https://www.justice.gov/atr/herfindahl-hirschman-index
