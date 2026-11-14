@@ -1318,6 +1318,16 @@
 - OPTIONS: **Recommendation:** move to [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) with the slice's follow-up task.
 - NEEDED BY: the follow-up task of slice S1 (S1-T10), which places it.
 
+## OI-158 — The hosted time limit of the web checks goes back to 1,800 seconds
+
+- ID: OI-158
+- TYPE: OPEN
+- NEEDED: Remove the hosted value of 3,000 s from `scripts/run_tests.py`, so that the limit of the suite `web-checks` is 1,800 s everywhere again, once task S1-T15 has made the suite fast enough on slow hosted runners.
+- WHY: [Decision 0027](docs/decisions/0027-hosted-web-checks-time-limit.md) allows the hosted value only as a stopgap. A wider limit finds a hanging run later.
+- DONE SO FAR: Task S1-T16 raises the limit on GitHub's hosted runner only, by the owner's decision of 2026-11-14. Task S1-T15 is in review: its first part gave no gain on hosted runners, and its second part is being built.
+- OPTIONS: **Default:** the pull request that completes S1-T15, or the one after it, removes the hosted value when three hosted runs in a row have finished the suite inside 1,800 s. Otherwise the owner decides to keep a hosted value.
+- NEEDED BY: the slice S1 gate records the state of this item; the removal follows S1-T15.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.

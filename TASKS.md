@@ -248,7 +248,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: `evals/typed_decisions/`, slice S1 spike report and dependency pin decision.
 - Depends: S1-T02, S1-T03, S1-T04, S1-T05, S1-T06, S1-T07, S1-T11. (S1-T12 was dropped from this list by a re-plan of 2026-11-13: the native trace waits for the owner at the console; the pin fields it decides stay open and close with the addendum of the slice S1 gate.)
 - Requirements: FE-03, TST-155, AI-98, TST-167, PLN-15.
-- Delivery: hard; personas AI; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/39).
+- Delivery: hard; personas AI; status done (pull request 39, merged 2026-11-14).
 ### S1-T09 — Exported set, presence and flow parameters, and months shown first
 - Goal: Fix `export_parameter_set` = `A` and the presence and flow parameters of PRV-59 in the rules configuration before the first world build, and record the number of monthly periods shown first.
 - Acceptance criteria: [ ] `export_parameter_set` is `A` unless open item OI-35 is closed with another value by the owner or a data owner; [ ] the presence and flow parameters that PRV-59 requires are positive and recorded in the slice S1 gate evidence; [ ] the name `presence_base` is not used; [ ] a missing or non-positive parameter fails the configuration check; [ ] the number of monthly periods shown first is chosen among the months of the synthetic reference period and recorded in the slice S1 gate evidence (decision 0016).
@@ -262,7 +262,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: `scripts/run_tests.py`, `scripts/ci_environment.py`, `scripts/ci_sandbox.py` (the shared definition only), their tests, and decision record 0027.
 - Depends: S0-T05.
 - Requirements: TST-03, TST-04.
-- Delivery: routine; personas Platform; status in progress. Added by the owner's decision of 2026-11-14 ([decision 0027](docs/decisions/0027-hosted-web-checks-time-limit.md)): the same passing web checks take from about 1,030 s to more than 1,800 s on hosted runners of different speed. The hosted value is a stopgap: it is removed, and the limit is 1,800 s everywhere again, when S1-T15 has made the suite fast enough on slow hosted runners (OI-158).
+- Delivery: routine; personas Platform; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/45). Added by the owner's decision of 2026-11-14 ([decision 0027](docs/decisions/0027-hosted-web-checks-time-limit.md)): the same passing web checks take from about 1,030 s to more than 1,800 s on hosted runners of different speed. The hosted value is a stopgap: it is removed, and the limit is 1,800 s everywhere again, when S1-T15 has made the suite fast enough on slow hosted runners (OI-158).
 ### S1-T10 — Review follow-up for slice S1
 - Goal: Close every proposed open item that the reviews of slice S1 entered in `OPEN_ITEMS.md`, before the slice S1 gate.
 - Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
