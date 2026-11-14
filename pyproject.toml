@@ -34,7 +34,7 @@ members = ["core", "custodian", "gateway", "product"]
 
 [tool.ruff]
 target-version = "py312"
-src = ["scripts", "core/src", "custodian/src", "product/src", "gateway/src"]
+src = ["scripts", "core/src", "custodian/src", "product/src", "gateway/src", "evals"]
 extend-exclude = ["*.md"]
 fix = false
 
@@ -44,7 +44,7 @@ select = ["E4", "E7", "F", "B", "I", "UP", "RUF"]
 [tool.mypy]
 python_version = "3.14"
 strict = true
-files = "scripts,core/src,custodian/src,product/src,gateway/src"
+files = "scripts,core/src,custodian/src,product/src,gateway/src,evals"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/scripts:$MYPY_CONFIG_FILE_DIR/core/src:$MYPY_CONFIG_FILE_DIR/custodian/src:$MYPY_CONFIG_FILE_DIR/product/src:$MYPY_CONFIG_FILE_DIR/gateway/src"
 
 [[tool.mypy.overrides]]

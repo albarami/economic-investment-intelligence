@@ -1350,3 +1350,63 @@ reason = "The digest rows are already ordered and each object's keys are already
 module = "custodian/src/eii_custodian/privacy/rules_config.py"
 mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -18,5 +18,5 @@\n     ]\n     encoded = json.dumps(\n         payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=True\n-    ).encode(\"utf-8\")\n+    ).encode(\"UTF-8\")\n     return hashlib.sha256(encoded).hexdigest()"
 reason = "The digest rows are already ordered and each object's keys are already written in sorted order, so the default, which does not sort keys, hashes the same bytes."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -8,7 +8,7 @@\n         raw is None\n         or not raw.isascii()\n         or not raw.isdecimal()\n-        or len(raw.lstrip(\"0\")) > 7\n+        or len(raw.lstrip(\"0\")) > 8\n     ):\n         raise Refusal(\"invalid token cap\")\n     cap = int(raw.lstrip(\"0\") or \"0\")"
+reason = "An eight-digit decimal cap also exceeds the later five-million cap bound; both paths refuse with the same fixed reason."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -11,7 +11,7 @@\n         or len(raw.lstrip(\"0\")) > 7\n     ):\n         raise Refusal(\"invalid token cap\")\n-    cap = int(raw.lstrip(\"0\") or \"0\")\n+    cap = int(raw.lstrip(\"XX0XX\") or \"0\")\n     if not 1 <= cap <= 5_000_000:\n         raise Refusal(\"invalid token cap\")\n     if planned > cap:"
+reason = "The preceding ASCII decimal guard excludes X, so stripping the character set XX0XX strips exactly the same leading zeroes."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -61,7 +61,7 @@\n         gateway.provider = observed\n         rows = []\n         raw_rows = []\n-        for case, request in zip(cases, requests, strict=True):\n+        for case, request in zip(cases, requests, strict=None):\n             record = gateway.decide(request)\n             if args.provider == \"jev\" and record[\"threshold_outcome\"] in (\n                 \"ERROR\","
+reason = "requests is built one-for-one from cases and only replaced one-for-one before this zip; the two lengths are equal on every path reaching the loop."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -61,7 +61,7 @@\n         gateway.provider = observed\n         rows = []\n         raw_rows = []\n-        for case, request in zip(cases, requests, strict=True):\n+        for case, request in zip(cases, requests, ):\n             record = gateway.decide(request)\n             if args.provider == \"jev\" and record[\"threshold_outcome\"] in (\n                 \"ERROR\","
+reason = "requests is built one-for-one from cases and only replaced one-for-one before this zip; the two lengths are equal on every path reaching the loop."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -61,7 +61,7 @@\n         gateway.provider = observed\n         rows = []\n         raw_rows = []\n-        for case, request in zip(cases, requests, strict=True):\n+        for case, request in zip(cases, requests, strict=False):\n             record = gateway.decide(request)\n             if args.provider == \"jev\" and record[\"threshold_outcome\"] in (\n                 \"ERROR\","
+reason = "requests is built one-for-one from cases and only replaced one-for-one before this zip; the two lengths are equal on every path reaching the loop."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -73,7 +73,7 @@\n                     f\"calls made {observed.calls_made}; tokens used {observed.tokens_used}\"\n                 )\n                 return 4\n-            actual[\"provider\"] = cast(str, record[\"provider_used\"])\n+            actual[\"provider\"] = cast(None, record[\"provider_used\"])\n             actual[\"model\"] = cast(str, record[\"reported_model_id\"])\n             if compare(actual, configured(args.provider)) == \"requalify\":\n                 state = \"requalify\""
+reason = "typing.cast returns its second argument unchanged and does not inspect its type argument; replacing that first argument has no runtime effect."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -74,7 +74,7 @@\n                 )\n                 return 4\n             actual[\"provider\"] = cast(str, record[\"provider_used\"])\n-            actual[\"model\"] = cast(str, record[\"reported_model_id\"])\n+            actual[\"model\"] = cast(None, record[\"reported_model_id\"])\n             if compare(actual, configured(args.provider)) == \"requalify\":\n                 state = \"requalify\"\n             accepted = record[\"threshold_outcome\"] == \"DECIDED\""
+reason = "typing.cast returns its second argument unchanged and does not inspect its type argument; replacing that first argument has no runtime effect."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -118,7 +118,7 @@\n                     correct=accepted and decoded == case[\"expected\"],\n                     outcome=record[\"threshold_outcome\"],\n                     orders=record[\"option_order\"],\n-                    memo_key=record[\"memo_key\"],\n+                    memo_key=None,\n                 )\n             )\n     finally:"
+reason = "This transient memo_key member is removed by committed_aggregate before output and has no other consumer; gateway records are unchanged."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -118,8 +118,7 @@\n                     correct=accepted and decoded == case[\"expected\"],\n                     outcome=record[\"threshold_outcome\"],\n                     orders=record[\"option_order\"],\n-                    memo_key=record[\"memo_key\"],\n-                )\n+                    )\n             )\n     finally:\n         if previous is None:"
+reason = "This transient memo_key member is removed by committed_aggregate before output and has no other consumer; gateway records are unchanged."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -123,7 +123,7 @@\n             )\n     finally:\n         if previous is None:\n-            os.environ.pop(\"EII_DECISION_PROVIDER\", None)\n+            os.environ.pop(\"EII_DECISION_PROVIDER\", )\n         else:\n             os.environ[\"EII_DECISION_PROVIDER\"] = previous\n     comparison = reproduction(args.provider, raw_rows, admitted)"
+reason = "The provider environment name is assigned before entering the try block and no called provider removes it, so this finally block always pops an existing name."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -167,7 +167,7 @@\n         result[\"calls_made\"] = observed.calls_made\n         result[\"tokens_used\"] = observed.tokens_used\n     path.parent.mkdir(parents=True, exist_ok=True)\n-    with path.open(\"x\", encoding=\"utf-8\") as stream:\n+    with path.open(\"x\", encoding=\"UTF-8\") as stream:\n         stream.write(canonical(committed_aggregate(result)) + \"\\n\")\n     print(state)\n     print("
+reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same encoder and bytes."
+
+[[survivors]]
+module = "evals/typed_decisions/requalify.py"
+mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -165,7 +165,7 @@\n         result[\"calls_made\"] = observed.calls_made\n         result[\"tokens_used\"] = observed.tokens_used\n     path.parent.mkdir(parents=True, exist_ok=True)\n-    with path.open(\"x\", encoding=\"utf-8\") as stream:\n+    with path.open(\"x\", encoding=\"UTF-8\") as stream:\n         stream.write(canonical(committed_aggregate(result)) + \"\\n\")\n     print(state)\n     print("
+reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same encoder and bytes."
