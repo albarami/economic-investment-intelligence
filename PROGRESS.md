@@ -19084,6 +19084,39 @@ Seed:      none
 Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
 ```
 
+### S1-T16 — a correction after the ledger: the status line of S1-T08 (pull request https://github.com/albarami/economic-investment-intelligence/pull/45 )
+
+- The ledger commit `08ba45df68b39a022aae96876443a3c0f73e0fa8` set the status line of task S1-T08 in `TASKS.md` to done (its pull request 39 is merged). The lead's whole test on that head then failed in one guard test and passed everywhere else: `scripts/tests/test_pin_rulings.py`, `test_every_pin_has_a_ruling_and_retreat`, with the fault "@mapbox/mapbox-gl-rtl-text: not-installed ruling names a completed task". The work commit is not involved: the same test passed in the ledger's run at the work commit, where the status line still said in review.
+- Cause, read in the test: the guard that S1-T08 delivered requires the words "retreat ruling S1-T08: none exists: " in the note of every pin that has no retreat, and it refuses a pin that is not installed when its note names a completed task anywhere. The one pin that is not installed and has no retreat therefore fails as soon as S1-T08 itself is marked done. The guard contradicts itself; the record of the pin is right.
+- The correction belongs to the guard, not to the records. This task changes no test (the owner's note of 2026-11-14, decision record 0027), so the guard is not corrected here: the status line of S1-T08 is taken back to its text on main in this commit, and the correction of the guard, with the status line, goes to the review follow-up of slice S1 (task S1-T10) as open item OI-159. Until then `TASKS.md` shows S1-T08 as in review although its pull request is merged; this entry and OI-159 say so.
+- The failing run is kept as evidence. After the correction the guard test passes again on this tree, and the lead's whole test on the corrected head is recorded with the closing record of this pull request.
+
+#### Evidence for the correction (the ledger head `08ba45df68b39a022aae96876443a3c0f73e0fa8` and this commit)
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    08ba45df68b39a022aae96876443a3c0f73e0fa8
+Command:   ./eii test --seed 2026111447
+Exit code: 1
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    2216 passed, 1 failed, 0 skipped
+Seed:      2026111447
+Notes:     The whole test command on the ledger head. One failure, in the suite python-guards: scripts/tests/test_pin_rulings.py::PinRulings::test_every_pin_has_a_ruling_and_retreat ("not-installed ruling names a completed task"); the five other suites passed. A real failure with a known cause, not a random one: see the correction above.
+```
+
+```text
+### S1-T16 — The time limit of the web checks on the hosted runner
+Commit:    the commit that holds this correction
+Command:   uv run --locked python -m pytest scripts/tests/test_pin_rulings.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped (and 5 subtests passed)
+Seed:      none
+Notes:     The guard test on the corrected tree, before the commit: with the status line of S1-T08 back at its text on main, every test of the file passes.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
