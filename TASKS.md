@@ -220,7 +220,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: assignment spike code and fixtures, a road-layer page under `web/spikes/` and its trace.
 - Depends: S1-T02, S1-T03.
 - Requirements: ARC-88, SYN-53, SYN-54, DES-50, TST-132, SYN-79, MTH-88, MTH-89, MTH-90, PRV-124, TST-213.
-- Delivery: hard; personas Simulation; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/38).
+- Delivery: hard; personas Simulation; status done (pull request 38, merged 2026-11-13).
 ### S1-T13 — The performance page saves native traces and refuses a software or remote renderer at once
 - Goal: Make the serve command of the performance spike store a posted trace, and make the page show its WebGL renderer as soon as it loads and refuse a software or remote renderer, or a capped frame rate, on screen before the orbit in the gate profile.
 - Acceptance criteria: [x] a test starts the development server of the serve command and posts a trace, which is stored, and a malformed post is refused in JSON; [x] the page shows the unmasked renderer at load; [x] in the gate profile a software or remote renderer, and a frame rate capped below the gate's need, are refused on screen before the orbit, and nothing is posted, with one planted case each; [x] no count, budget, profile or threshold of the gate changes.
@@ -248,7 +248,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: `evals/typed_decisions/`, slice S1 spike report and dependency pin decision.
 - Depends: S1-T02, S1-T03, S1-T04, S1-T05, S1-T06, S1-T07, S1-T11. (S1-T12 was dropped from this list by a re-plan of 2026-11-13: the native trace waits for the owner at the console; the pin fields it decides stay open and close with the addendum of the slice S1 gate.)
 - Requirements: FE-03, TST-155, AI-98, TST-167, PLN-15.
-- Delivery: hard; personas AI; status queued.
+- Delivery: hard; personas AI; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/39).
 ### S1-T09 — Exported set, presence and flow parameters, and months shown first
 - Goal: Fix `export_parameter_set` = `A` and the presence and flow parameters of PRV-59 in the rules configuration before the first world build, and record the number of monthly periods shown first.
 - Acceptance criteria: [ ] `export_parameter_set` is `A` unless open item OI-35 is closed with another value by the owner or a data owner; [ ] the presence and flow parameters that PRV-59 requires are positive and recorded in the slice S1 gate evidence; [ ] the name `presence_base` is not used; [ ] a missing or non-positive parameter fails the configuration check; [ ] the number of monthly periods shown first is chosen among the months of the synthetic reference period and recorded in the slice S1 gate evidence (decision 0016).

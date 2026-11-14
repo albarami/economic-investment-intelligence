@@ -31,6 +31,8 @@ class PychecksConfig(unittest.TestCase):
         import tomllib
 
         data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+        self.assertIn("evals", data["tool"]["ruff"]["src"])
+        self.assertIn("evals", data["tool"]["mypy"]["files"].split(","))
         select = data["tool"]["ruff"]["lint"]["select"]
         for family in ("E4", "E7", "F", "B", "I", "UP", "RUF"):
             self.assertIn(
@@ -148,3 +150,34 @@ class PychecksConfig(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EvalsCopy(unittest.TestCase):
+    def test_run_records_and_caches_are_not_copied(self) -> None:
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as folder:
+            source = Path(folder)
+            (source / "pyproject.toml").write_text("")
+            for name in ("scripts", "core", "custodian", "product", "gateway", "evals"):
+                (source / name).mkdir()
+            support.write_files(
+                source,
+                {
+                    "evals/typed_decisions/synthetic.py": 'value = "synthetic"\n',
+                    "evals/typed_decisions/runs/synthetic.json": "{}",
+                    "evals/typed_decisions/__pycache__/synthetic.pyc": "synthetic",
+                    "evals/.mypy_cache/synthetic.json": "{}",
+                    "evals/.ruff_cache/synthetic.json": "{}",
+                },
+            )
+            with patch.object(support, "ROOT", source):
+                copy = support.fresh_copy(self)
+            self.assertEqual(
+                sorted(
+                    p.relative_to(copy).as_posix()
+                    for p in (copy / "evals").rglob("*")
+                    if p.is_file()
+                ),
+                ["evals/typed_decisions/synthetic.py"],
+            )
