@@ -20402,6 +20402,114 @@ Seed:      none
 Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
 ```
 
+### S1-T17 — Gate fix for slice S1: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/48 )
+
+- What it is: the gate-fix task of slice S1 (TST-169), documents and records only. In the gate table of document 12 (section 5) the clause "the optional 3D view of decision 0019 item 14 passes its named test" and its evidence clause "TST-242 for the 3D view, with its frame-rate numbers reported" move from the row of slice S1 to the row of slice S6, unchanged in their words. Task S2-T10 gains the acceptance criterion that removes the hosted value of 3,000 s from the whole test command, with the runner's files in its scope. OI-158 gains an update and OI-160 is closed. No code, test, bound or workflow changes.
+- Why: the first review of the slice S1 gate (the gate record, pull request https://github.com/albarami/economic-investment-intelligence/pull/47 ). The second reviewer (the records) returned APPROVED with four proposed record items. The designated reviewer (the controls and the gate's proof) returned REJECTED with five points, and its verdict decides (REV-43). The lead judged each point against the files and holds all five valid. Three are fixed here; two concern sentences of the gate record itself and are corrected by new entries in the gate record's second round (TST-171). Both verdicts are copied unchanged into that round with this judgement.
+- Point 1, the 3D view. The slice S1 row of document 12 named the view as a gate item, and REV-33 makes every item of that row an item of the gate review. Document 14 puts the view in slice S6 (PLN-28; the row of its section 6 that names tasks S6-T18 and S6-T19; the task list and the gate text of slice S6), the gate text of slice S1 in document 14 and in TASKS.md does not name it, and no task of slice S1 builds it. The gate record had entered this as an assumption of the lead (OI-165, in pull request 47). The designated reviewer held that a gate item cannot be set aside by an assumption and gave two ways: passing evidence of TST-242 at the slice's final commit, or an owner-approved, independently reviewed correction of the row, merged before approval. The second is taken. The owner's approval, relayed by the owner's advisor on 2026-11-14 in answer to the lead's question on OI-165: "accepted as you entered it. The reviewers judge the fact, and the row of document 12 is corrected with the next documents change." The clause entered the slice S1 row with the documents change of decision 0019; decision 0019 item 14 and PLN-28 are unchanged, so this is the correction of one row and no new decision.
+- Point 4, OI-160. The gate record kept the item open because the hosted logs give no time for the one test alone. The item's own default asks for something else: the test passed in the three hosted runs counted for S1-T15, with the time of the suite `web-checks` recorded in each. That is the case, so the item is closed with the three runs.
+- Point 5, OI-158. The three hosted runs of its default each finished the suite inside 1,800 s, so its condition is met, and the item places the removal of the hosted value in task S2-T10; the entry of that task held no criterion for it. The criterion and the files are added. The removal itself is a change of the test runner and is not made during the gate; OI-158 stays open until it is merged.
+- Class: routine. Written by the lead (Anthropic Claude Fable 5.2) with a script that asserts each present wording exactly once before it replaces it; no builder tool wrote any part. One review by another maker, named in the closing record.
+- Not in this pull request: the correction of statements 10 and 14 of the gate record (points 2 and 3 of the designated reviewer; the gate record's second round); the closing of OI-165 (that item is entered by pull request 47 and is closed there, by this correction); the proposed record items of the second reviewer that go to the follow-up task of slice S2 (the stale comment that names OI-124 in the rules configuration; the format of the copied verdict of S1-T08). After this merge the slice's final commit is the merge commit of this pull request, and every gate item is run again at it (TST-166).
+
+#### Evidence for the work commit `0a602e3cf45efaeba8c88607a708d99eb96cd89d`
+
+```text
+### S1-T17 — Gate fix for slice S1
+Commit:    0a602e3cf45efaeba8c88607a708d99eb96cd89d
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 429 text files, 67 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the corrected rows: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### S1-T17 — Gate fix for slice S1
+Commit:    0a602e3cf45efaeba8c88607a708d99eb96cd89d
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### S1-T17 — Gate fix for slice S1
+Commit:    0a602e3cf45efaeba8c88607a708d99eb96cd89d
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical; the task does not change them.
+```
+
+```text
+### S1-T17 — Gate fix for slice S1
+Commit:    0a602e3cf45efaeba8c88607a708d99eb96cd89d
+Command:   python3 -I -c "t=open('docs/12_TESTING_AND_QUALITY.md',encoding='utf-8').read().split(chr(10)); r=lambda s:[l for l in t if l.startswith(s)][0]; a,b=r('| slice S1 Technical spike |'),r('| slice S6 The joined door |'); c='the optional 3D view of decision 0019 item 14 passes its named test'; e='TST-242 for the 3D view, with its frame-rate numbers reported'; w=chr(10).join(t); print('S1 row', a.count(c), a.count(e), a.count('3D'), 'S6 row', b.count(c), b.count(e), 'document', w.count(c), w.count(e))"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "S1 row 0 0 0 S6 row 1 1 document 1 1" (the clause and its evidence clause stand once in the document, both in the slice S6 row; the slice S1 row no longer names the view)
+Seed:      none
+Notes:     Acceptance criterion 1: the two clauses counted in each row of the gate table of document 12 section 5 and in the whole document.
+```
+
+```text
+### S1-T17 — Gate fix for slice S1
+Commit:    0a602e3cf45efaeba8c88607a708d99eb96cd89d
+Command:   python3 -I -c "import re; t=open('TASKS.md',encoding='utf-8').read(); s=t.index('### S2-T10 '); e=t.index(chr(10)+'### ',s+5) if (chr(10)+'### ') in t[s+5:s+6000] else t.index(chr(10)+'**slice S2 gate',s); x=t[s:e]; o=open('OPEN_ITEMS.md',encoding='utf-8').read(); i=lambda k:o[o.index(chr(10)+'## '+k+' '):o.index(chr(10)+'## ',o.index(chr(10)+'## '+k+' ')+5)]; print('S2-T10 criterion', x.count('the hosted value of 3,000 s is removed from the whole test command'), 'scope', x.count('scripts/run_tests.py'), 'OI-158', re.search(r'(?m)^- TYPE: (.*)$',i('OI-158')).group(1), i('OI-158').count('- UPDATE: 2026-11-14, by the gate-fix task S1-T17'), 'OI-160', re.search(r'(?m)^- TYPE: (.*)$',i('OI-160')).group(1), i('OI-160').count('- CLOSED: 2026-11-14, by the gate-fix task S1-T17'))"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "S2-T10 criterion 1 scope 1 OI-158 OPEN 1 OI-160 CLOSED (was OPEN) 1" (the criterion and the runner's file stand in the entry of S2-T10; OI-158 is open with its update; OI-160 is closed)
+Seed:      none
+Notes:     Acceptance criteria 2 and 3, read from TASKS.md and OPEN_ITEMS.md on the committed tree.
+```
+
+```text
+### S1-T17 — Gate fix for slice S1
+Commit:    0a602e3cf45efaeba8c88607a708d99eb96cd89d
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','89f3ca770291dde5c8f5eaa262ac4db6e3c66d18...0a602e3cf45efaeba8c88607a708d99eb96cd89d'],check=True,capture_output=True,text=True).stdout.splitlines()); w='M:OPEN_ITEMS.md M:TASKS.md M:docs/12_TESTING_AND_QUALITY.md'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "3 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Acceptance criterion 4: the work commit changes three files, all documents or records; no code, test or workflow file.
+```
+
+```text
+### S1-T17 — Gate fix for slice S1
+Commit:    0a602e3cf45efaeba8c88607a708d99eb96cd89d
+Command:   ./eii test --seed 2026111458
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    2250 passed, 0 failed, 0 skipped
+Seed:      2026111458
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### S1-T17 — Gate fix for slice S1
+Commit:    0a602e3cf45efaeba8c88607a708d99eb96cd89d
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','89f3ca770291dde5c8f5eaa262ac4db6e3c66d18..0a602e3cf45efaeba8c88607a708d99eb96cd89d'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
