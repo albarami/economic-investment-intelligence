@@ -13,6 +13,7 @@ from typing import TextIO
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import ci_environment
 import run_tests_counts as counts
 import run_tests_exec as runner_exec
 
@@ -67,6 +68,14 @@ _SEED_MAX = 4294967295
 _SEED_DETAIL = "seed must be ten decimal digits from 1000000000 to 4294967295"
 
 
+def suite_timeout(suite: Suite, environ: Mapping[str, str]) -> int:
+    """Return the limit of one suite, raised for the web checks on a hosted runner."""
+    if suite.name == "web-checks" and ci_environment.is_hosted_runner(environ):
+        # The hosted value is a stopgap of S1-T16 by the owner's decision of 2026-11-14 and returns to 1,800 s when S1-T15 makes the suite fast enough on slow runners.
+        return 3000
+    return suite.timeout
+
+
 def parse_arguments(argv: Sequence[str]) -> int | None:
     """Read an optional seed. Raise UsageError at the first fault."""
     seed: int | None = None
@@ -112,8 +121,9 @@ def run_suite(
                 (f"FAIL cannot-start: {suite.name}: {error}",),
                 (),
             )
+        timeout = suite_timeout(suite, parent)
         try:
-            launched = runner_exec.launch(cmd, root / suite.cwd, env, suite.timeout)
+            launched = runner_exec.launch(cmd, root / suite.cwd, env, timeout)
         except runner_exec.StartError as error:
             return SuiteResult(
                 suite.name,
@@ -133,7 +143,7 @@ def run_suite(
         parsed: counts.Counts | None = None
         if launched.timed_out:
             fail_lines.append(
-                f"FAIL timeout: {suite.name}: no result within {suite.timeout} s; "
+                f"FAIL timeout: {suite.name}: no result within {timeout} s; "
                 "the process group was killed"
             )
         else:
