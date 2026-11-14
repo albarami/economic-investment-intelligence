@@ -1364,6 +1364,7 @@
 - DONE SO FAR: Task S1-T16 raises the limit on GitHub's hosted runner only, by the owner's decision of 2026-11-14. Task S1-T15 is in review with both parts (pull request 43): on four processors of the build machine the spike's browser run fell from 1,993 s to 1,294 s (one valid timing). Its criterion on the suite's time (under 1,200 s on four processors, measured twice) is not met; by the re-plan of 2026-11-14 recorded in `PROGRESS.md` under S1-T15 it is moved, unticked and word for word, to task S2-T10, and no further pass is made before the slice S1 gate. What is left of it is part of this item: a further shortening of the browser run that removes or weakens no test, and the second valid timing run.
 - OPTIONS: **Default:** the pull request that completes S1-T15, or the one after it, removes the hosted value when three hosted runs in a row have finished the suite inside 1,800 s. The three runs are counted from the head of pull request 43: that head's run, the main branch's run after its merge, and the next pull request's run. Otherwise the owner decides to keep a hosted value.
 - NEEDED BY: the slice S1 gate records the state of this item; the work is done in task S2-T10, before the slice S2 gate.
+- UPDATE: 2026-11-14, by the gate-fix task S1-T17 after the first review of the slice S1 gate: the condition of the default is met. The three hosted runs it counts each finished the suite `web-checks` inside 1,800 s: the head of pull request 43 (731 s; 843 passed, 0 failed, 0 skipped), the main branch after its merge (912 s; 843 passed, 0 failed, 0 skipped) and the head of pull request 46 (937 s; 849 passed, 0 failed, 0 skipped); the main branch after the merge of pull request 46 took 938 s. The removal of the hosted value is now an acceptance criterion of task S2-T10, with the runner's files in its scope. It is a separate thing from that task's criterion on the suite's time on four processors (under 1,200 s, measured twice), which is not met. This item stays open until the removal is merged.
 
 ## OI-159 — The pin-ruling guard refuses the record once S1-T08 is marked done
 
@@ -1379,12 +1380,13 @@
 ## OI-160 — One time-out of the full street load on readiness, in a run under load
 
 - ID: OI-160
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - NEEDED: Show that the readiness bound of 170 s in the browser test "roads full street load draws every link and carries the Simulated mark" (`web/spikes/performance/tests/performance.spec.ts`) has a real margin on the runners that run it, or find why it was exceeded once.
 - WHY: In the builder's first measurement of part B of task S1-T15, taken while the build machine was loaded by other runs, that test timed out once on readiness at its bound and passed in the next run. A green re-run alone does not close a random failure (AGENTS rule 39).
 - DONE SO FAR: No bound was changed. The test passed in every run of the lead since: the two timing runs of the browser suite on four processors (the test took 3.5 minutes in the run under load and 2.3 minutes on reserved processors; 54 tests passed in each) and the browser run of the ledger of part B (54 passed).
 - OPTIONS: **Default:** the three hosted runs counted for S1-T15 (the head of pull request 43, the main branch after its merge, the next pull request) are the evidence: the item is closed when the test passed in all three, with the time of the suite `web-checks` in each recorded; a time-out in one of them keeps the item open and its cause is found before any bound moves.
 - NEEDED BY: the slice S1 gate records the state of this item.
+- CLOSED: 2026-11-14, by the gate-fix task S1-T17, on the item's own default: the test passed in the three hosted runs counted for S1-T15, and the time of the suite `web-checks` in each is recorded: the head of pull request 43 (731 s; 843 passed, 0 failed, 0 skipped), the main branch after its merge (912 s; 843 passed, 0 failed, 0 skipped) and the head of pull request 46 (937 s; 849 passed, 0 failed, 0 skipped). The main branch after the merge of pull request 46 passed too (938 s). No time-out was seen in any of them and no bound was changed. The hosted logs give no time for the one test alone, and the default does not ask for one; the first review of the slice S1 gate found that the gate record had kept the item open for that reason.
 
 ## OI-161 — Two dependency alerts on a development-only package that the mutation tester brings in
 
@@ -1405,6 +1407,38 @@
 - DONE SO FAR: The OPEN line stays in document 14 as it is. No owner is invented. Nothing built.
 - OPTIONS: **Default:** the lead names the owning task in a re-plan, recorded in TASKS.md, before the first task that builds a register-company table, card or map layer starts; the owner is asked only if the allocation needs a new task.
 - NEEDED BY: the slice S2 gate (the public pack and its places).
+
+## OI-163 — One browser test of the performance spike lost its page during readiness, once
+
+- ID: OI-163
+- TYPE: OPEN
+- NEEDED: The cause of one failure of the browser test "the smoke orbit draws both layers and records a trace" (`web/spikes/performance/tests/performance.spec.ts`), which ended during readiness with the browser's message `page.evaluate: Target page, context or browser has been closed`.
+- WHY: A random failure is recorded, and a green re-run alone does not close it (AGENTS rule 39; TST-168). The failure was seen once, on 2026-11-14, in a standalone run of the spike's browser tests on processors 0 to 3 of the build machine (53 passed, 1 failed), inside the measuring job for OI-158. That job kept no change to the repository, and its record does not hold the browser's own log of the failure.
+- DONE SO FAR: Recorded here by the slice S1 gate record. The same test passed in the job's later runs of the whole suite `web-checks`, in the lead's runs of the gate at the slice's final commit and in the hosted `tests` check of that commit. The cause is not found. No test, wait, bound or retry was changed.
+- OPTIONS: **Default:** task S2-T10, which holds the criterion on the suite's time (OI-158), repeats the standalone browser run on four processors with the browser's log and the page's console kept on a failure of readiness, and records either the cause or the number of runs without the failure; no retry is added to the test and no bound moves before the cause is known.
+- NEEDED BY: the slice S2 gate (task S2-T10).
+- UPDATE: 2026-11-14, by the second round of the slice S1 gate record: a likely cause is found, and the item stays open. By the browser tool's own report the failing run started at 17:18:31, and the test failed about one second into it. In that second, four campaigns of the mutation tester, started by a builder's job at 17:17:19, were running in the shared process-number space of the build machine, and three of them recorded time-outs that fired. The tester sends its time-out signal to a process number that may by then belong to another process (OI-168), and a browser process that is stopped in that way gives this message. No record says which process ended, so the cause is not proved. The default stands, now with no campaign in the shared space: the repeated standalone run of task S2-T10 either shows the failure again or counts the runs without it.
+
+## OI-165 — The optional 3D view stands in the slice S1 row of document 12's gate table
+
+- ID: OI-165
+- TYPE: CLOSED (was ASSUMPTION)
+- NEEDED: One place for the gate item of the optional 3D view of decision 0019 item 14. The row "slice S1 Technical spike" of [12_TESTING_AND_QUALITY.md](docs/12_TESTING_AND_QUALITY.md) section 5 says "the optional 3D view of decision 0019 item 14 passes its named test" and names as its evidence "TST-242 for the 3D view, with its frame-rate numbers reported". [14_IMPLEMENTATION_PLAN.md](docs/14_IMPLEMENTATION_PLAN.md) puts the view in slice S6: PLN-28, the row of section 6 that names tasks S6-T18 and S6-T19, and the task list and the gate text of section "14. slice S6 — The flagship location choice". The gate text of slice S1 in document 14 (section "9. slice S1 — Technical spike") has fourteen statements and none names the view. The row "slice S6 The joined door" of document 12 does not name it.
+- WHY: Found while the slice S1 gate record was prepared. REV-33 makes every item of the document 12 row an item of the gate review. No task of slice S1 builds the view (TASKS.md), so the clause cannot pass at this gate, and the gate record claims nothing about the view. The clause entered the slice S1 row with the documents change of decision 0019.
+- DONE SO FAR: The lead's reading, recorded in the slice S1 gate record: PLN-28 says that the work of decision 0019 lands where section 6 of document 14 puts it, so the clause belongs to the slice S6 row and is not a gate item of slice S1. No document is changed by the gate record.
+- OPTIONS: **Default:** a documents change with its own review moves the clause and its evidence clause from the slice S1 row to the slice S6 row of document 12, before the addendum that closes the slice S1 gate. The owner says so if the slice S1 gate is to hold a spike of the 3D view instead; the gate then stays open for it.
+- NEEDED BY: the addendum of the slice S1 gate (task S1-T12).
+- CLOSED: 2026-11-14, by the second round of the slice S1 gate record, on the item's default: the gate-fix task S1-T17 (pull request 48), a documents change with its own independent review, moved the clause and its evidence clause from the slice S1 row to the slice S6 row of document 12 (section 5), in the same words, with the owner's approval of the correction (quoted in the task log of S1-T17 in PROGRESS.md). The first review of the gate held that the question could not stand as an assumption while the gate was reviewed; the gate record's second round reads both rows at the slice's final commit. Nothing about the view itself is claimed: it is built and tested in slice S6.
+
+## OI-168 — The mutation tester's time-out can stop a process that is not its own
+
+- ID: OI-168
+- TYPE: OPEN
+- NEEDED: A way to run `scripts/mutation.py` that cannot stop a process outside its own campaign.
+- WHY: The pinned mutation tester (mutmut, the dependency group `mutation`) records a deadline and a process number for every mutant run and cancels no entry when a run ends. When a deadline passes, it sends the signal SIGXCPU to that number (its module `mutmut/workers/timeout.py`, whose own comment says that entries of ended processes stay until they reach the top). On a machine that reuses process numbers quickly, the number can by then belong to another process of the same user, which ends with "CPU time limit exceeded" (exit code 152). On 2026-11-14 a run of the guard-test discovery on the build machine ended that way within a minute, while a builder's campaign ran in the same process-number space; the same command at the same commit passed once no such campaign ran. The highest process number of the build machine is 99999. A random failure and its cause are recorded (AGENTS rule 39).
+- DONE SO FAR: The lead read the tester's module in full and found no limit on processor time in any shell, script or test of the repository. The campaign was stopped, and since then every campaign on the build machine is started in a process-number space of its own, with the sandbox tool the repository already uses, where it can reach only its own processes. Nothing in the repository is changed. The stopped run was not a run of the slice S1 gate. The lead's run records were read for the three random failures recorded earlier: OI-163 falls in a second in which four such campaigns were running (the update in that item); OI-125 and OI-160 do not fall on a campaign. The web mutation runner uses another tool, which was not examined.
+- OPTIONS: **Default:** `scripts/mutation.py` starts the tester in a process-number space of its own and refuses to run where it cannot, with a planted case; no fallback to the shared space. Alternative: raise the pin once the tester cancels its entries, and keep the separate space until then.
+- NEEDED BY: task S2-T10; until then no campaign runs in the shared process-number space of the build machine.
 
 ## OI-127 — PyYAML is installed through the root development group
 
@@ -1792,6 +1826,33 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - NEEDED: the task that scans the bundle or the exports states how the credit is judged there, or one line saying why not.
 - CLOSED BY: S1-T10
 - CLOSED: 2026-11-14, by S1-T10: task S3-T16 states in its entry of TASKS.md that its scan of the built bundle and of the rendered page judges the map's credit by the place rule of TST-263. No task of the plan scans an export with the private list, so there is nothing to place for the exports.
+
+### PO-S2-01 — The rules configuration names an open item that does not exist
+
+- ID: PO-S2-01
+- TYPE: OPEN
+- RAISED BY: the second reviewer of the slice S1 gate, round 1 (OpenAI GPT-6 Astra), 2026-11-14, proposed item P1 (its second half)
+- CONCERNS: REV-17 (documents agree with the work)
+- EVIDENCE: the first line of `custodian/src/eii_custodian/privacy/rules.toml` is a comment that says the owner's choices on its values "are recorded under open item OI-124". This file holds no OI-124 (it goes from OI-123 to OI-125); the task log of S1-T10 in PROGRESS.md ("Records corrected here") says so and says where the question of the window stands.
+- NEEDED: the comment names the place where the choices are recorded, or names no item. No value of the file changes, and the committed gate record of the rules still matches it (`custodian/tests/test_rules_config.py`). Or one line saying why not.
+
+### PO-S2-02 — The copied verdict of the second round of S1-T08 answers another list of checks
+
+- ID: PO-S2-02
+- TYPE: OPEN
+- RAISED BY: the second reviewer of the slice S1 gate, round 1 (OpenAI GPT-6 Astra), 2026-11-14, proposed item P3
+- CONCERNS: REV-16; the verdict format of [15_REVIEWER_CHECKLIST.md](docs/15_REVIEWER_CHECKLIST.md)
+- EVIDENCE: the entry "S1-T08: independent review, round 2 (the confirmation): APPROVED" of PROGRESS.md copies a verdict whose checks are six numbered lines and REV-01 to REV-11, not REV-10 to REV-29 and REV-38, and whose lines are not in the order of the verdict format. The verdict is copied unchanged, as REV-09 requires; the pull request was merged on it.
+- NEEDED: a new entry beside the copied verdict that says how its checks relate to the checklist's, or a statement by a reviewer in the required format for the same commit; the copied verdict is not rewritten (TST-171). Or one line saying why the item is not valid.
+
+### PO-S2-03 — Document 10 still lists the 3D view among the questions for the spike of slice S1
+
+- ID: PO-S2-03
+- TYPE: OPEN
+- RAISED BY: the reviewer of the gate-fix task S1-T17 (OpenAI GPT-6 Astra), 2026-11-14, proposed item P1
+- CONCERNS: REV-17 (documents agree with the work); PLN-28
+- EVIDENCE: [10_FRONTEND.md](docs/10_FRONTEND.md), section "Open questions and assumptions", the sentence that starts "Questions for the spike in slice S1" ends with "whether the 3D view holds the frame-rate gate". The gate-fix task S1-T17 moved the clause on the optional 3D view and its evidence clause (TST-242) from the slice S1 row to the slice S6 row of the gate table of document 12 (section 5), where document 14 places the view (PLN-28; S6-T18). The spike of slice S1 did not build the view and answered no such question; no record claims that it did.
+- NEEDED: with the next change of document 10, the sentence says that this question is answered by S6-T18 under TST-242, with the frame-rate configuration of slice S1 as its reference. No requirement, bound or test changes. Or one line saying why the item is not valid.
 
 ## Sources
 
