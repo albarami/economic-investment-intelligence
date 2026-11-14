@@ -10,7 +10,7 @@
 
 ## In brief
 
-- Nothing is built yet. Version 1 is a demonstrator on synthetic custodian-type labour and residence records attached to the real companies of the public registers ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)), simulated mobility and cited Public data. It reads no real custodian record, except the calibration table of the owner's note, read only by the world build, and no real mobility feed (AGENTS.md rules 3 and 4); the one live outside source at run time is the optional traffic provider, off by default ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 17).
+- Nothing is built yet. Version 1 is a demonstrator on synthetic custodian-type labour and residence records attached to the real companies of the public registers ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)), simulated mobility and cited Public data. It reads no real custodian record, except the calibration table of the owner's note, read only by the world build, and no real mobility feed (AGENTS.md rules 3 and 4); the live outside sources at run time are the optional traffic provider, off by default ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 17), and the optional map providers of [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7 (the imagery provider for satellite tiles and address search, and the photorealistic 3D tiles), each off unless its key is present.
 - This document lists what a deployment on real records must add. Each item is a precondition of that deployment, not a version 1 feature. Nothing here says that the product exists, that it passes a gate or that version 1 meets any item.
 - The version 1 controls are the floor. A deployment adds controls; it never relaxes one (AGENTS.md rule 12).
 - Six areas: real footfall counts from a telecom feed; differencing across periods, the forecast of a real protected series included; firm-level release of real register fields; query auditing and rate limits for drawn areas; the sources, the traffic provider included, that stay on if the product is ever hosted publicly or for a commercial purpose; and the governance of real custodian data, where document 13 already covers several points.
@@ -68,7 +68,7 @@ Version 1 shows register companies, the real companies of the public business re
 
 ## 5. Drawn areas: query auditing and rate limits
 
-In version 1 a drawn shape's protected figures snap to whole release units, two shapes that snap to the same units return identical protected figures, and attacks on drawn shapes and apportioning recover nothing (TST-25, TST-204, TST-221). A single-machine demonstrator with three seats needs nothing more; a served deployment does.
+In version 1 a drawn shape's protected figures snap to whole release units, two shapes that snap to the same units return identical protected figures, and attacks on drawn shapes and apportioning recover nothing (TST-25, TST-204, TST-221). A single-machine demonstrator with two company seats needs nothing more; a served deployment does.
 
 | ID | Requirement |
 |---|---|

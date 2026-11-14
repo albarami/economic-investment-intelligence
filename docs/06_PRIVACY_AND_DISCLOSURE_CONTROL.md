@@ -452,7 +452,7 @@ wage-bill leaves. Category totals, side totals and home-by-work marginals follow
 `other` is a treated leaf only where pooling occurred. No two treated leaves of one family overlap,
 and no equality is required between different tables, partitions, measures or breakdowns.
 
-`month_change` has additive families for three described tables only, the ones whose rows DAT-137
+`month_change` has additive families for two described tables only, the ones whose rows DAT-137
 lets hold cohort counts. Each family is one described table, partition, measure and pair of
 adjacent months, with breakdown `cohort`. For `resident_pay` and `worker_pay` its mutually
 exclusive leaves on each unit that covers the frame are the stayers, joiners and leavers of that
