@@ -1826,8 +1826,8 @@ Retrieved 2026-11-11 unless a date is given.
 - The sources of decision 0019, read 2026-11-12 (publisher, licence or terms, as its Sources list
   them; the full entries are in [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md)):
   - Live traffic provider (`traffic_tomtom_flow`, `traffic_tomtom_range`): TomTom, Traffic API
-    documentation, https://docs.tomtom.com/traffic-api/ ; the provider's developer terms could not
-    be read, and nothing of a response is stored.
+    documentation, https://docs.tomtom.com/traffic-api/ ; the provider's terms, read on 2026-11-13,
+    prohibit storing results, and nothing of a response is stored.
   - Relative busyness (`busy_gmaps`): Google, "About popular times, wait times and visit duration
     data", https://support.google.com/business/answer/6263531 ; the publisher's terms are recorded in its
     own words with the date read in document 04, PUB-12. The basis of use is the owner's decision for

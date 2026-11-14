@@ -31,13 +31,7 @@ COMMANDS: tuple[Command, ...] = (
     Command("up --embedded", "up", "Product", "real", NOT_YET),
     Command("down", "down", "Product", "placeholder", NOT_YET),
     Command(TEST_FORM, "test", "All", "real", ""),
-    Command(
-        "build-public",
-        "build-public",
-        "Custodian",
-        "placeholder",
-        "not_built (built by task S2-T01)",
-    ),
+    Command("build-public", "build-public", "Custodian", "real", ""),
     Command("build-world", "build-world", "Custodian", "placeholder", NOT_YET),
     Command("build-release", "build-release", "Custodian", "placeholder", NOT_YET),
     Command(

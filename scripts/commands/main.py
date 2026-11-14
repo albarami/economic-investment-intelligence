@@ -9,6 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import commands.build_public as build_public
 import commands.database as database
 import commands.placeholder as placeholder
 import commands.preflight_cmd as preflight_cmd
@@ -29,6 +30,8 @@ def main(argv: Sequence[str], environ: Mapping[str, str], root: Path) -> int:
         return database.run(word, environ, root, rest)
     if word == "up":
         return up_cmd.run(root, environ, rest)
+    if word == "build-public":
+        return build_public.run(root, environ, rest)
     if word in table.PLACEHOLDERS:
         if rest:
             table.write_usage()

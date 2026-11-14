@@ -1406,6 +1406,66 @@
 - OPTIONS: **Default:** the lead names the owning task in a re-plan, recorded in TASKS.md, before the first task that builds a register-company table, card or map layer starts; the owner is asked only if the allocation needs a new task.
 - NEEDED BY: the slice S2 gate (the public pack and its places).
 
+## OI-127 — PyYAML is installed through the root development group
+
+- ID: OI-127
+- TYPE: ASSUMPTION
+- NEEDED: Confirmation, by the first task that installs `eii_custodian` outside the root dependency group `dev`, that `pyyaml` moves into the custodian manifest `custodian/pyproject.toml` in that task's pull request.
+- WHY: The source registry of task S2-T01 is the committed file `custodian/publicdata/sources.yaml`, and the PyYAML package reads it. A member manifest cannot gain a third-party dependency while the clean-environment guard of task S0-T02 installs the members offline from an empty cache (OI-60, OI-116). PyYAML has no type stubs, so the one import carries the same `type: ignore[import-untyped]` mark that two existing checks already use.
+- DONE SO FAR: `pyyaml` 6.0.3 is pinned exactly in the root group `dev` and in `pins.toml` with the retreat 6.0.2 and the label ASSUMPTION. The loader calls `yaml.safe_load` only; a test fails if the loader source holds `yaml.load` or lacks `safe_load`. No other package was added.
+- OPTIONS: **Recommendation:** keep the package in the root group through slice S2; the task that first runs `build-public` or the registry from an environment without the `dev` group declares `pyyaml` in the custodian manifest and changes the clean-environment guard in the same pull request. Alternative: keep the registry in JSON, which needs no package, at the cost of comments and a harder review of 138 rows.
+- NEEDED BY: slice S2 pin confirmation; the first task that loads the registry outside the root development group.
+
+## OI-128 — The investment sources are used by the owner's decision of 2026-11-12
+
+- ID: OI-128
+- TYPE: CLOSED
+- NEEDED: Nothing; recorded so that the basis of use of the two investment sources is visible beside their terms.
+- WHY: Criterion 8 of task S2-T01 asks the registry to record the publisher's terms as read at fetch and the basis of use. The publisher's terms of use, read on 2026-11-13 at `https://www.invest.qa/en/terms-and-conditions?tab=terms-of-use`, allow copies for personal and non-commercial use while viewing and ask for the publisher's prior written permission and an acknowledgement of the source before the material is copied, modified or reproduced. The owner had decided on 2026-11-12, for this personal internal project: "use both sources fully, no permission needed."
+- DONE SO FAR: Both rows (`fdi_projects`, `investqa_pages`) name the terms page and record the owner's decision of 2026-11-12, in his words, as the basis of use. At every fetch the build reads the terms page, records its SHA-256 and retrieval time, and logs a line when the page has changed since the previous build; the sources are not switched off. The fetched data stays under `data/` and never enters the repository or a committed fixture; tests use synthetic pages shaped like the real ones. Every figure keeps its source and retrieval date (PUB-87, PUB-88).
+- OPTIONS: Closed by the owner's decision.
+- NEEDED BY: none.
+
+## OI-129 — One sandbox timing test failed once under machine load
+
+- ID: OI-129
+- TYPE: OPEN
+- NEEDED: The cause of one failure of `test_die_with_parent` in `scripts/tests/test_sandbox_mounts.py`, or a record that it did not recur over a stated number of runs.
+- WHY: AGENTS.md rule 39: a random failure is recorded, and a green re-run alone does not close it.
+- DONE SO FAR: During task S2-T01 (2026-11-13), the builder's whole test run at seed 2026111377 failed this test once with "a sandboxed process outlived its driver", while the machine was loaded (a load average of 74 on 32 processors, ruling L-106 of the run). The same test passed in the lead's whole runs at seeds 2026111378 and 2026111382, which ran at lower priority and finished with 0 failed. In the same builder run, two tests of the version check failed because that tool's shell had Node 24 first on its path instead of the pinned 22; that is an environment fault and not a random failure, and the lead's runs with Node 22 passed. No code was changed because of either.
+- OPTIONS: **Recommendation:** count the failures of this test over the next ten local runs and record the count here; if it recurs, make the test wait for the process group to end for a stated time before it judges, never loosen the assertion that the process does not outlive its driver.
+- NEEDED BY: the slice S2 gate.
+
+## OI-130 — Showing the live traffic layer outside internal evaluation
+
+- ID: OI-130
+- TYPE: OPEN
+- NEEDED: The owner's decision whether the optional live traffic layer (decision 0019, task S6-T19) is shown to anyone outside his own evaluation and testing.
+- WHY: The provider's terms, read by the lead in full on 2026-11-13 (`https://docs.tomtom.com/legal/terms-and-conditions`; no date or version on the page), license the free plan "for Evaluation Use only", defined as "internal evaluation and testing by you of the Licensed Products"; a demonstration to a ministry is not clearly internal evaluation.
+- DONE SO FAR: Document 04 records the terms on the two provider rows: Evaluation Use only; caching or storing results prohibited except in a client under the result's cache-control headers and never to serve several users (nothing is stored, as decision 0019 already says); the logos and copyright notices the provider's interfaces generate are kept, and other attribution comes from the provider's copyright interface; the page says nothing on showing the layer beside other map data. The layer stays off by default.
+- OPTIONS: **Recommendation:** keep the live layer for the owner's own evaluation and show the simulated traffic in every demonstration; if the owner wants the live layer in a demonstration, take a plan whose terms allow that use first.
+- NEEDED BY: task S6-T19.
+
+## OI-131 — Public split declarations of the registry rows
+
+- ID: OI-131
+- TYPE: OPEN
+- NEEDED: The registry rows of Public split tables declare the split dimensions their tables carry (DAT-141, PUB-90).
+- WHY: Review round 1 of S2-T01 found that the six `active_nat_occ_act` rows declare a nationality split but not the sex split their table `pub_active_nationality_occupation` carries, and that `sec_hr_comp_occ`, `wage_bands_priv`, `ref_min_wage` and the three `visitors_markets` rows declare no split on tables that are Public split tables.
+- DONE SO FAR: Recorded at the review of S2-T01; S2-T01 builds the fetchers and the registry, not the split tables.
+- OPTIONS: **Recommendation:** task S2-T11, which builds the Public split tables, sets each row's `public_splits` to the dimensions of its table and adds a test that compares the registry with the table contracts.
+- NEEDED BY: task S2-T11.
+
+## OI-164 — The registry loader does not yet follow decision 0026
+
+- ID: OI-164
+- TYPE: OPEN
+- NEEDED: The registry loader, the terms handling of the fetch and the registry rows follow [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): `owner_decision` is the basis of every source with no open licence covering the use, with no source admitted one by one and no separate decision record; the basis `none_stated` is gone; and terms read at a fetch never switch off a source that a visitor can read, or limit its release or display.
+- WHY: Decision 0026 merged (pull request 44) after task S2-T01 was built and approved. It rewrote two acceptance criteria of that task and named no task for the change of code. At the merge of S2-T01 the loader (`custodian/src/eii_custodian/publicdata/fetch/registry.py`) still admits an `owner_decision` source only when it is listed in `OWNER_DECISION_SOURCES` and names a record of `DECISION_RECORDS`, and keeps the basis `none_stated`, which 19 rows of `custodian/publicdata/sources.yaml` carry and for which `release_refused` refuses every release slot; and the fetch (`_switch_off_on_terms` in `custodian/src/eii_custodian/publicdata/fetch/build.py`) switches a source off when the terms read at a fetch forbid the use.
+- DONE SO FAR: The two criteria are moved, unticked and word for word, from the entry of S2-T01 to the new task S2-T21 in TASKS.md, and S2-T21 is added to what the pack assembly S2-T08 depends on. No code is changed by the move. The 10 sources admitted by name keep working, so no task built ahead is blocked.
+- OPTIONS: **Default:** task S2-T21 changes the loader, the fetch, the rows and their tests before the slice S2 gate; until then the loader stands as built and reviewed.
+- NEEDED BY: the slice S2 gate (task S2-T21, before the pack assembly S2-T08).
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
