@@ -1406,6 +1406,26 @@
 - OPTIONS: **Default:** the lead names the owning task in a re-plan, recorded in TASKS.md, before the first task that builds a register-company table, card or map layer starts; the owner is asked only if the allocation needs a new task.
 - NEEDED BY: the slice S2 gate (the public pack and its places).
 
+## OI-163 — One browser test of the performance spike lost its page during readiness, once
+
+- ID: OI-163
+- TYPE: OPEN
+- NEEDED: The cause of one failure of the browser test "the smoke orbit draws both layers and records a trace" (`web/spikes/performance/tests/performance.spec.ts`), which ended during readiness with the browser's message `page.evaluate: Target page, context or browser has been closed`.
+- WHY: A random failure is recorded, and a green re-run alone does not close it (AGENTS rule 39; TST-168). The failure was seen once, on 2026-11-14, in a standalone run of the spike's browser tests on processors 0 to 3 of the build machine (53 passed, 1 failed), inside the measuring job for OI-158. That job kept no change to the repository, and its record does not hold the browser's own log of the failure.
+- DONE SO FAR: Recorded here by the slice S1 gate record. The same test passed in the job's later runs of the whole suite `web-checks`, in the lead's runs of the gate at the slice's final commit and in the hosted `tests` check of that commit. The cause is not found. No test, wait, bound or retry was changed.
+- OPTIONS: **Default:** task S2-T10, which holds the criterion on the suite's time (OI-158), repeats the standalone browser run on four processors with the browser's log and the page's console kept on a failure of readiness, and records either the cause or the number of runs without the failure; no retry is added to the test and no bound moves before the cause is known.
+- NEEDED BY: the slice S2 gate (task S2-T10).
+
+## OI-165 — The optional 3D view stands in the slice S1 row of document 12's gate table
+
+- ID: OI-165
+- TYPE: ASSUMPTION
+- NEEDED: One place for the gate item of the optional 3D view of decision 0019 item 14. The row "slice S1 Technical spike" of [12_TESTING_AND_QUALITY.md](docs/12_TESTING_AND_QUALITY.md) section 5 says "the optional 3D view of decision 0019 item 14 passes its named test" and names as its evidence "TST-242 for the 3D view, with its frame-rate numbers reported". [14_IMPLEMENTATION_PLAN.md](docs/14_IMPLEMENTATION_PLAN.md) puts the view in slice S6: PLN-28, the row of section 6 that names tasks S6-T18 and S6-T19, and the task list and the gate text of section "14. slice S6 — The flagship location choice". The gate text of slice S1 in document 14 (section "9. slice S1 — Technical spike") has fourteen statements and none names the view. The row "slice S6 The joined door" of document 12 does not name it.
+- WHY: Found while the slice S1 gate record was prepared. REV-33 makes every item of the document 12 row an item of the gate review. No task of slice S1 builds the view (TASKS.md), so the clause cannot pass at this gate, and the gate record claims nothing about the view. The clause entered the slice S1 row with the documents change of decision 0019.
+- DONE SO FAR: The lead's reading, recorded in the slice S1 gate record: PLN-28 says that the work of decision 0019 lands where section 6 of document 14 puts it, so the clause belongs to the slice S6 row and is not a gate item of slice S1. No document is changed by the gate record.
+- OPTIONS: **Default:** a documents change with its own review moves the clause and its evidence clause from the slice S1 row to the slice S6 row of document 12, before the addendum that closes the slice S1 gate. The owner says so if the slice S1 gate is to hold a spike of the 3D view instead; the gate then stays open for it.
+- NEEDED BY: the addendum of the slice S1 gate (task S1-T12).
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
