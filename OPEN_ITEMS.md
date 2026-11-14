@@ -208,12 +208,13 @@
 ## OI-18 — Gateway token cap and key rotation
 
 - ID: OI-18
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - NEEDED: Owner confirmation of the project token cap and a key rotation date, and of whether the gateway's provider key may be used during the build: the owner's note of 2026-11-12 keeps the API keys of the uncommitted `.env` file for go-live and does not name this key ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12).
 - WHY: Offline provider use still needs a hard cost limit and credential hygiene.
 - DONE SO FAR: Default cap is 5 million tokens in total; no agent may purchase, upgrade or renew.
 - OPTIONS: **Recommendation:** confirm or tighten the default and record rotation before provider use; agents never change the subscription. No keyed provider run is made before the owner answers.
 - NEEDED BY: slice S1 gateway qualification and every later provider run.
+- CLOSED: 2026-11-13, by the owner's standing answer of that day: the gateway's provider key may be used for any run the plan calls for, on public or synthetic inputs only, from the lead's own shell and never through a worker tool, a test or CI; the caps are 5 million tokens for one run and 20 million for the build, and what each run used is logged; the key is rotated before go-live and at once if it is ever exposed; no agent purchases, upgrades or renews. The keyed requalification of 2026-11-13 made 340 calls and used 147,969 tokens ([evals/typed_decisions/README.md](evals/typed_decisions/README.md), section "Keyed run of 2026-11-13"). The rule that nothing a user types live goes to the provider stays as [decision 0014](docs/decisions/0014-typed-decision-gateway.md) has it; OI-15 stays open.
 
 ## OI-19 — Independent documentation review and corrections
 
@@ -1109,7 +1110,7 @@
 - TYPE: OPEN
 - NEEDED: A decision, in task S1-T08's confirmation of the web pins, on each of two alerts: raise the package through the lock file, or keep the alert open with its reason recorded.
 - WHY: GitHub opened two alerts on main on 2026-11-13, when pull request 34 (task S1-T02) merged: `image-size` 0.7.4, severity high (its parser of one icon format can loop without end on a crafted file; versions from 0.6.3 to 2.0.2 are affected, fixed in 2.0.3), and `fflate` 0.7.4, severity medium (its unzip function can loop without end on a malformed archive; versions from 0.7.0 below 0.7.5 are affected, fixed in 0.7.5). Both are transitive dependencies of `@deck.gl/geo-layers` 9.4.1 in `web/package-lock.json`, in runtime scope: `fflate` through `@loaders.gl/3d-tiles` and `@loaders.gl/compression` 4.5.4, which asks for exactly 0.7.4; `image-size` through `@luma.gl/gltf`, `@loaders.gl/textures` 4.4.5 and `texture-compressor` 1.0.2, which accepts the 0.7 series only. The spike uses the hexagon layer of that package; it loads no tile set, model, compressed texture or archive.
-- DONE SO FAR: Nothing is changed; a lock file changes only inside a task that owns it (rule 44 of [AGENTS.md](AGENTS.md)). Neither fixed release lies inside the range its parent asks for, so raising either needs an override in `web/package.json`. The built page of the application shell was searched for both packages and holds neither; the spike's own built page was not searched.
+- DONE SO FAR: Nothing is changed; a lock file changes only inside a task that owns it (rule 44 of [AGENTS.md](AGENTS.md)). Neither fixed release lies inside the range its parent asks for, so raising either needs an override in `web/package.json`. The built page of the application shell was searched for both packages and holds neither; the spike's own built page was not searched. On 2026-11-14 task S1-T08 built the performance spike's page with the spike's own build helper and searched its four files for `fflate`, `image-size` and one message string of each parser; none matched (a search of minified text, not proof that no parser code is present). It added the exact override of `fflate` 0.7.5 in `web/package.json`; the lock file changed only that package's version, address and integrity value; the spike's Node and browser tests, the glyph tests, lint, the type check, the production build and the host checks passed with it, so the override is kept and the `fflate` alert is answered. No override of `image-size` was made: its fixed release is a new major version outside the series its parent accepts, and the spike loads no texture image; that alert stays open until the loaders are upgraded or replaced and tested.
 - OPTIONS: **Recommendation:** in task S1-T08, search the spike's built page for both parsers; raise `fflate` to 0.7.5 by an override if the spike's tests stay green with it; keep the `image-size` alert open with its reason (no page loads a texture image; its fixed release is a new major version that its parent does not accept) unless a test shows the override harmless. Alternative: leave both until the map layers of slice S3 choose their loaders.
 - NEEDED BY: slice S1 gate; not a blocker.
 
@@ -1288,6 +1289,16 @@
 - OPTIONS: **Recommendation:** keep the bands until the operator's data arrives, then remap the one configuration value if the format differs.
 - NEEDED BY: when the operator's data arrives; not a blocker for version 1.
 
+## OI-149 — The reproduced measurement of the typed-decision set beside the admitted one
+
+- ID: OI-149
+- TYPE: OPEN
+- NEEDED: The owner's reading of the reproduced measurement beside the admitted one, without retuning a threshold and without treating this set as fresh human ground truth.
+- WHY: A successful reproduction on this set does not remove the recorded protocol differences and provides no fresh human labels (OI-15; [decision 0014](docs/decisions/0014-typed-decision-gateway.md), Evidence and item 6).
+- DONE SO FAR: The admitted aggregate `results_2026-11-11.json` records 248 correct of 260 with its stated interval [92.1, 97.3]. The keyed aggregate of task S1-T08, `results_2026-11-13T04-19-15-163796.json`, records 250 correct first answers of 260, a rate computed by code of 96.15384615384616%, inside that admitted interval, with its own Wilson interval [93.1, 97.9]; every one of its 340 replies names the pinned model. Its gateway outcomes are 176 DECIDED and 84 BELOW_THRESHOLD, and two decided cases are wrong (A-M-048 and A-M-049). Four protocol differences are recorded in the aggregate: the option orders are hash-derived, the activity labels are sent with the `isic-` prefix, the admitted run was made before the gateway existed, and the adapter cuts the yes/no label at a weight of 0.5. Task S1-T08 changed no threshold, no pin and neither aggregate.
+- OPTIONS: **Recommendation:** keep the reproduction as evidence for this model version, and settle its reading with the fresh human qualification of OI-15; change no threshold and no pin on this comparison alone.
+- NEEDED BY: the fresh human qualification of OI-15; not a blocker of the slice S1 gate.
+
 ## OI-150 — The feed minimum of the conformance suite under parameter set B
 
 - ID: OI-150
@@ -1319,6 +1330,46 @@
 - DONE SO FAR: Found by the lead's sweep of decision 0026. Left as it stands: the key is part of the card's closed list and of the tests that read it, and the card stays off screen while OI-03 is open.
 - OPTIONS: **Recommendation:** remove the key from card C33 when task S6-T17 is planned, with its test rows. Otherwise keep it and name the figure it covers.
 - NEEDED BY: the plan of task S6-T17 (slice S6).
+
+## OI-155 — Forms that render as a listed name without being its text
+
+- ID: OI-155
+- TYPE: PROPOSED (hardening: document 17)
+- NEEDED: A decision whether the documentation check should also refuse forms that a reader sees as a listed name but that are not its text: tags inside the name, a link on half of it, further invisible characters, further escape forms.
+- WHY: The break pass of task S1-T14 showed four such forms passing everywhere. The private list's plain patterns do not catch them either, with or without the place-scoped exception, so the exception weakens nothing here; refusing them is a defence against deliberate evasion beyond the task's criteria ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md)).
+- DONE SO FAR: Recorded with the four demonstrated forms in the task's evidence. Nothing built.
+- OPTIONS: **Recommendation:** move to [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) with the slice's follow-up task; build only if the repository ever takes contributions from outside the run.
+- NEEDED BY: the follow-up task of slice S1 (S1-T10), which places it.
+
+## OI-156 — An unreadable folder and a failing file listing narrow the documentation check silently
+
+- ID: OI-156
+- TYPE: PROPOSED (hardening: document 17)
+- NEEDED: A decision whether the documentation check should fail when a folder cannot be read or when git cannot list the files, instead of scanning less.
+- WHY: The break pass of task S1-T14 showed that a folder without read permission is skipped without a line, and that a failing git listing falls back, without notice, to the walk that leaves out build folders. Both are older than that task and concern the whole check, not its exception; neither occurs on the hosted checks.
+- DONE SO FAR: Recorded with both demonstrations in the task's evidence. Nothing built.
+- OPTIONS: **Recommendation:** move to [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) with the slice's follow-up task.
+- NEEDED BY: the follow-up task of slice S1 (S1-T10), which places it.
+
+## OI-158 — The hosted time limit of the web checks goes back to 1,800 seconds
+
+- ID: OI-158
+- TYPE: OPEN
+- NEEDED: Remove the hosted value of 3,000 s from `scripts/run_tests.py`, so that the limit of the suite `web-checks` is 1,800 s everywhere again, once task S1-T15 has made the suite fast enough on slow hosted runners.
+- WHY: [Decision 0027](docs/decisions/0027-hosted-web-checks-time-limit.md) allows the hosted value only as a stopgap. A wider limit finds a hanging run later.
+- DONE SO FAR: Task S1-T16 raises the limit on GitHub's hosted runner only, by the owner's decision of 2026-11-14. Task S1-T15 is in review: its first part gave no gain on hosted runners, and its second part is being built.
+- OPTIONS: **Default:** the pull request that completes S1-T15, or the one after it, removes the hosted value when three hosted runs in a row have finished the suite inside 1,800 s. Otherwise the owner decides to keep a hosted value.
+- NEEDED BY: the slice S1 gate records the state of this item; the removal follows S1-T15.
+
+## OI-159 — The pin-ruling guard refuses the record once S1-T08 is marked done
+
+- ID: OI-159
+- TYPE: OPEN
+- NEEDED: Correct the guard `scripts/tests/test_pin_rulings.py` so that a pin that is not installed is refused only when its not-installed ruling names a completed task, not when the retreat ruling's own attribution ("retreat ruling S1-T08") does; add the planted cases of both; then set the status line of S1-T08 in `TASKS.md` to done.
+- WHY: The guard requires the words "retreat ruling S1-T08: none exists: " in the note of a pin without a retreat and refuses a not-installed pin whose note names a completed task. With S1-T08 marked done, the pin `@mapbox/mapbox-gl-rtl-text` fails both ways. The lead's whole test on the ledger head of pull request 45 found it (seed 2026111447: 2216 passed, 1 failed).
+- DONE SO FAR: The status line of S1-T08 is back at "in review" although pull request 39 is merged, so that the guard passes; the cause is recorded in `PROGRESS.md` under task S1-T16. Nothing of the guard is changed (task S1-T16 changes no test, decision record 0027).
+- OPTIONS: **Default:** the review follow-up of slice S1 (task S1-T10) corrects the guard test-first and sets the status line.
+- NEEDED BY: the slice S1 gate, which reads the status lines of the slice's tasks.
 
 ## Change control
 
@@ -1607,6 +1658,36 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: `requestDecision` of `web/spikes/glyphs/guards.mjs` and `foreignRequest` of `web/spikes/performance/tests/performance.spec.ts` judge an address that begins with `http://` or `https://` by its origin and treat `data:` and `blob:` as local; an address with any other scheme is counted as same-origin. The content security policy of both spike servers stops such a request, and the browser tool does not report a WebSocket through the request event that the tests record, so no test sees one.
 - NEEDED: both judges count a scheme outside `http`, `https`, `data` and `blob` as foreign, with one planted case each; or one line saying why not.
 - CLOSED BY: S1-T10
+
+### PO-S1-09 — Files of the listed set that no pattern reads
+
+- ID: PO-S1-09
+- TYPE: OPEN
+- RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
+- CONCERNS: TST-140; OI-93
+- EVIDENCE: 114 of the 477 files git lists at commit a9db6c8 are never read by any pattern, built-in or private, because their suffix is not on the text list of `scripts/check_docs.py` (75 `.mjs`, 4 `.mts`, `.pyi`, `.env.example`, `uv.lock`, `.nvmrc`, `.python-version`, `.prettierignore`, and binary files); OI-93 does not name `.mjs`. Check 8 of TST-263 reads them only for a listed name.
+- NEEDED: the text list covers every UTF-8 file git lists, or one line saying why not.
+- CLOSED BY: a follow-up task of slice S1
+
+### PO-S1-10 — An unreadable private patterns file is ignored without a message
+
+- ID: PO-S1-10
+- TYPE: OPEN
+- RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
+- CONCERNS: TST-140; REV-25; OI-93
+- EVIDENCE: when `EII_FORBIDDEN_PATTERNS_FILE` is set but names no readable file, `scripts/check_docs.py` ignores it without a message, which silently turns off every private name, including the refusal that TST-263 relies on outside its places.
+- NEEDED: a set but unreadable file fails the check with one line that does not echo the path, with a planted case; or one line saying why not.
+- CLOSED BY: a follow-up task of slice S1
+
+### PO-S1-11 — Scans of the built bundle and the exports need the place rule
+
+- ID: PO-S1-11
+- TYPE: OPEN
+- RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
+- CONCERNS: TST-142; TST-263
+- EVIDENCE: the built web bundle and the exports of TST-142 and decision 0012 will carry the map's credit, so any scan of them with the private list refuses the name unless it applies the same place rule.
+- NEEDED: the task that scans the bundle or the exports states how the credit is judged there, or one line saying why not.
+- CLOSED BY: the task that adds the imagery source
 
 ## Sources
 

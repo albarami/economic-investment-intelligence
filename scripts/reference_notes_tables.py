@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import NamedTuple
 
 WEB = "web/REFERENCE_NOTES.md"
@@ -10,6 +11,9 @@ PINS = "pins.toml"
 LINKS = {WEB: "../docs/REFERENCE_NOTES.md", DOCS: "../web/REFERENCE_NOTES.md"}
 KINDS = ("READ", "OBSERVED", "PACK")
 CONFIRMED = "not yet confirmed"
+MEASURED = re.compile(
+    r'confirmed: .+; PROGRESS\.md heading "S1-T[0-9]+ — .+: task log"'
+)
 UNVERIFIED = "not verified"
 NOT_COVERED = "not covered: "
 FENCES = ("```", "~~~")

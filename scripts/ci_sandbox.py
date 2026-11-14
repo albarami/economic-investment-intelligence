@@ -26,6 +26,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TextIO
 
+import ci_environment
 import ci_junit as junit
 import sandbox_check
 import sandbox_profiles as tables
@@ -72,7 +73,7 @@ PACKAGE_LINES = tuple(
     re.compile(re.escape(name) + r" \S+")
     for name in ("apparmor", "apparmor-profiles", "bubblewrap")
 )
-HOSTED_RUNNER = {"GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "github-hosted"}
+HOSTED_RUNNER = ci_environment.HOSTED_RUNNER
 COMMAND_TIMEOUT = 120.0
 PROVE_TIMEOUT = 1500.0
 EXIT_USAGE = 2
@@ -267,7 +268,7 @@ def install_profile(
         2 when this is not a
         GitHub-hosted runner (nothing is run then).
     """
-    if any(environ.get(key) != value for key, value in HOSTED_RUNNER.items()):
+    if not ci_environment.is_hosted_runner(environ):
         print(
             "ci_sandbox: install-profile runs only on a GitHub-hosted runner; nothing was changed",
             file=err,

@@ -14,6 +14,20 @@ import pychecks_support as support
 class PychecksMypy(unittest.TestCase):
     """Prove mypy strict mode bites across workspace roots."""
 
+    def test_evals_copy_and_planted_type_error(self) -> None:
+        copy = support.fresh_copy(self)
+        self.assertTrue((copy / "evals/typed_decisions/requalify.py").is_file())
+        self.assertFalse((copy / "evals/typed_decisions/runs").exists())
+        self.assertEqual(list((copy / "evals").rglob("__pycache__")), [])
+        name = "evals/typed_decisions/planted_types.py"
+        support.write_files(copy, {name: 'value: int = "SYNTHETIC"\n'})
+        proc = support.run([support.tool("mypy")], copy, support.clean_env(copy))
+        self.assertEqual(proc.returncode, 1, proc.stdout + proc.stderr)
+        self.assertEqual(
+            support.mypy_findings(proc.stdout + proc.stderr),
+            [(name, 1, "assignment")],
+        )
+
     def test_mypy_strict_has_teeth(self) -> None:
 
         home = Path(tempfile.mkdtemp(dir=support.home_tmpdir()))

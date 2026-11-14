@@ -43,7 +43,7 @@ def fresh_copy(case: unittest.TestCase) -> Path:
     tmp = Path(tempfile.mkdtemp(prefix="pychecks-", dir=home_tmpdir()))
     case.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
     shutil.copy2(ROOT / "pyproject.toml", tmp / "pyproject.toml")
-    for folder in ("scripts", "core", "custodian", "product", "gateway"):
+    for folder in ("scripts", "core", "custodian", "product", "gateway", "evals"):
         shutil.copytree(
             ROOT / folder,
             tmp / folder,
@@ -54,6 +54,7 @@ def fresh_copy(case: unittest.TestCase) -> Path:
                 "*.egg-info",
                 "dist",
                 "build",
+                "runs",
             ),
         )
     return tmp
