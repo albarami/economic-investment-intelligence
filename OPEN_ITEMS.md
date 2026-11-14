@@ -1276,6 +1276,16 @@
 - OPTIONS: **Recommendation:** keep the bands until the operator's data arrives, then remap the one configuration value if the format differs.
 - NEEDED BY: when the operator's data arrives; not a blocker for version 1.
 
+## OI-150 — The feed minimum of the conformance suite under parameter set B
+
+- ID: OI-150
+- TYPE: OPEN
+- NEEDED: The owner's or a data owner's decision on which text holds under parameter set B: the conformance test that rejects a count-table row below the minimum of the active parameter set, or the feed rule of 20 panel devices with set B's 30 applied only by the privacy engine.
+- WHY: TST-32 ([12](docs/12_TESTING_AND_QUALITY.md)) asks the conformance suite to reject a row of `presence_hourly` or `od_hourly` below the minimum panel devices of the active parameter set. DAT-60 ([03](docs/03_DATA_CONTRACTS.md)) and SYN-57 ([05](docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md)) fix the feed minimum at 20 and leave set B's 30 to the privacy engine. Under set B the two differ for rows of 20 to 29 panel devices, and the kept cell of the split feed tables (decision 0023 item 16) follows the count table.
+- DONE SO FAR: Found by the lead's re-read of the sweep of [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md). Nothing is changed: lowering the test's bar would weaken a privacy test, which no agent does on its own authority (AGENTS rule 12). The exported set is A (task S1-T09), under which both texts say 20, so nothing differs today.
+- OPTIONS: **Default until decided:** the stricter text stands (TST-32 as written). Option A: keep TST-32 and state in DAT-60 and SYN-57 that under set B the simulator omits rows below 30. Option B: set the conformance minimum to the feed rule of 20 and leave 30 to the release, tested by TST-203.
+- NEEDED BY: before parameter set B is ever evaluated on a feed (slice S5); not a blocker of slices S2 to S4.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
