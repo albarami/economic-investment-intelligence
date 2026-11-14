@@ -17605,6 +17605,195 @@ Seed:      none
 Notes:     The two work commits between the base and the work commit have Conventional Commit subjects.
 ```
 
+#### S1-T09: independent review, round 1: APPROVED
+
+Reviewed commit `33172471b2160c98a5f7605768e6e81a30945910`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/40 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43538019509; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43538019610; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43538019483 ). Reviewed by OpenAI GPT-5.6 Sol (high) through the Codex command-line tool (the verdict is signed "OpenAI GPT-5"), a maker that neither planned nor built the task (the builder was xAI Grok 4.7 through the Cursor command-line tool; the plan, the ruling on its design review and the internal review were the lead's, Anthropic). The hosted tests job passed on this head on its one rerun; three earlier runs on three heads had ended on the time limit of the web checks, a cause shared with other pull requests and given its own task (S1-T15). The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T09 (pull request 40)
+COMMIT: 33172471b2160c98a5f7605768e6e81a30945910
+REVIEWER: OpenAI GPT-5
+SKILLS LOADED: project-orientation, task-standards, strict-reviewer, sanad-provenance, muhasabah-gate; code-review unavailable
+CHECKS:
+  REV-10 PASS All five TASKS.md S1-T09 criteria map to committed configuration, gate-record assertions, refusal fixtures and the retired-name scan; the gate record is recomputed from rules.toml.
+  REV-11 OPEN P1 P3 Lead runs on the work commit and head passed with 1,998 tests, including 116 configuration tests and three retired-name tests; 355 mutants produced 337 kills and 18 equivalent survivors. The hosted tests job is red for the recorded unrelated web timeout: https://github.com/albarami/economic-investment-intelligence/actions/runs/43538019509/job/132271631085
+  REV-12 PASS The recorded base-to-work diff contains the 46 task paths only; head-to-work tree evidence limits the remaining changes to OPEN_ITEMS.md, PROGRESS.md and TASKS.md.
+  REV-13 PASS The patch contains a complete checker and tests, with no TODO, FIXME, stub, empty implementation or invented release table.
+  REV-14 PASS The patch contains synthetic configuration and fixtures only; the hosted secret scan passed: https://github.com/albarami/economic-investment-intelligence/actions/runs/43538019509/job/132271630585
+  REV-15 PASS No assertion, threshold, tolerance or test count is weakened; new refusals and planted violations were added, and every mutation survivor is behaviorally equivalent.
+  REV-16 PASS The implementation follows S1-T09, ruling L-61 and DAT-129: four task entries, one rules-version identifier, no command entry point, and no invented mob.range_multiple rule code.
+  REV-17 OPEN P2 The module README and task records were updated and check_docs exited 0, but the OI-124 record references are inconsistent.
+  REV-18 PASS The checker reads only its supplied local TOML path, remains in the custodian plane and introduces no secret, network, serving-plane or record-level-data path.
+  REV-19 PASS No settled decision is reopened; set A follows OI-35, 23 months follows SYN-12, SYN-29 and PRV-53, and bases 50 and 100 remain the accepted judgement by analogy.
+  REV-20 PASS The four numeric choices are configuration values with gate-record lineage and stated pack or ruling basis; their canonical digest covers every field.
+  REV-21 N/A This task adds no screen, card, claim template or rendered numeral.
+  REV-22 PASS The task fixes one exported set and positive movement bases without changing treatment, partition, suppression, attack size or another privacy invariant.
+  REV-23 PASS The diff adds only custodian and scripts code; no product import or custodian-to-product path is introduced.
+  REV-24 N/A This task adds no English or Arabic view.
+  REV-25 PASS The diff contains no secret, private path, real record, realistic identifier, personal name, e-mail address or prohibited comparison; check_docs and secret-scan passed.
+  REV-26 PASS The README expressly limits what this task proves and makes no real-data, formal-privacy, endorsement, forecast, lookup or action claim.
+  REV-27 PASS The lead recorded cmp AGENTS.md CLAUDE.md exit 0 on the work commit and head.
+  REV-28 N/A This task creates no synthetic person, establishment, legal-entity, group or salary-file identifier.
+  REV-29 N/A This task attaches no fact or attribute to a named real place or business.
+  REV-38 PASS No gateway file or serving-plane import changes; the diff is confined to custodian rules, their tests and repository checks.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-11) record The hosted tests job was killed after 1,800 seconds in the unchanged performance-spike browser suite while all other suites passed; the brief requires a green hosted run before merge: https://github.com/albarami/economic-investment-intelligence/actions/runs/43538019509/job/132271631085
+  P2 (REV-17) record PROGRESS.md lines 17415 and 17422 refer to OI-124, but OPEN_ITEMS.md jumps from OI-123 to OI-125; line 17422 also says the 23-month window still awaits the owner although ruling L-101 records the advisor’s acceptance.
+  P3 (REV-11) record scripts/mutation_explained.toml line 1352 gives the sort-order rationale for the UTF-8-to-UTF-8 codec-name mutant; the mutant is equivalent, but its reason should state that the two codec spellings select the same codec.
+```
+
+#### S1-T09: merge record
+
+- The lead's checks on the merged head `33172471b2160c98a5f7605768e6e81a30945910` before the merge (ruling L-29): "TREE-IS-WORK ok: 522 paths at 33172471b2160c98a5f7605768e6e81a30945910", exit code 0; `./eii test --seed 2026111426`: exit code 0, "total: 1998 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/40 was squash-merged on 2026-11-14 at that head; merge commit `f0ee2f3c39a480501edb28bc85c33546e61ba5b9` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43555514660; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43555514688; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43555514623 .
+
+### S1-T15 — The browser run of the performance spike within the hosted time limit: task log, part A (pull request https://github.com/albarami/economic-investment-intelligence/pull/43 )
+
+- Why the task exists (the lead's ruling of 2026-11-14): the hosted `tests` job ended on the time limit of the suite `web-checks` (no result within 1,800 s) on five of nine runs between 03:00 and 08:40 on 2026-11-14, on pull requests that change no browser code; on the runs that passed the job took 21 to 35 minutes. Read from the failed runs' own logs: the browser tests of the performance spike run at one worker in a software renderer, and the suite was killed during the last one or two of them. The task is new in TASKS.md with this ledger.
+- Class: Standard (test code of a spike; no number a user sees). Builder: OpenAI GPT-6 Astra through the Codex command-line tool, one job of four hours that the launcher's time limit ended before its report was finished; the lead took the workspace over, read the whole change, and moved it onto main.
+- What the builder measured first (four processors, `taskset -c 0-3`): the spike's browser run alone took 1,993 s for 41 tests; the time went into independent page loads with real rendering, about 53 s for each road scene.
+- What it tried and dropped, each with its measurement: one readiness snapshot per browser call (no saving); two workers (no saving on four processors: the renderer is bound by the processors); a shared browser context (no saving).
+- What it kept: (1) readiness, the frame waits and the pause observation are taken inside the page, in the animation frame that sees the condition, instead of by polling from outside; the readiness time limit of 170 s is unchanged; (2) the English paused-visibility test runs in the pause scene before the clock test resumes it, which saves one full scene; only the first input action is shared, never an assertion; (3) the pause button is pressed through a small helper that batches the actionability checks and verifies a trusted click, with thirteen small-page tests that plant an absent, hidden, disabled, inert, covered, moving and zero-area button.
+- Nothing removed or weakened: the builder's structural audit found all 155 original assertions, every test declaration and every language-and-motion visibility case still present (160 assertions now); the lead read the change line by line and found the same. No layer count, frame wait, viewport, pixel ratio, limit, suite or workflow changed.
+- Result, stated plainly: on four processors the spike's browser run took 1,544 s for 54 tests after the change (the builder's last whole run: the web checks 1,568 s). The first acceptance criterion (under 1,200 s, measured twice) is NOT met. This pull request is part A; part B continues to the criterion. The hosted `tests` job on this pull request's own head is the direct measurement of the gain on a hosted runner; its duration is recorded with the head checks.
+- Entered in TASKS.md with this ledger, besides the task's own entry: the changed queue rule (the owner's decision of 2026-11-14: every task whose inputs exist is built at once and waits its turn to merge), and two re-plans of dependency lines that were the order of the plan and no input: S1-T09 on S1-T08 (S1-T09 merged first, pull request 40), and S4-T01 on the slice S3 gate task (its merge still waits for that gate).
+
+#### Evidence for the work commit `b84de814e335b886bf836c5c7418d25b80dc9cc8`
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    b84de814e335b886bf836c5c7418d25b80dc9cc8
+Command:   bash -c "set -o pipefail; npm --prefix web run test:spike:performance 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)), \"|\", \" \".join(re.findall(r\"[0-9]+ passed \\([0-9.]+m?s?\\)\", t)[:1]))'"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 114 # pass 114 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 54 passed (19.9m)" (the totals of the Node test runner and of the browser run inside it)
+Seed:      none
+Notes:     The tests of the performance spike with its browser tests, the thirteen small-page tests of the pause helper among them: the totals of the Node test runner and of the browser run.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    b84de814e335b886bf836c5c7418d25b80dc9cc8
+Command:   npm --prefix web run lint
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "> eslint --max-warnings 0 ." (exit code decides)
+Seed:      none
+Notes:     Lint of the web code, the new helper and its tests included.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    b84de814e335b886bf836c5c7418d25b80dc9cc8
+Command:   npm --prefix web run typecheck
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "> tsc --noEmit" (exit code decides)
+Seed:      none
+Notes:     Type check.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    b84de814e335b886bf836c5c7418d25b80dc9cc8
+Command:   npm --prefix web run format:check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Format.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    b84de814e335b886bf836c5c7418d25b80dc9cc8
+Command:   npm --prefix web run build
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "✓ built in 105ms" (the production build)
+Seed:      none
+Notes:     The production build is unchanged by test files and still builds.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    b84de814e335b886bf836c5c7418d25b80dc9cc8
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 410 text files, 63 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    b84de814e335b886bf836c5c7418d25b80dc9cc8
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    b84de814e335b886bf836c5c7418d25b80dc9cc8
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    b84de814e335b886bf836c5c7418d25b80dc9cc8
+Command:   ./eii test --seed 2026111437
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1998 passed, 0 failed, 0 skipped
+Seed:      2026111437
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit; its web checks hold the changed browser run.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    b84de814e335b886bf836c5c7418d25b80dc9cc8
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','f0ee2f3c39a480501edb28bc85c33546e61ba5b9...b84de814e335b886bf836c5c7418d25b80dc9cc8'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:web/spikes/performance/tests/pause-click.spec.ts A:web/spikes/performance/tests/pause-click.ts M:web/spikes/performance/README.md M:web/spikes/performance/playwright.config.ts M:web/spikes/performance/tests/performance.spec.ts'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "5 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The change touches the spike's browser tests, their configuration and the spike's README, and nothing else.
+```
+
+```text
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+Commit:    b84de814e335b886bf836c5c7418d25b80dc9cc8
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','f0ee2f3c39a480501edb28bc85c33546e61ba5b9..b84de814e335b886bf836c5c7418d25b80dc9cc8'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

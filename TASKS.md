@@ -18,7 +18,7 @@ The queue was re-planned on 2026-11-12 for [decision 0016](docs/decisions/0016-v
 - Acceptance evidence records the command or check, result, full commit hash and review verdict.
 - Files outside the task's scope are read-only.
 - Parallel tasks must have disjoint writable scopes; otherwise the lead serializes them.
-- A task may be built ahead in a worktree on the pushed head of one base task of the same slice that is still in review, in a fix round or in CI, when the lead's checks are green on that head and its open findings do not change what the new task builds on; one level only, and never across a slice boundary. It is not pushed and gets no pull request before its base is merged and it is rebased onto `main`; then every check is rerun.
+- A task whose inputs already exist is built at once, in its own worktree, whatever its slice (the owner's decision of 2026-11-14). It is ready when each task on its Depends line is merged, or is built with the lead's checks green on a local commit it can stand on. A slice gate that has not passed holds back only the task's merge, not its building. A built task is committed locally and waits its turn: pushes, hosted checks and merges are one at a time, in dependency order, the critical path first, and the gate order of merges is unchanged. The review by another maker may run on the local commit. Before its turn the task takes `main`; if `main` changed a file it depends on, every check is rerun. Nothing in the checks changes: disjoint writable scopes, builder and reviewer from different makers, the lead's checks, the ledger, the head checks, the required hosted checks and the review.
 - Each slice ends with a follow-up task before its gate that closes every proposed open item of the slice's reviews (REV-41); it is the last task of each slice below. Proposed open items go where [decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md) item 8 sends them: an item from a plan review goes into that task's build brief; an item raised by the review of a slice's follow-up task, or by a gate re-review, goes to the next slice's follow-up task, and in the last slice into the final report; the items of an approved pull request are entered by the next pull request's ledger commit, never on the approved head.
 - The findings of a rejected gate review are fixed in a gate-fix task of that slice, which has its own entry in this file, its own branch, its own pull request and a full independent review, and is listed after the slice's follow-up task. A gate-fix task takes the next free number of its slice.
 - Every build brief makes the builder break each condition of the code it writes, add a test for any break that nothing catches, and list the breaks in its return ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md) item 11). The break pass is short: after each break only the test files that cover the broken code run, the pass aims at about 15 minutes, and the full suite runs once at the end.
@@ -246,9 +246,17 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Goal: Fix `export_parameter_set` = `A` and the presence and flow parameters of PRV-59 in the rules configuration before the first world build, and record the number of monthly periods shown first.
 - Acceptance criteria: [ ] `export_parameter_set` is `A` unless open item OI-35 is closed with another value by the owner or a data owner; [ ] the presence and flow parameters that PRV-59 requires are positive and recorded in the slice S1 gate evidence; [ ] the name `presence_base` is not used; [ ] a missing or non-positive parameter fails the configuration check; [ ] the number of monthly periods shown first is chosen among the months of the synthetic reference period and recorded in the slice S1 gate evidence (decision 0016).
 - Scope: rules configuration and the slice S1 gate check.
-- Depends: S1-T08.
+- Depends: none. (S1-T08 was dropped from this line by a re-plan of 2026-11-14: the order was the plan's and had no technical content; this task reads or changes no file of S1-T08, whose fix round was still open when this task was approved.)
 - Requirements: PRV-05, PRV-59, PRV-120, SYN-12, PLN-25.
-- Delivery: hard; personas Privacy; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/40).
+- Delivery: hard; personas Privacy; status done (pull request 40, merged 2026-11-14).
+### S1-T15 — The browser run of the performance spike within the hosted time limit
+- Goal: Cut the time of the web checks' browser run so that the hosted tests job finishes inside its limit, without removing or weakening any test.
+- Acceptance criteria: [ ] the suite `web-checks` finishes in under 1,200 s on four processors, measured twice; [x] no test, assertion, planted case or bound is removed or weakened; [x] nothing is skipped or moved out of the whole test command; [x] the limit, the suite list and the workflow are unchanged.
+- Scope: `web/spikes/performance/tests/`, the spike's browser configuration and its README.
+- Depends: S1-T02, S1-T11, S1-T13.
+- Requirements: TST-06, TST-132.
+- Delivery: routine; personas Frontend; status in review, part A (pull request https://github.com/albarami/economic-investment-intelligence/pull/43). Added by the lead's ruling of 2026-11-14: the hosted tests job had ended on the time limit of the web checks on five of nine runs, on pull requests that change no browser code. Part A (waits taken inside the page, one pause scene shared, 1,993 s to 1,544 s for the spike's browser run on four processors) does not yet meet the first criterion; part B continues to it.
+
 ### S1-T10 — Review follow-up for slice S1
 - Goal: Close every proposed open item that the reviews of slice S1 entered in `OPEN_ITEMS.md`, before the slice S1 gate.
 - Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open.
@@ -494,7 +502,7 @@ These coarse tasks are refined at the slice S3 gate without weakening their crit
 - Goal: Implement unchanged conformance suites for all source contracts and the release contract.
 - Acceptance criteria: [ ] every planted defect fails for the intended reason; [ ] only `SYN-E-`, `SYN-L-`, `SYN-G-`, `SYN-P-` and `SYN-F-` identifier forms are accepted for their pinned record types; [ ] headers and periods are required; [ ] coverage omissions never become zero.
 - Scope: `contracts/`, conformance modules and fixtures.
-- Depends: S3-T10.
+- Depends: S3-T10, for its merge only. (The slice S3 gate is the order of the plan: the task uses no output of slice S3 and is built ahead under the owner's decision of 2026-11-14.)
 - Requirements: DAT-09, DAT-12, TST-30.
 - Delivery: hard; personas Data; status queued.
 ### S4-T02 — Register and employment world
