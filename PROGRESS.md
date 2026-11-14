@@ -18253,6 +18253,102 @@ Seed:      none
 Notes:     The two work commits have Conventional Commit subjects.
 ```
 
+### D0026 — Decision 0026, public sources used in full locally: the independent review in three rounds and its two fixes (pull request https://github.com/albarami/economic-investment-intelligence/pull/44 )
+
+- Review round 1 (2026-11-14): xAI Grok 4.7 through the Cursor command-line tool read the change in four parts on the ledger head 0c72119: part 2 (the public data pack and going live) APPROVED with no finding; parts 1, 3 and 4 REJECTED with one finding each, and one proposed point. The lead read each against the pack and judged all four valid: three sentences still carried a withdrawn rule (BRF-93 took the revenue cases from the survey's shares of output; assumption (39) of document 03 named two withdrawn indicators of the establishment-size table; the asset table of document 10 called the 2020 boundary layers shown in full), and one source gloss of document 05 described a source's terms before they were read.
+- The first fix (the editors' maker, OpenAI GPT-6 Astra through Codex; the reviewer's own sentences word for word; five passages in five files, among them the three passages added to the record's own lists): commit e513d31. The lead read the whole diff and ran the documentation check with the owner's private list, the tree check and the comparison of the two agent files.
+- Review round 2 (the confirmation, same reviewer, on e513d31): the three findings and the proposed point CLOSED; REJECTED with three new findings of the same kind: BE-124, TST-231 and the goal of task S7-T15 still said that the low, middle and high revenue cases come from the published survey shares. Valid: the fixer's search had looked for the words of round 1 and missed these three.
+- The second fix (applied by the lead, mechanically, with the reviewer's three replacement sentences word for word): commit 496ae3d. The lead then searched every tracked file for a sentence that ties the revenue range or its three cases to the survey or to shares and read each match: what remains is the acceptance criterion of S7-T15 (which gives the published shares to card C4's break-even point only), document 09's hold while open item OI-03 is open, and decision record 0019, which is history and is not edited.
+- Review round 3 (the second confirmation, same reviewer, on 496ae3d): APPROVED, the three findings closed, no finding, no proposed item.
+- The lead's check of the record's lists of passages against the real change flags five requirement identifiers as listed under "changed" although their own rows did not change (PUB-24, PUB-95, PUB-103, BE-57, BE-117): each is named in a passage that did change (a table row or an assumption that cites it), so the lists are true as written; the check compares rows only.
+- Evidence: the commands below at the second fix commit.
+
+#### Evidence for the work commit `496ae3d3235fce64783461a47d66318017efa263`
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 410 text files, 65 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the record and every amended document: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical; the record does not change them.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   bash -c "git diff --name-only e45dbb34397a462b93506d85714700c88917b92d HEAD -- AGENTS.md CLAUDE.md docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md | wc -l"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (the agent rules and document 06 are unchanged)
+Seed:      none
+Notes:     The record states that AGENTS.md, CLAUDE.md and document 06 are not changed; this row proves it on the committed tree. (Compared with the commit of main the branch started from.)
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   bash -c "grep -hciE 'under 20 panel|below 20 panel|admitted geography|admits to the local release' docs/0*.md docs/1*.md docs/GLOSSARY.md TASKS.md | paste -sd+ | bc"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no document of the pack keeps the fixed feed minimum of 20 or the admission of a source by a record)
+Seed:      none
+Notes:     Two of the replaced rules, searched by their words in the documents of the pack, the glossary and the tasks (decision records are history and are not searched).
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   ./eii test --seed 2026111448
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1998 passed, 0 failed, 0 skipped
+Seed:      2026111448
+Notes:     The whole test command on the build machine with a fresh seed, at the second fix commit.
+```
+
+```text
+### D0026 — Decision 0026: public sources used in full locally
+Commit:    496ae3d3235fce64783461a47d66318017efa263
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','0c7211908da3baac688d69e63559f0b8ceaded90..496ae3d3235fce64783461a47d66318017efa263'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two fix commits of the review rounds have Conventional Commit subjects.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
