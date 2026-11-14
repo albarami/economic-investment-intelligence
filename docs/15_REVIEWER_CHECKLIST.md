@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13; also amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md), as amended by [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) |
-| Date | 2026-11-13 |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13, and by decision 0026 on 2026-11-14; also amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md), as amended by [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) |
+| Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | The checklist and verdict format an independent reviewer applies to one commit before it may merge. |
 | Read first | [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md), [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENTATION_PLAN.md), [AGENTS.md](../AGENTS.md) |

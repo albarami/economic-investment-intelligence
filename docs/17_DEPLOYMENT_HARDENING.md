@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| Status | Draft v0.2, created by decisions 0016 and 0017 and amended by decisions 0018 and 0019 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13 |
-| Date | 2026-11-13 |
+| Status | Draft v0.2, created by decisions 0016 and 0017 and amended by decisions 0018 and 0019 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13, and by decision 0026 on 2026-11-14 |
+| Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | List what a deployment on real records must add beyond the demonstrator, so that no version 1 capability is read as ready for real data. |
-| Read first | [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md), [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md), [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) |
+| Read first | [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md), [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md), [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md), [decision 0026](decisions/0026-public-sources-used-in-full-locally.md) |
 
 ## In brief
 
@@ -79,13 +79,13 @@ In version 1 a drawn shape's protected figures snap to whole release units, two 
 
 ## 6. Public and investment sources if hosted publicly
 
-Version 1 is a personal, local project that nobody outside the owner's organisation sees. Every source a visitor can read is used and shown in full, whoever owns it, whatever its reuse terms ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)). It is read as a visitor's browser receives it, at a visitor's pace: no sign-in, paywall, robot check passed or back-end call with a key or token found in its pages. The allow-list and fetch checks stay. Document 04 records each publisher's terms in its own words with the date read. For a source with no open licence covering the use, the basis is the owner's decision for a personal, local project. Every figure shows its source, date and the publisher's caveat; fetched data stays in the uncommitted cache. The optional traffic provider keeps its existing rules.
+Version 1 is a personal, local project that nobody outside the owner's organisation sees. Every source a visitor can read is used and shown in full, whoever owns it, whatever its reuse terms ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)). It is read as a visitor's browser receives it, at a visitor's pace: no sign-in, paywall, robot check passed or back-end call with a key or token found in its pages. The allow-list and fetch checks stay. Document 04 records each publisher's terms in its own words with the date read. A provider's interface used under its own terms keeps `provider_terms` (PUB-95, PUB-97); for every other source with no open licence covering the use, the basis is the owner's decision for a personal, local project. Every figure shows its source, date and the publisher's caveat; fetched data stays in the uncommitted cache. The optional traffic provider keeps its existing rules.
 
 | ID | Requirement |
 |---|---|
 | DHA-50 | Before real use as defined in DHA-102, the owner uses that list to settle the permissions or licences needed, decides which public and investment sources stay on and records that decision in a decision record (decision 0017; [decision 0026](decisions/0026-public-sources-used-in-full-locally.md)). |
 | DHA-51 | That decision reads each source's terms again for real use and updates the one list in DHA-102, with the publisher's own words and the date read (DHA-70, DHA-85 to DHA-87). |
-| DHA-52 | A source on the DHA-102 list needs the permission or licence its terms require before real use. Without it the source is switched off before hosting, and the owner is told (decision 0017, "What would change this decision"). |
+| DHA-52 | A source on the DHA-102 list needs the permission or licence its terms require before real use as DHA-102 defines it. Without it the source is switched off before that use begins, and the owner is told (decision 0017, "What would change this decision"). |
 | DHA-53 | The decision also states whether official splits by sex or nationality (the WorldPop grids by age and sex, under their CC BY 4.0 attribution, included), and FDI projects that name real investing companies, are shown on a public host. This holds back nothing in version 1, which shows each FDI project in full under decision 0026. |
 | DHA-54 | On a public host each figure keeps its source and retrieval date, and fetched data stays out of the repository, as it does locally. |
 | DHA-85 | Traffic provider. Before the demonstrator is hosted publicly or for a commercial purpose, the traffic provider stays off until the owner decides ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), "What would change this decision"). That decision uses DHA-102 to settle the provider's developer terms for that use, which could not be read on 2026-11-12, among them its rule on storing responses (nothing is stored in version 1); the attribution "© TomTom" shown while a live layer is on; where the key is kept on a host (it stays in the API process and in no log, ledger or file); and whether the monthly free allowance (200,000 tile requests, 2,500 reachable-range requests) is enough or a paid arrangement is made. |
@@ -99,20 +99,20 @@ Version 1 is a personal, local project that nobody outside the owner's organisat
 |---|---|
 | DHA-102 | Keep the single list below of sources whose terms need permission or a licence before real use, filled as the terms are read, with the publisher's own words and the date read. Real use means anyone outside the owner's organisation is given access, a page showing the source's records is published, or the product is used commercially. Nothing on this list holds back version 1. The going-live rules of this section use this list ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)). |
 
-Document 04 supplies the terms records. Where it holds only a summary, that summary is identified below and is not presented as a publisher quotation. The pending words and dates are filled as terms are read.
+Document 04 supplies the terms records; the relative-busyness quotations also come from decision 0019, Sources. The weather entry identifies its registry summary, which is not a publisher quotation. The pending words and dates are filled as terms are read.
 
 | Source | Publisher's terms and date read | Before real use |
 |---|---|---|
-| Investment projects page, `fdi_projects` | "Reproduction of these pages, whether in whole or in part, is only permissible with the prior written authorization of Investment Promotion Agency LLC. These pages are to be used for information purposes only". Read 2026-11-14 from the fetch of 2026-11-13 (decision 0026; document 04, PUB-12). Data gatherer's terms to be read and recorded (document 04). | Obtain the agency's written permission and read the data gatherer's terms before anyone outside the owner's organisation is given access or any page showing these records is published; settle the terms for commercial use too. |
+| Investment projects page, `fdi_projects` | "Reproduction of these pages, whether in whole or in part, is only permissible with the prior written authorization of Investment Promotion Agency LLC. These pages are to be used for information purposes only". Read 2026-11-14 from the fetch of 2026-11-13 (decision 0026; document 04, PUB-12). Data gatherer's terms to be read and recorded (decision 0026 item 4; document 04). | Obtain the agency's written permission and read the data gatherer's terms before anyone outside the owner's organisation is given access or any page showing these records is published; settle the terms for commercial use too. |
 | Agency pages, `investqa_pages` | terms to be read and recorded (document 04) | Record and obtain any permission or licence needed for real use. |
-| Relative busyness, `busy_gmaps` | Document 04's registry summary says the publisher's terms name automated reading and bulk feeds; terms pages read 2026-11-12. Publisher's exact terms to be read and recorded (document 04). | Settle permission or licence for real use; DHA-86 keeps the source off before public or commercial hosting until the owner decides. |
-| Census map layers, including the census zone and district tables and the 2020 boundary layers | terms to be read and recorded (document 04) | Record written permission or licence for real use under DHA-70. |
+| Relative busyness, `busy_gmaps` | Terms of Service: "using automated means to access content from any of our services in violation of the machine-readable instructions on our web pages"; Maps additional terms: "mass download or create bulk feeds of the content"; read 2026-11-12 (decision 0019, Sources; recorded in document 04 under PUB-12). | Settle permission or licence for real use; DHA-86 keeps the source off before public or commercial hosting until the owner decides. |
+| Census map layers, including the census zone and district tables and the 2020 boundary layers | terms to be read and recorded (document 04) | Record the permission or licence needed for real use under DHA-70. |
 | National GIS centre's layers, `gis_*` of PUB-105 | terms to be read and recorded (document 04) | Record and obtain any permission or licence needed for real use. |
 | Weather history, `weather_openmeteo` | Document 04's registry summary: free interface for non-commercial use; data CC BY 4.0, with the attribution the publisher asks for. Terms and licence pages read 2026-11-12. Publisher's exact terms to be read and recorded (document 04). | Settle the interface's permission or licence for real use under DHA-87. |
 | Traffic provider, `traffic_tomtom_flow` and `traffic_tomtom_range` | Developer terms to be read and recorded (document 04); document 04 records that they were not read on 2026-11-12. | Settle the developer terms and allowance under DHA-85; the optional keyed provider keeps its existing version 1 rules. |
-| Public business register, `biz_register` | terms to be read and recorded (document 04) | Record at first file read and obtain any permission or licence needed for real use. |
-| Financial centre's public register, `fc_register` | terms to be read and recorded (document 04) | Record at first file read and obtain any permission or licence needed for real use. |
-| Public tender portal, `tenders_pub` | terms to be read and recorded (document 04) | Record and obtain any permission or licence needed for real use; reading terms is not a condition of fetching or showing in version 1. |
+| Public tender portal, `tenders_pub` | "If not stated otherwise, it must not reproduce, republish, upload, send, distribute or publicly display or edit the contents of this website without the prior written consent of through the Ministry of Finance", read 2026-11-14 (document 04). | Before real use: obtain the Ministry's prior written consent before anyone outside the owner's organisation is given access, any page showing tenders is published, or the product is used commercially. |
+
+The two public registers (`biz_register`, `fc_register`) join this list if their terms, once read and recorded in document 04, need a permission or a licence for real use.
 
 ## 7. Governance of real custodian data
 
@@ -180,6 +180,8 @@ Hardening points raised during the build that go beyond a task's acceptance crit
 - The items of section 8 stay open as real-deployment items; [OPEN_ITEMS.md](../OPEN_ITEMS.md) keeps their history.
 
 ## Sources
+
+- [decision 0026](decisions/0026-public-sources-used-in-full-locally.md), 2026-11-14: version 1 uses every visitor-readable source in full; the one list of permissions and licences before real use (DHA-102).
 
 - [Decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md), 2026-11-12: the priority rule and the register of section 9.
 - [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), 2026-11-12: the provider, the relative-busyness source, the weather source and the forecast of a real protected series, whose real-deployment consequences DHA-84 to DHA-87 list.

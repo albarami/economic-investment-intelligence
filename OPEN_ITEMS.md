@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 and by decision 0023 on 2026-11-13 (see PROGRESS.md) |
-| Date | 2026-11-12 |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12 and by decision 0023 on 2026-11-13, and by decision 0026 on 2026-11-14 (see PROGRESS.md) |
+| Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | Track every unresolved owner decision, assumption, pending correction and technical unknown without implying closure. |
 | Read first | [docs/README.md](docs/README.md), [PROGRESS.md](PROGRESS.md) |
@@ -264,6 +264,8 @@
 - DONE SO FAR: Defaults are no restricted survey figures, owner nominations before slice S4, assumed hotel occupancy until sourced, and documented draft eligibility rules.
 - OPTIONS: **Recommendation:** keep conservative defaults until evidence and reviewers exist; reconcile differences by decision record before the full world build.
 - NEEDED BY: slice S4 world and validation scorecard.
+- UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): the consent question is replaced: transport-survey summaries readable as a visitor are used in version 1 whatever their reuse terms, their terms recorded in the publisher's own words with the date read in document 04 and any permission needed for real use listed in document 17; what stays open is the mapping of published parameters to the manifest entries (document 05, Q1).
+
 
 ## OI-24 — Privacy-audit scope
 
@@ -845,6 +847,7 @@
 - NEEDED BY: slice S2 gate (S2-T17, PLN-25); slice S6 (S6-T14).
 - UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) items 8 and 12: the list gains the quarterly median price per square foot of method card C41 by district and use, a series of its own beside the property prices of card C14, whose table `pub_property_quarter` comes from the sales bulletins fetched in S2-T19 ([03_DATA_CONTRACTS.md](docs/03_DATA_CONTRACTS.md) DAT-167), so it is not a series without a table. The establishments of an area by month are now a Public count of register companies, not a released synthetic series; whether their forecast joins the list is fixed with the list at the slice that builds card C30 ([02_ARCHITECTURE.md](docs/02_ARCHITECTURE.md) ARC-138).
 - UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): The earlier licence condition is replaced: any source readable as a visitor under item 2 may be used, with the publisher's terms recorded in its own words with the date read and the basis of use in document 04. A source with no open licence covering the use uses `owner_decision`, the owner's decision for a personal, local project. Invent no value; a missing table or insufficient backtest still prevents a forecast (items 1 to 3).
+- UPDATE: 2026-11-14, by decision 0026 item 3 and ruling L-221: `provider_terms` stays for a provider's interface used under that provider's own terms (PUB-95 and PUB-97); `owner_decision` applies to every other source with no open licence covering the use.
 
 
 ## OI-99 — The traffic provider's rule on storing responses

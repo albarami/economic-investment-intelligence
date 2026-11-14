@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12, and by decisions 0021, 0022 and 0023 on 2026-11-13 |
-| Date | 2026-11-13 |
+| Status | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12, and by decisions 0021, 0022 and 0023 on 2026-11-13, and by decision 0026 on 2026-11-14 |
+| Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | Define every economic, location, footfall, traffic and labour-market method the product computes: inputs, formula, worked example (a regression test), provenance, honesty limits, allowed wording and measured cost. |
 | Read first | [01_PROJECT_BRIEF.md](01_PROJECT_BRIEF.md), [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md), [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md), [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md), [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) |
@@ -304,7 +304,7 @@ Tolerance: ± QAR 1 on each money figure; ± 0.1 percentage point on shares. The
 | Building rent, share of output | 11.6% | 11.6 to 15.1% |
 | Compensation | QAR 1,308,140 thousand (20.6%) | 20.6 to 25.2% |
 | Operating surplus | QAR 1,247,422 thousand (19.7%) | 6.9 to 19.7% |
-| Average annual wage | QAR 31,579 | |
+| Average annual wage | QAR 31,579 | about 31,500 to 32,800 |
 
 **User inputs (all stated on the card).**
 
@@ -400,7 +400,7 @@ the duration the page states is shown beside the second result, or "duration not
 
 **Incentive regression (fixture package, not a real offer).** Mode A, the illustrative inputs above, and a fixture package that takes `a_R = 0.25` off the rent. `R' = 30,000`. Break-even revenue is 30,000 / 0.313 = 95,846.65, shown as QAR 95,847 a month. 95,846.65 / 3,600 = 26.62, so 27 covers a day, and 27 / 60 = 0.45 seat turns. With E = 50, the minimum bill is 30,000 / (50 * 30 * 0.313) = 30,000 / 469.5 = 63.90, and the highest rent before the package is 56,340 / 0.75 = QAR 75,120. Without the package the results are those of the break-even example.
 
-**Scenarios beside the calculator ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 9 and 10).** The catchment-share scenario (C34) and the revenue range of the user's outlet (C35) join this calculator. C35 shows this card's break-even revenue beside its cases and reads the same survey norms (MTH-29). No output of this card takes a C33, C34 or C35 figure as an input.
+**Scenarios beside the calculator ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 9 and 10).** The catchment-share scenario (C34) and the revenue range of the user's outlet (C35) join this calculator. C35 shows this card's break-even revenue beside its cases and reads the same survey norms, so it stays off screen while OI-03 is open (MTH-29). No output of this card takes a C33, C34 or C35 figure as an input.
 
 **Provenance and status.** Norms: Public, `observed`, caveats `calculated`, `national_average`, `world_cup_year`. Calculator outputs: Public (least-real release input), `inferred`, "your inputs" tag. With a package, the Source chain also names the package's page and retrieval date, with caveat `agency_page`. **Compute cost.** Trivial (feasibility review; no time recorded).
 
@@ -415,7 +415,7 @@ the duration the page states is shown beside the second result, or "duration not
 | MTH-26 | C4 reproduces the break-even worked example, the norm checks above, and the target-surplus regression (`m - U = 0.116`; revenue QAR 344,827.59 a month; 96 covers a day; 1.6 seat turns; with E = 50, maximum rent QAR 20,880 and minimum bill QAR 229.89). |
 | MTH-27 | C4 lists every user input and every public norm it used, with year and table, in the Source chain (the evidence drawer). |
 | MTH-28 | No code divides a C4 output by presence, footfall or earner counts. C4 never returns a forecast of revenue, demand or capture. It returns the revenue that the user's own inputs would require. The site estimate (C33) and the user's scenarios (C34, C35) are separate cards; none of them is a forecast, and none feeds a C4 output. |
-| MTH-29 | C4 uses only the published inputs and share rules above, never a derived production value. Reconciliation R1 is closed by the absence of that field from the present datasets (the reconciliation record of task S2-T03); the separate wage-table reconciliation of OI-03 does not hold C4 off screen. |
+| MTH-29 | C4 uses only the published inputs and share rules above, never a derived production value. Reconciliation R1 is closed by the absence of that field from the present datasets (the reconciliation record of task S2-T03). C4 is not displayed until OI-03 is recorded as closed in `OPEN_ITEMS.md`. |
 | MTH-61 | C4 applies only the four parameter keys above (`rent_share`, `rent_amount`, `staff_share`, `staff_amount`), one package at a time and at most one parameter per input, and returns the results with and without the package side by side, with the duration the page states. It reproduces the incentive fixture: QAR 95,847 a month, 27 covers a day and 0.45 seat turns; with E = 50, a minimum bill of QAR 63.90 and a highest rent before the package of QAR 75,120. |
 | MTH-62 | A package parameter is a Public fact from `pub_investqa_record` with its page link and retrieval date, applied only as the user's input, with caveats `your_inputs` and `agency_page`. No package changes a Public norm, no one-off amount is spread over months, and no forecast stated on a page enters the calculator (PUB-88). |
 
@@ -486,7 +486,7 @@ keep: N_B >= 20, CLQ >= 1.2, q <= 0.05; show at most six, highest CLQ first
 presence at the pin: B is "found" if at least one B point lies within 250 m (straight line)
 ```
 
-**Illustrative note (not a passing regression).** Feasibility review, 2026-11-11, research-box extract, 999 permutations, 5% false-discovery control. Focal set "Italian restaurants including pizza places" (174 points). The seed, release hash, category identifiers, candidate set and expected p and q values were not recorded, so this note is not a passing regression until they are written here (MTH-03). The box and the confidence filter are in the formula above. This research box is not the version 1 Greater Doha frame, which is the five municipalities of the frame's review file (S2-T02; [decision 0026](decisions/0026-public-sources-used-in-full-locally.md)). Wherever Greater Doha appears on a screen or card, those five municipalities are named beside it once S2-T02 has merged.
+**Illustrative note (not a passing regression).** Feasibility review, 2026-11-11, research-box extract, 999 permutations, 5% false-discovery control. Focal set "Italian restaurants including pizza places" (174 points). The seed, release hash, category identifiers, candidate set and expected p and q values were not recorded, so this note is not a passing regression until they are written here (MTH-03). The box and the confidence filter are in the formula above. This research box is not the version 1 Greater Doha frame, which is the five municipalities of the frame's review file (S2-T02; [decision 0026](decisions/0026-public-sources-used-in-full-locally.md)). Wherever Greater Doha appears on a screen or card, its definition appears with it, naming those five municipalities; until S2-T02 merges, the pack refers to its review file instead of listing the names.
 
 | Neighbour category | CLQ |
 |---|---|
@@ -515,7 +515,7 @@ With Italian restaurants only (61 points), no neighbour survives. Tolerance: the
 
 **Purpose.** For a second door, show how much of its reach is already within the first door's reach.
 
-**Inputs.** Areas from `make_area`. In public-only mode the sets are whole base cells of the fixed frame: `make_area` reads no privacy-derived release unit and no protected or simulated table, and the snap report is technical metadata, not a Synthetic fact. Outside public-only mode, earners mode uses whole release units; residents mode reads no protected table, so it may use the exact drawn or travel-time shapes ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 6). Resident weights come from Census 2020 population in `pub_census_district` (`district_key`, `period`, `indicator`, `value`, `unit`, `source_id`), using count indicator `residents` with unit `persons` (PUB-84), joined to the centroid of `district.geometry`. Covered-earner weights come from `resident_pay` or `worker_pay`. The link times of C25 apply when a dial situation or an hour sets drive times. The district population comes from the census map layer that [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10 admits to the local release (OI-04 closed for version 1); if that layer is absent from the release, residents mode returns `NO_DATA` with its caveat, never because of its terms ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)).
+**Inputs.** Areas from `make_area`. In public-only mode the sets are whole base cells of the fixed frame: `make_area` reads no privacy-derived release unit and no protected or simulated table, and the snap report is technical metadata, not a Synthetic fact. Outside public-only mode, earners mode uses whole release units; residents mode reads no protected table, so it may use the exact drawn or travel-time shapes ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 6). Resident weights come from Census 2020 population in `pub_census_district` (`district_key`, `period`, `indicator`, `value`, `unit`, `source_id`), using count indicator `residents` with unit `persons` (PUB-84), joined to the centroid of `district.geometry`. Covered-earner weights come from `resident_pay` or `worker_pay`. The link times of C25 apply when a dial situation or an hour sets drive times. The district population comes from the census map layer `census_district_pop`, used and shown in full under PUB-12 ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)); if that layer is absent from the release, residents mode returns `NO_DATA` with its caveat, never because of its terms ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)).
 
 **Formula.**
 
@@ -562,11 +562,11 @@ In earners mode the intersection is itself a set of release units, so the privac
 ```
 coverage = employed residents working for private employers
            / all employed residents
-           on the finest admitted geography (PUB-82) that holds the share:
+           on the finest geography available from a visitor-readable source (PUB-82) that holds the share:
            zone, otherwise municipality, otherwise national
 the card names that geography
 if the area spans several zones, the min and max are shown as well (no blending)
-if no admitted geography holds the share: NO_DATA
+if no geography available from a visitor-readable source holds the share: NO_DATA
 ```
 
 ASSUMPTION: the private-employer share is a proxy for wage-protection coverage, as the research states; it is shown as a proxy. "Not measured" is not this gap. It is the coverage label for a person who has no pay in the wage records. An unknown housing class is the separate value `unknown`.
@@ -591,7 +591,7 @@ Tolerance: ± 0.5 percentage point.
 
 | ID | Requirement |
 |---|---|
-| MTH-39 | Every resident-pay card shows the C8 coverage bar, naming the geography used. The bar uses the finest admitted geography that holds the private-employer share (zone, otherwise municipality, otherwise national; PUB-82): the census map layers enter the local release by [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10, which closes OI-04 for version 1, and a missing source value gives `NO_DATA` with its caveat, never because of source terms ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)). The worker-pay card returns `NO_DATA` with reason `coverage_by_workplace_not_published`. It does not use the coverage label "Not measured" for that gap. |
+| MTH-39 | Every resident-pay card shows the C8 coverage bar, naming the geography used. The bar uses the finest geography available from a visitor-readable source that holds the private-employer share (zone, otherwise municipality, otherwise national; PUB-82): the census map layers are used and shown in full under PUB-12 like every visitor-readable source ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)), and a missing source value gives `NO_DATA` with its caveat, never because of source terms. The worker-pay card returns `NO_DATA` with reason `coverage_by_workplace_not_published`. It does not use the coverage label "Not measured" for that gap. |
 | MTH-40 | C8 never interpolates a census share onto grid cells or blends it into a protected figure. |
 
 ### C9 Zone momentum from utility series
@@ -1827,7 +1827,7 @@ a row that C32 or C15 does not return: the estimate passes its reason through an
 
 **Worked example (fixture, not a finding about a place).** One pay band, one opening hour, no visitors and 30 opening days; 100 people present; the share who buy runs from 0.1 to 0.3 and the spend per purchase from 20 to 40; one competitor at 0.5 km with `D` = 1 km, so σ = 1 / (1 + 0.5) = 2/3. At the middle of both ranges, M = 30 × 2/3 × 100 × 0.2 × 30 = 20 × 600 = 12,000. Swings: the share who buy gives 20 × 300 = 6,000 and 20 × 900 = 18,000, a swing of 12,000; the spend per purchase gives 20 × 400 = 8,000 and 20 × 800 = 16,000, a swing of 8,000; so the share who buy is the first driver. Percentile rule: for ten draws of 1,000, 2,000 .. 10,000, the low case is the value at rank 1 (1,000), the middle at rank 5 (5,000) and the high at rank 9 (9,000).
 
-**Provenance and status.** The least-real class of the inputs, Simulated while presence is simulated (MTH-07); `inferred`, with the "your inputs" tag because every range is the user's own (MTH-06); caveats `estimate_on_simulated_inputs` while any input is Simulated or Synthetic, `your_inputs`, `national_average`, `movement_not_purchases` and `present_by_pay_band_assumed`. Subject `area`. Never written to the release or the ledger. Off in public-only mode. The withdrawn survey benchmark is not shown (MTH-29). **Compute cost.** Not yet timed.
+**Provenance and status.** The least-real class of the inputs, Simulated while presence is simulated (MTH-07); `inferred`, with the "your inputs" tag because every range is the user's own (MTH-06); caveats `estimate_on_simulated_inputs` while any input is Simulated or Synthetic, `your_inputs`, `national_average`, `movement_not_purchases` and `present_by_pay_band_assumed`. Subject `area`. Never written to the release or the ledger. Off in public-only mode, and unavailable while OI-03 is open (MTH-29). The withdrawn survey benchmark is not shown. **Compute cost.** Not yet timed.
 
 **Limits and wording.** The estimate describes the stated model and ranges, not observed sales. The cases are cases of the model. The competition rule counts competitors by distance only and ignores their size. While presence is simulated, the estimate shows the format a linked mobility feed would give, not a finding about the place.
 
@@ -1837,7 +1837,7 @@ a row that C32 or C15 does not return: the estimate passes its reason through an
 | ID | Requirement |
 |---|---|
 | MTH-105 | C33 computes the monthly revenue of the model above over the whole release units of the snapped catchment, from C32's people present by pay band, C15's visitors, the competitor count and distances, and the stated ranges; draws each uncertain parameter from its range with the release seed; returns the 10th, 50th and 90th percentiles of the draws as the low, middle and high cases, by the nearest-rank rule; and returns the main drivers by the one-at-a-time swing, largest first. The same release and inputs return the same cases and drivers. It reproduces the fixture: 12,000 at the middle; swings 12,000 and 8,000; cases 1,000, 5,000 and 9,000 for the ten draws. |
-| MTH-106 | C33 carries the label "estimate on simulated inputs" while any input is Simulated or Synthetic, has subject `area`, and is never an estimate for a named real building or business; no figure for a named competitor is computed for display, shown, stored or logged. The share who buy and the spend per purchase by band are the user's own typed ranges with no prefill, and no range is calibrated or invented by the application ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12); a missing range returns `NO_DATA` with `inputs_not_entered`; the spend per purchase is never called spending power. The estimate is off in public-only mode, is never called a forecast, and enters a ranking only under MTH-65. |
+| MTH-106 | C33 carries the label "estimate on simulated inputs" while any input is Simulated or Synthetic, has subject `area`, and is never an estimate for a named real building or business; no figure for a named competitor is computed for display, shown, stored or logged. The share who buy and the spend per purchase by band are the user's own typed ranges with no prefill, and no range is calibrated or invented by the application ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12); a missing range returns `NO_DATA` with `inputs_not_entered`; the spend per purchase is never called spending power. The estimate is off in public-only mode, is unavailable while OI-03 is open (MTH-29), is never called a forecast, and enters a ranking only under MTH-65. |
 
 ### C34 Catchment-share scenario
 
@@ -1918,7 +1918,7 @@ any withheld presence group: SUPPRESSED with BELOW_PANEL_MINIMUM, never filled i
 
 **Worked example (fixture, not a finding about a place).** Two opening hours with 100 (90 to 110) and 200 (180 to 220) people present give H = 300 (270 to 330). With a capture rate of 0.01, 0.02 and 0.03, an average bill of 80, 100 and 120 and 30 days: low = 270 × 0.01 × 80 × 30 = 6,480; middle = 300 × 0.02 × 100 × 30 = 18,000; high = 330 × 0.03 × 120 × 30 = 35,640. Beside them stands C4's break-even revenue for the same user's C4 inputs (QAR 127,796 a month in C4's example).
 
-**Provenance and status.** Simulated, the least-real class of its inputs (MTH-07); `inferred`, "your inputs" tag (MTH-06); caveats `scenario_not_forecast`, `your_inputs`, `national_average` and `movement_not_purchases`. Subject `area`. Never written to the release or the ledger. Off in public-only mode, because its presence input is Simulated. Its break-even point uses C4's published inputs and share rules (MTH-29). **Compute cost.** Trivial; not separately timed.
+**Provenance and status.** Simulated, the least-real class of its inputs (MTH-07); `inferred`, "your inputs" tag (MTH-06); caveats `scenario_not_forecast`, `your_inputs`, `national_average` and `movement_not_purchases`. Subject `area`. Never written to the release or the ledger. Off in public-only mode, because its presence input is Simulated, and off screen while OI-03 is open, like the break-even calculator (MTH-29). Its break-even point uses C4's published inputs and share rules (MTH-29). **Compute cost.** Trivial; not separately timed.
 
 **Limits and wording.** The capture rate and the average bill are the user's assumptions, and the people present are simulated. Measures of present size, such as a wage bill (C24), a number of firms or retail sales where a Public table publishes them, are measurements with their own class and are not part of this card.
 
@@ -1927,7 +1927,7 @@ any withheld presence group: SUPPRESSED with BELOW_PANEL_MINIMUM, never filled i
 
 | ID | Requirement |
 |---|---|
-| MTH-108 | C35 computes the low, middle and high cases as the presence sum times the user's capture rate, average bill and opening days of the same case, shows them beside C4's break-even revenue, and reproduces the fixture (6,480; 18,000; 35,640). Every assumption is visible, editable and tagged "your inputs"; the result carries `scenario_not_forecast`, is never called a forecast, is off in public-only mode and uses C4's published inputs and share rules for the break-even point (MTH-29). The words "capture rate" name only this input of the user: the build-time scan allows them only as the label of that input in this card's templates. |
+| MTH-108 | C35 computes the low, middle and high cases as the presence sum times the user's capture rate, average bill and opening days of the same case, shows them beside C4's break-even revenue, and reproduces the fixture (6,480; 18,000; 35,640). Every assumption is visible, editable and tagged "your inputs"; the result carries `scenario_not_forecast`, is never called a forecast, is off in public-only mode and off screen while OI-03 is open (MTH-29), and uses C4's published inputs and share rules for the break-even point (MTH-29). The words "capture rate" name only this input of the user: the build-time scan allows them only as the label of that input in this card's templates. |
 
 ### C36 Night-time radiance by area and month
 
@@ -2305,8 +2305,8 @@ ASSUMPTIONS (each also marked where it is used):
 
 Open items from the master design that touch this document:
 
-- OI-03: reconciliation R1 of the restaurant totals is closed because production value is not a field of the present datasets (the reconciliation record of task S2-T03); the two wage-table means remain a separate reconciliation. C3 and the sector branch of C19 stay hidden until the wage-table reconciliation is closed (MTH-23, MTH-97). C4, C33 and C35 no longer depend on the withdrawn production value (MTH-29, MTH-106, MTH-108).
-- OI-04: closed for version 1 by [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10. The census map layers enter the local release, each figure with its source and retrieval date, so C7 resident weights and C8 shares are release facts; C12's research example uses a test supply layer, and C17 recomputes its research results on the release's own features and recorded settings; neither restriction comes from source terms. The coverage bar uses the finest admitted geography and names it, or returns `NO_DATA` (PUB-82). The single list in [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) records any permission or licence needed for real use, with the publisher's words and date read; it does not hold back version 1.
+- OI-03: reconciliation R1 of the restaurant totals is closed because production value is not a field of the present datasets (the reconciliation record of task S2-T03); the two wage-table means remain a separate reconciliation. C3, C4, the sector branch of C19, the site estimate of C33 and the revenue range of C35 stay hidden until it is closed (MTH-23, MTH-29, MTH-97, MTH-106, MTH-108). C4, C33 and C35 no longer depend on the withdrawn production value.
+- OI-04: closed for version 1 ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10, as history); the census map layers follow PUB-12 like every visitor-readable source under [decision 0026](decisions/0026-public-sources-used-in-full-locally.md), each figure with its source and retrieval date, and are never committed. Thus C7 resident weights and C8 shares are release facts; C12's research example uses a test supply layer, and C17 recomputes its research results on the release's own features and recorded settings; neither restriction comes from source terms. The coverage bar uses the finest geography available from a visitor-readable source and names it, or returns `NO_DATA` (PUB-82). The single list in [17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md) records any permission or licence needed for real use, with the publisher's words and date read; it does not hold back version 1.
 - OI-11: privacy thresholds are proposals. C7 earners mode, C10, C15, C19, C39 and C40 inherit the exported tier; they do not set a second threshold. C22 reads no protected figure since [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12.
 
 Open questions:

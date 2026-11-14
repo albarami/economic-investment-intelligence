@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12, and by decisions 0021, 0022 and 0023 on 2026-11-13 |
-| Date | 2026-11-13 |
+| Status | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12, and by decisions 0021, 0022 and 0023 on 2026-11-13, and by decision 0026 on 2026-11-14 |
+| Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | Specify how the custodian plane generates the synthetic labour and residence records attached to the real register companies, their monthly periods and the simulated presence and flow feeds, how the case sample files are made, what each parameter rests on, and how the result is checked, sealed and reproduced. |
 | Read first | [01_PROJECT_BRIEF.md](01_PROJECT_BRIEF.md), [02_ARCHITECTURE.md](02_ARCHITECTURE.md), [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md), [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md), [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md), [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) |
@@ -472,7 +472,7 @@ The attraction of a category group is `mob.category_attraction.<group>` in every
 
 ### 12.6 What the transport surveys do not give us
 
-The national transport surveys publish trip rates, mode shares and day-type traffic shapes [S30]. Summary documents readable as a visitor under PUB-03 are used and shown in full in version 1 under the owner's decision for a personal, local project ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)). Their restriction on publication is recorded in the publisher's words with the date read in document 04 and listed for real use in document 17; it does not bar their use here. Fetched figures stay in the uncommitted cache and never enter the repository. The mapping from published parameters to the manifest entries is not yet confirmed here; until it is, trip rates and the public-transport share remain explicitly ASSUMED with wide ranges, not excluded because of terms (Q1).
+The national transport surveys publish trip rates, mode shares and day-type traffic shapes [S30]. Summary documents readable as a visitor under PUB-12 may be used in version 1 whatever their reuse terms ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)); their source is not yet registered: its host, registry row and terms in the publisher's own words with the date read are to be added to document 04 (PUB-03, PUB-12), and any permission needed for real use to document 17, DHA-102. Fetched figures stay in the uncommitted cache; a manifest entry derived from them is read from the cache at build time and its value is never written into this document or a fixture. The mapping from published parameters to the manifest entries is not yet confirmed here; until it is, trip rates and the public-transport share remain explicitly ASSUMED with wide ranges, not excluded because of terms (Q1).
 
 ### 12.7 Event days
 
@@ -706,11 +706,11 @@ Size: the number of depots, deliveries a month, branches, opening hours and mont
 
 ## Open questions and assumptions
 
-Open items from the master design that touch this document: OI-03 (wage-table means must be reconciled before `wage.mean_by_occupation` is used in display; the fidelity check uses the table named by the fetcher), OI-04 (closed for version 1 by decision 0017 item 10: the census zone and district layers enter the local release; they are fetched at build time and never committed), OI-11 (privacy thresholds, including the panel-device minimum, are proposals).
+Open items from the master design that touch this document: OI-03 (wage-table means must be reconciled before `wage.mean_by_occupation` is used in display; the fidelity check uses the table named by the fetcher), OI-04 (closed for version 1 ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 10, as history); the census map layers follow PUB-12 like every visitor-readable source under [decision 0026](decisions/0026-public-sources-used-in-full-locally.md), each figure with its source and retrieval date, and are never committed), OI-11 (privacy thresholds, including the panel-device minimum, are proposals).
 
 Open questions:
 
-- Q1. Settled by [decision 0026](decisions/0026-public-sources-used-in-full-locally.md): publicly readable transport-survey summaries are used in version 1 without waiting for consent. Terms are recorded in document 04 and permissions for real use listed in document 17. OPEN: confirm the mapping of published parameters to the trip-rate and public-transport-share manifest entries and the scorecard benchmark; until then the manifest entries stay ASSUMED (section 12.6).
+- Q1. Settled by [decision 0026](decisions/0026-public-sources-used-in-full-locally.md): publicly readable transport-survey summaries are used in version 1 without waiting for consent. The source is not yet registered: its host, registry row and terms in the publisher's own words with the date read are to be added to document 04 (PUB-03, PUB-12), and any permission needed for real use to document 17, DHA-102. A parameter taken from such a summary is read from the uncommitted cache at build time and its value is never written into a document, a manifest that is committed, or a fixture. OPEN: confirm the mapping of published parameters to the trip-rate and public-transport-share manifest entries and the scorecard benchmark; until then the manifest entries stay ASSUMED (section 12.6).
 - Q2. Who are the two long-term residents for H5? Default: the owner nominates them before slice S4.
 - Q3. Which complete years of the museum series form `mob.visitor_month_shape`? A year with a one-off event distorts the shape (2022 is a World Cup year, as [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) notes). Default: a stated rule, fixed at slice S1 and recorded with the manifest, never a choice made after a run.
 - Q4. Is there a citable national public source, never a venue's level, for movement on National Day or a match day? Default: none; the `event.*` entries stay ASSUMED.

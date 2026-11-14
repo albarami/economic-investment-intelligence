@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Slice S0 (foundation) in progress; no feature code yet; scope amended by decisions 0016, 0017 and 0019 on 2026-11-12 and by decisions 0022 and 0023 on 2026-11-13 |
-| Date | 2026-11-12 |
+| Status | Slice S0 (foundation) in progress; no feature code yet; scope amended by decisions 0016, 0017 and 0019 on 2026-11-12 and by decisions 0022 and 0023 on 2026-11-13, and by decision 0026 on 2026-11-14 |
+| Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | Introduce a public proof-of-concept design for companies and its reading path. |
 | Read first | This page, then [docs/README.md](docs/README.md) |
@@ -18,7 +18,7 @@ The companies are the real ones of the public business register ([decision 0022]
 
 ## Honesty statement
 
-The custodian-type labour and residence records will be synthetic, built only for the confirmed sources of the data rule of decision 0023 and attached to the real companies of the public business register (decision 0022): every person is invented, and no real custodian record is read by repository code. Mobility, footfall and geofencing will be simulated locally, with no telecom operator contacted; a published relative-busyness figure of a named venue is a Public fact, not a mobility feed. Road traffic is simulated locally by default; the optional live traffic provider is off by default and is never needed by a test, a gate, a command or the guided story. Version 1 is a personal, local project visible only inside the owner's organisation. Every source readable as a visitor under [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) item 2 is used and shown in full regardless of its reuse terms. Every figure shows its source, date and the publisher's own caveat; estimates are labelled as estimates. Document 04 records each publisher's terms in its own words with the date read and the basis of use; for sources without an open licence covering the use, that basis is the owner's decision for this personal, local project. Document 17 keeps the permissions and licences needed before real use; nothing on that list holds back version 1.
+The custodian-type labour and residence records will be synthetic, built only for the confirmed sources of the data rule of decision 0023 and attached to the real companies of the public business register (decision 0022): every person is invented, and no real custodian record is read by repository code. Mobility, footfall and geofencing will be simulated locally, with no telecom operator contacted; a published relative-busyness figure of a named venue is a Public fact, not a mobility feed. Road traffic is simulated locally by default; the optional live traffic provider is off by default and is never needed by a test, a gate, a command or the guided story. Version 1 is a personal, local project visible only inside the owner's organisation. Every source readable as a visitor under [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) item 2 is used and shown in full regardless of its reuse terms. Every figure shows its source, date and the publisher's own caveat; estimates are labelled as estimates. Document 04 records each publisher's terms in its own words with the date read and the basis of use; `provider_terms` stays for a provider's interface used under that provider's own terms (PUB-95 and PUB-97); for every other source without an open licence covering the use, that basis is the owner's decision for this personal, local project. Document 17 keeps the permissions and licences needed before real use; nothing on that list holds back version 1.
 
 Only figures marked Public describe Qatar. Synthetic and Simulated figures demonstrate a format and a protection; they are not evidence about a real place, business or person. Suppressed is a separate provenance class, and evidence status is a separate axis from provenance.
 
