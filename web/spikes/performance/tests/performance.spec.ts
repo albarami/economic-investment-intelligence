@@ -1,4 +1,26 @@
 import { expect, test, type Page } from '@playwright/test';
+import {
+  ARABIC_REDUCED,
+  FULL,
+  FULL_STREET_LOAD,
+  GATE_BLANK_RENDERER,
+  GATE_SLOW_SCENE,
+  HEX_NONBLANK,
+  PARTICLE_NONBLANK,
+  PAUSE_SCENE,
+  PIXEL_CAP,
+  RENAMED_PROFILE,
+  ROAD_PAUSE_PLANT,
+  ROAD_TRACE_SCENE,
+  SMALL,
+  TRACE_CONTRACT,
+} from './canvas-mode.mjs';
+import {
+  foreignBeforeCommit,
+  refuseForeignAfterReady,
+} from './foreign-request.mjs';
+import { clickPause } from './pause-click';
+import { prepareCanvas } from './small-map';
 
 const HEXAGONS = 110000;
 const PARTICLES = 50000;
@@ -8,27 +30,36 @@ const WALL_HEIGHT = 1080;
 type Spike = NonNullable<Window['__spike']>;
 
 async function ready(page: Page): Promise<Spike> {
-  await page.waitForFunction(
-    () =>
-      window.__spike?.phase === 'done' || window.__spike?.phase === 'failed',
-    undefined,
-    { timeout: 170000 },
-  );
-  const value = await page.evaluate(() => window.__spike);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let value: Spike;
+  try {
+    value = await Promise.race([
+      page.evaluate(
+        () =>
+          new Promise<Spike>((resolve) => {
+            const read = () => {
+              const spike = window.__spike;
+              if (spike?.phase === 'done' || spike?.phase === 'failed') {
+                resolve(structuredClone(spike));
+              } else {
+                requestAnimationFrame(read);
+              }
+            };
+            read();
+          }),
+      ),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error('spike readiness timed out')),
+          170000,
+        );
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
   if (value === undefined) throw new Error('spike diagnostics are absent');
   return value;
-}
-
-function foreignRequest(url: string, origin: string): string {
-  if (url.startsWith('data:') || url.startsWith('blob:')) return '';
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    try {
-      return new URL(url).origin === origin ? '' : url;
-    } catch {
-      return url;
-    }
-  }
-  return '';
 }
 
 async function tracePosts(page: Page): Promise<number> {
@@ -37,19 +68,42 @@ async function tracePosts(page: Page): Promise<number> {
   return Number(await response.text());
 }
 
-async function open(page: Page, path: string): Promise<Spike> {
+async function open(
+  page: Page,
+  path: string,
+  canvas: string = FULL,
+): Promise<Spike> {
+  await prepareCanvas(page, canvas);
   const seen: string[] = [];
-  page.on('request', (request) => {
-    seen.push(request.url());
+  let settled = false;
+  let rejectForeign: (error: Error) => void = () => {};
+  const foreignStop = new Promise<never>((_, reject) => {
+    rejectForeign = reject;
   });
-  await page.goto(path);
-  const spike = await ready(page);
-  const origin = new URL(page.url()).origin;
-  for (const url of seen) {
-    const foreign = foreignRequest(url, origin);
-    if (foreign !== '') throw new Error(`non-same-origin request: ${foreign}`);
+  // A foreign request rejects before the scene render finishes. The text stays.
+  page.on('request', (request) => {
+    const url = request.url();
+    seen.push(url);
+    if (settled) return;
+    const foreign = foreignBeforeCommit(url, page.url());
+    if (foreign !== '') {
+      settled = true;
+      rejectForeign(new Error(`non-same-origin request: ${foreign}`));
+    }
+  });
+  const pending = (async () => {
+    await page.goto(path);
+    return ready(page);
+  })();
+  void pending.catch(() => undefined);
+  try {
+    const spike = await Promise.race([pending, foreignStop]);
+    const origin = new URL(page.url()).origin;
+    refuseForeignAfterReady(seen, origin);
+    return spike;
+  } finally {
+    settled = true;
   }
-  return spike;
 }
 
 test('the smoke orbit draws both layers and records a trace', async ({
@@ -76,7 +130,7 @@ test('the smoke orbit draws both layers and records a trace', async ({
       arm();
     }
   });
-  const spike = await open(page, '/en/_perf?profile=smoke');
+  const spike = await open(page, '/en/_perf?profile=smoke', TRACE_CONTRACT);
   expect(spike.phase).toBe('done');
   expect(spike.failure).toBe('');
   expect(spike.hexagonInstances).toBe(HEXAGONS);
@@ -111,7 +165,7 @@ test('the smoke orbit draws both layers and records a trace', async ({
 });
 
 test('the Arabic route uses the Arabic notice', async ({ page }) => {
-  const spike = await open(page, '/ar/_perf?profile=smoke');
+  const spike = await open(page, '/ar/_perf?profile=smoke', SMALL);
   await expect(page.locator('#renderer')).toHaveText(spike.webglRenderer);
   await expect(page.locator('#notice')).toHaveText(
     'عرض اصطناعي. امتداد مخترع. بلا اسم مكان.',
@@ -121,7 +175,11 @@ test('the Arabic route uses the Arabic notice', async ({ page }) => {
 });
 
 test('isolating hexagons leaves the hex canvas nonblank', async ({ page }) => {
-  const spike = await open(page, '/en/_perf?profile=smoke&isolate=hexagons');
+  const spike = await open(
+    page,
+    '/en/_perf?profile=smoke&isolate=hexagons',
+    HEX_NONBLANK,
+  );
   expect(spike.hexagonInstances).toBe(HEXAGONS);
   expect(spike.particleInstances).toBe(0);
   expect(spike.hex).toBe(true);
@@ -131,7 +189,11 @@ test('isolating hexagons leaves the hex canvas nonblank', async ({ page }) => {
 test('isolating particles leaves the particle canvas nonblank', async ({
   page,
 }) => {
-  const spike = await open(page, '/en/_perf?profile=smoke&isolate=particles');
+  const spike = await open(
+    page,
+    '/en/_perf?profile=smoke&isolate=particles',
+    PARTICLE_NONBLANK,
+  );
   expect(spike.hexagonInstances).toBe(0);
   expect(spike.particleInstances).toBe(PARTICLES);
   expect(spike.particle).toBe(true);
@@ -139,21 +201,37 @@ test('isolating particles leaves the particle canvas nonblank', async ({
 });
 
 test('omitting one hexagon lowers the drawn count', async ({ page }) => {
-  const spike = await open(page, '/en/_perf?profile=smoke&plant=omit-hexagon');
+  const spike = await open(
+    page,
+    '/en/_perf?profile=smoke&plant=omit-hexagon',
+    SMALL,
+  );
   expect(spike.hexagonInstances).toBe(HEXAGONS - 1);
+  expect(spike.hex).toBe(true);
+  expect(spike.particle).toBe(true);
 });
 
 test('hiding the hexagon layer reports no hexagon instances', async ({
   page,
 }) => {
-  const spike = await open(page, '/en/_perf?profile=smoke&plant=hide-hexagons');
+  const spike = await open(
+    page,
+    '/en/_perf?profile=smoke&plant=hide-hexagons',
+    SMALL,
+  );
   expect(spike.hexagonInstances).toBe(0);
   expect(spike.hex).toBe(false);
 });
 
 test('omitting one particle lowers the drawn count', async ({ page }) => {
-  const spike = await open(page, '/en/_perf?profile=smoke&plant=omit-particle');
+  const spike = await open(
+    page,
+    '/en/_perf?profile=smoke&plant=omit-particle',
+    SMALL,
+  );
   expect(spike.particleInstances).toBe(PARTICLES - 1);
+  expect(spike.particle).toBe(true);
+  expect(spike.hex).toBe(true);
 });
 
 test('hiding the particle layer reports no particle instances', async ({
@@ -162,35 +240,52 @@ test('hiding the particle layer reports no particle instances', async ({
   const spike = await open(
     page,
     '/en/_perf?profile=smoke&plant=hide-particles',
+    SMALL,
   );
   expect(spike.particleInstances).toBe(0);
   expect(spike.particle).toBe(false);
 });
 
 test('a frozen clock leaves the first particle in place', async ({ page }) => {
-  const spike = await open(page, '/en/_perf?profile=smoke&plant=freeze');
+  const spike = await open(page, '/en/_perf?profile=smoke&plant=freeze', SMALL);
   expect(spike.positionEnd).toBe(spike.positionStart);
 });
 
 test('an empty timestamp list is refused by name', async ({ page }) => {
-  const spike = await open(page, '/en/_perf?profile=smoke&plant=no-samples');
+  const spike = await open(
+    page,
+    '/en/_perf?profile=smoke&plant=no-samples',
+    SMALL,
+  );
   expect(spike.submitFailure).toBe('empty-timestamps');
 });
 
 test('a blank renderer is refused by name', async ({ page }) => {
-  const spike = await open(page, '/en/_perf?plant=missing-renderer');
+  const spike = await open(
+    page,
+    '/en/_perf?plant=missing-renderer',
+    GATE_BLANK_RENDERER,
+  );
   expect(spike.webglRenderer).toBe('');
   expect(spike.profile).toBe('gate');
   expect(spike.qualification).toBe('missing-renderer');
 });
 
 test('an unknown field is refused by name', async ({ page }) => {
-  const spike = await open(page, '/en/_perf?profile=smoke&plant=fail-submit');
+  const spike = await open(
+    page,
+    '/en/_perf?profile=smoke&plant=fail-submit',
+    SMALL,
+  );
   expect(spike.submitFailure).toBe('unknown-field');
 });
 
 test('ignoring the cap is qualified as the wrong cap', async ({ page }) => {
-  const spike = await open(page, '/en/_perf?profile=smoke&plant=ignore-cap');
+  const spike = await open(
+    page,
+    '/en/_perf?profile=smoke&plant=ignore-cap',
+    PIXEL_CAP,
+  );
   expect(spike.cap).toBe(spike.textPixelRatio);
   expect(spike.cap).toBe(2);
   expect(spike.bufferWidth).toBe(WALL_WIDTH * spike.cap);
@@ -201,6 +296,7 @@ test('a renamed profile is qualified by name', async ({ page }) => {
   const spike = await open(
     page,
     '/en/_perf?profile=smoke&plant=rename-profile',
+    RENAMED_PROFILE,
   );
   expect(spike.profile).toBe('tuned');
   expect(spike.qualification).toBe('unknown-profile');
@@ -210,6 +306,9 @@ test('the ordinary page helper rejects a remote asset', async ({ page }) => {
   await expect(
     open(page, '/en/_perf?profile=smoke&plant=remote-asset'),
   ).rejects.toThrow(/assets\.invalid/);
+  expect(await page.evaluate(() => window.__spike?.phase ?? '')).not.toBe(
+    'done',
+  );
 });
 
 test('a remote image does not load', async ({ page }) => {
@@ -217,6 +316,7 @@ test('a remote image does not load', async ({ page }) => {
   page.on('requestfailed', (request) => {
     if (request.url().includes('assets.invalid')) failed.push(request.url());
   });
+  await prepareCanvas(page, SMALL);
   await page.goto('/en/_perf?profile=smoke&plant=remote-asset');
   const spike = await ready(page);
   expect(spike.phase).toBe('done');
@@ -250,11 +350,7 @@ async function expectEarlyRefusal(
   await expect(page.locator('#renderer')).toHaveText(renderer);
   const after = await tracePosts(page);
   expect(after).toBe(before);
-  const origin = new URL(page.url()).origin;
-  for (const url of seen) {
-    const foreign = foreignRequest(url, origin);
-    if (foreign !== '') throw new Error(`non-same-origin request: ${foreign}`);
-  }
+  refuseForeignAfterReady(seen, new URL(page.url()).origin);
   expect(
     seen.filter((url) => new URL(url).pathname === '/__perf/trace'),
   ).toEqual([]);
@@ -307,6 +403,7 @@ test('a planted slow full scene with an empty canvas at 60 is stored', async ({
   page,
 }) => {
   const before = await tracePosts(page);
+  await prepareCanvas(page, GATE_SLOW_SCENE);
   await page.goto('/en/_perf?plant=slow-scene');
   await expect(page.locator('#renderer')).toHaveText(
     'Synthetic passing adapter',
@@ -339,11 +436,15 @@ const ROAD_LARGE = Object.keys(ROAD_LOADS)[1]!;
 const roadUrl = (extra = '') =>
   `/en/_perf?profile=smoke&layers=${ROAD_SET}${extra}`;
 
-async function framesAfter(page: Page, frames: number): Promise<void> {
-  await page.waitForFunction(
-    (count) => (window.__spike?.motionFrames ?? 0) > count + 2,
-    frames,
-  );
+async function framesAfter(page: Page, frames: number): Promise<Spike> {
+  return page.evaluate(async (count) => {
+    while ((window.__spike?.motionFrames ?? 0) <= count + 2) {
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => resolve()),
+      );
+    }
+    return structuredClone(window.__spike!);
+  }, frames);
 }
 
 type RoadScene = { page: Page; spike: Spike };
@@ -351,6 +452,7 @@ type PauseObservation = { paused: Spike; after: Spike; resumed: Spike };
 
 function sharedRoadScene(
   name: string,
+  canvas: string,
   language: string,
   reduced: boolean,
   register: (scene: () => RoadScene) => void,
@@ -363,10 +465,8 @@ function sharedRoadScene(
       const { baseURL, viewport, deviceScaleFactor } = info.project.use;
       page = await browser.newPage({ baseURL, viewport, deviceScaleFactor });
       if (reduced) await page.emulateMedia({ reducedMotion: 'reduce' });
-      spike = await open(
-        page,
-        `/${language}/_perf?profile=smoke&layers=${ROAD_SET}`,
-      );
+      const path = `/${language}/_perf?profile=smoke&layers=${ROAD_SET}`;
+      spike = await open(page, path, canvas);
       console.log(
         'MEASURED shared scene setup ms',
         name,
@@ -374,7 +474,14 @@ function sharedRoadScene(
       );
     });
     test.afterAll(async () => {
-      if (page) await page.close();
+      if (!page) return;
+      const started = performance.now();
+      await page.close();
+      console.log(
+        'MEASURED shared scene close ms',
+        name,
+        performance.now() - started,
+      );
     });
     // Default mode keeps each test independently runnable and does not skip
     // later tests after a failure. A restarted worker rebuilds this fixture.
@@ -382,22 +489,40 @@ function sharedRoadScene(
   });
 }
 
-async function observePause(page: Page): Promise<PauseObservation> {
-  await page.locator('#pause-motion').click();
-  await page.waitForFunction(() => window.__spike?.paused === true);
-  const paused = (await page.evaluate(() => window.__spike))!;
+async function observePause(
+  page: Page,
+  pause: () => Promise<void>,
+): Promise<PauseObservation> {
+  await pause();
+  const { paused, after } = await page.evaluate(async () => {
+    const frame = () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+    while (window.__spike?.paused !== true) await frame();
+    const paused = structuredClone(window.__spike);
+    while ((window.__spike?.motionFrames ?? 0) <= paused.motionFrames + 2) {
+      await frame();
+    }
+    return { paused, after: structuredClone(window.__spike!) };
+  });
   // Keep the clock-freeze assertion meaningful: do not start at the last hour.
   expect(paused.hoursShown.length).toBeLessThan(roadData.hours.length);
-  await framesAfter(page, paused.motionFrames);
-  const after = (await page.evaluate(() => window.__spike))!;
-  await page.locator('#pause-motion').click();
-  await page.waitForFunction(
-    ({ elapsed, position }) =>
-      (window.__spike?.motionElapsed ?? 0) > elapsed &&
-      window.__spike?.currentPosition !== position,
+  await clickPause(page);
+  const resumed = await page.evaluate(
+    async ({ elapsed, position }) => {
+      while (!(
+        (window.__spike?.motionElapsed ?? 0) > elapsed &&
+        window.__spike?.currentPosition !== position
+      )) {
+        await new Promise<void>((resolve) =>
+          requestAnimationFrame(() => resolve()),
+        );
+      }
+      return structuredClone(window.__spike!);
+    },
     { elapsed: paused.motionElapsed, position: paused.currentPosition },
   );
-  const resumed = (await page.evaluate(() => window.__spike))!;
   return { paused, after, resumed };
 }
 
@@ -405,6 +530,7 @@ function visibilityTest(
   scene: () => RoadScene,
   language: string,
   motion: string,
+  pause?: () => Promise<void>,
 ): void {
   test(`roads mark and legend are visible ${language} ${motion}`, async () => {
     test.setTimeout(600000);
@@ -413,7 +539,7 @@ function visibilityTest(
     const label = language === 'ar' ? 'إيقاف الحركة مؤقتًا' : 'Pause motion';
     await expect(button).toHaveText(label);
     if (motion === 'paused') {
-      await button.click();
+      await (pause ? pause() : clickPause(page));
       await Promise.all([
         expect(button).toHaveAttribute('aria-pressed', 'true'),
         expect(button).toHaveText(label),
@@ -429,100 +555,121 @@ function visibilityTest(
   });
 }
 
-sharedRoadScene('uninterrupted English road scene', 'en', false, (scene) => {
-  test('roads carry the Simulated word and dash style in the interleaved overlay', async () => {
-    const { page } = scene();
-    test.setTimeout(600000);
-    await Promise.all([
-      expect(page.locator('#road-mark')).toHaveText('Simulated'),
-      expect(page.locator('#road-mark')).toBeVisible(),
-      expect(page.locator('#road-legend')).toBeVisible(),
-      expect(page.locator('#road-sample')).toHaveCSS(
-        'border-top-style',
-        'dashed',
-      ),
-    ]);
-    expect(
-      await page.evaluate(() =>
-        Reflect.get(window.__spike ?? {}, 'roadDashEnabled'),
-      ),
-    ).toBe(true);
-  });
+sharedRoadScene(
+  'uninterrupted English road scene',
+  ROAD_TRACE_SCENE,
+  'en',
+  false,
+  (scene) => {
+    test('roads carry the Simulated word and dash style in the interleaved overlay', async () => {
+      const { page } = scene();
+      test.setTimeout(600000);
+      await Promise.all([
+        expect(page.locator('#road-mark')).toHaveText('Simulated'),
+        expect(page.locator('#road-mark')).toBeVisible(),
+        expect(page.locator('#road-legend')).toBeVisible(),
+        expect(page.locator('#road-sample')).toHaveCSS(
+          'border-top-style',
+          'dashed',
+        ),
+      ]);
+      expect(
+        await page.evaluate(() =>
+          Reflect.get(window.__spike ?? {}, 'roadDashEnabled'),
+        ),
+      ).toBe(true);
+    });
 
-  test('roads draw the configured full fixture and first load with both original layers', async () => {
-    test.setTimeout(600000);
-    const spike = scene().spike;
-    expect(spike.roadInstances).toBe(LAYER_SETS[ROAD_SET]!.roads);
-    expect(spike.road).toBe(true);
-    expect(spike.hexagonInstances).toBe(LAYER_SETS[ROAD_SET]!.hexagons);
-    expect(spike.particleInstances).toBe(LAYER_SETS[ROAD_SET]!.particles);
-  });
+    test('roads draw the configured full fixture and first load with both original layers', async () => {
+      test.setTimeout(600000);
+      const spike = scene().spike;
+      expect(spike.roadInstances).toBe(LAYER_SETS[ROAD_SET]!.roads);
+      expect(spike.road).toBe(true);
+      expect(spike.hexagonInstances).toBe(LAYER_SETS[ROAD_SET]!.hexagons);
+      expect(spike.particleInstances).toBe(LAYER_SETS[ROAD_SET]!.particles);
+    });
 
-  test('roads short orbit posts a well-formed smoke trace', async () => {
-    test.setTimeout(600000);
-    const spike = scene().spike;
-    expect(spike.phase).toBe('done');
-    expect(spike.submitFailure).toBe('');
-    expect(spike.qualification).toBe('smoke-profile');
-    expect(spike.savedPath).toContain(ROAD_SET);
-  });
+    test('roads short orbit posts a well-formed smoke trace', async () => {
+      test.setTimeout(600000);
+      const spike = scene().spike;
+      expect(spike.phase).toBe('done');
+      expect(spike.submitFailure).toBe('');
+      expect(spike.qualification).toBe('smoke-profile');
+      expect(spike.savedPath).toContain(ROAD_SET);
+    });
 
-  test('roads playback visits each stored hour and holds the recorded bands across the load cycle', async () => {
-    const { page } = scene();
-    test.setTimeout(600000);
-    await page.waitForFunction(
-      (hours) => window.__spike?.roadStates.at(-1)?.hour === hours.at(-1),
-      roadData.hours,
-      { timeout: 170000 },
-    );
-    const spike = (await page.evaluate(() => window.__spike))!;
-    expect(spike.hoursShown).toEqual(roadData.hours);
-    const links = roadData.roads.links;
-    const indexes = [
-      ...Array.from({ length: links.length * 2 }, (_, index) => index),
-      ...Array.from(
-        { length: links.length },
-        (_, index) => LAYER_SETS[ROAD_SET]!.roads! - links.length + index,
-      ),
-    ];
-    const expected = (hour: number) =>
-      indexes.map((index) => {
-        const fixture =
-          index < links.length ? index : (index - links.length) % links.length;
-        return (
-          roadData.rows.find(
-            (row) =>
-              row.hour === hour && row.link_id === links[fixture]!.link_id,
-          )?.volume_band ?? VOLUME_BANDS[0]
-        );
-      });
-    for (const state of spike.roadStates) {
-      expect(roadData.hours).toContain(state.hour);
-      expect(roadData.hours).toContain(state.nextHour);
-      expect(state.bands).toEqual(expected(state.hour));
-      expect(state.nextBands).toEqual(expected(state.nextHour));
-      expect(state.trigger).toBe(state.hour);
-      expect(state.stableData).toBe(true);
-    }
-    expect(
-      new Set(spike.roadStates.map((state) => JSON.stringify(state.bands)))
-        .size,
-    ).toBeGreaterThan(1);
-    expect(spike.hourStepsMs.length).toBe(roadData.hours.length - 1);
-    console.log(
-      'MEASURED headless stored-hour steps ms',
-      JSON.stringify(spike.hourStepsMs),
-    );
-  });
-  visibilityTest(scene, 'en', 'playing');
-});
+    test('roads playback visits each stored hour and holds the recorded bands across the load cycle', async () => {
+      const { page } = scene();
+      test.setTimeout(600000);
+      await page.waitForFunction(
+        (hours) => window.__spike?.roadStates.at(-1)?.hour === hours.at(-1),
+        roadData.hours,
+        { timeout: 170000 },
+      );
+      const spike = (await page.evaluate(() => window.__spike))!;
+      expect(spike.hoursShown).toEqual(roadData.hours);
+      const links = roadData.roads.links;
+      const indexes = [
+        ...Array.from({ length: links.length * 2 }, (_, index) => index),
+        ...Array.from(
+          { length: links.length },
+          (_, index) => LAYER_SETS[ROAD_SET]!.roads! - links.length + index,
+        ),
+      ];
+      const expected = (hour: number) =>
+        indexes.map((index) => {
+          const fixture =
+            index < links.length
+              ? index
+              : (index - links.length) % links.length;
+          return (
+            roadData.rows.find(
+              (row) =>
+                row.hour === hour && row.link_id === links[fixture]!.link_id,
+            )?.volume_band ?? VOLUME_BANDS[0]
+          );
+        });
+      for (const state of spike.roadStates) {
+        expect(roadData.hours).toContain(state.hour);
+        expect(roadData.hours).toContain(state.nextHour);
+        expect(state.bands).toEqual(expected(state.hour));
+        expect(state.nextBands).toEqual(expected(state.nextHour));
+        expect(state.trigger).toBe(state.hour);
+        expect(state.stableData).toBe(true);
+      }
+      expect(
+        new Set(spike.roadStates.map((state) => JSON.stringify(state.bands)))
+          .size,
+      ).toBeGreaterThan(1);
+      expect(spike.hourStepsMs.length).toBe(roadData.hours.length - 1);
+      console.log(
+        'MEASURED headless stored-hour steps ms',
+        JSON.stringify(spike.hourStepsMs),
+      );
+    });
+    visibilityTest(scene, 'en', 'playing');
+  },
+);
 
-sharedRoadScene('English pause scene', 'en', false, (scene) => {
+sharedRoadScene('English pause scene', PAUSE_SCENE, 'en', false, (scene) => {
+  let firstPause: Promise<void> | undefined;
+  const pause = () => {
+    // Both consumers start from this fixture's first pause, including when
+    // either test is selected alone or the worker restarts after a failure.
+    expect(scene().spike.phase).toBe('done');
+    expect(scene().spike.paused).toBe(false);
+    expect(scene().spike.reducedMotion).toBe(false);
+    return (firstPause ??= clickPause(scene().page));
+  };
+  // Assert the live paused DOM before the clock test resumes the scene.
+  // Only the input action is shared; visibility assertions are never cached.
+  visibilityTest(scene, 'en', 'paused', pause);
   let observation: Promise<PauseObservation> | undefined;
-  const paused = () => (observation ??= observePause(scene().page));
+  const paused = () => (observation ??= observePause(scene().page, pause));
   test('roads Pause motion freezes the hour clock and resumes it on a second press', async () => {
     test.setTimeout(600000);
     const { paused: before, after, resumed } = await paused();
+    expect(before.paused).toBe(true);
     expect(after.motionElapsed).toBe(before.motionElapsed);
     expect(after.hoursShown).toEqual(before.hoursShown);
     expect(resumed.paused).toBe(false);
@@ -530,22 +677,19 @@ sharedRoadScene('English pause scene', 'en', false, (scene) => {
   test('roads Pause motion freezes particles and resumes them on a second press', async () => {
     test.setTimeout(600000);
     const { paused: before, after, resumed } = await paused();
+    expect(before.paused).toBe(true);
     expect(after.currentPosition).toBe(before.currentPosition);
     expect(resumed.currentPosition).not.toBe(before.currentPosition);
   });
 });
 
-sharedRoadScene('English paused-visibility scene', 'en', false, (scene) => {
-  visibilityTest(scene, 'en', 'paused');
-});
-
-sharedRoadScene('English reduced-motion scene', 'en', true, (scene) => {
+sharedRoadScene('English reduced-motion scene', SMALL, 'en', true, (scene) => {
   test('roads reduced motion never starts hour playback or particles', async () => {
     const { page } = scene();
     test.setTimeout(600000);
     const spike = scene().spike;
-    await framesAfter(page, spike.motionFrames);
-    const after = (await page.evaluate(() => window.__spike))!;
+    const after = await framesAfter(page, spike.motionFrames);
+    expect(after.motionFrames).toBeGreaterThan(spike.motionFrames + 2);
     expect(after.reducedMotion).toBe(true);
     expect(after.motionElapsed).toBe(0);
     expect(after.hoursShown).toEqual(roadData.hours.slice(0, 1));
@@ -554,7 +698,7 @@ sharedRoadScene('English reduced-motion scene', 'en', true, (scene) => {
   visibilityTest(scene, 'en', 'reduced');
 });
 
-sharedRoadScene('Arabic road scene', 'ar', false, (scene) => {
+sharedRoadScene('Arabic road scene', SMALL, 'ar', false, (scene) => {
   test('roads have the Arabic provenance word and dashed legend on the Arabic route', async () => {
     const { page } = scene();
     test.setTimeout(600000);
@@ -578,13 +722,23 @@ sharedRoadScene('Arabic road scene', 'ar', false, (scene) => {
   visibilityTest(scene, 'ar', 'paused');
 });
 
-sharedRoadScene('Arabic reduced-motion scene', 'ar', true, (scene) => {
-  visibilityTest(scene, 'ar', 'reduced');
-});
+sharedRoadScene(
+  'Arabic reduced-motion scene',
+  ARABIC_REDUCED,
+  'ar',
+  true,
+  (scene) => {
+    visibilityTest(scene, 'ar', 'reduced');
+  },
+);
 
 test('roads paused playback plant is refused by name', async ({ page }) => {
   test.setTimeout(600000);
-  const spike = await open(page, roadUrl('&plant=pause-playback'));
+  const spike = await open(
+    page,
+    roadUrl('&plant=pause-playback'),
+    ROAD_PAUSE_PLANT,
+  );
   expect(spike.qualification).toBe('road-playback-stopped');
 });
 
@@ -592,14 +746,15 @@ test('roads missing dash plant removes the actual extension', async ({
   page,
 }) => {
   test.setTimeout(600000);
-  const spike = await open(page, roadUrl('&plant=omit-road-dash'));
+  const spike = await open(page, roadUrl('&plant=omit-road-dash'), SMALL);
   expect(spike.roadDashEnabled).toBe(false);
 });
 
 test('roads missing link plant lowers the drawn count', async ({ page }) => {
   test.setTimeout(600000);
-  const spike = await open(page, roadUrl('&plant=omit-road'));
+  const spike = await open(page, roadUrl('&plant=omit-road'), SMALL);
   expect(spike.roadInstances).toBe(LAYER_SETS[ROAD_SET]!.roads! - 1);
+  expect(spike.road).toBe(true);
   expect(spike.qualification).toBe('reduced-counts');
 });
 
@@ -607,7 +762,7 @@ test('roads hidden layer plant reports zero drawn road links', async ({
   page,
 }) => {
   test.setTimeout(600000);
-  const spike = await open(page, roadUrl('&plant=hide-roads'));
+  const spike = await open(page, roadUrl('&plant=hide-roads'), SMALL);
   expect(spike.roadInstances).toBe(0);
   expect(spike.road).toBe(false);
   expect(spike.qualification).toBe('reduced-counts');
@@ -620,6 +775,9 @@ test('roads ordinary helper refuses the remote request plant', async ({
   await expect(open(page, roadUrl('&plant=remote-asset'))).rejects.toThrow(
     /assets\.invalid/,
   );
+  expect(await page.evaluate(() => window.__spike?.phase ?? '')).not.toBe(
+    'done',
+  );
 });
 
 test('roads full street load draws every link and carries the Simulated mark', async ({
@@ -629,6 +787,7 @@ test('roads full street load draws every link and carries the Simulated mark', a
   const spike = await open(
     page,
     `/en/_perf?profile=smoke&layers=${ROAD_LARGE}`,
+    FULL_STREET_LOAD,
   );
   expect(spike.phase).toBe('done');
   expect(spike.roadInstances).toBe(LAYER_SETS[ROAD_LARGE]!.roads);

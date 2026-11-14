@@ -4,7 +4,7 @@ const baseURL = process.env.SPIKE_BASE_URL ?? 'http://127.0.0.1:4173';
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: 'performance.spec.ts',
+  testMatch: ['performance.spec.ts', 'pause-click.spec.ts'],
   fullyParallel: false,
   retries: 0,
   workers: 1,

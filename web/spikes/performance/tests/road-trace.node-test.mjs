@@ -158,6 +158,18 @@ for (const layerSet of Object.keys(config.ROAD_LOADS)) {
   });
 }
 
+test('a reduced road count is decided before the canvas size', () => {
+  const layerSet = Object.keys(config.ROAD_LOADS)[0];
+  const trace = traceFor(layerSet);
+  trace.counts.roads -= 1;
+  trace.canvas = { cssWidth: 480, cssHeight: 270 };
+  trace.drawingBuffer = { width: 960, height: 540 };
+  assert.equal(
+    validateGate(trace, layerSet, capture).failure,
+    'reduced-counts',
+  );
+});
+
 test('evidence rejects an unlisted road set before reading a capture', () => {
   assert.equal(
     verifyEvidence({ descriptor: 'unlisted', evidenceDir: '.' }).failure,
