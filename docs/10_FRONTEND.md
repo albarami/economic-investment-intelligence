@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13, and by decisions 0024 and 0026 on 2026-11-14 |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018 and 0019 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13, and by decisions 0024 and 0026 on 2026-11-14; amended by decision 0030 on 2026-11-14 (proposed) |
 | Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | Tell a builder exactly how the browser application of the EII proof of concept is structured, what each component does, how the map draws provenance, and how the front end is tested. |
@@ -531,7 +531,7 @@ Layer order: basemap fill and line layers, then deck.gl data layers placed benea
 | Buildings | basemap `buildings` layer (height, min_height) and a curated landmark list | MapLibre `fill-extrusion` | heights labelled estimates (below) |
 | Door pin | user pin | deck.gl `IconLayer` | context |
 | Requested or drawn area | `make_area` snap report, or the shape the user drew | deck.gl `PathLayer` | solid 2 px accent line with a 2 px casing in `--eii-bg`; after a snap, the same line at 35% opacity. It is not dashed or dotted, except a drive-time outline at a stored hour, which takes the Simulated outline of [11](11_DESIGN_DIRECTION.md). |
-| Released units | `grid_cell`, `release_unit`, `unit_member` | deck.gl `H3HexagonLayer`, one per resolution (9 and 8); unit outlines from `h3-js` cell-set boundaries in a `PathLayer` | outline in the class of the hero layer |
+| Released units | `grid_cell`, `release_unit`, `unit_member` | deck.gl `H3HexagonLayer` over resolution-9 cells, a resolution-8 base cell drawn as its seven resolution-9 children (its stored outline, never its own hexagon; [decision 0030](decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) item 3); unit outlines from `h3-js` cell-set boundaries over the same resolution-9 cells in a `PathLayer` | outline in the class of the hero layer |
 | Pay of workers or residents | `worker_pay`, `resident_pay` | `H3HexagonLayer`, flat fill by band, never extruded except in the optional 3D view (FE-138) | dotted (Synthetic) |
 | Crowd density (the presence layer) | the hourly presence release table with ranges ([03](03_DATA_CONTRACTS.md)), as estimated people per square kilometre computed by the release build or `eii_core.calc` | `H3HexagonLayer` (or the fallback `PolygonLayer`), flat fill by class; one stored hour selected by filter; cross-fade between stored hours | moving dashes (Simulated) |
 | Traffic | traffic link speeds by hour on the road graph ([03](03_DATA_CONTRACTS.md)) | `PathLayer` of road links, colour and width by class; one stored hour selected by filter; this is the traffic layer of the default setting `simulated` | static dashes (Simulated; [11](11_DESIGN_DIRECTION.md)) |
@@ -548,7 +548,7 @@ Layer order: basemap fill and line layers, then deck.gl data layers placed benea
 | Distance connectors | `scan_places` | `PathLayer` | solid (Public) |
 | Announced investment projects | `fdi_projects`, at the geography the source states | `ScatterplotLayer` at that geography's gazetteer point; counts in the DOM legend; each mark opens the full project card, and card, list and legend carry the collapsed source credits and page caveat of FE-116 | solid (Public) |
 | Property prices; construction pipeline | residential sales with their deal counts, and building permits and completion certificates, on their official geography ([04](04_PUBLIC_DATA_PACK.md)) | `GeoJsonLayer` fill and outline | solid (Public) |
-| Night-time lights | `pub_night_lights`, by frame cell (whole pixels, no split) and month, with a Public month list of its own | `H3HexagonLayer`, flat fill on the five-class ramp, one resolution (confirmed at the spike) | solid (Public) |
+| Night-time lights | `pub_night_lights`, by frame cell (whole pixels, no split) and month, with a Public month list of its own | `H3HexagonLayer`, flat fill on the five-class ramp, over resolution-9 cells, a resolution-8 frame cell drawn as its seven resolution-9 children ([decision 0030](decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) item 3) | solid (Public) |
 | Satellite imagery (map mode) | the imagery provider's satellite imagery, fetched by the local server with `ESRI_API_KEY` and passed on from its own paths; in no table and never stored | a raster base under the product's own layers, shown only in the satellite mode (FE-141) | a picture; no provenance class, because no fact is read from it; its credits inside the collapsed map credits |
 | Photorealistic 3D (map mode) | The photorealistic 3D tiles of the provider that [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) records (PUB-109), requested only through the product's own same-origin route, where the server adds `MAPTILE_API_KEY`; in no table and never stored | a 3D-tiles layer in place of the basemap and its buildings, shown only in that mode (FE-148); the library layer is confirmed at its task from the current official documentation | a picture; no provenance class, because no fact is read from it; the attribution its tiles carry, visible while the mode is on |
 | Buildings of all of Qatar in 3D (with the clock) | basemap buildings with heights in the order of PUB-106 ([04](04_PUBLIC_DATA_PACK.md)), each with its height source | MapLibre `fill-extrusion`, lit by the clock (FE-143) | heights labelled estimates (FE-52) |
@@ -565,6 +565,8 @@ Layer order: basemap fill and line layers, then deck.gl data layers placed benea
 | Optional 3D view | the unit statistic or the crowd density of the hero layer already on | the same `H3HexagonLayer` with extrusion on, a fixed height step for each class of the layer's five breaks | the class texture of the flat layer (FE-138) |
 | Ranked or similar areas (highlight, not a hero layer) | the candidate areas of a ranking, or the areas of one similar-area type | `PathLayer` outlines; the selected area in the accent | the least-real class of the ranking's criteria |
 
+Every layer keyed by frame cell or release unit draws a resolution-8 base cell as its seven resolution-9 children, never as its own hexagon. This covers the pay, crowd density, firm density and worker density rows, the optional 3D view and the `PolygonLayer` fallback. Every cell-set outline is traced over those resolution-9 cells, so that it equals the stored outline ([decision 0030](decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) item 3; FE-54).
+
 **Provenance textures.** The four treatments are fixed: solid = Public, dotted = Synthetic, moving dashes = Simulated, grey hatch with a lock = Suppressed, each always with its word in the legend and on the chip. Colours and pattern sizes come from [11](11_DESIGN_DIRECTION.md). The research names `FillStyleExtension` (procedural hatch and dot fills) and `PathStyleExtension` (dashed lines) as the deck.gl mechanisms. Whether these extensions apply through `H3HexagonLayer`'s sublayers, and how moving dashes are animated, is not confirmed; the spike settles both and records the method. The fallback is a `PolygonLayer` of cell boundaries from `h3-js`. With reduced motion, moving dashes become a static dash, still distinct from dots.
 
 **Particles.** Particles are drawn only from the aggregated, released `flow_hourly` table, for the selected stored hour. Bands 1 to 5 place 2, 4, 8, 16 and 32 particles on each released origin-destination pair. The layer caps at 50,000 particles by dropping pairs from the smallest band. The seed is 1. Paths are straight or arced between the two unit centres, never routed street traces. The legend states that a moving dot is a visual unit of a simulated aggregate flow, not a person or a trip. Agent trails are dropped; particles never carry an individual path.
@@ -579,7 +581,7 @@ Layer order: basemap fill and line layers, then deck.gl data layers placed benea
 
 **Watermark.** A watermark is drawn into the map canvas itself, so a screenshot of the canvas and every export (pack, image) carry it. It cannot be switched off from the interface. The rendering mechanism (a MapLibre custom layer drawing a screen-space quad, or a deck.gl screen-space layer) is chosen at slice S1. Its wording and look are set in [11](11_DESIGN_DIRECTION.md); it contains no numeral.
 
-**Camera.** Story moves use MapLibre camera animations with durations from [11](11_DESIGN_DIRECTION.md). The initial view is Qatar; the area tools work only inside the frame of the release.
+**Camera.** Story moves use MapLibre camera animations with durations from [11](11_DESIGN_DIRECTION.md). The initial view is Qatar; the area tools work only inside the mapped land area of the release ([03](03_DATA_CONTRACTS.md) section 1.1).
 
 | ID | Requirement | Slice |
 |---|---|---|
@@ -592,7 +594,7 @@ Layer order: basemap fill and line layers, then deck.gl data layers placed benea
 | FE-52 | The legend states that building heights are estimates whenever buildings are extruded. | slice S3 |
 | FE-53 | The watermark is present in the canvas in every frame and in every export; a pixel probe test on an exported image finds it. | slice S3 |
 | FE-54 | `H3HexagonLayer` instances each hold one resolution only. | slice S1 |
-| FE-55 | Released-unit outlines are computed in the browser only as geometry from cell ids; no statistic is computed or aggregated in the browser. | slice S5 |
+| FE-55 | Released-unit outlines are computed in the browser only as geometry from cell ids, a resolution-8 cell taken as its seven resolution-9 children (decision 0030 item 3); no statistic is computed or aggregated in the browser. | slice S5 |
 | FE-103 | The living map draws real businesses from public places data and public listings as solid Public points, and the establishment points of the public business register as the solid Public layer `company_points`, each of which opens its company card (FE-115, [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)); both stay unlabelled while a Synthetic or Simulated hero layer is on. No layer's data, label, marker or legend carries a company's wages, wage bill or other labour or residence detail; a test fails if a planted wage of one company or a `SYN-` identifier reaches any map layer or the canvas. | map foundation |
 | FE-104 | Crowd density is a hero layer of release-unit fills of estimated people per square kilometre for the selected stored hour, with the Simulated texture. Changing the hour cross-fades between two stored hours and never draws an interpolated value; the legend names the unit, the word "estimated" and the class. | map foundation |
 | FE-105 | With the default provider, traffic is a hero layer of road links classed by simulated speed against free-flow speed for the selected stored hour, on the real road network, with the static dash texture and width by class of [11](11_DESIGN_DIRECTION.md). A drive-time outline re-forms for the selected hour and keeps the Simulated outline; Public chips beside it stay solid. | flagship |
@@ -834,7 +836,7 @@ ASSUMPTIONS (each with its reason):
 11. The hour-change target is the dial-change target (section 12).
 12. Openings and closures are two hero layers, never one net layer, because the single magnitude ramp of [11](11_DESIGN_DIRECTION.md) has no diverging form (FE-113).
 13. The scenario tools sit beside the break-even panel as a component of their own, so that the catchment-share scenario is not tied to OI-03, which the record names for the revenue range only (FE-132).
-14. The night-lights layer is drawn as an `H3HexagonLayer` because its table is keyed by frame cell; the spike confirms it (FE-137).
+14. The night-lights layer is drawn as an `H3HexagonLayer` because its table is keyed by frame cell, a resolution-8 cell as its seven resolution-9 children (decision 0030 item 3); the spike confirms it (FE-137).
 15. The build phases in the Slice column of FE-128 to FE-139 follow the pairing of [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) with the phases of [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 15; the lead confirms them.
 
 Open points from decisions 0016 and 0017:
