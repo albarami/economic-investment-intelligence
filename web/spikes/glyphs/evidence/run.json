@@ -2,7 +2,7 @@
   "outcome": "recorded",
   "assetHashes": {
     "arabic-labels.png": "sha256:4b2fd7f121f1be9f7987fccd525ca21a3e6815f6612b7d423d58cc14655a072a",
-    "english-labels.png": "sha256:9a109b04285df64e6982746f4c4850b851e72034069096eef790e94218b24eb3",
+    "english-labels.png": "sha256:77392f7f7dc5dbb2ef70fba620d1bca04a3ce29ad15ef5ff2be9a18b4cb18d6d",
     "hexagons-below-labels.png": "sha256:08279e1c42591172b724cb81cb52d293dfc2a9efbd8e764012068a418ebe1f82"
   }
 }

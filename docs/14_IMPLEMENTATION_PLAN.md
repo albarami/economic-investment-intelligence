@@ -835,7 +835,7 @@ The open points of decisions 0016, 0017 and 0019 are settled at the gates that P
 - OI-05: use the working title Economic & Investment Intelligence (EII).
 - OI-06: use neutral record-type source labels.
 - OI-07: settled by [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 12: named synthetic firms, marked Synthetic, may be prospects, partners and suppliers; the lead records the closure in OPEN_ITEMS.md. [Decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) retires them: prospects, partners and suppliers are register companies.
-- OI-08: label live rows “this session”, mark seeded history Synthetic and show no company identity in oversight. Amended by [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md): under item 12 the ledger starts empty and holds only questions asked, so there is no seeded history to mark; under item 15 it stays only as the internal question log with no screen, and the oversight screen leaves version 1, so no row is shown (S9-T03; S9-T04 is withdrawn).
+- OI-08: narrowed by [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md): under item 12 the ledger starts empty and holds only questions asked, so there is no seeded history to mark; under item 15 it stays only as the internal question log with no screen, and the oversight screen leaves version 1, so no row is shown (S9-T03; S9-T04 is withdrawn). It stays open for one use: the distinct-organisation minimum of a roll-up of the question log made for the evaluation (PRV-66).
 - OI-09: the owner performs native Arabic review by default.
 - OI-10: preflight selects the available database path; CI uses a service container.
 - OI-11: present privacy thresholds as proposals.

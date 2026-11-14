@@ -430,6 +430,34 @@ class Rows(unittest.TestCase):
                 sock.assert_not_called()
                 child.assert_not_called()
 
+    def test_imagery_and_photorealistic_3d_key_rows(self) -> None:
+        """OPS-73 and OPS-74: optional map keys report present/absent without printing or connecting."""
+        for env_name, check_name, fn in (
+            ("ESRI_API_KEY", "imagery-provider-key", rows.imagery_provider_key_row),
+            (
+                "MAPTILE_API_KEY",
+                "photorealistic-3d-key",
+                rows.photorealistic_3d_key_row,
+            ),
+        ):
+            key = stubs.dummy(env_name.lower())
+            for env, want in (
+                ({}, "absent"),
+                ({env_name: ""}, "absent"),
+                ({env_name: key}, "present"),
+            ):
+                with (
+                    self.subTest(check=check_name, want=want, empty=not env),
+                    mock.patch.dict(os.environ, {env_name: key}, clear=True),
+                    mock.patch("socket.socket") as sock,
+                    mock.patch("subprocess.Popen") as child,
+                ):
+                    line = fn(env)
+                    self.assertEqual(line.text(), f"PASS {check_name}: {want}")
+                    self.assertNotIn(key, line.text())
+                    sock.assert_not_called()
+                    child.assert_not_called()
+
     def test_traffic_provider_key_row(self) -> None:
         """OPS-06: optional traffic key and each allowed/default setting pass."""
         key = stubs.dummy("traffic")

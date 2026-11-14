@@ -8,7 +8,7 @@ export function foreignRequest(url, origin) {
       return url;
     }
   }
-  return '';
+  return url;
 }
 
 /**

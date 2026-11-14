@@ -17,7 +17,7 @@ FORBIDDEN = {
     "eii_custodian": ("eii_product", "eii_gateway"),
     "eii_product": ("eii_custodian", "eii_gateway"),
 }
-ENV_NAMES = ("EII_DECISION_PROVIDER", "JEV_PRO_API_KEY")
+ENV_NAMES = ("EII_DECISION_PROVIDER", "JEV_PRO_API_KEY", "EARTHDATA_API_KEY")
 BYTECODE_DIR = "__pycache__"
 
 
@@ -178,6 +178,11 @@ def check_imports(root: Path) -> tuple[list[str], list[str]]:
                         continue
                     if not is_exempt_bytecode(path):
                         for env_name in ENV_NAMES:
+                            if (
+                                env_name == "EARTHDATA_API_KEY"
+                                and package == "eii_custodian"
+                            ):
+                                continue
                             if env_name.encode() in data:
                                 lines = data.split(b"\n")
                                 for idx, row in enumerate(lines, start=1):

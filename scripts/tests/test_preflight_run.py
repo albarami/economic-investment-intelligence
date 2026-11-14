@@ -133,6 +133,8 @@ class Preflight(unittest.TestCase):
             "PASS model-key: absent",
             "PASS traffic-provider-key: absent; EII_TRAFFIC_PROVIDER simulated",
             "PASS night-lights-key: absent",
+            "PASS imagery-provider-key: absent",
+            "PASS photorealistic-3d-key: absent",
             "PASS env-not-tracked: .env is not tracked by git",
             "PASS wsl-interop: cmd.exe printed a Windows version",
             "store: embedded",
@@ -239,14 +241,14 @@ class Preflight(unittest.TestCase):
                     elif label == "port_held":
                         want[11] = f"FAIL api-port: 127.0.0.1:{api_port} is in use"
                     elif label == "env_staged":
-                        want[15] = "FAIL env-not-tracked: .env is tracked by git"
+                        want[17] = "FAIL env-not-tracked: .env is tracked by git"
                     elif label == "pg_no_answer":
                         want[4] = (
                             f"WARN postgresql: no answer on 127.0.0.1:{db_port} "
                             "(pg_isready exit status 2); store embedded; Docker not reachable"
                         )
                     elif label == "cmd_missing":
-                        want[16] = "WARN wsl-interop: cmd.exe not found on PATH"
+                        want[18] = "WARN wsl-interop: cmd.exe not found on PATH"
                     self.assertEqual(report.text_lines(), want)
                     if label in (
                         "python",
@@ -581,7 +583,7 @@ class Preflight(unittest.TestCase):
         )
 
     def test_no_secret_in_any_line(self) -> None:
-        """U07 / OPS-07: all three dummy keys stay out of output and argv."""
+        """U07 / OPS-07: all five dummy keys stay out of output and argv."""
         labels = [
             "good",
             "psql_echo",
@@ -595,7 +597,9 @@ class Preflight(unittest.TestCase):
         key = stubs.dummy("key")
         traffic_key = stubs.dummy("traffic")
         night_key = stubs.dummy("night")
-        keys = (key, traffic_key, night_key)
+        imagery_key = stubs.dummy("imagery")
+        maptile_key = stubs.dummy("maptile")
+        keys = (key, traffic_key, night_key, imagery_key, maptile_key)
         password = stubs.dummy("pw")
         ran: list[str] = []
         with tempfile.TemporaryDirectory() as tmp:
@@ -608,6 +612,8 @@ class Preflight(unittest.TestCase):
                     env["ANTHROPIC_API_KEY"] = key
                     env["TOMTOM_API_KEY"] = traffic_key
                     env["EARTHDATA_API_KEY"] = night_key
+                    env["ESRI_API_KEY"] = imagery_key
+                    env["MAPTILE_API_KEY"] = maptile_key
                     stub_dir = case / "stubs"
                     url = stubs.database_url(password, db_port)
                     if label == "url_only":
@@ -763,6 +769,8 @@ class Preflight(unittest.TestCase):
             "model-key",
             "traffic-provider-key",
             "night-lights-key",
+            "imagery-provider-key",
+            "photorealistic-3d-key",
             "env-not-tracked",
             "wsl-interop",
         )

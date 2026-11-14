@@ -52,7 +52,9 @@ def faults(rows: list[dict[str, str]]) -> list[str]:
                     failures.append(
                         f"{row['name']}: missing or unknown PROGRESS.md heading"
                     )
-            elif completed.intersection(TASK.findall(note)):
+            elif completed.intersection(
+                TASK.findall(note.replace(NO_RETREAT, "retreat ruling: none exists: "))
+            ):
                 failures.append(
                     f"{row['name']}: not-installed ruling names a completed task"
                 )
@@ -154,6 +156,31 @@ class PlantedRulings(unittest.TestCase):
     def test_d_completed_task(self) -> None:
         self.assertTrue(
             faults([self.row("not installed: S0-T06 installs it and confirms it")])
+        )
+        self.assertTrue(
+            faults(
+                [
+                    self.row(
+                        "not installed: S1-T08 installs it and confirms it; "
+                        "retreat ruling S1-T08: none exists: synthetic reason",
+                        "none recorded",
+                    )
+                ]
+            )
+        )
+
+    def test_pending_task_with_completed_retreat_ruling_remains_valid(self) -> None:
+        self.assertEqual(
+            faults(
+                [
+                    self.row(
+                        "not installed: no task installs it; "
+                        "retreat ruling S1-T08: none exists: synthetic reason",
+                        "none recorded",
+                    )
+                ]
+            ),
+            [],
         )
 
     def test_pending_task_remains_valid(self) -> None:

@@ -2,7 +2,7 @@
 
 A synthetic page that draws invented geometry and invented names with MapLibre GL JS 6.17.0 and one interleaved deck.gl polygon layer. It is not a feature screen and it does not load a real basemap or a tile.
 
-The five Arabic names are منطقة الاختبار ألف, حي المحاكاة باء, مدينة المثال جيم, قرية العرض دال and شارع التجربة هاء. Each string in `names.json` is marked `pending native review`. The same mark is in `evidence/visual-review.md`. A model does not change that mark to approved.
+The owner approved the five Arabic strings in a native reading on 2026-11-13 (FE-57). The machine-read marks stay `pending native review`, because the evidence judge accepts a name's approval only together with the review of its image. The review of the images is open item OI-119.
 
 IBM Plex Sans and IBM Plex Sans Arabic are the chrome faces. Noto Sans and Noto Sans Arabic are the map faces, declared with `font-faces` and loaded from the npm packages. The four SIL licence texts are copied into `public/licences/` and served by the spike.
 

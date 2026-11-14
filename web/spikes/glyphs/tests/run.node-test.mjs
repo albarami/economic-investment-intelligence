@@ -6,6 +6,7 @@ import path from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { comparisonReport, gateDetail, runChild, runSuite } from './run.mjs';
+import { withHeldFiles } from './hold-files.mjs';
 
 const SPIKE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -29,14 +30,20 @@ test('the suite passes with no dist folder', async () => {
   const heldParent = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-glyphs-held-'));
   const held = path.join(heldParent, 'dist');
   const had = fs.existsSync(dist);
-  if (had) fs.renameSync(dist, held);
+  if (had) {
+    fs.cpSync(dist, held, { recursive: true });
+    fs.rmSync(dist, { recursive: true, force: true });
+  }
   try {
     assert.equal(fs.existsSync(dist), false);
     const status = await runSuite();
     assert.equal(status, 0);
     assert.equal(fs.existsSync(dist), false);
   } finally {
-    if (had && fs.existsSync(held)) fs.renameSync(held, dist);
+    if (had && fs.existsSync(held)) {
+      fs.rmSync(dist, { recursive: true, force: true });
+      fs.cpSync(held, dist, { recursive: true });
+    }
     fs.rmSync(heldParent, { recursive: true, force: true });
   }
 });
@@ -113,23 +120,14 @@ test('stripped CI reports no pixel comparison and a direct run names a missing b
 
   const baselines = path.join(SPIKE, 'tests', 'baselines');
   const held = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-glyphs-baselines-'));
-  const moved = [];
-  if (fs.existsSync(baselines)) {
-    for (const name of fs.readdirSync(baselines)) {
-      const from = path.join(baselines, name);
-      const to = path.join(held, name);
-      fs.renameSync(from, to);
-      moved.push([from, to]);
-    }
-  }
   const watched = [
     SPIKE,
     path.join(SPIKE, '..', '..', 'test-results'),
     path.join(SPIKE, '..', '..', 'playwright-report'),
     path.join(SPIKE, '..', '..', '..', 'data', 'glyph-captures'),
   ];
-  const before = watched.map((dir) => listFiles(dir));
-  try {
+  withHeldFiles(baselines, held, () => {
+    const before = watched.map((dir) => listFiles(dir));
     const result = spawnSync(
       process.execPath,
       [new URL('./run.mjs', import.meta.url).pathname],
@@ -145,8 +143,5 @@ test('stripped CI reports no pixel comparison and a direct run names a missing b
       watched.map((dir) => listFiles(dir)),
       before,
     );
-  } finally {
-    for (const [from, to] of moved) fs.renameSync(to, from);
-    fs.rmSync(held, { recursive: true, force: true });
-  }
+  });
 });
