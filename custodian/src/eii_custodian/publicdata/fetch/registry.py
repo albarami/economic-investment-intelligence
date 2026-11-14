@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 LICENCE_BASES = frozenset(
     {"dataset", "portal_terms", "provider_terms", "owner_decision", "none_stated"}
