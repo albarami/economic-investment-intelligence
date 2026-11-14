@@ -200,12 +200,13 @@
 ## OI-18 — Gateway token cap and key rotation
 
 - ID: OI-18
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - NEEDED: Owner confirmation of the project token cap and a key rotation date, and of whether the gateway's provider key may be used during the build: the owner's note of 2026-11-12 keeps the API keys of the uncommitted `.env` file for go-live and does not name this key ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12).
 - WHY: Offline provider use still needs a hard cost limit and credential hygiene.
 - DONE SO FAR: Default cap is 5 million tokens in total; no agent may purchase, upgrade or renew.
 - OPTIONS: **Recommendation:** confirm or tighten the default and record rotation before provider use; agents never change the subscription. No keyed provider run is made before the owner answers.
 - NEEDED BY: slice S1 gateway qualification and every later provider run.
+- CLOSED: 2026-11-13, by the owner's standing answer of that day: the gateway's provider key may be used for any run the plan calls for, on public or synthetic inputs only, from the lead's own shell and never through a worker tool, a test or CI; the caps are 5 million tokens for one run and 20 million for the build, and what each run used is logged; the key is rotated before go-live and at once if it is ever exposed; no agent purchases, upgrades or renews. The keyed requalification of 2026-11-13 made 340 calls and used 147,969 tokens ([evals/typed_decisions/README.md](evals/typed_decisions/README.md), section "Keyed run of 2026-11-13"). The rule that nothing a user types live goes to the provider stays as [decision 0014](docs/decisions/0014-typed-decision-gateway.md) has it; OI-15 stays open.
 
 ## OI-19 — Independent documentation review and corrections
 
@@ -1089,9 +1090,19 @@
 - TYPE: OPEN
 - NEEDED: A decision, in task S1-T08's confirmation of the web pins, on each of two alerts: raise the package through the lock file, or keep the alert open with its reason recorded.
 - WHY: GitHub opened two alerts on main on 2026-11-13, when pull request 34 (task S1-T02) merged: `image-size` 0.7.4, severity high (its parser of one icon format can loop without end on a crafted file; versions from 0.6.3 to 2.0.2 are affected, fixed in 2.0.3), and `fflate` 0.7.4, severity medium (its unzip function can loop without end on a malformed archive; versions from 0.7.0 below 0.7.5 are affected, fixed in 0.7.5). Both are transitive dependencies of `@deck.gl/geo-layers` 9.4.1 in `web/package-lock.json`, in runtime scope: `fflate` through `@loaders.gl/3d-tiles` and `@loaders.gl/compression` 4.5.4, which asks for exactly 0.7.4; `image-size` through `@luma.gl/gltf`, `@loaders.gl/textures` 4.4.5 and `texture-compressor` 1.0.2, which accepts the 0.7 series only. The spike uses the hexagon layer of that package; it loads no tile set, model, compressed texture or archive.
-- DONE SO FAR: Nothing is changed; a lock file changes only inside a task that owns it (rule 44 of [AGENTS.md](AGENTS.md)). Neither fixed release lies inside the range its parent asks for, so raising either needs an override in `web/package.json`. The built page of the application shell was searched for both packages and holds neither; the spike's own built page was not searched.
+- DONE SO FAR: Nothing is changed; a lock file changes only inside a task that owns it (rule 44 of [AGENTS.md](AGENTS.md)). Neither fixed release lies inside the range its parent asks for, so raising either needs an override in `web/package.json`. The built page of the application shell was searched for both packages and holds neither; the spike's own built page was not searched. On 2026-11-14 task S1-T08 built the performance spike's page with the spike's own build helper and searched its four files for `fflate`, `image-size` and one message string of each parser; none matched (a search of minified text, not proof that no parser code is present). It added the exact override of `fflate` 0.7.5 in `web/package.json`; the lock file changed only that package's version, address and integrity value; the spike's Node and browser tests, the glyph tests, lint, the type check, the production build and the host checks passed with it, so the override is kept and the `fflate` alert is answered. No override of `image-size` was made: its fixed release is a new major version outside the series its parent accepts, and the spike loads no texture image; that alert stays open until the loaders are upgraded or replaced and tested.
 - OPTIONS: **Recommendation:** in task S1-T08, search the spike's built page for both parsers; raise `fflate` to 0.7.5 by an override if the spike's tests stay green with it; keep the `image-size` alert open with its reason (no page loads a texture image; its fixed release is a new major version that its parent does not accept) unless a test shows the override harmless. Alternative: leave both until the map layers of slice S3 choose their loaders.
 - NEEDED BY: slice S1 gate; not a blocker.
+
+## OI-149 — The reproduced measurement of the typed-decision set beside the admitted one
+
+- ID: OI-149
+- TYPE: OPEN
+- NEEDED: The owner's reading of the reproduced measurement beside the admitted one, without retuning a threshold and without treating this set as fresh human ground truth.
+- WHY: A successful reproduction on this set does not remove the recorded protocol differences and provides no fresh human labels (OI-15; [decision 0014](docs/decisions/0014-typed-decision-gateway.md), Evidence and item 6).
+- DONE SO FAR: The admitted aggregate `results_2026-11-11.json` records 248 correct of 260 with its stated interval [92.1, 97.3]. The keyed aggregate of task S1-T08, `results_2026-11-13T04-19-15-163796.json`, records 250 correct first answers of 260, a rate computed by code of 96.15384615384616%, inside that admitted interval, with its own Wilson interval [93.1, 97.9]; every one of its 340 replies names the pinned model. Its gateway outcomes are 176 DECIDED and 84 BELOW_THRESHOLD, and two decided cases are wrong (A-M-048 and A-M-049). Four protocol differences are recorded in the aggregate: the option orders are hash-derived, the activity labels are sent with the `isic-` prefix, the admitted run was made before the gateway existed, and the adapter cuts the yes/no label at a weight of 0.5. Task S1-T08 changed no threshold, no pin and neither aggregate.
+- OPTIONS: **Recommendation:** keep the reproduction as evidence for this model version, and settle its reading with the fresh human qualification of OI-15; change no threshold and no pin on this comparison alone.
+- NEEDED BY: the fresh human qualification of OI-15; not a blocker of the slice S1 gate.
 
 ## Change control
 
