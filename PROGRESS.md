@@ -20085,6 +20085,12 @@ base update b0b288d54a94494c47cc8747ed62c8c0ba340e24: branch side cd506c62c8cbc6
 - Random failure recorded (AGENTS rule 39): OI-160, entered with this commit. In the builder's first measurement of part B, taken under load, the full street load timed out once on readiness at its bound of 170 s and passed in the next run. In the lead's two timing runs the same test passed in 3.5 minutes (under load) and 2.3 minutes (reserved processors).
 - Status lines set by this commit, each with the closing record above: S1-T14 done (pull request 42), S1-T16 done (pull request 45). The status line of S1-T08 stays as open item OI-159 says.
 
+### S1-T15 — Correction to the entry above: the unmet criterion is moved to task S2-T10, word for word (pull request https://github.com/albarami/economic-investment-intelligence/pull/43 )
+
+- The entry above says that the box of the first criterion stays unticked in the task's own entry and that the task is not marked done by this pull request. That form is replaced, before any review of this round: REV-10 and REV-39 (d) of the reviewer checklist make an unmet criterion of the task under review a rejecting finding, and round 1 of this review rejected on exactly that point, which the lead had judged valid.
+- Re-plan of 2026-11-14 (the lead's ruling L-263, on the advisor's note of 16:32): the criterion "the suite `web-checks` finishes in under 1,200 s on four processors, measured twice" leaves the entry of S1-T15 and enters the entry of S2-T10, the review follow-up of slice S2, unticked and word for word, with open item OI-158. The same form was used on 2026-11-13, when the two criteria of the native trace were moved word for word to S1-T12. Nothing else changes: the measured time stays 1,294 s; no test, assertion, bound or limit changes; the criterion is neither ticked nor reworded.
+- S1-T15 is judged on the three criteria it keeps, each ticked with its evidence in the entries above. What the note asked stands: no further pass before the slice S1 gate, and the rest of the speed-up is work after that gate.
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
