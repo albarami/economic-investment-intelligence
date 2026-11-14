@@ -1023,6 +1023,7 @@
 - DONE SO FAR: Both packages are pinned exactly in the root group `dev` and recorded in `pins.toml`: `fastapi` in the series the pack names, `uvicorn` with the label ASSUMPTION at the release that was current on 2026-11-13. `import eii_product` stays free of FastAPI; only `eii_product.api` imports it. The rows `pmtiles` and `@protomaps/basemaps` of `pins.toml` name S1-T04 as their first use; this task installs neither, because it serves a synthetic byte artefact and renders no map.
 - OPTIONS: **Recommendation:** keep both packages in the root group through slice S1; task S3-T08 declares them in `product/pyproject.toml` together with the change of the clean-environment guard; task S1-T08 confirms the two pins and corrects the first use of the two map rows. Alternative: a decision record names another server program.
 - NEEDED BY: slice S1 pin confirmation (S1-T08); task S3-T08.
+- UPDATE: 2026-11-14, by task S1-T10 (PO-S1-06): the same kind of gap holds for `pyvalhalla` and `h3`, which the areas spike of the product imports. Task S3-T04 declares both in `product/pyproject.toml` together with the change of the clean-environment guard; until then both stay in the root group `engine` under OI-60. This adds no answer to the NEEDED above. The earlier text is kept.
 
 ## OI-117 — A refused gateway request leaves no decision record, and run records are not committed by default
 
@@ -1053,6 +1054,7 @@
 - DONE SO FAR: The three screenshot tests run their structural, request and font assertions everywhere, inside `./eii test` too. Pixels are compared only by the hosted job `tests`, in a step of its own, against the baselines under `web/spikes/glyphs/tests/baselines/`. The same job first makes the three captures with the suite's own capture and uploads them; the lead commits them as baselines in a commit of their own. A missing or differing baseline fails the hosted step and names the file. The owner's native reading of the five Arabic names and the three images is recorded in `web/spikes/glyphs/evidence/visual-review.md`, which says pending until then.
 - OPTIONS: **Recommendation:** keep. Alternative: compare pixels on the build machine too, with a second set of baselines made there.
 - NEEDED BY: slice S1 gate (FE-46, FE-57).
+- UPDATE: 2026-11-14, by task S1-T10 (item I8): the five place identifiers and English names of the glyph spike are renamed (alif, ba, jim, dal and ha); the five Arabic strings are unchanged. Every machine-read review mark stays `pending native review`, because the evidence judge accepts a name's approval only together with the review of its image; the spike's README states the owner's approval of the five Arabic strings of 2026-11-13 (FE-57) in prose. The English baseline image is recaptured by the hosted job of pull request 46 and committed in a commit of its own. The review of the three images is still open. The earlier text is kept.
 
 ## OI-120 — The hour mechanism of drive areas and two choices of the routing spike
 
@@ -1334,22 +1336,24 @@
 ## OI-155 — Forms that render as a listed name without being its text
 
 - ID: OI-155
-- TYPE: PROPOSED (hardening: document 17)
+- TYPE: CLOSED (was PROPOSED (hardening: document 17))
 - NEEDED: A decision whether the documentation check should also refuse forms that a reader sees as a listed name but that are not its text: tags inside the name, a link on half of it, further invisible characters, further escape forms.
 - WHY: The break pass of task S1-T14 showed four such forms passing everywhere. The private list's plain patterns do not catch them either, with or without the place-scoped exception, so the exception weakens nothing here; refusing them is a defence against deliberate evasion beyond the task's criteria ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md)).
 - DONE SO FAR: Recorded with the four demonstrated forms in the task's evidence. Nothing built.
 - OPTIONS: **Recommendation:** move to [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) with the slice's follow-up task; build only if the repository ever takes contributions from outside the run.
 - NEEDED BY: the follow-up task of slice S1 (S1-T10), which places it.
+- CLOSED: 2026-11-14, by S1-T10: placed in section 9 of [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) as DHA-131, with the four forms, with its origin. Nothing built. The earlier text is kept.
 
 ## OI-156 — An unreadable folder and a failing file listing narrow the documentation check silently
 
 - ID: OI-156
-- TYPE: PROPOSED (hardening: document 17)
+- TYPE: CLOSED (was PROPOSED (hardening: document 17))
 - NEEDED: A decision whether the documentation check should fail when a folder cannot be read or when git cannot list the files, instead of scanning less.
 - WHY: The break pass of task S1-T14 showed that a folder without read permission is skipped without a line, and that a failing git listing falls back, without notice, to the walk that leaves out build folders. Both are older than that task and concern the whole check, not its exception; neither occurs on the hosted checks.
 - DONE SO FAR: Recorded with both demonstrations in the task's evidence. Nothing built.
 - OPTIONS: **Recommendation:** move to [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) with the slice's follow-up task.
 - NEEDED BY: the follow-up task of slice S1 (S1-T10), which places it.
+- CLOSED: 2026-11-14, by S1-T10: placed in section 9 of [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) as DHA-132, with its origin. Nothing built. The earlier text is kept.
 
 ## OI-158 — The hosted time limit of the web checks goes back to 1,800 seconds
 
@@ -1364,12 +1368,13 @@
 ## OI-159 — The pin-ruling guard refuses the record once S1-T08 is marked done
 
 - ID: OI-159
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - NEEDED: Correct the guard `scripts/tests/test_pin_rulings.py` so that a pin that is not installed is refused only when its not-installed ruling names a completed task, not when the retreat ruling's own attribution ("retreat ruling S1-T08") does; add the planted cases of both; then set the status line of S1-T08 in `TASKS.md` to done.
 - WHY: The guard requires the words "retreat ruling S1-T08: none exists: " in the note of a pin without a retreat and refuses a not-installed pin whose note names a completed task. With S1-T08 marked done, the pin `@mapbox/mapbox-gl-rtl-text` fails both ways. The lead's whole test on the ledger head of pull request 45 found it (seed 2026111447: 2216 passed, 1 failed).
 - DONE SO FAR: The status line of S1-T08 is back at "in review" although pull request 39 is merged, so that the guard passes; the cause is recorded in `PROGRESS.md` under task S1-T16. Nothing of the guard is changed (task S1-T16 changes no test, decision record 0027).
 - OPTIONS: **Default:** the review follow-up of slice S1 (task S1-T10) corrects the guard test-first and sets the status line.
 - NEEDED BY: the slice S1 gate, which reads the status lines of the slice's tasks.
+- CLOSED: 2026-11-14, by S1-T10: the guard refuses a pin that is not installed only when its not-installed ruling names a completed task; the attribution of a retreat ruling does not count. Proved by `test_d_completed_task` (a not-installed ruling naming a completed task still fails) and `test_pending_task_with_completed_retreat_ruling_remains_valid` in `scripts/tests/test_pin_rulings.py`; the status line of S1-T08 in TASKS.md is done. The earlier text is kept.
 
 ## OI-160 — One time-out of the full street load on readiness, in a run under load
 
@@ -1380,6 +1385,26 @@
 - DONE SO FAR: No bound was changed. The test passed in every run of the lead since: the two timing runs of the browser suite on four processors (the test took 3.5 minutes in the run under load and 2.3 minutes on reserved processors; 54 tests passed in each) and the browser run of the ledger of part B (54 passed).
 - OPTIONS: **Default:** the three hosted runs counted for S1-T15 (the head of pull request 43, the main branch after its merge, the next pull request) are the evidence: the item is closed when the test passed in all three, with the time of the suite `web-checks` in each recorded; a time-out in one of them keeps the item open and its cause is found before any bound moves.
 - NEEDED BY: the slice S1 gate records the state of this item.
+
+## OI-161 — Two dependency alerts on a development-only package that the mutation tester brings in
+
+- ID: OI-161
+- TYPE: OPEN
+- NEEDED: An override in `web/package.json` that raises the package `qs` to a fixed release, with the lock file made again by `npm install --package-lock-only` and the web checks green; or the alerts kept open with their reason recorded.
+- WHY: GitHub's dependency alerts on main name the package `qs` twice (alerts 4 and 7), severity medium, in `web/package-lock.json`. The lock file holds one copy, `qs` 6.15.1, in development scope only: `typed-rest-client` 2.3.1 asks for exactly that version, and `typed-rest-client` comes in through the pinned mutation tester `@stryker-mutator/core` 10.1.1. It runs on the build machine and in CI and is never served. Fixed releases exist; none can lie inside the exact version its parent asks for, so raising it needs an override.
+- DONE SO FAR: Nothing is changed. The lead read the alerts in GitHub's answer to a push on 2026-11-14; they are new since 2026-11-13. A lock file changes only inside a task that owns it, and `npm install --package-lock-only` runs only after a change to `web/package.json` (rule 44 of [AGENTS.md](AGENTS.md)). Task S1-T10 read the structure of the lock file for this entry: one copy of `qs`, one package that asks for it, no override of it.
+- OPTIONS: **Recommendation:** add the override at the next change of `web/package.json`, if the web checks and the tests of the web mutation runner stay green with it; otherwise keep the alerts open with that reason. Alternative: leave them until the pin of the mutation tester is next raised.
+- NEEDED BY: the next change of `web/package.json` or the slice S3 gate, whichever is first; not a blocker.
+
+## OI-162 — The task that builds the register-company table, card and map points
+
+- ID: OI-162
+- TYPE: OPEN
+- NEEDED: The slice and task that build the Public table `pub_register_company`, the company card and the map's establishment points of the register, beside the real business points of S2-T06 and S3-T12 (the OPEN line of [decision 0022](docs/decisions/0022-real-register-companies-with-a-synthetic-world.md) in [14_IMPLEMENTATION_PLAN.md](docs/14_IMPLEMENTATION_PLAN.md)).
+- WHY: The review of pull request 37 (point P1) found that the OPEN lines decision 0022 added to the pack name no task that owns them. The follow-up task of slice S1 (S1-T10, item I12) gave an owner where the plan has one; for this line its builders found no task of TASKS.md that names the three, and the follow-up adds no task.
+- DONE SO FAR: The OPEN line stays in document 14 as it is. No owner is invented. Nothing built.
+- OPTIONS: **Default:** the lead names the owning task in a re-plan, recorded in TASKS.md, before the first task that builds a register-company table, card or map layer starts; the owner is asked only if the allocation needs a new task.
+- NEEDED BY: the slice S2 gate (the public pack and its places).
 
 ## Change control
 
@@ -1612,92 +1637,101 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 ### PO-S1-02 — The boundary guard's list of environment names does not hold the night-lights key
 
 - ID: PO-S1-02
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: gate review of slice S0, round 1, designated reviewer (Google Gemini), 2026-11-13, proposed item P1
 - CONCERNS: ARC-81, as the reviewer names it (the variables that belong to build and evaluation tooling only)
 - EVIDENCE: `ENV_NAMES` in `scripts/tests/import_boundary_guard.py` holds `EII_DECISION_PROVIDER` and `JEV_PRO_API_KEY`. Document 02 says that `EARTHDATA_API_KEY` belongs to build and evaluation tooling only and is read by the public fetchers of `./eii build-public`; no test refuses a reference to it under `product/` or `core/` (OI-52).
 - NEEDED: the guard refuses a reference to `EARTHDATA_API_KEY` under `product/` and `core/` while `custodian/` may read it, with one planted violation; or one line saying why it is not needed.
 - CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: the import-boundary guard refuses `EARTHDATA_API_KEY` under `product/` and `core/` and allows it in the custodian plane and the tooling; `TOMTOM_API_KEY` stays allowed in the product plane. Proved by `test_earthdata_product_and_core` and `test_earthdata_custodian_and_tooling_tomtom_product_allowed` in `scripts/tests/test_s1_followup.py`.
 
 ### PO-S1-03 — Document 17 and its identifiers are outside the documentation check
 
 - ID: PO-S1-03
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: gate review of slice S0, round 1, designated reviewer (Google Gemini), 2026-11-13, proposed item P3
 - CONCERNS: TST-140
 - EVIDENCE: `REQUIRED_FILES` of `scripts/check_docs.py` does not hold `docs/17_DEPLOYMENT_HARDENING.md`, and `REQUIREMENT_PREFIXES` does not hold `DHA`. An identifier of document 17 that heads two rows therefore passes the check; PO-S0-17 was such a case and was found by hand.
 - NEEDED: the file and the prefix join the two lists, with one planted violation each; or one line saying why not.
 - CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: the documentation check requires `docs/17_DEPLOYMENT_HARDENING.md` and checks the `DHA` identifiers. Proved by `test_hardening_file_required`, `test_duplicate_hardening_identifier` and `test_unknown_hardening_identifier` in `scripts/tests/test_s1_followup.py`.
 
 ### PO-S1-04 — No test compares the tables of the documents with the lists the code holds
 
 - ID: PO-S1-04
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the lead, 2026-11-13, from the cause of the rejected first round of the slice S0 gate
 - CONCERNS: OPS-06; OPS-71; TST-141
 - EVIDENCE: The first round of the slice S0 gate was rejected because `CHECKS` of `scripts/preflight.py` held fifteen of the seventeen rows of the preflight table of document 13, and `.env.example`, `ENV_EXAMPLE_NAMES` of `scripts/check_tree.py` and `SECRET_NAMES` of `scripts/commit_guard.py` lacked the variables that decision 0019 had added to the variable tables. Each list was right when its task was built and went stale when a later decision changed its table. No test reads a table and its list together, so nothing failed.
 - NEEDED: for each of these lists, one test that reads the table of the document and the list in the code and fails on any difference, with one planted violation each; or one line saying why not.
 - CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: `scripts/tests/test_operations_parity.py` reads the tables of document 13 by section heading and column and compares them with `.env.example`, `ENV_EXAMPLE_NAMES` of `scripts/check_tree.py`, `SECRET_NAMES` of `scripts/commit_guard.py` and `CHECKS` of `scripts/preflight.py`, and the code was brought to the document. Proved by `test_document_and_code_inventories`, `test_added_table_row_is_refused` and `test_removed_code_name_is_refused`.
 
 ### PO-S1-05 — The hardening lists of the slice S1 spikes are not in the register of document 17
 
 - ID: PO-S1-05
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the lead, 2026-11-13, with the ledger of task S1-T04
 - CONCERNS: TASKS.md, section "Queue rules" (hardening beyond an acceptance criterion is listed, not built); document 17, section 9
 - EVIDENCE: Six tasks of slice S1 are built at the same time, so no builder edits document 17. Each task log of the slice in [PROGRESS.md](PROGRESS.md) records, in its line "Hardening listed, not built", the points its plan and its builder set aside.
 - NEEDED: one entry of the hardening register for each point of those lines that is not needed in version 1, each with its origin; or one line saying why a point needs no entry.
 - CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: section 9 of [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) holds DHA-103 to DHA-127, DHA-129 and DHA-130, one entry with its origin for each point of the seven lines "Hardening listed, not built" of the slice's task logs that version 1 does not need; each point that version 1 needs belongs to a task of the plan, as the return of the task's correction pass accounts point by point.
 
 ### PO-S1-06 — The product manifest does not declare the routing engine and the grid library that the areas spike imports
 
 - ID: PO-S1-06
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the reviewer of task S1-T03 (xAI Grok 4.7, through the Cursor command-line tool), 2026-11-13, point P1 of its verdict on pull request 33 (REV-17)
 - CONCERNS: BE-82; ARC-88; OI-60; OI-116
 - EVIDENCE: `product/src/eii_product/areas_spike/engine.py` imports `valhalla`, and `shapes.py` and `snap.py` of the same package import `h3`, while `product/pyproject.toml` declares neither: both packages sit in the root dependency group `engine` (the build ruling of the task, for the reason OI-60 gives). `product/README.md` states that home. No open item records that the task which builds the area tool must declare them in the product manifest or keep the exception; OI-116 records the same kind of gap for FastAPI only.
 - NEEDED: one sentence in an open item (OI-116 or OI-120) that names the task which declares `pyvalhalla` and `h3` in `product/pyproject.toml` together with the change of the clean-environment guard, or one line saying why the root group stays their home.
 - CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: the sentence its NEEDED asks for stands in OI-116, as its update of 2026-11-14: task S3-T04 declares `pyvalhalla` and `h3` in `product/pyproject.toml` together with the change of the clean-environment guard; until then both stay in the root group `engine` under OI-60.
 
 ### PO-S1-07 — The request judges of the two map spikes pass a scheme they do not know
 
 - ID: PO-S1-07
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the lead, 2026-11-13, at its check of task S1-T02
 - CONCERNS: FE-56; OI-115
 - EVIDENCE: `requestDecision` of `web/spikes/glyphs/guards.mjs` and `foreignRequest` of `web/spikes/performance/tests/performance.spec.ts` judge an address that begins with `http://` or `https://` by its origin and treat `data:` and `blob:` as local; an address with any other scheme is counted as same-origin. The content security policy of both spike servers stops such a request, and the browser tool does not report a WebSocket through the request event that the tests record, so no test sees one.
 - NEEDED: both judges count a scheme outside `http`, `https`, `data` and `blob` as foreign, with one planted case each; or one line saying why not.
 - CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: both judges count a scheme outside `http`, `https`, `data` and `blob` as foreign. Proved by "unknown request schemes are blocked" in `web/spikes/glyphs/tests/guards.node-test.mjs` and "unknown or file request schemes are refused rather than ignored" in `web/spikes/performance/tests/foreign-request.node-test.mjs`.
 
 ### PO-S1-09 — Files of the listed set that no pattern reads
 
 - ID: PO-S1-09
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
 - CONCERNS: TST-140; OI-93
 - EVIDENCE: 114 of the 477 files git lists at commit a9db6c8 are never read by any pattern, built-in or private, because their suffix is not on the text list of `scripts/check_docs.py` (75 `.mjs`, 4 `.mts`, `.pyi`, `.env.example`, `uv.lock`, `.nvmrc`, `.python-version`, `.prettierignore`, and binary files); OI-93 does not name `.mjs`. Check 8 of TST-263 reads them only for a listed name.
 - NEEDED: the text list covers every UTF-8 file git lists, or one line saying why not.
-- CLOSED BY: a follow-up task of slice S1
+- CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: the documentation check reads every regular file that git lists with the identifier-number rule and the private patterns, so no listed file stays unread; this is wider than the text list the item asks for. Proved by `test_eight_digit_run_in_mjs_and_private_pattern_in_non_utf8` in `scripts/tests/test_s1_followup.py`, whose plants include an `.mjs` file, files that are not UTF-8 and a file of an invented suffix that no list names.
 
 ### PO-S1-10 — An unreadable private patterns file is ignored without a message
 
 - ID: PO-S1-10
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
 - CONCERNS: TST-140; REV-25; OI-93
 - EVIDENCE: when `EII_FORBIDDEN_PATTERNS_FILE` is set but names no readable file, `scripts/check_docs.py` ignores it without a message, which silently turns off every private name, including the refusal that TST-263 relies on outside its places.
 - NEEDED: a set but unreadable file fails the check with one line that does not echo the path, with a planted case; or one line saying why not.
-- CLOSED BY: a follow-up task of slice S1
+- CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: a set private-patterns variable that names a missing path or a folder fails the check with one fixed line that prints no part of the path. Proved by `test_missing_private_pattern_file_fails_closed` and `test_directory_private_pattern_file_fails_closed` in `scripts/tests/test_s1_followup.py`.
 
 ### PO-S1-11 — Scans of the built bundle and the exports need the place rule
 
 - ID: PO-S1-11
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: the reviewer of the S1-T14 design, 2026-11-14
 - CONCERNS: TST-142; TST-263
 - EVIDENCE: the built web bundle and the exports of TST-142 and decision 0012 will carry the map's credit, so any scan of them with the private list refuses the name unless it applies the same place rule.
 - NEEDED: the task that scans the bundle or the exports states how the credit is judged there, or one line saying why not.
-- CLOSED BY: the task that adds the imagery source
+- CLOSED BY: S1-T10
+- CLOSED: 2026-11-14, by S1-T10: task S3-T16 states in its entry of TASKS.md that its scan of the built bundle and of the rendered page judges the map's credit by the place rule of TST-263. No task of the plan scans an export with the private list, so there is nothing to place for the exports.
 
 ## Sources
 
