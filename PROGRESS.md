@@ -17605,6 +17605,261 @@ Seed:      none
 Notes:     The two work commits between the base and the work commit have Conventional Commit subjects.
 ```
 
+### D0023 — Decision 0023: ten additions and the data rule: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/41 )
+
+- What it is: decision record 0023 and its sweep of the pack. The owner's decisions of 2026-11-13 and 2026-11-14, as the lead recorded them: ten additions (talent available near a site; Qatar in 3D with a clock; the national GIS centre's layers; voice; the best three sites with "how sure"; the financial centre's firms; satellite imagery with address search and the photorealistic 3D mode; property sale prices and bank credit; the decision question bank; tenders and district cooling with ten open-data families); the order of the site answer; the data rule with its six replacements; a product for companies designed for its personas, with no oversight seat and no ministry view; movement aggregates that carry age band, gender and nationality group; the talent ratio; no catchment beyond 30 minutes.
+- Class: Deep (it changes privacy rules and the agent rules). Lead: Anthropic (Claude Opus 5.5 on 2026-11-13 and until about 01:05 on 2026-11-14, Claude Fable 5.2 from then on): the decision record's content, every ruling, the decisions sheets, the combination of the editors' work and this ledger.
+- First pass (2026-11-13): the record drafted by the lead; the sweep of the pack by the lead's agents (Claude Opus 5.5), with the lead's audit of every planned synthetic source against the data rule (six replaced); a review through five lenses by the lead's agents with a second reader for each finding: 53 findings, 51 real, 48 fixed, 2 refuted, 3 ruled by the lead; a critic listed 21 gaps.
+- Second pass (2026-11-14, the lead's agents: editors and first reviewers Claude Opus 5.5, verifiers of privacy and high-severity findings and the critic Claude Fable 5.2): the owner's decisions of the evening of 2026-11-13 entered (no individual in a talent answer; companies only; designed for its personas) and the 21 gaps closed; three lenses gave 9 findings, 8 real, 7 fixed, 1 ruled by the lead (the talent answer's flows keep card C39's form, put to the owner in OI-147); the critic listed nine gaps, eight carried into the third pass and one being this ledger.
+- The move onto main (2026-11-14): task S1-T11 had merged decision 0021 meanwhile; six files conflicted in ten places (status lines, the range of decision records, two table rows, appended open items); the lead's script resolved them with both sides kept, and its proof lists every line of either side that the result does not hold (each one a line a rule rewrote).
+- Third pass (2026-11-14), edited and reviewed by other makers' tools from the lead's decisions sheet: five editors on separate file groups (xAI Grok 4.7 for the rules, the record, privacy, contracts, tests and methods; Cursor Composer 2.5 for the synthetic world, the public data pack, the architecture, the back end, the assistant, the front end, the design, the runbook, the tasks and the plan); then two review lenses on the pass's diff: privacy by Moonshot Kimi K3.1 Pro (7 findings) and consistency by OpenAI GPT-6 Astra (14 findings). The lead's agents verified every finding against the files (two on Claude Fable 5.2 for the privacy design and the structural checks, two on Claude Opus 5.5): 19 real or partly real with 103 passages to align, 2 refuted (the record may say which list its bands replaced; the staffing ladder's 20-minute step follows from the decision). The lead ruled on the contested points: a split value below the panel minimum is pooled into `other` so that nothing withheld can be recovered by subtraction; the age split covers every visitor with those under 15 in `other`; a flow split counts person trips; the talent answer's catchments are inside the structural checks in every playbook that calls the tool; homes stay no finer than the district and only a flow line's home end is a municipality. The same five editors entered the corrections.
+- Identifiers this decision adds are checked against main and the open branches: no identifier is defined twice; the decision record of task S1-T14 and its test identifier were renumbered on that task's branch.
+- The repository's checks cannot see whether a passage is true to the owner's decisions: that is the reviewer's judgement, with the lead's rulings in the pack. The documentation check also ran with the owner's private pattern list on every commit of the branch (the commit hook): no name of that list is in the change; the satellite imagery provider is named only by its role and its setting.
+- Open for the owner, each with a default that the pack states: whether road traffic is part of the movement source (yes); the form of the talent answer's flows (card C39's form, OI-147); the age bands against the operator's format when its data arrives (OI-148, not a question for the owner now).
+- Not in this pull request: any code. The tasks that build the additions are named in TASKS.md and document 14; the task that adds the imagery source also adds the provider's name in its two allowed places (task S1-T14 builds that exception).
+
+#### Evidence for the work commit `eeee5766c5c7445533a7b8028245fc376482160e`
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    eeee5766c5c7445533a7b8028245fc376482160e
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 364 text files, 63 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the record and every amended document: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    eeee5766c5c7445533a7b8028245fc376482160e
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    eeee5766c5c7445533a7b8028245fc376482160e
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after rules 3, 8 and 10 changed.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    eeee5766c5c7445533a7b8028245fc376482160e
+Command:   bash -c "grep -hE '45[ -]minute|15, 30 and 45|15/30/45' docs/0*.md docs/1*.md docs/GLOSSARY.md TASKS.md AGENTS.md README.md | grep -v 'qatar is small 45 minutes is way too far' | wc -l"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no document of the pack carries a 45-minute drive time)
+Seed:      none
+Notes:     The retired bands are gone from the documents of the pack, the glossary, the tasks, the agent rules and the README; the only lines left are the owner's quoted words (the record's own text and the history of a closed open item are not searched).
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    eeee5766c5c7445533a7b8028245fc376482160e
+Command:   ./eii test --seed 2026111424
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1879 passed, 0 failed, 0 skipped
+Seed:      2026111424
+Notes:     The whole test command on the build machine with a fresh seed: the pull request changes documents only, and the guards that read documents (the reference notes' anchors, the command tables) still pass.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    eeee5766c5c7445533a7b8028245fc376482160e
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','a9db6c85d19c1035377dfbc9fde8959fcc86cff7..eeee5766c5c7445533a7b8028245fc376482160e'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The three work commits between the base and the work commit have Conventional Commit subjects.
+```
+
+### D0023 — Decision 0023: ten additions and the data rule: review round 1 and the corrections (pull request https://github.com/albarami/economic-investment-intelligence/pull/41 )
+
+- Review round 1 (2026-11-14): OpenAI GPT-6 Astra through the Codex command-line tool, on the head 4fe15db, in seven parts because the whole change is about 1 MB as a word-level diff (the record, the rules and the indexes; privacy, contracts and the synthetic world; methods and tests; the back end and the assistant; the front end, the design and three small documents; the brief, the architecture and the public data pack; the tasks and the plan). Each part REJECTED: 26 findings and 6 proposed record points in all. The lead read every finding and accepted all of them; none needed the owner.
+- What the findings were. Older rules that had not been given an exception the decision states: the range every estimated people count carries (a split count has none); the apportionment of counts to a drawn outline (a split sums its snapped whole units); the closed list of two-family figures in the assistant's validator, the front end and the reviewer checklist (the talent ratio joins it); the rule that a generator takes sex-split public anchors only as totals (the movement generator's cited anchors); the staffing-only cut-off in the reviewer checklist (card C39's catchments are named apart); task criteria that barred every gender and nationality column. Gaps: no request argument selected a movement split (the closed argument `split_kinds` now does); the register snapshot kept no location, so a closure by area could not be computed (it keeps the registered cell, and the snapshot route has its own wording without event dates); the site check's two headline blocks stood on two different areas (both use the area picked); the satellite control was shown disabled without its key (it is hidden); the tender source was given an owner-decision licence basis (it has none); zoning was a fill in one document and outlines in another (outlines); the record's item 16 and card C15 promised flow splits on a screen (presence splits only; flow splits stay reachable through the back end).
+- The corrections: six editors on separate file groups from the reviewer's own words (xAI Grok 4.7 for four groups, Cursor Composer 2.5 for two), combined by the lead (18 files; work commit a097b2d). The editors then named passages in each other's files that must agree with their corrections; five small jobs entered those (9 files; work commit 4b85bc7): the tests of the drawn areas, the map modes and the site answer's order; the openings and closures tool; the open lines that still treated the owner's attribution note as awaited; three task rows.
+- The six record points are corrected in the same commits (the open item on the attribution note; the count of additive families in document 06; the method-test matrix in document 12; a cross-reference in document 11; two summaries of document 17).
+- Checks on the combined tree after each commit: the documentation check (also with the owner's private pattern list, by the commit hook), the tree check, the comparison of the two agent files: exit 0.
+
+#### Evidence for the work commit `4b85bc77a57d2afc154c3da83e12e1095ef4d79f`
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    4b85bc77a57d2afc154c3da83e12e1095ef4d79f
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 364 text files, 63 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the record and every amended document: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    4b85bc77a57d2afc154c3da83e12e1095ef4d79f
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    4b85bc77a57d2afc154c3da83e12e1095ef4d79f
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after rules 3, 8 and 10 changed.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    4b85bc77a57d2afc154c3da83e12e1095ef4d79f
+Command:   bash -c "grep -hE '45[ -]minute|15, 30 and 45|15/30/45' docs/0*.md docs/1*.md docs/GLOSSARY.md TASKS.md AGENTS.md README.md | grep -v 'qatar is small 45 minutes is way too far' | wc -l"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no document of the pack carries a 45-minute drive time)
+Seed:      none
+Notes:     The retired bands are gone from the documents of the pack, the glossary, the tasks, the agent rules and the README; the only lines left are the owner's quoted words (the record's own text and the history of a closed open item are not searched).
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    4b85bc77a57d2afc154c3da83e12e1095ef4d79f
+Command:   ./eii test --seed 2026111427
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1879 passed, 0 failed, 0 skipped
+Seed:      2026111427
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit of this round.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    4b85bc77a57d2afc154c3da83e12e1095ef4d79f
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','4fe15db6888d6636c8f43eb42aefc84efb8fa928..4b85bc77a57d2afc154c3da83e12e1095ef4d79f'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two work commits of this round, between the reviewed head and the work commit, have Conventional Commit subjects.
+```
+
+### D0023 — Decision 0023: ten additions and the data rule: the confirmation review and its corrections (pull request https://github.com/albarami/economic-investment-intelligence/pull/41 )
+
+- Correction of the entry before this one ("review round 1 and the corrections"): its line that the six record points were corrected is wrong on one point. The method-test matrix under TST-197 in document 12 was NOT changed by the commits that entry names (a097b2d and 4b85bc7): part 3's proposed item P1 had reached no editor. The matrix is corrected by the first commit of this round (91af084: MTH-118 and MTH-119 on card C16, MTH-122 on C39, MTH-121 on C41). The earlier line stays as written (rule 38).
+- The confirmation review (round 2, 2026-11-14): OpenAI GPT-6 Astra through the Codex command-line tool, on the head 798bc8d, again in seven parts, each with its own round-1 verdict, the word-level diff of its files and a map from every finding to the corrected passages (the map by xAI Grok 4.7 through Cursor, checked by the lead: every one of the 26 findings and 5 proposed items, the hunk counts of all seven diffs, 162 of 163 quotations word for word). Every earlier finding reads FIXED. Parts 1, 5 and 6: APPROVED. Parts 2, 3, 4 and 7: REJECTED with six new findings, each a contradiction in or beside a corrected passage.
+- The six findings, all judged valid by the lead (ruling L-182): the caveat-key table of document 03 still asked for the dates caveat on every register opening or closure count and lacked the snapshot caveat; SYN-57 and DAT-60 dropped every feed row under 20 panel devices before conformance, which made the pooling of small split values under PRV-134 impossible; AI-51 and the split refusal forbade every nationality attribute, against rule 10 and decision 0022 item 6; a chosen drive time moved only the wider area, so the two headline blocks stayed on the five-minute walk; task S2-T11 still forbade every use of a Public split on simulated presence, against SYN-89's cited anchors; task S2-T19 and document 14 switched off every source without terms, against the admission of the national GIS layers under PUB-12 and PUB-13.
+- First commit of this round (91af084): six editors on separate files from the reviewer's own words (xAI Grok 4.7 for five groups, Cursor Composer 2.5 for one), combined by the lead (10 files, 40 passages; one new identifier, BE-140, the route caveats of the openings-and-closures tool). It also corrects the two record points of the review (the TST-197 matrix; document 13's status of the attribution note).
+- The lead's own verification before sending it back: six read-only verifiers (Claude Opus 5.5 for four topics, Claude Fable 5.2 for the two privacy topics) swept each of the six topics across the whole pack and reported 78 points; the lead judged 77 valid (ruling L-185): passages in other documents that still stated an old rule, a correction too wide or too narrow, a sentence dropped. Among them: PRV-58, the rule-value table and the conformance test TST-32 still asked every split feed row for the panel minimum; four passages opened the population grid's sex split to the movement generator beyond SYN-89's cited anchors; six open questions switched the tender source off only on forbidding terms; five passages of document 04 still waited for the attribution note.
+- Second commit of this round (39b08e1), the agreement pass: six editors (xAI Grok 4.7) on separate files from the verification record and nine completions of the shared wording (15 files, 94 passages; every entry reported done; one leftover wording in document 04 entered by the lead). The decision record itself gains the sentence on the feed minimum, the items of decisions 0017 and 0019 that it amends, and BE-140.
+- Third commit of this round (5a41758): two verifiers (Claude Fable 5.2 on the privacy files, Claude Opus 5.5 on the others) read the 94 passages of the agreement pass once more and reported 17 points; the lead judged 15 valid (ruling L-188) and one editor (xAI Grok 4.7) entered them: four sentences that an edit had left broken; three rules that an edit had dropped (AI-138's rule that a small split value is never withheld alone beside published siblings; the slice S2 gate's rule that forbidding terms switch a source off); the decision record's own list of what it amends (decision 0019 item 22 is unchanged) and the attribution of its sentence on the feed minimum; four task criteria brought up to the planted cases of their requirements. The lead read each of the fifteen corrected passages. Not changed: TST-32, whose bar under parameter set B would otherwise drop (open item OI-150 with the stricter text as default); the reference to task S1-T14, whose entry arrives with its own pull request.
+- What does not change: no release minimum, rounding base or pooling order; a split feed row never leaves the custodian plane and no released value is below its family's minimum; no generator reads the population grid by sex or age; the worker nationality group appears only as a dimension of released statistics.
+- Checks on the combined tree after each commit: the documentation check (also with the owner's private pattern list, by the commit hook), the tree check, the comparison of the two agent files: exit 0.
+
+#### Evidence for the work commit `5a41758430dfe905a503dd576181d6938a620118`
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    5a41758430dfe905a503dd576181d6938a620118
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 364 text files, 63 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the record and every amended document: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    5a41758430dfe905a503dd576181d6938a620118
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    5a41758430dfe905a503dd576181d6938a620118
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after rules 3, 8 and 10 changed.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    5a41758430dfe905a503dd576181d6938a620118
+Command:   bash -c "grep -hE '45[ -]minute|15, 30 and 45|15/30/45' docs/0*.md docs/1*.md docs/GLOSSARY.md TASKS.md AGENTS.md README.md | grep -v 'qatar is small 45 minutes is way too far' | wc -l"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no document of the pack carries a 45-minute drive time)
+Seed:      none
+Notes:     The retired bands are gone from the documents of the pack, the glossary, the tasks, the agent rules and the README; the only lines left are the owner's quoted words (the record's own text and the history of a closed open item are not searched).
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    5a41758430dfe905a503dd576181d6938a620118
+Command:   ./eii test --seed 2026111436
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1879 passed, 0 failed, 0 skipped
+Seed:      2026111436
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit of this round.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    5a41758430dfe905a503dd576181d6938a620118
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','798bc8d42c1bc3d2b186b5ae9c8813d009d83012..5a41758430dfe905a503dd576181d6938a620118'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The three work commits of this round, between the reviewed head and the work commit, have Conventional Commit subjects.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
