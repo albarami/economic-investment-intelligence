@@ -46,6 +46,7 @@ As soon as the page has a WebGL2 context, and before the orbit starts, it shows 
 The gate profile refuses on screen at once, does not run the orbit, and posts nothing, when the renderer is missing, a software renderer, the Windows software driver, or WARP (`refused: missing-renderer` or `refused: software-renderer`), or when the renderer names a remote display adapter as its own word (`refused: remote-renderer`). Before the map and its layers load, the same profile counts frames on the empty canvas for about two seconds. If that empty canvas does not reach 60 frames a second, the page shows `refused: capped-frame-rate` with the measured frames a second. It does not load the layers and it posts nothing. If the empty canvas reaches 60 and the full scene does not, the orbit runs and the trace is stored, and the gate judges that trace. A slow full scene is not refused as a bad environment.
 
 If the page refuses, sit at the computer, not through Remote Desktop. Use Chrome at 100% zoom with Energy Saver off.
+
 ## Hourly road sets (S1-T11 round two)
 
 `hexagons-particles-roads` adds the recorded fixture links and an invented load of 100,000 short links. `hexagons-particles-roads-250k` uses 250,000 load links. Both retain the original hexagons and particles. These are load sizes fixed by the owner on 2026-11-13, based on his counts of ways: 24,367 motorway to tertiary; 76,703 including residential; 122,720 including service roads. Attribution of that basis: **OpenStreetMap contributors, counted by the owner through the Overpass service**. Ways are not links; the second load represents a full street network. This is the owner's supplied sizing basis, not a public dataset imported by the page or an independently verified count. No figure about a place appears on the page.
@@ -77,14 +78,36 @@ The browser suite keeps each named assertion test and each distinct plant. Tests
 with the same initial language, motion setting and road load share a page within
 a default-mode group; a failure does not skip later tests, and selecting one test
 still creates its fixture. Each group closes its page before the next one starts.
-The uninterrupted road scene records the full stored-hour cycle. A separate fresh
-English scene supplies one real pause/resume observation to both the hour-clock
-and particle tests, with a guard that the pause starts before the final hour.
-Initial reduced-motion scenes remain separate in both languages. Independent DOM
-assertions run together. Layer counts, frame waits, viewport, pixel ratios and
+The uninterrupted road scene records the full stored-hour cycle. A fresh English
+pause scene first checks the live paused mark and legend, then supplies one real
+pause/resume observation to both the hour-clock and particle
+tests, with a guard that the pause starts before the final hour. The first input
+action is shared; visibility assertions are not cached. Each consumer asserts
+its initial state, and selecting any one test still creates and pauses the scene.
+Initial reduced-motion scenes remain separate in both languages. Distinct plants
+each load their own page. Independent DOM assertions run together. Layer counts, frame waits, viewport, pixel ratios and
 all timeout values remain unchanged. The list reporter gives individual test
 durations; shared scene setup durations are printed separately and included in
 the measured browser wall time.
+
+Readiness waits on the same animation-frame condition and captures diagnostics
+in that callback; the host still enforces the same readiness timeout. The
+reduced-motion frame wait likewise returns its snapshot in the callback that
+observes more than two further motion frames. The pause
+button helper batches checks of visibility, native and inherited ARIA enabled
+state, inert ancestors, nonzero bounds, two-frame stability and the centre hit target before sending
+real mouse input. It verifies a trusted click on the target afterwards, so an
+intercepted click cannot count as a press. This helper is specific to the spike's
+static pause button, not a general replacement for Playwright actions. Small-page
+browser tests plant absent, hidden, disabled, inert, covered, moving and zero-area
+controls, direct and inherited ARIA-disabled controls, an explicit ARIA-enabled
+override, interception after preparation, and an offscreen control that must be
+scrolled into view. Original scene assertions and full rendering loads remain.
+The suite keeps one worker.
+The JSON reporter also writes `test-results/performance-timings.json` relative to this spike's
+Playwright configuration directory, allowing the repository test run's individual
+browser durations and overall Playwright duration to be inspected without a
+second full browser run.
 
 The mutation runner sets `workers = min(4, processors)` and passes
 `--test-concurrency=max(1, processors // workers)` to Node in every mutant's test
@@ -94,10 +117,3 @@ Run only one mutation job on the machine, at normal priority. Killed, survived,
 timed-out, uncovered and error counts remain separate. The runner prints exact
 locations and replacements for timed-out mutants as well as survivors, so every
 timeout can be replayed alone at normal load before interpreting it as evidence.
-
-English paused visibility uses its own fresh scene so it checks the first pause,
-as the original test did. It does not reuse the second pause after a clock test.
-The JSON reporter also writes `test-results/performance-timings.json` relative to this spike's
-Playwright configuration directory, allowing the repository test run's individual
-browser durations and overall Playwright duration to be inspected without a
-second full browser run.

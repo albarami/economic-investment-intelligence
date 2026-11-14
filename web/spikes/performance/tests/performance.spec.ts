@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { clickPause } from './pause-click';
 
 const HEXAGONS = 110000;
 const PARTICLES = 50000;
@@ -8,13 +9,34 @@ const WALL_HEIGHT = 1080;
 type Spike = NonNullable<Window['__spike']>;
 
 async function ready(page: Page): Promise<Spike> {
-  await page.waitForFunction(
-    () =>
-      window.__spike?.phase === 'done' || window.__spike?.phase === 'failed',
-    undefined,
-    { timeout: 170000 },
-  );
-  const value = await page.evaluate(() => window.__spike);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let value: Spike;
+  try {
+    value = await Promise.race([
+      page.evaluate(
+        () =>
+          new Promise<Spike>((resolve) => {
+            const read = () => {
+              const spike = window.__spike;
+              if (spike?.phase === 'done' || spike?.phase === 'failed') {
+                resolve(structuredClone(spike));
+              } else {
+                requestAnimationFrame(read);
+              }
+            };
+            read();
+          }),
+      ),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error('spike readiness timed out')),
+          170000,
+        );
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
   if (value === undefined) throw new Error('spike diagnostics are absent');
   return value;
 }
@@ -339,11 +361,15 @@ const ROAD_LARGE = Object.keys(ROAD_LOADS)[1]!;
 const roadUrl = (extra = '') =>
   `/en/_perf?profile=smoke&layers=${ROAD_SET}${extra}`;
 
-async function framesAfter(page: Page, frames: number): Promise<void> {
-  await page.waitForFunction(
-    (count) => (window.__spike?.motionFrames ?? 0) > count + 2,
-    frames,
-  );
+async function framesAfter(page: Page, frames: number): Promise<Spike> {
+  return page.evaluate(async (count) => {
+    while ((window.__spike?.motionFrames ?? 0) <= count + 2) {
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => resolve()),
+      );
+    }
+    return structuredClone(window.__spike!);
+  }, frames);
 }
 
 type RoadScene = { page: Page; spike: Spike };
@@ -382,22 +408,40 @@ function sharedRoadScene(
   });
 }
 
-async function observePause(page: Page): Promise<PauseObservation> {
-  await page.locator('#pause-motion').click();
-  await page.waitForFunction(() => window.__spike?.paused === true);
-  const paused = (await page.evaluate(() => window.__spike))!;
+async function observePause(
+  page: Page,
+  pause: () => Promise<void>,
+): Promise<PauseObservation> {
+  await pause();
+  const { paused, after } = await page.evaluate(async () => {
+    const frame = () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+    while (window.__spike?.paused !== true) await frame();
+    const paused = structuredClone(window.__spike);
+    while ((window.__spike?.motionFrames ?? 0) <= paused.motionFrames + 2) {
+      await frame();
+    }
+    return { paused, after: structuredClone(window.__spike!) };
+  });
   // Keep the clock-freeze assertion meaningful: do not start at the last hour.
   expect(paused.hoursShown.length).toBeLessThan(roadData.hours.length);
-  await framesAfter(page, paused.motionFrames);
-  const after = (await page.evaluate(() => window.__spike))!;
-  await page.locator('#pause-motion').click();
-  await page.waitForFunction(
-    ({ elapsed, position }) =>
-      (window.__spike?.motionElapsed ?? 0) > elapsed &&
-      window.__spike?.currentPosition !== position,
+  await clickPause(page);
+  const resumed = await page.evaluate(
+    async ({ elapsed, position }) => {
+      while (!(
+        (window.__spike?.motionElapsed ?? 0) > elapsed &&
+        window.__spike?.currentPosition !== position
+      )) {
+        await new Promise<void>((resolve) =>
+          requestAnimationFrame(() => resolve()),
+        );
+      }
+      return structuredClone(window.__spike!);
+    },
     { elapsed: paused.motionElapsed, position: paused.currentPosition },
   );
-  const resumed = (await page.evaluate(() => window.__spike))!;
   return { paused, after, resumed };
 }
 
@@ -405,6 +449,7 @@ function visibilityTest(
   scene: () => RoadScene,
   language: string,
   motion: string,
+  pause?: () => Promise<void>,
 ): void {
   test(`roads mark and legend are visible ${language} ${motion}`, async () => {
     test.setTimeout(600000);
@@ -413,7 +458,7 @@ function visibilityTest(
     const label = language === 'ar' ? 'إيقاف الحركة مؤقتًا' : 'Pause motion';
     await expect(button).toHaveText(label);
     if (motion === 'paused') {
-      await button.click();
+      await (pause ? pause() : clickPause(page));
       await Promise.all([
         expect(button).toHaveAttribute('aria-pressed', 'true'),
         expect(button).toHaveText(label),
@@ -518,11 +563,24 @@ sharedRoadScene('uninterrupted English road scene', 'en', false, (scene) => {
 });
 
 sharedRoadScene('English pause scene', 'en', false, (scene) => {
+  let firstPause: Promise<void> | undefined;
+  const pause = () => {
+    // Both consumers start from this fixture's first pause, including when
+    // either test is selected alone or the worker restarts after a failure.
+    expect(scene().spike.phase).toBe('done');
+    expect(scene().spike.paused).toBe(false);
+    expect(scene().spike.reducedMotion).toBe(false);
+    return (firstPause ??= clickPause(scene().page));
+  };
+  // Assert the live paused DOM before the clock test resumes the scene.
+  // Only the input action is shared; visibility assertions are never cached.
+  visibilityTest(scene, 'en', 'paused', pause);
   let observation: Promise<PauseObservation> | undefined;
-  const paused = () => (observation ??= observePause(scene().page));
+  const paused = () => (observation ??= observePause(scene().page, pause));
   test('roads Pause motion freezes the hour clock and resumes it on a second press', async () => {
     test.setTimeout(600000);
     const { paused: before, after, resumed } = await paused();
+    expect(before.paused).toBe(true);
     expect(after.motionElapsed).toBe(before.motionElapsed);
     expect(after.hoursShown).toEqual(before.hoursShown);
     expect(resumed.paused).toBe(false);
@@ -530,13 +588,10 @@ sharedRoadScene('English pause scene', 'en', false, (scene) => {
   test('roads Pause motion freezes particles and resumes them on a second press', async () => {
     test.setTimeout(600000);
     const { paused: before, after, resumed } = await paused();
+    expect(before.paused).toBe(true);
     expect(after.currentPosition).toBe(before.currentPosition);
     expect(resumed.currentPosition).not.toBe(before.currentPosition);
   });
-});
-
-sharedRoadScene('English paused-visibility scene', 'en', false, (scene) => {
-  visibilityTest(scene, 'en', 'paused');
 });
 
 sharedRoadScene('English reduced-motion scene', 'en', true, (scene) => {
@@ -544,8 +599,7 @@ sharedRoadScene('English reduced-motion scene', 'en', true, (scene) => {
     const { page } = scene();
     test.setTimeout(600000);
     const spike = scene().spike;
-    await framesAfter(page, spike.motionFrames);
-    const after = (await page.evaluate(() => window.__spike))!;
+    const after = await framesAfter(page, spike.motionFrames);
     expect(after.reducedMotion).toBe(true);
     expect(after.motionElapsed).toBe(0);
     expect(after.hoursShown).toEqual(roadData.hours.slice(0, 1));
