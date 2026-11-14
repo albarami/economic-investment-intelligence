@@ -17496,6 +17496,88 @@ Seed:      none
 Notes:     The three work commits between the base and the work commit have Conventional Commit subjects.
 ```
 
+### D0023 — Decision 0023: ten additions and the data rule: review round 1 and the corrections (pull request https://github.com/albarami/economic-investment-intelligence/pull/41 )
+
+- Review round 1 (2026-11-14): OpenAI GPT-6 Astra through the Codex command-line tool, on the head 4fe15db, in seven parts because the whole change is about 1 MB as a word-level diff (the record, the rules and the indexes; privacy, contracts and the synthetic world; methods and tests; the back end and the assistant; the front end, the design and three small documents; the brief, the architecture and the public data pack; the tasks and the plan). Each part REJECTED: 26 findings and 6 proposed record points in all. The lead read every finding and accepted all of them; none needed the owner.
+- What the findings were. Older rules that had not been given an exception the decision states: the range every estimated people count carries (a split count has none); the apportionment of counts to a drawn outline (a split sums its snapped whole units); the closed list of two-family figures in the assistant's validator, the front end and the reviewer checklist (the talent ratio joins it); the rule that a generator takes sex-split public anchors only as totals (the movement generator's cited anchors); the staffing-only cut-off in the reviewer checklist (card C39's catchments are named apart); task criteria that barred every gender and nationality column. Gaps: no request argument selected a movement split (the closed argument `split_kinds` now does); the register snapshot kept no location, so a closure by area could not be computed (it keeps the registered cell, and the snapshot route has its own wording without event dates); the site check's two headline blocks stood on two different areas (both use the area picked); the satellite control was shown disabled without its key (it is hidden); the tender source was given an owner-decision licence basis (it has none); zoning was a fill in one document and outlines in another (outlines); the record's item 16 and card C15 promised flow splits on a screen (presence splits only; flow splits stay reachable through the back end).
+- The corrections: six editors on separate file groups from the reviewer's own words (xAI Grok 4.7 for four groups, Cursor Composer 2.5 for two), combined by the lead (18 files; work commit a097b2d). The editors then named passages in each other's files that must agree with their corrections; five small jobs entered those (9 files; work commit 4b85bc7): the tests of the drawn areas, the map modes and the site answer's order; the openings and closures tool; the open lines that still treated the owner's attribution note as awaited; three task rows.
+- The six record points are corrected in the same commits (the open item on the attribution note; the count of additive families in document 06; the method-test matrix in document 12; a cross-reference in document 11; two summaries of document 17).
+- Checks on the combined tree after each commit: the documentation check (also with the owner's private pattern list, by the commit hook), the tree check, the comparison of the two agent files: exit 0.
+
+#### Evidence for the work commit `4b85bc77a57d2afc154c3da83e12e1095ef4d79f`
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    4b85bc77a57d2afc154c3da83e12e1095ef4d79f
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 364 text files, 63 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the record and every amended document: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    4b85bc77a57d2afc154c3da83e12e1095ef4d79f
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    4b85bc77a57d2afc154c3da83e12e1095ef4d79f
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after rules 3, 8 and 10 changed.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    4b85bc77a57d2afc154c3da83e12e1095ef4d79f
+Command:   bash -c "grep -hE '45[ -]minute|15, 30 and 45|15/30/45' docs/0*.md docs/1*.md docs/GLOSSARY.md TASKS.md AGENTS.md README.md | grep -v 'qatar is small 45 minutes is way too far' | wc -l"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no document of the pack carries a 45-minute drive time)
+Seed:      none
+Notes:     The retired bands are gone from the documents of the pack, the glossary, the tasks, the agent rules and the README; the only lines left are the owner's quoted words (the record's own text and the history of a closed open item are not searched).
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    4b85bc77a57d2afc154c3da83e12e1095ef4d79f
+Command:   ./eii test --seed 2026111427
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1879 passed, 0 failed, 0 skipped
+Seed:      2026111427
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit of this round.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    4b85bc77a57d2afc154c3da83e12e1095ef4d79f
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','4fe15db6888d6636c8f43eb42aefc84efb8fa928..4b85bc77a57d2afc154c3da83e12e1095ef4d79f'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two work commits of this round, between the reviewed head and the work commit, have Conventional Commit subjects.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
