@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13 |
+| Status | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13; amended by decision 0032 on 2026-11-15 |
 | Date | 2026-11-13 |
 | Owner | albarami |
 | Purpose | Give every coding agent the binding safety, accuracy, workflow and evidence rules. |
@@ -54,7 +54,7 @@
 
 ## Workflow and evidence
 
-33. Use one task per branch and pull request, with Conventional Commits. Change only the task's scope and update affected documents in the same pull request. Cite a pack document by a stable anchor (a requirement ID, a section heading, a task ID, a rule number or the numbered item of a decision record), never by line number.
+33. Use one task per branch and pull request, with Conventional Commits. Change only the task's scope and update affected documents in the same pull request. Cite a pack document by a stable anchor (a requirement ID, a section heading, a task ID, a rule number or the numbered item of a decision record), never by line number. Exception: under [decision 0032](docs/decisions/0032-approved-tasks-of-one-slice-may-merge-as-a-train.md), approved tasks of one slice may use one train branch and pull request. Each task is approved on its own local commit by another maker; its dependencies are merged or in the same train. One ledger holds every task's own rows and verdict. The six required hosted checks run once on the joined head; the lead runs the whole test with a fresh seed on the exact merge result; head checks are unchanged. One confirmation by a maker other than the one that joined the train confirms that the joined head holds exactly the approved commits and the records. The lead proves unchanged task changes by a script, file by file, listing each difference forced by the join and its reason; a forced code or test difference needs that task's own confirmation by another maker or the task leaves the train. The records are ledger rows, TASKS.md status lines, open items and pin headings added by the ledger. A joined head that fails a check is split and the parts retried. Every task keeps its own plan, build, checks and review; gates are unchanged. Decision records and other documents-only changes keep their own pull requests unless they are a task's own documents.
 34. Name a senior expert persona and a strict reviewer persona for every task, and log both with the skills used.
 35. Builder and reviewer must come from different makers. The reviewer edits nothing and returns APPROVED or REJECTED with file, line, defect and exact fix for every finding.
 36. Run tests and record real exit codes. Never hide failure with `|| true`, `continue-on-error`, a missing pipefail setting, retries, skips or refreshed baselines.

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Slice S0 (foundation) in progress; no feature code yet; scope amended by decisions 0016, 0017 and 0019 on 2026-11-12 and by decisions 0022 and 0023 on 2026-11-13, and by decision 0026 on 2026-11-14 |
+| Status | Slice S0 (foundation) in progress; no feature code yet; scope amended by decisions 0016, 0017 and 0019 on 2026-11-12 and by decisions 0022 and 0023 on 2026-11-13, and by decision 0026 on 2026-11-14; amended by decision 0032 on 2026-11-15 |
 | Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | Introduce a public proof-of-concept design for companies and its reading path. |
@@ -195,7 +195,7 @@ The custodian plane is the only place record-level synthetic data may exist. Its
 
 ## Build and review workflow
 
-Work proceeds in gated slices, one task per branch and pull request. The builder and independent reviewer come from different makers. Tests need real exit codes and recorded evidence; privacy and security checks are never weakened to obtain a pass. The detailed workflow is in [AGENTS.md](AGENTS.md) and the [reviewer checklist](docs/15_REVIEWER_CHECKLIST.md).
+Work proceeds in gated slices, one task per branch and pull request. The builder and independent reviewer come from different makers. Tests need real exit codes and recorded evidence; privacy and security checks are never weakened to obtain a pass. The detailed workflow is in [AGENTS.md](AGENTS.md) and the [reviewer checklist](docs/15_REVIEWER_CHECKLIST.md). The only exception is an approved train of one slice under [AGENTS.md](AGENTS.md) rule 33 and [decision 0032](docs/decisions/0032-approved-tasks-of-one-slice-may-merge-as-a-train.md).
 
 ## Licence and third-party attribution
 
