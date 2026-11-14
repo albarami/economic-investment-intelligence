@@ -858,7 +858,7 @@ Open points from [decision 0022](decisions/0022-real-register-companies-with-a-s
 
 Open points from [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md):
 
-- OPEN (owner, item 7): the satellite provider's attribution in committed text (OI-132). Until it is settled, the satellite credits are shown as the provider's imagery style carries them, inside the collapsed map credits (FE-139, FE-141).
+- RECEIVED (owner; ruling L-151; item 7; OI-132): the imagery provider's attribution note is received; its name appears only in the map attribution line and in the source rows of [04 Public data pack](04_PUBLIC_DATA_PACK.md), and on screen only inside the collapsed map credits while the satellite mode is on (FE-139, FE-141). What remains is the documentation guard's place-scoped exception, which task S1-T14 builds.
 - OPEN (item 7): the route of the photorealistic 3D tiles, the layer keys of the national GIS centre's layers and the fields of `GET /health` that report each map mode are fixed in [08 Back end](08_BACKEND.md); this document states the front end's expectation, and 08 wins.
 - OPEN (item 1): whether the flows of FE-144 have a layer key of their own (`commute_flows`) or come inside the result of `workers_within_reach`, as [08 Back end](08_BACKEND.md) proposes; 08 wins.
 - OPEN (items 1, 5 and 8): the family keys of the cards `workers_within_reach`, `location_allocation` and `price_measures` are fixed in [09 AI assistant](09_AI_ASSISTANT.md) section 5.1, and their caveat sentences in [11 Design direction](11_DESIGN_DIRECTION.md), at tasks S6-T20, S6-T21 and S6-T10; 09 wins.
