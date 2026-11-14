@@ -1349,7 +1349,7 @@ reason = "The digest rows are already ordered and each object's keys are already
 [[survivors]]
 module = "custodian/src/eii_custodian/privacy/rules_config.py"
 mutation = "--- src/eii_custodian/privacy/rules_config.py\n+++ src/eii_custodian/privacy/rules_config.py\n@@ -18,5 +18,5 @@\n     ]\n     encoded = json.dumps(\n         payload, ensure_ascii=False, separators=(\",\", \":\"), sort_keys=True\n-    ).encode(\"utf-8\")\n+    ).encode(\"UTF-8\")\n     return hashlib.sha256(encoded).hexdigest()"
-reason = "The digest rows are already ordered and each object's keys are already written in sorted order, so the default, which does not sort keys, hashes the same bytes."
+reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same encoder and bytes."
 
 [[survivors]]
 module = "evals/typed_decisions/requalify.py"

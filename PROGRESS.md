@@ -20091,6 +20091,317 @@ base update b0b288d54a94494c47cc8747ed62c8c0ba340e24: branch side cd506c62c8cbc6
 - Re-plan of 2026-11-14 (the lead's ruling L-263, on the advisor's note of 16:32): the criterion "the suite `web-checks` finishes in under 1,200 s on four processors, measured twice" leaves the entry of S1-T15 and enters the entry of S2-T10, the review follow-up of slice S2, unticked and word for word, with open item OI-158. The same form was used on 2026-11-13, when the two criteria of the native trace were moved word for word to S1-T12. Nothing else changes: the measured time stays 1,294 s; no test, assertion, bound or limit changes; the criterion is neither ticked nor reworded.
 - S1-T15 is judged on the three criteria it keeps, each ticked with its evidence in the entries above. What the note asked stands: no further pass before the slice S1 gate, and the rest of the speed-up is work after that gate.
 
+#### S1-T15: independent review, round 2 (the confirmation): APPROVED
+
+Reviewed commit `6c7d592ad2c60e1a5157c376ffc273097c95e628`, a head of pull request https://github.com/albarami/economic-investment-intelligence/pull/43 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43600879826; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43600879763; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43600879705 ). The reviewer is Moonshot AI Kimi K3.1 Pro through the Abacus command-line tool, the reviewer of round 1; part A of the change was built by OpenAI GPT-6 Astra through Codex and part B by xAI Grok 4.7 through Cursor, and the lead (Anthropic) wrote the records, so the reviewer comes from another maker than every writer. Its first answer of this round gave the verdict with six checks of the checklist; the complete form was asked of the same conversation and is the one below. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T15 (pull request 43), confirmation round 2
+COMMIT: 6c7d592ad2c60e1a5157c376ffc273097c95e628
+REVIEWER: Moonshot AI Kimi through Abacus
+SKILLS LOADED: strict-reviewer; code-review unavailable in this tool
+EARLIER FINDINGS:
+  F1 FIXED — The timing criterion is preserved unticked and word for word under S2-T10 (`TASKS.md:417`); S1-T15 retains three ticked criteria and truthfully records the 1,294 s result and OI-158 (`TASKS.md:261-265`).
+  F2 FIXED — `EVIDENCE.md:118-140` records targeted failing runs and restored green runs for `ready`, `framesAfter`, `observePause`, shared `firstPause`, `clickPause`, and the part-B optimizations and guards.
+CHECKS:
+  REV-10 PASS — All three retained acceptance criteria are supported by the unchanged test inventory and assertions, the recorded 54/54 browser run, and the unchanged runner, suite list, limits and workflow (`TASKS.md:261`; `EVIDENCE.md:8-23`; `playwright.config.ts:5-22`).
+  REV-11 PASS — The lead's recorded work-commit checks report 127/127 Node-reported tests, 54/54 browser tests, 2011/2011 whole-run tests, and successful lint, typecheck, format, build, documentation and tree checks; exact-head whole-test and hosted checks remain merge conditions excluded from this verdict by the brief (`EVIDENCE.md:6-23`).
+  REV-12 PASS — The task patch is confined to `web/spikes/performance/`, its README and task records; the base update is separately identified and no `data/` path is changed (`.overnight/DIFF.patch`, sections 1–4).
+  REV-13 PASS — The changed helpers and guards contain working implementations and planted controls, with no TODO, empty implementation, mock substitute or invented result (`performance.spec.ts:32-107`; `EVIDENCE.md:118-140`).
+  REV-14 PASS — The reviewed diff contains no credential, `.env` material, custodian record, personal data or real register value; hosted secret scanning remains an exact-head merge condition.
+  REV-15 PASS — No test, assertion, planted case or bound is removed or weakened; positive controls and guard assertions were added, the browser suite remains in the whole command, and retries remain zero (`performance.spec.ts`; `EVIDENCE.md:118-140`; `playwright.config.ts:7-11`).
+  REV-16 PASS — The patch implements S1-T15's three retained criteria without changing the native frame-rate requirement, test runner or planted-refusal behavior (`TASKS.md:259-265`; `run.mjs:41-74`).
+  REV-17 PASS — TASKS.md, PROGRESS.md, OI-158 and OI-160 record the measured result, moved criterion and unresolved readiness timeout; the recorded documentation check exited 0 (`TASKS.md:261-265`; `OPEN_ITEMS.md:1354-1382`; `EVIDENCE.md:16`).
+  REV-18 PASS — The new request handling is test-only and enforces same-origin requests; no credential, privileged access, stored external response or new access boundary is introduced (`performance.spec.ts:71-107`; `small-map.ts`; `foreign-request.mjs`).
+  REV-19 PASS — Rulings 1–3 are followed: no check is weakened, the unmet timing is not claimed as passing, and the criterion moves unticked and word for word to S2-T10 with OI-158 (`TASKS.md:261,417`; `PROGRESS.md`, S1-T15 correction entry).
+  REV-20 N/A — No economic fact, product estimate or forecast is introduced; the recorded durations are test measurements, not product facts.
+  REV-21 N/A — No application screen, claim catalogue or Fact-chip rendering path is changed.
+  REV-22 PASS — No privacy rule, parameter, treatment, attack suite or tolerance is touched by the diff.
+  REV-23 PASS — The changes remain under the web spike and import only its local test helpers; no custodian, product, core or gateway boundary is crossed (`performance.spec.ts:1-23`; `.overnight/DIFF.patch`).
+  REV-24 N/A — No bilingual rendering code is changed; the existing Arabic and reduced-motion assertions remain covered by the browser tests.
+  REV-25 PASS — The recorded `python3 scripts/check_docs.py` run exited 0, and the reviewed task changes contain no private path, e-mail address, real custodian record or prohibited named-place attribution (`EVIDENCE.md:16`).
+  REV-26 PASS — Neither the spike documentation nor the task records makes a prohibited claim about operation, endorsement, certification, data custody or venture success.
+  REV-27 PASS — `cmp AGENTS.md CLAUDE.md` is recorded with exit code 0, and neither file is changed by this task (`EVIDENCE.md:18`; `.overnight/DIFF.patch`).
+  REV-28 N/A — No worker, residence, company or synthetic-register identifier is introduced.
+  REV-29 N/A — No attribute, estimate or synthetic figure is attached to a real named place or business; the spike retains its invented-extent fixture.
+  REV-38 PASS — No gateway file, gateway import, `EII_DECISION_PROVIDER` read or runtime model call is added.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S1-T15: merge record
+
+- The lead's checks on the merged head `6c7d592ad2c60e1a5157c376ffc273097c95e628` before the merge (ruling L-29): "TREE-IS-WORK ok: 550 paths at 6c7d592ad2c60e1a5157c376ffc273097c95e628", exit code 0; `./eii test --seed 2026111452`: exit code 0, "total: 2230 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/43 was squash-merged on 2026-11-14 at that head; merge commit `ce64beb8c74172e7cec6d629b3d25f43a24733bb` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43602562053; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43602562061; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43602562051 .
+- Hosted time of the suite `web-checks`, counted run by run and not waited for (the advisor's note of 2026-11-14 16:32, ruling L-262): on the head 731 s, on the merge commit's run on main 912 s, 843 passed in both; neither met a time limit. The third counted run is the next pull request's.
+- Correction by the lead: the figure 1,294 s in the description and the merge message of pull request 43 and in the S1-T15 entry of TASKS.md is the time of the browser run of the performance spike ALONE on processors 0 to 3 (`taskset -c 0-3 node web/spikes/performance/tests/run.mjs`), as the task's ledger above says; it is not a time of the whole suite `web-checks`, which also runs the other test files of the suite (about 24 s more in the builder's earlier in-suite run). The suite's own time on four processors is not yet measured; the criterion, now in task S2-T10 with open item OI-158, is unchanged, and about 200 s rather than 100 s are still to be gained.
+
+### S1-T10 — Review follow-up for slice S1: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/46 )
+
+- What it is: the follow-up task of slice S1. It closes the proposed open items PO-S1-02 to PO-S1-11 (PO-S1-08 has no heading of its own in `OPEN_ITEMS.md`), the two corrections and the five proposed items of the OI-38 confirmation, the hardening points OI-155 and OI-156, the guard defect OI-159, and the record points of the reviews of pull requests 37 and 38, of tasks S1-T09 and S1-T14 and of decision 0023 that the lead placed here (rulings L-95, L-96, L-100, L-104 and L-252). One work commit, 1212306326cf52ddb43c20aafde7140cd45844a0, on main ce64beb8c74172e7cec6d629b3d25f43a24733bb.
+- Class: routine (TASKS.md). The documentation check and the import-boundary guard are changed, so the review reads both line by line.
+- Personas: builder, a senior platform and test engineer who closes review follow-ups one by one, changes only what an item names and shows the failing test first (all three briefs); reviewer, a staff platform and test reviewer of another maker (xAI Grok), read-only. Skills the builders loaded, by their own returns: first build task-standards, project-orientation, sanad-provenance, muhasabah-gate, github-flow and strict-reviewer; continuation task-standards, project-orientation, sanad-provenance and muhasabah-gate; correction pass task-standards, project-orientation, sanad-provenance, muhasabah-gate and github-flow. Test-driven development, systematic debugging and verification before completion were not in the first build's or the correction pass's catalogue; both followed the briefs' plain rules (planted failing case first, real exit codes, no skip).
+- Builders: (1) the first build, OpenAI GPT-6 Astra through Codex (876 s), on an older base, never committed: items I1 to I16. (2) The continuation on today's base (ruling L-252), Google Gemini 4 Carbon through Abacus, in three jobs (2,043 s, stopped at the tool's turn limit with no return; 43 s; 2,987 s with its return): items I1 to I16 brought onto the base and the new items N1 to N8. (3) The correction pass, OpenAI GPT-6 Astra through Codex (1,016 s): the ten corrections X1 to X10 that the lead's reading of the whole continuation diff found (the glyph evidence set to approved against ruling C; an unasked sentence in rule 44 and the asked clause not changed; the persona list of TASKS.md rewritten; decision 0021's dated correction missing; the TST-197 matrix changed on the wrong rows; a new rule in TST-142 and a new criterion in task S10-T05 where one sentence was asked; a test that skipped; a provider's short name in a test label; one more planted case for the all-files scan; the table of closures). (4) The lead: three wording corrections after the correction pass (document 08's open-item summary and document 14's OI-08 bullet now say that OI-08 is narrowed and stays open for one use, the distinct-organisation minimum of a roll-up of the question log made for the evaluation, PRV-66; DHA-131 of document 17 lists the four forms of OI-155), the commit and this ledger.
+- Guards: `EARTHDATA_API_KEY` is refused under `product/` and `core/` and allowed in the custodian plane and the tooling, while `TOMTOM_API_KEY` stays allowed in the product plane (`test_earthdata_product_and_core`, `test_earthdata_custodian_and_tooling_tomtom_product_allowed` in `scripts/tests/test_s1_followup.py`). The documentation check requires document 17 and checks its DHA identifiers (`test_hardening_file_required`, `test_duplicate_hardening_identifier`, `test_unknown_hardening_identifier`); it reads every regular file that git lists with the identifier-number rule and the private patterns, in place of the closed exemption list the continuation brief asked for, which the lead accepted (correction X9 adds a file of an invented unlisted suffix; `test_eight_digit_run_in_mjs_and_private_pattern_in_non_utf8`); a private-patterns variable that names a missing path or a folder fails closed with one fixed line that prints no part of the path (`test_missing_private_pattern_file_fails_closed`, `test_directory_private_pattern_file_fails_closed`). The correction pass showed each of the last two rules failing once with its production line removed, then restored. The request judges of both map spikes refuse a scheme outside `http`, `https`, `data` and `blob` ("unknown request schemes are blocked" in the glyph spike's guard tests; "unknown or file request schemes are refused rather than ignored" in the performance spike's foreign-request tests).
+- Operations parity: `scripts/tests/test_operations_parity.py` reads the tables of document 13 by section heading and column and compares them with `.env.example`, `ENV_EXAMPLE_NAMES` of `scripts/check_tree.py`, `SECRET_NAMES` of `scripts/commit_guard.py` and `CHECKS` of `scripts/preflight.py`; a row added to a copy of a table and a name removed from a copy of a list each fail. The code is brought to the document: two names in `.env.example` and the name lists, and two presence-only preflight rows.
+- Glyph spike: the five place identifiers and English names are alif (Alif Test District), ba (Ba Simulation Quarter), jim (Jim Example Town), dal (Dal Display Hamlet) and ha (Ha Trial Way); the five Arabic strings are unchanged. Every machine-read review mark stays `pending native review`, because the evidence judge accepts a name's approval only together with the review of its image; the README states the owner's approval of the five Arabic strings of 2026-11-13 (FE-57) in prose. The evidence folder was made again with the spike's own record command. No file under `web/spikes/glyphs/tests/baselines/` is changed: the English comparison baseline shows the old English names and is recaptured by the hosted job of this pull request, whose pixel step therefore fails on that one image until the lead commits the capture in a commit of its own (TST-91, TST-92, open item OI-119). The test that held the baselines by a rename now copies, verifies and removes them, with restoration whatever happens (four node tests with an injected cross-device error, a failed copy and a corrupt copy); the lead also ran the four tests with the temporary folder on another file system than the repository (see PO-S1-08 below).
+- Documents: hardening entries DHA-103 to DHA-132 in document 17 (DHA-128 is the stronger agent sandbox of ruling L-95; DHA-131 and DHA-132 are OI-155 and OI-156); the two fixes of the OI-38 confirmation in document 10 (section "1. Scope and boundaries" and the `reference` chips of the automated provenance audit); the stale texts of the verdict in documents 03, 08, 10 and 11; the attribution paragraph of document 10 brought to the tested forms of the imagery provider's name (S1-T14 review, P1); owners for the still-open questions of decision 0022 in document 05; the dated correction of decision 0021's mutation counts appended after the sentence it corrects; the codec reason of one explained mutant (S1-T09 review, P3); the rows of cards C16, C39 and C41 of the TST-197 matrix already name MTH-118 and MTH-119, MTH-122 and MTH-121, so nothing there changed. Rule 44 of AGENTS.md and CLAUDE.md changes only in its timeout clause, and the two files stay byte-identical.
+- Records in TASKS.md (in the work commit): the entry of the decision-0022 sweep (D0022, done with pull request 37); S1-T08 done with its criteria ticked (OI-159); one sentence in S3-T16 (its scan of the built bundle and of the rendered page judges the map's credit by the place rule of TST-263). By this ledger: S1-T15 done (pull request 43, merged 2026-11-14); one note in S5-T09 (the road-link identifiers of the assignment spike's fixture are renamed before it copies their shape; item I16); one sentence in S4-T02 for question Q20 of document 05.
+- Closures entered in `OPEN_ITEMS.md` by this ledger: PO-S1-02, 03, 04, 05, 06, 07, 09, 10 and 11, OI-155, OI-156 and OI-159 closed, each with its test or document anchor; OI-116 and OI-119 updated. PO-S1-06 is closed by the sentence its NEEDED asks for, placed in OI-116 as an update: task S3-T04 declares `pyvalhalla` and `h3` in the product manifest together with the change of the clean-environment guard. PO-S1-11 is closed for the scan of the built bundle and the rendered page (task S3-T16); no task of the plan scans an export with the private list, so there is nothing to place for exports. OI-08 stays open for its one remaining use. OI-119 stays open for the review of the three images.
+- PO-S1-08 (item I11, no heading of its own): the move across file systems is replaced by copy, verify and remove, with restoration by copy whatever happens; the module no longer calls a rename. Its tests inject the cross-device error. The first brief asked for a test that runs with the temporary folder on another file system; the tests do not choose a file system themselves, so the lead ran them that way, and the command is among those below: it takes a folder in the machine's default temporary folder, prints the file-system type of that folder and of the repository (an in-memory file system and a disk file system on the build machine) and the totals of the four tests. The other commands of this ledger run with their temporary folder inside the workspace, on the repository's own file system, so they do not show this case.
+- Questions of decision 0022 (item I12): Q13 to Q15 and Q17 to Q19 have owners in document 05; Q12, Q16 and the settled parts of Q13 and Q14 are settled by decision 0023 item 12; Q21 names S4-T04. Q20 gets task S4-T02 by this ledger's sentence in that task's entry (the line of document 05 is unchanged: a ledger changes records only). Q22 is open item OI-148, which waits for the operator's data and has no owner in version 1. The OPEN line of document 14 on the register-company table, card and map points gets no invented owner; it becomes open item OI-162, which asks which task owns it.
+- New open items: OI-161 (two dependency alerts on the development-only package `qs`), OI-162 (the owner task of the register-company table, card and map points).
+- Records corrected here (ruling L-252, part 5): the task log of S1-T09 names OI-124, which does not exist (the file goes from OI-123 to OI-125); the question it named, whether the window of 23 months stands, is the one the review of S1-T09 (point P2) says ruling L-101 records as accepted by the advisor. The earlier log is not rewritten.
+- Records of task S1-T15 corrected here (ruling L-252, part 5; the proposed points P2 to P5 of its first review, which its own ledgers did not take; no earlier entry is rewritten). P2: the task log of S1-T15 calls its class Standard; the task's entry in TASKS.md says routine, and routine is right. P3: at the first review the head's own evidence stood in the review pack and not in an entry of this file; the suite's hosted times are now in the closing record of pull request 43 above (731 s on the final head, 912 s on main). P4: "about 53 s for each road scene" named the shortest set-up time; by the first review's reading of the pack's table the six set-up times of the shared scenes ran from about 54 s to about 82 s. P5: beside the builder's figures of that log (1,544 s for the browser run, 1,568 s for the web checks) stands the lead's own run at that work commit, 54 browser tests in 19.9 minutes (the first command of that ledger).
+- One figure corrected in TASKS.md by this ledger: the entry of S1-T15 said "measured: 1,294 s" beside the moved criterion on the suite's time; 1,294 s is the performance spike's browser run alone on four reserved processors, not the whole suite `web-checks`, as the task log of S1-T15 and the closing record above say. The words now say so.
+- Criteria: this ledger ticks the first criterion only. The second is the reviewer's. On the third and fourth the lead's reading is put to the reviewer: no item of the slice's reviews is deferred or left open; for the one line of decision 0022 that no task can own, item I12 itself asked for a proposal and no new task, and that record is OI-162.
+- Not in this pull request: OI-158 (the hosted limit of the web checks; the lead decides after the hosted runs); every item of type ASSUMPTION or OPEN that waits for the owner (ruling L-252); the hosted English baseline, which comes in its own commit.
+- Evidence: the commands below at the work commit.
+
+#### Evidence for the work commit `1212306326cf52ddb43c20aafde7140cd45844a0`
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   uv run --locked python -m unittest scripts.tests.test_s1_followup -v
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The planted cases of the new guards: the night-lights key under product and core, document 17 and its identifiers, every listed file read (an .mjs file, files that are not UTF-8 and an invented unlisted suffix), and the private-patterns variable naming a missing path or a folder.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   uv run --locked python -m unittest scripts.tests.test_operations_parity -v
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    3 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The operations parity test: the tables of document 13 against the four inventories of the code, with a row added to a table and a name removed from a list each refused.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v 2>&1 >/dev/null
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    813 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Every guard test of the repository, the pin-ruling guard of OI-159, the import boundary, the hooks guard and the preflight rows among them. The suite's own report is on the error stream and is what this row keeps; the lines that one test of the assignment spike prints to the output stream are not part of it.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   bash -c "set -o pipefail; node --test 'web/spikes/glyphs/tests/*.node-test.mjs' 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)))'"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 46 # pass 46 # fail 0 # cancelled 0 # skipped 0 # todo 0" (the totals of the Node test runner over the glyph spike's node tests)
+Seed:      none
+Notes:     The glyph spike's node tests: the unknown-scheme plant of the request judge, the four tests of the baseline holding across file systems, and the renamed names.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   d=$(env -u TMPDIR mktemp -d) && a=$(stat -f -c %T "$d") && b=$(stat -f -c %T .) && r=$(TMPDIR="$d" node --test web/spikes/glyphs/tests/hold-files.node-test.mjs 2>&1 | grep -E '^# (tests|pass|fail) ' | tr '\n' ' '); s=$?; rm -rf "$d"; [ $s -eq 0 ] && echo "temporary folder on $a, repository on $b: $r"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "temporary folder on tmpfs, repository on ext2/ext3: # tests 4 # pass 4 # fail 0" (the file-system types of the two folders, then the totals of the Node test runner)
+Seed:      none
+Notes:     Item I11 (PO-S1-08) run for real: the four tests of the baseline holding with the temporary folder in the machine's default temporary folder, an in-memory file system, and the repository on a disk file system.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   bash -c "set -o pipefail; npm --prefix web run test:spike:performance 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)), \"|\", \" \".join(re.findall(r\"[0-9]+ passed \\([0-9.]+m?s?\\)\", t)[:1]))'"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 128 # pass 128 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 54 passed (13.6m)" (the totals of the Node test runner and of the browser run inside it)
+Seed:      none
+Notes:     The performance spike's node tests with its browser run: the unknown-scheme plants of the foreign-request judge, used before commit and after readiness.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   npm --prefix web run spike:glyphs:verify-evidence
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "visual review: pending native review"
+Seed:      none
+Notes:     The glyph evidence matches its sources, and the visual review stays pending (OI-119).
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   npm --prefix web run lint
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "> eslint --max-warnings 0 ." (exit code decides)
+Seed:      none
+Notes:     Lint of the web code.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   npm --prefix web run typecheck
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "> tsc --noEmit" (exit code decides)
+Seed:      none
+Notes:     Type check of the web code.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   npm --prefix web run format:check
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All matched files use Prettier code style!"
+Seed:      none
+Notes:     Format of the web code.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   npm --prefix web run build
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "✓ built in 124ms" (the production build)
+Seed:      none
+Notes:     The production build.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint of the Python files.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "233 files already formatted"
+Seed:      none
+Notes:     Format check.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 207 source files"
+Seed:      none
+Notes:     Strict types.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 429 text files, 67 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check, now over every listed file, with document 17 required.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check, with the names added to `.env.example`.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after the change of rule 44.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   ./eii test --seed 2026111453
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    2250 passed, 0 failed, 0 skipped
+Seed:      2026111453
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','ce64beb8c74172e7cec6d629b3d25f43a24733bb...1212306326cf52ddb43c20aafde7140cd45844a0'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:scripts/tests/test_operations_parity.py A:scripts/tests/test_s1_followup.py A:web/spikes/glyphs/tests/hold-files.mjs A:web/spikes/glyphs/tests/hold-files.node-test.mjs M:.env.example M:AGENTS.md M:CLAUDE.md M:TASKS.md M:docs/03_DATA_CONTRACTS.md M:docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md M:docs/08_BACKEND.md M:docs/10_FRONTEND.md M:docs/11_DESIGN_DIRECTION.md M:docs/12_TESTING_AND_QUALITY.md M:docs/14_IMPLEMENTATION_PLAN.md M:docs/17_DEPLOYMENT_HARDENING.md M:docs/decisions/0021-one-speed-for-a-link-and-an-hour.md M:scripts/check_docs.py M:scripts/check_tree.py M:scripts/commit_guard.py M:scripts/mutation_explained.toml M:scripts/preflight.py M:scripts/preflight_rows.py M:scripts/tests/import_boundary_guard.py M:scripts/tests/test_check_docs_exceptions.py M:scripts/tests/test_hooks_guard.py M:scripts/tests/test_import_boundary_files.py M:scripts/tests/test_pin_rulings.py M:scripts/tests/test_preflight_rows.py M:scripts/tests/test_preflight_run.py M:web/spikes/glyphs/README.md M:web/spikes/glyphs/evidence/asset-manifest.json M:web/spikes/glyphs/evidence/english-labels.png M:web/spikes/glyphs/evidence/network.json M:web/spikes/glyphs/evidence/run.json M:web/spikes/glyphs/fixtures.ts M:web/spikes/glyphs/guards.mjs M:web/spikes/glyphs/names.json M:web/spikes/glyphs/tests/guards.node-test.mjs M:web/spikes/glyphs/tests/run.node-test.mjs M:web/spikes/performance/tests/foreign-request.mjs M:web/spikes/performance/tests/foreign-request.node-test.mjs'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "42 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The paths the work commit changes against the base.
+```
+
+```text
+### S1-T10 — Review follow-up for slice S1
+Commit:    1212306326cf52ddb43c20aafde7140cd45844a0
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','ce64beb8c74172e7cec6d629b3d25f43a24733bb..1212306326cf52ddb43c20aafde7140cd45844a0'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

@@ -1642,8 +1642,8 @@ financial centre's public register as a second register under decision 0022 (6.1
 person-month rule and `basic` from the latest record (6.3); (7) OD flows at H3 resolution 7 (6.5);
 (8) situation hour windows and the Sunday-to-Thursday week (7.1); (9) monthly rows hold the
 primitives of their own month, and a figure over several months is computed from the rows of one
-family (7.1); (10) outlet size bands (7.3); (11) scalar values in
-linked-input hash JSON use the canonical representations fixed in section 8; (12) fixed application read-function names
+family (7.1); (10) outlet size bands (7.3); (11) the protected window uses the canonical JSON of the period and the four name-ordered
+feed manifest hashes fixed in section 8, with no post-linkage projection or second input hash; (12) fixed application read-function names
 (section 12); (13) "Not measured" is a coverage key (DAT-95); (14) forward-only application
 migrations (DAT-125); (15) comparison-direction wire values are `higher`, `lower` and `equal`
 (DAT-134); (16) the attacker-view audit report path is

@@ -112,6 +112,7 @@ REQUIRED_FILES = [
     "docs/14_IMPLEMENTATION_PLAN.md",
     "docs/15_REVIEWER_CHECKLIST.md",
     "docs/16_DEMO_RUNBOOK.md",
+    "docs/17_DEPLOYMENT_HARDENING.md",
     "docs/GLOSSARY.md",
 ]
 
@@ -168,13 +169,14 @@ REQUIREMENT_PREFIXES = (
     "PLN",
     "REV",
     "RUN",
+    "DHA",
 )
 PREFIX_ALTERNATION = "|".join(REQUIREMENT_PREFIXES)
 ID_RE = re.compile(
-    rf"(?<![A-Za-z0-9-])(?:{PREFIX_ALTERNATION})-\d{{2,3}}(?![A-Za-z0-9])"
+    rf"(?<![A-Za-z0-9-])(?:{PREFIX_ALTERNATION})-\d{{2,}}(?![A-Za-z0-9])"
 )
 # A definition is the first cell of a table row.
-DEF_RE = re.compile(rf"^\|\s*((?:{PREFIX_ALTERNATION})-\d{{2,3}})\s*\|")
+DEF_RE = re.compile(rf"^\|\s*((?:{PREFIX_ALTERNATION})-\d{{2,}})\s*\|")
 
 LINK_RE = re.compile(r"(?<!\!)\[[^\]\n]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 FENCE_RE = re.compile(r"^\s*(```|~~~)")
@@ -798,22 +800,49 @@ def listed_hits(lines: list[str], finder: NameFinder) -> dict[int, set[str]]:
     return found
 
 
-def check_listed_bytes(
-    rel: str, data: bytes, finder: NameFinder, failures: list[str]
+def check_non_utf8_bytes(
+    path: Path,
+    rel: str,
+    data: bytes,
+    patterns: list[tuple[str, re.Pattern[str], str]],
+    extra_patterns: list[tuple[str, re.Pattern[str], str]],
+    listed: dict[str, frozenset[str]],
+    finder: NameFinder,
+    failures: list[str],
 ) -> None:
-    """Check 8 on a file that is not UTF-8: read with replacement characters, and
-    once more without zero bytes (UTF-16 text)."""
+    """Scan a non-UTF-8 file with replacement characters, and once more without
+    zero bytes (UTF-16 text), for listed names and all forbidden patterns."""
     texts = [data.decode("utf-8", "replace")]
     if b"\x00" in data:
         texts.append(data.replace(b"\x00", b"").decode("utf-8", "replace"))
+    split_views = [view.splitlines() for view in texts]
     numbers: set[int] = set()
-    for text in texts:
-        numbers.update(listed_hits(text.splitlines(), finder))
-    for number in sorted(numbers):
-        failures.append(
-            f"FAIL listed-name: {show(rel)}:{number}: a listed name outside its "
-            f"places: {NOT_SHOWN}"
+    if listed:
+        for view_lines in split_views:
+            numbers.update(listed_hits(view_lines, finder))
+        for number in sorted(numbers):
+            failures.append(
+                f"FAIL listed-name: {show(rel)}:{number}: a listed name outside its "
+                f"places: {NOT_SHOWN}"
+            )
+    sensitive = set(numbers)
+    for view_lines in split_views:
+        for number, line in enumerate(view_lines, 1):
+            if any(pattern.search(line) for _, pattern, _ in extra_patterns):
+                sensitive.add(number)
+    emitted_counts: dict[str, int] = {}
+    for view_lines in split_views:
+        view_failures: list[str] = []
+        check_forbidden(
+            path, view_lines, patterns, {}, finder, sensitive, view_failures
         )
+        seen_in_view: dict[str, int] = {}
+        for item in view_failures:
+            count = seen_in_view.get(item, 0) + 1
+            seen_in_view[item] = count
+            if count > emitted_counts.get(item, 0):
+                emitted_counts[item] = count
+                failures.append(item)
 
 
 def load_extra_patterns(failures: list[str]) -> list[tuple[str, re.Pattern[str], str]]:
@@ -1113,8 +1142,9 @@ def main() -> int:
         except UnicodeDecodeError:
             if text_file:
                 failures.append(f"FAIL encoding: {show(rel)}: not valid UTF-8")
-            if listed:
-                check_listed_bytes(rel, data, finder, failures)
+            check_non_utf8_bytes(
+                path, rel, data, patterns, extra_patterns, listed, finder, failures
+            )
             continue
         lines = text.splitlines()
         allowed = allowed_lines(rel, text, lines, listed)
@@ -1130,11 +1160,11 @@ def main() -> int:
             for number, line in enumerate(lines, 1)
             if any(pattern.search(line) for _, pattern, _ in extra_patterns)
         }
-        # Every UTF-8 file meets the extra patterns; text files also the built-in ones.
+        # Every listed regular file meets both built-in and extra forbidden patterns.
         check_forbidden(
             path,
             lines,
-            patterns if text_file else extra_patterns,
+            patterns,
             allowed,
             finder,
             sensitive,

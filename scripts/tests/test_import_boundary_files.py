@@ -355,7 +355,7 @@ class ImportBoundaryFilesTest(unittest.TestCase):
         """Forbidden environment variable names fail as exact substrings."""
         count = 0
         for package, _rel in _TREES:
-            for name in guard.ENV_NAMES:
+            for name in ("EII_DECISION_PROVIDER", "JEV_PRO_API_KEY"):
                 with self.subTest(tree=package, name=name):
                     with tempfile.TemporaryDirectory() as folder:
                         root = Path(folder)

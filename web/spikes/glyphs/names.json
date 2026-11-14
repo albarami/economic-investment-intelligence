@@ -2,32 +2,32 @@
   "reviewMark": "pending native review",
   "places": [
     {
-      "id": "aleph",
-      "nameEn": "Aleph Test District",
+      "id": "alif",
+      "nameEn": "Alif Test District",
       "nameAr": "منطقة الاختبار ألف",
       "review": "pending native review"
     },
     {
-      "id": "bet",
-      "nameEn": "Bet Simulation Quarter",
+      "id": "ba",
+      "nameEn": "Ba Simulation Quarter",
       "nameAr": "حي المحاكاة باء",
       "review": "pending native review"
     },
     {
-      "id": "gimel",
-      "nameEn": "Gimel Example Town",
+      "id": "jim",
+      "nameEn": "Jim Example Town",
       "nameAr": "مدينة المثال جيم",
       "review": "pending native review"
     },
     {
-      "id": "dalet",
-      "nameEn": "Dalet Display Hamlet",
+      "id": "dal",
+      "nameEn": "Dal Display Hamlet",
       "nameAr": "قرية العرض دال",
       "review": "pending native review"
     },
     {
-      "id": "he",
-      "nameEn": "He Trial Way",
+      "id": "ha",
+      "nameEn": "Ha Trial Way",
       "nameAr": "شارع التجربة هاء",
       "review": "pending native review"
     }

@@ -303,10 +303,24 @@ def traffic_provider_key_row(environ: Mapping[str, str]) -> store.Line:
 
 
 def night_lights_key_row(environ: Mapping[str, str]) -> store.Line:
-    """Report optional night-lights key presence without contacting a source."""
+    """Check 15: EARTHDATA_API_KEY presence only; never print the value or connect."""
     if environ.get("EARTHDATA_API_KEY", ""):
         return store.Line("PASS", "night-lights-key", "present")
     return store.Line("PASS", "night-lights-key", "absent")
+
+
+def imagery_provider_key_row(environ: Mapping[str, str]) -> store.Line:
+    """OPS-73: ESRI_API_KEY presence only; never print the value or connect."""
+    if environ.get("ESRI_API_KEY", ""):
+        return store.Line("PASS", "imagery-provider-key", "present")
+    return store.Line("PASS", "imagery-provider-key", "absent")
+
+
+def photorealistic_3d_key_row(environ: Mapping[str, str]) -> store.Line:
+    """OPS-74: MAPTILE_API_KEY presence only; never print the value or connect."""
+    if environ.get("MAPTILE_API_KEY", ""):
+        return store.Line("PASS", "photorealistic-3d-key", "present")
+    return store.Line("PASS", "photorealistic-3d-key", "absent")
 
 
 def git_env(root: Path, environ: Mapping[str, str]) -> dict[str, str]:

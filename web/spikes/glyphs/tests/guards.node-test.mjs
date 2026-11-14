@@ -170,3 +170,15 @@ test('the spike sources keep the primary pin guards', () => {
   assert.equal(judgeRtlPlugin(page).ok, true, judgeRtlPlugin(page).detail);
   assert.equal(judgeWebGpu(page).ok, true, judgeWebGpu(page).detail);
 });
+
+test('unknown request schemes are blocked', () => {
+  for (const url of [
+    'ftp://example.invalid/tile.pbf',
+    'ws://127.0.0.1:1/socket',
+    'file:///synthetic.txt',
+  ]) {
+    const result = judgeRequests([url], 'http://127.0.0.1:1');
+    assert.equal(result.ok, false);
+    assert.equal(result.rows[0].decision, 'blocked');
+  }
+});
