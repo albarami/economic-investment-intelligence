@@ -260,6 +260,11 @@ Listed below by document and stable anchor: the whole change of this record's pu
 - 6.2 Tool contracts, `travel_times`, row Statuses
 - 6.2 Tool contracts, `compare_areas`, row Statuses
 - 6.2 Tool contracts, `own_records`, row Outputs
+- 6.2 Tool contracts, `reachable_access`, row Statuses
+- 6.2 Tool contracts, `site_estimate`, row Statuses
+- 6.2 Tool contracts, `revenue_range_scenario`, row Statuses
+- 6.2 Tool contracts, `location_allocation`, row Outputs
+- 6.2 Tool contracts, `location_allocation`, row Statuses
 
 ### docs/09_AI_ASSISTANT.md
 
