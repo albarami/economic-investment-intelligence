@@ -1,0 +1,39 @@
+[[rules_version]]
+rules_version_id = "rv-1.0.0-s1"
+parameter_set = "shared"
+rule_code = "export_parameter_set"
+value = "A"
+unit = "parameter set"
+description_en = "The one parameter set whose protected tables are exported."
+
+[[rules_version]]
+rules_version_id = "rv-1.0.0-s1"
+parameter_set = "shared"
+rule_code = "window_months"
+value = "23"
+unit = "months"
+description_en = "The number of consecutive complete months in the one version 1 window."
+
+[[rules_version]]
+rules_version_id = "rv-1.0.0-s1"
+parameter_set = "A"
+rule_code = "round_movement"
+value = "50"
+unit = "people or vehicle trips"
+description_en = "The rounding base of every released presence and flow estimate for set A."
+
+[[rules_version]]
+rules_version_id = "rv-1.0.0-s1"
+parameter_set = "B"
+rule_code = "round_movement"
+value = "100"
+unit = "people or vehicle trips"
+description_en = "The rounding base of every released presence and flow estimate for set B."
+
+[[rules_version]]
+rules_version_id = "rv-1.0.0-s1"
+parameter_set = "shared"
+rule_code = "not_a_rule"
+value = "1"
+unit = "unspecified"
+description_en = "Added entry."
