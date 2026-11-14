@@ -1094,6 +1094,26 @@
 - OPTIONS: **Recommendation:** in task S1-T08, search the spike's built page for both parsers; raise `fflate` to 0.7.5 by an override if the spike's tests stay green with it; keep the `image-size` alert open with its reason (no page loads a texture image; its fixed release is a new major version that its parent does not accept) unless a test shows the override harmless. Alternative: leave both until the map layers of slice S3 choose their loaders.
 - NEEDED BY: slice S1 gate; not a blocker.
 
+## OI-155 — Forms that render as a listed name without being its text
+
+- ID: OI-155
+- TYPE: PROPOSED (hardening: document 17)
+- NEEDED: A decision whether the documentation check should also refuse forms that a reader sees as a listed name but that are not its text: tags inside the name, a link on half of it, further invisible characters, further escape forms.
+- WHY: The break pass of task S1-T14 showed four such forms passing everywhere. The private list's plain patterns do not catch them either, with or without the place-scoped exception, so the exception weakens nothing here; refusing them is a defence against deliberate evasion beyond the task's criteria ([decision 0018](docs/decisions/0018-priorities-and-amendments-to-decision-0015.md)).
+- DONE SO FAR: Recorded with the four demonstrated forms in the task's evidence. Nothing built.
+- OPTIONS: **Recommendation:** move to [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) with the slice's follow-up task; build only if the repository ever takes contributions from outside the run.
+- NEEDED BY: the follow-up task of slice S1 (S1-T10), which places it.
+
+## OI-156 — An unreadable folder and a failing file listing narrow the documentation check silently
+
+- ID: OI-156
+- TYPE: PROPOSED (hardening: document 17)
+- NEEDED: A decision whether the documentation check should fail when a folder cannot be read or when git cannot list the files, instead of scanning less.
+- WHY: The break pass of task S1-T14 showed that a folder without read permission is skipped without a line, and that a failing git listing falls back, without notice, to the walk that leaves out build folders. Both are older than that task and concern the whole check, not its exception; neither occurs on the hosted checks.
+- DONE SO FAR: Recorded with both demonstrations in the task's evidence. Nothing built.
+- OPTIONS: **Recommendation:** move to [17_DEPLOYMENT_HARDENING.md](docs/17_DEPLOYMENT_HARDENING.md) with the slice's follow-up task.
+- NEEDED BY: the follow-up task of slice S1 (S1-T10), which places it.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
