@@ -265,6 +265,7 @@ Listed below by document and stable anchor: the whole change of this record's pu
 - 6.2 Tool contracts, `revenue_range_scenario`, row Statuses
 - 6.2 Tool contracts, `location_allocation`, row Outputs
 - 6.2 Tool contracts, `location_allocation`, row Statuses
+- 6.2 Tool contracts, `series_forecast`, row Statuses
 
 ### docs/09_AI_ASSISTANT.md
 
