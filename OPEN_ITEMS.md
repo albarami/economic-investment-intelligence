@@ -1300,6 +1300,26 @@
 - UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): CLOSED, decided: Option A. TST-32 stands as written. DAT-60 and SYN-57 say that the simulator omits rows of the count tables `presence_hourly` and `od_hourly` under the minimum panel devices of the active parameter set, 20 under set A and 30 under set B, before conformance. Nothing else about the two sets changes (item 11).
 
 
+## OI-151 — Greater Doha as five whole municipalities
+
+- ID: OI-151
+- TYPE: ASSUMPTION
+- NEEDED: The owner's confirmation or replacement of the lead's assumption that Greater Doha is, for version 1, five whole municipalities, named in the frame's review file of task S2-T02.
+- WHY: The frame's resolution boundary (resolution 9 inside Greater Doha, 8 elsewhere) and every use of the name on a screen or a card depend on it. [Decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) item 10 keeps the assumption for version 1 and rules that the definition is shown wherever the name appears.
+- DONE SO FAR: The advisor decided under the owner's delegation on 2026-11-14 that the five-municipality reading stays for version 1 and that this item stays open as a record point. The review file is built by task S2-T02; until that task merges, the pack refers to "the five municipalities of the frame's review file" and lists no names.
+- OPTIONS: **Default until decided:** five whole municipalities. Otherwise the owner names another set of whole municipalities or a drawn boundary, and the frame is rebuilt.
+- NEEDED BY: the slice S2 gate (the frame), and before any screen shows the name (slice S3).
+
+## OI-157 — The caveat key `national_average` on card C33 after the survey benchmark left it
+
+- ID: OI-157
+- TYPE: OPEN
+- NEEDED: Decide whether card C33 (site demand and revenue estimate) keeps the caveat key `national_average`.
+- WHY: [Decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) item 12 withdraws the survey's output per establishment, which was the only survey figure card C33 showed. The card's list of caveats in [07](docs/07_ECONOMIC_METHODS.md) still names `national_average`, which described that figure. A caveat with no figure behind it says something the card no longer shows.
+- DONE SO FAR: Found by the lead's sweep of decision 0026. Left as it stands: the key is part of the card's closed list and of the tests that read it, and the card stays off screen while OI-03 is open.
+- OPTIONS: **Recommendation:** remove the key from card C33 when task S6-T17 is planned, with its test rows. Otherwise keep it and name the figure it covers.
+- NEEDED BY: the plan of task S6-T17 (slice S6).
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
