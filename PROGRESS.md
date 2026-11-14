@@ -17409,6 +17409,93 @@ Seed:      none
 Notes:     The one work commit between the base and the work commit has a Conventional Commit subject.
 ```
 
+### D0023 — Decision 0023: ten additions and the data rule: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/41 )
+
+- What it is: decision record 0023 and its sweep of the pack. The owner's decisions of 2026-11-13 and 2026-11-14, as the lead recorded them: ten additions (talent available near a site; Qatar in 3D with a clock; the national GIS centre's layers; voice; the best three sites with "how sure"; the financial centre's firms; satellite imagery with address search and the photorealistic 3D mode; property sale prices and bank credit; the decision question bank; tenders and district cooling with ten open-data families); the order of the site answer; the data rule with its six replacements; a product for companies designed for its personas, with no oversight seat and no ministry view; movement aggregates that carry age band, gender and nationality group; the talent ratio; no catchment beyond 30 minutes.
+- Class: Deep (it changes privacy rules and the agent rules). Lead: Anthropic (Claude Opus 5.5 on 2026-11-13 and until about 01:05 on 2026-11-14, Claude Fable 5.2 from then on): the decision record's content, every ruling, the decisions sheets, the combination of the editors' work and this ledger.
+- First pass (2026-11-13): the record drafted by the lead; the sweep of the pack by the lead's agents (Claude Opus 5.5), with the lead's audit of every planned synthetic source against the data rule (six replaced); a review through five lenses by the lead's agents with a second reader for each finding: 53 findings, 51 real, 48 fixed, 2 refuted, 3 ruled by the lead; a critic listed 21 gaps.
+- Second pass (2026-11-14, the lead's agents: editors and first reviewers Claude Opus 5.5, verifiers of privacy and high-severity findings and the critic Claude Fable 5.2): the owner's decisions of the evening of 2026-11-13 entered (no individual in a talent answer; companies only; designed for its personas) and the 21 gaps closed; three lenses gave 9 findings, 8 real, 7 fixed, 1 ruled by the lead (the talent answer's flows keep card C39's form, put to the owner in OI-147); the critic listed nine gaps, eight carried into the third pass and one being this ledger.
+- The move onto main (2026-11-14): task S1-T11 had merged decision 0021 meanwhile; six files conflicted in ten places (status lines, the range of decision records, two table rows, appended open items); the lead's script resolved them with both sides kept, and its proof lists every line of either side that the result does not hold (each one a line a rule rewrote).
+- Third pass (2026-11-14), edited and reviewed by other makers' tools from the lead's decisions sheet: five editors on separate file groups (xAI Grok 4.7 for the rules, the record, privacy, contracts, tests and methods; Cursor Composer 2.5 for the synthetic world, the public data pack, the architecture, the back end, the assistant, the front end, the design, the runbook, the tasks and the plan); then two review lenses on the pass's diff: privacy by Moonshot Kimi K3.1 Pro (7 findings) and consistency by OpenAI GPT-6 Astra (14 findings). The lead's agents verified every finding against the files (two on Claude Fable 5.2 for the privacy design and the structural checks, two on Claude Opus 5.5): 19 real or partly real with 103 passages to align, 2 refuted (the record may say which list its bands replaced; the staffing ladder's 20-minute step follows from the decision). The lead ruled on the contested points: a split value below the panel minimum is pooled into `other` so that nothing withheld can be recovered by subtraction; the age split covers every visitor with those under 15 in `other`; a flow split counts person trips; the talent answer's catchments are inside the structural checks in every playbook that calls the tool; homes stay no finer than the district and only a flow line's home end is a municipality. The same five editors entered the corrections.
+- Identifiers this decision adds are checked against main and the open branches: no identifier is defined twice; the decision record of task S1-T14 and its test identifier were renumbered on that task's branch.
+- The repository's checks cannot see whether a passage is true to the owner's decisions: that is the reviewer's judgement, with the lead's rulings in the pack. The documentation check also ran with the owner's private pattern list on every commit of the branch (the commit hook): no name of that list is in the change; the satellite imagery provider is named only by its role and its setting.
+- Open for the owner, each with a default that the pack states: whether road traffic is part of the movement source (yes); the form of the talent answer's flows (card C39's form, OI-147); the age bands against the operator's format when its data arrives (OI-148, not a question for the owner now).
+- Not in this pull request: any code. The tasks that build the additions are named in TASKS.md and document 14; the task that adds the imagery source also adds the provider's name in its two allowed places (task S1-T14 builds that exception).
+
+#### Evidence for the work commit `eeee5766c5c7445533a7b8028245fc376482160e`
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    eeee5766c5c7445533a7b8028245fc376482160e
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 364 text files, 63 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the record and every amended document: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    eeee5766c5c7445533a7b8028245fc376482160e
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    eeee5766c5c7445533a7b8028245fc376482160e
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after rules 3, 8 and 10 changed.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    eeee5766c5c7445533a7b8028245fc376482160e
+Command:   bash -c "grep -hE '45[ -]minute|15, 30 and 45|15/30/45' docs/0*.md docs/1*.md docs/GLOSSARY.md TASKS.md AGENTS.md README.md | grep -v 'qatar is small 45 minutes is way too far' | wc -l"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no document of the pack carries a 45-minute drive time)
+Seed:      none
+Notes:     The retired bands are gone from the documents of the pack, the glossary, the tasks, the agent rules and the README; the only lines left are the owner's quoted words (the record's own text and the history of a closed open item are not searched).
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    eeee5766c5c7445533a7b8028245fc376482160e
+Command:   ./eii test --seed 2026111424
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    1879 passed, 0 failed, 0 skipped
+Seed:      2026111424
+Notes:     The whole test command on the build machine with a fresh seed: the pull request changes documents only, and the guards that read documents (the reference notes' anchors, the command tables) still pass.
+```
+
+```text
+### D0023 — Decision 0023: ten additions and the data rule
+Commit:    eeee5766c5c7445533a7b8028245fc376482160e
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','a9db6c85d19c1035377dfbc9fde8959fcc86cff7..eeee5766c5c7445533a7b8028245fc376482160e'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-14
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The three work commits between the base and the work commit have Conventional Commit subjects.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
