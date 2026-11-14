@@ -1685,8 +1685,10 @@ scenarios and the Public figures of DAT-157, and the schema condition that makes
 keys force the status Inferred (section 9, DAT-157 to DAT-162); (37) a base rate has the status that the churn rate of card C2 has,
 `observed` (DAT-159); (38) `pub_night_lights` is keyed by frame cell, from whole pixels with no split,
 and not by release unit, because no Public table has a `unit_id` (DAT-74, DAT-157), and the grid key of `pub_pop_agesex_grid`
-takes the prefix `wa_` (7.3); (39) the indicators `revenue` and `costs` of `pub_establishment_size`
-are the survey's per-establishment revenue and cost columns (7.3); (40) the whole-cell sum of
+takes the prefix `wa_` (7.3); (39) withdrawn by decision 0026 item 12:
+`pub_establishment_size` does not include `revenue` or `costs`; its indicators are `establishments`,
+`employees` and `compensation`; cards C33 and C35 show no survey output-per-establishment
+benchmark (section 7.3, DAT-161); (40) the whole-cell sum of
 `pub_pop_agesex_grid` over an area has the status `observed`, as an exact-shape count of Public
 points does (DAT-141, DAT-147); (41) the metric keys, units and value orders of the facts of
 decision 0023, and its caveat and reason keys (section 9, DAT-164 to DAT-168); (42) the features of

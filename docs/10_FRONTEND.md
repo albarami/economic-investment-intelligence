@@ -809,7 +809,7 @@ A script under `scripts/` (named in [13](13_DEPLOYMENT_AND_OPERATIONS.md)) build
 | Landmark heights | hand-entered estimates keyed by name and coordinates | project's own | joined to basemap footprints at build | the list only |
 | Interface fonts | IBM Plex Sans, IBM Plex Sans Arabic npm packages | SIL OFL 1.1 | bundled by Vite with the licence text | via lock file |
 | Icons | the set chosen in [11](11_DESIGN_DIRECTION.md) | as stated there | bundled by Vite | as stated there |
-| Zone geometry | per [04 Public data pack](04_PUBLIC_DATA_PACK.md) (`bnd_hdx` supplies frame geometry; source terms are recorded in document 04) | per 04 | fetched at build time, never committed; the 2020 boundary and census map layers may be used and shown in full; census layers join by keys to the frame geometry from `bnd_hdx` (PUB-13) | no |
+| Zone geometry | per [04 Public data pack](04_PUBLIC_DATA_PACK.md) (`bnd_hdx` supplies frame geometry; source terms are recorded in document 04) | per 04 | fetched at build time, never committed; the census map layers may be used and shown in full under PUB-12; the 2020 boundary layers (`bnd_zone_2020`, `bnd_district_2020`) stay a build-time check that every `bnd_hdx` zone matches a 2020 zone number, by zone keys (PUB-24), with no release table | no |
 
 | ID | Requirement | Slice |
 |---|---|---|

@@ -795,7 +795,7 @@ Retrieved 2026-11-11 unless stated. "Research note" means the point is an infere
 - [S27] Qatar News Agency, reduced public-sector hours during Ramadan, 16 Feb 2026, https://qna.org.qa/en/News-Area/News/2026-2/16/qatar-sets-reduced-working-hours-for-public-sector-during-ramadan.
 - [S28] The Peninsula, Ramadan working hours for the private sector, 14 Feb 2026, https://s.thepeninsula.qa/article/14/02/2026/ministry-of-labour-announces-ramadan-working-hours-for-private-sector.
 - [S29] The Peninsula, metro and tram Ramadan hours, 17 Feb 2026, https://s.thepeninsula.qa/article/17/02/2026/doha-metro-and-lusail-tram-announce-operating-hours-in-ramadan.
-- [S30] Ministry of Transport, transport master plan executive summaries (terms restrict publication), https://www.mot.gov.qa/en/land-transport/transportation-master-plan-for-qatar-2050.
+- [S30] Ministry of Transport, transport master plan executive summaries (its terms are to be read and recorded in document 04 with the date read, PUB-12), https://www.mot.gov.qa/en/land-transport/transportation-master-plan-for-qatar-2050.
 - [S31] Mobility simulation research, synthesis of the common fields of aggregate mobility feeds (research note).
 - [S32] Mobility simulation research, validation metrics and the circular-validation pitfall (research note).
 - [S33] Qatar Open Data Portal, Accident (zone and hour fields), https://www.data.gov.qa/explore/dataset/accident/.

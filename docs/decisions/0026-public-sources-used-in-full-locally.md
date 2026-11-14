@@ -189,6 +189,7 @@ None.
 
 **Changed**
 
+- Open questions and assumptions, assumption (39)
 - Section 7.2 Table catalogue, row `pub_tender`
 - DAT-168 (section 7.3 Columns), requirement
 - DAT-168 (section 7.3 Columns), GIS layers basis
@@ -320,6 +321,7 @@ None.
 
 **Changed**
 
+- Sources, entry [S30]
 - SYN-57
 - 12.6 What the transport surveys do not give us
 - 18. Not modelled, and dropped ideas (row: A transport-model fit benchmark on the scorecard)
@@ -448,6 +450,7 @@ None.
 
 **Changed**
 
+- 14. asset table, row Zone geometry
 - 4.5 Rooms, Trust centre row (tender source, PUB-108)
 - 4.5 Rooms, Trust centre row (basis of use, owner_decision, PUB-105)
 - Open questions and assumptions, item "OPEN: the public source of tenders is named by decision 0023 item 10"
