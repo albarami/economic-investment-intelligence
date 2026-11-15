@@ -286,12 +286,20 @@ def test_positive_height_refuses_zero_negative_and_non_finite(bad) -> None:
 
 
 @pytest.mark.parametrize(
-    "bad", [pytest.param(30, id="int"), pytest.param("30", id="str")]
+    "bad",
+    [
+        pytest.param(float("nan"), id="nan-float"),
+        pytest.param(30, id="int"),
+        pytest.param("30", id="str"),
+    ],
 )
 def test_positive_height_of_another_type_is_a_defect(bad) -> None:
-    """A non-Decimal is a programming defect of the caller and still raises."""
-    with pytest.raises(ValueError):
+    """A non-Decimal is a programming defect of the caller and raises the
+    closed refusal text whole, whether the value is not finite or any other
+    kind the function refuses with that text."""
+    with pytest.raises(ValueError) as err:
         positive_height(bad)
+    assert str(err.value) == "finite Decimal required"
 
 
 def test_each_written_height_and_statistic_is_the_rounded_decimal() -> None:
