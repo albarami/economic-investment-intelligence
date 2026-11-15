@@ -7,9 +7,13 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-import yaml  # type: ignore[import-untyped]
+import yaml
 
-from eii_custodian.publicdata.additions.common import AdditionError, require_lineage
+from eii_custodian.publicdata.additions.common import (
+    AdditionError,
+    FamilyParse,
+    require_lineage,
+)
 from eii_custodian.publicdata.additions.municipal import PARSERS
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.frame.checks import FrameError
@@ -79,7 +83,7 @@ def _run(
     folder: Path,
     field_map: dict[str, object] | None = None,
     receipt: dict[str, object] | None = None,
-) -> object:
+) -> FamilyParse:
     return PARSERS[source](
         _entry(slug),
         rows,
@@ -89,8 +93,8 @@ def _run(
     )
 
 
-def _coverage(parsed: object, reason: str) -> int:
-    return sum(item.count for item in parsed.coverage if item.reason == reason)  # type: ignore[attr-defined]
+def _coverage(parsed: FamilyParse, reason: str) -> int:
+    return sum(item.count for item in parsed.coverage if item.reason == reason)
 
 
 def _lineage(source_key: str, period: str, method: str) -> dict[str, object]:
@@ -177,8 +181,8 @@ def test_annual_permit_table_keeps_the_count_and_its_lineage(tmp_path: Path) -> 
     """One invented annual permit row is the whole table, with its source chain."""
     entry = _entry(PERMIT_ANNUAL)
     parsed = _run("permits_muni", PERMIT_ANNUAL, [_permit()], tmp_path)
-    assert parsed.table == "pub_building_permits"  # type: ignore[attr-defined]
-    assert parsed.rows == (  # type: ignore[attr-defined]
+    assert parsed.table == "pub_building_permits"
+    assert parsed.rows == (
         {
             "municipality_code": "syn_coast",
             "document_type": "building_permit",
@@ -188,11 +192,11 @@ def test_annual_permit_table_keeps_the_count_and_its_lineage(tmp_path: Path) -> 
             **_lineage(entry.key, "2022", METHOD_PERMITS),
         },
     )
-    assert parsed.period_first == "2022"  # type: ignore[attr-defined]
-    assert parsed.period_last == "2022"  # type: ignore[attr-defined]
+    assert parsed.period_first == "2022"
+    assert parsed.period_last == "2022"
     assert _coverage(parsed, "missing_measure") == 0
-    assert all(item.count > 0 for item in parsed.coverage)  # type: ignore[attr-defined]
-    question = parsed.questions[0]  # type: ignore[attr-defined]
+    assert all(item.count > 0 for item in parsed.coverage)
+    question = parsed.questions[0]
     assert "published key" in question.contract
     assert "3 classes" in question.inventory
     assert "classification" in question.change
@@ -202,7 +206,7 @@ def test_certificate_count_is_not_read_as_a_permit_number(tmp_path: Path) -> Non
     """The certificate slug keeps certificate_type and the count field's own number."""
     entry = _entry(PERMIT_CERT)
     parsed = _run("permits_muni", PERMIT_CERT, [_certificate()], tmp_path)
-    assert parsed.rows == (  # type: ignore[attr-defined]
+    assert parsed.rows == (
         {
             "municipality_code": "syn_inland",
             "document_type": "completion_certificate",
@@ -224,15 +228,15 @@ def test_monthly_permit_uses_the_lookup_and_building_type_all(tmp_path: Path) ->
         tmp_path,
         _named_month(_map(), PERMIT_MONTH),
     )
-    assert [row["document_count"] for row in parsed.rows] == [3, 7]  # type: ignore[attr-defined]
-    assert {row["period"] for row in parsed.rows} == {"2018-01", "2019-03"}  # type: ignore[attr-defined]
-    assert {row["building_type"] for row in parsed.rows} == {"all"}  # type: ignore[attr-defined]
-    assert {row["permit_type"] for row in parsed.rows} == {"New Building"}  # type: ignore[attr-defined]
-    assert {row["municipality_code"] for row in parsed.rows} == {"syn_coast"}  # type: ignore[attr-defined]
-    assert parsed.period_first == "2018-01"  # type: ignore[attr-defined]
-    assert parsed.period_last == "2019-03"  # type: ignore[attr-defined]
+    assert [row["document_count"] for row in parsed.rows] == [3, 7]
+    assert {row["period"] for row in parsed.rows} == {"2018-01", "2019-03"}
+    assert {row["building_type"] for row in parsed.rows} == {"all"}
+    assert {row["permit_type"] for row in parsed.rows} == {"New Building"}
+    assert {row["municipality_code"] for row in parsed.rows} == {"syn_coast"}
+    assert parsed.period_first == "2018-01"
+    assert parsed.period_last == "2019-03"
     assert entry.period_first == "2016-01"
-    assert parsed.rows[0]["method"] == METHOD_PERMITS  # type: ignore[attr-defined]
+    assert parsed.rows[0]["method"] == METHOD_PERMITS
 
 
 def test_monthly_float_count_stays_integral_and_zero_stays_zero(tmp_path: Path) -> None:
@@ -244,7 +248,7 @@ def test_monthly_float_count_stays_integral_and_zero_stays_zero(tmp_path: Path) 
         tmp_path,
         _named_month(_map(), PERMIT_MONTH_FLOAT),
     )
-    assert [row["document_count"] for row in parsed.rows] == [4, 0]  # type: ignore[attr-defined]
+    assert [row["document_count"] for row in parsed.rows] == [4, 0]
 
 
 def test_monthly_without_a_declared_spelling_writes_no_row(tmp_path: Path) -> None:
@@ -252,9 +256,9 @@ def test_monthly_without_a_declared_spelling_writes_no_row(tmp_path: Path) -> No
     parsed = _run(
         "permits_muni", PERMIT_MONTH, [_month(), _month(year="2019")], tmp_path
     )
-    assert parsed.rows == ()  # type: ignore[attr-defined]
+    assert parsed.rows == ()
     assert _coverage(parsed, "municipality_absent") == 2
-    question = parsed.questions[-1]  # type: ignore[attr-defined]
+    question = parsed.questions[-1]
     assert "no municipality field" in question.inventory
     assert "existing lookup" in question.change
 
@@ -271,8 +275,8 @@ def test_monthly_and_annual_views_are_not_added(tmp_path: Path) -> None:
         tmp_path / "monthly",
         _named_month(_map(), PERMIT_MONTH),
     )
-    assert annual.rows[0]["document_count"] == 10  # type: ignore[attr-defined]
-    assert [row["document_count"] for row in monthly.rows] == [3, 7]  # type: ignore[attr-defined]
+    assert annual.rows[0]["document_count"] == 10
+    assert [row["document_count"] for row in monthly.rows] == [3, 7]
 
 
 def test_unmapped_spelling_stops_with_the_lookup_count(tmp_path: Path) -> None:
@@ -347,7 +351,7 @@ def test_missing_count_is_left_out_and_a_dash_stops(tmp_path: Path) -> None:
         [_permit(count=None), _permit(year="2023", count=5)],
         tmp_path / "null",
     )
-    assert [row["document_count"] for row in parsed.rows] == [5]  # type: ignore[attr-defined]
+    assert [row["document_count"] for row in parsed.rows] == [5]
     assert _coverage(parsed, "missing_measure") == 1
     with pytest.raises(AdditionError) as caught:
         _run(
@@ -422,9 +426,9 @@ def test_the_modified_date_is_not_the_period(tmp_path: Path) -> None:
         tmp_path,
         receipt={**RECEIPT, "source_modified": "1999-01-01"},
     )
-    assert parsed.rows[0]["period"] == "2024"  # type: ignore[attr-defined]
-    assert parsed.period_first == "2024"  # type: ignore[attr-defined]
-    assert "1999" not in parsed.rows[0]["period"]  # type: ignore[attr-defined]
+    assert parsed.rows[0]["period"] == "2024"
+    assert parsed.period_first == "2024"
+    assert "1999" not in parsed.rows[0]["period"]
 
 
 def test_population_table_and_its_lineage(tmp_path: Path) -> None:
@@ -444,8 +448,8 @@ def test_population_table_and_its_lineage(tmp_path: Path) -> None:
         ],
         tmp_path,
     )
-    assert parsed.table == "pub_population_age"  # type: ignore[attr-defined]
-    assert parsed.rows == (  # type: ignore[attr-defined]
+    assert parsed.table == "pub_population_age"
+    assert parsed.rows == (
         {
             "municipality_code": "syn_coast",
             "age_group": "5 - 9",
@@ -482,12 +486,12 @@ def test_population_cells_are_not_summed_across_age_or_municipality(
         ],
         tmp_path,
     )
-    assert len(parsed.rows) == 2  # type: ignore[attr-defined]
-    assert sorted(row["value"] for row in parsed.rows) == [  # type: ignore[attr-defined]
+    assert len(parsed.rows) == 2
+    assert sorted(row["value"] for row in parsed.rows) == [
         Decimal("4.0000"),
         Decimal("6.0000"),
     ]
-    assert {row["municipality_code"] for row in parsed.rows} == {  # type: ignore[attr-defined]
+    assert {row["municipality_code"] for row in parsed.rows} == {
         "syn_coast",
         "syn_inland",
     }
@@ -531,8 +535,8 @@ def test_hotel_table_counts_facilities(tmp_path: Path) -> None:
         ],
         tmp_path,
     )
-    assert parsed.table == "pub_hotels_municipality"  # type: ignore[attr-defined]
-    assert parsed.rows == (  # type: ignore[attr-defined]
+    assert parsed.table == "pub_hotels_municipality"
+    assert parsed.rows == (
         {
             "municipality_code": "syn_coast",
             "facility_type": "Hotel Apartments",
@@ -540,8 +544,8 @@ def test_hotel_table_counts_facilities(tmp_path: Path) -> None:
             **_lineage(entry.key, "2022", METHOD_HOTELS),
         },
     )
-    assert "guests" not in parsed.rows[0]  # type: ignore[attr-defined]
-    assert "rooms" not in parsed.rows[0]  # type: ignore[attr-defined]
+    assert "guests" not in parsed.rows[0]
+    assert "rooms" not in parsed.rows[0]
 
 
 def test_a_guest_field_and_an_unknown_facility_type_stop(tmp_path: Path) -> None:
@@ -605,8 +609,8 @@ def test_census_keeps_the_file_year_and_discards_geometry(tmp_path: Path) -> Non
         tmp_path,
         receipt={**RECEIPT, "source_modified": "2026-06-02"},
     )
-    assert parsed.table == "pub_census_2015_municipality"  # type: ignore[attr-defined]
-    assert parsed.rows == (  # type: ignore[attr-defined]
+    assert parsed.table == "pub_census_2015_municipality"
+    assert parsed.rows == (
         {
             "municipality_code": "syn_coast",
             "indicator": "employees",
@@ -622,12 +626,12 @@ def test_census_keeps_the_file_year_and_discards_geometry(tmp_path: Path) -> Non
             **_lineage(entry.key, "2015", METHOD_CENSUS),
         },
     )
-    rendered = repr(parsed.rows)  # type: ignore[attr-defined]
+    rendered = repr(parsed.rows)
     assert "9.25" not in rendered
     assert "12.5" not in rendered
     assert _coverage(parsed, "percent_share_unheld") == 2
     assert _coverage(parsed, "geometry_discarded") == 2
-    question = parsed.questions[0]  # type: ignore[attr-defined]
+    question = parsed.questions[0]
     assert "percent" in question.inventory
     assert "establishments" in question.contract
 
@@ -652,7 +656,7 @@ def test_a_census_year_other_than_the_title_is_kept(tmp_path: Path) -> None:
         ],
         tmp_path,
     )
-    assert {row["period"] for row in parsed.rows} == {"2014"}  # type: ignore[attr-defined]
+    assert {row["period"] for row in parsed.rows} == {"2014"}
 
 
 def test_duplicate_hotel_key_stops(tmp_path: Path) -> None:
@@ -673,7 +677,7 @@ def test_duplicate_hotel_key_stops(tmp_path: Path) -> None:
 def test_lineage_is_refused_one_field_at_a_time(tmp_path: Path) -> None:
     """Clearing source, period, retrieval, method, licence or hash refuses the figure."""
     parsed = _run("permits_muni", PERMIT_ANNUAL, [_permit()], tmp_path)
-    row = dict(parsed.rows[0])  # type: ignore[attr-defined]
+    row = dict(parsed.rows[0])
     require_lineage(row)
     for field in LINEAGE:
         broken = dict(row)
@@ -816,8 +820,8 @@ def test_fencing_belongs_to_permits_and_not_to_certificates(tmp_path: Path) -> N
         [_permit(permit_type="FENCING", nw_lrkhs="تحويط")],
         tmp_path / "annual",
     )
-    assert annual.rows[0]["permit_type"] == "FENCING"  # type: ignore[attr-defined]
-    assert annual.rows[0]["document_type"] == "building_permit"  # type: ignore[attr-defined]
+    assert annual.rows[0]["permit_type"] == "FENCING"
+    assert annual.rows[0]["document_type"] == "building_permit"
     with pytest.raises(AdditionError) as caught:
         _run(
             "permits_muni",
@@ -853,7 +857,7 @@ def test_the_review_file_is_read_when_the_field_map_has_no_geography(
         {},
         {"frame": _frame(tmp_path), "review": REVIEW},
     )
-    assert parsed.rows[0]["document_count"] == 4  # type: ignore[attr-defined]
+    assert parsed.rows[0]["document_count"] == 4
 
 
 def test_a_missing_review_file_stops(tmp_path: Path) -> None:

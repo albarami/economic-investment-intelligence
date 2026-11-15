@@ -256,8 +256,10 @@ def _record(table: TableSpec) -> Verdict:
             for value in column.closed_values:
                 if _names_sex_or_gender(value):
                     return Verdict(False, "forbidden_closed_value")
-                if value.casefold() == "international_visitors":
+                if value == "international_visitors":
                     return Verdict(False, "international_visitors_on_worker")
+                if value not in _NATIONALITY:
+                    return Verdict(False, "forbidden_closed_value")
             continue
         if _parts(column.name) & _FORBIDDEN_PARTS:
             return Verdict(False, "forbidden_dimension")

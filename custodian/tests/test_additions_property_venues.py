@@ -7,13 +7,14 @@ import json
 from decimal import Decimal
 from pathlib import Path
 
-import duckdb  # type: ignore[import-untyped]
+import duckdb
 import pytest
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 from eii_custodian.publicdata.additions.build import build_additions, checked_selection
 from eii_custodian.publicdata.additions.common import (
     AdditionError,
+    FamilyParse,
     observe_period_bounds,
     parse_period_rule,
     parse_period_value,
@@ -80,7 +81,7 @@ def _deal(**overrides: object) -> dict[str, object]:
     return row
 
 
-def _property(folder: Path, rows: list[dict[str, object]]) -> object:
+def _property(folder: Path, rows: list[dict[str, object]]) -> FamilyParse:
     return parse_property(
         _entry("prop_resi_units"),
         rows,
@@ -90,8 +91,8 @@ def _property(folder: Path, rows: list[dict[str, object]]) -> object:
     )
 
 
-def _coverage(parsed: object, reason: str) -> int:
-    return sum(item.count for item in parsed.coverage if item.reason == reason)  # type: ignore[attr-defined]
+def _coverage(parsed: FamilyParse, reason: str) -> int:
+    return sum(item.count for item in parsed.coverage if item.reason == reason)
 
 
 def test_repeated_transaction_is_one_deal_and_a_disagreement_is_not_summed(
@@ -109,9 +110,9 @@ def test_repeated_transaction_is_one_deal_and_a_disagreement_is_not_summed(
             ),
         ],
     )
-    assert agreed.rows[0]["deal_count"] == 1  # type: ignore[attr-defined]
-    assert agreed.rows[0]["median_price"] == Decimal("10.00")  # type: ignore[attr-defined]
-    assert "property_value" not in agreed.rows[0]  # type: ignore[attr-defined]
+    assert agreed.rows[0]["deal_count"] == 1
+    assert agreed.rows[0]["median_price"] == Decimal("10.00")
+    assert "property_value" not in agreed.rows[0]
     blocked = _property(
         tmp_path / "blocked",
         [
@@ -129,10 +130,10 @@ def test_repeated_transaction_is_one_deal_and_a_disagreement_is_not_summed(
             ),
         ],
     )
-    assert blocked.rows[0]["deal_count"] == 1  # type: ignore[attr-defined]
-    assert blocked.rows[0]["median_price"] == Decimal("10.00")  # type: ignore[attr-defined]
+    assert blocked.rows[0]["deal_count"] == 1
+    assert blocked.rows[0]["median_price"] == Decimal("10.00")
     assert _coverage(blocked, "repeated_deal_price_disagreement") == 1
-    assert "500" not in repr(blocked.rows)  # type: ignore[attr-defined]
+    assert "500" not in repr(blocked.rows)
 
 
 def test_median_uses_the_middle_and_the_mean_of_two_middle_values(
@@ -147,7 +148,7 @@ def test_median_uses_the_middle_and_the_mean_of_two_middle_values(
             _deal(encrypted_transaction_number="SYN-DEAL-C", price_per_square_meter=20),
         ],
     )
-    assert odd.rows[0]["median_price"] == Decimal("20.00")  # type: ignore[attr-defined]
+    assert odd.rows[0]["median_price"] == Decimal("20.00")
     even = _property(
         tmp_path / "even",
         [
@@ -155,8 +156,8 @@ def test_median_uses_the_middle_and_the_mean_of_two_middle_values(
             _deal(encrypted_transaction_number="SYN-DEAL-B", price_per_square_meter=20),
         ],
     )
-    assert even.rows[0]["median_price"] == Decimal("15.00")  # type: ignore[attr-defined]
-    assert even.rows[0]["price_basis"] == "per_m2"  # type: ignore[attr-defined]
+    assert even.rows[0]["median_price"] == Decimal("15.00")
+    assert even.rows[0]["price_basis"] == "per_m2"
 
 
 def test_nonpositive_price_is_excluded_and_identifiers_stay_out(tmp_path: Path) -> None:
@@ -172,7 +173,7 @@ def test_nonpositive_price_is_excluded_and_identifiers_stay_out(tmp_path: Path) 
             ),
         ],
     )
-    assert parsed.rows[0]["deal_count"] == 1  # type: ignore[attr-defined]
+    assert parsed.rows[0]["deal_count"] == 1
     assert _coverage(parsed, "nonpositive_price") == 1
     rendered = repr(parsed)
     assert "SYN-DEAL-A" not in rendered
@@ -189,7 +190,7 @@ def test_unmatched_ambiguous_and_unmapped_districts_are_not_guessed(
         tmp_path / "unmatched",
         [_deal(), _deal(district_name="SYN Absent", sm_lmntq="SYN Absent AR")],
     )
-    assert len(unmatched.rows) == 1  # type: ignore[attr-defined]
+    assert len(unmatched.rows) == 1
     assert _coverage(unmatched, "unmatched_district") == 1
     assert "SYN Absent" not in repr(unmatched)
     ambiguous = _property(
@@ -203,7 +204,7 @@ def test_unmatched_ambiguous_and_unmapped_districts_are_not_guessed(
             ),
         ],
     )
-    assert ambiguous.rows == ()  # type: ignore[attr-defined]
+    assert ambiguous.rows == ()
     assert _coverage(ambiguous, "ambiguous_district") == 2
     with pytest.raises(AdditionError) as unmapped:
         _property(tmp_path / "unmapped", [_deal(municipality_name="SYN Missing")])
@@ -237,9 +238,9 @@ def test_a_district_name_with_two_keys_is_not_stored(tmp_path: Path) -> None:
 def test_per_unit_is_not_built_and_the_question_is_recorded(tmp_path: Path) -> None:
     """Both price columns are present. Only the per-square-metre aggregate is built."""
     parsed = _property(tmp_path / "basis", [_deal()])
-    assert {row["price_basis"] for row in parsed.rows} == {"per_m2"}  # type: ignore[attr-defined]
-    assert any("per-unit" in question.change for question in parsed.questions)  # type: ignore[attr-defined]
-    assert any("PUB-107" in question.change for question in parsed.questions)  # type: ignore[attr-defined]
+    assert {row["price_basis"] for row in parsed.rows} == {"per_m2"}
+    assert any("per-unit" in question.change for question in parsed.questions)
+    assert any("PUB-107" in question.change for question in parsed.questions)
 
 
 def _venues(folder: Path, rows: str) -> tuple[dict[str, str], ...]:
@@ -265,7 +266,7 @@ def _museum_row(**overrides: object) -> dict[str, object]:
     return row
 
 
-def _museum(folder: Path, rows: list[dict[str, object]], links: str) -> object:
+def _museum(folder: Path, rows: list[dict[str, object]], links: str) -> FamilyParse:
     return parse_museum(
         _entry("visits_museum"),
         rows,
@@ -294,10 +295,10 @@ def test_museum_alias_keeps_one_key_and_a_dash_drops_the_row(tmp_path: Path) -> 
         ],
         _LINKS,
     )
-    assert [row["value"] for row in parsed.rows] == [4, 9]  # type: ignore[attr-defined]
-    assert {row["venue_key"] for row in parsed.rows} == {"syn_hall"}  # type: ignore[attr-defined]
-    assert parsed.rows[0]["place_id"] is None  # type: ignore[attr-defined]
-    assert "lon" not in parsed.rows[0] and "lat" not in parsed.rows[0]  # type: ignore[attr-defined]
+    assert [row["value"] for row in parsed.rows] == [4, 9]
+    assert {row["venue_key"] for row in parsed.rows} == {"syn_hall"}
+    assert parsed.rows[0]["place_id"] is None
+    assert "lon" not in parsed.rows[0] and "lat" not in parsed.rows[0]
     assert _coverage(parsed, "missing_measure") == 1
 
 
@@ -467,7 +468,7 @@ def test_built_property_table_round_trips_and_lineage_is_required(
     assert found[0][1] == 2
     assert found[0][2] == "per_m2"
     parsed = _property(tmp_path / "lineage", rows)
-    broken = dict(parsed.rows[0])  # type: ignore[attr-defined]
+    broken = dict(parsed.rows[0])
     del broken["method"]
     with pytest.raises(AdditionError) as missing:
         require_lineage(broken)

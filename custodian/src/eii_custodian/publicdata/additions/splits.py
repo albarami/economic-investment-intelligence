@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
 
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 from eii_custodian.publicdata.additions.common import (
     FIELD_UNCONFIRMED,

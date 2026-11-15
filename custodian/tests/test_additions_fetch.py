@@ -433,7 +433,7 @@ def _bare(columns: tuple[tuple[str, str], ...], **overrides: object) -> Entry:
         "licence_url": "https://creativecommons.org/licenses/by/4.0/",
     }
     values.update(overrides)
-    return Entry(**values)  # type: ignore[arg-type]
+    return _entry_from(values)
 
 
 _EXPORT = (
@@ -486,6 +486,83 @@ def _transport(rows: list[dict[str, object]]):
         raise AssertionError(url)
 
     return transport
+
+
+def _entry_from(values: dict[str, object]) -> Entry:
+    """Build one entry from a fixture map, narrowing each field to its exact type."""
+    return Entry(
+        key=_map_text(values, "key"),
+        source_id=_map_text(values, "source_id"),
+        slug=_map_text(values, "slug"),
+        kind=_map_text(values, "kind"),
+        title_en=_map_text(values, "title_en"),
+        publisher=_map_text(values, "publisher"),
+        licence_id=_map_text(values, "licence_id"),
+        licence_basis=_map_text(values, "licence_basis"),
+        decision_record=_map_text(values, "decision_record"),
+        fetch_host=_map_text(values, "fetch_host"),
+        url=_map_text(values, "url"),
+        terms_url=_map_text(values, "terms_url"),
+        nightly_live_fetch=_map_flag(values, "nightly_live_fetch"),
+        public_splits=_map_texts(values, "public_splits"),
+        commit_allowed=_map_flag(values, "commit_allowed"),
+        release_tables=_map_texts(values, "release_tables"),
+        caveat_keys=_map_texts(values, "caveat_keys"),
+        columns=_map_columns(values, "columns"),
+        row_count_min=_map_count(values, "row_count_min"),
+        row_count_max=_map_count(values, "row_count_max"),
+        period_first=_map_text(values, "period_first"),
+        period_last=_map_text(values, "period_last"),
+        period_field=_map_text(values, "period_field"),
+        reconciliation=_map_text(values, "reconciliation"),
+        skip_reason=_map_text(values, "skip_reason"),
+        extension=_map_text(values, "extension"),
+        landing_url=_map_text(values, "landing_url"),
+        licence_url=_map_text(values, "licence_url"),
+    )
+
+
+def _map_text(values: dict[str, object], name: str) -> str:
+    value = values[name]
+    if isinstance(value, str):
+        return value
+    raise AssertionError(name)
+
+
+def _map_flag(values: dict[str, object], name: str) -> bool:
+    value = values[name]
+    if isinstance(value, bool):
+        return value
+    raise AssertionError(name)
+
+
+def _map_texts(values: dict[str, object], name: str) -> tuple[str, ...]:
+    value = values[name]
+    if isinstance(value, tuple) and all(isinstance(item, str) for item in value):
+        return value
+    raise AssertionError(name)
+
+
+def _map_columns(values: dict[str, object], name: str) -> tuple[tuple[str, str], ...]:
+    value = values[name]
+    if isinstance(value, tuple) and all(
+        isinstance(pair, tuple)
+        and len(pair) == 2
+        and isinstance(pair[0], str)
+        and isinstance(pair[1], str)
+        for pair in value
+    ):
+        return value
+    raise AssertionError(name)
+
+
+def _map_count(values: dict[str, object], name: str) -> int | None:
+    value = values[name]
+    if value is None:
+        return None
+    if isinstance(value, int) and not isinstance(value, bool):
+        return value
+    raise AssertionError(name)
 
 
 def _sidecar(folder: Path) -> dict[str, object]:

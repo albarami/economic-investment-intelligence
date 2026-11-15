@@ -13,6 +13,7 @@ from eii_custodian.publicdata.additions.build import parsers
 from eii_custodian.publicdata.additions.common import (
     AdditionError,
     Coverage,
+    FamilyParse,
     require_lineage,
 )
 from eii_custodian.publicdata.additions.splits import PARSERS
@@ -715,7 +716,7 @@ def test_a_blank_side_an_unknown_category_and_a_bad_code_stop(tmp_path: Path) ->
     assert active_missing.rows == ()
     assert active_missing.coverage == (Coverage("missing_measure", 1),)
     nat = _active_nat(NAT_MALES, "male", "non_qatari", "total")
-    nat_missing = _parse(nat, [_nat_row("2019", None)], tmp_path)  # type: ignore[arg-type]
+    nat_missing = _parse(nat, [_nat_row("2019", None)], tmp_path)
     assert nat_missing.rows == ()
     assert nat_missing.coverage == (Coverage("missing_measure", 1),)
     hotel = _hotel()
@@ -893,7 +894,7 @@ def test_parsers_are_registered_by_source_id() -> None:
     assert found["students_muni"] is PARSERS["students_muni"]
 
 
-def _parse(entry: Entry, raw: list[dict[str, object]], tmp_path: Path):
+def _parse(entry: Entry, raw: list[dict[str, object]], tmp_path: Path) -> FamilyParse:
     parser = PARSERS[entry.source_id]
     return parser(entry, raw, RECEIPT, {}, _cross(tmp_path))
 
@@ -966,7 +967,7 @@ def _entry(**overrides: object) -> Entry:
         "licence_url": "https://www.data.gov.qa/pages/license/annexes",
     }
     values.update(overrides)
-    return Entry(**values)  # type: ignore[arg-type]
+    return _entry_from(values)
 
 
 def _replace_period(entry: Entry, period_field: str) -> Entry:
@@ -1080,7 +1081,7 @@ def _active_nat(slug: str, sex: str, nationality: str, measure: str) -> Entry:
     )
 
 
-def _nat_row(year: str, value: int, field: str = "total") -> dict[str, object]:
+def _nat_row(year: str, value: int | None, field: str = "total") -> dict[str, object]:
     return {
         "year": year,
         "economic_activity": "Education",
@@ -1125,7 +1126,7 @@ def _comp(slug: str, table_code: str, code_field: str, indicator_field: str) -> 
         slug=slug,
         public_splits=("nationality",),
         release_tables=("pub_compensation_nationality",),
-        columns=tuple(columns),  # type: ignore[arg-type]
+        columns=tuple(columns),
         period_first="2015",
         period_last="2022",
     )
@@ -1275,3 +1276,80 @@ def _trends() -> Entry:
         period_first="2019",
         period_last="2025",
     )
+
+
+def _entry_from(values: dict[str, object]) -> Entry:
+    """Build one entry from a fixture map, narrowing each field to its exact type."""
+    return Entry(
+        key=_map_text(values, "key"),
+        source_id=_map_text(values, "source_id"),
+        slug=_map_text(values, "slug"),
+        kind=_map_text(values, "kind"),
+        title_en=_map_text(values, "title_en"),
+        publisher=_map_text(values, "publisher"),
+        licence_id=_map_text(values, "licence_id"),
+        licence_basis=_map_text(values, "licence_basis"),
+        decision_record=_map_text(values, "decision_record"),
+        fetch_host=_map_text(values, "fetch_host"),
+        url=_map_text(values, "url"),
+        terms_url=_map_text(values, "terms_url"),
+        nightly_live_fetch=_map_flag(values, "nightly_live_fetch"),
+        public_splits=_map_texts(values, "public_splits"),
+        commit_allowed=_map_flag(values, "commit_allowed"),
+        release_tables=_map_texts(values, "release_tables"),
+        caveat_keys=_map_texts(values, "caveat_keys"),
+        columns=_map_columns(values, "columns"),
+        row_count_min=_map_count(values, "row_count_min"),
+        row_count_max=_map_count(values, "row_count_max"),
+        period_first=_map_text(values, "period_first"),
+        period_last=_map_text(values, "period_last"),
+        period_field=_map_text(values, "period_field"),
+        reconciliation=_map_text(values, "reconciliation"),
+        skip_reason=_map_text(values, "skip_reason"),
+        extension=_map_text(values, "extension"),
+        landing_url=_map_text(values, "landing_url"),
+        licence_url=_map_text(values, "licence_url"),
+    )
+
+
+def _map_text(values: dict[str, object], name: str) -> str:
+    value = values[name]
+    if isinstance(value, str):
+        return value
+    raise AssertionError(name)
+
+
+def _map_flag(values: dict[str, object], name: str) -> bool:
+    value = values[name]
+    if isinstance(value, bool):
+        return value
+    raise AssertionError(name)
+
+
+def _map_texts(values: dict[str, object], name: str) -> tuple[str, ...]:
+    value = values[name]
+    if isinstance(value, tuple) and all(isinstance(item, str) for item in value):
+        return value
+    raise AssertionError(name)
+
+
+def _map_columns(values: dict[str, object], name: str) -> tuple[tuple[str, str], ...]:
+    value = values[name]
+    if isinstance(value, tuple) and all(
+        isinstance(pair, tuple)
+        and len(pair) == 2
+        and isinstance(pair[0], str)
+        and isinstance(pair[1], str)
+        for pair in value
+    ):
+        return value
+    raise AssertionError(name)
+
+
+def _map_count(values: dict[str, object], name: str) -> int | None:
+    value = values[name]
+    if value is None:
+        return None
+    if isinstance(value, int) and not isinstance(value, bool):
+        return value
+    raise AssertionError(name)

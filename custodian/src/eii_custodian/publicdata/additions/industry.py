@@ -12,7 +12,7 @@ from collections.abc import Mapping
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 from eii_custodian.publicdata.additions.common import (
     FIELD_UNCONFIRMED,

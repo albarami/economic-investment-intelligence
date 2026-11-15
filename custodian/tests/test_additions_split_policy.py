@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from eii_custodian.publicdata.additions.split_policy import (
+    _NATIONALITY,
     PUBLIC_SPLIT_TABLES,
     ColumnSpec,
     TableSpec,
@@ -498,6 +499,37 @@ def test_nationality_exception_refuses_a_sex_or_gender_value() -> None:
     assert validate_table_dimensions(female_case).reason == "forbidden_closed_value"
 
 
+def test_nationality_exception_values_match_the_module_list_exactly() -> None:
+    """A value is admitted only when it is exactly a member of the module's list."""
+    members = tuple(sorted(_NATIONALITY - {"international_visitors"}))
+    for value in members:
+        worker = TableSpec(
+            "employment_spell",
+            "worker_source",
+            (ColumnSpec("nationality_group", (value,)),),
+        )
+        company = TableSpec(
+            "establishment",
+            "company_source",
+            (ColumnSpec("establishment_nationality", (value,)),),
+        )
+        assert validate_table_dimensions(worker).reason == "admitted"
+        assert validate_table_dimensions(company).reason == "admitted"
+    plants = (
+        "qatari ",
+        " qatari",
+        "qatari\u200b",
+        "q\u0430tari",
+    )
+    for value in plants:
+        planted = TableSpec(
+            "employment_spell",
+            "worker_source",
+            (ColumnSpec("nationality_group", (value,)),),
+        )
+        assert validate_table_dimensions(planted).reason == "forbidden_closed_value"
+
+
 def test_reserved_grid_admits_only_public_display_on_a_drawn_area() -> None:
     """After the two named refusals, only public display on a drawn area is admitted."""
     base = {
@@ -649,7 +681,62 @@ def _public(**overrides: object) -> UseRequest:
         "lineage": "public",
     }
     values.update(overrides)
-    return UseRequest(**values)  # type: ignore[arg-type]
+    return UseRequest(
+        table=_request_text(values, "table"),
+        source_splits=_request_splits(values["source_splits"]),
+        consumer=_request_text(values, "consumer"),
+        geography=_request_text(values, "geography"),
+        categories=_request_text(values, "categories"),
+        lineage=_request_text(values, "lineage"),
+        join_to=_request_text(values, "join_to", "none"),
+        segments=_request_text(values, "segments", "none"),
+        person_key=_request_flag(values, "person_key"),
+        device_key=_request_flag(values, "device_key"),
+        trip_key=_request_flag(values, "trip_key"),
+        combines_protected=_request_flag(values, "combines_protected"),
+        apportions=_request_flag(values, "apportions"),
+        reserved_use=_request_text(values, "reserved_use", ""),
+        anchor=_request_text(values, "anchor", ""),
+        summed_over_source_categories=_request_flag(
+            values, "summed_over_source_categories"
+        ),
+    )
+
+
+def _request_text(
+    values: dict[str, object], name: str, default: str | None = None
+) -> str:
+    if name not in values:
+        if default is None:
+            raise AssertionError(name)
+        return default
+    value = values[name]
+    if isinstance(value, str):
+        return value
+    raise AssertionError(name)
+
+
+def _request_flag(values: dict[str, object], name: str) -> bool:
+    value = values.get(name, False)
+    if isinstance(value, bool):
+        return value
+    raise AssertionError(name)
+
+
+def _request_splits(value: object) -> tuple[tuple[str, tuple[str, ...]], ...]:
+    if not isinstance(value, tuple):
+        raise AssertionError("source_splits")
+    found: list[tuple[str, tuple[str, ...]]] = []
+    for item in value:
+        if not isinstance(item, tuple) or len(item) != 2:
+            raise AssertionError("source_splits")
+        name, splits = item
+        if not isinstance(name, str) or not isinstance(splits, tuple):
+            raise AssertionError("source_splits")
+        if not all(isinstance(part, str) for part in splits):
+            raise AssertionError("source_splits")
+        found.append((name, splits))
+    return tuple(found)
 
 
 def _anchor(anchor: str, summed_over_source_categories: bool = True) -> UseRequest:

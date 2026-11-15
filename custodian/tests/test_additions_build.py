@@ -8,7 +8,7 @@ import shutil
 from decimal import Decimal
 from pathlib import Path
 
-import duckdb  # type: ignore[import-untyped]
+import duckdb
 import pytest
 
 from eii_custodian.publicdata.additions.build import (

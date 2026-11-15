@@ -6,12 +6,16 @@ from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
-import duckdb  # type: ignore[import-untyped]
+import duckdb
 import pytest
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 from eii_custodian.publicdata.additions.build import parsers
-from eii_custodian.publicdata.additions.common import AdditionError, require_lineage
+from eii_custodian.publicdata.additions.common import (
+    AdditionError,
+    FamilyParse,
+    require_lineage,
+)
 from eii_custodian.publicdata.additions.industry import (
     parse_establishment_size,
     parse_logistics,
@@ -19,7 +23,7 @@ from eii_custodian.publicdata.additions.industry import (
     parse_trade,
 )
 from eii_custodian.publicdata.additions.storage import write_parquet
-from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 
 REVIEW = Path(__file__).resolve().parents[1] / "publicdata" / "review"
 RECEIPT = {
@@ -106,7 +110,7 @@ def _with_countries(rows: tuple[dict[str, str], ...]) -> dict[str, object]:
     return loaded
 
 
-def _entry(source_id: str, slug: str) -> object:
+def _entry(source_id: str, slug: str) -> Entry:
     return next(
         entry
         for entry in load_registry()
@@ -114,8 +118,8 @@ def _entry(source_id: str, slug: str) -> object:
     )
 
 
-def _coverage(parsed: object, reason: str) -> int:
-    return sum(item.count for item in parsed.coverage if item.reason == reason)  # type: ignore[attr-defined]
+def _coverage(parsed: FamilyParse, reason: str) -> int:
+    return sum(item.count for item in parsed.coverage if item.reason == reason)
 
 
 def _lineage(source_key: str, publisher: str, method: str) -> dict[str, object]:
