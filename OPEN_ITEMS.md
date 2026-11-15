@@ -2277,6 +2277,87 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: The fix of round 1 added the case of PRV-135 to four tool contracts, `location_allocation` among them; it decides nothing about the eligibility list of card C40. Two points stay open: how card C40 treats a candidate that has no base cell, and which reason key comes first when `inputs_not_entered` and `point_without_base_cell` both hold for `site_estimate`.
 - NEEDED: both are decided by the task that builds card C40 and by the task that builds `site_estimate`, each in its plan, with a test for the order. Or one line saying why the item is not valid.
 
+### PO-S2-21 — Mutants of the performance page and server on lines of earlier tasks
+
+- ID: PO-S2-21
+- TYPE: OPEN
+- RAISED BY: the lead's web mutation run for S1-T18 (2026-11-15)
+- CONCERNS: AGENTS.md rule 44 (the web mutation runner); `web/spikes/performance/server.mjs` and `web/spikes/performance/main.ts`
+- EVIDENCE: At db0b98e the run made 455 mutants in `server.mjs` (195 killed, 18 survived, 242 timed out) and 517 in `main.ts` (409 killed, 70 survived, 38 timed out). S1-T18 settled the one survivor and the three timeouts on the lines it changed. The others stand on lines of earlier tasks: 18 survivors and 239 timeouts in `server.mjs`, 69 survivors and 38 timeouts in `main.ts`. They are not killed, explained or replayed.
+- NEEDED: the follow-up task of slice S2 kills or explains these survivors and replays these timeouts alone at normal load, each result recorded apart from the killed mutants, as rule 44 asks.
+
+### PO-S2-22 — Test clients that never finish when a response stays open
+
+- ID: PO-S2-22
+- TYPE: OPEN
+- RAISED BY: the replay of S1-T18's timed-out mutants (the builder's return; check K4 of the confirmation review)
+- CONCERNS: AGENTS.md rule 44 (a timeout is reported apart from killed mutants); `web/spikes/performance/tests/mutation-server.node-test.mjs` and `web/spikes/performance/tests/trace.node-test.mjs`
+- EVIDENCE: With the body of the server's `send` emptied, no response is ever ended. The isolation test fails with `timed-out`, but the two test files named above stay pending, because their waiting client has no time limit of its own; the replay ends on the command's limit of 120 s with exit code 124. This mutant can therefore only time out; it is recorded as a timeout, not as a killed mutant.
+- NEEDED: the follow-up task of slice S2 assesses a time limit for the waiting test clients and shows with this planted mutant that a response that never ends then fails a test and ends the run.
+
+### PO-S2-23 — The browser's rendering threads choose their own processors
+
+- ID: PO-S2-23
+- TYPE: OPEN
+- RAISED BY: the lead's measurement of 2026-11-15, entered with S1-T18
+- CONCERNS: AGENTS.md rule 44 (a timeout is replayed alone at normal load); any run whose result is a time
+- EVIDENCE: The headless browser of the browser tests, started inside a run bound to a set of processors, keeps its own process on that set, but its sixteen rendering threads hold processors 0 to 11: the renderer sets its threads' processors itself, and a set given from outside does not bind them. A browser suite therefore loads processors 0 to 11 whatever set its run was given, and a timed run beside it is not clean. Nothing in the repository is changed; binding those threads would need a system setting that is the owner's.
+- NEEDED: the follow-up task of slice S2 looks at the renderer's own thread options. Until then the lead takes a run whose result is a time only while no browser suite is in flight, and replays a timed-out mutant or a time-limit failure seen beside a browser suite after that suite has ended, keeping both results.
+
+### PO-S2-24 — Temporary folders of the spike's tests left after a process is ended from outside
+
+- ID: PO-S2-24
+- TYPE: OPEN
+- RAISED BY: the lead's record of 2026-11-15, during S1-T18's web mutation run
+- CONCERNS: the tests under `web/spikes/performance/tests/` and their folders under the system's temporary folder
+- EVIDENCE: The performance spike's test folders under the system's temporary folder are not removed when a test process is ended from outside: more than 300 were left while the web mutation run went. S1-T18 does not change this.
+- NEEDED: the follow-up task of slice S2 assesses a cleanup that also holds when a test process is ended from outside, with that case planted and the state of the folders recorded.
+
+### PO-S2-25 — The remaining git variables and the runner's own listing of the workspace
+
+- ID: PO-S2-25
+- TYPE: OPEN
+- RAISED BY: the confirmation review of S1-T19 (check K6 and its hardening item) and the lead's run at e5a2be8
+- CONCERNS: `scripts/mutation.py` (`package_environment` and `main`); S1-T19
+- EVIDENCE: The fix of finding F1 removes the six repository-redirecting variables from the package run's environment. The configuration family (`GIT_CONFIG_GLOBAL`, `GIT_CONFIG_SYSTEM`, `GIT_CONFIG_COUNT/KEY/VALUE`) and `GIT_CEILING_DIRECTORIES`, `GIT_DISCOVERY_ACROSS_FILESYSTEM` and `GIT_NAMESPACE` stay: a package test in the copy then sees the same global git settings as in the workspace's ordinary run, and the reviewer agrees (K6). The runner's own listing of the workspace still follows the caller's git variables: with variables that name an outside repository it refuses with exit code 2 before any copy is made, and that repository's 19 files are unchanged.
+- NEEDED: the follow-up task of slice S2 assesses the handling of those remaining variables and of the listing, with tests. The recorded refusal is fail-closed; it is not a completed campaign.
+
+### PO-S2-26 — The package copy's pytest settings still differ from the project's
+
+- ID: PO-S2-26
+- TYPE: OPEN
+- RAISED BY: the builder of S1-T19 and its independent review, round 1 (Moonshot AI Kimi K3.1 Pro High through Devin), proposed item P3
+- CONCERNS: REV-16; `scripts/mutation.py` (the settings it writes into the copied package)
+- EVIDENCE: The repairs of S1-T19 make the copy's test path and the tests' file paths agree with the project's. The copy's pytest settings still omit the project's markers, its strict setting, its Hypothesis profile and its `not nightly` filter. The review records this as a follow-up, not as a finding.
+- NEEDED: the follow-up task of slice S2 assesses these remaining differences. The review names the follow-up task of slice S1, which is done; the item is carried to slice S2 on the lead's reading of decision 0018 item 8.
+
+### PO-S2-27 — The nine surviving mutants of the terms-text module
+
+- ID: PO-S2-27
+- TYPE: OPEN
+- RAISED BY: the lead's real campaign for S1-T19 at e5a2be8
+- CONCERNS: AGENTS.md rule 44; `custodian/src/eii_custodian/publicdata/fetch/terms_text.py`; S2-T21
+- EVIDENCE: The isolated campaign of the module made 46 mutants, killed 37 and left 9 survivors, exit code 1. That the campaign reaches its counts line proves the runner's repair; the nine survivors are not settled by S1-T19.
+- NEEDED: the nine survivors are killed or explained in task S2-T21, to which the lead assigns the module. The campaign's exit code 1 is not recorded anywhere as a pass.
+
+### PO-S2-28 — The remaining qualifications of git's answer in the copy
+
+- ID: PO-S2-28
+- TYPE: OPEN
+- RAISED BY: the builder of S1-T19, recorded in the lead's ruling of 2026-11-15
+- CONCERNS: `scripts/mutation.py` (`run_packages`); S1-T19
+- EVIDENCE: The builder named three qualifications of git's answer in the copy against a checkout. The copy's index is empty, so a path tracked despite a matching ignore rule would answer differently; nothing under the cache path is tracked. The copy's local exclude file is the fresh template. The user-level exclude file applies in both. The empty repository does not reproduce a checkout's whole git state.
+- NEEDED: the follow-up task of slice S2 assesses these limits and states them where the runner is documented, keeping the two differences (the index, the local exclude file) apart from the one behaviour the copy and a checkout share (the user-level exclude file).
+
+### PO-S2-29 — A mutation explanation stops matching when lines move
+
+- ID: PO-S2-29
+- TYPE: OPEN
+- RAISED BY: the lead's record of another task on 2026-11-15, entered with S1-T19
+- CONCERNS: AGENTS.md rule 44; `scripts/mutation_explained.toml`
+- EVIDENCE: An explained row holds the tool's difference text with its line numbers, so a row stops matching when lines are added above the mutation in the module. This was seen on another task on 2026-11-15. A form that survives such a move is not built.
+- NEEDED: the follow-up task of slice S2 assesses a form of explanation that survives a move of lines and still names the one mutation it explains.
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).

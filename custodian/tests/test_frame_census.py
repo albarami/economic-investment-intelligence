@@ -3,12 +3,16 @@
 from dataclasses import replace
 from decimal import Decimal
 from functools import cache
+from pathlib import Path
 
 import pytest
+from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.frame.census import census_rows, validate_tables
 from eii_custodian.publicdata.frame.checks import FrameError
+
+REVIEW = repository_root(Path(__file__)) / "custodian/publicdata/review"
 
 
 @cache
@@ -131,8 +135,6 @@ def cache_fixture(tmp_path, source, payload):
 
 
 def test_skipped_sources_have_empty_tables_and_named_reasons(tmp_path):
-    from pathlib import Path
-
     from eii_custodian.publicdata.frame.build import build_frame
 
     entries = tuple(
@@ -140,7 +142,7 @@ def test_skipped_sources_have_empty_tables_and_named_reasons(tmp_path):
         for e in load_registry()
         if e.source_id in {"bnd_hdx", "bnd_muni_2025", "est_census"}
     )
-    result = build_frame(tmp_path, entries, Path("custodian/publicdata/review"))
+    result = build_frame(tmp_path, entries, REVIEW)
     assert all(rows == [] for rows in result.tables.values())
     assert set(result.tables) == {
         "municipality",
@@ -268,8 +270,6 @@ def test_record_envelopes_and_unsupported_shapes():
 
 
 def test_all_skipped_frame_sources_have_named_reasons(tmp_path):
-    from pathlib import Path
-
     from eii_custodian.publicdata.frame.build import build_frame
 
     names = {
@@ -290,7 +290,7 @@ def test_all_skipped_frame_sources_have_named_reasons(tmp_path):
         for e in load_registry()
         if e.source_id in names
     )
-    result = build_frame(tmp_path, entries, Path("custodian/publicdata/review"))
+    result = build_frame(tmp_path, entries, REVIEW)
     assert result.report == [f"{name}: SYN-disabled" for name in sorted(names)] + [
         "frame: required geometry unavailable; dependent tables not built"
     ]
@@ -555,7 +555,6 @@ def test_unknown_population_indicator_preserves_inventory_and_skips():
 
 def test_cache_inventory_runs_before_missing_frame_return(tmp_path, monkeypatch):
     import socket
-    from pathlib import Path
 
     from eii_custodian.publicdata.frame.build import build_frame
 
@@ -609,7 +608,7 @@ def test_cache_inventory_runs_before_missing_frame_return(tmp_path, monkeypatch)
         raise AssertionError("network attempted")
 
     monkeypatch.setattr(socket, "socket", forbidden)
-    result = build_frame(tmp_path, entries, Path("custodian/publicdata/review"))
+    result = build_frame(tmp_path, entries, REVIEW)
     assert result.inventory["util_elec"]["zone_number"] == ("SYN-Z",)
     assert result.inventory["util_water"]["zone_number"] == ("SYN-Z",)
     assert result.inventory["pop_muni"]["municipality"] == ("Invented",)
@@ -697,22 +696,18 @@ def test_layer_envelope_field_changes_refuse(source):
 
 
 def test_unfetched_boundary_shape_never_accepts_guessed_fields(tmp_path):
-    from pathlib import Path
-
     from eii_custodian.publicdata.frame.build import build_frame
 
     with pytest.raises(FrameError, match="bnd_hdx: expected one cache receipt"):
         build_frame(
             tmp_path,
             (entry("bnd_hdx"), entry("bnd_muni_2025")),
-            Path("custodian/publicdata/review"),
+            REVIEW,
         )
     assert list(tmp_path.iterdir()) == []
 
 
 def test_raw_sources_all_skip_reasons_and_early_return(tmp_path):
-    from pathlib import Path
-
     from eii_custodian.publicdata.frame.build import build_frame
 
     names = {
@@ -733,7 +728,7 @@ def test_raw_sources_all_skip_reasons_and_early_return(tmp_path):
         for e in load_registry()
         if e.source_id in names
     )
-    result = build_frame(tmp_path, entries, Path("custodian/publicdata/review"))
+    result = build_frame(tmp_path, entries, REVIEW)
     assert result.report == [f"{name}: SYN-disabled" for name in sorted(names)] + [
         "frame: required geometry unavailable; dependent tables not built"
     ]
@@ -750,7 +745,7 @@ def test_raw_sources_all_skip_reasons_and_early_return(tmp_path):
         "pub_census_district",
     }
     assert result.sources == {}
-    result = build_frame(tmp_path, (), Path("custodian/publicdata/review"))
+    result = build_frame(tmp_path, (), REVIEW)
     assert result.report == [
         "frame: required geometry unavailable; dependent tables not built"
     ]
@@ -758,8 +753,6 @@ def test_raw_sources_all_skip_reasons_and_early_return(tmp_path):
 
 @pytest.mark.parametrize("level", ["municipality", "zone", "district", "gazetteer"])
 def test_raw_hdx_admission_for_each_table(tmp_path, level):
-    from pathlib import Path
-
     from eii_custodian.publicdata.frame.build import build_frame
 
     hdx = entry("bnd_hdx")
@@ -769,9 +762,7 @@ def test_raw_hdx_admission_for_each_table(tmp_path, level):
     with pytest.raises(
         FrameError, match=f"bnd_hdx: invalid release source for {level}"
     ):
-        build_frame(
-            tmp_path, (hdx, entry("bnd_muni_2025")), Path("custodian/publicdata/review")
-        )
+        build_frame(tmp_path, (hdx, entry("bnd_muni_2025")), REVIEW)
 
 
 def test_census_release_columns_match_dat_contract():
@@ -796,8 +787,6 @@ def test_census_release_columns_match_dat_contract():
 
 
 def test_every_confirmed_source_is_inspected_with_receipt(tmp_path):
-    from pathlib import Path
-
     from eii_custodian.publicdata.frame.build import build_frame
 
     layer_names = {
@@ -825,7 +814,7 @@ def test_every_confirmed_source_is_inspected_with_receipt(tmp_path):
         else:
             continue
         cache_fixture(tmp_path, source, payload)
-    result = build_frame(tmp_path, entries, Path("custodian/publicdata/review"))
+    result = build_frame(tmp_path, entries, REVIEW)
     assert set(result.inventory) == confirmed
     assert set(result.sources) == confirmed
     for source in layer_names:
@@ -846,8 +835,6 @@ def test_every_confirmed_source_is_inspected_with_receipt(tmp_path):
 @pytest.mark.parametrize("unavailable", ["bnd_hdx"])
 @pytest.mark.parametrize("mode", ["missing", "skipped"])
 def test_each_required_licensed_boundary_stops_build(tmp_path, unavailable, mode):
-    from pathlib import Path
-
     from eii_custodian.publicdata.frame.build import build_frame
 
     entries = [entry("bnd_hdx"), entry("bnd_muni_2025")]
@@ -858,7 +845,7 @@ def test_each_required_licensed_boundary_stops_build(tmp_path, unavailable, mode
             replace(e, skip_reason="SYN-disabled") if e.source_id == unavailable else e
             for e in entries
         ]
-    result = build_frame(tmp_path, tuple(entries), Path("custodian/publicdata/review"))
+    result = build_frame(tmp_path, tuple(entries), REVIEW)
     assert (
         result.report[-1]
         == "frame: required geometry unavailable; dependent tables not built"
@@ -1207,13 +1194,11 @@ def test_all_raw_geometry_columns_have_licensed_lineage():
 
 
 def test_confirmed_portal_licences_do_not_hide_missing_adapters(tmp_path):
-    from pathlib import Path
-
     from eii_custodian.publicdata.frame.build import inspect_cache
 
     names = {"zone_population", "census_hh_type_2020"}
     entries = tuple(e for e in load_registry() if e.source_id in names)
-    result = inspect_cache(tmp_path, entries, Path("custodian/publicdata/review"))
+    result = inspect_cache(tmp_path, entries, REVIEW)
     for name in names:
         assert f"{name}: cache_fields_unconfirmed; adapter_unavailable" in result.report
     assert all(not rows for rows in result.tables.values())
@@ -1476,13 +1461,11 @@ def test_r4_no_second_fixture_assembler():
 
 
 def test_r4_validation_only_boundary_is_refused_before_cache(tmp_path):
-    from pathlib import Path
-
     from eii_custodian.publicdata.frame.build import build_frame
 
     source = replace(entry("bnd_hdx"), licence_basis="none_stated")
     with pytest.raises(FrameError, match="bnd_hdx: invalid release source"):
-        build_frame(tmp_path, (source,), Path("custodian/publicdata/review"))
+        build_frame(tmp_path, (source,), REVIEW)
 
 
 def test_r4_declaring_a_split_does_not_invent_release_columns(measure_build):

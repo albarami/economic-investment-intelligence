@@ -3,6 +3,8 @@
 Usage: python scripts/mutation.py MODULE [MODULE ...]
 Each package runs from its own folder with source_paths=["src/"] and its own
 tests/ only. Cross-plane scripts/tests/ are not part of a package run.
+For a package run the copy's root is made an empty git repository, so that a
+package test that asks git about an ignore rule gets git's own answer.
 The four typed-decision modules run from the copy's root with evals/ as their
 source root and scripts/tests/test_requalify.py as their test selection.
 No hosted hook.
@@ -27,6 +29,17 @@ EVAL_MODULES = {
     "evals/typed_decisions/" + name + ".py"
     for name in ("interval", "reproduction", "route", "requalify")
 }
+# Each of these points git at a repository other than the one of the folder it runs in.
+GIT_REDIRECTS = frozenset(
+    {
+        "GIT_DIR",
+        "GIT_WORK_TREE",
+        "GIT_INDEX_FILE",
+        "GIT_OBJECT_DIRECTORY",
+        "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+        "GIT_COMMON_DIR",
+    }
+)
 
 
 def judge(survivors: list[dict[str, str]], ledger: Path) -> int:
@@ -41,11 +54,23 @@ def judge(survivors: list[dict[str, str]], ledger: Path) -> int:
     )
 
 
-def command(folder: Path, *arguments: str) -> subprocess.CompletedProcess[str]:
+def package_environment() -> dict[str, str]:
+    """The caller's environment without the variables that redirect git."""
+    return {
+        name: value for name, value in os.environ.items() if name not in GIT_REDIRECTS
+    }
+
+
+def command(
+    folder: Path, *arguments: str, environment: dict[str, str] | None = None
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [sys.executable, "-m", "mutmut", *arguments],
         cwd=folder,
-        env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        env={
+            **(os.environ if environment is None else environment),
+            "PYTHONDONTWRITEBYTECODE": "1",
+        },
         text=True,
         capture_output=True,
         check=False,
@@ -60,6 +85,7 @@ def run_copy(
     prefix: str = "",
     *,
     source_roots: list[str] | None = None,
+    environment: dict[str, str] | None = None,
 ) -> tuple[int, list[dict[str, str]]]:
     """Operate only inside an already disposable folder; always delete mutants."""
     if source_roots is None:
@@ -86,7 +112,7 @@ def run_copy(
     started = perf_counter()
     survivors: list[dict[str, str]] = []
     try:
-        result = command(folder, "run", "--max-children", "1")
+        result = command(folder, "run", "--max-children", "1", environment=environment)
         print(result.stdout.replace(str(folder), "<temporary>"), end="")
         print(
             result.stderr.replace(str(folder), "<temporary>"), end="", file=sys.stderr
@@ -121,7 +147,7 @@ def run_copy(
                 }.get(code, "incomplete")
                 counts[status] += 1
                 if status in ("survived", "not_covered"):
-                    shown = command(folder, "show", key)
+                    shown = command(folder, "show", key, environment=environment)
                     if shown.returncode:
                         return shown.returncode, survivors
                     # Store the exact tool diff, not its unstable mutant index or status heading.
@@ -153,6 +179,18 @@ def run_copy(
 def run_packages(folder: Path, modules: list[str], ledger: Path) -> int:
     """Keep mutmut's file-derived names identical to package imports."""
     packages = sorted({Path(module).parts[0] for module in modules})
+    # A package test may ask git about an ignore rule. The copy holds the listed
+    # ignore files; an empty repository at its root lets git evaluate them itself.
+    # Neither the init nor the package's tests may follow a caller's git variables
+    # to another repository.
+    environment = package_environment()
+    if packages:
+        subprocess.run(
+            ["git", "init", "--quiet", str(folder)],
+            check=True,
+            capture_output=True,
+            env=environment,
+        )
     for package in packages:
         selected = [
             str(Path(module).relative_to(package))
@@ -166,11 +204,16 @@ def run_packages(folder: Path, modules: list[str], ledger: Path) -> int:
             original
             + "\n[tool.pytest]\n"
             + 'addopts = ["--import-mode=importlib", "-p", "no:cacheprovider"]\n'
-            + 'pythonpath = ["src", "../.."]\n'
+            + 'pythonpath = ["src", "../..", "../../scripts", "../../scripts/tests"]\n'
         )
         try:
             code, _survivors = run_copy(
-                work, selected, ["tests/"], ledger, package + "/"
+                work,
+                selected,
+                ["tests/"],
+                ledger,
+                package + "/",
+                environment=environment,
             )
         finally:
             config.write_text(original)

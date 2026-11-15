@@ -11,6 +11,10 @@ import { judgeSubmission, validateGate } from './trace.mjs';
 
 const SPIKE = path.dirname(fileURLToPath(import.meta.url));
 export const MAX_BODY_BYTES = 2000000;
+const ISOLATION_HEADERS = {
+  'Cross-Origin-Opener-Policy': 'same-origin',
+  'Cross-Origin-Embedder-Policy': 'require-corp',
+};
 const PAGE_ROUTES = new Set(['/en/_perf', '/ar/_perf']);
 const TRACE_ROUTE = '/__perf/trace';
 const POSTS_ROUTE = '/__perf/posts';
@@ -86,6 +90,7 @@ function send(response, status, body, type) {
     'content-type': type,
     'content-security-policy': CSP,
     'cache-control': 'no-store',
+    ...ISOLATION_HEADERS,
   });
   response.end(body);
 }
@@ -337,7 +342,12 @@ export async function startViteServer(options) {
   if (!mode.ok) return mode;
   const vite = await createServer({
     configFile: path.join(SPIKE, 'vite.config.ts'),
-    server: { host: '127.0.0.1', port: 0, strictPort: false },
+    server: {
+      host: '127.0.0.1',
+      port: 0,
+      strictPort: false,
+      headers: ISOLATION_HEADERS,
+    },
     logLevel: 'silent',
     plugins: [tracePlugin(options)],
   });

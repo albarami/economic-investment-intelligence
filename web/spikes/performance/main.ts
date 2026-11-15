@@ -173,6 +173,8 @@ function readProfile(params: URLSearchParams, plant: string): string {
   return params.get('profile') === PROFILE_SMOKE ? PROFILE_SMOKE : PROFILE_GATE;
 }
 
+const COARSE_CLOCK = 'coarse-clock';
+
 function environmentGate(profile: string, plant: string): boolean {
   if (profile !== PROFILE_GATE) return false;
   return (
@@ -180,17 +182,30 @@ function environmentGate(profile: string, plant: string): boolean {
     plant === 'software-renderer' ||
     plant === 'remote-renderer' ||
     plant === 'capped-frame-rate' ||
-    plant === 'slow-scene'
+    plant === 'slow-scene' ||
+    plant === COARSE_CLOCK
   );
 }
 
 function plantedRenderer(real: string, plant: string): string {
   if (plant === 'software-renderer') return PLANTED_SOFTWARE_RENDERER;
   if (plant === 'remote-renderer') return PLANTED_REMOTE_RENDERER;
-  if (plant === 'capped-frame-rate' || plant === 'slow-scene') {
+  if (
+    plant === 'capped-frame-rate' ||
+    plant === 'slow-scene' ||
+    plant === COARSE_CLOCK
+  ) {
     return PASSING_PLANTED_RENDERER;
   }
   return real;
+}
+
+function coarseClockRefusal(profile: string, plant: string): string {
+  if (profile === PROFILE_SMOKE) return '';
+  if (plant === COARSE_CLOCK || window.crossOriginIsolated !== true) {
+    return COARSE_CLOCK;
+  }
+  return '';
 }
 
 function rendererLine(value: string): string {
@@ -337,6 +352,13 @@ async function start(): Promise<void> {
       refuse(rendererRefusal);
       return;
     }
+  }
+  const clockRefusal = coarseClockRefusal(spike.profile, plant);
+  if (clockRefusal !== '') {
+    refuse(clockRefusal);
+    return;
+  }
+  if (environmentGate(spike.profile, plant)) {
     const verdict = judgeEmptyCanvas(await emptyCanvasTimestamps(plant));
     if (!verdict.ok) {
       refuse(verdict.failure, verdict.framesPerSecond);
