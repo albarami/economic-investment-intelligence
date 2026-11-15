@@ -251,7 +251,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: the trace files and the native-capture record under `web/spikes/performance/evidence/`.
 - Depends: S1-T02, S1-T11, S1-T13.
 - Requirements: TST-132, FE-88, FE-89, PLN-07.
-- Delivery: routine; personas Frontend; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/55). Split from S1-T02 and S1-T11 by a re-plan of 2026-11-13: the native trace needs one action of the owner on the host, and the two criteria are moved here word for word. By the owner's note of 2026-11-13, nothing waits for it: the slice S1 gate runs on everything else and records this trace as its one open item, closed by a short addendum when the owner takes it at the PC itself; it is taken before any slice S3 task that depends on map performance is reviewed.
+- Delivery: routine; personas Frontend; status done (pull request 55, merged 2026-11-15). Split from S1-T02 and S1-T11 by a re-plan of 2026-11-13: the native trace needs one action of the owner on the host, and the two criteria are moved here word for word. By the owner's note of 2026-11-13, nothing waits for it: the slice S1 gate runs on everything else and records this trace as its one open item, closed by a short addendum when the owner takes it at the PC itself; it is taken before any slice S3 task that depends on map performance is reviewed.
 ### S1-T08 — Typed-decision requalification and pin ruling
 - Goal: Re-run `evals/typed_decisions/` in both fixed option orders, compare the stated intervals and confirm exact and retreat pins.
 - Acceptance criteria: [x] the full set runs; [x] the admitted measurement is reproduced within its stated intervals; [x] every choice case runs in both hash-derived option orders and is accepted only when both agree; [x] results and route identity are recorded; [x] drift triggers requalification; [x] any accepted alternative has a decision record.
@@ -351,18 +351,18 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas Data; status done (pull request 52, merged 2026-11-15).
 ### S2-T04 — Activity spine and graph tables
 - Goal: Build the reviewed activity spine, not-mappable bucket, graph tables and human review queue.
-- Acceptance criteria: [ ] largest 200 codes, all food-service codes and all playbook codes are reviewed; [ ] every admitted mapping has human sign-off; [ ] the remainder is flagged; [ ] graph edges obey the Public-or-lineage rule.
+- Acceptance criteria: [ ] largest 200 codes, all food-service codes and all playbook codes are reviewed; [ ] every admitted mapping has human sign-off; [ ] the remainder is flagged; [x] graph edges obey the Public-or-lineage rule.
 - Scope: activity review files, spine builder, `graph_node`, `graph_edge` tests.
 - Depends: S2-T01.
 - Requirements: PUB-33, ARC-83, DAT-100.
-- Delivery: hard; personas Data; status queued.
+- Delivery: hard; personas Data; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/58). The first three criteria stay open until a named person reviews the queue (OI-16, OI-205).
 ### S2-T05 — `spine_match` review triage
 - Goal: Use the offline gateway only to order and pre-fill the activity human-review queue.
-- Acceptance criteria: [ ] provider `none` leaves a valid deterministic queue; [ ] no mapping is adopted without sign-off; [ ] decision records stay under eval artefacts.
+- Acceptance criteria: [x] provider `none` leaves a valid deterministic queue; [x] no mapping is adopted without sign-off; [x] decision records stay under eval artefacts.
 - Scope: `scripts/` spine triage and `evals/typed_decisions/runs/`.
 - Depends: S2-T04, S1-T07.
 - Requirements: AI-98, DAT-126, TST-155.
-- Delivery: hard; personas Data; status queued.
+- Delivery: hard; personas Data; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/58).
 ### S2-T06 — Showcase places, business points and flagship selection
 - Goal: Build `pub_place_verification`, verify places in the four showcase areas, provide the real business points of the map and select a flagship building only from the recorded data check.
 - Acceptance criteria: [ ] every `pub_place` row carries `source_provider`, `licence` and `confidence`; [ ] `pub_place_verification` is keyed to `pub_place` and stores check date, reviewer role, verification link and status; [ ] verification statuses are stored; [ ] the recorded candidate data check determines the flagship; [ ] all flagship checks pass; [ ] incomplete-listing caveat remains attached; [ ] the map's real business points come only from the public places data and public listings that document 04 registers, each with its source and licence, among them the places of `places_fsq`, with the date of the release used, and `pub_place` points pass the display threshold; [ ] every showcase area and candidate flagship is resolvable (moved from task S2-T02, word for word, by the lead's ruling of 2026-11-14, recorded in `PROGRESS.md` by the ledger of merge train A).
@@ -372,11 +372,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas Data; status queued.
 ### S2-T07 — Calculation layer and method regressions
 - Goal: Implement deterministic Public calculations in `eii_core.calc` with method-card regression tests.
-- Acceptance criteria: [ ] no calculation reads files or databases; [ ] each implemented worked example has arithmetic and data tests; [ ] comparisons return facts rather than prose.
+- Acceptance criteria: [x] no calculation reads files or databases; [ ] each implemented worked example has arithmetic and data tests; [x] comparisons return facts rather than prose.
 - Scope: `core/eii_core/calc/`, calculation tests and method-card test fixtures.
 - Depends: S2-T03.
 - Requirements: MTH-01, MTH-03, DAT-90.
-- Delivery: hard; personas Methods; status queued.
+- Delivery: hard; personas Methods; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/58). The second criterion stays open: three data tests are owed and are proposed open items (PO-S2-37, PO-S2-40, PO-S2-41).
 ### S2-T13 — Tender source and apportioning weight
 - Goal: Confirm before the slice S2 gate the visitor-readable tender portal, used and shown in full with its terms recorded, or its absence for an access or technical reason, never its terms, and the apportioning weight for drawn shapes.
 - Acceptance criteria: [ ] the tender portal's visitor-readable public pages are registered, fetched by `./eii build-public` and shown in full, or the registry records their absence for an access or technical reason; its terms are read and recorded, never as a condition of fetching or showing; no tender is shown only while no visitor-readable public source is recorded, with `NO_DATA` and its caveat (PUB-93); [x] the apportioning weight that document 07 fixes for drawn shapes (area, or a visitor-readable public population grid with its terms recorded) is confirmed, and a grid enters whatever its reuse terms under [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md); [x] an apportioned figure is labelled Inferred and names its method and its geography; [x] the grid `worldpop_qat_2020` (weights only) and the grid `worldpop_qat_agesex` (population by age and sex, shown) stay separate, and no age-and-sex layer is an apportioning weight; [ ] both confirmations are recorded in the slice S2 gate evidence.
@@ -398,7 +398,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: places-source fetcher and parser under `custodian/publicdata/`, the category mapping, its registry row and tests, and one paragraph of the root `README.md`.
 - Depends: S2-T01, S2-T02.
 - Requirements: PUB-01, PUB-03, PUB-47, PUB-92, PUB-97, PUB-98, PUB-102.
-- Delivery: hard; personas Data; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/57).
+- Delivery: hard; personas Data; status done (pull request 57, merged 2026-11-15).
 ### S2-T16 — Relative busyness of named venues
 - Goal: Read the relative busyness by hour of the named venues of a build-time list into `pub_venue_busyness` as Public facts of `place_public` subjects, inside `./eii build-public` only.
 - Acceptance criteria: [ ] the project's own page reader fetches the values for the named venues of a build-time list, inside `./eii build-public` only, never at run time and never for a drawn area; [ ] `pub_venue_busyness` holds venue, day of week, hour, relative index 0 to 100 and retrieval date, and each value is a Public slot of a `place_public` subject labelled "Google Maps popular times" with its retrieval date; [ ] a value is a relative index and is never a count of people; [ ] the values stay in the uncommitted public cache and never enter the repository or a test fixture, and the reader is tested only on small hand-made pages of the same shape; [ ] the registry records `busy_gmaps` with `licence_basis: owner_decision` on the owner's decision for a personal, local project, and the publisher's terms in its own words with the date read and the basis of use; [ ] the source is left out of the nightly live fetch; [ ] a page that no longer matches the reader fails the build with a message naming the source, and nothing is loaded from it; [ ] any browser tooling the reader needs is pinned through the pin record and installed in a documented step apart from `./eii test`.
@@ -441,7 +441,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: `custodian/src/eii_custodian/publicdata/stage.py`, the failure path of the build in `custodian/src/eii_custodian/publicdata/fetch/build.py`, `custodian/src/eii_custodian/publicdata/frame/live.py`, the review file `custodian/publicdata/review/district_layer_aliases.csv`, `custodian/README.md`, their tests, the two named sentences of documents 05 and 07, and decision record 0034 with its line in the documentation index.
 - Depends: S2-T01, S2-T03.
 - Requirements: PUB-12, PUB-71.
-- Delivery: hard; personas Data; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/56). Added by a re-plan of 2026-11-15 (open item OI-195): an audit of the committed tree found values of sources without an open licence in the code, in two documents and in one review file, against item 5 of [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md), and no task was named for their removal. The task adds no source, feature or rule. Outside it, and standing as they are until a go-live under item 3 of [decision 0034](docs/decisions/0034-licence-questions-of-public-sources-are-answered-at-a-go-live.md), the record of this task: the band value that DAT-16 names, the sums in the registry citation of the row `ref_min_wage`, and the public history of the repository.
+- Delivery: hard; personas Data; status done (pull request 56, merged 2026-11-15). Added by a re-plan of 2026-11-15 (open item OI-195): an audit of the committed tree found values of sources without an open licence in the code, in two documents and in one review file, against item 5 of [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md), and no task was named for their removal. The task adds no source, feature or rule. Outside it, and standing as they are until a go-live under item 3 of [decision 0034](docs/decisions/0034-licence-questions-of-public-sources-are-answered-at-a-go-live.md), the record of this task: the band value that DAT-16 names, the sums in the registry citation of the row `ref_min_wage`, and the public history of the repository.
 ### S2-T08 — Public pack assembly and source review
 - Goal: Assemble the Public pack and close the slice S2 evidence bundle.
 - Acceptance criteria: [ ] source completeness passes for every Public input required by the pack, the 77 added portal datasets, the two investment sources and the sources of decision 0019 among them; [ ] every Public source in the release carries the publisher's terms in its own words with the date read and the basis of use, with no terms-based exclusion under [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md); [ ] the coverage bar uses and names the finest geography available from a visitor-readable source (PUB-82); [ ] OI-03 is closed; [ ] a different-maker reviewer checks twenty random figures; [ ] every regression and licence check passes; [ ] the confirmations of S2-T12, S2-T13, S2-T15 and S2-T17 are recorded.

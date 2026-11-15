@@ -195,6 +195,7 @@
 - DONE SO FAR: Default is individual review by the owner's delegate; the proposed batch audit is 30 random rows per batch with zero errors.
 - OPTIONS: **Recommendation:** review every code individually. Allow batches only by owner-approved audit rule with named sign-off.
 - NEEDED BY: slice S2 activity spine.
+- UPDATE: 2026-11-15, by the ledger of merge train B (task S2-T04): the review files, the queue and the guards are built and approved; no person is named and no mapping is admitted. On the real public cache the spine holds 4,901 codes, 243 of them in the mandatory queue. The review itself is OI-205. Still needed: the name of the person who signs and the answer on batches.
 
 ## OI-17 — Gateway measurement panel
 
@@ -1584,11 +1585,12 @@
 - DONE SO FAR: This task's four own values hold on the real cache; the reconciliation file names the handoff; the nine literals are asserted against the code's table and the document.
 - OPTIONS: **Recommendation:** close when S2-T04's five values are asserted at the join.
 - NEEDED BY: the section 9 regression criterion, when task S2-T04 stands on the same tree (S2-T04 is not in merge train A).
+- UPDATE: 2026-11-15, by the ledger of merge train B: task S2-T04 stands on the same tree as S2-T03 from this train. Whether its five PUB-67 stage values are asserted on the joined tree is not shown by any record of this ledger; the item stays PENDING until that assertion is run and recorded.
 
 ## OI-176 — Five low defects of the public-series calculations, fixed on the calculation layer's final form
 
 - ID: OI-176
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - NEEDED: The five defects D1 to D5 that the internal verification of task S2-T03 found are fixed once, with a planted test each, on the final form of the calculation layer: the branch of task S2-T07, which replaces `core/src/eii_core/calc/public_series.py` whole.
 - WHY: The verification (2026-11-15, at the commit dde9aeedd273c9f82c6e74b6b921ba1b3ee4f4c6; a helper of the lead on the lead's own maker and model, so an internal second reading and not another maker's review) found every formula equal to its card and no defect on a recorded figure of the task. The five defects, each reproduced on invented inputs:
   - D1, an exact half can round the wrong way, and the identity of MTH-21 is not exact (functions `ratio`, `weighted_mean` and `decomposition`): division is made at 28 digits before the later steps, so the value handed to `rounded` is already rounded once. Invented input: before, 5 workers at wage 1 and 1 at wage 0; after, 2 at wage 1 and 1 at wage 2; the means are 5/6 and 4/3 and the change is exactly 0.5. Got "0"; expected "1". Two more invented cases: a within part of exactly 8.5 printed "8", expected "9"; a mix share of exactly 6.25 per cent printed "6.2", expected "6.3". A breach of "round only at the end" (document 04 section 10).
@@ -1599,6 +1601,7 @@
 - DONE SO FAR: The lead's ruling L-354 keeps S2-T03 in merge train A: the lead's real-cache run at the task's fix commit printed every value of PUB-62 to PUB-66 and PUB-68 to PUB-70 equal to the pack's figures, and the lead's count on the real cancelled-licence file on 2026-11-15 found 40,472 rows, 1,221 undated, 39,251 inside the calendar of card C2 and 0 outside it. A fix pass on the branch of task S2-T07 runs since 2026-11-15 (started again as a join-and-fix pass after the lead's ruling L-357 on the square root of the interval method). The verification's list of tests that could pass on wrong code (its section V7, in the task's log) goes to the same pass.
 - OPTIONS: **Default:** the fix as the verification writes it for each defect (exact rationals up to the output and a sign-safe `rounded` for D1 and D2; a refusal for D3; a refusal or a separate count for D4; no summed quantity for D5), on S2-T07's branch only; `public_series.py` as merged by train A is not patched apart.
 - NEEDED BY: the merge of task S2-T07, which does not merge without the fix. Closes when S2-T07's review confirms the five fixes, each with its planted test, on its approved commit.
+- UPDATE: 2026-11-15, by the ledger of merge train B (task S2-T07): CLOSED. The five defects D1 to D5 are fixed on the final form of the calculation layer, commit 4bbaa98e91a3bd26b3eb6a7f9cfa94253b67b274 of the task's own change `6ccc85b..5090b40`. Each was reproduced red on the item's own invented inputs and fixed with its planted test: exact rationals up to the output and one rounding (D1), no negative zero (D2), a refusal for the empty size table (D3), a refusal by source and period for a dated row outside the calendar of card C2 (D4), no summed quantity (D5). The task's reviewer (Cognition SWE-2 High through Devin) confirmed the five fixes on the approved commit 5090b40c448a6657da4ecba9b0e2717243318294, check C1 PASS, with five values worked by hand. The item's closing rule is met.
 
 ## OI-177 — Secret-scanner evidence of S2-T12, pinned at its turn
 
@@ -1861,6 +1864,66 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - DONE SO FAR: The package README names the reader's allowances as its own: they touch only the recorded box of a file, which the selection does not use, or end in a named refusal. `test_fsq_connection_disables_geoparquet_conversion` proves that the conversion is set off before any read, on a hand-made file. The second confirmation passed the README's citations and the allowances paragraph (its checks N1a to N1d).
 - OPTIONS: **Recommendation:** the run of OI-197 records the three answers as header facts and yes-or-no answers only, with no value of a fetched row. If an answer differs from what the reader or the parser expects (a key in a place the reader does not read, a version the pages read do not cover, a column type other than the one the parser expects), the source is refused by its named error and the difference comes back as a ruling; nothing is guessed and no fixture is changed to fit.
 - NEEDED BY: the slice S2 gate; before any task reads `pub_place_fsq` from real data.
+
+## OI-203 — Card C2's rule as written flags 42 of the 125 months
+
+- ID: OI-203
+- TYPE: OPEN
+- NEEDED: A decision on the bulk-month rule of card C2 (document 07): it stays as written, or it is amended by a decision record.
+- WHY: The lead's count over the pinned cancellations file (2026-11-14): 153,669 dated and 7,386 undated cancellations, the card's own counts; the median of the 125 months is 305 and the threshold 915; the rule flags 42 of the 125 months, among them every month of 2023 and of 2024, holding 89.7 per cent of the dated cancellations. The three months the card names hold 43.1 per cent, which is the card's printed share. So the card's own open question (which other months the rule flags) has the answer 42, and "excluding flagged months" is empty for 2023 and 2024, the year of the card's own worked example.
+- DONE SO FAR: The lead changed no method (scope is frozen; a method amendment is a decision record). The data test `custodian/data_tests/test_pinned_methods.py` pins the three named months with their exact counts and their share 43.1, and the count of flagged months (42), their list and the share 89.7 as facts of the pinned file. It passed on the real cache at the approved commit of task S2-T07.
+- OPTIONS: **Default:** the rule stays as written in version 1 and the method note lists the 42 months. Alternative: a median over a moving window, by decision record.
+- NEEDED BY: task S2-T09 (the method cards), before the card's churn figure excluding flagged months is shown.
+
+## OI-204 — The rounding of a negative half
+
+- ID: OI-204
+- TYPE: ASSUMPTION
+- NEEDED: Confirmation that a negative exact half rounds away from zero in every displayed figure of the calculation layer.
+- WHY: The pack says half-up and round once at the end (document 04 section 10) and does not say which way a negative half goes. The layer rounds half away from zero on the magnitude; tests pin it.
+- DONE SO FAR: The lead's ruling of 2026-11-14 on the second verification of task S2-T07 took half away from zero as the assumption and asked for this item. The confirmation of 2026-11-15 read the rounding function and found one rounding and no second one.
+- OPTIONS: **Default:** half away from zero, as built. Alternative: half towards positive infinity, which changes the sign rule of the one rounding function and the tests that pin it.
+- NEEDED BY: task S2-T09, where the method cards state their rounding.
+
+## OI-205 — The human review of the activity spine on the real feeds
+
+- ID: OI-205
+- TYPE: OPEN
+- NEEDED: A named person's review of the mandatory queue of the activity spine, code by code, recorded in `custodian/publicdata/review/activity_spine.csv` with the reviewer's role and date and with the binding file beside it. Criteria 1 to 3 of task S2-T04 stay unticked until then. Before that review, the queue is computed again with the supplier membership of the reviewed baskets of S2-T03, so that the supplier activities are in it.
+- WHY: PUB-33 admits a mapping only when a person approves that the Arabic activity name fits the class title, and no model signs a review (the lead's ruling of 2026-11-15). The reader, the queue and their guards are built and approved; the reviewed data set is not delivered.
+- DONE SO FAR: The lead's run on the real public cache at commit c193a12 (2026-11-15, counts only) reads 4,901 activity codes: 2,125 `unreviewed`, 1,369 `not_mappable_legacy` (a code that is not seven digits long) and 1,407 `not_mappable_invalid_prefix` (a seven-digit code whose first four digits are not a class of the classification file, which holds 419 classes). The review queue holds 243 codes; 349 rows are left out in four groups and counted. The committed review file holds one `unreviewed` row and claims no decision; the category list is empty. The run's record does not state the supplier membership it was given, and the builder's documented call passes an empty complete membership. OI-16 (who signs, and whether batches are allowed) is not decided.
+- OPTIONS: **Default until a person is named:** no mapping is admitted and every consumer treats the spine as unreviewed. The review is done by the person OI-16 names, each code on its own unless the owner approves a batch rule.
+- NEEDED BY: task S2-T08 (the Public pack assembly) for any figure by activity class; before the slice S2 gate.
+
+## OI-206 — The terms of the classification file are not read
+
+- ID: OI-206
+- TYPE: OPEN
+- NEEDED: The publisher's own words on the use of the classification file `cls_isic4`, with the date read, recorded in the registry row and in the terms cell of document 04; or the lead's decision on how they are recorded when the page that holds them is on a host the fetcher may not contact.
+- WHY: PUB-03 holds the file's host on the allow-list. The helper's reading of 2026-11-15 found that the host's own pages carry only a footer line whose terms and copyright links lead to another host, which is not on the allow-list and was not contacted; the file itself carries no terms line. So `terms_url` cannot be a page of the allow-listed host.
+- DONE SO FAR: Part 2 of S2-T04 confirmed the file's direct address, its extension and its two columns in the registry row and filled the "how fetched" cell of document 04; the licence fields are unchanged, the basis stays `none_stated` and `terms_url` stays empty. The release mode of the activity graph refuses the source. The terms cell of document 04 says that the exact wording and the date read are to be recorded and names the owner's decision as the basis (PUB-12).
+- OPTIONS: **Default:** the row stays as it is and the graph's release mode keeps refusing titles from this source until the words are recorded. **Recommendation of the helper that read the host:** pass the point to task S2-T21, whose loader asks every row for the terms words and the date read under decision 0026.
+- NEEDED BY: task S2-T21's join pass (its loader refuses a registry row without the two terms fields); before any release that shows a class title.
+
+## OI-207 — One unexplained failure of the scripts unit suite in the builder's sandbox of S2-T05
+
+- ID: OI-207
+- TYPE: OPEN
+- NEEDED: The name and the cause of the test of `scripts/tests` that failed in the build pass of task S2-T05, or a recorded finding that it cannot be reproduced after the stated runs.
+- WHY: Rule 39: a green re-run alone does not close a random failure. On 2026-11-14 the builder of S2-T05 (OpenAI GPT-6 Astra through Codex) ran `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` at the end of its pass and recorded exit code 1. Its wrapper kept only the trailing output, so the failing test and the suite's total are not known. The builder did not run it again and reported the cause as unknown.
+- DONE SO FAR: The lead ran the same discovery at the task's local commit 00e3394b0a2d3cdaace7933a511ead58f9be5bf4 on the build machine on the same day: 708 tests, OK, exit 0. The independent reviewer read both records and judged that the failed run leaves no acceptance criterion unmet (REV-11). Two explained causes of an exit 1 of this suite are on record for other runs and are not shown to be the cause here: the interrupt test under a launch that ignores the interrupt signal (PO-S2-06), and, in a later pass of another task in another tool's sandbox, the two version tests failing because that sandbox's Node was outside the pinned line. The return of S2-T05 says that Node 22 was put first on the path for its runs.
+- OPTIONS: **Default:** the item is closed as not reproduced when the suite's recorded runs on the joined head of merge train B and on main after the merge pass, with those runs listed; if a test of `scripts/tests` fails in a builder's sandbox again, its kept output names it and this item takes the cause. Builders' wrappers keep the whole output of a failed suite. No test is skipped, retried inside a run or given a longer limit for it.
+- NEEDED BY: the slice S2 gate.
+
+## OI-208 — The qualification that a keyed run of the spine triage needs
+
+- ID: OI-208
+- TYPE: OPEN
+- NEEDED: The lead's decision, before any keyed run of `scripts/spine_triage.py`, whether the present qualification of the gateway covers the rubric, the language and the route that the triage of the activity spine would use, or which requalification is run first.
+- WHY: [Decision 0014](docs/decisions/0014-typed-decision-gateway.md), section "What would change this decision", ties a qualification to its model, rubric, language and route. The tool refuses a keyed provider unless a qualification record names exactly those four, and the task's change holds no such record, so today every keyed run is refused. The plan of S2-T05 raised the question, and the lead's rulings for the build left it open on purpose: "Whether the present qualification covers this rubric is the lead's decision before any keyed run."
+- DONE SO FAR: The task is built, reviewed and accepted with provider `none` and with recorded answers only; no keyed run and no live call was made by the builder, a test or the lead. The refusal is tested: a keyed request without a qualification record, and one whose record differs in the model, the rubric identifier, the rubric hash, the language or the route, are refused before a gateway object is made. OI-15 (human-labelled qualification sets) names "any changed model, rubric, language or route" under NEEDED BY; OI-16 names who signs a mapping.
+- OPTIONS: **Default:** no keyed run of the triage tool; the queue is ordered with provider `none` or with recorded answers. A keyed run follows only after the lead records, with its evidence, a qualification for exactly this rubric, language and route, inside the token allowance of the owner's recorded answer to OI-18 and from the lead's own shell.
+- NEEDED BY: the first keyed run of `scripts/spine_triage.py`; not needed by any gate, which all run with provider `none` (rule 27).
 
 ## Change control
 
@@ -2305,6 +2368,7 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: mutation testing of the modules that compute or compare numbers (rule 44, `scripts/mutation.py`)
 - EVIDENCE: The campaign on `core/src/eii_core/calc/public_series.py` is complete (130 mutants made, 127 killed, 3 survived and explained, exit 0). The three custodian series modules of the same task, `figures.py`, `baskets.py` and `reconcile.py` under `custodian/src/eii_custodian/publicdata/series/`, have no campaign: on the task's base the mutation copy lacks the scripts folder that one test of S2-T01 imports, so the custodian suite cannot run in it.
 - NEEDED: the campaign on the three modules, every survivor killed or explained. The lead runs it on the joined tree of the train that carries task S2-T21, where the mutation copy holds what the custodian suite imports; a survivor goes to the builder's maker of S2-T03. Or one line saying why the item is not valid.
+- UPDATE: 2026-11-15, by the ledger of merge train B (tasks S2-T04, S2-T05 and S2-T07): the item stays open. The campaign of `figures.py` ran to its end for the first time on a trial tree of that train at bbc5bfa869bc0a24f37c4a70ab10d0bd6a652577, where the module is byte-identical to the one the train merges: made 1,891, killed 1,741, survived 150, timed out 0, not covered 0, exit code 1. The run was possible because the repair of the mutation runner by task S1-T19 (pull request 54) stood under that tree, not because of task S2-T21, which the train does not carry. The explanations file holds no entry for the module, so all 150 survivors are unexplained: 149 stand on lines of S2-T03 that are byte-equal on main, and one stands on a line that S2-T07 added (line 342, the text of a refusal message that its test matches by a search). The exit code 1 is recorded as it is and is not a pass. By the lead's ruling of 2026-11-15 the 150 go to one thin test pass on its own branch after the train merges, built by the maker that built S2-T03 and reviewed by another maker, on a base that holds the runner's repair. On the train's first joined tree (cafd8b741dd2d16cb7514b4945d8413482fa7ad2), where the three series modules are the same blobs as in the commit the train merges, the lead's campaign of 2026-11-15 ran all three in one run with exit code 1: `reconcile.py` made 193, killed 181, survived 12; `baskets.py` made 238, killed 218, survived 20; `figures.py` made 1,891, killed 1,741, survived 150 again. The train changes two lines of `reconcile.py`, on which none of its 12 survivors stands, and no line of `baskets.py`. All three modules go to the same thin test pass.
 
 ### PO-S2-15 — The filled tender confirmation once S2-T19 fetches the source
 
@@ -2503,6 +2567,231 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: `custodian/src/eii_custodian/publicdata/places_fsq/footer.py` (`file_metadata`, the resolution of column orders); the package README
 - EVIDENCE: The reader uses a modern bound only where the file's list of column orders gives the column the type-defined order; under any other order it takes the deprecated bounds where present, and otherwise the statistic is missing and the file set is refused. The return of the second fix pass: "IEEE total order, member 2, is UNKNOWN in this pass". The reading of 2026-11-15 found that the format's definition now names two further column orders and a rule for a zero bound under the type-defined order that the reader does not apply; the lead ruled that none of its twelve points changes code, and the first confirmation passed the pair of bounds from mixed sources "unchanged as ruled" (its check K9). The reader fails closed: a copy written with a later order is refused by name and never read by a guessed order.
 - NEEDED: the follow-up task of slice S2 decides, after the live fetch shows which order the copy declares, whether the reader learns the later orders and the zero rule, each with its hand-encoded plant; or says in one line why refusal is enough.
+
+### PO-S2-37 — Card C8: the replay from a pinned file and the source entry of its fixture block
+
+- ID: PO-S2-37
+- TYPE: OPEN
+- RAISED BY: the designated reviewer of task S2-T07 (Cognition SWE-2 High through Devin), 2026-11-14 and 2026-11-15: finding F1 of round 1 (its deferred part) and proposed item P5 of round 2
+- CONCERNS: MTH-03 (a data test for each worked example); card C8 of document 07; `core/tests/fixtures/methods/public_methods.json`
+- EVIDENCE: The arithmetic test on card C8's printed inputs exists since the fix of F1. The data replay was not added: the national census table is not among the pinned sources of the lead's cache (the pins file names ten sources, none of them that table). The fixture's source entry `pub_census_national` carries only the dataset name, where its sibling entries carry publisher, address and licence; the card states that the census layers state no licence.
+- NEEDED: when the national census table is pinned, the replay of card C8 in `custodian/data_tests/` and the publisher and retrieval date in the fixture's source entry, by the task that writes the method-card pins. Or one line saying why the item is not valid.
+
+### PO-S2-38 — The four calculation modules share one mutable decimal context
+
+- ID: PO-S2-38
+- TYPE: OPEN
+- RAISED BY: the designated reviewer of task S2-T07, round 1, 2026-11-14, proposed item P2
+- CONCERNS: document 17 (a proposed hardening point); `core/src/eii_core/calc/public_series.py`
+- EVIDENCE: The reviewer's point: the modules share one mutable context object, `CALC_CONTEXT`; all arithmetic runs inside a local copy of it and nothing reads its flags, so results are unaffected, but a per-call copy or an immutable settings record would remove the surface a later edit could misuse. The confirmation of 2026-11-15 found exactly one stated decimal context in the module.
+- NEEDED: a hardening entry of document 17, or one line saying why the item is not valid.
+
+### PO-S2-39 — Two row types admit text fields without the exact-type check
+
+- ID: PO-S2-39
+- TYPE: OPEN
+- RAISED BY: the designated reviewer of task S2-T07, round 1, 2026-11-14, proposed item P3
+- CONCERNS: document 17 (a proposed hardening point); `core/src/eii_core/calc/public_methods.py`
+- EVIDENCE: The reviewer's point: `TradeRow` and `AnnualEnergy` admit their text fields (`product`, `origin`, `month`, `unit`, `zone`) without the exact-type check that every other admission point applies. Only a subclass of the text type differs, and every numeric field still passes the exact-type checks.
+- NEEDED: a hardening entry of document 17, or one line saying why the item is not valid.
+
+### PO-S2-40 — Card C1: its two unprinted denominators and its data test
+
+- ID: PO-S2-40
+- TYPE: OPEN
+- RAISED BY: the design review of task S2-T07 (xAI Grok 4.7 through Cursor, 2026-11-14, its fifth finding), the lead's ruling of 2026-11-14 on it, and the designated reviewer of the task, round 1, proposed item P4
+- CONCERNS: card C1 of document 07 (task S2-T09 owns the cards); MTH-03; `custodian/data_tests/`
+- EVIDENCE: Card C1 prints the two location quotients 1.39 and 3.05 and not the two counts they need. The lead read both from the cached open-licence table of active licences through the frame's municipality crosswalk and checked both quotients by hand within the card's tolerance of 0.01; the counts entered the method fixture with their source. That check is the lead's hand-check and no committed replay. Card C1 has no data test: it waits for the frame's population table.
+- NEEDED: card C1 prints both counts (task S2-T09); a replay in `custodian/data_tests/` asserts both denominators from the pinned file and the two quotients, and the card's data test follows when the frame's table stands on the same tree. Or one line saying why the item is not valid.
+
+### PO-S2-41 — The third worked row of card C2, by activity class, has no data test
+
+- ID: PO-S2-41
+- TYPE: OPEN
+- RAISED BY: the lead's ruling of 2026-11-14 on the questions of the third pass of task S2-T07 (its third question)
+- CONCERNS: card C2 of document 07; MTH-03; `custodian/data_tests/test_pinned_methods.py`
+- EVIDENCE: The data tests replay the national cancellations and two municipal rows of card C2. The third worked row, by activity class, needs the reviewed activity spine of task S2-T04. The spine's code joins main with this same train, and no mapping of it is reviewed or admitted (OI-205).
+- NEEDED: the data test of the third row once the spine is reviewed, named with its owner task. Or one line saying why the item is not valid.
+
+### PO-S2-42 — One check value is divided under the caller's decimal context
+
+- ID: PO-S2-42
+- TYPE: OPEN
+- RAISED BY: the designated reviewer of task S2-T07, confirmation of 2026-11-15, a proposed point marked record and hardening
+- CONCERNS: document 17 (a proposed hardening point); `custodian/src/eii_custodian/publicdata/series/figures.py`, function `compute_checks`, key `value_bn_2dp`
+- EVIDENCE: The reviewer's point: the exact total is divided by a Decimal power of ten under the ambient context. It is exact for every reachable total, and sensitive to the caller's context in principle, where the exact rational form would not be.
+- NEEDED: a hardening entry of document 17, or one line saying why the item is not valid.
+
+### PO-S2-43 — The refusal distance of an approximate value is absolute
+
+- ID: PO-S2-43
+- TYPE: OPEN
+- RAISED BY: the designated reviewer of task S2-T07, confirmation of 2026-11-15, a proposed point marked record and hardening
+- CONCERNS: document 17 (a proposed hardening point); `core/src/eii_core/calc/public_series.py`, constant `BOUNDARY_DISTANCE`
+- EVIDENCE: The reviewer's point: the band of 1e-40 covers the stored error of a fifty-digit value only for magnitudes below roughly 1e9. Every value the layer produces stays far under that; a later approximate path at larger magnitudes would need the band scaled.
+- NEEDED: a hardening entry of document 17, or one line saying why the item is not valid.
+
+### PO-S2-44 — The calendar of card C2 is written twice
+
+- ID: PO-S2-44
+- TYPE: OPEN
+- RAISED BY: the designated reviewer of task S2-T07, confirmation of 2026-11-15, a proposed point marked record and hardening
+- CONCERNS: document 17 (a proposed hardening point); `core/src/eii_core/calc/public_methods.py`, function `licence_churn`, and the constant `C2_CALENDAR` of `public_series.py`
+- EVIDENCE: The reviewer's point: `licence_churn` keeps its own copy of the 125-month calendar, identical to the constant; sharing the constant would prevent drift.
+- NEEDED: a hardening entry of document 17, or one line saying why the item is not valid.
+
+### PO-S2-45 — The mutation runner's copy of the `docs` folder after the repair of task S1-T19
+
+- ID: PO-S2-45
+- TYPE: OPEN
+- RAISED BY: the lead, at the join of merge train B, 2026-11-15
+- CONCERNS: `scripts/mutation.py`, function `run_packages`; document 17
+- EVIDENCE: Task S2-T07 added three lines that copy the repository's `docs` folder into each package copy, because a package's tests run one folder deeper there and `core/tests/test_second_fix.py` reads `docs/03_DATA_CONTRACTS.md` by walking up from its own file. The repair of task S1-T19, on main since pull request 54, makes the copy's root an empty git repository and adds a shared root lookup for tests (`custodian/tests/repository_root.py`). Whether the three lines are still needed after it was not tested.
+- NEEDED: one run of the campaign of a `core/src` module with the three lines removed; then the lines stay with a comment that says why, or go with the test brought to the shared lookup. Or one line saying why the item is not valid.
+
+### PO-S2-46 — Values that are not numbers under names ending `_unrounded`
+
+- ID: PO-S2-46
+- TYPE: OPEN
+- RAISED BY: the lead's ruling of 2026-11-14 on the questions of the third pass of task S2-T07 (its tenth question)
+- CONCERNS: the result types of `core/src/eii_core/calc/`; DAT-90
+- EVIDENCE: The ruling's words: non-number values under names ending `_unrounded` stay in version 1 with an open item. The fields concerned were not listed on the joined tree when this item was entered.
+- NEEDED: the list of those fields and one decision: they are renamed, or the name's meaning is written into the contract. Or one line saying why the item is not valid.
+
+### PO-S2-47 — Hardening of the fact layer that was recorded and not built
+
+- ID: PO-S2-47
+- TYPE: OPEN
+- RAISED BY: the lead's ruling of 2026-11-14 on the second verification of task S2-T07 (its list "not built, recorded")
+- CONCERNS: document 17 (proposed hardening points); DAT-134; the fact schema's task
+- EVIDENCE: The ruling lists, as beyond the task's criteria or in another task's file: making a fact constructible only through the wrapper (the language cannot enforce it; the origin check of DAT-134 belongs to the fact schema's task); a closed licence list, a host rule for a source address, and a retrieval date checked against the period; and the plain-decimal form of the decomposition that the public-series figures of S2-T03 call. Whether that plain form still exists after the exact-arithmetic fix was not checked when this item was entered.
+- NEEDED: a hardening entry of document 17 for each point that still holds, with its owner task. Or one line saying why the item is not valid.
+
+### PO-S2-48 — The purity guard names four modules; the apportioning module is not among them
+
+- ID: PO-S2-48
+- TYPE: OPEN
+- RAISED BY: a helper of the lead at the trial join of merge train B, 2026-11-15; checked again on the joined work commit for this ledger
+- CONCERNS: the first criterion of task S2-T07 in TASKS.md; `core/tests/test_calculation_purity.py`; `core/src/eii_core/calc/apportion.py` (task S2-T13)
+- EVIDENCE: The guard imports and lists `facts`, `public_methods`, `public_series` and `sector_economics` by name. Main gained `apportion.py` in the same package with pull request 52, after this task's base. On the joined tree the guard does not read it, and no test fails when a calculation module is added without joining the list.
+- NEEDED: the guard reads every module of `core/src/eii_core/calc/` (a listing of the folder, with a plant), or the list gains the module with one test that fails for an unlisted file. Or one line saying why the item is not valid.
+
+### PO-S2-49 — The data-test command stands in no rules file
+
+- ID: PO-S2-49
+- TYPE: OPEN
+- RAISED BY: a helper of the lead, 2026-11-15, from the lead's ruling of 2026-11-14 on the second verification of task S2-T07 (its point on data tests) read against rule 44
+- CONCERNS: rule 44 of AGENTS.md and CLAUDE.md; TST-197 and TST-198; `custodian/data_tests/`
+- EVIDENCE: The ruling says that the data tests stand outside the whole test command's discovery, that the lead runs them on the real cache with the evidence in the ledger, and that their command joins rule 44 in the task's document part. Rule 44 on the joined tree names no data-test command, and neither `README.md` nor `core/README.md` names the folder. The lead ran them as `uv run --locked python -m pytest custodian/data_tests -q -p no:cacheprovider` with the public cache linked into the workspace.
+- NEEDED: the command and its condition (the real public cache, the lead's shell only, never a test, a gate or CI) in rule 44 of both rules files, by a documents change; or one line saying why rule 44 does not need it.
+
+### PO-S2-50 — The runner's refusal of `PYTEST_ADDOPTS` reads the process environment only
+
+- ID: PO-S2-50
+- TYPE: OPEN
+- RAISED BY: the confirmation of the joined `scripts/mutation.py` for task S2-T07 (Cognition SWE-2 High through Devin, 2026-11-15), its one proposed item, marked hardening
+- CONCERNS: `scripts/mutation.py`, function `run_copy`; tasks S2-T07 and S1-T19; document 17 (a proposed hardening point)
+- EVIDENCE: The reviewer's point: the refusal of a set `PYTEST_ADDOPTS` in `run_copy` reads the process environment and not the `environment` mapping that a caller may pass. No caller in the tree can bypass it: the package run derives its environment from the process environment, so the refusal fires first, and the typed-decision run uses the process environment directly (check K3 of the confirmation). A later caller that passes a hand-built environment holding the variable would not be refused. The point is beyond both tasks' acceptance criteria.
+- NEEDED: the refusal also reads the mapping that is passed, with a planted test; or one line saying why the item is not valid.
+
+### PO-S2-51 — A sentence of document 04 section 6 says the classification source stays unconfirmed
+
+- ID: PO-S2-51
+- TYPE: OPEN
+- RAISED BY: the lead's pack note for review round 2 of S2-T04, 2026-11-14 (one sentence of the fix states the pack's then rule on a source's terms, which the owner's decision of that day changes through a decision record of its own); found again on the train's trial tree by the helper that drafted this ledger block, 2026-11-15
+- CONCERNS: document 04 section 6, the sentence after PUB-40 that begins "S2-T04 builds the offline activity spine"; the terms row of `cls_isic4` in the same document; PUB-13
+- EVIDENCE: The sentence, added by the first fix pass of S2-T04, ends: "the classification source stays unconfirmed so titles derived from it stay barred from release (PUB-13)". On the joined work commit of merge train B the same document's terms row for `cls_isic4`, as main holds it under decision 0026, ends: "titles and mappings may enter a release; any permission needed for real use goes on document 17's list". Part 2 of S2-T04 confirmed the file's address and columns and did not touch the sentence. The code agrees with the sentence, not with the row: the graph's release mode refuses the source while its basis is `none_stated`.
+- NEEDED: one wording for section 6 that agrees with decision 0026 and with what is still unconfirmed (the terms words, OI-206), made with the document pass of S2-T21 or of decision 0026; the code follows the loader of S2-T21 (PO-S2-52). Or one line saying why the item is not valid.
+
+### PO-S2-52 — This task's own confirmation of what the registry loader of S2-T21 changes in it
+
+- ID: PO-S2-52
+- TYPE: OPEN
+- RAISED BY: the scout's report of train B (a helper's trial join on main, 2026-11-15), points F1 and F2; the lead's ruling of 2026-11-15 06:34, part 1
+- CONCERNS: `custodian/src/eii_custodian/publicdata/review/graph.py`, `custodian/tests/test_activity_planted.py`, `custodian/tests/test_activity_real_shape.py`; rule 33 of AGENTS.md (a forced code or test difference needs that task's own confirmation by another maker); decision 0026
+- EVIDENCE: `graph.py` imports `release_refused` from the registry module and calls it in the title check of `cls_isic4`, and tests the basis against `none_stated`; `test_activity_planted.py` imports and asserts `release_refused` and plants a `none_stated` source; `test_activity_real_shape.py` asserts that the row `cls_isic4` has the basis `none_stated`. S2-T21 removes the function and the basis and holds the row as `owner_decision` with decision record 0026. S2-T21 left this train for a join pass on the train's tree; the lead ruled that where the two meet, the other tasks' code and tests follow the record's loader, each change named in that pass's return.
+- NEEDED: the changed lines of these three files, confirmed for S2-T04 by another maker than the one that makes them, with the train that carries S2-T21; the release bar on the classification file's titles is then stated by the loader's rule and by OI-206, not by the removed basis. Or one line saying why the item is not valid.
+
+### PO-S2-53 — Hardening points of the activity review
+
+- ID: PO-S2-53
+- TYPE: OPEN
+- RAISED BY: the builder of the first fix pass of S2-T04 (xAI Grok 4.7 through Cursor), 2026-11-14, under "HARDENING" in its return; the first builder's return names the file-length point too
+- CONCERNS: document 17 (a proposed hardening point); TST-51
+- EVIDENCE: The return says that a cryptographic reviewer signature and a review screen are not built: a review is recorded as a role and a date in a committed file, bound to its inputs by the binding file. It also says that `activity.py` and the larger activity test files are past the 500-line target, which the plan treats as a warning and not as a failure; the files were not split.
+- NEEDED: one entry of document 17 for the reviewer signature, with no change of scope (the scope is frozen); a decision whether the long files are split by a later task. Or one line saying why the item is not valid.
+
+### PO-S2-54 — Three type diagnostics of the activity refusal tests, visible only to an unconfigured type check
+
+- ID: PO-S2-54
+- TYPE: OPEN
+- RAISED BY: the confirmation of the mutation pass of task S2-T04 (Cognition SWE-2 High through Devin, 2026-11-15), its one proposed item, marked record (check M7); the builder's return of the thin repair names the same three places
+- CONCERNS: `custodian/tests/test_activity_survivors_refusals.py` and `custodian/tests/test_activity_survivors_refusals_decisions.py`; the file list of the type check in `pyproject.toml`; REV-15
+- EVIDENCE: A direct type check of the two files reports three `dict.update` mismatches, one in the first file and two in the second. The two files stand outside the configured file list of the type check, so the configured run reports no issue. The reviewer's reading: the three updates behave as intended and are no defect of what the tests prove; they are not suppression comments.
+- NEEDED: if these test files ever join the configured file list of the type check, the literal dictionaries are annotated as `dict[str, object]`. Or one line saying why the item is not valid.
+
+### PO-S2-55 — One test of the spine triage prints a line of the tool into the suite's output
+
+- ID: PO-S2-55
+- TYPE: OPEN
+- RAISED BY: the independent review of S2-T05 on its local commit (xAI Grok 4.7 through Cursor), 2026-11-14, proposed item P1 (REV-11), a record point.
+- CONCERNS: TST-155; rule 36 of `AGENTS.md` (a failure is never hidden).
+- EVIDENCE: `test_none_preserves_queue_without_network_or_key_access` in `scripts/tests/test_spine_triage.py` calls `main` without redirecting standard output, so every run of the suite prints the tool's success line `OK unsigned queue` after the suite's own result. The lead's discovery at the commit exited 0 (708 tests, OK), so the line hid no failure there. The line is the last line of the builder's failed discovery too, where it stood under a run that had exited 1.
+- NEEDED: the test redirects the tool's standard output, as the file's own helper for calling `main` does, so that the last line of the suite's output is the suite's own; a change of one test, made by a later task that owns the file. Or one line saying why the item is not valid.
+
+### PO-S2-56 — The count of project commands in `README.md` after S2-T05 added one to rule 44
+
+- ID: PO-S2-56
+- TYPE: OPEN
+- RAISED BY: the independent review of S2-T05 on its local commit (xAI Grok 4.7 through Cursor), 2026-11-14, proposed item P2 (REV-17), a record point.
+- CONCERNS: rule 44 of `AGENTS.md`; `README.md`, section "Current status".
+- EVIDENCE: `README.md` says "Thirty-two project commands run from the repository root today" and the commit of S2-T05 added `uv run --locked python scripts/spine_triage.py` and its test command to rule 44. The plan limited the task's README edit to one paragraph, so the count was left as it stood. The sentence still reads so on the joined work commit of merge train B.
+- NEEDED: the count and the list of that sentence are brought in line with rule 44 by the next documents change that touches `README.md`; whether the README keeps a count at all is decided there. Or one line saying why the item is not valid.
+
+### PO-S2-57 — A failure while the gateway builds its provider may leave no decision record
+
+- ID: PO-S2-57
+- TYPE: OPEN
+- RAISED BY: the builder's return of S2-T05 (OpenAI GPT-6 Astra through Codex), 2026-11-14, under NOT DONE and in its proposed open-item sentence; not a verdict finding. The review did not rule on it.
+- CONCERNS: DAT-126 (the decision record); the gateway of task S1-T07, which is outside the scope of S2-T05.
+- EVIDENCE: The builder reports that the triage tool returns the unchanged queue when the gateway cannot be built, and that the gateway builds its provider before the block that writes a decision record, so a failure at that step may be persisted in no record. The gateway's code was not changed by the task. With provider `none` and with recorded answers, the only providers of the build and of every gate, no test shows the case. This draft did not read the gateway's code to confirm the order.
+- NEEDED: the lead's reading of the gateway's start-up order, and then one of: a hardening entry of document 17 for the gateway (a start-up failure writes a record of outcome `UNAVAILABLE` or `ERROR`), or a recorded statement that a failure before any call needs no DAT-126 record. Or one line saying why the item is not valid.
+
+### PO-S2-58 — The part of the break pass of S2-T05 that was not done, and one surviving negation
+
+- ID: PO-S2-58
+- TYPE: OPEN
+- RAISED BY: the builder's return of S2-T05 (OpenAI GPT-6 Astra through Codex), 2026-11-14, under BREAKS and NOT DONE, and its proposed open-item sentence; not a verdict finding.
+- CONCERNS: rule 37 of `AGENTS.md` (every guard has a planted violation); the build brief's break pass (every comparison, boolean operand, early return and listed value); TST-155.
+- EVIDENCE: The builder's break pass negated 62 conditions of `scripts/spine_triage.py` and `scripts/spine_triage_io.py`; nine were caught by no test, assertions were added, and a follow-up of twelve runs caught eleven. One negation survives: the empty-string operand of `gateway.endpoint or ""` in `triage`, explained by the builder as unreachable for an admitted keyed run. The builder states that listed values and early returns were not broken one by one. The review approved on the acceptance criteria with a planted refusal for each new guard (REV-11) and raised no point on the break pass. The two modules are under `scripts/`, and no mutation campaign was run on them.
+- NEEDED: the lead's ruling whether the remaining breaks are owed (a thin break pass by the builder over the listed values and early returns of the two modules, with the surviving operand killed or its explanation recorded) or whether the reviewer's planted-refusal reading closes the point. Or one line saying why the item is not valid.
+
+### PO-S2-59 — No run of the spine triage on the real public cache is recorded
+
+- ID: PO-S2-59
+- TYPE: OPEN
+- RAISED BY: the builder's return of S2-T05, 2026-11-14, under NOT DONE ("No admission-path test for a real Parquet cache; no claim of live qualification or source readiness"), read with the lead's lesson of 2026-11-15 on S2-T04 ("an approval on invented fixtures with normalised names says nothing about the real shape; the real-cache run belongs before the review").
+- CONCERNS: the first acceptance criterion of task S2-T05 (provider `none` leaves a valid deterministic queue); PUB-35.
+- EVIDENCE: Every test of the task runs on an invented cache. The build brief ruled that the real structures are S2-T04's matter and that the lead confirms them on the real cache before either task's turn. The lead's real-cache runs of 2026-11-15 are runs of S2-T04's spine, and its further pass rewrote the invented cache of the triage tests in the real shapes; the records hold no run of `scripts/spine_triage.py` itself on the real cache.
+- NEEDED: one run of `uv run --locked python scripts/spine_triage.py` with provider `none` on the real public cache from the lead's own shell, recorded with counts and field names only: the exit code, the number of queue rows, and whether the queue written equals S2-T04's recomputed queue byte for byte; entered with the ledger of the task that integrates the spine. Or one line saying why the item is not valid.
+
+### PO-S2-60 — The table of lineage node types of the activity graph is read only by a test
+
+- ID: PO-S2-60
+- TYPE: OPEN
+- RAISED BY: the confirmation of the mutation pass of the graph module of task S2-T04 (Cognition SWE-2 High through Devin, 2026-11-15), a proposed item marked record (check G1); the builder's return names the same point
+- CONCERNS: `LINEAGE_NODE_TYPES` in `custodian/src/eii_custodian/publicdata/review/graph.py`; `custodian/tests/test_activity_graph_survivors_refusals.py`; DAT-100 to DAT-103
+- EVIDENCE: The pass removed the refusal "lineage edge has no lineage end" from `_check_edge`, which no input could reach behind `_check_edge_ends`. Since the removal no production line reads the table `LINEAGE_NODE_TYPES`; it stays as the declared table that `test_every_lineage_edge_type_has_a_lineage_node_at_one_end` reads, and that test fails if a later change gives a lineage edge type two public ends.
+- NEEDED: when the graph module is next changed, either the table gets a production reader again or the test states in its own text that it is the table's only reader. Or one line saying why the item is not valid.
+
+### PO-S2-61 — Three tests of the graph module's mutation pass rest on the behaviour of the Linux platform
+
+- ID: PO-S2-61
+- TYPE: OPEN
+- RAISED BY: the confirmation of the mutation pass of the graph module of task S2-T04 (Cognition SWE-2 High through Devin, 2026-11-15), a proposed item marked hardening (checks G2 and G3)
+- CONCERNS: `custodian/tests/test_activity_graph_survivors_writes.py` and `custodian/tests/test_activity_graph_survivors.py`; rule 37 of `AGENTS.md`
+- EVIDENCE: The test of the staging removal plants a folder that cannot be removed by its mode bits: under a process that may remove any folder the plant has no effect, the three mutants it kills would survive, and the test would still pass. The test of the read under the C locale loses its kill under the interpreter's UTF-8 mode and never fails wrongly. The tests of the staging prefix assume a longest file name of 255 bytes and a temporary folder on another device than the shared-memory folder. All hold on the declared platform and in the lead's campaigns; none can fail wrongly.
+- NEEDED: if the suite is ever run on another platform or as a privileged user, each of the three tests either proves its plant took effect before it asserts or is skipped there by name with its reason. Or one line saying why the item is not valid.
 
 ## Sources
 
