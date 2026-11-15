@@ -559,10 +559,10 @@ sources:
     slug: "population-area-and-population-density-per-square-kilometers-by-zone"
     kind: "portal_dataset"
     title_en: "Population, area and population density by zone"
-    publisher: "to be confirmed at slice S2"
-    licence_id: "unconfirmed"
-    licence_basis: "none_stated"
-    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-area-and-population-density-per-square-kilometers-by-zone/exports/json"
@@ -577,17 +577,17 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "publisher_or_licence_unconfirmed"
+    skip_reason: "cache_fields_unconfirmed; adapter_unavailable"
     extension: "json"
   - key: "est_census"
     source_id: "est_census"
     slug: "number-of-business-establishments-by-economic-activity-in-census-2010-2020"
     kind: "portal_dataset"
     title_en: "Number of business establishments by economic activity in census (2010, 2020)"
-    publisher: "to be confirmed at slice S2"
+    publisher: "National Planning Council"
     licence_id: "CC-BY-4.0"
     licence_basis: "dataset"
-    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-business-establishments-by-economic-activity-in-census-2010-2020/exports/json"
@@ -598,21 +598,28 @@ sources:
     commit_allowed: false
     release_tables: ["pub_census_national"]
     caveat_keys: []
-    columns: []
+    columns:
+      - {name: "economic_activity", type: "string"}
+      - {name: "economic_activity_ar", type: "string"}
+      - {name: "census_2020", type: "integer"}
+      - {name: "percent_census_2020", type: "number"}
+      - {name: "census_2010_2010", type: "integer"}
+      - {name: "percent_census_2010", type: "number"}
+      - {name: "percent_change", type: "number"}
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "publisher_or_licence_unconfirmed"
+    skip_reason: ""
     extension: "json"
   - key: "census_hh_type_2020"
     source_id: "census_hh_type_2020"
     slug: "population-by-type-of-household-gender-and-place-of-residence-on-the-census-night-december-2020"
     kind: "portal_dataset"
     title_en: "Population by type of household, gender and place of residence on the census night, December 2020"
-    publisher: "to be confirmed at slice S2"
-    licence_id: "unconfirmed"
-    licence_basis: "none_stated"
-    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-by-type-of-household-gender-and-place-of-residence-on-the-census-night-december-2020/exports/json"
@@ -627,7 +634,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "publisher_or_licence_unconfirmed"
+    skip_reason: "cache_fields_unconfirmed; adapter_unavailable"
     extension: "json"
   - key: "accident"
     source_id: "accident"
@@ -892,25 +899,25 @@ sources:
     kind: "https_file"
     title_en: "Qatar Subnational Administrative Boundaries (COD-AB)"
     publisher: "HDX, source Planning and Statistics Authority"
-    licence_id: "CC-BY-IGO"
+    licence_id: "cc-by-igo"
     licence_basis: "dataset"
     licence_url: "https://data.humdata.org/dataset/cod-ab-qat"
     decision_record: ""
     fetch_host: "data.humdata.org"
-    url: ""
+    url: "https://data.humdata.org/dataset/6a84f3b8-41cd-4769-a61f-6dbd5f61bd05/resource/1955adf8-4e4a-4a87-b3f0-0fbe6e761ca9/download/qat_admin_boundaries.geojson.zip"
     terms_url: ""
     landing_url: "https://data.humdata.org/dataset/cod-ab-qat"
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: ["zone", "municipality", "gazetteer"]
+    release_tables: ["zone", "municipality", "gazetteer", "district"]
     caveat_keys: []
     columns: []
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "direct_url_unconfirmed"
-    extension: "json"
+    skip_reason: ""
+    extension: "zip"
   - key: "bnd_muni_2025"
     source_id: "bnd_muni_2025"
     slug: "municipalities-in-qatar-2025"

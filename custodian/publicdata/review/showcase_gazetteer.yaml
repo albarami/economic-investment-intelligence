@@ -1,0 +1,42 @@
+[
+  {
+    "place_key": "landmark:0",
+    "kind": "landmark",
+    "name_en": "Lusail",
+    "name_ar": "لوسيل",
+    "aliases": null,
+    "source_id": null,
+    "record_key": null,
+    "arabic_review": "pending native review"
+  },
+  {
+    "place_key": "landmark:1",
+    "kind": "landmark",
+    "name_en": "West Bay",
+    "name_ar": "الخليج الغربي",
+    "aliases": null,
+    "source_id": null,
+    "record_key": null,
+    "arabic_review": "pending native review"
+  },
+  {
+    "place_key": "landmark:2",
+    "kind": "landmark",
+    "name_en": "Msheireb",
+    "name_ar": "مشيرب",
+    "aliases": null,
+    "source_id": null,
+    "record_key": null,
+    "arabic_review": "pending native review"
+  },
+  {
+    "place_key": "landmark:3",
+    "kind": "landmark",
+    "name_en": "The Pearl",
+    "name_ar": "اللؤلؤة",
+    "aliases": null,
+    "source_id": null,
+    "record_key": null,
+    "arabic_review": "pending native review"
+  }
+]
