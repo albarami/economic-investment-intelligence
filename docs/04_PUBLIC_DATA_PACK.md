@@ -641,6 +641,8 @@ ISIC 5610 Restaurants. The correct result is the "not mappable" bucket. By contr
 
 S2-T04 builds the offline activity spine from `custodian/publicdata/review/activity_spine.csv` and `custodian/publicdata/review/category_allowlist.csv`, with coverage method `activity_spine.v1`, and the classification source stays unconfirmed so titles derived from it stay barred from release (PUB-13).
 
+S2-T05's [offline triage command](../scripts/spine_triage.md) reuses the S2-T04 loader and refuses a stale queue before requesting evidence. Provider `none` preserves the baseline order; recorded or exactly qualified evidence may order and pre-fill only a separate suggestions file. The candidate binding is a title/version snapshot, never sign-off: a person signs every mapping through PUB-35, and the decision records stay under eval artefacts (DAT-126).
+
 ## 7. Playbook activities and customs baskets
 
 The master design names the restaurant and "the other playbook activities" without listing them.
