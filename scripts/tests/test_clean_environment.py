@@ -11,8 +11,12 @@ import sys
 import tempfile
 import tomllib
 import unittest
+from collections.abc import Mapping, Sequence
 from pathlib import Path
+from typing import cast
 from unittest.mock import patch
+
+from packaging import markers
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -202,42 +206,321 @@ def workspace_package_names(root: Path) -> set[str]:
     return names
 
 
-def declared_third_party_names(root: Path) -> set[str]:
-    """Return the non-member names the member manifests declare."""
-    members = workspace_package_names(root)
-    declared: set[str] = set()
-    for member in guard.MEMBER_DIRS:
-        project = member_manifest(root, member).get("project", {})
-        if not isinstance(project, dict):
-            continue
-        dependencies = project.get("dependencies", [])
-        if not isinstance(dependencies, list):
-            continue
-        for dep in dependencies:
-            if not isinstance(dep, str):
-                continue
-            name = guard.requirement_name(dep)
-            if name is not None and name not in members:
-                declared.add(name)
-    return declared
-
-
 def expected_installed_names(root: Path) -> set[str]:
-    """Return workspace names plus the locked names of declared third-party deps."""
-    text = (root / "uv.lock").read_text(encoding="utf-8")
-    lock = tomllib.loads(text)
-    locked = {
-        guard.normalise(str(package["name"]))
-        for package in lock.get("package", [])
-        if isinstance(package, dict) and isinstance(package.get("name"), str)
-    }
-    declared = declared_third_party_names(root) & locked
-    return workspace_package_names(root) | declared
+    """Return the names a clean installation resolves to: members and locked closure."""
+    manifests = {member: member_manifest(root, member) for member in guard.MEMBER_DIRS}
+    lock = tomllib.loads((root / "uv.lock").read_text(encoding="utf-8"))
+    return reachable_locked_names(
+        manifests,
+        lock,
+        cast(dict[str, str], markers.default_environment()),
+    )
+
+
+def reachable_locked_names(
+    manifests: Mapping[str, Mapping[str, object]],
+    lock: Mapping[str, object],
+    environment: Mapping[str, str],
+) -> set[str]:
+    """Compute the expected installed names from the manifests, lock and environment.
+
+    The workspace member names plus every package of the lock that is reachable
+    from them through the lock's own dependency edges: an edge is followed only
+    when its marker holds for ``environment``, and an extra's edges only when the
+    edge that leads there selects that extra.  The root manifest's dependency
+    groups are never followed: the clean installation installs the members' own
+    dependencies only.
+    """
+    entries: dict[str, list[Mapping[str, object]]] = {}
+    packages = lock.get("package", [])
+    if isinstance(packages, list):
+        for package in packages:
+            if isinstance(package, dict) and isinstance(package.get("name"), str):
+                key = guard.normalise(str(package["name"]))
+                entries.setdefault(key, []).append(package)
+    queue: list[tuple[str, frozenset[str]]] = []
+    for manifest in manifests.values():
+        project = manifest.get("project", {})
+        if isinstance(project, dict) and isinstance(project.get("name"), str):
+            queue.append((guard.normalise(str(project["name"])), frozenset()))
+    expected: set[str] = set()
+    seen: set[tuple[str, frozenset[str]]] = set()
+    while queue:
+        name, extras = queue.pop()
+        if (name, extras) in seen:
+            continue
+        seen.add((name, extras))
+        expected.add(name)
+        for package in entries.get(name, []):
+            edges: list[object] = []
+            dependencies = package.get("dependencies", [])
+            if isinstance(dependencies, list):
+                edges.extend(dependencies)
+            optional = package.get("optional-dependencies", {})
+            if isinstance(optional, dict):
+                for extra in extras:
+                    chosen = optional.get(extra)
+                    if isinstance(chosen, list):
+                        edges.extend(chosen)
+            for edge in edges:
+                if not isinstance(edge, dict) or not isinstance(edge.get("name"), str):
+                    continue
+                marker = edge.get("marker")
+                if isinstance(marker, str) and not markers.Marker(marker).evaluate(
+                    environment
+                ):
+                    continue
+                selected: list[str] = []
+                wanted = edge.get("extra")
+                if isinstance(wanted, list):
+                    selected = [str(one) for one in wanted if isinstance(one, str)]
+                queue.append((guard.normalise(str(edge["name"])), frozenset(selected)))
+    return expected
 
 
 def installed_names_equal(installed: set[str], expected: set[str]) -> bool:
     """The one comparison: installed names equal the expected names exactly."""
     return installed == expected
+
+
+INVENTED_MEMBER_LOCK = """version = 1
+
+[[package]]
+name = "eii-core"
+version = "0.0.0"
+source = { editable = "core" }
+
+[[package]]
+name = "eii-custodian"
+version = "0.0.0"
+source = { editable = "custodian" }
+
+[[package]]
+name = "eii-gateway"
+version = "0.0.0"
+source = { editable = "gateway" }
+
+[[package]]
+name = "eii-product"
+version = "0.0.0"
+source = { editable = "product" }
+"""
+
+LOCK_TRANSITIVE = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-direct" },
+]
+
+[[package]]
+name = "plant-direct"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-transit" },
+]
+
+[[package]]
+name = "plant-transit"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+LOCK_MARKERS = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-marker-base" },
+]
+
+[[package]]
+name = "plant-marker-base"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-marker-true", marker = "python_version >= '3'" },
+    { name = "plant-marker-false", marker = "python_version < '3'" },
+]
+
+[[package]]
+name = "plant-marker-true"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-marker-false"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+LOCK_EXTRAS = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-extra-host", extra = ["picked"] },
+]
+
+[[package]]
+name = "plant-extra-host"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[package.optional-dependencies]
+picked = [
+    { name = "plant-extra-picked" },
+]
+skipped = [
+    { name = "plant-extra-skipped" },
+]
+
+[[package]]
+name = "plant-extra-picked"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-extra-skipped"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+LOCK_SPELLING = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-spelt" },
+]
+
+[[package]]
+name = "plant-spelt"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-spelt-child" },
+]
+
+[[package]]
+name = "plant-spelt-child"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+LOCK_UNREACHABLE = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-reached" },
+]
+
+[[package]]
+name = "plant-reached"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-deep" },
+]
+
+[[package]]
+name = "plant-deep"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-orphan"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-reached" },
+    { name = "plant-orphan-dep" },
+]
+
+[[package]]
+name = "plant-orphan-dep"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+
+def write_invented_workspace(
+    root: Path,
+    member_dependencies: Mapping[str, Sequence[str]],
+    lock_text: str,
+) -> None:
+    """Write an invented workspace: four member manifests and one invented lock."""
+    for member, name, _module in guard.MEMBER_ROWS:
+        lines = [
+            "[project]",
+            f'name = "{name}"',
+            'version = "0.0.0"',
+        ]
+        deps = member_dependencies.get(member, ())
+        if deps:
+            lines.append("dependencies = [")
+            lines.extend(f'  "{dep}",' for dep in deps)
+            lines.append("]")
+        folder = root / member
+        folder.mkdir(parents=True)
+        (folder / "pyproject.toml").write_text(
+            "\n".join(lines) + "\n", encoding="utf-8"
+        )
+    (root / "uv.lock").write_text(lock_text, encoding="utf-8")
+
+
+class ExpectedInstalledNames(unittest.TestCase):
+    """Invented workspaces pin the expected set to the lock's own resolution."""
+
+    def expected_for(
+        self,
+        product_dependencies: Sequence[str],
+        lock_text: str,
+    ) -> set[str]:
+        """Write one invented workspace and return its expected installed names."""
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        write_invented_workspace(root, {"product": product_dependencies}, lock_text)
+        return expected_installed_names(root)
+
+    def test_transitive_dependency_is_expected(self) -> None:
+        expected = self.expected_for(("plant-direct>=1",), LOCK_TRANSITIVE)
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES) | {"plant-direct", "plant-transit"},
+        )
+
+    def test_true_marker_transitive_is_expected_and_false_marker_one_is_not(
+        self,
+    ) -> None:
+        expected = self.expected_for(("plant-marker-base>=1",), LOCK_MARKERS)
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES) | {"plant-marker-base", "plant-marker-true"},
+        )
+
+    def test_selected_extra_is_expected_and_unselected_extra_is_not(self) -> None:
+        expected = self.expected_for(
+            ("plant-extra-host[picked]>=1",),
+            LOCK_EXTRAS,
+        )
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES) | {"plant-extra-host", "plant-extra-picked"},
+        )
+
+    def test_manifest_and_lock_spellings_are_one_expected_name(self) -> None:
+        expected = self.expected_for(("Plant_Spelt>=1",), LOCK_SPELLING)
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES) | {"plant-spelt", "plant-spelt-child"},
+        )
+
+    def test_package_no_member_reaches_is_not_expected(self) -> None:
+        expected = self.expected_for(("plant-reached>=1",), LOCK_UNREACHABLE)
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES) | {"plant-reached", "plant-deep"},
+        )
 
 
 class CleanEnvironment(unittest.TestCase):
