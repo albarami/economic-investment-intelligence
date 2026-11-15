@@ -23143,6 +23143,271 @@ Seed:      none
 Notes:     The work commit has a Conventional Commit subject.
 ```
 
+#### D0033: independent review, round 1: REJECTED
+
+Reviewed commit `eae27c6e7fd56778ee1750707a13ec67070d24fa`, a local commit of decision record 0033, reviewed before any push of the branch (the task log of pull request https://github.com/albarami/economic-investment-intelligence/pull/53 says that the branch was not pushed before its work commit), so it has no hosted run of its own. Moonshot AI Kimi K3.1 Pro High through the Devin command-line tool (the verdict signs "Moonshot AI / Kimi K3.1 Pro High"); the readings and rulings are the lead's (Anthropic) and the record's text was edited by xAI Grok 4.7 through the Cursor command-line tool, so the reviewer comes from another maker. The verdict is copied unchanged from its first line (REV-09). Its five findings were judged valid and adopted, as that task log records.
+
+```text
+VERDICT: REJECTED
+TASK: decision record 0033, the Part A defaults of the register and employment world
+COMMIT: eae27c6e7fd56778ee1750707a13ec67070d24fa
+REVIEWER: Moonshot AI / Kimi K3.1 Pro High
+SKILLS LOADED: strict-reviewer, sanad-provenance, task-standards, project-orientation, muhasabah-gate; code-review not available
+CHECKS:
+  C1 FAIL
+    Item 1 FAIL — trim-only normalisation contradicts DAT-02, and the absolute output restriction contradicts section 6.1 LIST and DAT-15.
+    Item 2 PASS — DAT-21 to DAT-23 and the mapping rules are preserved, but DAT-24's code-distribution proof is unaddressed; see F3.
+    Item 3 PASS — the dormant parameter and SYN-24 remain unchanged.
+    Item 4 PASS — no nationality share is committed; SYN-06, SYN-13 and rule 10 are preserved.
+    Item 5 PASS — the centre's exclusion is expressly an interim Part A default with its feed question open.
+    Item 6 PASS — `unknown` only follows decision 0023 item 12 and SYN-18 without generating a worksite or deployed flag.
+    Item 7 PASS under C1 — the SYN-02 reading is explicit and limited to input-reader and median-check format values.
+    Item 8 FAIL — the interim nulls are acknowledged, but `establishment_nationality` is omitted from the required not-read coverage declaration; see F4.
+    Item 9 PASS — mount roles and the new sandbox proof remain explicitly undecided.
+  C2 PASS — pack quotations and cited anchors were verified, including the `census_2020_workbook` confirmation clause.
+  C3 FAIL — item 7 discloses calibration-table minimum-cell and salary-rounding parameters.
+  C4 PASS — the pointers preserve the original questions and OPEN statuses, name the right items, and the index lists 0033 as proposed; only the three scoped files change.
+  C5 FAIL — DAT-24's treatment for a code-free register remains unresolved without being named; no privacy rule, mount role or sandbox change is decided.
+FINDINGS:
+  F1
+    File: docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md
+    Place: item 1, registration-number normalisation
+    Wrong: “Leading and trailing blanks removed and nothing else” silently replaces DAT-02's required normalisation: upper-casing, removal of inner and non-breaking spaces, and conversion of Arabic-Indic digits to ASCII. The Amends row says no requirement changes, and this is not named as an interim default with an open item.
+    Fix: Replace the normalisation sentence with: “The number is normalised under DAT-02 (trim, upper-case, remove inner spaces and non-breaking spaces, and convert Arabic-Indic digits to ASCII) and validated against the register file under DAT-12; it is never parsed or matched against a synthetic-identifier length or pattern.”
+  F2
+    File: docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md
+    Place: item 1, registration-number outputs
+    Wrong: “And to nothing else” absolutely restricts the number to the vault feed, whereas section 6.1 gives it a LIST crossing and DAT-15 expressly permits it in the release and serving stores. The record does not identify this as a change or an interim exception.
+    Fix: Replace that sentence with: “Within Part A the number is written to the `registration_number` column of the feed in the vault and to no report, log, message, coverage file or repository file (decision 0022 item 8); its later handling in the release and serving stores is governed by section 6.1's LIST crossing and DAT-15.”
+  F3
+    File: docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md
+    Place: item 2, DAT-24
+    Wrong: The item establishes that the register has no activity-code column while declaring that DAT-24 stands. DAT-24's conformance test requires the four code buckets and their distribution; null codes cannot prove them. The activity-text review open item does not settle this unmet conformance requirement.
+    Fix: After “The code fields stay null until a register file shows a code.” insert: “DAT-24's code-distribution check is NOT PROVED for this code-free file; that is an interim Part A state, not a reading DAT-24 allows as final. Open item: a later decision must establish how the unchanged DAT-24 is proved before a finished feed or release.”
+  F4
+    File: docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md
+    Place: item 8, `establishment_nationality` and `coverage.json`
+    Wrong: The item makes `establishment_nationality` null because its columns are not read, but requires the README and coverage declaration to identify only the other four not-read fields. This leaves a nullable field without its feed-level reason, contrary to DAT-07, even though the contract's “register shows none” meaning is correctly disclaimed.
+    Fix: Replace “its README and `coverage.json` name the four fields as not read in Part A” with “its README and `coverage.json` name the four fields and `establishment_nationality` as not read in Part A”.
+  F5
+    File: docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md
+    Place: item 7, calibration-table declared format
+    Wrong: The final sentence records the exact minimum-cell parameters and salary-level rounding parameter of the calibration table, which review criterion C3 expressly prohibits.
+    Fix: Replace the final sentence with: “The owner's note and the advisor's reading supply the exact declared-format values; those values are not repeated in this record.”
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### D0033: independent review, round 2 (the confirmation of the five corrections): APPROVED
+
+Reviewed commit `3fee49f388af1f1a5a95a7d9113ffe51085f2a77`, a local commit that stood on main before pull request 52; the same reviewer. The verdict is copied unchanged from its first line (REV-09).
+
+```text
+VERDICT: APPROVED
+TASK: decision record 0033, confirmation of the five corrections
+COMMIT: 3fee49f388af1f1a5a95a7d9113ffe51085f2a77
+REVIEWER: Moonshot AI / Kimi K3.1 Pro High
+SKILLS LOADED: strict-reviewer, sanad-provenance, task-standards, muhasabah-gate; code-review not available
+CHECKS:
+  K1 PASS Item 1 now gives DAT-02's full normalisation and DAT-12 register-file validation; no trim-only wording remains.
+  K2 PASS Item 1 confines its output restriction to Part A and leaves release and serving stores to section 6.1's LIST crossing and DAT-15.
+  K3 PASS Item 2 marks DAT-24's code-distribution check NOT PROVED as an interim state with an open item; the Amends row names items 2 and 8.
+  K4 PASS Item 8 requires the README and `coverage.json` to name the four fields and `establishment_nationality` as not read.
+  K5 PASS No calibration minimum cell size or rounding unit remains; item 7 gives the real and stand-in file defaults and owner open item, with the SYN-02 reading unchanged.
+  K6 PASS `RECORD.diff` contains only the five corrections and the permitted Decided by, Sources and Amended passages updates; no other change appears.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  record: In the Sources owner's-note bullet, replace "the conditions quoted in item 7" with "the conditions referenced in item 7", because item 7 no longer quotes them.
+```
+
+#### D0033: merge record
+
+- The verdict stands on the head. The work commit `e8c4e3b321fad263a94cd0fcb2ace5c59ad7f750` is the approved change of `3fee49f388af1f1a5a95a7d9113ffe51085f2a77` committed again on main after pull request 52, with the one word of round 2's record point; the task log of pull request https://github.com/albarami/economic-investment-intelligence/pull/53 gives the comparison. The head `e56f8fc6e25daa1184da7109a08e4b0980761907` is that work commit and the ledger commit alone: "TREE-IS-WORK ok: 652 paths at e56f8fc6e25daa1184da7109a08e4b0980761907", exit code 0. Under the owner's rule on record-only moves the verdict stands.
+- CI on the head: the six required hosted checks passed on `e56f8fc6e25daa1184da7109a08e4b0980761907`: check-docs (10 s), planted-failures (1 min 55 s), sandbox proof (41 s), secret-scan (13 s), static-checks (1 min 16 s) and tests (31 min 22 s). Workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43673376467; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43673376472; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43673376470 .
+- The lead's head checks before the merge: every command exit code 0; `uv run --locked python scripts/ci_history_scan.py scan`: "history scan: range HEAD, 54 commits, at least 54 to list, RESULT: PASSED", exit code 0; `./eii test --seed 2026111478`: exit code 0, "total: 3157 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- The branch stood on current main (`79b8a13f29daca174c35a989c4b406816dda2f57`), so the head was the exact merge result: the whole test above is the test of the merge result.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/53 was squash-merged on 2026-11-15 at that head; merge commit `d234327dd2c5ea0631fcb0db8da87671ae8932fd` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43675679723 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43675679663 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43675679671 .
+- Round 1 proposed no open item. Round 2 proposed one record point: the Sources line of the record said that the owner's conditions are "quoted in item 7", where item 7 no longer quotes them. It is taken in the work commit itself, which says "referenced in item 7", as the task log of pull request https://github.com/albarami/economic-investment-intelligence/pull/53 records. Nothing is left to enter.
+
+### Merge train S1-b of slice S1 (S1-T18, S1-T19): task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/54 )
+
+- What it is: a merge train under [decision 0032](docs/decisions/0032-approved-tasks-of-one-slice-may-merge-as-a-train.md) (rule 33 of AGENTS.md). Two tasks of slice S1, each approved on its own local commit by another maker than its builder, are joined into one branch and one pull request with this one ledger entry, which holds every task's own rows and verdict (evidence rule 9 of this ledger). The joined work commit is `70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb` on `d234327dd2c5ea0631fcb0db8da87671ae8932fd`. Both tasks were added to slice S1 by a re-plan of 2026-11-15, after the slice S1 gate record was merged (pull request 47); the gate's one open item is task S1-T12, the native frame-rate traces. This ledger enters both tasks in TASKS.md.
+- The two tasks, each with its own change and its approving reviewer:
+  - S1-T18, The performance page reads its frame times on a precise clock: `8807b84..581067f` (two commits); APPROVED on db0b98e6ed83ffe12c11b4c43e7815d7086ad6ba and confirmed APPROVED on 581067f5e8040559f5833a91a89591825676e586, which adds one page test, both by Moonshot AI Kimi K3.1 Pro High through Devin (builder: xAI Grok 4.7 through Cursor). In the train it is commit cd08f0caf43b59d63b2792a5397b70a3b4a5c492.
+  - S1-T19, The mutation runner's package copy runs the package's tests as the project does: `f169bcc..e5a2be8` (three commits); REJECTED on 3d55882c09e033700cc2920c77d704cd4e8d102b with one finding and APPROVED on e5a2be87cc7d31464a693c2a623c162d5b33c3b0, which fixes it, both by Moonshot AI Kimi K3.1 Pro High through Devin (builder: a helper of Anthropic, Claude Fable 5.2). In the train it is commit 70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb, the joined work commit.
+- Dependencies (decision 0032 item 1). Neither task depends on the other. S1-T18 depends on S1-T13, on main since pull request 35. S1-T19 depends on S1-T11, the task that added the runner, on main since pull request 38, and on S2-T12, whose package test imports a script module, on main since pull request 52.
+- No forced difference (decision 0032 item 2). The branch is cut on main after pull request 53 and holds one commit per task: the task's own change, taken as a patch of its local range and applied on main. The lead's file-by-file proof of the join (a script that compares each task's own change with its commit in the train) found S1-T18 8 of 8 files identical and S1-T19 8 of 8 files identical, with no difference. The join changed no line of either task, so no task needs a confirmation of its own.
+- What follows at the train's turn and is not claimed here: the six required hosted checks run once, on the joined head; the lead runs the whole test command with a fresh seed on the exact merge result; one confirmation by a maker other than the one that joined the train says that the joined head holds exactly the approved commits and the records. Head checks are unchanged.
+- In front of this entry: the closing record of pull request 53.
+- New items of this ledger: PO-S2-21 to PO-S2-29, each named in its task's section below. They go to the follow-up task of slice S2, because the follow-up task of slice S1 (S1-T10) is done (the lead's reading of decision 0018 item 8).
+- Evidence: the commands below at the joined work commit. Each task's own figures at its own local commit are in its section; none of them is a figure of the joined tree.
+
+- **S1-T18 — The performance page reads its frame times on a precise clock.** The task's own rows, rounds, verdict and carried points. Change `8807b84..581067f`: commit db0b98e6ed83ffe12c11b4c43e7815d7086ad6ba (the fix) and commit 581067f5e8040559f5833a91a89591825676e586 (one page test added after approval); eight files, all under `web/spikes/performance/`.
+- Why: on 2026-11-15 the owner took the three native traces at the build machine (task S1-T12). The original layer set drew 1,800 frames in 30,000.9 ms with every interval between 16.3 and 17.1 ms, and the evidence command still refused it with `frame-rate`: the share of intervals under 16.7 ms read 0.5689. The lead measured the cause with a throwaway page in the build machine's headless browser, 10 seconds each. A page that is not cross-origin isolated gets its time in steps of 0.1 ms, so an on-time frame of 16.667 ms reads 16.6 or 16.7 ms. Served plain, every frame time lay on that grid and the share read 0.72 on an exact 60 Hz clock; served with the two isolation headers, the intervals read 16.660 to 16.670 ms and the share read 1.0000. These figures are the lead's measurement in a headless browser and say nothing yet about the native screen.
+- The lead's rulings. The bound of the gate (document 10, table row "Spike frame-rate gate (slice S1)": at least 95% of frames under 16.7 ms over the 30-second orbit) is not restated, widened or re-read; the instrument is made precise instead. No count, budget, bound or expected value of the spike changes, and the evidence command and the trace contract are untouched. The traces taken before this task were taken on the coarse clock and are not gate evidence: the owner opens the three pages once more after the merge, under S1-T12. No native frame-rate pass is claimed here.
+- What was built: both servers of the spike (the development server that the serve command starts and the static server of the tests) send `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. The gate profile refuses a page that is not isolated with `refused: coarse-clock`, after the renderer refusal and before the empty-canvas count; it loads no layer, runs no orbit and posts nothing. The smoke profile of the tests is exempt, since it decides no gate. The new test file `isolation.node-test.mjs` covers the document, an asset and the trace routes with planted failures; the browser tests cover the order of the refusals, the isolated page and a posted timestamp off the 0.1 ms grid; the README records the headers, the refusal and the limit of the headless measurement.
+- Who did what: builder xAI Grok 4.7 through Cursor, persona a senior web engineer for the performance-spike page clock (Frontend); reviewer Moonshot AI Kimi K3.1 Pro High through Devin, another maker, named in the builder's return as a principal reviewer. Skills the builder's return names: task-standards, project-orientation, superpowers:test-driven-development, superpowers:systematic-debugging, superpowers:verification-before-completion, muhasabah-gate. Skills the verdicts name: strict-reviewer, task-standards, sanad-provenance, muhasabah-gate; code-review and security-review were unavailable in that tool. There was no separate plan: the task was briefed from the re-plan.
+- Review round 1 on db0b98e: APPROVED, no finding. REV-10, REV-12 to REV-16, REV-18, REV-19 and REV-25 to REV-27 PASS; REV-11 and REV-17 OPEN on four record points: P1 the lead's whole test with a fresh seed, P2 the web mutation run, P3 the hosted checks, P4 the task's entry and ledger. P1 and P2 are met by the runs below, P3 follows once on the joined head, and P4 is this ledger. Confirmation of the one test added after approval, on 581067f: APPROVED, K1 to K4, no finding and no proposed item.
+- The lead's runs at db0b98e: the whole test command with the fresh seed 2026111471: 2,303 passed, 0 failed, 0 skipped, exit code 0. The lead's local checks at the same commit: 396 custodian, 2 core, 231 product and 814 script tests passed, and every command exited 0. The builder's own runs of the spike at that commit, as the round-1 verdict cites them: 132 of 132 Node tests and 55 of 55 browser tests passed.
+- The lead's own check of the development server, which the builder had checked over HTTP only: a headless browser loaded the page from the development server at db0b98e. Smoke profile: `crossOriginIsolated` true, phase done, 110,000 hexagons and 50,000 particles, one trace posted, no failed request, no page error, no console error. Planted coarse clock in the gate profile: `refused: coarse-clock`, no layer.
+- Mutation (rule 44 of AGENTS.md, the web runner, one run on its own processors, at db0b98e): `web/spikes/performance/server.mjs`: made 455, killed 195, survived 18, timed out 242; `web/spikes/performance/main.ts`: made 517, killed 409, survived 70, timed out 38. On the lines this task changed stood one survivor, in `main.ts` (the condition of the environment gate replaced by `true`), and three timeouts, in `server.mjs`. The survivor is killed by the page test `the smoke profile skips the empty-canvas gate`, seen red on the mutant (exit code 1) and green on the restored line (exit code 0); that test is commit 581067f. The three timeouts were replayed alone at normal load, as rule 44 asks. Two are killed by the test `the static server isolates the document, an asset and the trace routes` (exit code 1 each). The third, the body of the server's `send` emptied, is a timeout again (exit code 124 after 120 s): the response is never ended, and the two test files `mutation-server.node-test.mjs` and `trace.node-test.mjs` never finish. It is recorded as a timeout, not as a killed mutant. With the added test in place the builder's return records `npm run test:checks` with 854 passed and 0 failed, and `npm run lint`, `npm run format:check` and `npm run typecheck` each with exit code 0.
+- Not done, entered by this ledger. PO-S2-21: the survivors and timeouts of the two modules that stand on lines of earlier tasks (18 survivors and 239 timeouts in `server.mjs`, 69 survivors and 38 timeouts in `main.ts`) are not killed, explained or replayed here. PO-S2-22: the waiting test clients have no time limit of their own, so the emptied-`send` mutant can only time out. PO-S2-23: the browser's rendering threads set their own processors, so a timed run beside a browser suite is not clean. PO-S2-24: the spike's test folders under the system's temporary folder are left when a test process is ended from outside.
+
+- **S1-T19 — The mutation runner's package copy runs the package's tests as the project does.** The task's own rows, rounds, verdict and carried points. Change `f169bcc..e5a2be8`: commits 022d4a8fd35d13392b4d4dd76835d306e9627191 (the script folders on the copy's test path), 3d55882c09e033700cc2920c77d704cd4e8d102b (package tests find their files from their own location; the copy is an empty repository) and e5a2be87cc7d31464a693c2a623c162d5b33c3b0 (the fix of the review's finding); eight files.
+- The fault, found by another task's builder and checked by the lead in the files: `scripts/mutation.py` wrote the package copy's test path as the package source and the copy's root only, while the project's own setting also holds `scripts` and `scripts/tests`. A package test that imports a script module by its bare name (`custodian/tests/test_investment_build.py`) could not be collected in the copy, so every campaign of a custodian module stopped with no counts.
+- What was built. Part 1: the copy's test path also holds the copy's `scripts` and `scripts/tests` folders, test first on the runner's own invented fixture. Part 2, by the lead's ruling on the builder's first return: with the path repaired, twenty package tests still failed in the copy (fourteen of `test_frame_census.py`, three of `test_frame_crosswalk.py`, one of `test_frame_sixth.py`, two of `test_publicdata_registry.py`), because a test file sits one folder deeper there and the working folder is not the repository root; after the repair none fails. A package test now anchors its paths on its own file's location through one helper, `custodian/tests/repository_root.py`, which walks up to the first folder that holds both `AGENTS.md` and `custodian/publicdata/sources.yaml` and raises a named error when none is found within four levels; the helper has its own tests. No assertion is weakened, removed or skipped: only how a test finds a file changes. For the one test that asks git itself, git's answer is not replaced by a reading of the ignore file's text: the runner makes the copy's root an empty repository for a package run, so that git evaluates the same ignore files. The branch of the typed-decision harness is unchanged.
+- Who did what: builder a helper of Anthropic (Claude Fable 5.2), because the worker tools' environments do not hold the mutation group; persona a senior Python tooling engineer who owns a mutation-testing runner (Platform). Reviewer Moonshot AI Kimi K3.1 Pro High through Devin, a strict reviewer of another maker. Skills of the build brief: task-standards, project-orientation, superpowers:systematic-debugging, superpowers:test-driven-development, superpowers:verification-before-completion, muhasabah-gate. Skills the verdicts name: strict-reviewer, task-standards, project-orientation, sanad-provenance and muhasabah-gate in round 1, strict-reviewer in the confirmation; code-review was unavailable in that tool. Class: tooling; the task computes no number. There was no separate plan: the task was briefed from the lead's ruling.
+- Review round 1 on 3d55882: REJECTED with one finding, F1 (REV-10): the copy's `git init` and the package's mutation processes inherited the caller's git variables, so a caller's `GIT_DIR` could redirect the initialisation and the ignore answer outside the copy. Fixed test first, with an outside sentinel repository and two plants, each place alone unprotected failing: one environment without the six repository-redirecting variables (`GIT_DIR`, `GIT_WORK_TREE`, `GIT_INDEX_FILE`, `GIT_OBJECT_DIRECTORY`, `GIT_ALTERNATE_OBJECT_DIRECTORIES`, `GIT_COMMON_DIR`) reaches `git init` and the package's mutation processes. Confirmation on e5a2be8: APPROVED, K1 to K6, no finding. The record points of both rounds (the local-check results, the task's entry and ledger, the hosted checks) are met by the lines below, by this ledger and by the train's hosted checks; round 1's item P3 is PO-S2-26 and the confirmation's hardening item is PO-S2-25.
+- The lead's runs at e5a2be8: the runner's own tests (`uv run --locked python -m unittest scripts.tests.mutation_runner -v`) exit code 0; the lead's local checks (every suite but the browser stage) every command exit code 0. The real campaign of `custodian/src/eii_custodian/publicdata/fetch/terms_text.py`, run in its own process-number namespace with the workspace's own git variables set: made 46, killed 37, survived 9, exit code 1 for the survivors, the workspace's git folder unchanged. With variables that name an outside repository the runner refuses with exit code 2 before any copy is made, and that repository's 19 files are unchanged. That the campaign reaches its counts line is what this task proves; its exit code 1 is not a pass of the module. No whole-test run on this task's own commit is in the task's records: the whole test runs with this ledger on the joined work commit.
+- A breach by the lead, stated plainly: at 06:16 on 2026-11-15 the lead's first run of a real campaign for this task, and the builder's runs under the first brief, started `scripts/mutation.py` on a real tree outside the isolated process-number namespace that the run's own rule asks for. Two short runs, under one minute each; no job was seen ended in that window. Every later run used the isolated runner.
+- Not done, entered by this ledger. PO-S2-25: the git variables outside the finding stay in the package run's environment, and the runner's own listing of the workspace follows the caller's git variables. PO-S2-26: the copy's pytest settings still differ from the project's. PO-S2-27: the nine survivors of `terms_text.py`. PO-S2-28: the three remaining qualifications of git's answer in the copy. PO-S2-29: an explained row of `scripts/mutation_explained.toml` stops matching when lines are added above it.
+
+#### Evidence for the work commit `70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb`
+
+```text
+### Merge train S1-b of slice S1 (S1-T18, S1-T19)
+Commit:    70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb
+Command:   bash -c "set -o pipefail; uv run --locked python -m unittest scripts.tests.mutation_runner -v 2>&1 >/dev/null | tail -n 3 | tr '\n' ' '"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "Ran 9 tests in 9.110s  OK" (the runner's own nine tests (the test report alone; the tool's own output is not shown))
+Seed:      none
+Notes:     S1-T19: the mutation runner's own tests on its small invented fixture, the command of rule 44 of AGENTS.md. Nine tests: the seven that main holds and the task's two (the script folders on the copy's test path; git's own answer on an ignore rule in the copy, with the outside sentinel repository and the six redirecting variables). The tests need the group `mutation` in the environment and start the mutation tester on the invented fixture only.
+```
+
+```text
+### Merge train S1-b of slice S1 (S1-T18, S1-T19)
+Commit:    70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb
+Command:   uv run --locked python -m pytest custodian -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    1088 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S1-T19: the custodian suite on the joined tree, run from the repository root as the project runs it. The four repaired test files (test_frame_census.py, test_frame_crosswalk.py, test_frame_sixth.py, test_publicdata_registry.py) find their files through the helper custodian/tests/repository_root.py, and the helper's own tests (test_repository_root.py) are among the suite's. The repair changes how a test finds a file, not what it asserts, so the ordinary run must still pass whole. The task's records state no count of this suite on the joined tree; this row sets no expected number.
+```
+
+```text
+### Merge train S1-b of slice S1 (S1-T18, S1-T19)
+Commit:    70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb
+Command:   uv run --locked python -m pytest custodian/tests/test_repository_root.py custodian/tests/test_frame_census.py custodian/tests/test_frame_crosswalk.py custodian/tests/test_frame_sixth.py custodian/tests/test_publicdata_registry.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    213 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S1-T19: the helper's own tests and the four repaired test files, run alone. Twenty tests of these four files failed in the mutation copy before the repair (fourteen, three, one and two). The task's records state no count for these files alone.
+```
+
+```text
+### Merge train S1-b of slice S1 (S1-T18, S1-T19)
+Commit:    70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb
+Command:   bash -c "set -o pipefail; npm --prefix web run test:spike:performance 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)), \"|\", \" \".join(re.findall(r\"[0-9]+ passed \\([0-9.]+m?s?\\)\", t)[:1]))'"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 133 # pass 133 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 55 passed (11.3m)" (the totals of the Node test runner and of the browser run inside it)
+Seed:      none
+Notes:     S1-T18: the tests of the performance spike with its browser tests, the command of rule 44 of AGENTS.md (`npm run test:spike:performance` from `web/`, written with `--prefix web`). Every Node test passes (the count of tests equals the count passed): among them the new file isolation.node-test.mjs (both servers send the two isolation headers on the document, an asset and the trace routes, with planted failures) and the page test `the smoke profile skips the empty-canvas gate`, added after approval. One Node test runs the browser tests in the headless shell: the isolated page, a posted timestamp off the 0.1 ms grid and the planted refusal `coarse-clock`. The builder recorded 132 Node tests and 55 browser tests at db0b98e, before the one added Node test; the browser count of this row is taken from that record. The tests assert the trace contract and no frame rate.
+```
+
+```text
+### Merge train S1-b of slice S1 (S1-T18, S1-T19)
+Commit:    70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 255 source files"
+Seed:      none
+Notes:     The type check on the joined tree; S1-T19 changes Python files under scripts/ and custodian/tests/. House form of the last train's ledger.
+```
+
+```text
+### Merge train S1-b of slice S1 (S1-T18, S1-T19)
+Commit:    70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 516 text files, 73 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the joined tree: the README of the performance spike, as S1-T18 changed it, is the one document that either task changes.
+```
+
+```text
+### Merge train S1-b of slice S1 (S1-T18, S1-T19)
+Commit:    70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the joined tree: S1-T19 adds two files under custodian/tests/ and S1-T18 one under web/spikes/performance/tests/.
+```
+
+```text
+### Merge train S1-b of slice S1 (S1-T18, S1-T19)
+Commit:    70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical on the joined tree; neither task changes either.
+```
+
+```text
+### Merge train S1-b of slice S1 (S1-T18, S1-T19)
+Commit:    70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: range HEAD, 55 commits, at least 55 to list, RESULT: PASSED"
+Seed:      none
+Notes:     The pinned secret scanner over the whole history of the branch at the joined work commit. The findings the scanner still lists are the known evidence lines of S0-T05 in PROGRESS.md, which the script itself judges.
+```
+
+```text
+### Merge train S1-b of slice S1 (S1-T18, S1-T19)
+Commit:    70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','d234327dd2c5ea0631fcb0db8da87671ae8932fd...70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/tests/repository_root.py A:custodian/tests/test_repository_root.py A:web/spikes/performance/tests/isolation.node-test.mjs M:custodian/tests/test_frame_census.py M:custodian/tests/test_frame_crosswalk.py M:custodian/tests/test_frame_sixth.py M:custodian/tests/test_publicdata_registry.py M:scripts/mutation.py M:scripts/tests/mutation_runner.py M:web/spikes/performance/README.md M:web/spikes/performance/main.ts M:web/spikes/performance/server.mjs M:web/spikes/performance/tests/mutation-page.node-test.mjs M:web/spikes/performance/tests/mutation-server.node-test.mjs M:web/spikes/performance/tests/page-harness.mjs M:web/spikes/performance/tests/performance.spec.ts'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "16 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The whole change of the train against main: 16 files, the sum of the two tasks' own changes (eight files each); no file outside the two tasks' scopes.
+```
+
+```text
+### Merge train S1-b of slice S1 (S1-T18, S1-T19)
+Commit:    70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb
+Command:   ./eii test --seed 2026111479
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    3168 passed, 0 failed, 0 skipped
+Seed:      2026111479
+Notes:     The whole test command on the build machine with a fresh seed, at the joined work commit; once for the train.
+```
+
+```text
+### Merge train S1-b of slice S1 (S1-T18, S1-T19)
+Commit:    70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','d234327dd2c5ea0631fcb0db8da87671ae8932fd..70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Both work commits of the train, one for each task, have a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
