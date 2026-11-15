@@ -195,6 +195,7 @@
 - DONE SO FAR: Default is individual review by the owner's delegate; the proposed batch audit is 30 random rows per batch with zero errors.
 - OPTIONS: **Recommendation:** review every code individually. Allow batches only by owner-approved audit rule with named sign-off.
 - NEEDED BY: slice S2 activity spine.
+- UPDATE: 2026-11-15, by the ledger of merge train B5 (task S2-T04): the review files, the queue and the guards are built and approved; no person is named and no mapping is admitted. On the real public cache the spine holds 4,901 codes, 243 of them in the mandatory queue. The review itself is OI-203. Still needed: the name of the person who signs and the answer on batches.
 
 ## OI-17 — Gateway measurement panel
 
@@ -1584,6 +1585,7 @@
 - DONE SO FAR: This task's four own values hold on the real cache; the reconciliation file names the handoff; the nine literals are asserted against the code's table and the document.
 - OPTIONS: **Recommendation:** close when S2-T04's five values are asserted at the join.
 - NEEDED BY: the section 9 regression criterion, when task S2-T04 stands on the same tree (S2-T04 is not in merge train A).
+- UPDATE: 2026-11-15, by the ledger of merge train B5: task S2-T04 stands on the same tree as S2-T03 from this train. Whether its five PUB-67 stage values are asserted on the joined tree is not shown by any record of this ledger; the item stays PENDING until that assertion is run and recorded.
 
 ## OI-176 — Five low defects of the public-series calculations, fixed on the calculation layer's final form
 
@@ -1861,6 +1863,46 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - DONE SO FAR: The package README names the reader's allowances as its own: they touch only the recorded box of a file, which the selection does not use, or end in a named refusal. `test_fsq_connection_disables_geoparquet_conversion` proves that the conversion is set off before any read, on a hand-made file. The second confirmation passed the README's citations and the allowances paragraph (its checks N1a to N1d).
 - OPTIONS: **Recommendation:** the run of OI-197 records the three answers as header facts and yes-or-no answers only, with no value of a fetched row. If an answer differs from what the reader or the parser expects (a key in a place the reader does not read, a version the pages read do not cover, a column type other than the one the parser expects), the source is refused by its named error and the difference comes back as a ruling; nothing is guessed and no fixture is changed to fit.
 - NEEDED BY: the slice S2 gate; before any task reads `pub_place_fsq` from real data.
+
+## OI-203 — The human review of the activity spine on the real feeds
+
+- ID: OI-203
+- TYPE: OPEN
+- NEEDED: A named person's review of the mandatory queue of the activity spine, code by code, recorded in `custodian/publicdata/review/activity_spine.csv` with the reviewer's role and date and with the binding file beside it. Criteria 1 to 3 of task S2-T04 stay unticked until then. Before that review, the queue is computed again with the supplier membership of the reviewed baskets of S2-T03, so that the supplier activities are in it.
+- WHY: PUB-33 admits a mapping only when a person approves that the Arabic activity name fits the class title, and no model signs a review (the lead's ruling of 2026-11-15). The reader, the queue and their guards are built and approved; the reviewed data set is not delivered.
+- DONE SO FAR: The lead's run on the real public cache at commit c193a12 (2026-11-15, counts only) reads 4,901 activity codes: 2,125 `unreviewed`, 1,369 `not_mappable_legacy` (a code that is not seven digits long) and 1,407 `not_mappable_invalid_prefix` (a seven-digit code whose first four digits are not a class of the classification file, which holds 419 classes). The review queue holds 243 codes; 349 rows are left out in four groups and counted. The committed review file holds one `unreviewed` row and claims no decision; the category list is empty. The run's record does not state the supplier membership it was given, and the builder's documented call passes an empty complete membership. OI-16 (who signs, and whether batches are allowed) is not decided.
+- OPTIONS: **Default until a person is named:** no mapping is admitted and every consumer treats the spine as unreviewed. The review is done by the person OI-16 names, each code on its own unless the owner approves a batch rule.
+- NEEDED BY: task S2-T08 (the Public pack assembly) for any figure by activity class; before the slice S2 gate.
+
+## OI-204 — The terms of the classification file are not read
+
+- ID: OI-204
+- TYPE: OPEN
+- NEEDED: The publisher's own words on the use of the classification file `cls_isic4`, with the date read, recorded in the registry row and in the terms cell of document 04; or the lead's decision on how they are recorded when the page that holds them is on a host the fetcher may not contact.
+- WHY: PUB-03 holds the file's host on the allow-list. The helper's reading of 2026-11-15 found that the host's own pages carry only a footer line whose terms and copyright links lead to another host, which is not on the allow-list and was not contacted; the file itself carries no terms line. So `terms_url` cannot be a page of the allow-listed host.
+- DONE SO FAR: Part 2 of S2-T04 confirmed the file's direct address, its extension and its two columns in the registry row and filled the "how fetched" cell of document 04; the licence fields are unchanged, the basis stays `none_stated` and `terms_url` stays empty. The release mode of the activity graph refuses the source. The terms cell of document 04 says that the exact wording and the date read are to be recorded and names the owner's decision as the basis (PUB-12).
+- OPTIONS: **Default:** the row stays as it is and the graph's release mode keeps refusing titles from this source until the words are recorded. **Recommendation of the helper that read the host:** pass the point to task S2-T21, whose loader asks every row for the terms words and the date read under decision 0026.
+- NEEDED BY: task S2-T21's join pass (its loader refuses a registry row without the two terms fields); before any release that shows a class title.
+
+## OI-205 — One unexplained failure of the scripts unit suite in the builder's sandbox of S2-T05
+
+- ID: OI-205
+- TYPE: OPEN
+- NEEDED: The name and the cause of the test of `scripts/tests` that failed in the build pass of task S2-T05, or a recorded finding that it cannot be reproduced after the stated runs.
+- WHY: Rule 39: a green re-run alone does not close a random failure. On 2026-11-14 the builder of S2-T05 (OpenAI GPT-6 Astra through Codex) ran `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` at the end of its pass and recorded exit code 1. Its wrapper kept only the trailing output, so the failing test and the suite's total are not known. The builder did not run it again and reported the cause as unknown.
+- DONE SO FAR: The lead ran the same discovery at the task's local commit 00e3394b0a2d3cdaace7933a511ead58f9be5bf4 on the build machine on the same day: 708 tests, OK, exit 0. The independent reviewer read both records and judged that the failed run leaves no acceptance criterion unmet (REV-11). Two explained causes of an exit 1 of this suite are on record for other runs and are not shown to be the cause here: the interrupt test under a launch that ignores the interrupt signal (PO-S2-06), and, in a later pass of another task in another tool's sandbox, the two version tests failing because that sandbox's Node was outside the pinned line. The return of S2-T05 says that Node 22 was put first on the path for its runs.
+- OPTIONS: **Default:** the item is closed as not reproduced when the suite's recorded runs on the joined head of merge train B5 and on main after the merge pass, with those runs listed; if a test of `scripts/tests` fails in a builder's sandbox again, its kept output names it and this item takes the cause. Builders' wrappers keep the whole output of a failed suite. No test is skipped, retried inside a run or given a longer limit for it.
+- NEEDED BY: the slice S2 gate.
+
+## OI-206 — The qualification that a keyed run of the spine triage needs
+
+- ID: OI-206
+- TYPE: OPEN
+- NEEDED: The lead's decision, before any keyed run of `scripts/spine_triage.py`, whether the present qualification of the gateway covers the rubric, the language and the route that the triage of the activity spine would use, or which requalification is run first.
+- WHY: [Decision 0014](docs/decisions/0014-typed-decision-gateway.md), section "What would change this decision", ties a qualification to its model, rubric, language and route. The tool refuses a keyed provider unless a qualification record names exactly those four, and the task's change holds no such record, so today every keyed run is refused. The plan of S2-T05 raised the question, and the lead's rulings for the build left it open on purpose: "Whether the present qualification covers this rubric is the lead's decision before any keyed run."
+- DONE SO FAR: The task is built, reviewed and accepted with provider `none` and with recorded answers only; no keyed run and no live call was made by the builder, a test or the lead. The refusal is tested: a keyed request without a qualification record, and one whose record differs in the model, the rubric identifier, the rubric hash, the language or the route, are refused before a gateway object is made. OI-15 (human-labelled qualification sets) names "any changed model, rubric, language or route" under NEEDED BY; OI-16 names who signs a mapping.
+- OPTIONS: **Default:** no keyed run of the triage tool; the queue is ordered with provider `none` or with recorded answers. A keyed run follows only after the lead records, with its evidence, a qualification for exactly this rubric, language and route, inside the token allowance of the owner's recorded answer to OI-18 and from the lead's own shell.
+- NEEDED BY: the first keyed run of `scripts/spine_triage.py`; not needed by any gate, which all run with provider `none` (rule 27).
 
 ## Change control
 
@@ -2305,6 +2347,7 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: mutation testing of the modules that compute or compare numbers (rule 44, `scripts/mutation.py`)
 - EVIDENCE: The campaign on `core/src/eii_core/calc/public_series.py` is complete (130 mutants made, 127 killed, 3 survived and explained, exit 0). The three custodian series modules of the same task, `figures.py`, `baskets.py` and `reconcile.py` under `custodian/src/eii_custodian/publicdata/series/`, have no campaign: on the task's base the mutation copy lacks the scripts folder that one test of S2-T01 imports, so the custodian suite cannot run in it.
 - NEEDED: the campaign on the three modules, every survivor killed or explained. The lead runs it on the joined tree of the train that carries task S2-T21, where the mutation copy holds what the custodian suite imports; a survivor goes to the builder's maker of S2-T03. Or one line saying why the item is not valid.
+- UPDATE: 2026-11-15, by the ledger of merge train B5 (tasks S2-T04 and S2-T05): the item stays open. The campaign of `figures.py` ran to its end for the first time on a trial tree of train B4 at bbc5bfa869bc0a24f37c4a70ab10d0bd6a652577: made 1,891, killed 1,741, survived 150, timed out 0, not covered 0, exit code 1. The run was possible because the repair of the mutation runner by task S1-T19 (pull request 54) stood under that tree, not because of task S2-T21, which the train does not carry. The explanations file holds no entry for the module, so all 150 survivors are unexplained: 149 stand on lines of S2-T03 that are byte-equal on main, and one stands on a line that S2-T07 added (line 342, the text of a refusal message that its test matches by a search). That tree, and train B4's first cut cafd8b741dd2d16cb7514b4945d8413482fa7ad2, both held S2-T07, which changed ten lines of `figures.py` and two of `reconcile.py`; S2-T07 left the train at the split this ledger records, so neither changed blob is one this train merges. In the joined work commit b89fc325514b92e82d9fd8318d5c44b38d3309a6 all three modules are the blobs main a46e6ff7722d2ca0f966f1bd78a95c3462887497 holds and this train changes no line of them, read by `git rev-parse <commit>:<path>` at both: `figures.py` 48c4dd6d61783ba4a7669739041dd82cfb41c4cd, `reconcile.py` f4c02552639938b3f3b09edd1e9574ce4309d070, `baskets.py` 03043734490a1ea353933e82e353804c45cdca0a. On train B4's first cut the lead's campaign of 2026-11-15 ran all three in one run with exit code 1: `reconcile.py` made 193, killed 181, survived 12; `baskets.py` made 238, killed 218, survived 20; `figures.py` made 1,891, killed 1,741, survived 150 again. The exit code 1 is recorded as it is and is not a pass. By the lead's ruling of 2026-11-15 the survivors go to one thin test pass on its own branch, built by the maker that built S2-T03 and reviewed by another maker, on a base that holds the runner's repair; all three modules go to that pass.
 
 ### PO-S2-15 — The filled tender confirmation once S2-T19 fetches the source
 
@@ -2503,6 +2546,105 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: `custodian/src/eii_custodian/publicdata/places_fsq/footer.py` (`file_metadata`, the resolution of column orders); the package README
 - EVIDENCE: The reader uses a modern bound only where the file's list of column orders gives the column the type-defined order; under any other order it takes the deprecated bounds where present, and otherwise the statistic is missing and the file set is refused. The return of the second fix pass: "IEEE total order, member 2, is UNKNOWN in this pass". The reading of 2026-11-15 found that the format's definition now names two further column orders and a rule for a zero bound under the type-defined order that the reader does not apply; the lead ruled that none of its twelve points changes code, and the first confirmation passed the pair of bounds from mixed sources "unchanged as ruled" (its check K9). The reader fails closed: a copy written with a later order is refused by name and never read by a guessed order.
 - NEEDED: the follow-up task of slice S2 decides, after the live fetch shows which order the copy declares, whether the reader learns the later orders and the zero rule, each with its hand-encoded plant; or says in one line why refusal is enough.
+
+### PO-S2-37 — A sentence of document 04 section 6 says the classification source stays unconfirmed
+
+- ID: PO-S2-37
+- TYPE: OPEN
+- RAISED BY: the lead's pack note for review round 2 of S2-T04, 2026-11-14 (one sentence of the fix states the pack's then rule on a source's terms, which the owner's decision of that day changes through a decision record of its own); found again on train B4's trial tree by the helper that drafted this ledger block, 2026-11-15
+- CONCERNS: document 04 section 6, the sentence after PUB-40 that begins "S2-T04 builds the offline activity spine"; the terms row of `cls_isic4` in the same document; PUB-13
+- EVIDENCE: The sentence, added by the first fix pass of S2-T04, ends: "the classification source stays unconfirmed so titles derived from it stay barred from release (PUB-13)". On the joined work commit of merge train B5 the same document's terms row for `cls_isic4`, as main holds it under decision 0026, ends: "titles and mappings may enter a release; any permission needed for real use goes on document 17's list". Part 2 of S2-T04 confirmed the file's address and columns and did not touch the sentence. The code agrees with the sentence, not with the row: the graph's release mode refuses the source while its basis is `none_stated`.
+- NEEDED: one wording for section 6 that agrees with decision 0026 and with what is still unconfirmed (the terms words, OI-204), made with the document pass of S2-T21 or of decision 0026; the code follows the loader of S2-T21 (PO-S2-38). Or one line saying why the item is not valid.
+
+### PO-S2-38 — This task's own confirmation of what the registry loader of S2-T21 changes in it
+
+- ID: PO-S2-38
+- TYPE: OPEN
+- RAISED BY: the scout's report of train B4 (a helper's trial join on main, 2026-11-15), points F1 and F2; the lead's ruling of 2026-11-15 06:34, part 1
+- CONCERNS: `custodian/src/eii_custodian/publicdata/review/graph.py`, `custodian/tests/test_activity_planted.py`, `custodian/tests/test_activity_real_shape.py`; rule 33 of AGENTS.md (a forced code or test difference needs that task's own confirmation by another maker); decision 0026
+- EVIDENCE: `graph.py` imports `release_refused` from the registry module and calls it in the title check of `cls_isic4`, and tests the basis against `none_stated`; `test_activity_planted.py` imports and asserts `release_refused` and plants a `none_stated` source; `test_activity_real_shape.py` asserts that the row `cls_isic4` has the basis `none_stated`. S2-T21 removes the function and the basis and holds the row as `owner_decision` with decision record 0026. S2-T21 left train B4 for a join pass on train B4's tree; the lead ruled that where the two meet, the other tasks' code and tests follow the record's loader, each change named in that pass's return.
+- NEEDED: the changed lines of these three files, confirmed for S2-T04 by another maker than the one that makes them, with the train that carries S2-T21; the release bar on the classification file's titles is then stated by the loader's rule and by OI-204, not by the removed basis. Or one line saying why the item is not valid.
+
+### PO-S2-39 — Hardening points of the activity review
+
+- ID: PO-S2-39
+- TYPE: OPEN
+- RAISED BY: the builder of the first fix pass of S2-T04 (xAI Grok 4.7 through Cursor), 2026-11-14, under "HARDENING" in its return; the first builder's return names the file-length point too
+- CONCERNS: document 17 (a proposed hardening point); TST-51
+- EVIDENCE: The return says that a cryptographic reviewer signature and a review screen are not built: a review is recorded as a role and a date in a committed file, bound to its inputs by the binding file. It also says that `activity.py` and the larger activity test files are past the 500-line target, which the plan treats as a warning and not as a failure; the files were not split.
+- NEEDED: one entry of document 17 for the reviewer signature, with no change of scope (the scope is frozen); a decision whether the long files are split by a later task. Or one line saying why the item is not valid.
+
+### PO-S2-40 — Three type diagnostics of the activity refusal tests, visible only to an unconfigured type check
+
+- ID: PO-S2-40
+- TYPE: OPEN
+- RAISED BY: the confirmation of the mutation pass of task S2-T04 (Cognition SWE-2 High through Devin, 2026-11-15), its one proposed item, marked record (check M7); the builder's return of the thin repair names the same three places
+- CONCERNS: `custodian/tests/test_activity_survivors_refusals.py` and `custodian/tests/test_activity_survivors_refusals_decisions.py`; the file list of the type check in `pyproject.toml`; REV-15
+- EVIDENCE: A direct type check of the two files reports three `dict.update` mismatches, one in the first file and two in the second. The two files stand outside the configured file list of the type check, so the configured run reports no issue. The reviewer's reading: the three updates behave as intended and are no defect of what the tests prove; they are not suppression comments.
+- NEEDED: if these test files ever join the configured file list of the type check, the literal dictionaries are annotated as `dict[str, object]`. Or one line saying why the item is not valid.
+
+### PO-S2-41 — One test of the spine triage prints a line of the tool into the suite's output
+
+- ID: PO-S2-41
+- TYPE: OPEN
+- RAISED BY: the independent review of S2-T05 on its local commit (xAI Grok 4.7 through Cursor), 2026-11-14, proposed item P1 (REV-11), a record point.
+- CONCERNS: TST-155; rule 36 of `AGENTS.md` (a failure is never hidden).
+- EVIDENCE: `test_none_preserves_queue_without_network_or_key_access` in `scripts/tests/test_spine_triage.py` calls `main` without redirecting standard output, so every run of the suite prints the tool's success line `OK unsigned queue` after the suite's own result. The lead's discovery at the commit exited 0 (708 tests, OK), so the line hid no failure there. The line is the last line of the builder's failed discovery too, where it stood under a run that had exited 1.
+- NEEDED: the test redirects the tool's standard output, as the file's own helper for calling `main` does, so that the last line of the suite's output is the suite's own; a change of one test, made by a later task that owns the file. Or one line saying why the item is not valid.
+
+### PO-S2-42 — The count of project commands in `README.md` after S2-T05 added one to rule 44
+
+- ID: PO-S2-42
+- TYPE: OPEN
+- RAISED BY: the independent review of S2-T05 on its local commit (xAI Grok 4.7 through Cursor), 2026-11-14, proposed item P2 (REV-17), a record point.
+- CONCERNS: rule 44 of `AGENTS.md`; `README.md`, section "Current status".
+- EVIDENCE: `README.md` says "Thirty-two project commands run from the repository root today" and the commit of S2-T05 added `uv run --locked python scripts/spine_triage.py` and its test command to rule 44. The plan limited the task's README edit to one paragraph, so the count was left as it stood. The sentence still reads so on the joined work commit of merge train B5.
+- NEEDED: the count and the list of that sentence are brought in line with rule 44 by the next documents change that touches `README.md`; whether the README keeps a count at all is decided there. Or one line saying why the item is not valid.
+
+### PO-S2-43 — A failure while the gateway builds its provider may leave no decision record
+
+- ID: PO-S2-43
+- TYPE: OPEN
+- RAISED BY: the builder's return of S2-T05 (OpenAI GPT-6 Astra through Codex), 2026-11-14, under NOT DONE and in its proposed open-item sentence; not a verdict finding. The review did not rule on it.
+- CONCERNS: DAT-126 (the decision record); the gateway of task S1-T07, which is outside the scope of S2-T05.
+- EVIDENCE: The builder reports that the triage tool returns the unchanged queue when the gateway cannot be built, and that the gateway builds its provider before the block that writes a decision record, so a failure at that step may be persisted in no record. The gateway's code was not changed by the task. With provider `none` and with recorded answers, the only providers of the build and of every gate, no test shows the case. This draft did not read the gateway's code to confirm the order.
+- NEEDED: the lead's reading of the gateway's start-up order, and then one of: a hardening entry of document 17 for the gateway (a start-up failure writes a record of outcome `UNAVAILABLE` or `ERROR`), or a recorded statement that a failure before any call needs no DAT-126 record. Or one line saying why the item is not valid.
+
+### PO-S2-44 — The part of the break pass of S2-T05 that was not done, and one surviving negation
+
+- ID: PO-S2-44
+- TYPE: OPEN
+- RAISED BY: the builder's return of S2-T05 (OpenAI GPT-6 Astra through Codex), 2026-11-14, under BREAKS and NOT DONE, and its proposed open-item sentence; not a verdict finding.
+- CONCERNS: rule 37 of `AGENTS.md` (every guard has a planted violation); the build brief's break pass (every comparison, boolean operand, early return and listed value); TST-155.
+- EVIDENCE: The builder's break pass negated 62 conditions of `scripts/spine_triage.py` and `scripts/spine_triage_io.py`; nine were caught by no test, assertions were added, and a follow-up of twelve runs caught eleven. One negation survives: the empty-string operand of `gateway.endpoint or ""` in `triage`, explained by the builder as unreachable for an admitted keyed run. The builder states that listed values and early returns were not broken one by one. The review approved on the acceptance criteria with a planted refusal for each new guard (REV-11) and raised no point on the break pass. The two modules are under `scripts/`, and no mutation campaign was run on them.
+- NEEDED: the lead's ruling whether the remaining breaks are owed (a thin break pass by the builder over the listed values and early returns of the two modules, with the surviving operand killed or its explanation recorded) or whether the reviewer's planted-refusal reading closes the point. Or one line saying why the item is not valid.
+
+### PO-S2-45 — No run of the spine triage on the real public cache is recorded
+
+- ID: PO-S2-45
+- TYPE: OPEN
+- RAISED BY: the builder's return of S2-T05, 2026-11-14, under NOT DONE ("No admission-path test for a real Parquet cache; no claim of live qualification or source readiness"), read with the lead's lesson of 2026-11-15 on S2-T04 ("an approval on invented fixtures with normalised names says nothing about the real shape; the real-cache run belongs before the review").
+- CONCERNS: the first acceptance criterion of task S2-T05 (provider `none` leaves a valid deterministic queue); PUB-35.
+- EVIDENCE: Every test of the task runs on an invented cache. The build brief ruled that the real structures are S2-T04's matter and that the lead confirms them on the real cache before either task's turn. The lead's real-cache runs of 2026-11-15 are runs of S2-T04's spine, and its further pass rewrote the invented cache of the triage tests in the real shapes; the records hold no run of `scripts/spine_triage.py` itself on the real cache.
+- NEEDED: one run of `uv run --locked python scripts/spine_triage.py` with provider `none` on the real public cache from the lead's own shell, recorded with counts and field names only: the exit code, the number of queue rows, and whether the queue written equals S2-T04's recomputed queue byte for byte; entered with the ledger of the task that integrates the spine. Or one line saying why the item is not valid.
+
+### PO-S2-46 — The table of lineage node types of the activity graph is read only by a test
+
+- ID: PO-S2-46
+- TYPE: OPEN
+- RAISED BY: the confirmation of the mutation pass of the graph module of task S2-T04 (Cognition SWE-2 High through Devin, 2026-11-15), a proposed item marked record (check G1); the builder's return names the same point
+- CONCERNS: `LINEAGE_NODE_TYPES` in `custodian/src/eii_custodian/publicdata/review/graph.py`; `custodian/tests/test_activity_graph_survivors_refusals.py`; DAT-100 to DAT-103
+- EVIDENCE: The pass removed the refusal "lineage edge has no lineage end" from `_check_edge`, which no input could reach behind `_check_edge_ends`. Since the removal no production line reads the table `LINEAGE_NODE_TYPES`; it stays as the declared table that `test_every_lineage_edge_type_has_a_lineage_node_at_one_end` reads, and that test fails if a later change gives a lineage edge type two public ends.
+- NEEDED: when the graph module is next changed, either the table gets a production reader again or the test states in its own text that it is the table's only reader. Or one line saying why the item is not valid.
+
+### PO-S2-47 — Three tests of the graph module's mutation pass rest on the behaviour of the Linux platform
+
+- ID: PO-S2-47
+- TYPE: OPEN
+- RAISED BY: the confirmation of the mutation pass of the graph module of task S2-T04 (Cognition SWE-2 High through Devin, 2026-11-15), a proposed item marked hardening (checks G2 and G3)
+- CONCERNS: `custodian/tests/test_activity_graph_survivors_writes.py` and `custodian/tests/test_activity_graph_survivors.py`; rule 37 of `AGENTS.md`
+- EVIDENCE: The test of the staging removal plants a folder that cannot be removed by its mode bits: under a process that may remove any folder the plant has no effect, the three mutants it kills would survive, and the test would still pass. The test of the read under the C locale loses its kill under the interpreter's UTF-8 mode and never fails wrongly. The tests of the staging prefix assume a longest file name of 255 bytes and a temporary folder on another device than the shared-memory folder. All hold on the declared platform and in the lead's campaigns; none can fail wrongly.
+- NEEDED: if the suite is ever run on another platform or as a privileged user, each of the three tests either proves its plant took effect before it asserts or is skipped there by name with its reason. Or one line saying why the item is not valid.
 
 ## Sources
 
