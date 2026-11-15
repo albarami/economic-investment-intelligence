@@ -1601,12 +1601,13 @@
 ## OI-177 — Secret-scanner evidence of S2-T12, pinned at its turn
 
 - ID: OI-177
-- TYPE: PENDING
+- TYPE: CLOSED (was PENDING)
 - NEEDED: The pinned secret-scanner result of task S2-T12 — its command, the exact commit it ran on and its exit status — recorded at the task's turn, beside the hosted checks.
 - WHY: Both external review rounds found no secret and no real custodian record in the patch, but the supplied evidence does not establish that the secret scanner passed; the first review's record point asks for the pinned result and the confirmation repeats it.
 - DONE SO FAR: The lead's local checks at commit 0682edc ran the documentation check with the owner's private pattern list, exit 0; the reviews' own reading found nothing. At the train's turn the hosted secret scan of the first pushed head (pull request 51, closed unmerged) failed on one invented fixture key of the task's test, which is no secret; the value was changed inside the task's commit of the rebuilt train, and the scanner's command `uv run --locked python scripts/ci_history_scan.py scan` exits 0 at the joined work commit, as a row of the train's ledger records.
 - OPTIONS: **Recommendation:** record the hosted scan's result on the merged head with the closing record of the train's pull request, and close this item there.
 - NEEDED BY: the task's pull request (merge train A of slice S2).
+- CLOSED: 2026-11-15, by the closing record of pull request 52 in PROGRESS.md: the hosted job secret-scan passed on the merged head `f169bcc4948047910f145bc6b5b3e352f7b637d2`, https://github.com/albarami/economic-investment-intelligence/actions/runs/43669038415/job/132674745610 , and the scanner's command exits 0 at that commit in the lead's head checks.
 
 ## OI-178 — Document 03 section 7.3 against the investment cache records
 
@@ -1677,6 +1678,106 @@
 - DONE SO FAR: The same suite passed on the same commit in the lead's local checks a few minutes before (exit 0) and in a rerun with its whole output kept a few minutes after (814 tests, OK, exit 0). The failed run overlapped the start of another task's web mutation campaign on the same machine: the lead's capacity reading rose from a load of about 16 to about 57 on 28 usable processors within those minutes, and that campaign was then stopped under the run's capacity rule. The ledger tool now keeps the whole output of every refused row. The suite's row of this ledger entry is a further run on the timing lane.
 - OPTIONS: **Default:** watch the suite's next runs on this head and on main; if a test fails again, its kept output names it and this item takes the cause; if the next ten recorded runs of the suite pass, the item is closed as not reproduced, with those runs listed. No test is skipped, retried inside a run or given a longer limit for it.
 - NEEDED BY: the slice S2 gate.
+
+## OI-185 — The new read-only mount roles of the world build
+
+- ID: OI-185
+- TYPE: OPEN
+- NEEDED: A later decision record on the new read-only mount roles of the `build-world` profile, with a security review.
+- WHY: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md) item 9 leaves this part of document 05 Q11 to its own pass; it does not decide those roles.
+- DONE SO FAR: Part A proves the existing proofs unchanged, explicit input arguments or settings, and snapshot staging in an explicitly supplied scratch folder.
+- OPTIONS: **Default until decided:** S4-T02's “sandbox proof passes” criterion is NOT PROVED for the new inputs. The later record and security review must rule the roles before that criterion can be claimed.
+- NEEDED BY: before task S4-T02's pull request claims that criterion.
+
+## OI-186 — Register rows without a registration number
+
+- ID: OI-186
+- TYPE: OWNER DECISION
+- NEEDED: Whether another number the register publishes can key a company whose row has no registration number.
+- WHY: Document 03 section 6.1 makes the registration number non-null and the key joining attached records to their company; DAT-12 governs its validation.
+- DONE SO FAR: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md) item 1 records 1,458 such rows in the commercial file as read on 2026-11-15.
+- OPTIONS: **Default until the owner says otherwise:** count these rows and leave them out of the snapshot and stock, with their reason. An owner's decision on another published number would replace that default; no alternative key is settled here.
+- NEEDED BY: before the first real world build.
+
+## OI-187 — Proving DAT-24 for a register without activity codes
+
+- ID: OI-187
+- TYPE: OPEN
+- NEEDED: A later decision establishing how the unchanged DAT-24 is proved for a register file without activity codes.
+- WHY: The file publishes neither a code list nor a code column. Null activity codes are allowed when only text exists, but that does not prove DAT-24's code-distribution check.
+- DONE SO FAR: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md) item 2 calls this an interim Part A state, not a final reading allowed by DAT-24.
+- OPTIONS: **Default until decided:** the code-distribution check remains NOT PROVED and code fields stay null until a register file shows a code. A later decision must establish the proof; the requirement stays unchanged.
+- NEEDED BY: before a finished `business_register.v1` feed or a release.
+
+## OI-188 — Reviewing the register's activity texts
+
+- ID: OI-188
+- TYPE: OPEN
+- NEEDED: The owner's step: a person's review of the register's 78 category texts and 8 type texts to ISIC sections.
+- WHY: A company's ISIC section comes only through the reviewed activity map keyed by normalised activity text, never through a model, keyword or prefix (DAT-22; DAT-24).
+- DONE SO FAR: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md) item 2 sets published category text as activity text, with type text where the category is empty.
+- OPTIONS: **Default pending review:** only the reviewed activity map may place a company in an ISIC section. The person's review supplies that mapping; it does not replace it with inferred codes.
+- NEEDED BY: before the first real world build can place a company in an activity cell of the calibration table.
+
+## OI-189 — Specifying the workers' nationality shares
+
+- ID: OI-189
+- TYPE: OWNER DECISION
+- NEEDED: An approved specification of the workers' nationality shares, answering document 05 Q17.
+- WHY: A share needed by the build cannot be supplied without an approved specification; any committed share must be an ASSUMED manifest entry under SYN-06, with no real origin or origin in a Public split under SYN-13.
+- DONE SO FAR: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md) item 4 routes group keys through `EII_NATIONALITY_GROUPS_FILE`, read by key and SHA-256.
+- OPTIONS: **Default until the owner says otherwise:** commit no share; refuse with `missing_calibration` when a needed share lacks an approved specification. The approved specification would supply what is missing under the stated constraints.
+- NEEDED BY: before the first real world build.
+
+## OI-190 — Companies whose register publishes no activity
+
+- ID: OI-190
+- TYPE: OPEN
+- NEEDED: How the financial centre's companies stand in the feed when their register publishes no activity, under DAT-21 and DAT-23.
+- WHY: Their resolved share alone is below the suite's quality line, and their activity treatment remains open under document 05 Q19.
+- DONE SO FAR: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md) item 5 requires them to be read, counted, name-checked for SYN-20 and given identifiers in canonical order.
+- OPTIONS: **Default in Part A:** give them no jobs, report their count and exclude them from the December snapshot. Owner task S4-T01 or a later decision record must settle their feed treatment; Part B may add their rows.
+- NEEDED BY: Part B of task S4-T02.
+
+## OI-191 — Stating the calibration table's conditions in the repository
+
+- ID: OI-191
+- TYPE: OWNER DECISION
+- NEEDED: Whether the calibration table's conditions may be stated in the repository.
+- WHY: The lead reads these conditions as checks on an input's declared format, not values that generate records or belong in the manifest or generator constants.
+- DONE SO FAR: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md) item 7 puts that reading to the owner without repeating the exact values.
+- OPTIONS: **Default until the owner says otherwise:** the real table's declared-format file stays outside the repository beside the table; the committed stand-in has its own file with invented values. An owner's decision allowing the conditions to be stated would replace this restriction.
+- NEEDED BY: no build waits for it.
+
+## OI-192 — Mapping the register's establishment nationality
+
+- ID: OI-192
+- TYPE: OPEN
+- NEEDED: A reviewed mapping from the register's two nationality columns to the closed list of `establishment_nationality`, read with OI-154.
+- WHY: Neither column's values are keys of the owner's group list. The register holds nationality columns, so section 6.1's “null when the register shows none” is not the reason for Part A's null.
+- DONE SO FAR: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md) item 8 leaves both columns unread in Part A.
+- OPTIONS: **Default in Part A:** keep the field null and name it as not read in the snapshot's README and `coverage.json`. The reviewed mapping must settle how the published values reach the closed list.
+- NEEDED BY: Part B of task S4-T02.
+
+## OI-193 — Reading the register's statuses and licence dates
+
+- ID: OI-193
+- TYPE: OPEN
+- NEEDED: A later decision record ruling the reading of the register's two statuses and two licence dates.
+- WHY: Section 6.1 allows null statuses when no register file shows them; here the file does. Its date nulls mean not recorded or open-ended, neither of which Part A's unread fields establish.
+- DONE SO FAR: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md) item 8 names the later record as drafted, not yet in the pack.
+- OPTIONS: **Default in Part A:** leave `registration_status`, `licence_status`, `licence_valid_from` and `licence_valid_to` null as “not read”, named in the README and `coverage.json`. Part B fills them after the later record rules their reading; no release uses this interim snapshot.
+- NEEDED BY: Part B of task S4-T02.
+
+## OI-194 — Fetching and confirming the census workbook schema
+
+- ID: OI-194
+- TYPE: OPEN
+- NEEDED: The fetch and schema confirmation of `census_2020_workbook`.
+- WHY: The source's row in document 04 still says “to be confirmed at slice S2”; confirmation is needed before the first real world build.
+- DONE SO FAR: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md), “Amended passages”, names this work among the open items to be entered with the record's ledger.
+- OPTIONS: **Pending confirmation:** retain the row's “to be confirmed at slice S2” state. Fetching the workbook and confirming its schema would replace that pending state; the record names the work but supplies no confirmed schema or alternative source.
+- NEEDED BY: before the first real world build.
 
 ## Change control
 

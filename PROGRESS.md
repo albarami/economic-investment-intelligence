@@ -23006,6 +23006,143 @@ Seed:      none
 Notes:     Every work commit of the train (the commits of the four tasks and the lead's one commit) has a Conventional Commit subject.
 ```
 
+#### Merge train A of slice S2: the confirmation of the joined head: APPROVED
+
+Reviewed commit `f169bcc4948047910f145bc6b5b3e352f7b637d2`, the pushed head of pull request https://github.com/albarami/economic-investment-intelligence/pull/52 . OpenAI GPT-6 through the Codex command-line tool; the train was joined by the lead (Anthropic), so the confirmation comes from another maker (decision 0032 item 2). It is also task S2-T12's own confirmation of the two differences that the join forced in that task's test (checks B2 and B3). The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: merge train A of slice S2 (pull request 52), the train's confirmation and S2-T12's own confirmation
+COMMIT: f169bcc4948047910f145bc6b5b3e352f7b637d2
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, sanad-provenance, muhasabah-gate; code-review unavailable
+CHECKS:
+  A1 PASS Independently reran the inspected file-comparison script: S2-T02 39/39 identical; S2-T03 26/26 identical; S2-T13 6 identical, its seventh file sharing the exact blob added by S2-T03; S2-T12 16/19 identical, with only the two documents and test differing. Direct test comparison shows ONE replaced line at S2-T12's train commit and TWO at HEAD: fixture value and assertion.
+  A2 PASS Exactly the six specified commits, in the specified chronological order, all with Conventional Commit subjects. The ledger commit and the difference from 981bb1879e3db2c9c9788fb418e9399cb050d585 to HEAD affect only PROGRESS.md, OPEN_ITEMS.md and TASKS.md.
+  A3 PASS Each task's ledger section records its change, rounds and approval consistently with the supplied verdict files; reviewer naming is explained. Prior closing records precede the train entry. Task statuses, supported ticks and the criterion transferred to S2-T06 agree with the ledger. Required open items and OI-03's update are appended without earlier-line deletions; OI-151's update already exists on main. No tests or hosted checks were run by this reviewer.
+  A4 PASS HEAD contains no path matching forecast_series or s2_t17.
+  B1 PASS 1. Document 03, pub_investqa_record: removes the incorrect prediction about decision 0026 amending DAT-143; preserves the cache description, existing release rule and columns.
+  B1 PASS 2. Document 03, DAT-142: retains main's decision-0026 credits, exact caveat and estimate requirements together with the approved release-key sentence.
+  B1 PASS 3. Document 03, fdi_projects: preserves the approved column list and main's no-field-dropped requirement; “revised” reflects the completed task.
+  B1 PASS 4. Document 04, fdi_projects: preserves the approved measurements and reader facts alongside main's display requirements and exact caveat.
+  B1 PASS 5. Document 04, investment bullets: preserves the approved confirmation and release-key text, main's footer notice and SETTLED identifier rule. These reconciliations introduce no additional substantive requirement.
+  B2 PASS Main's registry has no type-suppression comment; the original base has one. Changing the expected count to zero matches main and rejects any “type: ignore” occurrence in the registry; the investment-build and fixture assertions remain intact.
+  B3 PASS (a) The fixture replacement is the only test-file difference besides B2. (b) No assertion reads this local key's value: the test checks bounds, period, confirmation, missing lineage, caveats, Public-only slots, forbidden joins, page-family coverage and agency registry settings. (c) The replacement remains fdi_ followed by sixteen lowercase hexadecimal characters. (d) Scanner configuration, both scanner scripts and workflow files are unchanged from main.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Merge train A of slice S2: merge record
+
+- The confirmation was given on the head itself, `f169bcc4948047910f145bc6b5b3e352f7b637d2`; nothing moved after it.
+- CI on the head: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43669038415; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43669038362; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43669038409 .
+- The lead's head checks before the merge, on processors 16 to 27 (the merge line's own set): every command exit code 0; `uv run --locked python scripts/ci_history_scan.py scan`: "history scan: range HEAD, 57 commits, at least 57 to list, RESULT: PASSED", exit code 0; `./eii test --seed 2026111475`: exit code 0, "total: 3157 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- The branch stood on current main (`106fe31ac6fd433f82d8c3b0628ce6fa131be90c`), so the head was the exact merge result: the whole test above is the test of the merge result.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/52 was squash-merged on 2026-11-15 at that head; merge commit `79b8a13f29daca174c35a989c4b406816dda2f57` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43671169380 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43671169360 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43671169338 .
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/51, the train's first head, was closed unmerged: its hosted secret-scan job failed on one invented fixture key of task S2-T12's test, which is no secret. The branch was built again with that one value changed inside the task's commit; nothing was force-pushed. The lead's local and head checks run the scanner's command since then.
+- OI-177 is closed by this record: the hosted job secret-scan passed on the merged head, https://github.com/albarami/economic-investment-intelligence/actions/runs/43669038415/job/132674745610 , and the scanner's command exits 0 at the same commit in the lead's head checks.
+- The confirmation proposed no open item.
+
+### D0033 — Decision 0033: the Part A defaults of the register and employment world: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/53 )
+
+- What it is: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md), Proposed: the lead's decision under the owner's delegation, for the owner's confirmation. It records the defaults for task S4-T02 Part A's December 2025 employment stock and one-month register snapshot. Part B builds the later months and fills what Part A leaves open. This split is the lead's plan, not a change to the task's entry.
+- Why: document 05 leaves questions about the register and employment world to the task; the build brief also left the table's format values and the sandbox roles to a ruling. The lead read the real files' structure in its own shell: counts, key sets, forms and yes-or-no answers only, with no row value read or printed.
+- The lead's reading, which the record carries: one register row is one establishment and each distinct registration number stands for one legal entity. Rows without that number are counted and excluded by default. Activity codes stay null; published activity text reaches ISIC sections only through the reviewed map. DAT-24's code-distribution check is NOT PROVED for this file without codes. Dormancy applies only to December-eligible companies; dormant companies have no jobs. Nationality shares need an approved specification; the financial centre's companies get no jobs and stay outside the December snapshot by default. `worksite_basis` is `unknown` only. The table's conditions belong to its declared format, not generator constants or manifest entries. The status, licence-date and establishment-nationality fields are not read in Part A; their nulls are interim, not contract-conforming final meanings. No release is built from this snapshot (items 1 to 8).
+- Class: Deep in its subject (the feed of the register and the employment world), documents only in its change. Lead: Anthropic (Claude Fable 5.2), the structure reads and rulings. Editor: xAI Grok 4.7 through Cursor, one pass from those rulings. Reviewer: Moonshot AI Kimi K3.1 Pro High through Devin.
+- The change: the new record, pointers at document 05 Q11, Q13, Q14, Q15, Q17, Q19 and Q20, and the decision index of docs/README.md. No code, check script, workflow file or requirement changes. The ledger enters OI-185 to OI-194 for the unresolved work.
+- Review: round 1 was REJECTED with five findings, all judged valid and adopted: full DAT-02 normalisation and DAT-12 validation; the number's writing restriction limited to Part A, with later handling under section 6.1 and DAT-15; DAT-24 marked NOT PROVED; establishment nationality named as not read in the snapshot's README and coverage file; and removal of the exact declared-format values. Round 2 was APPROVED with no finding, on the local commit `3fee49f388af1f1a5a95a7d9113ffe51085f2a77`, which stood on main before pull request 52. Its one record point is taken: the Sources line said the owner's conditions are “quoted in item 7”, where item 7 no longer quotes them, and now says “referenced in item 7”. The work commit `e8c4e3b321fad263a94cd0fcb2ace5c59ad7f750` is that approved change committed again on main after pull request 52 (the branch was never pushed before), with that one word: a comparison of the two commits shows one changed line in the record and no difference in document 05 or in docs/README.md. Under the owner's rule on record-only moves the verdict stands, with that comparison as proof. The first local commit of all held the table's conditions and was never pushed; the record was committed again as one clean commit. Two of the lead's own rulings were found wrong by the editor and the reviewer before any push and are corrected in the record: a row without a registration number as its own legal entity, and the number as never written to any output (item 1).
+- Left unchanged: decisions 0022 and 0023, all conformance guards, contracts, thresholds and tolerances, including DAT-21 to DAT-24. The stock is final when Part A ends; its snapshot is not. Item 9 leaves new mount roles to a later record and security review; S4-T02's sandbox criterion remains NOT PROVED for the new inputs.
+- The repository's checks cannot see whether each default is the right reading of the pack: that is the reviewer's judgement and, for defaults, the owner's. The documentation check also ran with the owner's private pattern list.
+- An earlier run of the whole test at this work commit failed and is recorded here, not hidden: `./eii test --seed 2026111476` ended with exit code 1, "total: 3154 passed, 3 failed, 0 skipped in 6 suites, 1 with problems"; the three failures were in the web checks and each said "missing browser. Run: npm --prefix web run spike:glyphs:install-browser". Cause, found before the run was repeated: the lead had prepared this workspace from one that never held the headless browser of the browser tests (rule 44 keeps it in an uncommitted folder). The browser was put in place and the lead's preparation script now takes it from a workspace that holds it. No file of the commit changed between the two runs. The run below, with a fresh seed, is the evidence; the failed run's output is kept by the lead.
+- Evidence: the commands below at the work commit.
+
+#### Evidence for the work commit `e8c4e3b321fad263a94cd0fcb2ace5c59ad7f750`
+
+```text
+### D0033 — Decision 0033: the Part A defaults of the register and employment world
+Commit:    e8c4e3b321fad263a94cd0fcb2ace5c59ad7f750
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 514 text files, 73 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the record and the two amended documents: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns. It also ran with the owner's private pattern list.
+```
+
+```text
+### D0033 — Decision 0033: the Part A defaults of the register and employment world
+Commit:    e8c4e3b321fad263a94cd0fcb2ace5c59ad7f750
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### D0033 — Decision 0033: the Part A defaults of the register and employment world
+Commit:    e8c4e3b321fad263a94cd0fcb2ace5c59ad7f750
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical; the record changes neither.
+```
+
+```text
+### D0033 — Decision 0033: the Part A defaults of the register and employment world
+Commit:    e8c4e3b321fad263a94cd0fcb2ace5c59ad7f750
+Command:   bash -c "git diff --name-only 79b8a13f29daca174c35a989c4b406816dda2f57 HEAD -- docs/decisions/ | grep -v 0033-the-part-a-defaults | wc -l"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no earlier decision record is changed)
+Seed:      none
+Notes:     The record is a new file (rule 46); this row proves on the committed tree that no earlier decision record was edited.
+```
+
+```text
+### D0033 — Decision 0033: the Part A defaults of the register and employment world
+Commit:    e8c4e3b321fad263a94cd0fcb2ace5c59ad7f750
+Command:   bash -c "git diff --name-only 79b8a13f29daca174c35a989c4b406816dda2f57 HEAD -- scripts .github web core custodian product gateway evals eii | wc -l"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no code, check script or workflow file is changed)
+Seed:      none
+Notes:     The record changes documents only: the new record, document 05's open questions and the decision index.
+```
+
+```text
+### D0033 — Decision 0033: the Part A defaults of the register and employment world
+Commit:    e8c4e3b321fad263a94cd0fcb2ace5c59ad7f750
+Command:   ./eii test --seed 2026111477
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    3157 passed, 0 failed, 0 skipped
+Seed:      2026111477
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### D0033 — Decision 0033: the Part A defaults of the register and employment world
+Commit:    e8c4e3b321fad263a94cd0fcb2ace5c59ad7f750
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','79b8a13f29daca174c35a989c4b406816dda2f57..e8c4e3b321fad263a94cd0fcb2ace5c59ad7f750'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
