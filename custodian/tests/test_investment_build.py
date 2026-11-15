@@ -725,7 +725,7 @@ def test_yaml_reader_is_the_registry_and_adds_no_suppression(tmp_path: Path) -> 
     assert "type: ignore" not in build
     assert "type: ignore" not in fixtures
     assert "import yaml" not in build
-    assert registry.count("type: ignore") == 1
+    assert registry.count("type: ignore") == 0
     broken = tmp_path / "broken.yaml"
     broken.write_text("[\n", encoding="utf-8")
     with pytest.raises(RegistryError):
