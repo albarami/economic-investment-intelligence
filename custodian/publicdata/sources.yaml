@@ -4054,3 +4054,158 @@ sources:
     skip_reason: ""
     extension: "parquet"
     basis_note: "terms to be read; checked 2026-11-14. Host terms of the copy were not found. Copyright 2024 Foursquare Labs, Inc. All rights reserved."
+  # S2-T06
+  - key: "places_ovt/part-00014"
+    source_id: "places_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture Places, release 2026-10-21.0, part 00014"
+    publisher: "Overture Maps Foundation"
+    licence_id: "other"
+    licence_basis: "dataset"
+    licence_url: "https://docs.overturemaps.org/attribution/"
+    decision_record: ""
+    fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
+    url: "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/release/2026-10-21.0/theme=places/type=place/part-00014-dcceff87-235e-5a0e-a4b4-5f25ccb873e7-c000.zstd.parquet"
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-15"
+    landing_url: "https://stac.overturemaps.org/2026-10-21.0/places/place/collection.json"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_place"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "parquet"
+    basis_note: |
+      recorded_bytes: 744601106
+      recorded_etag: 4ff3b0b5c984c13fb472965d6e91e953-12
+      STAC collection license: other. The theme is published under the CDLA Permissive 2.0 and Apache 2.0 licenses.
+      Data from Meta. Available under CDLA Permissive 2.0.
+      Data from Microsoft. Available under CDLA Permissive 2.0.
+      Data from PinMeTo. Available under CDLA Permissive 2.0.
+      Data from Krick. Available under CDLA Permissive 2.0.
+      Data from RenderSEO. Available under CDLA Permissive 2.0.
+      Data from DAC. Available under CDLA Permissive 2.0.
+      Data from BrightQuery. Available under CDLA Permissive 2.0.
+      Data from Birdeye. Available under CDLA Permissive 2.0.
+      Data from Uberall. Available under CDLA Permissive 2.0.
+      Data from OpenTravel Alliance. Available under CDLA Permissive 2.0.
+      Data from Foursquare. Copyright 2024 Foursquare Labs, Inc. All rights reserved. Available under Apache 2.0. Foursquare data was transformed to the Overture schema. Changed: 2026-03-18. NOTICE.txt.
+      Data from AllThePlaces. Available under CC0 1.0.
+  - key: "bldg_ovt/part-00288"
+    source_id: "bldg_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture Buildings, release 2026-10-21.0, part 00288"
+    publisher: "Overture Maps Foundation"
+    licence_id: "ODbL-1.0"
+    licence_basis: "dataset"
+    licence_url: "https://opendatacommons.org/licenses/odbl/"
+    decision_record: ""
+    fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
+    url: "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/release/2026-10-21.0/theme=buildings/type=building/part-00288-28a3d046-de24-53bb-bd50-0444cb513967-c000.zstd.parquet"
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-15"
+    landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["gazetteer"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "parquet"
+    basis_note: |
+      recorded_bytes: 528953830
+      recorded_etag: 240bfd5f8e661acddf10c6acd27a4aaa-8
+      License for theme: ODbL.
+      © OpenStreetMap contributors. Available under the Open Database License.
+      Global ML Building Footprints. Licensed by Microsoft under the Open Database License.
+      Google Open Buildings. Available under CC BY 4.0.
+      USGS 3D Elevation Program Digital Elevation Program.
+      Qian Shi, et al. A First High-quality Vector Data of Buildings in East Asian Countries Based on a Comprehensive Large-scale Mapping Framework. Zenodo, 22 July 2023, doi:10.5281/zenodo.8174931. Available under CC BY 4.0.
+      Work derived from BTN 2024 ign.es. Available under CC BY 4.0.
+  - key: "bldg_ovt/part-00384"
+    source_id: "bldg_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture Buildings, release 2026-10-21.0, part 00384"
+    publisher: "Overture Maps Foundation"
+    licence_id: "ODbL-1.0"
+    licence_basis: "dataset"
+    licence_url: "https://opendatacommons.org/licenses/odbl/"
+    decision_record: ""
+    fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
+    url: "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/release/2026-10-21.0/theme=buildings/type=building/part-00384-3eb496b1-cc75-5748-a633-0449cf44f528-c000.zstd.parquet"
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-15"
+    landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["gazetteer"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "parquet"
+    basis_note: |
+      recorded_bytes: 551505467
+      recorded_etag: 7dd2ebc15a7ac6361d2b6db609c7511c-9
+      License for theme: ODbL.
+      © OpenStreetMap contributors. Available under the Open Database License.
+      Global ML Building Footprints. Licensed by Microsoft under the Open Database License.
+      Google Open Buildings. Available under CC BY 4.0.
+      USGS 3D Elevation Program Digital Elevation Program.
+      Qian Shi, et al. A First High-quality Vector Data of Buildings in East Asian Countries Based on a Comprehensive Large-scale Mapping Framework. Zenodo, 22 July 2023, doi:10.5281/zenodo.8174931. Available under CC BY 4.0.
+      Work derived from BTN 2024 ign.es. Available under CC BY 4.0.
+  - key: "bldg_ovt/part-00385"
+    source_id: "bldg_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture Buildings, release 2026-10-21.0, part 00385"
+    publisher: "Overture Maps Foundation"
+    licence_id: "ODbL-1.0"
+    licence_basis: "dataset"
+    licence_url: "https://opendatacommons.org/licenses/odbl/"
+    decision_record: ""
+    fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
+    url: "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/release/2026-10-21.0/theme=buildings/type=building/part-00385-82be6408-14fb-51c1-89b0-93ae23c9516a-c000.zstd.parquet"
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-15"
+    landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["gazetteer"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "parquet"
+    basis_note: |
+      recorded_bytes: 523449656
+      recorded_etag: 24a71db386ba211e214ca287843efafd-8
+      License for theme: ODbL.
+      © OpenStreetMap contributors. Available under the Open Database License.
+      Global ML Building Footprints. Licensed by Microsoft under the Open Database License.
+      Google Open Buildings. Available under CC BY 4.0.
+      USGS 3D Elevation Program Digital Elevation Program.
+      Qian Shi, et al. A First High-quality Vector Data of Buildings in East Asian Countries Based on a Comprehensive Large-scale Mapping Framework. Zenodo, 22 July 2023, doi:10.5281/zenodo.8174931. Available under CC BY 4.0.
+      Work derived from BTN 2024 ign.es. Available under CC BY 4.0.

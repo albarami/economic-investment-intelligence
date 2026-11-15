@@ -36,6 +36,7 @@ from eii_custodian.publicdata.fetch.report import (
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
 from eii_custodian.publicdata.fetch.transport import Transport
 from eii_custodian.publicdata.investment_build import publish_investment
+from eii_custodian.publicdata.places.fetch import fetch_place_file, is_place_file
 from eii_custodian.publicdata.places_fsq.fetch import fetch_release, is_release_entry
 from eii_custodian.publicdata.stage import run_stage
 
@@ -226,6 +227,32 @@ def run_build(
             assert released is not None
             lines.append(pass_line(entry.key, released.digest, released.host))
             continue
+        if is_place_file(entry):
+            placed, place_failure = fetch_place_file(
+                entry, transport, cache, clock, sleep
+            )
+            if place_failure is not None:
+                lines.append(
+                    fail_line(
+                        entry.key,
+                        place_failure.url,
+                        place_failure.check,
+                        place_failure.expected,
+                        place_failure.observed,
+                    )
+                )
+                failure = FetchFailure(
+                    place_failure.code,
+                    entry.source_id,
+                    place_failure.url,
+                    place_failure.check,
+                    place_failure.expected,
+                    place_failure.observed,
+                )
+                break
+            assert placed is not None
+            lines.append(pass_line(entry.key, placed.digest, placed.host))
+            continue
         fetched, result = _fetch_row(entry, transport, cache, clock, sleep)
         if result is not None:
             lines.append(
@@ -271,6 +298,13 @@ def run_build(
         if counted.is_file():
             lines.append(counted.read_text(encoding="utf-8").strip())
     if failure is None:
+        from eii_custodian.publicdata.places.integrate import (
+            areas_before_stage,
+            frame_when_ready,
+        )
+
+        areas_before_stage(cache, lines)
+        frame_when_ready(cache, entries, lines)
         failure = run_stage(cache, build_entries=entries, build_lines=lines).failure
         stage = run_stage(cache)
         for figure_id in stage.missing:

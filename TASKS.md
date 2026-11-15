@@ -373,7 +373,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: place and place-verification builders, four review files, recorded flagship data check and decision fixture.
 - Depends: S2-T01, S2-T02.
 - Requirements: PUB-47, PUB-49, PUB-50, PUB-57, PUB-78, PUB-91, PUB-92, PUB-93.
-- Delivery: hard; personas Data; status queued.
+- Delivery: hard; personas Data; status part A in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/62). All eight criteria stay unticked: the live steps (real fetches with receipts, the reviewed attribution and category rows, the real places build, the reviewed keys of the eighth criterion, the real area-producer run, the hand checks and the recorded check on the real candidates) are part B, owed before task S2-T08 and before any criterion is ticked (open items of this pull request).
 ### S2-T07 — Calculation layer and method regressions
 - Goal: Implement deterministic Public calculations in `eii_core.calc` with method-card regression tests.
 - Acceptance criteria: [x] no calculation reads files or databases; [ ] each implemented worked example has arithmetic and data tests; [x] comparisons return facts rather than prose.

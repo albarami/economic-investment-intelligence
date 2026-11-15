@@ -9,6 +9,7 @@ from eii_custodian.publicdata.frame.gazetteer import (
     reviewed_points,
 )
 from eii_custodian.publicdata.frame.grid import build_grid, ownership_index
+from eii_custodian.publicdata.frame.live import resolve_reviewed_specs
 
 
 def test_administrative_names_and_interior_points():
@@ -48,6 +49,57 @@ def test_showcases_and_candidates_resolve_from_source_points():
     del points[("places_ovt", "SYN-R-10")]
     with pytest.raises(FrameError, match="source point"):
         reviewed_points(specs, points, grid)
+
+
+def test_null_source_stays_pending_and_a_filled_source_resolves():
+    grid = build_grid(*invented_frame(), set())
+    import h3
+
+    lat, lon = h3.cell_to_latlng(h3.int_to_str(grid[0]["cell"]))
+    report: list[str] = []
+    assert (
+        resolve_reviewed_specs(
+            [{"place_key": "SYN-pending", "source_id": None, "record_key": None}],
+            {},
+            grid,
+            report,
+        )
+        == []
+    )
+    assert report == ["gazetteer: source point pending S2-T06: SYN-pending"]
+    filled: list[str] = []
+    resolved = resolve_reviewed_specs(
+        [
+            {
+                "place_key": "SYN-P",
+                "kind": "landmark",
+                "name_en": "SYN Invented",
+                "name_ar": "اسم تجريبي",
+                "aliases": None,
+                "source_id": "places_ovt",
+                "record_key": "SYN-R",
+                "arabic_review": "pending native review",
+            }
+        ],
+        {("places_ovt", "SYN-R"): {"lon": lon, "lat": lat}},
+        grid,
+        filled,
+    )
+    assert filled == []
+    assert resolved[0]["source_id"] == "places_ovt"
+    assert resolved[0]["place_key"] == "SYN-P"
+    assert resolved[0]["name_en"] == "SYN Invented"
+    pending: list[str] = []
+    assert (
+        resolve_reviewed_specs(
+            [{"place_key": "SYN-EMPTY", "source_id": "", "record_key": "SYN-R"}],
+            {},
+            grid,
+            pending,
+        )
+        == []
+    )
+    assert pending == ["gazetteer: source point pending S2-T06: SYN-EMPTY"]
 
 
 def test_gazetteer_guard_violations():

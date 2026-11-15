@@ -27,6 +27,7 @@ class Response:
     final_url: str
     body: bytes
     hops: tuple[str, ...]
+    etag: str | None = None
 
 
 class TransportFault(Exception):
@@ -68,10 +69,11 @@ def open_https(url: str) -> Response:
         with opener.open(request, timeout=HTTP_TIMEOUT_S) as response:
             body = response.read()
             final = str(response.geturl())
+            etag = response.headers.get("ETag")
     except TransportFault:
         raise
     except urllib.error.HTTPError as exc:
         raise TransportFault("http", url) from exc
     except urllib.error.URLError as exc:
         raise TransportFault("unreachable", url) from exc
-    return Response(final_url=final, body=body, hops=tuple(hops))
+    return Response(final_url=final, body=body, hops=tuple(hops), etag=etag)

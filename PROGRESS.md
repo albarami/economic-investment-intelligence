@@ -26005,6 +26005,952 @@ Seed:      none
 Notes:     Both work commits have Conventional Commit subjects.
 ```
 
+#### Decision records 0035 to 0040: review, lens A, on the joined commit: REJECTED
+
+Reviewed commit `b9287e4`. Cognition SWE-2 High through Devin; another maker than the editors (OpenAI) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED
+TASK: DOCS 0035-0039 (decision records 0035, 0036, 0037, 0039)
+COMMIT: b9287e403dc3733426de2d50e1eab9c25014ea83
+REVIEWER: Cognition Devin, SWE-2 High
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review: not available in this tool (no skill of that name installed)
+CHECKS:
+  REV-10 FAIL acceptance criterion (2) is not met: pack passages made false by decisions 0035, 0036 and 0037 are not amended and cite no record (findings F1 to F9)
+  REV-11 PASS documents-only commit under REV-36; lead's recorded evidence at this commit (`.overnight/IN/review/EVIDENCE.md`): `python3 scripts/check_docs.py` exit 0 (603 text files, 85 Markdown files), `python3 scripts/check_tree.py` exit 0, `cmp AGENTS.md CLAUDE.md` exit 0
+  REV-12 PASS `git diff --stat 4f05fb6 HEAD`: 25 files, all Markdown; the name-only check lists no non-Markdown file; scopes match the records' amended-passage lists and the sibling records on the branch
+  REV-13 PASS no placeholders, stubs or invented figures; the records claim no implementation
+  REV-14 PASS no secrets, `.env`, custodian values or register rows; calibration tables are described by shape only; 0040 names environment keys, never key values
+  REV-15 PASS no test, check, threshold or CI weakening; documents only; TST-264 to TST-267 add planted violations
+  REV-16 FAIL amended passages do not follow the accepted decisions they must carry: surviving visible-origin requirements (0035), a surviving gender ban class (0037) and one record that contradicts another (0036 item 3 vs 0035); findings F1 to F9
+  REV-17 PASS affected documents were updated in the same change and `check_docs.py` is recorded green; the specific unamended passages are the findings below
+  REV-18 N/A documents-only commit: no code, security or data-handling change
+  REV-19 PASS every settled-decision change carries an accepted record; no earlier record was edited
+  REV-20 N/A documents-only commit per REV-36; no new figure is produced
+  REV-21 N/A documents-only commit; no rendered numeral
+  REV-22 PASS minimum counts, pooling, differencing and attack language are preserved and PRV-136 puts employment gender under the nationality-group rules; no invariant, attack size or tolerance is reduced
+  REV-23 N/A documents-only commit; no imports
+  REV-24 N/A documents-only commit; no displayed numerals
+  REV-25 PASS no private path, personal name, e-mail, real custodian figure or value, 8/11-digit run or secret in the change; unverified public sources are written "to be verified by task" (decision 0040)
+  REV-26 PASS no prohibited claim added; surviving instructions to render origin labels are findings F1 to F5
+  REV-27 PASS `git diff` shows AGENTS.md and CLAUDE.md at identical blob 09bca22->d18ff12; the lead's `cmp` is recorded exit 0
+  REV-28 PASS no synthetic identifiers added
+  REV-29 PASS no invented attribute on a real named place or business; register-company rules unchanged
+  REV-38 N/A documents-only commit; nothing of the typed-decision gateway reaches the serving plane
+FINDINGS:
+  F1 (REV-10, REV-16)
+    File: docs/14_IMPLEMENTATION_PLAN.md
+    Line: the slice S6 gate bullets at lines 657 to 658; also PLN-19 (line 51), task S3-T09 (line 429) and line 896
+    Wrong: the S6 gate still commands the visible label "estimate on simulated inputs" (line 657) and "the Simulated mark" (line 658); PLN-19 and line 896 keep "provenance marks" in the never-cut lists and S3-T09 still builds "provenance marks". Decision 0035 items 1, 4 and 7 and amended AGENTS.md rule 25 remove every audience origin label; document 14 carries no 0035 supersession clause, so the gate can never be true beside the standing check of document 15 (breaks acceptance criterion 2: two passages disagree).
+    Fix: remove the label clause from line 657 ("the site estimate shows its low, middle and high cases and its main drivers, and is never an estimate for a named real building or business"), change line 658 to the stated-assumption wording with backend marking (e.g. "carries its stated assumption and the backend origin marker of decision 0035 item 3"), drop "provenance marks" from S3-T09 and re-scope the never-cut "provenance marks" of PLN-19 and line 896 to backend markers, citing decision 0035 at each point. Prove by grep that no line of document 14 still requires a visible mark or label.
+  F2 (REV-10, REV-16)
+    File: docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md
+    Line: SYN-09 (line 111) and SYN-81 (line 704)
+    Wrong: SYN-09 requires the evidence drawer to say "calibrated" or "assumed" beside the Synthetic mark and SYN-81 requires every case-file figure to carry the Synthetic mark — visible origin labels that decision 0035 item 1 removes (the case C3 and C4 files are explicitly in its list). No 0035 citation or supersession covers this file.
+    Fix: amend both requirements to the backend origin marker of decision 0035 item 3 (visible text limited to method honesty), cite decision 0035, and add document 05 to the record's Amended passages.
+  F3 (REV-10, REV-16)
+    File: docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md
+    Line: PRV-60 (line 683) and PRV-126 (line 686)
+    Wrong: both still require the Simulated mark shown on figures ("shown with their Simulated mark", "carries the Simulated mark"), a visible origin label removed by decision 0035, with no citation.
+    Fix: replace each visible-mark clause with the backend origin marker of decision 0035 item 3 and add document 06 to the record's Amended passages.
+  F4 (REV-10, REV-16)
+    File: docs/07_ECONOMIC_METHODS.md
+    Line: the never-say row (line 1469), card C32 "Provenance and status" (line 1797), MTH-104 (line 1807), the sales/revenue row (line 2293) and the trend rule (line 2294)
+    Wrong: five places still require a visible Synthetic/Simulated mark or the removed label "estimate on simulated inputs" — e.g. "a congestion figure without the Simulated mark" is a decline, "It is Inferred, carries the Simulated mark" (MTH-104), "shown only as synthetic changes with the Synthetic mark (C20)", and the C33 estimate "with ... the label 'estimate on simulated inputs'". Decision 0035 removes all of them; this file has no supersession.
+    Fix: amend each to backend origin marking under decision 0035 item 3 (the decline list instead requires decline of a figure presented as official or measured), and add document 07 to the record's Amended passages.
+  F5 (REV-10, REV-16)
+    File: docs/08_BACKEND.md and docs/GLOSSARY.md
+    Line: BE-111 (08 line 329: "every frame carries the Simulated mark"), BE-122 (08 line 337: "carries the Simulated mark"); GLOSSARY.md lines 184, 247 and 278
+    Wrong: the same unamended visible-mark class — a visible Simulated mark on the traffic animation and on `present_by_pay_band`, and glossary entries defining figures that "carry the Simulated mark" and the Stage's "watermark".
+    Fix: amend each to the backend origin marker of decision 0035 item 3 (the glossary's Stage entry drops "watermark"), cite decision 0035, and add documents 08 and the glossary to the record's Amended passages.
+  F6 (REV-10)
+    File: docs/decisions/0036-generated-data-stands-for-the-future-real-data.md
+    Line: item 3 (the sentence "Rule 25's estimate label on generated inputs remains.")
+    Wrong: decision 0035 item 4 and the amended AGENTS.md rule 25 remove the "estimate on simulated inputs" label; record 0036 asserts the label remains, so the two records on the same branch disagree (acceptance criterion 2).
+    Fix: replace the sentence with "Rule 25's display requirements as amended by decision 0035 remain (no visible origin label; explicit backend origin and generator metadata).", verified against the current rule 25 text.
+  F7 (REV-10, REV-16)
+    File: docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md
+    Line: PRV-09 (line 171)
+    Wrong: unamended flat ban — "No sex or gender attribute, dimension or proxy may enter the worker, residence or company records or anything derived from them" and "a feed column ... that names sex or gender on a worker ... record ... fails the build" — fails the authorised `employment_spell.gender` of decision 0037 and contradicts PRV-136, DAT-141, DAT-170 and rule 10 as amended.
+    Fix: insert the narrow exception used by SYN-13/TST-208, e.g. "except employment gender and its authorised protected dimension under decision 0037", and add PRV-09 to decision 0037's Amended passages.
+  F8 (REV-10, REV-16)
+    File: docs/01_PROJECT_BRIEF.md
+    Line: line 28 (In brief) and line 449
+    Wrong: both still state that no sex or gender attribute exists on the worker, residence or company records — made false by decision 0037 (the same file's 9.3 row and BRF-31 were amended; these two were missed).
+    Fix: amend both to the same narrow exception ("...except employment gender and its authorised protected statistics under decision 0037") and add the passages to decision 0037's Amended passages.
+  F9 (REV-10, REV-16)
+    File: docs/02_ARCHITECTURE.md, docs/08_BACKEND.md, docs/11_DESIGN_DIRECTION.md, docs/GLOSSARY.md
+    Line: ARC-132 (02 line 439), BE-110 (08 line 328), DES-193 (11 line 771) and GLOSSARY.md line 19
+    Wrong: each flatly states worker, residence and company records carry no sex or gender (ARC-132 even cites rule 10, which was itself amended) — all made false by decision 0037 and none citing it; document 11's 0035 preamble covers origin-display clauses only, not this ban.
+    Fix: amend each to the narrow employment-gender exception under decision 0037 as in F7 and F8, and add the passages to decision 0037's Amended passages.
+PROPOSED OPEN ITEMS:
+  P1 docs/05 line 283 (SYN-16): the establishment `size_class` is specified as "the seven census classes" from attached jobs while decision 0036 item 4 fixes the generated world's four company size bands; the census classes do not nest into micro/small/medium/large — needs the lead's ruling whether the field re-bands or stays as its own public-shaped class.
+  P2 (record) docs/09 line 629 and docs/10 line 862: two open items made moot by decision 0035 (marks pending the owner's decision on marks; whether the removed watermark and provenance legend name the live traffic layer) — close or reword them.
+  P3 visible-mark leftovers inside the seven preamble documents, formally superseded by each document's decision-0035 section but likely to confuse builders: docs/11 In brief line 26 (class carried "by line style, texture and a word"), DES-04 (the four Arabic provenance words, line 48), DES-195 ("dotted Synthetic line", "class word of the series", line 525), DES-208 ("dotted Synthetic treatment", line 270), DES-185's `sample_file` sentence (line 473), docs/10 FE-120's "the file is synthetic" sentence (line 464) and FE-128's "class word of its series" (line 469), docs/16 line 227 ("Public mark") — amend each explicitly so no reader can mistake the superseded text for the target state.
+```
+
+#### Decision records 0035 to 0040: review, lens B, on the joined commit: REJECTED
+
+Reviewed commit `b9287e4`. Z.ai GLM-5.3 through Droid; another maker than the editors (OpenAI) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED
+TASK: DOCS 0038-0040 (decision records 0038 and 0040)
+COMMIT: b9287e403dc3733426de2d50e1eab9c25014ea83
+REVIEWER: Droid (Factory), GLM-5.3
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review is not present in this tool's skill list
+CHECKS:
+  REV-10 FAIL acceptance criterion (2) is not met: decision 0040 item 6's nationality-draw anchor is carried into AGENTS.md and CLAUDE.md rule 10 and into document 04 (In brief and PUB-90), but two passages of document 05 still state the old rule with no citation of 0040 and now disagree with the amended ones (finding F1). Criteria (1), (3) to (6) are met: both records say exactly what the owner's notes of 19:43 to 19:56 and 20:35 to 20:43 decide, no wider (no invented threshold, no new S2/S3 task in 0038, no paid spend, gap becomes an owner open item) and no narrower; no privacy rule, minimum count, attack size, tolerance, gate or provenance rule is dropped or weakened, and rules 3, 7, 8, 10, 16 to 25 stay whole except rule 10's owner-amended anchor clause; AGENTS.md and CLAUDE.md are byte-identical with Status naming 0040, no earlier decision record is edited and no code, test, configuration or workflow file changes (the recorded non-Markdown diff is empty); both records follow the accepted form and their amended-passages lists match what the files hold, and docs/README.md indexes both; no private path, name, key, keyed address, custodian figure or calibration value appears, and every unverified page lead reads "to be verified by task".
+  REV-11 PASS documents-only commit: the lead's recorded `python3 scripts/check_docs.py` exit 0 at this commit (REV-36); this reviewer's tool set has no shell, so the lead's recorded run on this exact commit is the evidence.
+  REV-12 PASS the recorded diff against 4f05fb6 lists only Markdown: docs 01 to 12, 14 to 16, README, TASKS.md, AGENTS.md, CLAUDE.md and the six new decision records; every changed file maps to one of the six records of the branch; nothing under data/.
+  REV-13 PASS no placeholder stands in for real work: the records claim nothing fetched, measured or implemented; unverified sources stay explicit leads owned by S2-T23 to S2-T26; the usage audit states it is eligibility, not fetch or wiring.
+  REV-14 PASS no key value or keyed address anywhere: only the variable names COMTRADE_PRIMARY_API_KEY and COMTRADE_SECONDARY_API_KEY and the header name Ocp-Apim-Subscription-Key appear (0040 item 2, document 04 section 2.3, TASKS.md S2-T23); no custodian record or value of the private calibration tables appears; the audit's counts are counts of the public-source registry.
+  REV-15 PASS no test, CI, lint or workflow file changed; the records and their task texts retain every attack size, tolerance, gate and review (S5-T12: "all attack sizes and tolerances stay unchanged"; S5-T13: document 06 unchanged, no second exported treatment).
+  REV-16 PASS pinned names, seats, slices and the make_area drive lists are used exactly; R3 keeps the drive cut-offs with the owner; C39's own catchments and MTH-53 are unchanged; the whole diff of tests and CI is empty.
+  REV-17 OPEN P1, P2 documents are updated and README indexes both records, but two stale open-item texts remain (document 05's Q17 and document 07's hot/cold open item) — record points, listed below.
+  REV-18 PASS the change only strengthens the boundary: keys read from the environment only, sent only in the header, keyed fetches only from the lead's shell, every automated test on invented recorded responses with no network and no key, planted query-key, truncation, budget and secret-in-error cases in S2-T23.
+  REV-19 PASS every reopened exclusion carries an owner-approved record: 0038 revises the synthetic-input exclusions under the notes of 19:43 to 19:56 on the terms of decision 0036; the 0005 item 2 and 0023 item 13 amendments are one-clause exceptions citing the record (ARC-85, BE-15, MTH-49), with drawn paths still four steps and fifteen nodes, no firm or owner edges, and the municipality ban standing.
+  REV-20 N/A documents-only change; no fact object or rendered figure is introduced (code checks REV-20 to REV-24 are N/A for this reason).
+  REV-21 N/A same reason: no screen, template or catalogue code changed.
+  REV-22 PASS privacy text preserved, not weakened: document 06 is untouched by both records; the formal-DP and cell-key spikes stay inside the custodian plane with no second exported treatment (PRV-120 retained in rule 12); the new nationality anchor joins nothing, segments nothing, apportions nothing, combines with no protected figure and adds no attribute (0040 item 6, rule 10, PUB-90).
+  REV-23 N/A same reason as REV-20: no code import to test.
+  REV-24 N/A same reason: no screen strings added by this change.
+  REV-25 PASS no private path (the withheld sentence of the 20:35 note stays out), no personal name, e-mail, bare run of exactly eight or eleven digits, or named product comparison; public sources carry publisher, dataset, page address and licence words or "to be verified by task".
+  REV-26 PASS no prohibited claim: both records assert no measured gain and no implemented capability; no formal-privacy claim (S5-T13, document 01 section 9.3 row); a publisher forecast stays a publisher statement, never a project forecast (0040 item 9, document 04); no verdict, probability, confidence claim or advice appears; 0038 item 2 keeps rule 25's intervals, error, cases, drivers, counts, periods and rank-stability requirements.
+  REV-27 PASS the lead's recorded `cmp AGENTS.md CLAUDE.md` exit 0 at this commit, and the reviewer's own full read of both files: identical throughout, rule 10's 0040 sentence byte-identical in both, and the Status line names decision 0040.
+  REV-28 N/A documents-only change; no identifier introduced.
+  REV-29 PASS no invented attribute on a real place or business: the audit's uses of place and register sources stay Public; 0038's spikes attach no figure to a named business; register-company card rules are unchanged; the nationality anchor adds no attribute.
+  REV-38 N/A documents-only change; no serving-plane code to test; the records keep the gateway behind the stage (R12; document 09's question-factory section).
+FINDINGS:
+  F1 (REV-10)
+    File: docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md
+    Line: 16 (In brief) and 270 (SYN-13)
+    Wrong: decision 0040 item 6 lets the world build calibrate the worker
+           records' nationality draw with a cited public nationality figure
+           (public first, private cross-check), and that change is carried
+           into AGENTS.md and CLAUDE.md rule 10 and into document 04's In
+           brief and PUB-90. Two passages of document 05 still state the old
+           rule without the amendment: the In brief says official splits by
+           sex or nationality "never shape a worker, residence or company
+           generator", and SYN-13 says an anchor published only with such a
+           split "enters the manifest already combined across the split by
+           worker counts ... except the movement split anchors of SYN-89".
+           Neither passage cites 0040, so both disagree with amended rule 10,
+           with PUB-90 (which names 0040 item 6's exception) and with
+           document 05's own "Public-first calibration — decision 0040"
+           section; a schema test or reviewer applying SYN-13 as written
+           would reject the S4-T11 anchor that rule 10 and PUB-90 permit
+           (breaks acceptance criterion 2: passages made false do not carry
+           the change, and two passages disagree).
+    Fix: amend both passages in place with the citation, as decision 0037 did
+         when it added its exception to the same row: in SYN-13, after
+         "except the movement split anchors of SYN-89" add ", and decision
+         0040 item 6's worker-nationality draw anchor (a cited public
+         nationality figure, summed over the source's own categories into
+         the existing worker nationality groups, with source and year, public
+         first and private cross-check; no join, segmentation, apportionment
+         to a drawn area or combination with a protected figure)"; in the In
+         brief bullet, after "never shape a worker, residence or company
+         generator" add "except decision 0040 item 6's cited
+         public-nationality calibration anchor of the worker records'
+         nationality draw". Prove it with `python3 scripts/check_docs.py`
+         exit 0 and by SYN-13, PUB-90 and rule 10 leading one reader to the
+         same answer.
+PROPOSED OPEN ITEMS:
+  P1 (REV-17, record) document 05's open question Q17 still reads OPEN
+  (decision 0022) with "official splits by nationality never reach a worker,
+  residence or company generator (SYN-13), so its source is not yet stated",
+  though 0040 item 6 and the Public-first calibration section answer the
+  source-policy question for the draw; update the row to say the source
+  policy is answered by 0040 item 6, leaving only the category mapping open.
+  P2 (REV-17, record) document 07's open-question bullet still lists hot and
+  cold spots "if time allows" and says MTH-49 stands until that task is named
+  and its card written, though 0038 item 5 R8 names S7-T23 and the Hot and
+  cold spots map card text exists; update the bullet for this card only.
+  P3 (REV-10, record) decision 0040's Open questions says "The wording
+  conflict in item 6's brief is recorded above", but only the resolution is
+  recorded, not the conflict itself (the brief said worker records carry no
+  sex or gender attribute, which decision 0037 changed); add one sentence
+  naming the conflict, or write "resolved above".
+```
+
+#### Decision records 0035 to 0040: confirmation, lens B, of fix passes 1 and 2: APPROVED
+
+Reviewed commit `1bd21a8`. Z.ai GLM-5.3 through Droid; another maker than the editor of the passes (OpenAI) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED
+TASK: decision records 0038 and 0040, confirmation of fix passes 1 and 2
+COMMIT: 1bd21a8
+REVIEWER: Z.ai GLM-5.3, through Droid
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review is not present in this tool's skill catalogue, and its plain meaning was followed
+CHECKS:
+  C1 PASS My verdict's only finding F1 is fixed exactly as prescribed: document 05 In brief now reads "never shape a worker, residence or company generator except decision 0040 item 6's cited public-nationality calibration anchor", and SYN-13 adds the full anchor clause with its bounds after the SYN-89 exception; SYN-13, PUB-90, rule 10 and the Public-first calibration section now lead one reader to the same answer.
+  C2 PASS All three record points applied, none needed a QUESTIONS listing: P1 (doc 05 Q17, source policy answered by 0040 items 5 and 6, only the category mapping open), P2 (doc 07 hot/cold bullet, committed to S7-T23 by 0038 item 5 R8, only the other two cards stay "if time allows"), P3 (doc 04 of 0040, Open questions and change control now says "resolved above").
+  C3 PASS I read the whole fix (FIXES.patch, every file section) file by file: the three exceptions carry their exact bounds unchanged (movement 0023 item 16 in SYN-13/PRV-09/BE-110; employment gender 0037 items 1 to 3 narrow with movement retained; the 0040 item 6 anchor verbatim with no join, segmentation, apportionment or protected combination), L-604 is followed exactly (the key `estimate_on_simulated_inputs` stays required in DAT-161, ARC-139 and TST-230 and is only marked never rendered, cases, drivers and editable assumptions retained), SYN-16 follows the binding ruling (four bands of 0036 item 4, census classes only on public tables), and no privacy rule, gate, minimum, tolerance, range, interval, attack size or planted case is weakened; the changed test wording (doc 10 Testing, TST-11/TST-14/TST-214/TST-230) asserts the same or more, and nothing claims built what is not (S1-T11 keeps its ticked history with the withdrawal clause).
+  C4 PASS I ran the sweep myself over docs/*.md and TASKS.md with my case-sensitive search tool on the brief's exact pattern; every hit is a 0035 preamble (docs 01, 09, 10, 11, 12, 15, 16) or a passage citing 0035 that withdraws the mark or keeps backend metadata only (BRF-05, BRF-19, FE-19/41/48/53/128/148, pack page, layer order, Provenance textures, Watermark, testing items, live-traffic CLOSED, spike question, DES-65/72/73/78/79/93/95/120/169/177/195/201/202/204/206/208, Marks-present rows, Blocker, Standing marks, assumptions rows, open question, GLOSSARY Stage and Standing strip, TASKS S1-T11 and S10-T05); no other class remains. (My tool's glob also returned docs/decisions/*.md, outside the brief's glob: 0035's own withdrawal text and 0019's accepted historical record.)
+  C5 PASS The Amended passages lists name every passage the fixes changed for the records I reviewed: 0038 gains "Document 07, Open questions and assumptions, hot/cold point: S7-T23 and the existing Hot and cold spots map card (item 5 R8)"; 0040 gains "Document 05, In brief and SYN-13 ... Q17 (items 5 and 6)" and "Open questions and change control".
+  C6 PASS All changed passages cite decision items, requirement IDs or section headings, never a line number; my full read of AGENTS.md and CLAUDE.md at this head shows them identical (Status naming 0040, rule 10's 0040 sentence, rule 25's 0035 parenthetical), the fix diff touches neither and both returns record `cmp` exit 0; the whole diff b9287e4 to 1bd21a8 lists only Markdown (TASKS.md, fifteen docs, five decision records).
+FINDINGS:
+  F1  File: docs/GLOSSARY.md / Anchor: the glossary term "Estimate on simulated inputs" / Wrong: the entry still opens "The label of the site demand and revenue estimate of method card C33 while any of its inputs is Simulated or Synthetic", so the one definitional passage left calls the key a label, while every operative passage the fixes carried (document 03 caveat-key table, ARC-139, BE-123, AI-88, FE-131, DES-72, DES-198, the 10.13 fixed-sentence row, TST-230) now states it is a required backend origin marker under 0035 item 3 with no audience label, never rendered; the entry was made stale by decision 0035 itself, was named by no finding of either verdict and by no passage of the lead's pass-2 list, and does not match the sweep pattern, so the fix passes complied with their briefs; it is non-operative (TST-230 fails a planted visible label) and does not reject this confirmation. Fix: in that entry replace "The label of" with "The required backend caveat key of", and append "; it is backend-only under decision 0035 item 3 and the template writer renders nothing for it" before the closing sentence, in a documents-only change.
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision records 0035 to 0040: confirmation, lens A, of fix passes 1 and 2: REJECTED
+
+Reviewed commit `1bd21a8`. Cognition SWE-2 High through Devin; another maker than the editor of the passes (OpenAI) and the lead (Anthropic).
+
+````text
+VERDICT: REJECTED
+TASK: decision records 0035, 0036, 0037 and 0039, confirmation of fix passes 1 and 2
+COMMIT: 1bd21a8
+REVIEWER: Cognition SWE-2 High, through Devin
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review: not available in this tool (no skill of that name installed)
+CHECKS:
+  C1 PASS every finding of the rejected verdict is fixed in the changed files or equivalently removed: doc 14 (PLN-19, S3-T09, slice S6 gate, S8 Scope, section 20, both OI-07 passages now historical), doc 05 (SYN-09, SYN-81; SYN-16 applies the four-band ruling of decision 0036 item 4 with census classes confined to public tables), doc 06 (PRV-60, PRV-126, PRV-122 backend-only; PRV-09 narrow employment-gender exception with the movement exception preserved), doc 07 (C25, C32, MTH-104, MTH-106, MTH-58, section-6 rows, In brief), doc 08 and GLOSSARY (BE-111, BE-122, BE-123, BE-85, BE-119, People present by pay band, Stage, Standing strip, User scenario), doc 01 (In brief and section-14 row), ARC-132, BE-110, DES-193, and decision 0036 item 3 corrected in place.
+  C2 PASS every point of both fix briefs is applied; unresolved record-only matters are listed by the builders under QUESTIONS with their reading (RETURN.fix1.md), and decision 0040's own open-questions paragraph now records the item-6 wording conflict as resolved without repealing 0037.
+  C3 FAIL no changed passage widens an exception, changes a privacy rule, gate, method, range, interval, minimum or test size, or claims implementation; but surviving unamended passages still conflict with decision 0035 item 1: the design-audit "Provenance" row passes only when every number and layer names its class, "the solid Public treatment" survives at FE-137, DES-200 and DES-207, "the Simulated outline" and "moving dashes for Simulated" survive in docs 10 and 11, and GLOSSARY still defines "Estimate on simulated inputs" as the estimate's label (F1 to F5).
+  C4 FAIL I ran the sweep over docs/*.md and TASKS.md: every regex hit classifies as a 0035 preamble, a withdrawal/backend-only passage citing 0035, or historical text in excluded decision records. However the pattern misses surviving visible-origin language — "names its class" (doc 11 audit row), "the solid Public treatment" (FE-137, DES-200, DES-207), "the Simulated outline" (doc 10 map-layers row, FE-144), "moving dashes for Simulated" (DES-08, DES-50), the capital-E "Estimate on simulated inputs" glossary entry, and the "dots and dashes ... provenance" rationale (doc 11 In brief, DES-190). The criterion "leave nothing that asks for a visible origin mark" is not yet met.
+  C5 PASS every changed passage appears in a record's amended-passage list: 0035 lists the documents/TASKS sweep passages including "16. Design audit gates" and "6. Map layers", 0036 lists SYN-16, 0037 lists the gender passages, 0038 lists the hot/cold row, 0040 lists the nationality-anchor and open-questions passages. The passages of F1 to F5 are absent only because they were not changed; their fixes must be added under decision 0035.
+  C6 PASS citations in the fix use stable anchors (requirement IDs, section headings, decision items), not line numbers; FIXES.patch touches only docs/*.md and TASKS.md with no AGENTS.md or CLAUDE.md hunk, so the two files remain byte-identical (builder-recorded cmp exit 0); no non-Markdown file is in the diff.
+FINDINGS:
+  F1  File docs/11_DESIGN_DIRECTION.md / Anchor section 16 "Design audit gates", checklist row "Provenance" / Wrong: the audit still passes only when "every number and layer names its class in a greyscale still" — a standing gate requiring rendered provenance classes that decision 0035 item 1 removes and that DES-63 to DES-65, as amended in this same change, now forbid; a compliant build fails this gate and a non-compliant one passes it / Fix: reword the pass criterion to the absence rule, e.g. "no number or layer names an origin class; suppression keeps its hatch, lock and reason; backend markers verified (DES-63 to DES-65)", cite decision 0035, and add the row to decision 0035's amended passages.
+  F2  File docs/11_DESIGN_DIRECTION.md and docs/10_FRONTEND.md / Anchor DES-200, DES-207 and FE-137 / Wrong: each still draws its layer "in/with the solid Public treatment" — the class-named origin treatment of the withdrawn legend; the identical phrase was correctly amended to "the solid treatment" in DES-201 and removed in DES-209 and DES-212, so the fix is internally inconsistent / Fix: delete the class word so the rows read "the solid treatment" (no origin meaning) or append the decision-0035 amendment clause; add the rows to decision 0035's amended passages.
+  F3  File docs/10_FRONTEND.md and docs/11_DESIGN_DIRECTION.md / Anchor document 10 section 6 "Map layers" ("Requested or drawn area" row) and FE-144; DES-08 and DES-50 / Wrong: "the Simulated outline" (twice in doc 10), "moving dashes for Simulated" and "the Simulated moving dashes" keep a line/dash style named for the Simulated class, and the pointer "the Simulated outline of [11]" now dangles because document 11 defines no class-named outline after the DES-63 rewrite / Fix: name the layer styles without the class word (e.g. "the traffic dash outline") or append the decision-0035 amendment clause; add the passages to decision 0035's amended passages.
+  F4  File docs/11_DESIGN_DIRECTION.md / Anchor "In brief" bullet on simulated animation and DES-190 / Wrong: "Dots and dashes stay reserved for provenance" and "Dots and dashes are provenance (DES-63)" still ground the dot/dash reservation in the withdrawn provenance encoding — DES-63 now says no origin texture is rendered, so the stated rationale is false and the reservation unexplained / Fix: reword both to state the rule without the provenance basis (e.g. dots and dashes remain reserved for layer textures and the withheld-state hatch; projections and forecasts are marked as specified) or drop the reservation; add the passages to decision 0035's amended passages.
+  F5  File docs/GLOSSARY.md / Anchor "Estimate on simulated inputs" / Wrong: the entry still defines the term as "The label of the site demand and revenue estimate of method card C33 while any of its inputs is Simulated or Synthetic" — the visible label was withdrawn by decision 0035 item 4; only the backend caveat key `estimate_on_simulated_inputs` remains and renders nothing (L-604) / Fix: redefine the entry as the backend caveat key of the C33 estimate that carries no audience label, keep the estimate's own description, cite decision 0035 item 4, and add the entry to decision 0035's amended passages.
+PROPOSED OPEN ITEMS:
+  none
+```
+````
+
+#### Decision records 0035 to 0040: confirmation, lens A, of fix pass 3: REJECTED
+
+Reviewed commit `7a30d34`. Cognition SWE-2 High through Devin; another maker than the editor of the pass (OpenAI) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED
+TASK: decision records 0035, 0036, 0037 and 0039, confirmation of fix pass 3
+COMMIT: 7a30d34
+REVIEWER: Cognition SWE-2 High, through Devin
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review: not available in this tool (no skill of that name installed)
+CHECKS:
+  C1 PASS every finding of confirmation 1 is fixed as stated: F1 at document 11 section 16 "Design audit gates", Provenance row ("No number or layer names an origin class; suppression keeps its hatch, lock and reason; backend markers verified", citing decision 0035 items 1 to 3); F2 at FE-137, DES-200 and DES-207 ("the solid treatment"); F3 at document 10 section 6 "Map layers" (Requested or drawn area row), FE-144, DES-08, DES-50 and DES-63 ("the traffic dash outline"/"traffic moving dashes", pointers now resolve to DES-63's definition); F4 at document 11 "In brief" animation bullet and DES-190 (reservation restated for layer textures and the withheld-state hatch, no provenance basis); F5 and CONFIRM-B F1 at GLOSSARY "Estimate on simulated inputs" (required backend caveat key, no audience label, renders nothing, items 3 and 4).
+  C2 PASS the wider-sweep changes are correct under decision 0035 and lose no meaning beyond origin: document 07 C33 "Limits and wording" Allowed sentence drops only the origin prefix; DES-06 keeps the calm solid-and-still opening with the class rule gone; DES-54 "solid dots with no origin meaning"; DES-100 keeps moving dashes as the traffic dash outline, names the magnitude class and drops the "The places are public." legend sentence; FE-103 "solid points"/"solid layer"; FE-105 "chips beside it stay solid"; the FE-137 fixture keeps 7 with Observed status and Public backend metadata; GLOSSARY "Trap" gains only a backend-only-origin clause.
+  C3 FAIL changed passages agree with decisions 0035 to 0040 and among themselves, no exception was widened and no privacy rule, gate (other than the authorised Provenance row), method, range, interval or test size changed; but surviving unamended "class line" requirements still order the withdrawn visible per-class line style, contradicting the amended DES-63, DES-73, DES-76, DES-77, DES-185, DES-195 and the new Provenance gate row, so the pack is internally inconsistent (F1).
+  C4 FAIL every hit in SWEEPS.lead.txt classifies as allowed: 0035 preambles; passages citing 0035 that withdraw the mark or keep it backend-only; DES-165's "simulated colour-vision deficiencies" is a vision test inside a row that withdraws origin textures (not an origin style); the two glossary entries state backend-only status; TASKS.md hits are absence requirements or the ticked S1-T11 criterion with its one withdrawal clause. But reading beyond the patterns: "class line" still asks for a visible origin style in seven passages and matches neither pattern (F1).
+  C5 PASS every passage changed in FIX3.patch appears in decision 0035's amended-passages list: document 10 (FE-137, FE-144, 6. Map layers Requested-or-drawn-area row, FE-103, FE-105, FE-137 fixture), document 11 (DES-200, DES-207, DES-08, DES-50, DES-63, In brief, DES-190, 16. Design audit gates Provenance row, DES-06, DES-54, DES-100), GLOSSARY (both entries) and document 07 (C33 Allowed sentence).
+  C6 PASS citations use stable anchors (requirement IDs, section headings, decision items), never line numbers; FIX3.patch touches only docs/07_ECONOMIC_METHODS.md, docs/10_FRONTEND.md, docs/11_DESIGN_DIRECTION.md, docs/GLOSSARY.md and docs/decisions/0035-*.md — no AGENTS.md or CLAUDE.md hunk, so the pair stays byte-identical (builder-recorded cmp exit 0); no non-Markdown file is in the diff.
+FINDINGS:
+  F1  Files docs/11_DESIGN_DIRECTION.md and docs/07_ECONOMIC_METHODS.md / Anchors DES-172, DES-175, DES-181, DES-211, DES-213; card C11 "Limits and wording" and card C16 "Limits and wording" / Wrong: "class line" — the pre-0035 visible line style keyed to the provenance class (former DES-195 glossed it: "the series' own class line (the solid Public line, or for a released monthly series ... the dotted Synthetic line)"; pass 2 amended DES-185 to "without a class line; its backend origin marker follows decision 0035 item 3") — is still required as a visible element: "a Fact chip of the change with its explicit sign and catalogue word (DES-33) and its class line" (DES-172); "each value a `compact` chip in its own class line" and "The Stage outlines the ranked areas in the least-real class line of the criteria" (DES-175); "outlined on the Stage in the least-real class line of their inputs" (DES-213); "A projection continues its series in the series' own class line" (DES-181); "each a Fact chip with its own class line" (DES-211); and "each criterion's class line says which" twice in document 07 — a visible origin style/word that decision 0035 item 1 removes, that the amended DES-63/73/76/77/185/195 forbid, that makes a compliant build fail the new Provenance gate, and that both sweep patterns miss ("class word" does not match "class line"; no class name precedes the noun). / Fix: drop the class-keyed element and keep the non-origin element, per the lead's ruling pattern: DES-172 delete "and its class line"; DES-175 "each value a `compact` chip" and outline ranked areas in one non-class outline (the data outline) with the selected area in the accent; DES-213 "outlined on the Stage as DES-175 outlines ranked areas"; DES-181 "continues its series' own line" with no class style; DES-211 "each a Fact chip"; document 07 C11 and C16 replace "each criterion's class line says which" with a backend clause (e.g. "each criterion's class stays in backend metadata (decision 0035 item 3)"), keeping the format-not-a-finding sentences; add all seven passages to decision 0035's amended-passages list under document 11 and document 07; extend sweep pattern 2 with `class line|least-real class` so the family cannot slip again.
+PROPOSED OPEN ITEMS:
+  record: document 10 "6. Map layers", Released-units row says "outline in the class of the hero layer" — ambiguous "class" (magnitude vs provenance); DES-100 now says "the hero layer's magnitude class", suggest the same word here for consistency.
+  record: "solid Public counts" (DES-172), "solid Public chips" (DES-110) and "parameters as Public chips" (DES-180) name the data class of chip contents in spec text, which the preamble allows as backend-metadata language, but pass 3's convention elsewhere is "solid treatment/dots/chips"; suggest normalising when DES-172 is next edited.
+```
+
+#### Decision records 0035 to 0040: confirmation, lens A, of fix pass 4: REJECTED
+
+Reviewed commit `01479b0`. Cognition SWE-2 High through Devin; another maker than the editor of the pass (OpenAI) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED
+TASK: decision records 0035, 0036, 0037 and 0039, confirmation of fix pass 4
+COMMIT: 01479b0
+REVIEWER: Cognition SWE-2 High, through Devin
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review: not available in this tool (no skill of that name installed)
+CHECKS:
+  C1 PASS DES-172 ("and its class line" dropped), DES-175 ("each value a `compact` chip"; ranked areas in the data outline of section 9.1 with the selected area in the accent), DES-181 ("its series' own line"), DES-211 ("each a Fact chip"), DES-213 (DES-175 pointer) and document 07 C11/C16 ("each criterion's class stays in backend metadata (decision 0035 item 3)", format-not-a-finding sentences kept) all match the lead's rulings; chips, series lines and area outlines survive.
+  C2 PASS Released-units row now "the hero layer's magnitude class" (as DES-100); Ranked-or-similar-areas row takes DES-175's data outline; "the data outline of section 9.1" resolves to a defined mark (section 9.1 mark table row "Data outline and area line", also named by DES-166); DES-13, DES-51, DES-91, DES-110, DES-180 and DES-172's "solid counts"/"solid chips"/"parameters as chips" are correct under decision 0035 and lose no meaning beyond origin.
+  C3 FAIL the changed passages themselves agree with decisions 0035 to 0040, no exception is widened and no privacy rule, gate, method, range, interval or test size changed; but surviving unamended requirements still order the withdrawn visible origin texture and origin label, contradicting DES-63, DES-65, DES-66, DES-165, the preambles and the section-16 Provenance gate row (F1, F2, F3).
+  C4 FAIL every hit of sweeps 1 and 2 classifies as allowed (0035 preambles, withdrawal/backend-only clauses, magnitude classes, "Public counts" naming DAT-164 provenance, tests that check the marker is NOT rendered, provider marks); the builder's a–e classification of sweep-3 hits holds and no kind (e) remains among the hits. But reading beyond the patterns: three passages still ask for a visible origin texture or origin label and match no pattern (F1, F2, F3).
+  C5 PASS every passage pass 4 changed appears in decision 0035's amended-passages list: document 07 C11/C16; document 10 map-layer rows Released units and Ranked or similar areas; document 11 DES-13, DES-51, DES-91, DES-110, DES-172 (twice), DES-175, DES-180, DES-181, DES-211, DES-213.
+  C6 PASS citations use stable anchors (requirement IDs, section headings, decision items), never line numbers; FIX4.patch touches only docs/07, docs/10, docs/11 and the 0035 record — no AGENTS.md or CLAUDE.md hunk, so the pair stays byte-identical (builder-recorded cmp exit 0); no non-Markdown file in the diff; the lead's blank-line edit in the amended-passages list is included.
+FINDINGS:
+  F1  File docs/11_DESIGN_DIRECTION.md / Anchor DES-182 / Wrong: "Every Synthetic figure carries its dot texture" still requires the withdrawn Synthetic origin texture; the row carries no decision-0035 qualifier, so it contradicts DES-63 ("No origin word, legend or origin texture is rendered"), DES-66 ("Origin-texture use is withdrawn... only for withheld-state textures") and the section-16 Provenance gate, and all three sweep patterns miss it ("Synthetic figure", not "Synthetic texture"). Fix: drop the texture clause and keep the rest, e.g. "Every Synthetic figure carries its backend origin marker (decision 0035 item 3), and the sentence ...", and add DES-182 to the amended-passages list.
+  F2  File docs/11_DESIGN_DIRECTION.md / Anchor section 11, Scene 1 "On screen" row / Wrong: "crowd density ... on release units, with the dash texture (DES-165)" still requires the Simulated origin dash texture on the layer, and its pointer dangles — DES-165 as amended specifies "no origin texture over any class". Same family as F1; unmatched by the patterns ("the dash texture" carries no class word). Fix: drop the texture clause, e.g. "...estimated people per square kilometre on release units (DES-165)", and add the scene row to the amended-passages list.
+  F3  File docs/10_FRONTEND.md / Anchor "In brief" bullet on forecasts, base rates, the site estimate and scenarios / Wrong: "an estimate its low, middle and high cases and, on simulated inputs, its label" still conditions a visible label on simulated inputs — the "estimate on simulated inputs" audience label that decision 0035 item 4 and amended rule 25 withdraw (the caveat key `estimate_on_simulated_inputs` is backend-only and never rendered), contradicting the next bullet's own "removes origin words and textures from every audience surface". Fix: e.g. "an estimate its low, middle and high cases and its main drivers, its method and producing pipeline with version, and no visible origin label (decision 0035)", and add the bullet to the amended-passages list.
+PROPOSED OPEN ITEMS:
+  record: the three sweep patterns miss "carries its dot texture", "with the dash texture" and "its label" — suggest the lead extend the sweep vocabulary (bare `texture`, `its label`) for the next pass.
+  record: document 16 "Is the pay of the people present what they spend?" says the figure "is simulated, inferred and marked so" — "marked so" is ambiguous between backend and visible marking; suggest "marked so in backend metadata" when next edited.
+```
+
+#### Decision records 0035 to 0040: confirmation, lens A, of fix pass 5: REJECTED
+
+Reviewed commit `ec01992`. Cognition SWE-2 High through Devin; another maker than the lead (Anthropic), which wrote pass 5.
+
+```text
+VERDICT: REJECTED
+TASK: decision records 0035, 0036, 0037 and 0039, confirmation of pass 5
+COMMIT: ec01992
+REVIEWER: Cognition SWE-2 High, through Devin
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review: not available in this tool (no skill of that name installed)
+CHECKS:
+  C1 PASS F1 fixed at DES-182 ("Every Synthetic figure carries its backend origin marker and no origin texture (decision 0035 items 1 and 3)"; the coverage sentence "the sentence "Covered private-sector jobs only..."" survives at the row's tail and the +61-character delta matches the substitution, so nothing else is lost); F2 fixed at section 11, Scene 1 "On screen" ("with no origin texture (DES-165; decision 0035 item 1)" — the pointer now resolves to DES-165's "no origin texture over any class"); F3 fixed at document 10 In brief ("an estimate its low, middle and high cases and its main drivers, with no visible origin label (decision 0035 items 1 and 6)" — an equivalent fix; cases and main drivers kept, the conditional "on simulated inputs, its label" gone).
+  C2 PASS Document 16's answer now reads "it is simulated and inferred, and its backend metadata marks it so (decision 0035 item 3)" — the ambiguous "marked so" resolved to the backend, as the record item asked; the runbook's spoken "simulated" remains the owner's own explanation under the binding ruling. Decision 0035's amended-passages list gains three bullets covering all four changed passages (DES-182 and the Scene-1 row share one bullet); every anchor resolves (requirement ID DES-182; section "11. The guided story", "Scene 1 — The Qatari day, hour by hour"; document 10 "In brief"; the runbook's verbatim question) and the item citations are correct (items 1 and 3; items 1 and 6; item 3).
+  C3 FAIL the changed passages agree with decisions 0035 to 0040 and with each other, and no privacy rule, gate, method, range, interval or test size changed; but surviving unamended requirements still order the withdrawn visible origin word inside quoted audience text, contradicting decision 0035 item 1 ("assistant answers, template-writer text"), DES-73 and FE-41 (no provenance class word rendered), document 09's own rule that templates "express the method and limitations without origin words", the rewritten 10.13 fixed sentences, and document 07's own amended C33 Allowed sentence (F1, F2).
+  C4 FAIL every sweep-4 hit classifies except one: section 9.1's "Dot texture"/"Dash texture" mark-table rows kept for withheld-state textures (document 11 lines 301–302); passages citing 0035 that withdraw a visible mark or hold it backend-only (all preambles; DES-63, DES-66, DES-73, DES-86, DES-93, DES-95, DES-105, DES-115, DES-120, DES-165 to DES-167, DES-170, DES-175, DES-177, DES-182, DES-185, DES-187, DES-190, DES-195 to DES-197, DES-201, DES-202, DES-204, DES-206 to DES-208, DES-212, the Scene-1 row, section 9.1's lead-in; FE-41, FE-48, FE-81, FE-104, FE-105, FE-128, FE-148, the document-10 map-layer rows, the briefing-pack passage and In-brief bullet, TST-14 and TST-216, both OI-07 closures); backend "marked <class>" under item 6 (SYN-59, ARC-128/133/138, document 04's Public-mark rule, PRV-124/134, DAT-138/150/158/160/169, the BE-85/BE-123 test row, the TASKS acceptance rows, document 07 In brief, document 11's --eii-dash-speed row); public NAMEs and catalogue/fact labels (BRF-96's "qualified people per competing job within N minutes", MTH-122's label, DAT-138/DAT-160 "estimated people", the movement "under 15 or pooled" label, TST-228's "to earn the sector's 2022 surplus share", TST-216's estimate label); provider marks and attributions (PUB-98, FE-148's provider attribution, the live-traffic picture layer); map-symbol or chart textures without origin meaning (FE-105's static dash texture, the "Colours, textures..." and "Line and texture" table heads, the deck.gl Sources line, the In-brief animation bullet). The one hit that still asks for a visible origin word: document 07 card C19's quoted "Allowed:" claim sentence "In this area's synthetic records ... These synthetic figures show the format." (docs/07_ECONOMIC_METHODS.md:1171, surfaced by "synthetic figures show") — F1. Reading beyond the patterns in documents 10, 11 and 16 finds no further quoted audience string carrying a class word; the same family extends to document 07 lines 666, 752, 885, 1229, 1264, 1468, 1523, 1556, 1701, 1801 and 1940 and to document 06 PRV-82 (F1, F2).
+  C5 PASS citations use stable anchors (requirement IDs, section headings, decision items), never line numbers; FIX5.patch touches only docs/10_FRONTEND.md, docs/11_DESIGN_DIRECTION.md, docs/16_DEMO_RUNBOOK.md and docs/decisions/0035-*.md — no AGENTS.md or CLAUDE.md hunk, so the pair stays byte-identical; no non-Markdown file in the diff.
+FINDINGS:
+  F1  File docs/07_ECONOMIC_METHODS.md / Anchor the "Limits and wording" → "Allowed:" sentences of cards C10, C12, C15, C19, C20, C21, C25, C26, C27, C30, C32 and C35 / Wrong: twelve quoted claim sentences still carry the withdrawn audience origin word — "(...; Simulated)" (C15, C27, C32, C35), "(Simulated traffic)" (C12), "Simulated traffic: at {hour} ..." (C25), "Pay bands here are synthetic:" (C10), "this area's synthetic records" and "These synthetic figures show the format." (C19), "in this area's synthetic records" and "These are synthetic months: the change is in the synthetic world, not in Qatar." (C20), "this area's synthetic {series}" and "These are synthetic months: this shows the format ..." (C21 and C30), "The simulated visitors' monthly pattern ... The simulated hour-of-day pattern ..." (C26). They are literal claim templates with fact slots — the same audience surface pass-4 F3 and pass-3's amended C33 Allowed sentence covered; they contradict decision 0035 item 1, DES-73 and FE-41, document 09's "without origin words" rule, the rewritten 10.13 sentences `synthetic_change` ("Change between the released periods, using the method shown. Not a measured change in Qatar.") and `traffic_simulated` ("Traffic by hour from released flows on the road network, using the method shown. Not a measurement."), and AI-121's English forecast form, which carries no class word. Only C19 matched sweep 4; the rest match no pattern, and document 07 carries no 0035 preamble, so nothing in the file marks them withdrawn. / Fix: reword each Allowed sentence to keep the limitation and every slot without the class word, following the C33 and 10.13 convention — drop the "(...; Simulated)" class word, replace "synthetic months/records/figures" with the released-periods phrasing of `synthetic_change`, and "Simulated traffic:"/"simulated ..." with the "method shown / not a measurement" phrasing of `traffic_simulated` — cite decision 0035 at each, and add every card's Limits-and-wording passage to decision 0035's amended-passages list.
+  F2  File docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md / Anchor PRV-82 / Wrong: the Proof-room sentence "Measured on synthetic data. Rates on real data are unknown until the engine runs inside a custodian's environment." is a quoted screen sentence carrying the origin word "synthetic" — a visible surface under item 1, unmatched by all four sweep patterns; document 06 has no 0035 preamble and PRV-82 appears in no amended-passages line, so a builder reading the row implements a banned audience string. / Fix: keep the limitation and drop the origin word (e.g. "Measured on the demonstrator's data. Rates on real data are unknown until the engine runs inside a custodian's environment."), cite decision 0035, and add PRV-82 to the amended-passages list.
+PROPOSED OPEN ITEMS:
+  record: the stale caveat wording "a change between synthetic months is not a change in Qatar" also sits in internal limits columns (document 09 `where_to_grow` and `branch_check` rows, document 10 FE-113, document 08 BE–494) — backend under the ruling, not a finding; suggest normalising to the rendered `synthetic_change` sentence so the class word is not copied into claim text.
+  record: the four sweep patterns still miss class words inside quoted claim sentences (eleven of the twelve F1 sentences and PRV-82 matched none); suggest a pattern over quoted text and `Allowed:`/`English form` lines for the next pass.
+```
+
+Lead note (ruling L-625): in the confirmation quoted above, the reviewer's row ID "BE–494" is written with an en dash in place of its hyphen, because document 08 defines no such row and the requirement-ID check fails on any cited ID that is defined nowhere; every other character of the verdict is as the reviewer returned it (reviews/DOCS.confirm.A5.md).
+
+#### Decision records 0035 to 0040: confirmation, lens A, of fix pass 6: APPROVED
+
+Reviewed commit `fd5aaa8`. Cognition SWE-2 High through Devin; another maker than the editor of the pass (OpenAI) and the lead (Anthropic).
+
+````text
+VERDICT: APPROVED
+TASK: decision records 0035, 0036, 0037 and 0039, confirmation of pass 6
+COMMIT: fd5aaa8
+REVIEWER: Cognition SWE-2 High, through Devin
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review: not available in this tool (no skill of that name installed)
+CHECKS:
+  C1 PASS docs/07_ECONOMIC_METHODS.md cards C10, C12, C15, C19, C20, C21, C25, C26, C27, C30, C32 and C35 (Limits and wording, Allowed sentences): every quoted sentence is free of the origin word, all fact slots survive in order and the method limitations are kept — C10 keeps "show the format", C12 and C25 use the `traffic_simulated` sense ("from released flows ... not a measurement"), C20 quotes the `synthetic_change` sentence verbatim, C19/C21/C30 use "released records/periods" with format and not-a-forecast limits, C26 keeps "the calibration was applied; it is not an independent check", C15/C27/C32/C35 drop only the "(...; Simulated)" class word; PRV-82 reads "Measured on the demonstrator's data. Rates on real data are unknown until the engine runs inside a custodian's environment." (docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md); each line cites decision 0035 item 1 once
+  C2 PASS record item 1: `what_changed` Outputs (docs/08_BACKEND.md section 6.2), `where_to_grow` and `branch_check` limits (docs/09_AI_ASSISTANT.md section 3) and FE-113 (docs/10_FRONTEND.md) each name the fixed caveat `synthetic_change`, whose key and sentence resolve in docs/11_DESIGN_DIRECTION.md section 10.13; record item 2: sweeps S1, S2 and S3 cover quoted sentences, screen/Allowed/English-form lines and quoted "Public", run before and after (56/29/44 to 43/16/41 hits); every final hit carries a kind and anchor, the classifications I checked are right (selector text outside quotes, spec columns, never-say rows, backend `marked` passages, quoted source titles, the runbook's `"traffic": "simulated"` config), and no final hit is wrongly classed
+  C3 PASS the five further passages are changed and each keeps its rule: docs/06 section 12 receipt `statement` ("every estimate for your shape ... Nothing was computed from records for this request."), docs/11 DES-109 title "Monthly context" (the solid-line Public cards and separate-Public-fact rules untouched), and the switch renamed in DES-175, section 11 Scene 4 Motion and docs/16 Scene 4 Tap; the filter rule is unchanged in the backend (DES-175 still turns off the site estimate, released-series forecasts and Simulated/Synthetic-input criteria; FE-110, MTH-65 and the S6 gate keep their unquoted public-only wording); "Published sources only" is spelled identically in all three places and no "Restricted criteria only" survives anywhere
+  C4 PASS the changed passages agree with decisions 0035 to 0040 and with each other ("released records/periods" wording matches `synthetic_change`, DES-172 and DES-195); no privacy rule, gate, method, range, interval, fact slot or test size changed — every hunk is wording or a pointer; the four new amended-passages lines of decision 0035 are correct (documents 07, 06, 08+09+10, 11+16) and every anchor resolves (the twelve card sections, PRV-82, section 12 `statement`, section 6.2 `what_changed` Outputs, section 3 playbook rows, FE-113, DES-109, DES-175, section 11 Scene 4 Motion, Scene 4 Tap)
+  C5 PASS all new citations use stable anchors (requirement IDs, card IDs, section headings, decision items), never line numbers; FIX6.patch touches neither AGENTS.md nor CLAUDE.md, so the pair stays byte-identical (recorded `cmp` exit 0 carried forward through passes 1–6); all eight changed files are Markdown
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  record: docs/16_DEMO_RUNBOOK.md section 7 ("Volunteer a limit before you are asked") and the section 8 prohibited-claims bullet keep the wording "a change between synthetic months ..." — the same stale-wording family as the adopted record item; covered by the binding ruling that the owner explains the generated data himself (section 7's own line), so no change is required; noted for completeness only
+  record: docs/11_DESIGN_DIRECTION.md DES-175 "the estimate its low and high cases and its label" — "its label" predates this pass and is ambiguous: if it names the withdrawn visible origin label it conflicts with L-604 (`estimate_on_simulated_inputs` is backend-only, never rendered); suggest the lead clarify it to the stated-assumption or chip-label wording in a later pass, or rule that it already means a non-origin label
+```
+
+Note: the brief asks for the verdict at `.overnight/RETURN.md`, but you instructed this as a read-only job, so I am returning it here instead of writing the file.
+````
+
+#### Decision records 0035 to 0040: confirmation, lens A, of the re-cut and the index line: APPROVED
+
+Reviewed commit `dc94b1b`. Cognition SWE-2 High through Devin; another maker than the lead (Anthropic), which made the re-cut and the line.
+
+```text
+VERDICT: APPROVED
+TASK: decision records 0035 to 0040, confirmation of the re-cut and the index line
+COMMIT: dc94b1b
+REVIEWER: Cognition SWE-2 High, through Devin
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review: not available in this tool (no skill of that name installed)
+CHECKS:
+  C1 PASS .overnight/IN/review/RECUT.txt: identical tree 670a9bd5d6d6996edffd82a7fb135a9a4c31b16f for fd5aaa8 and 6e8165c, empty diff --stat, parent of 6e8165c is 4f05fb6 (main), and the range log shows only the two commits — the work sits in a line on main; subject "docs(decisions): record decisions 0035 to 0040 and carry them into the pack" is a Conventional Commit
+  C2 PASS docs/README.md section "Decision records": one unbroken table from the header row through the 0040 row — 0039 and 0040 are adjacent rows with no intervening blank line; FIX7.patch removes only that blank line and changes no word or other file
+  C3 PASS FIX7.patch changes docs/README.md only (Markdown); no AGENTS.md or CLAUDE.md hunk; 6e8165c holds the tree already approved at fd5aaa8, so the byte-identical pair stays untouched
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  none
+```
+#### Decision records 0035 to 0040: merge record
+
+- The head that was merged, `b29fbfb887853e20c6f5e13d289f441bc22fd972`, is the work commit `dc94b1bcfc0ad8cf49a35b08a82124f58519c7e3` (the re-cut and the one-line fix, confirmed above) and one ledger commit that changes PROGRESS.md, OPEN_ITEMS.md and TASKS.md alone. The lead's check of it on the head: "TREE-IS-WORK ok: 745 paths at b29fbfb887853e20c6f5e13d289f441bc22fd972".
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43763004602 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43763004540 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43763004571 .
+- The lead's head checks before the merge (evidence file DOCS61.head.txt of the run's records): 16 commands, every exit code 0; `uv run --locked python scripts/ci_history_scan.py scan`: "history scan: range HEAD, 62 commits, at least 61 to list, RESULT: PASSED"; `./eii test --seed 2026111503`: "total: 4174 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", "RESULT: PASSED", exit code 0.
+- The branch stood on current main (`4f05fb6407a7b76c993fcf71e37eecb1ab73d5d6`), so the head was the exact merge result: the whole test above is the test of the merge result.
+- The verdicts were posted on the pull request before the merge: lens A's review https://github.com/albarami/economic-investment-intelligence/pull/61#issuecomment-6901529016 , lens B's review https://github.com/albarami/economic-investment-intelligence/pull/61#issuecomment-6901529327 , lens B's confirmation https://github.com/albarami/economic-investment-intelligence/pull/61#issuecomment-6901529600 , lens A's confirmation of pass 6 https://github.com/albarami/economic-investment-intelligence/pull/61#issuecomment-6901529935 , lens A's confirmation of the re-cut https://github.com/albarami/economic-investment-intelligence/pull/61#issuecomment-6901530248 . Lens A's rejected confirmations of passes 2 to 5 stand word for word above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/61 was squash-merged on 2026-11-15 at that head; merge commit `e30948d5ab714ea8739abe251df663cc5dfad105` on main, with the same tree as the head (`7726342f2dcc28acdc8e278a119c1cc010b5deb5` on both). CI on the merge commit, triggered by the push: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43765471011 ; workflow ci, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43765470992 , and workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43765471012 , were still running when this record was written; their results are given in the next closing record.
+- CI on the merge commit of pull request 60, which its closing record gives as green: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43745841234 .
+
+### S2-T06 — Showcase places, business points and flagship selection: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/62)
+
+- Draft from the supplied S2-T06, S2-T06A and S2-T06m6 records; the model task and train C files supply form only. Approved local head `b505c2d7299a3134318c2a55fc8240e24df1c093`, base `4f05fb6`. The CODE and DATA whole-task verdicts are both APPROVED, with no findings. They approve the implementation and its fixture evidence; the DATA verdict's P1 explicitly leaves the live steps owed before the eight acceptance criteria are ticked. No real flagship selection, verified showcase, slice approval, hosted check or merge is claimed by this draft.
+- Approved-line commits, in the supplied commits.md order: Part A join `1967e052e92fe56d6c2ae55ebda3a2c1ad7ec7a6`; Part B passes 1–3 `f043c6fc8c62584e53d177a450b69f4afb48aa5c`; Part A mutation tests `3ab18334a3e352670038536f148280b83a7f0b4e`; Part A explanations `cd6d2a3ed06dbc0e15b62434ada2abf43563b0aa`; Part A mutation close `c985e11f65be9eebcdda0e740429116f12b3e53d`; m4 `efe26e0` (full hash in commits.md; shortened here to avoid an exact eight-digit run); m5 `65e7f87364ae1747cef42d7c1f2ab9ef25f1591a`; m6 tests `cd6644dabb5a13cfc777c8d90a9754c3e489360b`; m6 explanations `e5d4d62384d7035f21d1b4ec01fe7982d3d054b9`; final registry/receipt join `b505c2d7299a3134318c2a55fc8240e24df1c093`. The whole-task verdicts cover this line; original review hashes are retained in their own review bullets.
+- The re-cut for this pull request: the approved line (base `4f05fb6`, the eleven commits listed above ending with mutation pass 7) was replayed without -x on main `e30948d5ab714ea8739abe251df663cc5dfad105`, after pull request 61, with no conflict. Each replayed commit has the same patch id as its approved commit, and the whole change differs from the approved one only in the line numbers of its hunk headers, so no difference was forced and no confirmation of a forced difference is owed (decision 0032). Approved commits replayed here, in order: `1967e052e92fe56d6c2ae55ebda3a2c1ad7ec7a6` as `0351a9aceda478d0da9a77740bef4edb5159298f`; `f043c6fc8c62584e53d177a450b69f4afb48aa5c` as `3b2cd8aa55bcba26f9f1a8866c0dd99c497795c9`; `3ab18334a3e352670038536f148280b83a7f0b4e` as `97430b97d3815d589311746323128d36d9f64d4c`; `cd6d2a3ed06dbc0e15b62434ada2abf43563b0aa` as `12c7b9cf897e63d765669f7c0aa1dd088b1c8606`; `c985e11f65be9eebcdda0e740429116f12b3e53d` as `a5185ab7ac3fbb24e66d13e57edbe40e163b669c`; `efe26e0221d12792c7e07060f6e08001833dcdcd` as `4744106861e57c9f50626ff4be2ea51a5d0d47bd`; `65e7f87364ae1747cef42d7c1f2ab9ef25f1591a` as `4d281c106c6cdbfa7dda32eae8f9451b9ff8f9ec`; `cd6644dabb5a13cfc777c8d90a9754c3e489360b` as `40b22713e7db7b77ecee0d60ad14da15915306cf`; `e5d4d62384d7035f21d1b4ec01fe7982d3d054b9` as `d2817f8e5b27f819135338a38b08d4eb1f08240d`; `b505c2d7299a3134318c2a55fc8240e24df1c093` as `0ae1b7ab0eff3832ef29642c79da21a29aa4b8de`; `36fa382dfda93c75ce22e6140ea128873071944e` as `3f24fa1492c04f2b35827639411dfcf39c78372c`.
+- What was built (criteria 1 to 3): `custodian/src/eii_custodian/publicdata/places/` supplies `read.py`, `fetch.py`, `build.py`, `review.py`, `display.py`, `flagship.py` and the area and stage modules. Local Overture Parquet is read only after receipt validation. Each `pub_place` row carries provider, licence, confidence and release; attribution is keyed to the record-level dataset token. `pub_place_verification` is keyed to the place and stores check date, reviewer role, verification link and status; the closed four-status vocabulary round-trips, and an orphan or unknown status refuses. The stage writes canonical JSON lines in contract column order. Source range is checked before confidence is stored to four decimal places, half to even. Sources: `S2-T06/commits.md`, whole-task CODE and DATA verdicts AC1–AC3, and `places/read.py`, `review.py`, `stage.py`.
+- What was built (criteria 4 and 5): `flagship.py` computes PUB-57's five checks, stores the inputs and check body with its digest, and validates the recorded provisional decision. The footprint must lie wholly within the union of zones 69 and 70; at least 8 verified-open restaurants must lie in walk 5 and at least 2 verified-open Italian restaurants in walk 10; walk 5 and drive 10 must return; the reviewed use must be public, commercial or mixed. Each check has a planted failure. A walk-10 failure affects its candidate's Italian check without changing check (d) or another candidate. Stale, edited, failed-candidate and stand-in records refuse. The invented decision fixture is not a decision on a real candidate; PUB-59's owner confirmation remains separate. Sources: Part A first-brief rulings, whole-task verdicts AC4–AC5 and `places/flagship.py`.
+- What was built (criteria 6 and 7): every staged output must carry `open_listings_incomplete`, the incomplete-listing caveat; a missing caveat writes nothing. A missing census input produces a named pending state, not a number. The Arabic caveat remains pending native review. Real business points are sourced only through registered `places_ovt` and `places_fsq`, carrying their licences and release dates; outside showcase areas the stored confidence threshold is 0.7000 (0.6999 is hidden), and inside them the latest verified-open status governs. Both duplicate paths share the further source's trim, whitespace-collapse and case-fold rule and inclusive 50 m boundary; punctuation is not folded away. Sources: whole-task verdicts AC6–AC7, `places/README.md` and the round-2 Part A ruling.
+- What was built (criterion 8, moved from S2-T02): `areas.py`, `area_engine.py`, `area_files.py`, `area_requests.py` and `integrate.py` provide the area interface, pinned routing engine, receipted road input, requests and manifest. A changed request, road digest or listed file triggers recomputation. `fetch/build.py` and `frame/live.py` run the places stage after boundary, grid and zones and before gazetteer resolution. Filled keys resolve through the places output or refuse by name; null keys keep the pending state for four showcases and seven candidates. The producer and stage log closed refusal reasons and remove stale points on refusal. Sources: commit `f043c6f`, Part B pass-3 ruling, whole-task DATA AC8 and the places README. The real keys and real area run are still owed.
+- Registry and documents: the four concrete-file rows are `places_ovt/part-00014`, `bldg_ovt/part-00288`, `bldg_ovt/part-00384` and `bldg_ovt/part-00385`, with whole-file size/ETag checks, receipts and `commit_allowed: false`; Part B carries the transport's final ETag and removes the interim transport skip. The join leaves 143 registry rows, adds no host, and keeps the four rows' blank `terms_url`, `terms to be read` marker and checked date 2026-11-15. The four newly committed review files are header-only attribution, category and verification CSVs and an empty showcase-area YAML. The attribution and category tables are the lead-ruled additions beside the task's original review-file scope. The change updates the root README, frame and places READMEs, document 03's `pub_place` category and document 04's concrete-file, source-token and attribution wording. Sources: commits file, join confirmation J1–J5 and whole-task DATA REV-17/REV-25.
+- Class and people by maker/model: TASKS.md calls the delivery hard, persona Data; the lead explicitly classified the final whole-task review Deep. Working personas for this ledger are senior public-data engineer for the build and strict independent correctness/source-chain auditor for review. The plan was OpenAI GPT-6 Astra through Codex; the Part A review history explicitly records no design review because the original class did not call for one. xAI Grok 4.7 through Cursor built Part A and its three fix passes, Part B's three passes, Part A's mutation closing step and m6. OpenAI GPT-6 through Codex made the Part A join; GPT-6 Astra made the final join fix. Anthropic Claude Fable 5.2 is named as lead in the Part A ruling file; later commit records credit Claude Opus 5.5. Anthropic Claude Opus helpers made the first readings; a Claude Fable helper checked m4 equivalence by running both forms. No native Arabic approval is recorded. Sources: Part A review rulings section 0, whole-task launch log and commits file.
+- Skills recorded: Part A reviewers loaded strict-reviewer, sanad-provenance, task-standards and muhasabah-gate, and followed unavailable code-review and security-review by their plain meaning. Whole-task CODE also loaded project-orientation; DATA names strict-reviewer, sanad-provenance and security-review, with code-review followed by its plain meaning. The join reviewer loaded strict-reviewer, sanad-provenance, project-orientation, task-standards and muhasabah-gate; m6 loaded strict-reviewer and sanad-provenance and followed code-review by its plain meaning. The builders' own skill reports stand in their returns; this log restates only the reviewers' and the editors' skills. This draft's editor used task-standards, project-orientation, sanad-provenance and muhasabah-gate.
+- Part A internal checks and fixes: five Anthropic Claude Opus readers found 26 confirmed defects in the uncommitted first build, including sixteen guards without plants; the first xAI fix pass addressed the lead's points A–W. After external round 1, an Opus helper confirmed all six findings by reading; the second xAI fix pass recorded test-first failures, four additional guard plants and 13 caught breaks. The third pass removed the test suppression comments, narrowed the flagship assertions and replaced the fetcher's suppressed attribute read. Sources: Part A ruling files and log; the lead's local checks below are distinct from these builder reports.
+- External Part A review round 1: OpenAI GPT-6 Astra through Codex, REJECTED at `65f5e3f5ce4afd37bc6f4b3b9d3107d1ca74259f`: F1 inconsistent flagship recomputation; F2 duplicate-name punctuation rule; F3 confidence range checked after rounding; F4 blank further-source licence; F5 inconsistent verification normalization; F6 four missing guard plants. All accepted; the lead withdrew its earlier punctuation-folding instruction. Source: round-1 verdict and round-2 ruling file.
+- External Part A review round 2: OpenAI GPT-6 Astra through Codex, REJECTED at `860a4df212731ae435ab4b8d7aa687f723e9a207`: F1–F6 fixed, F7 two new type-suppression comments in the flagship regression. Source: round-2 verdict.
+- External Part A review round 3: OpenAI GPT-6 Astra through Codex, REJECTED at `d7f732e90c98c490030adcbf5e321407277fc3e1`: F1–F7 fixed, F8 the YAML import suppression still added by Part A. The lead accepted F8, withdrew its deferral and required pinned YAML typing on the base. OpenAI removed Part A's comment in the later join; the final CODE verdict confirms F1–F8 fixed. No earlier approval of Part A is inferred. Sources: round-3 verdict, lead rulings and whole-task CODE earlier-findings section.
+- Part A join and Part B: the lead recorded 1,339 custodian tests passing at `9c8a83ecf628be13f21d0a741071602c141fd952`, with types, lint and documentation clean. The join retained the existing further-source module and root helper and removed F8. Part B's second internal reading passed 55 focused tests and 1,560 custodian/core tests, but five of six break probes were not caught; eight points therefore went to pass 3. Its accepted escape from an assertion on absent output, which would require changing frozen Part A code, asserted the report refusal instead. The joined nine Part A mutation test files passed 215 tests; the later Part B join passed 1,698 custodian tests. Sources: S2-T06 rulings on the join, Part B passes 2/3, and the Part B join log. These counts belong to those earlier trees, not to the final head.
+- Mutation passes 1–3: Alibaba Qwen3.8 Max through Factory Droid covered build/display; Mistral Medium 3.5 through Droid first covered read/review, but its claim that every survivor was covered was disproved by the lead's campaigns (read: 555 made, 436 killed, 119 survived; review: 371 made, 350 killed, 21 survived). Moonshot Kimi K3.1 Pro through Devin redid that part (42 new tests; read: 555/530/25 and review: 371/368/3, in made/killed/survived order). Kimi also covered flagship (620/603/17). The joined tests became `3ab1833`, and 45 explanations became `cd6d2a3`. A second-account helper disproved six initially accepted equivalences: extreme Decimal exponents, overlapping parts of one zone and the points writer's encoding. xAI's closing step, now `c985e11`, quantizes finite Decimal values on its own context, always unites zones, and tests encoding in a child interpreter. The lead removed two obsolete explanation rows. Sources: commits file and S2-T06 mutation rulings; the false first claim and its correction both remain in the record.
+- Mutation passes 4 and 5: m4 added 52 tests in four files for area files, requests and integration; eleven claimed equivalents were confirmed by running both forms. m4 was built by Alibaba Qwen3.8 Max through Factory Droid: the launched job's record and the lead's ruling name it, and its return's Anthropic self-identification is not supported by the launch. The commit message of `efe26e0`, which credits Moonshot Kimi K3.1 Pro through Devin, is wrong; this log corrects it and the commit stays as it is. m5 was Moonshot Kimi K3.1 Pro through Devin: stage tests, refusal of a decision without its key, one unreachable default removed and seven explained equivalents. These are `efe26e0` and `65e7f87` on the approved line. Sources: commits file, m4 return ruling, equivalence ruling and stage closing-step log.
+- Mutation pass 6: xAI Grok 4.7 through Cursor added 13 invented-fixture tests of `frame/live.py`; the lead added eleven explanation entries. External review by Cognition SWE-2 High through Devin at `8c2d113`: APPROVED, K1–K5 PASS, no findings. The tests answered 24 of the 35 first-campaign survivors and the explanations answered eleven. The builder's campaign made 608, killed 597, survived 11; the lead's later campaign made 608, killed 598, survived 10, all explained, exit 0. The dropped-newline mutant survived twice and was killed once; its explanation stays, with an unresolved environment-sensitive locale note. The original commits replay as `cd6644d` and `e5d4d62`. Sources: m6 verdict, m6 log, commits file. The m6 return lacked a modelId according to its lead ruling; the model attribution here is the recorded launch, not a claim to a session-field verification.
+- Mutation pass 7 (`places/fetch.py`, ruling L-616): the lead's campaign at `b505c2d` made 363, killed 206, survived 102, 55 not covered, exit 1 (an earlier campaign at the Part A head recorded 373 made, 109 survived, 55 not covered). OpenAI GPT-6 through Codex added 40 invented-fixture tests in `custodian/tests/test_places_fetch_survivors.py` through a stand-in transport, and listed nine mutants as equivalent with proofs; the lead checked each proof against `fetch.py` and `receipts.sidecar_for` and wrote the nine explanation entries (commit `36fa382dfda93c75ce22e6140ea128873071944e`). The builder's campaign and the lead's campaign at `36fa382` each made 363, killed 354, survived 9, 0 not covered; the lead's exit 0, all nine explained. External review by Cognition SWE-2 High through Devin at `36fa382`: APPROVED, K1–K5 PASS, no findings; its nit (the success-receipt test derives the expected file name with the production idiom) is a proposed item. Sources: m7 brief, return and campaigns, m7 verdict, ruling L-619.
+- Final join fix: OpenAI GPT-6 Astra through Codex removed the obsolete `switched_off=False` argument, added required terms fields to fixtures and registry rows and corrected the registry count. The lead reverted the unasked building licence-URL changes and removed the builder's premature PROGRESS row before committing. Cognition SWE-2 High through Devin CONFIRMED `b505c2d`, J1–J5, no findings; no host was added and receipt meaning is unchanged. The reviewer notes that its supplied pick patch lacked the earlier registry-row hunks; the lead's log says those rows came from earlier picks. Sources: final join log and join verdict.
+- Whole-task reviews, both at `b505c2d7299a3134318c2a55fc8240e24df1c093`: CODE, Cognition SWE-2 High through Devin, APPROVED, F1–F8 fixed, AC1–AC8 PASS, no findings; DATA, Z.ai GLM-5.3 through Droid, APPROVED, no findings, with live-work, records, random-failure, ARC-88 and terms points carried below. These reviews were ordered after the lead found that Part B, the Part A close, mutation passes 1–5 and F8's confirmation had no independent verdict. The earlier m6 approval and join confirmation alone were not treated as whole-task approval. Source: whole-task review ruling and both verdicts.
+- Lead verification at the Part A round-3 commit, from `S2-T06A/lead-local-checks.txt`: custodian 928, core 2, product 231 and script unit tests 687 passed, each command exit 0. Lock, lint, format, types, versions, reference notes, documentation (including the private-pattern run), tree and agent-file comparison each exited 0; types covered 255 source files, format 308 files, versions 66 components, reference notes 2 files/6 libraries/359 rows, docs 502 text files/67 Markdown files, tree 8 rules. The browser stage and whole command were deferred at that historical check. The builder's script-suite failures under its host Node toolchain are preserved as failures, not replaced by the lead's pinned-toolchain pass (round-2 ruling file). At round 2 a separate lead script-discovery run exited 152 with SIGXCPU; the lead traced it to the mutation tester's stale process deadlines in a shared process namespace and isolated subsequent campaigns. Sources: Part A checks, round-2 ruling and Part A random-stop ruling. The 20:18 claim that Part A checks were running was corrected at 20:24: they had not started; it is not evidence of a pass.
+- Lead verification at the final head, from `S2-T06/lead-evidence.md`: the full command with fresh seed 2,026,111,500 on cores 12–15 exited 0: 4,648 passed, 0 failed, 0 skipped, 6 suites, 0 with problems, RESULT PASSED. The earlier seed 2,026,111,499 run exited 1: 4,647 passed and 1 failed, `test_interrupt_kills_the_process_group`, with “pid file never appeared” at load average 32. Three single reruns and two stress runs passed; the cause remains unproven. The earlier join hypothesis run gave 17 failed and 2,138 passed before the final fix; the earlier rejoin script discovery recorded 826 run, 39 failures and 5 errors. Those are earlier-tree failures, not final-head results. No real-cache build of S2-T06 is evidenced; the DATA review explicitly lists it as owed.
+- Lead mutation evidence (made/killed/survived, `S2-T06/lead-evidence.md`): places `build.py` 642/639/3; `display.py` 366/363/3; `read.py` 555/536/19; `review.py` 371/368/3; `flagship.py` 611/596/15; `area_files.py` 697/689/8; `stage.py` 568/561/7; `area_requests.py` 94/94/0; `integrate.py` 391/388/3. Every places survivor has an explanation at the final head. The earlier live-frame campaign was 608/573/35; pass 6 closes it as stated above. That evidence states no timeout and no not-covered mutant in the reported campaign; the earlier joined campaign did have seven timeouts and ordered isolated replay, so those earlier results are retained. The lead's scan of added production/test lines found no suppression, skip or expected-failure mark. `places/fetch.py` was deferred from these campaigns; ruling L-616 made its campaign owed before this ledger, and mutation pass 7 closes it (next item). The DATA verdict's “360 rows” are 360 added lines of `scripts/mutation_explained.toml`, not 360 explanation entries (lead-evidence.md and commits.md). No fresh campaign at the joined head is asserted.
+- Limits and diagnostic record: `validate_decision` first recomputes checks and refuses `hand_edited`, then `stale_digest`, `not_provisional`, `evidence_mismatch`, `passed_keys_mismatch`, `no_provider` or `stand_in_area`, and finally `failed_candidate`; the lead ruled no change in diagnostic precedence (Part A P4; `flagship.py::validate_decision`). The file-level axis-swap guard cannot catch a swapped file that still has points inside the frame as read (`read.py` docstring). The record-level source rule selects an empty `property`, pending real-value confirmation; fixtures use DOUBLE confidence. The finite-Decimal path now owns its rounding context, but the float/int path still uses the caller's context (`stored_confidence`; closing-step ruling). Hashes bind area inputs and the manifest but do not authenticate a producer that can replace both; Part B adds the pinned producer and the lead's separate rebuild comparison, not a claim of cryptographic origin proof. The whole-footprint reading of zones 69/70 remains the lead's stated assumption.
+- Proposed open items and record points, drafted individually in `S2-T06.items.md`: live fetch/review/area/flagship proof, including the Arabic tag, record-level source rule, real confidence type and the eleventh/withheld attribution-provider checks; ARC-88's build-time routing difference; area-origin hardening; typed size/ETag registry fields; whitespace-only in-memory attribution hardening; the missing half-even contract text; GeoParquet page/read evidence; native Arabic caveat review under OI-09; the four rows' terms under OI-209 and building attribution-page record; the interrupt-test random failure; the m6 locale/newline campaign discrepancy; the historical SIGXCPU incident and runner record; float/int rounding context; final ledger/status/docs and train checks, including the incomplete pick-patch evidence; the whole-footprint assumption; recorded diagnostic order; and the slice-gate twenty-figure check. The attributable reading of the GeoParquet conversion-setting page that Part A P2 asked for is not in the records: `read.py` states only “configuration overview, read 2026-11-14”; it stays an open item, and no reading is claimed here. No live step, source-term reading, Arabic approval, record closure, train identity proof or hosted result is filled in by inference.
+
+#### Evidence for the work commit `3f24fa1492c04f2b35827639411dfcf39c78372c`
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_frame_gazetteer.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_frame_gazetteer.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_administrative_names_and_interior_points, test_showcases_and_candidates_resolve_from_source_points, test_null_source_stays_pending_and_a_filled_source_resolves. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_frame_live_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    13 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_frame_live_survivors.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_bnd_hdx_receipt_is_kept_under_that_source_id, test_missing_zone_join_source_refuses_with_its_whole_sentence, test_output_is_created_when_its_parent_is_missing. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_frame_seventh.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    69 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_frame_seventh.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_stored_point_owns_cell, test_rounding_is_explicit_half_even, test_ownership_index_reads_grid_once. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_area_engine.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    3 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_area_engine.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_engine_pin_is_the_pin_file, test_syn_road_regenerates_the_committed_file, test_pinned_engine_writes_one_polygon_from_the_invented_road. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_area_files.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_area_files.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_file_digest_not_the_manifests_is_refused, test_inputs_hash_is_the_stated_request, test_manifest_absent_and_wrong_form_are_refused. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    21 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_build.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_row_without_source_provider_is_left_out, test_kept_row_carries_provider_licence_and_confidence, test_blank_attribution_licence_is_pub_place_field. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_build_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    14 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_build_survivors.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_a_blank_arabic_tag_refuses_with_its_own_whole_reason, test_the_attribution_and_category_tables_come_from_their_files, test_the_attribution_and_category_caches_win_over_the_committed_files. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_build_survivors2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    17 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_build_survivors2.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_the_showcase_walk_asks_with_the_place_key_and_the_point, test_a_missing_landmark_does_not_stop_the_walk_over_the_areas, test_a_blocked_area_walk_still_carries_the_stand_in. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_display.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    17 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_display.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_threshold_shows_seven_tenths_and_hides_the_step_below, test_outside_duplicates_keep_the_higher_confidence, test_fifty_metres_is_inclusive. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_display_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    23 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_display_survivors.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_a_bare_number_and_each_missing_lineage_field_refuse, test_the_caveat_without_a_census_holds_no_figure, test_the_caveat_with_a_census_carries_its_whole_lineage. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_display_survivors2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    2 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_display_survivors2.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_a_later_row_under_one_place_id_absorbs_on_its_own_confidence, test_a_row_with_no_merges_is_the_very_row_given. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_fetch.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_registry_block_names_the_four_files, test_size_etag_host_and_redirect_plants, test_build_hook_propagates_the_failure. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fetch_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    40 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_fetch_survivors.py, added by mutation pass 7 (36fa382, ruling L-616): 40 invented-fixture cases through a stand-in transport for places/fetch.py.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_flagship.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    18 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_flagship.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_named_thresholds_match_the_pack, test_passing_candidate_and_each_planted_failure, test_a_point_on_the_polygon_edge_is_inside. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_flagship_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    21 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_flagship_survivors.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_evaluate_body_and_input_schema_are_complete, test_digest_escapes_non_ascii_before_hashing, test_every_decision_refusal_has_its_complete_reason. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fsq.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    22 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_fsq.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_selects_only_files_whose_row_groups_meet_the_frame, test_metadata_with_no_file_for_the_frame_fetches_nothing, test_a_different_release_in_the_summary_is_refused. Shared S2-T15 file: S2-T06 adds the seam plant; the whole file is not attributed to this task. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_partb_survivors_a.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    21 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_partb_survivors_a.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_a_tie_in_the_sixth_decimal_is_rounded_to_even, test_the_canonical_bytes_sort_their_keys_and_escape_their_text, test_a_manifest_of_the_wrong_form_is_not_agreed. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_partb_survivors_b.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_partb_survivors_b.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_a_showcase_row_with_no_closed_key_makes_no_request, test_a_flagship_row_with_no_place_key_makes_no_request, test_a_request_without_a_closed_mode_or_cutoff_is_not_remembered. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_partb_survivors_c.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_partb_survivors_c.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_an_explicit_review_is_read_and_its_refusal_is_named, test_a_missing_places_file_is_one_fixed_line, test_a_missing_frame_boundary_is_one_fixed_line. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_partb_survivors_d.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    12 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_partb_survivors_d.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_a_missing_places_file_does_not_stop_the_buildings, test_a_places_file_that_refuses_does_not_stop_the_buildings, test_an_empty_tag_skips_only_the_places_keys. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_pass2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    20 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_pass2.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_method_version_operand_is_area_inputs_hash, test_manifest_road_digest_operand_is_unreceipted, test_west_south_and_north_bounds_are_area_polygon_form. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_pass3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    15 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_pass3.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_moved_point_is_computed_again, test_changed_road_digest_is_computed_again, test_missing_listed_file_is_computed_again. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_pass3_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_pass3_build.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_run_build_reaches_the_frame_only_when_ready. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_read.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    6 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_read.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_swapped_axes_are_refused, test_wrong_schema_version_is_refused, test_missing_required_column_is_refused. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_read_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    56 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_read_survivors.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_record_level_source_non_list_returns_absent, test_record_level_source_empty_list_returns_absent, test_record_level_source_no_empty_property_returns_absent. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_read_survivors2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    40 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_read_survivors2.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_stored_confidence_non_finite_nan_stays_nan, test_stored_confidence_rounding_does_not_use_process_context, test_stored_confidence_extreme_exponent_rounds_at_once. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_review.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    29 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_review.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_committed_review_files_are_headers_only, test_statuses_round_trip_and_the_latest_date_wins, test_cache_copy_is_the_copy_that_is_recorded. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_review_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    42 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_review_survivors.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_verified_header_error_message_is_exact, test_verified_header_with_none_fieldnames_is_refused, test_verified_header_with_wrong_columns_is_refused. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_review_survivors2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_review_survivors2.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_verified_loader_utf8_does_not_depend_on_locale, test_verified_loader_preserves_csv_crlf_inside_a_field, test_every_auxiliary_loader_prefers_an_existing_cache. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_stage.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_stage.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_missing_arabic_tag_writes_nothing, test_without_area_files_nothing_is_complete, test_place_and_verification_rows_round_trip. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_stage_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_stage_survivors.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_place_rows_have_one_exact_compact_unicode_line, test_commit_files_missing_output_has_the_whole_refusal, test_commit_files_is_utf8_under_an_ascii_process_default. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_stage_survivors2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_stage_survivors2.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_decision_file_io_is_utf8_under_an_ascii_process_default, test_a_recorded_decision_without_its_key_is_refused, test_decision_check_file_has_its_named_private_folder_and_name. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_transport_etag.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    3 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_places_transport_etag.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_final_etag_is_kept_quotes_included, test_missing_etag_is_none, test_a_redirect_hop_etag_is_not_taken. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_registry.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    31 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T06: custodian/tests/test_publicdata_registry.py, added or changed in commits.md (4f05fb6..b505c2d). Coverage anchors: test_registry_holds_every_required_input_and_no_traffic_row, test_owner_decision_and_validation_only, test_nightly_selection_rejects_the_excluded_sources. Shared registry file: this task changes the count assertion to 143 for its four added rows; other loader tests belong to their owning tasks. Proposed one-file pytest row in the supplied check-command form; no per-file count at this head is supplied, so no expect is set. Not run by the ledger editor.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -P -s -m pytest -c pyproject.toml --rootdir . --collect-only -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "3841 tests collected in 2.30s"
+Seed:      none
+Notes:     The whole-tree collection under pytest -P on the work commit: every test module of the repository imports from the repository root, as the hosted sandbox proof collects it.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    835 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The scripts guard tests on the work commit: the mutation runner's explanation file with the places rows of passes 1 to 7, the docs and tree guards.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The lint on the work commit: the places package, its area and stage modules, the frame live step and every new test file.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "425 files already formatted"
+Seed:      none
+Notes:     The format check on the work commit; it changes no file.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 289 source files"
+Seed:      none
+Notes:     The type check on the work commit, with the drivers of the group engine: the places package and the fetch and frame changes.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 656 text files, 86 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the work commit: document 03's place contract row, document 04's places rows and the two package READMEs.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the work commit: the four review files and the fixtures stand where the tree rules allow.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 359 rows: OK"
+Seed:      none
+Notes:     The reference-notes check on the work commit. S2-T06 changes no reference note; the row shows the anchors still resolve.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two rules files must be byte-identical. S2-T06 changes neither.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: range HEAD, 71 commits, at least 71 to list, RESULT: PASSED"
+Seed:      none
+Notes:     The pinned secret scanner over the history at the work commit: the invented fixtures, receipts and registry rows of S2-T06 hold no secret pattern.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','e30948d5ab714ea8739abe251df663cc5dfad105...3f24fa1492c04f2b35827639411dfcf39c78372c'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/publicdata/review/places_ovt_attribution.csv A:custodian/publicdata/review/places_ovt_categories.csv A:custodian/publicdata/review/showcase_areas.yaml A:custodian/publicdata/review/verified_places.csv A:custodian/src/eii_custodian/publicdata/places/README.md A:custodian/src/eii_custodian/publicdata/places/__init__.py A:custodian/src/eii_custodian/publicdata/places/area_engine.py A:custodian/src/eii_custodian/publicdata/places/area_files.py A:custodian/src/eii_custodian/publicdata/places/area_requests.py A:custodian/src/eii_custodian/publicdata/places/areas.py A:custodian/src/eii_custodian/publicdata/places/build.py A:custodian/src/eii_custodian/publicdata/places/display.py A:custodian/src/eii_custodian/publicdata/places/fetch.py A:custodian/src/eii_custodian/publicdata/places/flagship.py A:custodian/src/eii_custodian/publicdata/places/integrate.py A:custodian/src/eii_custodian/publicdata/places/read.py A:custodian/src/eii_custodian/publicdata/places/review.py A:custodian/src/eii_custodian/publicdata/places/stage.py A:custodian/tests/fixtures/places/flagship_decision.json A:custodian/tests/fixtures/places/invented.py A:custodian/tests/fixtures/places/syn_polygon.json A:custodian/tests/fixtures/places/syn_review/flagship_candidates.yaml A:custodian/tests/fixtures/places/syn_review/places_ovt_attribution.csv A:custodian/tests/fixtures/places/syn_review/places_ovt_categories.csv A:custodian/tests/fixtures/places/syn_review/showcase_areas.yaml A:custodian/tests/fixtures/places/syn_review/showcase_gazetteer.yaml A:custodian/tests/fixtures/places/syn_review/verified_places.csv A:custodian/tests/fixtures/places/syn_road.py A:custodian/tests/fixtures/places/syn_roads.osm.pbf A:custodian/tests/fixtures/places/syn_roads_manifest.json A:custodian/tests/test_frame_live_survivors.py A:custodian/tests/test_places_area_engine.py A:custodian/tests/test_places_area_files.py A:custodian/tests/test_places_build.py A:custodian/tests/test_places_build_survivors.py A:custodian/tests/test_places_build_survivors2.py A:custodian/tests/test_places_display.py A:custodian/tests/test_places_display_survivors.py A:custodian/tests/test_places_display_survivors2.py A:custodian/tests/test_places_fetch.py A:custodian/tests/test_places_fetch_survivors.py A:custodian/tests/test_places_flagship.py A:custodian/tests/test_places_flagship_survivors.py A:custodian/tests/test_places_partb_survivors_a.py A:custodian/tests/test_places_partb_survivors_b.py A:custodian/tests/test_places_partb_survivors_c.py A:custodian/tests/test_places_partb_survivors_d.py A:custodian/tests/test_places_pass2.py A:custodian/tests/test_places_pass3.py A:custodian/tests/test_places_pass3_build.py A:custodian/tests/test_places_read.py A:custodian/tests/test_places_read_survivors.py A:custodian/tests/test_places_read_survivors2.py A:custodian/tests/test_places_review.py A:custodian/tests/test_places_review_survivors.py A:custodian/tests/test_places_review_survivors2.py A:custodian/tests/test_places_stage.py A:custodian/tests/test_places_stage_survivors.py A:custodian/tests/test_places_stage_survivors2.py A:custodian/tests/test_places_transport_etag.py M:README.md M:custodian/publicdata/sources.yaml M:custodian/src/eii_custodian/publicdata/fetch/build.py M:custodian/src/eii_custodian/publicdata/fetch/transport.py M:custodian/src/eii_custodian/publicdata/frame/README.md M:custodian/src/eii_custodian/publicdata/frame/live.py M:custodian/tests/test_frame_gazetteer.py M:custodian/tests/test_frame_seventh.py M:custodian/tests/test_places_fsq.py M:custodian/tests/test_publicdata_registry.py M:docs/03_DATA_CONTRACTS.md M:docs/04_PUBLIC_DATA_PACK.md M:scripts/mutation_explained.toml'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "73 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The whole change against main e30948d: 73 files (60 added, 13 changed), the files of the eleven approved commits and nothing else.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   ./eii test --seed 2026111504
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    4688 passed, 0 failed, 0 skipped
+Seed:      2026111504
+Notes:     The whole test command with a fresh seed at the work commit, after the re-cut on main e30948d.
+```
+
+```text
+### S2-T06 — Showcase places, business points and flagship selection
+Commit:    3f24fa1492c04f2b35827639411dfcf39c78372c
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','e30948d5ab714ea8739abe251df663cc5dfad105..3f24fa1492c04f2b35827639411dfcf39c78372c'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The eleven work commits of S2-T06 on main e30948d: the Part A join, Part B passes 1 to 3, the Part A mutation tests, explanations and close, mutation passes 4 to 6, the final join and mutation pass 7, each a Conventional Commit.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

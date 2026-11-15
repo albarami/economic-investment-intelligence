@@ -2017,6 +2017,186 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - OPTIONS: **Default:** proposed only, not built here. The task needs its own brief, a planted violation (rule 37) and a review by another maker.
 - NEEDED BY: before the next documentation pull request that amends audience wording.
 
+## OI-218 — Live places and flagship evidence
+
+- ID: OI-218
+- TYPE: PENDING
+- NEEDED: Complete the lead’s Part B live steps before ticking the eight criteria and before S2-T08.
+- WHY: Fixture approval does not verify a real showcase or select a real flagship.
+- DONE SO FAR: The DATA whole-task verdict P1 at b505c2d approves code but owes: the four concrete files and road receipts; attribution/category rows; Arabic tag; census lineage; places build/report; four showcase and seven candidate keys; showcase areas; real area manifest and rebuild comparison; verification rows; recorded check and provisional decision. Its P1 also says the header-only review-file test must change when real rows are entered. Part A rulings additionally owe the real confidence type (fixtures DOUBLE), record-level source entry rule, PUB-38 labels and the eleventh/withheld attribution-provider check; the withheld name is not reproduced here.
+- OPTIONS: **Default:** Keep pending states until these records exist. Confirm the source-language tag under PUB-27 and keep PUB-59 owner confirmation distinct from the provisional choice.
+- NEEDED BY: S2-T06 live completion, before S2-T08 and dependent real-data uses.
+
+## OI-219 — Build-time routing and ARC-88
+
+- ID: OI-219
+- TYPE: OPEN
+- NEEDED: Record the lead’s disposition of the custodian-side routing producer against ARC-88.
+- WHY: Document 02 locates routing in the API process; this build computes flagship areas in the custodian public build.
+- DONE SO FAR: The Part B start ruling explicitly ordered this proposed item; whole-task DATA P4 carries it. The pinned producer, receipts, requests, manifest and separate rebuild comparison are built.
+- OPTIONS: **Default:** Record the actual plane and purpose without silently amending an approved architecture rule; any material amendment needs its decision record.
+- NEEDED BY: S2-T10 follow-up, before the slice gate.
+
+## OI-220 — Area origin beyond body hashes
+
+- ID: OI-220
+- TYPE: OPEN
+- NEEDED: Carry the routing-provenance limitation into document 17 hardening.
+- WHY: A caller able to replace inputs and stand_in flags and recompute a digest cannot be authenticated from that body alone.
+- DONE SO FAR: Part A review P3 and the lead’s ruling retain this limit. Part B supplies a pinned producer, receipt/request/version bindings and a separate rebuild comparison; the places README describes those mechanisms.
+- OPTIONS: **Default:** Keep the trust-boundary limit explicit; do not describe the digest as authenticating the producer.
+- NEEDED BY: Document 17 hardening and S2-T10 record closure.
+
+## OI-221 — Typed recorded size and ETag
+
+- ID: OI-221
+- TYPE: OPEN
+- NEEDED: Resolve the proposed typed registry fields for recorded size and ETag.
+- WHY: The Part A ruling deferred these to Part B; the current fetcher still parses recorded values from basis_note.
+- DONE SO FAR: The transport ETag field and its plants are built, and interim skips are removed. Typed registry fields were separately proposed in the Part A ruling; transport completion does not close that proposal.
+- OPTIONS: **Default:** Retain strict parsing and named refusals until the lead assigns the typed-field change or records its disposition.
+- NEEDED BY: S2-T10 follow-up.
+
+## OI-222 — Whitespace-only in-memory attribution
+
+- ID: OI-222
+- TYPE: OPEN
+- NEEDED: Disposition of the hardening candidate for an in-memory attribution licence containing only spaces.
+- WHY: The helper’s note was explicitly retained as hardening, not part of the accepted round-1 findings.
+- DONE SO FAR: The round-2 ruling file records the lead’s decision to carry this candidate rather than build it. F4 separately fixed missing/blank further-source licences.
+- OPTIONS: **Default:** Judge the in-memory attribution seam separately from the further-source licence fix; keep the proposal pending until disposition.
+- NEEDED BY: S2-T10 follow-up; document 17 if deferred to deployment.
+
+## OI-223 — Confidence rounding contract text
+
+- ID: OI-223
+- TYPE: PENDING
+- NEEDED: Add the promised half-to-even, four-place source-confidence conversion rule to document 03.
+- WHY: The lead ordered the rounding mode into this task’s document change, and Part A P1 carries it; the current pub_place column row still says only decimal(5,4).
+- DONE SO FAR: stored_confidence and tests implement the rounding, source range is checked before it, and the display threshold reads the stored value. Document 03 section 7.3 records basic_category but no rounding mode in that row.
+- OPTIONS: **Default:** Record the implemented rule in the contract and preserve the tests; do not mark the documentation point closed from code alone.
+- NEEDED BY: S2-T06 records / S2-T10 before the slice gate.
+
+## OI-224 — GeoParquet setting reading record
+
+- ID: OI-224
+- TYPE: PENDING
+- NEEDED: The attributable official page and explicit reading confirmation requested by Part A P2.
+- WHY: A date in a source comment does not supply the requested page or establish a real-file check.
+- DONE SO FAR: read.py names enable_geoparquet_conversion and “configuration overview, read 2026-11-14”. The three Part A verdicts carry P2; the supplied evidence does not provide the requested page/read confirmation.
+- OPTIONS: **Default:** Read the official setting page and record publisher, page and retrieval date beside the code in Part B, keeping the invented-file run apart from the real-file check that is still owed; no reading is claimed here.
+- NEEDED BY: S2-T06 evidence record before the slice gate.
+
+## OI-225 — Native review of the Arabic caveat
+
+- ID: OI-225
+- TYPE: PENDING
+- NEEDED: Append S2-T06’s pending caveat review to existing OI-09 rather than claim Arabic approval.
+- WHY: Both whole-task lenses preserve the pending-native-review label.
+- DONE SO FAR: The English and Arabic caveats travel with outputs; Arabic name handling has fixture controls. No native Arabic approval is present in the supplied records.
+- OPTIONS: **Default:** Keep the pending label and obtain the named review in the bilingual work.
+- NEEDED BY: Native Arabic sign-off; align with OI-09.
+
+## OI-226 — Four source terms and building attribution record
+
+- ID: OI-226
+- TYPE: OPEN
+- NEEDED: Append these four rows to the work owed under OI-209; record the building attribution-page issue.
+- WHY: The marker with date checked is not the publisher’s own terms words.
+- DONE SO FAR: Join confirmation J2 accepts blank terms_url, terms to be read and 2026-11-15 as the interim state. The final join log records the lead’s reversion of the unasked building licence_url change, leaving the ODbL page, and says the building attribution page is named in no building-row URL; its words remain in basis_note. The allow-list was not widened.
+- OPTIONS: **Default:** Use the existing OI-209 item, not a duplicate terms-permission question. Preserve the lead’s pending host disposition for the attribution-page reading.
+- NEEDED BY: S2-T08 terms completeness before the slice gate.
+
+## OI-227 — Interrupt test random failure
+
+- ID: OI-227
+- TYPE: OPEN
+- NEEDED: Track the unproven failure at seed 2,026,111,499 under rule 39.
+- WHY: A green rerun does not establish a cause or close a random failure.
+- DONE SO FAR: lead-evidence.md: full test at b505c2d exited 1 with 4,647 passed and 1 failed; scripts/tests/test_runner_failures.py test_interrupt_kills_the_process_group reported “pid file never appeared” when its inner test did not start within 20 seconds at load average 32. Three single reruns and two stress runs passed; fresh seed 2,026,111,500 passed 4,648 tests, exit 0. CODE and DATA reviews both carry this item.
+- OPTIONS: **Default:** Preserve both runs and investigate without relaxing the timeout or assertion.
+- NEEDED BY: S2-T10 investigation; retain as open until causal evidence exists.
+
+## OI-228 — Live-frame newline mutant and locale sensitivity
+
+- ID: OI-228
+- TYPE: OPEN
+- NEEDED: Record and investigate the dropped-newline mutant’s inconsistent outcome and environment-sensitive locale assertion.
+- WHY: An equivalent mutant’s apparent kill can reflect an unrelated failure.
+- DONE SO FAR: m6 log: the mutant survived twice and was killed once; the explanation stays. Builder campaign 608 made, 597 killed, 11 survived; lead campaign 608 made, 598 killed, 10 survived, all explained, exit 0. Cognition’s APPROVED m6 review says the newline forms are equivalent on the used platform and identifies _ascii_locale’s encoding assertion as a likely, not proven, source of a spurious kill. Whole-task CODE carries the note.
+- OPTIONS: **Default:** Keep the explanation and discrepancy together; do not count a suspected flake as demonstrated test strength or close it on a rerun.
+- NEEDED BY: S2-T10; join to the lead’s existing open item if already numbered.
+
+## OI-229 — Historical SIGXCPU and campaign exit evidence
+
+- ID: OI-229
+- TYPE: PENDING
+- NEEDED: Carry the failed Part A run and the runner follow-up record without losing the original failure.
+- WHY: The task’s passing checks must not erase a failed check or a misleading wrapper status.
+- DONE SO FAR: Part A lead ruling records exit 152 at 860a4df during script discovery, traced to stale mutation-test deadlines and recycled process numbers in a shared namespace. Subsequent campaigns were isolated; the ruling assigned repository-runner enforcement to S2-T10. The later m6 rulings record a wrapper that returned the final tail command status and name mismatches for S2-T06m and m6 campaign files; the wrapper was fixed and approvals rested on the runner output’s own exit line. These records do not establish closure of the repository follow-up.
+- OPTIONS: **Default:** Link the existing runner item if already entered, retain the failed run, and use the runner output and saved exit record rather than the wrapper status alone.
+- NEEDED BY: S2-T10 records; no claim to reopen or close another task’s implementation.
+
+## OI-230 — Float and integer confidence rounding context
+
+- ID: OI-230
+- TYPE: OPEN
+- NEEDED: Record the closing-step review point that float/int confidence still quantizes under the caller’s decimal context.
+- WHY: The private context added by the close applies to finite Decimal inputs, not every branch.
+- DONE SO FAR: The Part A closing-step ruling explicitly leaves the float branch for review. stored_confidence at b505c2d passes _STORED_CONTEXT in its finite-Decimal branch; the text-conversion branch omits context. The whole-task verdicts approve the change but do not explicitly dispose of this named point.
+- OPTIONS: **Default:** Pin the float and integer branches to the same private context in Part B, with a test under a caller context of another rounding mode; do not broaden the finite-Decimal fix into a claim about all input types.
+- NEEDED BY: S2-T10 follow-up.
+
+## OI-231 — Fetch success-receipt test derives its file name
+
+- ID: OI-231
+- TYPE: OPEN
+- NEEDED: Write the expected receipt file name of the places fetch success test as a hand-written literal.
+- WHY: The m7 review (Cognition SWE-2 High through Devin, APPROVED 36fa382, no finding) notes that the success-receipt test of custodian/tests/test_places_fetch_survivors.py derives the expected file name with the production idiom, so a change of that idiom in both places would not be caught.
+- DONE SO FAR: Mutation pass 7 closed the places/fetch.py campaign owed under ruling L-616: the lead's campaign at 36fa382 made 363, killed 354, survived 9, all nine explained, exit 0. The reviewer raised this as hardening, not a finding.
+- OPTIONS: **Default:** Replace the derived name with a literal in the next places task; the module's campaign is re-run there.
+- NEEDED BY: S2-T06 Part B.
+
+## OI-232 — Task records and train verification still owed
+
+- ID: OI-232
+- TYPE: PENDING
+- NEEDED: Publish the corrected ledger, status line, numbered items and exact-head documentation evidence; retain the train’s shared checks once.
+- WHY: DATA P3 says the supplied final-head evidence has no check_docs.py record, and review approval is not a hosted or merge-result check.
+- DONE SO FAR: Both whole-task verdicts approve b505c2d. The join confirmation notes its pick patch omitted the earlier registry-row portion; the lead log explains those rows came from earlier picks. The drafts record that evidence limit. The task log corrects the maker of m4 (Alibaba Qwen3.8 Max through Factory Droid, not the Kimi credit of commit efe26e0) and the “360 rows” wording (360 added lines).
+- OPTIONS: **Default:** File the missing pick material if required for the train proof; reconcile marked records, number items, run the shared train checks and exact-merge-result whole test under decision 0032. No result is claimed here.
+- NEEDED BY: Lead’s train preparation and final merge record.
+
+## OI-233 — Whole-footprint interpretation of flagship check (a)
+
+- ID: OI-233
+- TYPE: ASSUMPTION
+- NEEDED: Preserve the lead’s stricter interpretation: the whole footprint lies within the union of zones 69 and 70.
+- WHY: The Part A first-brief ruling explicitly calls this an assumption for the ledger.
+- DONE SO FAR: flagship.py implements the union and coverage check; the mutation closing step always unites zones, including overlapping parts of one zone. Both whole-task reviews approve the implementation.
+- OPTIONS: **Default:** Keep the interpretation visible with the candidate check; a material change follows a decision record.
+- NEEDED BY: Real candidate review and provisional flagship record.
+
+## OI-234 — Flagship refusal order record
+
+- ID: OI-234
+- TYPE: PENDING
+- NEEDED: Enter the existing validate_decision diagnostic order; no order change is required.
+- WHY: Part A P4 found the brief’s stated precedence different from the code; the lead ruled that no diagnostic order had been decided.
+- DONE SO FAR: The task log records code order: recomputation/hand_edited, stale_digest, not_provisional, evidence_mismatch, passed_keys_mismatch, no_provider or stand_in_area, failed_candidate. Every combination still refuses; the order determines the reported code.
+- OPTIONS: **Default:** Close this record point when the lead publishes that account; do not change the validator for this draft.
+- NEEDED BY: S2-T06 ledger publication.
+
+## OI-235 — Twenty public figures at the slice gate
+
+- ID: OI-235
+- TYPE: PENDING
+- NEEDED: Keep the independent twenty-figure source check with S2-T08 and the slice gate.
+- WHY: The CODE whole-task review explicitly places REV-34 at the slice’s turn, not as a task finding.
+- DONE SO FAR: This task’s supplied evidence contains fixture checks, mutation campaigns and whole-suite runs; it does not report a completed twenty-figure source check.
+- OPTIONS: **Default:** Reference the slice’s existing gate work; do not create a duplicate task or mark it passed from this approval.
+- NEEDED BY: S2-T08 and the slice S2 gate.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
