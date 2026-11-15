@@ -1435,3 +1435,295 @@ reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 reso
 module = "custodian/src/eii_custodian/publicdata/stage.py"
 mutation = "--- src/eii_custodian/publicdata/stage.py\n+++ src/eii_custodian/publicdata/stage.py\n@@ -35,7 +35,7 @@\n             if expected is None and path.is_file() and not unrecorded:\n                 unrecorded = figure_id\n             continue\n-        got = json.loads(path.read_text(encoding=\"utf-8\"))\n+        got = json.loads(path.read_text(encoding=\"UTF-8\"))\n         if use_evidence:\n             from eii_custodian.publicdata.series.figures import validate_figure"
 reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same decoder, so every byte string is read or refused as before."
+
+# places_fsq S2-T15. Exact equivalent mutations from the project runner.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/names.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/names.py\n+++ src/eii_custodian/publicdata/places_fsq/names.py\n@@ -2,7 +2,7 @@\n     \"\"\"Return the number of single-character edits between two strings.\"\"\"\n     if left == right:\n         return 0\n-    if left == \"\":\n+    if left == \"XXXX\":\n         return len(right)\n     if right == \"\":\n         return len(left)"
+reason = "An empty left string never enters the loop, and the initial row already ends in len(right), so the early return and the comparison return the same integer."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/names.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/names.py\n+++ src/eii_custodian/publicdata/places_fsq/names.py\n@@ -4,7 +4,7 @@\n         return 0\n     if left == \"\":\n         return len(right)\n-    if right == \"\":\n+    if right == \"XXXX\":\n         return len(left)\n     previous = list(range(len(right) + 1))\n     for i, a in enumerate(left, start=1):"
+reason = "An empty right string adds no inner cells, and each outer step stores its own index, so the last cell is len(left), the same integer the early return uses."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/names.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/names.py\n+++ src/eii_custodian/publicdata/places_fsq/names.py\n@@ -6,7 +6,7 @@\n         return len(right)\n     if right == \"\":\n         return len(left)\n-    previous = list(range(len(right) + 1))\n+    previous = list(range(len(right) + 2))\n     for i, a in enumerate(left, start=1):\n         current = [i]\n         for j, b in enumerate(right, start=1):"
+reason = "The extra initial cell is never indexed: columns stop at len(right), and a non-empty left string replaces the row before the result is read. An empty left string returns before this line."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/names.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/names.py\n+++ src/eii_custodian/publicdata/places_fsq/names.py\n@@ -4,5 +4,5 @@\n         return False\n     return any(\n         haystack[index : index + span] == needle\n-        for index in range(len(haystack) - span + 1)\n+        for index in range(len(haystack) + span + 1)\n     )"
+reason = "A start past the last aligned window yields a slice shorter than a non-empty needle, so it cannot match. An empty needle is refused by _contains_words before _window, and a direct empty needle already matches at index 0."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/names.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/names.py\n+++ src/eii_custodian/publicdata/places_fsq/names.py\n@@ -4,5 +4,5 @@\n         return False\n     return any(\n         haystack[index : index + span] == needle\n-        for index in range(len(haystack) - span + 1)\n+        for index in range(len(haystack) - span + 2)\n     )"
+reason = "The one extra start index yields a slice one shorter than a non-empty needle, so it cannot match. An empty needle already matches at index 0, and the extra index does not change that result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/assemble.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/assemble.py\n+++ src/eii_custodian/publicdata/places_fsq/assemble.py\n@@ -23,7 +23,7 @@\n     table = tuple(_table_row(row, grid, release) for row in account.kept)\n     eligible = tuple(\n         _eligible(row, table_row, mapping, attribution, receipt_sha256)\n-        for row, table_row in zip(account.kept, table, strict=True)\n+        for row, table_row in zip(account.kept, table, strict=None)\n         if is_eligible(row, frame, links)\n     )\n     unmapped = sum("
+reason = "table is one _table_row per row of account.kept, so the sequences have equal length. Python 3.14 treats zip strict=None as false and returns the same pairs as strict=True."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/assemble.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/assemble.py\n+++ src/eii_custodian/publicdata/places_fsq/assemble.py\n@@ -23,7 +23,7 @@\n     table = tuple(_table_row(row, grid, release) for row in account.kept)\n     eligible = tuple(\n         _eligible(row, table_row, mapping, attribution, receipt_sha256)\n-        for row, table_row in zip(account.kept, table, strict=True)\n+        for row, table_row in zip(account.kept, table, )\n         if is_eligible(row, frame, links)\n     )\n     unmapped = sum("
+reason = "table is one _table_row per row of account.kept, so the sequences have equal length. Omitting strict leaves zip's default, which returns the same pairs and does not raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/assemble.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/assemble.py\n+++ src/eii_custodian/publicdata/places_fsq/assemble.py\n@@ -23,7 +23,7 @@\n     table = tuple(_table_row(row, grid, release) for row in account.kept)\n     eligible = tuple(\n         _eligible(row, table_row, mapping, attribution, receipt_sha256)\n-        for row, table_row in zip(account.kept, table, strict=True)\n+        for row, table_row in zip(account.kept, table, strict=False)\n         if is_eligible(row, frame, links)\n     )\n     unmapped = sum("
+reason = "table is one _table_row per row of account.kept, so the sequences have equal length. strict=False returns the same pairs as strict=True and does not raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/policy.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/policy.py\n+++ src/eii_custodian/publicdata/places_fsq/policy.py\n@@ -1,6 +1,6 @@\n def load_mapping(path: Path, known_keys: frozenset[str]) -> tuple[CategoryMapping, ...]:\n     \"\"\"Load a reviewed mapping. A bad row refuses the file's use.\"\"\"\n-    with path.open(encoding=\"utf-8\", newline=\"\") as handle:\n+    with path.open(encoding=None, newline=\"\") as handle:\n         reader = csv.DictReader(line for line in handle if not line.startswith(\"#\"))\n         if reader.fieldnames is None or tuple(reader.fieldnames) != MAPPING_COLUMNS:\n             raise PlacesFsqError(\"mapping_header\")"
+reason = "Path.open treats encoding None as locale.getencoding(). This interpreter reports UTF-8, the same codec as utf-8, so the mapping text is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/policy.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/policy.py\n+++ src/eii_custodian/publicdata/places_fsq/policy.py\n@@ -1,6 +1,6 @@\n def load_mapping(path: Path, known_keys: frozenset[str]) -> tuple[CategoryMapping, ...]:\n     \"\"\"Load a reviewed mapping. A bad row refuses the file's use.\"\"\"\n-    with path.open(encoding=\"utf-8\", newline=\"\") as handle:\n+    with path.open(newline=\"\") as handle:\n         reader = csv.DictReader(line for line in handle if not line.startswith(\"#\"))\n         if reader.fieldnames is None or tuple(reader.fieldnames) != MAPPING_COLUMNS:\n             raise PlacesFsqError(\"mapping_header\")"
+reason = "Omitting encoding uses locale.getencoding(). This interpreter reports UTF-8, so the mapping text matches an explicit utf-8 encoding."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/policy.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/policy.py\n+++ src/eii_custodian/publicdata/places_fsq/policy.py\n@@ -1,6 +1,6 @@\n def load_mapping(path: Path, known_keys: frozenset[str]) -> tuple[CategoryMapping, ...]:\n     \"\"\"Load a reviewed mapping. A bad row refuses the file's use.\"\"\"\n-    with path.open(encoding=\"utf-8\", newline=\"\") as handle:\n+    with path.open(encoding=\"UTF-8\", newline=\"\") as handle:\n         reader = csv.DictReader(line for line in handle if not line.startswith(\"#\"))\n         if reader.fieldnames is None or tuple(reader.fieldnames) != MAPPING_COLUMNS:\n             raise PlacesFsqError(\"mapping_header\")"
+reason = "Python resolves the codec names UTF-8 and utf-8 to the same codec, so the mapping text is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/policy.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/policy.py\n+++ src/eii_custodian/publicdata/places_fsq/policy.py\n@@ -12,7 +12,7 @@\n     seen: dict[str, str] = {}\n     for row in rows:\n         prior = seen.get(row.source_category_id)\n-        if prior is not None and prior != row.place_category_key:\n+        if prior is not None and prior == row.place_category_key:\n             raise PlacesFsqError(\"mapping_conflict\")\n         if prior is not None:\n             raise PlacesFsqError(\"mapping_conflict\")"
+reason = "The following statement raises mapping_conflict for every source category already seen, whether or not the product key differs. A first sight of an identifier still passes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/policy.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/policy.py\n+++ src/eii_custodian/publicdata/places_fsq/policy.py\n@@ -2,7 +2,7 @@\n     \"\"\"Refuse a reviewed policy file that disagrees with the enforced rules.\"\"\"\n     import yaml  # type: ignore[import-untyped]\n \n-    loaded = yaml.safe_load(path.read_text(encoding=\"utf-8\"))\n+    loaded = yaml.safe_load(path.read_text(encoding=None))\n     if not isinstance(loaded, dict):\n         raise PlacesFsqError(\"policy_disagrees\")\n     expected: dict[str, object] = {"
+reason = "Path.read_text treats encoding None as locale.getencoding(). This interpreter reports UTF-8, the same codec as utf-8, so the policy text is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/policy.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/policy.py\n+++ src/eii_custodian/publicdata/places_fsq/policy.py\n@@ -2,7 +2,7 @@\n     \"\"\"Refuse a reviewed policy file that disagrees with the enforced rules.\"\"\"\n     import yaml  # type: ignore[import-untyped]\n \n-    loaded = yaml.safe_load(path.read_text(encoding=\"utf-8\"))\n+    loaded = yaml.safe_load(path.read_text(encoding=\"UTF-8\"))\n     if not isinstance(loaded, dict):\n         raise PlacesFsqError(\"policy_disagrees\")\n     expected: dict[str, object] = {"
+reason = "Python resolves the codec names UTF-8 and utf-8 to the same codec, so the policy text is unchanged."
+
+# places_fsq parse.py equivalents, S2-T15.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/parse.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/parse.py\n+++ src/eii_custodian/publicdata/places_fsq/parse.py\n@@ -1,4 +1,4 @@\n def _local(path: Path) -> None:\n     text = str(path)\n-    if \"://\" in text or \":/\" in text or text.startswith(\"http\"):\n+    if \"XX://XX\" in text or \":/\" in text or text.startswith(\"http\"):\n         raise PlacesFsqError(\"remote_path\")"
+reason = "The check \":/\" in text already matches every string that contains \"://\", and a string without \":/\" cannot contain \"://\". Changing the \"://\" clause does not change the result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/parse.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/parse.py\n+++ src/eii_custodian/publicdata/places_fsq/parse.py\n@@ -8,7 +8,7 @@\n         endian = \">\"\n     else:\n         raise PlacesFsqError(\"geometry\")\n-    kind = struct.unpack_from(endian + \"I\", value, 1)[0]\n+    kind = struct.unpack_from(endian + \"i\", value, 1)[0]\n     base = kind & 0xFF\n     if base != _POINT:\n         raise PlacesFsqError(\"geometry\")"
+reason = "struct's signed and unsigned 32-bit reads differ at bit 31 and above. The geometry checks use bits 0-7 and bit 29, which agree for every four-byte value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/parse.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/parse.py\n+++ src/eii_custodian/publicdata/places_fsq/parse.py\n@@ -1,7 +1,7 @@\n def _column_types(path: Path) -> dict[str, str]:\n     connection = _connect()\n     described = connection.execute(\n-        \"SELECT column_name, column_type FROM (DESCRIBE SELECT * FROM read_parquet(?))\",\n+        \"select column_name, column_type from (describe select * from read_parquet(?))\",\n         [str(path)],\n     ).fetchall()\n     connection.close()"
+reason = "DuckDB accepts these keywords and read_parquet in either case. The described names and types come back unchanged, which a memory DESCRIBE of both cases showed."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/parse.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/parse.py\n+++ src/eii_custodian/publicdata/places_fsq/parse.py\n@@ -1,7 +1,7 @@\n def _column_types(path: Path) -> dict[str, str]:\n     connection = _connect()\n     described = connection.execute(\n-        \"SELECT column_name, column_type FROM (DESCRIBE SELECT * FROM read_parquet(?))\",\n+        \"SELECT COLUMN_NAME, COLUMN_TYPE FROM (DESCRIBE SELECT * FROM READ_PARQUET(?))\",\n         [str(path)],\n     ).fetchall()\n     connection.close()"
+reason = "DuckDB accepts these keywords and read_parquet in either case. The described names and types come from the file, and the full parser tests still passed with this spelling."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/parse.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/parse.py\n+++ src/eii_custodian/publicdata/places_fsq/parse.py\n@@ -7,6 +7,6 @@\n     connection.close()\n     found: dict[str, str] = {}\n     for name, kind in described:\n-        if isinstance(name, str) and isinstance(kind, str):\n+        if isinstance(name, str) or isinstance(kind, str):\n             found[name] = kind\n     return found"
+reason = "This installed DuckDB returns the described column name and type as two strings. Both parts are true together, so and and or accept the same rows."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/parse.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/parse.py\n+++ src/eii_custodian/publicdata/places_fsq/parse.py\n@@ -10,6 +10,6 @@\n         [str(path)],\n     )\n     names = [item[0] for item in relation.description]\n-    found = [dict(zip(names, row, strict=True)) for row in relation.fetchall()]\n+    found = [dict(zip(names, row, strict=None)) for row in relation.fetchall()]\n     connection.close()\n     return found"
+reason = "The names are the query description and each row is one result of that query, so the lengths match. Python 3.14 treats zip strict=None as false and returns the same pairs."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/parse.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/parse.py\n+++ src/eii_custodian/publicdata/places_fsq/parse.py\n@@ -10,6 +10,6 @@\n         [str(path)],\n     )\n     names = [item[0] for item in relation.description]\n-    found = [dict(zip(names, row, strict=True)) for row in relation.fetchall()]\n+    found = [dict(zip(names, row, )) for row in relation.fetchall()]\n     connection.close()\n     return found"
+reason = "The names are the query description and each row is one result of that query, so the lengths match. Omitting strict leaves zip's default, which returns the same pairs."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/parse.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/parse.py\n+++ src/eii_custodian/publicdata/places_fsq/parse.py\n@@ -10,6 +10,6 @@\n         [str(path)],\n     )\n     names = [item[0] for item in relation.description]\n-    found = [dict(zip(names, row, strict=True)) for row in relation.fetchall()]\n+    found = [dict(zip(names, row, strict=False)) for row in relation.fetchall()]\n     connection.close()\n     return found"
+reason = "The names are the query description and each row is one result of that query, so the lengths match. strict=False returns the same pairs as strict=True."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -1,5 +1,5 @@\n def _footer_bytes(body: bytes) -> bytes:\n-    if len(body) < 12 or body[:4] != _MAGIC or body[-4:] != _MAGIC:\n+    if len(body) <= 12 or body[:4] != _MAGIC or body[-4:] != _MAGIC:\n         raise PlacesFsqError(\"metadata_unreadable\")\n     length = struct.unpack_from(\"<I\", body, len(body) - 8)[0]\n     start = len(body) - 8 - length"
+reason = "The only additional rejected length is twelve bytes. In _footer_bytes the later length < 1 or start < 4 guard refuses every twelve-byte body: start = 4 - length, so a positive length starts before byte four and zero length fails length < 1. No twelve-byte body can return a footer."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -1,5 +1,5 @@\n def _footer_bytes(body: bytes) -> bytes:\n-    if len(body) < 12 or body[:4] != _MAGIC or body[-4:] != _MAGIC:\n+    if len(body) < 13 or body[:4] != _MAGIC or body[-4:] != _MAGIC:\n         raise PlacesFsqError(\"metadata_unreadable\")\n     length = struct.unpack_from(\"<I\", body, len(body) - 8)[0]\n     start = len(body) - 8 - length"
+reason = "The only additional rejected length is twelve bytes. The sibling length < 1 or start < 4 guard in _footer_bytes already refuses every such body: start = 4 - length, so no positive footer length fits after the opening magic."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -11,7 +11,7 @@\n     self._begin()\n     self._field(1, _LIST)\n     self._list_header(_STRUCT, 2)\n-    self._chunk(file_path, (\"longitude\",), longitude_pair, bbox, omit_stats=False)\n+    self._chunk(file_path, (\"longitude\",), longitude_pair, bbox, omit_stats=None)\n     self._chunk(\n         file_path,\n         (\"latitude\",),"
+reason = "_chunk passes omit_stats unchanged to _column, whose only use is if not omit_stats. False and None both take the statistics-writing branch; there is no other use or output of this argument."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -1,5 +1,5 @@\n def _uvarint(buffer: bytearray, value: int) -> None:\n-    number = value & ((1 << 64) - 1) if value < 0 else value\n+    number = value & ((1 << 64) - 1) if value <= 0 else value\n     while True:\n         byte = number & 0x7F\n         number >>= 7"
+reason = "The changed branch additionally masks zero. Zero AND the unsigned mask is still zero, so _uvarint writes the same single zero byte. Negative and positive inputs use the same branches as before."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -1,5 +1,5 @@\n def _uvarint(buffer: bytearray, value: int) -> None:\n-    number = value & ((1 << 64) - 1) if value < 0 else value\n+    number = value & ((1 << 64) - 1) if value < 1 else value\n     while True:\n         byte = number & 0x7F\n         number >>= 7"
+reason = "For integer input the only additional masked value is zero; zero AND the mask is zero. All other integers use the original branch and _uvarint emits identical bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -1,7 +1,7 @@\n def file_metadata(self) -> SummaryFooter:\n     self._begin()\n     groups: list[tuple[ChunkStat | None, ...]] = []\n-    orders: tuple[bool, ...] | None = None\n+    orders: tuple[bool, ...] | None = \"\"\n     dataset: tuple[float, float, float, float] | None = None\n     while True:\n         kind, field_id = self._header()"
+reason = "Before a column_orders list is read, an empty string has length zero. For every nonempty row group the sibling len(orders) != len(group) condition in file_metadata selects the same deprecated bounds as orders is None. An empty row group contains no column to resolve. Any actual list replaces the initial value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -17,7 +17,7 @@\n         if kind is None:\n             break\n         if field_id == 1 and kind == _BINARY:\n-            file_path = self._bytes().decode(\"utf-8\", \"replace\")\n+            file_path = self._bytes().decode(\"UTF-8\", \"replace\")\n         elif field_id == 3 and kind == _STRUCT:\n             meta = self._column()\n         else:"
+reason = "Python resolves UTF-8 and utf-8 to the same codec. The replacement error handler and all bytes are unchanged, including malformed UTF-8."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -10,7 +10,7 @@\n ]:\n     self._begin()\n     path: tuple[str, ...] = ()\n-    kind_code: int | None = None\n+    kind_code: int | None = \"\"\n     geo: tuple[float, float, float, float] | None = None\n     low: float | None = None\n     high: float | None = None"
+reason = "Until a type field is read, both None and the empty string fail kind_code != _TYPE_DOUBLE in _float, returning missing bounds. Reading a type replaces the initial value. No other consumer reads kind_code."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -5,7 +5,7 @@\n         parts: list[str] = []\n         for _ in range(size):\n             if element == _BINARY:\n-                parts.append(self._bytes().decode(\"utf-8\", \"replace\"))\n+                parts.append(self._bytes().decode(\"UTF-8\", \"replace\"))\n             else:\n                 self._skip_element(element)\n         return tuple(parts)"
+reason = "Python resolves UTF-8 and utf-8 to the same codec. _path returns identical strings for valid and malformed byte sequences with the unchanged replacement error handler."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -7,7 +7,7 @@\n         if kind is None:\n             break\n         if field_id == 1 and kind == _BINARY:\n-            key = self._bytes().decode(\"utf-8\", \"replace\")\n+            key = self._bytes().decode(\"UTF-8\", \"replace\")\n         elif field_id == 2 and kind == _BINARY:\n             value = self._bytes().decode(\"utf-8\", \"replace\")\n         else:"
+reason = "Python resolves UTF-8 and utf-8 to the same codec. _pair decodes the identical key bytes using the unchanged replacement error handler."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -9,7 +9,7 @@\n         if field_id == 1 and kind == _BINARY:\n             key = self._bytes().decode(\"utf-8\", \"replace\")\n         elif field_id == 2 and kind == _BINARY:\n-            value = self._bytes().decode(\"utf-8\", \"replace\")\n+            value = self._bytes().decode(\"UTF-8\", \"replace\")\n         else:\n             self._skip(kind)\n     return key, value"
+reason = "Python resolves UTF-8 and utf-8 to the same codec. _pair decodes the identical value bytes using the unchanged replacement error handler."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -2,7 +2,7 @@\n     self, kind_code: int | None\n ) -> tuple[float | None, float | None, float | None, float | None]:\n     self._begin()\n-    plain_min: bytes | None = None\n+    plain_min: bytes | None = \"\"\n     plain_max: bytes | None = None\n     value_min: bytes | None = None\n     value_max: bytes | None = None"
+reason = "The initial absent deprecated minimum becomes an empty string. _float rejects it through len(payload) != 8, yielding None just as the payload is None branch does. A present deprecated minimum overwrites the initial value, and modern bounds are independent."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -3,7 +3,7 @@\n ) -> tuple[float | None, float | None, float | None, float | None]:\n     self._begin()\n     plain_min: bytes | None = None\n-    plain_max: bytes | None = None\n+    plain_max: bytes | None = \"\"\n     value_min: bytes | None = None\n     value_max: bytes | None = None\n     while True:"
+reason = "The initial absent deprecated maximum becomes an empty string. _float rejects it through len(payload) != 8, yielding None just as payload is None does. A present deprecated maximum overwrites the initial value; modern bounds do not depend on it."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/footer.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/footer.py\n+++ src/eii_custodian/publicdata/places_fsq/footer.py\n@@ -7,5 +7,5 @@\n         if byte < 0x80:\n             return number\n         shift += 7\n-        if shift > 70:\n+        if shift > 71:\n             raise PlacesFsqError(\"metadata_unreadable\")"
+reason = "_varint initializes shift to zero and only increments by seven. Neither an input byte nor another path assigns shift. After seventy the next tested shift is seventy-seven, so >70 and >71 reject at the identical byte."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/select.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/select.py\n+++ src/eii_custodian/publicdata/places_fsq/select.py\n@@ -14,7 +14,7 @@\n             chosen.add(file_path)\n     if not chosen:\n         raise PlacesFsqError(\"no_file_for_frame\")\n-    basenames = [path.rsplit(\"/\", 1)[-1] for path in chosen]\n+    basenames = [path.rsplit(\"/\", )[-1] for path in chosen]\n     if len(set(basenames)) != len(basenames):\n         raise PlacesFsqError(\"file_name_duplicate\")\n     recorded = tuple(IgnoredGeo(path, bbox) for path, bbox in sorted(ignored.items()))"
+reason = "rsplit with no maximum or with maximum two still returns the same final segment as maximum one. select_partitions uses only index -1; earlier segments are never observed, for paths with zero, one or several slashes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/select.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/select.py\n+++ src/eii_custodian/publicdata/places_fsq/select.py\n@@ -14,7 +14,7 @@\n             chosen.add(file_path)\n     if not chosen:\n         raise PlacesFsqError(\"no_file_for_frame\")\n-    basenames = [path.rsplit(\"/\", 1)[-1] for path in chosen]\n+    basenames = [path.rsplit(\"/\", 2)[-1] for path in chosen]\n     if len(set(basenames)) != len(basenames):\n         raise PlacesFsqError(\"file_name_duplicate\")\n     recorded = tuple(IgnoredGeo(path, bbox) for path, bbox in sorted(ignored.items()))"
+reason = "rsplit with no maximum or with maximum two still returns the same final segment as maximum one. select_partitions uses only index -1; earlier segments are never observed, for paths with zero, one or several slashes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/parse.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/parse.py\n+++ src/eii_custodian/publicdata/places_fsq/parse.py\n@@ -2,5 +2,5 @@\n     import duckdb\n \n     connection = duckdb.connect()\n-    connection.execute(\"SET enable_geoparquet_conversion = false\")\n+    connection.execute(\"set enable_geoparquet_conversion = false\")\n     return connection"
+reason = "Only SQL capitalization changes. On the pinned DuckDB, this exact statement executes successfully and duckdb_settings reports enable_geoparquet_conversion false, just as the original statement does. The connection-setting test passed under this mutant; there is no input parameter to the statement."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/parse.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/parse.py\n+++ src/eii_custodian/publicdata/places_fsq/parse.py\n@@ -2,5 +2,5 @@\n     import duckdb\n \n     connection = duckdb.connect()\n-    connection.execute(\"SET enable_geoparquet_conversion = false\")\n+    connection.execute(\"SET ENABLE_GEOPARQUET_CONVERSION = FALSE\")\n     return connection"
+reason = "Only SQL capitalization changes. On the pinned DuckDB, this exact statement executes successfully and duckdb_settings reports enable_geoparquet_conversion false, just as the original statement does. The connection-setting test passed under this mutant; there is no input parameter to the statement."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -10,7 +10,7 @@\n     blocked = _blocked(entry)\n     if blocked is not None:\n         return None, blocked\n-    metadata, failure = _get(entry, transport, entry.url)\n+    metadata, failure = _get(None, transport, entry.url)\n     if failure is not None or metadata is None:\n         return None, failure\n     refusal = _body_refusal(metadata.body, metadata.final_url, metadata=True)"
+reason = "_get immediately executes del entry and never reads it. URL approval uses its url argument and transport only. Replacing the unused entry argument with None changes no branch, request, refusal or output."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -25,7 +25,7 @@\n     terms_body = b\"\"\n     terms_url = entry.terms_url\n     if terms_url:\n-        terms, failure = _get(entry, transport, terms_url)\n+        terms, failure = _get(None, transport, terms_url)\n         if failure is not None or terms is None:\n             return None, failure\n         refusal = _terms_refusal(terms.body, terms.final_url)"
+reason = "_get immediately executes del entry and never reads it. URL approval uses its url argument and transport only. Replacing the unused entry argument with None changes no branch, request, refusal or output."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -41,7 +41,7 @@\n             return None, ReleaseFailure(\n                 1, url, \"blocked_host\", \"allow-listed host\", url\n             )\n-        response, failure = _get(entry, transport, url)\n+        response, failure = _get(None, transport, url)\n         if failure is not None or response is None:\n             return None, failure\n         refusal = _body_refusal(response.body, response.final_url, metadata=False)"
+reason = "_get immediately executes del entry and never reads it. URL approval uses its url argument and transport only. Replacing the unused entry argument with None changes no branch, request, refusal or output."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -11,7 +11,7 @@\n     if blocked is not None:\n         return None, blocked\n     metadata, failure = _get(entry, transport, entry.url)\n-    if failure is not None or metadata is None:\n+    if failure is not None and metadata is None:\n         return None, failure\n     refusal = _body_refusal(metadata.body, metadata.final_url, metadata=True)\n     if refusal is not None:"
+reason = "Every return of _get is either (Response, None) or (None, ReleaseFailure): its approval, TransportFault and hop guards return the second form, and its sole success return uses the first. Therefore failure is not None and response is None always have the same truth value; no input reaches a returned mismatched pair."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -26,7 +26,7 @@\n     terms_url = entry.terms_url\n     if terms_url:\n         terms, failure = _get(entry, transport, terms_url)\n-        if failure is not None or terms is None:\n+        if failure is not None and terms is None:\n             return None, failure\n         refusal = _terms_refusal(terms.body, terms.final_url)\n         if refusal is not None:"
+reason = "Every return of _get is either (Response, None) or (None, ReleaseFailure): its approval, TransportFault and hop guards return the second form, and its sole success return uses the first. Therefore failure is not None and response is None always have the same truth value; no input reaches a returned mismatched pair."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -42,7 +42,7 @@\n                 1, url, \"blocked_host\", \"allow-listed host\", url\n             )\n         response, failure = _get(entry, transport, url)\n-        if failure is not None or response is None:\n+        if failure is not None and response is None:\n             return None, failure\n         refusal = _body_refusal(response.body, response.final_url, metadata=False)\n         if refusal is not None:"
+reason = "Every return of _get is either (Response, None) or (None, ReleaseFailure): its approval, TransportFault and hop guards return the second form, and its sole success return uses the first. Therefore failure is not None and response is None always have the same truth value; no input reaches a returned mismatched pair."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -22,7 +22,7 @@\n         return None, ReleaseFailure(\n             1, metadata.final_url, exc.reason, \"files for the frame\", \"none\"\n         )\n-    terms_body = b\"\"\n+    terms_body = None\n     terms_url = entry.terms_url\n     if terms_url:\n         terms, failure = _get(entry, transport, terms_url)"
+reason = "If terms_url is nonempty, terms_body is overwritten by terms.body before _store. Otherwise its only consumers are the truthiness checks in _store and _sidecar; both empty bytes and None select the empty digest and then JSON null. No consumer reads bytes when terms is false."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -44,7 +44,7 @@\n         response, failure = _get(entry, transport, url)\n         if failure is not None or response is None:\n             return None, failure\n-        refusal = _body_refusal(response.body, response.final_url, metadata=False)\n+        refusal = _body_refusal(response.body, response.final_url, metadata=None)\n         if refusal is not None:\n             return None, refusal\n         try:"
+reason = "_body_refusal uses metadata only in the conditional choosing metadata_unreadable versus not_parquet. False and None select not_parquet; the earlier magic and sign-in branches do not read this flag."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -1,7 +1,7 @@\n def _body_refusal(body: bytes, url: str, *, metadata: bool) -> ReleaseFailure | None:\n     if body.startswith(b\"PAR1\"):\n         return None\n-    text = body[:4000].decode(\"utf-8\", errors=\"replace\").casefold()\n+    text = body[:4000].decode(errors=\"replace\").casefold()\n     if any(mark in text for mark in _SIGN_IN):\n         return ReleaseFailure(1, url, \"sign_in_demand\", \"public file\", \"sign-in\")\n     check = \"metadata_unreadable\" if metadata else \"not_parquet\""
+reason = "bytes.decode defaults to UTF-8 when the encoding argument is omitted. The unchanged replacement error handler, bytes and case-folding therefore produce identical strings, including malformed byte sequences."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -1,5 +1,5 @@\n def _terms_refusal(body: bytes, url: str) -> ReleaseFailure | None:\n-    text = body.decode(\"utf-8\", errors=\"replace\")\n+    text = body.decode(errors=\"replace\")\n     folded = text.casefold()\n     if any(mark in folded for mark in _SIGN_IN):\n         return ReleaseFailure(1, url, \"sign_in_demand\", \"public file\", \"sign-in\")"
+reason = "bytes.decode defaults to UTF-8 when the encoding argument is omitted. The unchanged replacement error handler, bytes and case-folding therefore produce identical strings, including malformed byte sequences."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -1,7 +1,7 @@\n def _body_refusal(body: bytes, url: str, *, metadata: bool) -> ReleaseFailure | None:\n     if body.startswith(b\"PAR1\"):\n         return None\n-    text = body[:4000].decode(\"utf-8\", errors=\"replace\").casefold()\n+    text = body[:4000].decode(\"UTF-8\", errors=\"replace\").casefold()\n     if any(mark in text for mark in _SIGN_IN):\n         return ReleaseFailure(1, url, \"sign_in_demand\", \"public file\", \"sign-in\")\n     check = \"metadata_unreadable\" if metadata else \"not_parquet\""
+reason = "Python resolves UTF-8 and utf-8 to the same codec. The bytes or text and error handling are unchanged, so the decoded refusal text or encoded manifest bytes are identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -1,5 +1,5 @@\n def _terms_refusal(body: bytes, url: str) -> ReleaseFailure | None:\n-    text = body.decode(\"utf-8\", errors=\"replace\")\n+    text = body.decode(\"UTF-8\", errors=\"replace\")\n     folded = text.casefold()\n     if any(mark in folded for mark in _SIGN_IN):\n         return ReleaseFailure(1, url, \"sign_in_demand\", \"public file\", \"sign-in\")"
+reason = "Python resolves UTF-8 and utf-8 to the same codec. The bytes or text and error handling are unchanged, so the decoded refusal text or encoded manifest bytes are identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -39,7 +39,7 @@\n         \"terms_sha256\": terms_digest or None,\n         \"terms_url\": terms_url or None,\n     }\n-    payload = json.dumps(manifest, sort_keys=True).encode(\"utf-8\")\n+    payload = json.dumps(manifest, sort_keys=True).encode(\"UTF-8\")\n     digest = sha256_hex(payload)\n     final = directory / \"manifest.json\"\n     partial = directory / \".manifest.json.partial\""
+reason = "Python resolves UTF-8 and utf-8 to the same codec. The bytes or text and error handling are unchanged, so the decoded refusal text or encoded manifest bytes are identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -1,3 +1,3 @@\n def _data_url(file_path: str) -> str:\n-    name = file_path.rsplit(\"/\", 1)[-1]\n+    name = file_path.rsplit(\"/\", )[-1]\n     return f\"{COPY_ROOT}{PINNED_RELEASE}/places/{name}\""
+reason = "_data_url uses only the final element of rsplit. Unlimited splits and two splits produce the same final segment as one split, for a path containing zero, one or multiple slashes. Earlier segments are not read."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -1,3 +1,3 @@\n def _data_url(file_path: str) -> str:\n-    name = file_path.rsplit(\"/\", 1)[-1]\n+    name = file_path.rsplit(\"/\", 2)[-1]\n     return f\"{COPY_ROOT}{PINNED_RELEASE}/places/{name}\""
+reason = "_data_url uses only the final element of rsplit. Unlimited splits and two splits produce the same final segment as one split, for a path containing zero, one or multiple slashes. Earlier segments are not read."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -43,7 +43,7 @@\n     digest = sha256_hex(payload)\n     final = directory / \"manifest.json\"\n     partial = directory / \".manifest.json.partial\"\n-    directory.mkdir(parents=True, exist_ok=True)\n+    directory.mkdir(parents=None, exist_ok=True)\n     partial.write_bytes(payload)\n     os.replace(partial, final)\n     return digest"
+reason = "Before this mkdir, _store unconditionally calls commit_pair for directory/metadata. commit_pair creates that folder with parents=True and returns only after writing its pair, so directory already exists when this mkdir is reached. The unchanged exist_ok=True accepts it with any of these parents settings; a failure of the earlier commit_pair exits _store before this line."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -43,7 +43,7 @@\n     digest = sha256_hex(payload)\n     final = directory / \"manifest.json\"\n     partial = directory / \".manifest.json.partial\"\n-    directory.mkdir(parents=True, exist_ok=True)\n+    directory.mkdir(exist_ok=True)\n     partial.write_bytes(payload)\n     os.replace(partial, final)\n     return digest"
+reason = "Before this mkdir, _store unconditionally calls commit_pair for directory/metadata. commit_pair creates that folder with parents=True and returns only after writing its pair, so directory already exists when this mkdir is reached. The unchanged exist_ok=True accepts it with any of these parents settings; a failure of the earlier commit_pair exits _store before this line."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -43,7 +43,7 @@\n     digest = sha256_hex(payload)\n     final = directory / \"manifest.json\"\n     partial = directory / \".manifest.json.partial\"\n-    directory.mkdir(parents=True, exist_ok=True)\n+    directory.mkdir(parents=False, exist_ok=True)\n     partial.write_bytes(payload)\n     os.replace(partial, final)\n     return digest"
+reason = "Before this mkdir, _store unconditionally calls commit_pair for directory/metadata. commit_pair creates that folder with parents=True and returns only after writing its pair, so directory already exists when this mkdir is reached. The unchanged exist_ok=True accepts it with any of these parents settings; a failure of the earlier commit_pair exits _store before this line."

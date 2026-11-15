@@ -34,6 +34,7 @@ from eii_custodian.publicdata.fetch.report import (
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
 from eii_custodian.publicdata.fetch.transport import Transport
 from eii_custodian.publicdata.investment_build import publish_investment
+from eii_custodian.publicdata.places_fsq.fetch import fetch_release, is_release_entry
 from eii_custodian.publicdata.stage import run_stage
 
 CACHE_RELATIVE = "data/public_cache"
@@ -212,6 +213,30 @@ def run_build(
         if entry.kind == "citation_only":
             _write_citation(entry, cache, clock())
             lines.append(citation_line(entry.key))
+            continue
+        if is_release_entry(entry):
+            released, refused = fetch_release(entry, transport, cache, clock, sleep)
+            if refused is not None:
+                lines.append(
+                    fail_line(
+                        entry.key,
+                        refused.url,
+                        refused.check,
+                        refused.expected,
+                        refused.observed,
+                    )
+                )
+                failure = FetchFailure(
+                    refused.code,
+                    entry.source_id,
+                    refused.url,
+                    refused.check,
+                    refused.expected,
+                    refused.observed,
+                )
+                break
+            assert released is not None
+            lines.append(pass_line(entry.key, released.digest, released.host))
             continue
         fetched, result = _fetch_row(entry, transport, cache, clock, sleep)
         if result is not None:
