@@ -2437,3 +2437,13 @@ reason = "The conditional is evaluated only after 'len(etags) != 1' is false, so
 module = "custodian/src/eii_custodian/publicdata/places/fetch.py"
 mutation = "--- src/eii_custodian/publicdata/places/fetch.py\n+++ src/eii_custodian/publicdata/places/fetch.py\n@@ -21,7 +21,7 @@\n     ):\n         observed = sizes[0] if len(sizes) == 1 else \"\"\n         return None, FileFailure(1, entry.url, \"recorded_size\", \"bytes\", observed)\n-    if etag_malformed or len(etags) != 1 or not _etag_token(etags[0] if etags else \"\"):\n+    if etag_malformed or len(etags) != 1 or not _etag_token(etags[0] if etags else \"XXXX\"):\n         observed = etags[0] if len(etags) == 1 else \"\"\n         return None, FileFailure(1, entry.url, \"recorded_etag\", \"etag\", observed)\n     return (int(sizes[0]), etags[0]), None"
 reason = "The conditional is evaluated only after 'len(etags) != 1' is false, so etags holds exactly one element there and the original also takes etags[0]; the empty-list branch cannot run."
+
+[[survivors]]
+module = "product/src/eii_product/assistant/catalogue/brief.py"
+mutation = "--- src/eii_product/assistant/catalogue/brief.py\n+++ src/eii_product/assistant/catalogue/brief.py\n@@ -2,5 +2,5 @@\n     if type(value) not in {int, float}:\n         return False\n     if isinstance(value, float):\n-        return value == value and value not in {float(\"inf\"), float(\"-inf\")}\n+        return value == value and value not in {float(\"INF\"), float(\"-inf\")}\n     return True"
+reason = "float() reads the names inf and -inf without regard to letter case, so float(\"INF\") and float(\"-INF\") equal float(\"inf\") and float(\"-inf\"); the set holds the same two members and the membership test is the same for every value."
+
+[[survivors]]
+module = "product/src/eii_product/assistant/catalogue/brief.py"
+mutation = "--- src/eii_product/assistant/catalogue/brief.py\n+++ src/eii_product/assistant/catalogue/brief.py\n@@ -2,5 +2,5 @@\n     if type(value) not in {int, float}:\n         return False\n     if isinstance(value, float):\n-        return value == value and value not in {float(\"inf\"), float(\"-inf\")}\n+        return value == value and value not in {float(\"inf\"), float(\"-INF\")}\n     return True"
+reason = "float() reads the names inf and -inf without regard to letter case, so float(\"INF\") and float(\"-INF\") equal float(\"inf\") and float(\"-inf\"); the set holds the same two members and the membership test is the same for every value."

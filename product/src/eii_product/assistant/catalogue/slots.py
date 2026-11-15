@@ -74,8 +74,6 @@ def breakdown_refusal(
     """Refuse a breakdown the subject, metric or provenance list does not allow."""
     if breakdown not in BREAKDOWNS:
         return Refusal("BREAKDOWN", path)
-    if breakdown == "none":
-        return None
     if breakdown in PUBLIC_BREAKDOWNS:
         if set(provenances) != {"public"}:
             return Refusal("BREAKDOWN", path)
