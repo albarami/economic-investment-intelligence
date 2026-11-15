@@ -224,7 +224,7 @@ def fallback_errors(
 
 def height_counts(
     choices: Iterable[HeightChoice],
-    globfp_matches: Iterable[Iterable[tuple[Decimal, str, int, Decimal]]] = (),
+    globfp_matches: Iterable[Iterable[tuple[Decimal, str, int, Decimal]]],
 ) -> HeightCounts:
     """Counts by source, none reasons, dropped values and fallback buildings.
 
@@ -232,15 +232,19 @@ def height_counts(
     computed, from the chosen heights alone (rules 16 and 17). Each building's
     3D-GloBFP match list decides the tied-height count: a building counts once
     when its winning overlap ties another candidate's area at a different
-    height. A match list shorter or longer than the choices pairs by index.
+    height. The match list is a required argument and pairs one row with each
+    choice by index; a list whose length differs from the choices is refused.
     """
+    rows = list(choices)
+    match_rows = list(globfp_matches)
+    if len(match_rows) != len(rows):
+        raise ValueError("match list length differs from the choices")
     by_source = {name: 0 for name in (*ORDER, NONE_SOURCE)}
     none_reasons: dict[str, int] = {}
     no_value: dict[str, int] = {}
     fallback_buildings = 0
     tied_height_buildings = 0
-    match_rows = list(globfp_matches)
-    for index, choice in enumerate(choices):
+    for choice, matches in zip(rows, match_rows, strict=True):
         if choice.source not in HEIGHT_SOURCES:
             raise ValueError("height source outside the closed list")
         by_source[choice.source] += 1
@@ -255,15 +259,11 @@ def height_counts(
                 raise ValueError("candidate outside the closed order")
             reason = f"{name}_value_not_positive"
             no_value[reason] = no_value.get(reason, 0) + 1
-        if index < len(match_rows):
-            winner = largest_overlap(match_rows[index])
-            if winner is not None and any(
-                match[0] == winner[0]
-                and match[-1] != winner[-1]
-                and match[1:-1] != winner[1:-1]
-                for match in match_rows[index]
-            ):
-                tied_height_buildings += 1
+        winner = largest_overlap(matches)
+        if winner is not None and any(
+            match[0] == winner[0] and match[-1] != winner[-1] for match in matches
+        ):
+            tied_height_buildings += 1
     return HeightCounts(
         by_source,
         none_reasons,

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import io
+import math
 import zipfile
 from dataclasses import dataclass
 from decimal import Decimal
@@ -202,6 +203,25 @@ def _positive_height(value: Decimal) -> Decimal:
     return value
 
 
+def _height_decimal(text: str) -> Decimal:
+    """Only digits with at most one decimal point, in surrounding spaces.
+
+    Everything else is refused as `height_value` by name: an exponent, an
+    underscore, a sign, a second point, a lone point and a blank cell. The
+    published tables hold plain digits, and `Decimal` would accept more
+    than the published form ever writes.
+    """
+    body = text.strip(" ")
+    if (
+        not body
+        or body.count(".") > 1
+        or any(character not in "0123456789." for character in body)
+        or not any(character in "0123456789" for character in body)
+    ):
+        raise HeightError("height_value")
+    return Decimal(body)
+
+
 def _zip_members(body: bytes) -> dict[str, bytes]:
     """The five members of one zipped shapefile, extension -> bytes.
 
@@ -265,7 +285,9 @@ def _dbf_heights(dbf: bytes, field_name: str) -> tuple[Decimal, ...]:
     up to eighteen significant digits, which a library's numeric conversion
     would round. A missing, duplicated or non-numeric field, a record the
     table marks deleted, or a file shorter than its own header arithmetic is
-    structure_mismatch; a text that is no usable height is height_value.
+    structure_mismatch; the length is checked before the header's terminator
+    byte is read, so a table cut inside its header is refused the same way;
+    a text that is no usable height is height_value.
     """
     minimum = _DBF_HEADER_BYTES + _DBF_FIELD_BYTES + 2
     if len(dbf) < minimum or dbf[0:1] != _DBF_VERSION:
@@ -279,6 +301,7 @@ def _dbf_heights(dbf: bytes, field_name: str) -> tuple[Decimal, ...]:
         header_len < minimum - 1
         or descriptors % _DBF_FIELD_BYTES
         or record_len < 2
+        or len(dbf) < header_len
         or dbf[header_len - 1] != _DBF_TERMINATOR
         or len(dbf) < records_end
         or len(dbf) > records_end + 1
@@ -314,7 +337,7 @@ def _dbf_heights(dbf: bytes, field_name: str) -> tuple[Decimal, ...]:
         except UnicodeDecodeError:
             raise HeightError("height_value") from None
         try:
-            heights.append(_positive_height(Decimal(text)))
+            heights.append(_positive_height(_height_decimal(text)))
         except ArithmeticError:
             raise HeightError("height_value") from None
     return tuple(heights)
@@ -382,24 +405,25 @@ def _raster_window(
 ) -> Any:
     """The pixel window over the building table's bounds, grown and clipped.
 
-    `from_bounds` gives fractional offsets, which are rounded to whole cells;
-    the window then grows one cell on each side and is clipped to the raster.
-    An empty window reads nothing.
+    `from_bounds` gives fractional offsets. The start of the bounds is
+    floored and their end ceiled in cell units, the window then grows one
+    cell on each side and is clipped to the raster, as document 07 (MTH-123)
+    and the package README say. An empty window reads nothing.
     """
     windows = import_module("rasterio.windows")
     if bounds is None:
-        col_off, row_off, columns, rows = 0.0, 0.0, width, height
+        col_start, row_start, col_stop, row_stop = 0, 0, width, height
     else:
         west, south, east, north = bounds
         raw = windows.from_bounds(west, south, east, north, transform)
-        col_off = round(raw.col_off) - _WINDOW_GROW_CELLS
-        row_off = round(raw.row_off) - _WINDOW_GROW_CELLS
-        columns = round(raw.width) + 2 * _WINDOW_GROW_CELLS
-        rows = round(raw.height) + 2 * _WINDOW_GROW_CELLS
-    col_start = max(0, int(col_off))
-    row_start = max(0, int(row_off))
-    col_stop = min(width, int(col_off + columns))
-    row_stop = min(height, int(row_off + rows))
+        col_start = math.floor(raw.col_off) - _WINDOW_GROW_CELLS
+        row_start = math.floor(raw.row_off) - _WINDOW_GROW_CELLS
+        col_stop = math.ceil(raw.col_off + raw.width) + _WINDOW_GROW_CELLS
+        row_stop = math.ceil(raw.row_off + raw.height) + _WINDOW_GROW_CELLS
+    col_start = max(0, col_start)
+    row_start = max(0, row_start)
+    col_stop = min(width, col_stop)
+    row_stop = min(height, row_stop)
     if col_stop <= col_start or row_stop <= row_start:
         return windows.Window(0, 0, 0, 0)
     return windows.Window(
@@ -481,12 +505,14 @@ def read_sources(
     cache: Path,
     entries: tuple[Entry, ...] | list[Entry],
     rules: Rules,
-    bounds: tuple[float, float, float, float] | None = None,
+    bounds: tuple[float, float, float, float] | None,
 ) -> dict[str, SourceResult]:
     """Read every active row of the two height sources; absent rows are kept.
 
     `bounds` is the building table's bounding box (west, south, east, north);
-    a raster row reads only the window over it.
+    it is a required argument, so a caller cannot read a raster source
+    without handing the table's bounds in, and a raster row reads only the
+    window over it (an empty table's bounds are None).
     """
     results: dict[str, SourceResult] = {}
     for source_id in SOURCE_IDS:

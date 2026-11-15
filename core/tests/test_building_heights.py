@@ -5,6 +5,7 @@ Every value is invented (fixture ids SYN-B-*); the storey height of the fixture
 is 4 m, an invented fixture value, not the asset manifest's stated constant.
 """
 
+import inspect
 from dataclasses import replace
 from decimal import ROUND_UP, Decimal, localcontext
 
@@ -357,13 +358,15 @@ def test_the_refusal_messages_are_the_closed_texts() -> None:
         height_value("30")
     assert str(err.value) == "finite Decimal required"
     with pytest.raises(ValueError) as err:
-        height_counts([HeightChoice(Decimal("30"), "invented", "", ())])
+        height_counts([HeightChoice(Decimal("30"), "invented", "", ())], [[]])
     assert str(err.value) == "height source outside the closed list"
     with pytest.raises(ValueError) as err:
-        height_counts([HeightChoice(None, NONE_SOURCE, "", ())])
+        height_counts([HeightChoice(None, NONE_SOURCE, "", ())], [[]])
     assert str(err.value) == "a none choice needs its reason"
     with pytest.raises(ValueError) as err:
-        height_counts([HeightChoice(None, NONE_SOURCE, ORDER_EXHAUSTED, ("recorded",))])
+        height_counts(
+            [HeightChoice(None, NONE_SOURCE, ORDER_EXHAUSTED, ("recorded",))], [[]]
+        )
     assert str(err.value) == "candidate outside the closed order"
 
 
@@ -546,7 +549,10 @@ def test_a_rounded_zero_is_written_without_a_sign():
 
 def test_height_counts_counts_every_choice_once_by_source():
     """V10: counts by source, none reasons, drops and fallbacks, one function."""
-    counts = height_counts(choose_height(row) for row in _rows().values())
+    rows = _rows()
+    counts = height_counts(
+        [choose_height(row) for row in rows.values()], [[] for _ in rows]
+    )
     assert counts.by_source == {
         "recorded": 3,
         "floor_count": 1,
@@ -566,7 +572,7 @@ def test_height_counts_names_each_dropped_value_with_its_reason():
         choose_height(_candidates(None, None, None, Decimal(0))),
         choose_height(_candidates(None, None, Decimal("0.004"), None)),
     ]
-    counts = height_counts(choices)
+    counts = height_counts(choices, [[], [], []])
     assert counts.no_value_reasons == {
         "3dglobfp_value_not_positive": 1,
         "wsf3d_value_not_positive": 2,
@@ -584,9 +590,9 @@ def test_height_counts_keeps_the_resolved_none_reason_and_empty_choices():
         else choice
         for choice in (choose_height(row) for row in _rows().values())
     ]
-    counts = height_counts(resolved)
+    counts = height_counts(resolved, [[] for _ in _rows()])
     assert counts.none_reasons == {"structure_unconfirmed": 1}
-    empty = height_counts([])
+    empty = height_counts([], [])
     assert empty.by_source == {
         "recorded": 0,
         "floor_count": 0,
@@ -600,9 +606,26 @@ def test_height_counts_keeps_the_resolved_none_reason_and_empty_choices():
 def test_height_counts_refuses_a_source_outside_the_closed_list():
     """V10: an invented source on a choice is refused, never counted."""
     with pytest.raises(ValueError):
-        height_counts([HeightChoice(Decimal(5), "invented_source", "")])
+        height_counts([HeightChoice(Decimal(5), "invented_source", "")], [[]])
     with pytest.raises(ValueError):
-        height_counts([HeightChoice(None, "none", "")])
+        height_counts([HeightChoice(None, "none", "")], [[]])
+
+
+def test_a_match_list_of_the_wrong_length_is_refused() -> None:
+    """P4: the match list pairs one row with each choice, by index."""
+    choice = HeightChoice(Decimal(7), "3dglobfp", "", ())
+    with pytest.raises(ValueError) as err:
+        height_counts([choice], [])
+    assert str(err.value) == "match list length differs from the choices"
+    with pytest.raises(ValueError) as err:
+        height_counts([], [[]])
+    assert str(err.value) == "match list length differs from the choices"
+
+
+def test_globfp_matches_is_a_required_argument() -> None:
+    """P4: no default match list; every caller passes one row per choice."""
+    parameter = inspect.signature(height_counts).parameters["globfp_matches"]
+    assert parameter.default is inspect.Parameter.empty
 
 
 def test_scaled_cell_multiplies_the_stored_value_by_the_declared_scale():
@@ -659,7 +682,6 @@ def test_height_counts_ignores_a_same_height_or_losing_tie():
     choice = HeightChoice(Decimal(7), "3dglobfp", "", ())
     assert height_counts([choice], [same_height]).tied_height_buildings == 0
     assert height_counts([choice], [losing_tie]).tied_height_buildings == 0
-    assert height_counts([choice]).tied_height_buildings == 0
     assert height_counts([choice], [[]]).tied_height_buildings == 0
 
 
@@ -692,14 +714,3 @@ def test_height_counts_counts_each_tied_building() -> None:
     choice = HeightChoice(Decimal(7), "3dglobfp", "", ())
     counts = height_counts([choice, choice], [matches, matches])
     assert counts.tied_height_buildings == 2
-
-
-def test_height_counts_excludes_the_winners_own_row() -> None:
-    """The winning (file, row) never counts as its own tied candidate."""
-    area = Decimal(1)
-    matches = [
-        (area, "f", 0, Decimal(7)),
-        (area, "f", 0, Decimal(9)),
-    ]
-    choice = HeightChoice(Decimal(7), "3dglobfp", "", ())
-    assert height_counts([choice], [matches]).tied_height_buildings == 0

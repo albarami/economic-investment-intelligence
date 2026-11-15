@@ -131,10 +131,14 @@ def shapefile_members(
     }
 
 
-def zip_members(members: dict) -> bytes:
-    """Pack name -> bytes into one in-memory zip body."""
+def zip_members(members: dict, compression: int = zipfile.ZIP_DEFLATED) -> bytes:
+    """Pack name -> bytes into one in-memory zip body.
+
+    `compression` lets a planted case pack the members with a method the
+    reader does not accept (the compression-method check's own plant).
+    """
     out = io.BytesIO()
-    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as archive:
+    with zipfile.ZipFile(out, "w", compression) as archive:
         for name, body in members.items():
             archive.writestr(name, body)
     return out.getvalue()
@@ -262,12 +266,15 @@ def wsf_bytes(
     scale: float = 0.1,
     offset: float = 0.0,
     unit_tag: str | None = "m",
+    area_or_point: str = "Area",
 ) -> bytes:
     """A tiny invented WGS 84 raster in the published form's metadata.
 
-    Stored integers times the declared scale are metres; the dataset tag
-    `unit` holds the unit, as the real file does. Returns the file's bytes
-    for the cache pair.
+    Stored integers times the declared scale are metres; the dataset tags
+    `unit` and `AREA_OR_POINT` hold the unit and the raster type, as the real
+    file does (`area_or_point` lets a planted case tag the raster "Point",
+    the raster-type check's own plant). Returns the file's bytes for the
+    cache pair.
     """
     data = np.array(values, dtype=dtype).reshape(height, width)
     with rasterio.open(
@@ -285,6 +292,7 @@ def wsf_bytes(
         target.write(data, 1)
         target.scales = (scale,)
         target.offsets = (offset,)
+        target.update_tags(AREA_OR_POINT=area_or_point)
         if unit_tag is not None:
             target.update_tags(unit=unit_tag)
     return path.read_bytes()

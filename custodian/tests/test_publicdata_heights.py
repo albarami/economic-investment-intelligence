@@ -8,7 +8,9 @@ fixture is card C42's worked example; its error block is the card's.
 from __future__ import annotations
 
 import ast
+import inspect
 import json
+import zipfile
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -1111,7 +1113,7 @@ def test_a_wsf_body_that_is_not_a_raster_is_a_named_refusal(
     cache = tmp_path / "data" / "public_cache"
     invented.store(cache, row, b"this is not a raster, invented")
     with pytest.raises(HeightError) as err:
-        read_sources(cache, (row,), load_rules(rules))
+        read_sources(cache, (row,), load_rules(rules), bounds=None)
     assert err.value.name == "structure_mismatch"
 
     buildings = tmp_path / "data" / "assets" / "buildings" / "buildings.geojson"
@@ -1140,7 +1142,10 @@ def test_a_receipt_that_is_not_json_is_a_named_refusal(tmp_path: Path) -> None:
     meta.write_text("this is not json {")
     with pytest.raises(HeightError) as err:
         read_sources(
-            cache, (row,), load_rules(invented.rules_file(tmp_path / "r.yaml"))
+            cache,
+            (row,),
+            load_rules(invented.rules_file(tmp_path / "r.yaml")),
+            bounds=None,
         )
     assert err.value.name == "cache_receipt"
 
@@ -1449,7 +1454,7 @@ def test_cache_refusals_are_planted_and_named_in_full(tmp_path: Path) -> None:
     rules = invented.rules_file(tmp_path / "rules.yaml")
 
     def run(cache: Path, entry: Entry = row) -> None:
-        read_sources(cache, (entry,), load_rules(rules))
+        read_sources(cache, (entry,), load_rules(rules), bounds=None)
 
     cache = tmp_path / "two" / "cache"
     invented.store(cache, row, body)
@@ -1505,7 +1510,7 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
     def run(index: str, entry: Entry, body: bytes, rules_path: Path = rules) -> None:
         cache = tmp_path / index / "cache"
         invented.store(cache, entry, body)
-        read_sources(cache, (entry,), load_rules(rules_path))
+        read_sources(cache, (entry,), load_rules(rules_path), bounds=None)
 
     ring = invented.square(0, 0, 1)
     projected_wkt = (
@@ -1546,6 +1551,26 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
         raw[4:8] = count.to_bytes(4, "little")
         return bytes(raw)
 
+    def one_record_dbf() -> dict:
+        """A dbf whose header count matches its one record, beside two shapes.
+
+        The record-count check's own plant: the table is self-consistent, so
+        only the `.shp` row count differs from the `.dbf` records.
+        """
+        bodies = invented.shapefile_members(
+            [[invented.cw(ring)], [invented.cw(invented.square(5, 5, 1))]],
+            [["1", "7", ""], ["2", "9", ""]],
+        )
+        raw = bytearray(bodies["dbf"])
+        raw[4:8] = (1).to_bytes(4, "little")
+        header_len = int.from_bytes(raw[8:10], "little")
+        record_len = int.from_bytes(raw[10:12], "little")
+        bodies["dbf"] = bytes(raw[: header_len + record_len])
+        return bodies
+
+    # A bow-tie ring that crosses itself, the `is_valid` check's own plant.
+    self_crossing = [[0, 0], [2, 2], [2, 0], [0, 2], [0, 0]]
+
     globfp_cases: list[tuple[str, bytes, str]] = [
         ("notzip", b"this is not a zip {", "structure_mismatch"),
         (
@@ -1561,6 +1586,25 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
         (
             "nested",
             zipped(members(), extra={"folder/syn.tile.01.cpg": b"x"}),
+            "structure_mismatch",
+        ),
+        (
+            # The folder check's own plant: five members, one stem, one
+            # folder, so only the folder clause refuses this body.
+            "folder",
+            invented.shapefile_zip(
+                [[invented.cw(ring)]], [["1", "7", ""]], stem="folder/syn.tile.01"
+            ),
+            "structure_mismatch",
+        ),
+        (
+            # The compression-method check's own plant: five flat members of
+            # one stem, every one compressed with a method never published.
+            "bzip2",
+            invented.zip_members(
+                {f"syn.tile.01.{ext}": body for ext, body in members().items()},
+                compression=zipfile.ZIP_BZIP2,
+            ),
             "structure_mismatch",
         ),
         (
@@ -1626,6 +1670,21 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
             "structure_mismatch",
         ),
         (
+            # A table cut inside its own header: the declared header is
+            # longer than the bytes, so the length must be checked before
+            # the terminator byte is read.
+            "cutinsideheader",
+            zipped(members(dbf=members()["dbf"][:100])),
+            "structure_mismatch",
+        ),
+        (
+            # The record-count line's own plant: the header count matches
+            # the one dbf record, but the shapefile holds two shapes.
+            "shapemismatch",
+            zipped(one_record_dbf()),
+            "structure_mismatch",
+        ),
+        (
             "countmismatch",
             zipped(members(dbf=count_change(5))),
             "structure_mismatch",
@@ -1645,6 +1704,12 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
                 [["1", "7", ""]],
                 shape_type=__import__("shapefile").POINT,
             ),
+            "structure_mismatch",
+        ),
+        (
+            # The validity check's own plant: a polygon that crosses itself.
+            "selfcrossing",
+            invented.shapefile_zip([[self_crossing]], [["1", "7", ""]]),
             "structure_mismatch",
         ),
         (
@@ -1675,6 +1740,21 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
         (
             "starheight",
             zipped(members(dbf=dbf_change(0, offset, b"*" * size))),
+            "height_value",
+        ),
+        (
+            "exponentheight",
+            zipped(members(dbf=dbf_change(0, offset, b"1e2".rjust(size)))),
+            "height_value",
+        ),
+        (
+            "underscoreheight",
+            zipped(members(dbf=dbf_change(0, offset, b"1_0".rjust(size)))),
+            "height_value",
+        ),
+        (
+            "signedheight",
+            zipped(members(dbf=dbf_change(0, offset, b"+7".rjust(size)))),
             "height_value",
         ),
     ]
@@ -1744,6 +1824,14 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
             rules,
         ),
         (
+            # The raster-type check's own plant: an invented raster tagged
+            # "Point" where the declared structure says PixelIsArea.
+            "areapoint",
+            invented.wsf_bytes(tmp_path / "ap.tif", [[5]], 1, 1, area_or_point="Point"),
+            "structure_mismatch",
+            rules,
+        ),
+        (
             "band",
             invented.wsf_bytes(tmp_path / "b.tif", [[5]], 1, 1),
             "structure_mismatch",
@@ -1780,8 +1868,17 @@ def test_the_zip_member_total_bound_is_a_named_refusal(
     invented.store(cache, row, invented.globfp_zip([(invented.square(0, 0, 1), "7")]))
     with pytest.raises(HeightError, match="structure_mismatch"):
         read_sources(
-            cache, (row,), load_rules(invented.rules_file(tmp_path / "r.yaml"))
+            cache,
+            (row,),
+            load_rules(invented.rules_file(tmp_path / "r.yaml")),
+            bounds=None,
         )
+
+
+def test_bounds_is_a_required_argument_of_the_raster_read() -> None:
+    """P4: a caller that forgets the table's bounds cannot read a source."""
+    parameter = inspect.signature(read_sources).parameters["bounds"]
+    assert parameter.default is inspect.Parameter.empty
 
 
 def test_the_published_height_text_arrives_digit_for_digit(tmp_path: Path) -> None:
@@ -1942,18 +2039,45 @@ def test_tied_footprints_with_the_same_height_count_none(tmp_path: Path) -> None
 
 
 def test_only_the_window_over_the_building_table_is_read(tmp_path: Path) -> None:
-    """H5c: a cell far from the window never enters the grid."""
+    """H5c/P3: the exact worked window, floored, ceiled, grown one cell, clipped.
+
+    Worked by hand (MTH-123): the invented raster spans x in [0, 8) and y in
+    (0, 4] at one unit a cell, so bounds (3.6, 1.2, 3.9, 1.8) give fractional
+    cells 3.6 to 3.9 across and 2.2 to 2.8 down. Floored at the start, ceiled
+    at the end and grown one cell on each side, they give columns 2 to 5 and
+    rows 1 to 4: offset (2, 1), width 3, height 3.
+    """
     row = invented.entry("bldg_wsf3d", extension="tif")
     body = invented.wsf_bytes(
-        tmp_path / "w.tif", [[100, 200, 300, 400, 500, 600, 700, 800]], 8, 1
+        tmp_path / "w.tif",
+        [
+            [10, 20, 30, 40, 50, 60, 70, 80],
+            [110, 120, 130, 140, 150, 160, 170, 180],
+            [210, 220, 230, 240, 250, 260, 270, 280],
+            [310, 320, 330, 340, 350, 360, 370, 380],
+        ],
+        8,
+        4,
+        west=0.0,
+        north=4.0,
     )
     results = _sources(
-        tmp_path, (row,), None, ((row, body),), bounds=(3.0, 0.0, 4.0, 1.0)
+        tmp_path, (row,), None, ((row, body),), bounds=(3.6, 1.2, 3.9, 1.8)
     )
     grid = results["bldg_wsf3d"].wsf[0][1]
-    assert grid.width < 8
-    assert 800 not in grid.data.tolist()[0]
-    assert wsf_value(grid, Point(3.5, 0.5)) == Decimal("40")
+    assert grid.transform.c == 2.0
+    assert grid.transform.f == 3.0
+    assert grid.width == 3
+    assert grid.height == 3
+    assert grid.data.tolist() == [
+        [130, 140, 150],
+        [230, 240, 250],
+        [330, 340, 350],
+    ]
+    assert 380 not in grid.data.tolist()[0]
+    # The point sits in the grid's own cell (1, 1) — raster cell 240, so
+    # 240 tenths of a metre is 24 metres after the declared scale.
+    assert wsf_value(grid, Point(3.75, 1.75)) == Decimal("24")
 
 
 def test_a_building_in_the_windows_corner_cell_gets_its_own_cell(
