@@ -1977,6 +1977,46 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - OPTIONS: **Default:** the lead names the mutant from the tester's own result store of that campaign if it is kept, replays it alone and records the result apart from killed mutants; if the store is gone, the item is closed as not reproducible with the three later count lines listed.
 - NEEDED BY: the slice S2 gate.
 
+## OI-214 — The owner's choices R3, R6, R7 and R14 of decision 0038
+
+- ID: OI-214
+- TYPE: OWNER DECISION
+- NEEDED: The owner's choice on the four blocks that [decision 0038](docs/decisions/0038-advanced-methods-are-measured-spikes.md) lists under "Owner's choices": R3 (drive cut-off distribution), R6 (custodian-facing trust view), R7 (area wage trend by sector) and R14 (MCP tool server).
+- WHY: Decision 0038 records the audit's recommendation and estimated effort for each block, but it accepts none of them as scope. It changes no affected capability, cut-off list, release dimension, Later order or task.
+- DONE SO FAR: The four recommendations stand word for word in the record's table. R6 would reopen a narrow part of decision 0023 item 15.
+- OPTIONS: **Default until the owner decides:** nothing changes. The owner's 30-minute drive ceiling stays (R3). There is no custodian-facing view in version 1 (R6). The wage trend stays national by sector in version 1 (R7). The tool server stays outside the plan (R14). A yes on any block needs its own decision record and task.
+- NEEDED BY: before slice S11 ends, or earlier if the owner wants a block in version 1.
+
+## OI-215 — DES-175 "its label" names no origin marker
+
+- ID: OI-215
+- TYPE: OPEN
+- NEEDED: Clearer wording in docs/11_DESIGN_DIRECTION.md DES-175 for "the estimate its low and high cases and its label".
+- WHY: The confirmation of pass 6 noted that "its label" is older than decision 0035 and can be read as the withdrawn visible origin label. The caveat key `estimate_on_simulated_inputs` is a backend marker that is never rendered ([decision 0035](docs/decisions/0035-what-the-audience-sees-names-no-data-origin-and-the-backend-marks-it.md) item 4).
+- DONE SO FAR: The lead ruled that "its label" never means the origin marker. The text is unchanged in this pull request.
+- OPTIONS: **Default:** the next documentation pass that touches DES-175 replaces "its label" with the estimate's stated assumptions and main drivers, as rule 25 asks. Until then the ruling above governs how DES-175 is read.
+- NEEDED BY: the next documentation pass that touches DES-175.
+
+## OI-216 — The runbook's spoken words on synthetic months
+
+- ID: OI-216
+- TYPE: OPEN
+- NEEDED: Nothing unless the owner wants it: a record that docs/16_DEMO_RUNBOOK.md sections 7 and 8 keep the words "a change between synthetic months".
+- WHY: The confirmation of pass 6 found the same family of older wording there. The runbook's spoken answers are the owner's own explanation of the generated data ([decision 0035](docs/decisions/0035-what-the-audience-sees-names-no-data-origin-and-the-backend-marks-it.md) Context), not an audience screen.
+- DONE SO FAR: Noted. No text changed.
+- OPTIONS: **Default:** keep the owner's spoken wording. The owner may reword it at any rehearsal.
+- NEEDED BY: none.
+
+## OI-217 — A repository check for the removed visible-origin wording
+
+- ID: OI-217
+- TYPE: OPEN
+- NEEDED: A later task that adds a stable check to the documentation checks. It would list every passage under docs/ that still carries the visible-origin wording that [decision 0035](docs/decisions/0035-what-the-audience-sees-names-no-data-origin-and-the-backend-marks-it.md) removes: an origin class shown as a visible label, a class line, an origin texture or dot. Each allowed backend use would appear on a reviewed list.
+- WHY: The first review and five confirmations each found more passages of the same family by reading. Pass 6 then ran three sweeps by hand, before and after its edit, and classed every remaining hit. A check would let a reviewer verify an empty list instead of reading the whole pack again.
+- DONE SO FAR: Pass 6's sweep commands and classed final hits are kept in the lead's run records. The review of pass 6 checked them.
+- OPTIONS: **Default:** proposed only, not built here. The task needs its own brief, a planted violation (rule 37) and a review by another maker.
+- NEEDED BY: before the next documentation pull request that amends audience wording.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.

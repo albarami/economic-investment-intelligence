@@ -25489,6 +25489,522 @@ Seed:      none
 Notes:     The eight work commits of the train (S2-T07 build, one-test repair, import repair; S2-T21 joined build, thin test pass, mutation pass, confirmation fix, train C repair of the busy-source scan) each have a Conventional Commit subject.
 ```
 
+#### S2-T07: code review, round 1: REJECTED
+
+Reviewed commit `584bf94`. Cognition SWE-2 High (Devin); another maker than the lead (Anthropic), which joined the train.
+
+```text
+VERDICT: REJECTED
+TASK: S2-T07 (local commit)
+COMMIT: 584bf94ca6cde865961f3e826d81b302aee9ad21
+REVIEWER: Cognition SWE-2 High (Devin)
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review named by the brief is not installed in this tool
+CHECKS:
+  REV-10 FAIL The C8 worked example has no test feeding its printed inputs (finding F1). The other two criteria are met: no calculation reads files or databases (the AST purity guard refuses file, socket, database, clock, random, dynamic-import and dynamic-attribute forms in all four modules, with planted snippets proving each refusal) and comparisons return typed facts (compare_public_facts returns difference/ratio/direction CalculationFact objects or closed NoData/Suppressed results; order_changes returns typed ordering).
+  REV-11 PASS The lead's recorded local checks on this commit: `pytest custodian` (ignoring data_tests) 545 passed, `pytest core` 386 passed, `pytest product` 231 passed, unittest discovery 687 tests OK, `uv lock --check`, ruff check and format --check, mypy (226 files), check_versions, check_reference_notes, check_docs, check_tree, `cmp AGENTS.md CLAUDE.md` — all exit 0, run by the lead at this commit; the pinned data tests 8 passed on the real public cache (run by the lead; this workspace has no cache); mutation campaigns 3,258 mutants, none unexplained or uncovered. New behaviour has new tests and every guard has a planted violation. Hosted checks follow at the task's turn.
+  REV-12 PASS The manifest lists 36 changed files: the four calculation modules and `__init__.py` under `core/src/eii_core/calc/`, calculation tests and the method fixture under `core/tests/`, the pinned data tests under `custodian/data_tests/`, their wiring and invented-row regressions under `custodian/tests/`, the mutation runner, its ledger and tests, docs/03 (DAT-90 reason keys), the AGENTS.md/CLAUDE.md rule-44 sentence and the two README notes. Nothing under `data/`; no unrelated reformatting.
+  REV-13 PASS Search of all changed code and test files finds no TODO, FIXME, NotImplementedError, empty body, skip, xfail, type-ignore, noqa or pragma; invented fixtures are the documented test vehicle and published figures in fixtures carry named sources.
+  REV-14 PASS No secret, key or `.env` in the diff; no real custodian record, field, file or count; published figures arrive only as card fixtures or uncommitted pinned receipts; all person/labour/residence material is visibly invented.
+  REV-15 PASS Test and runner diffs read line by line: the 10 removed lines in `test_public_series_calc.py` are replaced by strictly richer typed-fact assertions of the same numbers plus more fields; the runner's single static deselect (`SOURCE_TEXT_GUARDS`, one node, only under the `core/` prefix, only inside instrumented copies) is refused for any other test selection via the new option and PYTEST_ADDOPTS refusals, and a runner test proves the guard is still collected by the ordinary suite; extending the module allowlist to `core/src` widens, not narrows, coverage. All 31 explained mutation survivors were individually checked against the code and each explanation is true.
+  REV-16 FAIL The approved plan required the fixtures to reference "C8's national coverage example" (PLAN.md, C8 line); the committed fixture holds only invented 3/4 values — finding F1. Work otherwise matches the plan and standards.
+  REV-17 OPEN P1 docs/03 DAT-90, both READMEs and the rule-44 sentence are updated in the same diff and `check_docs.py` exit 0 is recorded; the PROGRESS.md, TASKS.md and OPEN_ITEMS.md entries are absent and are entered by the task's ledger at merge — record point P1.
+  REV-18 PASS No secrets read outside the environment (none read at all), no model calls, no queries, no text surfaces; the calculation layer takes typed rows only.
+  REV-19 PASS Nothing on the dropped or later lists is built; no component decision is removed or replaced; the withdrawn C4 production derivations are refused rather than computed; the build order is respected.
+  REV-20 PASS Every emitted value is a CalculationFact with release, metric, geography, period, base fields, provenance classes and SourceChain objects validated for publisher, dataset, URL, licence, retrieval date and 64-hex hash; least-real and weakest-evidence are computed from inputs and cannot be overridden; unrounded values are retained beside each rounded display value; evidence status is a separate closed field; reason keys are closed and doc-checked against docs/03 DAT-90.
+  REV-21 N/A The commit adds no screen, card, template, claim or brief text; the numeral lint and provenance audit are not engaged.
+  REV-22 N/A The commit changes no partition, parameter set, treatment or audit code and no privacy tests.
+  REV-23 PASS `eii_core` imports only the standard library and itself (search confirms no `eii_custodian`, `eii_product` or `eii_gateway` import under `core/` or `custodian/` production code); the import-boundary guard tests exist and the suite passed.
+  REV-24 N/A No rendered text, numeral or Arabic string is added; Arabic municipality names appear only as published-source input values inside data tests.
+  REV-25 PASS No absolute local path, personal name, e-mail, real record or internal plan in the diff; no run of exactly eight or eleven digits in any changed file (searched); no committed fetched file — the public cache and pins stay uncommitted by design.
+  REV-26 PASS No prohibited claim anywhere; the README note states the limits honestly (inputs rows absent, no real-file agreement claimed, comparison boundary stated).
+  REV-27 PASS `cmp AGENTS.md CLAUDE.md` recorded exit 0; the diff gives both files the same blob hash (873ea27→778f8dc).
+  REV-28 PASS Synthetic identifiers are visibly invented slugs (`invented_*`, `zone:invented`, `municipality:<slug>`); real municipality names occur only as published-source values; no registration, licence or tax number and no register row in the diff; no eight- or eleven-digit run.
+  REV-29 PASS No Synthetic or Simulated attribute on any real named place or business; the municipal churn and C9 zone figures are Public facts computed from published sources with source chains; no named-business figure at all.
+  REV-38 PASS No `eii_gateway` import and no `EII_DECISION_PROVIDER`/`JEV_PRO_API_KEY` read anywhere under `core/`, `custodian/` or `product/` (searched); the gateway stays behind `scripts/` and `evals/`.
+FINDINGS:
+  F1 (REV-10)
+    File: core/tests/fixtures/methods/public_methods.json
+    Place: the "published" object at lines 66-410 holds the published worked examples of C1, C2, C3, C4, C5 and C9 and no C8 entry; the only C8 fixture is the invented `{"private": 3, "employed": 4, "percent": "75.0"}` at lines 438-442, exercised by `test_invented_c8_fixture_row_is_read` and `test_c8_invented_coverage_and_workplace` in core/tests/test_public_methods.py lines 251-259.
+    Wrong: the C8 worked example is fully written in docs/07_ECONOMIC_METHODS.md lines 577-585 — national 1,617,208 private-employer residents over 2,050,252 employed residents = 0.7888, rounded 78.9%, tolerance ±0.5 percentage point — yet no test or fixture feeds those inputs to `coverage_share`; the counts and 78.9 appear only in the documents and in `custodian/src/eii_custodian/publicdata/stage.py` (PUB-71, outside this task's diff). MTH-03, a named requirement of this task, requires an arithmetic test that feeds the worked example's own inputs and asserts the stated result within tolerance, so the acceptance criterion "each implemented worked example has arithmetic and data tests" is not met for C8, and the approved plan's C8 sentence ("fixtures reference ... C8's national coverage example") is unfulfilled. The MTH-03 data test recomputing the figure from a pinned census file may defer only while the census source is unpinned; nothing defers the arithmetic test on the printed inputs.
+    Fix: add a `"C8"` block to the fixture's `"published"` object naming `pub_census_national` / Census 2020 as its source with `private` 1617208, `employed` 2050252 and `percent` "78.9", and add a test in core/tests/test_public_methods.py feeding those two values through `coverage_share` and asserting the percent fact equals 78.9 inside the card's ±0.5-point tolerance; prove it by `uv run --locked python -m pytest core -q` exiting 0 with the new test, and if the census source is pinned in the lead's public cache, add the matching replay to `custodian/data_tests/test_pinned_methods.py` in the same fix.
+PROPOSED OPEN ITEMS:
+  P1 (REV-17) record — PROGRESS.md, TASKS.md and OPEN_ITEMS.md carry no entries for this commit; the rulings record they are entered by the task's ledger at the merge turn.
+  P2 (REV-20) hardening: document 17 — the four modules share one mutable `decimal.Context` object `CALC_CONTEXT` (public_series.py:20-29); all arithmetic runs inside `localcontext(CALC_CONTEXT)` and nothing reads its flags, so results are unaffected, but a per-call copy or an immutable settings record would remove the shared-mutation surface a later edit could misuse.
+  P3 (REV-16) hardening: document 17 — `TradeRow` (public_methods.py:359-368) and `AnnualEnergy` (public_methods.py:564-570) admit `str` fields (`product`, `origin`, `month`, `unit`, `zone`) without the exact-type `type() is str` check every other admission point applies; only a pathological `str` subclass differs, and every numeric field still passes `finite()`'s and `count()`'s exact-type checks.
+  P4 (REV-10) — card C1's two unprinted LQ denominators (13,600 Al Daayen all-activity, 1,042 national code 5630112) were read from the pinned `lic_active` file but verified only by the lead's hand-check (RULINGS.md F5); when S2-T09 writes the method-card pins, a `custodian/data_tests` replay asserting both denominators from the pinned file and the 1.39/3.05 quotients would turn that hand-check into committed evidence.
+```
+
+#### S2-T07: code review, round 2: APPROVED
+
+Reviewed commit `fc23734`. Cognition SWE-2 High (Devin); another maker than the lead (Anthropic), which joined the train.
+
+```text
+VERDICT: APPROVED
+TASK: S2-T07 (local commit), round 2
+COMMIT: fc23734b172ddc35d04458a1faedfc40b62d714c
+REVIEWER: Cognition SWE-2 High (Devin)
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review named by the brief is not installed in this tool
+EARLIER FINDINGS:
+  F1 FIXED The fixture now holds a "C8" block under "published" (public_methods.json lines 353-361) naming pub_census_national with private 1617208, employed 2050252, percent "78.9" — the printed inputs of docs/07_ECONOMIC_METHODS.md lines 577-585 — and test_c8_published_national_coverage (test_public_methods.py lines 31-53) feeds both counts through coverage_share and asserts percent.value == Decimal("78.9") and the unrounded value within the card's ±0.5-point tolerance (1617208/2050252 = 78.877… → 78.9, |78.877-78.9| = 0.023 ≤ 0.5). The lead's recorded run shows pytest core 387 passed (386 before, +1); the planted violation (reversed operands failing 126.8 vs 78.9, then restored) is recorded in RULINGS.md. No production line changed.
+CHECKS:
+  REV-10 PASS All three criteria now met: the C8 worked example has its arithmetic test on the printed inputs (F1 fixed); calculation purity and typed comparisons stand as reviewed.
+  REV-11 PASS Lead's recorded runs at fc23734: pytest custodian 545, core 387, product 231, unittest discovery 687 tests OK, uv lock --check, ruff check, ruff format --check, mypy (226 files), check_versions, check_reference_notes, check_docs (plain and with the private patterns file), check_tree, cmp AGENTS.md CLAUDE.md — all exit 0 (EVIDENCE.md). New test has a planted violation (reversed operands → 126.8 against 78.9). Hosted checks follow at the task's turn.
+  REV-12 PASS The patch changes exactly two files — core/tests/fixtures/methods/public_methods.json and core/tests/test_public_methods.py — both in the task's scope; nothing under data/, no unrelated reformatting.
+  REV-13 PASS No TODO, FIXME, stub, skip, xfail or fixed return added; the new code is a real test feeding the card's printed inputs through the real function.
+  REV-14 PASS No secret, key or .env; no real custodian record, field, file or count; the two counts are the card's printed Public figures from docs/07, not custodian data.
+  REV-15 PASS The diff adds only: one source entry, one fixture block, one import name and one test — nothing removed, lowered, widened, skipped or suppressed; the new test's planted violation is recorded.
+  REV-16 PASS The plan's C8 sentence ("fixtures reference … C8's national coverage example") is now fulfilled: block, source key and test present; the anchor names docs/07 C8 "Validation-file arithmetic" and the source key is the card's own pub_census_national.
+  REV-17 OPEN P1 check_docs.py exit 0 is recorded at this commit and no document needs the test-only change; PROGRESS.md, TASKS.md and OPEN_ITEMS.md entries are absent and follow at the task's ledger turn — record point P1.
+  REV-18 PASS Test and fixture only: no secrets read, no model calls, no queries, no untrusted text.
+  REV-19 PASS Nothing on the dropped or later lists is built; no component decision is removed or replaced.
+  REV-20 OPEN P5 The emitted fact is a CalculationFact from emit() with lineage, least-real class and evidence status computed from its inputs; the fixture lineage is the established invented arithmetic chain (test comment says so). The new source entry pub_census_national carries only the dataset name — sibling entries carry publisher, url and licence; the card states the census layers state no licence and no pinned file exists — completeness point P5, owed by the method-card-pins task per RULINGS.md.
+  REV-21 N/A No screen, card, template or rendered numeral is added.
+  REV-22 N/A No partition, parameter set, treatment or audit change.
+  REV-23 PASS The test imports eii_core.calc members only; no import of eii_custodian or eii_product is added anywhere.
+  REV-24 N/A No rendered English or Arabic text is added.
+  REV-25 PASS No local path, personal name, e-mail or internal plan; 1617208 and 2050252 are seven digits each, so no run of exactly eight or eleven digits; "Census 2020" is a public dataset name.
+  REV-26 PASS No prohibited claim, verdict, probability or advice is added.
+  REV-27 PASS The diff touches neither AGENTS.md nor CLAUDE.md; cmp exit 0 is recorded at this commit.
+  REV-28 PASS No synthetic or realistic identifier added; no registration, licence or tax number in the diff.
+  REV-29 PASS The figures are Public facts of a published census on the national geography; no Synthetic or Simulated attribute on any real place or business.
+  REV-38 PASS No gateway import or decision-provider key read is added.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17) record — PROGRESS.md, TASKS.md and OPEN_ITEMS.md carry no entries for this commit; they are entered by the task's ledger at the merge turn.
+  P5 (REV-20) — the fixture source entry pub_census_national cites only the dataset name "Census 2020"; publisher and retrieval date belong in the entry once the national census table is pinned, and the MTH-03 data replay of C8 from the pinned file is owed by the task that writes the method-card pins (RULINGS.md records the deferral; the census layers state no licence, per docs/07 C8 and decision 0017 item 10).
+```
+
+#### S2-T07: confirmation after the post-review changes: APPROVED
+
+Reviewed commit `5090b40`. Cognition SWE-2 High (Devin); another maker than the lead (Anthropic), which joined the train.
+
+```text
+VERDICT: APPROVED
+TASK: S2-T07, confirmation of the changes after approval
+COMMIT: 5090b40c448a6657da4ecba9b0e2717243318294
+REVIEWER: Cognition SWE-2 High (Devin)
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review named by the brief is not installed in this tool
+CHECKS:
+  C1 PASS All five defects have a test on the stated inputs and a root-cause fix: D1 test_exact_rounding.py:13-28 three exact-half cases plus wilson rational-square (line 45) and irrational (line 52) and boundary-refusal (line 59) tests, fixed by Fraction end-to-end and the exact identity at public_series.py:177; D2 test at line 33, fixed by the sign rule at public_series.py:112; D3 test_series_exact_regressions.py:10-26, fixed by figures.py:341; D4 test at lines 33-51 on 2025-06 and 2014-12, fixed by the C2_CALENDAR constant (public_series.py:34) and the refusal at figures.py:451; D5 test at lines 54-61 plus test_series_r5.py:208, fixed by figures.py:526. Hand-verified: case 1 change = 4/3 - 5/6 = 1/2 -> "1"; case 2 within = 20/3 + 11/6 = 17/2 = 8.5 -> "9" (also case 3: 117/176 / (117/11) = 1/16 -> 6.25% -> "6.3"; three-group within/mix/change = -1577/21, 1229/7, 2110/21; wilson(0,1) = (0, 2401/3026)).
+  C2 PASS Every display string routes through rounded() (public_series.py:100) on a Fraction or exact Decimal, or a boundary-checked Approximate; no float, quantize or second rounding exists in the calc modules (grep clean); the series package does no independent rounding — its only non-exact-form point is figures.py compute_checks "value_bn_2dp" dividing the exact Decimal total by Decimal(10**9) at ambient context, exact for every reachable total (hardening item, below).
+  C3 PASS BOUNDARY_DISTANCE = 1e-40 absolute (public_series.py:54,103-105,83-86) is sound: accumulated error of a 50-digit Approximate is a few ulp, ~4e-50 relative, so for every value this layer produces (Wilson endpoints in [0,1] and their quotients by national shares, magnitudes far below 1e9) the error is ~1e-43 or less, eight-plus orders inside the band; a value outside the band cannot be pushed across a boundary by the stored error. Exact-square radicands return exact Fraction endpoints (public_methods.py:48-57); the floor+1/2 boundary covers both sides of every half-integer.
+  C4 PASS Every changed expectation is a correction exact arithmetic forces, none a weakening: ratio/share unroundeds from 50-digit Decimals to the exact Fractions they rounded (D("0."+"3"*50) -> Fraction(1,3); D("33."+"3"*48) -> Fraction(100,3); "0."+"6"*49+"7" -> Fraction(2,3); "3."+"3"*49 -> Fraction(10,3); "0."+"3"*50 -> Fraction(1,3)); wilson endpoints to the already-stated closed form (0.20654329147389... -> Fraction(625,3026); 0.79345670852... -> Fraction(2401,3026)); density D("15000."+"0"*44+"1") -> Fraction(15000)+Fraction(1,4*10**45) (= exact 15000+2.5e-46); midpoint and sector expectations to exact inputs (D("1."+"0"*48+"1") -> Fraction(midpoint); D("10."+"0"*47+"1") -> Fraction(D("10."+"0"*48+"5")) = 10+5e-49 exact since emp*prod = 10*1000/1000... i.e. (1+5e-50)*1000/10/1000*100); fixed_composition_change D("1E-49") -> Fraction(5,10**50) exact; growth -66."6"*47+"7" -> Fraction(-200,3) and -1000-1e-46 -> Fraction(D("-1000."+"0"*46+"5")); worker sum 1E50 -> Fraction(10**50+1) keeping the dropped +1; near-tie order ("invented_a","invented_z") -> ("invented_z","invented_a") because the 51-digit ratios no longer collapse to a 50-digit tie; InvalidOperation on 51-digit input -> exact string "1."+"2"*50 (stronger); the 1e-20 tolerance-acceptance case -> required refusal (stricter, per LV-1b); c8 tolerance keeps the same +-0.5 bound on Fraction(789,10); low.is_signed() reformulated as rounded(low,0) == "0" (same unsigned-zero guarantee); custodian fixtures strengthened per LV-6 with values I verified (PUB-62: 24/7 -> "3.43", (24+6+10)/(7+13) -> "2.00"; PUB-68: sum 256, undated 9, dated 247, months 42/9/8, share 59/247 -> "24", bulk true/false/false at median 3 threshold 9); series_r5 asserts quantity absence per LV-5.
+  C5 PASS All 21 added mutation_explained.toml entries hold on every input: the localcontext->None entries surround only Fraction arithmetic, context-free Decimal comparisons/constructors (incl. to_integral_value equality, invariant under any rounding mode) and functions owning their own CALC_CONTEXT; the sum-start, sign<= vs <, format F/f, Decimal(0)/Decimal(1) key constant, [1]/[2] index and +-1/+-2 comparator entries are equivalences as reasoned; none is a caller-settable escape because the tests set hostile contexts directly. The MUT tests assert hand-worked literals (e.g. HHI 226/256*10000 = 8828.125 -> "6250.00" and "8828.13", 1/8 -> "0.13", .875, 130, Fraction(5,4), wilson centre 9901/39802 which I recomputed).
+  C6 PASS No conflict markers anywhere under core/ or custodian/src/eii_custodian/publicdata/series/ (grep clean); public_series.py holds exactly one stated decimal context, CALC_CONTEXT at line 21.
+  C7 PASS test_pinned_methods.py:438 now divides the Fraction exact_unrounded by the integer 10**9 — the same 1e9 scale the old D("1E9") division meant — and the expected "138.53" and every other recorded figure are unchanged.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  record — I ran nothing: no command, test or build was executed; every check is a reading of the files, the patches and the lead's recorded runs.
+  record/hardening — figures.py compute_checks "value_bn_2dp" divides the exact Decimal total by Decimal(10**9) under the ambient context; exact for every reachable total but caller-context sensitive in principle, where the exact form (Fraction) would not be.
+  record/hardening — the 1e-40 refusal band is absolute, so it covers the ~1e-48 stored error only for magnitudes below roughly 1e9; every value the layer produces stays far under that, but a future approximate path at larger magnitudes would need the band scaled.
+  record/hardening — licence_churn keeps its own copy of the 125-month calendar tuple (public_methods.py "expected") identical to C2_CALENDAR; sharing the constant would prevent drift.
+  record — the custodian figures.py mutation campaign is owed on the joined tree before merge per EVIDENCE.md; not a defect of this change.
+```
+
+#### S2-T07: confirmation of part 2, the whole-command import repair: APPROVED
+
+Reviewed commit `8880304`. Cognition SWE-2 High, through Devin; another maker than the lead (Anthropic), which joined the train.
+
+```text
+VERDICT: APPROVED
+TASK: S2-T07, confirmation of the repair of one test for the whole test command
+COMMIT: 8880304d3eb5f7025093057458a4ceb996835537
+REVIEWER: Cognition SWE-2 High, through Devin
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review is not installed in this tool, so its plain meaning was followed (verdict APPROVED/REJECTED; every finding names file, place, defect, exact fix)
+CHECKS:
+  W1 PASS `build_command` (scripts/run_tests_exec.py, the pytest branch) starts `python -P -s -m pytest`, and `-P` keeps the working folder off `sys.path`; `scripts` has no `__init__.py`, so `from scripts.run_tests` resolves as a namespace package only when the repo root is on `sys.path` — true on a plain `python -m pytest` run (cwd prepended), false under `-P`, hence ModuleNotFoundError. The `pythonpath = ["scripts"]` entry in pyproject.toml explains it precisely: it adds `<root>/scripts` (making `run_tests` importable) but never `<root>` (so the `scripts` package name cannot resolve).
+  W2 PASS The patch replaces only the one import line; `selections = [...]` and the three asserts at custodian/tests/test_method_cache.py:108-115 are untouched context, verified character-for-character against the standing file and the patch preimage. The root is found via `repository_root(Path(__file__))` (own location, resolve()+parents, never cwd — custodian/tests/repository_root.py). Lead's `git diff --stat` records 1 file, +8/−1; no skip, marker, or suppression comment was added.
+  W3 PASS The asserts still check membership and `is_relative_to`, so a planted `custodian/data_tests` arg must fail — the builder's planted run did fail with `AssertionError` (exit 1) at the membership assert. Under the whole command `<root>/scripts` is already on `sys.path` via the `pythonpath` ini entry, so the guarded insert is dormant and `sys.path` is unchanged for the suite; the only delta is `sys.modules["run_tests"]`, and no name inside `scripts/` (`commands`, `run_tests`, `ci_environment`, `spine_triage`, …) collides with anything another test imports — `import commands.build_public` in test_publicdata_behaviour.py and the investment tests already relies on the same path entry.
+  W4 PASS My own tree-wide grep for `from scripts.` / `import scripts` returns zero matches — the repair removed the only one, so the return's list is confirmed (in fact stronger: none remain anywhere).
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  (record) W2's `git show 60825ff…` comparison could not be run because this review is read-only with no shell; the unchanged assertions were verified instead against the patch preimage (its context lines) and the standing file, which jointly prove the repair touched only the import.
+  (record) Because `pythonpath = ["scripts"]` already puts `<root>/scripts` on `sys.path` under pytest, the test's guarded `sys.path.insert` only ever fires outside that configuration (e.g. the mutation-runner copy); it is inert under the whole command and consistent with the precedent's pattern.
+```
+
+#### S2-T07: confirmation of part 3, the data-test import repair: APPROVED
+
+Reviewed commit `2e19ee5`. Cognition SWE-2 High, through Devin; another maker than the lead (Anthropic), which joined the train.
+
+```text
+VERDICT: APPROVED
+TASK: S2-T07, confirmation of the repair of the data test's import for the sandbox proof
+COMMIT: 2e19ee5c12f11b8f2ea47679dee25931f47bf055
+REVIEWER: Cognition SWE-2 High, through Devin
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review is not installed, its plain meaning followed (verdict with file/place/defect/fix per finding)
+CHECKS:
+  W1 PASS `prove` runs `<python> -P -s -m pytest ... -m sandbox` with no folder (scripts/ci_sandbox.py:331-345); `-P` keeps the repo root off `sys.path` and pyproject's `pythonpath` (pyproject.toml:66-73) holds only src/test dirs, so `import custodian` can only resolve through a pytest-created parent. Under `--import-mode=importlib` (pyproject.toml:59) a file inside an `__init__.py` package is imported under that package's name, so `custodian/data_tests/test_pinned_methods.py` becomes `data_tests.test_pinned_methods` and no `custodian` parent is ever materialized — hence `ModuleNotFoundError: No module named 'custodian'` at line 6. Files in `custodian/tests`, `product/tests`, `scripts/tests` (no `__init__.py`) get rootdir-relative names like `custodian.tests.test_method_cache`, so pytest does create `custodian`/`product`/`scripts` parents rooted at the real dirs, and their `from custodian.tests.X` / `from custodian.data_tests.cache` imports resolve — exactly as RETURN.md and EVIDENCE.md record, and as the sole reported error confirms.
+  W2 PASS FIX.patch is the whole change: two hunks, +15/−1 matching the builder's `git diff --stat`; the file's lines 1-32 match the patch verbatim and all test code, assertions and expected values sit outside the hunks, unchanged by construction. The module is registered in `sys.modules` (line 30) before `exec_module` (line 31), under the name `eii_data_tests_cache` which nothing else uses; the `sys.modules.get` guard prevents re-execution, the path is fixed to `Path(__file__).parent / "cache.py"` so no different `cache.py` can be selected, and only an already-possible second copy under the unrelated name `custodian.data_tests.cache` (via test_method_cache) can coexist — same file, same code. No `sys.path` change, no skip, no suppression, one file only.
+  W3 PASS `pinned = _cache.pinned` binds the function of the very same `custodian/data_tests/cache.py`; `pinned(source)` is called with the same arguments in all eight tests, and `cache.py`'s `ROOT = parents[2]` resolves to the repo root from the same `__file__`, so the absent `data/public_cache` yields the same eight `public_cache_missing` outcomes the builder lists for both runs.
+  W4 PASS The list is believable: my own search finds the same 16 `custodian/tests` files with module-level `from custodian.` (all safe via the pytest-created `custodian` parent), the same 3 `product/tests` `from product.` imports, `test_requalify.py:11` `from evals.` rescued by its own `sys.path.insert` at line 9, and no `from core.`/`from scripts.`/`from commands.` imports in any test module. The only other package-dwelling test dir, `scripts/tests/gateway`, uses `eii_gateway` (on `pythonpath`), relative `.support`, and top-level imports resolved via `scripts/tests` — not of this class. `custodian/tests/test_method_cache.py:7` imports the init-holding `custodian.data_tests` yet survives because its own dir is package-less.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  record: this reviewer ran no commands, so byte-identity of the ~430 unchanged lines of test_pinned_methods.py against commit 60825ff rests on FIX.patch being the complete git-format diff and the consistent 15+/1− diffstat, not on a fresh `git show` comparison.
+  hardening: `custodian/data_tests/__init__.py` is the root of the asymmetry; removing the package marker from `data_tests` (or adding a whole-tree `--collect-only` check to the ordinary gates) would retire this failure class rather than repairing one instance.
+  record: when `custodian/tests/test_method_cache.py` runs its line-170 import, a second module object `custodian.data_tests.test_pinned_methods` executes the same file; the `eii_data_tests_cache` guard reuses the loaded cache module, so no double execution results — pre-existing behaviour, noted for the ledger.
+```
+
+#### S2-T21: code review, round 1: REJECTED
+
+Reviewed commit `9fbae70`. Cognition Devin, SWE-2 High; another maker than the lead (Anthropic), which joined the train.
+
+```text
+VERDICT: REJECTED
+TASK: S2-T21 (local commit)
+COMMIT: 9fbae7032c00929b219b6ed0d62ced74ca97e0eb
+REVIEWER: Cognition Devin, SWE-2 High
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review is not installed in this tool
+CHECKS:
+  REV-10 FAIL F1 — the loader/fetch/registry half of both criteria is proven by the five-module suite and the lead's runs; the release half belongs to S2-T08 (P1); one finding below breaks criterion 2's absence contract for an admissible row state.
+  REV-11 PASS — lead's recorded runs on this commit, all exit 0: pytest custodian 422 passed, core 2, product 231, unittest discovery 814 tests OK, check_docs 0; every new guard has a planted violation and the builder's break pass names the test that catches each break; hosted checks follow at the task's turn.
+  REV-12 PASS — `git diff --stat 7ebe2e2..HEAD` lists only the 12 in-scope files (loader, fetch modules, sources.yaml, the five test files, doc 04); nothing under `data/`; no unrelated reformatting.
+  REV-13 PASS — `terms to be read` is the designed state of decision 0026 item 3, not a stub; no TODO, FIXME or fixed return standing in for work.
+  REV-14 PASS — invented fixtures and hand-made bytes only; no secret, real record, register row or busy value anywhere in the diff.
+  REV-15 PASS — removed switch-off tests track the removed path and are replaced by inverted or split tests (`test_forbidding_terms_leave_the_source_fetched_and_stored`, `test_missing_publisher_stores_nothing`); `switched_off` is asserted false; no tolerance, skip, retry or CI change.
+  REV-16 PASS — rulings R1–R6 applied: portal missing-licence fails `dataset` only, every `terms_url` fingerprinted without opt-in, `terms_watch` made inert and tested so, `commit_allowed` dataset-only, the doc-04 words guard added; `import yaml  # type: ignore[import-untyped]` kept verbatim and no new suppression comments.
+  REV-17 OPEN P2 — doc 04 section 3.1 updated in the commit and `check_docs.py` exits 0 in the lead's run; PROGRESS.md, TASKS.md and OPEN_ITEMS.md do not record this commit yet, which follows at the task's turn (record).
+  REV-18 PASS — no secret in files or fixtures, no model-written query, no custodian-boundary or data-handling change beyond the task's scope.
+  REV-19 PASS — the change implements decision 0026 as written; nothing on a dropped list is built and no decision is removed or replaced.
+  REV-20 N/A — the commit adds no figure; the new registry fields record provenance text verbatim.
+  REV-21 N/A — no screen, template, claim or numeral output changes.
+  REV-22 PASS — no change to partition, parameter sets, treatment, audits or their tests.
+  REV-23 N/A — no `product/` file or custodian-import change in this commit.
+  REV-24 N/A — no rendered or bilingual text added.
+  REV-25 PASS — no busy-venue value in any committed file; the non-Python scan of `custodian/tests` plus its planted JSON violation exists; `check_docs.py` clean with and without the private patterns file; `busy_gmaps` keeps `nightly_live_fetch: false` and `nightly_blocked` still reports it.
+  REV-26 PASS — no prohibited claim added; doc and registry changes record terms and basis only.
+  REV-27 PASS — AGENTS.md and CLAUDE.md are not in the diff; `cmp` exit 0 recorded.
+  REV-28 PASS — no synthetic identifiers added and no run of exactly eight or eleven digits (check_docs exit 0); planted stand-ins are invented.
+  REV-29 PASS — no invented attribute on a real place or business; the two non-marker `terms_words` (`fdi_projects`, `busy_gmaps`) are verbatim substrings of the quotations document 04 already holds, enforced by `test_terms_words_other_than_the_marker_are_in_document_04`.
+  REV-38 N/A — no gateway or run-time change; the serving-plane boundary is untouched by this commit.
+FINDINGS:
+  F1 (REV-10)
+    File: custodian/src/eii_custodian/publicdata/fetch/build.py
+    Place: `run_build`, lines 192-202 of the head file
+    Wrong: The patch moved the `citation_only` branch ahead of the `skip_reason` branch. In the base, a `citation_only` row carrying a `skip_reason` — a state `load_registry` accepts and no test pins — printed `SKIP <key> <reason>` and wrote nothing; on this head it writes `citation.json` and a `PASS ... CITATION_ONLY` line, so a source marked absent for a recorded technical reason produces a usable output and its reason never reaches the lines or the build log. For a skipped citation row with a `terms_url` it also never fingerprints the terms page that ruling R2 requires of every skipped row recording one ("as today" a watched skipped citation row was fingerprinted by `_watch_skipped_terms`). This breaks criterion 2's tail ("unfetched sources ... still remain absent with NO_DATA and their caveat, with the actual reason recorded") and ruling R3 ("for a source that is absent for a technical reason, no usable output exists").
+    Fix: Restore the base order — evaluate `entry.skip_reason` (with `_read_terms_apart` for a `terms_url` row) before the `citation_only` branch — or refuse `skip_reason` on `citation_only` rows in `_entry`. Add a planted test: a `citation_only` `Entry` with `skip_reason="publisher_or_schema_unconfirmed"` and `terms_url=""` passed to `run_build` asserts a `SKIP ` line and that no `citation.json` was written. Prove it fails on this head and passes after the fix, then the five-module pytest run green.
+PROPOSED OPEN ITEMS:
+  P1 (REV-10) acceptance criteria 1 and 2, release half: this commit proves the loader/fetch/registry half; that every admitted source reaches the release whatever its terms, and every technical absence reaches it as `NO_DATA` with its reason and caveat, is S2-T08's proof — the builder's proposed item (a), carried forward.
+  P2 (REV-17) record: PROGRESS.md, TASKS.md and OPEN_ITEMS.md do not yet record this commit; the ledger entries and the criteria ticks follow at the task's turn (brief note 5).
+```
+
+#### S2-T21: code review, round 2: APPROVED
+
+Reviewed commit `f210a25`. Cognition Devin, SWE-2 High; another maker than the lead (Anthropic), which joined the train.
+
+```text
+VERDICT: APPROVED
+TASK: S2-T21 (local commit), round 2
+COMMIT: f210a256d4df4d80ed68700f258dcdaa60e56a81
+REVIEWER: Cognition Devin, SWE-2 High
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review is not installed in this tool
+EARLIER FINDINGS:
+  F1 FIXED — `run_build` evaluates `entry.skip_reason` before the `citation_only` branch (build.py lines 191-202); a skipped citation row prints `SKIP <key> <reason>` and writes no `citation.json`, and a `terms_url` on such a row is fingerprinted via `_read_terms_apart` (lines 279-298). Pinned by `test_skipped_citation_writes_no_citation`, `test_skipped_citation_fingerprints_terms_without_citation` and `test_unskipped_citation_writes_citation_and_line` in `custodian/tests/test_publicdata_fetch.py`; the lead's run records custodian pytest 438 passed, exit 0, on this commit.
+CHECKS:
+  REV-10 PASS — the absence contract of criterion 2 now holds for an admissible `citation_only` + `skip_reason` row, proven by the three planted tests above; the release half of criteria 1 and 2 remains S2-T08's proof (P1).
+  REV-11 PASS — lead's recorded runs on this exact commit, all exit 0: pytest custodian 438 passed, core 2, product 231, unittest discovery 814 tests OK, check_docs 0 (with and without the private patterns file), check_tree 0, uv lock --check 0, ruff check and format --check clean, mypy 221 files clean, check_versions and check_reference_notes OK, `cmp AGENTS.md CLAUDE.md` exit 0; new guards have planted violations (the three citation tests; each of the nine killed task-line mutants was shown red on one test, exit 1, before restore). Hosted checks follow at the task's turn.
+  REV-12 PASS — the fix commit touches 7 files, all in scope: `custodian/src/eii_custodian/publicdata/fetch/build.py`, the three task test files, two new test-equipment files under `custodian/tests/` (required by rulings K and P), and `scripts/mutation_explained.toml` for the campaign the round owed; nothing under `data/`; no unrelated reformatting.
+  REV-13 PASS — `repository_root` is real code with five tests of its own; no TODO, FIXME, fixed return or empty body in delivered code.
+  REV-14 PASS — invented fixtures, URLs and bodies only (`planted-terms`, `planted-licence`, `planted_citation`, `planted-token-value`); no secret, real custodian record, register row, registration number or busy value in the diff.
+  REV-15 PASS — diff of tests read line by line: only strengthening (regex `match=` anchored to `^...$`, scan folders asserted non-empty, gitignore test now proves the committed `.gitignore` itself in a fresh repo, safe-loader guard reads `registry_module.__file__`); no removed or loosened assertion, no new skip, retry, tolerance or suppression comment; the production diff is the branch-order move only.
+  REV-16 PASS — rulings applied as written: base order restored (A), tests-first planted tests added (B), only the order changed in production code (C), the guard reads the imported module's file (K), equipment byte-equal per the lead's `cmp` exit 0 (P/Q), the owed campaign ran on the three fetch modules and every survivor in a task line was killed or explained (W/X/Y); the one kept explanation is verifiably true — `_call` never reads its `entry` argument (kinds.py lines 109-132).
+  REV-17 OPEN P2 — `check_docs.py` exits 0 in the lead's recorded run; PROGRESS.md, TASKS.md and OPEN_ITEMS.md do not record this commit yet, which follows at the task's turn (record).
+  REV-18 PASS — no secret in files, fixtures or the toml entry; no model-written query; no custodian-boundary or data-handling change beyond the task's scope.
+  REV-19 PASS — the change implements decision 0026 as written and the round's binding rulings; no dropped item built, no decision removed or replaced.
+  REV-20 N/A — the commit adds no figure; the terms record written for skipped rows carries key, retrieval time, fingerprint, URL, terms words and read-on date verbatim.
+  REV-21 N/A — no screen, template, claim or numeral output changes.
+  REV-22 PASS — no change to partition, parameter sets, treatment, audits or their tests; the diff is confined to the public-data fetch path and its tests.
+  REV-23 N/A — no `product/` file or custodian-import change in this commit.
+  REV-24 N/A — no rendered or bilingual text added.
+  REV-25 PASS — no busy-venue value in any committed file; the non-Python busy-name scan is kept and now scans `REPO/custodian/tests`; check_docs clean with and without the private patterns file; every committed file's licence statements untouched.
+  REV-26 PASS — no prohibited claim added; the toml entry and test docstrings describe mechanics only.
+  REV-27 PASS — AGENTS.md and CLAUDE.md are not in the diff; `cmp` exit 0 recorded.
+  REV-28 PASS — no synthetic identifiers added and no run of exactly eight or eleven digits in the diff; planted stand-ins are invented strings.
+  REV-29 PASS — no invented attribute on a real named place or business; no registry terms fields changed; planted URLs sit on allow-listed public hosts already named by the sources.
+  REV-38 N/A — no gateway or run-time change; the serving-plane boundary is untouched by this commit.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-10) acceptance criteria 1 and 2, release half: this commit proves the loader/fetch/registry half; that every admitted source reaches the release whatever its terms, and every technical absence reaches it as `NO_DATA` with its reason and caveat, is S2-T08's proof — carried forward from the earlier verdict.
+  P2 (REV-17) record: PROGRESS.md, TASKS.md and OPEN_ITEMS.md do not yet record this commit; the ledger entries, the criteria ticks and the hosted checks follow at the task's turn.
+  P3 (REV-11) the owed mutation campaign on the three fetch modules ended exit 1 with 504 survivors and 3 not-located `__init__` mutants, all on lines of earlier tasks, not of this task — the lead holds the list; closure belongs to the slice's follow-up task. Evidence: `.overnight/CAMPAIGN_RESULT.1.txt` counts recorded in EVIDENCE.md and the lead's placement note in RULINGS.md.
+```
+
+#### S2-T21: confirmation of the join onto main: APPROVED
+
+Reviewed commit `d7baf1a`. Cognition SWE-2 through Devin; another maker than the lead (Anthropic), which joined the train.
+
+```text
+VERDICT: APPROVED
+TASK: S2-T21, confirmation of the joined change
+COMMIT: d7baf1ae09a8479a87b5edee6b7901b30918bc5d
+REVIEWER: Cognition SWE-2 through Devin
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review — not installed in this tool
+CHECKS:
+  K1 PASS `import yaml` is plain (registry.py:10); `run_build` keeps the `publish_investment` block and the `empty_coordinates.txt` lines after the terms branch (build.py:218-247); `_unconfirmed_watched` is the tree's planted row plus the R4 cells (test_publicdata_behaviour.py:642-659); `bnd_hdx` keeps the real humdata URL (sources.yaml:1183); `mutation_explained.toml` appends the task's one entry last. No unaccounted hunk in the task's 13 files; the only joined-only hunks there are B1 and B2.
+  K2 PASS sources.yaml:807-894 — `zone_population`, `est_census`, `census_hh_type_2020` keep `licence_id: "CC-BY-4.0"`, `licence_basis: "dataset"`, the CC licence address, `decision_record: ""` and their tree skip reasons, gaining only `terms_words`/`terms_read_on`. 27 is correct (29 − 2); the other assertions (138 rows, no `none_stated`, every owner_decision names `0026`) are unchanged and not weaker.
+  K3 PASS (a) Decision 0026 item 1: "Reuse terms do not … bar it from a release"; item 9: the classification source is not "barred from release because of terms" — no licence-based release refusal remains, so `_refuse_release` correctly drops `GraphRefused`. (b) The loader refuses `none_stated` (registry.py:2059-2060 plus `test_none_stated_basis_is_refused`), so no loaded row can hold it and items 1 and 9 bar nothing else; the removed `_admitted` clause guarded nothing reachable — covered by R5b. (c) `GraphError("unknown graph mode")`, `GraphError("cls_isic4 is not in the registry")` in release mode, and the unknown-source edge refusal (graph.py:581-586, 532-533) are unchanged; the patch touches only the import, `_refuse_release`, `_admitted`.
+  K4 PASS Every changed/removed assertion is in section 3 of INTERDIFF.md and follows a ruling (B1/R4, B2/R2, B8+B10/R5b, B9/R5a, B11/R5e, B14/R5c-d); I found none the table misses. `test_cached_release_refusal_writes_nothing` and the renamed release test leave no standing requirement untested — DAT-103's remaining arm is covered by `test_dat_103_edge_with_an_unknown_source_fails`, and release-mode build/write is covered by the renamed test. B1's planted row still proves an unconfirmed watched source: `page_list_unconfirmed` + `terms_watch` kept, terms hashed, change named, row left off.
+  K5 PASS `write_cached` still plants `switched_off: true` after `sidecar_for` (cache_fixture.py:93-94); the refusing readers are unchanged (cache_fixture.py:209, frame/build.py:51). B12 removals, B13's `""` for `terms_unread`, and B14's two required cells are each no larger than the signature change forces. Both `test_s2_t13_confirmation` tests plant the same phrases on `terms_words` with no assertion line changed — `confirm_s2_t13.py` never read `terms_forbid`, so the cases still prove what their names say.
+  K6 PASS `custodian/tests/repository_root.py` and `test_repository_root.py` are not in JOINED.patch; the tree's helper (two markers, four levels, `RepositoryRootNotFoundError`) and its 50-line test stand at the same import path the task's tests use. Nothing the task's criteria need is left untested; extra hardening is a proposed item only.
+  K7 PASS All B1–B14 added values are invented ("Invented terms words", "2026-01-15", "Invented forbidding phrase", "Invented restriction", "planted_source"); no real row values, no credential-like values, no absolute paths, no bare 8- or 11-digit runs. Registry additions name only publishers and addresses the pack already cites.
+  K8 PASS EVIDENCE.md's focused run (693 passed, exit 0) and the lead's checks (exit 0) match the return's RUN (1892 passed, ruff/mypy/docs/tree checks exit 0). The builder's admission that R4's asserts and F2's old asserts were not shown red leaves no new guard of this join without a planted violation — the join removes guards, it adds none.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  GraphRefused stays exported in graph.py (__all__, line 762) and nothing raises it — dead export for a later owner to remove.
+  frame/live.py, frame/census.py and confirm_s2_t13.py still name the basis none_stated; unreachable from a loaded registry row — cleanup belongs to a task that owns those files.
+  No test calls build_cached_graph with mode="release" after the join — a coverage point, not a weakened assertion.
+  graph.py gained two docstring lines and folded `entry = _entry_for(...)` into one condition (B4, B5): slightly more than the tree forced, behaviour unchanged — noted for the record.
+```
+
+#### S2-T21: confirmation of the thin pass: APPROVED
+
+Reviewed commit `71e92c8`. Cognition SWE-2 High; another maker than the lead (Anthropic), which joined the train.
+
+```text
+VERDICT: APPROVED
+TASK: S2-T21, confirmation of the thin test pass
+COMMIT: 71e92c898cd4342bf76b15ddecd47e0d35a07f7e
+REVIEWER: Cognition SWE-2 High
+SKILLS LOADED: strict-reviewer; code-review (not installed in this tool, reported per brief)
+CHECKS:
+  T1 PASS The test reads `root / "custodian/src/eii_custodian/publicdata/investment_build.py"` and `root / "custodian/src/eii_custodian/publicdata/fetch/registry.py"` via `repository_root(Path(__file__).parent)` (test_investment_build.py:722-729), exactly the ruling; `custodian/tests/repository_root.py` is unchanged by the diff.
+  T2 PASS All text assertions stand word for word (lines 730-733: `"type: ignore" not in build`, `not in fixtures`, `"import yaml" not in build`, `registry.count("type: ignore") == 0`) and the behaviour half (broken YAML -> `RegistryError`, lines 734-737) stands. The removed `publication` import was unused in this test; `read_yaml`/`RegistryError` remain in use.
+  T3 PASS RETURN.md records all four planted runs red: `# type: ignore` appended to registry.py fails `assert registry.count("type: ignore") == 0` (exit 1) before and after; the same on investment_build.py fails `assert "type: ignore" not in build` (exit 1) before and after; `git diff --exit-code -- custodian/src` exit 0 after each restore; clean runs exit 0.
+  T4 PASS The diff touches only `custodian/tests/test_investment_build.py`: one added import line (matching sibling files' form, e.g. test_frame_census.py:9) and the two reads; no skip, deselection, suppression comment or runner change.
+  T5 PASS The root pyproject is a `package = false` uv workspace and `eii-custodian` is a uv_build member installed editable; pytest's `pythonpath` additionally puts `custodian/src` ahead of site-packages, so the loaded module and the file the test reads are the same file — no installed-copy gap.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S2-T21: confirmation of the mutation pass: REJECTED
+
+Reviewed commit `6509b69`. Cognition SWE-2 High; another maker than the lead (Anthropic), which joined the train.
+
+```text
+VERDICT: REJECTED
+TASK: S2-T21, confirmation of the mutation pass
+COMMIT: 6509b69b9d1ea9f11437453af1e07d3365b68027
+REVIEWER: Cognition SWE-2 High
+SKILLS LOADED: strict-reviewer; code-review not loaded — no such skill in this toolset
+CHECKS:
+  M1 FAIL tests reach refusals/stored fields via public functions with whole-literal comparisons and the locale test is real, but `not isinstance(value, int)` of `_layer` has no only-it-refuses row (no non-bool non-int layer), and no row pins either operand of `terms_watch and terms_url.strip()==""` (no watch+valid-url row, no no-watch+blank-url row), so operand mutants on that line survive the file
+  M2 PASS all values invented (invented.invalid, planted-*, "Invented ..."); shared tokens are vocabulary only (bases, kind, json, `none`, `schema_unconfirmed` reason code, banned `traffic_tomtom_flow` which has no row); no terms text, licence wording, host or name copied from sources.yaml; no credential-like values
+  M3 PASS pinned behaviour matches decision 0026 (owner_decision↔record 0026), TASKS S2-T21, doc 03 source_registry and doc 04 §3.1/PUB-95 (no traffic row, layer rule per sources.yaml header); nothing pins a contradicted behaviour
+  M4 PASS the appended row's mutation changes only the codec name in `read_yaml` (`utf-8`→`UTF-8`); the codec-normalisation reason is true of Python's codec lookup; the patch changes no other row
+  M5 PASS the patch touches only the new test file and the one toml row; no custodian/src file, document or other test changed; no skip, xfail or suppression comment in the new file
+FINDINGS:
+  N1 File: custodian/tests/test_registry_survivors.py; Place: test_layer_refusals_name_the_whole_text; Wrong: for the or-refusal `isinstance(value, bool) or not isinstance(value, int)` only the bool operand has an isolating row (layer=True); layer=-1 is refused by `value < 0`, so no row is refused by `not isinstance(value, int)` alone; Fix: add a paged_layer row with a non-bool non-int layer, e.g. `invented_row(kind="paged_layer", layer=0.5)` or `layer="x"`, expecting "layer is not an integer"
+  N2 File: custodian/tests/test_registry_survivors.py; Place: test_terms_watch_requires_terms_url; Wrong: the and-refusal `terms_watch and terms_url.strip() == ""` has only the both-true row; operand mutants (`and`→`or`, dropping `terms_watch`, dropping the URL test) all survive this file; Fix: add a passing row with `terms_watch=True`, `basis_note` and a non-blank terms_url asserting `entry.terms_watch is True`, and a passing row with a blank terms_url and no terms_watch
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S2-T21: confirmation of the mutation pass fix: APPROVED
+
+Reviewed commit `b379cc5`. Cognition SWE-2 High; another maker than the lead (Anthropic), which joined the train.
+
+```text
+VERDICT: APPROVED
+TASK: S2-T21, confirmation of the fix of N1 and N2 of the mutation pass
+COMMIT: b379cc59e18b9d6bcc6c6653c6734bc43f76565c
+REVIEWER: Cognition SWE-2 High
+SKILLS LOADED: strict-reviewer; code-review not loaded — no such skill in this toolset
+CHECKS:
+  N1 PASS fraction row at lines 273-274 plants kind="paged_layer", layer=0.5 — non-bool non-int — expecting the whole LAYER_INTEGER text; under the `not isinstance(value, int)` operand mutant it passes `value < 0` and loads, so only that operand refuses it
+  N2 PASS watched row (lines 237-243) keeps terms_watch=True with a non-blank url and asserts kept[0].terms_watch is True, unwatched row (lines 244-246) has a blank terms_url and no watch and asserts terms_watch is False — each operand of `terms_watch and terms_url.strip()==""` has its own row; the original watch+blank-url refusal row still expects WATCH_URL at lines 231-236
+  N3 PASS the patch and the tree agree: only custodian/tests/test_registry_survivors.py differs, only the two named tests gained rows plus an accurate docstring rewording; no product file, no other test, no explained row, no skip or suppression comment
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Train C: the seven differences the join forced: APPROVED on `5147fde`
+
+```text
+VERDICT: APPROVED
+TASK: train C, confirmation of S2-T21's forced join differences
+COMMIT: 5147fdecdcac222a150464e0e43644d26f89d24d
+REVIEWER: OpenAI GPT-6, through Codex
+SKILLS LOADED: strict-reviewer, sanad-provenance, task-standards, project-orientation, muhasabah-gate; code-review unavailable, plain-meaning review applied
+CHECKS:
+  K1 PASS The seven files in IDENTITY.txt contain only join adaptations. fetch/build.py preserves the pre-existing run_build additions; test_publicdata_behaviour.py matches the approved final file. The five repair-file differences match FORCED.patch.
+  K2 PASS custodian/publicdata/sources.yaml, places_fsq/copy-2025-01-10: both added values come verbatim from basis_note. Apache-2.0 with dataset basis, empty decision_record and the pending-terms marker follows decision 0026 item 3.
+  K3 PASS places_fsq/fetch.py::_sidecar removes an obsolete argument. fetch/receipts.py::sidecar_for still emits switched_off: False and records terms_words, terms_read_on and the terms hash.
+  K4 PASS The survivor release test checks exact node IDs; the edge test checks classification admission, owner_decision and record 0026. These replace obsolete refusals under items 1, 3 and 9.
+    test_publicdata_registry.py::test_registry_counts_follow_decision_0026 retains exact equality: rg counted 139 registry keys, identical to main’s keys; the approved tree had 138, without S2-T15’s added row.
+  K5 PASS FORCED.patch contains no skip, expected failure, retry, suppression or widened tolerance. Obsolete refusal expectations are replaced with explicit positive assertions; no check is simply discarded.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  record: Correct EVIDENCE.md’s L-553 “byte-identical” statement for build.py: the complete files differ by main’s existing places-fetch and stage.unrecorded handling; those differences are preserved unchanged across the replay. test_publicdata_behaviour.py is byte-identical between the approved and replayed work commits.
+```
+
+#### Train C: the train repair e88a24a: APPROVED on `e88a24a`
+
+```text
+VERDICT: APPROVED
+TASK: S2-T21, confirmation of the train C repair of the busy-source scan
+COMMIT: e88a24aef76139c893919e184d56b422af591574
+REVIEWER: OpenAI GPT-6, through Codex
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate; code-review unavailable, plain-meaning review applied
+CHECKS:
+  C1 PASS custodian/tests/test_publicdata_registry.py::non_python_files_naming_busy removes the UTF-8 decoding failure described in EVIDENCE.md by excluding bytecode caches and reading bytes.
+  C2 PASS non_python_files_naming_busy retains coverage of every committed non-Python fixture; git lists no __pycache__ files and .gitignore excludes them. The ASCII busy_gmaps identifier remains detectable byte-for-byte.
+  C3 PASS custodian/tests/test_publicdata_registry.py::test_bytecode_cache_is_not_scanned_as_a_fixture and test_planted_binary_fixture_naming_busy_gmaps_fails_the_scan exercise both behaviours. EVIDENCE.md reports their respective failures under plants A and B; no tests were run during this review.
+  C4 PASS The commit diff changes only custodian/tests/test_publicdata_registry.py: the scan repair and two added tests. No test skip, xfail, suppression or earlier expected value changed.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Train C: the train's one confirmation: APPROVED on `b7e5dbf`
+
+```text
+VERDICT: APPROVED
+TASK: merge train C of slice S2 (pull request 60), the train's confirmation
+COMMIT: b7e5dbfe4f61bfb19ec77e68309729f8aaabe930
+REVIEWER: Cognition SWE-2 High, through Devin (a maker other than the lead that joined the train; I wrote no line of it)
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review is not installed in this tool, its plain meaning followed (verdict with file/place/defect/fix per finding)
+
+CHECKS:
+  A1 PASS — file-by-file against the approved commits: S2-T07 part 1 (60825ff → 4ea9986) 47/47 files identical, including AGENTS.md/CLAUDE.md, the docs, the calc modules and the toml block; part 2 (8880304 → 75f3ce3) 1/1 identical (the same 8-line whole-command import repair); part 3 (2e19ee5 → f014504) 1/1 identical (the same 15+/1− data-test import repair). S2-T21 part 1 (d7baf1a → 8581411) 26 own files vs 29 train files: 22 identical and exactly the seven listed forced differences — sources.yaml (the places row gains the two terms fields, matching main's S2-T15 row), fetch/build.py (same 170/170 changed content; only hunk boundaries differ; the result-side delta equals main's places-fetch delta exactly), test_publicdata_behaviour.py (726/725, planted-row context on main's later rows), test_publicdata_registry.py (444/444, registry count 139), places_fsq/fetch.py and the two activity-graph survivor test files (train-only: `switched_off` removed, `cls_isic4` admitted — both forced by main's cache_fixture/graph state). All seven match the reasons in TRAIN-C.confirm.forced.md (APPROVED on 5147fde, K1–K5). S2-T21 part 2 (71e92c8 → a220669) 1/1, part 3 (6509b69 → 33da61b) 2/2, part 4 (b379cc5 → 5147fde) 1/1, all identical. The repair e88a24a is its own commit touching only test_publicdata_registry.py (skips `__pycache__`, reads non-Python fixtures as bytes, adds the two planted tests) as confirmed APPROVED by OpenAI GPT-6 through Codex. Against main, scripts/mutation_explained.toml: six lines of main's public_series.py rows (three entries: the quantize mutant and the two sum-start mutants) are replaced; S2-T07's own block stands at line ~1411 after the requalify entry; S2-T21 part 1's kinds.py entry and part 3's registry.py entry each stand appended once at file end; no other main row is removed or reordered.
+  A2 PASS — exactly nine commits between base baf525b and HEAD, in order 4ea9986, 75f3ce3, f014504, 8581411, a220669, 33da61b, 5147fde, e88a24a, b7e5dbf, every subject a Conventional Commit. `git show --stat b7e5dbf` holds only PROGRESS.md, OPEN_ITEMS.md and TASKS.md; `git diff --stat e88a24a HEAD` holds the same three files and nothing else.
+  A3 PASS — the ledger holds the entry "Merge train C of slice S2 (S2-T07, S2-T21)" with separate sections per task. Every verdict of record matches its file under .overnight/VERDICTS/ on reviewer, commit, verdict and findings: S2-T07 — REJECTED on 584bf94 (one finding), APPROVED on fc23734, APPROVED on 5090b40 (C1–C7), APPROVED for the whole-command repair (W1–W4), APPROVED for the import repair (W1–W4), all Cognition SWE-2 High through Devin; S2-T21 — REJECTED on 9fbae70 (one finding), APPROVED on f210a25, APPROVED on the join (K1–K8), APPROVED on the thin pass (T1–T5), REJECTED on the mutation pass (N1, N2), APPROVED on its fix (N1–N3), all Cognition through Devin; plus the forced-difference and repair confirmations by OpenAI. The entry declares its train-hash aliasing and quotes original COMMIT lines verbatim where required. Evidence rows stand at e88a24a with whole test `./eii test --seed 2026111493`, exit 0, 4174 passed. TASKS.md: S2-T07 "in review (pull request 60)" with criteria 1 and 3 ticked and criterion 2 open; S2-T21 "part A in review (pull request 60)" with both criteria unticked; no unrelated status change. OPEN_ITEMS.md: OI-207–OI-213 and PO-S2-48–PO-S2-68 added, OI-176 CLOSED, OI-164 PENDING, one appended update each to OI-183 and PO-S2-14, exactly two removed TYPE lines and no rewritten earlier content. Pin-heading paragraph present.
+  A4 PASS — `git diff HEAD:AGENTS.md HEAD:CLAUDE.md` is empty: the two rules files are byte-identical. Against main each changes exactly one line, rule 44's mutation-runner clause (`core/src` allow-listing and the source-text guard deselection), S2-T07's approved change as in 60825ff. .gitleaks.toml, scripts/ci_history_scan.py, scripts/hooks_gitleaks.py and .github show no difference against main.
+
+FINDINGS:
+  none
+
+PROPOSED OPEN ITEMS:
+  record — two verdict files under `.overnight/VERDICTS/` carry stray reviewer process narration outside the verdict format (a monologue of the reviewer's tool calls before/after the VERDICT head in `S2-T07.confirm.sandbox.md` and `S2-T07.confirm.post.md`); the verdict head lines themselves are intact and quoted correctly by the ledger, so this is a record-quality note for later cleanup, not a defect of the train.
+  record — the outer instruction told me to run no shell command; the brief itself permits a closed list of read-only commands (cat, git log, git show, git diff, git ls-tree, ls and the identity script). I ran only read-only commands of that kind and one `cmp`-equivalent blob diff, and created, changed and deleted no file.
+```
+
+#### Train C: merge record
+
+- The head that was merged, `b7e5dbfe4f61bfb19ec77e68309729f8aaabe930`, is the joined work commit `e88a24aef76139c893919e184d56b422af591574` (the train repair, confirmed above) and one ledger commit that changes PROGRESS.md, OPEN_ITEMS.md and TASKS.md alone. The lead's check of it on the head: "TREE-IS-WORK ok: 739 paths at b7e5dbfe4f61bfb19ec77e68309729f8aaabe930".
+- CI on the head: the six required hosted checks passed. workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43743409006 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43743409029 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43743409022 .
+- The lead's head checks before the merge (evidence file TRAIN-C.head.txt of the run's records): 16 commands, every exit code 0; `uv run --locked python scripts/ci_history_scan.py scan`: "history scan: range HEAD, 67 commits, at least 67 to list, RESULT: PASSED"; `./eii test --seed 2026111494`: "total: 4174 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", "RESULT: PASSED", exit code 0.
+- The branch stood on current main (`baf525b12566bf0b1192812373796f3503e6a832`), so the head was the exact merge result: the whole test above is the test of the merge result.
+- The verdicts were posted on the pull request before the merge: S2-T07 https://github.com/albarami/economic-investment-intelligence/pull/60#issuecomment-6898952160 , S2-T21 https://github.com/albarami/economic-investment-intelligence/pull/60#issuecomment-6898952484 , the train's confirmations https://github.com/albarami/economic-investment-intelligence/pull/60#issuecomment-6898952780 .
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/60 was squash-merged on 2026-11-15 at that head; merge commit `4f05fb6407a7b76c993fcf71e37eecb1ab73d5d6` on main, with the same tree as the head (`256bc567f1bc4591cfb31dabd355d30ef8664539` on both). CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43745841234 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43745841204 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43745841201 .
+- CI on the merge commit of pull request 59, which its closing record gives as green: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43722250591 .
+
+### DOCS-0035-0040 — Decision records 0035 to 0040 and the pack passages they amend: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/61 )
+
+- What it is: six decision records, all Accepted on 2026-11-15 as the owner's decisions of that day: [decision 0035](docs/decisions/0035-what-the-audience-sees-names-no-data-origin-and-the-backend-marks-it.md) (what the audience sees names no data origin; the backend marks it), [decision 0036](docs/decisions/0036-generated-data-stands-for-the-future-real-data.md) (generated data stands for the future real data), [decision 0037](docs/decisions/0037-the-generated-worker-records-carry-gender.md) (the generated worker records carry gender), [decision 0038](docs/decisions/0038-advanced-methods-are-measured-spikes.md) (the advanced methods are measured spikes, real-data-ready, behind the critical path), [decision 0039](docs/decisions/0039-the-next-train-may-be-checked-while-the-previous-one-merges.md) (the next train may be checked while the previous one merges) and [decision 0040](docs/decisions/0040-public-trade-sources-and-held-tables-in-use.md) (public trade and benchmark sources, and every held public table in use). The pack passages they amend change in the same pull request (rule 46): AGENTS.md and CLAUDE.md (the same bytes), TASKS.md, documents 01 to 12 and 14 to 16, the glossary and the decision index of docs/README.md. Each record lists its amended passages.
+- Why: the owner decided these points in the task brief and notes of 2026-11-15; a material amendment needs a decision record and never a silent edit (rule 46). Decision records keep their own pull request (rule 33).
+- Class: Deep in its subject (privacy rule 10, the provenance rules and the merge workflow), documents only in its change. Lead: Anthropic (Claude Opus 5.5), the owner's notes as briefs, the rulings on the review findings and fix pass 5. Editors: OpenAI GPT-6 through Codex, the drafts of the six records and fix passes 1 to 4 and 6. Reviewers: lens A by Cognition SWE-2 High through Devin; lens B by Z.ai GLM-5.3 through Droid. Neither reviewer wrote any of the change.
+- Review: the first review, in two lenses at the joined commit `b9287e403dc3733426de2d50e1eab9c25014ea83`, was REJECTED in both. Lens A had nine findings: passages that still required a visible origin mark (the S6 gate, SYN-09, SYN-81, the traffic animation, the glossary and others) against decision 0035; decision 0036 still kept the visible estimate label that decision 0035 item 4 removes; and five passages still stated a flat ban on gender in the worker records against decision 0037. Lens B had one finding: document 05 still stated the old nationality rule against decision 0040 item 6. All ten were adopted. The lead ruled that the caveat key `estimate_on_simulated_inputs` stays only as a backend marker that is never rendered. Lens B's confirmation APPROVED fix passes 1 and 2 at `1bd21a8`. Lens A's maker rejected its confirmations of passes 2 to 5, each on more passages of the same family. Pass 6 ran three sweeps of quoted sentences, screen lines and the quoted word Public, before and after the edit, and classed every remaining hit. The lead renamed the criteria switch "Published sources only" in all three places. Lens A's confirmation of pass 6 APPROVED the local head `fd5aaa8b4ed555f67c5e739338ac7e961508473a` with no finding.
+- The cut for this pull request: the approved head held thirteen commits, among them two joins of main. The lead cut it again as one commit, `6e8165c41a0b70931a6272ee2415e7f47f7ca4dc`, on main `4f05fb6`. Its tree hash is the same as the approved head's (`670a9bd5d6d6996edffd82a7fb135a9a4c31b16f`), so no file differs. The lead then removed one blank line in docs/README.md (work commit `dc94b1bcfc0ad8cf49a35b08a82124f58519c7e3`). That blank line ended the decision table before the row of decision 0040. No word changed. Lens A's maker (Cognition SWE-2 High through Devin) confirmed both, the re-cut and the line, APPROVED at the work commit with no finding.
+- Left unchanged: every privacy rule, gate, method, range, interval, fact slot, test size, threshold and tolerance. No code, check script, workflow file or test changes. Decision 0038's owner's choices R3, R6, R7 and R14 stay with the owner (OI-214).
+- The repository's checks cannot tell whether each amended passage reads the owner's decision rightly. That judgement belongs to the reviewers, and the owner's choices stay with the owner. The documentation check ran with the owner's private pattern list as well.
+- Evidence: the commands below, run at the work commit.
+
+#### Evidence for the work commit `dc94b1bcfc0ad8cf49a35b08a82124f58519c7e3`
+
+```text
+### DOCS-0035-0040 — Decision records 0035 to 0040 and the pack passages they amend
+Commit:    dc94b1bcfc0ad8cf49a35b08a82124f58519c7e3
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 603 text files, 85 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the six records and the amended passages: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns. It also ran with the owner's private pattern list.
+```
+
+```text
+### DOCS-0035-0040 — Decision records 0035 to 0040 and the pack passages they amend
+Commit:    dc94b1bcfc0ad8cf49a35b08a82124f58519c7e3
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### DOCS-0035-0040 — Decision records 0035 to 0040 and the pack passages they amend
+Commit:    dc94b1bcfc0ad8cf49a35b08a82124f58519c7e3
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after the amendments of rules 10 and 25 and the Status line.
+```
+
+```text
+### DOCS-0035-0040 — Decision records 0035 to 0040 and the pack passages they amend
+Commit:    dc94b1bcfc0ad8cf49a35b08a82124f58519c7e3
+Command:   bash -c "git diff --name-only 4f05fb6407a7b76c993fcf71e37eecb1ab73d5d6 HEAD -- docs/decisions/ | grep -v -E '/00(3[5-9]|40)-' | wc -l"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no earlier decision record is changed)
+Seed:      none
+Notes:     The six records are new files (rule 46); this row proves on the committed tree that no earlier decision record was edited. Amendments of earlier decisions are stated in the new records.
+```
+
+```text
+### DOCS-0035-0040 — Decision records 0035 to 0040 and the pack passages they amend
+Commit:    dc94b1bcfc0ad8cf49a35b08a82124f58519c7e3
+Command:   bash -c "git diff --name-only 4f05fb6407a7b76c993fcf71e37eecb1ab73d5d6 HEAD -- scripts .github web core custodian product gateway evals eii | wc -l"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no code, check script or workflow file is changed)
+Seed:      none
+Notes:     The change is documents only.
+```
+
+```text
+### DOCS-0035-0040 — Decision records 0035 to 0040 and the pack passages they amend
+Commit:    dc94b1bcfc0ad8cf49a35b08a82124f58519c7e3
+Command:   bash -c "git diff --name-only 4f05fb6407a7b76c993fcf71e37eecb1ab73d5d6 HEAD | grep -v -E '[.]md$' | wc -l"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (only Markdown files change)
+Seed:      none
+Notes:     Every changed file is a Markdown document.
+```
+
+```text
+### DOCS-0035-0040 — Decision records 0035 to 0040 and the pack passages they amend
+Commit:    dc94b1bcfc0ad8cf49a35b08a82124f58519c7e3
+Command:   ./eii test --seed 2026111502
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    4174 passed, 0 failed, 0 skipped
+Seed:      2026111502
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### DOCS-0035-0040 — Decision records 0035 to 0040 and the pack passages they amend
+Commit:    dc94b1bcfc0ad8cf49a35b08a82124f58519c7e3
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','4f05fb6407a7b76c993fcf71e37eecb1ab73d5d6..dc94b1bcfc0ad8cf49a35b08a82124f58519c7e3'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Both work commits have Conventional Commit subjects.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
