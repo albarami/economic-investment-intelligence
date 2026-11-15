@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
 from custodian.tests.repository_root import repository_root
 
+import eii_custodian.publicdata.fetch.registry as registry_module
 from eii_custodian.publicdata.fetch.allowlist import (
     ALLOWED_HOSTS,
     NAMED_INVESTMENT_HOSTS,
@@ -16,14 +18,13 @@ from eii_custodian.publicdata.fetch.allowlist import (
 )
 from eii_custodian.publicdata.fetch.registry import (
     BANNED_SOURCE_IDS,
-    OWNER_DECISION_SOURCES,
+    Entry,
     RegistryError,
     load_registry,
     nightly_blocked,
     registry_path,
-    release_refused,
 )
-from eii_custodian.publicdata.fetch.seam import opener_hits, scan_tree
+from eii_custodian.publicdata.fetch.seam import SCAN_ROOTS, opener_hits, scan_tree
 
 FAMILY_COUNTS = {
     "prop_resi_units": 1,
@@ -87,24 +88,26 @@ def test_registry_holds_every_required_input_and_no_traffic_row() -> None:
 
 
 def test_owner_decision_and_validation_only() -> None:
-    """Admitted sources name their decision; a none_stated source cannot feed a release."""
+    """owner_decision names record 0026; every other basis names no record."""
     entries = load_registry()
     by_id = {entry.source_id: entry for entry in entries}
-    for source_id in OWNER_DECISION_SOURCES:
+    for source_id in (
+        "busy_gmaps",
+        "fdi_projects",
+        "census_zone_sector",
+        "bnd_zone_2020",
+        "bnd_district_2020",
+        "census_2020_workbook",
+    ):
         entry = by_id[source_id]
         assert entry.licence_basis == "owner_decision"
-        assert entry.decision_record in {"0017", "0019"}
-    assert by_id["busy_gmaps"].decision_record == "0019"
-    assert by_id["fdi_projects"].decision_record == "0017"
-    assert by_id["census_zone_sector"].decision_record == "0017"
-    assert by_id["bnd_zone_2020"].decision_record == "0017"
-    assert by_id["bnd_district_2020"].decision_record == "0017"
-    workbook = by_id["census_2020_workbook"]
-    assert workbook.licence_basis == "none_stated"
-    for slot in ("value", "share", "title", "geometry"):
-        assert release_refused(workbook, slot)
-    assert release_refused(by_id["census_zone_sector"], "value") is False
-    assert release_refused(by_id["busy_gmaps"], "value") is False
+        assert entry.decision_record == "0026"
+        assert entry.terms_words.strip()
+        assert _DATE_TEXT.fullmatch(entry.terms_read_on)
+    assert by_id["lic_active"].licence_basis == "dataset"
+    assert by_id["lic_active"].decision_record == ""
+    assert by_id["bnd_muni_2025"].licence_basis == "portal_terms"
+    assert by_id["weather_openmeteo"].licence_basis == "provider_terms"
 
 
 def test_nightly_selection_rejects_the_excluded_sources() -> None:
@@ -154,6 +157,74 @@ def _row(document: dict[str, object], source_id: str) -> dict[str, object]:
     raise AssertionError(source_id)
 
 
+_BASES = frozenset({"dataset", "portal_terms", "provider_terms", "owner_decision"})
+_DECISION_0026 = "0026"
+_DATE_TEXT = re.compile(r"\A\d{4}-\d{2}-\d{2}\Z")
+_MARKER = "terms to be read"
+
+
+def test_committed_registry_follows_decision_0026() -> None:
+    """Every committed row names one of the four bases, its record and its terms."""
+    for entry in load_registry():
+        assert entry.licence_basis in _BASES, entry.source_id
+        if entry.licence_basis == "owner_decision":
+            assert entry.decision_record == _DECISION_0026
+        else:
+            assert entry.decision_record == ""
+        assert entry.terms_words.strip()
+        assert _DATE_TEXT.fullmatch(entry.terms_read_on)
+
+
+def test_none_stated_basis_is_refused(tmp_path: Path) -> None:
+    """A planted none_stated row is not a basis of use."""
+
+    def none_stated(document: dict[str, object]) -> None:
+        _row(document, "roads_osm")["licence_basis"] = "none_stated"
+
+    with pytest.raises(RegistryError, match="unknown licence_basis"):
+        load_registry(_mutated(tmp_path, "none-stated.yaml", none_stated))
+
+
+def test_invented_owner_decision_with_record_0026_loads(tmp_path: Path) -> None:
+    """owner_decision admits any source id when the record is 0026."""
+
+    def invented(document: dict[str, object]) -> None:
+        row = _row(document, "roads_osm")
+        row["key"] = "planted_source"
+        row["source_id"] = "planted_source"
+        row["licence_basis"] = "owner_decision"
+        row["decision_record"] = _DECISION_0026
+
+    entries = load_registry(_mutated(tmp_path, "invented.yaml", invented))
+    planted = [entry for entry in entries if entry.source_id == "planted_source"]
+    assert len(planted) == 1
+    assert planted[0].licence_basis == "owner_decision"
+    assert planted[0].decision_record == _DECISION_0026
+
+
+def test_dataset_commit_allowed_loads(tmp_path: Path) -> None:
+    """A dataset row may be committed. Any other spelling of that basis is refused."""
+
+    def committed(document: dict[str, object]) -> None:
+        _row(document, "roads_osm")["commit_allowed"] = True
+
+    loaded = load_registry(_mutated(tmp_path, "dataset-commit.yaml", committed))
+    roads = [entry for entry in loaded if entry.source_id == "roads_osm"]
+    assert len(roads) == 1
+    assert roads[0].licence_basis == "dataset"
+    assert roads[0].commit_allowed is True
+
+
+def test_commit_allowed_on_owner_decision_is_refused(tmp_path: Path) -> None:
+    """commit_allowed is refused unless the basis is dataset."""
+
+    def committed(document: dict[str, object]) -> None:
+        _row(document, "fdi_projects")["commit_allowed"] = True
+
+    with pytest.raises(RegistryError, match=r"^cannot be committed$"):
+        load_registry(_mutated(tmp_path, "committed-owner.yaml", committed))
+
+
 def test_unknown_field_and_planted_traffic_row_are_refused(tmp_path: Path) -> None:
     """The loader rejects an unknown field and a traffic-provider row."""
     text = registry_path().read_text(encoding="utf-8")
@@ -176,7 +247,7 @@ def test_unknown_field_and_planted_traffic_row_are_refused(tmp_path: Path) -> No
 
 
 def test_loader_refuses_planted_breaks(tmp_path: Path) -> None:
-    """Duplicate keys, an unadmitted owner decision, a bare record and a committed none_stated fail."""
+    """Duplicate keys, a generic owner decision, a bare record and a non-dataset commit fail."""
 
     def duplicate(document: dict[str, object]) -> None:
         rows = document["sources"]
@@ -187,13 +258,16 @@ def test_loader_refuses_planted_breaks(tmp_path: Path) -> None:
     with pytest.raises(RegistryError, match="duplicate key"):
         load_registry(_mutated(tmp_path, "duplicate.yaml", duplicate))
 
-    def unadmitted(document: dict[str, object]) -> None:
+    def admitted(document: dict[str, object]) -> None:
         row = _row(document, "roads_osm")
         row["licence_basis"] = "owner_decision"
-        row["decision_record"] = "0017"
+        row["decision_record"] = "0026"
 
-    with pytest.raises(RegistryError, match="not admitted"):
-        load_registry(_mutated(tmp_path, "unadmitted.yaml", unadmitted))
+    admitted_rows = load_registry(_mutated(tmp_path, "admitted.yaml", admitted))
+    roads = [entry for entry in admitted_rows if entry.source_id == "roads_osm"]
+    assert len(roads) == 1
+    assert roads[0].licence_basis == "owner_decision"
+    assert roads[0].decision_record == "0026"
 
     def bare_record(document: dict[str, object]) -> None:
         _row(document, "roads_osm")["decision_record"] = "0017"
@@ -204,7 +278,7 @@ def test_loader_refuses_planted_breaks(tmp_path: Path) -> None:
     def committed(document: dict[str, object]) -> None:
         _row(document, "census_2020_workbook")["commit_allowed"] = True
 
-    with pytest.raises(RegistryError, match="cannot be committed"):
+    with pytest.raises(RegistryError, match=r"^cannot be committed$"):
         load_registry(_mutated(tmp_path, "committed.yaml", committed))
 
     def column(document: dict[str, object]) -> None:
@@ -303,73 +377,34 @@ OWNER_BASIS_NOTE = (
 
 
 def test_investment_sources_record_the_owner_decision_and_watch_terms() -> None:
-    """Both rows keep the terms page and the owner's words, and do not switch off."""
+    """Both rows keep the terms page, record 0026 and the terms fields."""
     by_id = {entry.source_id: entry for entry in load_registry()}
     for source_id in ("fdi_projects", "investqa_pages"):
         entry = by_id[source_id]
         assert entry.terms_url == TERMS_OF_USE
-        assert entry.terms_forbid == ()
         assert entry.terms_watch is True
         assert entry.basis_note == OWNER_BASIS_NOTE
         assert entry.licence_basis == "owner_decision"
-        assert entry.decision_record == "0017"
-
-
-def test_loader_refuses_terms_watch_and_terms_forbid_together(tmp_path: Path) -> None:
-    """A row cannot both watch the terms page and switch off on a recorded phrase."""
-
-    def both(document: dict[str, object]) -> None:
-        row = _row(document, "roads_osm")
-        row["terms_url"] = TERMS_OF_USE
-        row["terms_forbid"] = [FORBID_PHRASE]
-        row["terms_watch"] = True
-        row["basis_note"] = OWNER_BASIS_NOTE
-
-    with pytest.raises(RegistryError, match="terms_watch and terms_forbid together"):
-        load_registry(_mutated(tmp_path, "both.yaml", both))
+        assert entry.decision_record == "0026"
+        assert entry.terms_words.strip()
+        assert entry.terms_read_on == "2026-11-14"
+    assert by_id["investqa_pages"].terms_words == _MARKER
+    assert by_id["fdi_projects"].terms_words != _MARKER
 
 
 def test_loader_refuses_a_bad_terms_forbid(tmp_path: Path) -> None:
-    """terms_forbid must be a non-empty list of non-empty strings, with a terms URL."""
+    """terms_forbid is refused as an unknown field. The together-test name is dropped."""
 
-    def empty(document: dict[str, object]) -> None:
-        _row(document, "fdi_projects")["terms_forbid"] = []
+    def planted(document: dict[str, object]) -> None:
+        _row(document, "roads_osm")["terms_forbid"] = [FORBID_PHRASE]
 
-    with pytest.raises(RegistryError, match="terms_forbid is empty"):
-        load_registry(_mutated(tmp_path, "empty.yaml", empty))
-
-    def not_list(document: dict[str, object]) -> None:
-        _row(document, "fdi_projects")["terms_forbid"] = FORBID_PHRASE
-
-    with pytest.raises(RegistryError, match="not a list of non-empty strings"):
-        load_registry(_mutated(tmp_path, "text.yaml", not_list))
-
-    def blank(document: dict[str, object]) -> None:
-        _row(document, "investqa_pages")["terms_forbid"] = [""]
-
-    with pytest.raises(RegistryError, match="not a list of non-empty strings"):
-        load_registry(_mutated(tmp_path, "blank.yaml", blank))
-
-    def no_url(document: dict[str, object]) -> None:
-        row = _row(document, "roads_osm")
-        row["terms_url"] = ""
-        row["terms_forbid"] = [FORBID_PHRASE]
-
-    with pytest.raises(RegistryError, match="terms_forbid set without terms_url"):
-        load_registry(_mutated(tmp_path, "no-url.yaml", no_url))
+    with pytest.raises(RegistryError, match="unknown field"):
+        load_registry(_mutated(tmp_path, "forbid.yaml", planted))
 
 
 def test_loader_uses_the_safe_loader_only() -> None:
     """The registry module calls safe_load and does not call yaml.load."""
-    module = (
-        REPO
-        / "custodian"
-        / "src"
-        / "eii_custodian"
-        / "publicdata"
-        / "fetch"
-        / "registry.py"
-    )
+    module = Path(registry_module.__file__)
     text = module.read_text(encoding="utf-8")
     assert "safe_load" in text
     assert "yaml.load" not in text
@@ -377,18 +412,268 @@ def test_loader_uses_the_safe_loader_only() -> None:
 
 def test_only_the_transport_module_opens_a_connection() -> None:
     """A planted module that opens a connection fails the seam scan."""
+    for name in SCAN_ROOTS:
+        folder = REPO / name
+        assert folder.is_dir()
+        assert any(folder.rglob("*.py"))
     assert scan_tree(REPO) == ()
     planted = {"custodian/src/eii_custodian/planted.py": "import urllib.request\n"}
     assert opener_hits(planted) == ("custodian/src/eii_custodian/planted.py",)
 
 
-def test_cache_path_is_gitignored() -> None:
-    """The public cache path is ignored, so a fetched file is not committed."""
+def test_loader_refuses_a_missing_or_unknown_basis(tmp_path: Path) -> None:
+    """A row with no basis, and a row with an unknown basis, are refused."""
+
+    def missing(document: dict[str, object]) -> None:
+        _row(document, "roads_osm").pop("licence_basis")
+
+    with pytest.raises(RegistryError, match="missing field"):
+        load_registry(_mutated(tmp_path, "missing-basis.yaml", missing))
+
+    def unknown(document: dict[str, object]) -> None:
+        _row(document, "roads_osm")["licence_basis"] = "invented_basis"
+
+    with pytest.raises(RegistryError, match="unknown licence_basis"):
+        load_registry(_mutated(tmp_path, "unknown-basis.yaml", unknown))
+
+
+def test_owner_decision_rejects_an_old_or_empty_record(tmp_path: Path) -> None:
+    """owner_decision accepts only the record 0026, on a registry of that one row."""
+
+    def one(record: str, name: str) -> Path:
+        def mutate(document: dict[str, object]) -> None:
+            row = _row(document, "roads_osm")
+            row["licence_basis"] = "owner_decision"
+            row["decision_record"] = record
+            document["sources"] = [row]
+
+        return _mutated(tmp_path, name, mutate)
+
+    with pytest.raises(RegistryError, match="needs a decision record"):
+        load_registry(one("0017", "old-record.yaml"))
+
+    with pytest.raises(RegistryError, match="needs a decision record"):
+        load_registry(one("", "empty-record.yaml"))
+
+
+def test_dataset_row_rejects_a_decision_record(tmp_path: Path) -> None:
+    """A decision record on a basis other than owner_decision is refused."""
+
+    def recorded(document: dict[str, object]) -> None:
+        _row(document, "roads_osm")["decision_record"] = "0026"
+
+    with pytest.raises(RegistryError, match="without owner_decision"):
+        load_registry(_mutated(tmp_path, "dataset-record.yaml", recorded))
+
+
+def test_terms_words_must_be_present_text(tmp_path: Path) -> None:
+    """Missing, empty or blank terms_words are refused. The marker loads."""
+
+    def missing(document: dict[str, object]) -> None:
+        _row(document, "roads_osm").pop("terms_words")
+
+    with pytest.raises(RegistryError, match="missing field"):
+        load_registry(_mutated(tmp_path, "missing-words.yaml", missing))
+
+    def empty(document: dict[str, object]) -> None:
+        _row(document, "roads_osm")["terms_words"] = ""
+
+    with pytest.raises(RegistryError, match=r"^terms_words is empty$"):
+        load_registry(_mutated(tmp_path, "empty-words.yaml", empty))
+
+    def spaces(document: dict[str, object]) -> None:
+        _row(document, "roads_osm")["terms_words"] = "   "
+
+    with pytest.raises(RegistryError, match=r"^terms_words is empty$"):
+        load_registry(_mutated(tmp_path, "space-words.yaml", spaces))
+
+    def marker(document: dict[str, object]) -> None:
+        row = _row(document, "roads_osm")
+        row["terms_words"] = _MARKER
+        row["terms_read_on"] = "2026-11-01"
+
+    loaded = load_registry(_mutated(tmp_path, "marker.yaml", marker))
+    roads = [entry for entry in loaded if entry.source_id == "roads_osm"]
+    assert roads[0].terms_words == _MARKER
+    assert roads[0].terms_read_on == "2026-11-01"
+
+
+def test_terms_read_on_must_be_a_real_text_date(tmp_path: Path) -> None:
+    """A missing, impossible, non-ISO or unquoted date is refused."""
+
+    def missing(document: dict[str, object]) -> None:
+        _row(document, "roads_osm").pop("terms_read_on")
+
+    with pytest.raises(RegistryError, match="missing field"):
+        load_registry(_mutated(tmp_path, "missing-date.yaml", missing))
+
+    def impossible(document: dict[str, object]) -> None:
+        _row(document, "roads_osm")["terms_read_on"] = "2026-13-01"
+
+    with pytest.raises(RegistryError, match="not a date"):
+        load_registry(_mutated(tmp_path, "month.yaml", impossible))
+
+    def slashes(document: dict[str, object]) -> None:
+        _row(document, "roads_osm")["terms_read_on"] = "14/11/2026"
+
+    with pytest.raises(RegistryError, match="not a date"):
+        load_registry(_mutated(tmp_path, "slashes.yaml", slashes))
+
+    def week(document: dict[str, object]) -> None:
+        _row(document, "roads_osm")["terms_read_on"] = "2026-W46-6"
+
+    with pytest.raises(RegistryError, match="not a date"):
+        load_registry(_mutated(tmp_path, "week.yaml", week))
+
+    text = registry_path().read_text(encoding="utf-8")
+    unquoted = text.replace(
+        'terms_read_on: "2026-11-14"', "terms_read_on: 2026-11-14", 1
+    )
+    path = tmp_path / "unquoted.yaml"
+    path.write_text(unquoted, encoding="utf-8")
+    with pytest.raises(RegistryError, match="not text"):
+        load_registry(path)
+
+
+def test_skip_reason_must_not_name_a_licence_or_terms(tmp_path: Path) -> None:
+    """A skip reason that names a licence or terms is refused; a technical one loads."""
+
+    def plant(reason: str) -> object:
+        def mutate(document: dict[str, object]) -> None:
+            _row(document, "roads_osm")["skip_reason"] = reason
+
+        return mutate
+
+    for reason in (
+        "publisher_or_licence_unconfirmed",
+        "License_missing",
+        "terms_forbid_the_use",
+    ):
+        with pytest.raises(
+            RegistryError, match=r"^skip_reason names a licence or terms$"
+        ):
+            load_registry(_mutated(tmp_path, f"{reason}.yaml", plant(reason)))
+
+    loaded = load_registry(
+        _mutated(
+            tmp_path,
+            "technical.yaml",
+            plant("publisher_or_schema_unconfirmed"),
+        )
+    )
+    roads = [entry for entry in loaded if entry.source_id == "roads_osm"]
+    assert roads[0].skip_reason == "publisher_or_schema_unconfirmed"
+
+
+def test_registry_counts_follow_decision_0026() -> None:
+    """No none_stated row remains, and every owner_decision row names 0026."""
+    entries = load_registry()
+    assert len(entries) == 139
+    assert not any(entry.licence_basis == "none_stated" for entry in entries)
+    owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
+    assert len(owners) == 27
+    assert {entry.decision_record for entry in owners} == {"0026"}
+
+
+def terms_words_absent_from_pack(
+    entries: tuple[Entry, ...], pack: str
+) -> tuple[str, ...]:
+    """Return source ids whose terms words are neither the marker nor in the pack."""
+    return tuple(
+        entry.source_id
+        for entry in entries
+        if entry.terms_words != _MARKER and entry.terms_words not in pack
+    )
+
+
+def test_terms_words_other_than_the_marker_are_in_document_04() -> None:
+    """Recorded terms words are the publisher's words already quoted in document 04."""
+    pack = (REPO / "docs" / "04_PUBLIC_DATA_PACK.md").read_text(encoding="utf-8")
+    assert terms_words_absent_from_pack(load_registry(), pack) == ()
+
+
+def test_terms_words_absent_from_document_04_fail_the_guard(tmp_path: Path) -> None:
+    """A row whose words are not in document 04 fails the guard."""
+
+    def planted(document: dict[str, object]) -> None:
+        _row(document, "roads_osm")["terms_words"] = (
+            "invented words the pack never quotes"
+        )
+
+    entries = load_registry(_mutated(tmp_path, "words.yaml", planted))
+    pack = (REPO / "docs" / "04_PUBLIC_DATA_PACK.md").read_text(encoding="utf-8")
+    assert "roads_osm" in terms_words_absent_from_pack(entries, pack)
+
+
+_BUSY_ID = "busy_gmaps"
+
+
+def non_python_files_naming_busy(root: Path) -> tuple[str, ...]:
+    """Return non-Python files under root whose text names the busy source id."""
+    found: list[str] = []
+    for path in sorted(root.rglob("*")):
+        if not path.is_file() or path.suffix == ".py":
+            continue
+        if _BUSY_ID in path.read_text(encoding="utf-8"):
+            found.append(path.name)
+    return tuple(found)
+
+
+def test_no_non_python_test_file_names_busy_gmaps() -> None:
+    """No committed test fixture names the busy source id."""
+    tests = REPO / "custodian" / "tests"
+    assert non_python_files_naming_busy(tests) == ()
+
+
+def test_planted_json_naming_busy_gmaps_fails_the_scan(tmp_path: Path) -> None:
+    """A planted JSON file that names the busy source id fails the same scan."""
+    planted = tmp_path / "planted.json"
+    planted.write_text(
+        '{"source_id": "busy_gmaps", "values": ["invented-one", "invented-two"]}\n',
+        encoding="utf-8",
+    )
+    assert non_python_files_naming_busy(tmp_path) == ("planted.json",)
+
+
+def test_cache_path_is_gitignored(tmp_path: Path) -> None:
+    """The repository gitignore ignores the cache, and a file without that rule does not."""
     import subprocess
 
-    done = subprocess.run(
-        ["git", "check-ignore", "-q", "--", "data/public_cache"],
-        cwd=REPO,
+    empty = tmp_path / "empty-excludes"
+    empty.write_text("", encoding="utf-8")
+    fresh = tmp_path / "fresh"
+    fresh.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=fresh, check=True)
+    (fresh / ".gitignore").write_text(
+        (REPO / ".gitignore").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    ignored = subprocess.run(
+        [
+            "git",
+            "-c",
+            f"core.excludesFile={empty}",
+            "check-ignore",
+            "-q",
+            "--",
+            "data/public_cache",
+        ],
+        cwd=fresh,
         check=False,
     )
-    assert done.returncode == 0
+    assert ignored.returncode == 0
+    (fresh / ".gitignore").write_text("# planted, no data rule\n", encoding="utf-8")
+    open_cache = subprocess.run(
+        [
+            "git",
+            "-c",
+            f"core.excludesFile={empty}",
+            "check-ignore",
+            "-q",
+            "--",
+            "data/public_cache",
+        ],
+        cwd=fresh,
+        check=False,
+    )
+    assert open_cache.returncode == 1

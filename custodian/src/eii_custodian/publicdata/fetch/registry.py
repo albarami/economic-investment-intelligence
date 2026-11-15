@@ -2,33 +2,24 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
 import yaml
 
 LICENCE_BASES = frozenset(
-    {"dataset", "portal_terms", "provider_terms", "owner_decision", "none_stated"}
+    {"dataset", "portal_terms", "provider_terms", "owner_decision"}
 )
+DECISION_RECORD = "0026"
+_DATE_TEXT = re.compile(r"\A\d{4}-\d{2}-\d{2}\Z")
+_SKIP_LICENCE = "licen"
+_SKIP_TERMS = "terms"
 KINDS = frozenset(
     {"portal_dataset", "paged_layer", "https_file", "terms_page", "citation_only"}
 )
 BANNED_SOURCE_IDS = frozenset({"traffic_tomtom_flow", "traffic_tomtom_range"})
-OWNER_DECISION_SOURCES = frozenset(
-    {
-        "fdi_projects",
-        "investqa_pages",
-        "census_zone_sector",
-        "census_zone_occ",
-        "census_zone_hh",
-        "census_zone_lab",
-        "census_district_pop",
-        "bnd_zone_2020",
-        "bnd_district_2020",
-        "busy_gmaps",
-    }
-)
-DECISION_RECORDS = frozenset({"0017", "0019"})
 FIELDS = frozenset(
     {
         "key",
@@ -45,7 +36,8 @@ FIELDS = frozenset(
         "fetch_host",
         "url",
         "terms_url",
-        "terms_forbid",
+        "terms_words",
+        "terms_read_on",
         "terms_watch",
         "basis_note",
         "landing_url",
@@ -79,6 +71,8 @@ REQUIRED = frozenset(
         "fetch_host",
         "url",
         "terms_url",
+        "terms_words",
+        "terms_read_on",
         "landing_url",
         "nightly_live_fetch",
         "public_splits",
@@ -138,9 +132,10 @@ class Entry:
     skip_reason: str
     extension: str
     landing_url: str
+    terms_words: str
+    terms_read_on: str
     licence_url: str = ""
     layer: int | None = None
-    terms_forbid: tuple[str, ...] = ()
     terms_watch: bool = False
     basis_note: str = ""
 
@@ -168,13 +163,6 @@ def load_registry(path: Path | None = None) -> tuple[Entry, ...]:
     if len(keys) != len(set(keys)):
         raise RegistryError("duplicate key")
     return entries
-
-
-def release_refused(entry: Entry, slot: str) -> bool:
-    """True when a none_stated source is asked for a release slot."""
-    if slot not in {"value", "share", "title", "geometry"}:
-        raise RegistryError("unknown release slot")
-    return entry.licence_basis == "none_stated"
 
 
 def nightly_blocked(
@@ -221,24 +209,25 @@ def _entry(row: object) -> Entry:
         raise RegistryError("unknown licence_basis")
     record = _text(row, "decision_record")
     if basis == "owner_decision":
-        if source_id not in OWNER_DECISION_SOURCES:
-            raise RegistryError("owner_decision source is not admitted")
-        if record not in DECISION_RECORDS:
+        if record != DECISION_RECORD:
             raise RegistryError("owner_decision needs a decision record")
     elif record != "":
         raise RegistryError("decision_record set without owner_decision")
     commit = _bool(row, "commit_allowed")
-    if commit and basis == "none_stated":
-        raise RegistryError("none_stated cannot be committed")
-    terms_forbid = _terms_forbid(row)
+    if commit and basis != "dataset":
+        raise RegistryError("cannot be committed")
+    terms_words = _terms_words(row)
+    terms_read_on = _calendar_date(row, "terms_read_on")
     terms_watch = _terms_watch(row)
     basis_note = _basis_note(row)
-    if terms_watch and terms_forbid:
-        raise RegistryError("terms_watch and terms_forbid together")
     if terms_watch and basis_note.strip() == "":
         raise RegistryError("terms_watch set without basis_note")
     if terms_watch and _text(row, "terms_url").strip() == "":
         raise RegistryError("terms_watch set without terms_url")
+    skip_reason = _text(row, "skip_reason")
+    folded_skip = skip_reason.casefold()
+    if _SKIP_LICENCE in folded_skip or _SKIP_TERMS in folded_skip:
+        raise RegistryError("skip_reason names a licence or terms")
     return Entry(
         key=_text(row, "key"),
         source_id=source_id,
@@ -264,19 +253,20 @@ def _entry(row: object) -> Entry:
         period_last=_optional_text(row, "period_last"),
         period_field=_optional_text(row, "period_field"),
         reconciliation=_text(row, "reconciliation"),
-        skip_reason=_text(row, "skip_reason"),
+        skip_reason=skip_reason,
         extension=_text(row, "extension"),
         landing_url=_text(row, "landing_url"),
+        terms_words=terms_words,
+        terms_read_on=terms_read_on,
         licence_url=_optional_text(row, "licence_url"),
         layer=layer,
-        terms_forbid=terms_forbid,
         terms_watch=terms_watch,
         basis_note=basis_note,
     )
 
 
 def _terms_watch(row: dict[object, object]) -> bool:
-    """Return whether the row watches its terms page without switching off."""
+    """Return the compatibility flag. It changes nothing about fetch or terms."""
     if "terms_watch" not in row:
         return False
     value = row["terms_watch"]
@@ -295,24 +285,24 @@ def _basis_note(row: dict[object, object]) -> str:
     return value
 
 
-def _terms_forbid(row: dict[object, object]) -> tuple[str, ...]:
-    """Return the recorded phrases. A bad value, or one without a terms URL, is refused."""
-    if "terms_forbid" not in row:
-        return ()
-    value = row["terms_forbid"]
-    if value is None or value == []:
-        raise RegistryError("terms_forbid is empty")
-    if not isinstance(value, list):
-        raise RegistryError("terms_forbid is not a list of non-empty strings")
-    phrases: list[str] = []
-    for item in value:
-        if not isinstance(item, str) or item.strip() == "":
-            raise RegistryError("terms_forbid is not a list of non-empty strings")
-        phrases.append(item)
-    terms_url = row.get("terms_url")
-    if not isinstance(terms_url, str) or terms_url.strip() == "":
-        raise RegistryError("terms_forbid set without terms_url")
-    return tuple(phrases)
+def _terms_words(row: dict[object, object]) -> str:
+    """Return the publisher's words, or the marker. Blank text is refused."""
+    value = _text(row, "terms_words")
+    if value.strip() == "":
+        raise RegistryError("terms_words is empty")
+    return value
+
+
+def _calendar_date(row: dict[object, object], name: str) -> str:
+    """Return a YYYY-MM-DD date. A date object is refused as not text."""
+    value = _text(row, name)
+    if _DATE_TEXT.fullmatch(value) is None:
+        raise RegistryError(f"{name} is not a date")
+    try:
+        date.fromisoformat(value)
+    except ValueError:
+        raise RegistryError(f"{name} is not a date") from None
+    return value
 
 
 def _layer(row: dict[object, object], kind: str) -> int | None:

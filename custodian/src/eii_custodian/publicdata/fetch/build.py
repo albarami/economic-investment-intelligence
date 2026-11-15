@@ -9,8 +9,12 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
-from eii_custodian.publicdata.fetch.allowlist import approve
-from eii_custodian.publicdata.fetch.kinds import prepare, read_recorded_terms
+from eii_custodian.publicdata.fetch.allowlist import approve, host_of
+from eii_custodian.publicdata.fetch.kinds import (
+    TERMS_HOST_UNLISTED,
+    prepare,
+    read_terms_page,
+)
 from eii_custodian.publicdata.fetch.receipts import (
     cache_directory,
     commit_citation,
@@ -20,16 +24,14 @@ from eii_custodian.publicdata.fetch.receipts import (
 )
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.report import (
-    REASON_CHANGED,
-    REASON_FORBID,
     citation_line,
     coverage_line,
     fail_line,
-    owner_changed_line,
-    owner_line,
     pass_line,
     skip_line,
     terms_changed_line,
+    terms_host_line,
+    terms_unread_line,
 )
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
 from eii_custodian.publicdata.fetch.transport import Transport
@@ -79,6 +81,7 @@ class _Fetched:
     fetch_host: str
     retrieved_utc: str
     terms_sha256: str
+    terms_unread: str
 
 
 def utc_now() -> str:
@@ -115,15 +118,6 @@ def _fetch_row(
             "allow-listed host",
             entry.url,
         )
-    if entry.terms_url and not approve(entry.terms_url).ok:
-        return None, FetchFailure(
-            1,
-            entry.source_id,
-            entry.terms_url,
-            "blocked_host",
-            "allow-listed host",
-            entry.terms_url,
-        )
     try:
         prepared = prepare(entry, transport, sleep)
     except OSError:
@@ -152,7 +146,6 @@ def _fetch_row(
         source_modified=prepared.source_modified,
         row_count=prepared.row_count,
         terms_sha256=prepared.terms_sha256,
-        switched_off=False,
         portal_licence=prepared.portal_licence,
         portal_licence_url=prepared.portal_licence_url,
     )
@@ -174,7 +167,13 @@ def _fetch_row(
             "write failed",
         )
     return (
-        _Fetched(digest, prepared.fetch_host, retrieved, prepared.terms_sha256),
+        _Fetched(
+            digest,
+            prepared.fetch_host,
+            retrieved,
+            prepared.terms_sha256,
+            prepared.terms_unread,
+        ),
         None,
     )
 
@@ -192,22 +191,11 @@ def run_build(
     previous = _previous_term_hashes(cache)
     failure: FetchFailure | None = None
     for entry in entries:
-        if entry.terms_forbid:
-            stopped = _switch_off_on_terms(entry, transport, sleep, clock, lines, terms)
-            if stopped is not None:
-                failure = stopped
-                break
-            continue
-        if entry.terms_watch and entry.skip_reason:
-            stopped = _watch_skipped_terms(
-                entry, transport, sleep, clock, lines, terms, previous
-            )
-            if stopped is not None:
-                failure = stopped
-                break
-            lines.append(skip_line(entry.key, entry.skip_reason))
-            continue
         if entry.skip_reason:
+            if entry.terms_url:
+                _read_terms_apart(
+                    entry, transport, sleep, clock, lines, terms, previous
+                )
             lines.append(skip_line(entry.key, entry.skip_reason))
             continue
         if entry.kind == "citation_only":
@@ -240,9 +228,6 @@ def run_build(
             continue
         fetched, result = _fetch_row(entry, transport, cache, clock, sleep)
         if result is not None:
-            if result.check == "terms_forbid":
-                lines.append(owner_line(entry.key, entry.terms_url))
-                continue
             lines.append(
                 fail_line(
                     entry.key,
@@ -255,15 +240,10 @@ def run_build(
             failure = result
             break
         assert fetched is not None
-        if entry.terms_watch and fetched.terms_sha256:
-            _record_watched_terms(
-                entry,
-                fetched.terms_sha256,
-                fetched.retrieved_utc,
-                previous,
-                lines,
-                terms,
-            )
+        if entry.kind == "terms_page":
+            _note_fetched_terms(entry, fetched, lines, terms, previous)
+        elif entry.terms_url:
+            _read_terms_apart(entry, transport, sleep, clock, lines, terms, previous)
         batch = publish_investment(
             entry, cache, fetched.digest, transport, sleep, clock
         )
@@ -335,55 +315,38 @@ def run_build(
     return BuildOutcome(tuple(lines), failure)
 
 
-def _switch_off_on_terms(
+def _note_fetched_terms(
     entry: Entry,
-    transport: Transport,
-    sleep: Sleeper,
-    clock: Clock,
+    fetched: _Fetched,
     lines: list[str],
     terms: list[dict[str, object]],
-) -> FetchFailure | None:
-    """Read terms_url only. A recorded phrase, or its absence, switches the source off."""
-    read = read_recorded_terms(entry, transport, sleep)
-    if read.failure is not None:
+    previous: dict[str, str],
+) -> None:
+    """Record the fingerprint a terms_page row already read inside its fetch."""
+    if not entry.terms_url:
+        return
+    if fetched.terms_unread == TERMS_HOST_UNLISTED:
         lines.append(
-            fail_line(
-                entry.key,
-                read.failure.url,
-                read.failure.check,
-                read.failure.expected,
-                read.failure.observed,
-            )
+            terms_host_line(entry.key, host_of(entry.terms_url), entry.terms_url)
         )
-        return FetchFailure(
-            read.failure.code,
-            entry.source_id,
-            read.failure.url,
-            read.failure.check,
-            read.failure.expected,
-            read.failure.observed,
+        return
+    if fetched.terms_unread:
+        lines.append(
+            terms_unread_line(entry.key, fetched.terms_unread, entry.terms_url)
         )
-    if read.phrase_present:
-        lines.append(owner_line(entry.key, entry.terms_url))
-        reason = REASON_FORBID
-    else:
-        lines.append(owner_changed_line(entry.key, entry.terms_url))
-        reason = REASON_CHANGED
-    terms.append(
-        {
-            "key": entry.key,
-            "terms_url": entry.terms_url,
-            "terms_sha256": read.sha256,
-            "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
-            "retrieved_utc": clock(),
-            "reason": reason,
-            "switched_off": True,
-        }
-    )
-    return None
+        return
+    if fetched.terms_sha256:
+        _record_terms(
+            entry,
+            fetched.terms_sha256,
+            fetched.retrieved_utc,
+            previous,
+            lines,
+            terms,
+        )
 
 
-def _watch_skipped_terms(
+def _read_terms_apart(
     entry: Entry,
     transport: Transport,
     sleep: Sleeper,
@@ -391,32 +354,21 @@ def _watch_skipped_terms(
     lines: list[str],
     terms: list[dict[str, object]],
     previous: dict[str, str],
-) -> FetchFailure | None:
-    """Read and hash the terms page of a watched row that this task does not fetch."""
-    read = read_recorded_terms(entry, transport, sleep)
-    if read.failure is not None:
+) -> None:
+    """Read a terms page that the row's own fetch does not read."""
+    if not approve(entry.terms_url).ok:
         lines.append(
-            fail_line(
-                entry.key,
-                read.failure.url,
-                read.failure.check,
-                read.failure.expected,
-                read.failure.observed,
-            )
+            terms_host_line(entry.key, host_of(entry.terms_url), entry.terms_url)
         )
-        return FetchFailure(
-            read.failure.code,
-            entry.source_id,
-            read.failure.url,
-            read.failure.check,
-            read.failure.expected,
-            read.failure.observed,
-        )
-    _record_watched_terms(entry, read.sha256, clock(), previous, lines, terms)
-    return None
+        return
+    read = read_terms_page(entry, transport, sleep)
+    if read.failure is not None:
+        lines.append(terms_unread_line(entry.key, read.failure.check, entry.terms_url))
+        return
+    _record_terms(entry, read.sha256, clock(), previous, lines, terms)
 
 
-def _record_watched_terms(
+def _record_terms(
     entry: Entry,
     digest: str,
     retrieved: str,
@@ -432,6 +384,8 @@ def _record_watched_terms(
             "terms_sha256": digest,
             "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
             "terms_url": entry.terms_url,
+            "terms_words": entry.terms_words,
+            "terms_read_on": entry.terms_read_on,
         }
     )
     prior = previous.get(entry.key)
@@ -486,7 +440,6 @@ def _write_citation(entry: Entry, cache: Path, retrieved: str) -> None:
         source_modified="",
         row_count=None,
         terms_sha256="",
-        switched_off=False,
     )
     commit_citation(cache_directory(cache, entry.key), sidecar)
 

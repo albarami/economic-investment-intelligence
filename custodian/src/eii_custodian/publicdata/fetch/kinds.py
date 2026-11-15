@@ -28,8 +28,6 @@ from eii_custodian.publicdata.fetch.transport import (
 
 ARC_GIS_PAGE_SIZE = 2000
 _EXPORT_SUFFIX = "/exports/json"
-_FORBIDDEN = "forbids the use made here"
-_FORBIDDEN_ALT = "forbid the use made here"
 _CC_BY_4_TEXT = "CC BY"
 _CC_BY_4_URL = "https://creativecommons.org/licenses/by/4.0/"
 _SPACE_RUN = re.compile(r"\s+")
@@ -51,6 +49,10 @@ class Prepared:
     failure: AttemptFailure | None
     portal_licence: str = ""
     portal_licence_url: str = ""
+    terms_unread: str = ""
+
+
+TERMS_HOST_UNLISTED = "host_unlisted"
 
 
 def prepare(
@@ -182,17 +184,20 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
             ),
         )
     if licence == "":
-        return _failed(
-            entry,
-            AttemptFailure(
-                1,
-                meta.final_url,
-                "licence_missing",
-                _licence_expected(entry.licence_id),
-                _licence_observed("", licence_url),
-            ),
-        )
-    if not _licence_matches(licence, licence_url, entry.licence_id):
+        if entry.licence_basis == "dataset":
+            return _failed(
+                entry,
+                AttemptFailure(
+                    1,
+                    meta.final_url,
+                    "licence_missing",
+                    _licence_expected(entry.licence_id),
+                    _licence_observed("", licence_url),
+                ),
+            )
+        licence = ""
+        licence_url = ""
+    elif not _licence_matches(licence, licence_url, entry.licence_id):
         return _failed(
             entry,
             AttemptFailure(
@@ -314,23 +319,7 @@ def _terms(entry: Entry, reader: Read) -> Prepared:
     page, failure = _call(entry, entry.url, reader)
     if failure is not None or page is None:
         return _failed(entry, failure)
-    terms_hash = ""
-    if entry.terms_url:
-        terms, failure = _call(entry, entry.terms_url, reader)
-        if failure is not None or terms is None:
-            return _failed(entry, failure)
-        terms_hash = terms_text_sha256(terms.body)
-        if _forbids(entry, terms.body):
-            return _failed(
-                entry,
-                AttemptFailure(
-                    1,
-                    terms.final_url,
-                    "terms_forbid",
-                    "terms allow the use",
-                    "terms forbid the use",
-                ),
-            )
+    terms_hash, unread = _terms_fingerprint(entry, reader)
     return Prepared(
         page.body,
         page.final_url,
@@ -340,49 +329,43 @@ def _terms(entry: Entry, reader: Read) -> Prepared:
         None,
         terms_hash,
         None,
+        terms_unread=unread,
     )
 
 
-def _forbids(entry: Entry, body: bytes) -> bool:
-    if entry.source_id == "busy_gmaps" or entry.terms_watch:
-        return False
-    text = body.decode("utf-8", errors="replace").casefold()
-    return _FORBIDDEN in text or _FORBIDDEN_ALT in text
+def _terms_fingerprint(entry: Entry, reader: Read) -> tuple[str, str]:
+    """Read a terms page once. A technical miss leaves the data page in use."""
+    if not entry.terms_url:
+        return "", ""
+    if not approve(entry.terms_url).ok:
+        return "", TERMS_HOST_UNLISTED
+    terms, failure = _call(entry, entry.terms_url, reader)
+    if failure is not None or terms is None:
+        check = failure.check if failure is not None else "check_failed"
+        return "", check
+    return terms_text_sha256(terms.body), ""
 
 
 @dataclass(frozen=True)
-class RecordedTerms:
-    """The terms page for a row that names terms_forbid. The source URL is not read."""
+class TermsPage:
+    """A terms-page fingerprint, or the failure that left the page unread."""
 
     sha256: str
-    phrase_present: bool
     failure: AttemptFailure | None
 
 
-def read_recorded_terms(
+def read_terms_page(
     entry: Entry, transport: Transport, sleep: Callable[[float], None]
-) -> RecordedTerms:
-    """Read terms_url through the transport seam and compare the recorded phrases."""
+) -> TermsPage:
+    """Read terms_url and return its fingerprint, or a failure.
+
+    The source URL is not read. A failure does not decide the row's data.
+    """
     reader = _reader(transport, sleep)
     terms, failure = _call(entry, entry.terms_url, reader)
     if failure is not None or terms is None:
-        return RecordedTerms("", False, failure)
-    return RecordedTerms(
-        terms_text_sha256(terms.body),
-        _phrase_present(terms.body, entry.terms_forbid),
-        None,
-    )
-
-
-def _phrase_present(body: bytes, phrases: tuple[str, ...]) -> bool:
-    """Return whether any phrase is present after case folding and collapsed space."""
-    text = _folded(body.decode("utf-8", errors="replace"))
-    return any(_folded(phrase) in text for phrase in phrases)
-
-
-def _folded(value: str) -> str:
-    """Fold case and collapse each run of white space to one space."""
-    return _SPACE_RUN.sub(" ", value.casefold()).strip()
+        return TermsPage("", failure)
+    return TermsPage(terms_text_sha256(terms.body), None)
 
 
 def _failed(entry: Entry, failure: AttemptFailure | None) -> Prepared:

@@ -128,7 +128,6 @@ def cache_fixture(tmp_path, source, payload):
         source_modified="",
         row_count=None,
         terms_sha256="",
-        switched_off=False,
     )
     commit_pair(tmp_path / source.key, digest, source.extension, body, metadata)
     return tmp_path / source.key / f"{digest}.{source.extension}"
@@ -419,7 +418,6 @@ def test_cache_preserves_published_decimal_digits(tmp_path):
         source_modified="",
         row_count=1,
         terms_sha256="",
-        switched_off=False,
     )
     commit_pair(tmp_path / source.key, digest, source.extension, body, metadata)
     rows, _ = read_cached(tmp_path, source)
@@ -914,7 +912,6 @@ def test_cached_zip_is_verified_before_parsing(tmp_path):
         source_modified="",
         row_count=None,
         terms_sha256="",
-        switched_off=False,
     )
     commit_pair(tmp_path / source.key, digest, source.extension, body, receipt)
     assert read_cached(tmp_path, source)[0] == body
@@ -1033,7 +1030,6 @@ def test_raw_build_uses_licensed_geometry_and_writes_derived_review(
             source_modified="",
             row_count=None,
             terms_sha256="",
-            switched_off=False,
         )
         commit_pair(cache_dir / source.key, digest, source.extension, body, receipt)
     before = {
@@ -1281,7 +1277,6 @@ def measure_build(tmp_path):
                 source_modified="",
                 row_count=None,
                 terms_sha256="",
-                switched_off=False,
             )
             commit_pair(cache_dir / source.key, digest, source.extension, body, receipt)
         return build_frame(cache_dir, entries, review)

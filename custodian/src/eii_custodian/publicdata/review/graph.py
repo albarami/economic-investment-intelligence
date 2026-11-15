@@ -22,7 +22,6 @@ from typing import NamedTuple
 from eii_custodian.publicdata.fetch.registry import (
     Entry,
     load_registry,
-    release_refused,
 )
 from eii_custodian.publicdata.review.activity import (
     FEED_KEYS,
@@ -569,15 +568,13 @@ def _require_unmappable(nodes: Sequence[GraphNode]) -> None:
 
 
 def _refuse_release(registry: Sequence[Entry], mode: str) -> None:
+    """Reject an unknown mode. A release no longer bars a source for its licence."""
     if mode not in {"fixture", "release"}:
         raise GraphError("unknown graph mode")
     if mode != "release":
         return
-    entry = _entry_for(registry, "cls_isic4")
-    if entry is None:
+    if _entry_for(registry, "cls_isic4") is None:
         raise GraphError("cls_isic4 is not in the registry")
-    if release_refused(entry, "title"):
-        raise GraphRefused("cls_isic4 title is not released")
 
 
 def _entry_for(registry: Sequence[Entry], source_id: str) -> Entry | None:
@@ -588,10 +585,8 @@ def _entry_for(registry: Sequence[Entry], source_id: str) -> Entry | None:
 
 
 def _admitted(registry: Sequence[Entry], source_id: str) -> bool:
-    return any(
-        entry.source_id == source_id and entry.licence_basis != "none_stated"
-        for entry in registry
-    )
+    """A loaded registry row is admitted. Decision 0026 bars no basis from release."""
+    return any(entry.source_id == source_id for entry in registry)
 
 
 def _activity_sources(activity: ActivityRow) -> tuple[str, ...]:

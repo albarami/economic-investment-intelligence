@@ -45,7 +45,6 @@ def fixture(tmp_path: Path, value: str = "12.50"):
         source_modified="",
         row_count=1,
         terms_sha256="",
-        switched_off=False,
     )
     commit_pair(tmp_path / entry.key, digest, "json", body, receipt)
     return entry, digest, receipt
@@ -329,7 +328,6 @@ def series_cache(tmp_path: Path, source: str, rows: list[dict[str, object]]):
         source_modified="",
         row_count=len(rows),
         terms_sha256="",
-        switched_off=False,
     )
     commit_pair(tmp_path / entry.key, digest, "json", body, receipt)
     return entry, digest
@@ -436,7 +434,7 @@ def test_fetch_build_runs_selected_cache_checks(tmp_path: Path, monkeypatch) -> 
 
     def fetched(*args):
         return build._Fetched(
-            digest, entry.fetch_host, "2026-11-14T00:00:00Z", ""
+            digest, entry.fetch_host, "2026-11-14T00:00:00Z", "", ""
         ), None
 
     def wrapped(entries, cache, lines):

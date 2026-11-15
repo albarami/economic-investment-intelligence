@@ -993,6 +993,8 @@ def _base(
         skip_reason="",
         extension="html",
         landing_url=url,
+        terms_words="Invented terms words",
+        terms_read_on="2026-01-15",
         terms_watch=True,
         basis_note="Owner decision recorded for this planted row.",
     )

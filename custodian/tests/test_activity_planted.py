@@ -1,4 +1,4 @@
-"""Planted graph violations: DAT-100 to DAT-103 and the release switch."""
+"""Planted graph violations: DAT-100 to DAT-103."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from eii_custodian.publicdata.fetch.registry import load_registry, release_refused
+from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.review.activity import (
     ActivityRow,
     IsicClass,
@@ -19,8 +19,6 @@ from eii_custodian.publicdata.review.graph import (
     GraphEdge,
     GraphError,
     GraphNode,
-    GraphRefused,
-    build_cached_graph,
     build_graph,
     validate_graph,
     write_graph,
@@ -323,8 +321,11 @@ def test_dat_102_activity_without_a_class_edge_fails() -> None:
         validate_graph(graph.nodes, planted, load_registry())
 
 
-def test_dat_103_edge_without_an_admitted_licence_fails() -> None:
-    """A non-lineage edge may not rest on a none_stated source."""
+def test_dat_103_edge_on_the_classification_source_is_admitted() -> None:
+    """A non-lineage edge may rest on the classification source."""
+    entry = _entry("cls_isic4")
+    assert entry.licence_basis == "owner_decision"
+    assert entry.decision_record == "0026"
     graph = _graph()
     planted = tuple(
         edge._replace(source_id="cls_isic4")
@@ -332,8 +333,7 @@ def test_dat_103_edge_without_an_admitted_licence_fails() -> None:
         else edge
         for edge in graph.edges
     )
-    with pytest.raises(GraphError):
-        validate_graph(graph.nodes, planted, load_registry())
+    validate_graph(graph.nodes, planted, load_registry())
 
 
 def test_dat_103_edge_with_an_unknown_source_fails() -> None:
@@ -383,32 +383,20 @@ def test_unknown_activity_source_fails_closed() -> None:
         build_graph(spine, (planted,), classes, (), (), load_registry())
 
 
-def test_release_build_is_refused_and_writes_nothing(tmp_path: Path) -> None:
-    """The real registry refuses a release graph and leaves no output."""
+def test_release_build_of_the_classification_source_is_not_refused(
+    tmp_path: Path,
+) -> None:
+    """A release graph is not refused because the classification source has no open licence."""
     entry = _entry("cls_isic4")
-    assert release_refused(entry, "title") is True
-    with pytest.raises(GraphRefused):
-        _graph(mode="release")
-    graph = _graph()
+    assert entry.licence_basis == "owner_decision"
+    assert entry.decision_record == "0026"
+    graph = _graph(mode="release")
     output = tmp_path / "release"
-    with pytest.raises(GraphRefused):
-        write_graph(graph, output, registry=load_registry(), mode="release")
-    assert not output.exists()
-    assert list(tmp_path.iterdir()) == []
-
-
-def test_cached_release_refusal_writes_nothing(tmp_path: Path) -> None:
-    """The cache workflow refuses a release graph before any read and writes nothing."""
-    with pytest.raises(GraphRefused):
-        build_cached_graph(
-            tmp_path,
-            tmp_path / "review.csv",
-            tmp_path / "allowlist.csv",
-            (),
-            mode="release",
-            supplier_membership=_NO_SUPPLIERS,
-        )
-    assert list(tmp_path.iterdir()) == []
+    node_path, edge_path = write_graph(
+        graph, output, registry=load_registry(), mode="release"
+    )
+    assert node_path.is_file()
+    assert edge_path.is_file()
 
 
 def test_fixture_mode_works_on_an_invented_class(tmp_path: Path) -> None:

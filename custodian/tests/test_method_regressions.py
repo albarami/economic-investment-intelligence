@@ -355,7 +355,6 @@ def test_method_receipt_plants(tmp_path, plant):
         source_modified="",
         row_count=1,
         terms_sha256="",
-        switched_off=False,
     )
     commit_pair(tmp_path / entry.key, digest, "json", body, receipt)
     if plant == "stale_hash":

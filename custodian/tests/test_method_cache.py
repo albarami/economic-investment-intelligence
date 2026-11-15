@@ -34,7 +34,6 @@ def fixture(cache):
         source_modified="",
         row_count=4,
         terms_sha256="",
-        switched_off=False,
     )
     commit_pair(cache / entry.key, digest, "json", body, receipt)
     return digest
@@ -130,7 +129,6 @@ def _write_cached_source(cache: Path, source_key: str, rows: list[dict]):
         source_modified="",
         row_count=len(rows),
         terms_sha256="",
-        switched_off=False,
     )
     commit_pair(cache / entry.key, digest, entry.extension, body, receipt)
     return digest

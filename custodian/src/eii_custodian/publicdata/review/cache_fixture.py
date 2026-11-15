@@ -89,8 +89,9 @@ def write_cached(
         source_modified="",
         row_count=row_count,
         terms_sha256="",
-        switched_off=switched_off,
     )
+    if switched_off:
+        sidecar["switched_off"] = True
     commit_pair(cache_directory(cache, entry.key), sha, suffix, body, sidecar)
     return cache_directory(cache, entry.key) / f"{sha}.{suffix}"
 

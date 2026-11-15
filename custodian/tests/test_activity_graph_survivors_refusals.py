@@ -303,12 +303,15 @@ def test_public_sourced_from_edge_is_named() -> None:
 
 
 def test_edge_source_without_an_admitted_licence_is_named() -> None:
-    """A public edge sourced from cls_isic4 is refused."""
+    """A public edge sourced from cls_isic4 is admitted."""
     edge = _classified(source_id="cls_isic4")
-    _refuses(
-        lambda: _validate((_activity(), _class_node()), (edge,)),
-        "edge source has no release-admitted licence",
+    entries = tuple(
+        entry for entry in load_registry() if entry.source_id == "cls_isic4"
     )
+    assert len(entries) == 1
+    assert entries[0].licence_basis == "owner_decision"
+    assert entries[0].decision_record == "0026"
+    assert _validate((_activity(), _class_node()), (edge,)) is None
 
 
 def test_sourced_from_between_two_sources_is_named() -> None:
