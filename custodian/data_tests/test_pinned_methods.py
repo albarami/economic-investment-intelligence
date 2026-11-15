@@ -1,9 +1,11 @@
 """MTH-03 replays, explicitly invoked by the lead on pinned public-cache receipts."""
 
+import importlib.util
+import sys
 from decimal import Decimal as D
+from pathlib import Path
 
 import pytest
-from custodian.data_tests.cache import pinned
 
 from eii_core.calc.facts import Measure, NoData
 from eii_core.calc.public_methods import (
@@ -16,6 +18,18 @@ from eii_core.calc.public_methods import (
 from eii_core.calc.public_series import decomposition, ratio, rounded
 from eii_core.calc.sector_economics import Component, sector_norms, share_range
 from eii_custodian.publicdata.series.parse import customs_code, source_period
+
+_CACHE_NAME = "eii_data_tests_cache"
+_cache = sys.modules.get(_CACHE_NAME)
+if _cache is None:
+    _cache_spec = importlib.util.spec_from_file_location(
+        _CACHE_NAME, Path(__file__).resolve().parent / "cache.py"
+    )
+    assert _cache_spec is not None and _cache_spec.loader is not None
+    _cache = importlib.util.module_from_spec(_cache_spec)
+    sys.modules[_CACHE_NAME] = _cache
+    _cache_spec.loader.exec_module(_cache)
+pinned = _cache.pinned
 
 
 def reading(value, unit, period, chain, geography="national"):
