@@ -11462,6 +11462,60 @@ sources:
     period_field: "sit=row;form=date;field=year"
 # END S2-T19 sources
 
+# S2-T20 — the two height sources of PUB-106 (decision 0023 item A2).
+  - key: "bldg_3dglobfp"
+    source_id: "bldg_3dglobfp"
+    slug: ""
+    kind: "https_file"
+    title_en: "3D-GloBFP: open 3D building heights (footprints with estimated heights)"
+    publisher: "Che et al. 2024"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    decision_record: ""
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "direct_url_unconfirmed"
+    extension: ""
+  - key: "bldg_wsf3d"
+    source_id: "bldg_wsf3d"
+    slug: ""
+    kind: "https_file"
+    title_en: "WSF 3D: building height, 90 m cell mean"
+    publisher: "publisher recorded at the first fetch"
+    licence_id: "unconfirmed"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "direct_url_unconfirmed"
+    extension: ""
+
 forecast_series:
   - key: licence_issues
     state: held

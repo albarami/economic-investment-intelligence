@@ -413,6 +413,8 @@ def run_build(
                     "missing",
                 )
             )
+        if failure is None:
+            failure = _heights(cache, entries, lines)
     _write_log(cache, lines, terms)
     return BuildOutcome(tuple(lines), failure)
 
@@ -453,6 +455,44 @@ def _token_file(entry: Entry) -> bool:
     return (
         entry.source_id == TOKEN_SOURCE and "/" in entry.key and not entry.skip_reason
     )
+
+
+def _heights(
+    cache: Path,
+    entries: tuple[Entry, ...] | list[Entry],
+    lines: list[str],
+) -> FetchFailure | None:
+    """Run the heights step after the stage; a missing table only skips (B10)."""
+    from eii_custodian.publicdata.heights.step import (
+        BUILDINGS_RELATIVE,
+        HEIGHTS_RELATIVE,
+        HeightError,
+        build_heights,
+    )
+
+    root = cache.parent
+    try:
+        build_heights(
+            cache,
+            entries,
+            root / BUILDINGS_RELATIVE,
+            root / HEIGHTS_RELATIVE,
+            lines,
+        )
+    except HeightError as error:
+        lines.append(
+            fail_line(
+                "heights",
+                "",
+                error.name,
+                "valid height inputs",
+                error.name,
+            )
+        )
+        return FetchFailure(
+            1, "heights", "", error.name, "valid height inputs", error.name
+        )
+    return None
 
 
 def _note_fetched_terms(

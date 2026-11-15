@@ -805,7 +805,9 @@ def test_night_present_key_fetches_the_month(tmp_path, monkeypatch, capsys):
     )
     captured = capsys.readouterr()
     assert code == 0
-    assert "absent" not in captured.out
+    assert [line for line in captured.out.splitlines() if "absent" in line] == [
+        "SKIP heights building_table_absent"
+    ]
     assert seen == [YEAR_URL, DAY_URL, FILE_URL]
     cache = tmp_path / "data" / "public_cache"
     assert not (cache / "grids").exists()
