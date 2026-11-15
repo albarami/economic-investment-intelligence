@@ -55,8 +55,54 @@ FIELDS = frozenset(
         "reconciliation",
         "skip_reason",
         "extension",
+        "period",
+        "tile",
+        "sex",
+        "age_code",
+        "release",
+        "year",
+        "cell_units",
+        "doi",
+        "doi_confirmed",
+        "acknowledgement",
+        "point",
+        "variables",
+        "cache_role",
     }
 )
+FILE_FIELDS = {
+    "ntl_blackmarble": ("period", "tile", "release", "doi", "acknowledgement"),
+    "worldpop_qat_agesex": (
+        "sex",
+        "age_code",
+        "release",
+        "year",
+        "cell_units",
+        "doi",
+        "doi_confirmed",
+    ),
+    "weather_openmeteo": ("point", "variables", "cache_role"),
+}
+FILE_FIELD_NAMES = frozenset(name for names in FILE_FIELDS.values() for name in names)
+SEX_CODES = frozenset({"f", "m"})
+CELL_UNITS = frozenset({"people_per_cell", "density", "unconfirmed"})
+CACHE_ROLES = frozenset({"generator_input"})
+WEATHER_VARIABLES = frozenset(
+    {
+        "temperature_2m",
+        "relative_humidity_2m",
+        "apparent_temperature",
+        "precipitation",
+        "rain",
+        "weather_code",
+        "cloud_cover",
+        "wind_speed_10m",
+        "shortwave_radiation",
+    }
+)
+PERIOD_TEXT = re.compile(r"\A[0-9]{4}-[0-9]{2}\Z")
+TILE_TEXT = re.compile(r"\Ah[0-9]{2}v[0-9]{2}\Z")
+YEAR_TEXT = re.compile(r"\A[0-9]{4}\Z")
 REQUIRED = frozenset(
     {
         "key",
@@ -95,6 +141,25 @@ class RegistryError(Exception):
     def __init__(self, detail: str) -> None:
         self.detail = detail
         super().__init__(detail)
+
+
+@dataclass(frozen=True)
+class FileFields:
+    """The optional per-file metadata of one row; absent for every other row."""
+
+    period: str = ""
+    tile: str = ""
+    sex: str = ""
+    age_code: str = ""
+    release: str = ""
+    year: str = ""
+    cell_units: str = ""
+    doi: str = ""
+    doi_confirmed: bool = False
+    acknowledgement: str = ""
+    point: tuple[float, float] | None = None
+    variables: tuple[str, ...] = ()
+    cache_role: str = ""
 
 
 @dataclass(frozen=True)
@@ -138,6 +203,19 @@ class Entry:
     layer: int | None = None
     terms_watch: bool = False
     basis_note: str = ""
+    period: str = ""
+    tile: str = ""
+    sex: str = ""
+    age_code: str = ""
+    release: str = ""
+    year: str = ""
+    cell_units: str = ""
+    doi: str = ""
+    doi_confirmed: bool = False
+    acknowledgement: str = ""
+    point: tuple[float, float] | None = None
+    variables: tuple[str, ...] = ()
+    cache_role: str = ""
 
 
 def registry_path() -> Path:
@@ -282,6 +360,7 @@ def _entry(row: object) -> Entry:
     folded_skip = skip_reason.casefold()
     if _SKIP_LICENCE in folded_skip or _SKIP_TERMS in folded_skip:
         raise RegistryError("skip_reason names a licence or terms")
+    file_fields = _file_fields(row, source_id)
     return Entry(
         key=_text(row, "key"),
         source_id=source_id,
@@ -316,7 +395,119 @@ def _entry(row: object) -> Entry:
         layer=layer,
         terms_watch=terms_watch,
         basis_note=basis_note,
+        period=file_fields.period,
+        tile=file_fields.tile,
+        sex=file_fields.sex,
+        age_code=file_fields.age_code,
+        release=file_fields.release,
+        year=file_fields.year,
+        cell_units=file_fields.cell_units,
+        doi=file_fields.doi,
+        doi_confirmed=file_fields.doi_confirmed,
+        acknowledgement=file_fields.acknowledgement,
+        point=file_fields.point,
+        variables=file_fields.variables,
+        cache_role=file_fields.cache_role,
     )
+
+
+def _file_fields(row: dict[object, object], source_id: str) -> FileFields:
+    """Return the per-file metadata of one row, or nothing when the row holds none.
+
+    The fields are optional together: a row either holds the whole group its
+    source uses or none of it, and a field on any other source is refused.
+    """
+    present = {name for name in FILE_FIELD_NAMES if name in row}
+    allowed = set(FILE_FIELDS.get(source_id, ()))
+    outside = present - allowed
+    if outside:
+        raise RegistryError(
+            "file field on a row that does not use it: "
+            + ",".join(sorted(str(item) for item in outside))
+        )
+    if not present:
+        return FileFields()
+    if present != allowed:
+        raise RegistryError(
+            "incomplete file metadata: " + ",".join(sorted(allowed - present))
+        )
+    return FileFields(
+        period=_pattern(row, "period", PERIOD_TEXT) if "period" in present else "",
+        tile=_pattern(row, "tile", TILE_TEXT) if "tile" in present else "",
+        sex=_closed(row, "sex", SEX_CODES) if "sex" in present else "",
+        age_code=_digits(row, "age_code") if "age_code" in present else "",
+        release=_nonempty(row, "release") if "release" in present else "",
+        year=_pattern(row, "year", YEAR_TEXT) if "year" in present else "",
+        cell_units=(
+            _closed(row, "cell_units", CELL_UNITS) if "cell_units" in present else ""
+        ),
+        doi=_nonempty(row, "doi") if "doi" in present else "",
+        doi_confirmed=(
+            _bool(row, "doi_confirmed") if "doi_confirmed" in present else False
+        ),
+        acknowledgement=(
+            _nonempty(row, "acknowledgement") if "acknowledgement" in present else ""
+        ),
+        point=_point(row) if "point" in present else None,
+        variables=_variables(row) if "variables" in present else (),
+        cache_role=(
+            _closed(row, "cache_role", CACHE_ROLES) if "cache_role" in present else ""
+        ),
+    )
+
+
+def _pattern(row: dict[object, object], name: str, pattern: re.Pattern[str]) -> str:
+    value = _text(row, name)
+    if not pattern.match(value):
+        raise RegistryError(f"{name} is not in the recorded form")
+    return value
+
+
+def _closed(row: dict[object, object], name: str, allowed: frozenset[str]) -> str:
+    value = _text(row, name)
+    if value not in allowed:
+        raise RegistryError(f"{name} is not a recorded value")
+    return value
+
+
+def _digits(row: dict[object, object], name: str) -> str:
+    value = _text(row, name)
+    if not value.isdecimal() or not value.isascii():
+        raise RegistryError(f"{name} is not a decimal code")
+    return value
+
+
+def _nonempty(row: dict[object, object], name: str) -> str:
+    value = _text(row, name)
+    if value.strip() == "":
+        raise RegistryError(f"{name} is empty")
+    return value
+
+
+def _point(row: dict[object, object]) -> tuple[float, float]:
+    value = row["point"]
+    if not isinstance(value, list) or len(value) != 2:
+        raise RegistryError("point is not a pair of numbers")
+    pair: list[float] = []
+    for item in value:
+        if isinstance(item, bool) or not isinstance(item, int | float):
+            raise RegistryError("point is not a pair of numbers")
+        pair.append(float(item))
+    return (pair[0], pair[1])
+
+
+def _variables(row: dict[object, object]) -> tuple[str, ...]:
+    value = row["variables"]
+    if not isinstance(value, list) or not value:
+        raise RegistryError("variables is not a non-empty list of text")
+    found: list[str] = []
+    for item in value:
+        if not isinstance(item, str) or item not in WEATHER_VARIABLES:
+            raise RegistryError("variables is not a recorded value")
+        found.append(item)
+    if len(found) != len(set(found)):
+        raise RegistryError("variables repeats a name")
+    return tuple(found)
 
 
 def _terms_watch(row: dict[object, object]) -> bool:

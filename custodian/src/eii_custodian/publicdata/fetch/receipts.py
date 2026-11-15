@@ -9,6 +9,32 @@ from pathlib import Path
 
 from eii_custodian.publicdata.fetch.registry import Entry
 
+FILE_METADATA = {
+    "ntl_blackmarble": ("period", "tile", "release", "doi", "acknowledgement"),
+    "worldpop_qat_agesex": (
+        "sex",
+        "age_code",
+        "release",
+        "year",
+        "cell_units",
+        "doi",
+        "doi_confirmed",
+    ),
+    "weather_openmeteo": ("point", "variables", "cache_role"),
+}
+
+
+def file_metadata(entry: Entry) -> dict[str, object]:
+    """Return the closed per-file metadata of one row, or nothing for other rows."""
+    names = FILE_METADATA.get(entry.source_id, ())
+    if not names:
+        return {}
+    found: dict[str, object] = {}
+    for name in names:
+        value = getattr(entry, name)
+        found[name] = list(value) if isinstance(value, tuple) else value
+    return found
+
 
 def sha256_hex(body: bytes) -> str:
     """Return the SHA-256 hex digest of body."""
@@ -102,6 +128,7 @@ def sidecar_for(
         "source_modified": source_modified or None,
         "period_first": period_first or None,
         "period_last": period_last or None,
+        "file": file_metadata(entry) or None,
         "row_count": row_count,
         "columns": [{"name": name, "type": kind} for name, kind in entry.columns],
         "reconciliation": entry.reconciliation,

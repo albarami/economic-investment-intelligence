@@ -38,7 +38,8 @@ from eii_custodian.publicdata.fetch.report import (
     terms_unread_line,
 )
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
-from eii_custodian.publicdata.fetch.transport import Transport
+from eii_custodian.publicdata.fetch.transport import Transport, public_address
+from eii_custodian.publicdata.grids.fetch import GRID_SOURCES, prepare_grid
 from eii_custodian.publicdata.investment_build import publish_investment
 from eii_custodian.publicdata.places.fetch import fetch_place_file, is_place_file
 from eii_custodian.publicdata.places_fsq.fetch import fetch_release, is_release_entry
@@ -48,6 +49,7 @@ CACHE_RELATIVE = "data/public_cache"
 LOG_NAME = "build-log.json"
 Sleeper = Callable[[float], None]
 Clock = Callable[[], str]
+TOKEN_SOURCE = "ntl_blackmarble"
 
 
 @dataclass(frozen=True)
@@ -60,6 +62,9 @@ class FetchFailure:
     check: str
     expected: str
     observed: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "url", public_address(self.url))
 
     @property
     def detail(self) -> str:
@@ -100,9 +105,10 @@ def fetch_entry(
     cache: Path,
     clock: Clock,
     sleep: Sleeper,
+    token: str = "",
 ) -> FetchFailure | None:
     """Fetch one row. An unlisted host is refused before the transport is called."""
-    _fetched, failure = _fetch_row(entry, transport, cache, clock, sleep)
+    _fetched, failure = _fetch_row(entry, transport, cache, clock, sleep, token)
     return failure
 
 
@@ -112,6 +118,7 @@ def _fetch_row(
     cache: Path,
     clock: Clock,
     sleep: Sleeper,
+    token: str = "",
 ) -> tuple[_Fetched | None, FetchFailure | None]:
     """Fetch one row and return the receipt values this run wrote."""
     if entry.url and not approve(entry.url).ok:
@@ -124,7 +131,11 @@ def _fetch_row(
             entry.url,
         )
     try:
-        prepared = prepare(entry, transport, sleep)
+        prepared = (
+            prepare_grid(entry, transport, sleep, token)
+            if entry.source_id in GRID_SOURCES
+            else prepare(entry, transport, sleep)
+        )
     except OSError:
         return None, FetchFailure(
             1, entry.source_id, entry.url, "write_failed", "stored file", "write failed"
@@ -194,6 +205,8 @@ def run_build(
     cache: Path,
     clock: Clock,
     sleep: Sleeper,
+    token: str = "",
+    key_name: str = "",
     *,
     additions_review: Path | None = None,
     additions_frame: Path | None = None,
@@ -206,7 +219,16 @@ def run_build(
     failure: FetchFailure | None = None
     selected: list[tuple[str, str]] = []
     fetched_entries: list[Entry] = []
+    told_absent = False
     for entry in entries:
+        if not token and _token_file(entry):
+            if not told_absent:
+                lines.append(
+                    f"OMIT {TOKEN_SOURCE}: {key_name} absent; "
+                    "night-lights layer left out"
+                )
+                told_absent = True
+            continue
         if entry.skip_reason:
             if entry.terms_url:
                 _read_terms_apart(
@@ -268,7 +290,7 @@ def run_build(
             assert placed is not None
             lines.append(pass_line(entry.key, placed.digest, placed.host))
             continue
-        fetched, result = _fetch_row(entry, transport, cache, clock, sleep)
+        fetched, result = _fetch_row(entry, transport, cache, clock, sleep, token)
         if result is not None:
             lines.append(
                 fail_line(
@@ -406,6 +428,13 @@ def _publish_additions(
 
 def _review_dir() -> Path:
     return Path(__file__).resolve().parents[4] / "publicdata" / "review"
+
+
+def _token_file(entry: Entry) -> bool:
+    """True for a per-month radiance file entry that needs the archive token."""
+    return (
+        entry.source_id == TOKEN_SOURCE and "/" in entry.key and not entry.skip_reason
+    )
 
 
 def _note_fetched_terms(

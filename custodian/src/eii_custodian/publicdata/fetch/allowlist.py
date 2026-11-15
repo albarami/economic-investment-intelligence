@@ -25,12 +25,17 @@ ALLOWED_HOSTS = frozenset(
         "fdiprojects.invest.qa",
         "www.invest.qa",
         "data.source.coop",
+        "ladsweb.modaps.eosdis.nasa.gov",
+        "archive-api.open-meteo.com",
     }
 )
 
 NAMED_PORTAL_HOSTS = frozenset({"www.data.gov.qa", "www.data.qa"})
 NAMED_INVESTMENT_HOSTS = frozenset({"fdiprojects.invest.qa", "www.invest.qa"})
 NAMED_PLACES_HOST = "data.source.coop"
+NAMED_RADIANCE_HOST = "ladsweb.modaps.eosdis.nasa.gov"
+NAMED_POPULATION_HOST = "data.worldpop.org"
+NAMED_WEATHER_HOST = "archive-api.open-meteo.com"
 
 
 @dataclass(frozen=True)

@@ -4,10 +4,15 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Mapping, Sequence
+from functools import partial
 from pathlib import Path
 
+from earthdata_key import VARIABLE, earthdata_token
 from eii_custodian.publicdata.fetch.build import CACHE_RELATIVE, run_build, utc_now
-from eii_custodian.publicdata.fetch.registry import RegistryError, load_registry
+from eii_custodian.publicdata.fetch.registry import (
+    RegistryError,
+    load_registry,
+)
 from eii_custodian.publicdata.fetch.report import log_line
 from eii_custodian.publicdata.fetch.transport import Transport, open_https
 
@@ -24,17 +29,27 @@ def run(
     sleep: Sleeper | None = None,
 ) -> int:
     """Fetch the registry. Extra arguments are a usage error and open nothing."""
-    del environ
     if len(args) != 0:
         table.write_usage()
         return 2
+    token = earthdata_token(environ)
     opener = open_https if transport is None else transport
+    if transport is None and token:
+        opener = partial(open_https, token=token)
     pause = time.sleep if sleep is None else sleep
     try:
         entries = load_registry()
     except RegistryError as exc:
         return exits.finish(1, "build-public", exc.detail)
-    outcome = run_build(entries, opener, root / CACHE_RELATIVE, utc_now, pause)
+    outcome = run_build(
+        entries,
+        opener,
+        root / CACHE_RELATIVE,
+        utc_now,
+        pause,
+        token,
+        VARIABLE,
+    )
     for line in outcome.lines:
         print(line)
     print(log_line(f"{CACHE_RELATIVE}/build-log.json"))
