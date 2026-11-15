@@ -2247,3 +2247,58 @@ reason = "`_count_area` hands this `AreaResult` to `_count` alone, which reads o
 module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
 mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -8,6 +8,6 @@\n         return 0\n     return _count(\n         places,\n-        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", False),\n+        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", True),\n         classes,\n     )"
 reason = "`_count_area` hands this `AreaResult` to `_count` alone, which reads only `area.wkb`; the dataclass checks nothing on construction, so the five other fields reach no count and no refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/integrate.py"
+mutation = "--- src/eii_custodian/publicdata/places/integrate.py\n+++ src/eii_custodian/publicdata/places/integrate.py\n@@ -22,7 +22,7 @@\n     token = _BUILD_LINES.set(log)\n     try:\n         try:\n-            build_frame(cache, tuple(entries), review, None)\n+            build_frame(cache, tuple(entries), review, )\n         except FrameError:\n             _note(log, \"frame\", \"frame_refused\")\n     finally:"
+reason = "In frame_when_ready the dropped fourth argument None is the default of the parameter output of build_frame in publicdata/frame/build.py, the function this line imports, so build_frame is entered with the same four bound values."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/integrate.py"
+mutation = "--- src/eii_custodian/publicdata/places/integrate.py\n+++ src/eii_custodian/publicdata/places/integrate.py\n@@ -2,4 +2,4 @@\n     path = review / _TAG_FILE\n     if not path.is_file():\n         return \"\"\n-    return path.read_text(encoding=\"utf-8\").strip()\n+    return path.read_text(encoding=\"UTF-8\").strip()"
+reason = "The codec name is folded to lower case before any lookup, so \"UTF-8\" and \"utf-8\" name one codec object (codecs.lookup returns the same object for both, and a search function is asked only for the folded name); in _tag the file is decoded by the same decoder, so the stripped text and any decode error are the same."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/integrate.py"
+mutation = "--- src/eii_custodian/publicdata/places/integrate.py\n+++ src/eii_custodian/publicdata/places/integrate.py\n@@ -9,7 +9,7 @@\n     if len(files) != 1 or len(metas) != 1:\n         return None\n     try:\n-        loaded = json.loads(metas[0].read_text(encoding=\"utf-8\"))\n+        loaded = json.loads(metas[0].read_text(encoding=\"UTF-8\"))\n     except json.JSONDecodeError:\n         return None\n     if not isinstance(loaded, dict):"
+reason = "The codec name is folded to lower case before any lookup, so \"UTF-8\" and \"utf-8\" name one codec object (codecs.lookup returns the same object for both, and a search function is asked only for the folded name); in _receipt_of the receipt is decoded by the same decoder, so the parsed object and any decode error are the same."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/area_files.py"
+mutation = "--- src/eii_custodian/publicdata/places/area_files.py\n+++ src/eii_custodian/publicdata/places/area_files.py\n@@ -1,5 +1,4 @@\n def canonical_bytes(payload: Mapping[str, object]) -> bytes:\n     \"\"\"Sorted keys, one line, UTF-8.\"\"\"\n     return json.dumps(\n-        payload, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=True\n-    ).encode(\"utf-8\")\n+        payload, sort_keys=True, separators=(\",\", \":\"), ).encode(\"utf-8\")"
+reason = "In canonical_bytes the dropped keyword ensure_ascii=True is the default of json.dumps, so the call is the same call and the bytes are the same for every payload."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/area_files.py"
+mutation = "--- src/eii_custodian/publicdata/places/area_files.py\n+++ src/eii_custodian/publicdata/places/area_files.py\n@@ -2,4 +2,4 @@\n     \"\"\"Sorted keys, one line, UTF-8.\"\"\"\n     return json.dumps(\n         payload, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=True\n-    ).encode(\"utf-8\")\n+    ).encode(\"UTF-8\")"
+reason = "The codec name is folded to lower case before any lookup, so \"UTF-8\" and \"utf-8\" name one codec object (codecs.lookup returns the same object for both, and a search function is asked only for the folded name); in canonical_bytes the text is also pure ASCII after ensure_ascii, so the encoded bytes cannot differ."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/area_files.py"
+mutation = "--- src/eii_custodian/publicdata/places/area_files.py\n+++ src/eii_custodian/publicdata/places/area_files.py\n@@ -13,7 +13,7 @@\n     if not receipt.is_file():\n         raise AreaError(\"road_file_unreceipted\")\n     try:\n-        loaded = json.loads(receipt.read_text(encoding=\"utf-8\"))\n+        loaded = json.loads(receipt.read_text(encoding=\"UTF-8\"))\n     except json.JSONDecodeError as exc:\n         raise AreaError(\"road_file_unreceipted\") from exc\n     if not isinstance(loaded, dict) or loaded.get(\"sha256\") != digest:"
+reason = "The codec name is folded to lower case before any lookup, so \"UTF-8\" and \"utf-8\" name one codec object (codecs.lookup returns the same object for both, and a search function is asked only for the folded name); in _load_road the receipt is decoded by the same decoder, so the parsed object and any decode error are the same."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/area_files.py"
+mutation = "--- src/eii_custodian/publicdata/places/area_files.py\n+++ src/eii_custodian/publicdata/places/area_files.py\n@@ -2,7 +2,7 @@\n     \"\"\"True for a known byte order and no SRID flag. A hole stays inside the polygon.\"\"\"\n     order = wkb[0]\n     if order == _WKB_LITTLE:\n-        kind = int.from_bytes(wkb[1:5], \"little\")\n+        kind = int.from_bytes(wkb[1:6], \"little\")\n     elif order == _WKB_BIG:\n         kind = int.from_bytes(wkb[1:5], \"big\")\n     else:"
+reason = "In _one_ring the only use of kind is the test (kind & _WKB_SRID_FLAG) == 0, which reads bit 29 alone; the extra little-endian byte wkb[5] lands on bits 32 to 39 and cannot reach it, and a slice never raises on short bytes. Every caller passes bytes (_call_engine refuses anything else and _wkb returns bytes.fromhex)."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/area_files.py"
+mutation = "--- src/eii_custodian/publicdata/places/area_files.py\n+++ src/eii_custodian/publicdata/places/area_files.py\n@@ -4,7 +4,7 @@\n     if order == _WKB_LITTLE:\n         kind = int.from_bytes(wkb[1:5], \"little\")\n     elif order == _WKB_BIG:\n-        kind = int.from_bytes(wkb[1:5], \"big\")\n+        kind = int.from_bytes(wkb[1:5], )\n     else:\n         return False\n     return (kind & _WKB_SRID_FLAG) == 0"
+reason = "In _one_ring the dropped argument \"big\" is the default byteorder of int.from_bytes on every interpreter the project admits (requires-python is 3.14 or later; the default exists since 3.11), so the call is the same call."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/area_files.py"
+mutation = "--- src/eii_custodian/publicdata/places/area_files.py\n+++ src/eii_custodian/publicdata/places/area_files.py\n@@ -1,7 +1,7 @@\n def _stored_request(body: bytes, request: AreaRequest) -> bool:\n     \"\"\"True when the file's point, mode and cut-off are this run's request.\"\"\"\n     try:\n-        loaded = json.loads(body.decode(\"utf-8\"))\n+        loaded = json.loads(body.decode(\"UTF-8\"))\n     except (UnicodeError, json.JSONDecodeError):\n         return False\n     if not isinstance(loaded, dict):"
+reason = "The codec name is folded to lower case before any lookup, so \"UTF-8\" and \"utf-8\" name one codec object (codecs.lookup returns the same object for both, and a search function is asked only for the folded name); in _stored_request the body is decoded by the same decoder, so the same text or the same UnicodeError reaches the same lines."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/area_files.py"
+mutation = "--- src/eii_custodian/publicdata/places/area_files.py\n+++ src/eii_custodian/publicdata/places/area_files.py\n@@ -1,6 +1,6 @@\n def _read_manifest(body: bytes) -> tuple[dict[str, str], str]:\n     try:\n-        loaded = json.loads(body.decode(\"utf-8\"))\n+        loaded = json.loads(body.decode(\"UTF-8\"))\n     except (UnicodeError, json.JSONDecodeError) as exc:\n         raise AreaError(\"area_manifest_form\") from exc\n     if not isinstance(loaded, dict) or set(loaded) != {\"files\", \"road_sha256\"}:"
+reason = "The codec name is folded to lower case before any lookup, so \"UTF-8\" and \"utf-8\" name one codec object (codecs.lookup returns the same object for both, and a search function is asked only for the folded name); in _read_manifest the body is decoded by the same decoder, so the same text or the same UnicodeError reaches the same lines."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/area_files.py"
+mutation = "--- src/eii_custodian/publicdata/places/area_files.py\n+++ src/eii_custodian/publicdata/places/area_files.py\n@@ -1,6 +1,6 @@\n def _object(body: bytes) -> dict[str, object]:\n     try:\n-        loaded = json.loads(body.decode(\"utf-8\"))\n+        loaded = json.loads(body.decode(\"UTF-8\"))\n     except (UnicodeError, json.JSONDecodeError) as exc:\n         raise AreaError(\"area_request_mismatch\") from exc\n     if not isinstance(loaded, dict):"
+reason = "The codec name is folded to lower case before any lookup, so \"UTF-8\" and \"utf-8\" name one codec object (codecs.lookup returns the same object for both, and a search function is asked only for the folded name); in _object the body is decoded by the same decoder, so the same text or the same UnicodeError reaches the same lines."
