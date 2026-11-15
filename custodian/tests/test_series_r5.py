@@ -204,9 +204,8 @@ def test_country_totals_preserve_unattributed_rows(tmp_path, source, monkeypatch
     weight = Decimal(
         str(row["weight_kg" if source == "cus_imp_2019" else "weight_in_kilograms"])
     )
-    quantity = Decimal(str(row["quantity"]))
     assert [Decimal(r["weight_kg"]) for r in totals["rows"]] == [weight, weight * 3]
-    assert [Decimal(r["quantity"]) for r in totals["rows"]] == [quantity, quantity * 3]
+    assert all("quantity" not in r for r in totals["rows"])
     assert totals["source_chain"][0]["sha256"] == digest
 
 

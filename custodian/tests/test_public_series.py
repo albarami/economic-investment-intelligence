@@ -343,19 +343,23 @@ def test_series_build_writes_bound_tables_and_internal_checks(tmp_path: Path) ->
         tmp_path,
         "util_elec",
         [
-            {"year": "2021", "zone_number": "69", "value": 12},
-            {"year": "2025", "zone_number": "69", "value": 30},
+            {"year": "2021", "zone_number": "69", "value": 7},
+            {"year": "2025", "zone_number": "69", "value": 24},
             {"year": "2026", "zone_number": "69", "value": 5},
+            {"year": "2021", "zone_number": "70", "value": 13},
+            {"year": "2025", "zone_number": "70", "value": 6},
+            {"year": "2025", "zone_number": "71", "value": 10},
         ],
     )
+    # 24/7 -> 3.43; (24+6+10)/(7+13) = 2, including the new zone.
     result = build_series(tmp_path, [entry], {"util_elec": digest})
     assert result["selected"] == {"util_elec": digest}
     assert result["missing"] == ()
     assert result["checks"]["PUB-62"] == {
-        "zone_69_2021": "12",
-        "zone_69_2025": "30",
-        "ratio_2dp": "2.50",
-        "sum_ratio_2dp": "2.50",
+        "zone_69_2021": "7",
+        "zone_69_2025": "24",
+        "ratio_2dp": "3.43",
+        "sum_ratio_2dp": "2.00",
     }
     assert result["mismatch"] == "PUB-62"  # Invented figures do not match real anchors.
     path = tmp_path / "series" / "internal" / "pub_zone_utility.json"
@@ -364,13 +368,13 @@ def test_series_build_writes_bound_tables_and_internal_checks(tmp_path: Path) ->
         "zone_code": "69",
         "period": "2021",
         "utility": "electricity",
-        "value": 12,
+        "value": 7,
         "unit": "kWh",
         "partial_year": False,
         "caveat_keys": [],
     }
     assert table["rows"][2]["partial_year"] is True
-    assert table["row_sources"] == ["util_elec", "util_elec", "util_elec"]
+    assert table["row_sources"] == ["util_elec"] * 6
     assert table["method_version"] == "1"
     assert table["source_chain"][0]["sha256"] == digest
     assert not list((tmp_path / "series" / "display").glob("*.json"))
@@ -479,6 +483,33 @@ def test_independent_checks_and_contract_values() -> None:
         (Path(__file__).parent / "fixtures/series/confirmed_shapes.json").read_text(),
         parse_float=Decimal,
     )
+    # 24/7 -> 3.43; (24+6+10)/(7+13)=2.00, with one later-only zone.
+    fixtures["util_elec"] = [
+        dict(year=y, zone_number=z, value=v)
+        for y, z, v in [
+            ("2021", "69", 7),
+            ("2025", "69", 24),
+            ("2021", "70", 13),
+            ("2025", "70", 6),
+            ("2025", "71", 10),
+        ]
+    ]
+    # Median=3, strict threshold=9. Dated=59+2+62*3=247; 59/247*100 -> 24.
+    from eii_core.calc.public_series import C2_CALENDAR
+
+    from .test_series_exact_regressions import cancellation
+
+    fixtures["lic_cancelled"] = [
+        cancellation("2020", 7, 42),
+        cancellation("2022", 6, 9),
+        cancellation("2024", 9, 8),
+        cancellation("2020", 1, 2),
+        cancellation(None, None, 9),
+    ]
+    other = [
+        m for m in C2_CALENDAR if m not in {"2020-07", "2022-06", "2024-09", "2020-01"}
+    ][:62]
+    fixtures["lic_cancelled"].extend(cancellation(m[:4], int(m[5:]), 3) for m in other)
     assert compute_checks(
         {
             k: v
@@ -487,10 +518,10 @@ def test_independent_checks_and_contract_values() -> None:
         }
     ) == {
         "PUB-62": {
-            "zone_69_2021": "12",
-            "zone_69_2025": "30",
-            "ratio_2dp": "2.50",
-            "sum_ratio_2dp": "2.50",
+            "zone_69_2021": "7",
+            "zone_69_2025": "24",
+            "ratio_2dp": "3.43",
+            "sum_ratio_2dp": "2.00",
         },
         "PUB-63": {
             "populated_groups": "2",
@@ -505,16 +536,16 @@ def test_independent_checks_and_contract_values() -> None:
         "PUB-65": {"valuation_basis_present": "true"},
         "PUB-66": {"rows_2025": "1", "value_bn_2dp": "2.00"},
         "PUB-68": {
-            "sum_count": "11",
-            "undated": "2",
-            "dated_total": "9",
-            "july_2020": "3",
-            "june_2022": "3",
-            "september_2024": "3",
-            "combined_share_0dp": "100",
+            "sum_count": "256",
+            "undated": "9",
+            "dated_total": "247",
+            "july_2020": "42",
+            "june_2022": "9",
+            "september_2024": "8",
+            "combined_share_0dp": "24",
             "july_2020_bulk": "true",
-            "june_2022_bulk": "true",
-            "september_2024_bulk": "true",
+            "june_2022_bulk": "false",
+            "september_2024_bulk": "false",
         },
         "PUB-70": {"metro_2024_12": "10", "metro_2025_12": "15", "growth_0dp": "50"},
     }

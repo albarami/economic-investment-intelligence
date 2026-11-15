@@ -80,6 +80,8 @@ class MutationRunnerTests(unittest.TestCase):
         with TemporaryDirectory(prefix="synthetic-package-mutation-") as temporary:
             root = Path(temporary)
             (root / "pyproject.toml").write_text("")
+            (root / "docs").mkdir()
+            (root / "docs/synthetic.txt").write_text("invented reference")
             package = root / "custodian"
             (package / "src/synthetic").mkdir(parents=True)
             (package / "tests").mkdir()
@@ -88,7 +90,9 @@ class MutationRunnerTests(unittest.TestCase):
                 "def value():\n    return 2\n"
             )
             (package / "tests/test_toy.py").write_text(
-                "from synthetic.toy import value\n\ndef test_value():\n    assert value() == 2\n"
+                "from synthetic.toy import value\nfrom pathlib import Path\n"
+                "def test_value():\n    assert value() == 2\n"
+                "    assert (Path(__file__).parents[2] / 'docs/synthetic.txt').read_text() == 'invented reference'\n"
             )
             (package / "pyproject.toml").write_text("")
             (root / "scripts/tests").mkdir(parents=True)
@@ -100,6 +104,7 @@ class MutationRunnerTests(unittest.TestCase):
             import shutil
 
             shutil.copytree(package, root / "product")
+            shutil.copytree(package, root / "core")
             output = io.StringIO()
             (root / "scripts/mutation_explained.toml").write_text("survivors = []\n")
             listed = "\0".join(
@@ -127,12 +132,13 @@ class MutationRunnerTests(unittest.TestCase):
                         "mutation.py",
                         "custodian/src/synthetic/toy.py",
                         "product/src/synthetic/toy.py",
+                        "core/src/synthetic/toy.py",
                     ],
                 ),
             ):
                 code = runner.main()
             self.assertEqual(code, 0)
-            for name in ("custodian", "product"):
+            for name in ("custodian", "product", "core"):
                 self.assertIn(
                     name + "/src/synthetic/toy.py: made=1 killed=1 survived=0",
                     output.getvalue(),
@@ -307,7 +313,7 @@ class MutationRunnerTests(unittest.TestCase):
     def test_cli_refuses_git_listed_file_outside_package_sources(self) -> None:
         root = Path(__file__).resolve().parents[2]
         result = subprocess.run(
-            [sys.executable, "scripts/mutation.py", "core/src/eii_core/__init__.py"],
+            [sys.executable, "scripts/mutation.py", "scripts/mutation.py"],
             cwd=root,
             capture_output=True,
             text=True,
@@ -315,7 +321,8 @@ class MutationRunnerTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 2)
         self.assertIn(
-            "Every module must be inside custodian/src or product/src", result.stderr
+            "Every module must be inside core/src, custodian/src or product/src",
+            result.stderr,
         )
 
 
@@ -428,4 +435,71 @@ class EvalMutationRunnerTest(unittest.TestCase):
                     if p.is_file()
                 },
                 {**files, "unlisted.py": "synthetic unlisted sentinel\n"},
+            )
+
+
+class SourceGuardSelectionTests(unittest.TestCase):
+    def test_unlisted_deselection_refused_by_name(self) -> None:
+        runner = importlib.import_module("scripts.mutation")
+        with TemporaryDirectory(prefix="synthetic-selection-") as temporary:
+            folder = Path(temporary)
+            (folder / "pyproject.toml").write_text("")
+            output = io.StringIO()
+            with contextlib.redirect_stderr(output):
+                code, _ = runner.run_copy(
+                    folder,
+                    ["src/toy.py"],
+                    ["tests", "--deselect=tests/test_toy.py::test_value"],
+                    folder / "ledger.toml",
+                )
+            self.assertEqual(code, 2)
+            self.assertIn(
+                "Refusing test selection option: --deselect=tests/test_toy.py::test_value",
+                output.getvalue(),
+            )
+            self.assertEqual((folder / "pyproject.toml").read_text(), "")
+            with (
+                patch.dict("os.environ", {"PYTEST_ADDOPTS": "--deselect=unlisted"}),
+                contextlib.redirect_stderr(output),
+            ):
+                code, _ = runner.run_copy(
+                    folder, ["src/toy.py"], ["tests"], folder / "ledger.toml"
+                )
+            self.assertEqual(code, 2)
+            self.assertIn("PYTEST_ADDOPTS", output.getvalue())
+
+    def test_closed_guards_collected_by_ordinary_suite(self) -> None:
+        runner = importlib.import_module("scripts.mutation")
+        suite_runner = importlib.import_module("scripts.run_tests")
+        suites = suite_runner.SUITES
+        root = Path(__file__).resolve().parents[2]
+        collected: set[str] = set()
+        for suite in suites:
+            if suite.kind != "pytest" or not any(
+                node.startswith(suite.args[0] + "/")
+                for node in runner.SOURCE_TEXT_GUARDS
+            ):
+                continue
+            self.assertFalse(any(arg.startswith("-") for arg in suite.args))
+            with TemporaryDirectory(prefix="synthetic-collection-") as temporary:
+                command = suite_runner.runner_exec.build_command(
+                    suite, root, {}, Path(temporary), 1
+                )
+                self.assertFalse(any(arg.startswith("--deselect") for arg in command))
+                result = subprocess.run(
+                    [*command, "--collect-only", "-q"],
+                    cwd=root / suite.cwd,
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            collected.update(line.strip() for line in result.stdout.splitlines())
+        self.assertTrue(set(runner.SOURCE_TEXT_GUARDS) <= collected)
+        # An invented listed node outside the ordinary suite must fail membership.
+        with self.assertRaises(AssertionError):
+            self.assertTrue(
+                set(runner.SOURCE_TEXT_GUARDS)
+                | {"core/data_tests/test_invented.py::test_guard"}
+                <= collected
             )

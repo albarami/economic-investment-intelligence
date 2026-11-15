@@ -1412,19 +1412,229 @@ mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/re
 reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same encoder and bytes."
 
 [[survivors]]
-module = "core/src/eii_core/calc/public_series.py"
-mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -1,3 +1,3 @@\n def rounded(value: Decimal, places: int) -> str:\n     \"\"\"Round once, half up, at the output boundary.\"\"\"\n-    return str(value.quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP))\n+    return str(value.quantize(Decimal(2).scaleb(-places), rounding=ROUND_HALF_UP))"
-reason = "Decimal.quantize uses the exponent of its second operand, not its coefficient. Decimal(1).scaleb(-places) and Decimal(2).scaleb(-places) supply the same exponent, so the returned rounded string is unchanged for the supported output places."
+module = "core/src/eii_core/calc/sector_economics.py"
+mutation = "--- src/eii_core/calc/sector_economics.py\n+++ src/eii_core/calc/sector_economics.py\n@@ -95,7 +95,7 @@\n             if (\n                 not component.key\n                 or component.key in result\n-                or component.key in {\"production\", \"output_per_establishment\"}\n+                or component.key in {\"XXproductionXX\", \"output_per_establishment\"}\n                 or \"production\" in component.key\n                 or component.key == \"output_value\"\n             ):"
+reason = "The key production is also refused by the unchanged substring production check. Both original and mutant refuse before emitting a component; every other key follows identical checks."
+
+[[survivors]]
+module = "core/src/eii_core/calc/sector_economics.py"
+mutation = "--- src/eii_core/calc/sector_economics.py\n+++ src/eii_core/calc/sector_economics.py\n@@ -5,7 +5,7 @@\n     *,\n     places: int,\n ) -> CalculationFact:\n-    anchor = inputs[0]\n+    anchor = inputs[1]\n     return emit(\n         value,\n         unit=\"percent\","
+reason = "sector_norms validates all input measures against employees for period and geography before _percent. Its inputs always begin with employees and productivity, whose period, geography and kind are identical exact strings. Either anchor supplies identical metadata; the complete unchanged inputs tuple supplies every lineage and class. _percent is private, not an independent public boundary."
 
 [[survivors]]
 module = "core/src/eii_core/calc/public_series.py"
-mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -1,5 +1,5 @@\n def weighted_mean(groups: Mapping[str, Group]) -> tuple[Decimal, Decimal]:\n     \"\"\"Return paid workers and their weighted mean, without rounding.\"\"\"\n-    workers = sum((count for count, _ in groups.values()), ZERO)\n+    workers = sum((count for count, _ in groups.values()), )\n     bill = sum((count * wage for count, wage in groups.values()), ZERO)\n     return workers, ratio(bill, workers)"
-reason = "For nonempty Decimal counts, sum starts with integer zero instead of Decimal zero; adding either zero to the first Decimal produces the same Decimal sum. For empty groups the workers total is zero in both versions and ratio refuses the non-positive denominator before weighted_mean returns. No returned value or refusal diagnostic changes."
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -57,7 +57,7 @@\n         require_aligned((*workers, *wages))\n         return parsed\n \n-    before_rows = sorted(pairs(before), key=lambda row: row[0])\n+    before_rows = sorted(pairs(before), key=None)\n     after_rows = sorted(pairs(after), key=lambda row: row[0])\n     if before_rows[0][1].period == after_rows[0][1].period:\n         raise MeasureMismatch(\"period\")"
+reason = "B5 A6: pairs refuses group keys unless type(group) is str. A valid mapping therefore has distinct built-in text keys, with their ordinary consistent equality, hash and ordering. Sorted tuples compare their distinct first fields and never reach Measure fields. Sorting whole tuples and sorting on row[0] have identical order; empty typed groups are refused first."
 
 [[survivors]]
 module = "core/src/eii_core/calc/public_series.py"
-mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -1,5 +1,5 @@\n def weighted_mean(groups: Mapping[str, Group]) -> tuple[Decimal, Decimal]:\n     \"\"\"Return paid workers and their weighted mean, without rounding.\"\"\"\n     workers = sum((count for count, _ in groups.values()), ZERO)\n-    bill = sum((count * wage for count, wage in groups.values()), ZERO)\n+    bill = sum((count * wage for count, wage in groups.values()), )\n     return workers, ratio(bill, workers)"
-reason = "For nonempty groups every count-times-wage term is Decimal and adding integer zero or Decimal zero gives the same bill sum. For empty groups the workers total is Decimal zero and ratio refuses the non-positive denominator before the bill is divided or returned. No returned value or refusal diagnostic changes."
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -57,7 +57,7 @@\n         require_aligned((*workers, *wages))\n         return parsed\n \n-    before_rows = sorted(pairs(before), key=lambda row: row[0])\n+    before_rows = sorted(pairs(before), )\n     after_rows = sorted(pairs(after), key=lambda row: row[0])\n     if before_rows[0][1].period == after_rows[0][1].period:\n         raise MeasureMismatch(\"period\")"
+reason = "B5 A7: pairs refuses group keys unless type(group) is str. A valid mapping therefore has distinct built-in text keys, with their ordinary consistent equality, hash and ordering. Sorted tuples compare their distinct first fields and never reach Measure fields. Sorting whole tuples and sorting on row[0] have identical order; empty typed groups are refused first."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -58,7 +58,7 @@\n         return parsed\n \n     before_rows = sorted(pairs(before), key=lambda row: row[0])\n-    after_rows = sorted(pairs(after), key=lambda row: row[0])\n+    after_rows = sorted(pairs(after), key=None)\n     if before_rows[0][1].period == after_rows[0][1].period:\n         raise MeasureMismatch(\"period\")\n     if (before_rows[0][1].geography, before_rows[0][1].geography_kind) != ("
+reason = "B5 A8: pairs refuses group keys unless type(group) is str. A valid mapping therefore has distinct built-in text keys, with their ordinary consistent equality, hash and ordering. Sorted tuples compare their distinct first fields and never reach Measure fields. Sorting whole tuples and sorting on row[0] have identical order; empty typed groups are refused first."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -58,7 +58,7 @@\n         return parsed\n \n     before_rows = sorted(pairs(before), key=lambda row: row[0])\n-    after_rows = sorted(pairs(after), key=lambda row: row[0])\n+    after_rows = sorted(pairs(after), )\n     if before_rows[0][1].period == after_rows[0][1].period:\n         raise MeasureMismatch(\"period\")\n     if (before_rows[0][1].geography, before_rows[0][1].geography_kind) != ("
+reason = "B5 A9: pairs refuses group keys unless type(group) is str. A valid mapping therefore has distinct built-in text keys, with their ordinary consistent equality, hash and ordering. Sorted tuples compare their distinct first fields and never reach Measure fields. Sorting whole tuples and sorting on row[0] have identical order; empty typed groups are refused first."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -59,7 +59,7 @@\n \n     before_rows = sorted(pairs(before), key=lambda row: row[0])\n     after_rows = sorted(pairs(after), key=lambda row: row[0])\n-    if before_rows[0][1].period == after_rows[0][1].period:\n+    if before_rows[0][2].period == after_rows[0][1].period:\n         raise MeasureMismatch(\"period\")\n     if (before_rows[0][1].geography, before_rows[0][1].geography_kind) != (\n         after_rows[0][1].geography,"
+reason = "B5 A10: Measure refuses period, geography and geography_kind subclasses with its exact-str metadata and geography checks. pairs calls require_aligned on workers and wages together before this line, proving equal built-in string metadata within each year. Replacing worker index 1 with wage index 2 therefore supplies the identical text, type and comparison behavior; different-year and different-geography refusals are unchanged. The sceptic's custom equality/hash strings cannot reach this line."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -59,7 +59,7 @@\n \n     before_rows = sorted(pairs(before), key=lambda row: row[0])\n     after_rows = sorted(pairs(after), key=lambda row: row[0])\n-    if before_rows[0][1].period == after_rows[0][1].period:\n+    if before_rows[0][1].period == after_rows[0][2].period:\n         raise MeasureMismatch(\"period\")\n     if (before_rows[0][1].geography, before_rows[0][1].geography_kind) != (\n         after_rows[0][1].geography,"
+reason = "B5 A11: Measure refuses period, geography and geography_kind subclasses with its exact-str metadata and geography checks. pairs calls require_aligned on workers and wages together before this line, proving equal built-in string metadata within each year. Replacing worker index 1 with wage index 2 therefore supplies the identical text, type and comparison behavior; different-year and different-geography refusals are unchanged. The sceptic's custom equality/hash strings cannot reach this line."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -61,7 +61,7 @@\n     after_rows = sorted(pairs(after), key=lambda row: row[0])\n     if before_rows[0][1].period == after_rows[0][1].period:\n         raise MeasureMismatch(\"period\")\n-    if (before_rows[0][1].geography, before_rows[0][1].geography_kind) != (\n+    if (before_rows[0][2].geography, before_rows[0][1].geography_kind) != (\n         after_rows[0][1].geography,\n         after_rows[0][1].geography_kind,\n     ):"
+reason = "B5 A12: Measure refuses period, geography and geography_kind subclasses with its exact-str metadata and geography checks. pairs calls require_aligned on workers and wages together before this line, proving equal built-in string metadata within each year. Replacing worker index 1 with wage index 2 therefore supplies the identical text, type and comparison behavior; different-year and different-geography refusals are unchanged. The sceptic's custom equality/hash strings cannot reach this line."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -61,7 +61,7 @@\n     after_rows = sorted(pairs(after), key=lambda row: row[0])\n     if before_rows[0][1].period == after_rows[0][1].period:\n         raise MeasureMismatch(\"period\")\n-    if (before_rows[0][1].geography, before_rows[0][1].geography_kind) != (\n+    if (before_rows[0][1].geography, before_rows[0][2].geography_kind) != (\n         after_rows[0][1].geography,\n         after_rows[0][1].geography_kind,\n     ):"
+reason = "B5 A13: Measure refuses period, geography and geography_kind subclasses with its exact-str metadata and geography checks. pairs calls require_aligned on workers and wages together before this line, proving equal built-in string metadata within each year. Replacing worker index 1 with wage index 2 therefore supplies the identical text, type and comparison behavior; different-year and different-geography refusals are unchanged. The sceptic's custom equality/hash strings cannot reach this line."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -62,7 +62,7 @@\n     if before_rows[0][1].period == after_rows[0][1].period:\n         raise MeasureMismatch(\"period\")\n     if (before_rows[0][1].geography, before_rows[0][1].geography_kind) != (\n-        after_rows[0][1].geography,\n+        after_rows[0][2].geography,\n         after_rows[0][1].geography_kind,\n     ):\n         raise MeasureMismatch(\"geography\")"
+reason = "B5 A14: Measure refuses period, geography and geography_kind subclasses with its exact-str metadata and geography checks. pairs calls require_aligned on workers and wages together before this line, proving equal built-in string metadata within each year. Replacing worker index 1 with wage index 2 therefore supplies the identical text, type and comparison behavior; different-year and different-geography refusals are unchanged. The sceptic's custom equality/hash strings cannot reach this line."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -63,7 +63,7 @@\n         raise MeasureMismatch(\"period\")\n     if (before_rows[0][1].geography, before_rows[0][1].geography_kind) != (\n         after_rows[0][1].geography,\n-        after_rows[0][1].geography_kind,\n+        after_rows[0][2].geography_kind,\n     ):\n         raise MeasureMismatch(\"geography\")\n     before_groups = {"
+reason = "B5 A15: Measure refuses period, geography and geography_kind subclasses with its exact-str metadata and geography checks. pairs calls require_aligned on workers and wages together before this line, proving equal built-in string metadata within each year. Replacing worker index 1 with wage index 2 therefore supplies the identical text, type and comparison behavior; different-year and different-geography refusals are unchanged. The sceptic's custom equality/hash strings cannot reach this line."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -76,7 +76,7 @@\n     inputs = tuple(\n         cell for row in (*before_rows, *after_rows) for cell in (row[1], row[2])\n     )\n-    geography = before_rows[0][1].geography\n+    geography = before_rows[0][2].geography\n     kind = before_rows[0][1].geography_kind\n     period = after_rows[0][1].period"
+reason = "B5 A16: Measure refuses period, geography and geography_kind subclasses with its exact-str metadata and geography checks. pairs calls require_aligned on workers and wages together before this line, proving equal built-in string metadata within each year. Replacing worker index 1 with wage index 2 therefore supplies the identical text, type and comparison behavior; different-year and different-geography refusals are unchanged. The sceptic's custom equality/hash strings cannot reach this line."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -77,7 +77,7 @@\n         cell for row in (*before_rows, *after_rows) for cell in (row[1], row[2])\n     )\n     geography = before_rows[0][1].geography\n-    kind = before_rows[0][1].geography_kind\n+    kind = before_rows[0][2].geography_kind\n     period = after_rows[0][1].period\n \n     base_period = before_rows[0][1].period"
+reason = "B5 A17: Measure refuses period, geography and geography_kind subclasses with its exact-str metadata and geography checks. pairs calls require_aligned on workers and wages together before this line, proving equal built-in string metadata within each year. Replacing worker index 1 with wage index 2 therefore supplies the identical text, type and comparison behavior; different-year and different-geography refusals are unchanged. The sceptic's custom equality/hash strings cannot reach this line."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -78,7 +78,7 @@\n     )\n     geography = before_rows[0][1].geography\n     kind = before_rows[0][1].geography_kind\n-    period = after_rows[0][1].period\n+    period = after_rows[0][2].period\n \n     base_period = before_rows[0][1].period"
+reason = "B5 A18: Measure refuses period, geography and geography_kind subclasses with its exact-str metadata and geography checks. pairs calls require_aligned on workers and wages together before this line, proving equal built-in string metadata within each year. Replacing worker index 1 with wage index 2 therefore supplies the identical text, type and comparison behavior; different-year and different-geography refusals are unchanged. The sceptic's custom equality/hash strings cannot reach this line."
+
+[[survivors]]
+module = "core/src/eii_core/calc/facts.py"
+mutation = "--- src/eii_core/calc/facts.py\n+++ src/eii_core/calc/facts.py\n@@ -10,6 +10,6 @@\n     elif kind in (\"release_units\", \"user_scenario\", \"area_shape\"):\n         valid = value.startswith(kind + \":\") and bool(value[len(kind) + 1 :])\n     else:\n-        valid = False\n+        valid = None\n     if not valid:\n         raise MeasureMismatch(\"geography\")"
+reason = "After exact-str checks, an unsupported geography kind reaches this assignment. valid is local and is read only by if not valid; both False and None take that branch and raise MeasureMismatch geography. No value of valid is returned or stored."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -12,7 +12,7 @@\n         raise ValueError(\"complete declared calendar required\")\n     all_row = all_cancellations_row\n     dated_row = dated_cancellations_row\n-    require_aligned((active_row, *cancellations.values()), unit=\"count\", period=False)\n+    require_aligned((active_row, *cancellations.values()), unit=\"count\", period=None)\n     require_aligned(\n         (all_row, dated_row, *national_totals.values()), unit=\"count\", period=False\n     )"
+reason = "require_aligned reads period only in if period and the period-set check. Both False and None are falsy, so both omit that check; the unit and geography checks do not depend on this value. Rows are snapshotted once and neither form changes them."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -14,7 +14,7 @@\n     dated_row = dated_cancellations_row\n     require_aligned((active_row, *cancellations.values()), unit=\"count\", period=False)\n     require_aligned(\n-        (all_row, dated_row, *national_totals.values()), unit=\"count\", period=False\n+        (all_row, dated_row, *national_totals.values()), unit=\"count\", period=None\n     )\n     if all_row.geography_kind != \"national\":\n         raise MeasureMismatch(\"geography\")"
+reason = "require_aligned reads period only in if period and the period-set check. Both False and None are falsy, so both omit that check; the unit and geography checks do not depend on this value. Rows are snapshotted once and neither form changes them."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -43,7 +43,7 @@\n     flags = bulk_months({key: Decimal(value) for key, value in national_counts.items()})\n     included = sum(cancel_counts.values())\n     excluded = sum(value for key, value in cancel_counts.items() if key not in flags)\n-    flagged = sum(national_counts.get(key, 0) for key in flags)\n+    flagged = sum(national_counts.get(key, None) for key in flags)\n     if flagged > dated_cancellations:\n         raise ValueError(\"bulk count exceeds dated count\")\n     local_inputs = ("
+reason = "bulk_months returns only calendar months whose count is strictly greater than three times the nonnegative calendar median. A missing month has zero, so cannot exceed that nonnegative threshold. Every returned flag is therefore present in national_counts, and dict.get never reads its default. Changing or omitting that default cannot affect a count or refusal."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -43,7 +43,7 @@\n     flags = bulk_months({key: Decimal(value) for key, value in national_counts.items()})\n     included = sum(cancel_counts.values())\n     excluded = sum(value for key, value in cancel_counts.items() if key not in flags)\n-    flagged = sum(national_counts.get(key, 0) for key in flags)\n+    flagged = sum(national_counts.get(key, ) for key in flags)\n     if flagged > dated_cancellations:\n         raise ValueError(\"bulk count exceeds dated count\")\n     local_inputs = ("
+reason = "bulk_months returns only calendar months whose count is strictly greater than three times the nonnegative calendar median. A missing month has zero, so cannot exceed that nonnegative threshold. Every returned flag is therefore present in national_counts, and dict.get never reads its default. Changing or omitting that default cannot affect a count or refusal."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -43,7 +43,7 @@\n     flags = bulk_months({key: Decimal(value) for key, value in national_counts.items()})\n     included = sum(cancel_counts.values())\n     excluded = sum(value for key, value in cancel_counts.items() if key not in flags)\n-    flagged = sum(national_counts.get(key, 0) for key in flags)\n+    flagged = sum(national_counts.get(key, 1) for key in flags)\n     if flagged > dated_cancellations:\n         raise ValueError(\"bulk count exceeds dated count\")\n     local_inputs = ("
+reason = "bulk_months returns only calendar months whose count is strictly greater than three times the nonnegative calendar median. A missing month has zero, so cannot exceed that nonnegative threshold. Every returned flag is therefore present in national_counts, and dict.get never reads its default. Changing or omitting that default cannot affect a count or refusal."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -24,7 +24,7 @@\n     for row in rows:\n         _trade(row)\n     require_aligned(\n-        tuple(row.value_row for row in rows), period=False\n+        tuple(row.value_row for row in rows), period=None\n     ) if rows else None\n     window = months[0] + \"..\" + months[-1]"
+reason = "B5 A22: require_aligned reads period only in if period and the period-set check. Both False and None are falsy, so both omit that check; the unit and geography checks do not depend on this value. Rows are snapshotted once and neither form changes them."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -106,7 +106,7 @@\n         if prior_rows is not None:\n             _months(prior_months)\n             if (\n-                not set(prior_months) <= set(complete_months)\n+                not set(prior_months) < set(complete_months)\n                 or prior_months[-1] >= months[0]\n             ):\n                 raise ValueError(\"incomplete or overlapping prior window\")"
+reason = "B5 public_methods R14: the subset forms differ only if prior_months and complete_months have equal sets. The earlier current-month subset check then places all twelve distinct current months in the twelve prior months. Their sets are equal; _months requires consecutive ascending sequences, so their order is equal too. prior_months[-1] >= months[0] is then true in both forms and raises the same incomplete or overlapping prior window refusal. On every other input the subset predicates agree."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -10,6 +10,6 @@\n     magnitude = abs(scaled.numerator)\n     denominator = scaled.denominator\n     whole = (2 * magnitude + denominator) // (2 * denominator)\n-    sign = int(scaled < 0 and whole != 0)\n+    sign = int(scaled <= 0 and whole != 0)\n     digits = tuple(int(c) for c in str(whole))\n     return format(Decimal((sign, digits, -places)), \"f\")"
+reason = "scaled is a Fraction. The predicates differ only at scaled == 0; then magnitude is zero and whole is zero, so the common whole != 0 conjunct is false. The sign and all output characters are identical for every finite input."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -12,4 +12,4 @@\n     whole = (2 * magnitude + denominator) // (2 * denominator)\n     sign = int(scaled < 0 and whole != 0)\n     digits = tuple(int(c) for c in str(whole))\n-    return format(Decimal((sign, digits, -places)), \"f\")\n+    return format(Decimal((sign, digits, -places)), \"F\")"
+reason = "The Decimal constructed from sign, integer digits and exponent is always finite. Decimal fixed-point f and F differ only in capitalization of non-finite values; neither emits an exponent for finite values. Invalid construction raises before formatting in both forms."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -1,6 +1,6 @@\n def weighted_mean(groups: Mapping[str, Group]) -> tuple[Fraction, Fraction]:\n     \"\"\"Return paid workers and their weighted mean, without rounding.\"\"\"\n-    with localcontext(CALC_CONTEXT):\n+    with localcontext(None):\n         for workers_count, wage in groups.values():\n             finite(workers_count)\n             finite(wage)"
+reason = "weighted_mean admits only finite built-in Decimals. Its comparisons are exact; to_integral_value does not signal rounding, and its equality-to-original test has the same truth value under every rounding mode (true exactly for integral counts). All sums, products and division use Fraction. No Decimal rounding operation depends on this local context; neither local context leaks flags."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -2,7 +2,7 @@\n     before: Mapping[str, Group], after: Mapping[str, Group]\n ) -> dict[str, Fraction]:\n     \"\"\"Unrounded Kitagawa split. Display rounding is `decomposition`'s job.\"\"\"\n-    with localcontext(CALC_CONTEXT):\n+    with localcontext(None):\n         if before.keys() != after.keys():\n             raise ValueError(\"different groups\")\n         n0, mean0 = map(exact, weighted_mean(before))"
+reason = "_kitagawa gets Fraction worker totals and means from weighted_mean, which has its own context and rejects empty or zero totals. Every subsequent arithmetic operand is Fraction or int, including the conservation comparison and fixed composition sum. No Decimal arithmetic reads the replaced outer context."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -22,8 +22,7 @@\n                 Fraction(before[g][0]) / n0 * Fraction(after[g][1])\n                 for g in sorted(before)\n             ),\n-            Fraction(0),\n-        )\n+            )\n         return {\n             \"mean_before_unrounded\": mean0,\n             \"mean_after_unrounded\": mean1,"
+reason = "Reaching fixed_mean requires positive worker totals from weighted_mean, hence at least one group. Every summand is a Fraction. Starting the nonempty sum with int zero or Fraction zero produces the same Fraction on the first addition and thereafter. Empty groups fail before this sum, so an empty int sum cannot escape."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -80,7 +80,7 @@\n     kind = before_rows[0][1].geography_kind\n     period = after_rows[0][1].period\n \n-    base_period = before_rows[0][1].period\n+    base_period = before_rows[0][2].period\n \n     def money(name: str, value: Fraction) -> CalculationFact:\n         return emit("
+reason = "pairs calls require_aligned on all workers and wages before base_period is selected. Measure validates period as a built-in string. Worker index 1 and wage index 2 therefore hold equal period strings within that year's rows; the same base period reaches every emitted fact."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -119,7 +119,7 @@\n     change = exact[\"change_unrounded\"]\n     mean0 = exact[\"mean_before_unrounded\"]\n     mean1 = exact[\"mean_after_unrounded\"]\n-    with localcontext(CALC_CONTEXT):\n+    with localcontext(None):\n         mix_share = exact[\"mix_unrounded\"] / change * 100 if change != 0 else None\n         fixed = exact[\"fixed_composition_change_unrounded\"]\n         fixed_percent = ratio(fixed, mean0) * 100"
+reason = "The typed decomposition arithmetic here is exclusively Fraction arithmetic from _kitagawa and ratio. emit rounds through integer/Fraction arithmetic and exact Decimal construction, and validates finite values with exact comparisons. Counting populated groups uses integer sums and exact Decimal construction. Neither branch performs context-sensitive Decimal arithmetic under this outer context."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -2,7 +2,7 @@\n     rows: Sequence[tuple[Decimal, Decimal, str]],\n ) -> tuple[Fraction | None, int, int]:\n     \"\"\"Return QAR/kg, other-unit count and non-positive-kg count (PUB-45).\"\"\"\n-    with localcontext(CALC_CONTEXT):\n+    with localcontext(None):\n         value, weight = Fraction(0), Fraction(0)\n         other, missing = 0, 0\n         for qar, kg, unit in rows:"
+reason = "unit_value admits finite built-in Decimal cells before comparisons, which are exact. Values and weights are converted to Fraction before accumulation and division; other and missing are integer counters. Decimal zero comparisons and final Fraction comparisons do not round. The outer local context cannot change returned values or refusals."
+
+[[survivors]]
+module = "core/src/eii_core/calc/facts.py"
+mutation = "--- src/eii_core/calc/facts.py\n+++ src/eii_core/calc/facts.py\n@@ -138,7 +138,7 @@\n             base_geography_kind=before.geography_kind,\n         )\n \n-    with localcontext(CALC_CONTEXT):\n+    with localcontext(None):\n         delta = subtract(value1, value0)\n         places = before.places\n         if places is None:"
+reason = "compare_public_facts delegates approximate subtraction and division to subtract/divide, each with its own CALC_CONTEXT. compare uses exact Fractions; emit uses rounded's Fraction/integer operations and exact Decimal construction. Rebuilt Measures and replaced facts only validate finite values and metadata; no context-sensitive Decimal arithmetic remains in this outer context."
+
+[[survivors]]
+module = "core/src/eii_core/calc/facts.py"
+mutation = "--- src/eii_core/calc/facts.py\n+++ src/eii_core/calc/facts.py\n@@ -7,7 +7,7 @@\n         if isinstance(change, BandComparison) or isinstance(\n             change.ratio, (NoData, Suppressed)\n         ):\n-            return True, Decimal(0), change.metric_key\n+            return True, Decimal(1), change.metric_key\n         value = change.ratio_unrounded\n         if not isinstance(value, (Decimal, Fraction)) or type(value) not in (\n             Decimal,"
+reason = "For a missing ratio or band, key returns the same constant for every such row. ordered handles missing-versus-numeric before comparing scores. Between two missing rows compare sees equal exact Decimals (both zero or both one), returns zero, and the names decide. The constant never escapes the local key or changes comparisons."
+
+[[survivors]]
+module = "core/src/eii_core/calc/facts.py"
+mutation = "--- src/eii_core/calc/facts.py\n+++ src/eii_core/calc/facts.py\n@@ -30,7 +30,7 @@\n         missing0, score0, name0 = key(left)\n         missing1, score1, name1 = key(right)\n         if missing0 != missing1:\n-            return 1 if missing0 else -1\n+            return 2 if missing0 else -1\n         order = compare(score0, score1)\n         return order if order else (name0 > name1) - (name0 < name1)"
+reason = "ordered is used only through cmp_to_key by sorted; only whether its result is negative controls ordering. Changing its missing-left result from positive one to positive two preserves that sign for every pair, including every stable tie."
+
+[[survivors]]
+module = "core/src/eii_core/calc/facts.py"
+mutation = "--- src/eii_core/calc/facts.py\n+++ src/eii_core/calc/facts.py\n@@ -30,7 +30,7 @@\n         missing0, score0, name0 = key(left)\n         missing1, score1, name1 = key(right)\n         if missing0 != missing1:\n-            return 1 if missing0 else -1\n+            return 1 if missing0 else -2\n         order = compare(score0, score1)\n         return order if order else (name0 > name1) - (name0 < name1)"
+reason = "ordered is used only through cmp_to_key by sorted; only whether its result is negative controls ordering. Changing its numeric-left/missing-right result from negative one to negative two preserves that sign for every pair."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -5,7 +5,7 @@\n     population_count = _whole(population, \"count\")\n     count(licence_count)\n     count(population_count)\n-    with localcontext(CALC_CONTEXT):\n+    with localcontext(None):\n         density = ratio(Fraction(licence_count) * 10000, Fraction(population_count))\n     return _show(\n         density,"
+reason = "licence_density converts validated integer counts to Fraction before multiplication and ratio. The changed context surrounds only exact Fraction arithmetic; _show is outside it and independently uses exact output rounding. No caller precision, rounding or traps can affect this block."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -23,7 +23,7 @@\n     if local > local_all or national > national_all:\n         raise ValueError(\"activity count exceeds all activities\")\n     inputs = (local_row, local_all_row, national_row, national_all_row)\n-    with localcontext(CALC_CONTEXT):\n+    with localcontext(None):\n         share = ratio(Decimal(national), Decimal(national_all))\n         local_share = ratio(Decimal(local), Decimal(local_all))\n         if share == 0:"
+reason = "location_quotient's shares and quotient are Fractions. wilson owns CALC_CONTEXT for a non-rational root, and divide owns it for approximate interval endpoints. _show/emit round through Fractions and integer arithmetic. The replaced outer context performs no rounded Decimal operation, including the low-count branch."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -82,7 +82,7 @@\n             ),\n         )\n \n-    with localcontext(CALC_CONTEXT):\n+    with localcontext(None):\n         incl = ratio(Decimal(included), Decimal(active))\n         excl = ratio(Decimal(excluded), Decimal(active))\n         return {"
+reason = "licence_churn computes incl and excl with ratio as Fractions and scales them by integer 100. Wilson owns its approximate-root context; interval display uses exact rounding. Counts are int-to-Decimal conversions, and bulk share is Fraction arithmetic. No context-sensitive Decimal operation depends on this outer context."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -16,7 +16,7 @@\n     if private_employed > employed:\n         raise ValueError(\"private employed exceeds employed\")\n     inputs = (private_row, employed_row)\n-    with localcontext(CALC_CONTEXT):\n+    with localcontext(None):\n         low, high = wilson(private_employed, employed)\n         return {\n             \"percent\": _show("
+reason = "coverage_share gets Fraction percentages from ratio and multiplies by integer 100. wilson supplies either exact endpoints or approximate endpoints computed inside its own CALC_CONTEXT; _show/emit round these through Fractions. The outer context changes no arithmetic or refusal."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -55,7 +55,7 @@\n             raise ValueError(\"negative import value\")\n         grouped.setdefault(row.origin, []).append(row)\n     readings = tuple(cell for row in rows for cell in (row.value_row, row.weight_row))\n-    with localcontext(CALC_CONTEXT):\n+    with localcontext(None):\n         total = sum((Fraction(row.value) for row in rows), Fraction(0))\n         if total == 0:\n             return NoData(\"no_denominator\")"
+reason = "supplier_metrics converts monetary values to Fractions before totals, shares, HHI and trend arithmetic. unit_value also uses Fractions. Counts use exact int-to-Decimal construction; show/emit use exact rounding. All prior and current monetary validation compares finite values exactly; no operation depends on this outer context."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -56,7 +56,7 @@\n         grouped.setdefault(row.origin, []).append(row)\n     readings = tuple(cell for row in rows for cell in (row.value_row, row.weight_row))\n     with localcontext(CALC_CONTEXT):\n-        total = sum((Fraction(row.value) for row in rows), Fraction(0))\n+        total = sum((Fraction(row.value) for row in rows), )\n         if total == 0:\n             return NoData(\"no_denominator\")\n         origins: dict[str, dict[str, object]] = {}"
+reason = "An empty current row tuple gives either int zero or Fraction zero, both equal zero and immediately return the same NoData. A nonempty sum consists only of Fraction terms, so adding the first term to either zero gives the identical Fraction, including its type. No empty sum is returned."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -63,7 +63,7 @@\n         hhi = Fraction(0)\n         for origin in sorted(grouped):\n             values = grouped[origin]\n-            share = sum((Fraction(row.value) for row in values), Fraction(0)) / total\n+            share = sum((Fraction(row.value) for row in values), ) / total\n             uv, other, nonpositive = unit_value(\n                 [(row.value, row.weight, row.unit) for row in values]\n             )"
+reason = "Each grouped origin is created by appending a row, so values is nonempty. Each summed value is Fraction; adding the first term to int zero or Fraction zero produces the same Fraction. total is a nonzero Fraction. The resulting share and all derived fields are identical."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -121,7 +121,7 @@\n                 finite(row.value)\n                 if row.value < 0:\n                     raise ValueError(\"negative import value\")\n-            prior = sum((Fraction(row.value) for row in prior_rows), Fraction(0))\n+            prior = sum((Fraction(row.value) for row in prior_rows), )\n             trend = NoData(\"no_denominator\")\n             if prior > 0:\n                 trend_unrounded = (total - prior) / prior"
+reason = "For nonempty prior_rows every term is Fraction and either zero start yields the same Fraction. For empty prior_rows, int zero and Fraction zero both fail prior > 0; trend stays NoData and trend_unrounded stays None. The local prior value never otherwise escapes."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_methods.py"
+mutation = "--- src/eii_core/calc/public_methods.py\n+++ src/eii_core/calc/public_methods.py\n@@ -42,7 +42,7 @@\n         national_after.reading,\n         *(row.reading for row in rows),\n     )\n-    with localcontext(CALC_CONTEXT):\n+    with localcontext(None):\n         national = ratio(national_after.value, national_before.value)\n         if national <= 0:\n             raise ValueError(\"non-positive national ratio\")"
+reason = "zone_momentum gets national, present, ratios and relative levels through ratio as Fractions. Sorting negates Fractions and compares integer or text zone keys. Decimal comparisons against the fixed floor are exact, and output goes through exact emit rounding. There is no context-sensitive Decimal arithmetic in this outer block."
+
+[[survivors]]
+module = "core/src/eii_core/calc/sector_economics.py"
+mutation = "--- src/eii_core/calc/sector_economics.py\n+++ src/eii_core/calc/sector_economics.py\n@@ -62,7 +62,7 @@\n             for row in (component.value, component.group_total)\n         ),\n     )\n-    with localcontext(CALC_CONTEXT):\n+    with localcontext(None):\n         compensation = ratio(\n             ratio(Fraction(compensation_value) * 1000, Decimal(int(employee_count))),\n             productivity_value,"
+reason = "sector_norms converts compensation and surplus to Fraction before scaling by 1000 and ratio; outputs scale Fractions by 100. Components use ratio times Fraction(group percentage). Finite percentage comparisons are exact, and _percent/emit use exact rounding and exact Decimal construction. No arithmetic in the replaced outer context depends on Decimal precision or traps."
 
 [[survivors]]
 module = "custodian/src/eii_custodian/publicdata/stage.py"
