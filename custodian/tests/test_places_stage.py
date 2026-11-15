@@ -698,7 +698,6 @@ def _store(cache: Path, source_entry: object, body: bytes) -> None:
         source_modified="",
         row_count=None,
         terms_sha256="",
-        switched_off=False,
     )
     commit_pair(cache / source_entry.key, digest, source_entry.extension, body, receipt)
 

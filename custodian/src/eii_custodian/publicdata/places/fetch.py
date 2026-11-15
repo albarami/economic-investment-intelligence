@@ -104,7 +104,6 @@ def fetch_place_file(
         source_modified="",
         row_count=None,
         terms_sha256="",
-        switched_off=False,
     )
     commit_pair(
         cache_directory(cache, entry.key),

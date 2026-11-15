@@ -101,7 +101,6 @@ def _store(cache: Path, source: Entry, body: bytes) -> None:
         source_modified="",
         row_count=None,
         terms_sha256="",
-        switched_off=False,
     )
     commit_pair(directory, digest, source.extension, body, receipt)
 
