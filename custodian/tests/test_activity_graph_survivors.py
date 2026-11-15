@@ -22,7 +22,6 @@ from eii_custodian.publicdata.review.activity import (
 from eii_custodian.publicdata.review.graph import (
     AllowlistRow,
     GraphError,
-    GraphRefused,
     build_graph,
     parse_place_categories,
     read_allowlist,
@@ -382,18 +381,20 @@ def test_release_without_cls_isic4_names_the_missing_source() -> None:
 
 
 def test_release_of_the_real_registry_names_the_unreleased_title() -> None:
-    """Release mode names the unreleased cls_isic4 title."""
+    """Release mode builds the real registry, including the classification source."""
     activity = _activity("5610001")
-    _refuses(
-        lambda: build_graph(
-            _spine(activity),
-            (activity,),
-            (),
-            (),
-            (),
-            load_registry(),
-            mode="release",
-        ),
-        "cls_isic4 title is not released",
-        GraphRefused,
+    graph = build_graph(
+        _spine(activity),
+        (activity,),
+        (),
+        (),
+        (),
+        load_registry(),
+        mode="release",
     )
+    assert [node.node_id for node in graph.nodes] == [
+        "activity:5610001",
+        "activity_class:UNMAPPABLE",
+        "source:cls_isic4",
+        "source:lic_active",
+    ]

@@ -65,11 +65,10 @@ def sidecar_for(
     source_modified: str,
     row_count: int | None,
     terms_sha256: str,
-    switched_off: bool,
     portal_licence: str = "",
     portal_licence_url: str = "",
 ) -> dict[str, object]:
-    """Build the section 3.1 sidecar. Empty optionals are JSON null."""
+    """Build the section 3.1 sidecar. switched_off is always false."""
     return {
         "source_id": entry.source_id,
         "key": entry.key,
@@ -87,6 +86,8 @@ def sidecar_for(
         "portal_licence": portal_licence or None,
         "portal_licence_url": portal_licence_url or None,
         "terms_sha256": terms_sha256 or None,
+        "terms_words": entry.terms_words,
+        "terms_read_on": entry.terms_read_on,
         "decision_record": entry.decision_record or None,
         "public_splits": list(entry.public_splits),
         "commit_allowed": entry.commit_allowed,
@@ -101,7 +102,7 @@ def sidecar_for(
         "reconciliation": entry.reconciliation,
         "release_tables": list(entry.release_tables),
         "caveat_keys": list(entry.caveat_keys),
-        "switched_off": switched_off,
+        "switched_off": False,
     }
 
 

@@ -278,5 +278,4 @@ def _sidecar(
         source_modified=PINNED_RELEASE,
         row_count=None,
         terms_sha256=terms_text_sha256(terms) if terms else "",
-        switched_off=False,
     )

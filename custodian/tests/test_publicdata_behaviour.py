@@ -8,11 +8,17 @@ import json
 import sys
 from dataclasses import replace
 from pathlib import Path
+from typing import cast
 
 import pytest
 from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
+from eii_custodian.publicdata.fetch.kinds import (
+    _terms_fingerprint,
+    prepare,
+    read_terms_page,
+)
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.terms_text import (
@@ -36,10 +42,10 @@ TERMS = "https://fdiprojects.invest.qa/terms"
 OTHER = (
     "https://www.data.qa/api/explore/v2.1/catalog/datasets/planted-slug/exports/json"
 )
-
 REPO = repository_root(Path(__file__))
-if str(REPO / "scripts") not in sys.path:
-    sys.path.insert(0, str(REPO / "scripts"))
+_SCRIPTS = REPO / "scripts"
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
 KEY_NAMES = ("EARTHDATA_API_KEY", "TOMTOM_API_KEY")
 
 
@@ -81,6 +87,8 @@ def _entry() -> Entry:
         extension="pbf",
         landing_url=FILE_URL,
         licence_url="https://creativecommons.org/licenses/by/4.0/",
+        terms_words="invented terms words for a test",
+        terms_read_on="2026-11-14",
     )
 
 
@@ -136,6 +144,11 @@ def test_receipt_records_url_publisher_licence_retrieval_and_hash(
     assert side["licence_url"] == "https://creativecommons.org/licenses/by/4.0/"
     assert side["fetch_url"] == FILE_URL
     assert side["retrieved_utc"] == "2026-11-13T08:00:00Z"
+    assert side["terms_words"] == entry.terms_words
+    assert side["terms_read_on"] == entry.terms_read_on
+    assert side["licence_basis"] == entry.licence_basis
+    assert side["decision_record"] is None
+    assert side["switched_off"] is False
     assert (tmp_path / "planted" / f"{digest}.pbf").read_bytes() == body
 
 
@@ -253,59 +266,193 @@ def test_portal_publisher_or_licence_mismatch_stores_nothing(tmp_path: Path) -> 
     assert failure.check == "licence_mismatch"
 
 
-def test_missing_publisher_or_licence_stores_nothing(tmp_path: Path) -> None:
-    """An empty publisher or an empty licence is a failed check and stores nothing."""
+def test_missing_publisher_stores_nothing(tmp_path: Path) -> None:
+    """An empty publisher is a failed check and stores nothing, on every basis."""
     entry = replace(_entry(), kind="portal_dataset", extension="json", url=PORTAL)
+    owned = replace(
+        entry,
+        licence_basis="owner_decision",
+        decision_record="0026",
+    )
 
     def no_publisher(url: str) -> Response:
         payload = {"metas": {"default": {"publisher": "", "license": "CC BY 4.0"}}}
         return _ok(url, json.dumps(payload).encode("utf-8"))
 
-    failure = fetch_entry(entry, no_publisher, tmp_path, _clock, _sleep)
-    assert failure is not None
-    assert failure.check == "publisher_missing"
+    for row, folder in ((entry, tmp_path / "dataset"), (owned, tmp_path / "owned")):
+        failure = fetch_entry(row, no_publisher, folder, _clock, _sleep)
+        assert failure is not None
+        assert failure.check == "publisher_missing"
+        assert [path for path in folder.rglob("*") if path.is_file()] == []
 
-    def no_licence(url: str) -> Response:
+
+def _portal_without_licence(url: str) -> Response:
+    if url == META:
         payload = {
             "metas": {"default": {"publisher": "Planted publisher", "license": ""}}
         }
         return _ok(url, json.dumps(payload).encode("utf-8"))
-
-    failure = fetch_entry(entry, no_licence, tmp_path, _clock, _sleep)
-    assert failure is not None
-    assert failure.check == "licence_missing"
+    return _ok(url, b"[]")
 
 
-def test_terms_that_forbid_the_use_switch_the_source_off(tmp_path: Path) -> None:
-    """Terms that forbid the use switch the source off, store nothing, and name it."""
+def test_owner_decision_portal_without_a_licence_is_stored(tmp_path: Path) -> None:
+    """A portal that names no licence still stores an owner_decision row."""
     entry = replace(
         _entry(),
-        key="fdi_projects",
-        source_id="fdi_projects",
+        kind="portal_dataset",
+        extension="json",
+        url=PORTAL,
+        licence_basis="owner_decision",
+        decision_record="0026",
+    )
+    assert fetch_entry(entry, _portal_without_licence, tmp_path, _clock, _sleep) is None
+    side = _sidecar(tmp_path)
+    assert side["portal_licence"] is None
+    assert side["portal_licence_url"] is None
+    assert side["licence_basis"] == "owner_decision"
+    assert side["decision_record"] == "0026"
+    assert side["terms_words"] == entry.terms_words
+    assert side["terms_read_on"] == entry.terms_read_on
+    assert side["switched_off"] is False
+    assert list((tmp_path / "planted").glob("*.json"))
+
+
+def test_portal_terms_without_a_licence_is_stored(tmp_path: Path) -> None:
+    """A portal that names no licence still stores a portal_terms row."""
+    entry = replace(
+        _entry(),
+        kind="portal_dataset",
+        extension="json",
+        url=PORTAL,
+        licence_basis="portal_terms",
+        decision_record="",
+    )
+    assert fetch_entry(entry, _portal_without_licence, tmp_path, _clock, _sleep) is None
+    side = _sidecar(tmp_path)
+    assert side["portal_licence"] is None
+    assert side["portal_licence_url"] is None
+    assert side["licence_basis"] == "portal_terms"
+    assert side["switched_off"] is False
+
+
+def test_provider_terms_portal_without_a_licence_is_stored(tmp_path: Path) -> None:
+    """A portal that names no licence still stores a provider_terms row."""
+    entry = replace(
+        _entry(),
+        kind="portal_dataset",
+        extension="json",
+        url=PORTAL,
+        licence_basis="provider_terms",
+        decision_record="",
+    )
+    assert fetch_entry(entry, _portal_without_licence, tmp_path, _clock, _sleep) is None
+    side = _sidecar(tmp_path)
+    assert side["portal_licence"] is None
+    assert side["portal_licence_url"] is None
+    assert side["licence_basis"] == "provider_terms"
+
+
+def test_empty_portal_licence_is_returned_as_empty_strings() -> None:
+    """A portal with no licence text returns empty licence fields, URL included."""
+    entry = replace(
+        _entry(),
+        kind="portal_dataset",
+        extension="json",
+        url=PORTAL,
+        licence_basis="owner_decision",
+        decision_record="0026",
+    )
+
+    def transport(url: str) -> Response:
+        if url == META:
+            payload = {
+                "metas": {
+                    "default": {
+                        "publisher": "Planted publisher",
+                        "license": "",
+                        "license_url": "https://www.data.gov.qa/planted-licence",
+                    }
+                }
+            }
+            return _ok(url, json.dumps(payload).encode("utf-8"))
+        return _ok(url, b"[]")
+
+    prepared = prepare(entry, transport, _sleep)
+    assert prepared.failure is None
+    assert prepared.portal_licence == ""
+    assert prepared.portal_licence_url == ""
+
+
+def test_dataset_portal_without_a_licence_fails(tmp_path: Path) -> None:
+    """A dataset row claims a stated open licence, so a missing one fails."""
+    entry = replace(_entry(), kind="portal_dataset", extension="json", url=PORTAL)
+    failure = fetch_entry(entry, _portal_without_licence, tmp_path, _clock, _sleep)
+    assert failure is not None
+    assert failure.code == 1
+    assert failure.url == META
+    assert failure.check == "licence_missing"
+    assert failure.expected == (
+        "text:CC BY url:https://creativecommons.org/licenses/by/4.0/"
+    )
+    assert failure.observed == "text: url:"
+    assert [path for path in tmp_path.rglob("*") if path.is_file()] == []
+
+
+def test_owner_decision_portal_licence_mismatch_stores_nothing(tmp_path: Path) -> None:
+    """A licence the portal names, when it differs, fails for owner_decision too."""
+    entry = replace(
+        _entry(),
+        kind="portal_dataset",
+        extension="json",
+        url=PORTAL,
+        licence_basis="owner_decision",
+        decision_record="0026",
+        publisher="Planted publisher",
+    )
+
+    def licence(url: str) -> Response:
+        payload = {
+            "metas": {
+                "default": {"publisher": "Planted publisher", "license": "closed"}
+            }
+        }
+        return _ok(url, json.dumps(payload).encode("utf-8"))
+
+    failure = fetch_entry(entry, licence, tmp_path, _clock, _sleep)
+    assert failure is not None
+    assert failure.check == "licence_mismatch"
+    assert [path for path in tmp_path.rglob("*") if path.is_file()] == []
+
+
+def test_forbidding_terms_leave_the_source_fetched_and_stored(tmp_path: Path) -> None:
+    """A terms page that forbids the use still stores the source, with no OWNER line."""
+    entry = replace(
+        _entry(),
+        key="planted_page",
+        source_id="planted_page",
         kind="terms_page",
         extension="html",
         url=PAGE,
         terms_url=TERMS,
         licence_basis="owner_decision",
-        decision_record="0017",
+        decision_record="0026",
         fetch_host="fdiprojects.invest.qa",
+        terms_watch=False,
     )
+    page = b"<html>invented</html>"
 
     def transport(url: str) -> Response:
         if url == TERMS:
             return _ok(url, b"The page forbids the use made here.")
-        return _ok(url, b"<html>invented</html>")
+        return _ok(url, page)
 
     outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
     assert outcome.failure is None
-    assert (
-        f"OWNER fdi_projects switched off: terms read at fetch forbid the use ({TERMS})"
-    ) in outcome.lines
-    assert [
-        path
-        for path in tmp_path.rglob("*")
-        if path.is_file() and path.name != "build-log.json"
-    ] == []
+    assert not any("OWNER" in line for line in outcome.lines)
+    stored = _stored_page(tmp_path, entry.key)
+    assert stored.read_bytes() == page
+    log = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    assert not any("OWNER" in line for line in log["lines"])
 
 
 def test_busy_gmaps_stays_on_when_terms_name_the_use(tmp_path: Path) -> None:
@@ -319,7 +466,7 @@ def test_busy_gmaps_stays_on_when_terms_name_the_use(tmp_path: Path) -> None:
         url=PAGE,
         terms_url=TERMS,
         licence_basis="owner_decision",
-        decision_record="0019",
+        decision_record="0026",
         nightly_live_fetch=False,
     )
 
@@ -331,131 +478,10 @@ def test_busy_gmaps_stays_on_when_terms_name_the_use(tmp_path: Path) -> None:
     assert fetch_entry(entry, transport, tmp_path, _clock, _sleep) is None
     side = _sidecar(tmp_path)
     assert side["switched_off"] is False
-    assert side["decision_record"] == "0019"
+    assert side["decision_record"] == "0026"
+    assert side["terms_words"] == entry.terms_words
+    assert side["terms_read_on"] == entry.terms_read_on
     assert isinstance(side["terms_sha256"], str) and side["terms_sha256"]
-
-
-FORBID_PHRASE = (
-    "should not be copied or modified or re-produced in whole or in part without"
-)
-
-
-def test_recorded_phrase_switches_the_source_off_and_the_build_continues(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
-) -> None:
-    """A terms fixture holding the phrase switches that row off and the next row is fetched."""
-    import commands.build_public as build_public
-
-    gated = replace(
-        _entry(),
-        key="fdi_projects",
-        source_id="fdi_projects",
-        kind="terms_page",
-        extension="html",
-        url=PAGE,
-        terms_url=TERMS,
-        terms_forbid=(FORBID_PHRASE,),
-        licence_basis="owner_decision",
-        decision_record="0017",
-        fetch_host="fdiprojects.invest.qa",
-        skip_reason="page_list_unconfirmed",
-    )
-    other = _entry()
-    terms_body = (
-        b"the material SHOULD\nnot be copied or modified or "
-        b"re-produced in whole or in part without:\npermission"
-    )
-    seen: list[str] = []
-
-    def transport(url: str) -> Response:
-        seen.append(url)
-        if url == TERMS:
-            return _ok(url, terms_body)
-        if url == FILE_URL:
-            return _ok(url, b"invented-bytes")
-        raise AssertionError(url)
-
-    def entries() -> tuple[Entry, ...]:
-        return (gated, other)
-
-    monkeypatch.setattr(build_public, "load_registry", entries)
-    monkeypatch.setattr(build_public, "utc_now", _clock)
-    code = build_public.run(tmp_path, {}, (), transport=transport, sleep=_sleep)
-    captured = capsys.readouterr()
-    owner = (
-        f"OWNER fdi_projects switched off: terms read at fetch forbid the use ({TERMS})"
-    )
-    assert code == 0
-    assert owner in captured.out
-    assert "SKIP " not in captured.out
-    assert seen == [TERMS, FILE_URL]
-    cache = tmp_path / "data" / "public_cache"
-    assert list(cache.glob("fdi_projects/**/*")) == []
-    assert list((cache / "planted").glob("*.pbf"))
-    loaded = json.loads((cache / "build-log.json").read_text(encoding="utf-8"))
-    assert loaded["terms"] == [
-        {
-            "key": "fdi_projects",
-            "reason": "terms read at fetch forbid the use",
-            "retrieved_utc": "2026-11-13T08:00:00Z",
-            "switched_off": True,
-            "terms_sha256": terms_text_sha256(terms_body),
-            "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
-            "terms_url": TERMS,
-        }
-    ]
-
-
-def test_terms_changed_since_they_were_read_switches_the_source_off(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
-) -> None:
-    """A terms fixture without the recorded phrase switches the source off."""
-    import commands.build_public as build_public
-
-    gated = replace(
-        _entry(),
-        key="investqa_pages",
-        source_id="investqa_pages",
-        kind="terms_page",
-        extension="html",
-        url=PAGE,
-        terms_url=TERMS,
-        terms_forbid=(FORBID_PHRASE,),
-        licence_basis="owner_decision",
-        decision_record="0017",
-        fetch_host="www.invest.qa",
-    )
-    seen: list[str] = []
-
-    def transport(url: str) -> Response:
-        seen.append(url)
-        if url == TERMS:
-            return _ok(url, b"These terms permit personal viewing only.")
-        raise AssertionError(url)
-
-    def entries() -> tuple[Entry, ...]:
-        return (gated,)
-
-    monkeypatch.setattr(build_public, "load_registry", entries)
-    monkeypatch.setattr(build_public, "utc_now", _clock)
-    code = build_public.run(tmp_path, {}, (), transport=transport, sleep=_sleep)
-    captured = capsys.readouterr()
-    assert code == 0
-    assert (
-        "OWNER investqa_pages switched off: terms changed since they were read; "
-        f"read them again ({TERMS})"
-    ) in captured.out
-    assert seen == [TERMS]
-    cache = tmp_path / "data" / "public_cache"
-    stored = [
-        path
-        for path in cache.rglob("*")
-        if path.is_file() and path.name != "build-log.json"
-    ]
-    assert stored == []
-    loaded = json.loads((cache / "build-log.json").read_text(encoding="utf-8"))
-    assert loaded["terms"][0]["reason"] == "terms changed since they were read"
-    assert loaded["terms"][0]["switched_off"] is True
 
 
 OLD_FORBIDDING_WORDS = (
@@ -496,6 +522,8 @@ def test_watched_row_with_the_old_forbidding_words_is_fetched(
             "terms_sha256": terms_text_sha256(OLD_FORBIDDING_WORDS),
             "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
             "terms_url": watched.terms_url,
+            "terms_words": watched.terms_words,
+            "terms_read_on": watched.terms_read_on,
         }
     ]
 
@@ -546,6 +574,8 @@ def test_changed_terms_hash_is_logged_and_the_row_is_still_fetched(
             "terms_sha256": terms_text_sha256(terms_body),
             "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
             "terms_url": watched.terms_url,
+            "terms_words": watched.terms_words,
+            "terms_read_on": watched.terms_read_on,
         }
     ]
 
@@ -556,6 +586,9 @@ def test_skipped_watched_row_hashes_terms_and_does_not_switch_off(
     """An unconfirmed watched row is still hashed, named on a change, and left off."""
     watched = _unconfirmed_watched()
     assert watched.terms_watch is True
+    assert watched.decision_record == "0026"
+    assert watched.terms_words.strip()
+    assert watched.terms_read_on
     assert watched.skip_reason != ""
     previous = {
         "lines": [],
@@ -600,6 +633,8 @@ def test_skipped_watched_row_hashes_terms_and_does_not_switch_off(
             "terms_sha256": terms_text_sha256(OLD_FORBIDDING_WORDS),
             "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
             "terms_url": watched.terms_url,
+            "terms_words": watched.terms_words,
+            "terms_read_on": watched.terms_read_on,
         }
     ]
 
@@ -618,14 +653,14 @@ def _unconfirmed_watched() -> Entry:
         basis_note="Owner decision recorded for this planted unconfirmed row.",
         fetch_host="www.invest.qa",
         landing_url="https://www.invest.qa/unconfirmed",
-        licence_basis="dataset",
-        decision_record="",
+        licence_basis="owner_decision",
+        decision_record="0026",
         skip_reason="page_list_unconfirmed",
     )
 
 
 def _watched_entry() -> Entry:
-    """A planted row that watches its terms page and is never switched off."""
+    """A planted row that watches its terms page. The flag changes nothing."""
     return replace(
         _entry(),
         key="watched_source",
@@ -635,8 +670,11 @@ def _watched_entry() -> Entry:
         url=PAGE,
         terms_url=TERMS,
         terms_watch=True,
+        licence_basis="owner_decision",
+        decision_record="0026",
         fetch_host="fdiprojects.invest.qa",
         landing_url=PAGE,
+        basis_note="planted watch",
     )
 
 
@@ -648,6 +686,385 @@ def _stored_page(folder: Path, key: str) -> Path:
     ]
     assert len(found) == 1
     return found[0]
+
+
+_FILE_TERMS = "https://www.data.gov.qa/planted-terms"
+_TERMS_ONE = b"<p>Invented terms sentence one.</p>"
+_TERMS_TWO = b"<p>Invented terms sentence two.</p>"
+
+
+def _file_with_terms(*, watch: bool = False) -> Entry:
+    return replace(
+        _entry(),
+        terms_url=_FILE_TERMS,
+        terms_watch=watch,
+        basis_note="planted note",
+    )
+
+
+def test_changed_terms_on_an_unwatched_file_are_stored_both_times(
+    tmp_path: Path,
+) -> None:
+    """A changed terms page prints TERMS and the file is stored on both builds."""
+    entry = _file_with_terms()
+    assert entry.terms_watch is False
+    bodies = {"terms": _TERMS_ONE}
+    seen: list[str] = []
+
+    def transport(url: str) -> Response:
+        seen.append(url)
+        if url == _FILE_TERMS:
+            return _ok(url, bodies["terms"])
+        if url == FILE_URL:
+            return _ok(url, b"invented-bytes")
+        raise AssertionError(url)
+
+    first = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    assert first.failure is None
+    assert not any(line.startswith("TERMS ") for line in first.lines)
+    assert _stored_page(tmp_path, entry.key).read_bytes() == b"invented-bytes"
+    bodies["terms"] = _TERMS_TWO
+    second = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    notice = f"TERMS {entry.key} changed since the last build ({_FILE_TERMS})"
+    assert second.failure is None
+    assert notice in second.lines
+    assert _stored_page(tmp_path, entry.key).read_bytes() == b"invented-bytes"
+    assert seen.count(FILE_URL) == 2
+    assert not any(line.startswith("OWNER ") for line in second.lines)
+
+
+def test_changed_terms_on_a_skipped_row_store_nothing(tmp_path: Path) -> None:
+    """A skipped row is fingerprinted, named on a change, and stores nothing."""
+    entry = replace(
+        _file_with_terms(),
+        skip_reason="publisher_or_schema_unconfirmed",
+    )
+    bodies = {"terms": _TERMS_ONE}
+    seen: list[str] = []
+
+    def transport(url: str) -> Response:
+        seen.append(url)
+        if url == _FILE_TERMS:
+            return _ok(url, bodies["terms"])
+        raise AssertionError(url)
+
+    first = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    assert first.failure is None
+    assert any(line.startswith("SKIP ") for line in first.lines)
+    assert not any(line.startswith("TERMS ") for line in first.lines)
+    bodies["terms"] = _TERMS_TWO
+    second = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    notice = f"TERMS {entry.key} changed since the last build ({_FILE_TERMS})"
+    assert second.failure is None
+    assert notice in second.lines
+    assert any(line.startswith(f"SKIP {entry.key} ") for line in second.lines)
+    stored = [
+        path
+        for path in tmp_path.rglob("*")
+        if path.is_file() and path.name != "build-log.json"
+    ]
+    assert stored == []
+    assert seen == [_FILE_TERMS, _FILE_TERMS]
+
+
+def test_terms_watch_changes_nothing(tmp_path: Path) -> None:
+    """Two rows equal but for terms_watch fetch and report the same way."""
+    plain = _file_with_terms(watch=False)
+    watched = _file_with_terms(watch=True)
+
+    def transport(url: str) -> Response:
+        if url == _FILE_TERMS:
+            return _ok(url, _TERMS_ONE)
+        if url == FILE_URL:
+            return _ok(url, b"invented-bytes")
+        raise AssertionError(url)
+
+    left = run_build((plain,), transport, tmp_path / "plain", _clock, _sleep)
+    right = run_build((watched,), transport, tmp_path / "watched", _clock, _sleep)
+    assert left.failure is None
+    assert right.failure is None
+    assert left.lines == right.lines
+
+
+def test_terms_host_off_the_allow_list_is_not_contacted(tmp_path: Path) -> None:
+    """An unlisted terms host is not passed to the transport, and the file is stored."""
+    terms_url = "https://evil.example/planted-terms"
+    entry = replace(_entry(), terms_url=terms_url)
+    seen: list[str] = []
+
+    def transport(url: str) -> Response:
+        seen.append(url)
+        return _ok(url, b"invented-bytes")
+
+    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    notice = (
+        f"TERMS {entry.key} not read: host evil.example is not on the allow-list"
+        f" ({terms_url})"
+    )
+    assert outcome.failure is None
+    assert notice in outcome.lines
+    assert seen == [FILE_URL]
+    assert _stored_page(tmp_path, entry.key).read_bytes() == b"invented-bytes"
+
+
+def test_terms_page_host_off_the_list_is_not_contacted(tmp_path: Path) -> None:
+    """A terms_page row does not pass an unlisted terms host to the transport."""
+    terms_url = "https://evil.example/planted-terms"
+    entry = replace(
+        _entry(),
+        kind="terms_page",
+        extension="html",
+        url=PAGE,
+        terms_url=terms_url,
+        fetch_host="fdiprojects.invest.qa",
+        landing_url=PAGE,
+    )
+    seen: list[str] = []
+
+    def transport(url: str) -> Response:
+        seen.append(url)
+        return _ok(url, b"<html>invented</html>")
+
+    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    notice = (
+        f"TERMS {entry.key} not read: host evil.example is not on the allow-list"
+        f" ({terms_url})"
+    )
+    assert outcome.failure is None
+    assert notice in outcome.lines
+    assert seen == [PAGE]
+    assert _stored_page(tmp_path, entry.key).read_bytes() == b"<html>invented</html>"
+    assert _sidecar(tmp_path)["terms_sha256"] is None
+
+
+def test_terms_redirect_off_the_list_does_not_fail_the_row(tmp_path: Path) -> None:
+    """A terms redirect to an unlisted host is named and does not fail the data."""
+    entry = _file_with_terms()
+    landed = "https://evil.example/landed"
+
+    def transport(url: str) -> Response:
+        if url == _FILE_TERMS:
+            return _ok(landed, b"terms", hops=(landed,))
+        if url == FILE_URL:
+            return _ok(url, b"invented-bytes")
+        raise AssertionError(url)
+
+    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    notice = f"TERMS {entry.key} not read: blocked_host ({_FILE_TERMS})"
+    assert outcome.failure is None
+    assert notice in outcome.lines
+    assert _stored_page(tmp_path, entry.key).read_bytes() == b"invented-bytes"
+    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    assert loaded["terms"] == []
+
+
+def test_terms_page_without_a_terms_url_stores_no_fingerprint(tmp_path: Path) -> None:
+    """A terms page with no terms address stores the page and an empty fingerprint."""
+    entry = replace(
+        _entry(),
+        kind="terms_page",
+        extension="html",
+        url=PAGE,
+        terms_url="",
+        fetch_host="fdiprojects.invest.qa",
+        landing_url=PAGE,
+    )
+
+    def transport(url: str) -> Response:
+        assert url == PAGE
+        return _ok(url, b"<html>invented</html>")
+
+    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    assert outcome.failure is None
+    assert not any(line.startswith("TERMS ") for line in outcome.lines)
+    assert _sidecar(tmp_path)["terms_sha256"] is None
+    assert _stored_page(tmp_path, entry.key).read_bytes() == b"<html>invented</html>"
+
+
+def test_terms_page_without_a_terms_url_has_no_unread_reason() -> None:
+    """No terms address leaves both the fingerprint and the unread check empty."""
+    entry = replace(
+        _entry(),
+        kind="terms_page",
+        extension="html",
+        url=PAGE,
+        terms_url="",
+        fetch_host="fdiprojects.invest.qa",
+        landing_url=PAGE,
+    )
+
+    def transport(url: str) -> Response:
+        assert url == PAGE
+        return _ok(url, b"<html>invented</html>")
+
+    prepared = prepare(entry, transport, _sleep)
+    assert prepared.failure is None
+    assert prepared.terms_sha256 == ""
+    assert prepared.terms_unread == ""
+
+
+def test_terms_page_unread_names_the_check_and_stores_no_hash(tmp_path: Path) -> None:
+    """An allow-listed terms address that cannot be read names that check."""
+    entry = replace(
+        _entry(),
+        kind="terms_page",
+        extension="html",
+        url=PAGE,
+        terms_url=_FILE_TERMS,
+        fetch_host="fdiprojects.invest.qa",
+        landing_url=PAGE,
+    )
+
+    def transport(url: str) -> Response:
+        if url == PAGE:
+            return _ok(url, b"<html>invented</html>")
+        if url == _FILE_TERMS:
+            raise TransportFault("unreachable", url)
+        raise AssertionError(url)
+
+    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    notice = f"TERMS {entry.key} not read: unreachable ({_FILE_TERMS})"
+    assert outcome.failure is None
+    assert notice in outcome.lines
+    assert _sidecar(tmp_path)["terms_sha256"] is None
+    assert _stored_page(tmp_path, entry.key).read_bytes() == b"<html>invented</html>"
+
+
+def test_unread_terms_page_returns_an_empty_fingerprint() -> None:
+    """A terms page that cannot be read returns an empty fingerprint with the failure."""
+    entry = replace(_entry(), terms_url=_FILE_TERMS)
+
+    def transport(url: str) -> Response:
+        raise TransportFault("unreachable", url)
+
+    page = read_terms_page(entry, transport, _sleep)
+    assert page.failure is not None
+    assert page.failure.check == "unreachable"
+    assert page.sha256 == ""
+
+
+def test_missing_terms_response_names_check_failed() -> None:
+    """No response and no failure is the unread check named check_failed."""
+    entry = replace(
+        _entry(),
+        kind="terms_page",
+        url=PAGE,
+        terms_url=TERMS,
+        fetch_host="fdiprojects.invest.qa",
+    )
+
+    def reader(url: str) -> Response:
+        assert url == TERMS
+        return cast(Response, None)
+
+    fingerprint, unread = _terms_fingerprint(entry, reader)
+    assert fingerprint == ""
+    assert unread == "check_failed"
+
+
+def test_skipped_row_retries_its_terms_page(tmp_path: Path) -> None:
+    """A skipped row still reads its terms page, and a failed attempt waits."""
+    entry = replace(
+        _entry(),
+        skip_reason="publisher_or_schema_unconfirmed",
+        terms_url=_FILE_TERMS,
+    )
+    slept: list[float] = []
+    attempts = {"n": 0}
+
+    def transport(url: str) -> Response:
+        assert url == _FILE_TERMS
+        attempts["n"] += 1
+        if attempts["n"] == 1:
+            raise TransportFault("unreachable", url)
+        return _ok(url, _TERMS_ONE)
+
+    def sleeper(seconds: float) -> None:
+        slept.append(seconds)
+
+    outcome = run_build((entry,), transport, tmp_path, _clock, sleeper)
+    assert outcome.failure is None
+    assert slept == [1.0]
+    assert f"SKIP {entry.key} {entry.skip_reason}" in outcome.lines
+    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    assert loaded["terms"][0]["terms_sha256"] == terms_text_sha256(_TERMS_ONE)
+    assert list(tmp_path.rglob("citation.json")) == []
+
+
+def test_unread_terms_page_does_not_fail_the_row(tmp_path: Path) -> None:
+    """A terms page that cannot be reached leaves the data stored and records no hash."""
+    entry = _file_with_terms()
+
+    def transport(url: str) -> Response:
+        if url == _FILE_TERMS:
+            raise TransportFault("unreachable", url)
+        if url == FILE_URL:
+            return _ok(url, b"invented-bytes")
+        raise AssertionError(url)
+
+    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    notice = f"TERMS {entry.key} not read: unreachable ({_FILE_TERMS})"
+    assert outcome.failure is None
+    assert notice in outcome.lines
+    assert _stored_page(tmp_path, entry.key).read_bytes() == b"invented-bytes"
+    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    assert loaded["terms"] == []
+
+
+def test_citation_only_with_a_terms_url_calls_nothing(tmp_path: Path) -> None:
+    """A citation row with a terms address makes no network call."""
+    entry = replace(
+        _entry(),
+        kind="citation_only",
+        extension="",
+        nightly_live_fetch=False,
+        url="https://www.ilo.org/resource/news/planted",
+        terms_url=_FILE_TERMS,
+    )
+
+    def transport(url: str) -> Response:
+        raise AssertionError(url)
+
+    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    assert outcome.failure is None
+    side = _sidecar(tmp_path)
+    assert side["sha256"] == "CITATION_ONLY"
+    assert side["switched_off"] is False
+    assert side["terms_words"] == entry.terms_words
+    assert side["terms_read_on"] == entry.terms_read_on
+
+
+def test_failed_check_records_the_reason_and_stores_nothing(tmp_path: Path) -> None:
+    """A failed check leaves no usable file and names the check in the lines and the log."""
+    entry = replace(
+        _entry(),
+        kind="portal_dataset",
+        extension="json",
+        url=PORTAL,
+        row_count_min=2,
+        row_count_max=2,
+    )
+
+    def one_row(url: str) -> Response:
+        if url == META:
+            payload = _portal_meta("Planted publisher")
+            return _ok(url, json.dumps(payload).encode("utf-8"))
+        return _ok(url, b"[{}]")
+
+    outcome = run_build((entry,), one_row, tmp_path, _clock, _sleep)
+    assert outcome.failure is not None
+    assert outcome.failure.check == "row_count"
+    assert any(
+        line.startswith("FAIL ") and "row_count" in line for line in outcome.lines
+    )
+    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    assert any("row_count" in line for line in loaded["lines"])
+    stored = [
+        path
+        for path in tmp_path.rglob("*")
+        if path.is_file() and path.name != "build-log.json"
+    ]
+    assert stored == []
 
 
 def test_short_total_row_count_schema_and_period(tmp_path: Path) -> None:
@@ -855,6 +1272,9 @@ def test_citation_only_writes_metadata_and_does_not_fetch(tmp_path: Path) -> Non
     side = _sidecar(tmp_path)
     assert side["sha256"] == "CITATION_ONLY"
     assert side["bytes"] == 0
+    assert side["terms_words"] == entry.terms_words
+    assert side["terms_read_on"] == entry.terms_read_on
+    assert side["switched_off"] is False
     assert (tmp_path / "planted" / "citation.json").is_file()
 
 
@@ -879,6 +1299,8 @@ def test_production_code_does_not_name_a_key(tmp_path: Path) -> None:
     """The fetch code does not name a key, and a planted value is absent from a receipt."""
     secret = "planted-token-value"
     for folder in (REPO / "custodian" / "src", REPO / "scripts" / "commands"):
+        assert folder.is_dir()
+        assert any(folder.rglob("*.py"))
         for path in folder.rglob("*.py"):
             text = path.read_text(encoding="utf-8")
             for name in KEY_NAMES:

@@ -509,7 +509,8 @@ def test_cls_isic4_registry_row_records_the_confirmed_address() -> None:
     assert row.skip_reason == ""
     assert row.row_count_min is None
     assert row.row_count_max is None
-    assert row.licence_basis == "none_stated"
+    assert row.licence_basis == "owner_decision"
+    assert row.decision_record == "0026"
     assert row.licence_id == "unconfirmed"
     assert row.commit_allowed is False
 

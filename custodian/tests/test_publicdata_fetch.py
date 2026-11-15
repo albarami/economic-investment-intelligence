@@ -2,10 +2,16 @@
 
 from __future__ import annotations
 
+import json
+from dataclasses import replace
 from pathlib import Path
 
-from eii_custodian.publicdata.fetch.build import fetch_entry
+from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+from eii_custodian.publicdata.fetch.terms_text import (
+    FINGERPRINT_VISIBLE_TEXT,
+    terms_text_sha256,
+)
 from eii_custodian.publicdata.fetch.transport import Response
 
 
@@ -46,6 +52,8 @@ def test_refuses_unlisted_host(tmp_path: Path) -> None:
         skip_reason="",
         extension="bin",
         landing_url="",
+        terms_words="invented terms words for a test",
+        terms_read_on="2026-11-14",
     )
     failure = fetch_entry(entry, transport, tmp_path, _clock, _sleep)
     assert failure is not None
@@ -95,3 +103,76 @@ def _clock() -> str:
 
 def _sleep(_seconds: float) -> None:
     return None
+
+
+def _citation_entry() -> Entry:
+    return replace(
+        next(entry for entry in load_registry() if entry.kind == "citation_only"),
+        key="planted_citation",
+        source_id="planted_citation",
+        terms_url="",
+        skip_reason="",
+    )
+
+
+def test_skipped_citation_writes_no_citation(tmp_path: Path) -> None:
+    entry = replace(_citation_entry(), skip_reason="publisher_or_schema_unconfirmed")
+
+    def transport(url: str) -> Response:
+        raise AssertionError(url)
+
+    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    assert f"SKIP {entry.key} {entry.skip_reason}" in outcome.lines
+    assert outcome.failure is None
+    assert not list(tmp_path.rglob("citation.json"))
+    assert not any("CITATION_ONLY" in line for line in outcome.lines)
+    log = json.loads((tmp_path / "build-log.json").read_text())
+    assert log["lines"] == list(outcome.lines)
+    assert log["terms"] == []
+
+
+def test_skipped_citation_fingerprints_terms_without_citation(tmp_path: Path) -> None:
+    entry = replace(
+        _citation_entry(),
+        skip_reason="publisher_or_schema_unconfirmed",
+        terms_url="https://www.data.gov.qa/planted-terms",
+    )
+    seen: list[str] = []
+    body = b"<p>Invented terms sentence one.</p>"
+
+    def transport(url: str) -> Response:
+        seen.append(url)
+        assert url == entry.terms_url
+        return Response(final_url=url, body=body, hops=())
+
+    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    assert seen == [entry.terms_url]
+    assert outcome.failure is None
+    assert f"SKIP {entry.key} {entry.skip_reason}" in outcome.lines
+    assert not list(tmp_path.rglob("citation.json"))
+    assert not any("CITATION_ONLY" in line for line in outcome.lines)
+    log = json.loads((tmp_path / "build-log.json").read_text())
+    assert log["lines"] == list(outcome.lines)
+    assert log["terms"] == [
+        {
+            "key": entry.key,
+            "retrieved_utc": _clock(),
+            "terms_sha256": terms_text_sha256(body),
+            "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
+            "terms_url": entry.terms_url,
+            "terms_words": entry.terms_words,
+            "terms_read_on": entry.terms_read_on,
+        }
+    ]
+
+
+def test_unskipped_citation_writes_citation_and_line(tmp_path: Path) -> None:
+    entry = _citation_entry()
+
+    def transport(url: str) -> Response:
+        raise AssertionError(url)
+
+    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    assert outcome.failure is None
+    assert f"PASS {entry.key} sha256=CITATION_ONLY host=" in outcome.lines
+    assert (tmp_path / entry.key / "citation.json").is_file()

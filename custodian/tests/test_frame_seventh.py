@@ -313,7 +313,6 @@ def seventh_build(tmp_path):
             source_modified="",
             row_count=None,
             terms_sha256="",
-            switched_off=False,
         )
         commit_pair(cache / source.key, digest, source.extension, body, receipt)
     return lambda: build_frame(cache, entries, review, tmp_path / "output")
@@ -578,7 +577,6 @@ def test_k1_live_unlisted_indicator_refuses_after_proposal(
         source_modified="",
         row_count=None,
         terms_sha256="",
-        switched_off=False,
     )
     commit_pair(folder, digest, source.extension, body, receipt)
 

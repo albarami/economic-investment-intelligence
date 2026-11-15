@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
 
-from eii_core.calc.public_series import Group, weighted_mean
+from eii_core.calc.public_series import Group, decimal_value, weighted_mean
 
 R1_SOURCES = frozenset({"sec_hr_ind", "sec_hr_goods", "sec_hr_serv", "sec_hr_size"})
 R2_SOURCES = frozenset({"wage_occ", "wage_act"})
@@ -139,8 +139,8 @@ def wage_evidence(
                 "year": year,
                 "wage_occ_workers": str(n_occ),
                 "wage_act_workers": str(n_act),
-                "wage_occ_mean": str(m_occ),
-                "wage_act_mean": str(m_act),
+                "wage_occ_mean": str(decimal_value(m_occ)),
+                "wage_act_mean": str(decimal_value(m_act)),
                 "equal_workers": n_occ == n_act,
             }
         )

@@ -3,6 +3,7 @@
 # traffic_tomtom_flow and traffic_tomtom_range have no row (PUB-95).
 # A paged_layer row requires layer: a non-negative integer ArcGIS layer id, with no default.
 # Any other kind refuses layer.
+# terms_words and terms_read_on: the publisher's own words, or the marker "terms to be read", and the date read or the date checked.
 sources:
   - key: "lic_active"
     source_id: "lic_active"
@@ -17,6 +18,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/moci-active-certificates-by-municipality-and-business-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/moci-active-certificates-by-municipality-and-business-activity/"
     nightly_live_fetch: true
     public_splits: []
@@ -50,6 +53,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/moci-canceled-certificates-by-municipality-and-business-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/moci-canceled-certificates-by-municipality-and-business-activity/"
     nightly_live_fetch: true
     public_splits: []
@@ -87,6 +92,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/moci-issued-certificates-by-municipality-and-business-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/moci-issued-certificates-by-municipality-and-business-activity/"
     nightly_live_fetch: true
     public_splits: []
@@ -124,6 +131,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/qatar-imports-2025-2026/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/qatar-imports-2025-2026/"
     nightly_live_fetch: true
     public_splits: []
@@ -173,6 +182,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/qatar-imports-2019-2024-copy/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/qatar-imports-2019-2024-copy/"
     nightly_live_fetch: true
     public_splits: []
@@ -220,6 +231,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-economic-indicators-in-hotels-and-restaurants-by-activity1/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-economic-indicators-in-hotels-and-restaurants-by-activity1/"
     nightly_live_fetch: true
     public_splits: []
@@ -275,6 +288,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-estimates-of-intermediate-goods-value-in-hotels-and-restaurants-by0/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-estimates-of-intermediate-goods-value-in-hotels-and-restaurants-by0/"
     nightly_live_fetch: true
     public_splits: []
@@ -316,6 +331,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-estimates-of-intermediate-services-value-in-hotels-and-restaurants0/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-estimates-of-intermediate-services-value-in-hotels-and-restaurants0/"
     nightly_live_fetch: true
     public_splits: []
@@ -357,6 +374,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-number-establishments-employees-by-size-of-establishment-economic-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-number-establishments-employees-by-size-of-establishment-economic-activity/"
     nightly_live_fetch: true
     public_splits: []
@@ -401,6 +420,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-estimates-of-compensation-in-hotels-and-restaurants-by-occupation1/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-estimates-of-compensation-in-hotels-and-restaurants-by-occupation1/"
     nightly_live_fetch: true
     public_splits: []
@@ -426,6 +447,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q1/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q1/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -465,6 +488,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -504,6 +529,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/workers-in-paid-employment-and-average-monthly-wage-by-gender-and-sector/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/workers-in-paid-employment-and-average-monthly-wage-by-gender-and-sector/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -514,7 +541,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "publisher_or_licence_unconfirmed"
+    skip_reason: "publisher_or_schema_unconfirmed"
     extension: "json"
   - key: "wage_bands_priv"
     source_id: "wage_bands_priv"
@@ -523,12 +550,14 @@ sources:
     title_en: "Average monthly wage for workers in the private sector"
     publisher: "to be confirmed at slice S2"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: "https://www.data.gov.qa/pages/license/annexes"
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/average-monthly-wage-q-r-for-workers-in-private-sector-in-qatar-2021-2025/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/average-monthly-wage-q-r-for-workers-in-private-sector-in-qatar-2021-2025/"
     nightly_live_fetch: true
     public_splits: []
@@ -539,7 +568,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "publisher_or_licence_unconfirmed"
+    skip_reason: "publisher_or_schema_unconfirmed"
     extension: "json"
   - key: "work_hours_act"
     source_id: "work_hours_act"
@@ -548,12 +577,14 @@ sources:
     title_en: "Employed persons and average work hours by gender and economic activity"
     publisher: "to be confirmed at slice S2"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: "https://www.data.gov.qa/pages/license/annexes"
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/employed-persons-15-years-and-above-and-average-work-hours-by-gender-and-economic-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/employed-persons-15-years-and-above-and-average-work-hours-by-gender-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -564,7 +595,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "publisher_or_licence_unconfirmed"
+    skip_reason: "publisher_or_schema_unconfirmed"
     extension: "json"
   - key: "util_elec"
     source_id: "util_elec"
@@ -579,6 +610,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/electricity-total-consumption-by-zone-number/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/electricity-total-consumption-by-zone-number/"
     nightly_live_fetch: true
     public_splits: []
@@ -610,6 +643,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/water-total-consumption-by-zone-number/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/water-total-consumption-by-zone-number/"
     nightly_live_fetch: true
     public_splits: []
@@ -635,6 +670,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/public-transport-users/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/public-transport-users/"
     nightly_live_fetch: true
     public_splits: []
@@ -672,6 +709,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/accommodation-data-by-segment-date-and-key-metrics-supply-demand-occupancy-adr-revpar/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/accommodation-data-by-segment-date-and-key-metrics-supply-demand-occupancy-adr-revpar/"
     nightly_live_fetch: true
     public_splits: []
@@ -697,6 +736,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/consumer-price-index-cpi-by-expenditure-group-monthly/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/consumer-price-index-cpi-by-expenditure-group-monthly/"
     nightly_live_fetch: true
     public_splits: []
@@ -707,7 +748,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "publisher_or_licence_unconfirmed"
+    skip_reason: "publisher_or_schema_unconfirmed"
     extension: "json"
   - key: "prop_sales"
     source_id: "prop_sales"
@@ -722,6 +763,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/weekly-real-estates-sales-bulletin/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/weekly-real-estates-sales-bulletin/"
     nightly_live_fetch: true
     public_splits: []
@@ -747,6 +790,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-and-labour-force-by-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/population-and-labour-force-by-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -772,6 +817,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-area-and-population-density-per-square-kilometers-by-zone/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/population-area-and-population-density-per-square-kilometers-by-zone/"
     nightly_live_fetch: true
     public_splits: []
@@ -797,6 +844,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-business-establishments-by-economic-activity-in-census-2010-2020/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-business-establishments-by-economic-activity-in-census-2010-2020/"
     nightly_live_fetch: true
     public_splits: []
@@ -829,6 +878,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-by-type-of-household-gender-and-place-of-residence-on-the-census-night-december-2020/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/population-by-type-of-household-gender-and-place-of-residence-on-the-census-night-december-2020/"
     nightly_live_fetch: true
     public_splits: []
@@ -848,12 +899,14 @@ sources:
     title_en: "Accident"
     publisher: "to be confirmed at slice S2"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: "https://www.data.gov.qa/pages/license/annexes"
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/accident/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/accident/"
     nightly_live_fetch: true
     public_splits: []
@@ -864,7 +917,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "publisher_or_licence_unconfirmed"
+    skip_reason: "publisher_or_schema_unconfirmed"
     extension: "json"
   - key: "census_2020_workbook"
     source_id: "census_2020_workbook"
@@ -873,12 +926,14 @@ sources:
     title_en: "Census 2020 detailed results workbook, Tables 1, 2, 151 and 152"
     publisher: "Planning and Statistics Authority"
     licence_id: "none-stated"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: "web.archive.org"
     url: "https://web.archive.org/web/20240422094401/https://www.psa.gov.qa/Style%20Library/PSA/CensusDetailedResults/documents/Qatar_Census_2022_Final_Results.xlsx"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://web.archive.org/web/20240422094401/https://www.psa.gov.qa/Style%20Library/PSA/CensusDetailedResults/documents/Qatar_Census_2022_Final_Results.xlsx"
     nightly_live_fetch: true
     public_splits: []
@@ -904,6 +959,8 @@ sources:
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/QAT/v1/100m/constrained/"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/QAT/v1/100m/constrained/"
     nightly_live_fetch: true
     public_splits: []
@@ -926,10 +983,12 @@ sources:
     licence_id: "none-stated"
     licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: "0017"
+    decision_record: "0026"
     fetch_host: "services7.arcgis.com"
     url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Population_by_Major_Economic_Sectors_by_Zone_2020_WFL1/FeatureServer"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Population_by_Major_Economic_Sectors_by_Zone_2020_WFL1/FeatureServer"
     nightly_live_fetch: true
     public_splits: []
@@ -952,10 +1011,12 @@ sources:
     licence_id: "none-stated"
     licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: "0017"
+    decision_record: "0026"
     fetch_host: "services7.arcgis.com"
     url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Employed_Population_by_Occupation_by_Zone_2020_WFL1/FeatureServer"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Employed_Population_by_Occupation_by_Zone_2020_WFL1/FeatureServer"
     nightly_live_fetch: true
     public_splits: []
@@ -978,10 +1039,12 @@ sources:
     licence_id: "none-stated"
     licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: "0017"
+    decision_record: "0026"
     fetch_host: "services7.arcgis.com"
     url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Residence_for_Households_by_Zone_2020_WFL1/FeatureServer"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Residence_for_Households_by_Zone_2020_WFL1/FeatureServer"
     nightly_live_fetch: true
     public_splits: []
@@ -1004,10 +1067,12 @@ sources:
     licence_id: "none-stated"
     licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: "0017"
+    decision_record: "0026"
     fetch_host: "services7.arcgis.com"
     url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Residence_for_Workers_Labourer_Groups_by_Zone_2020_WFL1/FeatureServer"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Residence_for_Workers_Labourer_Groups_by_Zone_2020_WFL1/FeatureServer"
     nightly_live_fetch: true
     public_splits: []
@@ -1030,10 +1095,12 @@ sources:
     licence_id: "none-stated"
     licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: "0017"
+    decision_record: "0026"
     fetch_host: "services7.arcgis.com"
     url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Population_2020_District_Level/FeatureServer"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Population_2020_District_Level/FeatureServer"
     nightly_live_fetch: true
     public_splits: []
@@ -1056,10 +1123,12 @@ sources:
     licence_id: "none-stated"
     licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: "0017"
+    decision_record: "0026"
     fetch_host: "services7.arcgis.com"
     url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Zone_Boundary_2020/FeatureServer"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Zone_Boundary_2020/FeatureServer"
     nightly_live_fetch: true
     public_splits: []
@@ -1082,10 +1151,12 @@ sources:
     licence_id: "none-stated"
     licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: "0017"
+    decision_record: "0026"
     fetch_host: "services7.arcgis.com"
     url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/District_2020/FeatureServer"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/District_2020/FeatureServer"
     nightly_live_fetch: true
     public_splits: []
@@ -1111,6 +1182,8 @@ sources:
     fetch_host: "data.humdata.org"
     url: "https://data.humdata.org/dataset/6a84f3b8-41cd-4769-a61f-6dbd5f61bd05/resource/1955adf8-4e4a-4a87-b3f0-0fbe6e761ca9/download/qat_admin_boundaries.geojson.zip"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://data.humdata.org/dataset/cod-ab-qat"
     nightly_live_fetch: true
     public_splits: []
@@ -1136,6 +1209,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/municipalities-in-qatar-2025/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/municipalities-in-qatar-2025/"
     nightly_live_fetch: true
     public_splits: []
@@ -1146,7 +1221,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "publisher_or_licence_unconfirmed"
+    skip_reason: "publisher_or_schema_unconfirmed"
     extension: "json"
   - key: "bnd_geob"
     source_id: "bnd_geob"
@@ -1161,6 +1236,8 @@ sources:
     fetch_host: "www.geoboundaries.org"
     url: "https://www.geoboundaries.org/api/current/gbOpen/QAT/ALL/"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.geoboundaries.org/api/current/gbOpen/QAT/ALL/"
     nightly_live_fetch: true
     public_splits: []
@@ -1186,6 +1263,8 @@ sources:
     fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
     url: "s3://overturemaps-us-west-2/release/2026-10-21.0/theme=places/type=place/"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://stac.overturemaps.org/2026-10-21.0/catalog.json"
     nightly_live_fetch: true
     public_splits: []
@@ -1211,6 +1290,8 @@ sources:
     fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
     url: "s3://overturemaps-us-west-2/release/2026-10-21.0/theme=buildings/"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "s3://overturemaps-us-west-2/release/2026-10-21.0/theme=buildings/"
     nightly_live_fetch: true
     public_splits: []
@@ -1236,6 +1317,8 @@ sources:
     fetch_host: "download.openstreetmap.fr"
     url: "https://download.openstreetmap.fr/extracts/asia/qatar-latest.osm.pbf"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://download.openstreetmap.fr/extracts/asia/qatar-latest.osm.pbf"
     nightly_live_fetch: true
     public_splits: []
@@ -1255,12 +1338,14 @@ sources:
     title_en: "ISIC Rev.4 structure (English titles)"
     publisher: "United Nations Statistics Division"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: "unstats.un.org"
     url: "https://unstats.un.org/unsd/classifications/Econ/Download/In%20Text/ISIC_Rev_4_english_structure.Txt"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://unstats.un.org/unsd/classifications/Econ"
     nightly_live_fetch: true
     public_splits: []
@@ -1284,12 +1369,14 @@ sources:
     title_en: "Qatar minimum wage (Law No. 17 of 2020), reference page"
     publisher: "International Labour Organization"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: ""
     url: "https://www.ilo.org/resource/news/qatar-adopts-non-discriminatory-minimum-wage"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.ilo.org/resource/news/qatar-adopts-non-discriminatory-minimum-wage"
     nightly_live_fetch: false
     public_splits: []
@@ -1309,12 +1396,14 @@ sources:
     title_en: "Wage Protection Systems in the Gulf Cooperation Council Countries, November 2025"
     publisher: "International Labour Organization"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: ""
     url: "https://www.ilo.org/sites/default/files/2025-11/ILO_Beirut_Wage-Protection_Report_R10.pdf"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.ilo.org/sites/default/files/2025-11/ILO_Beirut_Wage-Protection_Report_R10.pdf"
     nightly_live_fetch: false
     public_splits: []
@@ -1334,12 +1423,14 @@ sources:
     title_en: "Mobility study methodology v3"
     publisher: "Spanish Ministry of Transport"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: ""
     url: "https://ropenspain.github.io/spanishoddata/codebooks/mitma_-_estudio_movilidad_covid-19_informe_metodologico_v3_en.pdf"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://ropenspain.github.io/spanishoddata/codebooks/mitma_-_estudio_movilidad_covid-19_informe_metodologico_v3_en.pdf"
     nightly_live_fetch: false
     public_splits: []
@@ -1359,12 +1450,14 @@ sources:
     title_en: "Flexible working system for the government sector"
     publisher: "The Peninsula"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: ""
     url: "https://thepeninsulaqatar.com/article/04/09/2024/cgb-announces-flexible-remote-work-system-for-qatar-government-sector"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://thepeninsulaqatar.com/article/04/09/2024/cgb-announces-flexible-remote-work-system-for-qatar-government-sector"
     nightly_live_fetch: false
     public_splits: []
@@ -1384,12 +1477,14 @@ sources:
     title_en: "Services exempted from closure during Friday prayers"
     publisher: "The Peninsula"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: ""
     url: "https://thepeninsulaqatar.com/article/17/08/2025/over-10-services-in-qatar-exempted-from-closure-during-friday-prayers-gazette"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://thepeninsulaqatar.com/article/17/08/2025/over-10-services-in-qatar-exempted-from-closure-during-friday-prayers-gazette"
     nightly_live_fetch: false
     public_splits: []
@@ -1409,12 +1504,14 @@ sources:
     title_en: "Metro and tram service hours from 1 January"
     publisher: "Qatar Tribune"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: ""
     url: "https://qatar-tribune.com/article/156642/front/metro-tram-service-hours-extended-from-january-1"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://qatar-tribune.com/article/156642/front/metro-tram-service-hours-extended-from-january-1"
     nightly_live_fetch: false
     public_splits: []
@@ -1434,12 +1531,14 @@ sources:
     title_en: "Regulated outdoor summer working hours from 1 June"
     publisher: "The Peninsula"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: ""
     url: "https://www.thepeninsulaqatar.com/article/31/05/2026/regulated-outdoor-summer-working-hours-come-into-force-on-june-1-in-qatar"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.thepeninsulaqatar.com/article/31/05/2026/regulated-outdoor-summer-working-hours-come-into-force-on-june-1-in-qatar"
     nightly_live_fetch: false
     public_splits: []
@@ -1459,12 +1558,14 @@ sources:
     title_en: "Restriction on trucks and large buses within Doha"
     publisher: "The Peninsula"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: ""
     url: "https://thepeninsulaqatar.com/article/01/06/2024/restriction-on-movement-of-trucks-and-large-buses-within-doha:-traffic-department"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://thepeninsulaqatar.com/article/01/06/2024/restriction-on-movement-of-trucks-and-large-buses-within-doha:-traffic-department"
     nightly_live_fetch: false
     public_splits: []
@@ -1484,12 +1585,14 @@ sources:
     title_en: "Reduced public-sector hours during Ramadan"
     publisher: "Qatar News Agency"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: ""
     url: "https://qna.org.qa/en/News-Area/News/2026-2/16/qatar-sets-reduced-working-hours-for-public-sector-during-ramadan"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://qna.org.qa/en/News-Area/News/2026-2/16/qatar-sets-reduced-working-hours-for-public-sector-during-ramadan"
     nightly_live_fetch: false
     public_splits: []
@@ -1509,12 +1612,14 @@ sources:
     title_en: "Ramadan working hours for the private sector"
     publisher: "The Peninsula"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: ""
     url: "https://s.thepeninsula.qa/article/14/02/2026/ministry-of-labour-announces-ramadan-working-hours-for-private-sector"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://s.thepeninsula.qa/article/14/02/2026/ministry-of-labour-announces-ramadan-working-hours-for-private-sector"
     nightly_live_fetch: false
     public_splits: []
@@ -1534,12 +1639,14 @@ sources:
     title_en: "Metro and tram Ramadan hours"
     publisher: "The Peninsula"
     licence_id: "unconfirmed"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: ""
     url: "https://s.thepeninsula.qa/article/17/02/2026/doha-metro-and-lusail-tram-announce-operating-hours-in-ramadan"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://s.thepeninsula.qa/article/17/02/2026/doha-metro-and-lusail-tram-announce-operating-hours-in-ramadan"
     nightly_live_fetch: false
     public_splits: []
@@ -1559,12 +1666,14 @@ sources:
     title_en: "Doha Traffic Index 2025"
     publisher: "TomTom"
     licence_id: "proprietary"
-    licence_basis: "none_stated"
+    licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: ""
+    decision_record: "0026"
     fetch_host: ""
     url: "https://www.tomtom.com/traffic-index/city/doha/"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.tomtom.com/traffic-index/city/doha/"
     nightly_live_fetch: false
     public_splits: []
@@ -1590,6 +1699,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/weekly-residential-units-sales-bulletin/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/weekly-residential-units-sales-bulletin/"
     nightly_live_fetch: true
     public_splits: []
@@ -1615,6 +1726,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/visitors-of-museums-and-exhibition-by-month-and-museum/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/visitors-of-museums-and-exhibition-by-month-and-museum/"
     nightly_live_fetch: true
     public_splits: []
@@ -1640,6 +1753,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/phcc-patient-visits-by-health-center-and-region/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/phcc-patient-visits-by-health-center-and-region/"
     nightly_live_fetch: true
     public_splits: []
@@ -1665,6 +1780,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/total-building-permits-issued-by-municipality-and-type-of-building-type-of-permit/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/total-building-permits-issued-by-municipality-and-type-of-building-type-of-permit/"
     nightly_live_fetch: true
     public_splits: []
@@ -1690,6 +1807,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/total-building-completion-certificates-issued-by-municipality-and-type-of-building-type-of/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/total-building-completion-certificates-issued-by-municipality-and-type-of-building-type-of/"
     nightly_live_fetch: true
     public_splits: []
@@ -1715,6 +1834,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-daayen-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-daayen-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -1740,6 +1861,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-khor-and-al-thakhira-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-khor-and-al-thakhira-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -1765,6 +1888,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-rayyan-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-rayyan-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -1790,6 +1915,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-shahhaniya-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-shahhaniya-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -1815,6 +1942,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-shamal-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-shamal-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -1840,6 +1969,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -1865,6 +1996,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-doha-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-doha-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -1890,6 +2023,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-umm-slal-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-umm-slal-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -1915,6 +2050,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-two/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-two/"
     nightly_live_fetch: true
     public_splits: []
@@ -1940,6 +2077,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-wholesale-and-retail-trade-four-digits/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-wholesale-and-retail-trade-four-digits/"
     nightly_live_fetch: true
     public_splits: []
@@ -1965,6 +2104,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-transport/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-transport/"
     nightly_live_fetch: true
     public_splits: []
@@ -1990,6 +2131,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-social-and-personal-services-two-digits/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-social-and-personal-services-two-digits/"
     nightly_live_fetch: true
     public_splits: []
@@ -2015,6 +2158,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-energy/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-energy/"
     nightly_live_fetch: true
     public_splits: []
@@ -2040,6 +2185,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-one/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-one/"
     nightly_live_fetch: true
     public_splits: []
@@ -2065,6 +2212,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/establishments-employees-and-compensation-of-employees-by-economic-activity-business-services/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/establishments-employees-and-compensation-of-employees-by-economic-activity-business-services/"
     nightly_live_fetch: true
     public_splits: []
@@ -2090,6 +2239,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-basic-metals/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-basic-metals/"
     nightly_live_fetch: true
     public_splits: []
@@ -2115,6 +2266,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-basic-pharmaceutical-products-and-pharmaceutical-preparations/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-basic-pharmaceutical-products-and-pharmaceutical-preparations/"
     nightly_live_fetch: true
     public_splits: []
@@ -2140,6 +2293,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-beverages/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-beverages/"
     nightly_live_fetch: true
     public_splits: []
@@ -2165,6 +2320,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-chemicals-and-chemical-products/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-chemicals-and-chemical-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -2190,6 +2347,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-coke-and-refined-petroleum-products/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-coke-and-refined-petroleum-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -2215,6 +2374,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-computer-electronic-and-optical-products/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-computer-electronic-and-optical-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -2240,6 +2401,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-electrical-equipment/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-electrical-equipment/"
     nightly_live_fetch: true
     public_splits: []
@@ -2265,6 +2428,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-fabricated-metal-products-except-machinery-and-equipment/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-fabricated-metal-products-except-machinery-and-equipment/"
     nightly_live_fetch: true
     public_splits: []
@@ -2290,6 +2455,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-food-products/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-food-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -2315,6 +2482,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-furniture/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-furniture/"
     nightly_live_fetch: true
     public_splits: []
@@ -2340,6 +2509,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-leather-and-related-products/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-leather-and-related-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -2365,6 +2536,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-machinery-and-equipment-nec/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-machinery-and-equipment-nec/"
     nightly_live_fetch: true
     public_splits: []
@@ -2390,6 +2563,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-manufacture-of-wood-and-of-products-of-wood-and-cork-except-furniture-manufacture/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-manufacture-of-wood-and-of-products-of-wood-and-cork-except-furniture-manufacture/"
     nightly_live_fetch: true
     public_splits: []
@@ -2415,6 +2590,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-motor-vehicles-trailers-and-semi-trailers/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-motor-vehicles-trailers-and-semi-trailers/"
     nightly_live_fetch: true
     public_splits: []
@@ -2440,6 +2617,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-other-non-metallic-mineral-products/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-other-non-metallic-mineral-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -2465,6 +2644,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-other-transport-equipment/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-other-transport-equipment/"
     nightly_live_fetch: true
     public_splits: []
@@ -2490,6 +2671,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-paper-and-paper-products/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-paper-and-paper-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -2515,6 +2698,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-rubber-and-plastics-products/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-rubber-and-plastics-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -2540,6 +2725,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-textiles/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-textiles/"
     nightly_live_fetch: true
     public_splits: []
@@ -2565,6 +2752,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-wearing-apparel/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-wearing-apparel/"
     nightly_live_fetch: true
     public_splits: []
@@ -2590,6 +2779,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/main-manufacturing-products/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/main-manufacturing-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -2615,6 +2806,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/purchases-sales-and-stocks-during-the-year-by-type-of-trade-wholesale-and-retail-trade-all/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/purchases-sales-and-stocks-during-the-year-by-type-of-trade-wholesale-and-retail-trade-all/"
     nightly_live_fetch: true
     public_splits: []
@@ -2640,6 +2833,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-by-municipality-and-age-groups/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/population-by-municipality-and-age-groups/"
     nightly_live_fetch: true
     public_splits: []
@@ -2665,6 +2860,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-hotel-apartments-by-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-hotel-apartments-by-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -2690,6 +2887,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/annual-certificates-of-origin-by-type-and-importing-country/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/annual-certificates-of-origin-by-type-and-importing-country/"
     nightly_live_fetch: true
     public_splits: []
@@ -2715,6 +2914,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-previous-port/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-previous-port/"
     nightly_live_fetch: true
     public_splits: []
@@ -2740,6 +2941,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-registration-hamad-port0/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-registration-hamad-port0/"
     nightly_live_fetch: true
     public_splits: []
@@ -2765,6 +2968,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/distribution-of-business-establishments-and-employees-by-municipalities-according-to-census-2015/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/distribution-of-business-establishments-and-employees-by-municipalities-according-to-census-2015/"
     nightly_live_fetch: true
     public_splits: []
@@ -2790,6 +2995,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/female-population-and-labour-force-by-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/female-population-and-labour-force-by-municipality/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -2815,6 +3022,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/male-population-and-labour-force-by-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/male-population-and-labour-force-by-municipality/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -2840,6 +3049,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/employed-persons-15-years-and-above-by-gender-and-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/employed-persons-15-years-and-above-by-gender-and-municipality/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -2865,6 +3076,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/unemployed-persons-15-years-and-above-by-gender-and-municipality/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/unemployed-persons-15-years-and-above-by-gender-and-municipality/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -2890,6 +3103,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/females-population-by-municipality-and-age-groups-december-2020/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/females-population-by-municipality-and-age-groups-december-2020/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -2915,6 +3130,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/males-population-by-municipality-and-age-groups-december-2020/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/males-population-by-municipality-and-age-groups-december-2020/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -2940,6 +3157,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-females-15-years-and-above-by-age-group-and-economic-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-females-15-years-and-above-by-age-group-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -2965,6 +3184,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-males-15-years-and-above-by-age-group-and-economic-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-males-15-years-and-above-by-age-group-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -2990,6 +3211,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3015,6 +3238,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-non-qatari-males-15-years-and-above-by-occupation-and-economic-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-non-qatari-males-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3040,6 +3265,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-non-qatari-population-15-years-and-above-by-occupation-and-economic-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-non-qatari-population-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3065,6 +3292,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-qatari-females-15-years-and-above-by-occupation-and-economic-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-qatari-females-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3090,6 +3319,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-qatari-males-15-years-and-above-by-occupation-and-economic-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-qatari-males-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3115,6 +3346,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-qatari-population-15-years-and-above-by-occupation-and-economic-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-qatari-population-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3140,6 +3373,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3165,6 +3400,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-building/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-building/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3190,6 +3427,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-business/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-business/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3215,6 +3454,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3240,6 +3481,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy0/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy0/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3265,6 +3508,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy1/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy1/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3290,6 +3535,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-one/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-one/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3315,6 +3562,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3340,6 +3589,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social0/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social0/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3365,6 +3616,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social1/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social1/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3390,6 +3643,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/students-by-level-of-education-municipality-gender-type-of-education-and-nationality-2025-2026/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/students-by-level-of-education-municipality-gender-type-of-education-and-nationality-2025-2026/"
     nightly_live_fetch: true
     public_splits: ["sex", "nationality"]
@@ -3415,6 +3670,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotel-guests-by-nationality-hotel-rating-and-hotel-stays/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotel-guests-by-nationality-hotel-rating-and-hotel-stays/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -3440,6 +3697,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/visitor-arrivals-by-mode-of-entry/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/visitor-arrivals-by-mode-of-entry/"
     nightly_live_fetch: true
     public_splits: []
@@ -3465,6 +3724,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/visitor-arrivals-by-region/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/visitor-arrivals-by-region/"
     nightly_live_fetch: true
     public_splits: []
@@ -3490,6 +3751,8 @@ sources:
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/visitor-arrivals-trends-by-mode-of-transport-air-land-sea/exports/json"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/visitor-arrivals-trends-by-mode-of-transport-air-land-sea/"
     nightly_live_fetch: true
     public_splits: []
@@ -3511,11 +3774,13 @@ sources:
     licence_id: "publisher-terms"
     licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: "0017"
+    decision_record: "0026"
     basis_note: 'Owner decision of 2026-11-12: "This is a personal internal project: use both sources fully, no permission needed."'
     fetch_host: "fdiprojects.invest.qa"
     url: "https://fdiprojects.invest.qa/"
     terms_url: "https://www.invest.qa/en/terms-and-conditions?tab=terms-of-use"
+    terms_words: "Reproduction of these pages, whether in whole or in part, is only permissible with the prior written authorization of Investment Promotion Agency LLC. These pages are to be used for information purposes only"
+    terms_read_on: "2026-11-14"
     terms_watch: true
     landing_url: "https://fdiprojects.invest.qa/"
     nightly_live_fetch: true
@@ -3577,11 +3842,13 @@ sources:
     licence_id: "publisher-terms"
     licence_basis: "owner_decision"
     licence_url: ""
-    decision_record: "0017"
+    decision_record: "0026"
     basis_note: 'Owner decision of 2026-11-12: "This is a personal internal project: use both sources fully, no permission needed."'
     fetch_host: "www.invest.qa"
     url: "https://www.invest.qa/"
     terms_url: "https://www.invest.qa/en/terms-and-conditions?tab=terms-of-use"
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     terms_watch: true
     landing_url: "https://www.invest.qa/"
     nightly_live_fetch: true
@@ -3629,10 +3896,12 @@ sources:
     licence_id: "none-stated"
     licence_basis: "owner_decision"
     licence_url: "https://policies.google.com/terms"
-    decision_record: "0019"
+    decision_record: "0026"
     fetch_host: ""
     url: ""
     terms_url: ""
+    terms_words: "Terms of Service: \"using automated means to access content from any of our services in violation of the machine-readable instructions on our web pages\"; Maps additional terms: \"mass download or create bulk feeds of the content\""
+    terms_read_on: "2026-11-12"
     landing_url: "https://support.google.com/business/answer/6263531"
     nightly_live_fetch: false
     public_splits: []
@@ -3658,6 +3927,8 @@ sources:
     fetch_host: ""
     url: ""
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -3683,6 +3954,8 @@ sources:
     fetch_host: "data.source.coop"
     url: "https://data.source.coop/fused/fsq-os-places/"
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://data.source.coop/fused/fsq-os-places/"
     nightly_live_fetch: true
     public_splits: []
@@ -3708,6 +3981,8 @@ sources:
     fetch_host: ""
     url: ""
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -3733,6 +4008,8 @@ sources:
     fetch_host: ""
     url: ""
     terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://open-meteo.com/en/docs/historical-weather-api"
     nightly_live_fetch: true
     public_splits: []
@@ -3759,6 +4036,8 @@ sources:
     fetch_host: "data.source.coop"
     url: "https://data.source.coop/fused/fsq-os-places/2025-01-10/places/_metadata"
     terms_url: "https://data.source.coop/fused/fsq-os-places/README.md"
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-14"
     landing_url: "https://data.source.coop/fused/fsq-os-places/"
     nightly_live_fetch: true
     public_splits: []

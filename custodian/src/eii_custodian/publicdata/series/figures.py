@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 from urllib.parse import quote
 
 from eii_core.calc.public_series import (
+    C2_CALENDAR,
     ZERO,
     Group,
     bulk_months,
@@ -337,6 +338,8 @@ def compute_checks(
         }
         if len(chosen["sec_hr_ind"]) != 1:
             raise ValueError("sec_hr_ind: one restaurant indicator row required")
+        if not chosen["sec_hr_size"]:
+            raise ValueError("sec_hr_size: restaurant size rows required")
         indicator = chosen["sec_hr_ind"][0]
         checks["PUB-64"] = {
             "establishments": str(
@@ -445,6 +448,10 @@ def compute_checks(
         for row in data["lic_cancelled"]:
             year, month = row["sn_llg"], row["shhr_llg"]
             period = source_period("lic_cancelled", year, month) or "UNDATED"
+            if period != "UNDATED" and period not in C2_CALENDAR:
+                raise ValueError(
+                    "lic_cancelled period outside the C2 calendar: " + period
+                )
             cancellations[period] = cancellations.get(period, ZERO) + Decimal(
                 str(row["dd_lrkhs_lmlg"])
             )
@@ -513,11 +520,10 @@ def country_totals(rows: Sequence[dict[str, object]]) -> list[dict[str, object]]
                 "row_count": 0,
                 "value_qar": ZERO,
                 "weight_kg": ZERO,
-                "quantity": ZERO,
             },
         )
         total["row_count"] = int(str(total["row_count"])) + 1
-        for field in ("value_qar", "weight_kg", "quantity"):
+        for field in ("value_qar", "weight_kg"):
             total[field] = Decimal(str(total[field])) + Decimal(str(row[field]))
     return [totals[key] for key in sorted(totals)]
 

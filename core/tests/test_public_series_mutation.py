@@ -65,4 +65,5 @@ def test_bulk_months_includes_december_and_final_may() -> None:
 
 def test_bulk_months_excludes_june_after_calendar_end() -> None:
     """June 2025 lies outside C2's January 2015 through May 2025 calendar."""
-    assert bulk_months({"2025-06": D(1)}) == ()
+    with pytest.raises(ValueError, match=r"^invalid cancellation month/count$"):
+        bulk_months({"2025-06": D(1)})

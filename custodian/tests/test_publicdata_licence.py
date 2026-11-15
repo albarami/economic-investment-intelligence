@@ -56,6 +56,8 @@ def _entry() -> Entry:
         extension="json",
         landing_url=PORTAL,
         licence_url="https://www.data.gov.qa/pages/license/annexes",
+        terms_words="invented terms words for a test",
+        terms_read_on="2026-11-14",
     )
 
 

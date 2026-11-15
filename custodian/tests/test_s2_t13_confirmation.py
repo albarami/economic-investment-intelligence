@@ -50,6 +50,8 @@ REGISTRY_FIXTURE_BASE = Entry(
     skip_reason="",
     extension="json",
     landing_url="https://invented.invalid/",
+    terms_words="Invented terms words",
+    terms_read_on="2026-01-15",
     licence_url="",
 )
 
@@ -119,7 +121,6 @@ def receipt(t, entry):
         source_modified="",
         row_count=None,
         terms_sha256=t.terms_sha256,
-        switched_off=False,
     )
 
 
@@ -435,7 +436,7 @@ def test_forbidding_registry_terms_do_not_block_completion():
         decision_record="0026",
         go_live_permission_needed=True,
     )
-    e = replace(registry_record(t), terms_forbid=("Invented forbidding phrase",))
+    e = replace(registry_record(t), terms_words="Invented forbidding phrase")
     assert (
         completion_evidence(
             Confirmation(t, WeightConfirmation()), e, receipt(t, e)
@@ -528,7 +529,7 @@ def test_visitor_source_shown_for_every_terms_reading(tmp_path, outcome):
         registry_record(c.tender),
         licence_basis=c.tender.basis_of_use,
         decision_record=c.tender.decision_record,
-        terms_forbid=("Invented restriction",),
+        terms_words="Invented restriction",
     )
     assert c.tender.shown is True
     assert tender_disposition(c.tender, e, receipt(c.tender, e)).shown

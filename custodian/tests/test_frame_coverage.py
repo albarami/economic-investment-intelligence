@@ -281,7 +281,7 @@ def test_registry_pass_three_attribution_and_archive():
             if source == "est_census"
             else "cache_fields_unconfirmed; adapter_unavailable"
         )
-    assert entries["bnd_muni_2025"].skip_reason == "publisher_or_licence_unconfirmed"
+    assert entries["bnd_muni_2025"].skip_reason == "publisher_or_schema_unconfirmed"
 
 
 def test_archive_all_property_types_parent_codes_and_multipolygon():

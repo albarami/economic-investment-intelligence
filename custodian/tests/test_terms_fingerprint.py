@@ -91,6 +91,8 @@ def _watched() -> Entry:
         landing_url=PAGE,
         terms_watch=True,
         basis_note="planted watch",
+        terms_words="invented terms words for a test",
+        terms_read_on="2026-11-14",
     )
 
 
@@ -204,6 +206,8 @@ def _expect_second_receipt(
             "terms_sha256": _visible_sha256(sentence),
             "terms_fingerprint": "visible_text",
             "terms_url": watched.terms_url,
+            "terms_words": watched.terms_words,
+            "terms_read_on": watched.terms_read_on,
         }
     ]
 

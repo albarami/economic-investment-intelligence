@@ -474,6 +474,8 @@ licence_id: CC-BY-4.0          # one of the ids in section 4
 licence_basis: dataset         # dataset | portal_terms | owner_decision (personal, local project, PUB-12) | provider_terms (PUB-95, PUB-97)
 licence_url: https://www.data.gov.qa/pages/license/annexes
 terms_sha256: null             # hash of every source's terms or licence page: SHA-256 of the terms or licence page's normalised visible text (scripts, styles, comments and tags removed; entities decoded; white space collapsed; Unicode NFC). The build log records terms_fingerprint visible_text beside it; a previous raw-byte digest has no such kind and is not compared; its own wording and date read are recorded in document 04 (PUB-12)
+terms_words: "terms to be read" # the publisher's own words, or the marker `terms to be read` (PUB-12, decision 0026 item 3)
+terms_read_on: "2026-11-14"     # example value; the date read, or the date checked (PUB-12, decision 0026 item 3)
 decision_record: null          # owner_decision only: 0026, the personal, local basis; no per-source grant (PUB-12)
 public_splits: []              # split dimensions this Public source may carry: sex, nationality (PUB-90)
 commit_allowed: false          # true only for small derived configs and fixtures

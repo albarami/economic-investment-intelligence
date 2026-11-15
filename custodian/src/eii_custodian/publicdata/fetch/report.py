@@ -18,23 +18,19 @@ def fail_line(key: str, url: str, check: str, expected: str, observed: str) -> s
     return f"FAIL {key} {url} {check} expected={expected} observed={observed}"
 
 
-REASON_FORBID = "terms read at fetch forbid the use"
-REASON_CHANGED = "terms changed since they were read"
-
-
-def owner_line(key: str, terms_url: str) -> str:
-    """Return the owner-facing line when the terms read at fetch forbid the use."""
-    return f"OWNER {key} switched off: {REASON_FORBID} ({terms_url})"
-
-
-def owner_changed_line(key: str, terms_url: str) -> str:
-    """Return the owner-facing line when the terms no longer contain the recorded phrase."""
-    return f"OWNER {key} switched off: {REASON_CHANGED}; read them again ({terms_url})"
-
-
 def terms_changed_line(key: str, terms_url: str) -> str:
-    """Return the line when a watched terms page differs from the previous build."""
+    """Return the line when a terms page differs from the previous build."""
     return f"TERMS {key} changed since the last build ({terms_url})"
+
+
+def terms_host_line(key: str, host: str, terms_url: str) -> str:
+    """Return the advisory when a terms host is not on the allow-list."""
+    return f"TERMS {key} not read: host {host} is not on the allow-list ({terms_url})"
+
+
+def terms_unread_line(key: str, check: str, terms_url: str) -> str:
+    """Return the advisory when a terms page cannot be read."""
+    return f"TERMS {key} not read: {check} ({terms_url})"
 
 
 def citation_line(key: str) -> str:
