@@ -1,0 +1,34 @@
+name_en,iso3,human_reviewed,reason
+Bolivia,BOL,false,
+Burma,MMR,false,
+Cape Verde,CPV,false,
+Czech,CZE,false,
+GreenLand,GRL,false,
+Iran,IRN,false,
+Ivory Coast,CIV,false,
+Kazakstan,KAZ,false,
+LAOS : Lao People's Democratic Republic,LAO,false,
+Macau,MAC,false,
+Macedonia,MKD,false,
+Moldova,MDA,false,
+Netherlands,NLD,false,
+Palestine,PSE,false,
+Republic of Benin,BEN,false,
+Russia,RUS,false,
+South Korea,KOR,false,
+Syria,SYR,false,
+Taiwan,TWN,false,
+Tajikstan,TJK,false,
+Tanzania,TZA,false,
+Trinidad And Tobago,TTO,false,
+Turkey,TUR,false,
+Ukrania,UKR,false,
+United Kingdom,GBR,false,
+United States Of America,USA,false,
+Venezuela,VEN,false,
+Vietnam,VNM,false,
+Dominican,,false,ambiguous
+Kosovo,,false,no_code_in_reference
+Not Specified European Cont,,false,not_a_country
+Scotland,,false,part_of_a_country
+UAE Free Zones,,false,not_a_country

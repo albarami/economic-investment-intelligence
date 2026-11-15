@@ -653,7 +653,7 @@ editorial choice by the EII team, not an official classification.
 | ID | Requirement |
 |---|---|
 | PUB-41 | Each playbook activity has one basket in `custodian/publicdata/review/baskets.yaml` with at most eight inputs (estimate from research: three activities, eight inputs each). Each input lists its tariff lines, an inclusion reason, excluded lines with reasons, the supplier ISIC class for licensed wholesale depth (for example ISIC 4630), reviewer role and date. |
-| PUB-42 | Basket lines are defined at eight digits or finer, chosen from the dataset's own bilingual line descriptions. A 4-digit heading or 6-digit subheading is never a basket line. |
+| PUB-42 | At build time, every included or excluded basket line must be a twelve-digit code in the customs source of 2025 onward; each included bilingual description pair must equal a source pair for that code after trimming whitespace at both ends only. Every source line under the eight-digit parent of an included line must be listed in that input, included or excluded with a reason; an unseen line refuses with `basket_line_unreviewed`, naming activity, input and code. A code may appear only once inside one activity. |
 | PUB-43 | Tariff codes in committed files are written in dotted form (digit groups separated by dots) so no bare 8-digit or 11-digit token appears in the repository; the loader strips the dots. |
 | PUB-44 | For periods covered only by `cus_imp_2019` (8-digit), a 12-digit basket line rolls up to its 8-digit parent; if that parent also holds lines excluded from the basket, the earlier-period value is marked "includes excluded lines" or not shown. |
 | PUB-45 | Unit value is computed as value in QAR divided by net kg, only over rows with kg greater than zero, and labelled "calculated". Rows in other quantity units are counted separately and never converted. The valuation basis is shown as the source states it, or "not stated by the source". |
@@ -663,8 +663,8 @@ editorial choice by the EII team, not an official classification.
 the heading arrived at QAR 8.69 per kg and Saudi goods at QAR 11.45 (master design section 9), while
 a judge's query of the same heading found South Korean goods at QAR 19.56 per kg (feasibility judge,
 2026-11-11), consistent with noodles in the mix. A heading-level unit value therefore blends
-products. The Italian-restaurant basket lists only lines whose descriptions name pasta (dry, filled
-or fresh as the reviewer decides) and excludes lines that name instant noodles. The heading-level
+products. The Italian-restaurant basket records the reviewer's included and excluded lines;
+the build checks every input against the source under PUB-42, without a keyword gate. The heading-level
 8.69 and 11.45 are regression checks (section 10), never displayed figures.
 
 ## 8. Places, named public venues and real businesses

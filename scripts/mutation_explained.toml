@@ -1410,3 +1410,18 @@ reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 reso
 module = "evals/typed_decisions/requalify.py"
 mutation = "--- evals/typed_decisions/requalify.py\n+++ evals/typed_decisions/requalify.py\n@@ -165,7 +165,7 @@\n         result[\"calls_made\"] = observed.calls_made\n         result[\"tokens_used\"] = observed.tokens_used\n     path.parent.mkdir(parents=True, exist_ok=True)\n-    with path.open(\"x\", encoding=\"utf-8\") as stream:\n+    with path.open(\"x\", encoding=\"UTF-8\") as stream:\n         stream.write(canonical(committed_aggregate(result)) + \"\\n\")\n     print(state)\n     print("
 reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same encoder and bytes."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -1,3 +1,3 @@\n def rounded(value: Decimal, places: int) -> str:\n     \"\"\"Round once, half up, at the output boundary.\"\"\"\n-    return str(value.quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP))\n+    return str(value.quantize(Decimal(2).scaleb(-places), rounding=ROUND_HALF_UP))"
+reason = "Decimal.quantize uses the exponent of its second operand, not its coefficient. Decimal(1).scaleb(-places) and Decimal(2).scaleb(-places) supply the same exponent, so the returned rounded string is unchanged for the supported output places."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -1,5 +1,5 @@\n def weighted_mean(groups: Mapping[str, Group]) -> tuple[Decimal, Decimal]:\n     \"\"\"Return paid workers and their weighted mean, without rounding.\"\"\"\n-    workers = sum((count for count, _ in groups.values()), ZERO)\n+    workers = sum((count for count, _ in groups.values()), )\n     bill = sum((count * wage for count, wage in groups.values()), ZERO)\n     return workers, ratio(bill, workers)"
+reason = "For nonempty Decimal counts, sum starts with integer zero instead of Decimal zero; adding either zero to the first Decimal produces the same Decimal sum. For empty groups the workers total is zero in both versions and ratio refuses the non-positive denominator before weighted_mean returns. No returned value or refusal diagnostic changes."
+
+[[survivors]]
+module = "core/src/eii_core/calc/public_series.py"
+mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -1,5 +1,5 @@\n def weighted_mean(groups: Mapping[str, Group]) -> tuple[Decimal, Decimal]:\n     \"\"\"Return paid workers and their weighted mean, without rounding.\"\"\"\n     workers = sum((count for count, _ in groups.values()), ZERO)\n-    bill = sum((count * wage for count, wage in groups.values()), ZERO)\n+    bill = sum((count * wage for count, wage in groups.values()), )\n     return workers, ratio(bill, workers)"
+reason = "For nonempty groups every count-times-wage term is Decimal and adding integer zero or Decimal zero gives the same bill sum. For empty groups the workers total is Decimal zero and ratio refuses the non-positive denominator before the bill is divided or returned. No returned value or refusal diagnostic changes."
