@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import errno
 import json
 import os
 import re
@@ -12,6 +13,7 @@ import tempfile
 import tomllib
 import unittest
 from collections.abc import Mapping, Sequence
+from functools import partial
 from pathlib import Path
 from typing import cast
 from unittest.mock import patch
@@ -161,29 +163,39 @@ def observe(envdir: Path, work: Path, env: dict[str, str]) -> list[list[object]]
     return rows
 
 
-def _seed_copy(src: str, dst: str) -> str:
-    try:
-        os.link(src, dst)
-    except OSError:
-        shutil.copy2(src, dst)
+def _seed_copy(src: str, dst: str, *, linked: dict[tuple[int, int], str]) -> str:
+    stat = os.stat(src)
+    key = (stat.st_dev, stat.st_ino)
+    previous = linked.get(key)
+    if previous is not None:
+        os.link(previous, dst)
+    else:
+        try:
+            os.link(src, dst)
+        except OSError:
+            shutil.copy2(src, dst)
+        linked[key] = dst
     return dst
 
 
-def seed_cache(cache: Path) -> None:
-    """Seed a child uv cache from the local cache of the synced environment."""
-    proc = subprocess.run(
-        [UV, "cache", "dir"],
-        capture_output=True,
-        text=True,
-        timeout=60,
-        check=False,
-    )
-    if proc.returncode != 0:
-        raise RuntimeError(f"uv cache dir failed: {proc.stderr.strip()}")
+def seed_cache(cache: Path, source: Path | None = None) -> None:
+    """Preserve links; only the class seed reads the original uv cache."""
+    if source is None:
+        proc = subprocess.run(
+            [UV, "cache", "dir"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=False,
+        )
+        if proc.returncode != 0:
+            raise RuntimeError(f"uv cache dir failed: {proc.stderr.strip()}")
+        source = Path(proc.stdout.strip())
     shutil.copytree(
-        Path(proc.stdout.strip()),
+        source,
         cache,
-        copy_function=_seed_copy,
+        symlinks=True,
+        copy_function=partial(_seed_copy, linked={}),
         dirs_exist_ok=True,
     )
 
@@ -708,12 +720,61 @@ class ExpectedInstalledNames(unittest.TestCase):
         self.assertIn("ambiguous", str(caught.exception))
 
 
+class CacheSeeding(unittest.TestCase):
+    def test_seed_preserves_links_across_filesystems_and_children(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "source"
+            (source / "archive").mkdir(parents=True)
+            original = source / "archive" / "file"
+            original.write_text("invented cache entry", encoding="utf-8")
+            (source / "alias").hardlink_to(original)
+            (source / "directory-link").symlink_to("archive", target_is_directory=True)
+            (source / "file-link").symlink_to("archive/file")
+            first, second = root / "first", root / "second"
+            real_link = os.link
+
+            def cross_device_link(src: str, dst: str) -> None:
+                if Path(src).is_relative_to(source):
+                    raise OSError(errno.EXDEV, "invented cross-device link")
+                real_link(src, dst)
+
+            discoveries = [
+                subprocess.CompletedProcess([UV, "cache", "dir"], 0, str(folder), "")
+                for folder in (source, first)
+            ]
+            with (
+                patch.object(subprocess, "run", side_effect=discoveries),
+                patch.object(os, "link", side_effect=cross_device_link),
+                patch.object(shutil, "copy2", wraps=shutil.copy2) as copies,
+            ):
+                seed_cache(first)
+                seed_cache(second)
+            for child in (first, second):
+                for name, target in (
+                    ("directory-link", "archive"),
+                    ("file-link", "archive/file"),
+                ):
+                    self.assertTrue((child / name).is_symlink(), name)
+                    self.assertEqual(os.readlink(child / name), target)
+                    self.assertTrue((child / name).resolve().is_relative_to(child))
+                    self.assertTrue((child / name).exists())
+                self.assertTrue((child / "alias").samefile(child / "archive/file"))
+                self.assertEqual(
+                    (child / "archive/file").read_text(encoding="utf-8"),
+                    "invented cache entry",
+                )
+            self.assertTrue((first / "archive/file").samefile(second / "archive/file"))
+            self.assertEqual(copies.call_count, 1)
+
+
 class CleanEnvironment(unittest.TestCase):
     sync: subprocess.CompletedProcess[str]
     lock_before: bytes
     lock_after: bytes
     ws: Path
     cache: Path
+    seed: Path
     work: Path
     env: Path
     _tmp: tempfile.TemporaryDirectory[str]
@@ -723,6 +784,8 @@ class CleanEnvironment(unittest.TestCase):
         cls._tmp = tempfile.TemporaryDirectory()
         cls.addClassCleanup(cls._tmp.cleanup)
         base = Path(cls._tmp.name)
+        cls.seed = base / "seed"
+        seed_cache(cls.seed)
         cls.cache = base / "cache"
         cls.ws = base / "ws"
         cls.work = base / "work"
@@ -731,7 +794,7 @@ class CleanEnvironment(unittest.TestCase):
         cls.work.mkdir()
         cls.env = base / "env"
         copy_workspace(cls.ws)
-        seed_cache(cls.cache)
+        seed_cache(cls.cache, cls.seed)
         cls.lock_before = (cls.ws / "uv.lock").read_bytes()
         cls.sync = run(
             [UV, *SYNC_OFFLINE],
@@ -743,19 +806,19 @@ class CleanEnvironment(unittest.TestCase):
     def test_lock_is_current(self) -> None:
         cache = Path(self._tmp.name) / "lock-cache"
         cache.mkdir(exist_ok=True)
-        seed_cache(cache)
+        seed_cache(cache, self.seed)
         proc = run([UV, "lock", "--check", "--offline"], REPO_ROOT, child_env(cache))
         self.assertEqual(proc.returncode, 0, proc.stderr)
 
     def test_stale_lock_is_detected(self) -> None:
-        tmp = tempfile.TemporaryDirectory()
+        tmp = tempfile.TemporaryDirectory(dir=self._tmp.name)
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
         cache = root / "cache"
         ws = root / "ws"
         cache.mkdir()
         ws.mkdir()
-        seed_cache(cache)
+        seed_cache(cache, self.seed)
         copy_workspace(ws)
         root_toml = (ws / "pyproject.toml").read_text(encoding="utf-8")
         stripped, removed = re.subn(DEPENDENCY_GROUPS_TABLE, "", root_toml)
@@ -809,7 +872,7 @@ class CleanEnvironment(unittest.TestCase):
                 self.assertFalse(path.is_relative_to(src_repo))
 
     def test_bare_environment_cannot_import(self) -> None:
-        tmp = tempfile.TemporaryDirectory()
+        tmp = tempfile.TemporaryDirectory(dir=self._tmp.name)
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
         cache = root / "cache"
@@ -817,7 +880,7 @@ class CleanEnvironment(unittest.TestCase):
         work = root / "work"
         cache.mkdir()
         work.mkdir()
-        seed_cache(cache)
+        seed_cache(cache, self.seed)
         proc = run(
             [UV, "venv", "--python", "3.14", "--offline", str(bare)],
             root,
@@ -868,7 +931,7 @@ class CleanEnvironment(unittest.TestCase):
                 self.assertFalse(installed_names_equal(corrupted, expected))
 
     def test_hostile_surroundings_do_not_change_the_result(self) -> None:
-        tmp = tempfile.TemporaryDirectory()
+        tmp = tempfile.TemporaryDirectory(dir=self._tmp.name)
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
         cache = root / "cache"
@@ -893,9 +956,9 @@ class CleanEnvironment(unittest.TestCase):
             hostile,
         ):
             path.mkdir(parents=True)
-        seed_cache(cache)
-        seed_cache(cache2)
-        seed_cache(cache3)
+        seed_cache(cache, self.seed)
+        seed_cache(cache2, self.seed)
+        seed_cache(cache3, self.seed)
         copy_workspace(ws)
         copy_workspace(ws3)
         (hostile / "uv").mkdir()
@@ -990,7 +1053,7 @@ class CleanEnvironment(unittest.TestCase):
                 alone_count += 1
                 folder = root / f"alone-{name}"
                 folder.mkdir()
-                seed_cache(folder)
+                seed_cache(folder, self.seed)
                 merged = with_process_tmp(
                     {**snapshot, "UV_CACHE_DIR": str(folder), name: h[name]},
                     folder,
