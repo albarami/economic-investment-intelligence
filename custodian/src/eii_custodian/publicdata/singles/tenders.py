@@ -216,7 +216,7 @@ class TenderRow:
     """One release row of pub_tender. No internal integer and no tender number."""
 
     tender_key: str
-    buying_entity: str | None
+    buying_entity: str
     buying_entity_ar: str | None
     category: str | None
     category_ar: str | None
@@ -244,6 +244,7 @@ class MergeResult:
     rows: tuple[TenderRow, ...]
     one_language: int
     missing_period: int
+    missing_buying_entity: int = 0
 
 
 @dataclass(frozen=True)
@@ -619,6 +620,13 @@ def _interpret(card: RawCard, list_name: str, language: str) -> _Parsed:
     if pairs and size_label is not None and pairs[-1][0] == size_label:
         company = pairs[-1][1] or None
         pairs = pairs[:-1]
+    if language == "en" and not _labelled_value(pairs, labels.get("buying_entity", "")):
+        omitted = _values_by_label(
+            expected, labels, pairs, list_name, skip_field="buying_entity"
+        )
+        if company is not None:
+            omitted["company_size"] = company
+        return _Parsed(card.internal_id, list_name, language, card.title, omitted)
     if len(pairs) < len(expected):
         raise TenderError(f"{list_name} label {len(pairs) + 1}")
     if len(pairs) > len(expected):
@@ -637,6 +645,38 @@ def _interpret(card: RawCard, list_name: str, language: str) -> _Parsed:
     return _Parsed(card.internal_id, list_name, language, card.title, values)
 
 
+def _labelled_value(pairs: Sequence[tuple[str, str]], label: str) -> str:
+    """Return a non-blank value for label, or an empty string when it is absent."""
+    for name, value in pairs:
+        if name == label and value.strip():
+            return value.strip()
+    return ""
+
+
+def _values_by_label(
+    expected: Sequence[str],
+    labels: Mapping[str, str],
+    pairs: Sequence[tuple[str, str]],
+    list_name: str,
+    *,
+    skip_field: str,
+) -> dict[str, object]:
+    """Read the card by label. The skipped field is null and is not a page failure."""
+    values: dict[str, object] = {}
+    for index, field in enumerate(expected, start=1):
+        if field == skip_field:
+            values[field] = None
+            continue
+        wanted = labels.get(field)
+        if wanted is None:
+            raise TenderError(f"{list_name} label {index}")
+        found = next((value for name, value in pairs if name == wanted), None)
+        if found is None:
+            raise TenderError(f"{list_name} label {index}")
+        values[field] = _parse_field(field, found)
+    return values
+
+
 def _parse_field(field: str, raw: str) -> object:
     if field in _DATE_FIELDS:
         return parse_date(field, raw)
@@ -653,8 +693,12 @@ def _merge(cards: Sequence[_Parsed]) -> MergeResult:
         grouped.setdefault(card.internal_id, []).append(card)
     pending: list[tuple[int, TenderRow]] = []
     one_language = 0
+    missing_buying_entity = 0
     for internal in sorted(grouped):
         group = grouped[internal]
+        if not _as_text(_field_by_language(group, "buying_entity").get("en")):
+            missing_buying_entity += 1
+            continue
         languages = {card.language for card in group}
         if len(languages) == 1:
             one_language += 1
@@ -662,7 +706,7 @@ def _merge(cards: Sequence[_Parsed]) -> MergeResult:
         pending.append((internal, row))
     rows = assign_tender_keys(pending)
     missing = sum(1 for row in rows if row.period is None)
-    return MergeResult(rows, one_language, missing)
+    return MergeResult(rows, one_language, missing, missing_buying_entity)
 
 
 def _row_for(group: Sequence[_Parsed]) -> TenderRow:
@@ -675,9 +719,12 @@ def _row_for(group: Sequence[_Parsed]) -> TenderRow:
     entities = _field_by_language(group, "buying_entity")
     categories = _field_by_language(group, "category")
     kinds = _field_by_language(group, "tender_type")
+    buying_entity = _as_text(entities.get("en"))
+    if not buying_entity:
+        raise TenderError("missing_buying_entity")
     return TenderRow(
         tender_key="",
-        buying_entity=_as_text(entities.get("en")),
+        buying_entity=buying_entity,
         buying_entity_ar=_as_text(entities.get("ar")),
         category=_as_text(categories.get("en")),
         category_ar=_as_text(categories.get("ar")),
@@ -875,6 +922,7 @@ def _coverage(merged: MergeResult, readings: Sequence[ListReading]) -> str:
     parts = [
         f"one language {merged.one_language}",
         f"without publication date {merged.missing_period}",
+        f"missing_buying_entity {merged.missing_buying_entity}",
     ]
     for reading in readings:
         if reading.first_stated_last != reading.last_stated_last:

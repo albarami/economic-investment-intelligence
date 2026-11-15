@@ -6,6 +6,7 @@ import json
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 from urllib.parse import urlencode
 
 from eii_custodian.publicdata.fetch.allowlist import approve, host_of
@@ -15,6 +16,7 @@ from eii_custodian.publicdata.fetch.checks import (
     period_failure,
     schema_failure,
 )
+from eii_custodian.publicdata.fetch.receipts import cache_directory
 from eii_custodian.publicdata.fetch.registry import (
     COLLECTED_FAMILIES,
     Entry,
@@ -58,13 +60,17 @@ class Prepared:
     period_last: str = ""
     periods_observed: bool = False
     terms_unread: str = ""
+    coverage_note: str = ""
 
 
 TERMS_HOST_UNLISTED = "host_unlisted"
 
 
 def prepare(
-    entry: Entry, transport: Transport, sleep: Callable[[float], None]
+    entry: Entry,
+    transport: Transport,
+    sleep: Callable[[float], None],
+    cache: Path | None = None,
 ) -> Prepared:
     """Fetch one row through the transport seam and apply its declared checks."""
     reader = _reader(transport, sleep)
@@ -75,7 +81,7 @@ def prepare(
     if entry.kind == "terms_page":
         return _terms(entry, reader)
     if entry.kind == "paged_cards":
-        return _paged_cards(entry, sleep)
+        return _paged_cards(entry, sleep, cache)
     return _file(entry, reader)
 
 
@@ -248,7 +254,7 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
         return _failed(entry, measured)
     count = len(rows) if rows is not None else None
     try:
-        first, last, saw_periods = _observed_periods(entry, rows)
+        first, last, saw_periods, coverage_note = _observed_periods(entry, rows)
     except FamilyPeriodError as exc:
         return _failed(
             entry,
@@ -270,6 +276,7 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
         first,
         last,
         saw_periods,
+        coverage_note=coverage_note,
     )
 
 
@@ -286,7 +293,7 @@ def family_period_bounds(entry: Entry, rows: list[object]) -> tuple[str, str, st
     """Bounds, or a distinct-label count when a label does not parse.
 
     A missing or null label is a named refusal. The refusal carries no cell value.
-    A bare family field uses the date form of the recorded family bounds.
+    A family field without a declared form is a named refusal. It is not read as a date.
     """
     from eii_custodian.publicdata.additions.common import (
         AdditionError,
@@ -294,11 +301,10 @@ def family_period_bounds(entry: Entry, rows: list[object]) -> tuple[str, str, st
         parse_period_value,
     )
 
-    if "form=" in entry.period_field:
-        rule = parse_period_rule(entry.period_field)
-        field, form = rule.field, rule.form
-    else:
-        field, form = entry.period_field, "date"
+    if "form=" not in entry.period_field:
+        raise FamilyPeriodError(entry.source_id, "period_form")
+    rule = parse_period_rule(entry.period_field)
+    field, form = rule.field, rule.form
     labels: list[object] = []
     for row in rows:
         if not isinstance(row, dict) or field not in row:
@@ -317,7 +323,9 @@ def family_period_bounds(entry: Entry, rows: list[object]) -> tuple[str, str, st
     return ordered[0], ordered[-1], ""
 
 
-def _observed_periods(entry: Entry, rows: list[object] | None) -> tuple[str, str, bool]:
+def _observed_periods(
+    entry: Entry, rows: list[object] | None
+) -> tuple[str, str, bool, str]:
     """Observed bounds from the period rule. An unconfirmed field stays blank."""
     from eii_custodian.publicdata.additions.common import (
         FIELD_UNCONFIRMED,
@@ -327,16 +335,16 @@ def _observed_periods(entry: Entry, rows: list[object] | None) -> tuple[str, str
 
     if entry.source_id in COLLECTED_FAMILIES and rows is not None:
         if not entry.period_field:
-            return "", "", True
-        first, last, _note = family_period_bounds(entry, rows)
-        return first, last, True
+            return "", "", True, ""
+        first, last, note = family_period_bounds(entry, rows)
+        return first, last, True, note
     if "form=" not in entry.period_field or rows is None:
-        return "", "", False
+        return "", "", False, ""
     rule = parse_period_rule(entry.period_field)
     if rule.field == FIELD_UNCONFIRMED:
-        return "", "", True
+        return "", "", True, ""
     first, last = observe_period_bounds(rows, rule)
-    return first, last, True
+    return first, last, True, ""
 
 
 def _measure_failure(
@@ -433,7 +441,9 @@ def _paged_undeclared(entry: Entry, reader: Read) -> Prepared:
     return Prepared(body, final, host_of(final), entry.publisher, "", total, "", None)
 
 
-def _paged_cards(entry: Entry, sleep: Callable[[float], None]) -> Prepared:
+def _paged_cards(
+    entry: Entry, sleep: Callable[[float], None], cache: Path | None
+) -> Prepared:
     """Hand a paged-card row to the tender fetch. The file reader is not used."""
     from datetime import UTC, datetime
 
@@ -444,6 +454,7 @@ def _paged_cards(entry: Entry, sleep: Callable[[float], None]) -> Prepared:
         tender_https,
     )
 
+    page_cache = None if cache is None else cache_directory(cache, entry.key)
     try:
         _fetched = fetch_tenders(
             tender_https(entry, chain_file=CHAIN_PATH),
@@ -452,6 +463,7 @@ def _paged_cards(entry: Entry, sleep: Callable[[float], None]) -> Prepared:
             sleep=sleep,
             clock=lambda: datetime.now(UTC),
             host=entry.fetch_host,
+            cache=page_cache,
         )
     except TenderError as exc:
         return _failed(

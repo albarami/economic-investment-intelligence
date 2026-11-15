@@ -247,6 +247,15 @@ FAMILIES = frozenset(
 )
 
 
+def _period_column(period_field: str) -> str:
+    """The published column a period rule names. A bare field is that column."""
+    if "form=" not in period_field:
+        return period_field
+    from eii_custodian.publicdata.additions.common import parse_period_rule
+
+    return parse_period_rule(period_field).field
+
+
 def _fixture_entry():
 
     original = next(
@@ -265,7 +274,7 @@ def _fixture_entry():
         row_count_max=2,
         period_first="2020-01-01",
         period_last="2021-01-01",
-        period_field="year",
+        period_field="sit=row;form=date;field=year",
         terms_url="",
     )
 
@@ -362,8 +371,9 @@ def test_each_family_cache_and_receipt_preserve_published_shape(tmp_path):
             period_last="",
             terms_url="",
         )
-        if entry.period_field:
-            record[entry.period_field] = "2020-01-01"
+        column = _period_column(entry.period_field)
+        if column:
+            record[column] = "2020-01-01"
         records = [record]
         assert (
             fetch_entry(
@@ -386,7 +396,7 @@ def test_each_family_cache_and_receipt_preserve_published_shape(tmp_path):
         assert receipt["public_splits"] == list(entry.public_splits)
         assert receipt["terms_words"] == entry.terms_words
         assert receipt["terms_read_on"] == entry.terms_read_on
-        assert receipt["period_first"] == ("2020-01-01" if entry.period_field else None)
+        assert receipt["period_first"] == ("2020-01-01" if column else None)
         assert receipt["period_last"] == receipt["period_first"]
         assert receipt["bytes"] == len(body.read_bytes())
         assert receipt["switched_off"] is False
@@ -1105,7 +1115,8 @@ def test_missing_family_period_label_names_the_source_and_the_field(tmp_path):
     assert failure is not None
     text = " ".join((failure.check, failure.expected, failure.observed))
     assert entry.source_id in text
-    assert entry.period_field in text
+    # K6: the refusal names the column. The registry field is now the declared form.
+    assert "year" in text
     assert "invented" not in text
 
 
@@ -1219,3 +1230,50 @@ def test_legacy_untyped_portal_response_keeps_existing_fetch_behavior(
         )
         is None
     )
+
+
+def test_distinct_label_count_is_written_on_the_receipt(tmp_path):
+    """J14: when bounds are null, the receipt's coverage note counts distinct labels."""
+    row = next(item for item in _block() if item["source_id"] == "trade_ext")
+    registry = tmp_path / "registry.yaml"
+    registry.write_text(yaml.safe_dump({"sources": [row]}))
+    entry = replace(
+        load_registry(registry)[0],
+        source_id="hotel_ext",
+        key="hotel_ext/invented",
+        slug="invented",
+        publisher="Invented publisher",
+        url="https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/invented/exports/json",
+        columns=(("year", "string"), ("value", "number")),
+        row_count_min=2,
+        row_count_max=2,
+        period_first="",
+        period_last="",
+        terms_url="",
+    )
+    records = [{"year": "2020 Guests", "value": 1}, {"year": "2021 Nights", "value": 2}]
+    assert (
+        fetch_entry(
+            entry,
+            _transport(entry, records),
+            tmp_path,
+            lambda: "2026-11-15T00:00:00Z",
+            lambda _: None,
+        )
+        is None
+    )
+    receipt = json.loads(next(tmp_path.rglob("*.meta.json")).read_text())
+    assert receipt.get("coverage_note") == "distinct labels 2"
+
+
+def test_family_row_without_a_period_form_is_refused(tmp_path):
+    """A planted family row that names a period field and no form is refused."""
+    row = next(item for item in _block() if item["source_id"] == "trade_ext").copy()
+    row["key"] = "trade_ext/planted-no-form"
+    row["slug"] = "planted-no-form"
+    row["period_field"] = "year"
+    path = tmp_path / "registry.yaml"
+    path.write_text(yaml.safe_dump({"sources": [row]}))
+    with pytest.raises(RegistryError, match="trade_ext") as caught:
+        load_registry(path)
+    assert "period_form" in str(caught.value)

@@ -94,6 +94,12 @@ class _Fetched:
     terms_unread: str
 
 
+def _digest_pages(directory: Path) -> str:
+    """Hash the stored page files. An empty body is not one of them."""
+    chunks = [path.read_bytes() for path in sorted(directory.rglob("*.html"))]
+    return sha256_hex(b"".join(chunks))
+
+
 def utc_now() -> str:
     """Return the current UTC time as the retrieval timestamp."""
     return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -134,7 +140,7 @@ def _fetch_row(
         prepared = (
             prepare_grid(entry, transport, sleep, token)
             if entry.source_id in GRID_SOURCES
-            else prepare(entry, transport, sleep)
+            else prepare(entry, transport, sleep, cache=cache)
         )
     except OSError:
         return None, FetchFailure(
@@ -148,6 +154,17 @@ def _fetch_row(
             prepared.failure.check,
             prepared.failure.expected,
             prepared.failure.observed,
+        )
+    if entry.kind == "paged_cards" and prepared.body == b"":
+        return (
+            _Fetched(
+                _digest_pages(cache_directory(cache, entry.key)),
+                prepared.fetch_host,
+                clock(),
+                prepared.terms_sha256,
+                prepared.terms_unread,
+            ),
+            None,
         )
     digest = sha256_hex(prepared.body)
     retrieved = clock()
@@ -169,6 +186,7 @@ def _fetch_row(
             if prepared.periods_observed
             else None
         ),
+        coverage_note=prepared.coverage_note,
     )
     try:
         commit_pair(

@@ -33,7 +33,7 @@ def test_entry_matches_the_recorded_slug() -> None:
     entry = bank_credit_entry()
     assert entry.publisher == "National Planning Council"
     assert entry.licence_basis == "dataset"
-    assert entry.period_field == "year"
+    assert entry.period_field == "sit=row;form=date;field=year"
     assert entry.period_first == "2012-01-01"
     assert entry.period_last == "2022-01-01"
     assert entry.public_splits == ()

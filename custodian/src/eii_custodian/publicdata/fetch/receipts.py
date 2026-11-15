@@ -94,6 +94,7 @@ def sidecar_for(
     portal_licence: str = "",
     portal_licence_url: str = "",
     observed_periods: tuple[str, str] | None = None,
+    coverage_note: str = "",
 ) -> dict[str, object]:
     """Build the section 3.1 sidecar. switched_off is always false."""
     if observed_periods is None:
@@ -130,6 +131,7 @@ def sidecar_for(
         "period_last": period_last or None,
         "file": file_metadata(entry) or None,
         "row_count": row_count,
+        "coverage_note": coverage_note or None,
         "columns": [{"name": name, "type": kind} for name, kind in entry.columns],
         "reconciliation": entry.reconciliation,
         "release_tables": list(entry.release_tables),

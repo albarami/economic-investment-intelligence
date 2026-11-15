@@ -976,6 +976,17 @@ def test_confirmation_block_records_the_visitor_portal() -> None:
     assert tender.shown is True
     assert tender.release_tables == ("pub_tender",)
     assert tender.go_live_permission_needed is True
+    assert tender.page == "https://monaqasat.mof.gov.qa/"
+    assert (
+        tender.page_sha256
+        == "32bb9e85e12368d14fc668216a6bee0a35545f222b5a4299ff279900f28ad81d"
+    )
+    assert tender.terms_url == "https://monaqasat.mof.gov.qa/TermsOfUse"
+    assert (
+        tender.terms_sha256
+        == "ec2df975cce3f9b1a5212e45a10d96c83d2fe1fd890dc56777a278f7ac46b0a1"
+    )
+    assert tender.retrieved_utc == "2026-11-14T07:44:16Z"
     for path in (
         "/TendersOnlineServices/AvailableMinistriesTenders/<n>",
         "/TendersOnlineServices/ClosedTenders/<n>",
@@ -1193,3 +1204,117 @@ def test_committed_awarded_fixture_parses() -> None:
     assert merged.rows[0].title == "Invented title"
     assert merged.rows[0].bond_qar == Decimal("1234.50")
     assert merged.missing_period == 1
+
+
+def test_card_without_a_buying_entity_is_left_out_and_counted(tmp_path: Path) -> None:
+    """A card whose English read has no Ministry is omitted, not a failed fetch."""
+    _clock.step = 0  # type: ignore[attr-defined]
+    english_card = _awarded(internal=424201, title="Invented").replace(
+        '<span class="card-label"><label>Ministry</label></span>'
+        '<span class="card-title"><span>Invented Entity</span></span>',
+        "",
+    )
+    english = _awarded_page(english_card).encode()
+    arabic = _page(
+        _awarded(
+            internal=424201,
+            title="عنوان",
+            labels={
+                "award": "تاريخ الترسية",
+                "sector": "نوع القطاع المطلوب",
+                "bond": "التأمين المؤقت (رق)",
+                "documents": "قيمة الوثائق (رق)",
+                "entity": "الجهة",
+                "kind": "النوع",
+            },
+            notice="يمكن التظلم على قرار الترسية خلال 5 أيام عمل من اليوم التالي لتاريخ الترسية",
+        ),
+        lang="ar",
+        path="/TendersOnlineServices/AwardedTenders",
+        last_page=1,
+    ).encode()
+    url = f"{HOST}/TendersOnlineServices/AwardedTenders/1"
+    result, _slept = _run(
+        _Fake({(url, "en"): english, (url, "ar"): arabic}),
+        tmp_path,
+        lists=("awarded",),
+    )
+    assert result.rows == ()
+    assert "missing_buying_entity 1" in result.coverage_note
+
+
+def test_build_stores_each_tender_page_and_no_empty_body(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The build path keeps each fetched page and does not store an empty body."""
+    from dataclasses import replace
+
+    import yaml
+
+    from eii_custodian.publicdata.fetch.build import fetch_entry
+    from eii_custodian.publicdata.fetch.receipts import sha256_hex
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.fetch.transport import Response
+    from eii_custodian.publicdata.singles import tenders as tender_mod
+
+    chain, pin = _chain(tmp_path)
+    monkeypatch.setattr(tender_mod, "CHAIN_PATH", chain)
+    # Awarded is the list whose Arabic labels are recorded. The other five are J5.
+    monkeypatch.setattr(tender_mod, "LIST_PATHS", (("awarded", "AwardedTenders"),))
+    document = yaml.safe_load(
+        (ROOT / "custodian/publicdata/sources.yaml").read_text(encoding="utf-8")
+    )
+    row = next(item for item in document["sources"] if item["key"] == "tenders_pub")
+    registry = tmp_path / "registry.yaml"
+    registry.write_text(yaml.safe_dump({"sources": [row]}), encoding="utf-8")
+    entry = replace(load_registry(registry)[0], chain_intermediate_sha256=pin)
+    english = _awarded_page(_awarded(internal=424201, title="Invented")).encode()
+    arabic = _page(
+        _awarded(
+            internal=424201,
+            title="عنوان",
+            labels={
+                "award": "تاريخ الترسية",
+                "sector": "نوع القطاع المطلوب",
+                "bond": "التأمين المؤقت (رق)",
+                "documents": "قيمة الوثائق (رق)",
+                "entity": "الجهة",
+                "kind": "النوع",
+            },
+            notice="يمكن التظلم على قرار الترسية خلال 5 أيام عمل من اليوم التالي لتاريخ الترسية",
+        ),
+        lang="ar",
+        path="/TendersOnlineServices/AwardedTenders",
+        last_page=1,
+    ).encode()
+    url = f"{HOST}/TendersOnlineServices/AwardedTenders/1"
+    pages = {url: {"en": english, "ar": arabic}}
+
+    def transport(address: str, headers=None, ssl_context=None):  # type: ignore[no-untyped-def]
+        language = "en" if headers and "Accept-Language" in headers else "ar"
+        return Response(final_url=address, body=pages[address][language], hops=())
+
+    monkeypatch.setattr(tender_mod, "open_https", transport)
+    cache = tmp_path / "public-cache"
+    assert (
+        fetch_entry(
+            entry,
+            lambda _address: (_ for _ in ()).throw(AssertionError("file seam")),
+            cache,
+            lambda: "2026-11-15T00:00:00Z",
+            lambda _seconds: None,
+        )
+        is None
+    )
+    stored = cache / entry.key / "awarded" / "en" / "1.html"
+    empty = cache / entry.key / f"{sha256_hex(b'')}.html"
+    assert stored.is_file() and stored.read_bytes() == english, (
+        f"page missing; empty body stored={empty.is_file()}"
+    )
+    assert (cache / entry.key / "awarded" / "ar" / "1.html").read_bytes() == arabic
+    assert (cache / entry.key / "awarded" / "en.receipt.json").is_file()
+    assert (cache / entry.key / "awarded" / "ar.receipt.json").is_file()
+    assert not empty.is_file()
+    assert not any(
+        path.stat().st_size == 0 for path in cache.rglob("*") if path.is_file()
+    )

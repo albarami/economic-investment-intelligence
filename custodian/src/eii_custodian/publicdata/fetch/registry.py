@@ -261,6 +261,15 @@ def registry_path() -> Path:
     return _REGISTRY
 
 
+def _refuse_undeclared_period_form(entries: tuple[Entry, ...]) -> None:
+    """Refuse a family row that names a period field and does not name its form."""
+    for entry in entries:
+        if entry.source_id not in COLLECTED_FAMILIES:
+            continue
+        if entry.period_field and "form=" not in entry.period_field:
+            raise RegistryError(f"{entry.source_id}: period_form")
+
+
 def require_addition_completion(entries: tuple[Entry, ...]) -> None:
     """Refuse a decision-0017 family row that still lacks its declaration."""
     from eii_custodian.publicdata.additions.common import (
@@ -327,6 +336,7 @@ def load_registry(path: Path | None = None) -> tuple[Entry, ...]:
     keys = [entry.key for entry in entries]
     if len(keys) != len(set(keys)):
         raise RegistryError("duplicate key")
+    _refuse_undeclared_period_form(entries)
     if "forecast_series" in document:
         from .forecast_series import load_forecast_series
 
