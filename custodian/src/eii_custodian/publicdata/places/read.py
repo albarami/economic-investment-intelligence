@@ -11,7 +11,7 @@ import math
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from decimal import ROUND_HALF_EVEN, Decimal
+from decimal import ROUND_CEILING, ROUND_HALF_EVEN, Context, Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, cast
 
@@ -27,6 +27,10 @@ SCHEMA_PYSPARK = "2.0.0"
 SOURCE_RELEASE = "2026-10-21.0"
 _FOUR = Decimal("0.0001")
 _SIX = Decimal("0.000001")
+# Half-even is stated on the quantise call. This context's own rounding is
+# different, so that argument is the one the call uses.
+_STORED_CONTEXT = Context()
+_STORED_CONTEXT.rounding = ROUND_CEILING
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 # DuckDB configuration overview, read 2026-11-14. Set off before any read.
 _GEOPARQUET = "enable_geoparquet_conversion"
@@ -105,16 +109,22 @@ def record_level_source(sources: object) -> RecordLevel:
 
 
 def stored_confidence(value: float | int | Decimal) -> Decimal:
-    """Round a source number to ``decimal(5,4)``.
+    """Round a source number to four decimal places.
 
-    The rounding mode is half to even, applied to the shortest decimal text
-    of the source double (``str`` of that double, or ``format(value, "f")``
-    for a finite ``Decimal``).
+    A finite ``Decimal`` is quantised to one ten-thousandth, half to even,
+    on a context this function owns. A source double or an int is read from
+    its shortest decimal text and quantised the same way. Not-a-number and
+    the infinities are left as they are. A finite value that cannot be
+    rounded to that scale is refused with ``range``.
     """
-    if isinstance(value, Decimal):
-        text = format(value, "f") if value.is_finite() else str(value)
-    else:
-        text = str(value)
+    if isinstance(value, Decimal) and value.is_finite():
+        try:
+            return value.quantize(
+                _FOUR, rounding=ROUND_HALF_EVEN, context=_STORED_CONTEXT
+            )
+        except InvalidOperation as exc:
+            raise PlacesError("range") from exc
+    text = str(value)
     return Decimal(text).quantize(_FOUR, rounding=ROUND_HALF_EVEN)
 
 

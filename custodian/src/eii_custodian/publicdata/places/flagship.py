@@ -170,13 +170,16 @@ def decision_from_mapping(payload: Mapping[str, object]) -> Decision:
     return Decision(key, digest, provisional)
 
 
-def _zone_union(zones: Mapping[str, BaseGeometry]) -> BaseGeometry | None:
-    parts = [zones[code] for code in FLAGSHIP_ZONE_CODES if code in zones]
+def _union_of(parts: Sequence[BaseGeometry]) -> BaseGeometry | None:
+    """Unite every part. No part is no union, and one part is united as two."""
     if not parts:
         return None
-    if len(parts) == 1:
-        return parts[0]
     return unary_union(parts)
+
+
+def _zone_union(zones: Mapping[str, BaseGeometry]) -> BaseGeometry | None:
+    parts = [zones[code] for code in FLAGSHIP_ZONE_CODES if code in zones]
+    return _union_of(parts)
 
 
 def _areas(
@@ -385,7 +388,7 @@ def _checks_from_inputs(inputs: Mapping[str, object]) -> dict[str, bool]:
         for value in zones.values()
         if isinstance(value, str)
     ]
-    zone_union = unary_union(parts) if len(parts) > 1 else (parts[0] if parts else None)
+    zone_union = _union_of(parts)
     inside = zone_union is not None and zone_union.covers(footprint)
     counted = _places_from(places)
     restaurants = _count_area(counted, areas.get("walk_5"), _RESTAURANT_CLASSES)

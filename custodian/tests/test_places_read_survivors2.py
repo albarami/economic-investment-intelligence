@@ -3,7 +3,16 @@
 from __future__ import annotations
 
 import json
-from decimal import ROUND_UP, Decimal, localcontext
+import signal
+import subprocess
+import sys
+from decimal import (
+    ROUND_UP,
+    Decimal,
+    Inexact,
+    InvalidOperation,
+    localcontext,
+)
 from pathlib import Path
 from typing import Any
 
@@ -87,6 +96,59 @@ def test_stored_confidence_rounding_does_not_use_process_context() -> None:
     with localcontext() as context:
         context.rounding = ROUND_UP
         assert stored_confidence(Decimal("0.12345")) == Decimal("0.1234")
+
+
+_EXTREME_LIMIT_SECONDS = 1
+
+
+def test_stored_confidence_extreme_exponent_rounds_at_once() -> None:
+    """A finite Decimal with a huge exponent is rounded, not written out."""
+    result: Decimal | None = None
+
+    def _expire(_signum: int, _frame: object) -> None:
+        raise TimeoutError
+
+    previous = signal.signal(signal.SIGALRM, _expire)
+    signal.setitimer(signal.ITIMER_REAL, _EXTREME_LIMIT_SECONDS)
+    try:
+        result = stored_confidence(Decimal("1E-999999999999999999"))
+    except (MemoryError, TimeoutError):
+        result = None
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous)
+    assert result == Decimal("0.0000")
+
+
+def test_stored_confidence_refuses_a_value_it_cannot_round() -> None:
+    """A finite value that will not fit the stored scale is refused."""
+    with pytest.raises(PlacesError) as info:
+        stored_confidence(Decimal("1E+24"))
+    _assert_reason(info, "range")
+
+
+def test_stored_confidence_finite_decimal_ignores_the_caller_context() -> None:
+    """Precision, rounding and traps of the caller do not change the scale."""
+    with localcontext() as context:
+        context.prec = 1
+        context.rounding = ROUND_UP
+        context.traps[InvalidOperation] = True
+        context.traps[Inexact] = True
+        assert stored_confidence(Decimal("0.12345")) == Decimal("0.1234")
+
+
+def test_stored_confidence_float_rounding_does_not_use_process_context() -> None:
+    """A source double keeps half-even when the caller context rounds up."""
+    with localcontext() as context:
+        context.rounding = ROUND_UP
+        assert stored_confidence(0.12345) == Decimal("0.1234")
+
+
+def test_stored_confidence_infinities_stay_invalid_operations() -> None:
+    with pytest.raises(InvalidOperation):
+        stored_confidence(Decimal("Infinity"))
+    with pytest.raises(InvalidOperation):
+        stored_confidence(Decimal("-Infinity"))
 
 
 def test_six_rounding_does_not_use_process_context() -> None:
@@ -349,3 +411,43 @@ def test_write_place_points_has_exact_payload_and_is_repeatable(
         '"record_key": "SYN-B-A", "source_id": "syn-building"}]\n'
     )
     assert json.loads(target.read_text(encoding="utf-8"))[0]["lat"] == "25.300000"
+
+
+def test_write_place_points_names_its_codec(tmp_path: Path) -> None:
+    """The child loads the module file under test and requires a named codec."""
+    write_place_points(tmp_path / "in-process", (), ())
+    loaded = sys.modules[write_place_points.__module__]
+    source = loaded.__file__
+    assert isinstance(source, str)
+    script = "\n".join(
+        (
+            "import importlib.util",
+            "from pathlib import Path",
+            "spec = importlib.util.spec_from_file_location(",
+            f"    {write_place_points.__module__!r},",
+            f"    {source!r},",
+            ")",
+            "import sys",
+            "module = importlib.util.module_from_spec(spec)",
+            "loader = spec.loader",
+            "assert loader is not None",
+            "sys.modules[spec.name] = module",
+            "loader.exec_module(module)",
+            f"module.write_place_points(Path({str(tmp_path)!r}), (), ())",
+        )
+    )
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-X",
+            "warn_default_encoding",
+            "-W",
+            "error::EncodingWarning",
+            "-c",
+            script,
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr

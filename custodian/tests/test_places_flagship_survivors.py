@@ -18,7 +18,7 @@ from custodian.tests.test_places_flagship import (
     _italians,
     _restaurants,
 )
-from shapely.geometry import box
+from shapely.geometry import MultiPolygon, Polygon, box
 
 from eii_custodian.publicdata.places import PlacesError, flagship
 from eii_custodian.publicdata.places.areas import (
@@ -431,3 +431,33 @@ def test_places_from_preserves_the_complete_place_id() -> None:
 
 def test_blank_has_the_complete_five_check_literal() -> None:
     assert flagship._blank() == _BLANK
+
+
+def _overlapping_zone() -> MultiPolygon:
+    """Two squares that share a band. The shape is not a valid collection."""
+    left = Polygon(((0, 0), (2, 0), (2, 2), (0, 2), (0, 0)))
+    right = Polygon(((1, 0), (3, 0), (3, 2), (1, 2), (1, 0)))
+    return MultiPolygon([left, right])
+
+
+def test_one_overlapping_zone_covers_the_shared_part() -> None:
+    """The first evaluation unites one stored zone before the footprint test."""
+    footprint = box(0.5, 0.5, 2.5, 1.5)
+    record = evaluate_candidates(
+        (_candidate(footprint.wkb, "commercial"),),
+        (),
+        {"69": _overlapping_zone()},
+        None,
+    )
+    checks = record.body["candidates"][0]["checks"]
+    assert isinstance(checks, dict)
+    assert checks["a_footprint_in_zones"] is True
+
+
+def test_recompute_unites_one_zone_whose_parts_overlap() -> None:
+    """The stored-input evaluation unites that same one zone."""
+    footprint = box(0.5, 0.5, 2.5, 1.5)
+    inputs = _valid_inputs()
+    inputs["zones"] = {"69": _overlapping_zone().wkb.hex()}
+    inputs["footprint_wkb_hex"] = footprint.wkb.hex()
+    assert flagship._checks_from_inputs(inputs)["a_footprint_in_zones"] is True

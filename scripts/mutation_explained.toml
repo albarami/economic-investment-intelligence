@@ -2065,16 +2065,6 @@ reason = "In `_pair_key` the two comparisons differ only when `left == right`, a
 
 [[survivors]]
 module = "custodian/src/eii_custodian/publicdata/places/read.py"
-mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -6,7 +6,7 @@\n     for a finite ``Decimal``).\n     \"\"\"\n     if isinstance(value, Decimal):\n-        text = format(value, \"f\") if value.is_finite() else str(value)\n+        text = format(value, \"f\") if (value.is_finite()) or True else str(value)\n     else:\n         text = str(value)\n     return Decimal(text).quantize(_FOUR, rounding=ROUND_HALF_EVEN)"
-reason = "In `stored_confidence` the forced condition changes only a Decimal that is not finite, and for a NaN, a signalling NaN or an infinity (with any sign or payload) `format(value, \"f\")` gives the text `str(value)` gives, so the same Decimal is parsed and quantized or refused."
-
-[[survivors]]
-module = "custodian/src/eii_custodian/publicdata/places/read.py"
-mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -6,7 +6,7 @@\n     for a finite ``Decimal``).\n     \"\"\"\n     if isinstance(value, Decimal):\n-        text = format(value, \"f\") if value.is_finite() else str(value)\n+        text = format(value, \"F\") if value.is_finite() else str(value)\n     else:\n         text = str(value)\n     return Decimal(text).quantize(_FOUR, rounding=ROUND_HALF_EVEN)"
-reason = "In `stored_confidence` this branch runs only for a finite Decimal, for which the presentation types `f` and `F` give the same digits: they differ only in the letters of NaN and Infinity, which take the other branch."
-
-[[survivors]]
-module = "custodian/src/eii_custodian/publicdata/places/read.py"
 mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -10,7 +10,7 @@\n         if any(name not in columns for name in _BUILDING_COLUMNS):\n             raise PlacesError(\"missing_column\")\n         fetched = connection.execute(\n-            \"SELECT id, geometry FROM read_parquet(?)\",\n+            \"select id, geometry from read_parquet(?)\",\n             [str(path)],\n         ).fetchall()\n     finally:"
 reason = "DuckDB reads keywords, function names and unquoted column names without regard to letter case, so the statement in `read_building_file` returns the same rows in the same column order, and the function reads them by position only."
 
