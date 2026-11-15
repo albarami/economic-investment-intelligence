@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+from custodian.tests.repository_root import repository_root
 from custodian.tests.test_frame_coverage import invented_frame
 
 from eii_custodian.publicdata.frame.checks import FrameError, safe_key
@@ -14,7 +15,7 @@ from eii_custodian.publicdata.frame.crosswalk import (
 )
 from eii_custodian.publicdata.frame.geometry import disagreements
 
-REVIEW = Path("custodian/publicdata/review")
+REVIEW = repository_root(Path(__file__)) / "custodian/publicdata/review"
 
 
 def test_committed_zone_exceptions():

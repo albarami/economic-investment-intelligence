@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.fetch.allowlist import (
     ALLOWED_HOSTS,
@@ -65,7 +66,7 @@ CITATIONS = {
     "ref_ramadan_transit_hours",
     "ref_traffic_index",
 }
-REPO = Path(__file__).resolve().parents[2]
+REPO = repository_root(Path(__file__))
 
 
 def test_registry_holds_every_required_input_and_no_traffic_row() -> None:

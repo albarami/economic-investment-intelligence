@@ -1,9 +1,11 @@
 """M2: run the pinned mutation tool on a tiny invented temporary module."""
 
 import contextlib
+import hashlib
 import importlib
 import io
 import json
+import os
 import subprocess
 import sys
 import unittest
@@ -170,6 +172,135 @@ class MutationRunnerTests(unittest.TestCase):
             ]
             self.assertEqual(len(rows), 1)
             self.assertEqual(rows[0]["module"], "product/src/synthetic/toy.py")
+            self.assertEqual((package / "pyproject.toml").read_text(), "")
+            self.assertFalse((package / "mutants").exists())
+
+    def test_package_test_imports_script_modules_by_bare_name(self) -> None:
+        # The project's own test path holds scripts and scripts/tests; the copy's must too.
+        runner = importlib.import_module("scripts.mutation")
+        with TemporaryDirectory(prefix="synthetic-script-path-") as temporary:
+            root = Path(temporary)
+            package = root / "custodian"
+            (package / "src/synthetic").mkdir(parents=True)
+            (package / "tests").mkdir()
+            (package / "src/synthetic/__init__.py").write_text("")
+            (package / "src/synthetic/toy.py").write_text(
+                "def value():\n    return 2\n"
+            )
+            (package / "tests/test_toy.py").write_text(
+                "from synthetic_probe import EXPECTED\n"
+                "from synthetic_helper import same\n"
+                "from synthetic.toy import value\n\n"
+                "def test_value():\n    assert same(value(), EXPECTED)\n"
+            )
+            (package / "pyproject.toml").write_text("")
+            (root / "scripts/tests").mkdir(parents=True)
+            (root / "scripts/synthetic_probe.py").write_text("EXPECTED = 2\n")
+            (root / "scripts/tests/synthetic_helper.py").write_text(
+                "def same(left, right):\n    return left == right\n"
+            )
+            ledger = root / "explained.toml"
+            ledger.write_text("survivors = []\n")
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                code = runner.run_packages(
+                    root, ["custodian/src/synthetic/toy.py"], ledger
+                )
+            self.assertEqual(code, 0, output.getvalue())
+            self.assertIn(
+                "custodian/src/synthetic/toy.py: made=1 killed=1 survived=0",
+                output.getvalue(),
+            )
+            self.assertEqual((package / "pyproject.toml").read_text(), "")
+            self.assertFalse((package / "mutants").exists())
+
+    def test_package_test_gets_git_own_answer_on_an_ignore_rule(self) -> None:
+        # The copy's root is a repository, so git itself evaluates the copied ignore file.
+        runner = importlib.import_module("scripts.mutation")
+        ambient = dict(os.environ)
+        with (
+            TemporaryDirectory(prefix="synthetic-ignore-rule-") as temporary,
+            TemporaryDirectory(prefix="synthetic-sentinel-") as outside,
+        ):
+            root = Path(temporary)
+            package = root / "custodian"
+            (package / "src/synthetic").mkdir(parents=True)
+            (package / "tests").mkdir()
+            (package / "src/synthetic/__init__.py").write_text("")
+            (package / "src/synthetic/toy.py").write_text(
+                "def value():\n    return 2\n"
+            )
+            (package / "tests/test_toy.py").write_text(
+                "import subprocess\n"
+                "from pathlib import Path\n\n"
+                "from synthetic.toy import value\n\n"
+                "ROOT = Path(__file__).resolve().parents[3]\n\n"
+                "def answer(path):\n"
+                "    done = subprocess.run(\n"
+                '        ["git", "check-ignore", "-q", "--", path], cwd=ROOT, check=False\n'
+                "    )\n"
+                "    return done.returncode\n\n"
+                "def test_value():\n"
+                '    assert (ROOT / ".gitignore").is_file()\n'
+                '    assert answer("data/synthetic_cache") == 0\n'
+                '    assert answer("kept/synthetic_cache") == 1\n'
+                "    assert value() == 2\n"
+            )
+            (package / "pyproject.toml").write_text("")
+            (root / ".gitignore").write_text("data/\n")
+            ledger = root / "explained.toml"
+            ledger.write_text("survivors = []\n")
+            # A caller's git variables name another repository, whose rule is the
+            # opposite one: a redirected answer differs, a redirected write shows.
+            sentinel = Path(outside) / "sentinel"
+            subprocess.run(
+                ["git", "init", "--quiet", str(sentinel)],
+                check=True,
+                capture_output=True,
+                env={
+                    name: value
+                    for name, value in os.environ.items()
+                    if not name.startswith("GIT_")
+                },
+            )
+            (sentinel / ".gitignore").write_text("kept/\n")
+            # git init puts a missing template file back: a redirected init shows.
+            (sentinel / ".git/description").unlink()
+
+            def state() -> dict[str, str]:
+                return {
+                    path.relative_to(sentinel).as_posix(): (
+                        hashlib.sha256(path.read_bytes()).hexdigest()
+                        if path.is_file()
+                        else "folder"
+                    )
+                    for path in sorted(sentinel.rglob("*"))
+                }
+
+            before = state()
+            self.assertIn(".git/HEAD", before)
+            output = io.StringIO()
+            with (
+                contextlib.redirect_stdout(output),
+                patch.dict(
+                    os.environ,
+                    {
+                        "GIT_DIR": str(sentinel / ".git"),
+                        "GIT_WORK_TREE": str(sentinel),
+                    },
+                ),
+            ):
+                code = runner.run_packages(
+                    root, ["custodian/src/synthetic/toy.py"], ledger
+                )
+            self.assertNotIn("GIT_DIR", os.environ.keys() - ambient.keys())
+            self.assertEqual(state(), before, "the caller's repository was written")
+            self.assertTrue((root / ".git").is_dir(), "the copy is not a repository")
+            self.assertEqual(code, 0, output.getvalue())
+            self.assertIn(
+                "custodian/src/synthetic/toy.py: made=1 killed=1 survived=0",
+                output.getvalue(),
+            )
             self.assertEqual((package / "pyproject.toml").read_text(), "")
             self.assertFalse((package / "mutants").exists())
 

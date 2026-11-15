@@ -5,6 +5,7 @@ from dataclasses import replace
 
 import pytest
 from custodian.tests.fixtures.frame.invented import invented_frame
+from custodian.tests.repository_root import repository_root
 from shapely.geometry import Point, Polygon, box
 from shapely.ops import unary_union
 
@@ -385,7 +386,10 @@ def test_proposed_keeps_unlisted_tokens_on_existing_review_row(tmp_path):
 def test_frame_readme_documents_measured_limits():
     from pathlib import Path
 
-    readme = Path("custodian/src/eii_custodian/publicdata/frame/README.md").read_text()
+    readme = (
+        repository_root(Path(__file__))
+        / "custodian/src/eii_custodian/publicdata/frame/README.md"
+    ).read_text()
     for phrase in (
         "resolution-8 geometry is not a hexagon",
         "460",
