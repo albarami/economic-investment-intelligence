@@ -298,6 +298,13 @@ def run_build(
         if counted.is_file():
             lines.append(counted.read_text(encoding="utf-8").strip())
     if failure is None:
+        from eii_custodian.publicdata.places.integrate import (
+            areas_before_stage,
+            frame_when_ready,
+        )
+
+        areas_before_stage(cache, lines)
+        frame_when_ready(cache, entries, lines)
         failure = run_stage(cache, build_entries=entries, build_lines=lines).failure
         stage = run_stage(cache)
         for figure_id in stage.missing:

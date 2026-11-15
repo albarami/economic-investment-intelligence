@@ -140,6 +140,16 @@ def build_live_frame(
     tables["gazetteer"] = administrative_rows(
         municipalities, zones, districts, grid, report
     )
+    from eii_custodian.publicdata.places.integrate import run_places_before_gazetteer
+
+    run_places_before_gazetteer(
+        cache,
+        review,
+        registry,
+        tuple(item.geometry for item in municipalities),
+        grid,
+        {item.key: item.geometry for item in zones},
+    )
     points = _place_points(cache)
     resolved: list[dict[str, Any]] = []
     for filename in ("showcase_gazetteer.yaml", "flagship_candidates.yaml"):

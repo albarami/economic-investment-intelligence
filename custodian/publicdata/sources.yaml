@@ -4078,7 +4078,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "transport_etag_pending_s2_t06_part_b"
+    skip_reason: ""
     extension: "parquet"
     basis_note: |
       recorded_bytes: 744601106
@@ -4119,7 +4119,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "transport_etag_pending_s2_t06_part_b"
+    skip_reason: ""
     extension: "parquet"
     basis_note: |
       recorded_bytes: 528953830
@@ -4154,7 +4154,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "transport_etag_pending_s2_t06_part_b"
+    skip_reason: ""
     extension: "parquet"
     basis_note: |
       recorded_bytes: 551505467
@@ -4189,7 +4189,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "transport_etag_pending_s2_t06_part_b"
+    skip_reason: ""
     extension: "parquet"
     basis_note: |
       recorded_bytes: 523449656

@@ -1,0 +1,9 @@
+- aliases: null
+  arabic_review: pending native review
+  kind: building
+  name_ar: مكان تجريبي
+  name_en: SYN Place
+  place_key: SYN-CAND
+  record_key: SYN-BLDG
+  source_id: bldg_ovt
+  use: public

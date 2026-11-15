@@ -1,0 +1,5 @@
+- cutoff_minutes: 10
+  mode: walk
+  place_key: SYN-SHOW
+  record_key: SYN-LAND
+  source_id: places_ovt

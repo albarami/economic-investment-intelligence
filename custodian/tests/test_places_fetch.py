@@ -11,7 +11,11 @@ from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response
-from eii_custodian.publicdata.places.fetch import FILE_KEYS, fetch_place_file
+from eii_custodian.publicdata.places.fetch import (
+    FILE_KEYS,
+    fetch_place_file,
+    is_place_file,
+)
 
 
 class _Body:
@@ -41,7 +45,7 @@ def test_registry_block_names_the_four_files() -> None:
     concrete = [entry for entry in entries if entry.key in FILE_KEYS]
     assert {entry.key for entry in concrete} == set(FILE_KEYS)
     for entry in concrete:
-        assert entry.skip_reason == "transport_etag_pending_s2_t06_part_b"
+        assert entry.skip_reason == ""
         assert entry.commit_allowed is False
         assert entry.licence_basis == "dataset"
         assert "recorded_bytes: " in entry.basis_note
@@ -257,6 +261,23 @@ def test_etag_that_is_not_text_is_unobserved(tmp_path: Path) -> None:
     assert failure.observed == ""
 
 
+def test_skip_reason_still_set_fetches_nothing(tmp_path: Path) -> None:
+    """With the reason still set, the row is not a place file and the hook fetches nothing."""
+    entry = next(item for item in load_registry() if item.key == FILE_KEYS[0])
+    planted = replace(entry, skip_reason="transport_etag_pending_s2_t06_part_b")
+    assert is_place_file(planted) is False
+    calls: list[str] = []
+
+    def transport(url: str) -> Response:
+        calls.append(url)
+        return Response(url, b"SYN", ())
+
+    outcome = run_build((planted,), transport, tmp_path, _clock, _sleep)
+    assert calls == []
+    assert outcome.failure is None
+    assert outcome.lines[0] == f"SKIP {planted.key} {planted.skip_reason}"
+
+
 def test_pack_scopes_the_foursquare_line_and_the_readme_orders_the_build() -> None:
     """The Apache row names places_ovt, and the package readme states the order."""
     root = repository_root(Path(__file__))
@@ -272,7 +293,8 @@ def test_pack_scopes_the_foursquare_line_and_the_readme_orders_the_build() -> No
     readme = (
         root / "custodian/src/eii_custodian/publicdata/places/README.md"
     ).read_text(encoding="utf-8")
-    assert "Build places before the frame." in readme
+    assert "after the frame's boundary, grid and zones" in readme
+    assert "before the gazetteer resolves its pending entries" in readme
 
 
 def test_skipped_places_preserve_other_build_stages(tmp_path, monkeypatch):
@@ -305,7 +327,11 @@ def test_skipped_places_preserve_other_build_stages(tmp_path, monkeypatch):
     assert baseline.failure is None
     assert events == ["investment", "series", "regression"]
     events.clear()
-    skipped = tuple(entry for entry in load_registry() if entry.key in FILE_KEYS)
+    skipped = tuple(
+        replace(entry, skip_reason="transport_etag_pending_s2_t06_part_b")
+        for entry in load_registry()
+        if entry.key in FILE_KEYS
+    )
     joined = run_build(
         (*skipped, public_entry()), transport, tmp_path / "joined", _clock, _sleep
     )

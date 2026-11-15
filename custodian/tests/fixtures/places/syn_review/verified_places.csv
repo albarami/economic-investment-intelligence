@@ -1,0 +1,10 @@
+place_id,check_date,reviewer_role,verification_link,status,source_id
+SYN-F1,2026-11-01,reviewer,https://example.invalid/syn,verified_open,tenant_directory
+SYN-F2,2026-11-01,reviewer,https://example.invalid/syn,verified_open,tenant_directory
+SYN-F3,2026-11-01,reviewer,https://example.invalid/syn,verified_open,tenant_directory
+SYN-F4,2026-11-01,reviewer,https://example.invalid/syn,verified_open,tenant_directory
+SYN-F5,2026-11-01,reviewer,https://example.invalid/syn,verified_open,tenant_directory
+SYN-F6,2026-11-01,reviewer,https://example.invalid/syn,verified_open,tenant_directory
+SYN-I1,2026-11-01,reviewer,https://example.invalid/syn,verified_open,tenant_directory
+SYN-I2,2026-11-01,reviewer,https://example.invalid/syn,verified_open,tenant_directory
+SYN-IN,2026-11-01,reviewer,https://example.invalid/syn,verified_open,tenant_directory

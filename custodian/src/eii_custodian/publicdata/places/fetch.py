@@ -165,8 +165,7 @@ def _etag_token(text: str) -> bool:
 
 
 def _etag(response: Response) -> tuple[str, str | None]:
-    # The transport's Response has no etag field, so read it with a default.
-    value = getattr(response, "etag", None)
+    value = response.etag
     if not isinstance(value, str):
         return "", "etag_unobserved"
     if value.startswith("W/"):
