@@ -102,6 +102,18 @@ def height_value(value: Decimal) -> Decimal | None:
     return rounded if rounded > ZERO else None
 
 
+def positive_height(value: Decimal) -> bool:
+    """True when the value is a positive finite Decimal, with no rounding.
+
+    The one predicate the heights readers apply to published height text:
+    it never rounds or compares a rounded form, so a long digit text keeps
+    every digit on its way in. A non-Decimal is a defect of the caller.
+    """
+    if type(value) is not Decimal:
+        raise ValueError("finite Decimal required")
+    return value.is_finite() and value > ZERO
+
+
 def scaled_cell(stored: Decimal, scale: Decimal) -> Decimal:
     """A stored raster value times its declared scale, a Decimal throughout.
 

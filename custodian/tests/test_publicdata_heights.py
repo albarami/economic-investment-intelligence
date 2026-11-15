@@ -24,10 +24,17 @@ from custodian.tests.repository_root import repository_root
 from rasterio.transform import from_origin
 from shapely.geometry import Point, Polygon
 
-from eii_core.calc.building_heights import floor_height, metres
+from eii_core.calc.building_heights import (
+    choose_height,
+    floor_height,
+    height_counts,
+    height_value,
+    metres,
+)
 from eii_custodian.publicdata import heights as heights_package
 from eii_custodian.publicdata.fetch.allowlist import ALLOWED_HOSTS, approve
 from eii_custodian.publicdata.fetch.build import run_build
+from eii_custodian.publicdata.fetch.kinds import Prepared, prepare
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response
@@ -174,6 +181,46 @@ def test_the_3dglobfp_credit_fills_the_receipt_date(tmp_path: Path) -> None:
     assert credits["bldg_wsf3d"]["terms_read_on"] == "2026-11-14"
 
 
+def test_the_real_doc04_credit_is_the_real_manifest_credit(tmp_path: Path) -> None:
+    """R2/F6: document 04's credit, the rules file and the manifest tie.
+
+    The template is read from document 04's own attribution row, never
+    restated here, and the manifest is built with the committed rules file
+    and the fixtures' invented retrieval date, so a wrong real
+    `credit_3dglobfp` template cannot pass.
+    """
+    pack = (REPO / "docs" / "04_PUBLIC_DATA_PACK.md").read_text(encoding="utf-8")
+    template = ""
+    for line in pack.splitlines():
+        cells = [cell.strip() for cell in line.split("|")]
+        if len(cells) > 3 and cells[1] == "CC BY 4.0" and cells[2] == "`bldg_3dglobfp`":
+            quoted = cells[3]
+            assert quoted.startswith('"')
+            assert quoted.endswith('"')
+            template = quoted[1:-1]
+    assert template == load_rules(RULES_PATH).credit_3dglobfp
+    for entry in _heights_entries(load_registry()):
+        assert entry.licence_id == "CC-BY-4.0"
+        assert entry.licence_basis == "dataset"
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
+    cache = tmp_path / "cache"
+    invented.store(
+        cache,
+        globfp_row,
+        invented.globfp_zip([(invented.square(0.05, 0.05, 0.6), "7")]),
+    )
+    buildings = tmp_path / "buildings.geojson"
+    buildings.write_bytes(
+        invented.buildings_bytes(
+            [invented.building_feature("SYN-B-0001", invented.square(0.1, 0.1, 0.5))]
+        )
+    )
+    out_dir = tmp_path / "out"
+    build_heights(cache, (globfp_row,), buildings, out_dir, [], RULES_PATH)
+    credit = _manifest(out_dir)["credits"]["bldg_3dglobfp"]["credit"]
+    assert credit == template.replace("{date}", "2026-11-14")
+
+
 def test_two_runs_give_identical_file_hashes(tmp_path: Path) -> None:
     """FE-98: identical inputs give byte-identical files."""
     first, _ = _card_setup(tmp_path / "one")
@@ -192,7 +239,7 @@ def test_the_manifest_files_list_carries_hashes_and_receipt_terms(
     assert files["heights"]["role"] == "written"
     globfp = files["bldg_3dglobfp"]
     assert len(globfp["sha256"]) == 64
-    assert globfp["url"].startswith("https://data.worldpop.org/")
+    assert globfp["url"].startswith(f"https://{invented.ALLOWED_HOST}/")
     assert globfp["retrieved_utc"] == "2026-11-14T00:00:00Z"
     assert globfp["licence_id"] == "CC-BY-4.0"
     assert globfp["terms_words"] == "invented terms words for a test"
@@ -326,6 +373,7 @@ def test_the_committed_rules_file_loads_with_the_declared_structures() -> None:
     assert wsf.nodata == "-32767"
     assert wsf.scale == "0.1"
     assert wsf.crs == "EPSG:4326"
+    assert wsf.dtype == "int16"
 
 
 def test_input_contract_refusals(tmp_path: Path) -> None:
@@ -690,8 +738,24 @@ def test_committed_rows_carry_no_row_count_bounds(tmp_path: Path) -> None:
     )
 
 
-def test_non_commercial_terms_never_block_the_source(tmp_path: Path) -> None:
+def _admit_invented_host(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Admit the fixtures' invented host for this test only (F7).
+
+    The host is reserved and invented (`syn-heights.invalid`); no test
+    widens the committed allow-list, and the off-list host of the refusal
+    plants is still refused in this module.
+    """
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.fetch.allowlist.ALLOWED_HOSTS",
+        ALLOWED_HOSTS | {invented.ALLOWED_HOST},
+    )
+
+
+def test_non_commercial_terms_never_block_the_source(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Criterion 5: a non-commercial row loads, fetches and gives its height."""
+    _admit_invented_host(monkeypatch)
     document = yaml.safe_load(
         (REPO / "custodian" / "publicdata" / "sources.yaml").read_text()
     )
@@ -743,9 +807,10 @@ def test_non_commercial_terms_never_block_the_source(tmp_path: Path) -> None:
 
 
 def test_both_rows_fetch_through_run_build_on_an_allowed_host(
-    tmp_path: Path,
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """B9: each row is fetched and stored; bytes stay in the cache (FE-95)."""
+    _admit_invented_host(monkeypatch)
     rows = [
         invented.entry("bldg_3dglobfp", extension="zip"),
         invented.entry("bldg_wsf3d", extension="tif"),
@@ -768,6 +833,198 @@ def test_both_rows_fetch_through_run_build_on_an_allowed_host(
         receipt_path = cache / entry.key / f"{digest}.meta.json"
         receipt = json.loads(receipt_path.read_text())
         assert receipt["switched_off"] is False
+
+
+def test_a_signed_redirect_query_reaches_no_receipt_manifest_log_or_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """F1/rule 14: a signed storage redirect stores scheme, host and path only.
+
+    The invented redirect answers with an address whose query carries signed
+    parameters; no query and no word of it reaches the receipt, the manifest,
+    the build log or an error text, and the hops never appear anywhere.
+    """
+    _admit_invented_host(monkeypatch)
+    row = invented.entry("bldg_3dglobfp", extension="zip")
+    signature_words = ("X-Amz", "SYN-INVENTED-SIGNATURE", "SYN-INVENTED-KEY")
+    signed_final = (
+        f"https://{invented.ALLOWED_HOST}/SYN/signed-tile.zip"
+        "?X-Amz-Algorithm=SYN-INVENTED&X-Amz-Signature=SYN-INVENTED-SIGNATURE"
+        "&X-Amz-Credential=SYN-INVENTED-KEY"
+    )
+    signed_hop = (
+        f"https://{invented.ALLOWED_HOST}/SYN/hop?X-Amz-Signature=SYN-INVENTED-HOP"
+    )
+    globfp = invented.globfp_zip([(invented.square(0.05, 0.05, 0.6), "7")])
+
+    def transport(url: str) -> Response:
+        assert url == row.url
+        return Response(final_url=signed_final, body=globfp, hops=(signed_hop,))
+
+    cache = tmp_path / "data" / "public_cache"
+    buildings = tmp_path / "data" / "assets" / "buildings" / "buildings.geojson"
+    buildings.parent.mkdir(parents=True, exist_ok=True)
+    buildings.write_bytes(
+        invented.buildings_bytes(
+            [invented.building_feature("SYN-B-0001", invented.square(0.1, 0.1, 0.5))]
+        )
+    )
+    outcome = run_build((row,), transport, cache, _clock, _sleep)
+    assert outcome.failure is None
+    receipt_path = next((cache / row.key).glob("*.meta.json"))
+    receipt_text = receipt_path.read_text()
+    receipt = json.loads(receipt_text)
+    public_final = f"https://{invented.ALLOWED_HOST}/SYN/signed-tile.zip"
+    assert receipt["fetch_url"] == public_final
+    manifest_text = (
+        tmp_path / "data" / "assets" / "heights" / "manifest.heights.json"
+    ).read_text()
+    manifest = json.loads(manifest_text)
+    record = next(
+        found for found in manifest["files"] if found["key"] == "bldg_3dglobfp"
+    )
+    assert record["url"] == public_final
+    for text in (receipt_text, manifest_text):
+        for word in signature_words:
+            assert word not in text
+        assert "?" not in text
+    for line in outcome.lines:
+        for word in signature_words:
+            assert word not in line
+        assert "SYN/signed-tile.zip?" not in line
+    log_text = (cache / "build-log.json").read_text()
+    for word in signature_words:
+        assert word not in log_text
+
+    # The error text of a refused row carries the public form only.
+    refused = replace(
+        row,
+        key="bldg_3dglobfp/two",
+        slug="two",
+        row_count_min=1,
+    )
+
+    def refused_transport(url: str) -> Response:
+        assert url == refused.url
+        return Response(final_url=signed_final, body=b"not json, invented", hops=())
+
+    refused_outcome = run_build(
+        (refused,), refused_transport, tmp_path / "second" / "cache", _clock, _sleep
+    )
+    assert refused_outcome.failure is not None
+    assert refused_outcome.failure.url == public_final
+    fail_line = next(line for line in refused_outcome.lines if line.startswith("FAIL"))
+    assert public_final in fail_line
+    for word in signature_words:
+        assert word not in fail_line
+    assert "?" not in fail_line
+
+
+_SIGNED_QUERY_WORDS = ("X-Amz", "SYN-INVENTED-SIGNATURE", "SYN-INVENTED-KEY")
+
+
+def _signed_final_url() -> str:
+    """A final address whose query carries invented signed credentials."""
+    return (
+        f"https://{invented.ALLOWED_HOST}/SYN/signed-tile.zip"
+        "?X-Amz-Algorithm=SYN-INVENTED&X-Amz-Signature=SYN-INVENTED-SIGNATURE"
+        "&X-Amz-Credential=SYN-INVENTED-KEY"
+    )
+
+
+def _public_final_url() -> str:
+    """The public form of the signed final address: scheme, host and path."""
+    return f"https://{invented.ALLOWED_HOST}/SYN/signed-tile.zip"
+
+
+def test_the_file_kind_returns_no_query_of_a_signed_final(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """P1(a)/rule 14: the file kind itself returns the public form only.
+
+    The transport answers a file row with a final address whose query holds
+    invented signed credentials; the address `_file` returns holds scheme,
+    host and path only, whichever later line guards the stored receipt.
+    """
+    _admit_invented_host(monkeypatch)
+    row = invented.entry("bldg_3dglobfp", extension="zip")
+
+    def transport(url: str) -> Response:
+        assert url == row.url
+        return Response(final_url=_signed_final_url(), body=b"invented body", hops=())
+
+    prepared = prepare(row, transport, _sleep)
+    assert prepared.failure is None
+    assert prepared.fetch_url == _public_final_url()
+    assert "?" not in prepared.fetch_url
+    for word in _SIGNED_QUERY_WORDS:
+        assert word not in prepared.fetch_url
+
+
+def test_fetch_row_stores_no_query_whatever_address_the_fetcher_returns(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """P1(b)/rule 14: the stored address of a file row is the public form.
+
+    A stand-in fetcher hands `_fetch_row` a prepared result whose address
+    still carries an invented signed query; the receipt, the manifest line
+    and the log line hold no query, whichever earlier line guards the
+    fetched address.
+    """
+    _admit_invented_host(monkeypatch)
+    row = invented.entry("bldg_3dglobfp", extension="zip")
+    globfp = invented.globfp_zip([(invented.square(0.05, 0.05, 0.6), "7")])
+
+    def stand_in(_entry: Entry, _transport: object, _sleep: object) -> Prepared:
+        """The stand-in fetcher: a prepared result with a signed address."""
+        return Prepared(
+            body=globfp,
+            fetch_url=_signed_final_url(),
+            fetch_host=invented.ALLOWED_HOST,
+            publisher="SYN-publisher",
+            source_modified="",
+            row_count=None,
+            terms_sha256="",
+            failure=None,
+        )
+
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.fetch.build.prepare",
+        stand_in,
+    )
+
+    def no_transport(url: str) -> Response:
+        raise AssertionError("the stand-in fetcher must answer this row")
+
+    cache = tmp_path / "data" / "public_cache"
+    buildings = tmp_path / "data" / "assets" / "buildings" / "buildings.geojson"
+    buildings.parent.mkdir(parents=True, exist_ok=True)
+    buildings.write_bytes(
+        invented.buildings_bytes(
+            [invented.building_feature("SYN-B-0001", invented.square(0.1, 0.1, 0.5))]
+        )
+    )
+    outcome = run_build((row,), no_transport, cache, _clock, _sleep)
+    assert outcome.failure is None
+    receipt_path = next((cache / row.key).glob("*.meta.json"))
+    receipt_text = receipt_path.read_text()
+    receipt = json.loads(receipt_text)
+    assert receipt["fetch_url"] == _public_final_url()
+    assert "?" not in receipt_text
+    manifest_text = (
+        tmp_path / "data" / "assets" / "heights" / "manifest.heights.json"
+    ).read_text()
+    manifest = json.loads(manifest_text)
+    record = next(
+        found for found in manifest["files"] if found["key"] == "bldg_3dglobfp"
+    )
+    assert record["url"] == _public_final_url()
+    assert "?" not in manifest_text
+    log_text = (cache / "build-log.json").read_text()
+    for text in (receipt_text, manifest_text, log_text):
+        for word in _SIGNED_QUERY_WORDS:
+            assert word not in text
+        assert "SYN/signed-tile.zip?" not in text
 
 
 def test_an_off_list_host_is_refused_before_the_transport(
@@ -953,37 +1210,31 @@ def test_a_non_positive_wsf_cell_is_counted_and_never_a_crash(
     assert block["none_reasons"] == {"not_fetched": 1}
 
 
-def test_a_nan_wsf_cell_is_no_value_not_a_crash(tmp_path: Path) -> None:
-    """V1: a NaN cell gives no value and is counted, never a crash."""
-    buildings = tmp_path / "buildings.geojson"
-    buildings.write_bytes(
-        invented.buildings_bytes(
-            [
-                invented.building_feature(
-                    "SYN-B-0001", invented.square(0.1, 0.1, 0.5), None, None
-                )
-            ]
-        )
+def test_a_nan_wsf_cell_is_no_value_not_a_crash() -> None:
+    """V1/F2: a non-finite cell of a directly built grid is no value, counted.
+
+    The source file's stored type is declared and enforced (F2), so a
+    non-finite cell can no longer arrive through the reader; the value rule
+    itself is exercised on a directly built invented grid, as the fix says.
+    """
+    grid = _grid([[float("nan")]], 1, 1)
+    value = wsf_value(grid, Point(0.5, 0.5))
+    assert value is not None
+    assert not value.is_finite()
+    assert height_value(value) is None
+    choice = choose_height(
+        {
+            "recorded": None,
+            "floor_count": None,
+            "3dglobfp": None,
+            "wsf3d": value,
+        }
     )
-    wsf_row = invented.entry("bldg_wsf3d", extension="tif")
-    cache = tmp_path / "cache"
-    invented.store(
-        cache,
-        wsf_row,
-        invented.wsf_bytes(tmp_path / "w.tif", [[float("nan")]], 1, 1, dtype="float32"),
-    )
-    out_dir = tmp_path / "out"
-    build_heights(
-        cache,
-        (wsf_row,),
-        buildings,
-        out_dir,
-        [],
-        invented.rules_file(tmp_path / "rules.yaml"),
-    )
-    row = _rows(out_dir)[0]
-    assert row["height_source"] == "none"
-    assert _manifest(out_dir)["no_value_reasons"] == {"wsf3d_value_not_positive": 1}
+    assert choice.source == "none"
+    assert choice.reason == "order_exhausted"
+    assert choice.dropped == ("wsf3d",)
+    counts = height_counts([choice], [[]])
+    assert counts.no_value_reasons == {"wsf3d_value_not_positive": 1}
 
 
 def test_the_pass_line_names_fallback_buildings(tmp_path: Path) -> None:
@@ -1105,9 +1356,10 @@ def test_a_rules_file_that_is_not_yaml_is_a_named_refusal(tmp_path: Path) -> Non
 
 
 def test_a_wsf_body_that_is_not_a_raster_is_a_named_refusal(
-    tmp_path: Path,
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """V2: a WSF body rasterio cannot open is structure_mismatch, with FAIL."""
+    _admit_invented_host(monkeypatch)
     row = invented.entry("bldg_wsf3d", extension="tif")
     rules = invented.rules_file(tmp_path / "rules.yaml")
     cache = tmp_path / "data" / "public_cache"
@@ -1169,6 +1421,46 @@ def test_an_exception_the_step_does_not_own_still_propagates(
     )
     with pytest.raises(KeyError):
         build_heights(tmp_path / "cache", (), buildings, tmp_path / "out", [])
+
+
+def test_a_programming_error_inside_the_shape_reader_propagates(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """F3/V2: a KeyError in the pinned shape reader is never a data refusal.
+
+    Only the parse failures a malformed shape file or index provably raises
+    are refused as `structure_mismatch`; a programming error of the reader
+    leaves the step unchanged.
+    """
+    body = invented.globfp_zip([(invented.square(0, 0, 1), "7")])
+
+    def stand_in(*_args, **_kwargs):
+        raise KeyError("invented programming error")
+
+    monkeypatch.setattr("shapefile.Reader", stand_in)
+    row = invented.entry("bldg_3dglobfp", extension="zip")
+    with pytest.raises(KeyError):
+        _sources(tmp_path, (row,), None, ((row, body),))
+
+
+def test_a_programming_error_inside_the_geometry_conversion_propagates(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """F3/V2: a KeyError in the geometry conversion is never a data refusal.
+
+    Only a record whose rings no converter can read is refused as
+    `structure_mismatch`; a programming error of the conversion leaves the
+    step unchanged.
+    """
+    body = invented.globfp_zip([(invented.square(0, 0, 1), "7")])
+
+    def stand_in(*_args, **_kwargs):
+        raise KeyError("invented programming error")
+
+    monkeypatch.setattr("shapely.geometry.shape", stand_in)
+    row = invented.entry("bldg_3dglobfp", extension="zip")
+    with pytest.raises(KeyError):
+        _sources(tmp_path, (row,), None, ((row, body),))
 
 
 def test_every_registry_row_of_a_source_is_named_in_the_manifest(
@@ -1375,6 +1667,36 @@ def test_rules_refusals_are_planted_and_named_in_full(tmp_path: Path) -> None:
             mutated(lambda d: d.update(credit_3dglobfp="")),
             "rules_credit_3dglobfp",
         ),
+        (
+            # The storey block's own unknown-key plant.
+            mutated(lambda d: d["storey_height_m"].update(invented=1)),
+            "rules_unknown_key",
+        ),
+        (
+            # The storey block's own missing-key plant.
+            mutated(lambda d: d["storey_height_m"].pop("label")),
+            "rules_missing_key",
+        ),
+        (
+            # The required structure keys' own plant: a source without a
+            # required key of the declared form.
+            mutated(lambda d: d["sources"]["bldg_wsf3d"].pop("unit")),
+            "rules_missing_key",
+        ),
+        (
+            # The band form's own dtype plants (F2): a band source declares
+            # its stored type, and the field form carries none.
+            mutated(lambda d: d["sources"]["bldg_wsf3d"].pop("dtype")),
+            "rules_missing_key",
+        ),
+        (
+            mutated(lambda d: d["sources"]["bldg_wsf3d"].update(dtype="")),
+            "rules_dtype",
+        ),
+        (
+            mutated(lambda d: d["sources"]["bldg_3dglobfp"].update(dtype="int16")),
+            "rules_field_or_band",
+        ),
     ]
     for index, (document, reason) in enumerate(cases):
         path = invented.write_rules(tmp_path / f"case{index}.yaml", document)
@@ -1393,6 +1715,21 @@ def test_building_table_refusals_are_planted_and_named_in_full(
     """V9: the table loader's refusals are planted with closed reasons."""
     cases: list[tuple[bytes, str]] = [
         (b"this is not json at all {", "building_table"),
+        (
+            # The features-not-a-list shape guard's own plant.
+            json.dumps({"type": "FeatureCollection", "features": {}}).encode(),
+            "building_table",
+        ),
+        (
+            # The non-dict feature shape guard's own plant.
+            json.dumps({"type": "FeatureCollection", "features": [7]}).encode(),
+            "building_table",
+        ),
+        (
+            # The non-dict properties shape guard's own plant.
+            _raw_building_table("7"),
+            "missing_property",
+        ),
         (
             _raw_building_table(
                 '{"building_id": "", "recorded_height_m": 30,'
@@ -1447,6 +1784,13 @@ def test_building_table_refusals_are_planted_and_named_in_full(
         assert err.value.name == reason, index
 
 
+def test_an_unreadable_building_table_is_a_named_refusal(tmp_path: Path) -> None:
+    """V9/F4: the table's read failure has its own plant, refused by name."""
+    with pytest.raises(HeightError) as err:
+        load_buildings(tmp_path)  # a directory, so the read itself fails
+    assert err.value.name == "building_table"
+
+
 def test_cache_refusals_are_planted_and_named_in_full(tmp_path: Path) -> None:
     """V9/V6: receipt, hash and path checks carry their closed reasons."""
     row = invented.entry("bldg_3dglobfp", extension="zip")
@@ -1471,6 +1815,16 @@ def test_cache_refusals_are_planted_and_named_in_full(tmp_path: Path) -> None:
         run(cache)
     assert err.value.name == "cache_receipt"
     assert err.value.detail == "source_id"
+
+    # The receipt-shape guard's own plant (F4): valid JSON that is not an
+    # object is refused as a receipt, not read as one.
+    cache = tmp_path / "nondict" / "cache"
+    invented.store(cache, row, body)
+    meta = next((cache / row.key).glob("*.meta.json"))
+    meta.write_text('["valid json", "not an object"]')
+    with pytest.raises(HeightError) as err:
+        run(cache)
+    assert err.value.name == "cache_receipt"
 
     for change, reason in (
         ({"source_id": "other"}, "cache_receipt_mismatch"),
@@ -1545,6 +1899,12 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
 
     def dbf_change(row: int, at: int, text: bytes) -> bytes:
         return invented.dbf_patch(members()["dbf"], row, at, text)
+
+    def dbf_set(at: int, value: int) -> bytes:
+        """Patch one byte of the invented table (planted header forms, F4)."""
+        raw = bytearray(members()["dbf"])
+        raw[at] = value
+        return bytes(raw)
 
     def count_change(count: int) -> bytes:
         raw = bytearray(members()["dbf"])
@@ -1631,6 +1991,36 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
             "structure_mismatch",
         ),
         (
+            # The extraction-failure check's own plant (F4): the declared
+            # sizes all stand, so every earlier check passes and only the
+            # member's own read fails on the corrupted stream.
+            "extractfail",
+            invented.zip_stream_corrupt(zipped(members()), "syn.tile.01.prj"),
+            "structure_mismatch",
+        ),
+        (
+            # The member-count clause's own plant (F4): six flat members of
+            # one stem, two of them the same `.dbf` name.
+            "duplicatedb",
+            invented.zip_members_duplicated(
+                {f"syn.tile.01.{ext}": body for ext, body in members().items()},
+                "syn.tile.01.dbf",
+            ),
+            "structure_mismatch",
+        ),
+        (
+            # The member-set clause's own plant (F4): five members of one
+            # stem, one `.dbf` name twice and no `.cpg`, so only the member
+            # set itself differs from the published form.
+            "duplicateset",
+            invented.zip_members_duplicated(
+                {f"syn.tile.01.{ext}": body for ext, body in members().items()},
+                "syn.tile.01.dbf",
+                drop="cpg",
+            ),
+            "structure_mismatch",
+        ),
+        (
             "badprj",
             zipped(members(prj=b"not a wkt at all")),
             "reference_system",
@@ -1675,6 +2065,35 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
             # the terminator byte is read.
             "cutinsideheader",
             zipped(members(dbf=members()["dbf"][:100])),
+            "structure_mismatch",
+        ),
+        (
+            # The minimum-length clause's own plant (F4): a table shorter
+            # than its own header arithmetic.
+            "shortdbf",
+            zipped(members(dbf=b"cut inside the invented header")),
+            "structure_mismatch",
+        ),
+        (
+            # The version clause's own plant (F4): a version byte the
+            # published form never writes.
+            "versionbyte",
+            zipped(members(dbf=dbf_set(0, 0x30))),
+            "structure_mismatch",
+        ),
+        (
+            # The descriptor-decoding branch's own plant (F4): a field
+            # descriptor whose name holds a byte no ASCII table writes.
+            "descriptor",
+            zipped(members(dbf=dbf_set(32 + 2, 0xC3))),
+            "structure_mismatch",
+        ),
+        (
+            # The record-layout offset check's own plant (F4): the first
+            # field's declared size is one byte short of the record length,
+            # so the field sizes no longer sum to the record layout.
+            "offsetlayout",
+            zipped(members(dbf=dbf_set(32 + 16, 17))),
             "structure_mismatch",
         ),
         (
@@ -1757,6 +2176,39 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
             zipped(members(dbf=dbf_change(0, offset, b"+7".rjust(size)))),
             "height_value",
         ),
+        (
+            # The record-text decoding branch's own plant (F4): a record
+            # whose height text holds a byte no ASCII table writes.
+            "nonascii",
+            zipped(members(dbf=dbf_change(0, offset, b"\xc3\xa9".rjust(size)))),
+            "height_value",
+        ),
+        (
+            # The shape-reader catch's own plants (F3/F4): a cut index, and
+            # a record whose point count no published file writes. The cut
+            # is past the eight-byte header word but short of the first
+            # index record, so pyshp's index unpack raises struct.error.
+            "truncshx",
+            zipped(members(shx=members()["shx"][:20])),
+            "structure_mismatch",
+        ),
+        (
+            "emptypoints",
+            zipped(members(shp=invented.shp_record_numpoints(members()["shp"], 0))),
+            "structure_mismatch",
+        ),
+        (
+            # The geometry-conversion catch's own plants (F3/F4): a
+            # one-point ring and a two-point ring, both refused by name.
+            "onepoint",
+            zipped(members(shp=invented.shp_record_numpoints(members()["shp"], 1))),
+            "structure_mismatch",
+        ),
+        (
+            "shortring",
+            zipped(members(shp=invented.shp_record_numpoints(members()["shp"], 2))),
+            "structure_mismatch",
+        ),
     ]
     for index, body, reason in globfp_cases:
         with pytest.raises(HeightError) as err:
@@ -1790,7 +2242,45 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
         nodata=-32767,
     ) as target:
         target.write(np.zeros((1, 1), dtype="int16"), 1)
+    # The driver check's own plant (F2): an invented ASCII grid, a driver
+    # the declared structure does not name.
+    other_driver = tmp_path / "ascii.tif"
+    with rasterio.open(
+        other_driver,
+        "w",
+        driver="AAIGrid",
+        width=1,
+        height=1,
+        count=1,
+        dtype="int16",
+        transform=from_origin(0, 1, 1, 1),
+        nodata=-32767,
+    ) as target:
+        target.write(np.zeros((1, 1), dtype="int16"), 1)
     wsf_cases: list[tuple[str, bytes, str, Path]] = [
+        (
+            "driver",
+            other_driver.read_bytes(),
+            "structure_mismatch",
+            rules,
+        ),
+        (
+            # The band-type check's own plants (F2): a float type and an
+            # unsigned byte type, both stored by real drivers but neither
+            # the type the source publishes.
+            "floatdtype",
+            invented.wsf_bytes(tmp_path / "f32.tif", [[5]], 1, 1, dtype="float32"),
+            "structure_mismatch",
+            rules,
+        ),
+        (
+            "uint8dtype",
+            invented.wsf_bytes(
+                tmp_path / "u8.tif", [[5]], 1, 1, dtype="uint8", nodata=0
+            ),
+            "structure_mismatch",
+            rules,
+        ),
         (
             "nodata",
             invented.wsf_bytes(tmp_path / "n.tif", [[5]], 1, 1, nodata=-1),

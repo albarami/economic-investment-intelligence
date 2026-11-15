@@ -168,11 +168,19 @@ def _fetch_row(
         )
     digest = sha256_hex(prepared.body)
     retrieved = clock()
+    # What is stored of a final address is scheme, host and path only (rule
+    # 14): a storage host's signed redirect query never reaches a receipt,
+    # whichever fetcher built the row. Hops are never stored at all.
+    stored_url = (
+        public_address(prepared.fetch_url)
+        if entry.kind == "https_file"
+        else prepared.fetch_url
+    )
     sidecar = sidecar_for(
         entry,
         digest=digest,
         nbytes=len(prepared.body),
-        fetch_url=prepared.fetch_url,
+        fetch_url=stored_url,
         fetch_host=prepared.fetch_host,
         retrieved_utc=retrieved,
         publisher=prepared.publisher,
@@ -200,7 +208,7 @@ def _fetch_row(
         return None, FetchFailure(
             1,
             entry.source_id,
-            prepared.fetch_url,
+            stored_url,
             "write_failed",
             "stored file",
             "write failed",

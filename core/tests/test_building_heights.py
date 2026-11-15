@@ -24,6 +24,7 @@ from eii_core.calc.building_heights import (
     height_value,
     largest_overlap,
     metres,
+    positive_height,
     scaled_cell,
 )
 
@@ -249,6 +250,48 @@ def test_metres_rounds_once_half_up_to_two_decimals() -> None:
     for bad in (10, "10.5", Decimal("NaN"), Decimal("Infinity")):
         with pytest.raises(ValueError):
             metres(bad)
+
+
+@pytest.mark.parametrize(
+    "good",
+    [
+        Decimal(7),
+        Decimal("0.004"),
+        Decimal("123.456789012345678"),
+        Decimal("1E+60"),
+    ],
+)
+def test_positive_height_accepts_a_positive_finite_decimal(good) -> None:
+    """F5/R1: the reader's predicate lives here and rounds nothing."""
+    assert positive_height(good) is True
+
+
+def test_positive_height_never_rounds_the_value_it_judges() -> None:
+    """A value `height_value` would drop or round keeps every digit here."""
+    tiny = Decimal("0.004")
+    assert positive_height(tiny) is True
+    assert height_value(tiny) is None
+    long_text = Decimal("123.456789012345678")
+    assert positive_height(long_text) is True
+    assert height_value(long_text) == Decimal("123.46")
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [Decimal(0), Decimal(-1), Decimal("-0.1"), Decimal("Infinity"), Decimal("NaN")],
+)
+def test_positive_height_refuses_zero_negative_and_non_finite(bad) -> None:
+    """F5: the zero, negative and non-finite cases are tested here."""
+    assert positive_height(bad) is False
+
+
+@pytest.mark.parametrize(
+    "bad", [pytest.param(30, id="int"), pytest.param("30", id="str")]
+)
+def test_positive_height_of_another_type_is_a_defect(bad) -> None:
+    """A non-Decimal is a programming defect of the caller and still raises."""
+    with pytest.raises(ValueError):
+        positive_height(bad)
 
 
 def test_each_written_height_and_statistic_is_the_rounded_decimal() -> None:

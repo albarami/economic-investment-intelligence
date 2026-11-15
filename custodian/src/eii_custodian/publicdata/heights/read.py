@@ -14,7 +14,9 @@ from __future__ import annotations
 import hashlib
 import io
 import math
+import struct
 import zipfile
+import zlib
 from dataclasses import dataclass
 from decimal import Decimal
 from importlib import import_module
@@ -27,6 +29,7 @@ import numpy.typing as npt
 from affine import Affine
 from shapely.geometry.base import BaseGeometry
 
+from eii_core.calc.building_heights import positive_height
 from eii_custodian.publicdata.fetch.receipts import cache_directory
 from eii_custodian.publicdata.fetch.registry import Entry
 
@@ -64,9 +67,6 @@ _WINDOW_GROW_CELLS = 1
 # The body is hashed in pieces: the published cell file is about 2.1 GB and
 # is never held in memory whole. 8 MiB pieces keep the read bounded.
 _HASH_PIECE_BYTES = 8 << 20
-_NUMERIC_DTYPES = frozenset(
-    {"float16", "float32", "float64", "uint8", "uint16", "uint32", "int16", "int32"}
-)
 
 
 @dataclass(frozen=True)
@@ -197,8 +197,12 @@ def _declared_check(structure: SourceStructure) -> None:
 
 
 def _positive_height(value: Decimal) -> Decimal:
-    """The parsed height text must be a positive, finite Decimal."""
-    if not value.is_finite() or value <= 0:
+    """The parsed height text must be a positive, finite Decimal.
+
+    The comparison is `eii_core.calc`'s own tested predicate (rules 16 and 17,
+    ruling R1); it rounds nothing, so an 18-digit text keeps every digit.
+    """
+    if not positive_height(value):
         raise HeightError("height_value")
     return value
 
@@ -271,7 +275,11 @@ def _zip_members(body: bytes) -> dict[str, bytes]:
                     NotImplementedError,
                     EOFError,
                     OSError,
+                    zlib.error,
                 ):
+                    # A member that declares one size and holds another, or
+                    # whose stream no inflater can read, is data, refused by
+                    # name (the extraction failure's own plant).
                     raise HeightError("structure_mismatch") from None
     except zipfile.BadZipFile:
         raise HeightError("structure_mismatch") from None
@@ -336,10 +344,7 @@ def _dbf_heights(dbf: bytes, field_name: str) -> tuple[Decimal, ...]:
             text = record[field_offset : field_offset + field_size].decode("ascii")
         except UnicodeDecodeError:
             raise HeightError("height_value") from None
-        try:
-            heights.append(_positive_height(_height_decimal(text)))
-        except ArithmeticError:
-            raise HeightError("height_value") from None
+        heights.append(_positive_height(_height_decimal(text)))
     return tuple(heights)
 
 
@@ -375,7 +380,10 @@ def _parse_globfp(
             shp=io.BytesIO(bodies["shp"]), shx=io.BytesIO(bodies["shx"])
         )
         records = reader.shapes()
-    except Exception:
+    except (struct.error, shapefile.ShapefileException):
+        # Only the parse failures a malformed shape file or index provably
+        # raises are data, refused by name (V2); anything else is a
+        # programming defect and leaves this reader unchanged.
         raise HeightError("structure_mismatch") from None
     if len(records) != len(heights):
         raise HeightError("structure_mismatch")
@@ -385,7 +393,10 @@ def _parse_globfp(
             raise HeightError("structure_mismatch")
         try:
             footprint = geometry.shape(record.__geo_interface__)
-        except Exception:
+        except (IndexError, ValueError):
+            # A record whose rings no converter can read is data, refused by
+            # name (V2); a programming defect of the conversion leaves it
+            # unchanged.
             raise HeightError("structure_mismatch") from None
         if (
             footprint.is_empty
@@ -439,11 +450,11 @@ def _parse_wsf(
 ) -> WsfGrid:
     """The declared band's window over the building table, never the whole file.
 
-    The published raster stores tenths of a metre: the dataset's own scale,
-    offset, no-data value, `unit` tag and raster type must equal the declared
-    structure, and the declared scale is handed on for the value rule. Only
-    the cells inside the window are read; a window past the cell bound is
-    refused before any read.
+    The published raster stores tenths of a metre: the file's own driver and
+    the band's own stored type must equal the declared structure, as must its
+    scale, offset, no-data value, `unit` tag and raster type, and the declared
+    scale is handed on for the value rule. Only the cells inside the window
+    are read; a window past the cell bound is refused before any read.
     """
     checked = _local_file(cache, body_path)
     rasterio = import_module("rasterio")
@@ -458,12 +469,14 @@ def _parse_wsf(
         raise HeightError("structure_mismatch") from None
     try:
         with rasterio.open(checked) as source:
+            if source.driver != structure.format:
+                raise HeightError("structure_mismatch")
             if source.count != band:
+                raise HeightError("structure_mismatch")
+            if source.dtypes[band - 1] != structure.dtype:
                 raise HeightError("structure_mismatch")
             if source.crs is None or source.crs.to_epsg() != EPSG_WGS84:
                 raise HeightError("reference_system")
-            if any(dtype not in _NUMERIC_DTYPES for dtype in source.dtypes):
-                raise HeightError("structure_mismatch")
             if source.nodata is None or Decimal(str(source.nodata)) != declared_nodata:
                 raise HeightError("structure_mismatch")
             if (

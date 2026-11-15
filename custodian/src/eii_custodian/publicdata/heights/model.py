@@ -56,7 +56,7 @@ _RULES_KEYS = frozenset(
 )
 _STOREY_KEYS = frozenset({"value", "label", "basis"})
 _STRUCTURE_KEYS = frozenset(
-    {"format", "field", "band", "unit", "nodata", "scale", "crs"}
+    {"format", "field", "band", "unit", "nodata", "scale", "crs", "dtype"}
 )
 
 
@@ -85,7 +85,8 @@ class SourceStructure:
     """The declared structure of one height source (PUB-07).
 
     `scale` is declared only on the band form: a stored cell value times the
-    scale is metres. The field form carries no scale.
+    scale is metres. `dtype` is the band's own stored type, as the source
+    publishes it. The field form carries neither.
     """
 
     format: str
@@ -95,6 +96,7 @@ class SourceStructure:
     nodata: str
     scale: str
     crs: str
+    dtype: str
 
 
 @dataclass(frozen=True)
@@ -148,9 +150,12 @@ def _structure(raw: object, source_id: str) -> SourceStructure:
     has_field = "field" in raw
     has_band = "band" in raw
     has_scale = "scale" in raw
-    if has_field == has_band or (has_scale and has_field):
+    has_dtype = "dtype" in raw
+    if has_field == has_band or (has_scale and has_field) or (has_dtype and has_field):
         raise HeightError("rules_field_or_band")
     if has_band and not has_scale:
+        raise HeightError("rules_missing_key")
+    if has_band and not has_dtype:
         raise HeightError("rules_missing_key")
     nodata = raw["nodata"]
     if not isinstance(nodata, str):
@@ -163,6 +168,7 @@ def _structure(raw: object, source_id: str) -> SourceStructure:
         nodata=nodata,
         scale=_require_text(raw.get("scale", ""), "scale") if has_band else "",
         crs=_require_text(raw["crs"], "crs"),
+        dtype=_require_text(raw.get("dtype", ""), "dtype") if has_band else "",
     )
 
 
@@ -223,6 +229,7 @@ def structure_unconfirmed(structure: SourceStructure) -> bool:
         structure.nodata,
         structure.scale,
         structure.crs,
+        structure.dtype,
     }
 
 

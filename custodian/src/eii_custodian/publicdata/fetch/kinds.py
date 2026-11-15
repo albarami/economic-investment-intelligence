@@ -31,6 +31,7 @@ from eii_custodian.publicdata.fetch.transport import (
     Response,
     Transport,
     TransportFault,
+    public_address,
 )
 
 ARC_GIS_PAGE_SIZE = 2000
@@ -481,17 +482,25 @@ def _paged_cards(
 
 
 def _file(entry: Entry, reader: Read) -> Prepared:
+    """Fetch one HTTPS file. What is kept of the final address is its public form.
+
+    A storage host answers a file request with a signed, time-limited redirect
+    whose query holds credentials (rule 14): only scheme, host and path of
+    the final address ever reach the receipt, the manifest, a check's error
+    text or the log, and `hops` are never stored anywhere.
+    """
     response, failure = _call(entry, entry.url, reader)
     if failure is not None or response is None:
         return _failed(entry, failure)
+    final = public_address(response.final_url)
     rows = _json_rows(response.body)
-    counted = count_failure(entry, rows, response.final_url)
+    counted = count_failure(entry, rows, final)
     if counted is not None:
         return _failed(entry, counted)
     return Prepared(
         response.body,
-        response.final_url,
-        host_of(response.final_url),
+        final,
+        host_of(final),
         entry.publisher,
         "",
         len(rows) if rows is not None else None,

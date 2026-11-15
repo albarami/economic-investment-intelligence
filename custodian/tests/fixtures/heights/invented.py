@@ -2,17 +2,21 @@
 
 Invented GeoJSON tables, invented zipped shapefiles and a tiny invented
 raster, written only into a test's temporary folder; nothing real is fetched,
-and no binary file is committed. Every identifier uses the SYN- form and every
-host is an allow-listed host with an invented path. The shapefile fixtures are
-written by the pinned shapefile package's own writer; the bytes a writer
+and no binary file is committed. Every identifier uses the SYN- form; the
+fetch fixtures use the reserved invented host `syn-heights.invalid`, which
+only a test admits to the allow-list, and the refusal plants use the
+invented unlisted host `invented-unlisted.example`. The shapefile fixtures
+are written by the pinned shapefile package's own writer; the bytes a writer
 cannot produce (an 18-digit height text, a deletion mark, a wrong record
-count, an encryption flag) are patched in the tests with the helpers here.
+count, an encryption flag, a duplicated zip member, a corrupted member
+stream, a lying shape record) are patched in the tests with the helpers here.
 """
 
 from __future__ import annotations
 
 import io
 import json
+import warnings
 import zipfile
 
 import numpy as np
@@ -29,7 +33,7 @@ from eii_custodian.publicdata.fetch.receipts import (
 )
 from eii_custodian.publicdata.fetch.registry import Entry
 
-ALLOWED_HOST = "data.worldpop.org"
+ALLOWED_HOST = "syn-heights.invalid"
 BLOCKED_HOST = "invented-unlisted.example"
 NODATA = -32767
 WGS84_PRJ = (
@@ -251,6 +255,65 @@ def zip_flag_patch(body: bytes, flag: int) -> bytes:
     return bytes(raw)
 
 
+def zip_members_duplicated(members: dict, name: str, drop: str = "") -> bytes:
+    """Pack members with one member name written twice (the duplicate plants).
+
+    A dict cannot hold two entries of one name, so the planted
+    duplicate-extension and member-set refusals pack their zip here:
+    `name` is written twice and, when `drop` names an extension, one member
+    of that extension is left out. The standard library warns about the
+    repeated name; that warning is the plant's own form, not a defect.
+    """
+    out = io.BytesIO()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as archive:
+            for member, member_body in members.items():
+                if member.endswith(f".{drop}"):
+                    continue
+                archive.writestr(member, member_body)
+                if member == name:
+                    archive.writestr(member, member_body)
+    return out.getvalue()
+
+
+def zip_stream_corrupt(body: bytes, name: str) -> bytes:
+    """Flip one byte inside one member's compressed stream.
+
+    The central directory keeps its declared sizes, so every check before the
+    member's own read passes and only the read itself fails (the extraction
+    failure check's own plant).
+    """
+    raw = bytearray(body)
+    marker = b"PK\x03\x04"
+    at = body.find(marker)
+    while at >= 0:
+        name_len = int.from_bytes(raw[at + 26 : at + 28], "little")
+        extra_len = int.from_bytes(raw[at + 28 : at + 30], "little")
+        compressed = int.from_bytes(raw[at + 18 : at + 22], "little")
+        if bytes(raw[at + 30 : at + 30 + name_len]) == name.encode("ascii"):
+            if compressed < 2:
+                raise AssertionError("member stream too small to corrupt")
+            raw[at + 30 + name_len + extra_len + 1] ^= 0x55
+            return bytes(raw)
+        at = body.find(marker, at + 4)
+    raise AssertionError(name)
+
+
+def shp_record_numpoints(shp: bytes, count: int) -> bytes:
+    """Rewrite the first shape record's point count (planted parse failures).
+
+    The record content begins at byte 108 of the `.shp` body: shape type,
+    bounding box, part count, then the point count, all little-endian in the
+    published form. A count the writer never writes makes the shape parser
+    or the geometry conversion refuse.
+    """
+    raw = bytearray(shp)
+    at = 108 + 4 + 32 + 4
+    raw[at : at + 4] = count.to_bytes(4, "little")
+    return bytes(raw)
+
+
 def wsf_bytes(
     path,
     values: list,
@@ -312,6 +375,7 @@ def rules_document(
     wsf_nodata: str = str(NODATA),
     wsf_scale: str = "0.1",
     wsf_crs: str = "EPSG:4326",
+    wsf_dtype: str = "int16",
 ) -> dict:
     """A hand-made declared structure with invented names (B6)."""
     return {
@@ -339,6 +403,7 @@ def rules_document(
                 "nodata": wsf_nodata,
                 "scale": wsf_scale,
                 "crs": wsf_crs,
+                "dtype": wsf_dtype,
             },
         },
     }

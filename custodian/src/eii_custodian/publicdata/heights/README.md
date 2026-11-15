@@ -43,11 +43,13 @@ text `"3.0"` with the label `ASSUMPTION` (the lead's stated assumption of
 2026-11-14; the owner replaces it). It is parsed to `Decimal` — never a float —
 and no Python file may repeat the literal. The same file declares the structure
 each height source must match, in the form confirmed in pass five:
-`bldg_3dglobfp` is `shapefile_zip` with the field `Height`, and `bldg_wsf3d` is
-a `GTiff` band `1` with nodata `-32767` and scale `"0.1"`, both in metres and
-EPSG:4326; the value `to be confirmed` marks a source whose structure is not
-yet confirmed and that source is absent with reason `structure_unconfirmed`,
-never a failure.
+`bldg_3dglobfp` is `shapefile_zip` with the field `Height`, and `bldg_wsf3d`
+is a `GTiff` band `1` of the declared sample type `int16` with nodata
+`-32767` and scale `"0.1"`, both in metres and EPSG:4326; the reader refuses
+another driver or another sample type by name (`structure_mismatch`); the
+value `to be confirmed` marks a source whose structure is not yet confirmed
+and that source is absent with reason `structure_unconfirmed`, never a
+failure.
 
 ## Sources
 
