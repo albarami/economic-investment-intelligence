@@ -33,6 +33,7 @@ from eii_custodian.publicdata.fetch.report import (
 )
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
 from eii_custodian.publicdata.fetch.transport import Transport
+from eii_custodian.publicdata.investment_build import publish_investment
 from eii_custodian.publicdata.stage import run_stage
 
 CACHE_RELATIVE = "data/public_cache"
@@ -238,7 +239,32 @@ def run_build(
                 lines,
                 terms,
             )
+        batch = publish_investment(
+            entry, cache, fetched.digest, transport, sleep, clock
+        )
+        if batch is not None:
+            lines.append(
+                fail_line(
+                    entry.key,
+                    batch.url,
+                    batch.check,
+                    batch.expected,
+                    batch.observed,
+                )
+            )
+            failure = FetchFailure(
+                batch.code,
+                entry.source_id,
+                batch.url,
+                batch.check,
+                batch.expected,
+                batch.observed,
+            )
+            break
         lines.append(pass_line(entry.key, fetched.digest, fetched.fetch_host))
+        counted = cache / entry.source_id / "empty_coordinates.txt"
+        if counted.is_file():
+            lines.append(counted.read_text(encoding="utf-8").strip())
     if failure is None:
         failure = run_stage(cache, build_entries=entries, build_lines=lines).failure
         stage = run_stage(cache)

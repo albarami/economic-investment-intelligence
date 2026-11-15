@@ -3518,10 +3518,49 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: ["fdi_projects"]
-    caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
+    caveat_keys: ["fdi_estimates"]
+    columns:
+      - name: "company"
+        type: "string"
+      - name: "source_country"
+        type: "string"
+      - name: "sector"
+        type: "string"
+      - name: "sub_sector"
+        type: "string"
+      - name: "business_function"
+        type: "string"
+      - name: "project_type"
+        type: "string"
+      - name: "capex_value"
+        type: "number"
+      - name: "capex_unit"
+        type: "string"
+      - name: "jobs"
+        type: "number"
+      - name: "announced"
+        type: "string"
+      - name: "location_text"
+        type: "string"
+      - name: "project_id"
+        type: "integer"
+      - name: "capex_currency"
+        type: "string"
+      - name: "lat"
+        type: "number"
+      - name: "lng"
+        type: "number"
+      - name: "tags"
+        type: "string"
+      - name: "project_year"
+        type: "integer"
+      - name: "project_month"
+        type: "integer"
+    row_count_min: 1400
+    row_count_max: 2500
+    period_first: "2017"
+    period_last: "2026"
+    period_field: "announced"
     reconciliation: "none"
     skip_reason: ""
     extension: "html"
@@ -3546,11 +3585,36 @@ sources:
     commit_allowed: false
     release_tables: ["pub_investqa_record"]
     caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
+    columns:
+      - name: "record_type"
+        type: "string"
+      - name: "record_key"
+        type: "string"
+      - name: "page_key"
+        type: "string"
+      - name: "title"
+        type: "string"
+      - name: "heading"
+        type: "string"
+      - name: "level"
+        type: "integer"
+      - name: "ordinal"
+        type: "integer"
+      - name: "parent_ordinal"
+        type: "integer"
+      - name: "text_items"
+        type: "string"
+      - name: "links"
+        type: "string"
+      - name: "page_url"
+        type: "string"
+    row_count_min: 20
+    row_count_max: 5000
+    period_first: "2000"
+    period_last: "2000"
+    period_field: "period"
     reconciliation: "none"
-    skip_reason: "page_list_unconfirmed"
+    skip_reason: ""
     extension: "html"
   - key: "busy_gmaps"
     source_id: "busy_gmaps"
