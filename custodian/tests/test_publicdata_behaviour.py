@@ -12,7 +12,7 @@ import pytest
 
 from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
-from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.terms_text import (
     FINGERPRINT_VISIBLE_TEXT,
     terms_text_sha256,
@@ -548,9 +548,8 @@ def test_changed_terms_hash_is_logged_and_the_row_is_still_fetched(
 def test_skipped_watched_row_hashes_terms_and_does_not_switch_off(
     tmp_path: Path,
 ) -> None:
-    """The skipped investment row is still hashed, named on a change, and left off."""
-    by_id = {entry.source_id: entry for entry in load_registry()}
-    watched = by_id["investqa_pages"]
+    """An unconfirmed watched row is still hashed, named on a change, and left off."""
+    watched = _unconfirmed_watched()
     assert watched.terms_watch is True
     assert watched.skip_reason != ""
     previous = {
@@ -598,6 +597,26 @@ def test_skipped_watched_row_hashes_terms_and_does_not_switch_off(
             "terms_url": watched.terms_url,
         }
     ]
+
+
+def _unconfirmed_watched() -> Entry:
+    """A planted watched row whose page list is still unconfirmed."""
+    return replace(
+        _entry(),
+        key="unconfirmed_pages",
+        source_id="unconfirmed_pages",
+        kind="terms_page",
+        extension="html",
+        url="https://www.invest.qa/unconfirmed",
+        terms_url="https://www.invest.qa/en/terms-and-conditions?tab=terms-of-use",
+        terms_watch=True,
+        basis_note="Owner decision recorded for this planted unconfirmed row.",
+        fetch_host="www.invest.qa",
+        landing_url="https://www.invest.qa/unconfirmed",
+        licence_basis="dataset",
+        decision_record="",
+        skip_reason="page_list_unconfirmed",
+    )
 
 
 def _watched_entry() -> Entry:

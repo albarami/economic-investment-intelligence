@@ -1,0 +1,253 @@
+{
+  "lic_active": [
+    {
+      "lbldy": "بلدية تجريبية",
+      "rmz_lnsht_ltjry": "invented-code",
+      "lnsht_ltjry": "نشاط تجريبي",
+      "dd_lrkhs_lnsht": 3
+    }
+  ],
+  "lic_cancelled": [
+    {
+      "sn_llg": null,
+      "shhr_llg": null,
+      "lbldy": "بلدية تجريبية",
+      "rmz_lnsht_ltjry": "invented-code",
+      "sm_lnsht_ltjry": "نشاط تجريبي",
+      "dd_lrkhs_lmlg": 2
+    },
+    {
+      "sn_llg": "2020",
+      "shhr_llg": 7,
+      "lbldy": "بلدية تجريبية",
+      "rmz_lnsht_ltjry": "invented-code",
+      "sm_lnsht_ltjry": "نشاط تجريبي",
+      "dd_lrkhs_lmlg": 3
+    },
+    {
+      "sn_llg": "2022",
+      "shhr_llg": 6,
+      "lbldy": "بلدية تجريبية",
+      "rmz_lnsht_ltjry": "invented-code",
+      "sm_lnsht_ltjry": "نشاط تجريبي",
+      "dd_lrkhs_lmlg": 3
+    },
+    {
+      "sn_llg": "2024",
+      "shhr_llg": 9,
+      "lbldy": "بلدية تجريبية",
+      "rmz_lnsht_ltjry": "invented-code",
+      "sm_lnsht_ltjry": "نشاط تجريبي",
+      "dd_lrkhs_lmlg": 3
+    }
+  ],
+  "lic_issued": [
+    {
+      "sn_lsdr": 2025,
+      "shhr_lsdr": 5,
+      "lbldy": "بلدية تجريبية",
+      "rmz_lnsht_ltjry": "invented-code",
+      "sm_lnsht_ltjry": "نشاط تجريبي",
+      "dd_lrkhs_lsdr": 3
+    }
+  ],
+  "cus_imp_2025": [
+    {
+      "year": "2025",
+      "quarter": "invented-quarter",
+      "lrb": "ربع تجريبي",
+      "month": 1,
+      "harmonized_system_code": 190200000001,
+      "details": "invented pasta",
+      "ltfsyl": "معكرونة تجريبية",
+      "country_of_origin": null,
+      "dwl_lmnsh": null,
+      "quantity": 1.5,
+      "weight_in_kilograms": 2.5,
+      "value_in_qatari_riyals": 2000000000
+    }
+  ],
+  "cus_imp_2019": [
+    {
+      "lsn_year": "2019",
+      "lrb_quarter": "invented-quarter",
+      "lshhr_month": 1.0,
+      "hs8": "19.02.00.01",
+      "details": "invented pasta",
+      "ltfsyl": "معكرونة تجريبية",
+      "country_of_origin": null,
+      "dwl_lmnsh": null,
+      "quantity": 1.5,
+      "weight_kg": 2.5,
+      "value_qr": 4.5
+    }
+  ],
+  "sec_hr_ind": [
+    {
+      "year": "2022",
+      "activity_code": 561,
+      "main_economic_activity": "invented-activity",
+      "lnsht_lqtsdy_lry_ysy": "نشاط تجريبي",
+      "operating_surplus_value_in_1_000_qr": 11,
+      "compensation_of_employees_value_in_1_000_qr": 12,
+      "value_added_per_worker_qr": 13,
+      "productivity_of_employee_qr": 14,
+      "percentage_of_intermediate_services_to_output": 1.25,
+      "percentage_of_intermediate_goods_to_output": 2.5,
+      "average_annual_wage_qr": 17
+    }
+  ],
+  "sec_hr_goods": [
+    {
+      "year": "2022",
+      "activity_code": 561,
+      "main_economic_activity": "invented-activity",
+      "lnsht_lqtsdy_lry_ysy": "نشاط تجريبي",
+      "type_of_commodity": "invented-kind",
+      "nw_lsl": "نوع تجريبي",
+      "estimates_of_intermediate_goods_value_value_in_1_000_qr": 11
+    }
+  ],
+  "sec_hr_serv": [
+    {
+      "year": "2022",
+      "activity_code": 561,
+      "main_economic_activity": "invented-activity",
+      "lnsht_lqtsdy_lry_ysy": "نشاط تجريبي",
+      "type_of_service": "invented-kind",
+      "nw_lkhdm": "نوع تجريبي",
+      "estimates_of_intermediate_services_value_value_in_1_000_qr": 11
+    }
+  ],
+  "sec_hr_size": [
+    {
+      "year": "2022",
+      "activity_code": 561,
+      "main_economic_activity": "invented-activity",
+      "lnsht_lqtsdy_lry_ysy": "نشاط تجريبي",
+      "size_of_establishment": "invented-size",
+      "hjm_lmnsh": "حجم تجريبي",
+      "number_of_employees": 11,
+      "number_of_establishments": 12
+    }
+  ],
+  "wage_occ": [
+    {
+      "year": "2020",
+      "gender": "invented-a",
+      "lnw": "فئة تجريبية",
+      "occupation": "invented-occupation",
+      "lmhn": "مهنة تجريبية",
+      "paid_employment_workers": 1,
+      "monthly_average_wage_qr": 10
+    },
+    {
+      "year": "2020",
+      "gender": "invented-b",
+      "lnw": "فئة تجريبية",
+      "occupation": "invented-occupation",
+      "lmhn": "مهنة تجريبية",
+      "paid_employment_workers": 3,
+      "monthly_average_wage_qr": 20
+    },
+    {
+      "year": "2025",
+      "gender": "invented-a",
+      "lnw": "فئة تجريبية",
+      "occupation": "invented-occupation",
+      "lmhn": "مهنة تجريبية",
+      "paid_employment_workers": 3,
+      "monthly_average_wage_qr": 12
+    },
+    {
+      "year": "2025",
+      "gender": "invented-b",
+      "lnw": "فئة تجريبية",
+      "occupation": "invented-occupation",
+      "lmhn": "مهنة تجريبية",
+      "paid_employment_workers": 1,
+      "monthly_average_wage_qr": 22
+    }
+  ],
+  "wage_act": [
+    {
+      "year": "2020",
+      "gender": "invented-a",
+      "lnw": "فئة تجريبية",
+      "economic_activity": "invented-occupation",
+      "lnsht_lqtsdy": "مهنة تجريبية",
+      "paid_employment_workers": 1,
+      "monthly_average_wage_qr": 10
+    },
+    {
+      "year": "2020",
+      "gender": "invented-b",
+      "lnw": "فئة تجريبية",
+      "economic_activity": "invented-occupation",
+      "lnsht_lqtsdy": "مهنة تجريبية",
+      "paid_employment_workers": 3,
+      "monthly_average_wage_qr": 20
+    },
+    {
+      "year": "2025",
+      "gender": "invented-a",
+      "lnw": "فئة تجريبية",
+      "economic_activity": "invented-occupation",
+      "lnsht_lqtsdy": "مهنة تجريبية",
+      "paid_employment_workers": 3,
+      "monthly_average_wage_qr": 12
+    },
+    {
+      "year": "2025",
+      "gender": "invented-b",
+      "lnw": "فئة تجريبية",
+      "economic_activity": "invented-occupation",
+      "lnsht_lqtsdy": "مهنة تجريبية",
+      "paid_employment_workers": 1,
+      "monthly_average_wage_qr": 22
+    }
+  ],
+  "util_elec": [
+    {
+      "year": "2021",
+      "zone_number": "69",
+      "value": 12
+    },
+    {
+      "year": "2025",
+      "zone_number": "69",
+      "value": 30
+    },
+    {
+      "year": "2026",
+      "zone_number": "69",
+      "value": 5
+    }
+  ],
+  "transit_monthly": [
+    {
+      "year": "2024",
+      "month": "December",
+      "lshhr": "شهر تجريبي",
+      "public_transport_buses": 1,
+      "doha_metro": 10,
+      "lusail_tram": 3
+    },
+    {
+      "year": "2025",
+      "month": "December",
+      "lshhr": "شهر تجريبي",
+      "public_transport_buses": 1,
+      "doha_metro": 15,
+      "lusail_tram": 3
+    },
+    {
+      "year": "2026",
+      "month": "January",
+      "lshhr": "شهر تجريبي",
+      "public_transport_buses": 1,
+      "doha_metro": 20,
+      "lusail_tram": 3
+    }
+  ]
+}

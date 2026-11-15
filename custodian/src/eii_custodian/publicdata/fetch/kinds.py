@@ -104,9 +104,21 @@ class _HopRefused(Exception):
         super().__init__(url)
 
 
+def read_bounded(
+    transport: Transport, sleep: Callable[[float], None], url: str
+) -> tuple[Response | None, AttemptFailure | None]:
+    """Read one URL through the existing retry and redirect checks."""
+    return _call_url(url, _reader(transport, sleep))
+
+
 def _call(
     entry: Entry, url: str, reader: Read
 ) -> tuple[Response | None, AttemptFailure | None]:
+    del entry
+    return _call_url(url, reader)
+
+
+def _call_url(url: str, reader: Read) -> tuple[Response | None, AttemptFailure | None]:
     decision = approve(url)
     if not decision.ok:
         return None, AttemptFailure(1, url, "blocked_host", "allow-listed host", url)

@@ -23,7 +23,15 @@ sources:
     commit_allowed: false
     release_tables: ["pub_licence_active"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "lbldy"
+        type: "string"
+      - name: "rmz_lnsht_ltjry"
+        type: "string"
+      - name: "lnsht_ltjry"
+        type: "string"
+      - name: "dd_lrkhs_lnsht"
+        type: "integer"
     row_count_min: 13189
     row_count_max: 13189
     reconciliation: "none"
@@ -48,7 +56,19 @@ sources:
     commit_allowed: false
     release_tables: ["pub_licence_cancelled"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "sn_llg"
+        type: "string"
+      - name: "shhr_llg"
+        type: "integer"
+      - name: "lbldy"
+        type: "string"
+      - name: "rmz_lnsht_ltjry"
+        type: "string"
+      - name: "sm_lnsht_ltjry"
+        type: "string"
+      - name: "dd_lrkhs_lmlg"
+        type: "integer"
     row_count_min: 40472
     row_count_max: 40472
     reconciliation: "none"
@@ -73,7 +93,19 @@ sources:
     commit_allowed: false
     release_tables: ["pub_licence_issued"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "sn_lsdr"
+        type: "integer"
+      - name: "shhr_lsdr"
+        type: "integer"
+      - name: "lbldy"
+        type: "string"
+      - name: "rmz_lnsht_ltjry"
+        type: "string"
+      - name: "sm_lnsht_ltjry"
+        type: "string"
+      - name: "dd_lrkhs_lsdr"
+        type: "integer"
     row_count_min: 8259
     row_count_max: 8259
     reconciliation: "none"
@@ -98,7 +130,31 @@ sources:
     commit_allowed: false
     release_tables: ["pub_customs_import"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "quarter"
+        type: "string"
+      - name: "lrb"
+        type: "string"
+      - name: "month"
+        type: "integer"
+      - name: "harmonized_system_code"
+        type: "integer"
+      - name: "details"
+        type: "string"
+      - name: "ltfsyl"
+        type: "string"
+      - name: "country_of_origin"
+        type: "string"
+      - name: "dwl_lmnsh"
+        type: "string"
+      - name: "quantity"
+        type: "number"
+      - name: "weight_in_kilograms"
+        type: "number"
+      - name: "value_in_qatari_riyals"
+        type: "number"
     row_count_min: 252048
     row_count_max: 252048
     reconciliation: "none"
@@ -123,7 +179,29 @@ sources:
     commit_allowed: false
     release_tables: ["pub_customs_import"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "lsn_year"
+        type: "string"
+      - name: "lrb_quarter"
+        type: "string"
+      - name: "lshhr_month"
+        type: "number"
+      - name: "hs8"
+        type: "string"
+      - name: "ltfsyl"
+        type: "string"
+      - name: "details"
+        type: "string"
+      - name: "dwl_lmnsh"
+        type: "string"
+      - name: "country_of_origin"
+        type: "string"
+      - name: "quantity"
+        type: "number"
+      - name: "weight_kg"
+        type: "number"
+      - name: "value_qr"
+        type: "number"
     row_count_min: 830494
     row_count_max: 830494
     reconciliation: "none"
@@ -148,7 +226,37 @@ sources:
     commit_allowed: false
     release_tables: ["pub_sector_accounts"]
     caveat_keys: []
-    columns: []
+    # PUB-64 source-field -> contract (ruling L-203 R6):
+    # sec_hr_ind.operating_surplus_value_in_1_000_qr -> pub_sector_accounts.value:operating_surplus
+    # sec_hr_ind.compensation_of_employees_value_in_1_000_qr -> pub_sector_accounts.value:compensation
+    # sec_hr_ind.value_added_per_worker_qr -> pub_sector_accounts.value:value_added_per_worker
+    # sec_hr_ind.productivity_of_employee_qr -> pub_sector_accounts.value:productivity_of_employee
+    # sec_hr_ind.percentage_of_intermediate_services_to_output -> pub_sector_accounts.value:services_share
+    # sec_hr_ind.percentage_of_intermediate_goods_to_output -> pub_sector_accounts.value:goods_share
+    # sec_hr_ind.average_annual_wage_qr -> pub_sector_accounts.value:average_annual_wage
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "integer"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "operating_surplus_value_in_1_000_qr"
+        type: "integer"
+      - name: "compensation_of_employees_value_in_1_000_qr"
+        type: "integer"
+      - name: "value_added_per_worker_qr"
+        type: "integer"
+      - name: "productivity_of_employee_qr"
+        type: "integer"
+      - name: "percentage_of_intermediate_services_to_output"
+        type: "number"
+      - name: "percentage_of_intermediate_goods_to_output"
+        type: "number"
+      - name: "average_annual_wage_qr"
+        type: "integer"
     row_count_min: null
     row_count_max: null
     reconciliation: "open"
@@ -173,10 +281,26 @@ sources:
     commit_allowed: false
     release_tables: ["pub_sector_accounts"]
     caveat_keys: []
-    columns: []
+    # PUB-64 source-field -> contract (ruling L-203 R6):
+    # sec_hr_goods.estimates_of_intermediate_goods_value_value_in_1_000_qr -> pub_sector_accounts.value:intermediate_goods
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "integer"
+      - name: "type_of_commodity"
+        type: "string"
+      - name: "nw_lsl"
+        type: "string"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "estimates_of_intermediate_goods_value_value_in_1_000_qr"
+        type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "none"
+    reconciliation: "open"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_serv"
@@ -198,10 +322,26 @@ sources:
     commit_allowed: false
     release_tables: ["pub_sector_accounts"]
     caveat_keys: []
-    columns: []
+    # PUB-64 source-field -> contract (ruling L-203 R6):
+    # sec_hr_serv.estimates_of_intermediate_services_value_value_in_1_000_qr -> pub_sector_accounts.value:intermediate_services
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "integer"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "type_of_service"
+        type: "string"
+      - name: "nw_lkhdm"
+        type: "string"
+      - name: "estimates_of_intermediate_services_value_value_in_1_000_qr"
+        type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "none"
+    reconciliation: "open"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_size"
@@ -223,10 +363,29 @@ sources:
     commit_allowed: false
     release_tables: ["pub_sector_accounts", "pub_establishment_size"]
     caveat_keys: []
-    columns: []
+    # PUB-64 source-field -> contract (ruling L-203 R6):
+    # sec_hr_size.number_of_employees -> pub_sector_accounts.value:employees
+    # sec_hr_size.number_of_establishments -> pub_sector_accounts.value:establishments
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "integer"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "size_of_establishment"
+        type: "string"
+      - name: "hjm_lmnsh"
+        type: "string"
+      - name: "number_of_employees"
+        type: "integer"
+      - name: "number_of_establishments"
+        type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "none"
+    reconciliation: "open"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_comp_occ"
@@ -273,7 +432,21 @@ sources:
     commit_allowed: false
     release_tables: ["pub_wage_table"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "gender"
+        type: "string"
+      - name: "lnw"
+        type: "string"
+      - name: "occupation"
+        type: "string"
+      - name: "lmhn"
+        type: "string"
+      - name: "paid_employment_workers"
+        type: "integer"
+      - name: "monthly_average_wage_qr"
+        type: "integer"
     row_count_min: null
     row_count_max: null
     reconciliation: "open"
@@ -298,7 +471,21 @@ sources:
     commit_allowed: false
     release_tables: ["pub_wage_table"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "gender"
+        type: "string"
+      - name: "lnw"
+        type: "string"
+      - name: "economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy"
+        type: "string"
+      - name: "paid_employment_workers"
+        type: "integer"
+      - name: "monthly_average_wage_qr"
+        type: "integer"
     row_count_min: null
     row_count_max: null
     reconciliation: "open"
@@ -384,7 +571,7 @@ sources:
     slug: "electricity-total-consumption-by-zone-number"
     kind: "portal_dataset"
     title_en: "Electricity total consumption by zone number"
-    publisher: "Kahramaa"
+    publisher: "KAHRAMAA"
     licence_id: "CC-BY-4.0"
     licence_basis: "dataset"
     licence_url: "https://www.data.gov.qa/pages/license/annexes"
@@ -398,7 +585,13 @@ sources:
     commit_allowed: false
     release_tables: ["pub_zone_utility"]
     caveat_keys: ["proxy_not_population", "partial_latest_year"]
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "zone_number"
+        type: "string"
+      - name: "value"
+        type: "integer"
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
@@ -448,7 +641,19 @@ sources:
     commit_allowed: false
     release_tables: ["pub_transit_monthly"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "month"
+        type: "string"
+      - name: "lshhr"
+        type: "string"
+      - name: "public_transport_buses"
+        type: "integer"
+      - name: "doha_metro"
+        type: "integer"
+      - name: "lusail_tram"
+        type: "integer"
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
@@ -559,10 +764,10 @@ sources:
     slug: "population-area-and-population-density-per-square-kilometers-by-zone"
     kind: "portal_dataset"
     title_en: "Population, area and population density by zone"
-    publisher: "to be confirmed at slice S2"
-    licence_id: "unconfirmed"
-    licence_basis: "none_stated"
-    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-area-and-population-density-per-square-kilometers-by-zone/exports/json"
@@ -577,17 +782,17 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "publisher_or_licence_unconfirmed"
+    skip_reason: "cache_fields_unconfirmed; adapter_unavailable"
     extension: "json"
   - key: "est_census"
     source_id: "est_census"
     slug: "number-of-business-establishments-by-economic-activity-in-census-2010-2020"
     kind: "portal_dataset"
     title_en: "Number of business establishments by economic activity in census (2010, 2020)"
-    publisher: "to be confirmed at slice S2"
+    publisher: "National Planning Council"
     licence_id: "CC-BY-4.0"
     licence_basis: "dataset"
-    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-business-establishments-by-economic-activity-in-census-2010-2020/exports/json"
@@ -598,21 +803,28 @@ sources:
     commit_allowed: false
     release_tables: ["pub_census_national"]
     caveat_keys: []
-    columns: []
+    columns:
+      - {name: "economic_activity", type: "string"}
+      - {name: "economic_activity_ar", type: "string"}
+      - {name: "census_2020", type: "integer"}
+      - {name: "percent_census_2020", type: "number"}
+      - {name: "census_2010_2010", type: "integer"}
+      - {name: "percent_census_2010", type: "number"}
+      - {name: "percent_change", type: "number"}
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "publisher_or_licence_unconfirmed"
+    skip_reason: ""
     extension: "json"
   - key: "census_hh_type_2020"
     source_id: "census_hh_type_2020"
     slug: "population-by-type-of-household-gender-and-place-of-residence-on-the-census-night-december-2020"
     kind: "portal_dataset"
     title_en: "Population by type of household, gender and place of residence on the census night, December 2020"
-    publisher: "to be confirmed at slice S2"
-    licence_id: "unconfirmed"
-    licence_basis: "none_stated"
-    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-by-type-of-household-gender-and-place-of-residence-on-the-census-night-december-2020/exports/json"
@@ -627,7 +839,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "publisher_or_licence_unconfirmed"
+    skip_reason: "cache_fields_unconfirmed; adapter_unavailable"
     extension: "json"
   - key: "accident"
     source_id: "accident"
@@ -892,25 +1104,25 @@ sources:
     kind: "https_file"
     title_en: "Qatar Subnational Administrative Boundaries (COD-AB)"
     publisher: "HDX, source Planning and Statistics Authority"
-    licence_id: "CC-BY-IGO"
+    licence_id: "cc-by-igo"
     licence_basis: "dataset"
     licence_url: "https://data.humdata.org/dataset/cod-ab-qat"
     decision_record: ""
     fetch_host: "data.humdata.org"
-    url: ""
+    url: "https://data.humdata.org/dataset/6a84f3b8-41cd-4769-a61f-6dbd5f61bd05/resource/1955adf8-4e4a-4a87-b3f0-0fbe6e761ca9/download/qat_admin_boundaries.geojson.zip"
     terms_url: ""
     landing_url: "https://data.humdata.org/dataset/cod-ab-qat"
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: ["zone", "municipality", "gazetteer"]
+    release_tables: ["zone", "municipality", "gazetteer", "district"]
     caveat_keys: []
     columns: []
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "direct_url_unconfirmed"
-    extension: "json"
+    skip_reason: ""
+    extension: "zip"
   - key: "bnd_muni_2025"
     source_id: "bnd_muni_2025"
     slug: "municipalities-in-qatar-2025"
@@ -3306,10 +3518,49 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: ["fdi_projects"]
-    caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
+    caveat_keys: ["fdi_estimates"]
+    columns:
+      - name: "company"
+        type: "string"
+      - name: "source_country"
+        type: "string"
+      - name: "sector"
+        type: "string"
+      - name: "sub_sector"
+        type: "string"
+      - name: "business_function"
+        type: "string"
+      - name: "project_type"
+        type: "string"
+      - name: "capex_value"
+        type: "number"
+      - name: "capex_unit"
+        type: "string"
+      - name: "jobs"
+        type: "number"
+      - name: "announced"
+        type: "string"
+      - name: "location_text"
+        type: "string"
+      - name: "project_id"
+        type: "integer"
+      - name: "capex_currency"
+        type: "string"
+      - name: "lat"
+        type: "number"
+      - name: "lng"
+        type: "number"
+      - name: "tags"
+        type: "string"
+      - name: "project_year"
+        type: "integer"
+      - name: "project_month"
+        type: "integer"
+    row_count_min: 1400
+    row_count_max: 2500
+    period_first: "2017"
+    period_last: "2026"
+    period_field: "announced"
     reconciliation: "none"
     skip_reason: ""
     extension: "html"
@@ -3334,11 +3585,36 @@ sources:
     commit_allowed: false
     release_tables: ["pub_investqa_record"]
     caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
+    columns:
+      - name: "record_type"
+        type: "string"
+      - name: "record_key"
+        type: "string"
+      - name: "page_key"
+        type: "string"
+      - name: "title"
+        type: "string"
+      - name: "heading"
+        type: "string"
+      - name: "level"
+        type: "integer"
+      - name: "ordinal"
+        type: "integer"
+      - name: "parent_ordinal"
+        type: "integer"
+      - name: "text_items"
+        type: "string"
+      - name: "links"
+        type: "string"
+      - name: "page_url"
+        type: "string"
+    row_count_min: 20
+    row_count_max: 5000
+    period_first: "2000"
+    period_last: "2000"
+    period_field: "period"
     reconciliation: "none"
-    skip_reason: "page_list_unconfirmed"
+    skip_reason: ""
     extension: "html"
   - key: "busy_gmaps"
     source_id: "busy_gmaps"

@@ -54,6 +54,7 @@
 - OPTIONS: **Recommendation:** follow the documented reconciliation and default to the named production-value and occupation tables only after sign-off. Otherwise leave the figures hidden.
 - NEEDED BY: slice S2 reconciliation; slice S7 methods and affected story scenes.
 - UPDATE: 2026-11-14, by [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): Restaurant production value is not a field of the present datasets and is neither derived nor shown. It is no longer a default or a reconciliation candidate. Reconciliation R1 is closed on that basis in the reconciliation record of task S2-T03, which is not merged yet. The wage-table reconciliation remains. Card C4 keeps shares of output computed from published figures only (item 12).
+- UPDATE: 2026-11-15, by the ledger of merge train A (task S2-T03): the two reconciliations are computed and recorded. R1 is recorded as "closed: not published": the production value is not a field of the four datasets and is neither derived nor shown. R2 is recorded as "reconciled: tables differ, occupation table used", with the other mean shown in the source chain. These status words are written by code as dispositions of evidence; they are not closure of this item and they release nothing. The closure mechanism and its tests are built: a missing record or an absent sign-off cannot close the item or release an affected fact, and every affected display fact stays blocked. The reconciliation record `docs/decisions/0025-reconciliation-of-restaurant-and-wage-figures.md` is proposed, not accepted. Still needed: the advisor's signed note under the owner's delegation, bound to the hash of that record and to the complete affected source set; then the registry entries move to resolved and the lead records the closure. OI-171 and OI-172 wait for the same sign-off.
 
 
 ## OI-04 — Census map-layer licence
@@ -1502,6 +1503,181 @@
 - OPTIONS: **Default:** task S2-T21 changes the loader, the fetch, the rows and their tests before the slice S2 gate; until then the loader stands as built and reviewed.
 - NEEDED BY: the slice S2 gate (task S2-T21, before the pack assembly S2-T08).
 
+## OI-166 — Placing a location that has no base cell
+
+- ID: OI-166
+- TYPE: OPEN
+- NEEDED: A rule, in its own decision record, for placing a location whose point has no base cell under [decision 0030](docs/decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) item 2: a register company's registered location, a case sample file's depot and a synthetic record. What a pin, a gazetteer key with a null `cell`, the release unit of a site under PRV-126 and card C33, and the candidate depot of card C29 get is already decided (no protected or Simulated figure, PRV-135; item 10), and so is a Public supply point of a Simulated access layer (item 11, put to the owner with its default); they are not part of this item.
+- WHY: The fixed grid does not cover the land exactly. On the real boundaries, 460 resolution-9 places with their centre in the mapped land area, about 48.45 km² in three municipalities outside Greater Doha that reach the coast or the border, have no owner, and edge pieces of places centred at sea or beyond the border have no cell, in Greater Doha too (decision 0030 item 12). PRV-11 fails the build for a contributor whose cell is not a row of `grid_cell`, and no cell is substituted for a point (item 2), so a location there can be neither placed nor moved.
+- DONE SO FAR: Decision 0030 records the question under "What is not decided" and "Open questions and assumptions", and ruling L-280 part (6) enters it here. Until the first task that places such a location decides it in its own record, three things hold: PRV-11 fails the build for a contributor; DAT-164's null `registered_cell` puts a register company in no area; the build report counts such locations first, so the size of the case is known before a rule is chosen. No generator moves a contributor into a neighbouring cell. Nothing is built.
+- OPTIONS: **Default until decided:** the three holds above. The rule is decided by the first task that places such a location, after its build report has counted the cases; the lead's default owner for the register companies' registered locations is task S4-T02. For a case sample file's depot and for a synthetic record no owner task is named: the task that first places one names this item in its plan.
+- NEEDED BY: the first task that places such a location (task S4-T02 by default, for the register companies), before its build places one.
+
+## OI-167 — A null-district fixture for the generator of SYN-32 and its fidelity check F15
+
+- ID: OI-167
+- TYPE: OPEN
+- NEEDED: When the generator of SYN-32 (family-housing residents sorted mildly by wage toward districts with higher median sale prices, at the rank correlation `res.wage_sorting`) and its fidelity check F15 (the rank correlation of family-housing wage with district sale price, within 0.1 of `res.wage_sorting`) are built, their fixtures include a cell with a null `district_key` in a reviewed district-free zone; a missing district price is never substituted, and no fidelity tolerance is relaxed for it.
+- WHY: Under [decision 0030](docs/decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) item 7, `grid_cell.district_key` is null for a cell whose centre lies in a zone listed in `zones_without_districts.csv`; the real frame has five such cells, all in zone 99. A reader that finds the null gives no district context and substitutes no neighbouring district (item 9), so SYN-32 and F15, which read a district's sale price, meet cells without one.
+- DONE SO FAR: Proposed by the one design review of decision 0030 (OpenAI GPT-6 Astra through Codex) and entered as an open item by ruling L-294; the record carries it under "Open questions and assumptions". Nothing is built.
+- OPTIONS: **Default:** the fixture and the two prohibitions of NEEDED are part of the owning task's tests. The owner is the task whose plan first covers the generator of SYN-32 and check F15; no task of TASKS.md lists SYN-32 in its Requirements line on main, so the plan of that task names this item.
+- NEEDED BY: that task, before its first world build.
+
+## OI-170 — The `Employed` indicator of the municipal population source is not loaded
+
+- ID: OI-170
+- TYPE: OPEN
+- NEEDED: the privacy judgement whether a count of the employed by municipality of residence belongs in what the attacker is assumed to know, taken at the design of slice S5; until then the count stays unloaded.
+- WHY: the source `pop_muni` holds an `Employed` indicator that maps to no contract token of `pub_population_municipality`; whether such a count is part of the attacker's assumed knowledge is a privacy judgement, not a mapping the task may choose (the lead's ruling for the seventh pass).
+- DONE SO FAR: `custodian/publicdata/review/population_indicators.csv` lists `Employed` with a blank token; the live build reports the unmapped indicators' rows as not loaded (192 rows on the real run, `Employed` among them), refuses an indicator the file does not list with the source and the indicator named, and a test pins the committed file with two planted edits of a copy.
+- OPTIONS: **Recommendation:** decide at the slice S5 privacy design, before any task loads or uses the count; loading it earlier needs that decision first.
+- NEEDED BY: the design of slice S5.
+
+## OI-171 — Three bed-linen lines whose two descriptions disagree
+
+- ID: OI-171
+- TYPE: OPEN
+- NEEDED: A decision whether the three customs lines whose English description says table linen while the Arabic says bed linen enter the hotel basket on the nomenclature's text, or stay excluded.
+- WHY: The bilingual review read the English as the publisher's error, and the international subheading supports that reading; but the review's own rule is that a line whose two descriptions disagree is not used, and settling it needs the nomenclature cited as a source, which the pack does not hold. Keeping a line out cannot put another product's imports into a unit value.
+- DONE SO FAR: The three lines stay excluded with the corrected reason; the input 'bed linen' is narrower than its name and says so.
+- OPTIONS: **Recommendation:** keep the lines out until the OI-03 sign-off decides; including them needs the nomenclature as a cited source.
+- NEEDED BY: the OI-03 sign-off; the hotel basket.
+
+## OI-172 — Owner's confirmation of the reviewed customs baskets
+
+- ID: OI-172
+- TYPE: OPEN
+- NEEDED: The owner's confirmation of the reviewed baskets in `custodian/publicdata/review/baskets.yaml`.
+- WHY: The baskets are reviewed by two expert personas of two makers (a procurement persona proposed the lines; a bilingual customs persona checked every line in both languages), not by a person; the file says so in its status and reviewer fields.
+- DONE SO FAR: 24 inputs over three activities; 74 included and 96 excluded lines, each with reasons, reviewer role, date and the hash of the source read; the build checks every listed code against the customs source's own twelve-digit lines and every sibling under an included eight-digit parent.
+- OPTIONS: **Recommendation:** confirm at the OI-03 sign-off, or name the lines to re-review.
+- NEEDED BY: the unit-value figures of PUB-65 and the estimates that read the baskets.
+
+## OI-173 — MTH-30 historical selection not called by the build
+
+- ID: OI-173
+- TYPE: OPEN
+- NEEDED: Wire the historical selection of `baskets.py` into the series build so a 2019-era eight-digit parent that also holds excluded lines is marked "includes excluded lines" or withheld (PUB-44, MTH-30).
+- WHY: The function exists and is tested, but `build_series` never calls it; 2019 contract rows carry no rollup_note.
+- DONE SO FAR: The function and its tests exist; the point was proposed by the first review and restated by the confirmation review as a slice follow-up. The owned anchors are 2025 figures.
+- OPTIONS: **Recommendation:** assign to the slice's follow-up task.
+- NEEDED BY: any 2019-period customs contract row.
+
+## OI-174 — The task's municipality alias file is replaced by the frame's crosswalk
+
+- ID: OI-174
+- TYPE: PENDING
+- NEEDED: When this task joins a main that holds the frame (S2-T02), replace this task's own alias file `custodian/publicdata/review/municipality_aliases.json` (empty) by the frame's crosswalk file (PUB-27); the licence-file spelling that waited for a reviewed alias resolves there.
+- WHY: The pack rules municipality names through the frame's committed crosswalk: an exact lookup after white-space normalisation, and an unmapped spelling fails the build.
+- DONE SO FAR: The exact-match join and its named check are built; the alias file ships empty; the lead's real-cache runs reported one unmatched spelling. Merge train A carries this task and S2-T02 with each task's approved change unchanged (decision 0032 item 2), so the join itself does not make the replacement.
+- OPTIONS: **Recommendation:** task S2-T08 adopts the frame's names file for the licence series and drops the task's own alias file, with the test that an unmapped spelling fails the build.
+- NEEDED BY: task S2-T08 (the Public pack assembly), whose build joins the series with the frame; before the slice S2 gate.
+
+## OI-175 — PUB-67 incomplete by design on this task's inputs
+
+- ID: OI-175
+- TYPE: PENDING
+- NEEDED: Nothing of this task: five of the nine PUB-67 stage values are S2-T04's and the frame's. This record keeps the handoff visible.
+- WHY: On this task's inputs the stage names PUB-67 as the first incomplete anchor and exits 1, as designed; a complete run is proved only when the tasks are joined.
+- DONE SO FAR: This task's four own values hold on the real cache; the reconciliation file names the handoff; the nine literals are asserted against the code's table and the document.
+- OPTIONS: **Recommendation:** close when S2-T04's five values are asserted at the join.
+- NEEDED BY: the section 9 regression criterion, when task S2-T04 stands on the same tree (S2-T04 is not in merge train A).
+
+## OI-176 — Five low defects of the public-series calculations, fixed on the calculation layer's final form
+
+- ID: OI-176
+- TYPE: OPEN
+- NEEDED: The five defects D1 to D5 that the internal verification of task S2-T03 found are fixed once, with a planted test each, on the final form of the calculation layer: the branch of task S2-T07, which replaces `core/src/eii_core/calc/public_series.py` whole.
+- WHY: The verification (2026-11-15, at the commit dde9aeedd273c9f82c6e74b6b921ba1b3ee4f4c6; a helper of the lead on the lead's own maker and model, so an internal second reading and not another maker's review) found every formula equal to its card and no defect on a recorded figure of the task. The five defects, each reproduced on invented inputs:
+  - D1, an exact half can round the wrong way, and the identity of MTH-21 is not exact (functions `ratio`, `weighted_mean` and `decomposition`): division is made at 28 digits before the later steps, so the value handed to `rounded` is already rounded once. Invented input: before, 5 workers at wage 1 and 1 at wage 0; after, 2 at wage 1 and 1 at wage 2; the means are 5/6 and 4/3 and the change is exactly 0.5. Got "0"; expected "1". Two more invented cases: a within part of exactly 8.5 printed "8", expected "9"; a mix share of exactly 6.25 per cent printed "6.2", expected "6.3". A breach of "round only at the end" (document 04 section 10).
+  - D2, a negative zero is printed (function `rounded`). Invented input: minus 0.4 at zero places gives "-0", expected "0"; minus 0.004 at two places gives "-0.00", expected "0.00".
+  - D3, a silent zero in PUB-64 (the series build's figures module). Invented input: the four tables present, one indicator row for activity 561 and 2022, no size row for that activity and year. Got establishments "0" and employees "0"; expected a refusal (MTH-09: never zero for an unknown).
+  - D4, dated cancellations outside the calendar of card C2 are left out of the rule without notice but stay in the totals (the PUB-68 branch of the figures module; `bulk_months`). Invented input: three named months of 42, 9 and 8, one other month of 2, 4 in June 2025, 6 in December 2014 and 9 undated. Got a dated total of 71 and a share of 83; expected the calendar's own total and share, 61 and 97, with the outside rows counted apart, or a refusal that names the period.
+  - D5, a sum of quantities whose unit the source does not state (`country_totals` of the figures module; an internal evidence file only). Invented input: two rows of one country with quantities 3 and 40. Got a quantity of 43; expected no such total (PUB-45: other units are counted, never combined).
+- DONE SO FAR: The lead's ruling L-354 keeps S2-T03 in merge train A: the lead's real-cache run at the task's fix commit printed every value of PUB-62 to PUB-66 and PUB-68 to PUB-70 equal to the pack's figures, and the lead's count on the real cancelled-licence file on 2026-11-15 found 40,472 rows, 1,221 undated, 39,251 inside the calendar of card C2 and 0 outside it. A fix pass on the branch of task S2-T07 runs since 2026-11-15 (started again as a join-and-fix pass after the lead's ruling L-357 on the square root of the interval method). The verification's list of tests that could pass on wrong code (its section V7, in the task's log) goes to the same pass.
+- OPTIONS: **Default:** the fix as the verification writes it for each defect (exact rationals up to the output and a sign-safe `rounded` for D1 and D2; a refusal for D3; a refusal or a separate count for D4; no summed quantity for D5), on S2-T07's branch only; `public_series.py` as merged by train A is not patched apart.
+- NEEDED BY: the merge of task S2-T07, which does not merge without the fix. Closes when S2-T07's review confirms the five fixes, each with its planted test, on its approved commit.
+
+## OI-177 — Secret-scanner evidence of S2-T12, pinned at its turn
+
+- ID: OI-177
+- TYPE: PENDING
+- NEEDED: The pinned secret-scanner result of task S2-T12 — its command, the exact commit it ran on and its exit status — recorded at the task's turn, beside the hosted checks.
+- WHY: Both external review rounds found no secret and no real custodian record in the patch, but the supplied evidence does not establish that the secret scanner passed; the first review's record point asks for the pinned result and the confirmation repeats it.
+- DONE SO FAR: The lead's local checks at commit 0682edc ran the documentation check with the owner's private pattern list, exit 0; the reviews' own reading found nothing. At the train's turn the hosted secret scan of the first pushed head (pull request 51, closed unmerged) failed on one invented fixture key of the task's test, which is no secret; the value was changed inside the task's commit of the rebuilt train, and the scanner's command `uv run --locked python scripts/ci_history_scan.py scan` exits 0 at the joined work commit, as a row of the train's ledger records.
+- OPTIONS: **Recommendation:** record the hosted scan's result on the merged head with the closing record of the train's pull request, and close this item there.
+- NEEDED BY: the task's pull request (merge train A of slice S2).
+
+## OI-178 — Document 03 section 7.3 against the investment cache records
+
+- ID: OI-178
+- TYPE: OPEN
+- NEEDED: Complete the deferred delivery records and reconcile the release column list of section 7.3 of document 03 with the records the reader writes, when decision record 0029 lands.
+- WHY: The release column list still describes the earlier keys and record types, while the reader's cache holds page records and heading-led block records with their text items, links, order and parent; the confirmation review records the difference, and the lead ruled that decision record 0029 settles it.
+- DONE SO FAR: The task's row of section 7.3 says what the reader writes and that the release table keeps DAT-143's rule (no paragraph column) meanwhile; the train join dropped the clause that had predicted the amendment under record 0026, which amends no word of DAT-143.
+- OPTIONS: **Recommendation:** wait for record 0029's pull request and write the column list once from its accepted design, not piecemeal.
+- NEEDED BY: decision record 0029's pull request; the release build that first uses `pub_investqa_record`.
+
+## OI-179 — Coordinate digit runs and the release text-token scan
+
+- ID: OI-179
+- TYPE: OPEN
+- NEEDED: The release scan of text tokens (TST-142) to read the release's coordinate values as numbers, not as text.
+- WHY: The dashboard page's coordinate literals carry runs of exactly eight or eleven digits after the decimal point (the lead counted 36 `lat` and 74 `lng` literals on its cached versions); the digit-run check therefore applies to text fields only in the reader, and a release scan that read coordinates as text would flag them wrongly — or be weakened to pass, which rule 12 forbids.
+- DONE SO FAR: The reader applies the check to text fields only; a coordinate given as a number literal is a number; the lead's run on the real pages found no text field of any record with such a run.
+- OPTIONS: **Recommendation:** a note for the release tasks that own TST-142's scan: coordinates are numbers wherever the scan reads the built release.
+- NEEDED BY: the release-build tasks and their scan, after slice S2.
+
+## OI-180 — Loading assumptions of the investment readers
+
+- ID: OI-180
+- TYPE: ASSUMPTION
+- NEEDED: The lead's confirmation (or the owner's, where a display decision depends on it) that the four loading rules the lead set are right; until confirmed they stand as written.
+- WHY: The rules record how the page's own empty forms load: both coordinates exactly 0 is the page's empty form (129 records on the cached pages) and loads as null; a capex of 0 with an empty currency (3 records) loads a null unit; the capex unit is `Mn USD` from the page's labels and the record's currency; texts are kept exactly as published, white space at their ends included.
+- DONE SO FAR: All four are built and are consistent with the lead's field-by-field decode of the real pages; documents 03 and 04 state the first three.
+- OPTIONS: **Recommendation:** keep them; a changed page that breaks one fails the build by source name and is seen at the next fetch.
+- NEEDED BY: the slice S2 gate, with the task's confirmation records.
+
+## OI-181 — The agency's Arabic pages
+
+- ID: OI-181
+- TYPE: OPEN
+- NEEDED: A later reading task for the Arabic side of the agency's site: the page list, the kind rules if the Arabic structure differs, and its own live comparison.
+- WHY: The task's inventory holds the 27 English pages only; where the agency publishes a page in Arabic and in English, the quotation decision is that each language shows the agency's own text, so the Arabic pages are needed before that rule can be met.
+- DONE SO FAR: The English inventory, reader and batch build are confirmed on the real pages; the record point that the inventory holds English pages only is recorded with the task.
+- OPTIONS: **Recommendation:** schedule the Arabic reading as its own task when the quotation design (record 0029) is settled.
+- NEEDED BY: the quotation display of decision record 0029; no version-1 gate unless the owner names it.
+
+## OI-182 — Crosswalk lookups of `fdi_projects` are empty maps
+
+- ID: OI-182
+- TYPE: OPEN
+- NEEDED: The committed, reviewed crosswalks that fill `source_country_iso3`, `municipality_code` and `place_key`.
+- WHY: The lookups are empty maps in this task by design: country, municipality and place keys stay null until a reviewed crosswalk links them (location is kept as the page's text meanwhile), and no value is edited by hand.
+- DONE SO FAR: The columns and the null rule are built and documented; the fields load empty on the real pages.
+- OPTIONS: **Recommendation:** leave to the crosswalk tasks that own the country, municipality and gazetteer maps.
+- NEEDED BY: the tasks owning the crosswalks and the cards that display mapped geography.
+
+## OI-183 — Mutation-sweep pass over the merged-task survivors (with S2-T11, S2-T15)
+
+- ID: OI-183
+- TYPE: OPEN
+- NEEDED: A mutation-sweep pass over the campaign survivors that lie outside their own tasks' changed lines, proposed for this task together with S2-T11 and S2-T15.
+- WHY: Another task's mutation campaign recorded survivors outside its own lines that are lines of merged task S2-T01, and the lead proposed the sweep pass naming this task among the ones that carry it.
+- DONE SO FAR: Nothing; proposed by the lead's ruling after the task's approval.
+- OPTIONS: **Recommendation:** scope the sweep when the pass is briefed; the survivors' counts and locations are in the lead's campaign records, not this task's.
+- NEEDED BY: the slice S2 gate or the affected tasks' pull requests, as the lead rules.
+
+## OI-184 — One unexplained failure of the scripts unit suite in a quick-row run
+
+- ID: OI-184
+- TYPE: OPEN
+- NEEDED: The name and the cause of one test of `scripts/tests` that failed once on the joined head of merge train A, or a recorded finding that it cannot be reproduced after the stated runs.
+- WHY: Rule 39: a green re-run alone does not close a random failure. On 2026-11-15 the lead's quick-row run of the train's ledger commands ended its row for `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` with exit code 1. The lead's ledger tool kept no output of a refused row then, so the failing test is not known.
+- DONE SO FAR: The same suite passed on the same commit in the lead's local checks a few minutes before (exit 0) and in a rerun with its whole output kept a few minutes after (814 tests, OK, exit 0). The failed run overlapped the start of another task's web mutation campaign on the same machine: the lead's capacity reading rose from a load of about 16 to about 57 on 28 usable processors within those minutes, and that campaign was then stopped under the run's capacity rule. The ledger tool now keeps the whole output of every refused row. The suite's row of this ledger entry is a further run on the timing lane.
+- OPTIONS: **Default:** watch the suite's next runs on this head and on main; if a test fails again, its kept output names it and this item takes the cause; if the next ten recorded runs of the suite pass, the item is closed as not reproduced, with those runs listed. No test is skipped, retried inside a run or given a longer limit for it.
+- NEEDED BY: the slice S2 gate.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -1855,6 +2031,150 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: REV-17 (documents agree with the work); PLN-28
 - EVIDENCE: [10_FRONTEND.md](docs/10_FRONTEND.md), section "Open questions and assumptions", the sentence that starts "Questions for the spike in slice S1" ends with "whether the 3D view holds the frame-rate gate". The gate-fix task S1-T17 moved the clause on the optional 3D view and its evidence clause (TST-242) from the slice S1 row to the slice S6 row of the gate table of document 12 (section 5), where document 14 places the view (PLN-28; S6-T18). The spike of slice S1 did not build the view and answered no such question; no record claims that it did.
 - NEEDED: with the next change of document 10, the sentence says that this question is answered by S6-T18 under TST-242, with the frame-rate configuration of slice S1 as its reference. No requirement, bound or test changes. Or one line saying why the item is not valid.
+
+### PO-S2-05 — Starting-table values dated to slice S1 that no open item holds
+
+- ID: PO-S2-05
+- TYPE: OPEN
+- RAISED BY: the designated reviewer of round 2 of the slice S1 gate record, pull request 47 (DeepSeek V4.1 Flash through Devin), 2026-11-14, proposed item P1; numbered by the lead's ruling L-332 and named by the closing record of that pull request
+- CONCERNS: the starting table of the calibration manifest in document 05 (SYN-69 validates the manifest before any generator runs; SYN-77 reads the range values)
+- EVIDENCE: The reviewer's point, in the ruling's words: the starting-table values that document 05 dates to slice S1 and that no open item holds, `mob.range_multiple` among them. The lead's ruling L-61 of 2026-11-13 had recorded for task S1-T09 that the two range values of SYN-77 are entries of that manifest and are fixed by no task of slice S1. Slice S1 closed without them.
+- NEEDED: one item, not two: the list of those values, each with the task that fixes it, is entered with the ledger of task S4-T07, which owes the slice S1 values of the calibration manifest. Or one line saying why the item is not valid.
+
+### PO-S2-06 — The test runner's interrupt path assumes that the interrupt signal is not ignored
+
+- ID: PO-S2-06
+- TYPE: OPEN
+- RAISED BY: the lead's ruling L-285 of 2026-11-14, part (5), on two failed runs of the scripts unit suite at the local commit 4a05f9e of task S2-T02; numbered by the closing record of pull request 47
+- CONCERNS: document 17 (a proposed hardening point); rule 39 (the failure is explained, so it is not entered as a random failure)
+- EVIDENCE: `test_runner_failures.RunnerFailures.test_interrupt_kills_the_process_group` failed in two runs of the scripts unit suite (687 tests, 1 failure, exit 1 each) and passed in the third (687 tests, OK, exit 0). In the second run's report the test found the runner's time-out line (no result within 30 s; the process group was killed) where it expected the line of an interrupted run. The cause is the lead's own launch form: a job started in the background from a non-interactive shell inherits an ignored interrupt signal, so the interrupt that the test sends never arrives. The ruling found no random failure and no defect of either change under test; the records of both failed runs are kept.
+- NEEDED: a hardening entry of document 17: the test runner's interrupt path, and its test, assume that the interrupt signal is not ignored when the runner starts. The ruling proposes the point and names no fix: whether the runner restores the signal's default handling at its start or refuses to start is decided when the entry is written. Or one line saying why the item is not valid.
+
+### PO-S2-07 — The pack's two-resolution wording amended by record 0030
+
+- ID: PO-S2-07
+- TYPE: OPEN
+- RAISED BY: the independent review of S2-T02 on its local commit (xAI Grok 4.7; the verdict file names SpaceXAI Grok 4.7), 2026-11-14, proposed item P1.
+- CONCERNS: REV-19 (amendments to settled pack wording go through a decision record).
+- EVIDENCE: the code follows the record's selection, so resolution-9 cells exist outside Greater Doha (598 on the real run); the sentences that still say resolution 9 in Greater Doha and 8 elsewhere are the glossary's "Base cell", document 03 section 1.1 "Base cell", DAT-51, SYN-10, document 02 "Grid and release unit", document 04 section 5 "Grid cell", document 06 sections 4.1, 4.2 and the Child K sentence of 4.3, and decision 0006 item 1.
+- NEEDED: those sentences are the amended passages of decision record 0030, which merged by pull request 49 on 2026-11-15, before this train; the item closes when the merge that carries both is checked against the record's passage list.
+
+### PO-S2-08 — The two required keys of document 03 section 7.3 amended by record 0030
+
+- ID: PO-S2-08
+- TYPE: OPEN
+- RAISED BY: the independent review of S2-T02 on its local commit (xAI Grok 4.7; the verdict file names SpaceXAI Grok 4.7), 2026-11-14, proposed item P2.
+- CONCERNS: REV-19.
+- EVIDENCE: document 03 section 7.3 makes `grid_cell.district_key` a required string and `gazetteer.cell` a required cell; the build stores nulls in the one reviewed case of each (five cells of zone 99 with reason `zone_without_district`; five district gazetteer rows with reason `point_without_base_cell`). Record 0030 items 7, 8 and 13 are the amendment, merged by pull request 49.
+- NEEDED: as PO-S2-07: the item closes when the joined tree is checked against the record's passage list.
+
+### PO-S2-09 — The fourth criterion's source points are task S2-T06's
+
+- ID: PO-S2-09
+- TYPE: OPEN
+- RAISED BY: the independent review of S2-T02 on its local commit (xAI Grok 4.7; the verdict file names SpaceXAI Grok 4.7), 2026-11-14, proposed item P3; the move was the lead's ruling before the review.
+- CONCERNS: REV-10 (the acceptance criteria); the task's fourth criterion.
+- EVIDENCE: `reviewed_points` resolves a landmark or building only when its spec has `source_id` and `record_key` and the point dict contains that pair; the committed `showcase_gazetteer.yaml` and `flagship_candidates.yaml` set both to null (4 landmarks, 7 buildings) and `build_live_frame` records `source point pending S2-T06` for each, ending `frame: partial; place points remain`.
+- NEEDED: the criterion moves, unticked and word for word, to task S2-T06 by a re-plan recorded in PROGRESS.md; S2-T06 fills the reviewed keys, supplies the source points and merges the rows. The frame keeps refusing an unfilled entry by name.
+
+### PO-S2-10 — A stale skipped-sources sentence in the frame README
+
+- ID: PO-S2-10
+- TYPE: OPEN
+- RAISED BY: the independent review of S2-T02 on its local commit (xAI Grok 4.7; the verdict file names SpaceXAI Grok 4.7), 2026-11-14, proposed item P5.
+- CONCERNS: REV-17.
+- EVIDENCE: `custodian/src/eii_custodian/publicdata/frame/README.md` still says `est_census`, `zone_population` and `census_hh_type_2020` remain skipped; `est_census` has an empty `skip_reason` and the live build writes two `pub_census_national` rows; the other two sources stay skipped.
+- NEEDED: the sentence names only `zone_population` and `census_hh_type_2020` with their reason, or describes `est_census` as read.
+
+### PO-S2-11 — `source_id` missing from the `pub_census_zone` column list
+
+- ID: PO-S2-11
+- TYPE: OPEN
+- RAISED BY: the independent review of S2-T02 on its local commit (xAI Grok 4.7; the verdict file names SpaceXAI Grok 4.7), 2026-11-14, proposed item P6.
+- CONCERNS: REV-20 (source and retrieval date on every Public row).
+- EVIDENCE: the `pub_census_zone` column list of document 03 section 7.3 omits `source_id`; `census_rows` and `test_census_release_columns_match_dat_contract` require it, and the map-layer acceptance criterion requires the source. The retrieval date is the receipt field `retrieved_utc`, which `test_r4_measures_and_receipt_lineage` checks.
+- NEEDED: the column list gains `source_id`.
+
+### PO-S2-12 — Likely-missing spellings for `municipality_names.csv`
+
+- ID: PO-S2-12
+- TYPE: OPEN
+- RAISED BY: the Arabic-expert model review of the municipality spellings (Google Gemini 4 Carbon), 2026-11-14, advisory outside its APPROVED verdict; and the first expert reading of 2026-11-15 (Moonshot AI Kimi K3.1 Pro High), point (c) of its notes on the table
+- CONCERNS: the coverage of the committed names file `custodian/publicdata/review/municipality_names.csv` (PUB-27)
+- EVIDENCE: Both readers list spellings that public datasets are likely to use and that the file does not hold. The review of 2026-11-14: counterparts of variants already present (the forms with the word for municipality in front of four of the names, and the two-part name with its conjunction spaced), and final-ha forms (of two one-word names, of the forms of a third, of the two-part name, and of the word for municipality itself). The reading of 2026-11-15, by the rows of the list it read: the final-ha form of row 15; rows 18, 8 and 3 with the word for municipality in front; row 5 with its conjunction unspaced. The exact strings are in the two returns, which are kept with the run's records; they are not repeated here. The file fails closed on any unmapped spelling, so a missing spelling refuses a build and cannot misjoin a row.
+- NEEDED: a spelling enters the file, reviewed, when a source that is read really writes it; none is added from a list alone. Or one line saying why the item is not valid.
+
+### PO-S2-13 — The Arabic name of one municipality is displayed in its official form
+
+- ID: PO-S2-13
+- TYPE: OPEN
+- RAISED BY: the lead's ruling L-356 of 2026-11-15 on the two expert readings of row 21 of the Arabic rows of the names file (Moonshot AI Kimi K3.1 Pro High; xAI Grok 4.7, which signs itself "SpaceXAI, Grok 4.7"), both recorded as model reviews
+- CONCERNS: PUB-27 (the names file maps names as sources write them); the Arabic wording of slice S3
+- EVIDENCE: Row 21 of the Arabic rows of `custodian/publicdata/review/municipality_names.csv` is a spelling that one read source writes for the municipality of rows 1 and 2. The first reading calls it WRONG, a misspelling of row 1's form. The second says that the official form is row 1's and rules REMOVE; it also says that row 21 names only this municipality and is SAFE in a join table. By the lead's ruling the row stays in the join table. A join table of source spellings is not a list of names for display.
+- NEEDED: the product displays this municipality's Arabic name in row 1's form and never in row 21's, checked where the name is first displayed, by the wording task of slice S3. Or one line saying why the item is not valid.
+
+### PO-S2-14 — The mutation campaign on the custodian series modules of S2-T03
+
+- ID: PO-S2-14
+- TYPE: OPEN
+- RAISED BY: the lead, 2026-11-15, at the mutation run of task S2-T03
+- CONCERNS: mutation testing of the modules that compute or compare numbers (rule 44, `scripts/mutation.py`)
+- EVIDENCE: The campaign on `core/src/eii_core/calc/public_series.py` is complete (130 mutants made, 127 killed, 3 survived and explained, exit 0). The three custodian series modules of the same task, `figures.py`, `baskets.py` and `reconcile.py` under `custodian/src/eii_custodian/publicdata/series/`, have no campaign: on the task's base the mutation copy lacks the scripts folder that one test of S2-T01 imports, so the custodian suite cannot run in it.
+- NEEDED: the campaign on the three modules, every survivor killed or explained. The lead runs it on the joined tree of the train that carries task S2-T21, where the mutation copy holds what the custodian suite imports; a survivor goes to the builder's maker of S2-T03. Or one line saying why the item is not valid.
+
+### PO-S2-15 — The filled tender confirmation once S2-T19 fetches the source
+
+- ID: PO-S2-15
+- TYPE: OPEN
+- RAISED BY: the independent review of S2-T13, rounds 1 and 2 (xAI Grok 4.7 through Cursor), proposed item P1
+- CONCERNS: REV-10 and PLN-25 (the first and last acceptance criteria stand on the mechanism only)
+- EVIDENCE: The committed record `custodian/publicdata/review/s2_t13_confirmation.yaml` is `not_yet_recorded`; `completion_evidence` rejects it as incomplete and `tender_disposition` returns `NO_DATA` with the document-04 caveat. The lead's recorded reading of the portal (its own evidence file of 2026-11-14) is not installed in the commit.
+- NEEDED: S2-T19 supplies the registry row and the fetch receipt; the record is then filled from the lead's reading (`terms_do_not_cover`, the publisher's own words, the date read, basis `owner_decision`, the go-live permission flag), and both confirmations reach the slice-S2 gate evidence.
+
+### PO-S2-16 — The unamended tender rule in the documents and the registry loader
+
+- ID: PO-S2-16
+- TYPE: OPEN
+- RAISED BY: the independent review of S2-T13, round 2 (xAI Grok 4.7 through Cursor), proposed item P3
+- CONCERNS: REV-16, REV-17, REV-19
+- EVIDENCE: PUB-108, PUB-93, document 14's S2-T19 bullet and TASKS.md S2-T19 still carry the pack's earlier tender rule (a source whose terms are absent, do not cover or forbid the use is switched off and not shown), and decision record 0026 is not in this commit; the registry loader's OWNER_DECISION_SOURCES does not include `tenders_pub` and its DECISION_RECORDS holds only the earlier records, so it cannot yet accept the `owner_decision`/`0026` row the filled confirmation will require.
+- NEEDED: the documents are amended by decision record 0026's own pass (the record says so) and the loader change is task S2-T21's (OI-164); record that the row cannot load before S2-T21 merges.
+
+### PO-S2-17 — The recorded form of an absent or disabled tender source for S2-T19
+
+- ID: PO-S2-17
+- TYPE: OPEN
+- RAISED BY: the lead's internal review of S2-T13 (the optional point of confirmed finding C9), not a verdict finding
+- CONCERNS: the registry handoff between this task's record and S2-T19's registry row
+- EVIDENCE: `completion_evidence` accepts an evidenced absence only as a registry row whose `skip_reason` equals the outcome with no release tables; the module docstring does not say that S2-T19 must write it that way, and a row that records forbidding terms with an empty `skip_reason` is not accepted (the internal review's note, written before the owner's decision 0026 changed which outcomes remain switch-offs).
+- NEEDED: state the convention in the module docstring, or accept the recorded switch-off form the registry already has; the lead decides which.
+
+### PO-S2-18 — The tender portal's certificate chain, a fact for S2-T19
+
+- ID: PO-S2-18
+- TYPE: OPEN
+- RAISED BY: the lead's recorded reading of the tender portal (the ruling text of 2026-11-14 names it a fact for task S2-T19)
+- CONCERNS: the fetcher of S2-T19
+- EVIDENCE: The portal's server omits its issuer's intermediate certificate; the lead completed the chain from the address the certificate names, verified it against the system roots and fetched with verification on. A fetcher needs the same completed chain; nothing disables verification.
+- NEEDED: S2-T19's fetcher completes the chain the same way and the fact is recorded in that task's brief.
+
+### PO-S2-19 — The index of `docs/README.md` does not name decision 0032 on three documents
+
+- ID: PO-S2-19
+- TYPE: OPEN
+- RAISED BY: the reviewer of decision record 0032, pull request 50 (xAI Grok 4.7; the verdict signs "SpaceXAI, Grok 4.7"), proposed item P2
+- CONCERNS: REV-17 (documents agree with the work)
+- EVIDENCE: The status cells for documents 12, 14 and 15 in the index of `docs/README.md` do not name decision 0032, while those documents' own Status rows do.
+- NEEDED: with the next change of `docs/README.md`, the three status cells name decision 0032. No rule changes. Or one line saying why the item is not valid.
+
+### PO-S2-20 — Card C40 and the reason order of `site_estimate` for a point without a base cell
+
+- ID: PO-S2-20
+- TYPE: OPEN
+- RAISED BY: the lead's ruling on round 1 of the review of decision record 0030 (pull request 49), carried by that pull request's closing record
+- CONCERNS: card C40 (its eligibility list) and the closed tool contract `site_estimate` of document 08 section 6.2, under PRV-135 and decision 0030 item 10
+- EVIDENCE: The fix of round 1 added the case of PRV-135 to four tool contracts, `location_allocation` among them; it decides nothing about the eligibility list of card C40. Two points stay open: how card C40 treats a candidate that has no base cell, and which reason key comes first when `inputs_not_entered` and `point_without_base_cell` both hold for `site_estimate`.
+- NEEDED: both are decided by the task that builds card C40 and by the task that builds `site_estimate`, each in its plan, with a test for the order. Or one line saying why the item is not valid.
 
 ## Sources
 

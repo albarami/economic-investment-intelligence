@@ -1,0 +1,250 @@
+name_en,iso3,human_reviewed
+Afghanistan,AFG,false
+Åland Islands,ALA,false
+Albania,ALB,false
+Algeria,DZA,false
+American Samoa,ASM,false
+Andorra,AND,false
+Angola,AGO,false
+Anguilla,AIA,false
+Antarctica,ATA,false
+Antigua and Barbuda,ATG,false
+Argentina,ARG,false
+Armenia,ARM,false
+Aruba,ABW,false
+Australia,AUS,false
+Austria,AUT,false
+Azerbaijan,AZE,false
+Bahamas,BHS,false
+Bahrain,BHR,false
+Bangladesh,BGD,false
+Barbados,BRB,false
+Belarus,BLR,false
+Belgium,BEL,false
+Belize,BLZ,false
+Benin,BEN,false
+Bermuda,BMU,false
+Bhutan,BTN,false
+Bolivia (Plurinational State of),BOL,false
+"Bonaire, Sint Eustatius and Saba",BES,false
+Bosnia and Herzegovina,BIH,false
+Botswana,BWA,false
+Bouvet Island,BVT,false
+Brazil,BRA,false
+British Indian Ocean Territory,IOT,false
+Brunei Darussalam,BRN,false
+Bulgaria,BGR,false
+Burkina Faso,BFA,false
+Burundi,BDI,false
+Cabo Verde,CPV,false
+Cambodia,KHM,false
+Cameroon,CMR,false
+Canada,CAN,false
+Cayman Islands,CYM,false
+Central African Republic,CAF,false
+Chad,TCD,false
+Chile,CHL,false
+China,CHN,false
+Christmas Island,CXR,false
+Cocos (Keeling) Islands,CCK,false
+Colombia,COL,false
+Comoros,COM,false
+Congo,COG,false
+Congo (the Democratic Republic of the),COD,false
+Cook Islands,COK,false
+Costa Rica,CRI,false
+Côte d'Ivoire,CIV,false
+Croatia,HRV,false
+Cuba,CUB,false
+Curaçao,CUW,false
+Cyprus,CYP,false
+Czechia,CZE,false
+Denmark,DNK,false
+Djibouti,DJI,false
+Dominica,DMA,false
+Dominican Republic,DOM,false
+Ecuador,ECU,false
+Egypt,EGY,false
+El Salvador,SLV,false
+Equatorial Guinea,GNQ,false
+Eritrea,ERI,false
+Estonia,EST,false
+Eswatini,SWZ,false
+Ethiopia,ETH,false
+Falkland Islands (Malvinas),FLK,false
+Faroe Islands,FRO,false
+Fiji,FJI,false
+Finland,FIN,false
+France,FRA,false
+French Guiana,GUF,false
+French Polynesia,PYF,false
+French Southern Territories,ATF,false
+Gabon,GAB,false
+Gambia,GMB,false
+Georgia,GEO,false
+Germany,DEU,false
+Ghana,GHA,false
+Gibraltar,GIB,false
+Greece,GRC,false
+Greenland,GRL,false
+Grenada,GRD,false
+Guadeloupe,GLP,false
+Guam,GUM,false
+Guatemala,GTM,false
+Guernsey,GGY,false
+Guinea,GIN,false
+Guinea-Bissau,GNB,false
+Guyana,GUY,false
+Haiti,HTI,false
+Heard Island and McDonald Islands,HMD,false
+Holy See,VAT,false
+Honduras,HND,false
+Hong Kong,HKG,false
+Hungary,HUN,false
+Iceland,ISL,false
+India,IND,false
+Indonesia,IDN,false
+Iran (Islamic Republic of),IRN,false
+Iraq,IRQ,false
+Ireland,IRL,false
+Isle of Man,IMN,false
+Israel,ISR,false
+Italy,ITA,false
+Jamaica,JAM,false
+Japan,JPN,false
+Jersey,JEY,false
+Jordan,JOR,false
+Kazakhstan,KAZ,false
+Kenya,KEN,false
+Kiribati,KIR,false
+Korea (the Democratic People's Republic of),PRK,false
+Korea (the Republic of),KOR,false
+Kuwait,KWT,false
+Kyrgyzstan,KGZ,false
+Lao People's Democratic Republic,LAO,false
+Latvia,LVA,false
+Lebanon,LBN,false
+Lesotho,LSO,false
+Liberia,LBR,false
+Libya,LBY,false
+Liechtenstein,LIE,false
+Lithuania,LTU,false
+Luxembourg,LUX,false
+Macao,MAC,false
+Madagascar,MDG,false
+Malawi,MWI,false
+Malaysia,MYS,false
+Maldives,MDV,false
+Mali,MLI,false
+Malta,MLT,false
+Marshall Islands,MHL,false
+Martinique,MTQ,false
+Mauritania,MRT,false
+Mauritius,MUS,false
+Mayotte,MYT,false
+Mexico,MEX,false
+Micronesia (Federated States of),FSM,false
+Moldova (the Republic of),MDA,false
+Monaco,MCO,false
+Mongolia,MNG,false
+Montenegro,MNE,false
+Montserrat,MSR,false
+Morocco,MAR,false
+Mozambique,MOZ,false
+Myanmar,MMR,false
+Namibia,NAM,false
+Nauru,NRU,false
+Nepal,NPL,false
+Netherlands (Kingdom of the),NLD,false
+New Caledonia,NCL,false
+New Zealand,NZL,false
+Nicaragua,NIC,false
+Niger,NER,false
+Nigeria,NGA,false
+Niue,NIU,false
+Norfolk Island,NFK,false
+North Macedonia,MKD,false
+Northern Mariana Islands,MNP,false
+Norway,NOR,false
+Oman,OMN,false
+Pakistan,PAK,false
+Palau,PLW,false
+"Palestine, State of",PSE,false
+Panama,PAN,false
+Papua New Guinea,PNG,false
+Paraguay,PRY,false
+Peru,PER,false
+Philippines,PHL,false
+Pitcairn,PCN,false
+Poland,POL,false
+Portugal,PRT,false
+Puerto Rico,PRI,false
+Qatar,QAT,false
+Réunion,REU,false
+Romania,ROU,false
+Russian Federation,RUS,false
+Rwanda,RWA,false
+Saint Barthélemy,BLM,false
+"Saint Helena, Ascension and Tristan da Cunha",SHN,false
+Saint Kitts and Nevis,KNA,false
+Saint Lucia,LCA,false
+Saint Martin (French part),MAF,false
+Saint Pierre and Miquelon,SPM,false
+Saint Vincent and the Grenadines,VCT,false
+Samoa,WSM,false
+San Marino,SMR,false
+Sao Tome and Principe,STP,false
+Saudi Arabia,SAU,false
+Senegal,SEN,false
+Serbia,SRB,false
+Seychelles,SYC,false
+Sierra Leone,SLE,false
+Singapore,SGP,false
+Sint Maarten (Dutch part),SXM,false
+Slovakia,SVK,false
+Slovenia,SVN,false
+Solomon Islands,SLB,false
+Somalia,SOM,false
+South Africa,ZAF,false
+South Georgia and the South Sandwich Islands,SGS,false
+South Sudan,SSD,false
+Spain,ESP,false
+Sri Lanka,LKA,false
+Sudan,SDN,false
+Suriname,SUR,false
+Svalbard and Jan Mayen,SJM,false
+Sweden,SWE,false
+Switzerland,CHE,false
+Syrian Arab Republic,SYR,false
+Taiwan (Province of China),TWN,false
+Tajikistan,TJK,false
+"Tanzania, the United Republic of",TZA,false
+Thailand,THA,false
+Timor-Leste,TLS,false
+Togo,TGO,false
+Tokelau,TKL,false
+Tonga,TON,false
+Trinidad and Tobago,TTO,false
+Tunisia,TUN,false
+Türkiye,TUR,false
+Turkmenistan,TKM,false
+Turks and Caicos Islands,TCA,false
+Tuvalu,TUV,false
+Uganda,UGA,false
+Ukraine,UKR,false
+United Arab Emirates,ARE,false
+United Kingdom of Great Britain and Northern Ireland,GBR,false
+United States of America,USA,false
+United States Minor Outlying Islands,UMI,false
+Uruguay,URY,false
+Uzbekistan,UZB,false
+Vanuatu,VUT,false
+Venezuela (Bolivarian Republic of),VEN,false
+Viet Nam,VNM,false
+Virgin Islands (British),VGB,false
+Virgin Islands (U.S.),VIR,false
+Wallis and Futuna,WLF,false
+Western Sahara,ESH,false
+Yemen,YEM,false
+Zambia,ZMB,false
+Zimbabwe,ZWE,false

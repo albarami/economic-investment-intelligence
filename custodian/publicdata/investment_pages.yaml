@@ -1,0 +1,192 @@
+# Page inventory for the investment readers.
+# The dashboard shape and the agency page list are confirmed by the lead's run
+# of both readers on the real pages on 2026-11-14 (live_page_compared). Tests
+# keep their own inventory.
+schema_version: investment_pages.v1
+sources:
+  fdi_projects:
+    confirmed: true
+    shape_id: fdi-dashboard-v2
+    capex_unit: Mn USD
+    capex_label_words:
+      - Capex
+      - Mn
+      - USD
+    location_precision: location_text
+    snapshot_identity: page_sha256
+    row_count_min: 1400
+    row_count_max: 2500
+    period_field: announced
+    period_first: "2017"
+    period_last: "2026"
+    mapping:
+      company: investing_company_name
+      source_country: src_country_name
+      sector: sector_name
+      sub_sector: sub_sector_name
+      business_function: function_name
+      project_type: project_type_name
+      capex_value: capex
+      jobs: jobs
+      announced: project_date
+      location_text: project_address
+    further_fields:
+      - tech_level_id
+      - src_state_name
+      - freezone_name
+      - city_id
+      - city_name
+      - world_region_id
+      - state_name
+      - src_country_id
+      - src_world_region_name
+      - lat
+      - fdi_sector_id
+      - src_world_region_id
+      - src_state_id
+      - country_name
+      - description
+      - parent_company_name
+      - tags
+      - naics_sub_sector_name
+      - project_year
+      - src_city_name
+      - function_id
+      - state_abbr
+      - src_city_id
+      - capex_currency
+      - sector_id
+      - world_region_name
+      - project_id
+      - parent_company_website
+      - lng
+      - state_id
+      - fdi_sector_name
+      - jobs
+      - country_id
+      - parent_company_id
+      - project_type_id
+      - province
+      - project_month
+    caveats:
+      announced_estimates: estimates of publicly announced projects
+      incomplete_coverage: does not capture all investment projects
+    country_iso3: {}
+    municipality_code: {}
+    place_key: {}
+    confirmation:
+      inventory_recorded: true
+      field_coverage_recorded: true
+      fixture_comparison_recorded: true
+      live_page_compared: true
+  investqa_pages:
+    confirmed: true
+    snapshot_identity: aggregate_manifest
+    row_count_min: 20
+    row_count_max: 5000
+    period_field: period
+    period_last: "2000"
+    furniture_classes:
+      - pattern-lg-1
+      - pattern-dual
+      - whatsHappening
+    kind_rules:
+      sector:
+        page_kind: sector
+        block_kind: sector_block
+        leading_level: 2
+        minimum_blocks: 3
+        minimum_paragraphs: 0
+      opportunity:
+        page_kind: opportunity
+        level_kinds:
+          3: opportunity
+        leading_level: 3
+        minimum_blocks: 5
+        minimum_paragraphs: 0
+      incentive:
+        page_kind: incentive
+        level_kinds:
+          4: incentive_parameter
+        h3_under_h4: setup_step
+        leading_level: 4
+        minimum_blocks: 4
+        minimum_paragraphs: 0
+      setup:
+        page_kind: setup
+        level_kinds:
+          2: setup_step
+          3: setup_step
+        leading_level: 2
+        minimum_blocks: 5
+        minimum_paragraphs: 0
+      law:
+        page_kind: law
+        block_kind: law_block
+        leading_level: 0
+        minimum_blocks: 0
+        minimum_paragraphs: 1
+    pages:
+      - url: https://www.invest.qa/en/sectors-and-opportunities/agriculture
+        kind: sector
+      - url: https://www.invest.qa/en/sectors-and-opportunities/education
+        kind: sector
+      - url: https://www.invest.qa/en/sectors-and-opportunities/energy
+        kind: sector
+      - url: https://www.invest.qa/en/sectors-and-opportunities/financial-services
+        kind: sector
+      - url: https://www.invest.qa/en/sectors-and-opportunities/healthcare-and-life-sciences
+        kind: sector
+      - url: https://www.invest.qa/en/sectors-and-opportunities/logistics-and-transport
+        kind: sector
+      - url: https://www.invest.qa/en/sectors-and-opportunities/manufacturing
+        kind: sector
+      - url: https://www.invest.qa/en/sectors-and-opportunities/media
+        kind: sector
+      - url: https://www.invest.qa/en/sectors-and-opportunities/professional-services
+        kind: sector
+      - url: https://www.invest.qa/en/sectors-and-opportunities/real-estate
+        kind: sector
+      - url: https://www.invest.qa/en/sectors-and-opportunities/sports
+        kind: sector
+      - url: https://www.invest.qa/en/sectors-and-opportunities/technology
+        kind: sector
+      - url: https://www.invest.qa/en/sectors-and-opportunities/tourism
+        kind: sector
+      - url: https://www.invest.qa/en/sectors-and-opportunities/opportunities
+        kind: opportunity
+      - url: https://www.invest.qa/en/incentives
+        kind: incentive
+        minimum_blocks: 0
+        minimum_paragraphs: 0
+      - url: https://www.invest.qa/en/incentives/advanced-industries
+        kind: incentive
+      - url: https://www.invest.qa/en/incentives/financial-services
+        kind: incentive
+      - url: https://www.invest.qa/en/incentives/logistics
+        kind: incentive
+      - url: https://www.invest.qa/en/incentives/technology
+        kind: incentive
+      - url: https://www.invest.qa/en/why-Qatar/establish-business-in-qatar
+        kind: setup
+      - url: https://www.invest.qa/en/resources/laws-and-regulations
+        kind: law
+        minimum_blocks: 0
+        minimum_paragraphs: 0
+      - url: https://www.invest.qa/en/resources/laws-and-regulations/customs
+        kind: law
+      - url: https://www.invest.qa/en/resources/laws-and-regulations/foreign-ownership
+        kind: law
+      - url: https://www.invest.qa/en/resources/laws-and-regulations/investment-laws
+        kind: law
+      - url: https://www.invest.qa/en/resources/laws-and-regulations/labour-law-practices
+        kind: law
+      - url: https://www.invest.qa/en/resources/laws-and-regulations/tax-regime
+        kind: law
+      - url: https://www.invest.qa/en/resources/laws-and-regulations/types-of-companies
+        kind: law
+    confirmation:
+      inventory_recorded: true
+      field_coverage_recorded: true
+      fixture_comparison_recorded: true
+      live_page_compared: true

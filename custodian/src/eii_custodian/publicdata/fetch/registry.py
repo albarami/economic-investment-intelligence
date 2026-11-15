@@ -152,7 +152,7 @@ def registry_path() -> Path:
 
 def load_registry(path: Path | None = None) -> tuple[Entry, ...]:
     """Load sources.yaml with the safe loader and refuse unknown fields."""
-    document = _read(path if path is not None else _REGISTRY)
+    document = read_yaml(path if path is not None else _REGISTRY)
     if not isinstance(document, dict):
         raise RegistryError("registry root is not a map")
     extra = set(document) - {"sources"}
@@ -186,8 +186,15 @@ def nightly_blocked(
     return tuple(name for name in selected if flags.get(name) is False)
 
 
-def _read(path: Path) -> object:
-    loaded: object = yaml.safe_load(path.read_text(encoding="utf-8"))
+def read_yaml(path: Path) -> object:
+    """Load one YAML document with the safe loader.
+
+    A malformed file raises RegistryError, the package's own error.
+    """
+    try:
+        loaded: object = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except yaml.YAMLError as exc:
+        raise RegistryError("malformed yaml") from exc
     return loaded
 
 
