@@ -1,0 +1,72 @@
+[
+  {
+    "place_key": "building:0",
+    "kind": "building",
+    "name_en": "Manarat Lusail",
+    "name_ar": "منارات لوسيل",
+    "aliases": null,
+    "source_id": null,
+    "record_key": null,
+    "arabic_review": "pending native review"
+  },
+  {
+    "place_key": "building:1",
+    "kind": "building",
+    "name_en": "Burj Al Fardan",
+    "name_ar": "برج الفردان",
+    "aliases": null,
+    "source_id": null,
+    "record_key": null,
+    "arabic_review": "pending native review"
+  },
+  {
+    "place_key": "building:2",
+    "kind": "building",
+    "name_en": "Marina Twin Towers",
+    "name_ar": "برجا المارينا",
+    "aliases": null,
+    "source_id": null,
+    "record_key": null,
+    "arabic_review": "pending native review"
+  },
+  {
+    "place_key": "building:3",
+    "kind": "building",
+    "name_en": "Place Vendôme",
+    "name_ar": "بلاس فاندوم",
+    "aliases": null,
+    "source_id": null,
+    "record_key": null,
+    "arabic_review": "pending native review"
+  },
+  {
+    "place_key": "building:4",
+    "kind": "building",
+    "name_en": "Q Tower",
+    "name_ar": "برج كيو",
+    "aliases": null,
+    "source_id": null,
+    "record_key": null,
+    "arabic_review": "pending native review"
+  },
+  {
+    "place_key": "building:5",
+    "kind": "building",
+    "name_en": "QiG Tower",
+    "name_ar": "برج كيو آي جي",
+    "aliases": null,
+    "source_id": null,
+    "record_key": null,
+    "arabic_review": "pending native review"
+  },
+  {
+    "place_key": "building:6",
+    "kind": "building",
+    "name_en": "Sendian Tower",
+    "name_ar": "برج سنديان",
+    "aliases": null,
+    "source_id": null,
+    "record_key": null,
+    "arabic_review": "pending native review"
+  }
+]
