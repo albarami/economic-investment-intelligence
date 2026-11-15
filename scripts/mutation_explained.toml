@@ -1447,6 +1447,86 @@ mutation = "--- src/eii_custodian/publicdata/review/activity.py\n+++ src/eii_cus
 reason = "codecs.lookup('UTF-8').name and codecs.lookup('utf-8').name both printed utf-8, so the two names select one codec."
 
 [[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -1,6 +1,6 @@\n def read_allowlist(path: Path) -> tuple[AllowlistRow, ...]:\n     \"\"\"Read the reviewed category allow-list.\"\"\"\n-    with path.open(\"r\", encoding=\"utf-8\", newline=\"\") as handle:\n+    with path.open(encoding=\"utf-8\", newline=\"\") as handle:\n         reader = csv.DictReader(handle)\n         if tuple(reader.fieldnames or ()) != ALLOWLIST_COLUMNS:\n             raise GraphError(\"allow-list header is not the fixed header\")"
+reason = "`Path.open` opens for reading in text mode when no mode is given, so `read_allowlist` opens the same file in the same way with or without the literal \"r\"; the encoding and newline arguments are unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -1,6 +1,6 @@\n def read_allowlist(path: Path) -> tuple[AllowlistRow, ...]:\n     \"\"\"Read the reviewed category allow-list.\"\"\"\n-    with path.open(\"r\", encoding=\"utf-8\", newline=\"\") as handle:\n+    with path.open(\"r\", encoding=\"UTF-8\", newline=\"\") as handle:\n         reader = csv.DictReader(handle)\n         if tuple(reader.fieldnames or ()) != ALLOWLIST_COLUMNS:\n             raise GraphError(\"allow-list header is not the fixed header\")"
+reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same codec, so `read_allowlist` decodes every file identically."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -5,7 +5,7 @@\n     found: set[str] = set()\n     for row in rows:\n         nested = row.get(\"categories\")\n-        value: object = None\n+        value: object = \"\"\n         if isinstance(nested, Mapping):\n             value = nested.get(\"primary\")\n         elif \"category\" in row:"
+reason = "In `parse_place_categories` the default of `value` is kept only for a row that has neither a mapping under `categories` nor a `category` key; the next statement refuses a value that is not a string and a string that is empty with the same error text, so None and the empty string end the same way."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -21,7 +21,7 @@\n     for row in spine.rows:\n         sources = _activity_sources(by_code[row.code])\n         source = sources[0]\n-        if len(sources) > 1:\n+        if len(sources) >= 1:\n             extra_sources[row.code] = sources[1:]\n         if row.status == \"mapped\":\n             _require_mapped_row(row, by_code[row.code], titles)"
+reason = "In `build_graph`, for an activity with exactly one source `sources[1:]` is the empty tuple; both readers of `extra_sources` iterate each stored tuple, so an empty entry adds no source to the used set and no edge."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -135,7 +135,7 @@\n         )\n     for node in tuple(nodes.values()):\n         if node.source_id is None or node.node_type == \"source\":\n-            continue\n+            break\n         _add_edge(\n             edges,\n             GraphEdge("
+reason = "In `build_graph` every node other than a source node is built with a source id, and the source nodes are added only by the loop directly above, after every other node; in the dictionary's insertion order the source nodes are therefore the suffix, so stopping at the first of them visits exactly the nodes that skipping each of them visits."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -29,5 +29,4 @@\n         allowlist,\n         categories,\n         entries,\n-        mode=mode,\n-    )\n+        )"
+reason = "`build_cached_graph` has already called `_refuse_release(entries, mode)` before it reads anything; `build_graph` uses its `mode` argument only for that same call, which under the default `fixture` refuses nothing, so dropping the argument changes no outcome of the cached build."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -22,6 +22,6 @@\n     for node in nodes:\n         if node.node_type != \"activity\":\n             continue\n-        if degrees.get(node.node_id, 0) != 1:\n+        if degrees.get(node.node_id, None) != 1:\n             raise GraphError(\"activity without one classified_as edge: \" + node.node_id)\n     _require_unmappable(nodes)"
+reason = "In `validate_graph` a node id absent from `degrees` has no edge of the counted type; the default is only compared with 1, and None differs from 1 exactly as 0 does."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -22,6 +22,6 @@\n     for node in nodes:\n         if node.node_type != \"activity\":\n             continue\n-        if degrees.get(node.node_id, 0) != 1:\n+        if degrees.get(node.node_id, ) != 1:\n             raise GraphError(\"activity without one classified_as edge: \" + node.node_id)\n     _require_unmappable(nodes)"
+reason = "In `validate_graph` a node id absent from `degrees` has no edge of the counted type; `dict.get` with no default returns None, and None differs from 1 exactly as 0 does."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -12,7 +12,7 @@\n         raise GraphError(\"graph output already exists\")\n     directory.parent.mkdir(parents=True, exist_ok=True)\n     staging = Path(\n-        tempfile.mkdtemp(dir=directory.parent, prefix=directory.name + \".tmp-\")\n+        tempfile.mkdtemp(dir=directory.parent, prefix=directory.name + \".TMP-\")\n     )\n     try:\n         _write_parquet("
+reason = "The staging folder made by `write_graph` is either renamed onto the output folder or removed; its own name is never read or written anywhere, and the changed prefix has the same length, so no output or refusal differs."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -1,7 +1,7 @@\n def _check_node(node: GraphNode, registry: Sequence[Entry]) -> None:\n     if node.node_type not in NODE_TYPES:\n         raise GraphError(\"unknown node type \" + node.node_type)\n-    if node.node_id.split(\":\", 1)[0] != node.node_type:\n+    if node.node_id.split(\":\", )[0] != node.node_type:\n         raise GraphError(\"node id prefix differs from its type: \" + node.node_id)\n     if node.code.strip() == \"\":\n         raise GraphError(\"node code is empty\")"
+reason = "`_check_node` reads only element 0 of the split, the text before the first colon, which is the same with no limit as with a limit of one."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -1,7 +1,7 @@\n def _check_node(node: GraphNode, registry: Sequence[Entry]) -> None:\n     if node.node_type not in NODE_TYPES:\n         raise GraphError(\"unknown node type \" + node.node_type)\n-    if node.node_id.split(\":\", 1)[0] != node.node_type:\n+    if node.node_id.split(\":\", 2)[0] != node.node_type:\n         raise GraphError(\"node id prefix differs from its type: \" + node.node_id)\n     if node.code.strip() == \"\":\n         raise GraphError(\"node code is empty\")"
+reason = "`_check_node` reads only element 0 of the split, the text before the first colon, which is the same for a limit of two as for a limit of one."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -8,7 +8,7 @@\n \n     connection = duckdb.connect()\n     try:\n-        connection.execute(\"SET threads=1\")\n+        connection.execute(\"set threads=1\")\n         connection.execute(\"SET preserve_insertion_order=true\")\n         declared = \", \".join(f'\"{name}\" {kind}' for name, kind in types)\n         connection.execute(f\"CREATE TABLE rows ({declared})\")"
+reason = "DuckDB reads the keyword SET and the name of a setting without regard to letter case, so `_write_parquet` applies the same setting and writes the same bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -8,7 +8,7 @@\n \n     connection = duckdb.connect()\n     try:\n-        connection.execute(\"SET threads=1\")\n+        connection.execute(\"SET THREADS=1\")\n         connection.execute(\"SET preserve_insertion_order=true\")\n         declared = \", \".join(f'\"{name}\" {kind}' for name, kind in types)\n         connection.execute(f\"CREATE TABLE rows ({declared})\")"
+reason = "DuckDB reads the keyword SET and the name of a setting without regard to letter case, so `_write_parquet` applies the same setting and writes the same bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -9,7 +9,7 @@\n     connection = duckdb.connect()\n     try:\n         connection.execute(\"SET threads=1\")\n-        connection.execute(\"SET preserve_insertion_order=true\")\n+        connection.execute(\"set preserve_insertion_order=true\")\n         declared = \", \".join(f'\"{name}\" {kind}' for name, kind in types)\n         connection.execute(f\"CREATE TABLE rows ({declared})\")\n         marks = \", \".join(\"?\" for _ in columns)"
+reason = "DuckDB reads the keyword SET, the name of a setting and a boolean word without regard to letter case, so `_write_parquet` applies the same setting and writes the same bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -9,7 +9,7 @@\n     connection = duckdb.connect()\n     try:\n         connection.execute(\"SET threads=1\")\n-        connection.execute(\"SET preserve_insertion_order=true\")\n+        connection.execute(\"SET PRESERVE_INSERTION_ORDER=TRUE\")\n         declared = \", \".join(f'\"{name}\" {kind}' for name, kind in types)\n         connection.execute(f\"CREATE TABLE rows ({declared})\")\n         marks = \", \".join(\"?\" for _ in columns)"
+reason = "DuckDB reads the keyword SET, the name of a setting and a boolean word without regard to letter case, so `_write_parquet` applies the same setting and writes the same bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/graph.py"
+mutation = "--- src/eii_custodian/publicdata/review/graph.py\n+++ src/eii_custodian/publicdata/review/graph.py\n@@ -17,7 +17,7 @@\n         connection.execute(\n             f'COPY (SELECT * FROM rows ORDER BY \"{columns[0]}\") TO '\n             f\"'{_sql_path(path)}' (FORMAT parquet, COMPRESSION zstd, \"\n-            \"ROW_GROUP_SIZE 122880)\"\n+            \"row_group_size 122880)\"\n         )\n     finally:\n         connection.close()"
+reason = "DuckDB reads the name of a COPY option without regard to letter case, so `_write_parquet` writes the same Parquet file with the same row group size."
+
+[[survivors]]
 module = "custodian/src/eii_custodian/publicdata/stage.py"
 mutation = "--- src/eii_custodian/publicdata/stage.py\n+++ src/eii_custodian/publicdata/stage.py\n@@ -12,7 +12,7 @@\n     if not path.is_file():\n         return None\n     try:\n-        record = json.loads(path.read_text(encoding=\"utf-8\"))\n+        record = json.loads(path.read_text(encoding=\"UTF-8\"))\n     except json.JSONDecodeError:\n         raise ValueError(f\"{figure_id}: {LOCAL_RECORD_REFUSED}\") from None\n     if ("
 reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same decoder, so every byte string is read or refused as before."
