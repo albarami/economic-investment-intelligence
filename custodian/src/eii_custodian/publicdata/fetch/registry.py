@@ -145,6 +145,55 @@ def registry_path() -> Path:
     return _REGISTRY
 
 
+def require_addition_completion(entries: tuple[Entry, ...]) -> None:
+    """Refuse a decision-0017 family row that still lacks its declaration."""
+    from eii_custodian.publicdata.additions.common import (
+        ADDITION_FAMILIES,
+        FIELD_UNCONFIRMED,
+        AdditionError,
+        parse_period_rule,
+    )
+
+    for entry in entries:
+        if entry.source_id not in ADDITION_FAMILIES:
+            continue
+        if not entry.columns:
+            raise RegistryError(f"{entry.key}: columns empty")
+        if entry.row_count_min is None or entry.row_count_min != entry.row_count_max:
+            raise RegistryError(f"{entry.key}: row count range not closed")
+        if entry.period_first == "" or entry.period_last == "":
+            raise RegistryError(f"{entry.key}: period bounds empty")
+        try:
+            rule = parse_period_rule(entry.period_field)
+        except AdditionError as error:
+            raise RegistryError(f"{entry.key}: {error.name}") from error
+        declared = {name for name, _kind in entry.columns}
+        if _period_name_undeclared(
+            rule.field, declared, FIELD_UNCONFIRMED
+        ) or _period_name_undeclared(rule.month_field, declared, FIELD_UNCONFIRMED):
+            raise RegistryError(f"{entry.key}: period_field_undeclared")
+        if entry.source_id == "active_nat_occ_act" and entry.public_splits != (
+            "nationality",
+            "sex",
+        ):
+            raise RegistryError(f"{entry.key}: split declaration")
+        if (
+            entry.source_id == "visitors_markets"
+            and "nationality" not in entry.public_splits
+        ):
+            raise RegistryError(f"{entry.key}: split declaration")
+
+
+def _period_name_undeclared(name: str, declared: set[str], marker: str) -> bool:
+    """True when a period rule names a column the row does not declare.
+
+    The registry marker is not a column name. An empty month is not a name.
+    """
+    if name == "" or name == marker:
+        return False
+    return name not in declared
+
+
 def load_registry(path: Path | None = None) -> tuple[Entry, ...]:
     """Load sources.yaml with the safe loader and refuse unknown fields."""
     document = read_yaml(path if path is not None else _REGISTRY)
@@ -166,6 +215,7 @@ def load_registry(path: Path | None = None) -> tuple[Entry, ...]:
         from .forecast_series import load_forecast_series
 
         load_forecast_series(document["forecast_series"], entries)
+    require_addition_completion(entries)
     return entries
 
 
@@ -377,7 +427,7 @@ def _columns(value: object) -> tuple[tuple[str, str], ...]:
         kind = item.get("type")
         if not isinstance(name, str) or not isinstance(kind, str):
             raise RegistryError("column name or type is not text")
-        if kind not in {"integer", "number", "string"}:
+        if kind not in {"integer", "number", "string", "object"}:
             raise RegistryError("unknown column type")
         found.append((name, kind))
     return tuple(found)

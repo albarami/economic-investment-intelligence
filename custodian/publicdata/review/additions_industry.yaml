@@ -1,0 +1,353 @@
+# Reviewed field map for establishment size, manufacturing, wholesale and retail
+# trade, and trade logistics. Labels are the inventory's own. Nothing is renamed
+# across bulletins. The country crosswalk has no rows: the lead adds exact labels.
+version: 1
+country_crosswalk: []
+regions_not_countries:
+  - "African Countries"
+  - "Asian Countries"
+  - "Central American & Caribbean Countries"
+  - "European Countries"
+  - "G.C.C Countries"
+  - "North American Countries"
+  - "Ocean Countries"
+  - "Other Arab Countries"
+  - "Other Countries"
+  - "South American Countries"
+certificate_types_unpublished:
+  - "#N/A"
+certificate_types:
+  - "Arab Certificate of Origin"
+  - "Certificate of Origin under Preferential System"
+  - "Certificates of Origin"
+  - "Free Zones Certificate of Origin"
+  - "GCC Certificates"
+  - "Unified GCC Certificate of Origin with EFTA Countries"
+  - "Unified GCC Certificate of Origin with Singapore"
+vessel_types:
+  - "Auto Carrier"
+  - "Bulk"
+  - "Containers"
+  - "Gas Tanker"
+  - "General Cargo"
+  - "Live Stock"
+  - "Oil Tanker"
+  - "Other"
+  - "Passengers Carrier"
+schemas:
+  a1:
+    layout: licence
+    licence_field: license_type
+    licence_ar: nw_ltrkhys
+    licence_types:
+      - "Industrial License"
+      - "Industrial Registration"
+    fields:
+      - year
+      - license_type
+      - nw_ltrkhys
+      - number_of_firms
+      - investment_million_qatari_riyals
+      - number_of_labour
+    measures:
+      - field: number_of_firms
+        indicator: firms
+        integral: true
+        unit: to_be_confirmed
+      - field: investment_million_qatari_riyals
+        indicator: investment
+        integral: false
+        unit: qar_million
+      - field: number_of_labour
+        indicator: labour
+        integral: true
+        unit: to_be_confirmed
+  a2:
+    layout: licence
+    licence_field: license_type
+    licence_ar: nw_ltrkhys
+    licence_types:
+      - "Industrial License"
+      - "Industrial Registration"
+    fields:
+      - year
+      - license_type
+      - nw_ltrkhys
+      - number_of_firms
+      - investment_in_million_qatari_riyals
+      - number_of_labour
+    measures:
+      - field: number_of_firms
+        indicator: firms
+        integral: true
+        unit: to_be_confirmed
+      - field: investment_in_million_qatari_riyals
+        indicator: investment
+        integral: false
+        unit: qar_million
+      - field: number_of_labour
+        indicator: labour
+        integral: true
+        unit: to_be_confirmed
+  b:
+    layout: licence
+    licence_field: license_type
+    licence_types:
+      - "Industrial License"
+      - "Industrial Registration"
+    fields:
+      - year
+      - license_type
+      - no_of_firms
+      - investment_qar_mil
+      - no_of_labour
+    measures:
+      - field: no_of_firms
+        indicator: firms
+        integral: true
+        unit: to_be_confirmed
+      - field: investment_qar_mil
+        indicator: investment
+        integral: false
+        unit: qar_million
+      - field: no_of_labour
+        indicator: labour
+        integral: true
+        unit: to_be_confirmed
+s2_sizes: &s2_sizes
+  - "Establishments with 10 Employees and More"
+  - "Establishments with Less than 10 Employees"
+s2_pairs: &s2_pairs
+  "Establishments with 10 Employees and More": "المنشآت 10 مشتغلين فأكثر"
+  "Establishments with Less than 10 Employees": "المنشآت أقل من 10 مشتغلين"
+s2_indicators: &s2_indicators
+  Employees: employees
+  Establishments: establishments
+s1_sizes: &s1_sizes
+  - "10 Employees and more"
+  - "Less than 10 Employees"
+s1_pairs: &s1_pairs
+  "10 Employees and more": "10 مشتغلين فأكثر"
+  "Less than 10 Employees": "أقل من 10 مشتغلين"
+s3_sizes: &s3_sizes
+  - "Establishments with 10+ Employee"
+  - "Establishments with <10 Employee"
+slugs:
+  number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-two:
+    family: est_size_act
+    layout: establishment
+    activity_form: two_digit
+    size_field: size_of_establishment
+    size_ar: hjm_lmnsh
+    indicator_field: indicator
+    indicator_ar: lbyn
+    indicators: *s2_indicators
+    size_classes: *s2_sizes
+    size_pairs: *s2_pairs
+    unit: to_be_confirmed
+    fields: [year, activity_code, size_of_establishment, hjm_lmnsh, indicator, lbyn, value]
+  number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-wholesale-and-retail-trade-four-digits:
+    family: est_size_act
+    layout: establishment
+    activity_form: four_digit
+    size_field: establishment_size
+    size_ar: hjm_lmnsh
+    indicator_field: indicator
+    indicator_ar: lbyn
+    indicators: *s2_indicators
+    size_classes: *s2_sizes
+    size_pairs: *s2_pairs
+    unit: to_be_confirmed
+    fields: [year, activity_code, establishment_size, hjm_lmnsh, indicator, lbyn, value]
+  number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-transport:
+    family: est_size_act
+    layout: establishment
+    activity_form: four_digit
+    size_field: establishment_size
+    size_ar: establishment_size_ar
+    indicator_field: item_type
+    indicator_ar: item_type_ar
+    indicators:
+      Employee: employees
+      Establishment: establishments
+    size_classes: *s3_sizes
+    unit: to_be_confirmed
+    fields: [year, activity_code, establishment_size, establishment_size_ar, item_type, item_type_ar, value]
+  number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-social-and-personal-services-two-digits:
+    family: est_size_act
+    layout: establishment
+    activity_form: closed
+    activity_codes: ["45", "85", "86", "87", "88", "90", "91", "93", "94", "95", "96"]
+    size_field: establishment_size
+    size_ar: hjm_lmnsh
+    indicator_field: indicator
+    indicator_ar: lbyn
+    indicators: to_be_confirmed
+    size_classes: *s2_sizes
+    size_pairs: *s2_pairs
+    unit: to_be_confirmed
+    fields: [year, activity_code, establishment_size, hjm_lmnsh, indicator, lbyn, value]
+  number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-energy:
+    family: est_size_act
+    layout: establishment
+    activity_form: mixed
+    size_field: establishment_size
+    size_ar: hjm_lmnsh
+    indicator_field: indicator
+    indicator_ar: lbyn
+    indicators:
+      "Number of Employees": employees
+      "Number of Establishments": establishments
+    size_classes: *s1_sizes
+    size_pairs: *s1_pairs
+    unit: to_be_confirmed
+    fields: [year, activity_code, establishment_size, hjm_lmnsh, indicator, lbyn, value]
+  number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-one:
+    family: est_size_act
+    layout: establishment
+    activity_form: closed
+    activity_codes: ["J", "K", "L", "M", "N"]
+    size_field: size_of_establishment
+    size_ar: hjm_lmnsh
+    indicator_field: indicator
+    indicator_ar: lbyn
+    indicators: *s2_indicators
+    size_classes: *s2_sizes
+    size_pairs: *s2_pairs
+    unit: to_be_confirmed
+    fields: [year, activity_code, size_of_establishment, hjm_lmnsh, indicator, lbyn, value]
+  establishments-employees-and-compensation-of-employees-by-economic-activity-business-services:
+    family: est_size_act
+    layout: establishment
+    activity_form: two_digit
+    indicator_field: indicator
+    indicator_ar: lbyn
+    indicators:
+      "Compensation of Employees": compensation
+      Employees: employees
+      Establishments: establishments
+    unit: to_be_confirmed
+    fields: [year, activity_code, indicator, lbyn, group, lmjmw, value]
+  manufacture-of-basic-metals:
+    family: mfg_industry
+    schema: a1
+  manufacture-of-beverages:
+    family: mfg_industry
+    schema: a1
+  manufacture-of-food-products:
+    family: mfg_industry
+    schema: a1
+  manufacture-of-motor-vehicles-trailers-and-semi-trailers:
+    family: mfg_industry
+    schema: a1
+  manufacture-of-computer-electronic-and-optical-products:
+    family: mfg_industry
+    schema: a2
+    licence_types:
+      - "Industrial License"
+  manufacture-of-furniture:
+    family: mfg_industry
+    schema: a2
+  manufacture-of-rubber-and-plastics-products:
+    family: mfg_industry
+    schema: a2
+  manufacture-of-textiles:
+    family: mfg_industry
+    schema: a2
+    labour_integral: false
+  manufacture-of-basic-pharmaceutical-products-and-pharmaceutical-preparations:
+    family: mfg_industry
+    schema: b
+  manufacture-of-chemicals-and-chemical-products:
+    family: mfg_industry
+    schema: b
+  manufacture-of-coke-and-refined-petroleum-products:
+    family: mfg_industry
+    schema: b
+  manufacture-of-electrical-equipment:
+    family: mfg_industry
+    schema: b
+  manufacture-of-fabricated-metal-products-except-machinery-and-equipment:
+    family: mfg_industry
+    schema: b
+  manufacture-of-leather-and-related-products:
+    family: mfg_industry
+    schema: b
+  manufacture-of-machinery-and-equipment-nec:
+    family: mfg_industry
+    schema: b
+  manufacture-of-manufacture-of-wood-and-of-products-of-wood-and-cork-except-furniture-manufacture:
+    family: mfg_industry
+    schema: b
+  manufacture-of-other-non-metallic-mineral-products:
+    family: mfg_industry
+    schema: b
+  manufacture-of-other-transport-equipment:
+    family: mfg_industry
+    schema: b
+  manufacture-of-paper-and-paper-products:
+    family: mfg_industry
+    schema: b
+  manufacture-of-wearing-apparel:
+    family: mfg_industry
+    schema: b
+  main-manufacturing-products:
+    family: mfg_industry
+    layout: products
+    fields: [year, category, lfy, product, lmntj, production, unit, lwhd]
+    categories:
+      - "Basic iron and steel"
+      - "Fertilizers"
+      - "Petro-chemicals"
+    products:
+      - "Ammonia"
+      - "Basic iron and steel"
+      - "Ethylene"
+      - "Methanol"
+      - "Urea"
+    units:
+      - "Thousand Metric Tons (MT '000)"
+      - "Thousand Tons (TN '000)"
+  purchases-sales-and-stocks-during-the-year-by-type-of-trade-wholesale-and-retail-trade-all:
+    family: trade_wr
+    layout: trade
+    fields: [year, type_of_trade, nw_ltjr, measure, lmw_shr, breakdown, ltfsyl, value]
+    indicators:
+      Purchases: purchases
+      Sales: sales
+      "Stock for Sale": stocks
+    breakdowns:
+      - "Beginning of Year"
+      - "End of Year"
+      - "Imported"
+      - "Local"
+      - "Retail"
+      - "Wholesale"
+  annual-certificates-of-origin-by-type-and-importing-country:
+    family: trade_logistics
+    layout: certificates
+    fields: [year, type_of_certificate, nw_lshhd, importing_country, ldwl_lmstwrd, number_of_issued_certificates]
+    country_field: importing_country
+    indicator: certificates
+    unit: to_be_confirmed
+  arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-previous-port:
+    family: trade_logistics
+    layout: vessels
+    fields: [year, country_of_previous_port, bld_lmyn_lsbq, vessel_type, nw_lsfyn, indicator, lbyn, number]
+    country_field: country_of_previous_port
+    unit: to_be_confirmed
+    indicators:
+      "Gross Tonnage": gross_tonnage
+      "Net Tonnage": net_tonnage
+      "Number of Vessels": vessels
+  arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-registration-hamad-port0:
+    family: trade_logistics
+    layout: wide
+    country_field: country_of_registration
+    unit: to_be_confirmed
+    columns: [others, passengers_vessels, vehicles_vessels, live_sheep, loose_materials, containers, generals_goods, gas_tankers, oil_tankers]
+    fields: [year, country_of_registration, bld_ltsjyl, number_tonnage, l_dd_wlhmwl, others, passengers_vessels, vehicles_vessels, live_sheep, loose_materials, containers, generals_goods, gas_tankers, oil_tankers]
+    indicators:
+      "Gross Tonnage": gross_tonnage
+      "Net Tonnage": net_tonnage
+      "No. of Vessels": vessels

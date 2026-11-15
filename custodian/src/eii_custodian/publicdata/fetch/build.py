@@ -9,6 +9,10 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
+from eii_custodian.publicdata.additions.common import (
+    ADDITION_FAMILIES as _ADDITION_FAMILIES,
+)
+from eii_custodian.publicdata.additions.common import AdditionError
 from eii_custodian.publicdata.fetch.allowlist import approve, host_of
 from eii_custodian.publicdata.fetch.kinds import (
     TERMS_HOST_UNLISTED,
@@ -149,6 +153,11 @@ def _fetch_row(
         terms_sha256=prepared.terms_sha256,
         portal_licence=prepared.portal_licence,
         portal_licence_url=prepared.portal_licence_url,
+        observed_periods=(
+            (prepared.period_first, prepared.period_last)
+            if prepared.periods_observed
+            else None
+        ),
     )
     try:
         commit_pair(
@@ -185,12 +194,18 @@ def run_build(
     cache: Path,
     clock: Clock,
     sleep: Sleeper,
+    *,
+    additions_review: Path | None = None,
+    additions_frame: Path | None = None,
+    additions_output: Path | None = None,
 ) -> BuildOutcome:
     """Fetch each row in order, then run the public_data stage."""
     lines: list[str] = []
     terms: list[dict[str, object]] = []
     previous = _previous_term_hashes(cache)
     failure: FetchFailure | None = None
+    selected: list[tuple[str, str]] = []
+    fetched_entries: list[Entry] = []
     for entry in entries:
         if entry.skip_reason:
             if entry.terms_url:
@@ -271,6 +286,9 @@ def run_build(
             _note_fetched_terms(entry, fetched, lines, terms, previous)
         elif entry.terms_url:
             _read_terms_apart(entry, transport, sleep, clock, lines, terms, previous)
+        if entry.source_id in _ADDITION_FAMILIES:
+            selected.append((entry.key, fetched.digest))
+            fetched_entries.append(entry)
         batch = publish_investment(
             entry, cache, fetched.digest, transport, sleep, clock
         )
@@ -297,6 +315,16 @@ def run_build(
         counted = cache / entry.source_id / "empty_coordinates.txt"
         if counted.is_file():
             lines.append(counted.read_text(encoding="utf-8").strip())
+    if failure is None and selected:
+        failure = _publish_additions(
+            tuple(fetched_entries),
+            tuple(selected),
+            cache,
+            additions_review,
+            additions_frame,
+            additions_output,
+            lines,
+        )
     if failure is None:
         from eii_custodian.publicdata.places.integrate import (
             areas_before_stage,
@@ -347,6 +375,37 @@ def run_build(
             )
     _write_log(cache, lines, terms)
     return BuildOutcome(tuple(lines), failure)
+
+
+def _publish_additions(
+    entries: tuple[Entry, ...],
+    selected: tuple[tuple[str, str], ...],
+    cache: Path,
+    review: Path | None,
+    frame: Path | None,
+    output: Path | None,
+    lines: list[str],
+) -> FetchFailure | None:
+    """Publish addition tables after the fetches. A parser failure leaves no tables."""
+    from eii_custodian.publicdata.additions.build import build_additions
+
+    review_dir = review if review is not None else _review_dir()
+    frame_dir = frame if frame is not None else review_dir
+    destination = output if output is not None else cache / "additions"
+    try:
+        build_additions(cache, entries, selected, review_dir, frame_dir, destination)
+    except AdditionError as error:
+        lines.append(
+            fail_line("additions", "", error.name, "published tables", error.name)
+        )
+        return FetchFailure(
+            1, "additions", "", error.name, "published tables", error.name
+        )
+    return None
+
+
+def _review_dir() -> Path:
+    return Path(__file__).resolve().parents[4] / "publicdata" / "review"
 
 
 def _note_fetched_terms(

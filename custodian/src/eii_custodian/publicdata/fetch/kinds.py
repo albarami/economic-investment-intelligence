@@ -49,6 +49,9 @@ class Prepared:
     failure: AttemptFailure | None
     portal_licence: str = ""
     portal_licence_url: str = ""
+    period_first: str = ""
+    period_last: str = ""
+    periods_observed: bool = False
     terms_unread: str = ""
 
 
@@ -218,7 +221,11 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
     period = period_failure(entry, rows, export.final_url)
     if period is not None:
         return _failed(entry, period)
+    measured = _measure_failure(entry, rows, export.final_url)
+    if measured is not None:
+        return _failed(entry, measured)
     count = len(rows) if rows is not None else None
+    first, last, saw_periods = _observed_periods(entry, rows)
     return Prepared(
         export.body,
         export.final_url,
@@ -230,7 +237,50 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
         None,
         licence,
         licence_url,
+        first,
+        last,
+        saw_periods,
     )
+
+
+def _observed_periods(entry: Entry, rows: list[object] | None) -> tuple[str, str, bool]:
+    """Observed bounds from the period rule. An unconfirmed field stays blank."""
+    from eii_custodian.publicdata.additions.common import (
+        FIELD_UNCONFIRMED,
+        observe_period_bounds,
+        parse_period_rule,
+    )
+
+    if "form=" not in entry.period_field or rows is None:
+        return "", "", False
+    rule = parse_period_rule(entry.period_field)
+    if rule.field == FIELD_UNCONFIRMED:
+        return "", "", True
+    first, last = observe_period_bounds(rows, rule)
+    return first, last, True
+
+
+def _measure_failure(
+    entry: Entry, rows: list[object] | None, url: str
+) -> AttemptFailure | None:
+    """Refuse measure text outside the reviewed missing-value list."""
+    from eii_custodian.publicdata.additions.common import AdditionError, read_measure
+    from eii_custodian.publicdata.additions.property_venues import missing_forms_for
+
+    if rows is None:
+        return None
+    found = missing_forms_for(entry.key)
+    if found is None:
+        return None
+    field, forms = found
+    for row in rows:
+        if not isinstance(row, dict):
+            return AttemptFailure(1, url, "measure_unparsed", field, "measure_unparsed")
+        try:
+            read_measure(row.get(field), missing_forms=forms, integral=True)
+        except AdditionError as error:
+            return AttemptFailure(1, url, error.name, field, error.name)
+    return None
 
 
 def _paged(entry: Entry, reader: Read) -> Prepared:

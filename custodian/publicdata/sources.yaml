@@ -1707,7 +1707,34 @@ sources:
     commit_allowed: false
     release_tables: ["pub_property_resi"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "registration_date"
+        type: "string"
+      - name: "encrypted_transaction_number"
+        type: "string"
+      - name: "encrypted_parcel_number"
+        type: "string"
+      - name: "sm_lbldy"
+        type: "string"
+      - name: "municipality_name"
+        type: "string"
+      - name: "sm_lmntq"
+        type: "string"
+      - name: "district_name"
+        type: "string"
+      - name: "nw_l_qr"
+        type: "string"
+      - name: "property_type"
+        type: "string"
+      - name: "area_square_meters"
+        type: "integer"
+      - name: "price_per_square_meter"
+        type: "integer"
+      - name: "property_value"
+        type: "integer"
+    period_field: "sit=row;form=date;field=registration_date"
+    period_first: "2025-08-24"
+    period_last: "2025-12-31"
     row_count_min: 570
     row_count_max: 570
     reconciliation: "none"
@@ -1734,7 +1761,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_venue_visits"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "month"
+        type: "string"
+      - name: "lshhr"
+        type: "string"
+      - name: "museum"
+        type: "string"
+      - name: "lmthf"
+        type: "string"
+      - name: "number"
+        type: "string"
+    period_field: "sit=row;form=year_text_and_month_name;field=year;month=month"
+    period_first: "2013-01"
+    period_last: "2024-12"
     row_count_min: 1372
     row_count_max: 1372
     reconciliation: "none"
@@ -1761,7 +1803,24 @@ sources:
     commit_allowed: false
     release_tables: ["pub_venue_visits"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "region"
+        type: "string"
+      - name: "health_center_name"
+        type: "string"
+      - name: "2020"
+        type: "number"
+      - name: "2021"
+        type: "number"
+      - name: "2022"
+        type: "number"
+      - name: "2023"
+        type: "number"
+      - name: "2024"
+        type: "number"
+    period_field: "sit=columns;form=year_header"
+    period_first: "2020"
+    period_last: "2024"
     row_count_min: 35
     row_count_max: 35
     reconciliation: "none"
@@ -1788,7 +1847,26 @@ sources:
     commit_allowed: false
     release_tables: ["pub_building_permits"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "building_type"
+        type: "string"
+      - name: "nw_lmbn"
+        type: "string"
+      - name: "permit_type"
+        type: "string"
+      - name: "nw_lrkhs"
+        type: "string"
+      - name: "municipality"
+        type: "string"
+      - name: "lbldy"
+        type: "string"
+      - name: "count"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2021"
+    period_last: "2023"
     row_count_min: 264
     row_count_max: 264
     reconciliation: "none"
@@ -1815,7 +1893,26 @@ sources:
     commit_allowed: false
     release_tables: ["pub_building_permits"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "building_type"
+        type: "string"
+      - name: "nw_lmbn"
+        type: "string"
+      - name: "certificate_type"
+        type: "string"
+      - name: "nw_lshhd"
+        type: "string"
+      - name: "municipality"
+        type: "string"
+      - name: "lbldy"
+        type: "string"
+      - name: "count"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2021"
+    period_last: "2023"
     row_count_min: 240
     row_count_max: 240
     reconciliation: "none"
@@ -1842,7 +1939,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_building_permits"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "month"
+        type: "string"
+      - name: "lshhr"
+        type: "string"
+      - name: "type_of_permit"
+        type: "string"
+      - name: "nw_lrkhs"
+        type: "string"
+      - name: "number"
+        type: "integer"
+    period_field: "sit=row;form=year_text_and_month_name;field=year;month=month"
+    period_first: "2016-01"
+    period_last: "2023-12"
     row_count_min: 288
     row_count_max: 288
     reconciliation: "none"
@@ -1869,7 +1981,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_building_permits"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "month"
+        type: "string"
+      - name: "lshhr"
+        type: "string"
+      - name: "type_of_permit"
+        type: "string"
+      - name: "nw_lrkhs"
+        type: "string"
+      - name: "number"
+        type: "integer"
+    period_field: "sit=row;form=year_text_and_month_name;field=year;month=month"
+    period_first: "2016-01"
+    period_last: "2023-12"
     row_count_min: 288
     row_count_max: 288
     reconciliation: "none"
@@ -1896,7 +2023,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_building_permits"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "month"
+        type: "string"
+      - name: "lshhr"
+        type: "string"
+      - name: "type_of_permit"
+        type: "string"
+      - name: "nw_lrkhs"
+        type: "string"
+      - name: "number"
+        type: "integer"
+    period_field: "sit=row;form=year_text_and_month_name;field=year;month=month"
+    period_first: "2016-01"
+    period_last: "2023-12"
     row_count_min: 288
     row_count_max: 288
     reconciliation: "none"
@@ -1923,7 +2065,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_building_permits"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "month"
+        type: "string"
+      - name: "lshhr"
+        type: "string"
+      - name: "type_of_permit"
+        type: "string"
+      - name: "nw_lrkhs"
+        type: "string"
+      - name: "number"
+        type: "number"
+    period_field: "sit=row;form=year_text_and_month_name;field=year;month=month"
+    period_first: "2017-01"
+    period_last: "2023-12"
     row_count_min: 252
     row_count_max: 252
     reconciliation: "none"
@@ -1950,7 +2107,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_building_permits"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "month"
+        type: "string"
+      - name: "lshhr"
+        type: "string"
+      - name: "type_of_permit"
+        type: "string"
+      - name: "nw_lrkhs"
+        type: "string"
+      - name: "number"
+        type: "integer"
+    period_field: "sit=row;form=year_text_and_month_name;field=year;month=month"
+    period_first: "2016-01"
+    period_last: "2023-12"
     row_count_min: 288
     row_count_max: 288
     reconciliation: "none"
@@ -1977,7 +2149,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_building_permits"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "month"
+        type: "string"
+      - name: "lshhr"
+        type: "string"
+      - name: "type_of_permit"
+        type: "string"
+      - name: "nw_lrkhs"
+        type: "string"
+      - name: "number"
+        type: "number"
+    period_field: "sit=row;form=year_text_and_month_name;field=year;month=month"
+    period_first: "2016-01"
+    period_last: "2023-12"
     row_count_min: 288
     row_count_max: 288
     reconciliation: "none"
@@ -2004,7 +2191,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_building_permits"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "month"
+        type: "string"
+      - name: "lshhr"
+        type: "string"
+      - name: "type_of_permit"
+        type: "string"
+      - name: "nw_lrkhs"
+        type: "string"
+      - name: "number"
+        type: "number"
+    period_field: "sit=row;form=year_text_and_month_name;field=year;month=month"
+    period_first: "2016-01"
+    period_last: "2023-12"
     row_count_min: 288
     row_count_max: 288
     reconciliation: "none"
@@ -2031,7 +2233,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_building_permits"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "month"
+        type: "string"
+      - name: "lshhr"
+        type: "string"
+      - name: "type_of_permit"
+        type: "string"
+      - name: "nw_lrkhs"
+        type: "string"
+      - name: "number"
+        type: "number"
+    period_field: "sit=row;form=year_text_and_month_name;field=year;month=month"
+    period_first: "2016-01"
+    period_last: "2023-12"
     row_count_min: 288
     row_count_max: 288
     reconciliation: "none"
@@ -2058,7 +2275,24 @@ sources:
     commit_allowed: false
     release_tables: ["pub_establishment_size"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "string"
+      - name: "size_of_establishment"
+        type: "string"
+      - name: "hjm_lmnsh"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 556
     row_count_max: 556
     reconciliation: "none"
@@ -2085,7 +2319,24 @@ sources:
     commit_allowed: false
     release_tables: ["pub_establishment_size"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "string"
+      - name: "establishment_size"
+        type: "string"
+      - name: "hjm_lmnsh"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 1840
     row_count_max: 1840
     reconciliation: "none"
@@ -2112,7 +2363,24 @@ sources:
     commit_allowed: false
     release_tables: ["pub_establishment_size"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "string"
+      - name: "establishment_size"
+        type: "string"
+      - name: "establishment_size_ar"
+        type: "string"
+      - name: "item_type"
+        type: "string"
+      - name: "item_type_ar"
+        type: "string"
+      - name: "value"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2014"
+    period_last: "2019"
     row_count_min: 356
     row_count_max: 356
     reconciliation: "none"
@@ -2139,7 +2407,24 @@ sources:
     commit_allowed: false
     release_tables: ["pub_establishment_size"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "string"
+      - name: "establishment_size"
+        type: "string"
+      - name: "hjm_lmnsh"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 316
     row_count_max: 316
     reconciliation: "none"
@@ -2166,7 +2451,24 @@ sources:
     commit_allowed: false
     release_tables: ["pub_establishment_size"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "string"
+      - name: "establishment_size"
+        type: "string"
+      - name: "hjm_lmnsh"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 2912
     row_count_max: 2912
     reconciliation: "none"
@@ -2193,7 +2495,24 @@ sources:
     commit_allowed: false
     release_tables: ["pub_establishment_size"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "string"
+      - name: "size_of_establishment"
+        type: "string"
+      - name: "hjm_lmnsh"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 160
     row_count_max: 160
     reconciliation: "none"
@@ -2220,7 +2539,24 @@ sources:
     commit_allowed: false
     release_tables: ["pub_establishment_size"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "group"
+        type: "string"
+      - name: "lmjmw"
+        type: "string"
+      - name: "value"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2021"
     row_count_min: 324
     row_count_max: 324
     reconciliation: "none"
@@ -2247,7 +2583,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "nw_ltrkhys"
+        type: "string"
+      - name: "number_of_firms"
+        type: "integer"
+      - name: "investment_million_qatari_riyals"
+        type: "number"
+      - name: "number_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2274,7 +2625,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "no_of_firms"
+        type: "integer"
+      - name: "investment_qar_mil"
+        type: "number"
+      - name: "no_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2301,7 +2665,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "nw_ltrkhys"
+        type: "string"
+      - name: "number_of_firms"
+        type: "integer"
+      - name: "investment_million_qatari_riyals"
+        type: "number"
+      - name: "number_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2328,7 +2707,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "no_of_firms"
+        type: "integer"
+      - name: "investment_qar_mil"
+        type: "number"
+      - name: "no_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2355,7 +2747,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "no_of_firms"
+        type: "integer"
+      - name: "investment_qar_mil"
+        type: "number"
+      - name: "no_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2382,7 +2787,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "nw_ltrkhys"
+        type: "string"
+      - name: "number_of_firms"
+        type: "integer"
+      - name: "investment_in_million_qatari_riyals"
+        type: "number"
+      - name: "number_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 7
     row_count_max: 7
     reconciliation: "none"
@@ -2409,7 +2829,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "no_of_firms"
+        type: "integer"
+      - name: "investment_qar_mil"
+        type: "number"
+      - name: "no_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2436,7 +2869,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "no_of_firms"
+        type: "integer"
+      - name: "investment_qar_mil"
+        type: "number"
+      - name: "no_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2463,7 +2909,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "nw_ltrkhys"
+        type: "string"
+      - name: "number_of_firms"
+        type: "integer"
+      - name: "investment_million_qatari_riyals"
+        type: "number"
+      - name: "number_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2490,7 +2951,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "nw_ltrkhys"
+        type: "string"
+      - name: "number_of_firms"
+        type: "integer"
+      - name: "investment_in_million_qatari_riyals"
+        type: "number"
+      - name: "number_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2517,7 +2993,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "no_of_firms"
+        type: "integer"
+      - name: "investment_qar_mil"
+        type: "number"
+      - name: "no_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2544,7 +3033,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "no_of_firms"
+        type: "integer"
+      - name: "investment_qar_mil"
+        type: "number"
+      - name: "no_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2571,7 +3073,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "no_of_firms"
+        type: "integer"
+      - name: "investment_qar_mil"
+        type: "number"
+      - name: "no_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2598,7 +3113,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "nw_ltrkhys"
+        type: "string"
+      - name: "number_of_firms"
+        type: "integer"
+      - name: "investment_million_qatari_riyals"
+        type: "number"
+      - name: "number_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2625,7 +3155,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "no_of_firms"
+        type: "integer"
+      - name: "investment_qar_mil"
+        type: "number"
+      - name: "no_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2652,7 +3195,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "no_of_firms"
+        type: "integer"
+      - name: "investment_qar_mil"
+        type: "number"
+      - name: "no_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2679,7 +3235,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "no_of_firms"
+        type: "integer"
+      - name: "investment_qar_mil"
+        type: "number"
+      - name: "no_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2706,7 +3275,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "nw_ltrkhys"
+        type: "string"
+      - name: "number_of_firms"
+        type: "integer"
+      - name: "investment_in_million_qatari_riyals"
+        type: "number"
+      - name: "number_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2733,7 +3317,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "nw_ltrkhys"
+        type: "string"
+      - name: "number_of_firms"
+        type: "integer"
+      - name: "investment_in_million_qatari_riyals"
+        type: "number"
+      - name: "number_of_labour"
+        type: "number"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2760,7 +3359,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "license_type"
+        type: "string"
+      - name: "no_of_firms"
+        type: "integer"
+      - name: "investment_qar_mil"
+        type: "number"
+      - name: "no_of_labour"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 14
     row_count_max: 14
     reconciliation: "none"
@@ -2787,7 +3399,26 @@ sources:
     commit_allowed: false
     release_tables: ["pub_manufacturing"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "category"
+        type: "string"
+      - name: "lfy"
+        type: "string"
+      - name: "product"
+        type: "string"
+      - name: "lmntj"
+        type: "string"
+      - name: "production"
+        type: "integer"
+      - name: "unit"
+        type: "string"
+      - name: "lwhd"
+        type: "string"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2016"
+    period_last: "2022"
     row_count_min: 35
     row_count_max: 35
     reconciliation: "none"
@@ -2814,7 +3445,26 @@ sources:
     commit_allowed: false
     release_tables: ["pub_trade_wr"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "type_of_trade"
+        type: "string"
+      - name: "nw_ltjr"
+        type: "string"
+      - name: "measure"
+        type: "string"
+      - name: "lmw_shr"
+        type: "string"
+      - name: "breakdown"
+        type: "string"
+      - name: "ltfsyl"
+        type: "string"
+      - name: "value"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 864
     row_count_max: 864
     reconciliation: "none"
@@ -2841,7 +3491,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_population_age"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "years"
+        type: "string"
+      - name: "age_groups"
+        type: "string"
+      - name: "lbldy"
+        type: "string"
+      - name: "municipality"
+        type: "string"
+      - name: "count"
+        type: "number"
+    period_field: "sit=row;form=year_text;field=years"
+    period_first: "2014"
+    period_last: "2024"
     row_count_min: 1584
     row_count_max: 1584
     reconciliation: "none"
@@ -2868,7 +3531,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_hotels_municipality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "municipality"
+        type: "string"
+      - name: "lbldy"
+        type: "string"
+      - name: "facility_type"
+        type: "string"
+      - name: "nw_lmnsh"
+        type: "string"
+      - name: "number"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2022"
+    period_last: "2024"
     row_count_min: 48
     row_count_max: 48
     reconciliation: "none"
@@ -2895,7 +3573,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_trade_logistics"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "type_of_certificate"
+        type: "string"
+      - name: "nw_lshhd"
+        type: "string"
+      - name: "importing_country"
+        type: "string"
+      - name: "ldwl_lmstwrd"
+        type: "string"
+      - name: "number_of_issued_certificates"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2024"
     row_count_min: 1162
     row_count_max: 1162
     reconciliation: "none"
@@ -2922,7 +3615,26 @@ sources:
     commit_allowed: false
     release_tables: ["pub_trade_logistics"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "country_of_previous_port"
+        type: "string"
+      - name: "bld_lmyn_lsbq"
+        type: "string"
+      - name: "vessel_type"
+        type: "string"
+      - name: "nw_lsfyn"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "number"
+        type: "number"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2016"
+    period_last: "2022"
     row_count_min: 1890
     row_count_max: 1890
     reconciliation: "none"
@@ -2949,7 +3661,38 @@ sources:
     commit_allowed: false
     release_tables: ["pub_trade_logistics"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "country_of_registration"
+        type: "string"
+      - name: "bld_ltsjyl"
+        type: "string"
+      - name: "number_tonnage"
+        type: "string"
+      - name: "l_dd_wlhmwl"
+        type: "string"
+      - name: "others"
+        type: "integer"
+      - name: "passengers_vessels"
+        type: "integer"
+      - name: "vehicles_vessels"
+        type: "integer"
+      - name: "live_sheep"
+        type: "integer"
+      - name: "loose_materials"
+        type: "integer"
+      - name: "containers"
+        type: "integer"
+      - name: "generals_goods"
+        type: "integer"
+      - name: "gas_tankers"
+        type: "integer"
+      - name: "oil_tankers"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2023"
     row_count_min: 717
     row_count_max: 717
     reconciliation: "none"
@@ -2976,7 +3719,28 @@ sources:
     commit_allowed: false
     release_tables: ["pub_census_2015_municipality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "municipality"
+        type: "string"
+      - name: "lbldy"
+        type: "string"
+      - name: "establishments_number_dd_lmnshat"
+        type: "integer"
+      - name: "establishments_lmnshat"
+        type: "number"
+      - name: "employees_number_dd_lmshtglwn"
+        type: "integer"
+      - name: "employees_lmshtglwn"
+        type: "number"
+      - name: "geo_point"
+        type: "object"
+      - name: "geo_shape"
+        type: "object"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2015"
     row_count_min: 8
     row_count_max: 8
     reconciliation: "none"
@@ -3003,7 +3767,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_labour_sex_municipality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "municipality"
+        type: "string"
+      - name: "lbldy"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lmw_shr"
+        type: "string"
+      - name: "count"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2020"
+    period_last: "2025"
     row_count_min: 240
     row_count_max: 240
     reconciliation: "none"
@@ -3030,7 +3809,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_labour_sex_municipality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "municipality"
+        type: "string"
+      - name: "lbldy"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lmw_shr"
+        type: "string"
+      - name: "count"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2020"
+    period_last: "2025"
     row_count_min: 240
     row_count_max: 240
     reconciliation: "none"
@@ -3057,7 +3851,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_labour_sex_municipality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "municipality"
+        type: "string"
+      - name: "lbldy"
+        type: "string"
+      - name: "gender"
+        type: "string"
+      - name: "ljns"
+        type: "string"
+      - name: "number"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2020"
+    period_last: "2025"
     row_count_min: 96
     row_count_max: 96
     reconciliation: "none"
@@ -3084,7 +3893,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_labour_sex_municipality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "municipality"
+        type: "string"
+      - name: "lbldy"
+        type: "string"
+      - name: "gender"
+        type: "string"
+      - name: "ljns"
+        type: "string"
+      - name: "number"
+        type: "integer"
+    period_field: "sit=row;form=date_as_year;field=year"
+    period_first: "2020"
+    period_last: "2025"
     row_count_min: 96
     row_count_max: 96
     reconciliation: "none"
@@ -3111,7 +3935,26 @@ sources:
     commit_allowed: false
     release_tables: ["pub_population_age_sex"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "years"
+        type: "string"
+      - name: "fy_t_l_mr_blsnwt"
+        type: "string"
+      - name: "age_groups_in_years"
+        type: "string"
+      - name: "lbldy"
+        type: "string"
+      - name: "municipality"
+        type: "string"
+      - name: "value"
+        type: "number"
+      - name: "geo_point"
+        type: "object"
+      - name: "geo_shape"
+        type: "object"
+    period_field: "sit=row;form=year_text;field=years"
+    period_first: "2014"
+    period_last: "2023"
     row_count_min: 1440
     row_count_max: 1440
     reconciliation: "none"
@@ -3138,7 +3981,22 @@ sources:
     commit_allowed: false
     release_tables: ["pub_population_age_sex"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "years"
+        type: "string"
+      - name: "fy_t_l_mr_blsnwt"
+        type: "string"
+      - name: "age_groups_in_years"
+        type: "string"
+      - name: "lbldy"
+        type: "string"
+      - name: "municipality"
+        type: "string"
+      - name: "value"
+        type: "number"
+    period_field: "sit=row;form=year_text;field=years"
+    period_first: "2014"
+    period_last: "2023"
     row_count_min: 1440
     row_count_max: 1440
     reconciliation: "none"
@@ -3165,7 +4023,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_active_sex_age"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "age_group"
+        type: "string"
+      - name: "economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy"
+        type: "string"
+      - name: "total"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2017"
+    period_last: "2023"
     row_count_min: 1551
     row_count_max: 1551
     reconciliation: "none"
@@ -3192,7 +4063,20 @@ sources:
     commit_allowed: false
     release_tables: ["pub_active_sex_age"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "age_group"
+        type: "string"
+      - name: "economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy"
+        type: "string"
+      - name: "total"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2017"
+    period_last: "2023"
     row_count_min: 1617
     row_count_max: 1617
     reconciliation: "none"
@@ -3215,11 +4099,26 @@ sources:
     terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
-    public_splits: ["nationality"]
+    public_splits: ["nationality", "sex"]
     commit_allowed: false
     release_tables: ["pub_active_nationality_occupation"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy"
+        type: "string"
+      - name: "occupation"
+        type: "string"
+      - name: "lmhn"
+        type: "string"
+      - name: "number"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2017"
+    period_last: "2023"
     row_count_min: 1269
     row_count_max: 1269
     reconciliation: "none"
@@ -3242,11 +4141,26 @@ sources:
     terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-non-qatari-males-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
-    public_splits: ["nationality"]
+    public_splits: ["nationality", "sex"]
     commit_allowed: false
     release_tables: ["pub_active_nationality_occupation"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy"
+        type: "string"
+      - name: "occupation"
+        type: "string"
+      - name: "lmhn"
+        type: "string"
+      - name: "total"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2017"
+    period_last: "2023"
     row_count_min: 1323
     row_count_max: 1323
     reconciliation: "none"
@@ -3269,11 +4183,26 @@ sources:
     terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-non-qatari-population-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
-    public_splits: ["nationality"]
+    public_splits: ["nationality", "sex"]
     commit_allowed: false
     release_tables: ["pub_active_nationality_occupation"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy"
+        type: "string"
+      - name: "occupation"
+        type: "string"
+      - name: "lmhn"
+        type: "string"
+      - name: "number"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2017"
+    period_last: "2023"
     row_count_min: 1323
     row_count_max: 1323
     reconciliation: "none"
@@ -3296,11 +4225,26 @@ sources:
     terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-qatari-females-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
-    public_splits: ["nationality"]
+    public_splits: ["nationality", "sex"]
     commit_allowed: false
     release_tables: ["pub_active_nationality_occupation"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy"
+        type: "string"
+      - name: "occupation"
+        type: "string"
+      - name: "lmhn"
+        type: "string"
+      - name: "number"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2017"
+    period_last: "2023"
     row_count_min: 1206
     row_count_max: 1206
     reconciliation: "none"
@@ -3323,11 +4267,26 @@ sources:
     terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-qatari-males-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
-    public_splits: ["nationality"]
+    public_splits: ["nationality", "sex"]
     commit_allowed: false
     release_tables: ["pub_active_nationality_occupation"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy"
+        type: "string"
+      - name: "occupation"
+        type: "string"
+      - name: "lmhn"
+        type: "string"
+      - name: "number"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2017"
+    period_last: "2024"
     row_count_min: 1440
     row_count_max: 1440
     reconciliation: "none"
@@ -3350,11 +4309,26 @@ sources:
     terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-qatari-population-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
-    public_splits: ["nationality"]
+    public_splits: ["nationality", "sex"]
     commit_allowed: false
     release_tables: ["pub_active_nationality_occupation"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy"
+        type: "string"
+      - name: "occupation"
+        type: "string"
+      - name: "lmhn"
+        type: "string"
+      - name: "number"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2017"
+    period_last: "2024"
     row_count_min: 1440
     row_count_max: 1440
     reconciliation: "none"
@@ -3381,7 +4355,32 @@ sources:
     commit_allowed: false
     release_tables: ["pub_compensation_nationality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "main_economic_activity_ar"
+        type: "string"
+      - name: "economic_activity"
+        type: "string"
+      - name: "economic_activity_ar"
+        type: "string"
+      - name: "labor_indicator"
+        type: "string"
+      - name: "labor_indicator_ar"
+        type: "string"
+      - name: "nationality"
+        type: "string"
+      - name: "nationality_ar"
+        type: "string"
+      - name: "code"
+        type: "string"
+      - name: "value"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2016"
+    period_last: "2021"
     row_count_min: 72
     row_count_max: 72
     reconciliation: "none"
@@ -3408,7 +4407,28 @@ sources:
     commit_allowed: false
     release_tables: ["pub_compensation_nationality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "string"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "nationality"
+        type: "string"
+      - name: "ljnsy"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "number"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2017"
+    period_last: "2022"
     row_count_min: 72
     row_count_max: 72
     reconciliation: "none"
@@ -3435,7 +4455,28 @@ sources:
     commit_allowed: false
     release_tables: ["pub_compensation_nationality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "string"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "nationality"
+        type: "string"
+      - name: "ljnsy"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "number"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 556
     row_count_max: 556
     reconciliation: "none"
@@ -3462,7 +4503,28 @@ sources:
     commit_allowed: false
     release_tables: ["pub_compensation_nationality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "string"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "nationality"
+        type: "string"
+      - name: "ljnsy"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "number"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 2872
     row_count_max: 2872
     reconciliation: "none"
@@ -3489,7 +4551,28 @@ sources:
     commit_allowed: false
     release_tables: ["pub_compensation_nationality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "string"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "nationality"
+        type: "string"
+      - name: "ljnsy"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "number"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 1040
     row_count_max: 1040
     reconciliation: "none"
@@ -3516,7 +4599,28 @@ sources:
     commit_allowed: false
     release_tables: ["pub_compensation_nationality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "string"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "nationality"
+        type: "string"
+      - name: "ljnsy"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "number"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 2904
     row_count_max: 2904
     reconciliation: "none"
@@ -3543,7 +4647,28 @@ sources:
     commit_allowed: false
     release_tables: ["pub_compensation_nationality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "string"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "nationality"
+        type: "string"
+      - name: "ljnsy"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 160
     row_count_max: 160
     reconciliation: "none"
@@ -3570,7 +4695,28 @@ sources:
     commit_allowed: false
     release_tables: ["pub_compensation_nationality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "integer"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "nationality"
+        type: "string"
+      - name: "ljnsy"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 1092
     row_count_max: 1092
     reconciliation: "none"
@@ -3597,7 +4743,28 @@ sources:
     commit_allowed: false
     release_tables: ["pub_compensation_nationality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "integer"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "nationality"
+        type: "string"
+      - name: "ljnsy"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 1072
     row_count_max: 1072
     reconciliation: "none"
@@ -3624,7 +4791,28 @@ sources:
     commit_allowed: false
     release_tables: ["pub_compensation_nationality"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "integer"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "nationality"
+        type: "string"
+      - name: "ljnsy"
+        type: "string"
+      - name: "indicator"
+        type: "string"
+      - name: "lbyn"
+        type: "string"
+      - name: "value"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2015"
+    period_last: "2022"
     row_count_min: 1092
     row_count_max: 1092
     reconciliation: "none"
@@ -3651,7 +4839,34 @@ sources:
     commit_allowed: false
     release_tables: ["pub_students"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "municipality"
+        type: "string"
+      - name: "lbldy"
+        type: "string"
+      - name: "level_of_education"
+        type: "string"
+      - name: "lmrhl_lt_lymy"
+        type: "string"
+      - name: "type_of_education"
+        type: "string"
+      - name: "nw_lt_lym"
+        type: "string"
+      - name: "nationality"
+        type: "string"
+      - name: "ljnsy"
+        type: "string"
+      - name: "gender"
+        type: "string"
+      - name: "ljns"
+        type: "string"
+      - name: "number_of_students"
+        type: "integer"
+    period_field: "sit=row;form=school_year;field=year"
+    period_first: "2020-2021"
+    period_last: "2025-2026"
     row_count_min: 1570
     row_count_max: 1570
     reconciliation: "none"
@@ -3678,7 +4893,26 @@ sources:
     commit_allowed: false
     release_tables: ["pub_visitor_markets"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "nationality"
+        type: "string"
+      - name: "ljnsy"
+        type: "string"
+      - name: "hotel_rating"
+        type: "string"
+      - name: "drj_lfndq"
+        type: "string"
+      - name: "metric"
+        type: "string"
+      - name: "lmqys"
+        type: "string"
+      - name: "number"
+        type: "number"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2020"
+    period_last: "2022"
     row_count_min: 192
     row_count_max: 192
     reconciliation: "none"
@@ -3701,11 +4935,30 @@ sources:
     terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/visitor-arrivals-by-mode-of-entry/"
     nightly_live_fetch: true
-    public_splits: []
+    public_splits: ["nationality"]
     commit_allowed: false
     release_tables: ["pub_visitor_markets"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "mode_of_entry"
+        type: "string"
+      - name: "tryq_ldkhwl"
+        type: "string"
+      - name: "june_2024"
+        type: "number"
+      - name: "july_2024"
+        type: "number"
+      - name: "august_2024"
+        type: "number"
+      - name: "september_2024"
+        type: "number"
+      - name: "october_2024"
+        type: "number"
+      - name: "november_2024"
+        type: "number"
+    period_field: "sit=columns;form=month_name_year"
+    period_first: "2024-06"
+    period_last: "2024-11"
     row_count_min: 3
     row_count_max: 3
     reconciliation: "none"
@@ -3728,11 +4981,30 @@ sources:
     terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/visitor-arrivals-by-region/"
     nightly_live_fetch: true
-    public_splits: []
+    public_splits: ["nationality"]
     commit_allowed: false
     release_tables: ["pub_visitor_markets"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "region"
+        type: "string"
+      - name: "lmntq"
+        type: "string"
+      - name: "june_2024"
+        type: "number"
+      - name: "july_2024"
+        type: "number"
+      - name: "august_2024"
+        type: "number"
+      - name: "september_2024"
+        type: "number"
+      - name: "october_2024"
+        type: "number"
+      - name: "november_2024"
+        type: "number"
+    period_field: "sit=columns;form=month_name_year"
+    period_first: "2024-06"
+    period_last: "2024-11"
     row_count_min: 6
     row_count_max: 6
     reconciliation: "none"
@@ -3755,11 +5027,22 @@ sources:
     terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/visitor-arrivals-trends-by-mode-of-transport-air-land-sea/"
     nightly_live_fetch: true
-    public_splits: []
+    public_splits: ["nationality"]
     commit_allowed: false
     release_tables: ["pub_visitor_markets"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "mode_of_transportation"
+        type: "string"
+      - name: "wsyl_lnql"
+        type: "string"
+      - name: "arrivals"
+        type: "integer"
+    period_field: "sit=row;form=year_text;field=year"
+    period_first: "2019"
+    period_last: "2025"
     row_count_min: 20
     row_count_max: 20
     reconciliation: "none"
