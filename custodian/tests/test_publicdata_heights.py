@@ -25,6 +25,7 @@ from shapely.geometry import Point, Polygon
 from eii_core.calc.building_heights import floor_height, metres
 from eii_custodian.publicdata import heights as heights_package
 from eii_custodian.publicdata.fetch.build import run_build
+from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response
 from eii_custodian.publicdata.heights import step
@@ -511,7 +512,7 @@ def test_read_refusals_and_absent_reasons(tmp_path: Path) -> None:
     row = invented.entry("bldg_3dglobfp", extension="geojson")
     body = invented.globfp_bytes([(invented.square(0, 0, 1), 7)])
     digest = invented.store(changed / "cache", row, body)
-    target = next((changed / "cache" / "bldg_3dglobfp").glob(f"{digest}.*"))
+    target = changed / "cache" / "bldg_3dglobfp" / f"{digest}.{row.extension}"
     target.write_bytes(b"planted other bytes")
     with pytest.raises(HeightError, match="content_hash_mismatch"):
         _sources(changed, (row,))
@@ -744,11 +745,11 @@ def test_both_rows_fetch_through_run_build_on_an_allowed_host(
     assert seen == [entry.url for entry in rows]
     assert "SKIP heights building_table_absent" in outcome.lines
     for entry in rows:
-        stored = list((cache / entry.key).glob("*.bin")) + list(
-            (cache / entry.key).glob("*.*son")
-        )
-        assert stored
-        receipt = json.loads(next((cache / entry.key).glob("*.meta.json")).read_text())
+        digest = sha256_hex(b"invented-bytes")
+        stored_body = cache / entry.key / f"{digest}.{entry.extension}"
+        assert stored_body.read_bytes() == b"invented-bytes"
+        receipt_path = cache / entry.key / f"{digest}.meta.json"
+        receipt = json.loads(receipt_path.read_text())
         assert receipt["switched_off"] is False
 
 
