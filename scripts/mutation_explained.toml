@@ -2392,3 +2392,48 @@ reason = "live.py: the codec lookup lower-cases an encoding name before it searc
 module = "custodian/src/eii_custodian/publicdata/frame/live.py"
 mutation = "--- src/eii_custodian/publicdata/frame/live.py\n+++ src/eii_custodian/publicdata/frame/live.py\n@@ -2,7 +2,7 @@\n     path = cache / \"places_s2_t06\" / \"place_points.json\"\n     if not path.is_file():\n         return {}\n-    loaded = json.loads(path.read_text(encoding=\"utf-8\"))\n+    loaded = json.loads(path.read_text(encoding=\"UTF-8\"))\n     found: dict[tuple[str, str], dict[str, Any]] = {}\n     if not isinstance(loaded, list):\n         return found"
 reason = "live.py: the codec lookup lower-cases an encoding name before it searches, so \"UTF-8\" and \"utf-8\" name the one UTF-8 codec under every locale and UTF-8 mode; the same text is read or written."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places/fetch.py\n+++ src/eii_custodian/publicdata/places/fetch.py\n@@ -15,7 +15,7 @@\n             1, entry.url, \"blocked_host\", \"allow-listed host\", entry.url\n         )\n     recorded, failure = _recorded(entry)\n-    if failure is not None or recorded is None:\n+    if failure is not None and recorded is None:\n         return None, failure\n     try:\n         response = transport(entry.url)"
+reason = "_recorded returns either (None, failure) with a failure record or ((size, etag), None); in both shapes 'failure is not None' and 'recorded is None' are both true or both false, so 'or' and 'and' choose the same branch for every entry."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places/fetch.py\n+++ src/eii_custodian/publicdata/places/fetch.py\n@@ -49,7 +49,7 @@\n         fetch_host=host_of(response.final_url),\n         retrieved_utc=clock(),\n         publisher=entry.publisher,\n-        source_modified=\"\",\n+        source_modified=None,\n         row_count=None,\n         terms_sha256=\"\",\n     )"
+reason = "sidecar_for writes source_modified as 'source_modified or None', so an empty text and None both store None; fetch_place_file passes this argument to nothing else."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places/fetch.py\n+++ src/eii_custodian/publicdata/places/fetch.py\n@@ -51,7 +51,7 @@\n         publisher=entry.publisher,\n         source_modified=\"\",\n         row_count=None,\n-        terms_sha256=\"\",\n+        terms_sha256=None,\n     )\n     commit_pair(\n         cache_directory(cache, entry.key),"
+reason = "sidecar_for writes terms_sha256 as 'terms_sha256 or None', so an empty text and None both store None; fetch_place_file passes this argument to nothing else."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places/fetch.py\n+++ src/eii_custodian/publicdata/places/fetch.py\n@@ -1,7 +1,7 @@\n def _recorded(entry: Entry) -> tuple[tuple[int, str] | None, FileFailure | None]:\n     sizes: list[str] = []\n     etags: list[str] = []\n-    size_malformed = False\n+    size_malformed = None\n     etag_malformed = False\n     for line in entry.basis_note.splitlines():\n         if line.startswith(\"recorded_bytes:\"):"
+reason = "The flag is only read for its truth in the refusal test of _recorded and is never returned; False and None are both false, and a malformed line sets it to True in either case."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places/fetch.py\n+++ src/eii_custodian/publicdata/places/fetch.py\n@@ -2,7 +2,7 @@\n     sizes: list[str] = []\n     etags: list[str] = []\n     size_malformed = False\n-    etag_malformed = False\n+    etag_malformed = None\n     for line in entry.basis_note.splitlines():\n         if line.startswith(\"recorded_bytes:\"):\n             if line.startswith(_BYTES_PREFIX):"
+reason = "The flag is only read for its truth in the refusal test of _recorded and is never returned; False and None are both false, and a malformed line sets it to True in either case."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places/fetch.py\n+++ src/eii_custodian/publicdata/places/fetch.py\n@@ -17,7 +17,7 @@\n     if (\n         size_malformed\n         or len(sizes) != 1\n-        or not _positive_size(sizes[0] if sizes else \"\")\n+        or not _positive_size(sizes[0] if (sizes) or True else \"\")\n     ):\n         observed = sizes[0] if len(sizes) == 1 else \"\"\n         return None, FileFailure(1, entry.url, \"recorded_size\", \"bytes\", observed)"
+reason = "The conditional is evaluated only after 'len(sizes) != 1' is false, so sizes holds exactly one element there and the original also takes sizes[0]; the empty-list branch cannot run."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places/fetch.py\n+++ src/eii_custodian/publicdata/places/fetch.py\n@@ -17,7 +17,7 @@\n     if (\n         size_malformed\n         or len(sizes) != 1\n-        or not _positive_size(sizes[0] if sizes else \"\")\n+        or not _positive_size(sizes[0] if sizes else \"XXXX\")\n     ):\n         observed = sizes[0] if len(sizes) == 1 else \"\"\n         return None, FileFailure(1, entry.url, \"recorded_size\", \"bytes\", observed)"
+reason = "The conditional is evaluated only after 'len(sizes) != 1' is false, so sizes holds exactly one element there and the original also takes sizes[0]; the empty-list branch cannot run."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places/fetch.py\n+++ src/eii_custodian/publicdata/places/fetch.py\n@@ -21,7 +21,7 @@\n     ):\n         observed = sizes[0] if len(sizes) == 1 else \"\"\n         return None, FileFailure(1, entry.url, \"recorded_size\", \"bytes\", observed)\n-    if etag_malformed or len(etags) != 1 or not _etag_token(etags[0] if etags else \"\"):\n+    if etag_malformed or len(etags) != 1 or not _etag_token(etags[0] if (etags) or True else \"\"):\n         observed = etags[0] if len(etags) == 1 else \"\"\n         return None, FileFailure(1, entry.url, \"recorded_etag\", \"etag\", observed)\n     return (int(sizes[0]), etags[0]), None"
+reason = "The conditional is evaluated only after 'len(etags) != 1' is false, so etags holds exactly one element there and the original also takes etags[0]; the empty-list branch cannot run."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/places/fetch.py\n+++ src/eii_custodian/publicdata/places/fetch.py\n@@ -21,7 +21,7 @@\n     ):\n         observed = sizes[0] if len(sizes) == 1 else \"\"\n         return None, FileFailure(1, entry.url, \"recorded_size\", \"bytes\", observed)\n-    if etag_malformed or len(etags) != 1 or not _etag_token(etags[0] if etags else \"\"):\n+    if etag_malformed or len(etags) != 1 or not _etag_token(etags[0] if etags else \"XXXX\"):\n         observed = etags[0] if len(etags) == 1 else \"\"\n         return None, FileFailure(1, entry.url, \"recorded_etag\", \"etag\", observed)\n     return (int(sizes[0]), etags[0]), None"
+reason = "The conditional is evaluated only after 'len(etags) != 1' is false, so etags holds exactly one element there and the original also takes etags[0]; the empty-list branch cannot run."
