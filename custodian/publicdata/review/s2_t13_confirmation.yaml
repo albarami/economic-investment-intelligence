@@ -1,0 +1,36 @@
+{
+  "tender": {
+    "outcome": "not_yet_recorded",
+    "source_id": "tenders_pub",
+    "publisher": "",
+    "page": "",
+    "terms_url": "",
+    "retrieved_utc": "",
+    "terms_sha256": "",
+    "page_sha256": "",
+    "licence_id": "",
+    "licence_basis": "",
+    "period_first": "",
+    "period_last": "",
+    "review_ref": "",
+    "review_reason": "",
+    "intended_use": "",
+    "release_tables": [],
+    "shown": false,
+    "search_note": "",
+    "read_as_visitor": false,
+    "basis_of_use": "",
+    "decision_record": "",
+    "terms_words": "",
+    "terms_read_on": "",
+    "go_live_permission_needed": false
+  },
+  "weight": {
+    "people_method": "area",
+    "grid_source_id": "worldpop_qat_2020",
+    "grid_admitted": false,
+    "reason": "direct_url_unconfirmed",
+    "agesex_source_id": "worldpop_qat_agesex",
+    "agesex_is_weight": false
+  }
+}
