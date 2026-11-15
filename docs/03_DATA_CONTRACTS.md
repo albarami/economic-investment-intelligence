@@ -1263,6 +1263,8 @@ and fifteen nodes per drawn path (master design section 4).
 | `table` | release table name | manifest |
 | `release` | `release_id` | manifest |
 
+In a committed review file an activity code is written in reversible dotted form, groups of four digits separated by dots when the code would otherwise be a bare run of eight or eleven digits, and the reader decodes that form back to the digits.
+
 `graph_edge`: `edge_id` string; `edge_type`; `from_node_id`, `to_node_id`; `provenance` (`public`,
 `lineage`); `basis` (`official`, `computed`, `editorial_reviewed`, `lineage`); `period` (Y);
 `attr_value` decimal(18,4) (Y); `attr_unit` string (Y); `attr_value_2` decimal(18,4) (Y);
