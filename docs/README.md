@@ -94,7 +94,6 @@
 | [0037](decisions/0037-the-generated-worker-records-carry-gender.md) | Employment gender drawn from owner calibration and released under document 06 | Accepted, 2026-11-15 |
 | [0038](decisions/0038-advanced-methods-are-measured-spikes.md) | Nineteen measured, real-data-ready method spikes behind the critical path; task placement, audit rulings, public-table widening and retained baselines | Accepted, 2026-11-15 |
 | [0039](decisions/0039-the-next-train-may-be-checked-while-the-previous-one-merges.md) | Pipeline the next train's checks, confirmation and ledger; move to new main, rerun checks and test the exact squash-merge result before merge | Accepted, 2026-11-15 |
-
 | [0040](decisions/0040-public-trade-sources-and-held-tables-in-use.md) | Public trade and benchmark sources; held-table usage audit, public-first nationality calibration and measured method/question wiring | Accepted, 2026-11-15 |
 
 ## Identifiers and change control
