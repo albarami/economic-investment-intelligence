@@ -18,7 +18,6 @@ from eii_custodian.publicdata.fetch.registry import (
     load_registry,
     registry_path,
 )
-from eii_custodian.publicdata.property.quarter import forecast_window
 
 
 def test_series_without_a_table_is_not_forecastable() -> None:
@@ -187,19 +186,6 @@ def test_committed_metadata_or_open_reason() -> None:
             assert not forecastable(row.key, committed(), load_registry())
 
 
-def _quarters(first: str, last: str) -> set[str]:
-    """Every ``YYYY-Qn`` from ``first`` to ``last`` inclusive."""
-
-    def index(quarter: str) -> int:
-        year, _, quarter_number = quarter.partition("-Q")
-        return int(year) * 4 + int(quarter_number)
-
-    return {
-        f"{(step - 1) // 4}-Q{(step - 1) % 4 + 1}"
-        for step in range(index(first), index(last) + 1)
-    }
-
-
 def test_district_subject_and_quarterly_separation() -> None:
     rows = {row.key: row for row in committed()}
     annual = rows["property_prices"]
@@ -208,15 +194,11 @@ def test_district_subject_and_quarterly_separation() -> None:
     assert annual.table == "pub_property_sale"
     assert annual.frequency == "year"
     assert quarterly.table == "pub_property_quarter"
-    assert quarterly.state == "held"
+    assert quarterly.state == "open"
     assert quarterly.frequency == "quarter"
-    assert quarterly.reason == ""
-    first, _, last = quarterly.period.partition("/")
-    assert forecast_window(_quarters(first, last)) == (
-        first,
-        last,
-        quarterly.past_count,
-    )
+    assert quarterly.past_count is None
+    assert "use_map" in quarterly.reason
+    assert "crosswalk" in quarterly.reason
 
 
 def test_a_held_quarterly_price_entry_validates() -> None:

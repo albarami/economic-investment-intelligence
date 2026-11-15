@@ -59,7 +59,7 @@ class UseMapping:
 def load_use_map(path: Path) -> tuple[UseMapping, ...]:
     """Read the committed mapping and refuse a row outside its contract."""
     rows = read_csv(path)
-    seen: dict[tuple[str, str], UseMapping] = {}
+    seen: dict[tuple[str, str, str], UseMapping] = {}
     result: list[UseMapping] = []
     for row in rows:
         if set(row) != set(USE_MAP_COLUMNS):
@@ -76,7 +76,7 @@ def load_use_map(path: Path) -> tuple[UseMapping, ...]:
             raise AdditionError("unknown_unit_type")
         parse_period_value(fields["reviewed_on"], "date")
         mapping = UseMapping(**fields)
-        pair = (mapping.arabic_label, mapping.usage_value)
+        pair = (mapping.source_id, mapping.arabic_label, mapping.usage_value)
         if pair in seen:
             raise AdditionError("use_map_conflict")
         seen[pair] = mapping
@@ -85,13 +85,19 @@ def load_use_map(path: Path) -> tuple[UseMapping, ...]:
 
 
 def use_lookup(
-    mappings: Iterable[UseMapping], arabic_label: str, usage: str
+    mappings: Iterable[UseMapping], source_id: str, arabic_label: str, usage: str
 ) -> UseMapping:
-    """Return the one reviewed row for a label and usage, or fail by name."""
-    rows = list(mappings)
+    """Return the one reviewed row for a bulletin, label and usage.
+
+    The source id is part of the lookup key (J29(d)): a label reviewed for
+    one bulletin never matches a row of the other.
+    """
+    if source_id not in SOURCE_IDS:
+        raise AdditionError("use_map_source")
+    scoped = [row for row in mappings if row.source_id == source_id]
     matches = [
         row
-        for row in rows
+        for row in scoped
         if row.arabic_label == arabic_label
         and (row.usage_value == ANY_USAGE or row.usage_value == usage)
     ]
@@ -99,6 +105,6 @@ def use_lookup(
         raise AdditionError("use_map_ambiguous")
     if matches:
         return matches[0]
-    if any(row.arabic_label == arabic_label for row in rows):
+    if any(row.arabic_label == arabic_label for row in scoped):
         raise AdditionError("unmapped_usage")
     raise AdditionError("unmapped_label")

@@ -1783,10 +1783,13 @@ the quality measure of DAT-24.
   require the reviewed property-use map (PUB-107). Bank credit uses its `year` field, 2012 to
   2022; the unit must be recorded from its source, never inferred from a modified date.
   The Public sector-growth series of C41 still needs a source before joining section 7.2.
-- S2-T19 GIS feature keys (DR1(d)): `feature_key` is a build-assigned string, never the
-  layer object id, parcel number or `PIN`, including a hash of those identifiers. The exact
-  generation form remains to be reconciled with the GIS builder's return before the join;
-  this declaration does not claim a feature export or stable-key run has passed.
+- S2-T19 GIS feature keys (DR1(d), the GIS builder's accepted form, J19): `feature_key`
+  is `fea-` followed by the first 16 hexadecimal characters of SHA-256 over the canonical
+  JSON of all release columns except `feature_key`, nulls included and keys sorted,
+  grouped in fours; identical release rows gain `_2`, `_3` and so on in read order. It is
+  build-assigned and content-based, never the layer object id, the parcel number or `PIN`,
+  nor a hash of those identifiers. This declaration does not claim a feature export or
+  stable-key run has passed.
 - S2-T19 tender keys (LR-T7): `tender_key` is `tnd_` followed by the first 16 hexadecimal
   characters of SHA-256 over canonical JSON of all merged release columns except
   `tender_key`, including nulls, with keys sorted. Identical release rows are ordered by

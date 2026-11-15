@@ -38,6 +38,7 @@ from eii_custodian.publicdata.additions.property_venues import (
     _text,
 )
 from eii_custodian.publicdata.property.use_map import (
+    SOURCE_IDS,
     UseMapping,
     use_lookup,
 )
@@ -106,10 +107,17 @@ def refuse_release_identifiers(
 
 def parse_bulletin(
     rows: object,
+    source_id: str,
     use_map: Iterable[UseMapping],
     crosswalk: Mapping[str, object],
 ) -> BulletinDeals:
-    """Return the kept deals of one or both bulletins, or fail by name."""
+    """Return the kept deals of one sales bulletin, or fail by name.
+
+    The bulletin source id scopes the use-map lookup (J29(d)): a label that
+    is reviewed only for the other bulletin never maps.
+    """
+    if source_id not in SOURCE_IDS:
+        raise AdditionError("use_map_source")
     if not isinstance(rows, list):
         raise AdditionError("bulletin_rows")
     if any(not isinstance(row, dict) for row in rows):
@@ -133,7 +141,7 @@ def parse_bulletin(
         district = _district(english, _text(row, "sm_lmntq"), districts, known, counts)
         if district is None:
             continue
-        mapping = use_lookup(mappings, _text(row, "nw_l_qr"), _usage(row))
+        mapping = use_lookup(mappings, source_id, _text(row, "nw_l_qr"), _usage(row))
         deal = _deal(row, district, municipality, mapping)
         reason = _unkept(deal)
         if reason is None:

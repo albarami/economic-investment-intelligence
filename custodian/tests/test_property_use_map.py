@@ -50,10 +50,10 @@ def test_committed_map_holds_no_row_and_refuses_every_label() -> None:
     rows = load_use_map(_map_path())
     assert rows == ()
     with pytest.raises(AdditionError) as caught:
-        use_lookup(rows, "SYN-UNIT", "")
+        use_lookup(rows, "prop_resi_units", "SYN-UNIT", "")
     assert caught.value.name == "unmapped_label"
     with pytest.raises(AdditionError) as other:
-        use_lookup(rows, "SYN-LAND-1", "SYN-USE-RESI")
+        use_lookup(rows, "prop_sales", "SYN-LAND-1", "SYN-USE-RESI")
     assert other.value.name == "unmapped_label"
 
 
@@ -84,31 +84,60 @@ def test_fixture_map_loads_and_holds_only_reviewed_rows() -> None:
 
 def test_lookup_matches_label_and_usage_and_marks_land() -> None:
     rows = _map()
-    land = use_lookup(rows, "SYN-LAND-1", "SYN-USE-RESI")
+    land = use_lookup(rows, "prop_sales", "SYN-LAND-1", "SYN-USE-RESI")
     assert land.source_id == "prop_sales"
     assert land.use_key == "residential"
     assert land.marker == LAND_MARKER
     assert land.land and land.unit_type is None
-    unit = use_lookup(rows, "SYN-UNIT-1", "SYN-USE-RESI")
+    unit = use_lookup(rows, "prop_sales", "SYN-UNIT-1", "SYN-USE-RESI")
     assert unit.marker == "residential_unit"
     assert not unit.land and unit.unit_type == "residential_unit"
 
 
 def test_wildcard_usage_matches_a_row_without_a_usage_field() -> None:
     rows = _map()
-    matched = use_lookup(rows, "SYN-UNIT", "")
+    matched = use_lookup(rows, "prop_resi_units", "SYN-UNIT", "")
     assert matched.source_id == "prop_resi_units"
     assert matched.usage_value == ANY_USAGE
     assert matched.unit_type == "residential_unit"
 
 
+def test_a_label_reviewed_for_one_bulletin_does_not_match_the_other() -> None:
+    """J29(d): the source id is part of the lookup key."""
+    rows = _map()
+    with pytest.raises(AdditionError) as caught:
+        use_lookup(rows, "prop_resi_units", "SYN-LAND-1", "SYN-USE-RESI")
+    assert caught.value.name == "unmapped_label"
+    with pytest.raises(AdditionError) as other:
+        use_lookup(rows, "prop_sales", "SYN-UNIT", "")
+    assert other.value.name == "unmapped_label"
+    land = use_lookup(rows, "prop_sales", "SYN-LAND-1", "SYN-USE-RESI")
+    assert land.source_id == "prop_sales"
+
+
+def test_the_same_label_usage_pair_may_exist_for_both_bulletins(
+    tmp_path: Path,
+) -> None:
+    """A (label, usage) pair reviewed under both sources is not a conflict."""
+    path = _write(
+        tmp_path / "both.csv",
+        [
+            "prop_sales,SYN-X,SYN-U,residential,land,SYN reviewer,2026-11-15",
+            "prop_resi_units,SYN-X,SYN-U,commercial,residential_unit,SYN reviewer,2026-11-15",
+        ],
+    )
+    rows = load_use_map(path)
+    assert use_lookup(rows, "prop_sales", "SYN-X", "SYN-U").use_key == "residential"
+    assert use_lookup(rows, "prop_resi_units", "SYN-X", "SYN-U").use_key == "commercial"
+
+
 def test_unmapped_label_and_unmapped_usage_fail_by_name() -> None:
     rows = _map()
     with pytest.raises(AdditionError) as label:
-        use_lookup(rows, "SYN-UNMAPPED", "SYN-USE-RESI")
+        use_lookup(rows, "prop_sales", "SYN-UNMAPPED", "SYN-USE-RESI")
     assert label.value.name == "unmapped_label"
     with pytest.raises(AdditionError) as usage:
-        use_lookup(rows, "SYN-LAND-1", "SYN-USE-UNMAPPED")
+        use_lookup(rows, "prop_sales", "SYN-LAND-1", "SYN-USE-UNMAPPED")
     assert usage.value.name == "unmapped_usage"
 
 
@@ -177,7 +206,7 @@ def test_wildcard_and_exact_usage_on_one_label_disagree_in_the_map(
     )
     rows = load_use_map(path)
     with pytest.raises(AdditionError) as caught:
-        use_lookup(rows, "SYN-X", "SYN-U")
+        use_lookup(rows, "prop_sales", "SYN-X", "SYN-U")
     assert caught.value.name == "use_map_ambiguous"
 
 

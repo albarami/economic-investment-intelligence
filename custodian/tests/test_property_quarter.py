@@ -11,6 +11,7 @@ from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.additions.common import AdditionError
 from eii_custodian.publicdata.additions.property_venues import IDENTIFIER_FIELDS
+from eii_custodian.publicdata.fetch.report import coverage_count_line
 from eii_custodian.publicdata.property.bulletin import (
     BulletinDeals,
     parse_bulletin,
@@ -20,6 +21,7 @@ from eii_custodian.publicdata.property.bulletin import (
 from eii_custodian.publicdata.property.quarter import (
     SQ_M_PER_SQ_FT,
     forecast_window,
+    held_series_window,
     quarter_aggregates,
     square_feet,
 )
@@ -59,10 +61,16 @@ def _map() -> object:
 
 
 def _parse(
-    rows: list[dict[str, object]], folder: Path, use_map: object = None
+    rows: list[dict[str, object]],
+    folder: Path,
+    use_map: object = None,
+    source_id: str = "prop_resi_units",
 ) -> BulletinDeals:
     return parse_bulletin(
-        rows, use_map if use_map is not None else _map(), _frame(folder)
+        rows,
+        source_id,
+        use_map if use_map is not None else _map(),
+        _frame(folder),
     )
 
 
@@ -119,7 +127,7 @@ def _blocked(parsed: BulletinDeals, reason: str) -> int:
 
 def test_worked_example_reproduces_the_card_fixture(tmp_path: Path) -> None:
     """MTH-116: median 550, deal count 2 and deal value 2,500,000."""
-    parsed = _parse(_rows("worked_example.json"), tmp_path)
+    parsed = _parse(_rows("worked_example.json"), tmp_path, source_id="prop_sales")
     assert len(parsed.deals) == 2
     assert _blocked(parsed, "repeated_deal_price_disagreement") == 0
     rows = quarter_aggregates(parsed.deals)
@@ -151,6 +159,7 @@ def test_a_deal_in_square_metres_converts_by_the_exact_factor(
     deals = _parse(
         [_sale(area_square_feet=None, area_square_meters=100, property_value=100000)],
         tmp_path,
+        source_id="prop_sales",
     )
     row = _all_row(quarter_aggregates(deals.deals))
     assert row["median_price_per_ft2"] == Decimal("92.90")
@@ -167,7 +176,9 @@ def test_even_count_median_is_the_mean_of_the_two_central_values(
         )
         for index, price in enumerate((100, 200, 300, 400))
     ]
-    row = _all_row(quarter_aggregates(_parse(rows, tmp_path).deals))
+    row = _all_row(
+        quarter_aggregates(_parse(rows, tmp_path, source_id="prop_sales").deals)
+    )
     assert row["median_price_per_ft2"] == Decimal("250.00")
     assert row["deal_count"] == 4
 
@@ -242,7 +253,11 @@ def test_unmapped_label_and_unmapped_usage_fail_the_build(tmp_path: Path) -> Non
         _parse(_rows("planted_unmapped_label.json"), tmp_path / "label")
     assert label.value.name == "unmapped_label"
     with pytest.raises(AdditionError) as usage:
-        _parse([_sale(property_usage="SYN-USE-UNMAPPED")], tmp_path / "usage")
+        _parse(
+            [_sale(property_usage="SYN-USE-UNMAPPED")],
+            tmp_path / "usage",
+            source_id="prop_sales",
+        )
     assert usage.value.name == "unmapped_usage"
 
 
@@ -258,12 +273,14 @@ def test_the_arabic_label_wins_where_english_disagrees(tmp_path: Path) -> None:
 
 def test_identifiers_never_reach_the_release_rows(tmp_path: Path) -> None:
     """DR1: identifier fields build inside, none is present in a release row."""
-    parsed = _parse([_resi(), _sale()], tmp_path)
-    rows = quarter_aggregates(parsed.deals)
+    resi = _parse([_resi()], tmp_path)
+    sale = _parse([_sale()], tmp_path, source_id="prop_sales")
+    identifiers = resi.identifiers | sale.identifiers
+    rows = quarter_aggregates(resi.deals + sale.deals)
     text = repr(rows)
     for name in IDENTIFIER_FIELDS:
         assert name not in text
-    for identifier in parsed.identifiers:
+    for identifier in identifiers:
         assert identifier not in text
     for row in rows:
         assert not set(row) & set(IDENTIFIER_FIELDS)
@@ -319,23 +336,27 @@ def test_an_ambiguous_district_is_blocked_not_kept(tmp_path: Path) -> None:
 
 def test_a_usage_field_that_is_not_text_fails(tmp_path: Path) -> None:
     with pytest.raises(AdditionError) as caught:
-        _parse([_sale(property_usage=9)], tmp_path)
+        _parse([_sale(property_usage=9)], tmp_path, source_id="prop_sales")
     assert caught.value.name == "measure_unparsed"
 
 
 def test_nonpositive_measures_are_blocked_not_kept(tmp_path: Path) -> None:
-    parsed = _parse(
+    resi = _parse(
         [
             _resi(price_per_square_meter=0),
             _resi(encrypted_transaction_number="SYN-TX-2", property_value=0),
-            _sale(area_square_feet=0, area_square_meters=None),
         ],
         tmp_path,
     )
-    assert not parsed.deals
-    assert _blocked(parsed, "nonpositive_price") == 2
-    assert _blocked(parsed, "nonpositive_area") == 1
-    assert quarter_aggregates(parsed.deals) == ()
+    sale = _parse(
+        [_sale(area_square_feet=0, area_square_meters=None)],
+        tmp_path,
+        source_id="prop_sales",
+    )
+    assert not resi.deals and not sale.deals
+    assert _blocked(resi, "nonpositive_price") == 2
+    assert _blocked(sale, "nonpositive_area") == 1
+    assert quarter_aggregates(resi.deals + sale.deals) == ()
 
 
 def test_a_unit_row_refuses_mixed_price_bases(tmp_path: Path) -> None:
@@ -373,14 +394,13 @@ def test_unit_type_rows_carry_their_basis_median_and_count(
 
 def test_a_shared_row_carries_no_source_id(tmp_path: Path) -> None:
     """DR2: the two bulletins' deals share one row keyed as section 7.3 states."""
-    parsed = _parse(
-        [
-            _resi(),
-            _sale(nw_l_qr="SYN-UNIT-1", area_square_feet=100, property_value=200),
-        ],
+    resi = _parse([_resi()], tmp_path)
+    sale = _parse(
+        [_sale(nw_l_qr="SYN-UNIT-1", area_square_feet=100, property_value=200)],
         tmp_path,
+        source_id="prop_sales",
     )
-    rows = quarter_aggregates(parsed.deals)
+    rows = quarter_aggregates(resi.deals + sale.deals)
     all_row = _all_row(rows)
     assert set(all_row) == {
         "district_key",
@@ -421,10 +441,12 @@ def test_an_unknown_source_field_is_refused(tmp_path: Path) -> None:
 
 def test_a_row_stream_that_is_not_a_list_of_maps_fails(tmp_path: Path) -> None:
     with pytest.raises(AdditionError) as rows:
-        parse_bulletin("not-a-list", _map(), _frame(tmp_path))
+        parse_bulletin("not-a-list", "prop_resi_units", _map(), _frame(tmp_path))
     assert rows.value.name == "bulletin_rows"
     with pytest.raises(AdditionError) as row:
-        parse_bulletin(["not-a-map"], _map(), _frame(tmp_path / "row"))
+        parse_bulletin(
+            ["not-a-map"], "prop_resi_units", _map(), _frame(tmp_path / "row")
+        )
     assert row.value.name == "bulletin_row"
 
 
@@ -480,3 +502,33 @@ def test_a_second_quarter_is_a_second_row(tmp_path: Path) -> None:
     }
     assert periods == {"2025-Q3", "2025-Q4"}
     assert forecast_window(periods) == ("2025-Q3", "2025-Q4", 2)
+
+
+def test_blocked_deals_go_on_the_build_report(tmp_path: Path) -> None:
+    """J28: an out-of-crosswalk district is a blocked row the report counts."""
+    parsed = _parse(
+        [_resi(district_name="SYN Unmapped", sm_lmntq="SYN Unmapped AR")],
+        tmp_path,
+    )
+    assert parsed.deals == ()
+    assert _blocked(parsed, "unmatched_district") == 1
+    lines = [
+        coverage_count_line("prop_resi_units", entry.reason, entry.count)
+        for entry in parsed.blocked
+    ]
+    assert lines == ["COVERAGE prop_resi_units unmatched_district 1"]
+
+
+def test_a_held_entry_whose_count_differs_from_the_kept_quarters_refuses() -> None:
+    """J27: a held entry holds only the count the kept quarters give."""
+    assert held_series_window("2025-Q3/2025-Q4", 2, {"2025-Q3", "2025-Q4"}) == (
+        "2025-Q3",
+        "2025-Q4",
+        2,
+    )
+    with pytest.raises(AdditionError) as caught:
+        held_series_window("2025-Q3/2025-Q4", 22, {"2025-Q3", "2025-Q4"})
+    assert caught.value.name == "held_window_mismatch"
+    with pytest.raises(AdditionError) as empty:
+        held_series_window("2020-Q3/2025-Q4", 22, set())
+    assert empty.value.name == "held_window_mismatch"

@@ -15,8 +15,11 @@ from urllib.parse import urlsplit
 from custodian.tests.repository_root import repository_root
 
 import h3
+from eii_custodian.publicdata.additions.common import Coverage
 from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.fetch.report import coverage_count_line, pin_share_line
 from eii_custodian.publicdata.fetch.transport import Response
+from eii_custodian.publicdata.gis.fields import declaration_for
 from eii_custodian.publicdata.gis.layers import (
     CONTEXT_ROLE,
     LayerError,
@@ -40,6 +43,37 @@ from eii_custodian.publicdata.gis.layers import (
 _ROOT = repository_root(Path(__file__))
 _GIS = "https://services.gisqatar.org.qa/server/rest/services/Vector/QARS/MapServer"
 _SURVEY_MS = 1579046400000
+
+# The registry column vocabulary for each declared service field type.
+_REGISTRY_KIND = {
+    "esriFieldTypeString": "string",
+    "esriFieldTypeSmallInteger": "integer",
+    "esriFieldTypeInteger": "integer",
+    "esriFieldTypeDouble": "number",
+    "esriFieldTypeDate": "integer",
+    "esriFieldTypeGeometry": "object",
+}
+
+
+def test_gis_registry_rows_match_the_reviewed_fields() -> None:
+    """J21: every gis_ row's columns, service path and layer equal the reviewed file."""
+    entries = {
+        entry.key: entry for entry in load_registry() if entry.key.startswith("gis_")
+    }
+    for key, entry in entries.items():
+        declaration = declaration_for(entry.source_id)
+        if declaration is None:
+            assert entry.skip_reason or entry.kind == "citation_only", key
+            continue
+        layer = declaration.layers[0]
+        assert urlsplit(entry.url).path == layer.service_path, key
+        assert entry.layer == layer.layer_id, key
+        assert [name for name, _ in entry.columns] == [
+            field.name for field in layer.fields
+        ], key
+        assert [kind for _, kind in entry.columns] == [
+            _REGISTRY_KIND[field.esri_type] for field in layer.fields
+        ], key
 
 
 def test_planted_pin_column_in_a_release_table_fails() -> None:
@@ -87,7 +121,7 @@ def test_land_price_rows_use_field_names_and_per_ft2() -> None:
         },
         "geometry": _square(),
     }
-    rows = land_price_rows([feature])
+    rows = land_price_rows([feature], "LandPricing2026")
     assert {row["use_category"] for row in rows} == {
         "ResidentialPrices",
         "ResidentialCityCenter",
@@ -106,6 +140,27 @@ def test_land_price_rows_use_field_names_and_per_ft2() -> None:
     assert prices["guide_price"] == Decimal("1000.00")
     assert "rent" not in json.dumps(rows, default=str).casefold()
     require_release_columns(rows)
+
+
+def test_land_price_period_is_exactly_one_year_of_the_service_name() -> None:
+    """J22: the period is the one year of the service's own name, or a refusal."""
+    feature = {
+        "attributes": {
+            "DIST_NO": 14,
+            "District_No": 14,
+            "ResidentialPrices": "1",
+            "ResidentialCityCenter": "1",
+            "ResidentialPriceFlats": "1",
+            "ResidentialPriceVillas": "1",
+            "CommercialPrices": "1",
+        },
+        "geometry": _square(),
+    }
+    rows = land_price_rows([feature], "LandPricing2026")
+    assert {row["period"] for row in rows} == {"2026"}
+    for name in ("InventedPricing", "LandPricing2025to2026", "LandPricing12345"):
+        with pytest_raises_layer("service name"):
+            land_price_rows([feature], name)
 
 
 def test_address_and_parcel_drop_pin_and_keep_published_dates() -> None:
@@ -234,6 +289,9 @@ def test_zoning_keeps_published_nulls_and_hides_ruleid() -> None:
     first, second, third = rows
     assert first["zoning_code"] == "SYN-A"
     assert first["source_layer"] == "Khor_Wakra_Zoning"
+    assert isinstance(first["permitted_uses"], str)
+    assert isinstance(first["height_rule"], str)
+    assert isinstance(first["setback_rule"], str)
     assert first["height_rule"] is not None
     assert "SYN-H" in str(first["height_rule"])
     assert "null" in str(first["height_rule"]).casefold() or "None" not in str(
@@ -336,6 +394,26 @@ def test_poi_category_stays_null_and_landmarks_use_reviewed_points() -> None:
     assert "EMAIL" not in landmarks[0]
 
 
+def test_landmark_keys_are_content_based() -> None:
+    """J24: the same landmarks in another order give the same lm- keys."""
+    souq = {
+        "attributes": {"ENAME": "SYN SOUQ", "ANAME": "سوق تجريبي"},
+        "geometry": _point(10.25, 20.5),
+    }
+    fort = {
+        "attributes": {"ENAME": "SYN FORT", "ANAME": "حصن تجريبي"},
+        "geometry": _point(10.35, 20.5),
+    }
+    grid = _grid(10.25, 20.5) + _grid(10.35, 20.5)
+    first = landmark_rows([souq, fort], grid)
+    second = landmark_rows([fort, souq], grid)
+    assert [row["place_key"] for row in first] == [row["place_key"] for row in second]
+    assert len({row["place_key"] for row in first}) == 2
+    for row in first:
+        assert str(row["place_key"]).startswith("lm-")
+        assert not str(row["place_key"]).startswith("lm-1")
+
+
 def test_pin_share_counts_points_inside_the_same_pin() -> None:
     parcel = {
         "attributes": {"PIN": 1001},
@@ -347,6 +425,8 @@ def test_pin_share_counts_points_inside_the_same_pin() -> None:
     assert share.inside == 1
     assert share.total == 2
     assert share.line == "address_points_inside_same_pin: 1/2"
+    assert share.line == pin_share_line(share.inside, share.total)
+    assert pin_share_line(1, 2) == "address_points_inside_same_pin: 1/2"
     assert "threshold" not in share.line
 
 
@@ -364,7 +444,7 @@ def test_district_numbers_that_differ_fail() -> None:
         "geometry": _square(),
     }
     try:
-        land_price_rows([feature])
+        land_price_rows([feature], "LandPricing2026")
     except LayerError as error:
         assert str(error) == "district numbers differ"
         assert "14" not in str(error)
@@ -374,7 +454,8 @@ def test_district_numbers_that_differ_fail() -> None:
 
 
 def test_health_rows_split_a_centre_from_a_catchment() -> None:
-    rows = health_rows(
+    """J22: the layers publish no period, so it is null with a coverage note."""
+    result = health_rows(
         [
             {
                 "layer_name": "PHCC.PHCC_LOCATION_2026",
@@ -404,10 +485,17 @@ def test_health_rows_split_a_centre_from_a_catchment() -> None:
             },
         ]
     )
+    rows = result.rows
     assert {row["feature_kind"] for row in rows} == {"centre", "catchment"}
-    assert {row["period"] for row in rows} == {"2026"}
+    assert {row["period"] for row in rows} == {None}
     assert {row["name_en"] for row in rows} == {"SYN CENTRE", "SYN CATCHMENT"}
+    assert result.coverage == (Coverage("period_not_published", 2),)
+    assert [
+        coverage_count_line("gis_phcc", note.reason, note.count)
+        for note in result.coverage
+    ] == ["COVERAGE gis_phcc period_not_published 2"]
     require_release_columns(rows)
+    assert health_rows([]).coverage == ()
 
 
 def test_context_has_no_release_table() -> None:

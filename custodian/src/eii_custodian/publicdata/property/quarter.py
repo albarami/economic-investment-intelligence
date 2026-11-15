@@ -127,6 +127,22 @@ def forecast_window(quarters: Iterable[str]) -> tuple[str, str, int] | None:
     return seen[run[0]], seen[run[-1]], len(run)
 
 
+def held_series_window(
+    period: str, past_count: int, quarters: Iterable[str]
+) -> tuple[str, str, int]:
+    """Refuse a held forecast entry whose window is not the kept-quarter window.
+
+    A held ``property_prices_quarterly`` entry may state only the trailing
+    contiguous run of quarters with a kept deal: its ``period`` bounds and
+    ``past_count`` equal ``forecast_window`` of those quarters (J27).
+    """
+    window = forecast_window(quarters)
+    first, _, last = period.partition("/")
+    if window is None or window != (first, last, past_count):
+        raise AdditionError("held_window_mismatch")
+    return window
+
+
 def _quarter_index(quarter: object) -> int:
     if not isinstance(quarter, str):
         raise AdditionError("quarter_period")

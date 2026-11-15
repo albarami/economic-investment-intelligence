@@ -17,6 +17,7 @@ from eii_custodian.publicdata.property.bulletin import (
 )
 from eii_custodian.publicdata.property.quarter import (
     forecast_window,
+    held_series_window,
     quarter_aggregates,
     square_feet,
 )
@@ -41,6 +42,7 @@ __all__ = [
     "Deal",
     "UseMapping",
     "forecast_window",
+    "held_series_window",
     "load_use_map",
     "parse_bulletin",
     "quarter_aggregates",

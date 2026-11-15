@@ -20,8 +20,10 @@ from typing import Any
 from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
 
+from eii_custodian.publicdata.additions.common import Coverage
 from eii_custodian.publicdata.fetch.kinds import prepare
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.report import pin_share_line
 from eii_custodian.publicdata.fetch.transport import Transport
 from eii_custodian.publicdata.frame.gazetteer import reviewed_points
 from eii_custodian.publicdata.frame.grid import ownership_index, point_cell
@@ -61,8 +63,7 @@ _SETBACK_FIELDS = (
     "SET_W_S1",
     "SET_W_S2",
 )
-_LAND_YEAR = "2026"
-_HEALTH_YEAR = "2026"
+_SERVICE_YEAR = re.compile(r"(?<!\d)\d{4}(?!\d)")
 _RAIL_KIND = {2: "planned_station", 0: "line", 1: "protection_zone"}
 _RAIL_GEOM = {2: "point", 0: "line", 1: "polygon"}
 _BANNED = frozenset(
@@ -131,6 +132,24 @@ class PinShare:
     line: str
 
 
+@dataclass(frozen=True)
+class HealthRows:
+    """Health rows and the coverage note the build report carries."""
+
+    rows: tuple[dict[str, object], ...]
+    coverage: tuple[Coverage, ...]
+
+
+@dataclass(frozen=True)
+class _LandmarkBody:
+    """The stored landmark content its lm- key is taken from."""
+
+    name_en: str
+    name_ar: str
+    lon: Decimal
+    lat: Decimal
+
+
 def read_layer(entry: Entry, transport: Transport) -> LayerRead:
     """Page one declared source. A refusal returns no layers."""
     prepared = prepare(entry, transport, _no_sleep)
@@ -185,8 +204,15 @@ def assign_feature_keys(rows: list[dict[str, object]]) -> list[dict[str, object]
     return keyed
 
 
-def land_price_rows(features: list[dict[str, object]]) -> list[dict[str, object]]:
-    """One guide-price row per published price field. The field name is the use."""
+def land_price_rows(
+    features: list[dict[str, object]], service_name: str
+) -> list[dict[str, object]]:
+    """One guide-price row per published price field. The field name is the use.
+
+    The period is the one year of the service's own name; a service name
+    without exactly one year is refused (J22).
+    """
+    period = _service_year(service_name)
     rows: list[dict[str, object]] = []
     for feature in features:
         attributes = _attributes(feature)
@@ -195,7 +221,7 @@ def land_price_rows(features: list[dict[str, object]]) -> list[dict[str, object]
             rows.append(
                 {
                     "district_key": district,
-                    "period": _LAND_YEAR,
+                    "period": period,
                     "use_category": field,
                     "guide_price": parse_guide_price(field, attributes.get(field)),
                     "price_basis": "per_ft2",
@@ -312,8 +338,12 @@ def rail_rows(layers: list[dict[str, object]]) -> list[dict[str, object]]:
     return keyed
 
 
-def health_rows(layers: list[dict[str, object]]) -> list[dict[str, object]]:
-    """Health centres and catchments. The year is the one in the layer name."""
+def health_rows(layers: list[dict[str, object]]) -> HealthRows:
+    """Health centres and catchments. The layers publish no period (J22).
+
+    ``period`` is null and a ``period_not_published`` coverage note counts
+    the rows for the build report.
+    """
     rows: list[dict[str, object]] = []
     for layer in layers:
         name = layer.get("layer_name")
@@ -332,13 +362,14 @@ def health_rows(layers: list[dict[str, object]]) -> list[dict[str, object]]:
                     "name_ar": _optional_text(
                         attributes.get("A_HC_NAME", attributes.get("ANAME"))
                     ),
-                    "period": _HEALTH_YEAR,
+                    "period": None,
                     "geometry": geometry_wkb(_geometry(feature), geometry),
                 }
             )
     keyed = assign_feature_keys(rows)
     require_release_columns(keyed)
-    return keyed
+    coverage = (Coverage("period_not_published", len(keyed)),) if keyed else ()
+    return HealthRows(tuple(keyed), coverage)
 
 
 def poi_rows(
@@ -367,13 +398,27 @@ def poi_rows(
 def landmark_rows(
     features: list[dict[str, object]], grid: list[dict[str, object]]
 ) -> list[dict[str, Any]]:
-    """Landmark names enter the gazetteer only through reviewed_points."""
-    specifications: list[dict[str, Any]] = []
-    points: dict[tuple[str, str], dict[str, Any]] = {}
-    for index, feature in enumerate(features, start=1):
+    """Landmark names enter the gazetteer only through reviewed_points.
+
+    The ``lm-`` key is content-based (J24): the canonical JSON of the stored
+    name and point, never the input order.
+    """
+    prepared: list[_LandmarkBody] = []
+    for feature in features:
         attributes = _attributes(feature)
         lon, lat = _lon_lat(feature)
-        key = f"lm-{index}"
+        prepared.append(
+            _LandmarkBody(
+                name_en=_required_text(attributes.get("ENAME")),
+                name_ar=_required_text(attributes.get("ANAME")),
+                lon=lon,
+                lat=lat,
+            )
+        )
+    keyed = _landmark_keys(prepared)
+    specifications: list[dict[str, Any]] = []
+    points: dict[tuple[str, str], dict[str, Any]] = {}
+    for key, body in keyed:
         specifications.append(
             {
                 "place_key": key,
@@ -381,15 +426,46 @@ def landmark_rows(
                 "arabic_review": "pending native review",
                 "source_id": "gis_landmarks",
                 "record_key": key,
-                "name_en": _required_text(attributes.get("ENAME")),
-                "name_ar": _required_text(attributes.get("ANAME")),
+                "name_en": body.name_en,
+                "name_ar": body.name_ar,
                 "aliases": None,
             }
         )
-        points[("gis_landmarks", key)] = {"lon": float(lon), "lat": float(lat)}
+        points[("gis_landmarks", key)] = {
+            "lon": float(body.lon),
+            "lat": float(body.lat),
+        }
     rows = reviewed_points(specifications, points, _frame_grid(grid))
     require_release_columns(rows)
     return rows
+
+
+def _landmark_keys(
+    bodies: list[_LandmarkBody],
+) -> list[tuple[str, _LandmarkBody]]:
+    """Assign lm- keys by content in canonical order; ties gain _2, and so on."""
+    seen: dict[str, int] = {}
+    keyed: list[tuple[str, _LandmarkBody]] = []
+    for body in sorted(bodies, key=_landmark_canonical):
+        digest = hashlib.sha256(_landmark_canonical(body)).hexdigest()
+        grouped = "-".join(digest[index : index + 4] for index in range(0, 16, 4))
+        base = f"lm-{grouped}"
+        seen[base] = seen.get(base, 0) + 1
+        suffix = "" if seen[base] == 1 else f"_{seen[base]}"
+        keyed.append((base + suffix, body))
+    return keyed
+
+
+def _landmark_canonical(body: _LandmarkBody) -> bytes:
+    """The canonical content a landmark's lm- key is taken from."""
+    return _canonical(
+        {
+            "name_en": body.name_en,
+            "name_ar": body.name_ar,
+            "lon": body.lon,
+            "lat": body.lat,
+        }
+    )
 
 
 def address_parcel_share(
@@ -407,7 +483,7 @@ def address_parcel_share(
         if any(polygon.covers(point) for polygon in by_pin.get(pin, [])):
             inside += 1
     total = len(addresses)
-    return PinShare(inside, total, f"address_points_inside_same_pin: {inside}/{total}")
+    return PinShare(inside, total, pin_share_line(inside, total))
 
 
 def context_tables() -> dict[str, list[dict[str, object]]]:
@@ -484,6 +560,14 @@ def _parse_body(body: bytes) -> tuple[ParsedLayer, ...]:
 def _published(attributes: dict[str, object], names: tuple[str, ...]) -> str:
     payload = {name: attributes.get(name) for name in names}
     return json.dumps(payload, sort_keys=True, ensure_ascii=False)
+
+
+def _service_year(service_name: str) -> str:
+    """The year of the service's own name; it must hold exactly one year."""
+    years = _SERVICE_YEAR.findall(service_name)
+    if len(years) != 1:
+        raise LayerError("service name year")
+    return str(years[0])
 
 
 def _district_key(attributes: dict[str, object]) -> str:

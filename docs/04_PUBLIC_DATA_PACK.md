@@ -505,13 +505,19 @@ Additional declared layers of the same source (B2 of the lead's S2-T19 brief, PU
 The stated page limits are 2000 for land price, rail, health centres, zoning, parcels and
 Street; 10000 for landmarks, 20000 for QARS and 1000 for commercial points. The reader uses
 the value the layer answers, not these observations as a fixed limit. GIS coordinates are
-published in wkid 2932 (metres); release geometry follows document 03 section 1.2, WKB in
-EPSG:4326. `PIN` as the parcel number on QARS and CadastrePlots is an **ASSUMPTION** of the
+published in wkid 2932 (metres); the build asks for them in EPSG:4326 and refuses a
+response in any other spatial reference, never projecting them itself; release geometry
+is the geometry library's own WKB of the requested coordinates (J18: the frame's release
+function serves only the three boundary levels and carries a geometry object, it does
+not encode bytes), WKB in EPSG:4326 as document 03 section 1.2 states. `PIN` as the
+parcel number on QARS and CadastrePlots is an **ASSUMPTION** of the
 lead (LR-G4): no alias says parcel. It is a cache-only join key, never a release column or
 input to `feature_key`. Parcel area is `SHAPE.AREA`, not `PDAREA`; both `STARTDATE` and
 `ENDDATE` are retained. The build reports the share of address points inside the same-PIN
-parcel without setting a threshold. Land-price fields are text converted by tested code;
-the alias states `per_ft2`. Two fields share an Arabic alias; field names distinguish them.
+parcel as the build-report line `address_points_inside_same_pin: inside/total`, computed
+by tested code over the cached features, without setting a threshold. Land-price fields
+are text converted by tested code; the alias states `per_ft2`. Two fields share an
+Arabic alias; field names distinguish them.
 The commercial-point layer has no category; `POI_KEY` does not fill it.
 
 Portal terms, read 2026-11-15 from `https://www.data.gov.qa/pages/license/` (first two
@@ -1035,7 +1041,7 @@ A8 adds, and the source table that holds each:
 | Announced investment by sector | `fdi_projects` | `fdi_projects` | held; with the page's notes "includes estimates of publicly announced projects" and "does not capture all investment projects"; announced capital stays labelled an announced estimate and is never added to measured figures (PUB-87) |
 | Construction pipeline by municipality (permits) | `permits_muni` | `pub_building_permits` | held; series end in 2023 |
 | Expected new households and workers from the pipeline | none for the conversion parameters (`census_hh_type_2020` is registered but has no release table until slice S2 confirms its columns) | none | open: no source table yet |
-| Median price per square foot by district and use, by quarter (card C41) | `prop_sales` and `prop_resi_units` (of the latter, the deals of price basis `per_m2` only) | `pub_property_quarter` | set by S2-T19, which confirms the table's columns at the first fetch ([03](03_DATA_CONTRACTS.md) DAT-167 and open questions); each quarter with its deal count; a series of its own unit and period, never joined to the annual medians per square metre of `pub_property_sale` |
+| Median price per square foot by district and use, by quarter (card C41) | `prop_sales` and `prop_resi_units` (of the latter, the deals of price basis `per_m2` only) | `pub_property_quarter` | open: awaiting a reviewed use map and a reviewed district crosswalk, so the kept-deal count cannot be computed yet; when both exist the window is the trailing run of quarters with a kept deal and the entry holds only the count that run gives ([03](03_DATA_CONTRACTS.md) DAT-167 and open questions); each quarter with its deal count; a series of its own unit and period, never joined to the annual medians per square metre of `pub_property_sale` |
 
 The released monthly series that card C30 also takes ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 6). They are release tables of the custodian-type feeds, not Public sources, and have no row in section 2:
 

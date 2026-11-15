@@ -48,6 +48,16 @@ def coverage_line(figure_id: str) -> str:
     return f"COVERAGE {figure_id} not_measured"
 
 
+def coverage_count_line(key: str, reason: str, count: int) -> str:
+    """Return the coverage line counting rows not kept for a named reason."""
+    return f"COVERAGE {key} {reason} {count}"
+
+
+def pin_share_line(inside: int, total: int) -> str:
+    """Return the same-PIN address share line of LR-G4 for the build report."""
+    return f"address_points_inside_same_pin: {inside}/{total}"
+
+
 def log_line(relative: str) -> str:
     """Return the build-log path line. The path is relative to the repository."""
     return f"build-log: {relative}"
