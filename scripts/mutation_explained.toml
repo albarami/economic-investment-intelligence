@@ -2032,3 +2032,228 @@ reason = "_call approves the URL and reads the response. Its entry argument is n
 module = "custodian/src/eii_custodian/publicdata/fetch/registry.py"
 mutation = "--- src/eii_custodian/publicdata/fetch/registry.py\n+++ src/eii_custodian/publicdata/fetch/registry.py\n@@ -4,7 +4,7 @@\n     A malformed file raises RegistryError, the package's own error.\n     \"\"\"\n     try:\n-        loaded: object = yaml.safe_load(path.read_text(encoding=\"utf-8\"))\n+        loaded: object = yaml.safe_load(path.read_text(encoding=\"UTF-8\"))\n     except yaml.YAMLError as exc:\n         raise RegistryError(\"malformed yaml\") from exc\n     return loaded"
 reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same decoder, so every byte string is read or refused as before."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/build.py"
+mutation = "--- src/eii_custodian/publicdata/places/build.py\n+++ src/eii_custodian/publicdata/places/build.py\n@@ -62,7 +62,7 @@\n     )\n     status = {key: row.status for key, row in latest_status(verifications).items()}\n     inside, area_notes, stand_in, area_blocked = _inside(\n-        showcase_areas, kept, area_provider, boundary\n+        showcase_areas, kept, area_provider, None\n     )\n     report.extend(area_notes)\n     outcome = resolve_duplicates(kept, inside, status)"
+reason = "`_inside` begins with `del boundary` and names that parameter nowhere else, so the value `build_places` passes in fourth place reaches no computation, note or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/build.py"
+mutation = "--- src/eii_custodian/publicdata/places/build.py\n+++ src/eii_custodian/publicdata/places/build.py\n@@ -14,4 +14,4 @@\n     table = loaded[1]\n     if not isinstance(table, tuple):\n         raise PlacesError(\"loader\")\n-    return cast(tuple[tuple[str, str], ...], table)\n+    return cast(None, table)"
+reason = "`typing.cast` returns its second argument and never reads its first, so `_table` returns the same `table` object."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/build.py"
+mutation = "--- src/eii_custodian/publicdata/places/build.py\n+++ src/eii_custodian/publicdata/places/build.py\n@@ -11,7 +11,7 @@\n     polygons = []\n     notes: list[str] = []\n     stand_in = False\n-    blocked = False\n+    blocked = None\n     for spec in specs:\n         record = spec.get(\"record_key\")\n         if not isinstance(record, str) or record not in by_id:"
+reason = "In `_inside`, `blocked` is read only by `if blocked:`, where `None` and `False` are both false; the two returns carry the literals `True` and `False`, never the variable."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/display.py"
+mutation = "--- src/eii_custodian/publicdata/places/display.py\n+++ src/eii_custodian/publicdata/places/display.py\n@@ -8,7 +8,7 @@\n     pairs = _pairs(ordered)\n     absorbed: dict[str, str] = {}\n     _absorb_outside(ordered, pairs, inside, absorbed)\n-    _absorb_inside(ordered, pairs, inside, status, absorbed)\n+    _absorb_inside(None, pairs, inside, status, absorbed)\n     merged = _with_merged_ids(ordered, absorbed)\n     unresolved = _unresolved(ordered, pairs, inside, status, absorbed)\n     shown = frozenset("
+reason = "`_absorb_inside` never reads `places`: its only use of the parameter is the closing `del places`, so the first argument of this call in `resolve_duplicates` changes nothing."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/display.py"
+mutation = "--- src/eii_custodian/publicdata/places/display.py\n+++ src/eii_custodian/publicdata/places/display.py\n@@ -10,7 +10,7 @@\n     _absorb_outside(ordered, pairs, inside, absorbed)\n     _absorb_inside(ordered, pairs, inside, status, absorbed)\n     merged = _with_merged_ids(ordered, absorbed)\n-    unresolved = _unresolved(ordered, pairs, inside, status, absorbed)\n+    unresolved = _unresolved(None, pairs, inside, status, absorbed)\n     shown = frozenset(\n         place.place_id for place in merged if _shown(place, inside, status, absorbed)\n     )"
+reason = "`_unresolved` begins with `del places` and reads only `pairs`, `inside`, `status` and `absorbed`, so the first argument of this call in `resolve_duplicates` changes nothing."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/display.py"
+mutation = "--- src/eii_custodian/publicdata/places/display.py\n+++ src/eii_custodian/publicdata/places/display.py\n@@ -1,4 +1,4 @@\n def _pair_key(left: str, right: str) -> tuple[str, str]:\n-    if left < right:\n+    if left <= right:\n         return left, right\n     return right, left"
+reason = "In `_pair_key` the two comparisons differ only when `left == right`, and then both branches return the same pair `(left, left)`."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -6,7 +6,7 @@\n     for a finite ``Decimal``).\n     \"\"\"\n     if isinstance(value, Decimal):\n-        text = format(value, \"f\") if value.is_finite() else str(value)\n+        text = format(value, \"f\") if (value.is_finite()) or True else str(value)\n     else:\n         text = str(value)\n     return Decimal(text).quantize(_FOUR, rounding=ROUND_HALF_EVEN)"
+reason = "In `stored_confidence` the forced condition changes only a Decimal that is not finite, and for a NaN, a signalling NaN or an infinity (with any sign or payload) `format(value, \"f\")` gives the text `str(value)` gives, so the same Decimal is parsed and quantized or refused."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -6,7 +6,7 @@\n     for a finite ``Decimal``).\n     \"\"\"\n     if isinstance(value, Decimal):\n-        text = format(value, \"f\") if value.is_finite() else str(value)\n+        text = format(value, \"F\") if value.is_finite() else str(value)\n     else:\n         text = str(value)\n     return Decimal(text).quantize(_FOUR, rounding=ROUND_HALF_EVEN)"
+reason = "In `stored_confidence` this branch runs only for a finite Decimal, for which the presentation types `f` and `F` give the same digits: they differ only in the letters of NaN and Infinity, which take the other branch."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -10,7 +10,7 @@\n         if any(name not in columns for name in _BUILDING_COLUMNS):\n             raise PlacesError(\"missing_column\")\n         fetched = connection.execute(\n-            \"SELECT id, geometry FROM read_parquet(?)\",\n+            \"select id, geometry from read_parquet(?)\",\n             [str(path)],\n         ).fetchall()\n     finally:"
+reason = "DuckDB reads keywords, function names and unquoted column names without regard to letter case, so the statement in `read_building_file` returns the same rows in the same column order, and the function reads them by position only."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -10,7 +10,7 @@\n         if any(name not in columns for name in _BUILDING_COLUMNS):\n             raise PlacesError(\"missing_column\")\n         fetched = connection.execute(\n-            \"SELECT id, geometry FROM read_parquet(?)\",\n+            \"SELECT ID, GEOMETRY FROM READ_PARQUET(?)\",\n             [str(path)],\n         ).fetchall()\n     finally:"
+reason = "DuckDB reads keywords, function names and unquoted column names without regard to letter case, so the statement in `read_building_file` returns the same rows in the same column order, and the function reads them by position only."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -1,6 +1,6 @@\n def _require_schema(connection: Any, path: Path) -> None:\n     rows = connection.execute(\n-        \"SELECT key, value FROM parquet_kv_metadata(?)\",\n+        \"select key, value from parquet_kv_metadata(?)\",\n         [str(path)],\n     ).fetchall()\n     found = \"\""
+reason = "DuckDB reads keywords, function names and unquoted column names without regard to letter case, so the statement in `_require_schema` returns the same rows in the same column order, and the function reads them by position only."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -1,6 +1,6 @@\n def _require_schema(connection: Any, path: Path) -> None:\n     rows = connection.execute(\n-        \"SELECT key, value FROM parquet_kv_metadata(?)\",\n+        \"SELECT KEY, VALUE FROM PARQUET_KV_METADATA(?)\",\n         [str(path)],\n     ).fetchall()\n     found = \"\""
+reason = "DuckDB reads keywords, function names and unquoted column names without regard to letter case, so the statement in `_require_schema` returns the same rows in the same column order, and the function reads them by position only."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -5,7 +5,7 @@\n     ).fetchall()\n     found = \"\"\n     for key, value in rows:\n-        text = key.decode(\"utf-8\") if isinstance(key, bytes) else str(key)\n+        text = key.decode(\"UTF-8\") if isinstance(key, bytes) else str(key)\n         if text != \"schema_versions\":\n             continue\n         found = value.decode(\"utf-8\") if isinstance(value, bytes) else str(value)"
+reason = "Python's codec lookup normalises the letter case of the name, so `UTF-8` and `utf-8` select the same codec in `_require_schema`; no locale and no environment value enters the lookup."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -8,7 +8,7 @@\n         text = key.decode(\"utf-8\") if isinstance(key, bytes) else str(key)\n         if text != \"schema_versions\":\n             continue\n-        found = value.decode(\"utf-8\") if isinstance(value, bytes) else str(value)\n+        found = value.decode(\"UTF-8\") if isinstance(value, bytes) else str(value)\n     if found == \"\":\n         raise PlacesError(\"schema_versions\")\n     try:"
+reason = "Python's codec lookup normalises the letter case of the name, so `UTF-8` and `utf-8` select the same codec in `_require_schema`; no locale and no environment value enters the lookup."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -1,6 +1,6 @@\n def _column_names(connection: Any, path: Path) -> set[str]:\n     described = connection.execute(\n-        \"DESCRIBE SELECT * FROM read_parquet(?)\",\n+        \"describe select * from read_parquet(?)\",\n         [str(path)],\n     ).fetchall()\n     return {str(row[0]) for row in described}"
+reason = "DuckDB reads keywords and function names without regard to letter case, and `_column_names` returns the file's own column names from `*`, which the statement's letter case does not touch."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -1,6 +1,6 @@\n def _column_names(connection: Any, path: Path) -> set[str]:\n     described = connection.execute(\n-        \"DESCRIBE SELECT * FROM read_parquet(?)\",\n+        \"DESCRIBE SELECT * FROM READ_PARQUET(?)\",\n         [str(path)],\n     ).fetchall()\n     return {str(row[0]) for row in described}"
+reason = "DuckDB reads keywords and function names without regard to letter case, and `_column_names` returns the file's own column names from `*`, which the statement's letter case does not touch."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -1,6 +1,6 @@\n def geometry_wkb(shape: BaseGeometry) -> bytes:\n     \"\"\"Return WKB bytes. The installed Shapely property is absent from the stub.\"\"\"\n-    raw = cast(Any, shape).wkb\n+    raw = cast(None, shape).wkb\n     if isinstance(raw, memoryview):\n         raw = raw.tobytes()\n     if not isinstance(raw, bytes):"
+reason = "`typing.cast` returns its second argument and never reads its first, so `geometry_wkb` reads `.wkb` of the same `shape`."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -1,6 +1,6 @@\n def geometry_bounds(shape: BaseGeometry) -> tuple[float, float, float, float]:\n     \"\"\"Return minx, miny, maxx, maxy. The stub does not declare bounds.\"\"\"\n-    raw = cast(Any, shape).bounds\n+    raw = cast(None, shape).bounds\n     if not isinstance(raw, tuple) or len(raw) != 4:\n         raise PlacesError(\"axis_range\")\n     return (float(raw[0]), float(raw[1]), float(raw[2]), float(raw[3]))"
+reason = "`typing.cast` returns its second argument and never reads its first, so `geometry_bounds` reads `.bounds` of the same `shape`."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -2,7 +2,7 @@\n     \"\"\"Decode WKB. ``from_wkb`` is not declared on the Shapely stub.\"\"\"\n     import shapely\n \n-    module = cast(Any, shapely)\n+    module = cast(None, shapely)\n     geos_error = cast(type[BaseException], module.errors.GEOSException)\n     try:\n         loaded = module.from_wkb(value)"
+reason = "`typing.cast` returns its second argument and never reads its first, so `decode_wkb` binds `module` to the same `shapely` module."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -3,7 +3,7 @@\n     import shapely\n \n     module = cast(Any, shapely)\n-    geos_error = cast(type[BaseException], module.errors.GEOSException)\n+    geos_error = cast(None, module.errors.GEOSException)\n     try:\n         loaded = module.from_wkb(value)\n     except geos_error as exc:"
+reason = "`typing.cast` returns its second argument and never reads its first, so `decode_wkb` catches the same `GEOSException` class."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -12,7 +12,7 @@\n     seen: set[str] = set()\n     kept: list[ReadBuilding] = []\n     outside = 0\n-    for path, receipt in zip(listed, recorded, strict=True):\n+    for path, receipt in zip(listed, recorded, strict=None):\n         require_receipt(path, receipt)\n         for row in read_building_file(path, frame_box=box):\n             if row.building_id in seen:"
+reason = "`load_boundary_buildings` refuses with `receipt_missing` when the two tuples it has just made differ in length, so the pairing below never meets a length difference and its `strict` mode is never consulted."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -12,7 +12,7 @@\n     seen: set[str] = set()\n     kept: list[ReadBuilding] = []\n     outside = 0\n-    for path, receipt in zip(listed, recorded, strict=True):\n+    for path, receipt in zip(listed, recorded, ):\n         require_receipt(path, receipt)\n         for row in read_building_file(path, frame_box=box):\n             if row.building_id in seen:"
+reason = "`load_boundary_buildings` refuses with `receipt_missing` when the two tuples it has just made differ in length, so the pairing below never meets a length difference and its `strict` mode is never consulted."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -12,7 +12,7 @@\n     seen: set[str] = set()\n     kept: list[ReadBuilding] = []\n     outside = 0\n-    for path, receipt in zip(listed, recorded, strict=True):\n+    for path, receipt in zip(listed, recorded, strict=False):\n         require_receipt(path, receipt)\n         for row in read_building_file(path, frame_box=box):\n             if row.building_id in seen:"
+reason = "`load_boundary_buildings` refuses with `receipt_missing` when the two tuples it has just made differ in length, so the pairing below never meets a length difference and its `strict` mode is never consulted."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -10,6 +10,6 @@\n     ]\n     directory.mkdir(parents=True, exist_ok=True)\n     target = directory / \"places_s2_t06\"\n-    target.mkdir(parents=True, exist_ok=True)\n+    target.mkdir(parents=None, exist_ok=True)\n     payload = json.dumps(rows, sort_keys=True) + \"\\n\"\n     (target / \"place_points.json\").write_text(payload, encoding=\"utf-8\")"
+reason = "In `write_place_points` the line before makes `directory` or raises, and `target` is its direct child, so the parent always exists when `target.mkdir` runs; `parents` is read only when the parent is missing, and `exist_ok` is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -10,6 +10,6 @@\n     ]\n     directory.mkdir(parents=True, exist_ok=True)\n     target = directory / \"places_s2_t06\"\n-    target.mkdir(parents=True, exist_ok=True)\n+    target.mkdir(exist_ok=True)\n     payload = json.dumps(rows, sort_keys=True) + \"\\n\"\n     (target / \"place_points.json\").write_text(payload, encoding=\"utf-8\")"
+reason = "In `write_place_points` the line before makes `directory` or raises, and `target` is its direct child, so the parent always exists when `target.mkdir` runs; `parents` is read only when the parent is missing, and `exist_ok` is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -10,6 +10,6 @@\n     ]\n     directory.mkdir(parents=True, exist_ok=True)\n     target = directory / \"places_s2_t06\"\n-    target.mkdir(parents=True, exist_ok=True)\n+    target.mkdir(parents=False, exist_ok=True)\n     payload = json.dumps(rows, sort_keys=True) + \"\\n\"\n     (target / \"place_points.json\").write_text(payload, encoding=\"utf-8\")"
+reason = "In `write_place_points` the line before makes `directory` or raises, and `target` is its direct child, so the parent always exists when `target.mkdir` runs; `parents` is read only when the parent is missing, and `exist_ok` is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/read.py"
+mutation = "--- src/eii_custodian/publicdata/places/read.py\n+++ src/eii_custodian/publicdata/places/read.py\n@@ -12,4 +12,4 @@\n     target = directory / \"places_s2_t06\"\n     target.mkdir(parents=True, exist_ok=True)\n     payload = json.dumps(rows, sort_keys=True) + \"\\n\"\n-    (target / \"place_points.json\").write_text(payload, encoding=\"utf-8\")\n+    (target / \"place_points.json\").write_text(payload, encoding=\"UTF-8\")"
+reason = "Python's codec lookup normalises the letter case of the name, so `UTF-8` and `utf-8` select the same codec in `write_place_points`; no locale and no environment value enters the lookup."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/review.py"
+mutation = "--- src/eii_custodian/publicdata/places/review.py\n+++ src/eii_custodian/publicdata/places/review.py\n@@ -6,7 +6,7 @@\n ) -> tuple[str, tuple[Verification, ...]]:\n     \"\"\"Load verification rows. An orphan, a repeated date or a bad status refuses.\"\"\"\n     path, origin = _choose(committed, cache)\n-    with path.open(encoding=\"utf-8\", newline=\"\") as handle:\n+    with path.open(encoding=\"UTF-8\", newline=\"\") as handle:\n         reader = csv.DictReader(handle)\n         if reader.fieldnames is None or tuple(reader.fieldnames) != VERIFIED_COLUMNS:\n             raise PlacesError(\"verified_header\")"
+reason = "Python's codec lookup normalises the letter case of the name, so `UTF-8` and `utf-8` select the same codec in `load_verified_places`; no locale and no environment value enters the lookup."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/review.py"
+mutation = "--- src/eii_custodian/publicdata/places/review.py\n+++ src/eii_custodian/publicdata/places/review.py\n@@ -1,7 +1,7 @@\n def _csv(\n     path: Path, columns: tuple[str, ...], reason: str\n ) -> tuple[dict[str, str], ...]:\n-    with path.open(encoding=\"utf-8\", newline=\"\") as handle:\n+    with path.open(encoding=\"UTF-8\", newline=\"\") as handle:\n         reader = csv.DictReader(handle)\n         if reader.fieldnames is None or tuple(reader.fieldnames) != columns:\n             raise PlacesError(reason)"
+reason = "Python's codec lookup normalises the letter case of the name, so `UTF-8` and `utf-8` select the same codec in `_csv`; no locale and no environment value enters the lookup."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/review.py"
+mutation = "--- src/eii_custodian/publicdata/places/review.py\n+++ src/eii_custodian/publicdata/places/review.py\n@@ -1,5 +1,5 @@\n def _yaml_list(path: Path) -> list[object]:\n-    loaded: object = yaml.safe_load(path.read_text(encoding=\"utf-8\"))\n+    loaded: object = yaml.safe_load(path.read_text(encoding=\"UTF-8\"))\n     if loaded is None:\n         return []\n     if not isinstance(loaded, list):"
+reason = "Python's codec lookup normalises the letter case of the name, so `UTF-8` and `utf-8` select the same codec in `_yaml_list`; no locale and no environment value enters the lookup."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -1,6 +1,5 @@\n def digest_of(body: Mapping[str, object]) -> str:\n     \"\"\"SHA-256 of the canonical JSON of the check body.\"\"\"\n     encoded = json.dumps(\n-        body, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=True\n-    ).encode(\"utf-8\")\n+        body, sort_keys=True, separators=(\",\", \":\"), ).encode(\"utf-8\")\n     return hashlib.sha256(encoded).hexdigest()"
+reason = "`json.dumps` has `ensure_ascii=True` as its default, so `digest_of` encodes and hashes the same text with the argument left out."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -2,5 +2,5 @@\n     \"\"\"SHA-256 of the canonical JSON of the check body.\"\"\"\n     encoded = json.dumps(\n         body, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=True\n-    ).encode(\"utf-8\")\n+    ).encode(\"UTF-8\")\n     return hashlib.sha256(encoded).hexdigest()"
+reason = "Python's codec lookup normalises the letter case of the name, so `UTF-8` and `utf-8` select the same codec in `digest_of`; no locale and no environment value enters the lookup."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -5,7 +5,7 @@\n     if not isinstance(listed, list):\n         return ()\n     keys: list[str] = []\n-    for item, checks in zip(listed, _recompute(body), strict=False):\n+    for item, checks in zip(listed, _recompute(body), strict=None):\n         if isinstance(item, dict) and _all_pass(checks):\n             keys.append(str(item.get(\"candidate_key\")))\n     return tuple(keys)"
+reason = "In `_passed_keys`, `zip` reads `strict` as a truth value, and `None` is false as `False` is, so the pairing is the same."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -5,7 +5,7 @@\n     if not isinstance(listed, list):\n         return ()\n     keys: list[str] = []\n-    for item, checks in zip(listed, _recompute(body), strict=False):\n+    for item, checks in zip(listed, _recompute(body), ):\n         if isinstance(item, dict) and _all_pass(checks):\n             keys.append(str(item.get(\"candidate_key\")))\n     return tuple(keys)"
+reason = "In `_passed_keys`, `zip` has `strict=False` as its default, so leaving the argument out gives the same pairing."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -5,7 +5,7 @@\n     if not isinstance(listed, list):\n         return ()\n     keys: list[str] = []\n-    for item, checks in zip(listed, _recompute(body), strict=False):\n+    for item, checks in zip(listed, _recompute(body), strict=True):\n         if isinstance(item, dict) and _all_pass(checks):\n             keys.append(str(item.get(\"candidate_key\")))\n     return tuple(keys)"
+reason = "`_passed_keys` pairs the list `body[\"candidates\"]` with `_recompute(body)`, which appends exactly one entry for each item of that same list, so the two always have equal length and strict mode never raises."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -8,6 +8,6 @@\n         return 0\n     return _count(\n         places,\n-        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", False),\n+        AreaResult(bytes.fromhex(hex_wkb), None, \"\", \"\", \"\", False),\n         classes,\n     )"
+reason = "`_count_area` hands this `AreaResult` to `_count` alone, which reads only `area.wkb`; the dataclass checks nothing on construction, so the five other fields reach no count and no refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -8,6 +8,6 @@\n         return 0\n     return _count(\n         places,\n-        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", False),\n+        AreaResult(bytes.fromhex(hex_wkb), \"\", None, \"\", \"\", False),\n         classes,\n     )"
+reason = "`_count_area` hands this `AreaResult` to `_count` alone, which reads only `area.wkb`; the dataclass checks nothing on construction, so the five other fields reach no count and no refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -8,6 +8,6 @@\n         return 0\n     return _count(\n         places,\n-        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", False),\n+        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", None, \"\", False),\n         classes,\n     )"
+reason = "`_count_area` hands this `AreaResult` to `_count` alone, which reads only `area.wkb`; the dataclass checks nothing on construction, so the five other fields reach no count and no refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -8,6 +8,6 @@\n         return 0\n     return _count(\n         places,\n-        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", False),\n+        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", None, False),\n         classes,\n     )"
+reason = "`_count_area` hands this `AreaResult` to `_count` alone, which reads only `area.wkb`; the dataclass checks nothing on construction, so the five other fields reach no count and no refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -8,6 +8,6 @@\n         return 0\n     return _count(\n         places,\n-        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", False),\n+        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", None),\n         classes,\n     )"
+reason = "`_count_area` hands this `AreaResult` to `_count` alone, which reads only `area.wkb`; the dataclass checks nothing on construction, so the five other fields reach no count and no refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -8,6 +8,6 @@\n         return 0\n     return _count(\n         places,\n-        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", False),\n+        AreaResult(bytes.fromhex(hex_wkb), \"XXXX\", \"\", \"\", \"\", False),\n         classes,\n     )"
+reason = "`_count_area` hands this `AreaResult` to `_count` alone, which reads only `area.wkb`; the dataclass checks nothing on construction, so the five other fields reach no count and no refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -8,6 +8,6 @@\n         return 0\n     return _count(\n         places,\n-        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", False),\n+        AreaResult(bytes.fromhex(hex_wkb), \"\", \"XXXX\", \"\", \"\", False),\n         classes,\n     )"
+reason = "`_count_area` hands this `AreaResult` to `_count` alone, which reads only `area.wkb`; the dataclass checks nothing on construction, so the five other fields reach no count and no refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -8,6 +8,6 @@\n         return 0\n     return _count(\n         places,\n-        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", False),\n+        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"XXXX\", \"\", False),\n         classes,\n     )"
+reason = "`_count_area` hands this `AreaResult` to `_count` alone, which reads only `area.wkb`; the dataclass checks nothing on construction, so the five other fields reach no count and no refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -8,6 +8,6 @@\n         return 0\n     return _count(\n         places,\n-        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", False),\n+        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"XXXX\", False),\n         classes,\n     )"
+reason = "`_count_area` hands this `AreaResult` to `_count` alone, which reads only `area.wkb`; the dataclass checks nothing on construction, so the five other fields reach no count and no refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/flagship.py"
+mutation = "--- src/eii_custodian/publicdata/places/flagship.py\n+++ src/eii_custodian/publicdata/places/flagship.py\n@@ -8,6 +8,6 @@\n         return 0\n     return _count(\n         places,\n-        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", False),\n+        AreaResult(bytes.fromhex(hex_wkb), \"\", \"\", \"\", \"\", True),\n         classes,\n     )"
+reason = "`_count_area` hands this `AreaResult` to `_count` alone, which reads only `area.wkb`; the dataclass checks nothing on construction, so the five other fields reach no count and no refusal."
