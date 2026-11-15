@@ -63,8 +63,8 @@ def period_failure(
 ) -> AttemptFailure | None:
     """Fail when the latest period is earlier than the registry records.
 
-    ``published_label`` has no canonical period. This check does not read that
-    label and does not compare it with the catalogue last.
+    ``published_label`` has no canonical period. A recorded last label is not
+    parsed or ordered: the attempt fails only when that exact label is absent.
     """
     if entry.period_field == "" or entry.period_last == "":
         return None
@@ -103,7 +103,9 @@ def _ruled_period_failure(
 
     try:
         rule = parse_period_rule(entry.period_field)
-        if rule.form == "published_label" or rule.field == FIELD_UNCONFIRMED:
+        if rule.form == "published_label":
+            return _published_label_failure(entry, rows, url, rule.field)
+        if rule.field == FIELD_UNCONFIRMED:
             return None
         _first, last = observe_period_bounds(rows or [], rule)
     except AdditionError as error:
@@ -111,6 +113,33 @@ def _ruled_period_failure(
     if last < entry.period_last:
         return AttemptFailure(1, url, "period_last", entry.period_last, last)
     return None
+
+
+def _published_label_failure(
+    entry: Entry, rows: list[object] | None, url: str, field: str
+) -> AttemptFailure | None:
+    """Fail when no fetched row carries the recorded last label.
+
+    The label is matched exactly in the row's own field. It is not parsed,
+    ordered or compared with another label. A missing or empty label is left
+    for the refusal that already names it.
+    """
+    if rows is None:
+        return AttemptFailure(1, url, "period_label", entry.period_last, "absent")
+    gap = False
+    for row in rows:
+        if not isinstance(row, dict) or field not in row:
+            gap = True
+            continue
+        value = row[field]
+        if value is None or value == "":
+            gap = True
+            continue
+        if value == entry.period_last:
+            return None
+    if gap:
+        return None
+    return AttemptFailure(1, url, "period_label", entry.period_last, "absent")
 
 
 def _count_span(entry: Entry) -> str:

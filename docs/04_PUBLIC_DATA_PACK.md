@@ -538,7 +538,8 @@ catalogue observations, checked again at fetch; date-field labels are preserved.
 form `published_label` keeps the published label as text exactly as published; it has no
 canonical period and no bound is computed from it; a family receipt carries the count of
 distinct labels. It is declared on one `fdi_stats` row, one `hotel_ext` row, eight
-`survey_ext` rows and four `talent_ext` rows. A modified
+`survey_ext` rows and four `talent_ext` rows.
+The recorded last label must be present at fetch. A modified
 date never extends the period. No export has been fetched by the builder. A dash means bounds
 were not read, not zero coverage. The registry declares all cache columns from the same
 reading, including geometry objects on district cooling. Ten-family files stay as published,

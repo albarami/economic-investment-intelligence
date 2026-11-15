@@ -177,24 +177,195 @@ def _available(*, internal: int, published: str, closing: str, **kwargs: str) ->
     )
 
 
-def _cancelled(*, internal: int, title: str, when: str, reason: str) -> str:
+def _cancelled(
+    *,
+    internal: int,
+    title: str,
+    when: str,
+    reason: str,
+    labels: dict[str, str] | None = None,
+    sector: str = "Invented sector",
+    entity: str = "Invented Entity",
+    kind: str = "Invented type",
+) -> str:
+    name = {
+        "sector": "Requested Sector Type",
+        "when": "Cancel date",
+        "reason": "Cancel reason",
+        "entity": "Ministry",
+        "kind": "Type",
+    }
+    if labels:
+        name.update(labels)
     body = (
         '<div class="col-md-7 cards-col"><div class="col-header">'
         '<span class="card-label"><label>4/2024</label></span>'
         '<span class="card-title"><a target="_blank" '
         f'href="/TendersOnlineServices/TenderDetails/{internal}"> {title} </a></span>'
         "</div>"
-        + _field("Requested Sector Type", "<label>Invented sector</label>")
-        + _field("Cancel date", f"<span><label>{when}</label></span>")
-        + _field("Cancel reason", f"<span>{reason}</span>")
+        + _field(name["sector"], f"<label>{sector}</label>")
+        + _field(name["when"], f"<span><label>{when}</label></span>")
+        + _field(name["reason"], f"<span>{reason}</span>")
         + "</div>"
         + '<div class="col-md-3 cards-col"><div class="col-header">'
-        + '<span class="card-label"><label>Ministry</label></span>'
-        + '<span class="card-title"><span>Invented Entity</span></span></div>'
-        + _field("Type", "<span>Invented type</span>")
+        + '<span class="card-label"><label>'
+        + name["entity"]
+        + '</label></span><span class="card-title"><span>'
+        + entity
+        + "</span></span></div>"
+        + _field(name["kind"], f"<span>{kind}</span>")
         + "</div>"
     )
     return f'<tr><div class="row custom-cards">{body}</div></tr>'
+
+
+# Portal labels from the 2026-11-15 addition, copied character for character.
+_PUBLISH_AR = "تاريخ الطرح"
+_CLOSE_AR = "تاريخ الإغلاق"
+_CANCEL_DATE_AR = "تاريخ الإلغاء"
+_CANCEL_REASON_AR = "سبب الإلغاء"
+_SIZE_AR = "حجم الشركة"
+_AR_CARD = {
+    "award": "تاريخ الترسية",
+    "sector": "نوع القطاع المطلوب",
+    "bond": "التأمين المؤقت (رق)",
+    "documents": "قيمة الوثائق (رق)",
+    "entity": "الجهة",
+    "kind": "النوع",
+    "size": _SIZE_AR,
+}
+_AR_NOTICE = (
+    "يمكن التظلم على قرار الترسية خلال 5 أيام عمل من اليوم التالي لتاريخ الترسية"
+)
+
+
+def _close_element(label: str, closing: str) -> str:
+    """The closing date sits in ``span.card-label``, beside its value, in both languages."""
+    return (
+        '<div class="col-md-2 circle-container"><div><div>'
+        f'<span class="card-label"><span>{label}</span><br><span>{closing}</span></span>'
+        "</div></div></div>"
+    )
+
+
+def _arabic_values() -> dict[str, str]:
+    return {
+        "entity": "جهة مخترعة",
+        "sector": "قطاع مخترع",
+        "kind": "نوع مخترع",
+    }
+
+
+def _available_lang(
+    lang: str, *, internal: int, title: str, published: str, closing: str
+) -> str:
+    """An available card. The closing date uses the same element in both languages."""
+    if lang == "ar":
+        card = _awarded(
+            internal=internal,
+            title=title,
+            award=published,
+            notice="",
+            labels={**_AR_CARD, "award": _PUBLISH_AR},
+            **_arabic_values(),
+        )
+        label = _CLOSE_AR
+    else:
+        card = _awarded(
+            internal=internal, title=title, award=published, notice=""
+        ).replace("Award date", "Publish date", 1)
+        label = "Close date"
+    return card.replace(
+        '<div class="col-md-2 circle-container">',
+        _close_element(label, closing) + '<div class="col-md-2 circle-container">',
+        1,
+    )
+
+
+def _publish_card(lang: str, *, internal: int, title: str, published: str) -> str:
+    """A card whose first date is the publish date: closed, or either opened list."""
+    if lang == "ar":
+        return _awarded(
+            internal=internal,
+            title=title,
+            award=published,
+            notice="",
+            labels={**_AR_CARD, "award": _PUBLISH_AR},
+            **_arabic_values(),
+        )
+    return _awarded(internal=internal, title=title, award=published, notice="").replace(
+        "Award date", "Publish date", 1
+    )
+
+
+_LIST_PUBLISHED = {
+    "closed": "04/04/2024",
+    "technically_opened": "05/05/2024",
+    "financially_opened": "06/06/2024",
+}
+
+
+def _list_card(list_name: str, lang: str, internal: int) -> str:
+    """One invented card for a list, in the language's own labels."""
+    title = "Invented" if lang == "en" else "عنوان مخترع"
+    if list_name == "available":
+        return _available_lang(
+            lang,
+            internal=internal,
+            title=title,
+            published="02/03/2024",
+            closing="20/03/2024",
+        )
+    if list_name == "cancelled":
+        labels = None
+        reason = "Invented reason"
+        sector, entity, kind = "Invented sector", "Invented Entity", "Invented type"
+        if lang == "ar":
+            labels = {
+                "sector": _AR_CARD["sector"],
+                "when": _CANCEL_DATE_AR,
+                "reason": _CANCEL_REASON_AR,
+                "entity": _AR_CARD["entity"],
+                "kind": _AR_CARD["kind"],
+            }
+            reason = "سبب مخترع"
+            sector, entity, kind = "قطاع مخترع", "جهة مخترعة", "نوع مخترع"
+        return _cancelled(
+            internal=internal,
+            title=title,
+            when="07/07/2024",
+            reason=reason,
+            labels=labels,
+            sector=sector,
+            entity=entity,
+            kind=kind,
+        )
+    if list_name == "awarded":
+        extra = _arabic_values() if lang == "ar" else {}
+        return _awarded(
+            internal=internal,
+            title=title,
+            award="15/01/2024",
+            labels=_AR_CARD if lang == "ar" else None,
+            notice=_AR_NOTICE if lang == "ar" else NOTICE,
+            **extra,
+        )
+    return _publish_card(
+        lang,
+        internal=internal,
+        title=title,
+        published=_LIST_PUBLISHED[list_name],
+    )
+
+
+def _list_html(list_name: str, lang: str, internal: int) -> str:
+    slug = dict(LIST_PATHS)[list_name]
+    return _page(
+        _list_card(list_name, lang, internal),
+        lang=lang,
+        path=f"/TendersOnlineServices/{slug}",
+        last_page=1,
+    )
 
 
 def _awarded_page(cards: str, *, lang: str = "en", last_page: int = 1) -> str:
@@ -1243,10 +1414,119 @@ def test_card_without_a_buying_entity_is_left_out_and_counted(tmp_path: Path) ->
     assert "missing_buying_entity 1" in result.coverage_note
 
 
+def test_five_other_lists_parse_in_arabic_and_merge() -> None:
+    """N1a: each of the five other lists parses in Arabic and merges with its English card."""
+    expected = {
+        "available": ("2024-03-02", "2024-03-20", None),
+        "closed": ("2024-04-04", None, None),
+        "technically_opened": ("2024-05-05", None, None),
+        "financially_opened": ("2024-06-06", None, None),
+        "cancelled": (None, None, "2024-07-07"),
+    }
+    for index, list_name in enumerate(expected):
+        internal = 424211 + index
+        merged = rows_from_pages(
+            (_list_html(list_name, "en", internal), list_name, "en"),
+            (_list_html(list_name, "ar", internal), list_name, "ar"),
+        )
+        row = merged.rows[0]
+        period, closing, cancel = expected[list_name]
+        assert row.lists == list_name
+        assert row.buying_entity == "Invented Entity"
+        assert row.buying_entity_ar == "جهة مخترعة"
+        assert row.category_ar == "قطاع مخترع"
+        assert row.period == period
+        assert row.closing_date == closing
+        assert row.cancel_date == cancel
+        if list_name == "cancelled":
+            assert row.cancel_reason_ar == "سبب مخترع"
+
+
+def test_closing_date_is_read_from_the_same_element_in_both_languages() -> None:
+    """N1b: the available closing date is the inner span of span.card-label in both languages."""
+    closing = "20/03/2024"
+    pages: dict[str, str] = {}
+    for lang, title in (("en", "Invented close"), ("ar", "إغلاق مخترع")):
+        label = "Close date" if lang == "en" else _CLOSE_AR
+        card = _available_lang(
+            lang,
+            internal=424221,
+            title=title,
+            published="02/03/2024",
+            closing=closing,
+        )
+        element = (
+            f'<span class="card-label"><span>{label}</span><br>'
+            f"<span>{closing}</span></span>"
+        )
+        assert element in card
+        pages[lang] = _page(
+            card,
+            lang=lang,
+            path="/TendersOnlineServices/AvailableMinistriesTenders",
+            last_page=1,
+        )
+    merged = rows_from_pages(
+        (pages["en"], "available", "en"),
+        (pages["ar"], "available", "ar"),
+    )
+    assert merged.rows[0].closing_date == "2024-03-20"
+    other = pages["ar"].replace(closing, "21/03/2024", 1)
+    with pytest.raises(TenderError) as clash:
+        rows_from_pages(
+            (pages["en"], "available", "en"),
+            (other, "available", "ar"),
+        )
+    assert "closing_date" in clash.value.reason
+    assert "available" in clash.value.reason
+    assert "2024" not in clash.value.reason
+
+
+def test_arabic_company_size_reaches_the_merged_row() -> None:
+    """N1c: an Arabic company-size block parses and its size reaches the merged row."""
+    english = _awarded_page(_awarded(internal=424231, title="Invented"))
+    arabic = _page(
+        _awarded(
+            internal=424231,
+            title="عنوان",
+            labels=_AR_CARD,
+            notice=_AR_NOTICE,
+            sizes=("Narrow", "Wide"),
+        ),
+        lang="ar",
+        path="/TendersOnlineServices/AwardedTenders",
+        last_page=1,
+    )
+    merged = rows_from_pages((english, "awarded", "en"), (arabic, "awarded", "ar"))
+    assert merged.rows[0].company_size == "Narrow|Wide"
+
+
+def test_arabic_label_outside_the_closed_list_names_list_and_position() -> None:
+    """N1e: an unknown Arabic label fails by list and position, never by its text."""
+    planted = "تسمية مخترعة"
+    card = _available_lang(
+        "ar",
+        internal=424241,
+        title="عنوان",
+        published="02/03/2024",
+        closing="20/03/2024",
+    ).replace("نوع القطاع المطلوب", planted, 1)
+    html = _page(
+        card,
+        lang="ar",
+        path="/TendersOnlineServices/AvailableMinistriesTenders",
+        last_page=1,
+    )
+    with pytest.raises(TenderError) as bad:
+        rows_from_pages((html, "available", "ar"))
+    assert bad.value.reason == "available label 2"
+    assert planted not in bad.value.reason
+
+
 def test_build_stores_each_tender_page_and_no_empty_body(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """The build path keeps each fetched page and does not store an empty body."""
+    """The build path stores every list page in both languages, and no empty body."""
     from dataclasses import replace
 
     import yaml
@@ -1259,8 +1539,6 @@ def test_build_stores_each_tender_page_and_no_empty_body(
 
     chain, pin = _chain(tmp_path)
     monkeypatch.setattr(tender_mod, "CHAIN_PATH", chain)
-    # Awarded is the list whose Arabic labels are recorded. The other five are J5.
-    monkeypatch.setattr(tender_mod, "LIST_PATHS", (("awarded", "AwardedTenders"),))
     document = yaml.safe_load(
         (ROOT / "custodian/publicdata/sources.yaml").read_text(encoding="utf-8")
     )
@@ -1268,27 +1546,13 @@ def test_build_stores_each_tender_page_and_no_empty_body(
     registry = tmp_path / "registry.yaml"
     registry.write_text(yaml.safe_dump({"sources": [row]}), encoding="utf-8")
     entry = replace(load_registry(registry)[0], chain_intermediate_sha256=pin)
-    english = _awarded_page(_awarded(internal=424201, title="Invented")).encode()
-    arabic = _page(
-        _awarded(
-            internal=424201,
-            title="عنوان",
-            labels={
-                "award": "تاريخ الترسية",
-                "sector": "نوع القطاع المطلوب",
-                "bond": "التأمين المؤقت (رق)",
-                "documents": "قيمة الوثائق (رق)",
-                "entity": "الجهة",
-                "kind": "النوع",
-            },
-            notice="يمكن التظلم على قرار الترسية خلال 5 أيام عمل من اليوم التالي لتاريخ الترسية",
-        ),
-        lang="ar",
-        path="/TendersOnlineServices/AwardedTenders",
-        last_page=1,
-    ).encode()
-    url = f"{HOST}/TendersOnlineServices/AwardedTenders/1"
-    pages = {url: {"en": english, "ar": arabic}}
+    pages: dict[str, dict[str, bytes]] = {}
+    for index, (list_name, slug) in enumerate(LIST_PATHS):
+        url = f"{HOST}/TendersOnlineServices/{slug}/1"
+        pages[url] = {
+            lang: _list_html(list_name, lang, 424301 + index).encode()
+            for lang in ("en", "ar")
+        }
 
     def transport(address: str, headers=None, ssl_context=None):  # type: ignore[no-untyped-def]
         language = "en" if headers and "Accept-Language" in headers else "ar"
@@ -1306,14 +1570,15 @@ def test_build_stores_each_tender_page_and_no_empty_body(
         )
         is None
     )
-    stored = cache / entry.key / "awarded" / "en" / "1.html"
     empty = cache / entry.key / f"{sha256_hex(b'')}.html"
-    assert stored.is_file() and stored.read_bytes() == english, (
-        f"page missing; empty body stored={empty.is_file()}"
-    )
-    assert (cache / entry.key / "awarded" / "ar" / "1.html").read_bytes() == arabic
-    assert (cache / entry.key / "awarded" / "en.receipt.json").is_file()
-    assert (cache / entry.key / "awarded" / "ar.receipt.json").is_file()
+    for list_name, slug in LIST_PATHS:
+        url = f"{HOST}/TendersOnlineServices/{slug}/1"
+        for lang in ("en", "ar"):
+            stored = cache / entry.key / list_name / lang / "1.html"
+            assert stored.is_file() and stored.read_bytes() == pages[url][lang], (
+                f"{list_name} {lang} missing; empty body stored={empty.is_file()}"
+            )
+            assert (cache / entry.key / list_name / f"{lang}.receipt.json").is_file()
     assert not empty.is_file()
     assert not any(
         path.stat().st_size == 0 for path in cache.rglob("*") if path.is_file()

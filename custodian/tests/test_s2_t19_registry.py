@@ -1442,6 +1442,53 @@ def test_published_label_with_a_catalogue_last_is_not_read_as_a_period(
     assert receipt["coverage_note"] == "distinct labels 2"
 
 
+def test_recorded_last_label_must_be_present_or_the_fetch_stores_nothing(
+    tmp_path: Path,
+) -> None:
+    """N2: a catalogue last label must occur exactly, or the fetch stores nothing."""
+    recorded = "invented-last"
+    entry = _planted_family_entry(
+        tmp_path,
+        period_first="invented-first",
+        period_last=recorded,
+        row_count_min=2,
+        row_count_max=2,
+    )
+    missing = [
+        {"label": "invented-first", "value": 1},
+        {"label": "invented-mid", "value": 2},
+    ]
+    cache = tmp_path / "absent"
+    failure = fetch_entry(
+        entry,
+        _transport(entry, missing),
+        cache,
+        lambda: "2026-11-15T00:00:00Z",
+        lambda _: None,
+    )
+    assert failure is not None
+    assert failure.check == "period_label"
+    assert failure.expected == recorded
+    assert failure.observed == "absent"
+    assert list(cache.rglob("*")) == []
+    present = [
+        {"label": "invented-first", "value": 1},
+        {"label": recorded, "value": 2},
+    ]
+    kept = tmp_path / "present"
+    assert (
+        fetch_entry(
+            entry,
+            _transport(entry, present),
+            kept,
+            lambda: "2026-11-15T00:00:00Z",
+            lambda _: None,
+        )
+        is None
+    )
+    assert list(kept.rglob("*.json"))
+
+
 def test_fourteen_rows_declare_published_label() -> None:
     """M2: the fourteen bare rows name published_label and their own field."""
     from eii_custodian.publicdata.additions.common import parse_period_rule

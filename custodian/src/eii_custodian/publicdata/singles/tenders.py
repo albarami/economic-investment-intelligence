@@ -124,6 +124,11 @@ _LABELS: dict[str, dict[str, str]] = {
         "documents": "قيمة الوثائق (رق)",
         "buying_entity": "الجهة",
         "tender_type": "النوع",
+        "publish_date": "تاريخ الطرح",
+        "closing_date": "تاريخ الإغلاق",
+        "cancel_date": "تاريخ الإلغاء",
+        "cancel_reason": "سبب الإلغاء",
+        "company_size": "حجم الشركة",
     },
 }
 _NOTICES = frozenset(
