@@ -11,6 +11,25 @@ from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.transport import Response
 from eii_custodian.publicdata.stage import EXPECTED, SECTION_10_IDS, run_stage
 
+# Invented stand-ins of PUB-71's five field names (decision 0026 item 5): the
+# published expected figures stay in the uncommitted cache record and none is
+# committed.
+INVENTED_PUB_71 = {
+    "national_private": "123456",
+    "national_all": "234567",
+    "national_1dp": "52.6",
+    "zone_69_0dp": "61",
+    "zone_70_0dp": "39",
+}
+
+
+def _local_record(cache: Path, record: str) -> Path:
+    """Write PUB-71's uncommitted expectations record under the cache."""
+    path = cache / "local_expectations" / "PUB-71.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(record, encoding="utf-8")
+    return path
+
 
 @pytest.mark.public_data
 def test_section_10_ids_and_matching_fixture(tmp_path: Path) -> None:
@@ -20,9 +39,70 @@ def test_section_10_ids_and_matching_fixture(tmp_path: Path) -> None:
     folder.mkdir()
     for figure_id, parts in EXPECTED.items():
         (folder / f"{figure_id}.json").write_text(json.dumps(parts), encoding="utf-8")
+    # PUB-71's expected record is uncommitted (decision 0026 item 5): the stage
+    # reads it from the cache's local record, here an invented stand-in.
+    _local_record(tmp_path, json.dumps(INVENTED_PUB_71))
+    (folder / "PUB-71.json").write_text(json.dumps(INVENTED_PUB_71), encoding="utf-8")
     result = run_stage(tmp_path)
     assert result.mismatch == ""
     assert result.missing == ()
+
+
+@pytest.mark.public_data
+def test_pub71_matching_local_record_passes(tmp_path: Path) -> None:
+    """A local record matching the measured figure passes PUB-71."""
+    _local_record(tmp_path, json.dumps(INVENTED_PUB_71))
+    folder = tmp_path / "figures"
+    folder.mkdir()
+    (folder / "PUB-71.json").write_text(json.dumps(INVENTED_PUB_71), encoding="utf-8")
+    result = run_stage(tmp_path, required=("PUB-71",))
+    assert result.mismatch == ""
+    assert "PUB-71" not in result.missing
+
+
+@pytest.mark.public_data
+def test_pub71_differing_local_record_fails_by_figure(tmp_path: Path) -> None:
+    """A measured figure that disagrees with the local record fails by name."""
+    _local_record(tmp_path, json.dumps(INVENTED_PUB_71))
+    folder = tmp_path / "figures"
+    folder.mkdir()
+    planted = {**INVENTED_PUB_71, "national_all": "1"}
+    (folder / "PUB-71.json").write_text(json.dumps(planted), encoding="utf-8")
+    result = run_stage(tmp_path, required=("PUB-71",))
+    assert result.mismatch == "PUB-71"
+
+
+@pytest.mark.public_data
+def test_pub71_without_local_record_is_not_measured(tmp_path: Path) -> None:
+    """With no local record PUB-71 is reported not measured, never a pass."""
+    folder = tmp_path / "figures"
+    folder.mkdir()
+    (folder / "PUB-71.json").write_text(json.dumps(INVENTED_PUB_71), encoding="utf-8")
+    result = run_stage(tmp_path)
+    assert result.mismatch == ""
+    assert "PUB-71" in result.missing
+    required = run_stage(tmp_path, required=("PUB-71",))
+    assert required.mismatch == "PUB-71"
+    assert "PUB-71" in required.missing
+
+
+@pytest.mark.public_data
+@pytest.mark.parametrize(
+    "record",
+    [
+        json.dumps({"national_private": "1"}),
+        json.dumps({**INVENTED_PUB_71, "invented_extra": "1"}),
+        json.dumps({**INVENTED_PUB_71, "national_all": "not decimal text"}),
+        json.dumps({**INVENTED_PUB_71, "national_all": 7}),
+        "not json",
+    ],
+    ids=["missing-field", "extra-field", "not-decimal-text", "not-text", "malformed"],
+)
+def test_pub71_malformed_local_record_refused(tmp_path: Path, record: str) -> None:
+    """A local record of another shape is refused by one fixed reason."""
+    _local_record(tmp_path, record)
+    with pytest.raises(ValueError, match="local expectations record refused"):
+        run_stage(tmp_path)
 
 
 @pytest.mark.public_data

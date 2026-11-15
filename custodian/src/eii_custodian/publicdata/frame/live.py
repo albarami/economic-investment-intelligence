@@ -85,8 +85,7 @@ def build_live_frame(
             )
             writer.writeheader()
             writer.writerows(municipality_review)
-    alias_file = review / "district_layer_aliases.csv"
-    aliases = read_csv(alias_file)
+    aliases = district_aliases(review, cache)
     district_map, differences = join_districts(
         frame["district"],
         raw_layers["bnd_district_2020"],
@@ -214,6 +213,20 @@ def build_live_frame(
     )
     report.append("frame: partial; place points remain")
     return FrameResult(tables, report, sources, inventory)
+
+
+def district_aliases(review: Path, cache: Path) -> list[dict[str, str]]:
+    """Reviewed district aliases of the committed header plus the local file.
+
+    `bnd_district_2020` has no open licence (decision 0026 item 5): reviewed
+    alias rows live only in `cache/review/district_layer_aliases.csv` of the
+    uncommitted cache; the committed file keeps its header and no data row.
+    """
+    rows = read_csv(review / "district_layer_aliases.csv")
+    local = cache / "review" / "district_layer_aliases.csv"
+    if local.is_file():
+        rows += read_csv(local)
+    return rows
 
 
 def licensed_rows(boundaries: list[Boundary], kind: str) -> list[dict[str, object]]:
