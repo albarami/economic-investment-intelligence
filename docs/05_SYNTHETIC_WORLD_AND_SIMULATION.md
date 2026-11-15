@@ -632,7 +632,7 @@ Calibration anchors (section 3, ANCHORED) shape the world. Hold-outs are never r
 What each hold-out can and cannot show:
 
 - H1 tests within-zone placement, the only check with a fine official geography.
-- H2 tests the spatial spread of activity. The accident hour field does not behave like traffic (70.1% of 2024 records carry morning labels, counted by the mobility research through the portal API) [S33, S16], so it is never used.
+- H2 tests the spatial spread of activity. The accident hour field does not behave like traffic (the hour field's labels are not spread as traffic is) [S33, S16], so it is never used; the count was made by the mobility research through the portal API and stays in the uncommitted cache (PUB-12).
 - H3 tests the assumed parameter `mob.pt_share` more than the model; the scorecard says so. The congestion comparison above does the same for the assumed parameters of the assignment (section 14).
 - H6 tests the municipal blend of section 6 against a census year that the blend does not use. The years differ (2015 and May 2025 against 2020), so its tolerance is wide.
 - Electricity by zone is not a hold-out, because `pop.zone_scaling_exponent` uses it.

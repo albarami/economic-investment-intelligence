@@ -3,12 +3,16 @@
 Parsers that read the cached files belong to later tasks. Until a figure file
 is written into the cache, the stage records coverage not_measured and does
 not invent a value. A planted figure that differs from the published anchor
-fails.
+fails. PUB-71's expected figures are never committed: the stage reads them
+from one local record inside the uncommitted cache. A produced figure whose
+local record is absent still fails the build: the row keeps its not-measured
+coverage and is named so the build cannot succeed on missing evidence.
 """
 
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -19,8 +23,11 @@ from eii_custodian.publicdata.fetch.registry import Entry
 if TYPE_CHECKING:
     from eii_custodian.publicdata.fetch.build import FetchFailure
 
-# Anchors copied from docs/04_PUBLIC_DATA_PACK.md section 10. They are the
-# published figures the stage compares; this module does not compute them.
+# Anchors of the openly licensed rows, copied from docs/04_PUBLIC_DATA_PACK.md
+# section 10. They are the published figures the stage compares; this module
+# does not compute them. PUB-71's source has no open licence (decision 0026
+# item 5): its expected rounded results stay in one local record inside the
+# uncommitted public cache, and no value of it is committed.
 EXPECTED: dict[str, dict[str, str]] = {
     "PUB-62": {
         "zone_69_2021": "429964072",
@@ -90,13 +97,6 @@ EXPECTED: dict[str, dict[str, str]] = {
         "metro_2024_12": "5529167",
         "growth_0dp": "33",
     },
-    "PUB-71": {
-        "national_private": "1617208",
-        "national_all": "2050252",
-        "national_1dp": "78.9",
-        "zone_69_0dp": "72",
-        "zone_70_0dp": "45",
-    },
     "PUB-72": {
         "al_daayen_residents": "111282",
         "national_residents": "3219982",
@@ -106,16 +106,66 @@ EXPECTED: dict[str, dict[str, str]] = {
     "PUB-73": {"places_qa": "26383", "establishments_2020": "71203"},
 }
 
-SECTION_10_IDS = tuple(EXPECTED)
+SECTION_10_IDS: tuple[str, ...] = tuple(f"PUB-{number}" for number in range(62, 74))
+
+LOCAL_EXPECTATIONS_DIR = "local_expectations"
+LOCAL_RECORD_REFUSED = "local expectations record refused"
+_DECIMAL_TEXT = re.compile(r"-?\d+(?:\.\d+)?")
+# Field names of each regression row whose expected figures are kept only in
+# the uncommitted cache; a record of another shape is refused.
+_LOCAL_FIELDS: dict[str, tuple[str, ...]] = {
+    "PUB-71": (
+        "national_private",
+        "national_all",
+        "national_1dp",
+        "zone_69_0dp",
+        "zone_70_0dp",
+    ),
+}
 
 
 @dataclass(frozen=True)
 class StageResult:
-    """Coverage notes, and the first figure id that disagreed, if any."""
+    """Coverage notes, and the first figure id that disagreed, if any.
+
+    ``unrecorded`` names the first figure that was produced while its local
+    expectations record is absent; the row stays not measured and the build
+    must fail on it.
+    """
 
     missing: tuple[str, ...]
     mismatch: str
     failure: FetchFailure | None = None
+    unrecorded: str = ""
+
+
+def _local_expected(cache: Path, figure_id: str) -> dict[str, str] | None:
+    """Return the uncommitted expectations record, or None when absent.
+
+    The record lives at cache/LOCAL_EXPECTATIONS_DIR/<figure_id>.json. A
+    record of another shape — a missing or extra field, or a value that is
+    not decimal text — is refused by one fixed reason.
+    """
+    fields = _LOCAL_FIELDS.get(figure_id)
+    if fields is None:
+        return None
+    path = cache / LOCAL_EXPECTATIONS_DIR / f"{figure_id}.json"
+    if not path.is_file():
+        return None
+    try:
+        record = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        raise ValueError(f"{figure_id}: {LOCAL_RECORD_REFUSED}") from None
+    if (
+        not isinstance(record, dict)
+        or set(record) != set(fields)
+        or any(
+            not isinstance(value, str) or _DECIMAL_TEXT.fullmatch(value) is None
+            for value in record.values()
+        )
+    ):
+        raise ValueError(f"{figure_id}: {LOCAL_RECORD_REFUSED}")
+    return {name: record[name] for name in fields}
 
 
 def run_stage(
@@ -126,7 +176,13 @@ def run_stage(
     build_entries: Sequence[Entry] | None = None,
     build_lines: list[str] | None = None,
 ) -> StageResult:
-    """Compare figure files under cache/figures with the section 10 anchors."""
+    """Compare figure files under cache/figures with the section 10 anchors.
+
+    A figure with no committed anchor and no local record is reported like a
+    figure that cannot be measured today, never as a pass. A produced figure
+    whose local record is absent is named in ``unrecorded`` as well: its row
+    stays not measured and the build fails on the missing record.
+    """
     if build_entries is not None:
         from eii_custodian.publicdata.series.figures import finish_build
 
@@ -134,16 +190,20 @@ def run_stage(
             raise ValueError("selected fetch lines required")
         return StageResult((), "", finish_build(build_entries, cache, build_lines))
     missing: list[str] = []
+    unrecorded = ""
     if set(required) - set(SECTION_10_IDS):
         raise ValueError("unknown required regression")
     for figure_id in SECTION_10_IDS:
+        expected = EXPECTED.get(figure_id) or _local_expected(cache, figure_id)
         internal = cache / "series" / "regression" / f"{figure_id}.json"
         use_evidence = evidence or internal.is_file()
         path = internal if use_evidence else cache / "figures" / f"{figure_id}.json"
-        if not path.is_file():
+        if expected is None or not path.is_file():
             missing.append(figure_id)
             if figure_id in required:
                 return StageResult(tuple(missing), figure_id)
+            if expected is None and path.is_file() and not unrecorded:
+                unrecorded = figure_id
             continue
         got = json.loads(path.read_text(encoding="utf-8"))
         if use_evidence:
@@ -151,6 +211,6 @@ def run_stage(
 
             validate_figure(got)
             got = got["values"]
-        if got != EXPECTED[figure_id]:
+        if got != expected:
             return StageResult(tuple(missing), figure_id)
-    return StageResult(tuple(missing), "")
+    return StageResult(tuple(missing), "", unrecorded=unrecorded)

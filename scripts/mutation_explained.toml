@@ -1425,3 +1425,13 @@ reason = "For nonempty Decimal counts, sum starts with integer zero instead of D
 module = "core/src/eii_core/calc/public_series.py"
 mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public_series.py\n@@ -1,5 +1,5 @@\n def weighted_mean(groups: Mapping[str, Group]) -> tuple[Decimal, Decimal]:\n     \"\"\"Return paid workers and their weighted mean, without rounding.\"\"\"\n     workers = sum((count for count, _ in groups.values()), ZERO)\n-    bill = sum((count * wage for count, wage in groups.values()), ZERO)\n+    bill = sum((count * wage for count, wage in groups.values()), )\n     return workers, ratio(bill, workers)"
 reason = "For nonempty groups every count-times-wage term is Decimal and adding integer zero or Decimal zero gives the same bill sum. For empty groups the workers total is Decimal zero and ratio refuses the non-positive denominator before the bill is divided or returned. No returned value or refusal diagnostic changes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/stage.py"
+mutation = "--- src/eii_custodian/publicdata/stage.py\n+++ src/eii_custodian/publicdata/stage.py\n@@ -12,7 +12,7 @@\n     if not path.is_file():\n         return None\n     try:\n-        record = json.loads(path.read_text(encoding=\"utf-8\"))\n+        record = json.loads(path.read_text(encoding=\"UTF-8\"))\n     except json.JSONDecodeError:\n         raise ValueError(f\"{figure_id}: {LOCAL_RECORD_REFUSED}\") from None\n     if ("
+reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same decoder, so every byte string is read or refused as before."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/stage.py"
+mutation = "--- src/eii_custodian/publicdata/stage.py\n+++ src/eii_custodian/publicdata/stage.py\n@@ -35,7 +35,7 @@\n             if expected is None and path.is_file() and not unrecorded:\n                 unrecorded = figure_id\n             continue\n-        got = json.loads(path.read_text(encoding=\"utf-8\"))\n+        got = json.loads(path.read_text(encoding=\"UTF-8\"))\n         if use_evidence:\n             from eii_custodian.publicdata.series.figures import validate_figure"
+reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same decoder, so every byte string is read or refused as before."

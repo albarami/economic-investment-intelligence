@@ -288,6 +288,24 @@ def run_build(
                     stage.mismatch,
                 )
             )
+        elif stage.unrecorded:
+            failure = FetchFailure(
+                1,
+                stage.unrecorded,
+                "",
+                "public_data",
+                "local expectations record",
+                "missing",
+            )
+            lines.append(
+                fail_line(
+                    stage.unrecorded,
+                    "",
+                    "public_data",
+                    "local expectations record",
+                    "missing",
+                )
+            )
     _write_log(cache, lines, terms)
     return BuildOutcome(tuple(lines), failure)
 
