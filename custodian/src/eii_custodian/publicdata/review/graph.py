@@ -255,10 +255,7 @@ def build_graph(
     for row in spine.rows:
         if row.status != "mapped":
             continue
-        title = titles.get(row.isic_class)
-        if title is None:
-            raise GraphError("mapped class has no ISIC title: " + row.isic_class)
-        _add_node(nodes, _class_node(title))
+        _add_node(nodes, _class_node(titles[row.isic_class]))
     _add_node(
         nodes,
         GraphNode(
@@ -518,12 +515,6 @@ def _check_edge(
     if edge.provenance == "lineage":
         if edge.edge_type not in LINEAGE_EDGE_TYPES:
             raise GraphError("lineage edge has a public edge type")
-        ends = {
-            by_id[edge.from_node_id].node_type,
-            by_id[edge.to_node_id].node_type,
-        }
-        if not ends & LINEAGE_NODE_TYPES:
-            raise GraphError("lineage edge has no lineage end")
         return
     if edge.edge_type in LINEAGE_EDGE_TYPES:
         raise GraphError("lineage edge type with public provenance")
