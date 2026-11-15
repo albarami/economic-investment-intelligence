@@ -14,7 +14,7 @@ from eii_custodian.publicdata.fetch import build
 from eii_custodian.publicdata.places_fsq.assemble import _table_row
 from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
 from eii_custodian.publicdata.places_fsq.parse import parse_file
-from eii_custodian.publicdata.places_fsq.policy import assert_policy
+from eii_custodian.publicdata.places_fsq.policy import assert_policy, load_mapping
 
 
 def test_skipped_fsq_preserves_other_build_stages(tmp_path, monkeypatch):
@@ -94,5 +94,25 @@ def test_policy_text_is_read_as_utf8(tmp_path: Path) -> None:
     try:
         locale.setlocale(locale.LC_ALL, "C")
         assert_policy(path)
+    finally:
+        locale.setlocale(locale.LC_ALL, previous)
+
+
+def test_mapping_text_is_read_as_utf8(tmp_path: Path) -> None:
+    """An approved rationale survives even when the process locale is ASCII."""
+    path = tmp_path / "mapping.csv"
+    path.write_text(
+        "source_category_id,place_category_key,mapping_version,review_status,"
+        "reviewer_role,review_date,rationale\n"
+        "SYN-category,SYN-target,SYN-version,approved,SYN-reviewer,"
+        "2025-01-10,SYN-café rationale\n",
+        encoding="utf-8",
+    )
+    previous = locale.setlocale(locale.LC_ALL)
+    try:
+        locale.setlocale(locale.LC_ALL, "C")
+        loaded = load_mapping(path, frozenset({"SYN-target"}))
+        assert len(loaded) == 1
+        assert loaded[0].rationale == "SYN-café rationale"
     finally:
         locale.setlocale(locale.LC_ALL, previous)

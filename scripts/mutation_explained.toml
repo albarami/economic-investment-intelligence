@@ -1479,16 +1479,6 @@ reason = "table is one _table_row per row of account.kept, so the sequences have
 
 [[survivors]]
 module = "custodian/src/eii_custodian/publicdata/places_fsq/policy.py"
-mutation = "--- src/eii_custodian/publicdata/places_fsq/policy.py\n+++ src/eii_custodian/publicdata/places_fsq/policy.py\n@@ -1,6 +1,6 @@\n def load_mapping(path: Path, known_keys: frozenset[str]) -> tuple[CategoryMapping, ...]:\n     \"\"\"Load a reviewed mapping. A bad row refuses the file's use.\"\"\"\n-    with path.open(encoding=\"utf-8\", newline=\"\") as handle:\n+    with path.open(encoding=None, newline=\"\") as handle:\n         reader = csv.DictReader(line for line in handle if not line.startswith(\"#\"))\n         if reader.fieldnames is None or tuple(reader.fieldnames) != MAPPING_COLUMNS:\n             raise PlacesFsqError(\"mapping_header\")"
-reason = "Path.open treats encoding None as locale.getencoding(). This interpreter reports UTF-8, the same codec as utf-8, so the mapping text is unchanged."
-
-[[survivors]]
-module = "custodian/src/eii_custodian/publicdata/places_fsq/policy.py"
-mutation = "--- src/eii_custodian/publicdata/places_fsq/policy.py\n+++ src/eii_custodian/publicdata/places_fsq/policy.py\n@@ -1,6 +1,6 @@\n def load_mapping(path: Path, known_keys: frozenset[str]) -> tuple[CategoryMapping, ...]:\n     \"\"\"Load a reviewed mapping. A bad row refuses the file's use.\"\"\"\n-    with path.open(encoding=\"utf-8\", newline=\"\") as handle:\n+    with path.open(newline=\"\") as handle:\n         reader = csv.DictReader(line for line in handle if not line.startswith(\"#\"))\n         if reader.fieldnames is None or tuple(reader.fieldnames) != MAPPING_COLUMNS:\n             raise PlacesFsqError(\"mapping_header\")"
-reason = "Omitting encoding uses locale.getencoding(). This interpreter reports UTF-8, so the mapping text matches an explicit utf-8 encoding."
-
-[[survivors]]
-module = "custodian/src/eii_custodian/publicdata/places_fsq/policy.py"
 mutation = "--- src/eii_custodian/publicdata/places_fsq/policy.py\n+++ src/eii_custodian/publicdata/places_fsq/policy.py\n@@ -1,6 +1,6 @@\n def load_mapping(path: Path, known_keys: frozenset[str]) -> tuple[CategoryMapping, ...]:\n     \"\"\"Load a reviewed mapping. A bad row refuses the file's use.\"\"\"\n-    with path.open(encoding=\"utf-8\", newline=\"\") as handle:\n+    with path.open(encoding=\"UTF-8\", newline=\"\") as handle:\n         reader = csv.DictReader(line for line in handle if not line.startswith(\"#\"))\n         if reader.fieldnames is None or tuple(reader.fieldnames) != MAPPING_COLUMNS:\n             raise PlacesFsqError(\"mapping_header\")"
 reason = "Python resolves the codec names UTF-8 and utf-8 to the same codec, so the mapping text is unchanged."
 
