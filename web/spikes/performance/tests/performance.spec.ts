@@ -26,6 +26,19 @@ const HEXAGONS = 110000;
 const PARTICLES = 50000;
 const WALL_WIDTH = 1920;
 const WALL_HEIGHT = 1080;
+// Coarsened performance.now() steps by 0.1 ms. A stamp is on that grid when its
+// distance to the nearest multiple of this step is at most the tolerance.
+// 1e-6 ms is above binary rounding of a millisecond-scale stamp and below the
+// 0.005 ms resolution of an isolated clock, so a precise stamp is not mistaken
+// for a grid point.
+const COARSE_CLOCK_STEP_MS = 0.1;
+const COARSE_CLOCK_GRID_TOLERANCE_MS = 1e-6;
+
+function liesOnCoarseClockGrid(stamp: number): boolean {
+  const nearest =
+    Math.round(stamp / COARSE_CLOCK_STEP_MS) * COARSE_CLOCK_STEP_MS;
+  return Math.abs(stamp - nearest) <= COARSE_CLOCK_GRID_TOLERANCE_MS;
+}
 
 type Spike = NonNullable<Window['__spike']>;
 
@@ -109,6 +122,17 @@ async function open(
 test('the smoke orbit draws both layers and records a trace', async ({
   page,
 }) => {
+  const postedTimestamps: number[] = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname !== '/__perf/trace') return;
+    const raw = request.postData();
+    if (raw === null) return;
+    const body = JSON.parse(raw) as { timestamps?: unknown };
+    if (!Array.isArray(body.timestamps)) return;
+    for (const stamp of body.timestamps) {
+      if (typeof stamp === 'number') postedTimestamps.push(stamp);
+    }
+  });
   await page.addInitScript(() => {
     const see = () => {
       const text = document.querySelector('#renderer')?.textContent ?? '';
@@ -160,6 +184,10 @@ test('the smoke orbit draws both layers and records a trace', async ({
   );
   await expect(page.locator('#renderer')).toHaveText(spike.webglRenderer);
   expect(await page.evaluate(() => window.__rendererSeenBeforeOrbit)).toBe(
+    true,
+  );
+  expect(await page.evaluate(() => crossOriginIsolated)).toBe(true);
+  expect(postedTimestamps.some((stamp) => !liesOnCoarseClockGrid(stamp))).toBe(
     true,
   );
 });
@@ -395,6 +423,15 @@ test('a planted capped empty canvas is refused before the layers load', async ({
     page,
     '/en/_perf?plant=capped-frame-rate',
     'refused: capped-frame-rate 30',
+    'Synthetic passing adapter',
+  );
+});
+
+test('a planted coarse clock is refused before the orbit', async ({ page }) => {
+  await expectEarlyRefusal(
+    page,
+    '/en/_perf?plant=coarse-clock',
+    'refused: coarse-clock',
     'Synthetic passing adapter',
   );
 });

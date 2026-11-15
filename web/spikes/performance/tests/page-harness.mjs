@@ -112,6 +112,7 @@ export async function pageHarness(
     devicePixelRatio: 1,
     innerWidth: config.WALL_CSS_WIDTH,
     innerHeight: config.WALL_CSS_HEIGHT,
+    crossOriginIsolated: options.isolated !== false,
     addEventListener(name, callback) {
       handlers.window[name] = callback;
     },

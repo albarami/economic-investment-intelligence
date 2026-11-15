@@ -125,6 +125,8 @@ test('origin headers require strings and an exact same-origin value', async () =
         'content-type': 'text/plain',
         'content-security-policy': CSP,
         'cache-control': 'no-store',
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Embedder-Policy': 'require-corp',
       },
     },
   ]);
@@ -379,6 +381,10 @@ test('listening failures and Vite cleanup are observable without starting a nati
             host: '127.0.0.1',
             port: 0,
             strictPort: false,
+            headers: {
+              'Cross-Origin-Opener-Policy': 'same-origin',
+              'Cross-Origin-Embedder-Policy': 'require-corp',
+            },
           });
           assert.equal(options.logLevel, 'silent');
           assert.ok(options.configFile.endsWith('/performance/vite.config.ts'));

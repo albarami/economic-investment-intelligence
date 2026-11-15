@@ -25,6 +25,7 @@ test('page helper decisions preserve every supported profile and environment pla
     'remote-renderer',
     'capped-frame-rate',
     'slow-scene',
+    'coarse-clock',
   ]) {
     assert.equal(m.environmentGate('gate', plant), true);
     assert.equal(m.environmentGate('smoke', plant), false);
@@ -38,7 +39,7 @@ test('page helper decisions preserve every supported profile and environment pla
     m.plantedRenderer('real', 'remote-renderer'),
     'Microsoft Remote Display Adapter',
   );
-  for (const plant of ['capped-frame-rate', 'slow-scene'])
+  for (const plant of ['capped-frame-rate', 'slow-scene', 'coarse-clock'])
     assert.equal(m.plantedRenderer('real', plant), 'Synthetic passing adapter');
   assert.equal(m.plantedRenderer('real', ''), 'real');
   assert.equal(m.rendererLine('   '), 'none is available');
@@ -140,6 +141,69 @@ test('posting preserves protocol fields and all response failure forms', async (
     assert.deepEqual(args, ['POST', '/__perf/trace']);
   for (const args of h.sent.headers)
     assert.deepEqual(args, ['content-type', 'application/json']);
+});
+
+test('a coarse clock is refused after the renderer and before the empty canvas', async () => {
+  const planted = await pageHarness('', false, false, {
+    search: '?plant=coarse-clock',
+    isolated: true,
+  });
+  assert.equal(planted.window.__spike.failure, 'coarse-clock');
+  assert.equal(planted.window.__spike.phase, 'failed');
+  assert.equal(
+    planted.nodes.get('#map-failure').textContent,
+    'refused: coarse-clock',
+  );
+  assert.equal(
+    planted.nodes.get('#renderer').textContent,
+    'Synthetic passing adapter',
+  );
+  assert.equal(planted.input, undefined);
+  assert.equal(planted.orbit, undefined);
+  assert.equal(planted.requests.length, 0);
+  assert.equal(planted.window.__spike.hexagonInstances, 0);
+  assert.equal(planted.window.__spike.particleInstances, 0);
+
+  const unmarked = await pageHarness('', false, false, {
+    search: '?profile=gate',
+    isolated: false,
+  });
+  assert.equal(unmarked.window.__spike.failure, 'coarse-clock');
+  assert.equal(unmarked.input, undefined);
+  assert.equal(unmarked.orbit, undefined);
+  assert.equal(unmarked.requests.length, 0);
+
+  const software = await pageHarness('', false, false, {
+    search: '?plant=software-renderer',
+    isolated: false,
+  });
+  assert.equal(software.window.__spike.failure, 'software-renderer');
+  assert.equal(
+    software.nodes.get('#map-failure').textContent,
+    'refused: software-renderer',
+  );
+  assert.equal(software.input, undefined);
+
+  const capped = await pageHarness('', false, false, {
+    search: '?plant=capped-frame-rate',
+    isolated: false,
+  });
+  assert.equal(capped.window.__spike.failure, 'coarse-clock');
+  assert.equal(
+    capped.nodes.get('#map-failure').textContent,
+    'refused: coarse-clock',
+  );
+  assert.equal(capped.input, undefined);
+  assert.equal(capped.requests.length, 0);
+
+  const smoke = await pageHarness('', false, false, {
+    search: '?profile=smoke&plant=coarse-clock',
+    isolated: false,
+  });
+  assert.equal(smoke.window.__spike.failure, '');
+  assert.equal(smoke.window.__spike.phase === 'failed', false);
+  assert.notEqual(smoke.input, undefined);
+  assert.equal(smoke.requests.length, 0);
 });
 
 test('environment refusal happens before layers, orbit and post', async () => {
@@ -298,4 +362,15 @@ test('scene plants keep explicit load choices and failures visible', async () =>
     [0, 50, 100, 150, 200, 250, 300, 350, 400],
   );
   assert.equal(slow.requests[0].summary.shareUnderBudget, 0);
+});
+
+test('the smoke profile skips the empty-canvas gate', async () => {
+  const smoke = await pageHarness('', false, false, {
+    search: '?profile=smoke&plant=capped-frame-rate',
+  });
+  assert.equal(smoke.window.__spike.failure, '');
+  assert.equal(smoke.window.__spike.phase === 'failed', false);
+  assert.notEqual(smoke.input, undefined);
+  assert.equal(smoke.requests.length, 0);
+  assert.equal(smoke.nodes.get('#map-failure').textContent, '');
 });
