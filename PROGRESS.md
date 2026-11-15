@@ -275,6 +275,7 @@ PROPOSED OPEN ITEMS:
 6. Keep personal names, attendee details and quotations out of this public ledger.
 7. An evidence entry names the tested work commit. It is added by a ledger commit on the same branch that changes only ledger files (PROGRESS.md, OPEN_ITEMS.md and the status lines of TASKS.md), so the pull-request head differs from the tested commit by ledger text alone, and the checks are run again on that head. The reviewer's verdict and the merge record of a task are entered by the next pull request. Confirmed by the owner on 2026-11-11.
 8. A continuous-integration run is cited by its full link, never by a bare run number.
+9. A merge train ([decision 0032](docs/decisions/0032-approved-tasks-of-one-slice-may-merge-as-a-train.md); rule 33 of [AGENTS.md](AGENTS.md)) has one evidence entry, and rule 7 is read for it as follows. The entry names the joined work commit and, for every task of the train, its approved local commits. It holds every task's own rows and the verdict that another maker gave on the task's local commit: for a task of a train that verdict is entered by the train's own ledger, not by the next pull request. The entry is added by a ledger commit on the train's branch that changes only the records: the ledger files of rule 7 and the pin headings that decision 0032 item 2 counts among the records. The required hosted checks run once, on the joined head, which differs from the tested joined work commit by those records alone. The confirmation of the joined head by another maker and the merge record are entered by the next pull request. Added with decision 0032 on 2026-11-15.
 
 ## Task and gate evidence
 
@@ -22404,6 +22405,105 @@ Notes:     The whole test command on the build machine with a fresh seed, at the
 ### D0030 — Decision 0030: the frame's grid by index ownership and two nullable keys
 Commit:    bdd8de0eb7aa193993102a9601029834c6803154
 Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','907730582b17da16035146ab6e346a6c61fc5ce1..bdd8de0eb7aa193993102a9601029834c6803154'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The work commit has a Conventional Commit subject.
+```
+
+### D0032 — Decision 0032: approved tasks of one slice may merge as a train: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/50 )
+
+- What it is: decision record 0032 and its amendments to the workflow rules (documents only; no code, no check script, no workflow file). The decision is the owner's own note of 2026-11-15, quoted word for word once in the record, and its status is Accepted. Tasks of one slice that are each approved on their own local commit by another maker, and whose dependencies are merged or ride in the same train, may be joined into one branch and one pull request: one ledger with every task's own rows and verdict, the six required hosted checks once on the joined head, the lead's whole test with a fresh seed on the exact merge result, and one confirmation by another maker that the joined head holds exactly the approved commits and the records. A joined head that fails a check is split and the parts are retried. Every task keeps its own plan, build, checks and review. Gates are unchanged.
+- Why: approved tasks waited one behind another at the merge line, and each single pull request costs one run of the hosted checks and one whole test, although the work itself is already reviewed.
+- The lead's reading, which the record carries as items 2 and 3 and which the review judges: "exactly the approved commits" means that the change of each task's approved local commits arrives on the joined head unchanged, shown by a script file by file, with every difference that the join itself forced listed with its reason; a forced difference in a task's code or test is not a record, and that task then gets its own confirmation by another maker or leaves the train; the records are the ledger rows, the status lines of TASKS.md, the open items and the pin headings that the ledger adds. Builder and reviewer of a task stay from different makers, the confirmation of a train comes from a maker other than the one that joined it, no check is dropped or run on less, pushes stay one at a time, and decision records and other documents-only changes keep their own pull requests unless they are a task's own documents.
+- Class: Standard (workflow rules; no privacy, security, number or release rule changes). Lead: Anthropic (Claude Fable 5.2): the reading of the note and the brief. Editor: OpenAI GPT-6 through the Codex command-line tool (one pass, 310 s): the record's text in the form of record 0027 and every amended passage. The lead read the record and the whole change word by word and changed nothing in it.
+- The change: the new record file and eight tracked files. AGENTS.md and CLAUDE.md, rule 33 (the full conditions of the exception) and their status rows, byte-identical. TASKS.md, Queue rules: the one-task rule, the built-ahead task's push and merge order, and the gate-fix task's own branch. README.md: the workflow sentence. Document 14: the two bullets of "In brief", PLN-04 and steps 2, 7, 8 and 10 of section 3. Document 15: REV-02, REV-04, REV-09, REV-11, REV-12 and REV-41, and steps 1 and 4 of section 1.1. Document 12: TST-162, TST-163, TST-164 and TST-170. The decision index of docs/README.md. Every amended passage keeps its sentence and gains the exception with a citation of rule 33 and decision 0032; no earlier decision record is edited.
+- Left unchanged, by the editor's search and the lead's reading: the passages that say one accountable builder, one review and one log per task (they stay true in a train); the rule that every pull-request stage passes on the final head; the routing of proposed open items to the next pull request. No script or hosted workflow enforces one task per pull request, so no check changes.
+- Evidence rule 9 of this ledger is added by this entry's ledger commit. It says how rule 7 is read for a train: one evidence entry that names the joined work commit and each task's approved local commits; every task's own rows and its verdict in the train's own ledger; a ledger commit that changes only the records, the pin headings of decision 0032 item 2 among them; the required hosted checks once on the joined head; the confirmation of the joined head and the merge record by the next pull request.
+- The repository's checks cannot see whether a passage says exactly the owner's note: that is the reviewer's judgement, with the note and the lead's reading in the review pack. The documentation check also ran with the owner's private pattern list.
+- The closing records of pull requests 47, 36 and 49 are not in this entry: they are entered by the ledger of the first train of slice S2, which follows this pull request and numbers the open items that those records enter.
+- Evidence: the commands below at the work commit.
+
+#### Evidence for the work commit `069e6ea5f02018563c45a53a989acf32c9a442e1`
+
+```text
+### D0032 — Decision 0032: approved tasks of one slice may merge as a train
+Commit:    069e6ea5f02018563c45a53a989acf32c9a442e1
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 452 text files, 69 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with the record and every amended document: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns. It also ran with the owner's private pattern list.
+```
+
+```text
+### D0032 — Decision 0032: approved tasks of one slice may merge as a train
+Commit:    069e6ea5f02018563c45a53a989acf32c9a442e1
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### D0032 — Decision 0032: approved tasks of one slice may merge as a train
+Commit:    069e6ea5f02018563c45a53a989acf32c9a442e1
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical after the amendment of rule 33 and of their status rows.
+```
+
+```text
+### D0032 — Decision 0032: approved tasks of one slice may merge as a train
+Commit:    069e6ea5f02018563c45a53a989acf32c9a442e1
+Command:   bash -c "git diff --name-only 8807b84f8a686ffbefab49c6e549d8befa63d683 HEAD -- docs/decisions/ | grep -v 0032-approved-tasks-of-one-slice | wc -l"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no earlier decision record is changed)
+Seed:      none
+Notes:     The amendment is a new record (rule 46); this row proves on the committed tree that no accepted record was edited.
+```
+
+```text
+### D0032 — Decision 0032: approved tasks of one slice may merge as a train
+Commit:    069e6ea5f02018563c45a53a989acf32c9a442e1
+Command:   bash -c "git diff --name-only 8807b84f8a686ffbefab49c6e549d8befa63d683 HEAD -- scripts .github web core custodian product gateway evals eii | wc -l"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no code, check script or workflow file is changed)
+Seed:      none
+Notes:     The record changes documents only: no script and no hosted workflow enforces one task per pull request, so no check changes.
+```
+
+```text
+### D0032 — Decision 0032: approved tasks of one slice may merge as a train
+Commit:    069e6ea5f02018563c45a53a989acf32c9a442e1
+Command:   ./eii test --seed 2026111469
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    2299 passed, 0 failed, 0 skipped
+Seed:      2026111469
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### D0032 — Decision 0032: approved tasks of one slice may merge as a train
+Commit:    069e6ea5f02018563c45a53a989acf32c9a442e1
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','8807b84f8a686ffbefab49c6e549d8befa63d683..069e6ea5f02018563c45a53a989acf32c9a442e1'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
 Exit code: 0
 Date:      2026-11-15
 Run by:    lead (local)
