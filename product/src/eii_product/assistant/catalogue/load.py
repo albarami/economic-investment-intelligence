@@ -7,7 +7,7 @@ import json
 from collections.abc import Callable
 from pathlib import Path
 
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 from eii_product.assistant.catalogue.directives import _directives
 from eii_product.assistant.catalogue.entries import (

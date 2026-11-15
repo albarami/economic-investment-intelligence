@@ -7,10 +7,16 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
+import tomllib
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import workspace_guard as guard
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -42,7 +48,7 @@ FROM_PARENT = (
 ALONE: dict[str, tuple[int, str]] = {
     "UV_PYTHON": (2, "No interpreter found at path"),
     "UV_NO_SOURCES": (1, "needs to be updated"),
-    "UV_EXCLUDE_NEWER": (1, "needs to be updated"),
+    "UV_EXCLUDE_NEWER": (1, "published after the exclude newer time"),
     "UV_RESOLUTION": (1, "needs to be updated"),
 }
 
@@ -151,6 +157,89 @@ def observe(envdir: Path, work: Path, env: dict[str, str]) -> list[list[object]]
     return rows
 
 
+def _seed_copy(src: str, dst: str) -> str:
+    try:
+        os.link(src, dst)
+    except OSError:
+        shutil.copy2(src, dst)
+    return dst
+
+
+def seed_cache(cache: Path) -> None:
+    """Seed a child uv cache from the local cache of the synced environment."""
+    proc = subprocess.run(
+        [UV, "cache", "dir"],
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+    if proc.returncode != 0:
+        raise RuntimeError(f"uv cache dir failed: {proc.stderr.strip()}")
+    shutil.copytree(
+        Path(proc.stdout.strip()),
+        cache,
+        copy_function=_seed_copy,
+        dirs_exist_ok=True,
+    )
+
+
+def member_manifest(root: Path, member: str) -> dict[str, object]:
+    """Parse one member manifest."""
+    text = (root / member / "pyproject.toml").read_text(encoding="utf-8")
+    return tomllib.loads(text)
+
+
+def workspace_package_names(root: Path) -> set[str]:
+    """Return the distribution names of the workspace members."""
+    names: set[str] = set()
+    for member in guard.MEMBER_DIRS:
+        project = member_manifest(root, member).get("project", {})
+        if isinstance(project, dict):
+            name = project.get("name")
+            if isinstance(name, str):
+                names.add(guard.normalise(name))
+    return names
+
+
+def declared_third_party_names(root: Path) -> set[str]:
+    """Return the non-member names the member manifests declare."""
+    members = workspace_package_names(root)
+    declared: set[str] = set()
+    for member in guard.MEMBER_DIRS:
+        project = member_manifest(root, member).get("project", {})
+        if not isinstance(project, dict):
+            continue
+        dependencies = project.get("dependencies", [])
+        if not isinstance(dependencies, list):
+            continue
+        for dep in dependencies:
+            if not isinstance(dep, str):
+                continue
+            name = guard.requirement_name(dep)
+            if name is not None and name not in members:
+                declared.add(name)
+    return declared
+
+
+def expected_installed_names(root: Path) -> set[str]:
+    """Return workspace names plus the locked names of declared third-party deps."""
+    text = (root / "uv.lock").read_text(encoding="utf-8")
+    lock = tomllib.loads(text)
+    locked = {
+        guard.normalise(str(package["name"]))
+        for package in lock.get("package", [])
+        if isinstance(package, dict) and isinstance(package.get("name"), str)
+    }
+    declared = declared_third_party_names(root) & locked
+    return workspace_package_names(root) | declared
+
+
+def installed_names_equal(installed: set[str], expected: set[str]) -> bool:
+    """The one comparison: installed names equal the expected names exactly."""
+    return installed == expected
+
+
 class CleanEnvironment(unittest.TestCase):
     sync: subprocess.CompletedProcess[str]
     lock_before: bytes
@@ -174,6 +263,7 @@ class CleanEnvironment(unittest.TestCase):
         cls.work.mkdir()
         cls.env = base / "env"
         copy_workspace(cls.ws)
+        seed_cache(cls.cache)
         cls.lock_before = (cls.ws / "uv.lock").read_bytes()
         cls.sync = run(
             [UV, *SYNC_OFFLINE],
@@ -185,6 +275,7 @@ class CleanEnvironment(unittest.TestCase):
     def test_lock_is_current(self) -> None:
         cache = Path(self._tmp.name) / "lock-cache"
         cache.mkdir(exist_ok=True)
+        seed_cache(cache)
         proc = run([UV, "lock", "--check", "--offline"], REPO_ROOT, child_env(cache))
         self.assertEqual(proc.returncode, 0, proc.stderr)
 
@@ -196,6 +287,7 @@ class CleanEnvironment(unittest.TestCase):
         ws = root / "ws"
         cache.mkdir()
         ws.mkdir()
+        seed_cache(cache)
         copy_workspace(ws)
         root_toml = (ws / "pyproject.toml").read_text(encoding="utf-8")
         stripped, removed = re.subn(DEPENDENCY_GROUPS_TABLE, "", root_toml)
@@ -257,6 +349,7 @@ class CleanEnvironment(unittest.TestCase):
         work = root / "work"
         cache.mkdir()
         work.mkdir()
+        seed_cache(cache)
         proc = run(
             [UV, "venv", "--python", "3.14", "--offline", str(bare)],
             root,
@@ -273,7 +366,9 @@ class CleanEnvironment(unittest.TestCase):
                 self.assertNotEqual(imp.returncode, 0)
                 self.assertIn("ModuleNotFoundError", imp.stderr)
 
-    def test_uv_pip_list_names_the_four_packages(self) -> None:
+    def test_installed_names_equal_the_workspace_and_the_locked_declared_packages(
+        self,
+    ) -> None:
         proc = run(
             [
                 UV,
@@ -289,10 +384,20 @@ class CleanEnvironment(unittest.TestCase):
             child_env(self.cache),
         )
         self.assertEqual(proc.returncode, 0, proc.stderr)
-        names = {row["name"] for row in json.loads(proc.stdout)}
-        self.assertEqual(
-            names, {"eii-core", "eii-custodian", "eii-gateway", "eii-product"}
+        installed = {
+            guard.normalise(str(row["name"])) for row in json.loads(proc.stdout)
+        }
+        expected = expected_installed_names(REPO_ROOT)
+        self.assertTrue(installed_names_equal(installed, expected))
+        declared = sorted(expected - workspace_package_names(REPO_ROOT))
+        self.assertTrue(declared)
+        plants = (
+            ("undeclared", installed | {"eii-undeclared-plant"}),
+            ("declared-missing", installed - {declared[0]}),
         )
+        for label, corrupted in plants:
+            with self.subTest(plant=label):
+                self.assertFalse(installed_names_equal(corrupted, expected))
 
     def test_hostile_surroundings_do_not_change_the_result(self) -> None:
         tmp = tempfile.TemporaryDirectory()
@@ -320,6 +425,9 @@ class CleanEnvironment(unittest.TestCase):
             hostile,
         ):
             path.mkdir(parents=True)
+        seed_cache(cache)
+        seed_cache(cache2)
+        seed_cache(cache3)
         copy_workspace(ws)
         copy_workspace(ws3)
         (hostile / "uv").mkdir()
@@ -371,9 +479,11 @@ class CleanEnvironment(unittest.TestCase):
                 ws,
                 e,
             )
-            names = {row["name"] for row in json.loads(pip.stdout)}
-            self.assertEqual(
-                names, {"eii-core", "eii-custodian", "eii-gateway", "eii-product"}
+            names = {
+                guard.normalise(str(row["name"])) for row in json.loads(pip.stdout)
+            }
+            self.assertTrue(
+                installed_names_equal(names, expected_installed_names(REPO_ROOT))
             )
             self.assertEqual(observe(self.env, work, e), clean)
 
@@ -412,6 +522,7 @@ class CleanEnvironment(unittest.TestCase):
                 alone_count += 1
                 folder = root / f"alone-{name}"
                 folder.mkdir()
+                seed_cache(folder)
                 merged = with_process_tmp(
                     {**snapshot, "UV_CACHE_DIR": str(folder), name: h[name]},
                     folder,

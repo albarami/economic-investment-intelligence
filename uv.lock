@@ -265,10 +265,14 @@ version = "0.0.0"
 source = { editable = "product" }
 dependencies = [
     { name = "eii-core" },
+    { name = "pyyaml" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "eii-core", editable = "core" }]
+requires-dist = [
+    { name = "eii-core", editable = "core" },
+    { name = "pyyaml", specifier = "==6.0.3" },
+]
 
 [[package]]
 name = "eii-workspace"
