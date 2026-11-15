@@ -17,7 +17,9 @@ from shapely import point_on_surface
 from shapely.geometry import Point
 from shapely.geometry.base import BaseGeometry
 
-from eii_core.calc.building_heights import largest_overlap
+from eii_core.calc.building_heights import height_value, largest_overlap
+
+from .model import HeightError
 
 if TYPE_CHECKING:
     from .read import WsfGrid
@@ -82,12 +84,27 @@ def wsf_value(grid: WsfGrid, point: Point) -> Decimal | None:
 def wsf3d_height(
     point: Point, files: tuple[tuple[str, WsfGrid], ...]
 ) -> Decimal | None:
-    """The first file in sorted order that gives the point a value."""
+    """The one file's cell value; two or more files giving a value refuse.
+
+    A file whose cell at the point is a no-data cell or outside its raster
+    gives no value and does not take part; one whose value is not a usable
+    height gives no value either, and the bad value is handed on so the
+    choice can count it.
+    """
+    found: list[Decimal] = []
+    usable: list[Decimal] = []
     for _name, grid in sorted(files, key=lambda item: item[0]):
         value = wsf_value(grid, point)
-        if value is not None:
-            return value
-    return None
+        if value is None:
+            continue
+        found.append(value)
+        if height_value(value) is not None:
+            usable.append(value)
+    if len(usable) > 1:
+        raise HeightError("wsf3d_overlap")
+    if usable:
+        return usable[0]
+    return found[0] if found else None
 
 
 __all__ = [

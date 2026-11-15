@@ -15,9 +15,11 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import rasterio
 import yaml
 from custodian.tests.fixtures.heights import invented
 from custodian.tests.repository_root import repository_root
+from rasterio.transform import from_origin
 from shapely.geometry import Point, Polygon
 
 from eii_core.calc.building_heights import floor_height, metres
@@ -25,6 +27,7 @@ from eii_custodian.publicdata import heights as heights_package
 from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response
+from eii_custodian.publicdata.heights import step
 from eii_custodian.publicdata.heights.manifest import (
     ESTIMATE_LABEL,
     check_row,
@@ -466,12 +469,17 @@ def test_a_no_data_cell_and_a_point_outside_give_no_value() -> None:
     assert wsf_value(grid, Point(0.5, 0.0)) is None
 
 
-def test_two_wsf_files_sort_by_name_never_by_grid() -> None:
-    """The file order is the name sort; a comparison of grids would crash."""
+def test_two_wsf_files_giving_values_at_one_point_are_refused() -> None:
+    """V11: two files that both give a value at the point refuse, never choose."""
     low = _grid([[7]], 1, 1)
     high = _grid([[9]], 1, 1)
     files = (("b", high), ("a", low))
-    assert wsf3d_height(Point(0.5, 0.5), files) == Decimal(7)
+    with pytest.raises(HeightError, match="wsf3d_overlap"):
+        wsf3d_height(Point(0.5, 0.5), files)
+    nodata = _grid([[-99999]], 1, 1)
+    assert wsf3d_height(Point(0.5, 0.5), (("a", nodata), ("b", low))) == Decimal(7)
+    zero = _grid([[0]], 1, 1)
+    assert wsf3d_height(Point(0.5, 0.5), (("a", zero), ("b", low))) == Decimal(7)
 
 
 def _sources(tmp_path: Path, entries, rules=None, bodies=()):
@@ -880,6 +888,94 @@ def test_a_long_expansion_statistic_is_written_at_the_stated_decimals(
     assert block["mean_absolute_error_m"] == "0.01"
 
 
+def test_a_non_positive_wsf_cell_is_counted_and_never_a_crash(
+    tmp_path: Path,
+) -> None:
+    """V1: raster [[0, 5]] — the recorded 30 wins and each 0 cell is counted."""
+    buildings = tmp_path / "data" / "assets" / "buildings" / "buildings.geojson"
+    buildings.parent.mkdir(parents=True, exist_ok=True)
+    buildings.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-0001", invented.square(0.1, 0.1, 0.5), 30, None
+                ),
+                invented.building_feature(
+                    "SYN-B-0002", invented.square(0.6, 0.7, 0.3), None, None
+                ),
+                invented.building_feature(
+                    "SYN-B-0003", invented.square(1.1, 0.1, 0.5), None, None
+                ),
+            ]
+        )
+    )
+    wsf_row = invented.entry("bldg_wsf3d", extension="tif")
+    cache = tmp_path / "data" / "public_cache"
+    invented.store(
+        cache, wsf_row, invented.wsf_bytes(tmp_path / "w.tif", [[0, 5]], 2, 1)
+    )
+    out_dir = tmp_path / "data" / "assets" / "heights"
+    lines: list[str] = []
+    build_heights(
+        cache,
+        (wsf_row,),
+        buildings,
+        out_dir,
+        lines,
+        invented.rules_file(tmp_path / "rules.yaml"),
+    )
+    rows = {row["building_id"]: row for row in _rows(out_dir)}
+    assert rows["SYN-B-0001"]["height_m"] == "30.00"
+    assert rows["SYN-B-0001"]["height_source"] == "recorded"
+    assert rows["SYN-B-0002"]["height_source"] == "none"
+    assert rows["SYN-B-0003"]["height_m"] == "5.00"
+    assert rows["SYN-B-0003"]["height_source"] == "wsf3d"
+    block = _manifest(out_dir)
+    assert block["no_value_reasons"] == {"wsf3d_value_not_positive": 2}
+    assert block["none_reasons"] == {"not_fetched": 1}
+
+
+def test_a_nan_wsf_cell_is_no_value_not_a_crash(tmp_path: Path) -> None:
+    """V1: a NaN cell gives no value and is counted, never a crash."""
+    buildings = tmp_path / "buildings.geojson"
+    buildings.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-0001", invented.square(0.1, 0.1, 0.5), None, None
+                )
+            ]
+        )
+    )
+    wsf_row = invented.entry("bldg_wsf3d", extension="tif")
+    cache = tmp_path / "cache"
+    invented.store(
+        cache,
+        wsf_row,
+        invented.wsf_bytes(tmp_path / "w.tif", [[float("nan")]], 1, 1),
+    )
+    out_dir = tmp_path / "out"
+    build_heights(
+        cache,
+        (wsf_row,),
+        buildings,
+        out_dir,
+        [],
+        invented.rules_file(tmp_path / "rules.yaml"),
+    )
+    row = _rows(out_dir)[0]
+    assert row["height_source"] == "none"
+    assert _manifest(out_dir)["no_value_reasons"] == {"wsf3d_value_not_positive": 1}
+
+
+def test_the_pass_line_names_fallback_buildings(tmp_path: Path) -> None:
+    """V10: the PASS line counts buildings whose source is a fallback."""
+    _out_dir, lines = _card_setup(tmp_path)
+    (line,) = [line for line in lines if line.startswith("PASS heights")]
+    assert "fallback_buildings=3" in line
+    assert "sources=" not in line
+
+
 def test_no_float_call_converts_a_figure_in_the_heights_package(
     tmp_path: Path,
 ) -> None:
@@ -906,3 +1002,645 @@ def test_the_heights_package_has_no_numeric_storey_literal() -> None:
                     path,
                     node.lineno,
                 )
+
+
+def _raw_building_table(properties_json: str) -> bytes:
+    """A building table with literal JSON properties (for 1e60, dup keys)."""
+    ring = json.dumps([invented.square(0, 0, 1)])
+    return (
+        '{"type": "FeatureCollection", "features": [{"type": "Feature",'
+        ' "geometry": {"type": "Polygon", "coordinates": ' + ring + "},"
+        ' "properties": ' + properties_json + "}]}"
+    ).encode()
+
+
+def test_a_repeated_key_in_the_building_table_is_refused(tmp_path: Path) -> None:
+    """V6: an object holding a key twice is refused, naming the key, never the value."""
+    path = tmp_path / "dup.geojson"
+    path.write_bytes(
+        _raw_building_table(
+            '{"building_id": "SYN-B-0001", "recorded_height_m": 30,'
+            ' "recorded_height_m": null, "floor_count": 8,'
+            ' "footprint_source_id": "SYN-FOOT"}'
+        )
+    )
+    with pytest.raises(HeightError) as err:
+        load_buildings(path)
+    assert err.value.name == "building_table"
+    assert err.value.detail == "recorded_height_m"
+
+
+def test_a_recorded_height_too_large_for_the_context_is_refused(
+    tmp_path: Path,
+) -> None:
+    """V2: a recorded 1e60 cannot round at the stated places; named refusal."""
+    path = tmp_path / "huge.geojson"
+    path.write_bytes(
+        _raw_building_table(
+            '{"building_id": "SYN-B-0001", "recorded_height_m": 1e60,'
+            ' "floor_count": null, "footprint_source_id": "SYN-FOOT"}'
+        )
+    )
+    with pytest.raises(HeightError) as err:
+        load_buildings(path)
+    assert err.value.name == "bad_recorded_height_m"
+
+
+def test_a_recorded_height_that_rounds_to_zero_is_refused(tmp_path: Path) -> None:
+    """V7: a recorded 0.004 is refused as a zero is, with the zero's reason."""
+    path = tmp_path / "zero.geojson"
+    path.write_bytes(
+        _raw_building_table(
+            '{"building_id": "SYN-B-0001", "recorded_height_m": 0.004,'
+            ' "floor_count": 8, "footprint_source_id": "SYN-FOOT"}'
+        )
+    )
+    with pytest.raises(HeightError) as err:
+        load_buildings(path)
+    assert err.value.name == "bad_recorded_height_m"
+
+
+def test_a_floor_product_too_large_for_the_context_is_refused(
+    tmp_path: Path,
+) -> None:
+    """V2: a valid floor count times a valid storey can still overflow."""
+    rules = invented.rules_file(tmp_path / "r.yaml", storey="4E+47")
+    path = tmp_path / "buildings.geojson"
+    path.write_bytes(
+        _raw_building_table(
+            '{"building_id": "SYN-B-0001", "recorded_height_m": null,'
+            ' "floor_count": 4e47, "footprint_source_id": "SYN-FOOT"}'
+        )
+    )
+    with pytest.raises(HeightError) as err:
+        build_heights(tmp_path / "cache", (), path, tmp_path / "out", [], rules)
+    assert err.value.name == "bad_floor_count"
+
+
+def test_a_rules_file_that_is_not_yaml_is_a_named_refusal(tmp_path: Path) -> None:
+    """V2: a rules file that is not YAML is refused as rules_root."""
+    path = tmp_path / "rules.yaml"
+    path.write_text("][")
+    with pytest.raises(HeightError) as err:
+        load_rules(path)
+    assert err.value.name == "rules_root"
+
+
+def test_a_wsf_body_that_is_not_a_raster_is_a_named_refusal(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """V2: a WSF body rasterio cannot open is structure_mismatch, with FAIL."""
+    row = invented.entry("bldg_wsf3d", extension="tif")
+    rules = invented.rules_file(tmp_path / "rules.yaml")
+    cache = tmp_path / "data" / "public_cache"
+    invented.store(cache, row, b"this is not a raster, invented")
+    with pytest.raises(HeightError) as err:
+        read_sources(cache, (row,), load_rules(rules))
+    assert err.value.name == "structure_mismatch"
+
+    buildings = tmp_path / "data" / "assets" / "buildings" / "buildings.geojson"
+    buildings.parent.mkdir(parents=True, exist_ok=True)
+    buildings.write_bytes(
+        invented.buildings_bytes(
+            [invented.building_feature("SYN-B-0001", invented.square(0, 0, 1), 30, 8)]
+        )
+    )
+    # The committed rules still mark the live structures unconfirmed, so the
+    # step's FAIL line is driven through this confirmed-structure rules file.
+    real_build_heights = step.build_heights
+
+    def with_confirmed_rules(*args, **kwargs):
+        return real_build_heights(*args, rules_path=rules, **kwargs)
+
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.step.build_heights",
+        with_confirmed_rules,
+    )
+
+    def transport(url: str) -> Response:
+        return Response(final_url=url, body=b"this is not a raster, invented", hops=())
+
+    outcome = run_build((row,), transport, cache, _clock, _sleep)
+    assert outcome.failure is not None
+    assert outcome.failure.check == "structure_mismatch"
+    assert any("FAIL heights" in line for line in outcome.lines)
+
+
+def test_a_receipt_that_is_not_json_is_a_named_refusal(tmp_path: Path) -> None:
+    """V2: a receipt that is not JSON is refused as cache_receipt."""
+    row = invented.entry("bldg_3dglobfp", extension="geojson")
+    cache = tmp_path / "cache"
+    invented.store(cache, row, invented.globfp_bytes([(invented.square(0, 0, 1), 7)]))
+    meta = next((cache / row.key).glob("*.meta.json"))
+    meta.write_text("this is not json {")
+    with pytest.raises(HeightError) as err:
+        read_sources(
+            cache, (row,), load_rules(invented.rules_file(tmp_path / "r.yaml"))
+        )
+    assert err.value.name == "cache_receipt"
+
+
+def test_an_exception_the_step_does_not_own_still_propagates(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """V2: no blanket catch — a KeyError inside a stand-in reader escapes."""
+    buildings = tmp_path / "buildings.geojson"
+    buildings.write_bytes(
+        invented.buildings_bytes(
+            [invented.building_feature("SYN-B-0001", invented.square(0, 0, 1), 30, 8)]
+        )
+    )
+
+    def stand_in(_path):
+        raise KeyError("invented programming error")
+
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.step.load_buildings", stand_in
+    )
+    with pytest.raises(KeyError):
+        build_heights(tmp_path / "cache", (), buildings, tmp_path / "out", [])
+
+
+def test_every_registry_row_of_a_source_is_named_in_the_manifest(
+    tmp_path: Path,
+) -> None:
+    """V3: a cached row and an uncached row are each named; state is partial."""
+    globfp_row = invented.entry("bldg_3dglobfp", extension="geojson")
+    missing = replace(globfp_row, key="bldg_3dglobfp/two", slug="two")
+    cache = tmp_path / "data" / "public_cache"
+    invented.store(
+        cache,
+        globfp_row,
+        invented.globfp_bytes([(invented.square(0.05, 0.05, 0.6), 7)]),
+    )
+    buildings = tmp_path / "data" / "assets" / "buildings" / "buildings.geojson"
+    buildings.parent.mkdir(parents=True, exist_ok=True)
+    buildings.write_bytes(
+        invented.buildings_bytes(
+            [invented.building_feature("SYN-B-0001", invented.square(0.1, 0.1, 0.5))]
+        )
+    )
+    out_dir = tmp_path / "data" / "assets" / "heights"
+    build_heights(
+        cache,
+        (globfp_row, missing),
+        buildings,
+        out_dir,
+        [],
+        invented.rules_file(tmp_path / "rules.yaml"),
+    )
+    source = _manifest(out_dir)["sources"]["bldg_3dglobfp"]
+    assert source["state"] == "partial"
+    assert source["reason"] == "not_fetched"
+    assert source["rows"] == [
+        {"key": "bldg_3dglobfp", "reason": "", "state": "read"},
+        {"key": "bldg_3dglobfp/two", "reason": "not_fetched", "state": "not_fetched"},
+    ]
+    assert _rows(out_dir)[0]["height_m"] == "7.00"
+    assert _rows(out_dir)[0]["height_source"] == "3dglobfp"
+
+
+def test_a_skip_removes_the_outputs_of_an_earlier_run(tmp_path: Path) -> None:
+    """V4: after a good run, a later SKIP leaves no heights file behind."""
+    out_dir, _ = _card_setup(tmp_path)
+    assert (out_dir / "heights.json").is_file()
+    assert (out_dir / "manifest.heights.json").is_file()
+    lines: list[str] = []
+    build_heights(
+        tmp_path / "cache",
+        (),
+        tmp_path / "absent.geojson",
+        out_dir,
+        lines,
+    )
+    assert lines == ["SKIP heights building_table_absent"]
+    assert not (out_dir / "heights.json").exists()
+    assert not (out_dir / "manifest.heights.json").exists()
+
+
+def test_a_refusal_removes_the_outputs_of_an_earlier_run(tmp_path: Path) -> None:
+    """V4: after a good run, a refused table leaves no heights file behind."""
+    out_dir, _ = _card_setup(tmp_path)
+    buildings = tmp_path / "data" / "assets" / "buildings" / "buildings.geojson"
+    buildings.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-0001",
+                    invented.square(0, 0, 1),
+                    30,
+                    8,
+                    extra={"SYN_figure": 7.5},
+                )
+            ]
+        )
+    )
+    with pytest.raises(HeightError):
+        build_heights(tmp_path / "cache", (), buildings, out_dir, [])
+    assert not (out_dir / "heights.json").exists()
+    assert not (out_dir / "manifest.heights.json").exists()
+
+
+def test_a_blank_footprint_source_id_is_refused(tmp_path: Path) -> None:
+    """V8: an empty or blank footprint_source_id refuses the row."""
+    for blank in ("", "   "):
+        path = tmp_path / f"blank{len(blank)}.geojson"
+        path.write_bytes(
+            invented.buildings_bytes(
+                [
+                    invented.building_feature(
+                        "SYN-B-0001",
+                        invented.square(0, 0, 1),
+                        30,
+                        8,
+                        source=blank,
+                    )
+                ]
+            )
+        )
+        with pytest.raises(HeightError) as err:
+            load_buildings(path)
+        assert err.value.name == "footprint_source_id"
+
+
+def test_the_manifest_names_the_tables_source_chain_not_a_licence(
+    tmp_path: Path,
+) -> None:
+    """V8: the table record points at the asset pipeline's manifest entry."""
+    out_dir, _ = _card_setup(tmp_path)
+    record = {f["key"]: f for f in _manifest(out_dir)["files"]}["building_table"]
+    assert record["source_chain"] == (
+        "the asset pipeline's own manifest entry of the same key and sha256"
+    )
+    for field in ("licence_id", "licence_basis", "url", "terms_words"):
+        assert field not in record
+
+
+def test_rules_refusals_are_planted_and_named_in_full(tmp_path: Path) -> None:
+    """V9: every rules check is planted with its closed reason in full."""
+
+    def mutated(change) -> dict:
+        document = invented.rules_document()
+        change(document)
+        return document
+
+    cases: list[tuple[dict, str]] = [
+        (mutated(lambda d: d.update(storey_height_m=5)), "rules_storey"),
+        (
+            mutated(lambda d: d["storey_height_m"].update(value="not a number")),
+            "rules_storey_value",
+        ),
+        (
+            mutated(lambda d: d["storey_height_m"].update(value="1E+60")),
+            "rules_storey_value",
+        ),
+        (
+            mutated(lambda d: d["storey_height_m"].update(value="0.004")),
+            "rules_storey_value",
+        ),
+        (mutated(lambda d: d.update(sources=["x"])), "rules_sources"),
+        (
+            mutated(lambda d: d["sources"].update(bldg_wsf3d="x")),
+            "rules_source",
+        ),
+        (
+            mutated(lambda d: d["sources"]["bldg_3dglobfp"].update(band="1")),
+            "rules_field_or_band",
+        ),
+        (
+            mutated(lambda d: d["sources"]["bldg_wsf3d"].pop("band")),
+            "rules_field_or_band",
+        ),
+        (
+            mutated(lambda d: d["sources"]["bldg_wsf3d"].update(nodata=5)),
+            "rules_nodata",
+        ),
+        (
+            mutated(lambda d: d["sources"]["bldg_3dglobfp"].update(format="")),
+            "rules_format",
+        ),
+        (
+            mutated(lambda d: d["sources"]["bldg_3dglobfp"].update(field="")),
+            "rules_field",
+        ),
+        (
+            mutated(lambda d: d["sources"]["bldg_wsf3d"].update(band="")),
+            "rules_band",
+        ),
+        (
+            mutated(lambda d: d["sources"]["bldg_3dglobfp"].update(unit="")),
+            "rules_unit",
+        ),
+        (
+            mutated(lambda d: d["sources"]["bldg_3dglobfp"].update(crs="")),
+            "rules_crs",
+        ),
+        (
+            mutated(lambda d: d["storey_height_m"].update(basis="")),
+            "rules_basis",
+        ),
+        (mutated(lambda d: d.update(order="")), "rules_order"),
+        (
+            mutated(lambda d: d.update(match_3dglobfp="")),
+            "rules_match_3dglobfp",
+        ),
+        (mutated(lambda d: d.update(match_wsf3d="")), "rules_match_wsf3d"),
+        (
+            mutated(lambda d: d.update(credit_3dglobfp="")),
+            "rules_credit_3dglobfp",
+        ),
+    ]
+    for index, (document, reason) in enumerate(cases):
+        path = invented.write_rules(tmp_path / f"case{index}.yaml", document)
+        with pytest.raises(HeightError) as err:
+            load_rules(path)
+        assert err.value.name == reason, index
+    path = invented.write_rules(tmp_path / "list.yaml", ["not", "a", "dict"])
+    with pytest.raises(HeightError) as err:
+        load_rules(path)
+    assert err.value.name == "rules_root"
+
+
+def test_building_table_refusals_are_planted_and_named_in_full(
+    tmp_path: Path,
+) -> None:
+    """V9: the table loader's refusals are planted with closed reasons."""
+    cases: list[tuple[bytes, str]] = [
+        (b"this is not json at all {", "building_table"),
+        (
+            _raw_building_table(
+                '{"building_id": "", "recorded_height_m": 30,'
+                ' "floor_count": 8, "footprint_source_id": "SYN-FOOT"}'
+            ),
+            "building_id",
+        ),
+        (
+            _raw_building_table(
+                '{"building_id": "SYN-B-0001", "recorded_height_m": 30,'
+                ' "floor_count": 8, "footprint_source_id": 7}'
+            ),
+            "footprint_source_id",
+        ),
+        (
+            invented.buildings_bytes(
+                [
+                    invented.building_feature(
+                        "SYN-B-0001",
+                        invented.square(0, 0, 1),
+                        30,
+                        8,
+                        geometry={"type": "Polygon", "coordinates": []},
+                    )
+                ]
+            ),
+            "bad_footprint",
+        ),
+        (
+            invented.buildings_bytes(
+                [
+                    invented.building_feature(
+                        "SYN-B-0001",
+                        invented.square(0, 0, 1),
+                        30,
+                        8,
+                        geometry={
+                            "type": "Polygon",
+                            "coordinates": [[[0, 0], [1, 1], [1, 0], [0, 1], [0, 0]]],
+                        },
+                    )
+                ]
+            ),
+            "bad_footprint",
+        ),
+    ]
+    for index, (body, reason) in enumerate(cases):
+        path = tmp_path / f"case{index}.geojson"
+        path.write_bytes(body)
+        with pytest.raises(HeightError) as err:
+            load_buildings(path)
+        assert err.value.name == reason, index
+
+
+def test_cache_refusals_are_planted_and_named_in_full(tmp_path: Path) -> None:
+    """V9/V6: receipt, hash and path checks carry their closed reasons."""
+    row = invented.entry("bldg_3dglobfp", extension="geojson")
+    body = invented.globfp_bytes([(invented.square(0, 0, 1), 7)])
+    rules = invented.rules_file(tmp_path / "rules.yaml")
+
+    def run(cache: Path, entry: Entry = row) -> None:
+        read_sources(cache, (entry,), load_rules(rules))
+
+    cache = tmp_path / "two" / "cache"
+    invented.store(cache, row, body)
+    invented.store(cache, row, body + b" invented")
+    with pytest.raises(HeightError) as err:
+        run(cache)
+    assert err.value.name == "cache_receipt"
+
+    cache = tmp_path / "dup" / "cache"
+    invented.store(cache, row, body)
+    meta = next((cache / row.key).glob("*.meta.json"))
+    meta.write_text('{"source_id": "a", "source_id": "b"}')
+    with pytest.raises(HeightError) as err:
+        run(cache)
+    assert err.value.name == "cache_receipt"
+    assert err.value.detail == "source_id"
+
+    for change, reason in (
+        ({"source_id": "other"}, "cache_receipt_mismatch"),
+        ({"publisher": ""}, "cache_receipt_missing"),
+        ({"sha256": "abc"}, "malformed_hash"),
+    ):
+        cache = tmp_path / reason / "cache"
+        invented.store(cache, row, body)
+        meta = next((cache / row.key).glob("*.meta.json"))
+        receipt = json.loads(meta.read_text())
+        receipt.update(change)
+        meta.write_text(json.dumps(receipt, sort_keys=True) + "\n")
+        with pytest.raises(HeightError) as err:
+            run(cache)
+        assert err.value.name == reason
+
+    outside = invented.entry(
+        "bldg_wsf3d", key="bldg_wsf3d/../../outside", extension="tif"
+    )
+    cache = tmp_path / "escape" / "cache"
+    invented.store(
+        cache, outside, invented.wsf_bytes(tmp_path / "esc.tif", [[5]], 1, 1)
+    )
+    with pytest.raises(HeightError) as err:
+        run(cache, outside)
+    assert err.value.name == "cache_path"
+
+
+def test_source_structure_refusals_are_planted_and_named_in_full(
+    tmp_path: Path,
+) -> None:
+    """V9/V2: each structure branch of both readers carries its reason."""
+    globfp_row = invented.entry("bldg_3dglobfp", extension="geojson")
+    wsf_row = invented.entry("bldg_wsf3d", extension="tif")
+    rules = invented.rules_file(tmp_path / "rules.yaml")
+
+    def run(index: str, entry: Entry, body: bytes, rules_path: Path = rules) -> None:
+        cache = tmp_path / index / "cache"
+        invented.store(cache, entry, body)
+        read_sources(cache, (entry,), load_rules(rules_path))
+
+    def globfp(features: list, **extra) -> bytes:
+        return json.dumps(
+            {"type": "FeatureCollection", "features": features, **extra}
+        ).encode()
+
+    feature = {"type": "Feature", "properties": {"syn_height_m": 7}}
+    globfp_cases: list[tuple[str, bytes, str]] = [
+        ("notjson", b"this is not json {", "structure_mismatch"),
+        ("notfc", b'{"type": "Feature"}', "structure_mismatch"),
+        (
+            "featdict",
+            b'{"type": "FeatureCollection", "features": {}}',
+            "structure_mismatch",
+        ),
+        (
+            "featnum",
+            b'{"type": "FeatureCollection", "features": [5]}',
+            "structure_mismatch",
+        ),
+        (
+            "proptext",
+            globfp([{**feature, "properties": "x"}]),
+            "structure_mismatch",
+        ),
+        (
+            "geopoint",
+            globfp(
+                [
+                    {
+                        **feature,
+                        "geometry": {"type": "Point", "coordinates": [0, 0]},
+                    }
+                ]
+            ),
+            "structure_mismatch",
+        ),
+        (
+            "geobad",
+            globfp(
+                [
+                    {
+                        **feature,
+                        "geometry": {"type": "Polygon", "coordinates": "x"},
+                    }
+                ]
+            ),
+            "structure_mismatch",
+        ),
+        (
+            "geoempty",
+            globfp(
+                [
+                    {
+                        **feature,
+                        "geometry": {"type": "Polygon", "coordinates": []},
+                    }
+                ]
+            ),
+            "structure_mismatch",
+        ),
+        (
+            "dupkey",
+            b'{"type": "FeatureCollection", "type": "FeatureCollection",'
+            b' "features": []}',
+            "structure_mismatch",
+        ),
+        (
+            "crs3857",
+            globfp([], crs={"properties": {"name": "EPSG:3857"}}),
+            "reference_system",
+        ),
+        (
+            "negheight",
+            invented.globfp_bytes([(invented.square(0, 0, 1), -3)]),
+            "height_value",
+        ),
+        (
+            "textheight",
+            invented.globfp_bytes([(invented.square(0, 0, 1), "x")]),
+            "height_value",
+        ),
+    ]
+    for index, body, reason in globfp_cases:
+        with pytest.raises(HeightError) as err:
+            run(f"g-{index}", globfp_row, body)
+        assert err.value.name == reason, index
+
+    bad_dtype = tmp_path / "d.tif"
+    with rasterio.open(
+        bad_dtype,
+        "w",
+        driver="GTiff",
+        width=1,
+        height=1,
+        count=1,
+        dtype="int8",
+        crs="EPSG:4326",
+        transform=from_origin(0, 1, 1, 1),
+        nodata=-1,
+    ) as target:
+        target.write(np.zeros((1, 1), dtype="int8"), 1)
+    no_crs = tmp_path / "c.tif"
+    with rasterio.open(
+        no_crs,
+        "w",
+        driver="GTiff",
+        width=1,
+        height=1,
+        count=1,
+        dtype="float32",
+        transform=from_origin(0, 1, 1, 1),
+        nodata=-99999,
+    ) as target:
+        target.write(np.zeros((1, 1), dtype="float32"), 1)
+    wsf_cases: list[tuple[str, bytes, str, Path]] = [
+        (
+            "nodata",
+            invented.wsf_bytes(tmp_path / "n.tif", [[5]], 1, 1, nodata=-1),
+            "structure_mismatch",
+            rules,
+        ),
+        ("dtype", bad_dtype.read_bytes(), "structure_mismatch", rules),
+        ("nocrs", no_crs.read_bytes(), "reference_system", rules),
+        (
+            "band",
+            invented.wsf_bytes(tmp_path / "b.tif", [[5]], 1, 1),
+            "structure_mismatch",
+            invented.rules_file(tmp_path / "rb.yaml", wsf_band="x"),
+        ),
+        (
+            "declarednodata",
+            invented.wsf_bytes(tmp_path / "dn.tif", [[5]], 1, 1),
+            "structure_mismatch",
+            invented.rules_file(tmp_path / "rdn.yaml", wsf_nodata="x"),
+        ),
+    ]
+    for index, body, reason, rules_path in wsf_cases:
+        with pytest.raises(HeightError) as err:
+            run(f"w-{index}", wsf_row, body, rules_path)
+        assert err.value.name == reason, index
+
+
+def test_the_writer_refusal_output_row_is_planted() -> None:
+    """V9: a sourced row with no height or with a reason is refused."""
+    row = {
+        "building_id": "SYN-B-0001",
+        "height_m": None,
+        "height_source": "recorded",
+        "footprint_source_id": "SYN-FOOT",
+        "reason": "",
+    }
+    with pytest.raises(HeightError) as err:
+        check_row(dict(row))
+    assert err.value.name == "output_row"
+    row["height_m"], row["reason"] = "30.00", "order_exhausted"
+    with pytest.raises(HeightError) as err:
+        check_row(dict(row))
+    assert err.value.name == "output_row"

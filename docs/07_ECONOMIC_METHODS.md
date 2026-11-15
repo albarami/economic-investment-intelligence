@@ -2256,12 +2256,12 @@ The distance and the zone test are Public and `observed` (MTH-05), with the cave
 
 **Purpose.** Give every building of the basemap a height in the order of [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A2 (PUB-106), keep the source of each height with it, measure the error of each fallback against the recorded heights, and keep every height visibly an estimate (FE-50, FE-52). The card is computed in the public-data build only (MTH-02) and feeds the 3D view of S3-T16; it draws nothing itself.
 
-**Inputs.** The basemap's building table with, per building, its identifier, its footprint polygon, its recorded height or none, its floor count or none and its footprint source; the open 3D building heights of `bldg_3dglobfp`; the WSF 3D 90 m cell mean of `bldg_wsf3d`; and the stated storey height, held as quoted text in `custodian/publicdata/height_rules.yaml` and read as a `Decimal`, never a float.
+**Inputs.** The basemap's building table with, per building, its identifier, its footprint polygon, its recorded height or none, its floor count or none and its footprint source; the open 3D building heights of `bldg_3dglobfp`; the WSF 3D 90 m cell mean of `bldg_wsf3d`; and the stated storey height, held as quoted text in `custodian/publicdata/height_rules.yaml` and read as a `Decimal`, never a float. A recorded height or floor count that is not a usable positive number refuses the whole table, by name (`bad_recorded_height_m`, `bad_floor_count`); a recorded height that rounds to zero refuses the same way.
 
 **Formula.**
 
 ```
-height       the first present value of the order, per building:
+height       the first usable value of the order, per building:
              1. the recorded height
              2. the floor count times the stated storey height
              3. the 3D-GloBFP height of the matched footprint
@@ -2269,16 +2269,28 @@ height       the first present value of the order, per building:
              5. none when the order is exhausted, with its reason
                 (order_exhausted or the absent source's own reason), never the
                 number 0
+             a usable value is a positive finite one that does not round to
+             zero at the stated places; a fallback that gives no usable value
+             is no value and is counted (wsf3d_value_not_positive for the WSF
+             3D cell), never a crash and never overriding a recorded height
 3D-GloBFP    the candidate footprints that contain the building's representative
-             point (a point guaranteed inside the footprint); the candidate with
+             point (a point guaranteed inside the footprint); a point on a
+             candidate's boundary counts as inside; the candidate with
              the largest overlap area against the building footprint wins; a
              residual tie takes the lowest file name in sorted order, then the
              lowest row index within its file
-WSF 3D       the 90 m cell that contains the representative point; a no-data
-             cell, or a point outside the raster, gives no value
+WSF 3D       the 90 m cell that contains the representative point; a point on a
+             cell's west or north edge belongs to that cell and on its east or
+             south edge to the next; a no-data cell, a point outside the
+             raster, or a cell value that is not a positive finite number
+             gives no value, the last counted under wsf3d_value_not_positive;
+             several files that each give a usable value at one point refuse
+             the table (wsf3d_overlap), while files that do not overlap are
+             read together
 errors       for each fallback (floor count, 3D-GloBFP, WSF 3D), over the
              buildings that hold both that fallback's height and a recorded
-             height: signed error = fallback height - recorded height, in
+             height, taken on the written (rounded) heights: signed error =
+             rounded fallback height - rounded recorded height, in
              metres; four statistics: the count of pairs, the mean signed
              error, the mean absolute error and the median absolute error; the
              median of an even count is the mean of the two central values; a
@@ -2288,7 +2300,7 @@ errors       for each fallback (floor count, 3D-GloBFP, WSF 3D), over the
 
 **Storey height (ASSUMPTION).** The stated storey height is 3.0 metres, the lead's stated assumption of 2026-11-14; the owner replaces it. It is the only place the number lives, as the text "3.0" in `height_rules.yaml`, and the measured error of the floor-count fallback is shown beside it in the asset manifest.
 
-**Rounding (ASSUMPTION).** Every height in metres and each error statistic is rounded once, half-up, to two decimals of a metre by `eii_core.calc.building_heights`, the document's rule for calculation outputs; two decimals is the lead's stated assumption of 2026-11-15, the card stating no number of decimals for a height, and the owner replaces it. The written asset holds the rounded decimal's own text, never a float.
+**Rounding (ASSUMPTION).** Every height in metres and each error statistic is rounded once, half-up, to two decimals of a metre by `eii_core.calc.building_heights`, the document's rule for calculation outputs; two decimals is the lead's stated assumption of 2026-11-15, the card stating no number of decimals for a height, and the owner replaces it. Half-up is away from zero for a negative value, and a rounded zero is written unsigned, never -0.00. The written asset holds the rounded decimal's own text, never a float.
 
 **Worked example (regression; invented fixture identifiers SYN-B-0001 to SYN-B-0007 and an invented storey height of 4 m for the fixture only).** The floor-count product: 5 floors times 4 gives 20. The order per building: SYN-B-0001 (recorded 30, floors 8, 3D-GloBFP 24, WSF 3D 18) gives 30 recorded; SYN-B-0002 (recorded 12, floors 3, 3D-GloBFP 15, no WSF 3D) gives 12 recorded; SYN-B-0003 (recorded 21, no floors, 3D-GloBFP 15, WSF 3D 13) gives 21 recorded; SYN-B-0004 (no recorded, floors 5, 3D-GloBFP 11) gives 20 floor_count; SYN-B-0005 (nothing but WSF 3D 6) gives 6 wsf3d; SYN-B-0006 (nothing) gives none; SYN-B-0007 (no recorded, no floors, 3D-GloBFP 7, WSF 3D 5) gives 7 3dglobfp. The counts by source are recorded 3, floor_count 1, 3dglobfp 1, wsf3d 1, none 1. The fallback errors over the buildings that hold both values: floor_count (32 over 30 gives +2; 12 over 12 gives 0) gives count 2, mean signed +1, mean absolute 1, median absolute 1; 3dglobfp (24 over 30 gives -6; 15 over 12 gives +3; 15 over 21 gives -6) gives count 3, mean signed -3, mean absolute 5, median absolute 6; wsf3d (18 over 30 gives -12; 13 over 21 gives -8) gives count 2, mean signed -10, mean absolute 10, median absolute 10. The overlaps: 50 and 40 give 50; 40 on file 'b' row 0 and 40 on file 'a' row 3 give 'a' row 3.
 

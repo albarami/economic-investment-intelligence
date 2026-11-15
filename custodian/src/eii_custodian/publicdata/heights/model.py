@@ -18,7 +18,7 @@ import yaml
 from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
 
-from eii_core.calc.building_heights import HEIGHT_SOURCES
+from eii_core.calc.building_heights import HEIGHT_SOURCES, height_value
 
 BUILDINGS_RELATIVE = "assets/buildings/buildings.geojson"
 HEIGHTS_RELATIVE = "assets/heights"
@@ -61,8 +61,9 @@ _STRUCTURE_KEYS = frozenset({"format", "field", "band", "unit", "nodata", "crs"}
 class HeightError(ValueError):
     """A named refusal. The name is the check that failed."""
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, detail: str = "") -> None:
         self.name = name
+        self.detail = detail
         super().__init__(name)
 
 
@@ -110,6 +111,25 @@ def _require_text(value: object, name: str) -> str:
     return value
 
 
+def unique_json(body: bytes | str, name: str) -> object:
+    """Parse JSON with Decimal numbers; refuse a repeated object key (V6)."""
+
+    def hook(pairs: list[tuple[str, object]]) -> dict[str, object]:
+        out: dict[str, object] = {}
+        for key, value in pairs:
+            if key in out:
+                raise HeightError(name, key)
+            out[key] = value
+        return out
+
+    try:
+        return json.loads(body, parse_float=Decimal, object_pairs_hook=hook)
+    except HeightError:
+        raise
+    except ValueError:
+        raise HeightError(name) from None
+
+
 def _structure(raw: object, source_id: str) -> SourceStructure:
     if not isinstance(raw, dict):
         raise HeightError("rules_source")
@@ -137,7 +157,10 @@ def _structure(raw: object, source_id: str) -> SourceStructure:
 
 def load_rules(path: Path) -> Rules:
     """Read the committed height rules; every key is checked."""
-    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    try:
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except yaml.YAMLError:
+        raise HeightError("rules_root") from None
     if not isinstance(document, dict):
         raise HeightError("rules_root")
     if set(document) - _RULES_KEYS:
@@ -158,7 +181,7 @@ def load_rules(path: Path) -> Rules:
         storey_height = Decimal(value_text)
     except ArithmeticError:
         raise HeightError("rules_storey_value") from None
-    if not storey_height.is_finite() or storey_height <= 0:
+    if height_value(storey_height) is None:
         raise HeightError("rules_storey_value")
     sources = document["sources"]
     if not isinstance(sources, dict) or set(sources) != set(SOURCE_IDS):
@@ -192,13 +215,13 @@ def structure_unconfirmed(structure: SourceStructure) -> bool:
 
 
 def _number(value: object, name: str) -> Decimal | None:
-    """A number or null; anything else, non-positive or non-finite is refused."""
+    """A number or null; anything else or an unusable value is refused."""
     if value is None:
         return None
     if isinstance(value, bool) or not isinstance(value, (int, Decimal)):
         raise HeightError(f"bad_{name}")
     parsed = Decimal(value) if isinstance(value, int) else value
-    if not parsed.is_finite() or parsed <= 0:
+    if height_value(parsed) is None:
         raise HeightError(f"bad_{name}")
     return parsed
 
@@ -221,8 +244,8 @@ def _footprint(geometry: object) -> BaseGeometry:
 def load_buildings(path: Path) -> list[Building]:
     """Read the one documented building table; every refusal writes no row."""
     try:
-        payload = json.loads(path.read_bytes(), parse_float=Decimal)
-    except (OSError, ValueError):
+        payload = unique_json(path.read_bytes(), "building_table")
+    except OSError:
         raise HeightError("building_table") from None
     if not isinstance(payload, dict) or payload.get("type") != "FeatureCollection":
         raise HeightError("building_table")
@@ -248,7 +271,7 @@ def load_buildings(path: Path) -> list[Building]:
             raise HeightError("repeated_id")
         seen.add(building_id)
         footprint_source_id = properties["footprint_source_id"]
-        if not isinstance(footprint_source_id, str):
+        if not isinstance(footprint_source_id, str) or not footprint_source_id.strip():
             raise HeightError("footprint_source_id")
         floor_count = _number(properties["floor_count"], "floor_count")
         if floor_count is not None and floor_count != floor_count.to_integral_value():
@@ -312,4 +335,5 @@ __all__ = [
     "load_rules",
     "storey_literals",
     "structure_unconfirmed",
+    "unique_json",
 ]

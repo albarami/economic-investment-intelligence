@@ -11,7 +11,6 @@ reference system that is wrong is refused.
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from decimal import Decimal
 from importlib import import_module
@@ -33,6 +32,7 @@ from .model import (
     Rules,
     SourceStructure,
     structure_unconfirmed,
+    unique_json,
 )
 
 EPSG_WGS84 = 4326
@@ -57,7 +57,12 @@ class WsfGrid:
 
 @dataclass(frozen=True)
 class SourceResult:
-    """The files one source gave, or its absent reason and recorded terms."""
+    """The files one source gave, or its absent reason and recorded terms.
+
+    `rows` names every registry row of the source with its own state and
+    reason; the source's state is `read` only when every row is, `absent`
+    when no row gave a file, and `partial` between the two.
+    """
 
     source_id: str
     state: str
@@ -65,6 +70,7 @@ class SourceResult:
     globfp: tuple[tuple[str, tuple[tuple[BaseGeometry, Decimal], ...]], ...]
     wsf: tuple[tuple[str, WsfGrid], ...]
     files: tuple[dict[str, object], ...]
+    rows: tuple[dict[str, str], ...]
     terms_words: str
     terms_read_on: str
     retrieved_utc: str
@@ -95,7 +101,12 @@ def _verified_body(cache: Path, entry: Entry) -> tuple[Path, dict[str, object]] 
         return None
     if len(receipts) != 1:
         raise HeightError("cache_receipt")
-    receipt = json.loads(receipts[0].read_text(encoding="utf-8"))
+    try:
+        receipt = unique_json(receipts[0].read_text(encoding="utf-8"), "cache_receipt")
+    except OSError:
+        raise HeightError("cache_receipt") from None
+    if not isinstance(receipt, dict):
+        raise HeightError("cache_receipt")
     for field, expected in (
         ("source_id", entry.source_id),
         ("key", entry.key),
@@ -155,10 +166,7 @@ def _parse_globfp(
     body: bytes, structure: SourceStructure
 ) -> tuple[tuple[BaseGeometry, Decimal], ...]:
     """GeoJSON features with the declared height property; nothing else reads."""
-    try:
-        payload = json.loads(body, parse_float=Decimal)
-    except ValueError:
-        raise HeightError("structure_mismatch") from None
+    payload = unique_json(body, "structure_mismatch")
     if not isinstance(payload, dict) or payload.get("type") != "FeatureCollection":
         raise HeightError("structure_mismatch")
     declared_crs = payload.get("crs")
@@ -206,22 +214,25 @@ def _parse_wsf(cache: Path, body_path: Path, structure: SourceStructure) -> WsfG
         declared_nodata = Decimal(structure.nodata)
     except ArithmeticError:
         raise HeightError("structure_mismatch") from None
-    with rasterio.open(checked) as source:
-        if source.count != band:
-            raise HeightError("structure_mismatch")
-        if source.crs is None or source.crs.to_epsg() != EPSG_WGS84:
-            raise HeightError("reference_system")
-        if any(dtype not in _NUMERIC_DTYPES for dtype in source.dtypes):
-            raise HeightError("structure_mismatch")
-        if source.nodata is None or Decimal(str(source.nodata)) != declared_nodata:
-            raise HeightError("structure_mismatch")
-        return WsfGrid(
-            transform=source.transform,
-            data=source.read(band),
-            nodata=Decimal(str(source.nodata)),
-            width=source.width,
-            height=source.height,
-        )
+    try:
+        with rasterio.open(checked) as source:
+            if source.count != band:
+                raise HeightError("structure_mismatch")
+            if source.crs is None or source.crs.to_epsg() != EPSG_WGS84:
+                raise HeightError("reference_system")
+            if any(dtype not in _NUMERIC_DTYPES for dtype in source.dtypes):
+                raise HeightError("structure_mismatch")
+            if source.nodata is None or Decimal(str(source.nodata)) != declared_nodata:
+                raise HeightError("structure_mismatch")
+            return WsfGrid(
+                transform=source.transform,
+                data=source.read(band),
+                nodata=Decimal(str(source.nodata)),
+                width=source.width,
+                height=source.height,
+            )
+    except rasterio.errors.RasterioIOError:
+        raise HeightError("structure_mismatch") from None
 
 
 def read_sources(
@@ -253,6 +264,14 @@ def read_sources(
                 globfp=(),
                 wsf=(),
                 files=(),
+                rows=tuple(
+                    {
+                        "key": row.key,
+                        "reason": row.skip_reason or "structure_unconfirmed",
+                        "state": "not_fetched",
+                    }
+                    for row in rows
+                ),
                 terms_words=terms.terms_words if terms else "",
                 terms_read_on=terms.terms_read_on if terms else "",
                 retrieved_utc="",
@@ -262,37 +281,46 @@ def read_sources(
         globfp: list[tuple[str, tuple[tuple[BaseGeometry, Decimal], ...]]] = []
         wsf: list[tuple[str, WsfGrid]] = []
         files: list[dict[str, object]] = []
-        absent_reasons: list[str] = []
+        records: list[dict[str, str]] = []
         retrieved_utc = ""
         for row in rows:
-            if row.skip_reason:
-                absent_reasons.append(row.skip_reason)
-                continue
-            found = _verified_body(cache, row)
-            if found is None:
-                absent_reasons.append("not_fetched")
-                continue
-            body_path, receipt = found
-            digest = str(receipt["sha256"])
-            if not retrieved_utc:
-                retrieved_utc = str(receipt["retrieved_utc"])
-            files.append(_file_record(row, receipt, digest))
-            file_name = row.slug or row.key
-            if source_id == "bldg_3dglobfp":
-                globfp.append(
-                    (file_name, _parse_globfp(body_path.read_bytes(), structure))
-                )
-            else:
-                wsf.append((file_name, _parse_wsf(cache, body_path, structure)))
-        if not rows:
-            absent_reasons.append("not_fetched")
+            state = "not_fetched"
+            reason = row.skip_reason or "not_fetched"
+            if not row.skip_reason:
+                found = _verified_body(cache, row)
+                if found is not None:
+                    body_path, receipt = found
+                    digest = str(receipt["sha256"])
+                    if not retrieved_utc:
+                        retrieved_utc = str(receipt["retrieved_utc"])
+                    files.append(_file_record(row, receipt, digest))
+                    file_name = row.slug or row.key
+                    if source_id == "bldg_3dglobfp":
+                        globfp.append(
+                            (
+                                file_name,
+                                _parse_globfp(body_path.read_bytes(), structure),
+                            )
+                        )
+                    else:
+                        wsf.append((file_name, _parse_wsf(cache, body_path, structure)))
+                    state, reason = "read", ""
+            records.append({"key": row.key, "reason": reason, "state": state})
+        missing = [record["reason"] for record in records if record["state"] != "read"]
+        if globfp or wsf:
+            state = "read" if not missing else "partial"
+            reason = "" if not missing else missing[0]
+        else:
+            state = "absent"
+            reason = missing[0] if missing else "not_fetched"
         results[source_id] = SourceResult(
             source_id=source_id,
-            state="read" if (globfp or wsf) else "absent",
-            reason="" if (globfp or wsf) else absent_reasons[0],
+            state=state,
+            reason=reason,
             globfp=tuple(globfp),
             wsf=tuple(wsf),
             files=tuple(files),
+            rows=tuple(records),
             terms_words=rows[0].terms_words if rows else "",
             terms_read_on=rows[0].terms_read_on if rows else "",
             retrieved_utc=retrieved_utc,

@@ -5,18 +5,22 @@ Every value is invented (fixture ids SYN-B-*); the storey height of the fixture
 is 4 m, an invented fixture value, not the asset manifest's stated constant.
 """
 
+from dataclasses import replace
 from decimal import ROUND_UP, Decimal, localcontext
 
 import pytest
 
 from eii_core.calc.building_heights import (
-    FALLBACKS,
     NO_PAIRS,
+    NONE_SOURCE,
     ORDER,
     ORDER_EXHAUSTED,
+    HeightChoice,
     choose_height,
     fallback_errors,
     floor_height,
+    height_counts,
+    height_value,
     largest_overlap,
     metres,
 )
@@ -327,18 +331,11 @@ def test_the_refusal_messages_are_the_closed_texts() -> None:
     with pytest.raises(ValueError) as err:
         floor_height(Decimal(5), Decimal(0))
     assert str(err.value) == "storey_height must be positive"
-    for name in ORDER:
-        candidates = {key: None for key in ORDER}
-        candidates[name] = Decimal(0)
-        with pytest.raises(ValueError) as err:
-            choose_height(candidates)
-        assert str(err.value) == f"{name} must be positive"
-    for name in FALLBACKS:
-        candidates = {key: None for key in ORDER}
-        candidates["recorded"], candidates[name] = Decimal(10), Decimal(0)
-        with pytest.raises(ValueError) as err:
-            fallback_errors([candidates])
-        assert str(err.value) == f"{name} must be positive"
+    candidates = {key: None for key in ORDER}
+    candidates["recorded"] = Decimal(0)
+    with pytest.raises(ValueError) as err:
+        choose_height(candidates)
+    assert str(err.value) == "recorded must be positive"
     with pytest.raises(ValueError) as err:
         fallback_errors([_candidates(Decimal(0), None, None, None)])
     assert str(err.value) == "recorded must be positive"
@@ -355,6 +352,18 @@ def test_the_refusal_messages_are_the_closed_texts() -> None:
     with pytest.raises(ValueError) as err:
         largest_overlap([(Decimal(-1), "a", 0, Decimal(8))])
     assert str(err.value) == "overlap area must not be negative"
+    with pytest.raises(ValueError) as err:
+        height_value("30")
+    assert str(err.value) == "finite Decimal required"
+    with pytest.raises(ValueError) as err:
+        height_counts([HeightChoice(Decimal("30"), "invented", "", ())])
+    assert str(err.value) == "height source outside the closed list"
+    with pytest.raises(ValueError) as err:
+        height_counts([HeightChoice(None, NONE_SOURCE, "", ())])
+    assert str(err.value) == "a none choice needs its reason"
+    with pytest.raises(ValueError) as err:
+        height_counts([HeightChoice(None, NONE_SOURCE, ORDER_EXHAUSTED, ("recorded",))])
+    assert str(err.value) == "candidate outside the closed order"
 
 
 def test_a_zero_overlap_area_is_a_candidate_not_a_refusal() -> None:
@@ -397,12 +406,13 @@ def test_a_non_positive_or_non_finite_floor_count_or_storey_is_refused(floors, s
         Decimal(-1),
         Decimal("Infinity"),
         Decimal("NaN"),
+        Decimal("0.004"),
         pytest.param(30, id="int"),
         pytest.param("30", id="str"),
     ],
 )
-def test_a_non_positive_or_non_finite_candidate_height_is_refused(bad):
-    """A candidate that is not a positive finite Decimal is refused."""
+def test_a_non_positive_or_non_finite_recorded_height_is_refused(bad):
+    """A recorded candidate that is not a usable height is refused."""
     with pytest.raises(ValueError):
         choose_height(
             {
@@ -412,6 +422,43 @@ def test_a_non_positive_or_non_finite_candidate_height_is_refused(bad):
                 "wsf3d": None,
             }
         )
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [Decimal(0), Decimal(-1), Decimal("Infinity"), Decimal("NaN")],
+)
+def test_a_non_positive_or_non_finite_fallback_is_no_value(bad):
+    """V1: a bad fallback candidate is no value, counted, never a crash."""
+    choice = choose_height(
+        {
+            "recorded": Decimal(30),
+            "floor_count": None,
+            "3dglobfp": bad,
+            "wsf3d": Decimal(5),
+        }
+    )
+    assert choice.height == Decimal(30)
+    assert choice.source == "recorded"
+    assert choice.dropped == ("3dglobfp",)
+    alone = choose_height(
+        {
+            "recorded": None,
+            "floor_count": None,
+            "3dglobfp": bad,
+            "wsf3d": Decimal(5),
+        }
+    )
+    assert alone.height == Decimal(5)
+    assert alone.source == "wsf3d"
+    assert alone.dropped == ("3dglobfp",)
+
+
+@pytest.mark.parametrize(
+    "bad", [pytest.param(30, id="int"), pytest.param("30", id="str")]
+)
+def test_a_fallback_candidate_of_another_type_is_a_defect(bad):
+    """A non-Decimal fallback is a programming error and still raises."""
     with pytest.raises(ValueError):
         choose_height(
             {
@@ -447,3 +494,111 @@ def test_a_candidate_outside_the_closed_order_is_refused():
                 }
             ]
         )
+
+
+def test_a_fallback_that_rounds_to_zero_is_no_value_and_counted():
+    """V7: a fallback height that rounds to 0.00 at the stated places is none."""
+    choice = choose_height(_candidates(None, None, Decimal("0.004"), Decimal(7)))
+    assert choice.height == Decimal(7)
+    assert choice.source == "wsf3d"
+    assert choice.dropped == ("3dglobfp",)
+    alone = choose_height(_candidates(None, None, None, Decimal("0.004")))
+    assert alone.source == "none"
+    assert alone.reason == ORDER_EXHAUSTED
+    assert alone.dropped == ("wsf3d",)
+
+
+def test_a_bad_fallback_contributes_no_error_pair_and_loses_no_valid_pair():
+    """V1: a non-positive fallback is skipped; the valid pairs stay."""
+    rows = [
+        _candidates(Decimal(10), None, Decimal(0), None),
+        _candidates(Decimal(10), None, Decimal(11), None),
+    ]
+    block = fallback_errors(rows)["3dglobfp"]
+    assert block.count == 1
+    assert block.mean_signed == Decimal(1)
+
+
+def test_a_floor_product_cannot_round_to_zero_at_the_stated_places():
+    """V7: a positive floor count times a positive storey height is >= it."""
+    assert floor_height(Decimal(1), STOREY) == STOREY
+    assert floor_height(Decimal(2), STOREY) > floor_height(Decimal(1), STOREY)
+
+
+def test_a_rounded_zero_is_written_without_a_sign():
+    """V5: a rounded zero is unsigned, on the function and through the errors."""
+    assert str(metres(Decimal("-0.004"))) == "0.00"
+    assert str(metres(Decimal("-0.005"))) == "-0.01"
+    rows = [
+        _candidates(Decimal(10), None, Decimal("9.99"), None),
+        _candidates(Decimal(10), None, Decimal("10.00"), None),
+        _candidates(Decimal(10), None, Decimal("10.00"), None),
+    ]
+    block = fallback_errors(rows)["3dglobfp"]
+    # The errors are -0.01, 0 and 0: the exact mean signed error is
+    # -0.0033..., a rounded zero that is written "0.00", never "-0.00".
+    assert str(block.mean_signed) == "0.00"
+    assert not block.mean_signed.is_signed()
+    assert str(block.mean_absolute) == "0.00"
+    assert str(block.median_absolute) == "0.00"
+
+
+def test_height_counts_counts_every_choice_once_by_source():
+    """V10: counts by source, none reasons, drops and fallbacks, one function."""
+    counts = height_counts(choose_height(row) for row in _rows().values())
+    assert counts.by_source == {
+        "recorded": 3,
+        "floor_count": 1,
+        "3dglobfp": 1,
+        "wsf3d": 1,
+        "none": 1,
+    }
+    assert counts.none_reasons == {"order_exhausted": 1}
+    assert counts.no_value_reasons == {}
+    assert counts.fallback_buildings == 3
+
+
+def test_height_counts_names_each_dropped_value_with_its_reason():
+    """V1/V10: a dropped fallback value counts under <source>_value_not_positive."""
+    choices = [
+        choose_height(_candidates(Decimal(30), None, None, Decimal(0))),
+        choose_height(_candidates(None, None, None, Decimal(0))),
+        choose_height(_candidates(None, None, Decimal("0.004"), None)),
+    ]
+    counts = height_counts(choices)
+    assert counts.no_value_reasons == {
+        "3dglobfp_value_not_positive": 1,
+        "wsf3d_value_not_positive": 2,
+    }
+    assert counts.by_source["recorded"] == 1
+    assert counts.none_reasons == {"order_exhausted": 2}
+    assert counts.fallback_buildings == 0
+
+
+def test_height_counts_keeps_the_resolved_none_reason_and_empty_choices():
+    """V10: a none row keeps its written reason; an empty run gives zeros."""
+    resolved = [
+        replace(choice, reason="structure_unconfirmed")
+        if choice.source == "none"
+        else choice
+        for choice in (choose_height(row) for row in _rows().values())
+    ]
+    counts = height_counts(resolved)
+    assert counts.none_reasons == {"structure_unconfirmed": 1}
+    empty = height_counts([])
+    assert empty.by_source == {
+        "recorded": 0,
+        "floor_count": 0,
+        "3dglobfp": 0,
+        "wsf3d": 0,
+        "none": 0,
+    }
+    assert empty.fallback_buildings == 0
+
+
+def test_height_counts_refuses_a_source_outside_the_closed_list():
+    """V10: an invented source on a choice is refused, never counted."""
+    with pytest.raises(ValueError):
+        height_counts([HeightChoice(Decimal(5), "invented_source", "")])
+    with pytest.raises(ValueError):
+        height_counts([HeightChoice(None, "none", "")])

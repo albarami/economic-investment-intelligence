@@ -18,6 +18,7 @@ from eii_core.calc.building_heights import (
     NONE_SOURCE,
     FallbackError,
     HeightChoice,
+    HeightCounts,
 )
 
 from .model import OUTPUT_COLUMNS, HeightError, Rules
@@ -113,8 +114,7 @@ def _credits(rules: Rules, results: dict[str, SourceResult]) -> dict[str, object
 def manifest_block(
     rules: Rules,
     results: dict[str, SourceResult],
-    counts: dict[str, int],
-    none_reasons: dict[str, int],
+    counts: HeightCounts,
     errors: dict[str, FallbackError],
     input_files: list[dict[str, object]],
 ) -> dict[str, object]:
@@ -125,7 +125,7 @@ def manifest_block(
     files.sort(key=lambda record: str(record["key"]))
     return {
         "card": CARD_ID,
-        "counts": counts,
+        "counts": counts.by_source,
         "credits": _credits(rules, results),
         "errors": _error_block(errors),
         "estimate_label": ESTIMATE_LABEL,
@@ -134,12 +134,14 @@ def manifest_block(
         "match_wsf3d": rules.match_wsf3d,
         "method": METHOD_ID,
         "method_line": METHOD_LINE,
-        "none_reasons": none_reasons,
+        "none_reasons": counts.none_reasons,
+        "no_value_reasons": counts.no_value_reasons,
         "order": rules.order,
         "sources": {
             source_id: {
                 "reason": results[source_id].reason,
                 "state": results[source_id].state,
+                "rows": list(results[source_id].rows),
             }
             for source_id in ("bldg_3dglobfp", "bldg_wsf3d")
         },

@@ -6,16 +6,17 @@ input raises `HeightError`, whose name is the check the FAIL line carries.
 
 from __future__ import annotations
 
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
 from eii_core.calc.building_heights import (
-    FALLBACKS,
-    HEIGHT_SOURCES,
     NONE_SOURCE,
+    HeightChoice,
     choose_height,
     fallback_errors,
     floor_height,
+    height_counts,
 )
 from eii_custodian.publicdata.fetch.receipts import sha256_hex as file_sha256
 from eii_custodian.publicdata.fetch.registry import Entry
@@ -59,20 +60,29 @@ def _resolve(
     buildings: list[Building],
     rules: Rules,
     results: dict[str, SourceResult],
-) -> tuple[list[dict[str, object]], list[dict[str, Decimal | None]]]:
+) -> tuple[
+    list[dict[str, object]],
+    list[dict[str, Decimal | None]],
+    list[HeightChoice],
+]:
     """Per building: the candidate dict for errors and the checked output row."""
     rows: list[dict[str, object]] = []
     candidates: list[dict[str, Decimal | None]] = []
+    choices: list[HeightChoice] = []
     absent = _none_reason(results)
     for building in buildings:
         point = representative_point(building.geometry)
-        candidate: dict[str, Decimal | None] = {
-            "recorded": building.recorded,
-            "floor_count": (
+        try:
+            floor_product = (
                 floor_height(building.floor_count, rules.storey_height)
                 if building.floor_count is not None
                 else None
-            ),
+            )
+        except ArithmeticError:
+            raise HeightError("bad_floor_count") from None
+        candidate: dict[str, Decimal | None] = {
+            "recorded": building.recorded,
+            "floor_count": floor_product,
             "3dglobfp": globfp_height(
                 point,
                 building.geometry,
@@ -84,6 +94,7 @@ def _resolve(
         reason = ""
         if choice.source == NONE_SOURCE:
             reason = absent or choice.reason
+            choice = replace(choice, reason=reason)
         rows.append(
             output_row(
                 building.building_id,
@@ -93,7 +104,8 @@ def _resolve(
             )
         )
         candidates.append(candidate)
-    return rows, candidates
+        choices.append(choice)
+    return rows, candidates, choices
 
 
 def build_heights(
@@ -104,22 +116,21 @@ def build_heights(
     lines: list[str],
     rules_path: Path | None = None,
 ) -> None:
-    """Run the heights step: skip on an absent table, refuse on a bad input."""
+    """Run the heights step: skip on an absent table, refuse on a bad input.
+
+    The step's own earlier outputs are removed before anything is read, so a
+    later skip or refusal never leaves an old heights file behind.
+    """
+    for name in (HEIGHTS_FILE, MANIFEST_FILE):
+        (out_dir / name).unlink(missing_ok=True)
     if not buildings_path.is_file():
         lines.append(skip_line("heights", "building_table_absent"))
         return
     rules = load_rules(rules_path if rules_path is not None else RULES_PATH)
     buildings = load_buildings(buildings_path)
     results = read_sources(cache, entries, rules)
-    rows, candidates = _resolve(buildings, rules, results)
-    counts = {name: 0 for name in HEIGHT_SOURCES}
-    none_reasons: dict[str, int] = {}
-    for row in rows:
-        source = str(row["height_source"])
-        counts[source] += 1
-        if source == NONE_SOURCE:
-            reason = str(row["reason"])
-            none_reasons[reason] = none_reasons.get(reason, 0) + 1
+    rows, candidates, choices = _resolve(buildings, rules, results)
+    counts = height_counts(choices)
     errors = fallback_errors(candidates)
     heights_body = dump_sorted(rows)
     input_files: list[dict[str, object]] = [
@@ -128,6 +139,9 @@ def build_heights(
             "path": BUILDINGS_RELATIVE,
             "role": "read",
             "sha256": file_sha256(buildings_path.read_bytes()),
+            "source_chain": (
+                "the asset pipeline's own manifest entry of the same key and sha256"
+            ),
         },
         {
             "key": "heights",
@@ -140,7 +154,6 @@ def build_heights(
         rules,
         results,
         counts,
-        none_reasons,
         errors,
         input_files,
     )
@@ -152,7 +165,7 @@ def build_heights(
         },
     )
     lines.append(
-        f"PASS heights rows={len(rows)} sources={sum(counts[s] for s in FALLBACKS)}"
+        f"PASS heights rows={len(rows)} fallback_buildings={counts.fallback_buildings}"
     )
 
 
