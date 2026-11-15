@@ -1,0 +1,1058 @@
+{
+ "status": "reviewed: model review of 2026-11-14; the owner's confirmation of the baskets is open",
+ "basis": "docs/04_PUBLIC_DATA_PACK.md section 7 (PUB-41); the tariff lines and their two descriptions are those of the customs dataset of 2025 onward, as published",
+ "activities": [
+  {
+   "activity": "5610",
+   "inputs": [
+    {
+     "name": "uncooked pasta, with or without egg",
+     "lines": [
+      {
+       "code": "1902.11.10.0000",
+       "description_en": "Macaroni , Vermicelli and Similer Items Like Spaghetti or Cannelloni Stares or Lateres in Form",
+       "description_ar": "مكرونة وشعيرية وأصناف مماثلة كالسباغتي والكانيلوني والعجائن التي بشكل أصداف أو نجوم أو أحرف الخ، تحتوي على بيض"
+      },
+      {
+       "code": "1902.11.90.0000",
+       "description_en": "Pasta, Other",
+       "description_ar": "غيرها من العجائن الغذائيه، تحتوي على بيض"
+      },
+      {
+       "code": "1902.19.10.0000",
+       "description_en": "Macaroni , Vermicelli and Similer Items Like Spaghetti or Cannelloni Stars or Lateres in Form",
+       "description_ar": "غيرها، مكرونه وشعريه واصناف مماثله كاسباجتى والعجائن التى بشكل اصداف او نجوم او احرف الخ"
+      }
+     ],
+     "inclusion_reason": "Both descriptions identify uncooked pasta shapes or other pasta; these are recurring wholesale restaurant inputs with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "1902.11.20.0000",
+       "reason": "Frozen pasta, not dry pasta."
+      },
+      {
+       "code": "1902.11.30.0000",
+       "reason": "Potato-flour chips in macaroni shape are not pasta."
+      },
+      {
+       "code": "1902.19.20.0000",
+       "reason": "Frozen pasta, not dry pasta."
+      },
+      {
+       "code": "1902.19.30.0000",
+       "reason": "Potato-flour chips in macaroni shape are not pasta."
+      },
+      {
+       "code": "1902.19.90.0000",
+       "reason": "descriptions disagree: English says other pasta products; Arabic says other potato-flour products."
+      },
+      {
+       "code": "1902.20.10.0000",
+       "reason": "Stuffed meat pasta, not dry unstuffed pasta."
+      },
+      {
+       "code": "1902.20.20.0000",
+       "reason": "Stuffed fish, crustacean or mollusc pasta, not dry unstuffed pasta."
+      },
+      {
+       "code": "1902.20.90.0000",
+       "reason": "Other stuffed pasta, not dry unstuffed pasta."
+      },
+      {
+       "code": "1902.30.10.0000",
+       "reason": "Instant dried noodles are not pasta for this basket."
+      },
+      {
+       "code": "1902.30.20.0000",
+       "reason": "Instant dried prepared pasta is prepared, not dry uncooked pasta."
+      },
+      {
+       "code": "1902.30.30.0000",
+       "reason": "Dried prepared pasta is prepared, not dry uncooked pasta."
+      },
+      {
+       "code": "1902.30.90.0000",
+       "reason": "Other prepared pasta is not dry uncooked pasta."
+      },
+      {
+       "code": "1902.40.00.0000",
+       "reason": "Couscous is not pasta."
+      }
+     ],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "olive oil",
+     "lines": [
+      {
+       "code": "1509.20.00.0000",
+       "description_en": "- Extra Virgin Olive Oil",
+       "description_ar": "زيت العصرة الأولى (زيت بكر) إكسترا"
+      },
+      {
+       "code": "1509.30.00.0000",
+       "description_en": "- Virgin Olive Oil",
+       "description_ar": "زيت العصرة الأولى (زيت بكر)"
+      },
+      {
+       "code": "1509.40.00.0000",
+       "description_en": "- Other Virgin Olive Oils",
+       "description_ar": "زيوت بكر أخر"
+      },
+      {
+       "code": "1509.90.00.0000",
+       "description_en": "Olive Oil and Its Fractions, Refined, but Not Chemically Modified",
+       "description_ar": "غيرها من زيت الزيتون وجزيئاته، مكررا ولكن غير معدل كيمياويا"
+      }
+     ],
+     "inclusion_reason": "The lines are the subheadings of the olive oil heading: virgin, extra-virgin, other virgin and refined olive oil. The English description of each names olive oil; the Arabic of the virgin lines names the grade under that heading. It is a recurring wholesale restaurant input with catalogue import mass.",
+     "excluded_lines": [],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "prepared or preserved tomatoes",
+     "lines": [
+      {
+       "code": "2002.10.00.0000",
+       "description_en": "Tomatoes Whole or in Pieces, Prepared or Preserved Nes.",
+       "description_ar": "بندوره كامله او مقطعه، محضرة أو محفوظة بغير الخل أو حمض الخليك"
+      },
+      {
+       "code": "2002.90.10.0000",
+       "description_en": "Tomato Paste, Prepared or Preserved Nes.",
+       "description_ar": "هريس (معجون) البندورة، محضرة أو محفوظة بغير الخل أو حمض الخليك"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name prepared or preserved tomatoes or tomato paste; these are recurring wholesale restaurant inputs with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "2002.90.90.0000",
+       "reason": "The English description is the residual \"Other\" and does not name tomatoes; the Arabic names other tomatoes. The two descriptions do not both name the input, so the line stays out."
+      }
+     ],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "Parmesan and grated cheese",
+     "lines": [
+      {
+       "code": "0406.20.00.0001",
+       "description_en": "Grated Cheese, of All Kinds",
+       "description_ar": "أجبان مبشورة من جميع الأنواع"
+      },
+      {
+       "code": "0406.90.24.0000",
+       "description_en": "- - - - Medium Hard and Hard Parmesan Cheese",
+       "description_ar": "- - - - جبن الباروميزان قاسي أو متوسط التقسية"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name grated cheese or Parmesan; these are recurring wholesale Italian-restaurant inputs with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "0406.90.21.0000",
+       "reason": "Cheddar is neither the selected Parmesan line nor the grated-cheese line."
+      },
+      {
+       "code": "0406.90.22.0000",
+       "reason": "Gouda is neither the selected Parmesan line nor the grated-cheese line."
+      },
+      {
+       "code": "0406.90.23.0000",
+       "reason": "Gruyere is neither the selected Parmesan line nor the grated-cheese line."
+      },
+      {
+       "code": "0406.90.25.0000",
+       "reason": "Romano is neither the selected Parmesan line nor the grated-cheese line."
+      },
+      {
+       "code": "0406.90.26.0000",
+       "reason": "Kashkaval is neither the selected Parmesan line nor the grated-cheese line."
+      },
+      {
+       "code": "0406.90.29.0000",
+       "reason": "Generic other medium-hard and hard cheese does not establish Parmesan or grated cheese."
+      },
+      {
+       "code": "0406.90.90.0000",
+       "reason": "Generic other cheese does not establish Parmesan or grated cheese."
+      }
+     ],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "wheat flour",
+     "lines": [
+      {
+       "code": "1101.00.10.0000",
+       "description_en": "Wheat Flour",
+       "description_ar": "دقيق حنطه - قمح"
+      }
+     ],
+     "inclusion_reason": "Both descriptions explicitly name wheat flour, a recurring wholesale input for pizza and pasta preparation with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "1101.00.20.0000",
+       "reason": "A wheat-and-rye flour blend is not straight wheat flour."
+      }
+     ],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "milled rice",
+     "lines": [
+      {
+       "code": "1006.30.00.0000",
+       "description_en": "Semi Milled or Wholly Milled Rice, Whether or Not Polished or Glazed",
+       "description_ar": "أرز مضروب كليا أو جزئيا وان كان ممسوحا أو ملمعا"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name semi-milled or wholly milled rice, a recurring wholesale restaurant input with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "1006.10.00.0000",
+       "reason": "Rice in the husk is not milled rice."
+      },
+      {
+       "code": "1006.20.00.0000",
+       "reason": "Husked brown rice is not semi-milled or wholly milled rice."
+      },
+      {
+       "code": "1006.40.00.0000",
+       "reason": "Broken rice is a separate product line and is not explicitly described as milled rice."
+      }
+     ],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "fresh or chilled tomatoes",
+     "lines": [
+      {
+       "code": "0702.00.00.0000",
+       "description_en": "Tomatoes, Fresh or Chilled",
+       "description_ar": "طماطم (بندورة) طازجة أو مبردة"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name fresh or chilled tomatoes, a recurring wholesale restaurant produce input with catalogue import mass.",
+     "excluded_lines": [],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "bovine meat cuts and mince",
+     "lines": [
+      {
+       "code": "0201.20.00.0000",
+       "description_en": "Meat of Bovine Animals, Cuts with Bone in, Fresh or Chilled",
+       "description_ar": "لحوم فصيلة الأبقار، قطع بعظمها، طازجة أو مبردة"
+      },
+      {
+       "code": "0201.30.00.0000",
+       "description_en": "Meat of Bovine Animals, Boneless, Fresh or Chilled",
+       "description_ar": "لحوم فصيلة الأبقار بدون عظام، طازجة أو مبردة"
+      },
+      {
+       "code": "0202.20.00.0000",
+       "description_en": "Meat of Bovine Animals, Cuts with Bone in, Frozen",
+       "description_ar": "لحوم فصيلة الأبقار، قطع بعظمها، مجمدة"
+      },
+      {
+       "code": "0202.30.10.0000",
+       "description_en": "Meat of Bovine Animals, Mince",
+       "description_ar": "لحوم أبقار مفرومة"
+      },
+      {
+       "code": "0202.30.90.0000",
+       "description_en": "Meat of Bovine Animals Other Types, Frozen",
+       "description_ar": "غيرها من الحوم الأبقار ، مجمدة"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name bovine meat cuts or mince; these are recurring wholesale restaurant inputs with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "0201.10.00.0001",
+       "reason": "Whole fresh carcasses are not cuts or mince."
+      },
+      {
+       "code": "0201.10.00.0002",
+       "reason": "Fresh half-carcasses are not cuts or mince."
+      },
+      {
+       "code": "0201.10.00.0003",
+       "reason": "Whole chilled carcasses are not cuts or mince."
+      },
+      {
+       "code": "0201.10.00.0004",
+       "reason": "Chilled half-carcasses are not cuts or mince."
+      },
+      {
+       "code": "0202.10.00.0001",
+       "reason": "Whole frozen carcasses are not cuts or mince."
+      },
+      {
+       "code": "0202.10.00.0002",
+       "reason": "Frozen half-carcasses are not cuts or mince."
+      }
+     ],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    }
+   ]
+  },
+  {
+   "activity": "5630",
+   "inputs": [
+    {
+     "name": "roasted coffee",
+     "lines": [
+      {
+       "code": "0901.21.00.0000",
+       "description_en": "Roasted Coffee, Not Decaffeinated (Whether or Not Ground)",
+       "description_ar": "بن محمص غير منزوع منه (الكافين) وان كان مسحوقا"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name roasted coffee, the recurring wholesale coffee-shop input, and the catalogue records import mass.",
+     "excluded_lines": [
+      {
+       "code": "0901.11.00.0000",
+       "reason": "Not roasted; English also says Unfrosted while Arabic says unroasted."
+      },
+      {
+       "code": "0901.12.00.0000",
+       "reason": "Not roasted; English also says Unfrosted while Arabic says unroasted."
+      },
+      {
+       "code": "0901.22.00.0000",
+       "reason": "descriptions disagree: English says roasted caffeinated coffee; Arabic says roasted decaffeinated coffee."
+      },
+      {
+       "code": "0901.90.10.0000",
+       "reason": "Coffee husks and skins are not roasted coffee beans or grounds."
+      },
+      {
+       "code": "0901.90.20.0000",
+       "reason": "Coffee substitutes containing coffee are not roasted coffee."
+      }
+     ],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "long-life milk",
+     "lines": [
+      {
+       "code": "0401.10.31.0000",
+       "description_en": "- - - - Long Life Milk, in Containers Exceeding 1 Litre Skimmed , Not Concentrated nor Containing Added Sugar or Other Sweetening Matter.",
+       "description_ar": "- - - - لبن (حليب) طويل الأجل منزوع الدسم بعبوات تزيد سعتها عن لتر واحد غير محتوية على سكر مضاف أو على مواد تحلية أخر"
+      },
+      {
+       "code": "0401.10.32.0000",
+       "description_en": "- - - - Long Life Milk, in Containers Exceeding 1 Litre Low Fat , by Weight, Not Exceeding 1 Percent Not Concentrated nor Containing Added Sugar or Other Sweetening Matter.",
+       "description_ar": "- - - - لبن (حليب) طويل الأجل بعبوات تزيد سعتها عن لتر واحد بنسبة دسم لا تزيد عن 1% وزنا غير محتوية على سكر مضاف أو على مواد تحلية أخر"
+      },
+      {
+       "code": "0401.10.91.0000",
+       "description_en": "- - - - Long Life Milk, in Containers Not Exceeding 1 Litre Skimmed , Not Concentrated nor Containing Added Sugar or Other Sweetening Matter.",
+       "description_ar": "- - - - لبن (حليب) طويل الأجل منزوع الدسم بعبوات لا تزيد سعتها عن لتر واحد غير محتوية على سكر مضاف أو على مواد تحلية أخر"
+      },
+      {
+       "code": "0401.20.30.0000",
+       "description_en": "Long Life Milk , in Packing Exceeding 1 L",
+       "description_ar": "ألبان وقشدة، غير مركزة ولا محتوية على سكر مضاف أو على مواد تحلية أخر.لبن (حليب) طويل الأجل بعبوات تزيد سعتها عن لتر واحد بنسبة دسم تزيد عن 1% ولا تتجاوز 6% وزناً"
+      },
+      {
+       "code": "0401.20.91.0000",
+       "description_en": "- - - - Long Life Milk, in Containers Not Exceeding 1 Litre Content, by Weight, Exceeding 1 Percent but Not Exceeding 6 Percent Not Concentrated nor Containing Added Sugar or Other Sweetening Matter.",
+       "description_ar": "- - - - لبن (حليب) طويل الأجل بعبوات لا تزيد سعتها عن لتر واحد بنسبة دسم تزيد عن 1%ولاتتجاوز 6%وزنا غير محتوية على سكر مضاف أو على مواد تحلية أخر"
+      },
+      {
+       "code": "0401.40.91.0000",
+       "description_en": "- - - - Long Life Milk, in Containers Not Exceeding 1 Litre Content, by Weight, Exceeding 6 Percent but Not Exceeding 10 Percent Not Concentrated nor Containing Added Sugar or Other Sweetening Matter.",
+       "description_ar": "- - - - لبن (حليب) طويل الأجل بعبوات لا تزيد سعتها عن لتر واحد بنسبة دسم تزيد عن 6%ولاتتجاوز 10%وزنا غير محتوية على سكر مضاف أو على مواد تحلية أخر"
+      },
+      {
+       "code": "0401.50.30.0000",
+       "description_en": "Long Life Milk, in Containers Exceeding 1 Litre،Of a Fat Content by Weight Exceeding 10 Percent",
+       "description_ar": "لبن (حليب) طويل الأجل بعبوات تزيد سعتها عن لتر ، بنسبة دسم تزيد عن 10% وزناً"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name long-life milk without added sweetening; these are recurring wholesale coffee-shop inputs with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "0401.10.94.0000",
+       "reason": "descriptions disagree: English says containers exceeding one litre; Arabic says containers not exceeding one litre."
+      },
+      {
+       "code": "0401.50.91.0000",
+       "reason": "descriptions disagree: English says containers exceeding one litre; Arabic says containers not exceeding one litre."
+      }
+     ],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "cane or beet sugar for beverages",
+     "lines": [
+      {
+       "code": "1701.99.11.0001",
+       "description_en": "Powdered Sugar",
+       "description_ar": "سكر ناعم ."
+      },
+      {
+       "code": "1701.99.11.0002",
+       "description_en": "Coarse Sugar",
+       "description_ar": "سكر خشن ."
+      },
+      {
+       "code": "1701.99.12.0001",
+       "description_en": "Sugar Cubes",
+       "description_ar": "سكر مكعبات."
+      },
+      {
+       "code": "1701.99.12.0002",
+       "description_en": "Sugar in Solid Form",
+       "description_ar": "سكر قوالب."
+      },
+      {
+       "code": "1701.99.20.0003",
+       "description_en": "Brown Sugar",
+       "description_ar": "سكر بني"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name clear sugar forms used to sweeten beverages; these are recurring wholesale coffee-shop inputs with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "1701.12.10.0001",
+       "reason": "Raw beet sugar for refining is not ordinary beverage sugar."
+      },
+      {
+       "code": "1701.13.10.0000",
+       "reason": "Cane sugar for industrial refining is not ordinary beverage sugar."
+      },
+      {
+       "code": "1701.13.90.0000",
+       "reason": "Raw cane sugar under the chapter subheading note is not identified as ordinary beverage sugar."
+      },
+      {
+       "code": "1701.14.10.0000",
+       "reason": "Cane sugar for industrial refining is not ordinary beverage sugar."
+      },
+      {
+       "code": "1701.14.90.0000",
+       "reason": "Other solid cane sugar is not identified as retail beverage sugar."
+      },
+      {
+       "code": "1701.91.00.0000",
+       "reason": "Sugar with added flavouring or colouring is outside the plain-sugar input."
+      },
+      {
+       "code": "1701.99.20.0001",
+       "reason": "Rock candy is a confectionery product, not the selected beverage-sugar forms."
+      },
+      {
+       "code": "1701.99.20.0002",
+       "reason": "Palm sugar is not cane or beet sugar."
+      },
+      {
+       "code": "1701.99.20.9999",
+       "reason": "Generic Other does not identify a sugar form in either description."
+      },
+      {
+       "code": "1701.99.13.0000",
+       "reason": "descriptions disagree: English says castor sugar; Arabic describes refined powdered sugar with added flavouring or colouring."
+      },
+      {
+       "code": "1701.99.30.0000",
+       "reason": "descriptions disagree: English says chemically pure sucrose; Arabic also says it contains added flavouring or colouring."
+      },
+      {
+       "code": "1701.99.90.0000",
+       "reason": "English says other sugar products while Arabic specifies other sugar with added flavouring or colouring; the scope is not consistent enough for inclusion."
+      }
+     ],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "tea",
+     "lines": [
+      {
+       "code": "0902.10.00.0000",
+       "description_en": "Green Tea (Not Fermented) in Immediate Packing, 3 Kgs or Less",
+       "description_ar": "شاي أخضر (غير مخمر) في عبوات مباشره لا يزيد وزن محتواها عن 3 كج"
+      },
+      {
+       "code": "0902.20.00.0000",
+       "description_en": "Green Tea (Not Fermented) in Other Packing",
+       "description_ar": "شاي أخضر (غير مخمر) في عبوات أخر"
+      },
+      {
+       "code": "0902.30.10.0000",
+       "description_en": "Teabag Not Exceeding 3 G",
+       "description_ar": "شاي أسود مغلف بوريقات صغيرة لا تزيد وزنها عن 3 جرام"
+      },
+      {
+       "code": "0902.30.90.0000",
+       "description_en": "Other Types of Teas",
+       "description_ar": "غيره من الشاى"
+      },
+      {
+       "code": "0902.40.00.0000",
+       "description_en": "Black Tea (Fermented) in Other Packing",
+       "description_ar": "شاي أسود (مخمر) وشاي مخمر جزئيا، في عبوات أخر"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name green, black or other tea; these are recurring wholesale coffee-shop inputs with catalogue import mass.",
+     "excluded_lines": [],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "cocoa powder without added sweetening",
+     "lines": [
+      {
+       "code": "1805.00.00.0000",
+       "description_en": "Cocoa Powder, Not Containing Added Sugar or Other Sweetening Matter",
+       "description_ar": "مسحوق كاكاو لا يحتوي على سكر مضاف أو مواد تحلية اخر"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name unsweetened cocoa powder, a recurring wholesale input for cocoa and chocolate drinks with catalogue import mass.",
+     "excluded_lines": [],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "paperboard cups",
+     "lines": [
+      {
+       "code": "4823.69.00.0004",
+       "description_en": "Cup of Paperboard",
+       "description_ar": "أكواب من ورق مقوى"
+      }
+     ],
+     "inclusion_reason": "Both descriptions explicitly name paperboard cups, a recurring wholesale disposable input for coffee shops with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "4823.61.00.0004",
+       "reason": "Bamboo cups are not paperboard cups."
+      },
+      {
+       "code": "4823.69.00.0001",
+       "reason": "Both descriptions name trays of paperboard, not cups."
+      },
+      {
+       "code": "4823.69.00.0002",
+       "reason": "Both descriptions name dishes of paperboard, not cups."
+      },
+      {
+       "code": "4823.69.00.0003",
+       "reason": "Both descriptions name plates of paperboard, not cups."
+      }
+     ],
+     "supplier_isic": "4649",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "orange juice",
+     "lines": [
+      {
+       "code": "2009.11.10.0000",
+       "description_en": "Frozen Orange Juice Not Containing Added Sygar or Other Sweetening",
+       "description_ar": "عصير برتقال مجمد غير مضاف اليه سكر أومواد تحلية اخر"
+      },
+      {
+       "code": "2009.12.10.0000",
+       "description_en": "Orange Juice Not Frozen, Brix Value Not Exceeding 20 Not Added Sugar or Other Sweetening",
+       "description_ar": "عصير برتقال غير مجمد ، لا تزيد قيمة بريكس فيه عن 20 غير مضاف اليه سكر أومواد تحلية اخر"
+      },
+      {
+       "code": "2009.12.20.0000",
+       "description_en": "Orange Juice, Not Frozen, Brix Value Not Exceeding 20 Added Sugar or Other Sweetening",
+       "description_ar": "عصير برتقال غير مجمد ، لا تزيد قيمة بريكس فيه عن 20 مضاف اليه سكر أومواد تحلية اخر"
+      },
+      {
+       "code": "2009.19.10.0000",
+       "description_en": "Other Orange Juice, with No Added Sugar or Other Sweetening",
+       "description_ar": "غيره من عصير برتقال ، غير مضاف اليه سكر أو مواد تحلية اخر"
+      },
+      {
+       "code": "2009.19.20.0000",
+       "description_en": "Other Orange Juice, Added to It Sugar or Other Sweetening",
+       "description_ar": "غيره من عصير برتقال ، مضاف اليه سكر أو مواد تحلية اخر"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name orange juice in clear frozen, Brix and sweetening variants; it is a recurring wholesale coffee-shop input with catalogue import mass.",
+     "excluded_lines": [],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "packaged drinking water",
+     "lines": [
+      {
+       "code": "2201.10.10.0001",
+       "description_en": "Natural Mineral Water, 1Litre Bottle or Less",
+       "description_ar": "مياه معدنية طبيعية في عبوات حجم (1) لتر وأقل"
+      },
+      {
+       "code": "2201.10.10.0002",
+       "description_en": "Natural Mineral Water, Larger Than 1 Litre Bottle",
+       "description_ar": "مياه معدنية طبيعية في عبوات حجمها يزيد عن (1) لتر"
+      },
+      {
+       "code": "2201.10.20.0001",
+       "description_en": "Artificial Mineral Water, 1 Litre Bottle or Less",
+       "description_ar": "مياه معدنية اصطناعية في عبوات حجم (1) لتر وأقل"
+      },
+      {
+       "code": "2201.10.20.0002",
+       "description_en": "Artificial Mineral Water, Larger Than 1 Litre Bottle",
+       "description_ar": "مياه معدنية اصطناعية في عبوات حجمها يزيد عن (1) لتر"
+      },
+      {
+       "code": "2201.10.30.0001",
+       "description_en": "Sparkling Water, 1 Litre Bottle or Less",
+       "description_ar": "مياه غازية في عبوات حجم (1) لتر وأقل"
+      },
+      {
+       "code": "2201.90.10.0003",
+       "description_en": "Normal Drinking Water, Not Containing Added Sugar or Other Sweetening and Unflavored, 1 Litre Bottle or Smaller",
+       "description_ar": "مياه عادية طبيعية غير مضاف إليها سكر أو مواد تحلية وغير منكهة في عبوات حجم (1) لتر وأقل"
+      },
+      {
+       "code": "2201.90.10.0004",
+       "description_en": "Normal Drinking Water, Not Containing Added Sugar or Other Sweetening and Unflavored, Larger Than 1 Litre Bottle",
+       "description_ar": "مياه عادية طبيعية غير مضاف إليها سكر أو مواد تحلية وغير منكهة في عبوات حجمها يزيد عن (1) لتر"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name packaged mineral, sparkling or ordinary drinking water; these are recurring wholesale coffee-shop inputs with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "2201.10.10.9999",
+       "reason": "Generic Other does not name drinking water in either description."
+      },
+      {
+       "code": "2201.10.20.9999",
+       "reason": "Generic Other does not name drinking water in either description."
+      },
+      {
+       "code": "2201.90.10.9999",
+       "reason": "Generic Other does not name drinking water in either description."
+      },
+      {
+       "code": "2201.90.90.0001",
+       "reason": "descriptions disagree: English says snow; Arabic says ice; neither names packaged drinking water."
+      },
+      {
+       "code": "2201.90.90.0002",
+       "reason": "Ice is not packaged drinking water."
+      },
+      {
+       "code": "2201.90.90.9999",
+       "reason": "Generic Other does not name packaged drinking water in either description."
+      }
+     ],
+     "supplier_isic": "4630",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    }
+   ]
+  },
+  {
+   "activity": "5510",
+   "inputs": [
+    {
+     "name": "bed linen",
+     "lines": [
+      {
+       "code": "6302.10.00.0000",
+       "description_en": "Bed Linen",
+       "description_ar": "بياضات الأسرة"
+      },
+      {
+       "code": "6302.21.00.0000",
+       "description_en": "Bed Linen of Cotton",
+       "description_ar": "بياضات الأسرة من قطن"
+      },
+      {
+       "code": "6302.22.00.0000",
+       "description_en": "Bed Linen of Man-Made Fibres",
+       "description_ar": "بياضات الأسرة من الياف صناعيه"
+      },
+      {
+       "code": "6302.29.00.0000",
+       "description_en": "Bed Linen of Other Textile Materials",
+       "description_ar": "بياضات الأسرة من مواد نسجيه اخرى"
+      }
+     ],
+     "inclusion_reason": "Both descriptions explicitly name bed linen; these are recurring wholesale hotel room-linen inputs with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "6302.31.00.0000",
+       "reason": "The two descriptions disagree: the English names table linen, the Arabic bed linen of cotton. A line whose two descriptions disagree is not used. The bilingual reviewer reads the Arabic as right and the English as the publisher's error; including the line is put to the sign-off (open point)."
+      },
+      {
+       "code": "6302.32.00.0000",
+       "reason": "The two descriptions disagree: the English names table linen, the Arabic bed linen of man-made fibres. A line whose two descriptions disagree is not used. The bilingual reviewer reads the Arabic as right and the English as the publisher's error; including the line is put to the sign-off (open point)."
+      },
+      {
+       "code": "6302.39.00.0000",
+       "reason": "The two descriptions disagree: the English names table linen, the Arabic bed linen of other textile materials. A line whose two descriptions disagree is not used. The bilingual reviewer reads the Arabic as right and the English as the publisher's error; including the line is put to the sign-off (open point)."
+      },
+      {
+       "code": "6302.40.00.0000",
+       "reason": "Knitted or crocheted table linen is not bed linen."
+      },
+      {
+       "code": "6302.51.00.0000",
+       "reason": "Cotton table linen is not bed linen."
+      },
+      {
+       "code": "6302.53.00.0000",
+       "reason": "Man-made-fibre table linen is not bed linen."
+      },
+      {
+       "code": "6302.59.00.0000",
+       "reason": "Table linen of other textile materials is not bed linen."
+      }
+     ],
+     "supplier_isic": "4641",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "towels",
+     "lines": [
+      {
+       "code": "6302.91.20.0000",
+       "description_en": "Ordinary Towels and Bath Towels, of Cotton",
+       "description_ar": "فوط ومناشف عادية، مناشف حمام من قطن"
+      },
+      {
+       "code": "6302.91.90.0000",
+       "description_en": "Towels, Other",
+       "description_ar": "غيرها من الفوط"
+      }
+     ],
+     "inclusion_reason": "Both descriptions explicitly name ordinary, bath or other towels; these are recurring wholesale hotel room-linen inputs with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "6302.60.00.0000",
+       "reason": "Both descriptions name toilet and kitchen linen, not explicitly towels."
+      },
+      {
+       "code": "6302.91.10.0000",
+       "reason": "Pilgrimage towels and coverings are not ordinary hotel towels."
+      },
+      {
+       "code": "6302.91.30.0000",
+       "reason": "Continuous reeled towelling is not ordinary hotel towels."
+      },
+      {
+       "code": "6302.91.40.0000",
+       "reason": "Drying, shoe-shining and kitchen towels are not ordinary hotel room towels."
+      },
+      {
+       "code": "6302.93.00.0000",
+       "reason": "The Arabic description names towels; the English says only linen and does not confirm towels. The two descriptions do not both name the input, so the line stays out."
+      },
+      {
+       "code": "6302.99.00.0000",
+       "reason": "The Arabic description names towels; the English says only linen and does not confirm towels. The two descriptions do not both name the input, so the line stays out."
+      }
+     ],
+     "supplier_isic": "4641",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "skin-washing preparations",
+     "lines": [
+      {
+       "code": "3401.30.00.0000",
+       "description_en": "- Organic Suface-Active Products and Preparations for Washing the Skin, in the Form of Liguid or Cream and Put for Retail Sale, Whether or Not Containing Soap",
+       "description_ar": "منتجات ومحضرات غواسل عضوية لغسل الجلد على هيئة سائل أوكريم مهيئة للبيع بالتجزئة،وان احتوت على صابون"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name retail skin-washing preparations in liquid or cream form, a recurring wholesale hotel toiletry input with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "3401.11.80.0000",
+       "reason": "descriptions disagree: English says household soaps; Arabic says toilet soap, so the skin-washing scope is not consistent."
+      },
+      {
+       "code": "3401.11.90.0000",
+       "reason": "English says other organic surface-active products while Arabic says other soap; neither explicitly names a skin-washing preparation."
+      },
+      {
+       "code": "3401.20.30.0000",
+       "reason": "Both descriptions name aqueous liquid soap but do not explicitly identify skin-washing preparations."
+      }
+     ],
+     "supplier_isic": "4649",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "shampoo",
+     "lines": [
+      {
+       "code": "3305.10.90.0000",
+       "description_en": "- - - Other Shampoo",
+       "description_ar": "- - - غيرها من أنواع شامبو"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name shampoo, a recurring wholesale hotel toiletry input with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "3305.10.10.0000",
+       "reason": "Antifungal shampoo is a specialised therapeutic product outside the ordinary hotel-shampoo input."
+      },
+      {
+       "code": "3305.10.20.0000",
+       "reason": "Treatment shampoo is a specialised product outside the ordinary hotel-shampoo input."
+      }
+     ],
+     "supplier_isic": "4649",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "mattresses",
+     "lines": [
+      {
+       "code": "9404.21.10.0000",
+       "description_en": "Spring Mattresses",
+       "description_ar": "مراتب بنوابض"
+      },
+      {
+       "code": "9404.21.90.0006",
+       "description_en": "Covered Sponge Mattresses",
+       "description_ar": "فرشات اسفنجية مكسية"
+      },
+      {
+       "code": "9404.29.10.0000",
+       "description_en": "Spring Mattresses",
+       "description_ar": "مراتب بنوابض"
+      },
+      {
+       "code": "9404.29.90.0000",
+       "description_en": "Mattresses of Materials Other Than Rubber or Plastics, Other",
+       "description_ar": "غيرها من الفرش والمراتب"
+      }
+     ],
+     "inclusion_reason": "Both descriptions explicitly name spring, sponge or other-material mattresses; these are repeatable wholesale hotel-room furnishings with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "9404.10.00.0000",
+       "reason": "Mattress supports are not mattresses."
+      },
+      {
+       "code": "9404.21.90.9999",
+       "reason": "Generic Other does not name a mattress in either description."
+      },
+      {
+       "code": "9404.40.00.0000",
+       "reason": "Both descriptions name quilts, bedspreads, eiderdowns and duvets: bedding, not mattresses."
+      },
+      {
+       "code": "9404.90.10.0000",
+       "reason": "Quilts and duvets are not mattresses."
+      },
+      {
+       "code": "9404.90.90.0000",
+       "reason": "Other cushion sets are not mattresses."
+      }
+     ],
+     "supplier_isic": "4649",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "tableware and tea or coffee service",
+     "lines": [
+      {
+       "code": "6911.10.00.0001",
+       "description_en": "Tea and Coffee Sets.",
+       "description_ar": "أطقم الشاي والقهوة"
+      },
+      {
+       "code": "6911.10.00.0002",
+       "description_en": "Soup Dishes.",
+       "description_ar": "أوعية الحساء"
+      },
+      {
+       "code": "6911.10.00.0003",
+       "description_en": "Salad Bowls.",
+       "description_ar": "طاسات السلطة"
+      },
+      {
+       "code": "6911.10.00.0005",
+       "description_en": "Coffee and Tea Pots.",
+       "description_ar": "أباريق القهوة و الشاي"
+      },
+      {
+       "code": "6911.10.00.0012",
+       "description_en": "Coffee Cups.",
+       "description_ar": "فناجين القهوة"
+      },
+      {
+       "code": "6911.10.00.0013",
+       "description_en": "Tea Cups.",
+       "description_ar": "كاسات الشاي"
+      }
+     ],
+     "inclusion_reason": "Both descriptions name tableware articles or tea and coffee service pieces; these are recurring wholesale hotel dining inputs with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "6911.10.00.0017",
+       "reason": "Cooking pots are kitchen cookware, not tableware or tea and coffee service."
+      },
+      {
+       "code": "6911.10.00.9999",
+       "reason": "Generic Other does not identify tableware in either description."
+      },
+      {
+       "code": "6911.90.00.0000",
+       "reason": "Other household and toilet articles are not explicitly tableware or tea and coffee service."
+      }
+     ],
+     "supplier_isic": "4649",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "drinking glasses",
+     "lines": [
+      {
+       "code": "7013.22.00.0000",
+       "description_en": "- Stemware Drinking Glasses of Lead Crystal",
+       "description_ar": "كؤوس الشرب ذات الساق ، من كريستال الرصاص"
+      },
+      {
+       "code": "7013.28.00.0000",
+       "description_en": "Other of Stemware Drinking Glasses Other Than of Glassceramics",
+       "description_ar": "غيرها من كؤوس الشرب ذات الساق"
+      },
+      {
+       "code": "7013.33.00.0000",
+       "description_en": "Another Drink Cups, of Lead Crystal",
+       "description_ar": "كؤوس شراب أخر، من كريستال الرصاص"
+      },
+      {
+       "code": "7013.37.00.0000",
+       "description_en": "- Other Drinking Glasses, Other Than of Glass Ceramics:",
+       "description_ar": "غيرها من كؤوس الشرب عدا ما هو من خزف"
+      }
+     ],
+     "inclusion_reason": "Both descriptions explicitly name stemware or other drinking glasses; these are recurring wholesale hotel dining inputs with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "7013.10.10.0000",
+       "reason": "Tableware and kitchenware are not explicitly drinking glasses."
+      },
+      {
+       "code": "7013.10.49.0000",
+       "reason": "English says other table glassware while Arabic says other household articles; neither explicitly names drinking glasses."
+      },
+      {
+       "code": "7013.10.90.0000",
+       "reason": "English says other kitchen glassware while Arabic says other household articles; neither explicitly names drinking glasses."
+      },
+      {
+       "code": "7013.41.00.0000",
+       "reason": "Lead-crystal tableware is not explicitly drinking glasses."
+      },
+      {
+       "code": "7013.42.00.0000",
+       "reason": "Both descriptions specify only a glass coefficient of expansion, not drinking glasses."
+      },
+      {
+       "code": "7013.49.00.0000",
+       "reason": "Other table glassware is not explicitly drinking glasses."
+      }
+     ],
+     "supplier_isic": "4649",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    },
+    {
+     "name": "toilet paper",
+     "lines": [
+      {
+       "code": "4818.10.00.0000",
+       "description_en": "Toilet Paper",
+       "description_ar": "ورق صحي"
+      }
+     ],
+     "inclusion_reason": "Both descriptions explicitly name toilet paper, a recurring wholesale hotel consumable with catalogue import mass.",
+     "excluded_lines": [
+      {
+       "code": "4818.20.00.0001",
+       "reason": "Cleansing tissues are not toilet paper."
+      },
+      {
+       "code": "4818.20.00.0002",
+       "reason": "Paper towels are not toilet paper."
+      },
+      {
+       "code": "4818.20.00.0003",
+       "reason": "Rolls of handkerchiefs are not toilet paper."
+      },
+      {
+       "code": "4818.30.10.0000",
+       "reason": "Tablecloths are not toilet paper."
+      }
+     ],
+     "supplier_isic": "4649",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "review_date": "2026-11-14",
+     "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
+    }
+   ]
+  }
+ ]
+}

@@ -240,6 +240,7 @@ def run_build(
             )
         lines.append(pass_line(entry.key, fetched.digest, fetched.fetch_host))
     if failure is None:
+        failure = run_stage(cache, build_entries=entries, build_lines=lines).failure
         stage = run_stage(cache)
         for figure_id in stage.missing:
             lines.append(coverage_line(figure_id))

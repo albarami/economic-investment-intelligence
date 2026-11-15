@@ -23,7 +23,15 @@ sources:
     commit_allowed: false
     release_tables: ["pub_licence_active"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "lbldy"
+        type: "string"
+      - name: "rmz_lnsht_ltjry"
+        type: "string"
+      - name: "lnsht_ltjry"
+        type: "string"
+      - name: "dd_lrkhs_lnsht"
+        type: "integer"
     row_count_min: 13189
     row_count_max: 13189
     reconciliation: "none"
@@ -48,7 +56,19 @@ sources:
     commit_allowed: false
     release_tables: ["pub_licence_cancelled"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "sn_llg"
+        type: "string"
+      - name: "shhr_llg"
+        type: "integer"
+      - name: "lbldy"
+        type: "string"
+      - name: "rmz_lnsht_ltjry"
+        type: "string"
+      - name: "sm_lnsht_ltjry"
+        type: "string"
+      - name: "dd_lrkhs_lmlg"
+        type: "integer"
     row_count_min: 40472
     row_count_max: 40472
     reconciliation: "none"
@@ -73,7 +93,19 @@ sources:
     commit_allowed: false
     release_tables: ["pub_licence_issued"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "sn_lsdr"
+        type: "integer"
+      - name: "shhr_lsdr"
+        type: "integer"
+      - name: "lbldy"
+        type: "string"
+      - name: "rmz_lnsht_ltjry"
+        type: "string"
+      - name: "sm_lnsht_ltjry"
+        type: "string"
+      - name: "dd_lrkhs_lsdr"
+        type: "integer"
     row_count_min: 8259
     row_count_max: 8259
     reconciliation: "none"
@@ -98,7 +130,31 @@ sources:
     commit_allowed: false
     release_tables: ["pub_customs_import"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "quarter"
+        type: "string"
+      - name: "lrb"
+        type: "string"
+      - name: "month"
+        type: "integer"
+      - name: "harmonized_system_code"
+        type: "integer"
+      - name: "details"
+        type: "string"
+      - name: "ltfsyl"
+        type: "string"
+      - name: "country_of_origin"
+        type: "string"
+      - name: "dwl_lmnsh"
+        type: "string"
+      - name: "quantity"
+        type: "number"
+      - name: "weight_in_kilograms"
+        type: "number"
+      - name: "value_in_qatari_riyals"
+        type: "number"
     row_count_min: 252048
     row_count_max: 252048
     reconciliation: "none"
@@ -123,7 +179,29 @@ sources:
     commit_allowed: false
     release_tables: ["pub_customs_import"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "lsn_year"
+        type: "string"
+      - name: "lrb_quarter"
+        type: "string"
+      - name: "lshhr_month"
+        type: "number"
+      - name: "hs8"
+        type: "string"
+      - name: "ltfsyl"
+        type: "string"
+      - name: "details"
+        type: "string"
+      - name: "dwl_lmnsh"
+        type: "string"
+      - name: "country_of_origin"
+        type: "string"
+      - name: "quantity"
+        type: "number"
+      - name: "weight_kg"
+        type: "number"
+      - name: "value_qr"
+        type: "number"
     row_count_min: 830494
     row_count_max: 830494
     reconciliation: "none"
@@ -148,7 +226,37 @@ sources:
     commit_allowed: false
     release_tables: ["pub_sector_accounts"]
     caveat_keys: []
-    columns: []
+    # PUB-64 source-field -> contract (ruling L-203 R6):
+    # sec_hr_ind.operating_surplus_value_in_1_000_qr -> pub_sector_accounts.value:operating_surplus
+    # sec_hr_ind.compensation_of_employees_value_in_1_000_qr -> pub_sector_accounts.value:compensation
+    # sec_hr_ind.value_added_per_worker_qr -> pub_sector_accounts.value:value_added_per_worker
+    # sec_hr_ind.productivity_of_employee_qr -> pub_sector_accounts.value:productivity_of_employee
+    # sec_hr_ind.percentage_of_intermediate_services_to_output -> pub_sector_accounts.value:services_share
+    # sec_hr_ind.percentage_of_intermediate_goods_to_output -> pub_sector_accounts.value:goods_share
+    # sec_hr_ind.average_annual_wage_qr -> pub_sector_accounts.value:average_annual_wage
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "integer"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "operating_surplus_value_in_1_000_qr"
+        type: "integer"
+      - name: "compensation_of_employees_value_in_1_000_qr"
+        type: "integer"
+      - name: "value_added_per_worker_qr"
+        type: "integer"
+      - name: "productivity_of_employee_qr"
+        type: "integer"
+      - name: "percentage_of_intermediate_services_to_output"
+        type: "number"
+      - name: "percentage_of_intermediate_goods_to_output"
+        type: "number"
+      - name: "average_annual_wage_qr"
+        type: "integer"
     row_count_min: null
     row_count_max: null
     reconciliation: "open"
@@ -173,10 +281,26 @@ sources:
     commit_allowed: false
     release_tables: ["pub_sector_accounts"]
     caveat_keys: []
-    columns: []
+    # PUB-64 source-field -> contract (ruling L-203 R6):
+    # sec_hr_goods.estimates_of_intermediate_goods_value_value_in_1_000_qr -> pub_sector_accounts.value:intermediate_goods
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "integer"
+      - name: "type_of_commodity"
+        type: "string"
+      - name: "nw_lsl"
+        type: "string"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "estimates_of_intermediate_goods_value_value_in_1_000_qr"
+        type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "none"
+    reconciliation: "open"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_serv"
@@ -198,10 +322,26 @@ sources:
     commit_allowed: false
     release_tables: ["pub_sector_accounts"]
     caveat_keys: []
-    columns: []
+    # PUB-64 source-field -> contract (ruling L-203 R6):
+    # sec_hr_serv.estimates_of_intermediate_services_value_value_in_1_000_qr -> pub_sector_accounts.value:intermediate_services
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "integer"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "type_of_service"
+        type: "string"
+      - name: "nw_lkhdm"
+        type: "string"
+      - name: "estimates_of_intermediate_services_value_value_in_1_000_qr"
+        type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "none"
+    reconciliation: "open"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_size"
@@ -223,10 +363,29 @@ sources:
     commit_allowed: false
     release_tables: ["pub_sector_accounts", "pub_establishment_size"]
     caveat_keys: []
-    columns: []
+    # PUB-64 source-field -> contract (ruling L-203 R6):
+    # sec_hr_size.number_of_employees -> pub_sector_accounts.value:employees
+    # sec_hr_size.number_of_establishments -> pub_sector_accounts.value:establishments
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "activity_code"
+        type: "integer"
+      - name: "main_economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy_lry_ysy"
+        type: "string"
+      - name: "size_of_establishment"
+        type: "string"
+      - name: "hjm_lmnsh"
+        type: "string"
+      - name: "number_of_employees"
+        type: "integer"
+      - name: "number_of_establishments"
+        type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "none"
+    reconciliation: "open"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_comp_occ"
@@ -273,7 +432,21 @@ sources:
     commit_allowed: false
     release_tables: ["pub_wage_table"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "gender"
+        type: "string"
+      - name: "lnw"
+        type: "string"
+      - name: "occupation"
+        type: "string"
+      - name: "lmhn"
+        type: "string"
+      - name: "paid_employment_workers"
+        type: "integer"
+      - name: "monthly_average_wage_qr"
+        type: "integer"
     row_count_min: null
     row_count_max: null
     reconciliation: "open"
@@ -298,7 +471,21 @@ sources:
     commit_allowed: false
     release_tables: ["pub_wage_table"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "gender"
+        type: "string"
+      - name: "lnw"
+        type: "string"
+      - name: "economic_activity"
+        type: "string"
+      - name: "lnsht_lqtsdy"
+        type: "string"
+      - name: "paid_employment_workers"
+        type: "integer"
+      - name: "monthly_average_wage_qr"
+        type: "integer"
     row_count_min: null
     row_count_max: null
     reconciliation: "open"
@@ -384,7 +571,7 @@ sources:
     slug: "electricity-total-consumption-by-zone-number"
     kind: "portal_dataset"
     title_en: "Electricity total consumption by zone number"
-    publisher: "Kahramaa"
+    publisher: "KAHRAMAA"
     licence_id: "CC-BY-4.0"
     licence_basis: "dataset"
     licence_url: "https://www.data.gov.qa/pages/license/annexes"
@@ -398,7 +585,13 @@ sources:
     commit_allowed: false
     release_tables: ["pub_zone_utility"]
     caveat_keys: ["proxy_not_population", "partial_latest_year"]
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "zone_number"
+        type: "string"
+      - name: "value"
+        type: "integer"
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
@@ -448,7 +641,19 @@ sources:
     commit_allowed: false
     release_tables: ["pub_transit_monthly"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "year"
+        type: "string"
+      - name: "month"
+        type: "string"
+      - name: "lshhr"
+        type: "string"
+      - name: "public_transport_buses"
+        type: "integer"
+      - name: "doha_metro"
+        type: "integer"
+      - name: "lusail_tram"
+        type: "integer"
     row_count_min: null
     row_count_max: null
     reconciliation: "none"

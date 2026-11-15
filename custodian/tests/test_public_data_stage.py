@@ -30,7 +30,12 @@ def test_planted_wrong_figure_fails_the_stage(tmp_path: Path) -> None:
     """A figure file that disagrees with the published anchor fails the build."""
     folder = tmp_path / "figures"
     folder.mkdir()
-    planted = dict(EXPECTED["PUB-62"])
+    planted = {
+        "zone_69_2021": "429964072",
+        "zone_69_2025": "1436402796",
+        "ratio_2dp": "3.34",
+        "sum_ratio_2dp": "1.34",
+    }
     planted["zone_69_2021"] = "1"
     (folder / "PUB-62.json").write_text(json.dumps(planted), encoding="utf-8")
 
