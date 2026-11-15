@@ -1499,12 +1499,13 @@
 ## OI-164 — The registry loader does not yet follow decision 0026
 
 - ID: OI-164
-- TYPE: OPEN
+- TYPE: PENDING (was OPEN)
 - NEEDED: The registry loader, the terms handling of the fetch and the registry rows follow [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md): `owner_decision` is the basis of every source with no open licence covering the use, with no source admitted one by one and no separate decision record; the basis `none_stated` is gone; and terms read at a fetch never switch off a source that a visitor can read, or limit its release or display.
 - WHY: Decision 0026 merged (pull request 44) after task S2-T01 was built and approved. It rewrote two acceptance criteria of that task and named no task for the change of code. At the merge of S2-T01 the loader (`custodian/src/eii_custodian/publicdata/fetch/registry.py`) still admits an `owner_decision` source only when it is listed in `OWNER_DECISION_SOURCES` and names a record of `DECISION_RECORDS`, and keeps the basis `none_stated`, which 19 rows of `custodian/publicdata/sources.yaml` carry and for which `release_refused` refuses every release slot; and the fetch (`_switch_off_on_terms` in `custodian/src/eii_custodian/publicdata/fetch/build.py`) switches a source off when the terms read at a fetch forbid the use.
 - DONE SO FAR: The two criteria are moved, unticked and word for word, from the entry of S2-T01 to the new task S2-T21 in TASKS.md, and S2-T21 is added to what the pack assembly S2-T08 depends on. No code is changed by the move. The 10 sources admitted by name keep working, so no task built ahead is blocked.
 - OPTIONS: **Default:** task S2-T21 changes the loader, the fetch, the rows and their tests before the slice S2 gate; until then the loader stands as built and reviewed.
 - NEEDED BY: the slice S2 gate (task S2-T21, before the pack assembly S2-T08).
+- UPDATE: 2026-11-15, by the ledger of merge train C (task S2-T21): PENDING, not closed. Task S2-T21 changed the loader, the fetch, the rows and their tests under one design review, two code reviews and four confirmations by another maker, and merges as its part A. The list of admitted sources, the basis `none_stated` and the switch-off on terms are gone. Both criteria stay unticked (part B): they wait for the publishers' words (OI-209), the reasons of six skipped rows (OI-210), the release proof of S2-T08 (OI-211) and DHA-102 (OI-212).
 
 ## OI-166 — Placing a location that has no base cell
 
@@ -1590,7 +1591,7 @@
 ## OI-176 — Five low defects of the public-series calculations, fixed on the calculation layer's final form
 
 - ID: OI-176
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - NEEDED: The five defects D1 to D5 that the internal verification of task S2-T03 found are fixed once, with a planted test each, on the final form of the calculation layer: the branch of task S2-T07, which replaces `core/src/eii_core/calc/public_series.py` whole.
 - WHY: The verification (2026-11-15, at the commit dde9aeedd273c9f82c6e74b6b921ba1b3ee4f4c6; a helper of the lead on the lead's own maker and model, so an internal second reading and not another maker's review) found every formula equal to its card and no defect on a recorded figure of the task. The five defects, each reproduced on invented inputs:
   - D1, an exact half can round the wrong way, and the identity of MTH-21 is not exact (functions `ratio`, `weighted_mean` and `decomposition`): division is made at 28 digits before the later steps, so the value handed to `rounded` is already rounded once. Invented input: before, 5 workers at wage 1 and 1 at wage 0; after, 2 at wage 1 and 1 at wage 2; the means are 5/6 and 4/3 and the change is exactly 0.5. Got "0"; expected "1". Two more invented cases: a within part of exactly 8.5 printed "8", expected "9"; a mix share of exactly 6.25 per cent printed "6.2", expected "6.3". A breach of "round only at the end" (document 04 section 10).
@@ -1601,6 +1602,7 @@
 - DONE SO FAR: The lead's ruling L-354 keeps S2-T03 in merge train A: the lead's real-cache run at the task's fix commit printed every value of PUB-62 to PUB-66 and PUB-68 to PUB-70 equal to the pack's figures, and the lead's count on the real cancelled-licence file on 2026-11-15 found 40,472 rows, 1,221 undated, 39,251 inside the calendar of card C2 and 0 outside it. A fix pass on the branch of task S2-T07 runs since 2026-11-15 (started again as a join-and-fix pass after the lead's ruling L-357 on the square root of the interval method). The verification's list of tests that could pass on wrong code (its section V7, in the task's log) goes to the same pass.
 - OPTIONS: **Default:** the fix as the verification writes it for each defect (exact rationals up to the output and a sign-safe `rounded` for D1 and D2; a refusal for D3; a refusal or a separate count for D4; no summed quantity for D5), on S2-T07's branch only; `public_series.py` as merged by train A is not patched apart.
 - NEEDED BY: the merge of task S2-T07, which does not merge without the fix. Closes when S2-T07's review confirms the five fixes, each with its planted test, on its approved commit.
+- UPDATE: 2026-11-15, by the ledger of merge train C (task S2-T07): CLOSED. The five defects D1 to D5 are fixed on the final form of the calculation layer, commit 4bbaa98e91a3bd26b3eb6a7f9cfa94253b67b274 of the task's own change `6ccc85b..5090b40`. Each was reproduced red on the item's own invented inputs and fixed with its planted test: exact rationals up to the output and one rounding (D1), no negative zero (D2), a refusal for the empty size table (D3), a refusal by source and period for a dated row outside the calendar of card C2 (D4), no summed quantity (D5). The task's reviewer (Cognition SWE-2 High through Devin) confirmed the five fixes on the approved commit 5090b40c448a6657da4ecba9b0e2717243318294, check C1 PASS, with five values worked by hand. The item's closing rule is met.
 
 ## OI-177 — Secret-scanner evidence of S2-T12, pinned at its turn
 
@@ -1672,6 +1674,7 @@
 - DONE SO FAR: Nothing; proposed by the lead's ruling after the task's approval.
 - OPTIONS: **Recommendation:** scope the sweep when the pass is briefed; the survivors' counts and locations are in the lead's campaign records, not this task's.
 - NEEDED BY: the slice S2 gate or the affected tasks' pull requests, as the lead rules.
+- UPDATE: 2026-11-15, by the ledger of merge train C (task S2-T21): the item stays open and gains the survivors of that task's campaigns that stand outside its changed lines. Before the join, the campaigns on the three fetch modules left 508 survivor or not-covered lines, of which one stood on a line of that task and is explained; three more mutants of two `__init__` methods could not be placed by their hunk text and stand on no line of the task. The second code review recorded them in the reviewer's words (Cognition SWE-2, proposed item P3): "the owed mutation campaign on the three fetch modules ended exit 1 with 504 survivors and 3 not-located `__init__` mutants, all on lines of earlier tasks, not of this task — the lead holds the list; closure belongs to the slice's follow-up task." On the joined local tree at 858141106b9160505bdb0db813e78a9593743d3d the campaigns ended with exit code 1 each, and none is a pass: `kinds.py` made 855, killed 560, survived 295; `build.py` made 544, killed 439, survived 100, not covered 5; `receipts.py` made 167, killed 107, survived 60; `terms_text.py` made 46, killed 37, survived 9. By the lead's placing against the lines the task changed: `receipts.py` none on the task's 4 lines; `build.py` none on its 61 lines; `kinds.py` one on its 41 lines, explained by its row, and two not located (two `__init__` lines); `terms_text.py` was not changed by the task. The loader `registry.py` is no longer part of the sweep: its campaign ends with 546 of 547 killed and the one survivor explained.
 
 ## OI-184 — One unexplained failure of the scripts unit suite in a quick-row run
 
@@ -1903,6 +1906,76 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - DONE SO FAR: The task is built, reviewed and accepted with provider `none` and with recorded answers only; no keyed run and no live call was made by the builder, a test or the lead. The refusal is tested: a keyed request without a qualification record, and one whose record differs in the model, the rubric identifier, the rubric hash, the language or the route, are refused before a gateway object is made. OI-15 (human-labelled qualification sets) names "any changed model, rubric, language or route" under NEEDED BY; OI-16 names who signs a mapping.
 - OPTIONS: **Default:** no keyed run of the triage tool; the queue is ordered with provider `none` or with recorded answers. A keyed run follows only after the lead records, with its evidence, a qualification for exactly this rubric, language and route, inside the token allowance of the owner's recorded answer to OI-18 and from the lead's own shell.
 - NEEDED BY: the first keyed run of `scripts/spine_triage.py`; not needed by any gate, which all run with provider `none` (rule 27).
+
+## OI-207 — Card C2's rule as written flags 42 of the 125 months
+
+- ID: OI-207
+- TYPE: OPEN
+- NEEDED: A decision on the bulk-month rule of card C2 (document 07): it stays as written, or it is amended by a decision record.
+- WHY: The lead's count over the pinned cancellations file (2026-11-14): 153,669 dated and 7,386 undated cancellations, the card's own counts; the median of the 125 months is 305 and the threshold 915; the rule flags 42 of the 125 months, among them every month of 2023 and of 2024, holding 89.7 per cent of the dated cancellations. The three months the card names hold 43.1 per cent, which is the card's printed share. So the card's own open question (which other months the rule flags) has the answer 42, and "excluding flagged months" is empty for 2023 and 2024, the year of the card's own worked example.
+- DONE SO FAR: The lead changed no method (scope is frozen; a method amendment is a decision record). The data test `custodian/data_tests/test_pinned_methods.py` pins the three named months with their exact counts and their share 43.1, and the count of flagged months (42), their list and the share 89.7 as facts of the pinned file. It passed on the real cache at the approved commit of task S2-T07.
+- OPTIONS: **Default:** the rule stays as written in version 1 and the method note lists the 42 months. Alternative: a median over a moving window, by decision record.
+- NEEDED BY: task S2-T09 (the method cards), before the card's churn figure excluding flagged months is shown.
+
+## OI-208 — The rounding of a negative half
+
+- ID: OI-208
+- TYPE: ASSUMPTION
+- NEEDED: Confirmation that a negative exact half rounds away from zero in every displayed figure of the calculation layer.
+- WHY: The pack says half-up and round once at the end (document 04 section 10) and does not say which way a negative half goes. The layer rounds half away from zero on the magnitude; tests pin it.
+- DONE SO FAR: The lead's ruling of 2026-11-14 on the second verification of task S2-T07 took half away from zero as the assumption and asked for this item. The confirmation of 2026-11-15 read the rounding function and found one rounding and no second one.
+- OPTIONS: **Default:** half away from zero, as built. Alternative: half towards positive infinity, which changes the sign rule of the one rounding function and the tests that pin it.
+- NEEDED BY: task S2-T09, where the method cards state their rounding.
+
+## OI-209 — 136 registry rows carry the marker `terms to be read` in place of the publisher's words
+
+- ID: OI-209
+- TYPE: OPEN
+- NEEDED: For each source, the publisher's terms in its own words with the date read and the basis of use, recorded in document 04 and in the two registry fields `terms_words` and `terms_read_on` (PUB-12; item 3 of [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md)). This is a record that the pack requires, made by reading each terms page as a visitor; it is not a question of permission, and under item 1 of the record no reading switches a source off.
+- WHY: Task S2-T21 added the two fields to all 138 rows of `custodian/publicdata/sources.yaml` and read no terms page. 136 rows carry the marker `terms to be read` with the date checked, 2026-11-14; two rows (`fdi_projects` and `busy_gmaps`) carry words that document 04 already held, which a guard test compares with that document. Both acceptance criteria of S2-T21 ask for the publisher's own words for every source, so neither is ticked on the marker, and the task merged as its part A. At the train C head a raw read counts 139 rows and 136 markers; the additional places file row lacks both terms fields. The permitted registry test fails; see the train log and CHECK.md. This item records the original task debt, not a passing joined registry.
+- DONE SO FAR: The loader requires both fields on every row and refuses an empty text or a date that is not a calendar date; the marker is the designed state of decision 0026 item 3 until a page is read (the first code review's REV-13). The fetch fingerprints every terms page a row records and prints a line when one changes. Raised by the builder of S2-T21 (xAI Grok 4.7; the return signs "SpaceXAI, Grok 4.7") as its proposed item (b).
+- OPTIONS: **Default:** the lead's live reading fills the words and the date row by row, in document 04 first and then in the registry, so that the guard test covers each row as it is filled; a row whose page cannot be read as a visitor keeps the marker and says so.
+- NEEDED BY: task S2-T08 (its criterion that every Public source in the release carries the publisher's terms in its own words), before the slice S2 gate; the two criteria of S2-T21 are ticked no earlier (its part B).
+
+## OI-210 — Six rows are skipped with one phrase that names no actual technical reason
+
+- ID: OI-210
+- TYPE: OPEN
+- NEEDED: The actual technical reason of each of the six rows that carry `skip_reason` `publisher_or_schema_unconfirmed` (`wage_sector`, `wage_bands_priv`, `work_hours_act`, `cpi_group`, `accident`, `bnd_muni_2025`), or the confirmation that the row can be fetched.
+- WHY: PUB-13 and the second criterion of S2-T21 ask that an absent source is absent "with the actual reason recorded", and decision 0026 allows no absence for a reason of licence or terms. The rows carried `publisher_or_licence_unconfirmed` before the task; the loader now refuses a skip reason that names a licence or terms, and the build gave all of them the one phrase its brief named, which states no reason row by row.
+- DONE SO FAR: The first build renamed nine rows. At the join onto the tree of train B three of them (`zone_population`, `est_census`, `census_hh_type_2020`) kept the licence cells and skip reasons that the tree had since confirmed, so six rows carry the phrase at `5147fdecdcac222a150464e0e43644d26f89d24d`. Raised by the builder of S2-T21 as its proposed item (c): the rows "stay skipped until the lead states the actual technical reason of each or confirms the row fetchable".
+- OPTIONS: **Default:** the lead reads each source as a visitor and records the reason found (an unconfirmed file, address or schema, a failed check) or clears the skip; a row skipped for its licence alone becomes fetchable.
+- NEEDED BY: task S2-T08 (source completeness), before the slice S2 gate.
+
+## OI-211 — The release half of both criteria of S2-T21 is proved by the pack assembly
+
+- ID: OI-211
+- TYPE: OPEN
+- NEEDED: Tests of task S2-T08 at the release boundary: every admitted source reaches the release whatever its terms words or basis, and a source absent for a technical reason reaches it as `NO_DATA` with its actual reason and caveat. The two criteria of S2-T21 are ticked with this item named beside them, never on fetch success alone.
+- WHY: The fetch that S2-T21 changes assembles no release and shows nothing. The design review's finding F3 said so of the plan, and both code reviews carried it. The reviewer's words (Cognition SWE-2, proposed item P1 of both local code reviews): "acceptance criteria 1 and 2, release half: this commit proves the loader/fetch/registry half; that every admitted source reaches the release whatever its terms, and every technical absence reaches it as `NO_DATA` with its reason and caveat, is S2-T08's proof".
+- DONE SO FAR: S2-T21 proves its own boundary on invented inputs: a cached file and a receipt for an admitted row; no usable output and the recorded reason for a technical absence. Task S2-T08 depends on S2-T21 and its second criterion already asks that every Public source in the release carries its terms "with no terms-based exclusion" under decision 0026. Raised first by the builder of S2-T21 as its proposed item (a).
+- OPTIONS: **Default:** S2-T08's plan names the two tests and this item; when they pass on its approved commit, that task's ledger ticks the boxes of S2-T21 that then wait for nothing else.
+- NEEDED BY: task S2-T08, before the slice S2 gate.
+
+## OI-212 — DHA-102 is not updated by S2-T21
+
+- ID: OI-212
+- TYPE: OPEN
+- NEEDED: What the second criterion of S2-T21 asks of document 17: "changed terms update document 17, DHA-102, where permission or a licence is needed for real use". The list of DHA-102 is brought in line with the registry's terms record when the words of OI-209 are read.
+- WHY: The plan listed document 17 among its files; the build did not touch it, and its return says so under what is not proved. No terms page was read by the task, so no changed terms were seen; the fetch now prints a line when a recorded terms page changes, and nothing joins that line or the registry to the list of DHA-102.
+- DONE SO FAR: Nothing in document 17. The builder named a machine check that joins the DHA-102 list to the registry as hardening that it did not build (PO-S2-65).
+- OPTIONS: **Default:** the pass that records the publishers' words (OI-209) updates DHA-102 in the same change and the criterion's clause is judged then.
+- NEEDED BY: the tick of the second criterion of S2-T21; before the slice S2 gate.
+
+## OI-213 — One timed-out mutant of the loader's campaign was not classified
+
+- ID: OI-213
+- TYPE: OPEN
+- NEEDED: The lead's replay, alone and at normal load, of the one mutant of `custodian/src/eii_custodian/publicdata/fetch/registry.py` that timed out, or a recorded finding that it cannot be named from the records.
+- WHY: Rule 39: a green re-run alone does not close an unexplained failure. The lead's campaign of the loader on the joined tree, after the thin test pass, ended with the line `made=547 killed=452 survived=94 timed_out=1 not_covered=0 incomplete=0`. The runner prints a hunk for a survivor and for a not-covered mutant only, so the campaign's record holds no hunk for the timeout, and the builder of the mutation pass could not say whether it is a loop that cannot end or a slow mutant.
+- DONE SO FAR: The three later campaigns of the module count `timed_out=0` with 546 of 547 killed; the builder's reading is that a new test may have killed the mutant before a timeout. That campaign's own line gives 7,481 seconds of wall time, where the later ones give about 1,000 seconds each; the records this item rests on do not say why.
+- OPTIONS: **Default:** the lead names the mutant from the tester's own result store of that campaign if it is kept, replays it alone and records the result apart from killed mutants; if the store is gone, the item is closed as not reproducible with the three later count lines listed.
+- NEEDED BY: the slice S2 gate.
 
 ## Change control
 
@@ -2347,6 +2420,7 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: mutation testing of the modules that compute or compare numbers (rule 44, `scripts/mutation.py`)
 - EVIDENCE: The campaign on `core/src/eii_core/calc/public_series.py` is complete (130 mutants made, 127 killed, 3 survived and explained, exit 0). The three custodian series modules of the same task, `figures.py`, `baskets.py` and `reconcile.py` under `custodian/src/eii_custodian/publicdata/series/`, have no campaign: on the task's base the mutation copy lacks the scripts folder that one test of S2-T01 imports, so the custodian suite cannot run in it.
 - NEEDED: the campaign on the three modules, every survivor killed or explained. The lead runs it on the joined tree of the train that carries task S2-T21, where the mutation copy holds what the custodian suite imports; a survivor goes to the builder's maker of S2-T03. Or one line saying why the item is not valid.
+- UPDATE: 2026-11-15, by the ledger of merge train C (task S2-T07): the calculation change now joins main. The campaign record of train B5 above stays unchanged: the runs were on train B4 trees that held this task, not on this joined head. The task brings the changed figures.py and reconcile.py back; the 150, 12 and 20 survivors recorded above remain with the same thin test pass, and exit code 1 remains not a pass. The lead's identity account says that every mutated source file of the tasks is byte-identical to its approved form except fetch/build.py, whose rerun is recorded in this train's log.
 - UPDATE: 2026-11-15, by the ledger of merge train B5 (tasks S2-T04 and S2-T05): the item stays open. The campaign of `figures.py` ran to its end for the first time on a trial tree of train B4 at bbc5bfa869bc0a24f37c4a70ab10d0bd6a652577: made 1,891, killed 1,741, survived 150, timed out 0, not covered 0, exit code 1. The run was possible because the repair of the mutation runner by task S1-T19 (pull request 54) stood under that tree, not because of task S2-T21, which the train does not carry. The explanations file holds no entry for the module, so all 150 survivors are unexplained: 149 stand on lines of S2-T03 that are byte-equal on main, and one stands on a line that S2-T07 added (line 342, the text of a refusal message that its test matches by a search). That tree, and train B4's first cut cafd8b741dd2d16cb7514b4945d8413482fa7ad2, both held S2-T07, which changed ten lines of `figures.py` and two of `reconcile.py`; S2-T07 left the train at the split this ledger records, so neither changed blob is one this train merges. In the joined work commit b89fc325514b92e82d9fd8318d5c44b38d3309a6 all three modules are the blobs main a46e6ff7722d2ca0f966f1bd78a95c3462887497 holds and this train changes no line of them, read by `git rev-parse <commit>:<path>` at both: `figures.py` 48c4dd6d61783ba4a7669739041dd82cfb41c4cd, `reconcile.py` f4c02552639938b3f3b09edd1e9574ce4309d070, `baskets.py` 03043734490a1ea353933e82e353804c45cdca0a. On train B4's first cut the lead's campaign of 2026-11-15 ran all three in one run with exit code 1: `reconcile.py` made 193, killed 181, survived 12; `baskets.py` made 238, killed 218, survived 20; `figures.py` made 1,891, killed 1,741, survived 150 again. The exit code 1 is recorded as it is and is not a pass. By the lead's ruling of 2026-11-15 the survivors go to one thin test pass on its own branch, built by the maker that built S2-T03 and reviewed by another maker, on a base that holds the runner's repair; all three modules go to that pass.
 
 ### PO-S2-15 — The filled tender confirmation once S2-T19 fetches the source
@@ -2645,6 +2719,193 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: `custodian/tests/test_activity_graph_survivors_writes.py` and `custodian/tests/test_activity_graph_survivors.py`; rule 37 of `AGENTS.md`
 - EVIDENCE: The test of the staging removal plants a folder that cannot be removed by its mode bits: under a process that may remove any folder the plant has no effect, the three mutants it kills would survive, and the test would still pass. The test of the read under the C locale loses its kill under the interpreter's UTF-8 mode and never fails wrongly. The tests of the staging prefix assume a longest file name of 255 bytes and a temporary folder on another device than the shared-memory folder. All hold on the declared platform and in the lead's campaigns; none can fail wrongly.
 - NEEDED: if the suite is ever run on another platform or as a privileged user, each of the three tests either proves its plant took effect before it asserts or is skipped there by name with its reason. Or one line saying why the item is not valid.
+
+### PO-S2-48 — Card C8: the replay from a pinned file and the source entry of its fixture block
+
+- ID: PO-S2-48
+- TYPE: OPEN
+- RAISED BY: the designated reviewer of task S2-T07 (Cognition SWE-2 High through Devin), 2026-11-14 and 2026-11-15: finding F1 of round 1 (its deferred part) and proposed item P5 of round 2
+- CONCERNS: MTH-03 (a data test for each worked example); card C8 of document 07; `core/tests/fixtures/methods/public_methods.json`
+- EVIDENCE: The arithmetic test on card C8's printed inputs exists since the fix of F1. The data replay was not added: the national census table is not among the pinned sources of the lead's cache (the pins file names ten sources, none of them that table). The fixture's source entry `pub_census_national` carries only the dataset name, where its sibling entries carry publisher, address and licence; the card states that the census layers state no licence.
+- NEEDED: when the national census table is pinned, the replay of card C8 in `custodian/data_tests/` and the publisher and retrieval date in the fixture's source entry, by the task that writes the method-card pins. Or one line saying why the item is not valid.
+
+### PO-S2-49 — The four calculation modules share one mutable decimal context
+
+- ID: PO-S2-49
+- TYPE: OPEN
+- RAISED BY: the designated reviewer of task S2-T07, round 1, 2026-11-14, proposed item P2
+- CONCERNS: document 17 (a proposed hardening point); `core/src/eii_core/calc/public_series.py`
+- EVIDENCE: The reviewer's point: the modules share one mutable context object, `CALC_CONTEXT`; all arithmetic runs inside a local copy of it and nothing reads its flags, so results are unaffected, but a per-call copy or an immutable settings record would remove the surface a later edit could misuse. The confirmation of 2026-11-15 found exactly one stated decimal context in the module.
+- NEEDED: a hardening entry of document 17, or one line saying why the item is not valid.
+
+### PO-S2-50 — Two row types admit text fields without the exact-type check
+
+- ID: PO-S2-50
+- TYPE: OPEN
+- RAISED BY: the designated reviewer of task S2-T07, round 1, 2026-11-14, proposed item P3
+- CONCERNS: document 17 (a proposed hardening point); `core/src/eii_core/calc/public_methods.py`
+- EVIDENCE: The reviewer's point: `TradeRow` and `AnnualEnergy` admit their text fields (`product`, `origin`, `month`, `unit`, `zone`) without the exact-type check that every other admission point applies. Only a subclass of the text type differs, and every numeric field still passes the exact-type checks.
+- NEEDED: a hardening entry of document 17, or one line saying why the item is not valid.
+
+### PO-S2-51 — Card C1: its two unprinted denominators and its data test
+
+- ID: PO-S2-51
+- TYPE: OPEN
+- RAISED BY: the design review of task S2-T07 (xAI Grok 4.7 through Cursor, 2026-11-14, its fifth finding), the lead's ruling of 2026-11-14 on it, and the designated reviewer of the task, round 1, proposed item P4
+- CONCERNS: card C1 of document 07 (task S2-T09 owns the cards); MTH-03; `custodian/data_tests/`
+- EVIDENCE: Card C1 prints the two location quotients 1.39 and 3.05 and not the two counts they need. The lead read both from the cached open-licence table of active licences through the frame's municipality crosswalk and checked both quotients by hand within the card's tolerance of 0.01; the counts entered the method fixture with their source. That check is the lead's hand-check and no committed replay. Card C1 has no data test: it waits for the frame's population table.
+- NEEDED: card C1 prints both counts (task S2-T09); a replay in `custodian/data_tests/` asserts both denominators from the pinned file and the two quotients, and the card's data test follows when the frame's table stands on the same tree. Or one line saying why the item is not valid.
+
+### PO-S2-52 — The third worked row of card C2, by activity class, has no data test
+
+- ID: PO-S2-52
+- TYPE: OPEN
+- RAISED BY: the lead's ruling of 2026-11-14 on the questions of the third pass of task S2-T07 (its third question)
+- CONCERNS: card C2 of document 07; MTH-03; `custodian/data_tests/test_pinned_methods.py`
+- EVIDENCE: The data tests replay the national cancellations and two municipal rows of card C2. The third worked row, by activity class, needs the reviewed activity spine of task S2-T04. The spine's code joined main with train B5 (pull request 59); its human review remains OI-203 on main.
+- NEEDED: the data test of the third row once the spine is reviewed, named with its owner task. Or one line saying why the item is not valid.
+
+### PO-S2-53 — One check value is divided under the caller's decimal context
+
+- ID: PO-S2-53
+- TYPE: OPEN
+- RAISED BY: the designated reviewer of task S2-T07, confirmation of 2026-11-15, a proposed point marked record and hardening
+- CONCERNS: document 17 (a proposed hardening point); `custodian/src/eii_custodian/publicdata/series/figures.py`, function `compute_checks`, key `value_bn_2dp`
+- EVIDENCE: The reviewer's point: the exact total is divided by a Decimal power of ten under the ambient context. It is exact for every reachable total, and sensitive to the caller's context in principle, where the exact rational form would not be.
+- NEEDED: a hardening entry of document 17, or one line saying why the item is not valid.
+
+### PO-S2-54 — The refusal distance of an approximate value is absolute
+
+- ID: PO-S2-54
+- TYPE: OPEN
+- RAISED BY: the designated reviewer of task S2-T07, confirmation of 2026-11-15, a proposed point marked record and hardening
+- CONCERNS: document 17 (a proposed hardening point); `core/src/eii_core/calc/public_series.py`, constant `BOUNDARY_DISTANCE`
+- EVIDENCE: The reviewer's point: the band of 1e-40 covers the stored error of a fifty-digit value only for magnitudes below roughly 1e9. Every value the layer produces stays far under that; a later approximate path at larger magnitudes would need the band scaled.
+- NEEDED: a hardening entry of document 17, or one line saying why the item is not valid.
+
+### PO-S2-55 — The calendar of card C2 is written twice
+
+- ID: PO-S2-55
+- TYPE: OPEN
+- RAISED BY: the designated reviewer of task S2-T07, confirmation of 2026-11-15, a proposed point marked record and hardening
+- CONCERNS: document 17 (a proposed hardening point); `core/src/eii_core/calc/public_methods.py`, function `licence_churn`, and the constant `C2_CALENDAR` of `public_series.py`
+- EVIDENCE: The reviewer's point: `licence_churn` keeps its own copy of the 125-month calendar, identical to the constant; sharing the constant would prevent drift.
+- NEEDED: a hardening entry of document 17, or one line saying why the item is not valid.
+
+### PO-S2-56 — The mutation runner's copy of the `docs` folder after the repair of task S1-T19
+
+- ID: PO-S2-56
+- TYPE: OPEN
+- RAISED BY: the lead, at the join of merge train B4, 2026-11-15
+- CONCERNS: `scripts/mutation.py`, function `run_packages`; document 17
+- EVIDENCE: Task S2-T07 added three lines that copy the repository's `docs` folder into each package copy, because a package's tests run one folder deeper there and `core/tests/test_second_fix.py` reads `docs/03_DATA_CONTRACTS.md` by walking up from its own file. The repair of task S1-T19, on main since pull request 54, makes the copy's root an empty git repository and adds a shared root lookup for tests (`custodian/tests/repository_root.py`). Whether the three lines are still needed after it was not tested.
+- NEEDED: one run of the campaign of a `core/src` module with the three lines removed; then the lines stay with a comment that says why, or go with the test brought to the shared lookup. Or one line saying why the item is not valid.
+
+### PO-S2-57 — Values that are not numbers under names ending `_unrounded`
+
+- ID: PO-S2-57
+- TYPE: OPEN
+- RAISED BY: the lead's ruling of 2026-11-14 on the questions of the third pass of task S2-T07 (its tenth question)
+- CONCERNS: the result types of `core/src/eii_core/calc/`; DAT-90
+- EVIDENCE: The ruling's words: non-number values under names ending `_unrounded` stay in version 1 with an open item. The fields concerned were not listed on the joined tree when this item was entered.
+- NEEDED: the list of those fields and one decision: they are renamed, or the name's meaning is written into the contract. Or one line saying why the item is not valid.
+
+### PO-S2-58 — Hardening of the fact layer that was recorded and not built
+
+- ID: PO-S2-58
+- TYPE: OPEN
+- RAISED BY: the lead's ruling of 2026-11-14 on the second verification of task S2-T07 (its list "not built, recorded")
+- CONCERNS: document 17 (proposed hardening points); DAT-134; the fact schema's task
+- EVIDENCE: The ruling lists, as beyond the task's criteria or in another task's file: making a fact constructible only through the wrapper (the language cannot enforce it; the origin check of DAT-134 belongs to the fact schema's task); a closed licence list, a host rule for a source address, and a retrieval date checked against the period; and the plain-decimal form of the decomposition that the public-series figures of S2-T03 call. Whether that plain form still exists after the exact-arithmetic fix was not checked when this item was entered.
+- NEEDED: a hardening entry of document 17 for each point that still holds, with its owner task. Or one line saying why the item is not valid.
+
+### PO-S2-59 — The purity guard names four modules; the apportioning module is not among them
+
+- ID: PO-S2-59
+- TYPE: OPEN
+- RAISED BY: a helper of the lead at the trial join of merge train B4, 2026-11-15; checked again on the joined work commit for this ledger
+- CONCERNS: the first criterion of task S2-T07 in TASKS.md; `core/tests/test_calculation_purity.py`; `core/src/eii_core/calc/apportion.py` (task S2-T13)
+- EVIDENCE: The guard imports and lists `facts`, `public_methods`, `public_series` and `sector_economics` by name. Main gained `apportion.py` in the same package with pull request 52, after this task's base. On the joined tree the guard does not read it, and no test fails when a calculation module is added without joining the list.
+- NEEDED: the guard reads every module of `core/src/eii_core/calc/` (a listing of the folder, with a plant), or the list gains the module with one test that fails for an unlisted file. Or one line saying why the item is not valid.
+
+### PO-S2-60 — The data-test command stands in no rules file
+
+- ID: PO-S2-60
+- TYPE: OPEN
+- RAISED BY: a helper of the lead, 2026-11-15, from the lead's ruling of 2026-11-14 on the second verification of task S2-T07 (its point on data tests) read against rule 44
+- CONCERNS: rule 44 of AGENTS.md and CLAUDE.md; TST-197 and TST-198; `custodian/data_tests/`
+- EVIDENCE: The ruling says that the data tests stand outside the whole test command's discovery, that the lead runs them on the real cache with the evidence in the ledger, and that their command joins rule 44 in the task's document part. Rule 44 on the joined tree names no data-test command, and neither `README.md` nor `core/README.md` names the folder. The lead ran them as `uv run --locked python -m pytest custodian/data_tests -q -p no:cacheprovider` with the public cache linked into the workspace.
+- NEEDED: the command and its condition (the real public cache, the lead's shell only, never a test, a gate or CI) in rule 44 of both rules files, by a documents change; or one line saying why rule 44 does not need it.
+
+### PO-S2-61 — The runner's refusal of `PYTEST_ADDOPTS` reads the process environment only
+
+- ID: PO-S2-61
+- TYPE: OPEN
+- RAISED BY: the confirmation of the joined `scripts/mutation.py` for task S2-T07 (Cognition SWE-2 High through Devin, 2026-11-15), its one proposed item, marked hardening
+- CONCERNS: `scripts/mutation.py`, function `run_copy`; tasks S2-T07 and S1-T19; document 17 (a proposed hardening point)
+- EVIDENCE: The reviewer's point: the refusal of a set `PYTEST_ADDOPTS` in `run_copy` reads the process environment and not the `environment` mapping that a caller may pass. No caller in the tree can bypass it: the package run derives its environment from the process environment, so the refusal fires first, and the typed-decision run uses the process environment directly (check K3 of the confirmation). A later caller that passes a hand-built environment holding the variable would not be refused. The point is beyond both tasks' acceptance criteria.
+- NEEDED: the refusal also reads the mapping that is passed, with a planted test; or one line saying why the item is not valid.
+
+### PO-S2-62 — `GraphRefused` is exported and nothing raises it
+
+- ID: PO-S2-62
+- TYPE: OPEN
+- RAISED BY: the confirmation of the joined change of S2-T21 (Cognition SWE-2 through Devin, 2026-11-15), proposed item
+- CONCERNS: `custodian/src/eii_custodian/publicdata/review/graph.py` (the class `GraphRefused` and the module's export list), a file of task S2-T04
+- EVIDENCE: The reviewer's words: "GraphRefused stays exported in graph.py (__all__, line 762) and nothing raises it — dead export for a later owner to remove." The join of S2-T21 removed the one raise, the release refusal on a licence that items 1 and 9 of [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) end; the builder's return says the same under its check for the lead.
+- NEEDED: the follow-up task of slice S2, or the next task that owns the graph module, removes the class and its export with any import of it; or one line says why it stays.
+
+### PO-S2-63 — Three mentions of the basis `none_stated` that no loaded row can reach
+
+- ID: PO-S2-63
+- TYPE: OPEN
+- RAISED BY: the builder of the join pass of S2-T21 (xAI Grok 4.7 through Cursor) and the confirmation of the joined change (Cognition SWE-2 through Devin), 2026-11-15
+- CONCERNS: `custodian/src/eii_custodian/publicdata/frame/live.py` (`build_live_frame`); `custodian/src/eii_custodian/publicdata/frame/census.py` (`census_rows`); `custodian/src/eii_custodian/publicdata/confirm_s2_t13.py` (`BASES`); their tests that plant the basis
+- EVIDENCE: The reviewer's words: "frame/live.py, frame/census.py and confirm_s2_t13.py still name the basis none_stated; unreachable from a loaded registry row — cleanup belongs to a task that owns those files." The loader refuses the basis, so only a planted entry takes the two frame arms, and the confirmation module reads no registry row. The lead's ruling for the join left the three as they are.
+- NEEDED: the follow-up task of slice S2 removes the two dead arms and the two values of `BASES` that decision 0026 retired, with the tests that plant them changed to the bases that exist; or one line says why each stays.
+
+### PO-S2-64 — No test builds the cached graph in release mode after the join
+
+- ID: PO-S2-64
+- TYPE: OPEN
+- RAISED BY: the confirmation of the joined change of S2-T21 (Cognition SWE-2 through Devin, 2026-11-15), proposed item
+- CONCERNS: `custodian/src/eii_custodian/publicdata/review/graph.py` (`build_cached_graph`); `custodian/tests/test_activity_planted.py`
+- EVIDENCE: The reviewer's words: "No test calls build_cached_graph with mode="release" after the join — a coverage point, not a weakened assertion." The join removed `test_cached_release_refusal_writes_nothing`, which planted only the licence refusal that the record ends; the release build of the uncached path is covered by `test_release_build_of_the_classification_source_is_not_refused`.
+- NEEDED: the follow-up task of slice S2 adds one test that builds the cached graph in release mode on invented inputs and asserts what it writes; or one line says why it is not valid.
+
+### PO-S2-65 — Hardening of the terms record that S2-T21 named and did not build
+
+- ID: PO-S2-65
+- TYPE: OPEN
+- RAISED BY: the builder of S2-T21 (xAI Grok 4.7 through Cursor, 2026-11-14), in the return of the build pass; the design review (OpenAI GPT-6) had ruled the three deferred
+- CONCERNS: `custodian/src/eii_custodian/publicdata/fetch/registry.py`; `custodian/publicdata/sources.yaml` (the fields `licence_id`, `terms_words`); the build log of `./eii build-public`; document 17, DHA-102
+- EVIDENCE: The builder's words: "A machine check joining the DHA-102 list to the registry. A normalised `licence_id` vocabulary. A build-log count of `terms to be read` rows." The design review's words on them: "Leave the DHA-102 cross-check, licence vocabulary and pending-row count deferred." Two further leftovers of the same change stand by design: the registry flag `terms_watch`, which two rows set and which now changes nothing, and the receipt field `switched_off`, which is always false.
+- NEEDED: the follow-up task of slice S2 decides each of the three (built with a planted violation, or one line why not) and whether the two inert fields leave the registry and the receipt with a schema change of their own.
+
+### PO-S2-66 — The busy-venue name scan fails on a bytecode file under the tests folder
+
+- ID: PO-S2-66
+- TYPE: OPEN
+- RAISED BY: the lead, from the return of the mutation pass of S2-T21 (xAI Grok 4.7 through Cursor, 2026-11-15) and from a second helper run on a former candidate tree (2026-11-15); a failure with a known cause, recorded once for merge train C under rule 39, under S2-T21, whose test it is
+- CONCERNS: `custodian/tests/test_publicdata_registry.py` (`test_no_non_python_test_file_names_busy_gmaps` and the scan it calls, `non_python_files_naming_busy`); document 17 (a proposed hardening point)
+- EVIDENCE: The scan reads as UTF-8 text every file under `custodian/tests` that is not a Python file, so a binary file there stops it with a decoding error that names no rule. The input records describe two occurrences. In the mutation pass of S2-T21 one run of the custodian tests ended with exit code 1 on a bytecode file of the new test file, written by the test runner under `custodian/tests/__pycache__/`; the builder removed the file, ran the tests again with bytecode writing switched off and recorded 1,311 passed, exit code 0. On that former candidate tree a helper's run of `uv run --locked python -m pytest custodian/tests/test_publicdata_registry.py custodian/tests/test_publicdata_behaviour.py -q -p no:cacheprovider`, after five other pytest commands in the same tree, ended with exit code 1, `1 failed, 69 passed`, on the same test and a compiled file that its own earlier runs had written; its shell had not set the no-bytecode variable. Why the lead's own runs pass: the whole test command sets the no-bytecode variable for its test processes (`scripts/run_tests_exec.py`), and the commands of a ledger run in a tree with no bytecode files and with that variable set. So run on the former trial tree, the same command gave 70 passed, exit code 0. These are historical results, not results on train C. The permitted registry-file run at the train C work commit also met the decoding failure (15 failed, 14 passed overall, exit 1); the other failures concern the missing terms fields of the places file row.
+- NEEDED: the follow-up task of slice S2 makes the scan read the files that git lists, or read bytes and search them, so that a cache file can neither stop it nor hide a named file from it, with a planted binary file; the scan is not narrowed to pass. Until then the commands of a ledger run in a tree with no bytecode files and with the no-bytecode variable set. Or one line says why it is not valid.
+
+### PO-S2-67 — Two test files of S2-T21 are longer than the briefs' target
+
+- ID: PO-S2-67
+- TYPE: OPEN
+- RAISED BY: the builder of S2-T21 (xAI Grok 4.7 through Cursor, 2026-11-14), in the return of the build pass, as a check for the lead
+- CONCERNS: `custodian/tests/test_publicdata_behaviour.py`; `custodian/tests/test_publicdata_registry.py`
+- EVIDENCE: The builder's words at the build pass: "`custodian/tests/test_publicdata_behaviour.py` is 1094 lines and `test_publicdata_registry.py` is 634. The brief says 500 lines is a target, not a failure. They were not split." At `5147fdecdcac222a150464e0e43644d26f89d24d` the two files hold 1,318 and 679 lines.
+- NEEDED: the follow-up task of slice S2 splits the two files by subject with no test changed, removed or renamed (the names are cited by this ledger), or one line says that the target does not bind test files.
+
+- ID: PO-S2-68
+- TYPE: OPEN
+- RAISED BY: the lead (Anthropic Claude), 2026-11-15, from the rerun of the campaign of fetch/build.py on merge train C
+- CONCERNS: `custodian/src/eii_custodian/publicdata/fetch/build.py`; `scripts/mutation_explained.toml`
+- EVIDENCE: At `5147fdecdcac222a150464e0e43644d26f89d24d` the campaign of the module made 630 mutants: 494 killed, 131 survived, 5 not covered, exit 1. Placed by `git blame` over the train's commits, all 136 stand on lines main already held (S2-T01, train A, S2-T22, S2-T15) and none on the 61 lines of S2-T21; the explanations file holds no row for the module.
+- NEEDED: a thin test pass of slice S2 kills each survivor or proves it equivalent with a row of the explanations file, before the slice S2 gate; no test of the module is weakened.
 
 ## Sources
 
