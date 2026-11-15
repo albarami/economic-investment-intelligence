@@ -227,13 +227,23 @@ def test_terms_watch_requires_basis_note(tmp_path: Path) -> None:
 
 
 def test_terms_watch_requires_terms_url(tmp_path: Path) -> None:
-    """terms_watch with a blank terms url is refused with the whole message."""
+    """A blank terms url is refused only when terms_watch is set."""
     row = invented_row(
         terms_watch=True,
         basis_note=BASIS_NOTE,
         terms_url="   ",
     )
     expect(sources(tmp_path, "watch-url.yaml", [row]), WATCH_URL)
+    watched = invented_row(
+        terms_watch=True,
+        basis_note=BASIS_NOTE,
+        terms_url="https://invented.invalid/terms",
+    )
+    kept = load_registry(sources(tmp_path, "watched.yaml", [watched]))
+    assert kept[0].terms_watch is True
+    unwatched = invented_row(terms_url="")
+    accepted = load_registry(sources(tmp_path, "unwatched.yaml", [unwatched]))
+    assert accepted[0].terms_watch is False
 
 
 def test_terms_watch_must_be_boolean(tmp_path: Path) -> None:
@@ -260,6 +270,8 @@ def test_layer_refusals_name_the_whole_text(tmp_path: Path) -> None:
     expect(sources(tmp_path, "absent.yaml", [absent]), LAYER_REQUIRED)
     flag = invented_row(kind="paged_layer", layer=True)
     expect(sources(tmp_path, "flag.yaml", [flag]), LAYER_INTEGER)
+    fraction = invented_row(kind="paged_layer", layer=0.5)
+    expect(sources(tmp_path, "fraction.yaml", [fraction]), LAYER_INTEGER)
     negative = invented_row(kind="paged_layer", layer=-1)
     expect(sources(tmp_path, "negative.yaml", [negative]), LAYER_NEGATIVE)
 
