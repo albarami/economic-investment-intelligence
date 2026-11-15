@@ -20,10 +20,12 @@ from urllib.parse import urlsplit
 
 from eii_custodian.publicdata.confirm_s2_t13 import CAVEAT
 from eii_custodian.publicdata.fetch.allowlist import approve
+from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.transport import (
     ATTEMPT_LIMIT,
     BACKOFF_S,
     TransportFault,
+    open_https,
 )
 from eii_custodian.publicdata.singles.tenders_html import (
     PageShapeError,
@@ -33,6 +35,7 @@ from eii_custodian.publicdata.singles.tenders_html import (
 )
 
 TENDER_HOST = "monaqasat.mof.gov.qa"
+CHAIN_PATH = Path("data/public_chain/tenders_pub.intermediate.pem")
 PAGE_SIZE = 20
 PACE_S = 3
 KIND = "paged_cards"
@@ -77,6 +80,7 @@ _MARK = "[...]"
 _DIGIT_MIN = 7
 _DIGIT_MAX = 15
 _KEY_HEX = 16
+_TENDER_KEY = re.compile(r"\Atnd_[0-9a-f]{16}(?:_[1-9][0-9]*)?\Z")
 _MONEY = Decimal("0.01")
 _DATE_FIELDS = frozenset({"award_date", "publish_date", "closing_date", "cancel_date"})
 _AMOUNT_FIELDS = frozenset({"bond", "documents"})
@@ -411,15 +415,45 @@ def publish_tenders(rows: Sequence[TenderRow], *, recorded: bool) -> Published:
 
 
 def reject_release(rows: Sequence[Mapping[str, object]]) -> None:
-    """Fail a release table that holds an identifier column or a contact shape."""
+    """Fail a release table that holds an identifier column or a contact shape.
+
+    ``tender_key`` is checked by its own pattern and is exempt from the contact scan.
+    """
     for row in rows:
         if any(name in _IDENTIFIER_COLUMNS for name in row):
             raise TenderError("release_identifier")
-        for value in row.values():
-            if isinstance(value, str) and (
-                _EMAIL.search(value) is not None or _EIGHT.search(value) is not None
-            ):
+        key = row.get("tender_key")
+        if not isinstance(key, str) or _TENDER_KEY.fullmatch(key) is None:
+            raise TenderError("tender_key")
+        for name, value in row.items():
+            if name == "tender_key" or not isinstance(value, str):
+                continue
+            if _EMAIL.search(value) is not None or _EIGHT.search(value) is not None:
                 raise TenderError("release_contact")
+
+
+def list_page(host: str, slug: str, number: int) -> str:
+    """One list address from the host and the declared list name."""
+    return f"https://{host}/TendersOnlineServices/{slug}/{number}"
+
+
+def list_addresses(host: str) -> tuple[str, ...]:
+    """The six first-page addresses. A registry page number is not an input."""
+    return tuple(list_page(host, slug, 1) for _name, slug in LIST_PATHS)
+
+
+def tender_https(
+    entry: Entry, *, chain_file: Path | None = None
+) -> Callable[[PageCall], PageBody]:
+    """Hand the verifying context from ``chain_context`` to ``open_https``."""
+    path = CHAIN_PATH if chain_file is None else chain_file
+    context = chain_context(path, entry.chain_intermediate_sha256)
+
+    def transport(call: PageCall) -> PageBody:
+        response = open_https(call.url, headers=dict(call.headers), ssl_context=context)
+        return PageBody(status=200, body=response.body, final_url=response.final_url)
+
+    return transport
 
 
 def chain_context(path: Path, pin: str) -> ssl.SSLContext:
@@ -450,6 +484,8 @@ def fetch_tenders(
     clock: Callable[[], datetime],
     lists: tuple[str, ...] | None = None,
     only_urls: tuple[str, ...] | None = None,
+    host: str = TENDER_HOST,
+    cache: Path | None = None,
 ) -> FetchResult:
     """Fetch the six lists in both languages through the injected transport."""
     chosen = tuple(item[0] for item in LIST_PATHS) if lists is None else lists
@@ -465,16 +501,16 @@ def fetch_tenders(
             raise TenderError("refused_path")
     call_flags = (int(context.verify_mode), bool(context.check_hostname))
     collected: list[tuple[str, str, str]] = []
+    stored: list[tuple[str, str, int, bytes]] = []
     readings: list[ListReading] = []
     started = False
     for language in ("en", "ar"):
         for list_name, slug in LIST_PATHS:
             if list_name not in chosen:
                 continue
-            base = f"https://{TENDER_HOST}/TendersOnlineServices/{slug}"
-            first_text, first_hour = _get(
+            first_body, first_hour = _get(
                 transport,
-                f"{base}/1",
+                list_page(host, slug, 1),
                 language,
                 call_flags,
                 sleep,
@@ -482,20 +518,24 @@ def fetch_tenders(
                 pace=started,
             )
             started = True
+            first_text = first_body.decode("utf-8")
+            stored.append((list_name, language, 1, first_body))
             first_raw = _checked_page(first_text, language)
             bound = first_raw.stated_last
             _require_count(len(first_raw.cards), is_last=bound == 1)
             pages = [(1, first_text, first_raw, first_hour)]
             for number in range(2, bound + 1):
-                text, hour = _get(
+                body, hour = _get(
                     transport,
-                    f"{base}/{number}",
+                    list_page(host, slug, number),
                     language,
                     call_flags,
                     sleep,
                     clock,
                     pace=True,
                 )
+                text = body.decode("utf-8")
+                stored.append((list_name, language, number, body))
                 raw = _checked_page(text, language)
                 _require_count(len(raw.cards), is_last=number == bound)
                 pages.append((number, text, raw, hour))
@@ -513,7 +553,33 @@ def fetch_tenders(
             for _number, text, _raw, _hour in pages:
                 collected.append((text, list_name, language))
     merged = rows_from_pages(*collected)
+    if cache is not None:
+        _write_pages(cache, stored, readings)
     return FetchResult(merged.rows, _coverage(merged, readings), tuple(readings))
+
+
+def _write_pages(
+    cache: Path,
+    stored: Sequence[tuple[str, str, int, bytes]],
+    readings: Sequence[ListReading],
+) -> None:
+    """Store each page as fetched, and one receipt per list and language."""
+    for list_name, language, number, body in stored:
+        dest = cache / list_name / language / f"{number}.html"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(body)
+    for reading in readings:
+        payload = {
+            "list_name": reading.list_name,
+            "language": reading.language,
+            "first_stated_last": reading.first_stated_last,
+            "last_stated_last": reading.last_stated_last,
+            "first_hour": reading.first_hour,
+            "last_hour": reading.last_hour,
+        }
+        path = cache / reading.list_name / f"{reading.language}.receipt.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def ssl_switched_off(files: Mapping[str, str]) -> tuple[str, ...]:
@@ -763,7 +829,7 @@ def _get(
     clock: Callable[[], datetime],
     *,
     pace: bool,
-) -> tuple[str, str]:
+) -> tuple[bytes, str]:
     _refuse(url)
     if pace:
         sleep(float(PACE_S))
@@ -787,7 +853,7 @@ def _get(
             sleep(BACKOFF_S[attempt])
             continue
         hour = clock().strftime("%Y-%m-%dT%H")
-        return body.body.decode("utf-8"), hour
+        return body.body, hour
     raise TenderError("http_status")
 
 

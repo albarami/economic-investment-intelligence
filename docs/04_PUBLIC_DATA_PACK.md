@@ -622,8 +622,10 @@ and `/TendersOnlineServices/CancelledTenders/<n>`. Every list is read in English
 with at least three seconds from the end of one to the start of the next, and retries as
 PUB-06. Each non-last page must hold 20 cards; the last holds between 1 and 20. The pager's
 largest integer at the end of an `a.page-link` href gives the last page. No total is published,
-so completeness cannot be proved by a count. Each list receipt records its first and last
-stated page bounds and reading times; changed bounds are reported, never silently re-read.
+so completeness cannot be proved by a count. Each fetched page is kept in the uncommitted
+public cache as fetched. Each list and language has one receipt, recording the last page
+number stated at the first request and at the last request, and the hour of each; changed
+bounds are reported, never silently re-read.
 
 The lists are merged by the internal integer inside the build; it and the displayed tender
 number are dropped before release. Missing language columns stay null and are counted in the

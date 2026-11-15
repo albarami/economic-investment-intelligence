@@ -74,6 +74,8 @@ def prepare(
         return _paged(entry, reader)
     if entry.kind == "terms_page":
         return _terms(entry, reader)
+    if entry.kind == "paged_cards":
+        return _paged_cards(entry, sleep)
     return _file(entry, reader)
 
 
@@ -245,7 +247,15 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
     if measured is not None:
         return _failed(entry, measured)
     count = len(rows) if rows is not None else None
-    first, last, saw_periods = _observed_periods(entry, rows)
+    try:
+        first, last, saw_periods = _observed_periods(entry, rows)
+    except FamilyPeriodError as exc:
+        return _failed(
+            entry,
+            AttemptFailure(
+                1, export.final_url, "period_label", exc.source_id, exc.field
+            ),
+        )
     return Prepared(
         export.body,
         export.final_url,
@@ -263,6 +273,50 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
     )
 
 
+class FamilyPeriodError(Exception):
+    """A family period label is missing. The message names the source and the field."""
+
+    def __init__(self, source_id: str, field: str) -> None:
+        self.source_id = source_id
+        self.field = field
+        super().__init__(f"{source_id} {field}")
+
+
+def family_period_bounds(entry: Entry, rows: list[object]) -> tuple[str, str, str]:
+    """Bounds, or a distinct-label count when a label does not parse.
+
+    A missing or null label is a named refusal. The refusal carries no cell value.
+    A bare family field uses the date form of the recorded family bounds.
+    """
+    from eii_custodian.publicdata.additions.common import (
+        AdditionError,
+        parse_period_rule,
+        parse_period_value,
+    )
+
+    if "form=" in entry.period_field:
+        rule = parse_period_rule(entry.period_field)
+        field, form = rule.field, rule.form
+    else:
+        field, form = entry.period_field, "date"
+    labels: list[object] = []
+    for row in rows:
+        if not isinstance(row, dict) or field not in row:
+            raise FamilyPeriodError(entry.source_id, field)
+        value = row[field]
+        if value is None or value == "":
+            raise FamilyPeriodError(entry.source_id, field)
+        labels.append(value)
+    parsed: list[str] = []
+    for label in labels:
+        try:
+            parsed.append(parse_period_value(label, form))
+        except AdditionError:
+            return "", "", f"distinct labels {len(set(map(str, labels)))}"
+    ordered = sorted(parsed)
+    return ordered[0], ordered[-1], ""
+
+
 def _observed_periods(entry: Entry, rows: list[object] | None) -> tuple[str, str, bool]:
     """Observed bounds from the period rule. An unconfirmed field stays blank."""
     from eii_custodian.publicdata.additions.common import (
@@ -274,9 +328,8 @@ def _observed_periods(entry: Entry, rows: list[object] | None) -> tuple[str, str
     if entry.source_id in COLLECTED_FAMILIES and rows is not None:
         if not entry.period_field:
             return "", "", True
-        # LR-P7/P8/P11: preserve the source's labels, including unsplit year text.
-        labels = [row[entry.period_field] for row in rows if isinstance(row, dict)]
-        return min(labels), max(labels), True
+        first, last, _note = family_period_bounds(entry, rows)
+        return first, last, True
     if "form=" not in entry.period_field or rows is None:
         return "", "", False
     rule = parse_period_rule(entry.period_field)
@@ -378,6 +431,36 @@ def _paged_undeclared(entry: Entry, reader: Read) -> Prepared:
         "utf-8"
     )
     return Prepared(body, final, host_of(final), entry.publisher, "", total, "", None)
+
+
+def _paged_cards(entry: Entry, sleep: Callable[[float], None]) -> Prepared:
+    """Hand a paged-card row to the tender fetch. The file reader is not used."""
+    from datetime import UTC, datetime
+
+    from eii_custodian.publicdata.singles.tenders import (
+        CHAIN_PATH,
+        TenderError,
+        fetch_tenders,
+        tender_https,
+    )
+
+    try:
+        _fetched = fetch_tenders(
+            tender_https(entry, chain_file=CHAIN_PATH),
+            chain_file=CHAIN_PATH,
+            chain_sha256=entry.chain_intermediate_sha256,
+            sleep=sleep,
+            clock=lambda: datetime.now(UTC),
+            host=entry.fetch_host,
+        )
+    except TenderError as exc:
+        return _failed(
+            entry,
+            AttemptFailure(1, entry.url, exc.reason, exc.reason, exc.reason),
+        )
+    return Prepared(
+        b"", entry.url, entry.fetch_host, entry.publisher, "", None, "", None
+    )
 
 
 def _file(entry: Entry, reader: Read) -> Prepared:

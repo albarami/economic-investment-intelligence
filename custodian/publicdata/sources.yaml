@@ -11030,7 +11030,7 @@ sources:
       or edit the contents of this website without the prior written consent of through the Ministry of Finance
     terms_read_on: '2026-11-14'
     landing_url: https://monaqasat.mof.gov.qa/TendersOnlineServices/AvailableMinistriesTenders/1
-    nightly_live_fetch: true
+    nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
     release_tables:
@@ -11045,7 +11045,7 @@ sources:
       /TendersOnlineServices/ClosedTenders/<n>, /TendersOnlineServices/TechnicallyOpenedTenders/<n>, /TendersOnlineServices/FinanciallyOpenedTenders/<n>,
       /TendersOnlineServices/AwardedTenders/<n>, /TendersOnlineServices/CancelledTenders/<n>; page size 20; Arabic
       without a language header; English with Accept-Language: en-US,en;q=0.5; sequential requests at least three
-      seconds apart. Certificate pin awaits the lead; no certificate file committed.'
+      seconds apart. Certificate pin awaits the lead; no certificate file committed. nightly_live_fetch is false because the chain file is not in the repository and a hosted nightly job could not open the connection.'
   - key: trade_ext/imports-by-nature-of-items-and-year
     source_id: trade_ext
     slug: imports-by-nature-of-items-and-year

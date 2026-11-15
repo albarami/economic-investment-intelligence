@@ -1080,6 +1080,60 @@ def test_survey_period_field_is_declared_even_before_bounds_are_read():
             assert entry.period_first == entry.period_last == ""
 
 
+def test_a_paged_layer_omits_its_layer_only_for_a_technical_reason(tmp_path):
+    """J17(a): a plant with any other skip reason cannot omit the layer."""
+    row = next(row for row in _block() if row["key"] == "gis_boundaries")
+    row.pop("layer", None)
+    row["skip_reason"] = "invented_gap"
+    path = tmp_path / "registry.yaml"
+    path.write_text(yaml.safe_dump({"sources": [row]}))
+    with pytest.raises(RegistryError, match="paged_layer requires layer"):
+        load_registry(path)
+
+
+def test_missing_family_period_label_names_the_source_and_the_field(tmp_path):
+    """J14: a missing or null label is a named refusal. The refusal carries no value."""
+    entry = replace(_fixture_entry(), period_first="", period_last="")
+    records = [{"year": "", "value": 1}, {"year": "", "value": 2}]
+    failure = fetch_entry(
+        entry,
+        _transport(entry, records),
+        tmp_path,
+        lambda: "2026-11-15T00:00:00Z",
+        lambda _: None,
+    )
+    assert failure is not None
+    text = " ".join((failure.check, failure.expected, failure.observed))
+    assert entry.source_id in text
+    assert entry.period_field in text
+    assert "invented" not in text
+
+
+def test_unparsed_family_labels_leave_null_bounds_and_a_distinct_count(tmp_path):
+    """J14: bounds are stated only when every label parses; otherwise the count."""
+    entry = replace(
+        _fixture_entry(), source_id="hotel_ext", period_first="", period_last=""
+    )
+    records = [{"year": "2020 Guests", "value": 1}, {"year": "2021 Nights", "value": 2}]
+    assert (
+        fetch_entry(
+            entry,
+            _transport(entry, records),
+            tmp_path,
+            lambda: "2026-11-15T00:00:00Z",
+            lambda _: None,
+        )
+        is None
+    )
+    receipt = json.loads(next(tmp_path.rglob("*.meta.json")).read_text())
+    assert (receipt["period_first"], receipt["period_last"]) == (None, None)
+    from eii_custodian.publicdata.fetch.kinds import family_period_bounds
+
+    _first, _last, note = family_period_bounds(entry, records)
+    assert note == "distinct labels 2"
+    assert "Guests" not in note
+
+
 def test_unsplit_text_period_labels_reach_receipts_unchanged(tmp_path):
     entry = replace(
         _fixture_entry(), source_id="hotel_ext", period_first="", period_last=""
@@ -1096,10 +1150,8 @@ def test_unsplit_text_period_labels_reach_receipts_unchanged(tmp_path):
         is None
     )
     receipt = json.loads(next(tmp_path.rglob("*.meta.json")).read_text())
-    assert (receipt["period_first"], receipt["period_last"]) == (
-        "2020 Guests",
-        "2021 Nights",
-    )
+    # J14: unsplit labels are not bounds. The previous assertion expected the labels.
+    assert (receipt["period_first"], receipt["period_last"]) == (None, None)
 
 
 def test_no_period_field_cannot_inherit_stale_registry_bounds(tmp_path):

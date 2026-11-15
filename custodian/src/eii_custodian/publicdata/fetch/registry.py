@@ -597,13 +597,33 @@ def _calendar_date(row: dict[object, object], name: str) -> str:
     return value
 
 
+TECHNICAL_SKIP_REASONS = frozenset(
+    {
+        "publisher_or_schema_unconfirmed",
+        "cache_fields_unconfirmed",
+        "adapter_unavailable",
+        "schema_unconfirmed",
+        "direct_url_unconfirmed",
+        "page_list_unconfirmed",
+        "overture_bucket_not_opened",
+        "certificate_chain_incomplete",
+    }
+)
+
+
+def _technical_reason(reason: str) -> bool:
+    """A layer may be omitted only for this closed vocabulary, one token or several."""
+    tokens = [part.strip() for part in reason.split(";") if part.strip()]
+    return bool(tokens) and all(token in TECHNICAL_SKIP_REASONS for token in tokens)
+
+
 def _layer(row: dict[object, object], kind: str) -> int | None:
     if kind != "paged_layer":
         if "layer" in row:
             raise RegistryError("layer on a row that is not paged_layer")
         return None
     if "layer" not in row or row["layer"] is None:
-        if _text(row, "skip_reason"):
+        if _technical_reason(_text(row, "skip_reason")):
             return None
         raise RegistryError("paged_layer requires layer")
     value = row["layer"]

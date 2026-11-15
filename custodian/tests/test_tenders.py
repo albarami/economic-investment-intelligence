@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import ssl
 import subprocess
 from datetime import UTC, datetime
@@ -1002,6 +1003,186 @@ def test_future_page_has_no_cards() -> None:
 
 def test_normalise_collapses_whitespace() -> None:
     assert normalise_text("  a \n b  ") == "a b"
+
+
+def test_paged_cards_never_reaches_the_file_reader(tmp_path: Path, monkeypatch) -> None:
+    """J1: prepare hands a paged_cards row to the tender fetch. _file must not run."""
+    from dataclasses import replace
+
+    from eii_custodian.publicdata.fetch import kinds
+    from eii_custodian.publicdata.fetch.kinds import prepare
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.fetch.transport import Response
+
+    def _file(entry, reader):  # type: ignore[no-untyped-def]
+        raise AssertionError("paged_cards reached _file")
+
+    monkeypatch.setattr(kinds, "_file", _file)
+    path, pin = _chain(tmp_path)
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.singles.tenders.CHAIN_PATH",
+        path,
+        raising=False,
+    )
+    entry = next(
+        item
+        for item in load_registry(ROOT / "custodian/publicdata/sources.yaml")
+        if item.key == "tenders_pub"
+    )
+    entry = replace(
+        entry,
+        chain_intermediate_sha256=pin,
+        url="https://monaqasat.mof.gov.qa/TendersOnlineServices/AvailableMinistriesTenders/9",
+    )
+    seen: list[str] = []
+
+    def opener(url: str, headers=None, ssl_context=None):  # type: ignore[no-untyped-def]
+        seen.append(url)
+        return Response(final_url=url, body=b"", hops=())
+
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.singles.tenders.open_https",
+        opener,
+        raising=False,
+    )
+    prepare(
+        entry,
+        lambda _url: (_ for _ in ()).throw(AssertionError("seam")),
+        lambda _s: None,
+    )
+    assert seen
+    assert "/9" not in seen[0]
+    assert seen[0].startswith(
+        "https://monaqasat.mof.gov.qa/TendersOnlineServices/AvailableMinistriesTenders/1"
+    )
+
+
+def test_adapter_hands_the_verifying_context_to_open_https(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """J2: the pin is the registry field; the context chain_context built is opened."""
+    from dataclasses import replace
+
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.fetch.transport import Response
+    from eii_custodian.publicdata.singles.tenders import (
+        CHAIN_PATH,
+        PageCall,
+        tender_https,
+    )
+
+    path, pin = _chain(tmp_path)
+    entry = next(
+        item
+        for item in load_registry(ROOT / "custodian/publicdata/sources.yaml")
+        if item.key == "tenders_pub"
+    )
+    entry = replace(entry, chain_intermediate_sha256=pin)
+    seen: list[object] = []
+
+    def opener(url: str, headers=None, ssl_context=None):  # type: ignore[no-untyped-def]
+        seen.append(ssl_context)
+        return Response(final_url=url, body=b"", hops=())
+
+    monkeypatch.setattr("eii_custodian.publicdata.singles.tenders.open_https", opener)
+    call = PageCall(
+        "https://monaqasat.mof.gov.qa/TendersOnlineServices/AwardedTenders/1",
+        (("Accept-Language", "en-US,en;q=0.5"),),
+        ssl.CERT_REQUIRED,
+        True,
+    )
+    tender_https(entry, chain_file=path)(call)
+    assert seen[0] is not None
+    assert seen[0].verify_mode == ssl.CERT_REQUIRED  # type: ignore[attr-defined]
+    assert seen[0].check_hostname is True  # type: ignore[attr-defined]
+    assert CHAIN_PATH == Path("data/public_chain/tenders_pub.intermediate.pem")
+    wrong = replace(entry, chain_intermediate_sha256="ab" * 32)
+    seen.clear()
+    with pytest.raises(TenderError) as mismatch:
+        tender_https(wrong, chain_file=path)(call)
+    assert mismatch.value.reason == "certificate_chain_incomplete"
+    assert seen == []
+
+
+def test_list_addresses_use_the_host_and_the_declared_names(tmp_path: Path) -> None:
+    """J2: six list addresses come from the host and the list names, not a page number."""
+    from eii_custodian.publicdata.singles.tenders import list_addresses
+
+    host = "monaqasat.mof.gov.qa"
+    addresses = list_addresses(host)
+    assert len(addresses) == 6
+    assert [item[1] for item in LIST_PATHS] == [
+        address.rsplit("/", 2)[-2] for address in addresses
+    ]
+    assert all(
+        address == f"https://{host}/TendersOnlineServices/{slug}/1"
+        for (_name, slug), address in zip(LIST_PATHS, addresses, strict=True)
+    )
+    assert all("/9" not in address for address in addresses)
+
+
+def test_fetched_pages_are_cached_with_one_receipt_per_list_and_language(
+    tmp_path: Path,
+) -> None:
+    """J3: each page is stored as fetched; the receipt records LR-T6's bounds and hours."""
+    _clock.step = 0  # type: ignore[attr-defined]
+    english = _awarded_page(_awarded(internal=424201, title="Invented")).encode()
+    arabic = _page(
+        _awarded(
+            internal=424201,
+            title="عنوان",
+            labels={
+                "award": "تاريخ الترسية",
+                "sector": "نوع القطاع المطلوب",
+                "bond": "التأمين المؤقت (رق)",
+                "documents": "قيمة الوثائق (رق)",
+                "entity": "الجهة",
+                "kind": "النوع",
+            },
+            notice="يمكن التظلم على قرار الترسية خلال 5 أيام عمل من اليوم التالي لتاريخ الترسية",
+        ),
+        lang="ar",
+        path="/TendersOnlineServices/AwardedTenders",
+        last_page=1,
+    ).encode()
+    url = f"{HOST}/TendersOnlineServices/AwardedTenders/1"
+    fake = _Fake({(url, "en"): english, (url, "ar"): arabic})
+    cache = tmp_path / "cache"
+    result, _slept = _run(fake, tmp_path, lists=("awarded",), cache=cache)
+    stored = cache / "awarded" / "en" / "1.html"
+    assert stored.read_bytes() == english
+    receipt = json.loads((cache / "awarded" / "en.receipt.json").read_text())
+    assert receipt["first_stated_last"] == result.readings[0].first_stated_last
+    assert receipt["last_stated_last"] == result.readings[0].last_stated_last
+    assert receipt["first_hour"] == result.readings[0].first_hour
+    assert receipt["last_hour"] == result.readings[0].last_hour
+    assert (cache / "awarded" / "ar.receipt.json").is_file()
+
+
+def test_tender_key_pattern_is_exempt_from_the_contact_scan() -> None:
+    """J4: a well-formed key is not a contact; other strings still are."""
+    between = "tnd_ab" + ("9" * 8) + "cdef01"
+    all_digits = "tnd_" + ("4" * 16)
+    keys = (
+        "tnd_" + ("a" * 16),
+        "tnd_" + ("a" * 16) + "_2",
+        "tnd_" + "abcdef0123456789",
+        between,
+        all_digits,
+    )
+    for shaped in keys:
+        reject_release([{"tender_key": shaped, "title": "Invented title"}])
+    with pytest.raises(TenderError) as malformed:
+        reject_release([{"tender_key": "tnd_" + ("g" * 16), "title": "Invented"}])
+    assert malformed.value.reason == "tender_key"
+    with pytest.raises(TenderError) as digits:
+        reject_release(
+            [{"tender_key": keys[0], "title": "Invented " + ("8" * 8) + " tail"}]
+        )
+    assert digits.value.reason == "release_contact"
+    with pytest.raises(TenderError) as mail:
+        reject_release([{"tender_key": keys[0], "buying_entity": _mail()}])
+    assert mail.value.reason == "release_contact"
 
 
 def test_committed_awarded_fixture_parses() -> None:

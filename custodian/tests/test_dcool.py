@@ -52,8 +52,9 @@ def test_entry_declares_culture_as_text() -> None:
     # The registry row is built here; part R appends sources.yaml.
     entry = dcool_entry()
     kinds = dict(entry.columns)
-    assert kinds["culture"] == "text"
-    assert kinds["industrial"] == "int"
+    # J2 / join section 4b: the helper follows the registry row (string, integer).
+    assert kinds["culture"] == "string"
+    assert kinds["industrial"] == "integer"
     assert "geo_point" in kinds
     assert entry.release_tables == ("pub_district_cooling",)
     assert entry.slug == "design-cooling-capacity-by-status-municipality-and-sector-tr"
