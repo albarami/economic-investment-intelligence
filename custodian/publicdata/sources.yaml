@@ -3741,3 +3741,33 @@ sources:
     reconciliation: "none"
     skip_reason: "fetcher_owned_by_S2-T14"
     extension: "json"
+  # S2-T15
+  - key: "places_fsq/copy-2025-01-10"
+    source_id: "places_fsq"
+    slug: ""
+    kind: "https_file"
+    title_en: "Foursquare Open Source Places, public copy, release 2025-01-10"
+    publisher: "Foursquare"
+    licence_id: "Apache-2.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.apache.org/licenses/LICENSE-2.0"
+    decision_record: ""
+    fetch_host: "data.source.coop"
+    url: "https://data.source.coop/fused/fsq-os-places/2025-01-10/places/_metadata"
+    terms_url: "https://data.source.coop/fused/fsq-os-places/README.md"
+    landing_url: "https://data.source.coop/fused/fsq-os-places/"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_place_fsq"]
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    period_first: "2025-01-10"
+    period_last: "2025-01-10"
+    period_field: "source_release"
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "parquet"
+    basis_note: "terms to be read; checked 2026-11-14. Host terms of the copy were not found. Copyright 2024 Foursquare Labs, Inc. All rights reserved."

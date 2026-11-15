@@ -5,10 +5,12 @@ from __future__ import annotations
 import http.client
 import io
 import json
+import sys
 from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
@@ -34,7 +36,10 @@ TERMS = "https://fdiprojects.invest.qa/terms"
 OTHER = (
     "https://www.data.qa/api/explore/v2.1/catalog/datasets/planted-slug/exports/json"
 )
-REPO = Path(__file__).resolve().parents[2]
+
+REPO = repository_root(Path(__file__))
+if str(REPO / "scripts") not in sys.path:
+    sys.path.insert(0, str(REPO / "scripts"))
 KEY_NAMES = ("EARTHDATA_API_KEY", "TOMTOM_API_KEY")
 
 

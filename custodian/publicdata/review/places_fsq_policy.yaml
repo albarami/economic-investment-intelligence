@@ -1,0 +1,21 @@
+# Reviewed policy for the public copy of places_fsq. Header facts only.
+release: "2025-01-10"
+release_field: folder_name
+metadata_file: "2025-01-10/places/_metadata"
+selection: row_group_coordinate_statistics
+ignored_bounds: file_geographic_metadata
+frame_box:
+  west: 50.7
+  south: 24.4
+  east: 51.7
+  north: 26.2
+country: QA
+display: name_and_point_in_frame_and_no_closing_date
+name_normalisation: trim_collapse_whitespace_casefold
+name_languages: source_name_against_either_main_places_name
+distance_m: 50
+distance_source: PUB-51
+attribution: "Copyright 2024 Foursquare Labs, Inc. All rights reserved. Licensed under the Apache License, Version 2.0."
+host_terms: "terms to be read; checked 2026-11-14"
+name_ar: always_null
+categories: category_ids_and_category_labels

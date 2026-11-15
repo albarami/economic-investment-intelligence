@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Status | Draft written by task S0-T13 on 2026-11-12; every row is as true as the page or run it names, on the date it names |
-| Date | 2026-11-12 |
+| Date | 2026-11-14 |
 | Owner | Project owner (see OPEN_ITEMS.md) |
 | Purpose | Record the official pages read and the idioms that changed from earlier versions for DuckDB 2.0, PostgreSQL 18 and the current Claude API, the libraries and services that the pack calls newer than most model training data. |
 | Read first | [02_ARCHITECTURE.md](02_ARCHITECTURE.md) section 7, [the notes for the map libraries](../web/REFERENCE_NOTES.md) |
@@ -52,6 +52,7 @@ Setup, in an empty folder: `uv venv --python 3.14 venv`, then `uv pip install --
 | R7 | duckdb 2.0.0 | 2026-11-12 | `venv/bin/python -I -c "import duckdb; d=duckdb.connect('t.duckdb'); d.execute('create or replace table t as select 1 i'); d.close(); c=duckdb.connect('t.duckdb', read_only=True); c.execute('insert into t values (2)')"` | _duckdb.InvalidInputException: Invalid Input Error: Cannot execute statement of type "INSERT" |
 | R8 | duckdb 2.0.0 | 2026-11-12 | `venv/bin/python -I -c "import duckdb; c=duckdb.connect('t.duckdb', read_only=True); duckdb.connect('t.duckdb', read_only=False)"` | _duckdb.ConnectionException: Connection Error: Can't open a connection to same database file |
 | R9 | duckdb 2.0.0 | 2026-11-12 | `venv/bin/python -I -c "import duckdb; c=duckdb.connect('t.duckdb', read_only=True); c.execute('set enable_external_access=false'); c.execute('set lock_configuration=true'); c.execute('set enable_external_access=true')"` | _duckdb.InvalidInputException: Invalid Input Error: Cannot change configuration option |
+| R10 | duckdb 2.0.0 | 2026-11-14 | `uv run --locked python -I -c "import duckdb; c=duckdb.connect(); c.execute(\"copy (select 51.0::double as longitude, 25.0::double as latitude) to 'note.parquet' (format parquet)\"); print(c.execute(\"select path_in_schema, stats_min, stats_max from parquet_metadata('note.parquet') where path_in_schema = 'longitude'\").fetchall())"` | [('longitude', '51.0', '51.0')] |
 
 ### Idioms that changed
 
@@ -93,6 +94,7 @@ Setup, in an empty folder: `uv venv --python 3.14 venv`, then `uv pip install --
 | S25 | The pack says DuckDB 2.x needs SET geometry_always_xy=true for the Overture extract (docs/04_PUBLIC_DATA_PACK.md PUB-17); the spatial extension overview page (P12) does not mention the setting: not verified. | PACK | docs/04_PUBLIC_DATA_PACK.md PUB-17 | - |
 | S26 | The pack records that a DuckDB GEOMETRY column arrives as a PostGIS geometry column through the PostgreSQL extension with no conversion (docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence"); that was measured by the architecture research and not repeated here: not verified. | PACK | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" | - |
 | S27 | The pack lists byte-order sorting of text as an assumption to be confirmed with the parity query of slice S1 (docs/02_ARCHITECTURE.md section "The portable SQL subset (minimum rules)"); the page read (S19) names the default for DuckDB only, and no parity query has been run: not verified. | PACK | docs/02_ARCHITECTURE.md section "The portable SQL subset (minimum rules)" | - |
+| S28 | In duckdb 2.0.0, parquet_metadata of a local file returns stats_min and stats_max for a DOUBLE column named longitude. | OBSERVED | R10 | - |
 
 ### Slice S1 confirmation
 
