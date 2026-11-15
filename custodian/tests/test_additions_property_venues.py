@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from decimal import Decimal
+from decimal import ROUND_DOWN, Context, Decimal, localcontext
 from pathlib import Path
 
 import duckdb
@@ -158,6 +158,43 @@ def test_median_uses_the_middle_and_the_mean_of_two_middle_values(
     )
     assert even.rows[0]["median_price"] == Decimal("15.00")
     assert even.rows[0]["price_basis"] == "per_m2"
+
+
+def test_median_is_unchanged_when_the_caller_context_changes(tmp_path: Path) -> None:
+    """A caller's precision and rounding do not change the two median fixtures."""
+    with localcontext(Context(prec=1, rounding=ROUND_DOWN)):
+        odd = _property(
+            tmp_path / "odd",
+            [
+                _deal(
+                    encrypted_transaction_number="SYN-DEAL-A",
+                    price_per_square_meter=10,
+                ),
+                _deal(
+                    encrypted_transaction_number="SYN-DEAL-B",
+                    price_per_square_meter=30,
+                ),
+                _deal(
+                    encrypted_transaction_number="SYN-DEAL-C",
+                    price_per_square_meter=20,
+                ),
+            ],
+        )
+        assert odd.rows[0]["median_price"] == Decimal("20.00")
+        even = _property(
+            tmp_path / "even",
+            [
+                _deal(
+                    encrypted_transaction_number="SYN-DEAL-A",
+                    price_per_square_meter=10,
+                ),
+                _deal(
+                    encrypted_transaction_number="SYN-DEAL-B",
+                    price_per_square_meter=20,
+                ),
+            ],
+        )
+        assert even.rows[0]["median_price"] == Decimal("15.00")
 
 
 def test_nonpositive_price_is_excluded_and_identifiers_stay_out(tmp_path: Path) -> None:

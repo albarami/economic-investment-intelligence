@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from decimal import Decimal
+from decimal import ROUND_DOWN, Context, Decimal, localcontext
 from pathlib import Path
 
 import pytest
@@ -495,6 +495,53 @@ def test_population_cells_are_not_summed_across_age_or_municipality(
         "syn_coast",
         "syn_inland",
     }
+
+
+def test_scaled_values_are_unchanged_when_the_caller_context_changes(
+    tmp_path: Path,
+) -> None:
+    """12.0000 and 4.0000/6.0000 do not follow the caller context."""
+    with localcontext(Context(prec=1, rounding=ROUND_DOWN)):
+        one = _run(
+            "pop_muni_age",
+            POPULATION,
+            [
+                {
+                    "years": "2020",
+                    "age_groups": "5 - 9",
+                    "lbldy": "SYN Coast AR",
+                    "municipality": "SYN Coast",
+                    "count": 12.0,
+                }
+            ],
+            tmp_path / "one",
+        )
+        assert one.rows[0]["value"] == Decimal("12.0000")
+        two = _run(
+            "pop_muni_age",
+            POPULATION,
+            [
+                {
+                    "years": "2020",
+                    "age_groups": "0",
+                    "lbldy": "SYN Coast AR",
+                    "municipality": "SYN Coast",
+                    "count": 4,
+                },
+                {
+                    "years": "2020",
+                    "age_groups": "1 - 4",
+                    "lbldy": "SYN Inland AR",
+                    "municipality": "SYN Inland",
+                    "count": 6,
+                },
+            ],
+            tmp_path / "two",
+        )
+        assert sorted(row["value"] for row in two.rows) == [
+            Decimal("4.0000"),
+            Decimal("6.0000"),
+        ]
 
 
 def test_unknown_age_group_stops(tmp_path: Path) -> None:

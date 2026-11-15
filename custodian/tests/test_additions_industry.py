@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from decimal import Decimal
+from decimal import ROUND_DOWN, Context, Decimal, localcontext
 from pathlib import Path
 
 import duckdb
@@ -730,6 +730,49 @@ def test_extra_investment_precision_stops() -> None:
             {},
         )
     assert caught.value.name == "measure_precision"
+
+
+def test_quantize_is_unchanged_when_the_caller_context_changes() -> None:
+    """14.00, 10.5000 and the precision refusal do not follow the caller context."""
+    with localcontext(Context(prec=1, rounding=ROUND_DOWN)):
+        parsed = parse_establishment_size(
+            _entry("est_size_act", TWO),
+            [
+                {
+                    "year": "2018",
+                    "activity_code": "11",
+                    "size_of_establishment": S2_LARGE,
+                    "hjm_lmnsh": S2_LARGE_AR,
+                    "indicator": "Employees",
+                    "lbyn": "SYN-IND",
+                    "value": 14,
+                }
+            ],
+            RECEIPT,
+            _map(),
+            {},
+        )
+        assert parsed.rows[0]["value"] == Decimal("14.00")
+        manufactured = parse_manufacturing(
+            _entry("mfg_industry", METALS),
+            [_metals("2019", 1, "10.5", 1)],
+            RECEIPT,
+            _map(),
+            {},
+        )
+        investment = next(
+            row for row in manufactured.rows if row["indicator"] == "investment"
+        )
+        assert investment["value"] == Decimal("10.5000")
+        with pytest.raises(AdditionError) as caught:
+            parse_manufacturing(
+                _entry("mfg_industry", METALS),
+                [_metals("2019", 1, "1.23456", 1)],
+                RECEIPT,
+                _map(),
+                {},
+            )
+        assert caught.value.name == "measure_precision"
 
 
 def test_the_doubled_manufacture_prefix_is_the_table_code() -> None:

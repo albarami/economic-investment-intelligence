@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Context, Decimal, localcontext
 from pathlib import Path
 from typing import Any
 
@@ -482,7 +482,23 @@ def _scaled(value: object) -> Decimal | None:
         return None
     if number < 0:
         raise AdditionError("measure_negative")
-    return number.quantize(_SCALE)
+    precision = _working_precision(number, places=4, carry=0)
+    with localcontext(Context(prec=precision, rounding=ROUND_HALF_UP)):
+        return number.quantize(_SCALE, rounding=ROUND_HALF_UP)
+
+
+def _working_precision(number: Decimal, *, places: int, carry: int) -> int:
+    """Precision that holds this integral number at the contract scale."""
+    pair = number.as_tuple()
+    digits = len(pair.digits)
+    exponent = pair.exponent
+    if isinstance(exponent, int) and exponent >= 0:
+        integer_digits = digits + exponent
+    elif isinstance(exponent, int):
+        integer_digits = max(0, digits + exponent)
+    else:
+        integer_digits = digits
+    return max(digits, integer_digits + places + carry, 1)
 
 
 def _number(value: object, *, integral: bool) -> Decimal | None:

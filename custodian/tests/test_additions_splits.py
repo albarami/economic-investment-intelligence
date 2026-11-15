@@ -14,6 +14,7 @@ from eii_custodian.publicdata.additions.common import (
     AdditionError,
     Coverage,
     FamilyParse,
+    parse_period_rule,
     require_lineage,
 )
 from eii_custodian.publicdata.additions.splits import PARSERS
@@ -59,6 +60,29 @@ def test_labour_year_field_replaces_the_unconfirmed_marker() -> None:
     assert rules[UNEMPLOYED][0] == "sit=row;form=date_as_year;field=year"
     assert rules[FEMALE][1]["year"] == "string"
     assert rules[UNEMPLOYED][1]["year"] == "string"
+
+
+def test_both_population_files_hold_a_text_year(tmp_path: Path) -> None:
+    """Both registry rows use a four-digit text year, and each slug parses one."""
+    entries = [
+        entry for entry in load_registry() if entry.source_id == "pop_muni_age_sex"
+    ]
+    assert len(entries) == 2
+    sexes: list[str] = []
+    for entry in entries:
+        assert entry.period_field == "sit=row;form=year_text;field=years"
+        rule = parse_period_rule(entry.period_field)
+        assert rule.form == "year_text"
+        assert rule.field == "years"
+        folder = tmp_path / entry.slug
+        folder.mkdir()
+        parsed = _parse(entry, [_population_age_sex_row(entry)], folder)
+        assert parsed.rows[0]["period"] == "2016"
+        assert parsed.period_first == "2016"
+        sex = parsed.rows[0]["sex"]
+        assert isinstance(sex, str)
+        sexes.append(sex)
+    assert sorted(sexes) == ["female", "male"]
 
 
 def test_employed_row_keeps_its_category_and_its_lineage(tmp_path: Path) -> None:
@@ -1019,6 +1043,27 @@ def _indicator_row(year: str, indicator: str, count: int) -> dict[str, object]:
         "lmw_shr": "مؤشر",
         "count": count,
     }
+
+
+def _population_age_sex_row(entry: Entry) -> dict[str, object]:
+    invented: dict[str, object] = {
+        "years": "2016",
+        "fy_t_l_mr_blsnwt": "1 - 4",
+        "age_groups_in_years": "1 - 4",
+        "lbldy": "حي مخترع",
+        "municipality": "North Ward",
+        "value": 6,
+    }
+    row: dict[str, object] = {}
+    for name, kind in entry.columns:
+        if name in invented:
+            row[name] = invented[name]
+            continue
+        if kind == "object":
+            row[name] = None
+            continue
+        raise AssertionError(name)
+    return row
 
 
 def _pop() -> Entry:

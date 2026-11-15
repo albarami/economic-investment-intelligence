@@ -287,7 +287,12 @@ def build_additions(
         parsed.append(parser(entry, raw, receipt, field_map, crosswalks))
     tables = _tables(parsed)
     report = _report(parsed, pending)
-    return publish(output, tables, {"pending_slugs": pending}, report)
+    sources = [
+        {"key": key, "sha256": digest} for key, digest in sorted(selection.items())
+    ]
+    return publish(
+        output, tables, {"pending_slugs": pending, "sources": sources}, report
+    )
 
 
 def _tables(
@@ -442,6 +447,8 @@ def _cached_export(
         raise AdditionError("export_unreadable")
     if not isinstance(receipt, dict):
         raise AdditionError("export_unreadable")
+    if receipt.get("sha256") != digest:
+        raise AdditionError("hash_mismatch")
     rows: list[dict[str, object]] = []
     for row in loaded:
         if isinstance(row, dict):

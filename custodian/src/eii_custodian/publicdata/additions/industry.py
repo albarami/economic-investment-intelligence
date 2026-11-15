@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_HALF_UP, Context, Decimal, localcontext
 from pathlib import Path
 
 import yaml
@@ -670,10 +670,26 @@ def _number(value: object, *, integral: bool, places: int) -> Decimal | None:
     if read.number is None:
         raise AdditionError("measure_unparsed")
     quantum = Decimal(1).scaleb(-places)
-    quantized = read.number.quantize(quantum, rounding=ROUND_HALF_UP)
+    precision = _working_precision(read.number, places=places, carry=1)
+    with localcontext(Context(prec=precision, rounding=ROUND_HALF_UP)):
+        quantized = read.number.quantize(quantum, rounding=ROUND_HALF_UP)
     if quantized != read.number:
         raise AdditionError("measure_precision")
     return quantized
+
+
+def _working_precision(number: Decimal, *, places: int, carry: int) -> int:
+    """Precision that holds one half-up quantize of this number."""
+    pair = number.as_tuple()
+    digits = len(pair.digits)
+    exponent = pair.exponent
+    if isinstance(exponent, int) and exponent >= 0:
+        integer_digits = digits + exponent
+    elif isinstance(exponent, int):
+        integer_digits = max(0, digits + exponent)
+    else:
+        integer_digits = digits
+    return max(digits, integer_digits + places + carry, 1)
 
 
 def _breakdown(pairs: tuple[tuple[str, str], ...]) -> str:

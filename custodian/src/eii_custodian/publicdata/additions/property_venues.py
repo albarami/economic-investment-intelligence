@@ -11,7 +11,7 @@ from __future__ import annotations
 import csv
 from collections import defaultdict
 from collections.abc import Mapping
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_HALF_UP, Context, Decimal, localcontext
 from pathlib import Path
 
 import yaml
@@ -465,12 +465,32 @@ def _median(prices: list[int]) -> Decimal:
     ordered = sorted(prices)
     count = len(ordered)
     if count % 2 == 1:
-        value = Decimal(ordered[count // 2])
+        span = Decimal(ordered[count // 2])
     else:
-        left = Decimal(ordered[count // 2 - 1])
-        right = Decimal(ordered[count // 2])
-        value = (left + right) / Decimal(2)
-    return value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        span = Decimal(ordered[count // 2 - 1] + ordered[count // 2])
+    precision = _working_precision(span, places=2, carry=0)
+    with localcontext(Context(prec=precision, rounding=ROUND_HALF_UP)):
+        if count % 2 == 1:
+            value = Decimal(ordered[count // 2])
+        else:
+            left = Decimal(ordered[count // 2 - 1])
+            right = Decimal(ordered[count // 2])
+            value = (left + right) / Decimal(2)
+        return value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
+def _working_precision(number: Decimal, *, places: int, carry: int) -> int:
+    """Precision that holds this number at the target scale without a second rounding."""
+    pair = number.as_tuple()
+    digits = len(pair.digits)
+    exponent = pair.exponent
+    if isinstance(exponent, int) and exponent >= 0:
+        integer_digits = digits + exponent
+    elif isinstance(exponent, int):
+        integer_digits = max(0, digits + exponent)
+    else:
+        integer_digits = digits
+    return max(digits, integer_digits + places + carry, 1)
 
 
 def _ambiguous_districts(

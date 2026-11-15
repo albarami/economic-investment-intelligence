@@ -207,6 +207,61 @@ def test_schema_checks_every_row_and_allows_null() -> None:
     )
     assert failure is not None
     assert failure.check == "schema_retyped"
+    url = "https://www.data.gov.qa/x"
+    valid_row = {"count": 1, "geo": {"kind": "point"}}
+    later_empty = schema_failure(entry, [valid_row, {}], url)
+    assert later_empty is not None
+    assert later_empty.check == "schema_missing"
+    assert later_empty.expected == "count"
+    later_none = schema_failure(entry, [valid_row, None], url)
+    assert later_none is not None
+    assert later_none.check == "schema_missing"
+    assert later_none.expected == "count"
+    empty = schema_failure(entry, [], url)
+    assert empty is not None
+    assert empty.check == "schema_missing"
+    assert empty.expected == "count"
+
+
+def test_an_open_row_count_range_is_refused() -> None:
+    """A decision-0017 row whose count is a range is refused by the closed message."""
+    opened = replace(
+        _closed(
+            (("year", "string"),),
+            "est_size_act",
+            "sit=row;form=year_text;field=year",
+        ),
+        row_count_max=2,
+    )
+    with pytest.raises(RegistryError) as caught:
+        require_addition_completion((opened,))
+    assert str(caught.value) == f"{opened.key}: row count range not closed"
+
+
+def test_empty_period_bounds_are_refused() -> None:
+    """A decision-0017 row with an empty period bound is refused by the closed message."""
+    emptied = replace(
+        _closed(
+            (("year", "string"),),
+            "est_size_act",
+            "sit=row;form=year_text;field=year",
+        ),
+        period_first="",
+    )
+    with pytest.raises(RegistryError) as caught:
+        require_addition_completion((emptied,))
+    assert str(caught.value) == f"{emptied.key}: period bounds empty"
+
+
+def test_a_visitors_market_without_nationality_is_refused() -> None:
+    """Removing nationality from a visitors row is refused by the closed message."""
+    entry = next(
+        item for item in load_registry() if item.source_id == "visitors_markets"
+    )
+    stripped = replace(entry, public_splits=())
+    with pytest.raises(RegistryError) as caught:
+        require_addition_completion((stripped,))
+    assert str(caught.value) == f"{stripped.key}: split declaration"
 
 
 def test_receipt_records_the_observed_period_not_the_modified_date(
@@ -362,7 +417,9 @@ def test_a_later_pass_without_a_parser_is_pending(
     folder = cache / entry.key
     folder.mkdir(parents=True)
     (folder / f"{digest}.json").write_bytes(body)
-    (folder / f"{digest}.meta.json").write_text("{}", encoding="utf-8")
+    (folder / f"{digest}.meta.json").write_text(
+        json.dumps({"sha256": digest}), encoding="utf-8"
+    )
     review = tmp_path / "review"
     review.mkdir()
     (review / "additions_property_venues.yaml").write_text(

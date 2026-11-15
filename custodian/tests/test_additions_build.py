@@ -13,10 +13,21 @@ import pytest
 
 from eii_custodian.publicdata.additions.build import (
     _field_map,
+    _refuse_value,
     _tables,
     build_additions,
+    checked_selection,
 )
-from eii_custodian.publicdata.additions.common import AdditionError, FamilyParse
+from eii_custodian.publicdata.additions.common import (
+    AdditionError,
+    FamilyParse,
+    _collect_periods,
+    _header_period,
+    parse_period_rule,
+    parse_period_value,
+    read_measure,
+)
+from eii_custodian.publicdata.additions.storage import write_parquet
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 
 _REVIEW = Path(__file__).resolve().parents[1] / "publicdata" / "review"
@@ -496,6 +507,347 @@ def test_an_unreadable_field_map_stops(tmp_path: Path) -> None:
     with pytest.raises(AdditionError) as decoded:
         _field_map(raw)
     assert decoded.value.name == "field_map_unreadable"
+
+
+def test_manifest_names_one_sorted_source_hash_per_selected_slug(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Each selected slug contributes one key and body hash, in key order."""
+    from eii_custodian.publicdata.additions import industry
+
+    monkeypatch.delitem(industry.PARSERS, "est_size_act")
+    monkeypatch.delitem(industry.PARSERS, "mfg_industry")
+    first = _entry("mfg_industry", _METALS)
+    second = _entry("est_size_act", _TWO)
+    cache = tmp_path / "cache"
+    first_digest = _cached(cache, first, b"[]")
+    second_digest = _cached(cache, second, b"[{}]")
+    review = _review(tmp_path / "review")
+    destination = build_additions(
+        cache,
+        (first, second),
+        {first.key: first_digest, second.key: second_digest},
+        review,
+        tmp_path / "frame",
+        tmp_path / "out",
+    )
+    manifest = json.loads((destination / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["sources"] == [
+        {"key": second.key, "sha256": second_digest},
+        {"key": first.key, "sha256": first_digest},
+    ]
+
+
+def test_a_receipt_hash_other_than_the_body_publishes_nothing(tmp_path: Path) -> None:
+    """A sidecar hash that is not the verified body publishes no current set."""
+    entry = _entry("est_size_act", _TWO)
+    raw = [
+        {
+            "year": "2015",
+            "activity_code": "11",
+            "size_of_establishment": _SIZE,
+            "hjm_lmnsh": _SIZE_AR,
+            "indicator": "Employees",
+            "lbyn": "SYN-IND",
+            "value": 14,
+        }
+    ]
+    body = json.dumps(raw).encode("utf-8")
+    digest = hashlib.sha256(body).hexdigest()
+    cache = tmp_path / "cache"
+    folder = cache / entry.key
+    folder.mkdir(parents=True)
+    (folder / f"{digest}.json").write_bytes(body)
+    (folder / f"{digest}.meta.json").write_text(
+        json.dumps({"retrieved_utc": _RETRIEVED, "sha256": "0" * 64}),
+        encoding="utf-8",
+    )
+    review = tmp_path / "review"
+    review.mkdir()
+    for name in _REVIEW_FILES:
+        shutil.copyfile(_REVIEW / name, review / name)
+    frame = tmp_path / "frame"
+    frame.mkdir()
+    (frame / "municipality_names.csv").write_text(
+        "name,municipality_code\n", encoding="utf-8"
+    )
+    with pytest.raises(AdditionError) as caught:
+        build_additions(
+            cache, (entry,), {entry.key: digest}, review, frame, tmp_path / "out"
+        )
+    assert caught.value.name == "hash_mismatch"
+    assert not (tmp_path / "out" / "current" / "manifest.json").exists()
+
+
+def test_blank_selection_fields_are_slug_absent(tmp_path: Path) -> None:
+    """An empty key or an empty digest is refused before a manifest is written."""
+    review = _review(tmp_path / "review")
+    with pytest.raises(AdditionError) as blank_key:
+        build_additions(
+            tmp_path / "cache",
+            (),
+            (("", "ab"),),
+            review,
+            tmp_path / "frame",
+            tmp_path / "out-key",
+        )
+    assert blank_key.value.name == "slug_absent"
+    assert not (tmp_path / "out-key" / "current" / "manifest.json").exists()
+    with pytest.raises(AdditionError) as blank_digest:
+        checked_selection((("est_size_act/invented", ""),))
+    assert blank_digest.value.name == "slug_absent"
+
+
+def test_duplicate_entry_keys_are_refused(tmp_path: Path) -> None:
+    """Two registry rows with one key are refused before a manifest is written."""
+    entry = _entry("est_size_act", _TWO)
+    with pytest.raises(AdditionError) as caught:
+        build_additions(
+            tmp_path / "cache",
+            (entry, entry),
+            {entry.key: "ab"},
+            tmp_path / "review",
+            tmp_path / "frame",
+            tmp_path / "out",
+        )
+    assert caught.value.name == "duplicate_slug_selection"
+    assert not (tmp_path / "out" / "current" / "manifest.json").exists()
+
+
+def test_an_unknown_slug_is_refused(tmp_path: Path) -> None:
+    """A selected key with no registry row is refused and publishes nothing."""
+    review = _review(tmp_path / "review")
+    with pytest.raises(AdditionError) as caught:
+        build_additions(
+            tmp_path / "cache",
+            (),
+            {"missing/invented": "ab"},
+            review,
+            tmp_path / "frame",
+            tmp_path / "out",
+        )
+    assert caught.value.name == "slug_absent"
+    assert not (tmp_path / "out" / "current" / "manifest.json").exists()
+
+
+def test_a_non_addition_slug_is_refused(tmp_path: Path) -> None:
+    """A selected row outside the eighteen families is refused and publishes nothing."""
+    from dataclasses import replace
+
+    entry = replace(
+        _entry("est_size_act", _TWO),
+        source_id="not_an_addition",
+        key="not_an_addition/invented",
+    )
+    review = _review(tmp_path / "review")
+    with pytest.raises(AdditionError) as caught:
+        build_additions(
+            tmp_path / "cache",
+            (entry,),
+            {entry.key: "ab"},
+            review,
+            tmp_path / "frame",
+            tmp_path / "out",
+        )
+    assert caught.value.name == "slug_absent"
+    assert not (tmp_path / "out" / "current" / "manifest.json").exists()
+
+
+def test_invalid_export_json_is_unreadable(tmp_path: Path) -> None:
+    """A body that is not JSON is refused after its hash matches, and nothing is published."""
+    entry = _entry("est_size_act", _TWO)
+    cache, review, digest = _export(tmp_path, entry, b"not-json", '{"sha256":"side"}')
+    with pytest.raises(AdditionError) as caught:
+        build_additions(
+            cache,
+            (entry,),
+            {entry.key: digest},
+            review,
+            tmp_path / "frame",
+            tmp_path / "out",
+        )
+    assert caught.value.name == "export_unreadable"
+    assert not (tmp_path / "out" / "current" / "manifest.json").exists()
+
+
+def test_a_non_list_result_is_unreadable(tmp_path: Path) -> None:
+    """A results value that is not a list is refused, and nothing is published."""
+    entry = _entry("est_size_act", _TWO)
+    body = b'{"results": {"not": "a list"}}'
+    digest = hashlib.sha256(body).hexdigest()
+    cache, review, _digest = _export(
+        tmp_path, entry, body, json.dumps({"sha256": digest})
+    )
+    with pytest.raises(AdditionError) as caught:
+        build_additions(
+            cache,
+            (entry,),
+            {entry.key: digest},
+            review,
+            tmp_path / "frame",
+            tmp_path / "out",
+        )
+    assert caught.value.name == "export_unreadable"
+    assert not (tmp_path / "out" / "current" / "manifest.json").exists()
+
+
+def test_a_non_dict_receipt_is_unreadable(tmp_path: Path) -> None:
+    """A receipt that is not an object is refused, and nothing is published."""
+    entry = _entry("est_size_act", _TWO)
+    cache, review, digest = _export(tmp_path, entry, b"[]", "[]")
+    with pytest.raises(AdditionError) as caught:
+        build_additions(
+            cache,
+            (entry,),
+            {entry.key: digest},
+            review,
+            tmp_path / "frame",
+            tmp_path / "out",
+        )
+    assert caught.value.name == "export_unreadable"
+    assert not (tmp_path / "out" / "current" / "manifest.json").exists()
+
+
+def test_an_unsupported_column_kind_is_refused(tmp_path: Path) -> None:
+    """A kind outside VARCHAR, INTEGER and DECIMAL is refused and writes nothing."""
+    with pytest.raises(AdditionError) as caught:
+        _refuse_value(Decimal("1"), "DATE")
+    assert caught.value.name == "value_out_of_column"
+    assert not (tmp_path / "current").exists()
+    assert list(tmp_path.rglob("*.parquet")) == []
+
+
+def test_a_period_piece_without_equals_is_unreadable() -> None:
+    """A period piece with no equals sign is refused and returns no period."""
+    found: list[object] = []
+    with pytest.raises(AdditionError) as caught:
+        found.append(parse_period_rule("sit=row;form=year_text;years"))
+    assert caught.value.name == "period_field_unreadable"
+    assert found == []
+
+
+def test_an_empty_row_period_field_is_refused() -> None:
+    """A row rule with an empty field name is refused and returns no period."""
+    found: list[object] = []
+    with pytest.raises(AdditionError) as caught:
+        found.append(parse_period_rule("sit=row;form=year_text;field="))
+    assert caught.value.name == "period_field_empty"
+    assert found == []
+
+
+def test_year_number_and_year_month_reject_a_bad_value() -> None:
+    """A text year_number and an out-of-range year_month are refused."""
+    found: list[object] = []
+    with pytest.raises(AdditionError) as year:
+        found.append(parse_period_value("2020", "year_number"))
+    assert year.value.name == "period_form"
+    with pytest.raises(AdditionError) as month:
+        found.append(parse_period_value("2020-13", "year_month"))
+    assert month.value.name == "period_form"
+    assert found == []
+
+
+def test_year_number_and_year_month_accept_a_closed_value() -> None:
+    """The passing control: an integer year and a YYYY-MM month parse."""
+    assert parse_period_value(2020, "year_number") == "2020"
+    assert parse_period_value("2020-06", "year_month") == "2020-06"
+
+
+def test_a_date_outside_month_or_day_bounds_is_refused() -> None:
+    """A month above 12 or a day above 31 is refused and returns no period."""
+    found: list[object] = []
+    with pytest.raises(AdditionError) as month:
+        found.append(parse_period_value("2020-13-01", "date"))
+    assert month.value.name == "period_form"
+    with pytest.raises(AdditionError) as day:
+        found.append(parse_period_value("2020-01-32", "date"))
+    assert day.value.name == "period_form"
+    assert found == []
+
+
+def test_a_non_dict_row_is_period_unreadable() -> None:
+    """A row that is not an object is refused and collects no period."""
+    rule = parse_period_rule("sit=row;form=year_text;field=year")
+    found: list[str] = []
+    with pytest.raises(AdditionError) as caught:
+        found.extend(_collect_periods(["2016"], rule))
+    assert caught.value.name == "period_unreadable"
+    assert found == []
+
+
+def test_a_non_string_column_key_is_period_unreadable() -> None:
+    """A column header that is not text is refused and collects no period."""
+    rule = parse_period_rule("sit=columns;form=year_header")
+    found: list[str] = []
+    with pytest.raises(AdditionError) as caught:
+        found.extend(_collect_periods([{1: 1}], rule))
+    assert caught.value.name == "period_unreadable"
+    assert found == []
+
+
+def test_an_unknown_month_name_header_is_refused() -> None:
+    """A header shaped like a month but not a month name is refused."""
+    found: list[object] = []
+    with pytest.raises(AdditionError) as caught:
+        found.append(_header_period("notamonth_2020", "month_name_year"))
+    assert caught.value.name == "period_form"
+    assert found == []
+
+
+def test_boolean_object_and_non_finite_measures_are_unparsed() -> None:
+    """A boolean, an object and a non-finite float are refused and yield no number."""
+    found: list[object] = []
+    for value in (True, {"n": 1}, float("inf")):
+        with pytest.raises(AdditionError) as caught:
+            found.append(read_measure(value, missing_forms=frozenset(), integral=False))
+        assert caught.value.name == "measure_unparsed"
+    assert found == []
+
+
+def test_a_bad_column_name_writes_no_parquet(tmp_path: Path) -> None:
+    """A column identifier outside the closed pattern writes no Parquet file."""
+    path = tmp_path / "tables" / "pub_population_age.parquet"
+    with pytest.raises(AdditionError) as caught:
+        write_parquet(path, (("value", "INTEGER"), ("bad-name", "VARCHAR")), ())
+    assert caught.value.name == "column_name"
+    assert not path.is_file()
+    assert not (tmp_path / "current").exists()
+    assert list(tmp_path.rglob("*.parquet")) == []
+
+
+def _cached(cache: Path, entry: Entry, body: bytes) -> str:
+    digest = hashlib.sha256(body).hexdigest()
+    folder = cache / entry.key
+    folder.mkdir(parents=True)
+    (folder / f"{digest}.{entry.extension}").write_bytes(body)
+    (folder / f"{digest}.meta.json").write_text(
+        json.dumps({"sha256": digest}), encoding="utf-8"
+    )
+    return digest
+
+
+def _review(path: Path) -> Path:
+    path.mkdir()
+    (path / "additions_property_venues.yaml").write_text(
+        "version: 1\n", encoding="utf-8"
+    )
+    (path / "venue_crosswalk.csv").write_text(
+        "source_key,published_name,venue_key,place_id,reviewer_role,reviewed_on\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def _export(
+    tmp_path: Path, entry: Entry, body: bytes, side: str
+) -> tuple[Path, Path, str]:
+    digest = hashlib.sha256(body).hexdigest()
+    cache = tmp_path / "cache"
+    folder = cache / entry.key
+    folder.mkdir(parents=True)
+    (folder / f"{digest}.{entry.extension}").write_bytes(body)
+    (folder / f"{digest}.meta.json").write_text(side, encoding="utf-8")
+    return cache, _review(tmp_path / "review"), digest
 
 
 def _entry(source_id: str, slug: str) -> Entry:
