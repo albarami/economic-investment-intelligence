@@ -13,6 +13,7 @@ import io
 import json
 import tempfile
 import zipfile
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -25,6 +26,19 @@ from eii_custodian.publicdata.fetch.receipts import (
     sidecar_for,
 )
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.series.parse import FIELD_MAP, MONTH_FIELDS, NULLABLE
+
+_EVIDENCE_MARK = "EVIDENCE_ONLY:"
+_LOGICAL_COLUMNS = (
+    ("activity_code", "activity_code"),
+    ("activity_name_ar", "activity_name_ar"),
+    ("active_count", "active_count"),
+    ("cancelled_count", "cancelled_count"),
+    ("municipality", "municipality_code"),
+)
+_INVENTED_MUNICIPALITY = "بلدية مخترعة"
+_INVENTED_YEAR = "2024"
+_INVENTED_MONTH = 1
 
 RETRIEVED_UTC = "2026-11-01T00:00:00Z"
 PARQUET_BATCH = 1024
@@ -79,6 +93,81 @@ def write_cached(
     )
     commit_pair(cache_directory(cache, entry.key), sha, suffix, body, sidecar)
     return cache_directory(cache, entry.key) / f"{sha}.{suffix}"
+
+
+def real_feed_body(feed: str, rows: Sequence[Mapping[str, object]]) -> bytes:
+    """Encode invented rows as a JSON list in the real field names of ``feed``."""
+    return json.dumps([real_feed_row(feed, row) for row in rows]).encode()
+
+
+def class_csv(
+    rows: Sequence[Mapping[str, object] | tuple[str, str]],
+) -> bytes:
+    """Encode invented class rows as quoted CSV with the real header and CRLF."""
+    lines = ['"Code","Description"']
+    for row in rows:
+        code, title = _class_pair(row)
+        lines.append(
+            '"' + code.replace('"', '""') + '","' + title.replace('"', '""') + '"'
+        )
+    return ("\r\n".join(lines) + "\r\n").encode("ascii")
+
+
+def _mapped_field(feed: str, column: str) -> str:
+    found = [
+        source
+        for source, (_table, release) in FIELD_MAP[feed].items()
+        if release.removeprefix(_EVIDENCE_MARK) == column
+    ]
+    if len(found) != 1:
+        raise CacheError("activity column is not one field: " + column)
+    return found[0]
+
+
+def _period_names(feed: str) -> tuple[str, str]:
+    month = MONTH_FIELDS[feed]
+    years = [name for name in NULLABLE[feed] if name != month]
+    if len(years) != 1:
+        raise CacheError("activity period is not one year field")
+    return years[0], month
+
+
+def real_feed_row(feed: str, row: Mapping[str, object]) -> dict[str, object]:
+    """Return one invented row in the real field names of ``feed``."""
+    built: dict[str, object] = {}
+    logical = {key for key, _column in _LOGICAL_COLUMNS}
+    for key, column in _LOGICAL_COLUMNS:
+        if key in row:
+            built[_mapped_field(feed, column)] = row[key]
+    if feed == "lic_cancelled":
+        year_name, month_name = _period_names(feed)
+        if "year" in row:
+            built[year_name] = row["year"]
+        if "month" in row:
+            built[month_name] = row["month"]
+    for key, value in row.items():
+        if key not in logical and key not in {"year", "month"}:
+            built[str(key)] = value
+    municipality = _mapped_field(feed, "municipality_code")
+    if municipality not in built:
+        built[municipality] = _INVENTED_MUNICIPALITY
+    if feed == "lic_cancelled":
+        year_name, month_name = _period_names(feed)
+        if year_name not in built:
+            built[year_name] = _INVENTED_YEAR
+        if month_name not in built:
+            built[month_name] = _INVENTED_MONTH
+    return built
+
+
+def _class_pair(row: Mapping[str, object] | tuple[str, str]) -> tuple[str, str]:
+    if isinstance(row, tuple):
+        return row
+    code = row.get("Code", row.get("code"))
+    title = row.get("Description", row.get("label_en", row.get("title_en", "")))
+    if not isinstance(code, str) or not isinstance(title, str):
+        raise CacheError("class fixture code or title is not text")
+    return code, title
 
 
 def read_cached(

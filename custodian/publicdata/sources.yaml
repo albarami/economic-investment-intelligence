@@ -1259,7 +1259,7 @@ sources:
     licence_url: ""
     decision_record: ""
     fetch_host: "unstats.un.org"
-    url: ""
+    url: "https://unstats.un.org/unsd/classifications/Econ/Download/In%20Text/ISIC_Rev_4_english_structure.Txt"
     terms_url: ""
     landing_url: "https://unstats.un.org/unsd/classifications/Econ"
     nightly_live_fetch: true
@@ -1267,12 +1267,16 @@ sources:
     commit_allowed: false
     release_tables: []
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "Code"
+        type: "string"
+      - name: "Description"
+        type: "string"
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "direct_url_unconfirmed"
-    extension: "json"
+    skip_reason: ""
+    extension: "csv"
   - key: "ref_min_wage"
     source_id: "ref_min_wage"
     slug: ""

@@ -27,11 +27,13 @@ from eii_custodian.publicdata.review.activity import (
 )
 from eii_custodian.publicdata.review.cache_fixture import (
     CacheError,
+    class_csv,
     read_cached,
     read_csv,
     read_json,
     read_parquet,
     read_xlsx,
+    real_feed_body,
     write_cached,
 )
 from eii_custodian.publicdata.review.graph import (
@@ -444,12 +446,21 @@ def test_place_categories_read_nested_and_alias() -> None:
 def test_cache_reader_accepts_a_written_pair(tmp_path: Path) -> None:
     """A written body and sidecar read back with their bytes."""
     entry = _entry("lic_active")
-    body = b'[{"activity_code": "5610101"}]'
+    body = real_feed_body(
+        "lic_active",
+        [
+            {
+                "activity_code": "5610101",
+                "activity_name_ar": "مطعم",
+                "active_count": 10,
+            }
+        ],
+    )
     write_cached(tmp_path, entry, body)
     cached = read_cached(tmp_path, entry)
     assert cached.body == body
     assert cached.sidecar["key"] == "lic_active"
-    assert read_json(cached.body) == [{"activity_code": "5610101"}]
+    assert read_json(cached.body) == json.loads(body)
 
 
 def test_cache_reader_refuses_a_stale_pair(tmp_path: Path) -> None:
@@ -513,51 +524,33 @@ def test_parquet_places_fixture_feeds_the_graph(tmp_path: Path) -> None:
     assert any(edge.edge_type == "listed_as" for edge in graph.edges)
 
 
-def test_cached_feeds_convert_digit_string_counts(tmp_path: Path) -> None:
-    """A CSV and an XLSX feed carry their counts as digit strings."""
-    registry = tuple(
-        replace(entry, extension="csv")
-        if entry.key == "lic_active"
-        else replace(entry, extension="xlsx")
-        if entry.key == "lic_cancelled"
-        else entry
-        for entry in load_registry()
-    )
+def test_cached_feeds_refuse_a_count_written_as_text(tmp_path: Path) -> None:
+    """A count carried as text refuses the feed."""
     write_cached(
         tmp_path,
-        _entry("lic_active", registry),
-        "activity_code,activity_name_ar,active_count\n5610101,مطعم,10\n".encode(),
-        extension="csv",
-    )
-    write_cached(
-        tmp_path,
-        _entry("lic_cancelled", registry),
-        _xlsx(
-            (
-                ("activity_code", "activity_name_ar", "cancelled_count"),
-                ("5610201", "كافيتيريا", "4"),
-            )
+        _entry("lic_active"),
+        real_feed_body(
+            "lic_active",
+            [
+                {
+                    "activity_code": "5610101",
+                    "activity_name_ar": "مطعم",
+                    "active_count": "10",
+                }
+            ],
         ),
-        extension="xlsx",
     )
-    write_cached(
-        tmp_path,
-        _entry("cls_isic4", registry),
-        b'[{"code": "5610", "label_en": "Restaurants", "label_ar": ""}]',
-    )
+    write_cached(tmp_path, _entry("lic_cancelled"), real_feed_body("lic_cancelled", []))
+    write_cached(tmp_path, _entry("cls_isic4"), class_csv([("5610", "Restaurants")]))
     review = _review_csv(tmp_path)
     _binding_beside(review)
-    inputs = load_activity_inputs(
-        tmp_path,
-        (),
-        registry=registry,
-        review_path=review,
-        supplier_membership=_NO_SUPPLIERS,
-    )
-    counts = {
-        row.code: (row.active_count, row.cancelled_count) for row in inputs.activities
-    }
-    assert counts == {"5610101": (10, 0), "5610201": (0, 4)}
+    with pytest.raises(SpineError, match="lic_active"):
+        load_activity_inputs(
+            tmp_path,
+            (),
+            review_path=review,
+            supplier_membership=_NO_SUPPLIERS,
+        )
 
 
 def test_build_cached_graph_requires_a_supplier_membership(tmp_path: Path) -> None:
@@ -998,7 +991,8 @@ def _write_cached_feeds(folder: Path, *, label_en: str = _RESTAURANT) -> None:
     write_cached(
         folder,
         _entry("lic_active"),
-        json.dumps(
+        real_feed_body(
+            "lic_active",
             [
                 {
                     "activity_code": "5610101",
@@ -1010,13 +1004,14 @@ def _write_cached_feeds(folder: Path, *, label_en: str = _RESTAURANT) -> None:
                     "activity_name_ar": "تجارة قطع الغيار",
                     "active_count": 5,
                 },
-            ]
-        ).encode(),
+            ],
+        ),
     )
     write_cached(
         folder,
         _entry("lic_cancelled"),
-        json.dumps(
+        real_feed_body(
+            "lic_cancelled",
             [
                 {
                     "activity_code": "5610201",
@@ -1028,14 +1023,10 @@ def _write_cached_feeds(folder: Path, *, label_en: str = _RESTAURANT) -> None:
                     "activity_name_ar": "مطعم",
                     "cancelled_count": 0,
                 },
-            ]
-        ).encode(),
+            ],
+        ),
     )
-    write_cached(
-        folder,
-        _entry("cls_isic4"),
-        json.dumps([{"code": "5610", "label_en": label_en, "label_ar": ""}]).encode(),
-    )
+    write_cached(folder, _entry("cls_isic4"), class_csv([("5610", label_en)]))
     write_cached(
         folder, _entry("places_ovt"), _places_parquet(folder, ("cafe", "restaurant"))
     )
