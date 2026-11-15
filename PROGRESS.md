@@ -23766,6 +23766,269 @@ Seed:      none
 Notes:     The work commit has a Conventional Commit subject.
 ```
 
+#### S1-T12: the task's one review, with the addendum of the slice S1 gate: APPROVED
+
+Reviewed commit `c75c196ae901a68a2460db5aa007822c24dd1360`, the first pushed head of pull request https://github.com/albarami/economic-investment-intelligence/pull/55 . Moonshot AI Kimi K3.1 Pro High through the Devin command-line tool, another maker than the lead's (Anthropic), who took the traces with the owner and wrote the records. Hosted checks on that head: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43685690927 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43685690899 ; workflow ci FAILURE, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43685690889 : the job static-checks failed at its step "Check web format" and the job planted-failures at its plant of the same check, because the spike's page writes a trace as one line of JSON and the project's web format check reads every JSON file under `web/`. The verdict is on the content of the traces and the records; the failure was repaired by the next work commit, which the same reviewer confirmed (below). The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T12 and the addendum of the slice S1 gate
+COMMIT: c75c196ae901a68a2460db5aa007822c24dd1360
+REVIEWER: Moonshot AI Kimi K3.1 Pro High
+SKILLS LOADED: strict-reviewer, sanad-provenance, task-standards, project-orientation, muhasabah-gate; code-review unavailable (plain meaning applied)
+CHECKS:
+  V1 PASS The original trace contains 1,801 timestamps = 1,800 frames over 30.001 s; 1,730/1,800 = 0.961111…, matching its stored 0.9611111111111111 and exceeding the unchanged 0.95 minimum at the strict 16.7 ms budget (trace; config.mjs; PROGRESS.md S1-T12). It records 110,000 hexagons, 50,000 particles, gate profile, NVIDIA D3D11 hardware rendering and no interruption.
+  V2 PASS First road trace: 1,613/1,800 = 0.896111…, stored 0.8961111111111111; full street trace: 1,623/1,800 = 0.901666…, stored 0.9016666666666666. Both are below 0.95 and are recorded without a pass claim; criterion 2 requires a recorded animated-road result, while document 10’s minimum names the hexagon/particle load and trace.mjs qualify() exempts road sets only from that share minimum.
+  V3 PASS Each capture record has role/date/host/browser/trace/sha256; the evidence rows bind each recorded SHA-256 to its trace. All traces name main a8a99dd94c30e3c5e3522d18f90c0edc14646f3e and the same lock digest; no personal name, e-mail, machine path or secret was found. Windows non-headless Chrome UA and NVIDIA D3D11 renderer support native hardware capture; identity as the build machine, operation outside WSL and physical-console capture rest on the owner’s attestation (capture records; PROGRESS.md capture account).
+  V4 PASS Recorded at work commit 25eb0c3 in PROGRESS.md, and not rerun here under the outer no-shell instruction: original last line “native frame-rate gate passed”, exit 0; hexagons-particles-roads last line “native road result recorded”, exit 0; hexagons-particles-roads-250k last line “native road result recorded”, exit 0.
+  V5 PASS Addendum statements 3 and 10 stay within the traces, earlier gate record and fresh whole-test record; no road-set, other-machine, other-browser or other-pixel-ratio frame-rate pass is claimed. The earlier record remains present with statements 3 and 10 open and the addendum supplying their closure (TST-171). pins.toml and package-lock.json support MapLibre 6.17.0 and deck.gl 9.4.1; the traces support the full load trial and cap 1 at DPR 1.125 with a 1920×1080 buffer.
+  V6 PASS TASKS.md has both S1-T12 criteria ticked and status in review, with S1-T18/S1-T19 done. OI-122 is closed; OI-121 remains an ASSUMPTION; PO-S2-30/31 accurately preserve the stale-record follow-up and undecided road-frame-rate statement. PR 54’s correction is appended at PROGRESS.md’s merge record and rewrites neither earlier evidence row.
+  V7 PASS PROGRESS.md’s scope check records exactly the six added evidence files (“6 [] []”), with the ledger limited to PROGRESS.md, TASKS.md and OPEN_ITEMS.md. AGENTS.md and CLAUDE.md match throughout and have a recorded cmp exit 0; config.mjs retains 16.7/0.95 and no test or bound change is shown.
+GATE ADDENDUM: CONFIRMED
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S1-T12: the confirmation of the formatted traces: APPROVED
+
+Reviewed commit `3132aa059defc7e70e3e0c1412c511a8bd76c82b`, a pushed head of pull request https://github.com/albarami/economic-investment-intelligence/pull/55 , with CI green on it (workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43686477383 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43686477385 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43686477391 ). The same reviewer. The commit rewrites the three traces with the project's own formatter (`npm run format`), changes whitespace alone, and updates the digests of the three capture records; no check, ignore list, bound or code file changed. The verdict is copied unchanged from its first line (REV-09); it is also posted on the pull request.
+
+```text
+VERDICT: APPROVED
+TASK: S1-T12, confirmation of the formatted traces
+COMMIT: 3132aa059defc7e70e3e0c1412c511a8bd76c82b
+REVIEWER: Moonshot AI Kimi K3.1 Pro High
+SKILLS LOADED: strict-reviewer, sanad-provenance, task-standards, project-orientation, muhasabah-gate; code-review unavailable (plain meaning applied)
+CHECKS:
+  W1 PASS Read and exact-token searched all three before/after pairs; metadata, timestamps, summaries and numeric spellings agree, with only JSON whitespace/layout changed. The recorded full comparisons also report whitespace-stripped texts and values parsed with numbers as text equal; no key, string or number is added, missing or altered.
+  W2 PASS DIGESTS.txt and the capture records agree for all three traces: the before values are the round-one digests, and each after value is the corresponding record’s current sha256 (63297cb5…, 11783ad1…, a7ec92dc…).
+  W3 PASS STAT.txt names exactly the three traces and three capture records, all under web/spikes/performance/evidence/; no check, ignore list, workflow, test, bound or code file is touched. The records’ role/date/host/browser/trace fields are unchanged.
+  W4 PASS V1–V7 still hold; none is invalidated by layout-only changes. The unchanged original trace gives 1,730/1,800 = 0.961111…, matching 0.9611111111111111 and remaining above 0.95; both road results remain recorded without pass claims.
+  W5 PASS The draft accurately records the two failures, formatter-only rewrite, content-equivalence proof, digest rebinding and preservation of round-one entries at their commit. It expressly distinguishes formatter bytes from server-written bytes; this transparent, digest-bound formatting preserves TST-132 and both task criteria without changing check scope.
+GATE ADDENDUM: STILL CONFIRMED
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### S1-T12: merge record
+
+- The head that was merged, `803fceedd1959f18baf717ea3a9df5c3e774a024`, is the confirmed work commit `3132aa059defc7e70e3e0c1412c511a8bd76c82b` and one ledger commit that changes PROGRESS.md alone (the round-2 entries, 157 lines). The verdicts stand on a move of records only; the lead's check of it on the head: "TREE-IS-WORK ok: 661 paths at 803fceedd1959f18baf717ea3a9df5c3e774a024", exit code 0.
+- CI on the head: the six required hosted checks passed. Workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43688423705 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43688423698 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43688423710 .
+- The lead's head checks before the merge, on processors 16 to 27 (the merge line's own set): every command exit code 0; `uv run --locked python scripts/ci_history_scan.py scan`: "history scan: range HEAD, 58 commits, at least 58 to list, RESULT: PASSED", exit code 0; `./eii test --seed 2026111485`: exit code 0, "total: 3168 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- The branch stood on current main (`a8a99dd94c30e3c5e3522d18f90c0edc14646f3e`), so the head was the exact merge result: the whole test above is the test of the merge result.
+- Both verdicts were posted on the pull request before the merge, https://github.com/albarami/economic-investment-intelligence/pull/55#issuecomment-6890840976 .
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/55 was squash-merged on 2026-11-15 at that head; merge commit `2bbdad2d400ac4c65810d7c3785cd66459970c60` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43690817895 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43690817808 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43690817848 .
+- Why the failure reached the hosted checks: the lead's own checks before the first push did not run the four static checks of `web/` (`npm run check`, `lint`, `format:check`, `typecheck`). From this pull request on the lead runs them before pushing any head that changes a file under `web/`. That the spike's page writes a trace in a form the format check refuses is entered as proposed item PO-S2-34.
+
+### S2-T22 — No value of a source without an open licence stands in the repository: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/56 )
+
+- What it is and why it exists: a repair task that the lead added by a re-plan of 2026-11-15 (OI-195). Item 5 of [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) says: "No record, name or value of a source not under an open licence appears in the repository, a test, a fixture, a committed screenshot, a brief or a document. Fetched data stays in the uncommitted cache. Tests use stand-ins of the same shape with invented values." On 2026-11-15 the build of another task stopped on a difference between the regression table of document 04 section 10 and the stage's table of expected figures, and the lead then had the whole committed tree of main `2bbdad2d400ac4c65810d7c3785cd66459970c60` audited for such values. The audit names places, kinds and counts and no value. It found three places: in code, five literal figures under the key PUB-71 of the table `EXPECTED` in `custodian/src/eii_custodian/publicdata/stage.py`, of the source `census_zone_sector` (registry basis `owner_decision`), while the row PUB-71 of document 04 says that none of its values is committed; in a document, the figures of a research regression in the row MTH-46 of document 07 (four figures by the audit's count), computed from census layers of the same basis; in a data file, one district name of the layer `bnd_district_2020` (basis `owner_decision`) in the one data row of `custodian/publicdata/review/district_layer_aliases.csv`. The audit left seven groups unclassified. The task removes the three and, after its review, a fourth (the share in the sentence on hypothesis H2 of document 05), and adds a guard so that an expected figure of such a source cannot be committed again. It adds no source, feature or rule. This log, like the audit, the briefs, the returns and the verdicts, writes none of the removed values: it names them by file, key and kind only.
+- The four work commits. The first three were built, reviewed and approved on main `a8a99dd94c30e3c5e3522d18f90c0edc14646f3e` as `c1532af9f329b34cbebb57727bec1132ba15795d` (the build), `b44bed2e01752dcafa4260a83e12b794a1ddbd9f` (the fix pass of the review) and `f60afd2e9c664e1dd26b3b9d6882daa4860a60ff` (the mutation pass). When pull request 55 merged, the lead applied the same three changes in the same order on main `2bbdad2d400ac4c65810d7c3785cd66459970c60`: `0cc833f7abb424ec1ac2577685030a621a49d887`, `978b35a9e5c595c1049c60e142e378d97c90656a` and `01d4734a4664609e03b36589adb69cda6f5bfcd9`. The lead's script compared, file by file, the added and removed lines of each approved commit with those of its copy: 7 of 7, 4 of 4 and 3 of 3 files identical, no difference. The fourth, `f9f1c934d610ce27207fe1cd2fb1cb09758708db`, is the task's own document: decision record 0034 and its two lines in the documentation index (see "The owner's word and the record" below). Below, a hash that names what a review, a confirmation or a campaign saw is the approved commit's; the commands of this entry ran at `f9f1c934d610ce27207fe1cd2fb1cb09758708db`. The first two change nine files: `custodian/README.md`, `custodian/publicdata/review/district_layer_aliases.csv`, `custodian/src/eii_custodian/publicdata/fetch/build.py`, `custodian/src/eii_custodian/publicdata/frame/live.py`, `custodian/src/eii_custodian/publicdata/stage.py`, the new `custodian/tests/test_open_licence_commit_guard.py`, `custodian/tests/test_public_data_stage.py`, and one sentence each of documents 05 and 07.
+- Who did what. Builder of all three passes: Cognition SWE-2 through Devin (the returns name the model "SWE-2 High"). Reviewer of the code review and of the confirmation: OpenAI GPT-6 through Codex, a maker other than the builder's and the lead's (rule 35). The lead (Anthropic) wrote the briefs and the rulings, committed the builder's uncommitted changes, ran the checks below and the mutation campaigns, and wrote the task's section of TASKS.md, the two explained rows and decision record 0034; the lead's own lines in the last two work commits were confirmed by the reviewer, of another maker than the lead's. The audit and the inputs of this ledger were drafted by helpers of Anthropic (Claude Fable 5.2) and read and ruled by the lead.
+- Personas and skills (rule 34). Builder's persona: a senior data engineer for public-data provenance in a public repository; for the mutation pass, a senior Python test engineer. Reviewer's persona: a principal reviewer of data provenance and repository hygiene with the security lens. The builder logged task-standards, project-orientation, sanad-provenance and muhasabah-gate as loaded in the build pass, and task-standards and sanad-provenance in the fix pass; it reported that the three superpowers skills its briefs named (test-driven-development, systematic-debugging, verification-before-completion) are not installed in its tool and that it followed their plain meaning: a failing test first, the root cause before a change, real exit codes. The reviewer logged strict-reviewer, sanad-provenance and muhasabah-gate in the review, and strict-reviewer, sanad-provenance, task-standards, project-orientation and muhasabah-gate in the confirmation; it reported code-review and security-review as unavailable in its tool, with their plain meanings applied.
+- Pass 1, the build (`c1532af9f329b34cbebb57727bec1132ba15795d`), four build points. B1: the five literals left the stage module, and "PUB-71" stays among the twelve regression ids of section 10, which are now an explicit tuple. The stage reads the expected figures of that row from one local record, `local_expectations/PUB-71.json` inside the uncommitted public cache `data/public_cache/`: one JSON object that maps the five field names the table had to decimal text. With no record the row takes the path that a figure which cannot be measured today already takes (the coverage line `not_measured`), never a pass, and no new status word was added. A record of another shape (a missing or an extra field, a value that is not decimal text, a value that is not text, text that is not JSON) is refused by the one fixed reason "local expectations record refused", which names the row and holds no value. The comment above the table was corrected, and `custodian/README.md` says where the record lives and that the lead writes it on the build machine from the published source. B2: the guard `test_expected_anchors_only_cover_open_dataset_sources` in the new test file reads the registry, takes the source ids of each regression row from the last cell of the row in document 04 section 10 and from the map `DEPENDENCIES` of `series/figures.py`, asserts that the two agree and that all twelve rows are mapped, and fails when the table holds a figure for a row with a source whose `licence_basis` is not `dataset`. Its planted violation: an invented literal put back under "PUB-71" in a copy of the table, which the guard reports by the row's id with the source `census_zone_sector`. B3: the bracket of MTH-46 became words in the form the C12 research note beside it already uses ("the research figures stay in the uncommitted cache (PUB-12)"); no other sentence of document 07 changed. B4: the committed alias file keeps its header and no data row; the new function `district_aliases` of `frame/live.py` reads the committed file and, when it is present, a local file of the same header at `review/district_layer_aliases.csv` inside the cache; with no local file a district that needs an alias stays unmatched and is reported by the existing line `district_name_pair_unmatched`; `join_districts` is unchanged. Two tests: `test_local_alias_file_rows_reach_join_districts` (an invented alias row in a temporary local file reaches the join) and the guard `test_committed_district_layer_aliases_hold_no_source_row`, planted with an invented row. The builder's return gives the first failing line of each new test.
+- The one code review, on `c1532af9f329b34cbebb57727bec1132ba15795d`, word for word in its head lines: "VERDICT: REJECTED", "TASK: S2-T22, code review", "REVIEWER: OpenAI GPT-6". Its checks Q1 and Q3 to Q6 passed: the three values are gone and none came back in an added line, the invented stand-ins are visibly invented, the guard and its plant are real, MTH-46 alone changed in document 07, and the frame's matches and the assertions of its tests are unchanged. Q2 and Q7 failed, with three findings.
+- What became of each finding. F1 (with the local record absent, a PUB-71 figure that the build did compute was reported as not measured, and a build that failed before could succeed): adopted and fixed in pass 2. F2 (the sentence on hypothesis H2 in section 16 of document 05 printed a share counted from the records of the source `accident`, whose registry row says basis `none_stated` with an unconfirmed licence): adopted and fixed in pass 2. F3 (the published band value that DAT-16 of document 03 names, and the three sums in the citation of the row `ref_min_wage` in section 2.2 of document 04): not built in this task, by the lead's ruling of 2026-11-15, and since answered by the owner's word; see "The owner's word and the record".
+- Pass 2, the fix pass (`b44bed2e01752dcafa4260a83e12b794a1ddbd9f`). F1: `run_stage` still enters the row in its missing list, and when a figure file is present while the row's only expectations are the absent local record, it names the row in the new field `StageResult.unrecorded`; a required row keeps its earlier mismatch return. `run_build` turns that field into a failure by the same path a mismatch takes to the build's outcome and exit, after the coverage lines. The failure line, exactly: `FAIL PUB-71  public_data expected=local expectations record observed=missing` (the two spaces stand for the empty address field, as in the existing mismatch lines); it holds no value. When no figure was produced, the row is not measured and nothing fails. Three tests at the level of `run_build`: `test_pub71_present_figure_without_record_fails_the_build` (red before the fix: `StageResult` had no field `unrecorded`), `test_pub71_matching_record_passes_the_build` and `test_pub71_no_figure_leaves_the_build_unfailed` (both passed before and after, by the builder's return). F2: the bracket of the H2 sentence says its finding in words (the hour field's labels are not spread as traffic is), says that the count was made by the mobility research through the portal API and stays in the uncommitted cache (PUB-12), and keeps the source references [S33, S16]; no other sentence of document 05 changed.
+- The confirmation, on `b44bed2e01752dcafa4260a83e12b794a1ddbd9f`, by the same reviewer, word for word: "VERDICT: APPROVED", "TASK: S2-T22, confirmation of the fix pass", "REVIEWER: OpenAI GPT-6", "EARLIER FINDINGS: F1 FIXED; F2 FIXED; F3 CARRIED BY THE RECORD", "FINDINGS: none". Its checks R1 to R4 passed. On R3 it wrote that carrying DAT-16 and `ref_min_wage` to a proposed decision record is sound under rule 46 on the stated holding terms, and: "This approves the repair scope, not redistribution permission or an exception to decision 0026 item 5."
+- Pass 3, the mutation pass (`f60afd2e9c664e1dd26b3b9d6882daa4860a60ff`, applied as `01d4734a4664609e03b36589adb69cda6f5bfcd9`). The lead's campaign of `custodian/src/eii_custodian/publicdata/stage.py` at the first commit made 107 mutants, killed 98 and left 9 survivors (exit code 1); at the fix commit it made 116, killed 106 and left 10 (exit code 1). Neither is recorded as a pass. The lead placed the ten: two change the codec name of a read from "utf-8" to "UTF-8" and are equivalent; eight can be killed by a test (two reads in the locale's encoding, two exact error texts, three constructor arguments on the build path, one initial value). The builder's test pass (its brief asked for tests only, no change of the module, and each kill shown red by hand against the mutant before the campaign) added one file, `custodian/tests/test_public_data_stage_survivors.py`, with six tests: `test_local_record_is_read_as_utf8` and `test_figure_text_is_read_as_utf8` (the process locale is set to "C" inside try/finally and restored, in the form of the repository's own `test_rules_text_is_read_as_utf8`; the file read holds a character outside ASCII; no read is replaced by a double), `test_selected_fetch_lines_error_text` and `test_unknown_required_regression_error_text` (the exact text of each refusal), `test_build_entries_result_has_empty_missing_and_mismatch` and `test_unrecorded_is_empty_text_when_nothing_is_unrecorded`. The builder's return gives the failing line of each test against its mutant and the evidence that the locale switch changes the default encoding of a read in this interpreter. It logged task-standards as loaded and followed the plain meaning of the two superpowers skills its tool lacks. The campaign that the lead's service ran after the tests: `custodian/src/eii_custodian/publicdata/stage.py: made=116 killed=114 survived=2 timed_out=0 not_covered=0 incomplete=0`, the two survivors being the two codec-name mutants. The lead wrote their two rows in `scripts/mutation_explained.toml` from the campaign's own diff texts, with the reason the file already uses for that class (the codec lookup normalises the name), and the task's section of TASKS.md with `, S2-T22` added to the Depends line of S2-T08. The lead's campaign at that commit, run in its own process-number namespace as the run's rule asks: the same count line and exit code 0 (every survivor explained). The campaign is not a command of this entry: a mutation run is never started from the ledger script; its output is the lead's record.
+- The last confirmation, of the last work commit as approved, `f60afd2e9c664e1dd26b3b9d6882daa4860a60ff` (the new tests, the two explained rows and the task's section of TASKS.md): by the same reviewer, word for word: "VERDICT: APPROVED", "TASK: S2-T22, confirmation of the mutation pass and the task's section", "REVIEWER: OpenAI GPT-6", "FINDINGS: none". Its checks M1 to M5 passed: the six tests reach their lines and assert exact outcomes (on the test that catches a decoding error through `ValueError`: "its exact-message assertion prevents a false pass"); the invented stand-ins copy no removed value; the two rows change only the codec name and no earlier row; the task's section maps its six criteria to what the three commits did, and its last line "preserves F3 and public history for an owner decision without resolving them"; nothing else changed. Two record points: the open item and the final campaign result are kept in this ledger, and the review was static: the reviewer read the service's campaign record (two survivors before the rows, exit code 1) and did not run the lead's campaign with the rows.
+- Every changed assertion of an existing test, with its reason. (1) `custodian/tests/test_public_data_stage.py`, `test_section_10_ids_and_matching_fixture`: its two assertions (no mismatch; nothing missing) are unchanged in text, and its set-up now also writes an invented local record for PUB-71 and a matching invented figure file, because the loop over the committed table no longer writes a PUB-71 figure and the row's expectations are no longer committed (decision 0026 item 5). Without that set-up the row would be missing. (2) `custodian/tests/test_public_series.py`: no change; every read of the table there covers PUB-62 to PUB-70, rows of `dataset` sources, as the builder reported and the reviewer confirmed under Q6. (3) The fix pass changed no existing assertion; `test_pub71_without_local_record_is_not_measured` of pass 1 keeps its assertions and they hold. (4) No assertion of the frame's tests was changed, weakened or removed (the review's Q5). (5) The mutation pass: it changed no existing assertion; it adds one test file.
+- The owner's word and the record. The lead first held that changing the two passages of F3 is a material amendment of the pack, which rule 46 gives to a decision record and the owner, and prepared them, with the audit's unclassified groups and the public history, as questions in a proposed record; the reviewer passed that course in its check R3. On 2026-11-15 the owner answered through the advisor, before any such record was pushed: version 1 is a personal, local project, and licence and terms matters are not weighed at this stage but answered at a go-live; the repair stands and merges as approved; no further audit, repair task or review is opened for a reason of licence; the history is not rewritten. The record was therefore rewritten to ask nothing: [decision 0034](docs/decisions/0034-licence-questions-of-public-sources-are-answered-at-a-go-live.md), accepted on the owner's words, says what the audit found, what this task removed and what the lead's reading of licence statements found on 2026-11-15 (metadata and terms pages only), and names in its item 3, by anchor and with no value, the places that stand as they are until a go-live: the two passages of F3, the year bounds of the two investment rows, three committed review files, the registry rows on basis `none_stated`, and the public history. It is this task's own document and its fourth work commit (rule 33). The lead states its own fault plainly: it brought a licence matter to the owner as a decision after the owner had said on 2026-11-14 that the legal route is for a go-live.
+- The confirmation of the record, on `f9f1c934d610ce27207fe1cd2fb1cb09758708db`, by the same reviewer, word for word: "VERDICT: APPROVED", "TASK: S2-T22, confirmation of the task's decision record 0034", "REVIEWER: OpenAI GPT-6", "FINDINGS: none". Its checks D1 to D6 passed: the record and the two index passages hold no value of a source; the facts of the Context and of item 3 agree with the audit, the verdicts, the patches and the tree; the reading is reported as what catalogue records and pages state, with the unread texts named; the Status and items 1 to 5 follow the owner's word and the advisor's reading, and "No general permission or changed gate, test, privacy rule or hard limit is introduced"; on its own finding: "F3 leaves no version-1 licence decision pending". Four record points, answered here: (1) item 3 (c) of the record speaks of the two keys collectively; exactly, both registry rows hold `period_first` and `period_last`, and `custodian/publicdata/investment_pages.yaml` holds both for `fdi_projects` and `period_last` alone for `investqa_pages`; this sentence is the correction, and the decision does not change; (2) the patch file the lead put beside the brief was, by the lead's slip, the patch of the first repair commit and not of the record; the reviewer read the named commit's own difference in the workspace, which is the evidence of this confirmation; (3) the open item and the new last sentence of the task's section are entered by this ledger, as promised; (4) the review was static and read-only.
+- What the task does not do. (1) It changes neither passage of F3: the band value that DAT-16 names and the three sums in the citation of the row `ref_min_wage` stand until a go-live (decision 0034 item 3). (2) No registry row changes: the lead's reading found that the catalogue records of three portal datasets state an open licence while their registry rows say unconfirmed; the rows stay as they are and the reading is recorded in decision 0034 for the go-live. (3) The public history is not changed: every removed value stays readable in the history of the base branch, the code literals since pull request 36; rewriting published history is forbidden to the lead and to every agent (rule 40). (4) The other groups the audit could not classify are untouched and stand under the same item 3. (5) No other expected figure, bound or behaviour of the other eleven regression rows changes.
+- Limits, said plainly. The review and the confirmation were static and read-only: the reviewer ran nothing, and the test results it read are the builder's and the lead's. The builder ran the task's test files, the custodian and core tests (1,273 passed after pass 1; 1,276 after pass 2), the lint, the format check, the type check (255 source files) and the documentation check, each with exit code 0 in its returns; the tree check and the comparison of the two rules files in pass 1 only. The builder ran no whole test command and no mutation campaign; the lead ran both, and the whole test is the suite entry below. `./eii build-public` was not run by the builder or for this ledger, and no run of the real build with a real local record is recorded: every test uses an invented stand-in of the five field names in a temporary folder, and no test reads the real cache. Whether a real local record exists on the build machine is not stated by any record this log rests on. The guard checks the declared sources of a row, not the origin of a literal: it cannot see a figure of a source without an open licence put under a row whose listed sources are open (the review's Q3). The header of an alias file is not validated strictly in either path (PO-S2-32). The failure of the evidence mode of `build_series` on a missing record is proved through the last stage run of `run_build`, not by an assertion on `build_series` itself (the builder's own note).
+- Open items entered by this ledger: OI-195 (the places that stand until a go-live, closed for version 1 by decision 0034); the proposed items PO-S2-32 (the header of an alias file) and PO-S2-33 (the two local files written by hand) of this task; and PO-S2-34, raised by the closing record of pull request 55. Two record points of the reviewer are answered by this entry and need no item: that the review and the confirmations were static (said under Limits), and that the record and its open item were absent from the checkout of the first confirmation (both are in this pull request).
+- What follows and is not claimed here: the six required hosted checks on the head of this pull request, the whole test on the exact merge result, and the merge itself.
+- In front of this entry: the closing record of pull request 55.
+- Evidence: the commands below at the work commit `f9f1c934d610ce27207fe1cd2fb1cb09758708db`.
+
+#### Evidence for the work commit `f9f1c934d610ce27207fe1cd2fb1cb09758708db`
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   uv run --locked python -m pytest custodian/tests/test_public_data_stage.py custodian/tests/test_public_data_stage_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    19 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The task's tests of the regression stage, both files run alone, on invented stand-ins of the five field names of row PUB-71 in a temporary folder; no test reads the real cache. Criterion 1: test_section_10_ids_and_matching_fixture (the twelve ids, with an invented local record and a matching invented figure), test_pub71_matching_local_record_passes, test_pub71_differing_local_record_fails_by_figure (planted: one differing value fails by the row's id), test_pub71_without_local_record_is_not_measured (no record: the row is missing and never a pass; as a required row it fails by its id), test_pub71_malformed_local_record_refused (five planted records: a missing field, an extra field, a value that is not decimal text, a value that is not text, text that is not JSON; each refused by the fixed reason 'local expectations record refused'). Criterion 2: test_pub71_present_figure_without_record_fails_the_build (planted: a produced figure with no local record; the build's failure names the row with expected 'local expectations record' and observed 'missing', and the not-measured coverage line is kept), test_pub71_matching_record_passes_the_build, test_pub71_no_figure_leaves_the_build_unfailed. The second file holds the six tests of the mutation pass: the local record and a figure file are read as UTF-8 under an ASCII locale (the locale is set and restored inside the test; no read is replaced by a double), the two refusals of `run_stage` are asserted by their exact text, the result of the build path has an empty missing tuple and an empty mismatch, and the unrecorded field is empty text when no figure lacks a record. The builder recorded 19 passed for the two files at the last work commit.
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   uv run --locked python -m pytest custodian/tests/test_open_licence_commit_guard.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    3 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The guard of the task and its planted violations (rule 37), run alone. Criterion 3: test_expected_anchors_only_cover_open_dataset_sources reads the registry `custodian/publicdata/sources.yaml` through its loader, takes the source ids of each regression row from the last cell of the row in document 04 section 10 and from the map DEPENDENCIES of `series/figures.py`, asserts that the two agree and that all twelve rows are mapped, and fails when the table EXPECTED holds a figure for a row with a source whose `licence_basis` is not `dataset`. Planted: an invented literal put back under 'PUB-71' in a copy of the table; the guard then reports exactly that row with the source `census_zone_sector`. Criterion 5: test_committed_district_layer_aliases_hold_no_source_row (the committed alias file holds its header and no data row; planted: an invented row appended to a copy of the text trips the same predicate) and test_local_alias_file_rows_reach_join_districts (with no local file the invented district stays unmatched and is reported by `district_name_pair_unmatched`; an invented alias row in a temporary local file under the cache's review folder reaches `join_districts` and gives the match). The guard checks the declared sources of a row, not the origin of a literal. Three tests at b44bed2; this row sets no expected number.
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   uv run --locked python -m pytest custodian core -q -p no:cacheprovider --ignore=custodian/data_tests
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    1282 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The custodian and core tests at the work commit, in the form of the builder's and the lead's local checks, which leaves out the folder custodian/data_tests (those tests read the real public cache and stand outside the whole test command's discovery by design). Among them: the two test files of the task, `custodian/tests/test_public_series.py`, which the task leaves unchanged because every read of the table there covers PUB-62 to PUB-70, and the frame's tests, of which no assertion changed. Recorded on earlier commits of the task: 1,273 passed at c1532af and 1,276 at b44bed2 (the builder's returns and the lead's own runs); the last work commit adds tests, so this row sets no expected number.
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    814 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The guard tests of scripts/tests at the work commit, none failed or skipped. The task adds no script and no script test; its last work commit adds two rows to `scripts/mutation_explained.toml`, the two equivalent mutants of the stage module. No return of the task records a count of this discovery, so this row sets no expected number.
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The lint at the work commit. The task's code and tests hold no suppression comment and no skip. The builder recorded exit code 0 and this line after pass 1 and after pass 2.
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "312 files already formatted"
+Seed:      none
+Notes:     The format check at the work commit; it changes no file. The builder recorded 311 files after pass 1 and after pass 2; the last work commit may add a test file, so the pattern sets no number.
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 255 source files"
+Seed:      none
+Notes:     The type check at the work commit: among its files are the changed modules `publicdata/stage.py`, `publicdata/fetch/build.py` and `publicdata/frame/live.py` and the task's test files, with no type-suppression comment. Recorded on earlier commits of the task: 255 source files at c1532af and at b44bed2; not a count of the last work commit.
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 525 text files, 77 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check at the work commit. Criterion 4: the row MTH-46 of document 07 and the sentence on hypothesis H2 in section 16 of document 05 say their finding in words, with their source references kept; no other sentence of either document changed. The check also reads the two sentences added to `custodian/README.md`, the task's own section of TASKS.md, and decision record 0034 with its line in the documentation index. It does not prove that a figure is absent: that is the review's Q1 and R4 and the lead's own script, which prints no value.
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check at the work commit: the task adds test files under `custodian/tests` and no folder. The committed review file `custodian/publicdata/review/district_layer_aliases.csv` stays in its place with its header alone.
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The lock file agrees with the project files at the work commit; the task changes no `pyproject.toml` and no lock file.
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two rules files are byte-identical at the work commit; the task changes neither.
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: range HEAD, 59 commits, at least 59 to list, RESULT: PASSED"
+Seed:      none
+Notes:     The pinned secret scanner over the whole history of the branch at the work commit, judged by the script itself (the findings it still lists are the known evidence lines of S0-T05 in PROGRESS.md). It reads patterns of secrets only: it is not a check for values of a source without an open licence, which stay readable in the public history (OI-195).
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','2bbdad2d400ac4c65810d7c3785cd66459970c60...f9f1c934d610ce27207fe1cd2fb1cb09758708db'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/tests/test_open_licence_commit_guard.py A:custodian/tests/test_public_data_stage_survivors.py A:docs/decisions/0034-licence-questions-of-public-sources-are-answered-at-a-go-live.md M:TASKS.md M:custodian/README.md M:custodian/publicdata/review/district_layer_aliases.csv M:custodian/src/eii_custodian/publicdata/fetch/build.py M:custodian/src/eii_custodian/publicdata/frame/live.py M:custodian/src/eii_custodian/publicdata/stage.py M:custodian/tests/test_public_data_stage.py M:docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md M:docs/07_ECONOMIC_METHODS.md M:docs/README.md M:scripts/mutation_explained.toml'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "14 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The whole change of the task against main: 14 files. Code: the stage module, the failure path of the build and the frame's alias reader under `custodian/src/eii_custodian/publicdata/`. Data: the committed review file of district layer aliases, which keeps its header alone. Tests: the task's test files under `custodian/tests/`. Documents: `custodian/README.md`, one sentence each of documents 05 and 07, the task's own section of TASKS.md, and the task's decision record 0034 with its two lines in `docs/README.md`. Records of the mutation pass: two rows of `scripts/mutation_explained.toml`. No registry row, no other document and no file outside the task's scope.
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   ./eii test --seed 2026111486
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    3188 passed, 0 failed, 0 skipped
+Seed:      2026111486
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit. It runs the task's test files under custodian/tests with the rest of the custodian suite. It does NOT run `./eii build-public`, it reads no real cache and no real local record, and it runs no mutation campaign.
+```
+
+```text
+### S2-T22 — No value of a source without an open licence stands in the repository
+Commit:    f9f1c934d610ce27207fe1cd2fb1cb09758708db
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','2bbdad2d400ac4c65810d7c3785cd66459970c60..f9f1c934d610ce27207fe1cd2fb1cb09758708db'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The four work commits of the task (the build, the fix pass of the review, the mutation pass and the task's decision record) each have a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

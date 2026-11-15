@@ -1781,6 +1781,16 @@
 - OPTIONS: **Pending confirmation:** retain the row's “to be confirmed at slice S2” state. Fetching the workbook and confirming its schema would replace that pending state; the record names the work but supplies no confirmed schema or alternative source.
 - NEEDED BY: before the first real world build.
 
+## OI-195 — Places that rest on a source whose licence is not open or not confirmed stand until a go-live
+
+- ID: OI-195
+- TYPE: CLOSED for version 1 (was OPEN)
+- NEEDED: Nothing in version 1. At a go-live: for each place of item 3 of [decision 0034](docs/decisions/0034-licence-questions-of-public-sources-are-answered-at-a-go-live.md), the licence or the terms of its source are settled by the legal route of that day.
+- WHY: Item 5 of [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) allows no record, name or value of a source not under an open licence in the repository. An audit of the committed tree on 2026-11-15, which names places, kinds and counts and no value, found three places that broke it, and the review of the repair a fourth; no task was named for their removal, so the lead added task S2-T22 by a re-plan of that day (a repair of a rule's breach is not a new feature, and the scope stays frozen). The review's finding F3 named two further places that a repair cannot remove without changing what the pack means, and the audit left other groups unclassified. A forward repair changes the head of the base branch only: the removed values stay readable in the public history.
+- DONE SO FAR: Task S2-T22 removed the four places from the head and added a guard with a planted violation, under one review and its confirmations by another maker. The lead had the licence statements of five sources read on 2026-11-15 (metadata and terms pages only, no data record). The lead prepared the remaining places as questions for the owner; the owner answered that version 1 is a personal, local project and that licence questions are answered at a go-live, not at this stage. Decision 0034 records that word, what was found and done, the reading, and in its item 3 the places that stand as they are until a go-live: the wage-band scheme of document 03 with DAT-16, the statutory minimum in documents 04, 05 and 07, the year bounds of the two investment rows, three committed review files, the registry rows on basis `none_stated`, and the public history. No registry row changed, and the history was not rewritten (rule 40 of AGENTS.md).
+- OPTIONS: **Decided by the owner (decision 0034):** the listed places stand; tasks build from the pack as it is written; item 5 of decision 0026 stays the rule for every new commit; no further audit, repair task or review is opened for a reason of licence or terms in version 1. The lead keeps one list of the places for the go-live, outside the pack.
+- NEEDED BY: a go-live; not before.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -2377,6 +2387,33 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: document 10, table row "Spike frame-rate gate (slice S1)" and FE-89; `web/spikes/performance/trace.mjs` (a road set records its share and has no minimum); the tasks of slice S3 that depend on map performance
 - EVIDENCE: The two native road traces of S1-T12 are recorded with a share of frame intervals under 16.7 ms of 0.8961 (100,004 road features) and 0.9017 (250,004 road features), both under the minimum of 0.95 that the gate sets for the hexagon and particle load alone; neither trace holds an interval over 17.08 ms. No document states a bound for the map with the road layer, and no pass is claimed for it.
 - NEEDED: before a task of slice S3 that depends on map performance is reviewed, a decision whether the map with the road layer gets a frame-rate statement of its own or the recorded shares stand as evidence without a bound. No bound is restated or added without a decision record.
+
+### PO-S2-32 — The header of an alias file is not validated strictly
+
+- ID: PO-S2-32
+- TYPE: OPEN
+- RAISED BY: the code review of S2-T22 (OpenAI GPT-6, 2026-11-15), outside its verdict, as hardening
+- CONCERNS: `custodian/src/eii_custodian/publicdata/frame/crosswalk.py` (`read_csv`); `custodian/src/eii_custodian/publicdata/frame/live.py` (`district_aliases`); `custodian/src/eii_custodian/publicdata/frame/joins.py`; the committed file `custodian/publicdata/review/district_layer_aliases.csv` and the local file of the same header in the uncommitted cache
+- EVIDENCE: The reviewer's words: "frame/crosswalk.py:read_csv does not validate the raw header; duplicate column names can collapse silently before joins.py checks dictionary keys. Validate exact unique headers and row widths for both alias paths, with malformed-file plants." Its check Q5 passed and says that strict header validation is absent in both paths, the committed one and the local one that S2-T22 adds; the gap is older than the task and the task did not widen what the parser accepts.
+- NEEDED: the follow-up task of slice S2 validates the exact header, with unique column names, and the width of every row for both alias paths, each refusal with its planted malformed file; or says in one line why it is not valid.
+
+### PO-S2-33 — The two local files of S2-T22 are written by hand
+
+- ID: PO-S2-33
+- TYPE: OPEN
+- RAISED BY: the builder of S2-T22 (Cognition SWE-2, 2026-11-15), in the return of the build pass
+- CONCERNS: the local record `local_expectations/PUB-71.json` and the local file `review/district_layer_aliases.csv` inside the uncommitted cache `data/public_cache/`; `custodian/src/eii_custodian/publicdata/stage.py` (`_local_expected`); `custodian/src/eii_custodian/publicdata/frame/live.py` (`district_aliases`); `custodian/README.md`
+- EVIDENCE: The builder's words: "The local expectations record and the cache `review/` folder are written by hand; no command produces them. If a build step should scaffold or validate their presence (beyond the stage's fixed refusal), a task could own that." The stage refuses a record of another shape and fails the build when a produced figure has no record; nothing checks that the alias file is present, and with none a district that needs an alias is reported as unmatched. No run of the real build with a real local record is recorded for S2-T22. The builder also noted that the frame's README still says that the committed alias file supplies the reviewed aliases.
+- NEEDED: the follow-up task of slice S2 decides whether a build step writes, checks or only reports the two local files, and brings the frame's README sentence in line; no value of a source without an open licence is committed by either.
+
+### PO-S2-34 — The performance spike's page writes a trace that the web format check refuses
+
+- ID: PO-S2-34
+- TYPE: OPEN
+- RAISED BY: the lead, at the merge of pull request 55 (task S1-T12, 2026-11-15)
+- CONCERNS: `web/spikes/performance/` (the loopback server of `npm run spike:performance:serve`, which writes a trace under `web/spikes/performance/evidence/`); `npm run format:check`; the README of the spike
+- EVIDENCE: The server writes a trace as one line of JSON. The web format check reads every JSON file under `web/`, so the first head of pull request 55 failed the hosted job static-checks at its step "Check web format" and the job planted-failures at its plant of the same check. The three traces were then rewritten by the project's formatter and the digests of their capture records updated, with a proof that nothing but whitespace differs; no check was changed. A later native trace would fail in the same way.
+- NEEDED: the follow-up task of slice S2 makes the server write a trace in the form the formatter keeps (or the spike's README tells the person who takes a trace to run the formatter and update the capture record's digest before committing); the format check and its ignore list are not changed for it; or one line says why it is not valid.
 
 ## Sources
 
