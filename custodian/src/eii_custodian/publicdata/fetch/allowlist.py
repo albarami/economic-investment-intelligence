@@ -29,6 +29,9 @@ ALLOWED_HOSTS = frozenset(
         "archive-api.open-meteo.com",
         "services.gisqatar.org.qa",
         "monaqasat.mof.gov.qa",
+        "ndownloader.figshare.com",
+        "44c1cec316ec56bca76dfd65d2882b20.r2.cloudflarestorage.com",
+        "download.geoservice.dlr.de",
     }
 )
 

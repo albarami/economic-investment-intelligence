@@ -17,6 +17,7 @@ from eii_core.calc.building_heights import (
     fallback_errors,
     floor_height,
     height_counts,
+    largest_overlap,
 )
 from eii_custodian.publicdata.fetch.receipts import sha256_hex as file_sha256
 from eii_custodian.publicdata.fetch.registry import Entry
@@ -29,7 +30,9 @@ from .manifest import (
     write_outputs,
 )
 from .match import (
-    globfp_height,
+    GlobfpIndex,
+    globfp_candidates,
+    globfp_index,
     representative_point,
     wsf3d_height,
 )
@@ -56,19 +59,37 @@ def _none_reason(results: dict[str, SourceResult]) -> str:
     return ""
 
 
+def _table_bounds(
+    buildings: list[Building],
+) -> tuple[float, float, float, float] | None:
+    """The bounding box of every footprint, or none for an empty table."""
+    if not buildings:
+        return None
+    boxes = [building.geometry.bounds for building in buildings]
+    return (
+        min(box[0] for box in boxes),
+        min(box[1] for box in boxes),
+        max(box[2] for box in boxes),
+        max(box[-1] for box in boxes),
+    )
+
+
 def _resolve(
     buildings: list[Building],
     rules: Rules,
     results: dict[str, SourceResult],
+    index: GlobfpIndex,
 ) -> tuple[
     list[dict[str, object]],
     list[dict[str, Decimal | None]],
     list[HeightChoice],
+    list[list[tuple[Decimal, str, int, Decimal]]],
 ]:
-    """Per building: the candidate dict for errors and the checked output row."""
+    """Per building: the candidate dict, the choice and the match list."""
     rows: list[dict[str, object]] = []
     candidates: list[dict[str, Decimal | None]] = []
     choices: list[HeightChoice] = []
+    globfp_matches: list[list[tuple[Decimal, str, int, Decimal]]] = []
     absent = _none_reason(results)
     for building in buildings:
         point = representative_point(building.geometry)
@@ -80,14 +101,12 @@ def _resolve(
             )
         except ArithmeticError:
             raise HeightError("bad_floor_count") from None
+        matches = globfp_candidates(point, building.geometry, index)
+        winner = largest_overlap(matches)
         candidate: dict[str, Decimal | None] = {
             "recorded": building.recorded,
             "floor_count": floor_product,
-            "3dglobfp": globfp_height(
-                point,
-                building.geometry,
-                results["bldg_3dglobfp"].globfp,
-            ),
+            "3dglobfp": winner[-1] if winner is not None else None,
             "wsf3d": wsf3d_height(point, results["bldg_wsf3d"].wsf),
         }
         choice = choose_height(candidate)
@@ -105,7 +124,8 @@ def _resolve(
         )
         candidates.append(candidate)
         choices.append(choice)
-    return rows, candidates, choices
+        globfp_matches.append(matches)
+    return rows, candidates, choices, globfp_matches
 
 
 def build_heights(
@@ -128,9 +148,12 @@ def build_heights(
         return
     rules = load_rules(rules_path if rules_path is not None else RULES_PATH)
     buildings = load_buildings(buildings_path)
-    results = read_sources(cache, entries, rules)
-    rows, candidates, choices = _resolve(buildings, rules, results)
-    counts = height_counts(choices)
+    results = read_sources(cache, entries, rules, bounds=_table_bounds(buildings))
+    index = globfp_index(results["bldg_3dglobfp"].globfp)
+    rows, candidates, choices, globfp_matches = _resolve(
+        buildings, rules, results, index
+    )
+    counts = height_counts(choices, globfp_matches)
     errors = fallback_errors(candidates)
     heights_body = dump_sorted(rows)
     input_files: list[dict[str, object]] = [

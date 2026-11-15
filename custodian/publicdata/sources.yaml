@@ -11463,21 +11463,21 @@ sources:
 # END S2-T19 sources
 
 # S2-T20 — the two height sources of PUB-106 (decision 0023 item A2).
-  - key: "bldg_3dglobfp"
+  - key: "bldg_3dglobfp/1636"
     source_id: "bldg_3dglobfp"
-    slug: ""
+    slug: "1636"
     kind: "https_file"
-    title_en: "3D-GloBFP: open 3D building heights (footprints with estimated heights)"
+    title_en: "3D-GloBFP: the first global three-dimensional building footprint dataset (PART Ⅴ, grid ID: 1300-1699), tile 1636"
     publisher: "Che et al. 2024"
     licence_id: "CC-BY-4.0"
     licence_basis: "dataset"
     decision_record: ""
-    fetch_host: ""
-    url: ""
+    fetch_host: "ndownloader.figshare.com"
+    url: "https://ndownloader.figshare.com/files/54052157"
     terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
-    landing_url: ""
+    terms_words: "\"CC BY 4.0\" on the figshare item; \"Rights License Creative Commons Attribution 4.0 International\" on the Zenodo record"
+    terms_read_on: "2026-11-15"
+    landing_url: "https://figshare.com/articles/dataset/3D-GloBFP_the_first_global_three-dimensional_building_footprint_dataset_PART_grid_ID_1300-1699_/28890593"
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
@@ -11487,23 +11487,49 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "direct_url_unconfirmed"
-    extension: ""
+    skip_reason: ""
+    extension: "zip"
+  - key: "bldg_3dglobfp/1639"
+    source_id: "bldg_3dglobfp"
+    slug: "1639"
+    kind: "https_file"
+    title_en: "3D-GloBFP: the first global three-dimensional building footprint dataset (PART Ⅴ, grid ID: 1300-1699), tile 1639"
+    publisher: "Che et al. 2024"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    decision_record: ""
+    fetch_host: "ndownloader.figshare.com"
+    url: "https://ndownloader.figshare.com/files/54051971"
+    terms_url: ""
+    terms_words: "\"CC BY 4.0\" on the figshare item; \"Rights License Creative Commons Attribution 4.0 International\" on the Zenodo record"
+    terms_read_on: "2026-11-15"
+    landing_url: "https://figshare.com/articles/dataset/3D-GloBFP_the_first_global_three-dimensional_building_footprint_dataset_PART_grid_ID_1300-1699_/28890593"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "zip"
   - key: "bldg_wsf3d"
     source_id: "bldg_wsf3d"
     slug: ""
     kind: "https_file"
-    title_en: "WSF 3D: building height, 90 m cell mean"
-    publisher: "publisher recorded at the first fetch"
-    licence_id: "unconfirmed"
-    licence_basis: "owner_decision"
-    decision_record: "0026"
-    fetch_host: ""
-    url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
-    landing_url: ""
+    title_en: "World Settlement Footprint (WSF) 3D - Building Height - Global, 90m"
+    publisher: "German Aerospace Center (DLR)"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    decision_record: ""
+    fetch_host: "download.geoservice.dlr.de"
+    url: "https://download.geoservice.dlr.de/WSF3D/files/global/WSF3D_V02_BuildingHeight.tif"
+    terms_url: "https://geoservice.dlr.de/web/terms"
+    terms_words: "\"License: CC-BY-4.0\" on the landing page; \"The WSF3D is licensed under CC-BY-4.0.\"; \"Copyright DLR (year of production)\"; \"DLR not liable for damage resulting from use.\""
+    terms_read_on: "2026-11-15"
+    landing_url: "https://geoservice.dlr.de/web/datasets/wsf_3d"
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
@@ -11513,8 +11539,8 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "direct_url_unconfirmed"
-    extension: ""
+    skip_reason: ""
+    extension: "tif"
 
 forecast_series:
   - key: licence_issues

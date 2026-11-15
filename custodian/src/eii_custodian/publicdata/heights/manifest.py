@@ -150,6 +150,7 @@ def manifest_block(
             "label": rules.label,
             "value": rules.storey_value,
         },
+        "tied_height_buildings": counts.tied_height_buildings,
     }
 
 

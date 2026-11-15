@@ -3,12 +3,15 @@
 The representative point is shapely's `point_on_surface`, an interior point
 guaranteed inside the polygon (the frame's gazetteer uses it the same way). The
 choice among several containing 3D-GloBFP footprints is made by the calc
-function `largest_overlap`, never here.
+function `largest_overlap`, never here. The spatial index over all footprints
+of all files is built once per run by `globfp_index`; a stored raster value
+becomes metres in the calc function `scaled_cell`, never here.
 """
 
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from decimal import Decimal
 from importlib import import_module
 from typing import TYPE_CHECKING
@@ -17,12 +20,31 @@ from shapely import point_on_surface
 from shapely.geometry import Point
 from shapely.geometry.base import BaseGeometry
 
-from eii_core.calc.building_heights import height_value, largest_overlap
+from eii_core.calc.building_heights import (
+    height_value,
+    largest_overlap,
+    scaled_cell,
+)
 
 from .model import HeightError
 
 if TYPE_CHECKING:
+    from shapely.strtree import STRtree
+
     from .read import WsfGrid
+
+
+@dataclass(frozen=True)
+class GlobfpIndex:
+    """The run's one spatial index, built once over every footprint.
+
+    `metas` pairs each indexed geometry with its (file name, row index,
+    height), in the same order the geometries were handed to the tree.
+    """
+
+    tree: STRtree
+    metas: tuple[tuple[str, int, Decimal], ...]
+    count: int
 
 
 def representative_point(geometry: BaseGeometry) -> Point:
@@ -30,26 +52,33 @@ def representative_point(geometry: BaseGeometry) -> Point:
     return point_on_surface(geometry)
 
 
-def globfp_candidates(
-    point: Point,
-    footprint: BaseGeometry,
+def globfp_index(
     files: tuple[tuple[str, tuple[tuple[BaseGeometry, Decimal], ...]], ...],
-) -> list[tuple[Decimal, str, int, Decimal]]:
-    """(overlap area, file name, row index, height) per containing footprint."""
+) -> GlobfpIndex:
+    """Build the run's spatial index once, over all footprints of all files."""
     geometries: list[BaseGeometry] = []
-    index: list[tuple[str, int, Decimal]] = []
+    metas: list[tuple[str, int, Decimal]] = []
     for file_name, rows in files:
         for row_index, (candidate, height) in enumerate(rows):
             geometries.append(candidate)
-            index.append((file_name, row_index, height))
-    if not geometries:
-        return []
+            metas.append((file_name, row_index, height))
     tree = import_module("shapely.strtree").STRtree(geometries)
+    return GlobfpIndex(tree, tuple(metas), len(geometries))
+
+
+def globfp_candidates(
+    point: Point,
+    footprint: BaseGeometry,
+    index: GlobfpIndex,
+) -> list[tuple[Decimal, str, int, Decimal]]:
+    """(overlap area, file name, row index, height) per containing footprint."""
+    if index.count == 0:
+        return []
     found: list[tuple[Decimal, str, int, Decimal]] = []
-    for hit in tree.query(point):
-        candidate = geometries[int(hit)]
+    for hit in index.tree.query(point):
+        candidate = index.tree.geometries[hit]
         if candidate.covers(point):
-            file_name, row_index, height = index[int(hit)]
+            file_name, row_index, height = index.metas[hit]
             area = candidate.intersection(footprint).area
             found.append((Decimal(str(area)), file_name, row_index, height))
     return found
@@ -58,10 +87,10 @@ def globfp_candidates(
 def globfp_height(
     point: Point,
     footprint: BaseGeometry,
-    files: tuple[tuple[str, tuple[tuple[BaseGeometry, Decimal], ...]], ...],
+    index: GlobfpIndex,
 ) -> Decimal | None:
     """The height of the overlap winner, or none when no footprint contains."""
-    winner = largest_overlap(globfp_candidates(point, footprint, files))
+    winner = largest_overlap(globfp_candidates(point, footprint, index))
     if winner is None:
         return None
     _area, _file, _row, height = winner
@@ -69,7 +98,12 @@ def globfp_height(
 
 
 def wsf_value(grid: WsfGrid, point: Point) -> Decimal | None:
-    """The cell mean holding the point; no-data or outside gives no value."""
+    """The cell holding the point, in metres; no-data or outside gives none.
+
+    The stored value is tenths of a metre: it is scaled by the declared
+    scale in the calc function. A no-data cell gives none; a stored value
+    that is not finite is handed on unscaled so the choice counts it.
+    """
     inverse = ~grid.transform
     column, row = inverse @ (point.x, point.y)
     col, row_i = math.floor(column), math.floor(row)
@@ -78,7 +112,9 @@ def wsf_value(grid: WsfGrid, point: Point) -> Decimal | None:
     value = Decimal(str(grid.data[row_i, col]))
     if value == grid.nodata:
         return None
-    return value
+    if not value.is_finite():
+        return value
+    return scaled_cell(value, grid.scale)
 
 
 def wsf3d_height(
@@ -108,8 +144,10 @@ def wsf3d_height(
 
 
 __all__ = [
+    "GlobfpIndex",
     "globfp_candidates",
     "globfp_height",
+    "globfp_index",
     "representative_point",
     "wsf3d_height",
     "wsf_value",

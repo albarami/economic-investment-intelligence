@@ -1,17 +1,23 @@
 """Hand-made stand-ins for the height inputs (FE-95).
 
-Invented GeoJSON tables and a tiny invented raster, written only into a test's
-temporary folder; nothing real is fetched, and no binary file is committed.
-Every identifier uses the SYN- form and every host is an allow-listed host
-with an invented path.
+Invented GeoJSON tables, invented zipped shapefiles and a tiny invented
+raster, written only into a test's temporary folder; nothing real is fetched,
+and no binary file is committed. Every identifier uses the SYN- form and every
+host is an allow-listed host with an invented path. The shapefile fixtures are
+written by the pinned shapefile package's own writer; the bytes a writer
+cannot produce (an 18-digit height text, a deletion mark, a wrong record
+count, an encryption flag) are patched in the tests with the helpers here.
 """
 
 from __future__ import annotations
 
+import io
 import json
+import zipfile
 
 import numpy as np
 import rasterio
+import shapefile
 import yaml
 from rasterio.transform import from_origin
 
@@ -25,7 +31,17 @@ from eii_custodian.publicdata.fetch.registry import Entry
 
 ALLOWED_HOST = "data.worldpop.org"
 BLOCKED_HOST = "invented-unlisted.example"
-NODATA = -99999
+NODATA = -32767
+WGS84_PRJ = (
+    b'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",'
+    b'SPHEROID["WGS_1984",6378137.0,298.257223563]],'
+    b'PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]'
+)
+GLOBFP_FIELDS = (
+    ("FID", "N", 18, 0),
+    ("Height", "N", 24, 15),
+    ("FID_1", "N", 24, 15),
+)
 
 
 def square(x: float, y: float, size: float) -> list:
@@ -37,6 +53,11 @@ def square(x: float, y: float, size: float) -> list:
         [x, y + size],
         [x, y],
     ]
+
+
+def cw(ring: list) -> list:
+    """Return the ring as a clockwise outer ring, the published tiles' form."""
+    return [ring[0], *reversed(ring[1:-1]), ring[0]]
 
 
 def building_feature(
@@ -71,21 +92,159 @@ def buildings_bytes(features: list) -> bytes:
     )
 
 
-def globfp_bytes(features: list, field: str = "syn_height_m") -> bytes:
-    """Invented 3D-GloBFP stand-in: (ring, height) pairs as GeoJSON."""
-    return json.dumps(
-        {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "geometry": {"type": "Polygon", "coordinates": [ring]},
-                    "properties": {field: height},
-                }
-                for ring, height in features
-            ],
-        }
-    ).encode("utf-8")
+def shapefile_members(
+    shapes: list,
+    records: list,
+    fields: list | None = None,
+    *,
+    shape_type: int = shapefile.POLYGON,
+    prj: bytes = WGS84_PRJ,
+) -> dict:
+    """The five members of one invented shapefile, as raw bytes.
+
+    `shapes` is one entry per record: a list of rings (each ring a list of
+    points) for a polygon file, a point pair for a point file, or None for a
+    null shape. `records` is one list of field texts per record.
+    """
+    fields = fields if fields is not None else [list(f) for f in GLOBFP_FIELDS]
+    shp_io, shx_io, dbf_io = io.BytesIO(), io.BytesIO(), io.BytesIO()
+    writer = shapefile.Writer(shp=shp_io, shx=shx_io, dbf=dbf_io, shapeType=shape_type)
+    for field in fields:
+        writer.field(*field)
+    for geometry, record in zip(shapes, records, strict=True):
+        if geometry is None:
+            writer.null()
+        elif shape_type == shapefile.POLYGON:
+            writer.poly(geometry)
+        elif shape_type == shapefile.POINT:
+            writer.point(*geometry)
+        else:
+            raise AssertionError("fixture shape type")
+        writer.record(*record)
+    writer.close()
+    return {
+        "cpg": b"ISO-8859-1",
+        "dbf": dbf_io.getvalue(),
+        "prj": prj,
+        "shp": shp_io.getvalue(),
+        "shx": shx_io.getvalue(),
+    }
+
+
+def zip_members(members: dict) -> bytes:
+    """Pack name -> bytes into one in-memory zip body."""
+    out = io.BytesIO()
+    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as archive:
+        for name, body in members.items():
+            archive.writestr(name, body)
+    return out.getvalue()
+
+
+def shapefile_zip(
+    shapes: list,
+    records: list,
+    fields: list | None = None,
+    *,
+    stem: str = "syn.tile.01",
+    shape_type: int = shapefile.POLYGON,
+    prj: bytes = WGS84_PRJ,
+    overrides: dict | None = None,
+    extra: dict | None = None,
+    drop: tuple = (),
+) -> bytes:
+    """One invented zipped shapefile: flat, five members of one stem.
+
+    `stem` may hold dots, as the real tiles' names do. `overrides` replaces a
+    member by extension, `drop` removes members, `extra` adds members under
+    their own names (the planted refusals use all three).
+    """
+    bodies = shapefile_members(shapes, records, fields, shape_type=shape_type, prj=prj)
+    bodies.update(overrides or {})
+    for ext in drop:
+        bodies.pop(ext, None)
+    members = {f"{stem}.{ext}": body for ext, body in bodies.items()}
+    members.update(extra or {})
+    return zip_members(members)
+
+
+def globfp_zip(
+    features: list,
+    field: str = "Height",
+    stem: str = "syn.tile.01",
+    **kwargs,
+) -> bytes:
+    """Invented 3D-GloBFP tile: (geometry, height text) pairs in a zip.
+
+    A geometry is one ring (a list of points) or a list of rings for a
+    footprint with a hole or several parts. Three numeric fields carry the
+    height field in the middle; the first and last columns stand for FID and
+    FID_1, whose texts mean nothing to the reader.
+    """
+    fields = [
+        [field if name == "Height" else name, ftype, size, decimals]
+        for name, ftype, size, decimals in GLOBFP_FIELDS
+    ]
+    shapes = []
+    for geometry, _height in features:
+        if isinstance(geometry[0][0], (int, float)):
+            shapes.append([cw(geometry)])
+        else:
+            shapes.append([cw(ring) for ring in geometry])
+    records = [
+        [str(index + 1), height, ""]
+        for index, (_geometry, height) in enumerate(features)
+    ]
+    return shapefile_zip(shapes, records, fields, stem=stem, **kwargs)
+
+
+def dbf_fields(dbf: bytes) -> list:
+    """(name, type, record offset, size) of each field of the table bytes."""
+    header_len = int.from_bytes(dbf[8:10], "little")
+    count = (header_len - 33) // 32
+    fields = []
+    offset = 1
+    for index in range(count):
+        desc = dbf[32 + index * 32 : 32 + (index + 1) * 32]
+        name = desc[:11].split(b"\x00", 1)[0].decode("ascii")
+        fields.append((name, desc[11:12].decode("ascii"), offset, desc[16]))
+        offset += desc[16]
+    return fields
+
+
+def dbf_field_offset(dbf: bytes, name: str) -> tuple:
+    """(record offset, size) of the named field."""
+    for field_name, _ftype, offset, size in dbf_fields(dbf):
+        if field_name == name:
+            return offset, size
+    raise AssertionError(name)
+
+
+def dbf_patch(dbf: bytes, row: int, offset: int, text: bytes) -> bytes:
+    """Write raw bytes at one record offset of the table (a planted form)."""
+    raw = bytearray(dbf)
+    header_len = int.from_bytes(raw[8:10], "little")
+    record_len = int.from_bytes(raw[10:12], "little")
+    start = header_len + row * record_len + offset
+    raw[start : start + len(text)] = text
+    return bytes(raw)
+
+
+def zip_flag_patch(body: bytes, flag: int) -> bytes:
+    """Set the general-purpose flag bits of every central-directory entry.
+
+    The planted encryption violation sets bit 0, which the standard library
+    cannot write itself.
+    """
+    raw = bytearray(body)
+    marker = b"PK\x01\x02"
+    at = 0
+    while True:
+        at = body.find(marker, at)
+        if at < 0:
+            break
+        raw[at + 8] |= flag
+        at += 1
+    return bytes(raw)
 
 
 def wsf_bytes(
@@ -99,9 +258,18 @@ def wsf_bytes(
     cell: float = 1.0,
     nodata: float = NODATA,
     epsg: int = 4326,
+    dtype: str = "int16",
+    scale: float = 0.1,
+    offset: float = 0.0,
+    unit_tag: str | None = "m",
 ) -> bytes:
-    """A tiny invented WGS 84 raster; returns its bytes for the cache pair."""
-    data = np.array(values, dtype="float32").reshape(height, width)
+    """A tiny invented WGS 84 raster in the published form's metadata.
+
+    Stored integers times the declared scale are metres; the dataset tag
+    `unit` holds the unit, as the real file does. Returns the file's bytes
+    for the cache pair.
+    """
+    data = np.array(values, dtype=dtype).reshape(height, width)
     with rasterio.open(
         path,
         "w",
@@ -109,12 +277,16 @@ def wsf_bytes(
         width=width,
         height=height,
         count=1,
-        dtype="float32",
+        dtype=dtype,
         crs=f"EPSG:{epsg}",
         transform=from_origin(west, north, cell, cell),
         nodata=nodata,
     ) as target:
         target.write(data, 1)
+        target.scales = (scale,)
+        target.offsets = (offset,)
+        if unit_tag is not None:
+            target.update_tags(unit=unit_tag)
     return path.read_bytes()
 
 
@@ -122,14 +294,15 @@ def rules_document(
     *,
     storey: str = "4",
     label: str = "ASSUMPTION",
-    globfp_format: str = "GeoJSON",
-    globfp_field: str = "syn_height_m",
+    globfp_format: str = "shapefile_zip",
+    globfp_field: str = "Height",
     globfp_unit: str = "m",
     globfp_crs: str = "EPSG:4326",
     wsf_format: str = "GTiff",
     wsf_band: str = "1",
     wsf_unit: str = "m",
     wsf_nodata: str = str(NODATA),
+    wsf_scale: str = "0.1",
     wsf_crs: str = "EPSG:4326",
 ) -> dict:
     """A hand-made declared structure with invented names (B6)."""
@@ -156,6 +329,7 @@ def rules_document(
                 "band": wsf_band,
                 "unit": wsf_unit,
                 "nodata": wsf_nodata,
+                "scale": wsf_scale,
                 "crs": wsf_crs,
             },
         },
@@ -248,18 +422,18 @@ def card_fixture(tmp_path):
         building_feature(building_id, square(i + 0.1, 0.1, 0.5), recorded, floors)
         for i, (building_id, (recorded, floors)) in enumerate(sorted(specs.items()))
     ]
-    globfp = globfp_bytes(
+    globfp = globfp_zip(
         [
-            (square(0.05, 0.05, 0.6), 24),
-            (square(1.05, 0.05, 0.6), 15),
-            (square(2.05, 0.05, 0.6), 15),
-            (square(3.05, 0.05, 0.6), 11),
-            (square(6.05, 0.05, 0.6), 7),
+            (square(0.05, 0.05, 0.6), "24"),
+            (square(1.05, 0.05, 0.6), "15"),
+            (square(2.05, 0.05, 0.6), "15"),
+            (square(3.05, 0.05, 0.6), "11"),
+            (square(6.05, 0.05, 0.6), "7"),
         ]
     )
     wsf = wsf_bytes(
         tmp_path / "syn-wsf.tif",
-        [[18, NODATA, 13, NODATA, 6, NODATA, 5, NODATA]],
+        [[180, NODATA, 130, NODATA, 60, NODATA, 50, NODATA]],
         8,
         1,
     )

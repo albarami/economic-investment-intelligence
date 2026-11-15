@@ -24,11 +24,11 @@ from shapely.geometry import Point, Polygon
 
 from eii_core.calc.building_heights import floor_height, metres
 from eii_custodian.publicdata import heights as heights_package
+from eii_custodian.publicdata.fetch.allowlist import ALLOWED_HOSTS, approve
 from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response
-from eii_custodian.publicdata.heights import step
 from eii_custodian.publicdata.heights.manifest import (
     ESTIMATE_LABEL,
     check_row,
@@ -36,6 +36,7 @@ from eii_custodian.publicdata.heights.manifest import (
 from eii_custodian.publicdata.heights.match import (
     globfp_candidates,
     globfp_height,
+    globfp_index,
     representative_point,
     wsf3d_height,
     wsf_value,
@@ -48,7 +49,11 @@ from eii_custodian.publicdata.heights.model import (
     load_rules,
     storey_literals,
 )
-from eii_custodian.publicdata.heights.read import WsfGrid, read_sources
+from eii_custodian.publicdata.heights.read import (
+    WsfGrid,
+    read_sources,
+    sha256_path,
+)
 from eii_custodian.publicdata.heights.step import build_heights
 
 REPO = repository_root(Path(__file__))
@@ -76,7 +81,7 @@ def _card_setup(tmp_path):
     """The card's fixture: seven buildings, one 3D-GloBFP file, one raster."""
     tmp_path.mkdir(parents=True, exist_ok=True)
     buildings, globfp, wsf = invented.card_fixture(tmp_path)
-    globfp_row = invented.entry("bldg_3dglobfp", extension="geojson")
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
     wsf_row = invented.entry("bldg_wsf3d", extension="tif")
     cache = tmp_path / "data" / "public_cache"
     invented.store(cache, globfp_row, globfp)
@@ -128,6 +133,7 @@ def test_the_card_fixture_end_to_end(tmp_path: Path) -> None:
         "none": 1,
     }
     assert block["none_reasons"] == {"order_exhausted": 1}
+    assert block["tied_height_buildings"] == 0
     assert block["errors"]["floor_count"] == {
         "count": 2,
         "mean_signed_error_m": "1.00",
@@ -207,10 +213,10 @@ def test_an_absent_building_table_is_a_skip_line_not_a_failure(
     assert not (tmp_path / "out").exists()
 
 
-def test_the_committed_rules_leave_both_sources_structure_unconfirmed(
+def test_the_committed_rules_read_both_sources_not_fetched(
     tmp_path: Path,
 ) -> None:
-    """Without a structure note both sources are absent, never a failure."""
+    """The committed structures are confirmed; unfetched rows are absent."""
     out_dir = tmp_path / "out"
     buildings_path = tmp_path / "buildings.geojson"
     buildings_path.write_bytes(
@@ -236,10 +242,10 @@ def test_the_committed_rules_leave_both_sources_structure_unconfirmed(
     )
     rows = {row["building_id"]: row for row in _rows(out_dir)}
     assert rows["SYN-B-0001"]["height_source"] == "none"
-    assert rows["SYN-B-0001"]["reason"] == "structure_unconfirmed"
+    assert rows["SYN-B-0001"]["reason"] == "not_fetched"
     assert rows["SYN-B-0002"]["height_m"] == "30.00"
     block = _manifest(out_dir)
-    assert block["sources"]["bldg_3dglobfp"]["reason"] == "structure_unconfirmed"
+    assert block["sources"]["bldg_3dglobfp"]["reason"] == "not_fetched"
     assert block["sources"]["bldg_wsf3d"]["state"] == "absent"
     assert block["storey_height_m"]["value"] == "3.0"
     assert block["credits"]["bldg_3dglobfp"]["credit"] == ""
@@ -301,21 +307,23 @@ def test_rules_reader_refusals(tmp_path: Path) -> None:
         load_rules(invented.write_rules(tmp_path / "e.yaml", document))
 
 
-def test_the_committed_rules_file_loads_and_marks_every_value() -> None:
-    """The committed file parses; every declared value is the marker."""
+def test_the_committed_rules_file_loads_with_the_declared_structures() -> None:
+    """The committed file parses; the declared values name the real forms."""
     rules = load_rules(RULES_PATH)
     assert rules.storey_height == Decimal("3.0")
     assert rules.label == "ASSUMPTION"
-    for structure in rules.structures.values():
-        assert all(
-            value == "to be confirmed"
-            for value in (
-                structure.format,
-                structure.unit,
-                structure.nodata,
-                structure.crs,
-            )
-        )
+    globfp = rules.structures["bldg_3dglobfp"]
+    assert globfp.format == "shapefile_zip"
+    assert globfp.field == "Height"
+    assert globfp.unit == "m"
+    assert globfp.crs == "EPSG:4326"
+    wsf = rules.structures["bldg_wsf3d"]
+    assert wsf.format == "GTiff"
+    assert wsf.band == "1"
+    assert wsf.unit == "m"
+    assert wsf.nodata == "-32767"
+    assert wsf.scale == "0.1"
+    assert wsf.crs == "EPSG:4326"
 
 
 def test_input_contract_refusals(tmp_path: Path) -> None:
@@ -426,8 +434,9 @@ def test_a_footprint_not_holding_the_point_gives_no_candidate() -> None:
     point = representative_point(building)
     away = _polygon(invented.square(5, 5, 1))
     files = (("f", ((away, Decimal(9)),)),)
-    assert globfp_candidates(point, building, files) == []
-    assert globfp_height(point, building, files) is None
+    index = globfp_index(files)
+    assert globfp_candidates(point, building, index) == []
+    assert globfp_height(point, building, index) is None
 
 
 def test_the_larger_overlap_wins_and_residual_ties_are_broken() -> None:
@@ -437,17 +446,17 @@ def test_the_larger_overlap_wins_and_residual_ties_are_broken() -> None:
     whole = _polygon(invented.square(-0.5, -0.5, 2))
     part = _polygon(invented.square(0.5, 0.5, 1))
     files = (("one", ((part, Decimal(8)), (whole, Decimal(9)))),)
-    assert globfp_height(point, building, files) == Decimal(9)
+    assert globfp_height(point, building, globfp_index(files)) == Decimal(9)
     across = (
         ("b", ((whole, Decimal(8)),)),
         ("a", ((whole, Decimal(9)),)),
     )
-    assert globfp_height(point, building, across) == Decimal(9)
+    assert globfp_height(point, building, globfp_index(across)) == Decimal(9)
     same_file = (("a", ((whole, Decimal(8)), (whole, Decimal(9)))),)
-    assert globfp_height(point, building, same_file) == Decimal(8)
+    assert globfp_height(point, building, globfp_index(same_file)) == Decimal(8)
 
 
-def _grid(values, width, height, nodata=Decimal("-99999")):
+def _grid(values, width, height, nodata=Decimal("-99999"), scale=Decimal("1")):
     from rasterio.transform import from_origin
 
     return WsfGrid(
@@ -456,6 +465,7 @@ def _grid(values, width, height, nodata=Decimal("-99999")):
         nodata=nodata,
         width=width,
         height=height,
+        scale=scale,
     )
 
 
@@ -483,7 +493,7 @@ def test_two_wsf_files_giving_values_at_one_point_are_refused() -> None:
     assert wsf3d_height(Point(0.5, 0.5), (("a", zero), ("b", low))) == Decimal(7)
 
 
-def _sources(tmp_path: Path, entries, rules=None, bodies=()):
+def _sources(tmp_path: Path, entries, rules=None, bodies=(), bounds=None):
     """Run read_sources over stored fixtures."""
     tmp_path.mkdir(parents=True, exist_ok=True)
     cache = tmp_path / "cache"
@@ -493,12 +503,13 @@ def _sources(tmp_path: Path, entries, rules=None, bodies=()):
         cache,
         entries,
         load_rules(rules or invented.rules_file(tmp_path / "rules.yaml")),
+        bounds=bounds,
     )
 
 
 def test_read_refusals_and_absent_reasons(tmp_path: Path) -> None:
     """B6: hash and receipt defects refuse; skip and not_fetched are absent."""
-    row = invented.entry("bldg_3dglobfp", extension="geojson")
+    row = invented.entry("bldg_3dglobfp", extension="zip")
     skipped = replace(
         row, key="bldg_3dglobfp/two", slug="two", skip_reason="direct_url_unconfirmed"
     )
@@ -509,8 +520,8 @@ def test_read_refusals_and_absent_reasons(tmp_path: Path) -> None:
     assert results["bldg_3dglobfp"].state == "absent"
     assert results["bldg_3dglobfp"].reason == "not_fetched"
     changed = tmp_path / "three"
-    row = invented.entry("bldg_3dglobfp", extension="geojson")
-    body = invented.globfp_bytes([(invented.square(0, 0, 1), 7)])
+    row = invented.entry("bldg_3dglobfp", extension="zip")
+    body = invented.globfp_zip([(invented.square(0, 0, 1), "7")])
     digest = invented.store(changed / "cache", row, body)
     target = changed / "cache" / "bldg_3dglobfp" / f"{digest}.{row.extension}"
     target.write_bytes(b"planted other bytes")
@@ -569,9 +580,9 @@ def test_read_declared_and_file_structure_refusals(tmp_path: Path) -> None:
             invented.rules_file(tmp_path / "ok2.yaml"),
             ((row, two_band.read_bytes()),),
         )
-    globfp_row = invented.entry("bldg_3dglobfp", extension="geojson")
-    missing_field = invented.globfp_bytes(
-        [(invented.square(0, 0, 1), 7)], field="other_name"
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
+    missing_field = invented.globfp_zip(
+        [(invented.square(0, 0, 1), "7")], field="other_name"
     )
     with pytest.raises(HeightError, match="structure_mismatch"):
         _sources(
@@ -586,8 +597,8 @@ def test_a_marker_structure_is_absent_without_failure(tmp_path: Path) -> None:
     """`to be confirmed` gives `structure_unconfirmed`, no failure."""
     document = invented.rules_document()
     document["sources"]["bldg_3dglobfp"]["format"] = "to be confirmed"
-    row = invented.entry("bldg_3dglobfp", extension="geojson")
-    body = invented.globfp_bytes([(invented.square(0, 0, 1), 7)])
+    row = invented.entry("bldg_3dglobfp", extension="zip")
+    body = invented.globfp_zip([(invented.square(0, 0, 1), "7")])
     results = _sources(
         tmp_path,
         (row,),
@@ -611,53 +622,57 @@ def test_another_declared_format_is_absent_not_refused(tmp_path: Path) -> None:
     assert results["bldg_3dglobfp"].reason == "structure_unconfirmed"
 
 
-def _heights_entries(loaded: tuple[Entry, ...]) -> dict[str, Entry]:
-    return {
-        entry.source_id: entry
-        for entry in loaded
-        if entry.source_id in {"bldg_3dglobfp", "bldg_wsf3d"}
-    }
+def _heights_entries(loaded: tuple[Entry, ...]) -> list[Entry]:
+    return [
+        entry for entry in loaded if entry.source_id in {"bldg_3dglobfp", "bldg_wsf3d"}
+    ]
 
 
 def test_committed_rows_load_with_their_basis_and_no_credit() -> None:
-    """Criterion 4: the two rows load; 3D-GloBFP has its licence, no credit."""
+    """Criterion 4: the three rows load with their licences and no credit."""
     entries = _heights_entries(load_registry())
-    globfp = entries["bldg_3dglobfp"]
-    assert globfp.licence_id == "CC-BY-4.0"
-    assert globfp.licence_basis == "dataset"
-    assert globfp.decision_record == ""
-    assert "credit" not in vars(globfp)
-    wsf = entries["bldg_wsf3d"]
-    assert wsf.licence_basis == "owner_decision"
-    assert wsf.decision_record == "0026"
-    assert wsf.licence_id == "unconfirmed"
-    for entry in entries.values():
+    assert [entry.key for entry in entries] == [
+        "bldg_3dglobfp/1636",
+        "bldg_3dglobfp/1639",
+        "bldg_wsf3d",
+    ]
+    for entry in entries:
+        assert entry.source_id in {"bldg_3dglobfp", "bldg_wsf3d"}
+        assert entry.licence_id == "CC-BY-4.0"
+        assert entry.licence_basis == "dataset"
+        assert entry.decision_record == ""
+        assert "credit" not in vars(entry)
         assert entry.kind == "https_file"
         assert entry.commit_allowed is False
         assert entry.nightly_live_fetch is False
-        assert entry.skip_reason == "direct_url_unconfirmed"
+        assert entry.skip_reason == ""
         assert entry.row_count_min is None
         assert entry.row_count_max is None
+        assert entry.terms_watch is False
+    globfp = entries[0]
+    assert globfp.fetch_host == "ndownloader.figshare.com"
+    assert globfp.extension == "zip"
+    wsf = entries[2]
+    assert wsf.fetch_host == "download.geoservice.dlr.de"
+    assert wsf.extension == "tif"
     pack = (REPO / "docs" / "04_PUBLIC_DATA_PACK.md").read_text()
     assert '"Che et al. 2024"' in pack
     document = yaml.safe_load(
         (REPO / "custodian" / "publicdata" / "sources.yaml").read_text()
     )
-    rows = {
-        row["source_id"]: row
+    rows = [
+        row
         for row in document["sources"]
         if row["source_id"] in {"bldg_3dglobfp", "bldg_wsf3d"}
-    }
-    assert "credit" not in rows["bldg_3dglobfp"]
-    assert "credit" not in rows["bldg_wsf3d"]
+    ]
+    assert all("credit" not in row for row in rows)
 
 
 def test_committed_rows_carry_no_row_count_bounds(tmp_path: Path) -> None:
     """R9(a): the count check reads JSON only; a planted bound fails."""
     entries = _heights_entries(load_registry())
     assert all(
-        entry.row_count_min is None and entry.row_count_max is None
-        for entry in entries.values()
+        entry.row_count_min is None and entry.row_count_max is None for entry in entries
     )
     document = yaml.safe_load(
         (REPO / "custodian" / "publicdata" / "sources.yaml").read_text()
@@ -669,7 +684,7 @@ def test_committed_rows_carry_no_row_count_bounds(tmp_path: Path) -> None:
         entry.row_count_min is None and entry.row_count_max is None
         for entry in _heights_entries(
             load_registry(invented.write_rules(tmp_path / "r.yaml", document))
-        ).values()
+        )
     )
 
 
@@ -691,7 +706,7 @@ def test_non_commercial_terms_never_block_the_source(tmp_path: Path) -> None:
     loaded = load_registry(invented.write_rules(tmp_path / "r.yaml", document))
     row = next(entry for entry in loaded if entry.source_id == "bldg_wsf3d")
     assert row.licence_id == "CC-BY-NC-4.0"
-    wsf = invented.wsf_bytes(tmp_path / "w.tif", [[42]], 1, 1)
+    wsf = invented.wsf_bytes(tmp_path / "w.tif", [[420]], 1, 1)
 
     def transport(url: str) -> Response:
         assert url == row.url
@@ -730,7 +745,7 @@ def test_both_rows_fetch_through_run_build_on_an_allowed_host(
 ) -> None:
     """B9: each row is fetched and stored; bytes stay in the cache (FE-95)."""
     rows = [
-        invented.entry("bldg_3dglobfp", extension="geojson"),
+        invented.entry("bldg_3dglobfp", extension="zip"),
         invented.entry("bldg_wsf3d", extension="tif"),
     ]
     seen: list[str] = []
@@ -864,12 +879,12 @@ def test_a_long_expansion_statistic_is_written_at_the_stated_decimals(
     buildings_path = tmp_path / "data" / "assets" / "buildings" / "buildings.geojson"
     buildings_path.parent.mkdir(parents=True, exist_ok=True)
     buildings_path.write_bytes(invented.buildings_bytes(features))
-    globfp_row = invented.entry("bldg_3dglobfp", extension="geojson")
-    globfp = invented.globfp_bytes(
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
+    globfp = invented.globfp_zip(
         [
-            (invented.square(0.05, 0.05, 0.6), 1.01),
-            (invented.square(1.05, 0.05, 0.6), 1.01),
-            (invented.square(2.05, 0.05, 0.6), 1.02),
+            (invented.square(0.05, 0.05, 0.6), "1.01"),
+            (invented.square(1.05, 0.05, 0.6), "1.01"),
+            (invented.square(2.05, 0.05, 0.6), "1.02"),
         ]
     )
     cache = tmp_path / "data" / "public_cache"
@@ -913,7 +928,7 @@ def test_a_non_positive_wsf_cell_is_counted_and_never_a_crash(
     wsf_row = invented.entry("bldg_wsf3d", extension="tif")
     cache = tmp_path / "data" / "public_cache"
     invented.store(
-        cache, wsf_row, invented.wsf_bytes(tmp_path / "w.tif", [[0, 5]], 2, 1)
+        cache, wsf_row, invented.wsf_bytes(tmp_path / "w.tif", [[0, 50]], 2, 1)
     )
     out_dir = tmp_path / "data" / "assets" / "heights"
     lines: list[str] = []
@@ -953,7 +968,7 @@ def test_a_nan_wsf_cell_is_no_value_not_a_crash(tmp_path: Path) -> None:
     invented.store(
         cache,
         wsf_row,
-        invented.wsf_bytes(tmp_path / "w.tif", [[float("nan")]], 1, 1),
+        invented.wsf_bytes(tmp_path / "w.tif", [[float("nan")]], 1, 1, dtype="float32"),
     )
     out_dir = tmp_path / "out"
     build_heights(
@@ -1088,7 +1103,7 @@ def test_a_rules_file_that_is_not_yaml_is_a_named_refusal(tmp_path: Path) -> Non
 
 
 def test_a_wsf_body_that_is_not_a_raster_is_a_named_refusal(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path,
 ) -> None:
     """V2: a WSF body rasterio cannot open is structure_mismatch, with FAIL."""
     row = invented.entry("bldg_wsf3d", extension="tif")
@@ -1106,17 +1121,6 @@ def test_a_wsf_body_that_is_not_a_raster_is_a_named_refusal(
             [invented.building_feature("SYN-B-0001", invented.square(0, 0, 1), 30, 8)]
         )
     )
-    # The committed rules still mark the live structures unconfirmed, so the
-    # step's FAIL line is driven through this confirmed-structure rules file.
-    real_build_heights = step.build_heights
-
-    def with_confirmed_rules(*args, **kwargs):
-        return real_build_heights(*args, rules_path=rules, **kwargs)
-
-    monkeypatch.setattr(
-        "eii_custodian.publicdata.heights.step.build_heights",
-        with_confirmed_rules,
-    )
 
     def transport(url: str) -> Response:
         return Response(final_url=url, body=b"this is not a raster, invented", hops=())
@@ -1129,9 +1133,9 @@ def test_a_wsf_body_that_is_not_a_raster_is_a_named_refusal(
 
 def test_a_receipt_that_is_not_json_is_a_named_refusal(tmp_path: Path) -> None:
     """V2: a receipt that is not JSON is refused as cache_receipt."""
-    row = invented.entry("bldg_3dglobfp", extension="geojson")
+    row = invented.entry("bldg_3dglobfp", extension="zip")
     cache = tmp_path / "cache"
-    invented.store(cache, row, invented.globfp_bytes([(invented.square(0, 0, 1), 7)]))
+    invented.store(cache, row, invented.globfp_zip([(invented.square(0, 0, 1), "7")]))
     meta = next((cache / row.key).glob("*.meta.json"))
     meta.write_text("this is not json {")
     with pytest.raises(HeightError) as err:
@@ -1166,13 +1170,13 @@ def test_every_registry_row_of_a_source_is_named_in_the_manifest(
     tmp_path: Path,
 ) -> None:
     """V3: a cached row and an uncached row are each named; state is partial."""
-    globfp_row = invented.entry("bldg_3dglobfp", extension="geojson")
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
     missing = replace(globfp_row, key="bldg_3dglobfp/two", slug="two")
     cache = tmp_path / "data" / "public_cache"
     invented.store(
         cache,
         globfp_row,
-        invented.globfp_bytes([(invented.square(0.05, 0.05, 0.6), 7)]),
+        invented.globfp_zip([(invented.square(0.05, 0.05, 0.6), "7")]),
     )
     buildings = tmp_path / "data" / "assets" / "buildings" / "buildings.geojson"
     buildings.parent.mkdir(parents=True, exist_ok=True)
@@ -1317,6 +1321,22 @@ def test_rules_refusals_are_planted_and_named_in_full(tmp_path: Path) -> None:
             "rules_nodata",
         ),
         (
+            mutated(lambda d: d["sources"]["bldg_wsf3d"].pop("scale")),
+            "rules_missing_key",
+        ),
+        (
+            mutated(lambda d: d["sources"]["bldg_wsf3d"].update(scale="")),
+            "rules_scale",
+        ),
+        (
+            mutated(lambda d: d["sources"]["bldg_wsf3d"].update(scale=1)),
+            "rules_scale",
+        ),
+        (
+            mutated(lambda d: d["sources"]["bldg_3dglobfp"].update(scale="0.1")),
+            "rules_field_or_band",
+        ),
+        (
             mutated(lambda d: d["sources"]["bldg_3dglobfp"].update(format="")),
             "rules_format",
         ),
@@ -1424,8 +1444,8 @@ def test_building_table_refusals_are_planted_and_named_in_full(
 
 def test_cache_refusals_are_planted_and_named_in_full(tmp_path: Path) -> None:
     """V9/V6: receipt, hash and path checks carry their closed reasons."""
-    row = invented.entry("bldg_3dglobfp", extension="geojson")
-    body = invented.globfp_bytes([(invented.square(0, 0, 1), 7)])
+    row = invented.entry("bldg_3dglobfp", extension="zip")
+    body = invented.globfp_zip([(invented.square(0, 0, 1), "7")])
     rules = invented.rules_file(tmp_path / "rules.yaml")
 
     def run(cache: Path, entry: Entry = row) -> None:
@@ -1478,7 +1498,7 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
     tmp_path: Path,
 ) -> None:
     """V9/V2: each structure branch of both readers carries its reason."""
-    globfp_row = invented.entry("bldg_3dglobfp", extension="geojson")
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
     wsf_row = invented.entry("bldg_wsf3d", extension="tif")
     rules = invented.rules_file(tmp_path / "rules.yaml")
 
@@ -1487,85 +1507,174 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
         invented.store(cache, entry, body)
         read_sources(cache, (entry,), load_rules(rules_path))
 
-    def globfp(features: list, **extra) -> bytes:
-        return json.dumps(
-            {"type": "FeatureCollection", "features": features, **extra}
-        ).encode()
+    ring = invented.square(0, 0, 1)
+    projected_wkt = (
+        b'PROJCS["WGS_1984_Web_Mercator_Auxiliary_Sphere",'
+        b'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",'
+        b'SPHEROID["WGS_1984",6378137.0,298.257223563]],'
+        b'PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],'
+        b'PROJECTION["Mercator_Auxiliary_Sphere"],'
+        b'PARAMETER["False_Easting",0.0],PARAMETER["False_Northing",0.0],'
+        b'PARAMETER["Central_Meridian",0.0],PARAMETER["Standard_Parallel_1",0.0],'
+        b'PARAMETER["Auxiliary_Sphere_Type",0.0],UNIT["Meter",1.0]]'
+    )
+    other_datum_wkt = (
+        b'GEOGCS["GCS_North_American_1983",DATUM["D_North_American_1983",'
+        b'SPHEROID["GRS_1980",6378137.0,298.257222101]],'
+        b'PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]'
+    )
 
-    feature = {"type": "Feature", "properties": {"syn_height_m": 7}}
+    def members(**changes) -> dict:
+        bodies = invented.shapefile_members([[invented.cw(ring)]], [["1", "7", ""]])
+        bodies.update(changes)
+        return bodies
+
+    def zipped(
+        bodies: dict, stem: str = "syn.tile.01", extra: dict | None = None
+    ) -> bytes:
+        out = {f"{stem}.{ext}": body for ext, body in bodies.items()}
+        out.update(extra or {})
+        return invented.zip_members(out)
+
+    offset, size = invented.dbf_field_offset(members()["dbf"], "Height")
+
+    def dbf_change(row: int, at: int, text: bytes) -> bytes:
+        return invented.dbf_patch(members()["dbf"], row, at, text)
+
+    def count_change(count: int) -> bytes:
+        raw = bytearray(members()["dbf"])
+        raw[4:8] = count.to_bytes(4, "little")
+        return bytes(raw)
+
     globfp_cases: list[tuple[str, bytes, str]] = [
-        ("notjson", b"this is not json {", "structure_mismatch"),
-        ("notfc", b'{"type": "Feature"}', "structure_mismatch"),
+        ("notzip", b"this is not a zip {", "structure_mismatch"),
         (
-            "featdict",
-            b'{"type": "FeatureCollection", "features": {}}',
+            "fourmembers",
+            zipped({k: v for k, v in members().items() if k != "cpg"}),
             "structure_mismatch",
         ),
         (
-            "featnum",
-            b'{"type": "FeatureCollection", "features": [5]}',
+            "sixmembers",
+            zipped(members(), extra={"six.txt": b"x"}),
             "structure_mismatch",
         ),
         (
-            "proptext",
-            globfp([{**feature, "properties": "x"}]),
+            "nested",
+            zipped(members(), extra={"folder/syn.tile.01.cpg": b"x"}),
             "structure_mismatch",
         ),
         (
-            "geopoint",
-            globfp(
-                [
-                    {
-                        **feature,
-                        "geometry": {"type": "Point", "coordinates": [0, 0]},
-                    }
-                ]
+            "twostems",
+            zipped(
+                {k: v for k, v in members().items() if k != "prj"},
+                extra={"other.prj": invented.WGS84_PRJ},
             ),
             "structure_mismatch",
         ),
         (
-            "geobad",
-            globfp(
-                [
-                    {
-                        **feature,
-                        "geometry": {"type": "Polygon", "coordinates": "x"},
-                    }
-                ]
-            ),
+            "missingdbf",
+            zipped({k: v for k, v in members().items() if k != "dbf"}),
             "structure_mismatch",
         ),
         (
-            "geoempty",
-            globfp(
-                [
-                    {
-                        **feature,
-                        "geometry": {"type": "Polygon", "coordinates": []},
-                    }
-                ]
-            ),
+            "badcpg",
+            zipped(members(cpg=b"UTF-8")),
             "structure_mismatch",
         ),
         (
-            "dupkey",
-            b'{"type": "FeatureCollection", "type": "FeatureCollection",'
-            b' "features": []}',
+            "encrypted",
+            invented.zip_flag_patch(zipped(members()), 1),
             "structure_mismatch",
         ),
         (
-            "crs3857",
-            globfp([], crs={"properties": {"name": "EPSG:3857"}}),
+            "badprj",
+            zipped(members(prj=b"not a wkt at all")),
             "reference_system",
         ),
         (
+            "projectedprj",
+            zipped(members(prj=projected_wkt)),
+            "reference_system",
+        ),
+        (
+            "otherdatum",
+            zipped(members(prj=other_datum_wkt)),
+            "reference_system",
+        ),
+        (
+            "missingfield",
+            invented.globfp_zip([(ring, "7")], field="other_name"),
+            "structure_mismatch",
+        ),
+        (
+            "fieldwrongtype",
+            invented.shapefile_zip(
+                [[invented.cw(ring)]],
+                [["1", "7", ""]],
+                [["FID", "N", 18, 0], ["Height", "C", 24, 0], ["FID_1", "N", 24, 15]],
+            ),
+            "structure_mismatch",
+        ),
+        (
+            "deletedrow",
+            zipped(members(dbf=dbf_change(0, 0, b"*"))),
+            "structure_mismatch",
+        ),
+        (
+            "truncateddbf",
+            zipped(members(dbf=members()["dbf"][:-5])),
+            "structure_mismatch",
+        ),
+        (
+            "countmismatch",
+            zipped(members(dbf=count_change(5))),
+            "structure_mismatch",
+        ),
+        (
+            "nullshape",
+            invented.shapefile_zip(
+                [None],
+                [["1", "7", ""]],
+            ),
+            "structure_mismatch",
+        ),
+        (
+            "pointshape",
+            invented.shapefile_zip(
+                [[1, 1]],
+                [["1", "7", ""]],
+                shape_type=__import__("shapefile").POINT,
+            ),
+            "structure_mismatch",
+        ),
+        (
             "negheight",
-            invented.globfp_bytes([(invented.square(0, 0, 1), -3)]),
+            invented.globfp_zip([(ring, "-3")]),
+            "height_value",
+        ),
+        (
+            "zeroheight",
+            invented.globfp_zip([(ring, "0")]),
             "height_value",
         ),
         (
             "textheight",
-            invented.globfp_bytes([(invented.square(0, 0, 1), "x")]),
+            zipped(members(dbf=dbf_change(0, offset, b"x" * size))),
+            "height_value",
+        ),
+        (
+            "blankheight",
+            zipped(members(dbf=dbf_change(0, offset, b" " * size))),
+            "height_value",
+        ),
+        (
+            "nanheight",
+            zipped(members(dbf=dbf_change(0, offset, b"NaN".rjust(size)))),
+            "height_value",
+        ),
+        (
+            "starheight",
+            zipped(members(dbf=dbf_change(0, offset, b"*" * size))),
             "height_value",
         ),
     ]
@@ -1596,11 +1705,11 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
         width=1,
         height=1,
         count=1,
-        dtype="float32",
+        dtype="int16",
         transform=from_origin(0, 1, 1, 1),
-        nodata=-99999,
+        nodata=-32767,
     ) as target:
-        target.write(np.zeros((1, 1), dtype="float32"), 1)
+        target.write(np.zeros((1, 1), dtype="int16"), 1)
     wsf_cases: list[tuple[str, bytes, str, Path]] = [
         (
             "nodata",
@@ -1610,6 +1719,30 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
         ),
         ("dtype", bad_dtype.read_bytes(), "structure_mismatch", rules),
         ("nocrs", no_crs.read_bytes(), "reference_system", rules),
+        (
+            "scale",
+            invented.wsf_bytes(tmp_path / "s.tif", [[5]], 1, 1, scale=0.2),
+            "structure_mismatch",
+            rules,
+        ),
+        (
+            "offset",
+            invented.wsf_bytes(tmp_path / "o.tif", [[5]], 1, 1, offset=0.5),
+            "structure_mismatch",
+            rules,
+        ),
+        (
+            "unitmissing",
+            invented.wsf_bytes(tmp_path / "u.tif", [[5]], 1, 1, unit_tag=None),
+            "structure_mismatch",
+            rules,
+        ),
+        (
+            "unitwrong",
+            invented.wsf_bytes(tmp_path / "uw.tif", [[5]], 1, 1, unit_tag="ft"),
+            "structure_mismatch",
+            rules,
+        ),
         (
             "band",
             invented.wsf_bytes(tmp_path / "b.tif", [[5]], 1, 1),
@@ -1622,11 +1755,294 @@ def test_source_structure_refusals_are_planted_and_named_in_full(
             "structure_mismatch",
             invented.rules_file(tmp_path / "rdn.yaml", wsf_nodata="x"),
         ),
+        (
+            "declaredscale",
+            invented.wsf_bytes(tmp_path / "ds.tif", [[5]], 1, 1),
+            "structure_mismatch",
+            invented.rules_file(tmp_path / "rds.yaml", wsf_scale="0.2"),
+        ),
     ]
     for index, body, reason, rules_path in wsf_cases:
         with pytest.raises(HeightError) as err:
             run(f"w-{index}", wsf_row, body, rules_path)
         assert err.value.name == reason, index
+
+
+def test_the_zip_member_total_bound_is_a_named_refusal(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A zip whose members declare more than the bound is refused."""
+    import eii_custodian.publicdata.heights.read as read_module
+
+    monkeypatch.setattr(read_module, "_ZIP_MEMBER_TOTAL_MAX", 10)
+    row = invented.entry("bldg_3dglobfp", extension="zip")
+    cache = tmp_path / "cache"
+    invented.store(cache, row, invented.globfp_zip([(invented.square(0, 0, 1), "7")]))
+    with pytest.raises(HeightError, match="structure_mismatch"):
+        read_sources(
+            cache, (row,), load_rules(invented.rules_file(tmp_path / "r.yaml"))
+        )
+
+
+def test_the_published_height_text_arrives_digit_for_digit(tmp_path: Path) -> None:
+    """An 18-digit height text parses as the Decimal the publisher wrote."""
+    bodies = invented.shapefile_members(
+        [[invented.cw(invented.square(0, 0, 1))]], [["1", "7", ""]]
+    )
+    offset, size = invented.dbf_field_offset(bodies["dbf"], "Height")
+    bodies["dbf"] = invented.dbf_patch(
+        bodies["dbf"], 0, offset, b"123.456789012345678".rjust(size)
+    )
+    row = invented.entry("bldg_3dglobfp", extension="zip")
+    results = _sources(
+        tmp_path,
+        (row,),
+        None,
+        (
+            (
+                row,
+                invented.zip_members(
+                    {f"syn.tile.01.{k}": v for k, v in bodies.items()}
+                ),
+            ),
+        ),
+    )
+    files = results["bldg_3dglobfp"].globfp
+    ((_geometry, height),) = files[0][1]
+    assert height == Decimal("123.456789012345678")
+
+
+def test_a_footprint_with_a_hole_reads_its_height(tmp_path: Path) -> None:
+    """A ring inside the outer ring is a hole, not a second footprint."""
+    outer = invented.cw(invented.square(0, 0, 10))
+    hole = invented.square(2, 2, 4)
+    bodies = invented.shapefile_members([[outer, hole]], [["1", "9", ""]])
+    row = invented.entry("bldg_3dglobfp", extension="zip")
+    results = _sources(
+        tmp_path,
+        (row,),
+        None,
+        (
+            (
+                row,
+                invented.zip_members(
+                    {f"syn.tile.01.{k}": v for k, v in bodies.items()}
+                ),
+            ),
+        ),
+    )
+    ((geometry, height),) = results["bldg_3dglobfp"].globfp[0][1]
+    assert height == Decimal("9")
+    assert not geometry.covers(Point(4, 4))
+    assert geometry.covers(Point(1, 1))
+    building = _polygon(invented.square(2.5, 2.5, 3))
+    point = representative_point(building)
+    assert (
+        globfp_height(point, building, globfp_index(results["bldg_3dglobfp"].globfp))
+        is None
+    )
+
+
+def test_two_tiles_read_together_and_keep_their_row_indices(tmp_path: Path) -> None:
+    """Two rows of one source read side by side, each named by its key."""
+    low = invented.entry("bldg_3dglobfp", extension="zip")
+    high = replace(
+        invented.entry("bldg_3dglobfp", extension="zip"),
+        key="bldg_3dglobfp/high",
+        slug="high",
+    )
+    same = invented.square(0, 0, 1)
+    results = _sources(
+        tmp_path,
+        (low, high),
+        None,
+        (
+            (low, invented.globfp_zip([(same, "7")])),
+            (high, invented.globfp_zip([(same, "9")])),
+        ),
+    )
+    files = results["bldg_3dglobfp"].globfp
+    assert [name for name, _rows in files] == [low.key, high.key]
+    building = _polygon(invented.square(0.1, 0.1, 0.5))
+    point = representative_point(building)
+    assert globfp_height(point, building, globfp_index(files)) == Decimal("7")
+
+
+def test_the_footprint_index_is_built_once_for_the_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """H3: seven buildings, one tile: the index constructor runs once."""
+    import shapely.strtree
+
+    constructions: list[int] = []
+    real = shapely.strtree.STRtree
+
+    class CountingTree(real):
+        def __init__(self, geometries):
+            constructions.append(len(geometries))
+            super().__init__(geometries)
+
+    monkeypatch.setattr("shapely.strtree.STRtree", CountingTree)
+    _card_setup(tmp_path)
+    assert constructions == [5]
+
+
+def test_tied_footprints_with_two_heights_count_one(tmp_path: Path) -> None:
+    """H4: two identical footprints, two heights: one building counts one."""
+    buildings = tmp_path / "data" / "assets" / "buildings" / "buildings.geojson"
+    buildings.parent.mkdir(parents=True, exist_ok=True)
+    buildings.write_bytes(
+        invented.buildings_bytes(
+            [invented.building_feature("SYN-B-0001", invented.square(0.1, 0.1, 0.5))]
+        )
+    )
+    row = invented.entry("bldg_3dglobfp", extension="zip")
+    cache = tmp_path / "data" / "public_cache"
+    same = invented.square(0.05, 0.05, 0.6)
+    invented.store(cache, row, invented.globfp_zip([(same, "7.5"), (same, "9.5")]))
+    out_dir = tmp_path / "data" / "assets" / "heights"
+    build_heights(
+        cache,
+        (row,),
+        buildings,
+        out_dir,
+        [],
+        invented.rules_file(tmp_path / "rules.yaml"),
+    )
+    table_row = _rows(out_dir)[0]
+    assert table_row["height_m"] == "7.50"
+    assert table_row["height_source"] == "3dglobfp"
+    assert _manifest(out_dir)["tied_height_buildings"] == 1
+
+
+def test_tied_footprints_with_the_same_height_count_none(tmp_path: Path) -> None:
+    """H4: two identical footprints of one height are not a different-height tie."""
+    buildings = tmp_path / "data" / "assets" / "buildings" / "buildings.geojson"
+    buildings.parent.mkdir(parents=True, exist_ok=True)
+    buildings.write_bytes(
+        invented.buildings_bytes(
+            [invented.building_feature("SYN-B-0001", invented.square(0.1, 0.1, 0.5))]
+        )
+    )
+    row = invented.entry("bldg_3dglobfp", extension="zip")
+    cache = tmp_path / "data" / "public_cache"
+    same = invented.square(0.05, 0.05, 0.6)
+    invented.store(cache, row, invented.globfp_zip([(same, "7.5"), (same, "7.5")]))
+    out_dir = tmp_path / "data" / "assets" / "heights"
+    build_heights(
+        cache,
+        (row,),
+        buildings,
+        out_dir,
+        [],
+        invented.rules_file(tmp_path / "rules.yaml"),
+    )
+    assert _rows(out_dir)[0]["height_m"] == "7.50"
+    assert _manifest(out_dir)["tied_height_buildings"] == 0
+
+
+def test_only_the_window_over_the_building_table_is_read(tmp_path: Path) -> None:
+    """H5c: a cell far from the window never enters the grid."""
+    row = invented.entry("bldg_wsf3d", extension="tif")
+    body = invented.wsf_bytes(
+        tmp_path / "w.tif", [[100, 200, 300, 400, 500, 600, 700, 800]], 8, 1
+    )
+    results = _sources(
+        tmp_path, (row,), None, ((row, body),), bounds=(3.0, 0.0, 4.0, 1.0)
+    )
+    grid = results["bldg_wsf3d"].wsf[0][1]
+    assert grid.width < 8
+    assert 800 not in grid.data.tolist()[0]
+    assert wsf_value(grid, Point(3.5, 0.5)) == Decimal("40")
+
+
+def test_a_building_in_the_windows_corner_cell_gets_its_own_cell(
+    tmp_path: Path,
+) -> None:
+    """H5c: a building in the window's corner cell reads that cell's value."""
+    row = invented.entry("bldg_wsf3d", extension="tif")
+    body = invented.wsf_bytes(
+        tmp_path / "w.tif", [[100, 200, 300, 400, 500, 600]], 6, 1
+    )
+    results = _sources(
+        tmp_path, (row,), None, ((row, body),), bounds=(3.1, 0.0, 3.6, 1.0)
+    )
+    grid = results["bldg_wsf3d"].wsf[0][1]
+    assert wsf_value(grid, Point(3.35, 0.5)) == Decimal("40")
+
+
+def test_a_window_spanning_the_raster_is_refused(tmp_path: Path) -> None:
+    """H5c: a window over the bound is raster_window, before any read."""
+    path = tmp_path / "wide.tif"
+    side = 8192
+    with rasterio.open(
+        path,
+        "w",
+        driver="GTiff",
+        width=side,
+        height=side,
+        count=1,
+        dtype="int16",
+        crs="EPSG:4326",
+        transform=from_origin(0, float(side), 1, 1),
+        nodata=-32767,
+        compress="lzw",
+    ) as target:
+        target.scales = (0.1,)
+        target.update_tags(unit="m")
+    row = invented.entry("bldg_wsf3d", extension="tif")
+    with pytest.raises(HeightError, match="raster_window"):
+        _sources(
+            tmp_path / "a",
+            (row,),
+            None,
+            ((row, path.read_bytes()),),
+        )
+    results = _sources(
+        tmp_path / "b",
+        (row,),
+        None,
+        ((row, path.read_bytes()),),
+        bounds=(3.0, 0.0, 4.0, 1.0),
+    )
+    grid = results["bldg_wsf3d"].wsf[0][1]
+    assert grid.width < side
+
+
+def test_a_building_table_wholly_outside_the_raster_reads_nothing(
+    tmp_path: Path,
+) -> None:
+    """H5c: a table outside the raster gives an empty grid, not a refusal."""
+    row = invented.entry("bldg_wsf3d", extension="tif")
+    body = invented.wsf_bytes(tmp_path / "w.tif", [[50, 60]], 2, 1)
+    results = _sources(
+        tmp_path, (row,), None, ((row, body),), bounds=(50.0, 50.0, 60.0, 60.0)
+    )
+    grid = results["bldg_wsf3d"].wsf[0][1]
+    assert grid.width == 0
+    assert wsf_value(grid, Point(55, 55)) is None
+
+
+def test_the_piecewise_digest_equals_the_one_shot_digest(tmp_path: Path) -> None:
+    """H5d: a body larger than one piece hashes piecewise to the same digest."""
+    import eii_custodian.publicdata.heights.read as read_module
+
+    size = read_module._HASH_PIECE_BYTES + 123
+    body = (bytes(range(256)) * (size // 256 + 1))[:size]
+    path = tmp_path / "big.bin"
+    path.write_bytes(body)
+    assert sha256_path(path) == sha256_hex(body)
+
+
+def test_the_height_hosts_join_the_allow_list() -> None:
+    """PUB-03: the three height hosts are listed; another name is refused."""
+    assert "ndownloader.figshare.com" in ALLOWED_HOSTS
+    assert "44c1cec316ec56bca76dfd65d2882b20.r2.cloudflarestorage.com" in ALLOWED_HOSTS
+    assert "download.geoservice.dlr.de" in ALLOWED_HOSTS
+    assert approve("https://ndownloader.figshare.com/ndownloader/files/1").ok
+    assert not approve(
+        "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.r2.cloudflarestorage.com/x"
+    ).ok
 
 
 def test_the_writer_refusal_output_row_is_planted() -> None:

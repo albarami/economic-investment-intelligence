@@ -23,6 +23,7 @@ from eii_core.calc.building_heights import (
     height_value,
     largest_overlap,
     metres,
+    scaled_cell,
 )
 
 STOREY = Decimal(4)
@@ -602,3 +603,103 @@ def test_height_counts_refuses_a_source_outside_the_closed_list():
         height_counts([HeightChoice(Decimal(5), "invented_source", "")])
     with pytest.raises(ValueError):
         height_counts([HeightChoice(None, "none", "")])
+
+
+def test_scaled_cell_multiplies_the_stored_value_by_the_declared_scale():
+    """A stored raster value times the declared scale, one Decimal product."""
+    assert scaled_cell(Decimal(180), Decimal("0.1")) == Decimal("18.0")
+    assert scaled_cell(Decimal(7), Decimal("0.1")) == Decimal("0.7")
+    assert scaled_cell(Decimal(-32767), Decimal("0.1")) == Decimal("-3276.7")
+    for stored, scale in (
+        (Decimal(1), Decimal(0)),
+        (Decimal(1), Decimal("-0.1")),
+        (Decimal(1), Decimal("NaN")),
+        (Decimal("NaN"), Decimal("0.1")),
+        (Decimal("Infinity"), Decimal("0.1")),
+        (1, Decimal("0.1")),
+        (Decimal(1), 0.1),
+        ("1", Decimal("0.1")),
+    ):
+        with pytest.raises(ValueError):
+            scaled_cell(stored, scale)
+
+
+def test_scaled_cell_stays_finite_when_the_product_overflows_the_context():
+    """A stored value past the context precision rounds, never a crash."""
+    stored = Decimal("1." + "5" * 60)
+    result = scaled_cell(stored, Decimal("0.1"))
+    assert result.is_finite()
+    assert result > Decimal(0)
+
+
+def test_height_counts_counts_a_different_height_tie_once():
+    """A winning overlap tied at a different height counts one building."""
+    area = Decimal(1)
+    matches = [
+        (area, "f", 0, Decimal(7)),
+        (area, "f", 1, Decimal(9)),
+    ]
+    choice = HeightChoice(Decimal(7), "3dglobfp", "", ())
+    counts = height_counts([choice], [matches])
+    assert counts.tied_height_buildings == 1
+
+
+def test_height_counts_ignores_a_same_height_or_losing_tie():
+    """A tie at the winning area but one height, or among losers, is none."""
+    area = Decimal(1)
+    same_height = [
+        (area, "f", 0, Decimal(7)),
+        (area, "f", 1, Decimal(7)),
+    ]
+    losing_tie = [
+        (Decimal(2), "f", 0, Decimal(7)),
+        (Decimal(1), "f", 1, Decimal(9)),
+        (Decimal(1), "f", 2, Decimal(11)),
+    ]
+    choice = HeightChoice(Decimal(7), "3dglobfp", "", ())
+    assert height_counts([choice], [same_height]).tied_height_buildings == 0
+    assert height_counts([choice], [losing_tie]).tied_height_buildings == 0
+    assert height_counts([choice]).tied_height_buildings == 0
+    assert height_counts([choice], [[]]).tied_height_buildings == 0
+
+
+def test_scaled_cell_refusals_carry_their_closed_messages() -> None:
+    """Each scale check names its own fault in the closed refusal text."""
+    with pytest.raises(ValueError) as err:
+        scaled_cell(Decimal("NaN"), Decimal("0.1"))
+    assert str(err.value) == "finite Decimal required"
+    with pytest.raises(ValueError) as err:
+        scaled_cell(Decimal(1), Decimal("NaN"))
+    assert str(err.value) == "finite Decimal required"
+    with pytest.raises(ValueError) as err:
+        scaled_cell(Decimal(1), Decimal(0))
+    assert str(err.value) == "scale must be positive"
+
+
+def test_scaled_cell_uses_the_calculation_context_precision() -> None:
+    """The product is exact at the stated context, not the ambient one."""
+    stored = Decimal("1." + "5" * 40)
+    assert scaled_cell(stored, Decimal("0.1")) == Decimal("0.1" + "5" * 40)
+
+
+def test_height_counts_counts_each_tied_building() -> None:
+    """Two buildings each winning on a different-height tie count two."""
+    area = Decimal(1)
+    matches = [
+        (area, "f", 0, Decimal(7)),
+        (area, "f", 1, Decimal(9)),
+    ]
+    choice = HeightChoice(Decimal(7), "3dglobfp", "", ())
+    counts = height_counts([choice, choice], [matches, matches])
+    assert counts.tied_height_buildings == 2
+
+
+def test_height_counts_excludes_the_winners_own_row() -> None:
+    """The winning (file, row) never counts as its own tied candidate."""
+    area = Decimal(1)
+    matches = [
+        (area, "f", 0, Decimal(7)),
+        (area, "f", 0, Decimal(9)),
+    ]
+    choice = HeightChoice(Decimal(7), "3dglobfp", "", ())
+    assert height_counts([choice], [matches]).tied_height_buildings == 0

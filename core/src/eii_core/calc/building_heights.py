@@ -53,12 +53,17 @@ class FallbackError:
 
 @dataclass(frozen=True)
 class HeightCounts:
-    """Every count the manifest and the PASS line carry, in one place."""
+    """Every count the manifest and the PASS line carry, in one place.
+
+    `tied_height_buildings` counts the buildings whose winning 3D-GloBFP
+    overlap ties another candidate's area at a different height.
+    """
 
     by_source: dict[str, int]
     none_reasons: dict[str, int]
     no_value_reasons: dict[str, int]
     fallback_buildings: int
+    tied_height_buildings: int
 
 
 def _positive(value: Decimal, name: str) -> None:
@@ -95,6 +100,24 @@ def height_value(value: Decimal) -> Decimal | None:
     except ArithmeticError:
         return None
     return rounded if rounded > ZERO else None
+
+
+def scaled_cell(stored: Decimal, scale: Decimal) -> Decimal:
+    """A stored raster value times its declared scale, a Decimal throughout.
+
+    The stored value is a finite Decimal on entry and the scale a positive
+    finite Decimal; the product is computed once in the calculation context
+    and handed back unchecked, so a stored value that is no usable height is
+    the caller's own value rule to drop, and an overflow stays finite.
+    """
+    if type(stored) is not Decimal or not stored.is_finite():
+        raise ValueError("finite Decimal required")
+    if type(scale) is not Decimal or not scale.is_finite():
+        raise ValueError("finite Decimal required")
+    if scale <= ZERO:
+        raise ValueError("scale must be positive")
+    with localcontext(CALC_CONTEXT):
+        return +(stored * scale)
 
 
 def floor_height(floor_count: Decimal, storey_height: Decimal) -> Decimal:
@@ -199,17 +222,25 @@ def fallback_errors(
     return result
 
 
-def height_counts(choices: Iterable[HeightChoice]) -> HeightCounts:
+def height_counts(
+    choices: Iterable[HeightChoice],
+    globfp_matches: Iterable[Iterable[tuple[Decimal, str, int, Decimal]]] = (),
+) -> HeightCounts:
     """Counts by source, none reasons, dropped values and fallback buildings.
 
     The one place every count the manifest and the PASS line carry is
-    computed, from the chosen heights alone (rules 16 and 17).
+    computed, from the chosen heights alone (rules 16 and 17). Each building's
+    3D-GloBFP match list decides the tied-height count: a building counts once
+    when its winning overlap ties another candidate's area at a different
+    height. A match list shorter or longer than the choices pairs by index.
     """
     by_source = {name: 0 for name in (*ORDER, NONE_SOURCE)}
     none_reasons: dict[str, int] = {}
     no_value: dict[str, int] = {}
     fallback_buildings = 0
-    for choice in choices:
+    tied_height_buildings = 0
+    match_rows = list(globfp_matches)
+    for index, choice in enumerate(choices):
         if choice.source not in HEIGHT_SOURCES:
             raise ValueError("height source outside the closed list")
         by_source[choice.source] += 1
@@ -224,4 +255,19 @@ def height_counts(choices: Iterable[HeightChoice]) -> HeightCounts:
                 raise ValueError("candidate outside the closed order")
             reason = f"{name}_value_not_positive"
             no_value[reason] = no_value.get(reason, 0) + 1
-    return HeightCounts(by_source, none_reasons, no_value, fallback_buildings)
+        if index < len(match_rows):
+            winner = largest_overlap(match_rows[index])
+            if winner is not None and any(
+                match[0] == winner[0]
+                and match[-1] != winner[-1]
+                and match[1:-1] != winner[1:-1]
+                for match in match_rows[index]
+            ):
+                tied_height_buildings += 1
+    return HeightCounts(
+        by_source,
+        none_reasons,
+        no_value,
+        fallback_buildings,
+        tied_height_buildings,
+    )

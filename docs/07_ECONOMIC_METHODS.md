@@ -2273,20 +2273,31 @@ height       the first usable value of the order, per building:
              zero at the stated places; a fallback that gives no usable value
              is no value and is counted (wsf3d_value_not_positive for the WSF
              3D cell), never a crash and never overriding a recorded height
-3D-GloBFP    the candidate footprints that contain the building's representative
+3D-GloBFP    each file is one flat zip holding a shapefile's five members; the
+             named height field is read as the record's own decimal text and
+             parsed to a Decimal, never through a float, so a height of
+             eighteen significant digits arrives digit for digit; the
+             candidate footprints that contain the building's representative
              point (a point guaranteed inside the footprint); a point on a
              candidate's boundary counts as inside; the candidate with
              the largest overlap area against the building footprint wins; a
              residual tie takes the lowest file name in sorted order, then the
-             lowest row index within its file
+             lowest row index within its file; the one spatial index over all
+             footprints of all files is built once per run; a building whose
+             winning overlap ties a different-height candidate is counted
+             under tied_height_buildings
 WSF 3D       the 90 m cell that contains the representative point; a point on a
              cell's west or north edge belongs to that cell and on its east or
-             south edge to the next; a no-data cell, a point outside the
-             raster, or a cell value that is not a positive finite number
-             gives no value, the last counted under wsf3d_value_not_positive;
-             several files that each give a usable value at one point refuse
-             the table (wsf3d_overlap), while files that do not overlap are
-             read together
+             south edge to the next; the stored value is tenths of a metre and
+             is scaled by the declared scale 0.1 in tested code, a Decimal
+             throughout; only the window of cells over the building table's
+             bounds, grown one cell on each side, is read, never the whole
+             file; a no-data cell, a point outside the raster, or a cell value
+             that is not a positive finite number gives no value, the last
+             counted under wsf3d_value_not_positive; several files that each
+             give a usable value at one point refuse the table
+             (wsf3d_overlap), while files that do not overlap are read
+             together
 errors       for each fallback (floor count, 3D-GloBFP, WSF 3D), over the
              buildings that hold both that fallback's height and a recorded
              height, taken on the written (rounded) heights: signed error =

@@ -580,10 +580,10 @@ def test_skip_reason_must_not_name_a_licence_or_terms(tmp_path: Path) -> None:
 def test_registry_counts_follow_decision_0026() -> None:
     """No none_stated row remains, and every owner_decision row names 0026."""
     entries = load_registry()
-    assert len(entries) == 284
+    assert len(entries) == 285
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
-    assert len(owners) == 27 + 13 + 1  # Twelve GIS rows, the tender portal, and bldg_wsf3d.
+    assert len(owners) == 27 + 13  # Twelve GIS rows and the tender portal.
     assert {entry.decision_record for entry in owners} == {"0026"}
 
 

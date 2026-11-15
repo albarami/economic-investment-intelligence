@@ -25,7 +25,7 @@ Written under `data/assets/heights/` (uncommitted):
   `height_source`, `footprint_source_id`, `reason`;
 - `manifest.heights.json` — the deterministic manifest: input and output file
   hashes, retrieval metadata, licences and basis, terms, credits, the matching
-  rules, the source order, the counts per source, the `none` reasons, the error
+  rules, the source order, the counts per source, the `none` reasons, the tied-height count, the error
   block of each fallback against the recorded heights, the storey-height
   assumption, and the label `Heights are estimates.` Both files are sorted and
   byte-stable: identical inputs give identical bytes (FE-98).
@@ -42,24 +42,40 @@ has count 0 and reason `no_pairs`. The same numbers are computed by
 text `"3.0"` with the label `ASSUMPTION` (the lead's stated assumption of
 2026-11-14; the owner replaces it). It is parsed to `Decimal` — never a float —
 and no Python file may repeat the literal. The same file declares the structure
-each height source must match; the value `to be confirmed` marks a source
-whose structure is not yet confirmed and that source is absent with reason
-`structure_unconfirmed`, never a failure.
+each height source must match, in the form confirmed in pass five:
+`bldg_3dglobfp` is `shapefile_zip` with the field `Height`, and `bldg_wsf3d` is
+a `GTiff` band `1` with nodata `-32767` and scale `"0.1"`, both in metres and
+EPSG:4326; the value `to be confirmed` marks a source whose structure is not
+yet confirmed and that source is absent with reason `structure_unconfirmed`,
+never a failure.
 
 ## Sources
 
-The two height sources are the registry rows `bldg_3dglobfp` and `bldg_wsf3d`
-of `custodian/publicdata/sources.yaml`. Until a direct URL is confirmed each
-row holds `skip_reason: "direct_url_unconfirmed"`, no host joins the
-allow-list, and no fetched byte is committed (FE-95). A source absent from the
-cache is `not_fetched`; a switched-off row is refused; a row the fetch
-reported is read and its hash, receipt, terms and declared structure are
-checked before any row is parsed.
+The two height sources are the registry rows of
+`custodian/publicdata/sources.yaml`: `bldg_3dglobfp/1636` and
+`bldg_3dglobfp/1639`, the two tile files holding Qatar (CC BY 4.0, credit
+"Che et al. 2024", from `ndownloader.figshare.com`), and `bldg_wsf3d`, the
+global file of `download.geoservice.dlr.de` (CC BY 4.0, credit "Copyright DLR
+(year of production)"). Each 3D-GloBFP file is one flat zip of exactly five
+members — `cpg`, `dbf`, `prj`, `shp`, `shx` — of one stem: the `cpg` text must
+read `ISO-8859-1`, the `prj` well-known text must resolve to EPSG:4326 through
+`to_epsg`, and the named `Height` field is read as the `dbf` record's own
+fixed-width text and parsed to `Decimal`, never through a float. The WSF 3D
+file's hash is computed in pieces, and only the window of cells over the
+building table's bounds, grown one cell on each side, is read. No fetched byte
+is committed (FE-95). A source absent from the cache is `not_fetched`; a
+switched-off row is refused; a row the fetch reported is read and its hash,
+receipt, terms and declared structure are checked before any row is parsed.
 
 ## Matching
 
 3D-GloBFP candidate footprints are those holding the building's
 `point_on_surface` (never the centroid) and overlapping its footprint; the
 largest overlap wins, ties take the lowest file name then the lowest row
-index. WSF 3D uses the 90 m cell holding the same representative point; a
-no-data cell or a point outside the raster gives no value.
+index, and a building whose winning overlap ties a different-height candidate
+is counted in the manifest's `tied_height_buildings`. The spatial index over
+all footprints of all files is built once per run. WSF 3D uses the cell
+holding the same representative point, its stored value scaled by the
+declared scale in `eii_core.calc.building_heights`; a no-data cell or a point
+outside the raster gives no value, and several files each giving a usable
+value at one point refuse the build (`wsf3d_overlap`).
