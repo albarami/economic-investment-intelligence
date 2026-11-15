@@ -64,10 +64,12 @@ calls `build_live_frame`. The old staged-only assembler is removed under L-212
 M7. Integration fixtures use the same ZIP and map-layer envelopes as the real
 build. Primitive geometry, crosswalk, census and gazetteer tests remain.
 
-Showcase and flagship source points remain pending S2-T06, and team-written
-Arabic remains pending native review (PUB-32). The raw build reports those
-unresolved points rather than inventing them. No geometry repair, tolerance,
-privacy parameter, new network fetcher or command is introduced.
+Showcase and flagship source points resolve when `source_id` and `record_key`
+are both filled and the places output names that point. An entry that is still
+null stays pending S2-T06. Team-written Arabic remains pending native review
+(PUB-32). The raw build reports those unresolved points rather than inventing
+them. No geometry repair, tolerance, privacy parameter, new network fetcher or
+command is introduced.
 
 Library references recorded by the previous pass on 2026-11-14:
 [h3-py API](https://uber.github.io/h3-py/api_verbose.html),

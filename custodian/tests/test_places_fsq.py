@@ -918,6 +918,26 @@ def _at_distance(metres: float) -> tuple[float, float]:
     raise AssertionError("distance did not fall to the requested metres")
 
 
+def test_a_grid_without_the_kept_cells_refuses(tmp_path: Path) -> None:
+    """A kept row whose cell is absent from the grid refuses the build."""
+    path = tmp_path / "places.parquet"
+    write_places(path, [place()])
+    with pytest.raises(PlacesFsqError, match="cell"):
+        build_places(
+            files={"near.parquet": path},
+            expected_sha256={"near.parquet": sha256_hex(path.read_bytes())},
+            frame=FRAME_BOX,
+            grid=_grid((0.0, 0.0)),
+            places=(),
+            mapping=(),
+            labels=(),
+            min_edit_distance=3,
+            release=PINNED_RELEASE,
+            attribution=ATTRIBUTION,
+            receipt_sha256="a" * 64,
+        )
+
+
 def _build(
     path: Path,
     places: tuple[PlaceStandIn, ...],

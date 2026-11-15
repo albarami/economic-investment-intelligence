@@ -760,7 +760,7 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `pub_population_municipality` | `municipality_code`; `period`; `indicator`; `value` decimal(18,4); `unit`; `source_id` |
 | `pub_census_national` | `period`; `indicator`; `value` decimal(18,4); `unit`; `source_id` |
 | `pub_census_district` | `district_key`; `period`; `indicator`; `value` decimal(18,4); `unit`; `source_id` |
-| `pub_place` | `place_id` string (source identifier); `name` string; `name_ar` string (Y); `category` string (public place category); `lon`, `lat` decimal(9,6); `cell` cell; `source_release` string; `source_provider` string; `licence` string; `confidence` decimal(5,4); `merged_ids` string (Y, semicolon-separated reviewed source identifiers) |
+| `pub_place` | `place_id` string (source identifier); `name` string; `name_ar` string (Y); `category` string (`basic_category`); `lon`, `lat` decimal(9,6); `cell` cell; `source_release` string; `source_provider` string; `licence` string; `confidence` decimal(5,4); `merged_ids` string (Y, semicolon-separated reviewed source identifiers) |
 | `pub_place_verification` | `place_id` string; `check_date` date; `reviewer_role` string; `verification_link` string; `status` (`verified_open`, `closed_or_moved`, `not_found`, `duplicate`); `source_id` |
 | `pub_hotel_monthly` | `period`; `star_class` string; `indicator` (`occupancy`, `adr`, `revpar`, `supply`, `demand`); `value` decimal(14,2); `unit` |
 | `pub_price_index` | `period`; `group_code` string; `index_value` decimal(10,2); `base_period` string |

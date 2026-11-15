@@ -21,7 +21,7 @@ from .crosswalk import (
     propose_reviews,
     read_csv,
 )
-from .gazetteer import administrative_rows, validate_frame_tables
+from .gazetteer import administrative_rows, reviewed_points, validate_frame_tables
 from .geometry import Boundary, release_rows
 from .grid import build_grid
 from .joins import check_census_zones, join_districts, join_municipalities
@@ -140,11 +140,15 @@ def build_live_frame(
     tables["gazetteer"] = administrative_rows(
         municipalities, zones, districts, grid, report
     )
+    points = _place_points(cache)
+    resolved: list[dict[str, Any]] = []
     for filename in ("showcase_gazetteer.yaml", "flagship_candidates.yaml"):
-        for spec in json.loads((review / filename).read_text(encoding="utf-8")):
-            report.append(
-                f"gazetteer: source point pending S2-T06: {spec['place_key']}"
-            )
+        specs = json.loads((review / filename).read_text(encoding="utf-8"))
+        resolved.extend(
+            resolve_reviewed_specs(specs, points, tables["grid_cell"], report)
+        )
+    if resolved:
+        tables["gazetteer"].extend(resolved)
     staged = []
     for row in raw_layers["census_district_pop"]:
         pair = (row["ZONENO"], row["DISTRICTNO"])
@@ -227,6 +231,46 @@ def district_aliases(review: Path, cache: Path) -> list[dict[str, str]]:
     if local.is_file():
         rows += read_csv(local)
     return rows
+
+
+def resolve_reviewed_specs(
+    specs: list[dict[str, Any]],
+    points: dict[tuple[str, str], dict[str, Any]],
+    grid: list[dict[str, Any]],
+    report: list[str],
+) -> list[dict[str, Any]]:
+    """Resolve a filled source key. A null key keeps the pending S2-T06 refusal."""
+    filled = []
+    for spec in specs:
+        source = spec.get("source_id")
+        record = spec.get("record_key")
+        if isinstance(source, str) and source and isinstance(record, str) and record:
+            filled.append(spec)
+        else:
+            report.append(
+                f"gazetteer: source point pending S2-T06: {spec['place_key']}"
+            )
+    if not filled:
+        return []
+    return reviewed_points(filled, points, grid)
+
+
+def _place_points(cache: Path) -> dict[tuple[str, str], dict[str, Any]]:
+    path = cache / "places_s2_t06" / "place_points.json"
+    if not path.is_file():
+        return {}
+    loaded = json.loads(path.read_text(encoding="utf-8"))
+    found: dict[tuple[str, str], dict[str, Any]] = {}
+    if not isinstance(loaded, list):
+        return found
+    for item in loaded:
+        if not isinstance(item, dict):
+            continue
+        source = item.get("source_id")
+        record = item.get("record_key")
+        if isinstance(source, str) and isinstance(record, str):
+            found[(source, record)] = {"lon": item["lon"], "lat": item["lat"]}
+    return found
 
 
 def licensed_rows(boundaries: list[Boundary], kind: str) -> list[dict[str, object]]:

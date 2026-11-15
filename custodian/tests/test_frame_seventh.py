@@ -315,7 +315,63 @@ def seventh_build(tmp_path):
             terms_sha256="",
         )
         commit_pair(cache / source.key, digest, source.extension, body, receipt)
-    return lambda: build_frame(cache, entries, review, tmp_path / "output")
+
+    def _run():
+        return build_frame(cache, entries, review, tmp_path / "output")
+
+    _run.cache = cache
+    _run.review = review
+    _run.entries = entries
+    return _run
+
+
+def test_filled_place_point_enters_the_live_gazetteer(seventh_build, tmp_path):
+    """A filled spec resolves through the places output of build_live_frame."""
+    import json
+
+    from eii_custodian.publicdata.frame.build import inspect_cache
+    from eii_custodian.publicdata.frame.live import build_live_frame
+
+    cache = seventh_build.cache
+    review = seventh_build.review
+    point_dir = cache / "places_s2_t06"
+    point_dir.mkdir()
+    (point_dir / "place_points.json").write_text(
+        json.dumps(
+            [
+                {
+                    "source_id": "places_ovt",
+                    "record_key": "SYN-R",
+                    "lon": "0.020000",
+                    "lat": "0.020000",
+                }
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (review / "showcase_gazetteer.yaml").write_text(
+        json.dumps(
+            [
+                {
+                    "place_key": "SYN-LAND",
+                    "kind": "landmark",
+                    "name_en": "SYN Invented",
+                    "name_ar": "اسم تجريبي",
+                    "aliases": None,
+                    "source_id": "places_ovt",
+                    "record_key": "SYN-R",
+                    "arabic_review": "pending native review",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    inspected = inspect_cache(cache, seventh_build.entries, review)
+    result = build_live_frame(
+        cache, seventh_build.entries, review, tmp_path / "gazetteer-out", inspected
+    )
+    assert any(row["place_key"] == "SYN-LAND" for row in result.tables["gazetteer"])
 
 
 def test_seventh_live_build(seventh_build):
