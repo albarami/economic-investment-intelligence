@@ -23408,6 +23408,364 @@ Seed:      none
 Notes:     Both work commits of the train, one for each task, have a Conventional Commit subject.
 ```
 
+#### Merge train S1-b of slice S1: the confirmation of the joined head: APPROVED
+
+Reviewed commit `7218dfe5bc54306c7432d8dfea8ee06f5353468b`, the pushed head of pull request https://github.com/albarami/economic-investment-intelligence/pull/54 . OpenAI GPT-6 through the Codex command-line tool; the train was joined by the lead (Anthropic), so the confirmation comes from another maker (decision 0032 item 2). The lead's script found no difference between either task's approved change and its commit in the train, so no task needed a confirmation of its own. The verdict is copied unchanged from its first line (REV-09). It was given before the merge and posted on the pull request after it, on 2026-11-15, https://github.com/albarami/economic-investment-intelligence/pull/54#issuecomment-6890044553 .
+
+```text
+VERDICT: APPROVED
+TASK: merge train S1-b of slice S1 (pull request 54), the train's confirmation
+COMMIT: 7218dfe5bc54306c7432d8dfea8ee06f5353468b
+REVIEWER: OpenAI / GPT-6
+SKILLS LOADED: strict-reviewer, sanad-provenance, task-standards, project-orientation, muhasabah-gate; code-review unavailable
+CHECKS:
+  A1 PASS Independently reran the read-only comparison and checked file modes and blob identities: S1-T18 8/8 identical; S1-T19 8/8 identical; no differences.
+  A2 PASS Exactly cd08f0c → 70ac197 → 7218dfe follow the specified base, with Conventional Commit subjects. The ledger changes only PROGRESS.md, OPEN_ITEMS.md and TASKS.md.
+  A3 OPEN P1 Records preserve both tasks' reviewer identities, commits, rounds and verdicts against the supplied verdict files. Pull request 53's closing record precedes the train entry. Supported task criteria, statuses and additions-only PO-S2-21 through PO-S2-29 match the brief. The whole-test record names 70ac197, seed 2026111479 and exit 0.
+  A4 PASS AGENTS.md and CLAUDE.md have identical blobs and are unchanged from main; the specified scanner files and .github workflows are unchanged.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 record — PROGRESS.md, joined-work evidence: the mutation-runner and performance-test Counts fields incorrectly say “not a test suite”; label them as test results. The performance-test note also attributes its browser count to db0b98e while the row presents captured output at 70ac197; clarify which run supplies that count, retaining earlier evidence and appending the correction.
+```
+
+#### Merge train S1-b of slice S1: merge record
+
+- The confirmation was given on the head itself, `7218dfe5bc54306c7432d8dfea8ee06f5353468b`; nothing moved after it.
+- CI on the head: the six required hosted checks passed. Workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43679702432; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43679702438; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43679702430 .
+- The lead's head checks before the merge, on processors 16 to 27 (the merge line's own set): every command exit code 0; `uv run --locked python scripts/ci_history_scan.py scan`: "history scan: range HEAD, 56 commits, at least 56 to list, RESULT: PASSED", exit code 0; `./eii test --seed 2026111480`: exit code 0, "total: 3168 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", RESULT: PASSED.
+- The branch stood on current main (`d234327dd2c5ea0631fcb0db8da87671ae8932fd`), so the head was the exact merge result: the whole test above is the test of the merge result.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/54 was squash-merged on 2026-11-15 at that head; merge commit `a8a99dd94c30e3c5e3522d18f90c0edc14646f3e` on main, with the same tree as the head. CI on the merge commit, triggered by the push: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43681870547 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43681870532 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43681870523 .
+- The confirmation proposed one record point (P1), taken here as a correction that is appended and rewrites nothing (rule 38 of AGENTS.md). In the train's evidence at `70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb`, two entries carry the words "not a test suite" in their Counts field because the ledger script writes those words for every entry whose last output line is matched by a pattern: the mutation runner's own tests ("Ran 9 tests in 9.110s  OK") and the tests of the performance spike ("# tests 133 # pass 133 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 55 passed (11.3m)"). Both are test results: nine tests ran and passed, and 133 Node tests and 55 browser tests ran and passed, each in the captured output of that entry's own run at that commit. The note of the second entry says that its browser count "is taken from" the builder's record at db0b98e: that sentence names where the expected number came from; the count 55 that the entry shows was printed by the entry's own run at `70ac1973003fe8a2fc62e1eda2ef3c0946a43ccb`.
+
+#### Slice S1 gate — Technical spike: addendum, the native traces of task S1-T12 (pull request https://github.com/albarami/economic-investment-intelligence/pull/55 )
+
+- What this is: the addendum that the gate record of slice S1 names as the close of its one open item (the entry "Slice S1 gate — Technical spike: gate record, round 2" above: statement 3, "closed by the gate's addendum when task S1-T12 records the two native traces"). That record stays as written (TST-171); where it says "Open" for statements 3 and 10, this entry holds. The evidence is the three committed traces with their capture records and the entries of task S1-T12 below, at the work commit `25eb0c37afae2b092b35a1c2908dbbff29e03851` of pull request https://github.com/albarami/economic-investment-intelligence/pull/55 , which sits on main `a8a99dd94c30e3c5e3522d18f90c0edc14646f3e`.
+- Statement 3, word for word (document 14 section "9. slice S1 — Technical spike"): "110,000 hexagons and 50,000 particles render at 60 frames per second." **True, by its named test.** The owner took the trace on 2026-11-15 in Chrome running natively on the host of the build machine (TST-132), on the cross-origin isolated page of main `a8a99dd94c30e3c5e3522d18f90c0edc14646f3e`. The trace of the layer set `hexagons-particles` holds 110,000 hexagons and 50,000 particles, 1,800 frames in 30.001 s and a share of frame intervals under 16.7 ms of 0.9611, against the minimum of 0.95 (document 10, table row "Spike frame-rate gate (slice S1)"); no loss of visibility, resize or loss of the drawing context. Its named test, `npm run spike:performance:verify-evidence`, prints "native frame-rate gate passed" and exits 0. The bound is the one the gate record names; no revised performance target was proposed or used (TST-167).
+- The repeated trace with the road layer, which the task's second criterion asks to be recorded: first road load (100,004 road features) 1,800 frames, share 0.8961; full street load (250,004 road features) 1,800 frames, share 0.9017. Both shares are under 0.95. The bound of statement 3 names the hexagon and particle load only, and the evidence command sets no share minimum for a road set: it prints "native road result recorded" for each and exits 0. No frame-rate pass is claimed for a road set. No trace holds an interval over 17.08 ms.
+- Statement 10, word for word: "Each item passes its named test." It was open "with statement 3 and because of it alone". The named test of statement 3 now passes (above). The other items' evidence stands in the gate record at the slice's final commit `02355344e771d47db858ba2a22dfd0003d29bda8`; at the work commit of this addendum the lead ran the whole test command with a fresh seed and the checks of the entries below, and no gate item but statement 3 was run again one by one.
+- TST-165, the row of this task, which the gate record held as "open: the gate's addendum (waits for the owner at the console)":
+
+| Task | Pull requests and merge commits |
+|---|---|
+| S1-T12 — Native frame-rate traces of the map spikes | pull request 55, in review at the time of this entry; work commit `25eb0c37afae2b092b35a1c2908dbbff29e03851` |
+
+- Two tasks were added to slice S1 after the gate record, by a re-plan of 2026-11-15, and are not in its table: S1-T18 and S1-T19, both merged with pull request 54 (the closing record above).
+- The fields of the pin confirmation of S1-T08 that the frame rate decides (the pin record's spike result: "Native spike results, load trial and pixel-ratio cap: not yet confirmed; waits for the native trace of task S1-T12"), with what the traces now show:
+  - The spike result that chose between pin and retreat, for MapLibre GL JS and for deck.gl: the traces were taken at the exact pins (the rows of `pins.toml`: `maplibre-gl` 6.17.0 and the deck.gl layer packages 9.4.1); each trace records the digest of the lock file, which equals the digest of `web/package-lock.json` at the work commit. The gate's load passed its named test at the pins. No retreat was tried and none is needed; no pin moves and no technical alternative is accepted, so no decision record is owed (statement 11).
+  - The load trial of 110,000 hexagons and 50,000 particles: both counts are recorded in each trace and the verifier refuses a trace with reduced counts; the load passed.
+  - The pixel-ratio cap value: 1, on the wall canvas of 1920 by 1080 CSS pixels, with a drawing buffer of 1920 by 1080 at a device pixel ratio of 1.125. The gate's load passed at this one cap; the cap was not searched. It stays the assumption of OI-121, for the owner to confirm or replace.
+  - This entry records what the traces show. The rows of `pins.toml` and `web/REFERENCE_NOTES.md` that hold these fields still read "not yet confirmed" at the work commit; a ledger commit changes the ledger files only, so they are not changed here.
+- Open items (TST-168): OI-122 is closed by this ledger; OI-121 gets an update and stays an assumption; the records that still say the trace is owed, and the question of a statement for the map with the road layer, are entered as the proposed items PO-S2-30 and PO-S2-31.
+- Verdict of the gate after this addendum: PENDING one reviewer's confirmation of this addendum (the committed traces, the evidence command's result and this entry; ruling L-82 of the run, item 3). The gate is not claimed as passed by this entry.
+
+### S1-T12 — Native frame-rate traces of the map spikes: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/55 )
+
+- What it is: the two criteria on the native frame rate that a re-plan of 2026-11-13 moved word for word from S1-T02 and S1-T11 to this task (OI-122). TST-132 asks that the frame-rate check of slice S1 is measured on the build machine in a browser that runs natively on the host. The task's scope is the trace files and the native-capture records under `web/spikes/performance/evidence/`, and nothing else: the work commit `25eb0c37afae2b092b35a1c2908dbbff29e03851` on `a8a99dd94c30e3c5e3522d18f90c0edc14646f3e` adds six files there, three traces and their three capture records, and changes no code, test, bound or document. This task also carries the addendum of the slice S1 gate, which stands in front of this entry.
+- Who did what: the capture is the owner's one action on the host of the build machine (the task's criterion asks for a browser that runs natively there); the lead (Anthropic) served the page, wrote the three capture records from the traces' own digests, ran the evidence command and committed the six files; no code was built, so the task has no builder's return. Persona of the work: a senior web performance engineer who reads frame-time traces (Frontend); persona of the review: a strict reviewer of evidence and gate records, of another maker than Anthropic. The inputs of this ledger and of the gate's addendum were drafted by a helper of Anthropic (Claude Fable 5.2) and read and ruled by the lead. Skills used: task-standards, sanad-provenance, superpowers:verification-before-completion, muhasabah-gate.
+- The re-plan history, in short. By the owner's note of 2026-11-13 the task waited for the owner at the console, and the slice S1 gate ran on everything else with this trace as its one open item (the gate record, round 2, statement 3). On 2026-11-15, between 01:14 and 01:17, the owner took three first traces; the evidence command refused the original layer set with `frame-rate`, because a page that is not cross-origin isolated reads its frame times in steps of 0.1 ms. The lead did not restate the bound: task S1-T18 (merge train S1-b, pull request 54) made the page cross-origin isolated, and the owner took the three traces again. The first traces are not committed and are not evidence.
+- The capture. The owner took the three traces on 2026-11-15 between 08:40 and 08:42, in Chrome running natively on Windows on the build machine, on the page that `npm run spike:performance:serve` served from a checkout at main `a8a99dd94c30e3c5e3522d18f90c0edc14646f3e`. The lead checked the two isolation headers of that server with an HTTP HEAD request: `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. Each trace records that code commit and the digest of the lock file, the gate profile, the renderer as the browser reported it (ANGLE on an NVIDIA GeForce RTX 5090 through Direct3D 11, a hardware renderer), a canvas of 1920 by 1080 CSS pixels with a drawing buffer of 1920 by 1080, a device pixel ratio of 1.125 and the pixel-ratio cap 1 with its label ASSUMPTION. Each capture record holds the six fields that the README of the spike names: role owner, date 2026-11-15, host windows-native, browser chrome, the repository path of its trace and that file's SHA-256.
+- Criterion 1, word for word: "the trace records 60 frames per second on the build machine". Met. The trace of the original layer set (`hexagons-particles`: 110,000 hexagons and 50,000 particles) holds 1,800 frames in 30.001 s, with no loss of visibility, no resize and no loss of the drawing context. Its summary reads p50 16.665 ms, p95 16.695 ms and p99 16.715 ms, and a share of frame intervals under the budget of 0.9611: 1,730 of its 1,800 intervals lie strictly under 16.7 ms. The bound is the one of document 10, table row "Spike frame-rate gate (slice S1)": at least 95% of frames under 16.7 ms over a 30-second scripted camera orbit with particles animating (`FRAME_BUDGET_MS` 16.7 and `SHARE_MINIMUM` 0.95 in `web/spikes/performance/config.mjs`). The evidence command passes on it: `npm run spike:performance:verify-evidence` prints "native frame-rate gate passed" and exits 0 (the first entry below). The bound was not restated, widened or re-read, and the cap was not searched.
+- Criterion 2, word for word: "the S1-T02 trace is repeated with the road layer animated, and its result is recorded". Met: the trace is repeated at both pinned road loads, with the road layer's hour playback running and reduced motion off, and both results are recorded. First road load (`hexagons-particles-roads`, 100,004 road features with the same hexagons and particles): 1,800 frames, p99 16.765 ms, share under the budget 0.8961 (1,613 of 1,800 intervals). Full street load (`hexagons-particles-roads-250k`, 250,004 road features): 1,800 frames, p99 16.745 ms, share under the budget 0.9017 (1,623 of 1,800 intervals). Neither has a loss of visibility, a resize or a loss of the drawing context. The evidence command prints "native road result recorded" for each and exits 0 (the second and third entries below).
+- How the road traces are read, said plainly. The share of both road traces is under 0.95. The share minimum applies to the hexagon and particle load only: the gate statement and the row of document 10 name 110,000 hexagons and 50,000 particles, and the criterion asks that the road result "is recorded", not that it passes a bound. The verifier follows that (`qualify` in `web/spikes/performance/trace.mjs`; the README of the spike, section "Road trace hand-off (S1-T12)": "the road sets record the frame-budget share without imposing a pass threshold"). What it asks of a road set is every other qualification of a gate trace: the contract, version, provenance and seed; the three counts, with the road count of the set; the wall canvas and the cap; the gate profile with a completed orbit of at least 30,000 ms; animation running; road playback uninterrupted, reduced motion off and the shown hours in the fixture's order; no interruption; a hardware renderer that is not remote; a native capture record of the owner; and a committed, unchanged trace whose digest equals the record's. "Recorded" is therefore not "passed": no frame-rate pass is claimed for a road set.
+- What the intervals show. No trace holds an interval over 17.08 ms, so no trace holds a missed frame at the display's rate of 60 a second: the largest intervals are 16.77 ms (original set), 17.08 ms (first road load) and 16.92 ms (full street load). The intervals that are not under the budget (70, 187 and 177 of 1,800) lie within four tenths of a millisecond above 16.7 ms, beside the display's own period. These are readings of the committed timestamps; the percentiles and the share are computed by `summariseFrames` in `trace.mjs` and nowhere else.
+- The gate's addendum. Statement 3 of the slice S1 gate ("110,000 hexagons and 50,000 particles render at 60 frames per second") was the gate's one open item, and statement 10 was open because of it alone. The addendum in front of this entry records the result against both, the row of this task for TST-165 and the fields of the pin confirmation of S1-T08 that the frame rate decides. The earlier gate record is not edited (TST-171). The gate's verdict after the addendum waits for one reviewer's confirmation and is not claimed here.
+- Open items. OI-122 (the native traces wait for one action of the owner) is closed by this ledger. OI-121 (the pixel-ratio cap) gets an update: the gate's load passed its named test at the cap 1; the item stays an assumption for the owner to confirm or replace.
+- Remaining open points, none of them claimed here; the first two are entered by this ledger as the proposed items PO-S2-30 and PO-S2-31. (1) The rows of `pins.toml` and `web/REFERENCE_NOTES.md` that wait for this trace still read "not yet confirmed", and the README of the spike still says that the native frame-rate gate is pending: they are outside this task's scope and outside what a ledger commit may change. (2) The road sets have no bound of their own, and their share is under the bound of the gate's load; what that means for the map of slice S3 is not decided here. (3) The strings of the page that wait for the owner's native reading still wait. (4) The traces say nothing about another machine, browser, display rate or pixel ratio than the ones they record.
+- What follows and is not claimed here: the review of this pull request by another maker than the builder's, the six required hosted checks on its head, the whole test on the exact merge result, and the one reviewer's confirmation of the gate's addendum.
+- In front of this entry: the closing record of pull request 54 and the addendum of the slice S1 gate.
+- Evidence: the commands below at the work commit `25eb0c37afae2b092b35a1c2908dbbff29e03851`.
+
+#### Evidence for the work commit `25eb0c37afae2b092b35a1c2908dbbff29e03851`
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    25eb0c37afae2b092b35a1c2908dbbff29e03851
+Command:   npm --prefix web run spike:performance:verify-evidence
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "native frame-rate gate passed" (the last line of the evidence command; any refusal prints FAIL with its name and exits 1)
+Seed:      none
+Notes:     Criterion 1 and statement 3 of the slice S1 gate: the evidence command of rule 44 of AGENTS.md (`npm run spike:performance:verify-evidence` from `web/`, written with `--prefix web`) on the committed native trace of the original layer set, 110,000 hexagons and 50,000 particles. It passes only on a committed, unchanged trace of the gate profile whose digest equals the capture record's, taken by the owner in a native browser of the host with a hardware renderer, with the pinned counts, the wall canvas and the cap, a completed orbit of at least 30,000 ms with no interruption, and a share of frame intervals strictly under 16.7 ms of at least 0.95. The trace holds 1,800 frames with a share of 0.9611. Until this commit the command failed with `missing-native-trace`.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    25eb0c37afae2b092b35a1c2908dbbff29e03851
+Command:   npm --prefix web run spike:performance:verify-evidence -- hexagons-particles-roads
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "native road result recorded" (the last line of the evidence command for a road set; recorded, not passed against a bound)
+Seed:      none
+Notes:     Criterion 2, the first road load: the evidence command on the committed native trace of the layer set `hexagons-particles-roads` (100,004 road features with the same hexagons and particles) and its own capture record. A road set must meet every qualification of a gate trace, with its road count, uninterrupted road playback, reduced motion off and the shown hours in the fixture's order; the command sets no minimum of the share for a road set. The trace holds 1,800 frames with a share under the budget of 0.8961, which is under 0.95: the result is recorded and no frame-rate pass is claimed for it.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    25eb0c37afae2b092b35a1c2908dbbff29e03851
+Command:   npm --prefix web run spike:performance:verify-evidence -- hexagons-particles-roads-250k
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "native road result recorded" (the last line of the evidence command for a road set; recorded, not passed against a bound)
+Seed:      none
+Notes:     Criterion 2, the full street load: the evidence command on the committed native trace of the layer set `hexagons-particles-roads-250k` (250,004 road features with the same hexagons and particles) and its own capture record, under the same qualifications as the first road load. The trace holds 1,800 frames with a share under the budget of 0.9017, which is under 0.95: the result is recorded and no frame-rate pass is claimed for it.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    25eb0c37afae2b092b35a1c2908dbbff29e03851
+Command:   bash -c "set -o pipefail; npm --prefix web run test:spike:performance 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)), \"|\", \" \".join(re.findall(r\"[0-9]+ passed \\([0-9.]+m?s?\\)\", t)[:1]))'"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 133 # pass 133 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 55 passed (12.0m)" (the totals of the Node test runner and of the browser run inside it)
+Seed:      none
+Notes:     The tests of the performance spike with its browser tests, the command of rule 44 of AGENTS.md (`npm run test:spike:performance` from `web/`, written with `--prefix web`), at the work commit, with the three native traces and their capture records in the evidence folder. Every Node test passes (the count of tests equals the count passed), and one Node test runs the browser tests in the headless shell. The tests that compare the evidence folder before and after a server run (`tests/vite-server.node-test.mjs`) now compare a folder that holds six files. The row form and the browser count of the pattern are those of the last ledger (merge train S1-b); the task changes no test. The tests assert the two layer counts and the trace contract and no frame rate: the frame rate is the three evidence rows above.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    25eb0c37afae2b092b35a1c2908dbbff29e03851
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 522 text files, 76 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check at the work commit: it reads every file that git lists, the three capture records and the three traces among them, with the identifier-number rule and the private patterns. The task changes no document of the pack.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    25eb0c37afae2b092b35a1c2908dbbff29e03851
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check at the work commit: the task adds six files under `web/spikes/performance/evidence/` and no file elsewhere.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    25eb0c37afae2b092b35a1c2908dbbff29e03851
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical at the work commit; the task changes neither.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    25eb0c37afae2b092b35a1c2908dbbff29e03851
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: range HEAD, 55 commits, at least 55 to list, RESULT: PASSED"
+Seed:      none
+Notes:     The pinned secret scanner over the whole history of the branch at the work commit, the three traces and the three capture records among its files. The findings the scanner still lists are the known evidence lines of S0-T05 in PROGRESS.md, which the script itself judges.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    25eb0c37afae2b092b35a1c2908dbbff29e03851
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','a8a99dd94c30e3c5e3522d18f90c0edc14646f3e...25eb0c37afae2b092b35a1c2908dbbff29e03851'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:web/spikes/performance/evidence/hexagons-particles-roads-250k.rf205x1b3f.json A:web/spikes/performance/evidence/hexagons-particles-roads.rba14x7227.json A:web/spikes/performance/evidence/hexagons-particles.r93b0xdd83.json A:web/spikes/performance/evidence/native-capture.hexagons-particles-roads-250k.md A:web/spikes/performance/evidence/native-capture.hexagons-particles-roads.md A:web/spikes/performance/evidence/native-capture.md'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "6 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The whole change of the task against main: 6 files, all added under `web/spikes/performance/evidence/` (three traces and their three capture records); no file outside the task's scope, and no code, test or document changed.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    25eb0c37afae2b092b35a1c2908dbbff29e03851
+Command:   ./eii test --seed 2026111481
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    3168 passed, 0 failed, 0 skipped
+Seed:      2026111481
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit. It is also the run that the gate's addendum names for the tree that holds the native traces.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    25eb0c37afae2b092b35a1c2908dbbff29e03851
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','a8a99dd94c30e3c5e3522d18f90c0edc14646f3e..25eb0c37afae2b092b35a1c2908dbbff29e03851'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The work commit has a Conventional Commit subject.
+```
+
+### S1-T12 — Native frame-rate traces of the map spikes: task log, round 2: the traces in the formatter's layout (pull request https://github.com/albarami/economic-investment-intelligence/pull/55 )
+
+- What happened. On the first head of this pull request (`c75c196ae901a68a2460db5aa007822c24dd1360`) two of the six required hosted checks failed, `static-checks` at its step "Check web format" and `planted-failures` at its plant of the same check ("plant web-format: the clean copy failed"), run https://github.com/albarami/economic-investment-intelligence/actions/runs/43685690889 . The cause is one: the performance page's server writes a trace as one line of JSON, and the web format check (`npm run format:check`, rule 44 of AGENTS.md) reads every JSON file under `web/`, the three committed traces among them. Nothing else failed. The lead's own checks had not run the web format check before the push; that is the lead's gap, and the web static checks of the hosted job are run by the lead from now on before a head with a change under `web/` is pushed.
+- What was changed, in the work commit `3132aa059defc7e70e3e0c1412c511a8bd76c82b` on the first ledger commit `c75c196ae901a68a2460db5aa007822c24dd1360`: the three traces are rewritten by the project's own formatter (`npm run format` from `web/`, rule 44), and the three capture records carry the SHA-256 of the committed files. No check, its scope, a bound, a test or any code is changed, and nothing is added to the formatter's ignore list.
+- What is the same and how it was proved. For each trace the lead compared the file as the page's server wrote it with the committed file: the two texts are identical once whitespace outside strings is removed, so every key, every string and every number stands as the same characters, and the parsed values are equal (numbers compared as their own text). The digests, before (the file as written, the value of the first round's capture record) and after (the committed file): `hexagons-particles`: c5dfc0eb32ece6e76c53a3b919123ea1ca777cc3776c2b4a2c6e7c4ddec910e1, then 63297cb5032a9cfc6649226885ae002d2e742c0ecfa9f143ff61fc0859b86ee4; first road load: 0f389d09943c88d45134375e90466e905c8fa93e169dc236e56f5d5c2f86f3f5, then 11783ad17543c9985210f77f494d645c22c7bff60f21b81d479684c31422d21f; full street load: de5306c7ab54921b32f476ce9ffc662f0ca623f57d5514c73e5473082b9c9781, then a7ec92dcce543a4443453992b8493a0d1f4225369b6cf322a33856914bcd1052. The same values of all six stand in the capture records of the two commits (`git show c75c196ae901a68a2460db5aa007822c24dd1360:web/spikes/performance/evidence/native-capture.md` and the files of `3132aa059defc7e70e3e0c1412c511a8bd76c82b`, and likewise for the two road sets).
+- What this means for the first round. The first round's entries above stand as run at `25eb0c37afae2b092b35a1c2908dbbff29e03851`: the shares, counts, intervals and results they record are values of the traces' content, which is unchanged. Where the first round's task log and the gate's addendum say that each capture record holds "that file's SHA-256" and that a trace's digest "equals the record's", that is true at both commits; the digests themselves are those of the committed files of each commit. The words "a committed, unchanged trace" in the first round's log mean unchanged since its commit; the layout of the committed file is the formatter's since this round. This is a correction that is appended and rewrites nothing (rule 38 of AGENTS.md).
+- The evidence command at `3132aa059defc7e70e3e0c1412c511a8bd76c82b`: "native frame-rate gate passed", exit code 0; "native road result recorded" for each road set, exit code 0 (the first three entries below). The web format check passes (the fourth entry).
+- The review. The task's one review and the confirmation of the gate's addendum were given on the first head: APPROVED, GATE ADDENDUM: CONFIRMED, by Moonshot AI Kimi K3.1 Pro High through Devin, findings none (its record follows with the closing record of this pull request). The head has moved for a change of work files, so that verdict does not carry over by itself: the same reviewer is asked to confirm exactly this round's difference (six files: whitespace of three traces, three digests) and this entry.
+- A proposed item of this round, entered with the next ledger: the performance page's server writes a trace that the project's format check refuses, and the README of the spike does not say that a trace is formatted before it is committed; one of the two is to change (the follow-up task of slice S2).
+- Evidence: the commands below at the work commit `3132aa059defc7e70e3e0c1412c511a8bd76c82b`.
+
+#### Evidence for the work commit `3132aa059defc7e70e3e0c1412c511a8bd76c82b`
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    3132aa059defc7e70e3e0c1412c511a8bd76c82b
+Command:   npm --prefix web run spike:performance:verify-evidence
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "native frame-rate gate passed" (the last line of the evidence command; any refusal prints FAIL with its name and exits 1)
+Seed:      none
+Notes:     Criterion 1 and statement 3 of the slice S1 gate: the evidence command of rule 44 of AGENTS.md (`npm run spike:performance:verify-evidence` from `web/`, written with `--prefix web`) on the committed native trace of the original layer set, 110,000 hexagons and 50,000 particles. It passes only on a committed, unchanged trace of the gate profile whose digest equals the capture record's, taken by the owner in a native browser of the host with a hardware renderer, with the pinned counts, the wall canvas and the cap, a completed orbit of at least 30,000 ms with no interruption, and a share of frame intervals strictly under 16.7 ms of at least 0.95. The trace holds 1,800 frames with a share of 0.9611. Until this commit the command failed with `missing-native-trace`.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    3132aa059defc7e70e3e0c1412c511a8bd76c82b
+Command:   npm --prefix web run spike:performance:verify-evidence -- hexagons-particles-roads
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "native road result recorded" (the last line of the evidence command for a road set; recorded, not passed against a bound)
+Seed:      none
+Notes:     Criterion 2, the first road load: the evidence command on the committed native trace of the layer set `hexagons-particles-roads` (100,004 road features with the same hexagons and particles) and its own capture record. A road set must meet every qualification of a gate trace, with its road count, uninterrupted road playback, reduced motion off and the shown hours in the fixture's order; the command sets no minimum of the share for a road set. The trace holds 1,800 frames with a share under the budget of 0.8961, which is under 0.95: the result is recorded and no frame-rate pass is claimed for it.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    3132aa059defc7e70e3e0c1412c511a8bd76c82b
+Command:   npm --prefix web run spike:performance:verify-evidence -- hexagons-particles-roads-250k
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "native road result recorded" (the last line of the evidence command for a road set; recorded, not passed against a bound)
+Seed:      none
+Notes:     Criterion 2, the full street load: the evidence command on the committed native trace of the layer set `hexagons-particles-roads-250k` (250,004 road features with the same hexagons and particles) and its own capture record, under the same qualifications as the first road load. The trace holds 1,800 frames with a share under the budget of 0.9017, which is under 0.95: the result is recorded and no frame-rate pass is claimed for it.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    3132aa059defc7e70e3e0c1412c511a8bd76c82b
+Command:   npm --prefix web run format:check
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "All matched files use Prettier code style!" (the web format check, the hosted step that refused the first head)
+Seed:      none
+Notes:     The web format check of rule 44 of AGENTS.md (`npm run format:check` from `web/`, written with `--prefix web`), which the hosted job static-checks runs and which refused the three traces as the page's server had written them (one line of JSON each). It passes on the traces in the formatter's layout.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    3132aa059defc7e70e3e0c1412c511a8bd76c82b
+Command:   bash -c "set -o pipefail; npm --prefix web run test:spike:performance 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)), \"|\", \" \".join(re.findall(r\"[0-9]+ passed \\([0-9.]+m?s?\\)\", t)[:1]))'"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 133 # pass 133 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 55 passed (12.0m)" (the totals of the Node test runner and of the browser run inside it)
+Seed:      none
+Notes:     The tests of the performance spike with its browser tests, the command of rule 44 of AGENTS.md (`npm run test:spike:performance` from `web/`, written with `--prefix web`), at the work commit, with the three native traces and their capture records in the evidence folder. Every Node test passes (the count of tests equals the count passed), and one Node test runs the browser tests in the headless shell. The tests that compare the evidence folder before and after a server run (`tests/vite-server.node-test.mjs`) now compare a folder that holds six files. The row form and the browser count of the pattern are those of the last ledger (merge train S1-b); the task changes no test. The tests assert the two layer counts and the trace contract and no frame rate: the frame rate is the three evidence rows above.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    3132aa059defc7e70e3e0c1412c511a8bd76c82b
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 522 text files, 76 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check at the work commit: it reads every file that git lists, the three capture records and the three traces among them, with the identifier-number rule and the private patterns. The task changes no document of the pack.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    3132aa059defc7e70e3e0c1412c511a8bd76c82b
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check at the work commit: the task adds six files under `web/spikes/performance/evidence/` and no file elsewhere.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    3132aa059defc7e70e3e0c1412c511a8bd76c82b
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files are byte-identical at the work commit; the task changes neither.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    3132aa059defc7e70e3e0c1412c511a8bd76c82b
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: range HEAD, 57 commits, at least 57 to list, RESULT: PASSED"
+Seed:      none
+Notes:     The pinned secret scanner over the whole history of the branch at the work commit, the three traces and the three capture records among its files. The findings the scanner still lists are the known evidence lines of S0-T05 in PROGRESS.md, which the script itself judges.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    3132aa059defc7e70e3e0c1412c511a8bd76c82b
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','c75c196ae901a68a2460db5aa007822c24dd1360...3132aa059defc7e70e3e0c1412c511a8bd76c82b'],check=True,capture_output=True,text=True).stdout.splitlines()); w='M:web/spikes/performance/evidence/hexagons-particles-roads-250k.rf205x1b3f.json M:web/spikes/performance/evidence/hexagons-particles-roads.rba14x7227.json M:web/spikes/performance/evidence/hexagons-particles.r93b0xdd83.json M:web/spikes/performance/evidence/native-capture.hexagons-particles-roads-250k.md M:web/spikes/performance/evidence/native-capture.hexagons-particles-roads.md M:web/spikes/performance/evidence/native-capture.md'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; output "6 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The whole change of this round against the first ledger commit: the six evidence files (three traces in the formatter's layout, three capture records with the digests of the committed files); no code, test, check, bound or document changed.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    3132aa059defc7e70e3e0c1412c511a8bd76c82b
+Command:   ./eii test --seed 2026111484
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    3168 passed, 0 failed, 0 skipped
+Seed:      2026111484
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit. It is also the run that the gate's addendum names for the tree that holds the native traces.
+```
+
+```text
+### S1-T12 — Native frame-rate traces of the map spikes
+Commit:    3132aa059defc7e70e3e0c1412c511a8bd76c82b
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','c75c196ae901a68a2460db5aa007822c24dd1360..3132aa059defc7e70e3e0c1412c511a8bd76c82b'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-15
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
