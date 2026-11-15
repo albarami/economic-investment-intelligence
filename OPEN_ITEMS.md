@@ -1076,16 +1076,18 @@
 - DONE SO FAR: The page sets the cap to 1 through the map's own pixel ratio, labels it ASSUMPTION, records it on every trace and does not search it; text stays at the display's own pixel ratio. In the browser tests the drawing buffer is 1920 by 1080 at a device pixel ratio of 2. The reference notes say that the cap reaches the overlay through another property; in the interleaved mode this project uses, the map owns the canvas and the map's pixel ratio is what the buffer followed (measured; task S1-T08 corrects the notes).
 - OPTIONS: **Recommendation:** keep the cap at 1 until a native trace of task S1-T12 passes or fails with it; if it fails, FE-89 and the retreat pins decide what is tried, and the sizes are never reduced.
 - NEEDED BY: task S1-T12 (the native trace); slice S1 pin confirmation (S1-T08).
+- UPDATE: 2026-11-15, by S1-T12 (pull request https://github.com/albarami/economic-investment-intelligence/pull/55 ): the native traces were taken with the cap at 1, on a display with a device pixel ratio of 1.125; each trace records the cap, its label ASSUMPTION and a drawing buffer of 1920 by 1080. With this cap the gate's load of 110,000 hexagons and 50,000 particles passed its named test (share of frame intervals under 16.7 ms 0.9611 against the minimum of 0.95). The condition of the recommendation is met on the passing side: the cap stays at 1, no other cap was tried, and neither FE-89 nor a retreat pin is called on. The two road sets were recorded at the same cap with shares of 0.8961 and 0.9017; no bound applies to them. The traces say nothing about a display with a higher pixel ratio. The item stays an assumption: the owner confirms or replaces the value.
 
 ## OI-122 — The native frame-rate traces are a task of their own and wait for one action of the owner
 
 - ID: OI-122
-- TYPE: ASSUMPTION
+- TYPE: CLOSED (was ASSUMPTION)
 - NEEDED: The owner to take the trace (the steps are in `web/spikes/performance/README.md`). The re-plan that makes the two native traces task S1-T12 was accepted by the owner on 2026-11-13, as a stated assumption of the proof of concept.
 - WHY: TST-132 asks that the frame-rate check is measured in a browser that runs natively on the host of the build machine, because a browser inside WSL can fall back to software rendering. The build agents do not start programs of the host. The third criterion of S1-T02 and the fifth of S1-T11 therefore need a person, and they would hold both spikes unmerged while everything else of them is built, tested and reviewed.
 - DONE SO FAR: A re-plan of 2026-11-13, made with the pull request of S1-T02: the two criteria moved word for word to the new task S1-T12, which depends on S1-T02 and S1-T11; S1-T08 depends on S1-T12 as well, so the pins that the frame rate decides (FE-89) are not confirmed before the traces exist. The slice S1 gate is unchanged: it still needs the frame-rate statement. The page records the trace by itself; the evidence command passes only on a committed native trace of the gate profile with a hardware renderer and at least 95% of frames under 16.7 ms, and it fails with `missing-native-trace` until then. No placeholder trace exists and nothing is claimed. Changed by a further re-plan of 2026-11-13, entered with the pull request of S1-T13 (the owner's note that he reaches the workstation only through Remote Desktop until Sunday 15 November, which holds Windows to 30 frames a second): S1-T12 waits for the owner at the console; S1-T08 and S1-T10 no longer depend on it; the pin fields that the frame rate decides (FE-89) stay open in S1-T08 and close with the addendum of the slice S1 gate, whose record names the native trace as its one open item. The serve command's server could not store the owner's first trace; task S1-T13 fixed it.
 - OPTIONS: **Recommendation:** keep the re-plan; the owner runs `npm --prefix web run spike:performance:serve` from the repository root, opens the printed address in Chrome or Edge on Windows and leaves the page open until it shows a path; the lead then commits the trace with its capture record. Alternative: the owner allows the build to start the host browser itself with a temporary profile.
 - NEEDED BY: the addendum of the slice S1 gate (through S1-T12), and before any slice S3 task that depends on map performance is reviewed.
+- CLOSED: 2026-11-15, by S1-T12 (pull request https://github.com/albarami/economic-investment-intelligence/pull/55 ): the owner took the three traces at the console on 2026-11-15, in Chrome running natively on the host of the build machine, on the page of main `a8a99dd94c30e3c5e3522d18f90c0edc14646f3e`, which is cross-origin isolated since task S1-T18. The three traces and their capture records are committed under `web/spikes/performance/evidence/`. The evidence command passes on the original layer set (1,800 frames; share of frame intervals under 16.7 ms 0.9611 against the minimum of 0.95) and records the two road sets (shares 0.8961 and 0.9017, both under 0.95; the command sets no minimum for a road set, and no pass is claimed for one). The first traces of the same day, taken on the coarse clock before S1-T18, are not committed and are not evidence. The addendum of the slice S1 gate stands in PROGRESS.md with the ledger of S1-T12; the gate's verdict waits for one reviewer's confirmation of it. The pin fields that the frame rate decides are answered in that addendum; their rows in `pins.toml` and `web/REFERENCE_NOTES.md` are not changed by it.
 
 ## OI-123 — The version-1 parameters of the traffic assignment, fixed at slice S1 with their sources
 
@@ -2357,6 +2359,24 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: AGENTS.md rule 44; `scripts/mutation_explained.toml`
 - EVIDENCE: An explained row holds the tool's difference text with its line numbers, so a row stops matching when lines are added above the mutation in the module. This was seen on another task on 2026-11-15. A form that survives such a move is not built.
 - NEEDED: the follow-up task of slice S2 assesses a form of explanation that survives a move of lines and still names the one mutation it explains.
+
+### PO-S2-30 — Records that still say the native trace is owed
+
+- ID: PO-S2-30
+- TYPE: OPEN
+- RAISED BY: the ledger of S1-T12 and the addendum of the slice S1 gate (2026-11-15)
+- CONCERNS: `pins.toml` (the key `spike_result` and the notes of the rows `maplibre-gl`, `@deck.gl/core`, `@deck.gl/layers`, `@deck.gl/geo-layers` and `@deck.gl/extensions`); `web/REFERENCE_NOTES.md` (the paragraph on the fields that wait for task S1-T12 and the rows "spike result that chose between pin and retreat", "pixel-ratio cap value" and "load trial of 110,000 hexagons and 50,000 particles"); `web/spikes/performance/README.md`
+- EVIDENCE: The native traces are committed and the evidence command passes on the gate's load. The addendum of the slice S1 gate answers the fields that the frame rate decides, but the rows above still read "not yet confirmed" and the README still says that the native frame-rate gate is pending. The scope of S1-T12 is the evidence folder only.
+- NEEDED: the follow-up task of slice S2 brings these rows and sentences in line with the addendum, with the pin check and the reference-notes check run on the result. No pin, retreat, bound or cap value changes.
+
+### PO-S2-31 — No frame-rate statement exists for the map with the road layer
+
+- ID: PO-S2-31
+- TYPE: OPEN
+- RAISED BY: the ledger of S1-T12 (2026-11-15)
+- CONCERNS: document 10, table row "Spike frame-rate gate (slice S1)" and FE-89; `web/spikes/performance/trace.mjs` (a road set records its share and has no minimum); the tasks of slice S3 that depend on map performance
+- EVIDENCE: The two native road traces of S1-T12 are recorded with a share of frame intervals under 16.7 ms of 0.8961 (100,004 road features) and 0.9017 (250,004 road features), both under the minimum of 0.95 that the gate sets for the hexagon and particle load alone; neither trace holds an interval over 17.08 ms. No document states a bound for the map with the road layer, and no pass is claimed for it.
+- NEEDED: before a task of slice S3 that depends on map performance is reviewed, a decision whether the map with the road layer gets a frame-rate statement of its own or the recorded shares stand as evidence without a bound. No bound is restated or added without a decision record.
 
 ## Sources
 
