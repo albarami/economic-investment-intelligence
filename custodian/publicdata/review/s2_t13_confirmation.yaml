@@ -13,7 +13,7 @@
     "period_first": "",
     "period_last": "",
     "review_ref": "S2-T19",
-    "review_reason": "Visitor reads the six card lists without sign-in. The terms require prior written consent, so the basis is the owner's decision 0026. The page hash is of the list-path note and the terms hash is of the recorded quotation, until the fetch hashes replace them.",
+    "review_reason": "Visitor reads the six card lists without sign-in. The terms require prior written consent, so the basis is the owner's decision 0026. The page hash and the terms hash are the SHA-256 of the two bodies as fetched at retrieved_utc.",
     "intended_use": "Public tenders by buying entity and category",
     "release_tables": ["pub_tender"],
     "shown": true,

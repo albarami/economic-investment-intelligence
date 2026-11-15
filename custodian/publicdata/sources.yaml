@@ -8759,7 +8759,8 @@ sources:
     row_count_max: 6
     period_first: '2025'
     period_last: Q3-2025
-    period_field: period
+    period_field: "sit=row;form=published_label;field=period"
+    basis_note: 'Two shapes.'
   - key: fdi_stats/sdg-17-3-1-foreign-direct-investment-inflows
     source_id: fdi_stats
     slug: sdg-17-3-1-foreign-direct-investment-inflows
@@ -9365,7 +9366,8 @@ sources:
     row_count_max: 120
     period_first: 2019 Guests
     period_last: 2023 Nights
-    period_field: year
+    period_field: "sit=row;form=published_label;field=year"
+    basis_note: 'Text kept unsplit.'
   - key: hotel_ext/number-of-hotel-guests-and-nights-of-stay-by-nationality
     source_id: hotel_ext
     slug: number-of-hotel-guests-and-nights-of-stay-by-nationality
@@ -10249,8 +10251,8 @@ sources:
     row_count_max: 40
     period_first: null
     period_last: null
-    period_field: year
-    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+    period_field: "sit=row;form=published_label;field=year"
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity
     source_id: survey_ext
     slug: hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity
@@ -10301,8 +10303,8 @@ sources:
     row_count_max: 126
     period_first: null
     period_last: null
-    period_field: year
-    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+    period_field: "sit=row;form=published_label;field=year"
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity0
     source_id: survey_ext
     slug: hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity0
@@ -10352,8 +10354,8 @@ sources:
     row_count_max: 162
     period_first: null
     period_last: null
-    period_field: year
-    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+    period_field: "sit=row;form=published_label;field=year"
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/production-value-hotels-and-restaurants-type-of-revenue-and-main-economic-activity-less-10-employees
     source_id: survey_ext
     slug: production-value-hotels-and-restaurants-type-of-revenue-and-main-economic-activity-less-10-employees
@@ -10406,8 +10408,8 @@ sources:
     row_count_max: 40
     period_first: null
     period_last: null
-    period_field: year
-    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+    period_field: "sit=row;form=published_label;field=year"
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/production-value-of-hotels-and-restaurants-type-revenue-economic-activity-10-employees-and-more
     source_id: survey_ext
     slug: production-value-of-hotels-and-restaurants-type-revenue-economic-activity-10-employees-and-more
@@ -10460,8 +10462,8 @@ sources:
     row_count_max: 40
     period_first: null
     period_last: null
-    period_field: year
-    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+    period_field: "sit=row;form=published_label;field=year"
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/revenues-hotels-restaurants-current-activity-by-revenue-item-and-main-activity-10-employees-and-more
     source_id: survey_ext
     slug: revenues-hotels-restaurants-current-activity-by-revenue-item-and-main-activity-10-employees-and-more
@@ -10512,8 +10514,8 @@ sources:
     row_count_max: 50
     period_first: null
     period_last: null
-    period_field: year_lsn
-    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+    period_field: "sit=row;form=published_label;field=year_lsn"
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/revenues-of-current-activity-by-revenue-item-and-main-activity-hotels-and-restaurants
     source_id: survey_ext
     slug: revenues-of-current-activity-by-revenue-item-and-main-activity-hotels-and-restaurants
@@ -10563,8 +10565,8 @@ sources:
     row_count_max: 90
     period_first: null
     period_last: null
-    period_field: year
-    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+    period_field: "sit=row;form=published_label;field=year"
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/transformational-revenues-by-revenue-item-and-main-activity-establishments-with-10-employees-or-more
     source_id: survey_ext
     slug: transformational-revenues-by-revenue-item-and-main-activity-establishments-with-10-employees-or-more
@@ -10615,8 +10617,8 @@ sources:
     row_count_max: 162
     period_first: null
     period_last: null
-    period_field: year
-    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+    period_field: "sit=row;form=published_label;field=year"
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: talent_ext/education-statistics-number-of-graduates-of-private-colleges-and-universities-by-educational
     source_id: talent_ext
     slug: education-statistics-number-of-graduates-of-private-colleges-and-universities-by-educational
@@ -10671,7 +10673,8 @@ sources:
     row_count_max: 56
     period_first: 2018/2019
     period_last: 2023/2024
-    period_field: academic_year
+    period_field: "sit=row;form=published_label;field=academic_year"
+    basis_note: 'School years with a slash.'
   - key: talent_ext/education-statistics-number-of-graduates-of-public-colleges-and-universities-by-academic-degree
     source_id: talent_ext
     slug: education-statistics-number-of-graduates-of-public-colleges-and-universities-by-academic-degree
@@ -10734,7 +10737,8 @@ sources:
     row_count_max: 635
     period_first: 2011/2012
     period_last: 2023/2024
-    period_field: academic_year
+    period_field: "sit=row;form=published_label;field=academic_year"
+    basis_note: 'School years with a slash.'
   - key: talent_ext/education-statistics-number-of-graduates-of-public-colleges-and-universities-by-educational
     source_id: talent_ext
     slug: education-statistics-number-of-graduates-of-public-colleges-and-universities-by-educational
@@ -10787,7 +10791,8 @@ sources:
     row_count_max: 550
     period_first: 2018/2019
     period_last: 2022/2023
-    period_field: year
+    period_field: "sit=row;form=published_label;field=year"
+    basis_note: 'School years with a slash.'
   - key: talent_ext/education-statistics-number-of-graduates-on-scholarships-abroad-by-field-of-study-and-gender
     source_id: talent_ext
     slug: education-statistics-number-of-graduates-on-scholarships-abroad-by-field-of-study-and-gender
@@ -10893,7 +10898,8 @@ sources:
     row_count_max: 80
     period_first: 2018/2019
     period_last: 2022/2023
-    period_field: year
+    period_field: "sit=row;form=published_label;field=year"
+    basis_note: 'School years with a slash.'
   - key: talent_ext/trainees-at-the-private-training-centers-by-employment-status-gender-nationality-and-field-of
     source_id: talent_ext
     slug: trainees-at-the-private-training-centers-by-employment-status-gender-nationality-and-field-of

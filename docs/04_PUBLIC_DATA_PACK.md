@@ -534,7 +534,11 @@ a licence URL: its basis is `portal_terms`, its terms are the second sentence ab
 empty dataset fields stay empty. No quarterly producer table or unit-value index is registered.
 
 The following is the exact confirmed portal-slug list. Counts and bounds are the lead's
-catalogue observations, checked again at fetch; date-field labels are preserved. A modified
+catalogue observations, checked again at fetch; date-field labels are preserved. The closed
+form `published_label` keeps the published label as text exactly as published; it has no
+canonical period and no bound is computed from it; a family receipt carries the count of
+distinct labels. It is declared on one `fdi_stats` row, one `hotel_ext` row, eight
+`survey_ext` rows and four `talent_ext` rows. A modified
 date never extends the period. No export has been fetched by the builder. A dash means bounds
 were not read, not zero coverage. The registry declares all cache columns from the same
 reading, including geometry objects on district cooling. Ten-family files stay as published,

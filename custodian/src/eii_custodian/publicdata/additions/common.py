@@ -47,6 +47,7 @@ PERIOD_FORMS = frozenset(
         "month_name_year",
         "school_year",
         "year_text_and_month_name",
+        "published_label",
     }
 )
 FIELD_UNCONFIRMED = "to_be_confirmed"
@@ -183,8 +184,14 @@ def parse_period_rule(period_field: str) -> PeriodRule:
 
 
 def parse_period_value(value: object, form: str) -> str:
-    """Return the canonical period for one cell. The form list is closed."""
+    """Return the canonical period for one cell. The form list is closed.
+
+    ``published_label`` is closed and has no canonical period, so this route
+    refuses it by name. A reader cannot take the label for a period here.
+    """
     if form not in PERIOD_FORMS:
+        raise AdditionError("period_form")
+    if form == "published_label":
         raise AdditionError("period_form")
     if form == "year_text":
         if isinstance(value, str) and _YEAR.fullmatch(value):
@@ -221,8 +228,11 @@ def observe_period_bounds(rows: list[object], rule: PeriodRule) -> tuple[str, st
     """Return the first and last period present in the rows.
 
     The function has no modified-date argument. An unconfirmed field name is
-    refused by name rather than guessed.
+    refused by name rather than guessed. ``published_label`` has no canonical
+    period, so a caller that asks for bounds is refused by name.
     """
+    if rule.form == "published_label":
+        raise AdditionError("period_form")
     if rule.field == FIELD_UNCONFIRMED:
         raise AdditionError("period_field_unconfirmed")
     found = _collect_periods(rows, rule)

@@ -349,6 +349,8 @@ def test_family_receipt_uses_observed_period_not_modified_date(tmp_path):
 def test_each_family_cache_and_receipt_preserve_published_shape(tmp_path):
     """Invented values in the B2-declared shapes; no publisher response is copied."""
 
+    from eii_custodian.publicdata.additions.common import parse_period_rule
+
     for original in load_registry(REPO / "custodian/publicdata/sources.yaml"):
         if original.source_id not in FAMILIES:
             continue
@@ -372,6 +374,10 @@ def test_each_family_cache_and_receipt_preserve_published_shape(tmp_path):
             terms_url="",
         )
         column = _period_column(entry.period_field)
+        published = (
+            "form=" in entry.period_field
+            and parse_period_rule(entry.period_field).form == "published_label"
+        )
         if column:
             record[column] = "2020-01-01"
         records = [record]
@@ -396,8 +402,14 @@ def test_each_family_cache_and_receipt_preserve_published_shape(tmp_path):
         assert receipt["public_splits"] == list(entry.public_splits)
         assert receipt["terms_words"] == entry.terms_words
         assert receipt["terms_read_on"] == entry.terms_read_on
-        assert receipt["period_first"] == ("2020-01-01" if column else None)
-        assert receipt["period_last"] == receipt["period_first"]
+        if published:
+            # M1: published_label computes no bound. The receipt counts labels.
+            assert receipt["period_first"] is None
+            assert receipt["period_last"] is None
+            assert receipt["coverage_note"] == "distinct labels 1"
+        else:
+            assert receipt["period_first"] == ("2020-01-01" if column else None)
+            assert receipt["period_last"] == receipt["period_first"]
         assert receipt["bytes"] == len(body.read_bytes())
         assert receipt["switched_off"] is False
     assert not list(tmp_path.rglob("*.parquet"))
@@ -1083,10 +1095,15 @@ def test_absent_layer_can_explicitly_be_null(tmp_path):
 
 
 def test_survey_period_field_is_declared_even_before_bounds_are_read():
+    """M2: survey rows declare published_label. Their bounds stay unread."""
+    from eii_custodian.publicdata.additions.common import parse_period_rule
+
     for entry in load_registry(REPO / "custodian/publicdata/sources.yaml"):
         if entry.source_id == "survey_ext":
-            assert entry.period_field in {"year", "year_lsn"}
-            assert (entry.period_field, "string") in entry.columns
+            rule = parse_period_rule(entry.period_field)
+            assert rule.form == "published_label"
+            assert rule.field in {"year", "year_lsn"}
+            assert (rule.field, "string") in entry.columns
             assert entry.period_first == entry.period_last == ""
 
 
@@ -1277,3 +1294,181 @@ def test_family_row_without_a_period_form_is_refused(tmp_path):
     with pytest.raises(RegistryError, match="trade_ext") as caught:
         load_registry(path)
     assert "period_form" in str(caught.value)
+
+
+_PUBLISHED_LABEL_ROWS = {
+    "fdi_stats/foreign-direct-investment": "period",
+    "hotel_ext/number-of-hotel-guests-and-nights-of-stay-by-month": "year",
+    "survey_ext/hotels-and-restaurants-statistics-production-value-by-type-of-revenue-and-main-economic-activity": "year",
+    "survey_ext/hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity": "year",
+    "survey_ext/hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity0": "year",
+    "survey_ext/production-value-hotels-and-restaurants-type-of-revenue-and-main-economic-activity-less-10-employees": "year",
+    "survey_ext/production-value-of-hotels-and-restaurants-type-revenue-economic-activity-10-employees-and-more": "year",
+    "survey_ext/revenues-hotels-restaurants-current-activity-by-revenue-item-and-main-activity-10-employees-and-more": "year_lsn",
+    "survey_ext/revenues-of-current-activity-by-revenue-item-and-main-activity-hotels-and-restaurants": "year",
+    "survey_ext/transformational-revenues-by-revenue-item-and-main-activity-establishments-with-10-employees-or-more": "year",
+    "talent_ext/education-statistics-number-of-graduates-of-private-colleges-and-universities-by-educational": "academic_year",
+    "talent_ext/education-statistics-number-of-graduates-of-public-colleges-and-universities-by-academic-degree": "academic_year",
+    "talent_ext/education-statistics-number-of-graduates-of-public-colleges-and-universities-by-educational": "year",
+    "talent_ext/total-students-on-scholarships-at-home-and-abroad-by-degree-and-gender": "year",
+}
+
+
+def _planted_family_entry(tmp_path: Path, **changes):
+    """One collected-family row, so a period test does not load the whole registry."""
+    row = next(item for item in _block() if item["source_id"] == "trade_ext").copy()
+    row["key"] = "trade_ext/planted-published-label"
+    row["slug"] = "planted-published-label"
+    path = tmp_path / "one.yaml"
+    path.write_text(yaml.safe_dump({"sources": [row]}))
+    entry = load_registry(path)[0]
+    return replace(
+        entry,
+        period_field="sit=row;form=published_label;field=label",
+        columns=(("label", "string"), ("value", "number")),
+        publisher="Invented publisher",
+        terms_url="",
+        **changes,
+    )
+
+
+def test_published_label_is_accepted_by_parse_period_rule() -> None:
+    """M1: the closed list accepts published_label. A bare field stays unreadable."""
+    from eii_custodian.publicdata.additions.common import (
+        PERIOD_FORMS,
+        AdditionError,
+        parse_period_rule,
+    )
+
+    rule = parse_period_rule("sit=row;form=published_label;field=label")
+    assert rule.form == "published_label"
+    assert rule.sit == "row"
+    assert rule.field == "label"
+    assert "published_label" in PERIOD_FORMS
+    with pytest.raises(AdditionError) as bare:
+        parse_period_rule("label")
+    assert bare.value.name == "period_field_unreadable"
+
+
+def test_parse_period_value_refuses_published_label() -> None:
+    """M1: the form is closed, and a label is still not a canonical period."""
+    from eii_custodian.publicdata.additions.common import (
+        PERIOD_FORMS,
+        AdditionError,
+        parse_period_value,
+    )
+
+    assert "published_label" in PERIOD_FORMS
+    for label in ("2014", "Q2-2014"):
+        with pytest.raises(AdditionError) as caught:
+            parse_period_value(label, "published_label")
+        assert caught.value.name == "period_form"
+
+
+def test_published_label_bounds_count_labels_of_two_shapes(tmp_path: Path) -> None:
+    """M1: two label shapes yield no bounds and the distinct count."""
+    from eii_custodian.publicdata.fetch.kinds import family_period_bounds
+
+    entry = _planted_family_entry(tmp_path, period_first="", period_last="")
+    rows = [
+        {"label": "2014", "value": 1},
+        {"label": "Q2-2014", "value": 2},
+        {"label": "2014", "value": 3},
+    ]
+    assert family_period_bounds(entry, rows) == ("", "", "distinct labels 2")
+
+
+def test_published_label_missing_label_refuses_by_name(tmp_path: Path) -> None:
+    """M1: a missing, null or empty label is refused by name and carries no cell."""
+    from eii_custodian.publicdata.fetch.kinds import (
+        FamilyPeriodError,
+        family_period_bounds,
+    )
+
+    entry = _planted_family_entry(tmp_path)
+    for value in ("", None):
+        with pytest.raises(FamilyPeriodError) as caught:
+            family_period_bounds(entry, [{"label": value, "value": 1}])
+        assert caught.value.source_id == entry.source_id
+        assert caught.value.field == "label"
+        assert str(caught.value) == f"{entry.source_id} label"
+
+
+def test_observe_period_bounds_refuses_published_label_by_name() -> None:
+    """M1: a bounds caller refuses this form by name and does not return a label."""
+    from eii_custodian.publicdata.additions.common import (
+        AdditionError,
+        observe_period_bounds,
+        parse_period_rule,
+    )
+
+    rule = parse_period_rule("sit=row;form=published_label;field=label")
+    with pytest.raises(AdditionError) as caught:
+        observe_period_bounds(
+            [{"label": "2014"}, {"label": "Q2-2014"}],
+            rule,
+        )
+    assert caught.value.name == "period_form"
+
+
+def test_published_label_with_a_catalogue_last_is_not_read_as_a_period(
+    tmp_path: Path,
+) -> None:
+    """M1: a set period_last must not turn the label into a period or a fetch failure."""
+    from eii_custodian.publicdata.fetch.checks import period_failure
+
+    entry = _planted_family_entry(
+        tmp_path,
+        period_first="2014",
+        period_last="Q2-2014",
+        row_count_min=2,
+        row_count_max=2,
+    )
+    rows = [{"label": "2014", "value": 1}, {"label": "Q2-2014", "value": 2}]
+    assert period_failure(entry, rows, entry.url) is None
+    assert (
+        fetch_entry(
+            entry,
+            _transport(entry, rows),
+            tmp_path,
+            lambda: "2026-11-15T00:00:00Z",
+            lambda _: None,
+        )
+        is None
+    )
+    receipt = json.loads(next(tmp_path.rglob("*.meta.json")).read_text())
+    assert receipt["period_first"] is None
+    assert receipt["period_last"] is None
+    assert receipt["coverage_note"] == "distinct labels 2"
+
+
+def test_fourteen_rows_declare_published_label() -> None:
+    """M2: the fourteen bare rows name published_label and their own field."""
+    from eii_custodian.publicdata.additions.common import parse_period_rule
+
+    entries = {
+        entry.key: entry
+        for entry in load_registry(REPO / "custodian/publicdata/sources.yaml")
+    }
+    assert len(_PUBLISHED_LABEL_ROWS) == 14
+    for key, field in _PUBLISHED_LABEL_ROWS.items():
+        rule = parse_period_rule(entries[key].period_field)
+        assert rule.form == "published_label"
+        assert rule.sit == "row"
+        assert rule.field == field
+        assert (field, "string") in entries[key].columns
+        if key.startswith("fdi_stats/"):
+            clause = "Two shapes."
+        elif key.startswith("hotel_ext/"):
+            clause = "Text kept unsplit."
+        elif key.startswith("survey_ext/"):
+            clause = "Labels not read yet."
+        else:
+            clause = "School years with a slash."
+        assert clause in entries[key].basis_note
+    published = {
+        entry.key
+        for entry in entries.values()
+        if "published_label" in entry.period_field
+    }
+    assert published == set(_PUBLISHED_LABEL_ROWS)

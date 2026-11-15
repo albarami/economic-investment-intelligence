@@ -294,6 +294,9 @@ def family_period_bounds(entry: Entry, rows: list[object]) -> tuple[str, str, st
 
     A missing or null label is a named refusal. The refusal carries no cell value.
     A family field without a declared form is a named refusal. It is not read as a date.
+    ``published_label`` is not parsed and is not tried as another form: the same
+    missing-label refusals apply, and present labels yield no bounds and the note
+    ``distinct labels N``.
     """
     from eii_custodian.publicdata.additions.common import (
         AdditionError,
@@ -313,6 +316,8 @@ def family_period_bounds(entry: Entry, rows: list[object]) -> tuple[str, str, st
         if value is None or value == "":
             raise FamilyPeriodError(entry.source_id, field)
         labels.append(value)
+    if form == "published_label":
+        return "", "", f"distinct labels {len(set(map(str, labels)))}"
     parsed: list[str] = []
     for label in labels:
         try:

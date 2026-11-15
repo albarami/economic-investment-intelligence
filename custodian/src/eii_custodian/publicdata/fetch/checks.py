@@ -61,7 +61,11 @@ def schema_failure(
 def period_failure(
     entry: Entry, rows: list[object] | None, url: str
 ) -> AttemptFailure | None:
-    """Fail when the latest period is earlier than the registry records."""
+    """Fail when the latest period is earlier than the registry records.
+
+    ``published_label`` has no canonical period. This check does not read that
+    label and does not compare it with the catalogue last.
+    """
     if entry.period_field == "" or entry.period_last == "":
         return None
     if "form=" in entry.period_field:
@@ -99,7 +103,7 @@ def _ruled_period_failure(
 
     try:
         rule = parse_period_rule(entry.period_field)
-        if rule.field == FIELD_UNCONFIRMED:
+        if rule.form == "published_label" or rule.field == FIELD_UNCONFIRMED:
             return None
         _first, last = observe_period_bounds(rows or [], rule)
     except AdditionError as error:
