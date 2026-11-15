@@ -1427,6 +1427,26 @@ mutation = "--- src/eii_core/calc/public_series.py\n+++ src/eii_core/calc/public
 reason = "For nonempty groups every count-times-wage term is Decimal and adding integer zero or Decimal zero gives the same bill sum. For empty groups the workers total is Decimal zero and ratio refuses the non-positive denominator before the bill is divided or returned. No returned value or refusal diagnostic changes."
 
 [[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/activity.py"
+mutation = "--- src/eii_custodian/publicdata/review/activity.py\n+++ src/eii_custodian/publicdata/review/activity.py\n@@ -1,6 +1,6 @@\n def read_review_csv(path: Path) -> tuple[ReviewRow, ...]:\n     \"\"\"Read the review file and refuse every malformed row.\"\"\"\n-    with path.open(\"r\", encoding=\"utf-8\", newline=\"\") as handle:\n+    with path.open(encoding=\"utf-8\", newline=\"\") as handle:\n         reader = csv.DictReader(handle)\n         header = tuple(reader.fieldnames or ())\n         if header != SPINE_COLUMNS:"
+reason = "Path.open defaults mode to 'r'. inspect.signature(pathlib.Path.open) printed (self, mode='r', buffering=-1, encoding=None, errors=None, newline=None), so dropping the explicit mode leaves the same read."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/activity.py"
+mutation = "--- src/eii_custodian/publicdata/review/activity.py\n+++ src/eii_custodian/publicdata/review/activity.py\n@@ -1,6 +1,6 @@\n def read_review_csv(path: Path) -> tuple[ReviewRow, ...]:\n     \"\"\"Read the review file and refuse every malformed row.\"\"\"\n-    with path.open(\"r\", encoding=\"utf-8\", newline=\"\") as handle:\n+    with path.open(\"r\", encoding=\"UTF-8\", newline=\"\") as handle:\n         reader = csv.DictReader(handle)\n         header = tuple(reader.fieldnames or ())\n         if header != SPINE_COLUMNS:"
+reason = "codecs.lookup('UTF-8').name and codecs.lookup('utf-8').name both printed utf-8, so the two names select one codec."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/activity.py"
+mutation = "--- src/eii_custodian/publicdata/review/activity.py\n+++ src/eii_custodian/publicdata/review/activity.py\n@@ -1,6 +1,6 @@\n def write_review_csv(path: Path, rows: Sequence[SpineRow | ReviewRow]) -> None:\n     \"\"\"Write spine rows with the fixed header and column order.\"\"\"\n-    with path.open(\"w\", encoding=\"utf-8\", newline=\"\") as handle:\n+    with path.open(\"w\", encoding=\"UTF-8\", newline=\"\") as handle:\n         writer = csv.writer(handle, lineterminator=\"\\n\")\n         writer.writerow(SPINE_COLUMNS)\n         for row in rows:"
+reason = "codecs.lookup('UTF-8').name and codecs.lookup('utf-8').name both printed utf-8, so the two names select one codec."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/review/activity.py"
+mutation = "--- src/eii_custodian/publicdata/review/activity.py\n+++ src/eii_custodian/publicdata/review/activity.py\n@@ -1,7 +1,7 @@\n def read_review_binding(path: Path) -> ReviewedBinding:\n     \"\"\"Read the version and class-title identities stored with a review.\"\"\"\n     try:\n-        payload = json.loads(path.read_text(encoding=\"utf-8\"))\n+        payload = json.loads(path.read_text(encoding=\"UTF-8\"))\n     except (OSError, UnicodeError, json.JSONDecodeError) as error:\n         raise SpineError(\"review binding is not readable\") from error\n     if not isinstance(payload, dict):"
+reason = "codecs.lookup('UTF-8').name and codecs.lookup('utf-8').name both printed utf-8, so the two names select one codec."
+
+[[survivors]]
 module = "custodian/src/eii_custodian/publicdata/stage.py"
 mutation = "--- src/eii_custodian/publicdata/stage.py\n+++ src/eii_custodian/publicdata/stage.py\n@@ -12,7 +12,7 @@\n     if not path.is_file():\n         return None\n     try:\n-        record = json.loads(path.read_text(encoding=\"utf-8\"))\n+        record = json.loads(path.read_text(encoding=\"UTF-8\"))\n     except json.JSONDecodeError:\n         raise ValueError(f\"{figure_id}: {LOCAL_RECORD_REFUSED}\") from None\n     if ("
 reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same decoder, so every byte string is read or refused as before."
