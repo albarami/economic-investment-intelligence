@@ -614,7 +614,9 @@ def non_python_files_naming_busy(root: Path) -> tuple[str, ...]:
     for path in sorted(root.rglob("*")):
         if not path.is_file() or path.suffix == ".py":
             continue
-        if _BUSY_ID in path.read_text(encoding="utf-8"):
+        if "__pycache__" in path.relative_to(root).parts:
+            continue
+        if _BUSY_ID.encode("utf-8") in path.read_bytes():
             found.append(path.name)
     return tuple(found)
 
@@ -633,6 +635,24 @@ def test_planted_json_naming_busy_gmaps_fails_the_scan(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     assert non_python_files_naming_busy(tmp_path) == ("planted.json",)
+
+
+def test_bytecode_cache_is_not_scanned_as_a_fixture(tmp_path: Path) -> None:
+    """Bytecode that pytest writes is never committed, so the scan skips it."""
+    cache = tmp_path / "__pycache__"
+    cache.mkdir()
+    (cache / "test_one.cpython-314-pytest-9.2.0.pyc").write_bytes(
+        b"\xb6\xbd\xf9j\x00busy_gmaps\x00\xff"
+    )
+    assert non_python_files_naming_busy(tmp_path) == ()
+
+
+def test_planted_binary_fixture_naming_busy_gmaps_fails_the_scan(
+    tmp_path: Path,
+) -> None:
+    """A planted fixture that is not UTF-8 text but names the id still fails."""
+    (tmp_path / "planted.bin").write_bytes(b"\xb6\xbd\x00busy_gmaps\xff")
+    assert non_python_files_naming_busy(tmp_path) == ("planted.bin",)
 
 
 def test_cache_path_is_gitignored(tmp_path: Path) -> None:
