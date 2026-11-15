@@ -25,6 +25,11 @@ from tempfile import TemporaryDirectory
 from time import perf_counter
 
 ROOT = Path(__file__).resolve().parents[1]
+# Source-text checks inspect instrumentation, not calculated values (L-273 part 3).
+SOURCE_TEXT_GUARDS = {
+    "core/tests/test_calculation_purity.py::test_purity_guard_and_planted_io_helper": "The AST import allow-list refuses mutmut.mutation.trampoline instrumentation.",
+}
+
 EVAL_MODULES = {
     "evals/typed_decisions/" + name + ".py"
     for name in ("interval", "reproduction", "route", "requalify")
@@ -88,6 +93,17 @@ def run_copy(
     environment: dict[str, str] | None = None,
 ) -> tuple[int, list[dict[str, str]]]:
     """Operate only inside an already disposable folder; always delete mutants."""
+    for test in tests:
+        if test.startswith("-"):
+            print(f"Refusing test selection option: {test}", file=sys.stderr)
+            return 2, []
+    if os.environ.get("PYTEST_ADDOPTS"):
+        print("Refusing PYTEST_ADDOPTS in mutation run", file=sys.stderr)
+        return 2, []
+    pytest_args = ["-p", "no:cacheprovider"]
+    for node in SOURCE_TEXT_GUARDS:
+        if prefix and node.startswith(prefix):
+            pytest_args.append("--deselect=" + node.removeprefix(prefix))
     if source_roots is None:
         source_roots = ["src/"]
     # The entire git-listed copy is safe to copy again; no ignored files enter it.
@@ -103,7 +119,7 @@ def run_copy(
                 "only_mutate = " + json.dumps(modules),
                 "also_copy = " + json.dumps(extra),
                 "pytest_add_cli_args_test_selection = " + json.dumps(tests),
-                'pytest_add_cli_args = ["-p", "no:cacheprovider"]',
+                "pytest_add_cli_args = " + json.dumps(pytest_args),
                 'process_isolation = "fork"',
             ]
         )
@@ -198,6 +214,9 @@ def run_packages(folder: Path, modules: list[str], ledger: Path) -> int:
             if Path(module).parts[0] == package
         ]
         work = folder / package
+        # Instrumented tests are one level deeper; preserve their repository-doc path.
+        if (folder / "docs").is_dir():
+            shutil.copytree(folder / "docs", work / "docs")
         config = work / "pyproject.toml"
         original = config.read_text()
         config.write_text(
@@ -241,11 +260,12 @@ def main() -> int:
         parser.error("Every module must be a git-listed file")
     if any(
         module not in EVAL_MODULES
-        and Path(module).parts[:2] not in {("custodian", "src"), ("product", "src")}
+        and Path(module).parts[:2]
+        not in {("core", "src"), ("custodian", "src"), ("product", "src")}
         for module in args.modules
     ):
         parser.error(
-            "Every module must be inside custodian/src or product/src "
+            "Every module must be inside core/src, custodian/src or product/src "
             "or one of the four typed-decision modules"
         )
     with TemporaryDirectory(prefix="synthetic-mutation-") as temporary:

@@ -1,0 +1,463 @@
+{
+  "method_version": "S2-T07-v1",
+  "rounding": "ROUND_HALF_UP at output only",
+  "sources": {
+    "pub_census_national": {
+      "dataset": "Census 2020"
+    },
+    "lic_active": {
+      "publisher": "Ministry of Commerce and Industry",
+      "dataset": "moci-active-certificates-by-municipality-and-business-activity",
+      "url": "https://www.data.gov.qa/explore/dataset/moci-active-certificates-by-municipality-and-business-activity/",
+      "licence": "CC-BY-4.0"
+    },
+    "lic_cancelled": {
+      "publisher": "Ministry of Commerce and Industry",
+      "dataset": "moci-canceled-certificates-by-municipality-and-business-activity",
+      "url": "https://www.data.gov.qa/explore/dataset/moci-canceled-certificates-by-municipality-and-business-activity/",
+      "licence": "CC-BY-4.0"
+    },
+    "cus_imp_2025": {
+      "publisher": "National Planning Council",
+      "dataset": "qatar-imports-2025-2026",
+      "url": "https://www.data.gov.qa/explore/dataset/qatar-imports-2025-2026/",
+      "licence": "CC-BY-4.0"
+    },
+    "sec_hr_ind": {
+      "publisher": "National Planning Council",
+      "dataset": "hotels-and-restaurants-statistics-economic-indicators-in-hotels-and-restaurants-by-activity1",
+      "url": "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-economic-indicators-in-hotels-and-restaurants-by-activity1/",
+      "licence": "CC-BY-4.0"
+    },
+    "sec_hr_size": {
+      "publisher": "National Planning Council",
+      "dataset": "hotels-and-restaurants-number-establishments-employees-by-size-of-establishment-economic-activity",
+      "url": "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-number-establishments-employees-by-size-of-establishment-economic-activity/",
+      "licence": "CC-BY-4.0"
+    },
+    "wage_occ": {
+      "publisher": "National Planning Council",
+      "dataset": "workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q1",
+      "url": "https://www.data.gov.qa/explore/dataset/workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q1/",
+      "licence": "CC-BY-4.0"
+    },
+    "util_elec": {
+      "publisher": "KAHRAMAA",
+      "dataset": "electricity-total-consumption-by-zone-number",
+      "url": "https://www.data.gov.qa/explore/dataset/electricity-total-consumption-by-zone-number/",
+      "licence": "CC-BY-4.0"
+    },
+    "pop_muni": {
+      "publisher": "National Planning Council",
+      "dataset": "population-and-labour-force-by-municipality",
+      "licence": "CC-BY-4.0",
+      "url": "https://www.data.gov.qa/explore/dataset/population-and-labour-force-by-municipality/"
+    },
+    "sec_hr_goods": {
+      "publisher": "National Planning Council",
+      "dataset": "hotels-and-restaurants-statistics-estimates-of-intermediate-goods-value-in-hotels-and-restaurants-by0",
+      "licence": "CC-BY-4.0",
+      "url": "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-estimates-of-intermediate-goods-value-in-hotels-and-restaurants-by0/"
+    },
+    "sec_hr_serv": {
+      "publisher": "National Planning Council",
+      "dataset": "hotels-and-restaurants-statistics-estimates-of-intermediate-services-value-in-hotels-and-restaurants0",
+      "licence": "CC-BY-4.0",
+      "url": "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-estimates-of-intermediate-services-value-in-hotels-and-restaurants0/"
+    }
+  },
+  "published": {
+    "C1": {
+      "anchor": "docs/07_ECONOMIC_METHODS.md C1; brief L5",
+      "sources": [
+        "lic_active",
+        "pop_muni"
+      ],
+      "local_restaurants": 361,
+      "local_all": 13600,
+      "national_restaurants": 4782,
+      "national_all": 249622,
+      "local_coffee": 173,
+      "national_coffee": 1042,
+      "local_population": 111282,
+      "national_population": 3219982,
+      "density": [
+        "32",
+        "15"
+      ],
+      "lq": [
+        "1.39",
+        "3.05"
+      ]
+    },
+    "C2": {
+      "anchor": "docs/07_ECONOMIC_METHODS.md C2; brief L1 and L6",
+      "sources": [
+        "lic_active",
+        "lic_cancelled"
+      ],
+      "all": 161055,
+      "dated": 153669,
+      "undated": 7386,
+      "bulk": {
+        "2020-07": 40791,
+        "2022-06": 14212,
+        "2024-09": 11232
+      },
+      "bulk_percent": "43.1",
+      "restaurant_cases": [
+        [
+          318,
+          2109,
+          "15.1"
+        ],
+        [
+          49,
+          361,
+          "13.6"
+        ]
+      ],
+      "ratio_case": [
+        2510,
+        7878,
+        "0.32"
+      ]
+    },
+    "C3": {
+      "anchor": "docs/07_ECONOMIC_METHODS.md C3; IN/fix.facts.md",
+      "sources": [
+        "wage_occ"
+      ],
+      "period_before": "2020",
+      "period_after": "2025",
+      "groups": [
+        {
+          "group": "gender=Females&occupation=Clerks",
+          "workers_before": "35,833",
+          "wage_before": "15,390",
+          "workers_after": "57,213",
+          "wage_after": "18,990"
+        },
+        {
+          "group": "gender=Females&occupation=Craft%20And%20Related%20Trades%20Workers",
+          "workers_before": "298",
+          "wage_before": "3,600",
+          "workers_after": "2,036",
+          "wage_after": "4,469"
+        },
+        {
+          "group": "gender=Females&occupation=Elementary%20Occupations",
+          "workers_before": "116,697",
+          "wage_before": "2,997",
+          "workers_after": "91,846",
+          "wage_after": "3,298"
+        },
+        {
+          "group": "gender=Females&occupation=Legislators%2C%20Senior%20Officials%20And%20Managers",
+          "workers_before": "5,870",
+          "wage_before": "36,857",
+          "workers_after": "7,604",
+          "wage_after": "42,062"
+        },
+        {
+          "group": "gender=Females&occupation=Plant%20And%20Machine%20Operators%20And%20Assemblers",
+          "workers_before": "496",
+          "wage_before": "3,221",
+          "workers_after": "812",
+          "wage_after": "3,362"
+        },
+        {
+          "group": "gender=Females&occupation=Professionals",
+          "workers_before": "65,112",
+          "wage_before": "26,073",
+          "workers_after": "138,683",
+          "wage_after": "24,088"
+        },
+        {
+          "group": "gender=Females&occupation=Service%20Workers%20And%20Shop%20And%20Market%20Sales%20Workers",
+          "workers_before": "51,111",
+          "wage_before": "4,928",
+          "workers_after": "69,711",
+          "wage_after": "7,669"
+        },
+        {
+          "group": "gender=Females&occupation=Skilled%20Agricultural%20And%20Fishery%20Workers",
+          "workers_before": "0",
+          "wage_before": "0",
+          "workers_after": "0",
+          "wage_after": "0"
+        },
+        {
+          "group": "gender=Females&occupation=Technicians%20And%20Associate%20Professionals",
+          "workers_before": "17,218",
+          "wage_before": "18,899",
+          "workers_after": "43,672",
+          "wage_after": "16,862"
+        },
+        {
+          "group": "gender=Males&occupation=Clerks",
+          "workers_before": "95,006",
+          "wage_before": "21,150",
+          "workers_after": "148,021",
+          "wage_after": "19,288"
+        },
+        {
+          "group": "gender=Males&occupation=Craft%20And%20Related%20Trades%20Workers",
+          "workers_before": "665,437",
+          "wage_before": "3,785",
+          "workers_after": "572,269",
+          "wage_after": "4,513"
+        },
+        {
+          "group": "gender=Males&occupation=Elementary%20Occupations",
+          "workers_before": "267,977",
+          "wage_before": "3,690",
+          "workers_after": "221,199",
+          "wage_after": "3,480"
+        },
+        {
+          "group": "gender=Males&occupation=Legislators%2C%20Senior%20Officials%20And%20Managers",
+          "workers_before": "45,880",
+          "wage_before": "45,685",
+          "workers_after": "53,415",
+          "wage_after": "45,062"
+        },
+        {
+          "group": "gender=Males&occupation=Plant%20And%20Machine%20Operators%20And%20Assemblers",
+          "workers_before": "274,342",
+          "wage_before": "4,167",
+          "workers_after": "314,843",
+          "wage_after": "4,021"
+        },
+        {
+          "group": "gender=Males&occupation=Professionals",
+          "workers_before": "173,027",
+          "wage_before": "29,883",
+          "workers_after": "224,896",
+          "wage_after": "28,957"
+        },
+        {
+          "group": "gender=Males&occupation=Service%20Workers%20And%20Shop%20And%20Market%20Sales%20Workers",
+          "workers_before": "125,833",
+          "wage_before": "6,236",
+          "workers_after": "179,882",
+          "wage_after": "7,140"
+        },
+        {
+          "group": "gender=Males&occupation=Skilled%20Agricultural%20And%20Fishery%20Workers",
+          "workers_before": "24,762",
+          "wage_before": "3,966",
+          "workers_after": "34,354",
+          "wage_after": "3,486"
+        },
+        {
+          "group": "gender=Males&occupation=Technicians%20And%20Associate%20Professionals",
+          "workers_before": "155,942",
+          "wage_before": "20,400",
+          "workers_after": "185,687",
+          "wage_after": "19,837"
+        }
+      ]
+    },
+    "C4": {
+      "anchor": "decision 0026 item 12; docs/07_ECONOMIC_METHODS.md C4; IN/fix.facts.md",
+      "sources": [
+        "sec_hr_ind",
+        "sec_hr_size",
+        "sec_hr_goods",
+        "sec_hr_serv"
+      ],
+      "years": {
+        "2018": {
+          "establishments": "1,901",
+          "employees": "39,396",
+          "compensation_thousand": "1,244,363",
+          "surplus_thousand": "376,816",
+          "productivity": "137,648",
+          "goods_percent": "40.46",
+          "services_percent": "21.35",
+          "food": "1,521,201",
+          "beverages": "230,611",
+          "goods_total": "2,193,886",
+          "rent": "820,928",
+          "services_total": "1,158,028"
+        },
+        "2019": {
+          "establishments": "1,998",
+          "employees": "40,614",
+          "compensation_thousand": "1,285,371",
+          "surplus_thousand": "396,309",
+          "productivity": "139,339",
+          "goods_percent": "41.79",
+          "services_percent": "20.87",
+          "food": "1,615,587",
+          "beverages": "220,706",
+          "goods_total": "2,365,056",
+          "rent": "808,377",
+          "services_total": "1,181,086"
+        },
+        "2020": {
+          "establishments": "1,976",
+          "employees": "37,260",
+          "compensation_thousand": "1,220,173",
+          "surplus_thousand": "751,380",
+          "productivity": "130,001",
+          "goods_percent": "39.57",
+          "services_percent": "17.96",
+          "food": "1,369,442",
+          "beverages": "242,960",
+          "goods_total": "1,916,725",
+          "rent": "607,114",
+          "services_total": "869,898"
+        },
+        "2021": {
+          "establishments": "1,906",
+          "employees": "32,950",
+          "compensation_thousand": "1,037,337",
+          "surplus_thousand": "705,660",
+          "productivity": "141,057",
+          "goods_percent": "39.79",
+          "services_percent": "17.85",
+          "food": "1,301,655",
+          "beverages": "264,169",
+          "goods_total": "1,849,601",
+          "rent": "583,942",
+          "services_total": "829,831"
+        },
+        "2022": {
+          "establishments": "2,086",
+          "employees": "41,458",
+          "compensation_thousand": "1,308,140",
+          "surplus_thousand": "1,247,422",
+          "productivity": "152,875",
+          "goods_percent": "40.6",
+          "services_percent": "16.5",
+          "food": "1,858,573",
+          "beverages": "352,691",
+          "goods_total": "2,573,362",
+          "rent": "737,227",
+          "services_total": "1,045,667"
+        }
+      }
+    },
+    "C5": {
+      "anchor": "docs/07_ECONOMIC_METHODS.md C5",
+      "sources": [
+        "cus_imp_2025"
+      ],
+      "value": "20.08E6",
+      "weight": "2311E3",
+      "unit_value": "8.69",
+      "other_checks_status": "Other weights, total rows, HHI and trend not supplied."
+    },
+    "C8": {
+      "anchor": "docs/07_ECONOMIC_METHODS.md C8; Validation-file arithmetic",
+      "sources": [
+        "pub_census_national"
+      ],
+      "private": 1617208,
+      "employed": 2050252,
+      "percent": "78.9"
+    },
+    "C9": {
+      "anchor": "docs/07_ECONOMIC_METHODS.md C9; IN/fix.facts.md",
+      "sources": [
+        "util_elec"
+      ],
+      "national_before": "41.78E9",
+      "national_after": "55.83E9",
+      "zones": [
+        {
+          "zone": "2",
+          "kwh_2021": "19,313,897",
+          "kwh_2025": "124,877,109"
+        },
+        {
+          "zone": "72",
+          "kwh_2021": "22,699,633",
+          "kwh_2025": "122,274,350"
+        },
+        {
+          "zone": "29",
+          "kwh_2021": "21,757,091",
+          "kwh_2025": "87,622,087"
+        },
+        {
+          "zone": "69",
+          "kwh_2021": "429,964,072",
+          "kwh_2025": "1,436,402,796"
+        },
+        {
+          "zone": "50",
+          "kwh_2021": "36,999,405",
+          "kwh_2025": "107,488,662"
+        },
+        {
+          "zone": "48",
+          "kwh_2021": "100,008,819",
+          "kwh_2025": "245,398,276"
+        },
+        {
+          "zone": "19",
+          "kwh_2021": "47,091,998",
+          "kwh_2025": "97,137,438"
+        },
+        {
+          "zone": "12",
+          "kwh_2021": "31,004,933",
+          "kwh_2025": "63,771,207"
+        },
+        {
+          "zone": "33",
+          "kwh_2021": "142,925,816",
+          "kwh_2025": "275,990,271"
+        },
+        {
+          "zone": "73",
+          "kwh_2021": "26,031,922",
+          "kwh_2025": "46,956,302"
+        }
+      ]
+    }
+  },
+  "invented": {
+    "C3": {
+      "before": {
+        "invented_a": [
+          "3",
+          "10"
+        ],
+        "invented_b": [
+          "1",
+          "30"
+        ]
+      },
+      "after": {
+        "invented_a": [
+          "1",
+          "14"
+        ],
+        "invented_b": [
+          "3",
+          "34"
+        ]
+      },
+      "change": "14",
+      "within": "4",
+      "mix": "10",
+      "fixed_composition_change": "4"
+    },
+    "C8": {
+      "private": 3,
+      "employed": 4,
+      "percent": "75.0"
+    },
+    "C20": {
+      "before": "120",
+      "after": "150",
+      "difference": "30",
+      "ratio": "1.25",
+      "direction": "higher"
+    }
+  }
+}
