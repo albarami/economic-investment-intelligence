@@ -217,6 +217,34 @@ def expected_installed_names(root: Path) -> set[str]:
     )
 
 
+def _entry_applies_to_environment(
+    package: Mapping[str, object],
+    environment: Mapping[str, str],
+) -> bool:
+    """Whether one lock package entry resolves for ``environment``.
+
+    An entry without ``resolution-markers`` applies to every environment.  One
+    with them applies only where one of its markers holds: uv's lock writes the
+    fork markers of a forked package in this field, and an entry whose markers
+    all fail names a fork this environment does not use.
+    """
+    listed = package.get("resolution-markers")
+    if listed is None:
+        return True
+    if not isinstance(listed, list):
+        raise AssertionError(
+            f"lock package entry has a non-list resolution-markers field: {listed!r}"
+        )
+    for one in listed:
+        if not isinstance(one, str):
+            raise AssertionError(
+                f"lock package entry has a non-string resolution-marker: {one!r}"
+            )
+        if markers.Marker(one).evaluate(environment):
+            return True
+    return False
+
+
 def reachable_locked_names(
     manifests: Mapping[str, Mapping[str, object]],
     lock: Mapping[str, object],
@@ -225,11 +253,15 @@ def reachable_locked_names(
     """Compute the expected installed names from the manifests, lock and environment.
 
     The workspace member names plus every package of the lock that is reachable
-    from them through the lock's own dependency edges: an edge is followed only
-    when its marker holds for ``environment``, and an extra's edges only when the
-    edge that leads there selects that extra.  The root manifest's dependency
-    groups are never followed: the clean installation installs the members' own
-    dependencies only.
+    from them through the lock's own dependency edges: an entry of a package is
+    traversed only when its fork selection applies to ``environment`` (an entry
+    with ``resolution-markers`` only when one of them holds, an entry without
+    them always; two active entries of one name are refused as ambiguous), an
+    edge is followed only when its marker holds for ``environment``, an extra's
+    edges only when the edge that leads there selects that extra, and an
+    optional edge's marker is evaluated with ``extra`` set to that extra.  The
+    root manifest's dependency groups are never followed: the clean installation
+    installs the members' own dependencies only.
     """
     entries: dict[str, list[Mapping[str, object]]] = {}
     packages = lock.get("package", [])
@@ -251,23 +283,36 @@ def reachable_locked_names(
             continue
         seen.add((name, extras))
         expected.add(name)
-        for package in entries.get(name, []):
-            edges: list[object] = []
+        active: list[Mapping[str, object]] = [
+            package
+            for package in entries.get(name, [])
+            if _entry_applies_to_environment(package, environment)
+        ]
+        if len(active) > 1:
+            raise AssertionError(
+                f"the lock is ambiguous for this test: {len(active)} active "
+                f"entries of package '{name}' for one environment"
+            )
+        for package in active:
+            edges: list[tuple[object, Mapping[str, str]]] = []
             dependencies = package.get("dependencies", [])
             if isinstance(dependencies, list):
-                edges.extend(dependencies)
+                for edge in dependencies:
+                    edges.append((edge, environment))
             optional = package.get("optional-dependencies", {})
             if isinstance(optional, dict):
                 for extra in extras:
                     chosen = optional.get(extra)
                     if isinstance(chosen, list):
-                        edges.extend(chosen)
-            for edge in edges:
+                        edge_env: Mapping[str, str] = {**environment, "extra": extra}
+                        for edge in chosen:
+                            edges.append((edge, edge_env))
+            for edge, edge_env in edges:
                 if not isinstance(edge, dict) or not isinstance(edge.get("name"), str):
                     continue
                 marker = edge.get("marker")
                 if isinstance(marker, str) and not markers.Marker(marker).evaluate(
-                    environment
+                    edge_env
                 ):
                     continue
                 selected: list[str] = []
@@ -442,6 +487,118 @@ source = { registry = "https://example.com/simple" }
 )
 
 
+LOCK_FORKS = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-fork-base" },
+]
+
+[[package]]
+name = "plant-fork-base"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+resolution-markers = [
+    "python_version >= '3.0'",
+]
+dependencies = [
+    { name = "plant-fork-active-child" },
+]
+
+[[package]]
+name = "plant-fork-base"
+version = "2.0"
+source = { registry = "https://example.com/simple" }
+resolution-markers = [
+    "python_version < '3.0'",
+]
+dependencies = [
+    { name = "plant-fork-phantom-child" },
+]
+
+[[package]]
+name = "plant-fork-active-child"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-fork-phantom-child"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+LOCK_EXTRA_MARKERS = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-extra-marker-host", extra = ["picked"] },
+]
+
+[[package]]
+name = "plant-extra-marker-host"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[package.optional-dependencies]
+picked = [
+    { name = "plant-extra-marker-match", marker = "extra == 'picked'" },
+    { name = "plant-extra-marker-cross", marker = "extra == 'skipped'" },
+]
+skipped = [
+    { name = "plant-extra-marker-skip", marker = "extra == 'skipped'" },
+]
+
+[[package]]
+name = "plant-extra-marker-match"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-extra-marker-cross"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-extra-marker-skip"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+LOCK_AMBIGUOUS = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-fork-ambiguous" },
+]
+
+[[package]]
+name = "plant-fork-ambiguous"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-fork-first-child" },
+]
+
+[[package]]
+name = "plant-fork-ambiguous"
+version = "2.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-fork-second-child" },
+]
+
+[[package]]
+name = "plant-fork-first-child"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-fork-second-child"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+
 def write_invented_workspace(
     root: Path,
     member_dependencies: Mapping[str, Sequence[str]],
@@ -521,6 +678,34 @@ class ExpectedInstalledNames(unittest.TestCase):
             expected,
             set(guard.MEMBER_NAMES) | {"plant-reached", "plant-deep"},
         )
+
+    def test_inactive_fork_child_is_not_expected_and_active_fork_child_is(
+        self,
+    ) -> None:
+        expected = self.expected_for(("plant-fork-base>=1",), LOCK_FORKS)
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES) | {"plant-fork-base", "plant-fork-active-child"},
+        )
+
+    def test_extra_marker_expected_through_selected_extra_and_not_an_unselected_one(
+        self,
+    ) -> None:
+        expected = self.expected_for(
+            ("plant-extra-marker-host[picked]>=1",),
+            LOCK_EXTRA_MARKERS,
+        )
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES)
+            | {"plant-extra-marker-host", "plant-extra-marker-match"},
+        )
+
+    def test_two_active_entries_of_one_name_are_refused(self) -> None:
+        with self.assertRaises(AssertionError) as caught:
+            self.expected_for(("plant-fork-ambiguous>=1",), LOCK_AMBIGUOUS)
+        self.assertIn("plant-fork-ambiguous", str(caught.exception))
+        self.assertIn("ambiguous", str(caught.exception))
 
 
 class CleanEnvironment(unittest.TestCase):
