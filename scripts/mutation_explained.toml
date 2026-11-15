@@ -2027,3 +2027,8 @@ reason = "Python resolves the codec names UTF-8 and utf-8 to the same codec, so 
 module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
 mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -4,7 +4,7 @@\n         return \"\", \"\"\n     if not approve(entry.terms_url).ok:\n         return \"\", TERMS_HOST_UNLISTED\n-    terms, failure = _call(entry, entry.terms_url, reader)\n+    terms, failure = _call(None, entry.terms_url, reader)\n     if failure is not None or terms is None:\n         check = failure.check if failure is not None else \"check_failed\"\n         return \"\", check"
 reason = "_call approves the URL and reads the response. Its entry argument is not read, so None there leaves the fingerprint and the unread check unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/registry.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/registry.py\n+++ src/eii_custodian/publicdata/fetch/registry.py\n@@ -4,7 +4,7 @@\n     A malformed file raises RegistryError, the package's own error.\n     \"\"\"\n     try:\n-        loaded: object = yaml.safe_load(path.read_text(encoding=\"utf-8\"))\n+        loaded: object = yaml.safe_load(path.read_text(encoding=\"UTF-8\"))\n     except yaml.YAMLError as exc:\n         raise RegistryError(\"malformed yaml\") from exc\n     return loaded"
+reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same decoder, so every byte string is read or refused as before."
