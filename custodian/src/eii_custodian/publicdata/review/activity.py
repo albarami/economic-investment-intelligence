@@ -19,6 +19,7 @@ from pathlib import Path
 
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.review.cache_fixture import read_cached, read_rows
+from eii_custodian.publicdata.series.parse import FIELD_MAP, confirmed_rows
 
 STATUSES = (
     "mapped",
@@ -50,14 +51,13 @@ FOOD_PREFIX = "56"
 PLAYBOOK_CLASSES = frozenset({"5510", "5610", "5630"})
 CODE_SYSTEM_VERSION = "licence_codes_2025_05"
 METHOD_VERSION = "activity_spine.v1"
-ACTIVITY_FIELDS = frozenset(
-    {"activity_code", "activity_name_ar", "active_count", "cancelled_count"}
-)
-ACTIVE_FIELDS = frozenset({"activity_code", "activity_name_ar", "active_count"})
-CANCELLED_FIELDS = frozenset({"activity_code", "activity_name_ar", "cancelled_count"})
 FEED_KEYS = ("lic_active", "lic_cancelled")
-ISIC_FIELDS = frozenset({"code", "label_en", "label_ar", "title_en", "title_ar"})
+_ISIC_FEED = "cls_isic4"
+_ISIC_FIELDS = frozenset({"Code", "Description"})
+_EVIDENCE_MARK = "EVIDENCE_ONLY:"
 _DIGITS = re.compile(r"\A[0-9]+\Z")
+_CLASS_DIGITS = re.compile(r"\A[0-9]{4}\Z")
+_HIGHER_LEVEL = re.compile(r"\A(?:[A-Za-z]|[0-9]{2}|[0-9]{3})\Z")
 _ISO_DATE = re.compile(r"\A[0-9]{4}-[0-9]{2}-[0-9]{2}\Z")
 _SHA256 = re.compile(r"\A[0-9a-f]{64}\Z")
 _CLASS_TITLE = "class_title"
@@ -192,6 +192,32 @@ class ReviewManifest:
 
 
 @dataclass(frozen=True)
+class LeftOut:
+    """Rows left out of one feed, counted by the code field's pattern class."""
+
+    feed: str
+    field: str
+    pattern: str
+    count: int
+
+
+@dataclass(frozen=True)
+class FeedRead:
+    """One licence feed aggregated by activity code, with rows left out."""
+
+    rows: tuple[ActivityRow, ...]
+    left_out: tuple[LeftOut, ...] = ()
+
+
+@dataclass(frozen=True)
+class ClassRead:
+    """ISIC classes from the real file, with higher levels left out."""
+
+    classes: tuple[IsicClass, ...]
+    left_out: tuple[LeftOut, ...] = ()
+
+
+@dataclass(frozen=True)
 class ActivityInputs:
     """The spine with the parsed activities and classes the graph also needs."""
 
@@ -199,6 +225,7 @@ class ActivityInputs:
     activities: tuple[ActivityRow, ...]
     classes: tuple[IsicClass, ...]
     manifest: ReviewManifest | None = None
+    left_out: tuple[LeftOut, ...] = ()
 
 
 def spine_path() -> Path:
@@ -211,60 +238,53 @@ def allowlist_path() -> Path:
     return _REVIEW / "category_allowlist.csv"
 
 
-def parse_activity_rows(
-    rows: Iterable[Mapping[str, object]],
-) -> tuple[ActivityRow, ...]:
-    """Aggregate the active and cancelled feeds to one row per code."""
-    merged: dict[str, tuple[str, int, int]] = {}
-    for row in rows:
-        unknown = set(row) - ACTIVITY_FIELDS
-        if unknown:
-            raise SpineError("unknown activity field " + ",".join(sorted(unknown)))
-        missing = ACTIVITY_FIELDS - set(row)
-        if missing:
-            raise SpineError("missing activity field " + ",".join(sorted(missing)))
-        code = _code(row["activity_code"])
-        name = _text(row["activity_name_ar"], "activity_name_ar")
-        active = _count(row["active_count"], "active_count")
-        cancelled = _count(row["cancelled_count"], "cancelled_count")
-        held = merged.get(code)
-        if held is None:
-            merged[code] = (name, active, cancelled)
-            continue
-        if held[0] != name:
-            raise SpineError("conflicting activity name for " + code)
-        merged[code] = (name, held[1] + active, held[2] + cancelled)
-    return tuple(
-        ActivityRow(
-            code=code,
-            name_ar=name,
-            active_count=active,
-            cancelled_count=cancelled,
-        )
-        for code, (name, active, cancelled) in sorted(merged.items())
-    )
+def release_field(feed: str, column: str) -> str:
+    """Read an EVIDENCE_ONLY: prefix as a mark on the release column, not part of its name."""
+    found = [
+        source
+        for source, (_table, release) in FIELD_MAP[feed].items()
+        if release.removeprefix(_EVIDENCE_MARK) == column
+    ]
+    if len(found) != 1:
+        raise SpineError("activity column is not one field: " + column)
+    return found[0]
 
 
-def parse_isic_rows(
-    rows: Iterable[Mapping[str, object]],
-) -> tuple[IsicClass, ...]:
-    """Read ISIC class titles, accepting the title aliases of the fixture."""
+def parse_isic_rows(rows: Iterable[Mapping[str, object]]) -> ClassRead:
+    """Read Code and Description; a four-digit code is a class and higher levels are counted."""
     found: dict[str, IsicClass] = {}
+    omitted: dict[str, int] = {}
     for row in rows:
-        unknown = set(row) - ISIC_FIELDS
+        present = set(row)
+        unknown = present - _ISIC_FIELDS
+        missing = _ISIC_FIELDS - present
         if unknown:
-            raise SpineError("unknown isic field " + ",".join(sorted(unknown)))
-        code = _code(row.get("code"))
-        if len(code) != 4:
-            raise SpineError("isic class is not four digits")
-        label_en = _text(_first(row, "label_en", "title_en"), "label_en")
-        label_ar = _optional_text(_first(row, "label_ar", "title_ar"), "label_ar")
-        item = IsicClass(code=code, label_en=label_en, label_ar=label_ar)
-        held = found.get(code)
-        if held is not None and held != item:
-            raise SpineError("conflicting isic title for " + code)
-        found[code] = item
-    return tuple(found[code] for code in sorted(found))
+            names = ",".join(sorted(str(item) for item in unknown))
+            raise SpineError("unknown isic field " + names)
+        if missing:
+            raise SpineError("missing isic field " + ",".join(sorted(missing)))
+        code = row["Code"]
+        description = row["Description"]
+        if not isinstance(code, str) or not isinstance(description, str):
+            raise SpineError("isic field is not text")
+        if _CLASS_DIGITS.match(code) is not None:
+            if description == "":
+                raise SpineError("isic class title is empty")
+            item = IsicClass(code=code, label_en=description, label_ar="")
+            held = found.get(code)
+            if held is not None and held != item:
+                raise SpineError("conflicting isic title for " + code)
+            found[code] = item
+            continue
+        if _HIGHER_LEVEL.match(code) is not None:
+            pattern = _pattern_class(code)
+            omitted[pattern] = omitted.get(pattern, 0) + 1
+            continue
+        raise SpineError("isic code pattern is not a class or a higher level")
+    return ClassRead(
+        classes=tuple(found[code] for code in sorted(found)),
+        left_out=_left_out(_ISIC_FEED, "Code", omitted),
+    )
 
 
 def entry_by_key(entries: Sequence[Entry], key: str) -> Entry:
@@ -277,33 +297,43 @@ def entry_by_key(entries: Sequence[Entry], key: str) -> Entry:
     return found[0]
 
 
-def parse_feed_rows(
-    rows: Iterable[Mapping[str, object]], feed: str
-) -> tuple[ActivityRow, ...]:
-    """Read one cached feed; the other feed's count is zero."""
+def parse_feed_rows(rows: Iterable[Mapping[str, object]], entry: Entry) -> FeedRead:
+    """Aggregate one confirmed licence feed by activity code.
+
+    Municipality, year and month stay in the source row and are summed away.
+    A code that is not a digit string is left out and counted by pattern class.
+    """
+    feed = entry.source_id
     if feed not in FEED_KEYS:
         raise SpineError("unknown activity feed " + feed)
-    fields = ACTIVE_FIELDS if feed == "lic_active" else CANCELLED_FIELDS
-    count_field = "active_count" if feed == "lic_active" else "cancelled_count"
+    try:
+        confirmed = confirmed_rows(entry, [dict(row) for row in rows])
+    except ValueError as error:
+        raise SpineError(str(error)) from error
+    code_field = release_field(feed, "activity_code")
+    name_field = release_field(feed, "activity_name_ar")
+    count_column = "active_count" if feed == "lic_active" else "cancelled_count"
+    count_field = release_field(feed, count_column)
     merged: dict[str, tuple[str, int]] = {}
-    for row in rows:
-        unknown = set(row) - fields
-        if unknown:
-            raise SpineError("unknown activity field " + ",".join(sorted(unknown)))
-        missing = fields - set(row)
-        if missing:
-            raise SpineError("missing activity field " + ",".join(sorted(missing)))
-        code = _code(row["activity_code"])
-        name = _text(row["activity_name_ar"], "activity_name_ar")
-        count = _feed_count(row[count_field], count_field)
-        held = merged.get(code)
+    omitted: dict[str, int] = {}
+    for row in confirmed:
+        raw_code = row[code_field]
+        name = _text(row[name_field], "activity_name_ar")
+        count = _count(row[count_field], count_column)
+        if not isinstance(raw_code, str) or _DIGITS.match(raw_code) is None:
+            if not isinstance(raw_code, str):
+                raise SpineError(feed + " field type: " + code_field)
+            pattern = _pattern_class(raw_code)
+            omitted[pattern] = omitted.get(pattern, 0) + 1
+            continue
+        held = merged.get(raw_code)
         if held is None:
-            merged[code] = (name, count)
+            merged[raw_code] = (name, count)
             continue
         if held[0] != name:
-            raise SpineError("conflicting activity name for " + code)
-        merged[code] = (name, held[1] + count)
-    return tuple(
+            raise SpineError("conflicting activity name for " + raw_code)
+        merged[raw_code] = (name, held[1] + count)
+    parsed = tuple(
         ActivityRow(
             code=code,
             name_ar=name,
@@ -313,6 +343,19 @@ def parse_feed_rows(
         )
         for code, (name, count) in sorted(merged.items())
     )
+    return FeedRead(rows=parsed, left_out=_left_out(feed, code_field, omitted))
+
+
+def read_cached_feed(cache: Path, entry: Entry) -> FeedRead:
+    """Read one cached licence feed into aggregated rows and the left-out report."""
+    return parse_feed_rows(read_rows(read_cached(cache, entry)), entry)
+
+
+def read_cached_classes(cache: Path, entry: Entry) -> ClassRead:
+    """Read the cached class file into classes and the left-out report."""
+    if entry.source_id != _ISIC_FEED:
+        raise SpineError("unknown class feed " + entry.source_id)
+    return parse_isic_rows(read_rows(read_cached(cache, entry)))
 
 
 def merge_feed_rows(
@@ -387,18 +430,21 @@ def load_activity_inputs(
 ) -> ActivityInputs:
     """Read the three cached keys, the review file and the spine they derive."""
     entries = load_registry() if registry is None else registry
-    active_body = read_cached(cache, entry_by_key(entries, "lic_active"))
-    cancelled_body = read_cached(cache, entry_by_key(entries, "lic_cancelled"))
-    class_body = read_cached(cache, entry_by_key(entries, "cls_isic4"))
-    active = parse_feed_rows(read_rows(active_body), "lic_active")
-    cancelled = parse_feed_rows(read_rows(cancelled_body), "lic_cancelled")
-    classes = parse_isic_rows(read_rows(class_body))
-    activities = merge_feed_rows(active, cancelled)
+    active_entry = entry_by_key(entries, "lic_active")
+    cancelled_entry = entry_by_key(entries, "lic_cancelled")
+    class_entry = entry_by_key(entries, _ISIC_FEED)
+    active_body = read_cached(cache, active_entry)
+    cancelled_body = read_cached(cache, cancelled_entry)
+    class_body = read_cached(cache, class_entry)
+    active = parse_feed_rows(read_rows(active_body), active_entry)
+    cancelled = parse_feed_rows(read_rows(cancelled_body), cancelled_entry)
+    class_read = parse_isic_rows(read_rows(class_body))
+    activities = merge_feed_rows(active.rows, cancelled.rows)
     path = review_path if review_path is not None else spine_path()
     reviews = read_review_csv(path)
     spine = build_spine(
         activities,
-        classes,
+        class_read.classes,
         reviews,
         playbook_codes,
         supplier_membership=supplier_membership,
@@ -411,13 +457,17 @@ def load_activity_inputs(
         source_hashes=(
             _source_hash("lic_active", active_body.sidecar),
             _source_hash("lic_cancelled", cancelled_body.sidecar),
-            _source_hash("cls_isic4", class_body.sidecar),
+            _source_hash(_ISIC_FEED, class_body.sidecar),
         ),
         review_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
-        class_title_sha256=_class_title_sha256(classes),
+        class_title_sha256=_class_title_sha256(class_read.classes),
     )
     return ActivityInputs(
-        spine=spine, activities=activities, classes=classes, manifest=manifest
+        spine=spine,
+        activities=activities,
+        classes=class_read.classes,
+        manifest=manifest,
+        left_out=active.left_out + cancelled.left_out + class_read.left_out,
     )
 
 
@@ -912,10 +962,25 @@ def _review_row(row: Mapping[str, object]) -> ReviewRow:
     )
 
 
-def _first(row: Mapping[str, object], name: str, alias: str) -> object:
-    if name in row:
-        return row[name]
-    return row.get(alias)
+def _pattern_class(code: str) -> str:
+    if code == "":
+        return "empty"
+    marks: list[str] = []
+    for char in code:
+        if "0" <= char <= "9":
+            marks.append("9")
+        elif char.isalpha():
+            marks.append("a")
+        else:
+            marks.append("?")
+    return "".join(marks)
+
+
+def _left_out(feed: str, field: str, omitted: Mapping[str, int]) -> tuple[LeftOut, ...]:
+    return tuple(
+        LeftOut(feed=feed, field=field, pattern=pattern, count=count)
+        for pattern, count in sorted(omitted.items())
+    )
 
 
 def _code(value: object) -> str:
@@ -942,12 +1007,6 @@ def _count(value: object, name: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or value < 0:
         raise SpineError(name + " is not a non-negative integer")
     return value
-
-
-def _feed_count(value: object, name: str) -> int:
-    if isinstance(value, str) and _DIGITS.match(value) is not None:
-        return int(value)
-    return _count(value, name)
 
 
 def _length(value: object) -> int:

@@ -11,7 +11,11 @@ from eii_custodian.publicdata.review.activity import (
     write_queue_csv,
     write_review_csv,
 )
-from eii_custodian.publicdata.review.cache_fixture import write_cached
+from eii_custodian.publicdata.review.cache_fixture import (
+    class_csv,
+    real_feed_body,
+    write_cached,
+)
 
 
 def invented_cache(root: Path) -> list[str]:
@@ -19,22 +23,23 @@ def invented_cache(root: Path) -> list[str]:
     cache = root / "data/public_cache"
     cache.mkdir(parents=True)
     bodies = {
-        "lic_active": [
-            {
-                "activity_code": code,
-                "activity_name_ar": "نشاط اصطناعي للاختبار",
-                "active_count": count,
-            }
-            for code, count in (("5610901", 9), ("5610902", 9), ("561099", 3))
-        ],
-        "lic_cancelled": [],
-        "cls_isic4": [
-            {"code": "5610", "label_en": "Invented test class", "label_ar": ""}
-        ],
+        "lic_active": real_feed_body(
+            "lic_active",
+            [
+                {
+                    "activity_code": code,
+                    "activity_name_ar": "نشاط اصطناعي للاختبار",
+                    "active_count": count,
+                }
+                for code, count in (("5610901", 9), ("5610902", 9), ("561099", 3))
+            ],
+        ),
+        "lic_cancelled": real_feed_body("lic_cancelled", []),
+        "cls_isic4": class_csv([("5610", "Invented test class")]),
     }
     for entry in load_registry():
         if entry.key in bodies:
-            write_cached(cache, entry, json.dumps(bodies[entry.key]).encode())
+            write_cached(cache, entry, bodies[entry.key])
     review = cache / "review.csv"
     queue = cache / "queue.csv"
     membership = cache / "membership.json"

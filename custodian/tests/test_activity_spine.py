@@ -20,10 +20,12 @@ from eii_custodian.publicdata.review.activity import (
     SupplierMembership,
     build_spine,
     class_bucket_counts,
+    entry_by_key,
     finalise_spine,
     load_activity_inputs,
     load_seed_reviews,
-    parse_activity_rows,
+    merge_feed_rows,
+    parse_feed_rows,
     parse_isic_rows,
     read_review_csv,
     review_binding,
@@ -31,7 +33,13 @@ from eii_custodian.publicdata.review.activity import (
     write_queue_csv,
     write_review_csv,
 )
-from eii_custodian.publicdata.review.cache_fixture import CacheError, write_cached
+from eii_custodian.publicdata.review.cache_fixture import (
+    CacheError,
+    class_csv,
+    real_feed_body,
+    real_feed_row,
+    write_cached,
+)
 from eii_custodian.publicdata.review.graph import build_graph
 
 _NO_SUPPLIERS = SupplierMembership(codes=(), complete=True)
@@ -364,7 +372,7 @@ def test_load_activity_inputs_requires_a_supplier_membership(tmp_path: Path) -> 
                 "active_count": 10,
             }
         ],
-        classes=[{"code": "5610", "label_en": "Restaurants", "label_ar": ""}],
+        classes=[("5610", "Restaurants")],
     )
     with pytest.raises(TypeError, match="supplier_membership"):
         load_activity_inputs(tmp_path, (), review_path=_review_file(tmp_path))
@@ -394,8 +402,8 @@ def test_cached_cancelled_only_supplier_reaches_the_mandatory_queue(
             }
         ],
         classes=[
-            {"code": "4100", "label_en": "Class 4100", "label_ar": ""},
-            {"code": "4630", "label_en": "Class 4630", "label_ar": ""},
+            ("4100", "Class 4100"),
+            ("4630", "Class 4630"),
         ],
     )
     membership = SupplierMembership(codes=("4630001",), complete=True)
@@ -554,39 +562,121 @@ def test_cancelled_only_rows_add_nothing_to_the_buckets() -> None:
 
 
 def test_activity_rows_aggregate_and_refuse_conflicts() -> None:
-    """Repeated codes sum; a conflicting name or a bad count fails."""
-    rows = (
-        {
-            "activity_code": "5610101",
-            "activity_name_ar": "مطعم",
-            "active_count": 2,
-            "cancelled_count": 1,
-        },
-        {
-            "activity_code": "5610101",
-            "activity_name_ar": "مطعم",
-            "active_count": 3,
-            "cancelled_count": 0,
-        },
+    """Repeated codes sum; a conflicting name, a bad count or an extra field fails."""
+    active = parse_feed_rows(
+        (
+            real_feed_row(
+                "lic_active",
+                {
+                    "activity_code": "5610101",
+                    "activity_name_ar": "مطعم",
+                    "active_count": 2,
+                    "municipality": "أ",
+                },
+            ),
+            real_feed_row(
+                "lic_active",
+                {
+                    "activity_code": "5610101",
+                    "activity_name_ar": "مطعم",
+                    "active_count": 3,
+                    "municipality": "ب",
+                },
+            ),
+        ),
+        entry_by_key(load_registry(), "lic_active"),
     )
-    parsed = parse_activity_rows(rows)
-    assert parsed == (ActivityRow("5610101", "مطعم", 5, 1),)
+    cancelled = parse_feed_rows(
+        (
+            real_feed_row(
+                "lic_cancelled",
+                {
+                    "activity_code": "5610101",
+                    "activity_name_ar": "مطعم",
+                    "cancelled_count": 1,
+                },
+            ),
+        ),
+        entry_by_key(load_registry(), "lic_cancelled"),
+    )
+    assert merge_feed_rows(active.rows, cancelled.rows) == (
+        ActivityRow("5610101", "مطعم", 5, 1, ("lic_active", "lic_cancelled")),
+    )
     with pytest.raises(SpineError):
-        parse_activity_rows((rows[0], {**rows[1], "activity_name_ar": "مقهى"}))
+        parse_feed_rows(
+            (
+                real_feed_row(
+                    "lic_active",
+                    {
+                        "activity_code": "5610101",
+                        "activity_name_ar": "مطعم",
+                        "active_count": 2,
+                    },
+                ),
+                real_feed_row(
+                    "lic_active",
+                    {
+                        "activity_code": "5610101",
+                        "activity_name_ar": "مقهى",
+                        "active_count": 3,
+                    },
+                ),
+            ),
+            entry_by_key(load_registry(), "lic_active"),
+        )
     with pytest.raises(SpineError):
-        parse_activity_rows(({**rows[0], "active_count": -1},))
+        parse_feed_rows(
+            (
+                real_feed_row(
+                    "lic_active",
+                    {
+                        "activity_code": "5610101",
+                        "activity_name_ar": "مطعم",
+                        "active_count": -1,
+                    },
+                ),
+            ),
+            entry_by_key(load_registry(), "lic_active"),
+        )
     with pytest.raises(SpineError):
-        parse_activity_rows(({**rows[0], "active_count": True},))
+        parse_feed_rows(
+            (
+                real_feed_row(
+                    "lic_active",
+                    {
+                        "activity_code": "5610101",
+                        "activity_name_ar": "مطعم",
+                        "active_count": True,
+                    },
+                ),
+            ),
+            entry_by_key(load_registry(), "lic_active"),
+        )
     with pytest.raises(SpineError):
-        parse_activity_rows(({**rows[0], "planted": 1},))
+        parse_feed_rows(
+            (
+                real_feed_row(
+                    "lic_active",
+                    {
+                        "activity_code": "5610101",
+                        "activity_name_ar": "مطعم",
+                        "active_count": 1,
+                        "planted": 1,
+                    },
+                ),
+            ),
+            entry_by_key(load_registry(), "lic_active"),
+        )
 
 
-def test_isic_rows_accept_title_aliases() -> None:
-    """The fixture may name the titles label_* or title_*."""
-    parsed = parse_isic_rows(
-        ({"code": "5610", "title_en": "Restaurants", "title_ar": ""},)
-    )
-    assert parsed == (IsicClass("5610", "Restaurants", ""),)
+def test_isic_rows_read_code_and_description() -> None:
+    """A class row is Code and Description; a title alias is an unknown field."""
+    parsed = parse_isic_rows(({"Code": "5610", "Description": "Restaurants"},))
+    assert parsed.classes == (IsicClass("5610", "Restaurants", ""),)
+    with pytest.raises(SpineError, match="unknown isic field title_en"):
+        parse_isic_rows(
+            ({"Code": "5610", "Description": "Restaurants", "title_en": "Alias"},)
+        )
 
 
 def test_review_code_round_trip_uses_the_dotted_form(tmp_path: Path) -> None:
@@ -700,20 +790,16 @@ def test_queue_csv_round_trip(tmp_path: Path) -> None:
 
 
 def test_committed_seed_has_no_mapped_row() -> None:
-    """The seed names the restaurant and the legacy code, and maps nothing."""
+    """The committed file holds one unreviewed row and no claimed decision."""
     reviews = load_seed_reviews()
-    assert tuple(row.code for row in reviews) == ("561000", "5610101")
-    assert all(row.status != "mapped" for row in reviews)
+    assert len(reviews) == 1
+    assert all(row.status == "unreviewed" for row in reviews)
     assert all(row.reviewed_by_role == "" for row in reviews)
     assert all(row.reviewed_on == "" for row in reviews)
-    restaurant = reviews[1]
+    restaurant = reviews[0]
     assert restaurant.name_ar == "مطعم"
     assert restaurant.isic_class == "5610"
     assert restaurant.status == "unreviewed"
-    legacy = reviews[0]
-    assert legacy.name_ar == "تجارة قطع الغيار"
-    assert legacy.status == "not_mappable_legacy"
-    assert legacy.isic_class == ""
     assert spine_path().name == "activity_spine.csv"
 
 
@@ -1019,7 +1105,7 @@ def test_loaded_spine_records_complete_lineage(tmp_path: Path) -> None:
         }
     ]
     cancelled: list[dict[str, object]] = []
-    classes = [{"code": "5610", "label_en": "Restaurants", "label_ar": ""}]
+    classes = [("5610", "Restaurants")]
     _write_feeds(tmp_path, active=active, cancelled=cancelled, classes=classes)
     review = _review_file(tmp_path)
     inputs = load_activity_inputs(
@@ -1031,8 +1117,8 @@ def test_loaded_spine_records_complete_lineage(tmp_path: Path) -> None:
     assert manifest.method_version == "activity_spine.v1"
     sources = dict(manifest.source_hashes)
     assert set(sources) == {"lic_active", "lic_cancelled", "cls_isic4"}
-    assert sources["lic_active"] == sha256_hex(json.dumps(active).encode())
-    assert sources["cls_isic4"] == sha256_hex(json.dumps(classes).encode())
+    assert sources["lic_active"] == sha256_hex(real_feed_body("lic_active", active))
+    assert sources["cls_isic4"] == sha256_hex(class_csv(classes))
     assert manifest.review_sha256 == hashlib.sha256(review.read_bytes()).hexdigest()
     assert len(manifest.class_title_sha256) == 64
 
@@ -1060,7 +1146,7 @@ def test_cache_to_spine_reads_the_three_keys(tmp_path: Path) -> None:
                 "cancelled_count": 4,
             },
         ],
-        classes=[{"code": "5610", "label_en": "Restaurants", "label_ar": ""}],
+        classes=[("5610", "Restaurants")],
     )
     review = _review_file(tmp_path, _MAPPED_ROW)
     _binding_beside(review)
@@ -1113,7 +1199,7 @@ def test_cache_to_spine_records_source_presence(tmp_path: Path) -> None:
                 "cancelled_count": 7,
             },
         ],
-        classes=[{"code": "5610", "label_en": "Restaurants", "label_ar": ""}],
+        classes=[("5610", "Restaurants")],
     )
     inputs = load_activity_inputs(
         tmp_path,
@@ -1146,7 +1232,7 @@ def test_cache_to_spine_refuses_a_malformed_row(tmp_path: Path) -> None:
         _write_feeds(
             cache,
             active=[planted],
-            classes=[{"code": "5610", "label_en": "Restaurants", "label_ar": ""}],
+            classes=[("5610", "Restaurants")],
         )
         with pytest.raises(SpineError):
             load_activity_inputs(
@@ -1175,7 +1261,7 @@ def test_cache_to_spine_refuses_conflicting_feed_names(tmp_path: Path) -> None:
                 "cancelled_count": 1,
             },
         ],
-        classes=[{"code": "5610", "label_en": "Restaurants", "label_ar": ""}],
+        classes=[("5610", "Restaurants")],
     )
     with pytest.raises(SpineError):
         load_activity_inputs(
@@ -1210,7 +1296,7 @@ def test_cache_to_spine_refuses_a_missing_registry_key(tmp_path: Path) -> None:
                 "active_count": 1,
             },
         ],
-        classes=[{"code": "5610", "label_en": "Restaurants", "label_ar": ""}],
+        classes=[("5610", "Restaurants")],
     )
     with pytest.raises(SpineError):
         load_activity_inputs(
@@ -1449,13 +1535,17 @@ def _write_feeds(
     *,
     active: list[dict[str, object]] | None = None,
     cancelled: list[dict[str, object]] | None = None,
-    classes: list[dict[str, object]] | None = None,
+    classes: list[dict[str, object]] | list[tuple[str, str]] | None = None,
 ) -> None:
-    write_cached(cache, _cache_entry("lic_active"), json.dumps(active or []).encode())
     write_cached(
-        cache, _cache_entry("lic_cancelled"), json.dumps(cancelled or []).encode()
+        cache, _cache_entry("lic_active"), real_feed_body("lic_active", active or [])
     )
-    write_cached(cache, _cache_entry("cls_isic4"), json.dumps(classes or []).encode())
+    write_cached(
+        cache,
+        _cache_entry("lic_cancelled"),
+        real_feed_body("lic_cancelled", cancelled or []),
+    )
+    write_cached(cache, _cache_entry("cls_isic4"), class_csv(classes or []))
 
 
 def _write_restaurant_cache(folder: Path, *, label_en: str = "Restaurants") -> None:
@@ -1468,7 +1558,7 @@ def _write_restaurant_cache(folder: Path, *, label_en: str = "Restaurants") -> N
                 "active_count": 10,
             }
         ],
-        classes=[{"code": "5610", "label_en": label_en, "label_ar": ""}],
+        classes=[("5610", label_en)],
     )
 
 
