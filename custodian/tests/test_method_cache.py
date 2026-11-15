@@ -96,7 +96,14 @@ def test_method_cache_named_failures(tmp_path, plant):
 
 
 def test_method_data_tests_are_outside_whole_command_selection():
-    from scripts.run_tests import SUITES
+    import sys
+
+    from custodian.tests.repository_root import repository_root
+
+    repo = repository_root(Path(__file__))
+    if str(repo / "scripts") not in sys.path:
+        sys.path.insert(0, str(repo / "scripts"))
+    from run_tests import SUITES
 
     selections = [
         arg for suite in SUITES if suite.kind == "pytest" for arg in suite.args
