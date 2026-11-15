@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13, and by decisions 0024 and 0026 on 2026-11-14; also amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md), as amended by [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md); amended by decision 0030 on 2026-11-14 (proposed) |
+| Status | Draft v0.3, amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13, and by decisions 0024 and 0026 on 2026-11-14; also amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md), as amended by [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md); amended by decision 0030 on 2026-11-14 (proposed); amended by decision 0032 on 2026-11-15 |
 | Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | Define every kind of test, the CI pipeline, the evidence that proves each slice gate, and the definition of done. |
@@ -508,9 +508,9 @@ Each row joins the gate of the slice of [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENT
 |---|---|
 | TST-160 | Every acceptance criterion of the task in [TASKS.md](../TASKS.md) is met, and each criterion points at a test or a recorded check. |
 | TST-161 | New behaviour has tests, and each new guard has its teeth (TST-04). Where practical, the test was seen failing before the code that makes it pass. |
-| TST-162 | `./eii test` and `python3 scripts/check_docs.py` exited 0 in the lead's own run on the final commit, and CI is green on the same commit. |
-| TST-163 | Only files in the task's scope changed; documents affected by the change are updated in the same pull request. |
-| TST-164 | The [PROGRESS.md](../PROGRESS.md) entry of section 6.3 exists, and the independent reviewer returned APPROVED under [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md), or the commit counts as APPROVED under its REV-40 (a verdict left with no finding counts as APPROVED for that commit). The designated reviewer's verdict decides; extra reviewers are advisory (REV-43). |
+| TST-162 | `./eii test` and `python3 scripts/check_docs.py` exited 0 in the lead's own run on the final commit, and CI is green on the same commit. For a train under [AGENTS.md](../AGENTS.md) rule 33 and [decision 0032](decisions/0032-approved-tasks-of-one-slice-may-merge-as-a-train.md), each task keeps its own checks, the six hosted checks run once on the joined head, and the lead runs the whole test with a fresh seed on the exact merge result; head checks stay unchanged. |
+| TST-163 | Only files in the task's scope changed; documents affected by the change are updated in the same pull request. For a train under [AGENTS.md](../AGENTS.md) rule 33 and [decision 0032](decisions/0032-approved-tasks-of-one-slice-may-merge-as-a-train.md), each task keeps its own scope and the joined head holds exactly the approved changes and the records. |
+| TST-164 | The [PROGRESS.md](../PROGRESS.md) entry of section 6.3 exists, and the independent reviewer returned APPROVED under [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md), or the commit counts as APPROVED under its REV-40 (a verdict left with no finding counts as APPROVED for that commit). The designated reviewer's verdict decides; extra reviewers are advisory (REV-43). For a train under [AGENTS.md](../AGENTS.md) rule 33 and [decision 0032](decisions/0032-approved-tasks-of-one-slice-may-merge-as-a-train.md), one ledger preserves every task's rows and local-commit verdict, with the separate confirmation of the joined head by another maker. |
 
 ### 6.2 A slice is done when
 
@@ -526,7 +526,7 @@ Each row joins the gate of the slice of [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENT
 
 | ID | Requirement |
 |---|---|
-| TST-170 | Each evidence entry must give the task or gate item, the full 40-character commit hash, the exact command, the exit code as printed by the shell, the date, who ran it (lead or CI, with the run link), the test counts (passed, failed, skipped) and any seed. |
+| TST-170 | Each evidence entry must give the task or gate item, the full 40-character commit hash, the exact command, the exit code as printed by the shell, the date, who ran it (lead or CI, with the run link), the test counts (passed, failed, skipped) and any seed. For a train under [AGENTS.md](../AGENTS.md) rule 33 and [decision 0032](decisions/0032-approved-tasks-of-one-slice-may-merge-as-a-train.md), one ledger holds every task's own rows and verdict, identifying the approved local commits, joined head and exact merge result separately. |
 | TST-171 | An entry is never edited after the fact. A correction is a new entry that names the one it corrects. |
 
 ```text
