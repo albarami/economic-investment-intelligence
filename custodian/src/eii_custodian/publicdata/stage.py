@@ -4,7 +4,9 @@ Parsers that read the cached files belong to later tasks. Until a figure file
 is written into the cache, the stage records coverage not_measured and does
 not invent a value. A planted figure that differs from the published anchor
 fails. PUB-71's expected figures are never committed: the stage reads them
-from one local record inside the uncommitted cache.
+from one local record inside the uncommitted cache. A produced figure whose
+local record is absent still fails the build: the row keeps its not-measured
+coverage and is named so the build cannot succeed on missing evidence.
 """
 
 from __future__ import annotations
@@ -124,11 +126,17 @@ _LOCAL_FIELDS: dict[str, tuple[str, ...]] = {
 
 @dataclass(frozen=True)
 class StageResult:
-    """Coverage notes, and the first figure id that disagreed, if any."""
+    """Coverage notes, and the first figure id that disagreed, if any.
+
+    ``unrecorded`` names the first figure that was produced while its local
+    expectations record is absent; the row stays not measured and the build
+    must fail on it.
+    """
 
     missing: tuple[str, ...]
     mismatch: str
     failure: FetchFailure | None = None
+    unrecorded: str = ""
 
 
 def _local_expected(cache: Path, figure_id: str) -> dict[str, str] | None:
@@ -171,7 +179,9 @@ def run_stage(
     """Compare figure files under cache/figures with the section 10 anchors.
 
     A figure with no committed anchor and no local record is reported like a
-    figure that cannot be measured today, never as a pass.
+    figure that cannot be measured today, never as a pass. A produced figure
+    whose local record is absent is named in ``unrecorded`` as well: its row
+    stays not measured and the build fails on the missing record.
     """
     if build_entries is not None:
         from eii_custodian.publicdata.series.figures import finish_build
@@ -180,6 +190,7 @@ def run_stage(
             raise ValueError("selected fetch lines required")
         return StageResult((), "", finish_build(build_entries, cache, build_lines))
     missing: list[str] = []
+    unrecorded = ""
     if set(required) - set(SECTION_10_IDS):
         raise ValueError("unknown required regression")
     for figure_id in SECTION_10_IDS:
@@ -191,6 +202,8 @@ def run_stage(
             missing.append(figure_id)
             if figure_id in required:
                 return StageResult(tuple(missing), figure_id)
+            if expected is None and path.is_file() and not unrecorded:
+                unrecorded = figure_id
             continue
         got = json.loads(path.read_text(encoding="utf-8"))
         if use_evidence:
@@ -200,4 +213,4 @@ def run_stage(
             got = got["values"]
         if got != expected:
             return StageResult(tuple(missing), figure_id)
-    return StageResult(tuple(missing), "")
+    return StageResult(tuple(missing), "", unrecorded=unrecorded)

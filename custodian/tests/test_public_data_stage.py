@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from eii_custodian.publicdata.fetch.build import run_build
+from eii_custodian.publicdata.fetch.report import coverage_line
 from eii_custodian.publicdata.fetch.transport import Response
 from eii_custodian.publicdata.stage import EXPECTED, SECTION_10_IDS, run_stage
 
@@ -84,6 +85,64 @@ def test_pub71_without_local_record_is_not_measured(tmp_path: Path) -> None:
     required = run_stage(tmp_path, required=("PUB-71",))
     assert required.mismatch == "PUB-71"
     assert "PUB-71" in required.missing
+
+
+@pytest.mark.public_data
+def test_pub71_present_figure_without_record_fails_the_build(
+    tmp_path: Path,
+) -> None:
+    """A produced figure with no local record fails the build, named by row."""
+    folder = tmp_path / "figures"
+    folder.mkdir()
+    (folder / "PUB-71.json").write_text(json.dumps(INVENTED_PUB_71), encoding="utf-8")
+    result = run_stage(tmp_path)
+    assert result.unrecorded == "PUB-71"
+    assert "PUB-71" in result.missing
+
+    def unused(url: str) -> Response:
+        raise AssertionError(url)
+
+    outcome = run_build(
+        (), unused, tmp_path, lambda: "2026-11-13T08:00:00Z", lambda _seconds: None
+    )
+    assert outcome.failure is not None
+    assert outcome.failure.check == "public_data"
+    assert outcome.failure.source_id == "PUB-71"
+    assert outcome.failure.expected == "local expectations record"
+    assert outcome.failure.observed == "missing"
+    assert coverage_line("PUB-71") in outcome.lines
+
+
+@pytest.mark.public_data
+def test_pub71_matching_record_passes_the_build(tmp_path: Path) -> None:
+    """The same figure with a matching local record leaves the build unfailed."""
+    _local_record(tmp_path, json.dumps(INVENTED_PUB_71))
+    folder = tmp_path / "figures"
+    folder.mkdir()
+    (folder / "PUB-71.json").write_text(json.dumps(INVENTED_PUB_71), encoding="utf-8")
+
+    def unused(url: str) -> Response:
+        raise AssertionError(url)
+
+    outcome = run_build(
+        (), unused, tmp_path, lambda: "2026-11-13T08:00:00Z", lambda _seconds: None
+    )
+    assert outcome.failure is None
+    assert coverage_line("PUB-71") not in outcome.lines
+
+
+@pytest.mark.public_data
+def test_pub71_no_figure_leaves_the_build_unfailed(tmp_path: Path) -> None:
+    """No produced figure: the absent local record fails nothing."""
+
+    def unused(url: str) -> Response:
+        raise AssertionError(url)
+
+    outcome = run_build(
+        (), unused, tmp_path, lambda: "2026-11-13T08:00:00Z", lambda _seconds: None
+    )
+    assert outcome.failure is None
+    assert coverage_line("PUB-71") in outcome.lines
 
 
 @pytest.mark.public_data
