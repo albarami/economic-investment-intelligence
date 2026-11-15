@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 import pytest
+from custodian.tests.repository_root import repository_root
 
 from check_tree import DATA_PROBES
 from eii_custodian.publicdata.fetch.registry import FIELDS, Entry, load_registry
@@ -716,12 +717,16 @@ def test_failed_audit_leaves_the_earlier_pointer(
 
 def test_yaml_reader_is_the_registry_and_adds_no_suppression(tmp_path: Path) -> None:
     """The package has one YAML reader, and this task adds no type suppression."""
-    import eii_custodian.publicdata.investment_build as publication
     from eii_custodian.publicdata.fetch.registry import RegistryError, read_yaml
 
-    build = Path(publication.__file__).read_text(encoding="utf-8")
+    root = repository_root(Path(__file__).parent)
+    build = (
+        root / "custodian/src/eii_custodian/publicdata/investment_build.py"
+    ).read_text(encoding="utf-8")
     fixtures = _FIXTURE_PATH.read_text(encoding="utf-8")
-    registry = Path(read_yaml.__code__.co_filename).read_text(encoding="utf-8")
+    registry = (
+        root / "custodian/src/eii_custodian/publicdata/fetch/registry.py"
+    ).read_text(encoding="utf-8")
     assert "type: ignore" not in build
     assert "type: ignore" not in fixtures
     assert "import yaml" not in build
