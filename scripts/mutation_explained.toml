@@ -1497,16 +1497,6 @@ module = "custodian/src/eii_custodian/publicdata/places_fsq/policy.py"
 mutation = "--- src/eii_custodian/publicdata/places_fsq/policy.py\n+++ src/eii_custodian/publicdata/places_fsq/policy.py\n@@ -12,7 +12,7 @@\n     seen: dict[str, str] = {}\n     for row in rows:\n         prior = seen.get(row.source_category_id)\n-        if prior is not None and prior != row.place_category_key:\n+        if prior is not None and prior == row.place_category_key:\n             raise PlacesFsqError(\"mapping_conflict\")\n         if prior is not None:\n             raise PlacesFsqError(\"mapping_conflict\")"
 reason = "The following statement raises mapping_conflict for every source category already seen, whether or not the product key differs. A first sight of an identifier still passes."
 
-[[survivors]]
-module = "custodian/src/eii_custodian/publicdata/places_fsq/policy.py"
-mutation = "--- src/eii_custodian/publicdata/places_fsq/policy.py\n+++ src/eii_custodian/publicdata/places_fsq/policy.py\n@@ -2,7 +2,7 @@\n     \"\"\"Refuse a reviewed policy file that disagrees with the enforced rules.\"\"\"\n     import yaml  # type: ignore[import-untyped]\n \n-    loaded = yaml.safe_load(path.read_text(encoding=\"utf-8\"))\n+    loaded = yaml.safe_load(path.read_text(encoding=None))\n     if not isinstance(loaded, dict):\n         raise PlacesFsqError(\"policy_disagrees\")\n     expected: dict[str, object] = {"
-reason = "Path.read_text treats encoding None as locale.getencoding(). This interpreter reports UTF-8, the same codec as utf-8, so the policy text is unchanged."
-
-[[survivors]]
-module = "custodian/src/eii_custodian/publicdata/places_fsq/policy.py"
-mutation = "--- src/eii_custodian/publicdata/places_fsq/policy.py\n+++ src/eii_custodian/publicdata/places_fsq/policy.py\n@@ -2,7 +2,7 @@\n     \"\"\"Refuse a reviewed policy file that disagrees with the enforced rules.\"\"\"\n     import yaml  # type: ignore[import-untyped]\n \n-    loaded = yaml.safe_load(path.read_text(encoding=\"utf-8\"))\n+    loaded = yaml.safe_load(path.read_text(encoding=\"UTF-8\"))\n     if not isinstance(loaded, dict):\n         raise PlacesFsqError(\"policy_disagrees\")\n     expected: dict[str, object] = {"
-reason = "Python resolves the codec names UTF-8 and utf-8 to the same codec, so the policy text is unchanged."
-
 # places_fsq parse.py equivalents, S2-T15.
 [[survivors]]
 module = "custodian/src/eii_custodian/publicdata/places_fsq/parse.py"
@@ -1727,3 +1717,8 @@ reason = "Before this mkdir, _store unconditionally calls commit_pair for direct
 module = "custodian/src/eii_custodian/publicdata/places_fsq/fetch.py"
 mutation = "--- src/eii_custodian/publicdata/places_fsq/fetch.py\n+++ src/eii_custodian/publicdata/places_fsq/fetch.py\n@@ -43,7 +43,7 @@\n     digest = sha256_hex(payload)\n     final = directory / \"manifest.json\"\n     partial = directory / \".manifest.json.partial\"\n-    directory.mkdir(parents=True, exist_ok=True)\n+    directory.mkdir(parents=False, exist_ok=True)\n     partial.write_bytes(payload)\n     os.replace(partial, final)\n     return digest"
 reason = "Before this mkdir, _store unconditionally calls commit_pair for directory/metadata. commit_pair creates that folder with parents=True and returns only after writing its pair, so directory already exists when this mkdir is reached. The unchanged exist_ok=True accepts it with any of these parents settings; a failure of the earlier commit_pair exits _store before this line."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places_fsq/policy.py"
+mutation = "--- src/eii_custodian/publicdata/places_fsq/policy.py\n+++ src/eii_custodian/publicdata/places_fsq/policy.py\n@@ -2,7 +2,7 @@\n     \"\"\"Refuse a reviewed policy file that disagrees with the enforced rules.\"\"\"\n     import yaml\n \n-    loaded = yaml.safe_load(path.read_text(encoding=\"utf-8\"))\n+    loaded = yaml.safe_load(path.read_text(encoding=\"UTF-8\"))\n     if not isinstance(loaded, dict):\n         raise PlacesFsqError(\"policy_disagrees\")\n     expected: dict[str, object] = {"
+reason = "Python resolves the codec names UTF-8 and utf-8 to the same codec, so the policy text is unchanged."
