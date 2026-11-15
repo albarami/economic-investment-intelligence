@@ -1,0 +1,6 @@
+# Reviewed use map of PUB-107: the Arabic label and the usage field of the two
+# sales bulletins to a use_key and a marker. The English label is never read.
+# Marker `land` marks land without a building; any other marker is a published
+# unit-type key of prop_resi_units. The lead fills the reviewed rows from the
+# real files and an expert review; with no row committed every label fails.
+source_id,arabic_label,usage_value,use_key,marker,reviewer,reviewed_on

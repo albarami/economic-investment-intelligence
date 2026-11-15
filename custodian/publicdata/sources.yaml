@@ -769,9 +769,37 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: ["pub_property_sale"]
+    release_tables: ["pub_property_sale", "pub_property_quarter"]
     caveat_keys: []
-    columns: []
+    columns:
+      - name: "registration_date"
+        type: "string"
+      - name: "encrypted_transaction_number"
+        type: "string"
+      - name: "encrypted_parcel_number"
+        type: "string"
+      - name: "sm_lbldy"
+        type: "string"
+      - name: "municipality_name"
+        type: "string"
+      - name: "sm_lmntq"
+        type: "string"
+      - name: "district_name"
+        type: "string"
+      - name: "nw_l_qr"
+        type: "string"
+      - name: "property_type"
+        type: "string"
+      - name: "property_usage"
+        type: "string"
+      - name: "area_square_meters"
+        type: "integer"
+      - name: "area_square_feet"
+        type: "integer"
+      - name: "price_per_square_meter"
+        type: "integer"
+      - name: "property_value"
+        type: "integer"
     row_count_min: 26719
     row_count_max: 26719
     reconciliation: "none"
@@ -1705,7 +1733,7 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: ["pub_property_resi"]
+    release_tables: ["pub_property_resi", "pub_property_quarter"]
     caveat_keys: []
     columns:
       - name: "registration_date"
@@ -7782,6 +7810,3652 @@ sources:
     point: [25.2854, 51.531]
     variables: ["temperature_2m"]
     cache_role: "generator_input"
+  - key: bank_credit_act/local-banks-credit-by-economic-activity
+    source_id: bank_credit_act
+    slug: local-banks-credit-by-economic-activity
+    kind: portal_dataset
+    title_en: Local Banks Credit by Economic Activity
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/local-banks-credit-by-economic-activity/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/local-banks-credit-by-economic-activity/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables:
+    - pub_bank_credit
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: economic_activity
+      type: string
+    - name: lnsht_lqtsdy
+      type: string
+    - name: value
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 88
+    row_count_max: 88
+    period_first: '2012-01-01'
+    period_last: '2022-01-01'
+    period_field: year
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month
+    source_id: completions_ext
+    slug: building-completion-certificates-issued-by-type-of-certificate-and-month
+    kind: portal_dataset
+    title_en: Building Completion Certificates Issued by Type of Certificate and Month
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-completion-certificates-issued-by-type-of-certificate-and-month/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/building-completion-certificates-issued-by-type-of-certificate-and-month/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: month
+      type: string
+    - name: lshhr
+      type: string
+    - name: certificate_type
+      type: string
+    - name: nw_lshhd
+      type: string
+    - name: count
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 72
+    row_count_max: 72
+    period_first: '2021-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-daayen-municipality
+    source_id: completions_ext
+    slug: building-completion-certificates-issued-by-type-of-certificate-and-month-al-daayen-municipality
+    kind: portal_dataset
+    title_en: Building Completion Certificates Issued by Type of Certificate and Month - Al Daayen Municipality
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-completion-certificates-issued-by-type-of-certificate-and-month-al-daayen-municipality/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/building-completion-certificates-issued-by-type-of-certificate-and-month-al-daayen-municipality/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: month
+      type: string
+    - name: lshhr
+      type: string
+    - name: type_of_certificate
+      type: string
+    - name: nw_lshhd
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 120
+    row_count_max: 120
+    period_first: '2019-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-khor-and-al-thakhira
+    source_id: completions_ext
+    slug: building-completion-certificates-issued-by-type-of-certificate-and-month-al-khor-and-al-thakhira
+    kind: portal_dataset
+    title_en: Building Completion Certificates Issued by Type of Certificate and Month - Al Khor and Al Thakhira Municipality
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-completion-certificates-issued-by-type-of-certificate-and-month-al-khor-and-al-thakhira/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/building-completion-certificates-issued-by-type-of-certificate-and-month-al-khor-and-al-thakhira/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: month
+      type: string
+    - name: lshhr
+      type: string
+    - name: type_of_certificate
+      type: string
+    - name: nw_lshhd
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 120
+    row_count_max: 120
+    period_first: '2019-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-rayyan-municipality
+    source_id: completions_ext
+    slug: building-completion-certificates-issued-by-type-of-certificate-and-month-al-rayyan-municipality
+    kind: portal_dataset
+    title_en: Building Completion Certificates Issued by Type of Certificate and Month - Al Rayyan Municipality
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-completion-certificates-issued-by-type-of-certificate-and-month-al-rayyan-municipality/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/building-completion-certificates-issued-by-type-of-certificate-and-month-al-rayyan-municipality/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: month
+      type: string
+    - name: lshhr
+      type: string
+    - name: type_of_certificate
+      type: string
+    - name: nw_lshhd
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 120
+    row_count_max: 120
+    period_first: '2019-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-shahhaniya-municipality
+    source_id: completions_ext
+    slug: building-completion-certificates-issued-by-type-of-certificate-and-month-al-shahhaniya-municipality
+    kind: portal_dataset
+    title_en: Building Completion Certificates Issued by Type of Certificate and Month - Al Shahhaniya Municipality
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-completion-certificates-issued-by-type-of-certificate-and-month-al-shahhaniya-municipality/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/building-completion-certificates-issued-by-type-of-certificate-and-month-al-shahhaniya-municipality/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: month
+      type: string
+    - name: lshhr
+      type: string
+    - name: type_of_certificate
+      type: string
+    - name: nw_lshhd
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 120
+    row_count_max: 120
+    period_first: '2019-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-shamal-municipality
+    source_id: completions_ext
+    slug: building-completion-certificates-issued-by-type-of-certificate-and-month-al-shamal-municipality
+    kind: portal_dataset
+    title_en: Building Completion Certificates Issued by Type of Certificate and Month - Al Shamal Municipality
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-completion-certificates-issued-by-type-of-certificate-and-month-al-shamal-municipality/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/building-completion-certificates-issued-by-type-of-certificate-and-month-al-shamal-municipality/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: month
+      type: string
+    - name: lshhr
+      type: string
+    - name: type_of_certificate
+      type: string
+    - name: nw_lshhd
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 120
+    row_count_max: 120
+    period_first: '2019-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-wakrah-municipality
+    source_id: completions_ext
+    slug: building-completion-certificates-issued-by-type-of-certificate-and-month-al-wakrah-municipality
+    kind: portal_dataset
+    title_en: Building Completion Certificates Issued by Type of Certificate and Month - Al Wakrah Municipality
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-completion-certificates-issued-by-type-of-certificate-and-month-al-wakrah-municipality/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/building-completion-certificates-issued-by-type-of-certificate-and-month-al-wakrah-municipality/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: month
+      type: string
+    - name: lshhr
+      type: string
+    - name: type_of_certificate
+      type: string
+    - name: nw_lshhd
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 120
+    row_count_max: 120
+    period_first: '2019-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-doha-municipality
+    source_id: completions_ext
+    slug: building-completion-certificates-issued-by-type-of-certificate-and-month-doha-municipality
+    kind: portal_dataset
+    title_en: Building Completion Certificates Issued by Type of Certificate and Month - Doha Municipality
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-completion-certificates-issued-by-type-of-certificate-and-month-doha-municipality/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/building-completion-certificates-issued-by-type-of-certificate-and-month-doha-municipality/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: month
+      type: string
+    - name: lshhr
+      type: string
+    - name: type_of_certificate
+      type: string
+    - name: nw_lshhd
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 120
+    row_count_max: 120
+    period_first: '2019-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-umm-slal-municipality0
+    source_id: completions_ext
+    slug: building-completion-certificates-issued-by-type-of-certificate-and-month-umm-slal-municipality0
+    kind: portal_dataset
+    title_en: Building Completion Certificates Issued by Type of Certificate and Month - Umm Slal Municipality
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-completion-certificates-issued-by-type-of-certificate-and-month-umm-slal-municipality0/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/building-completion-certificates-issued-by-type-of-certificate-and-month-umm-slal-municipality0/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: month
+      type: string
+    - name: lshhr
+      type: string
+    - name: type_of_certificate
+      type: string
+    - name: nw_lshhd
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 120
+    row_count_max: 120
+    period_first: '2019-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: coverage_ext/electricity-network-coverage
+    source_id: coverage_ext
+    slug: electricity-network-coverage
+    kind: portal_dataset
+    title_en: Electricity Network Coverage
+    publisher: KAHRAMAA
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/electricity-network-coverage/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/electricity-network-coverage/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: electricity_network_coverage
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 7
+    row_count_max: 7
+    period_first: '2019-01-01'
+    period_last: '2025-01-01'
+    period_field: year
+  - key: coverage_ext/electricity-network-coverage-by-municipality
+    source_id: coverage_ext
+    slug: electricity-network-coverage-by-municipality
+    kind: portal_dataset
+    title_en: Electricity Network Coverage by Municipality
+    publisher: KAHRAMAA
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/electricity-network-coverage-by-municipality/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/electricity-network-coverage-by-municipality/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: municipality
+      type: string
+    - name: lbldy
+      type: string
+    - name: value
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 56
+    row_count_max: 56
+    period_first: '2019-01-01'
+    period_last: '2025-01-01'
+    period_field: year
+  - key: coverage_ext/proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender
+    source_id: coverage_ext
+    slug: proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender
+    kind: portal_dataset
+    title_en: Proportion of Mobile Network Coverage (At Least 2G and At Least 3G) by Gender
+    publisher: Communications Regulatory Authority
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender/
+    nightly_live_fetch: true
+    public_splits:
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: gender
+      type: string
+    - name: ljns
+      type: string
+    - name: category
+      type: string
+    - name: lfy
+      type: string
+    - name: value
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 24
+    row_count_max: 24
+    period_first: '2020-01-01'
+    period_last: '2025-01-01'
+    period_field: year
+  - key: coverage_ext/proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender-and-municipality
+    source_id: coverage_ext
+    slug: proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender-and-municipality
+    kind: portal_dataset
+    title_en: Proportion of Mobile Network Coverage (At Least 2G and At Least 3G) by Gender and Municipality
+    publisher: Communications Regulatory Authority
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender-and-municipality/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender-and-municipality/
+    nightly_live_fetch: true
+    public_splits:
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: municipality
+      type: string
+    - name: lbldy
+      type: string
+    - name: gender
+      type: string
+    - name: ljns
+      type: string
+    - name: category
+      type: string
+    - name: lfy
+      type: string
+    - name: value
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 192
+    row_count_max: 192
+    period_first: '2020-01-01'
+    period_last: '2025-01-01'
+    period_field: year
+  - key: coverage_ext/sdg-9-c-1-proportion-of-population-covered-by-a-mobile-network-by-technology
+    source_id: coverage_ext
+    slug: sdg-9-c-1-proportion-of-population-covered-by-a-mobile-network-by-technology
+    kind: portal_dataset
+    title_en: SDG  9.c.1 Proportion of Population Covered by a Mobile Network by Technology
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/sdg-9-c-1-proportion-of-population-covered-by-a-mobile-network-by-technology/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/sdg-9-c-1-proportion-of-population-covered-by-a-mobile-network-by-technology/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: technology
+      type: string
+    - name: ltknwlwjy
+      type: string
+    - name: percentage
+      type: string
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 24
+    row_count_max: 24
+    period_first: '2016-01-01'
+    period_last: '2021-01-01'
+    period_field: year
+  - key: coverage_ext/water-supply-coverage
+    source_id: coverage_ext
+    slug: water-supply-coverage
+    kind: portal_dataset
+    title_en: Water Supply Coverage
+    publisher: KAHRAMAA
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/water-supply-coverage/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/water-supply-coverage/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: coverage_type
+      type: string
+    - name: nw_ltgty
+      type: string
+    - name: supply_coverage
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 21
+    row_count_max: 21
+    period_first: '2019-01-01'
+    period_last: '2025-01-01'
+    period_field: year
+  - key: coverage_ext/water-supply-coverage-by-municipality
+    source_id: coverage_ext
+    slug: water-supply-coverage-by-municipality
+    kind: portal_dataset
+    title_en: Water Supply Coverage by Municipality
+    publisher: KAHRAMAA
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/water-supply-coverage-by-municipality/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/water-supply-coverage-by-municipality/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: municipality
+      type: string
+    - name: lbldy
+      type: string
+    - name: water_supply_coverage
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 56
+    row_count_max: 56
+    period_first: '2019-01-01'
+    period_last: '2025-01-01'
+    period_field: year
+  - key: dcool_capacity/design-cooling-capacity-by-status-municipality-and-sector-tr
+    source_id: dcool_capacity
+    slug: design-cooling-capacity-by-status-municipality-and-sector-tr
+    kind: portal_dataset
+    title_en: Design Cooling Capacity by Status, Municipality, and Sector (TR)
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/design-cooling-capacity-by-status-municipality-and-sector-tr/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/design-cooling-capacity-by-status-municipality-and-sector-tr/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables:
+    - pub_district_cooling
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: project_status
+      type: string
+    - name: municipality
+      type: string
+    - name: other
+      type: integer
+    - name: industrial
+      type: integer
+    - name: real_estate_development
+      type: integer
+    - name: sport
+      type: integer
+    - name: culture
+      type: string
+    - name: health
+      type: integer
+    - name: transport
+      type: integer
+    - name: education
+      type: integer
+    - name: hotels
+      type: integer
+    - name: commercial
+      type: integer
+    - name: district_cooling_service_supply
+      type: integer
+    - name: lbldy
+      type: string
+    - name: hl_lmshry
+      type: string
+    - name: geo_point
+      type: object
+    - name: geo_shape
+      type: object
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 69
+    row_count_max: 69
+    period_first: '2019-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: fdi_stats/foreign-direct-investment
+    source_id: fdi_stats
+    slug: foreign-direct-investment
+    kind: portal_dataset
+    title_en: Foreign Direct Investment
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/foreign-direct-investment/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/foreign-direct-investment/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: period
+      type: string
+    - name: indicator
+      type: string
+    - name: lbyn
+      type: string
+    - name: value
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 6
+    row_count_max: 6
+    period_first: '2025'
+    period_last: Q3-2025
+    period_field: period
+  - key: fdi_stats/sdg-17-3-1-foreign-direct-investment-inflows
+    source_id: fdi_stats
+    slug: sdg-17-3-1-foreign-direct-investment-inflows
+    kind: portal_dataset
+    title_en: SDG 17.3.1 Foreign Direct Investment Inflows
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/sdg-17-3-1-foreign-direct-investment-inflows/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/sdg-17-3-1-foreign-direct-investment-inflows/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: amount
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 35
+    row_count_max: 35
+    period_first: '1990-01-01'
+    period_last: '2024-01-01'
+    period_field: year
+  - key: gis_address
+    source_id: gis_address
+    slug: ''
+    kind: paged_layer
+    title_en: QARS
+    publisher: national GIS centre
+    licence_id: ''
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: services.gisqatar.org.qa
+    url: https://services.gisqatar.org.qa/server/rest/services/Vector/QARS/MapServer
+    terms_url: ''
+    terms_words: terms to be read
+    terms_read_on: '2026-11-15'
+    landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/QARS/MapServer
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables:
+    - pub_address_point
+    caveat_keys: []
+    columns:
+    - name: ZONE_NO
+      type: integer
+    - name: STREET_NO
+      type: integer
+    - name: BUILDING_NO
+      type: integer
+    - name: PIN
+      type: integer
+    - name: BUILDING_NO_SUBTYPE
+      type: integer
+    - name: SURVEYED_DATE
+      type: integer
+    - name: SHAPE
+      type: object
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    layer: 0
+  - key: gis_boundaries
+    source_id: gis_boundaries
+    slug: ''
+    kind: paged_layer
+    title_en: gis_boundaries
+    publisher: national GIS centre
+    licence_id: ''
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: services.gisqatar.org.qa
+    url: ''
+    terms_url: ''
+    terms_words: terms to be read
+    terms_read_on: '2026-11-15'
+    landing_url: ''
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    reconciliation: none
+    skip_reason: direct_url_unconfirmed
+    extension: json
+  - key: gis_context
+    source_id: gis_context
+    slug: ''
+    kind: paged_layer
+    title_en: ROADFlowlnA
+    publisher: national GIS centre
+    licence_id: ''
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: services.gisqatar.org.qa
+    url: https://services.gisqatar.org.qa/server/rest/services/Vector/ROADFlowlnA/MapServer
+    terms_url: ''
+    terms_words: terms to be read
+    terms_read_on: '2026-11-15'
+    landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/ROADFlowlnA/MapServer
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: STREET_NO
+      type: integer
+    - name: ZONE_NO
+      type: integer
+    - name: ROAD_CLASS
+      type: string
+    - name: CLASS_ARABIC
+      type: integer
+    - name: RD_ENAME
+      type: string
+    - name: RD_ANAME
+      type: string
+    - name: SHAPE
+      type: object
+    - name: SHAPE.LEN
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    layer: 0
+    basis_note: 'LR-G11: street centre lines with class and names; no flow, volume, speed or direction field.'
+  - key: gis_imagery_history
+    source_id: gis_imagery_history
+    slug: ''
+    kind: paged_layer
+    title_en: gis_imagery_history
+    publisher: national GIS centre
+    licence_id: ''
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: services.gisqatar.org.qa
+    url: ''
+    terms_url: ''
+    terms_words: terms to be read
+    terms_read_on: '2026-11-15'
+    landing_url: ''
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    reconciliation: none
+    skip_reason: direct_url_unconfirmed
+    extension: json
+  - key: gis_land_price
+    source_id: gis_land_price
+    slug: ''
+    kind: paged_layer
+    title_en: LandPricing2026
+    publisher: national GIS centre
+    licence_id: ''
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: services.gisqatar.org.qa
+    url: https://services.gisqatar.org.qa/server/rest/services/Vector/LandPricing2026/MapServer
+    terms_url: ''
+    terms_words: terms to be read
+    terms_read_on: '2026-11-15'
+    landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/LandPricing2026/MapServer
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables:
+    - pub_land_price
+    caveat_keys: []
+    columns:
+    - name: DIST_NO
+      type: integer
+    - name: District_No
+      type: integer
+    - name: ANAME
+      type: string
+    - name: ENAME
+      type: string
+    - name: ResidentialPrices
+      type: string
+    - name: ResidentialCityCenter
+      type: string
+    - name: ResidentialPriceFlats
+      type: string
+    - name: ResidentialPriceVillas
+      type: string
+    - name: CommercialPrices
+      type: string
+    - name: Shape
+      type: object
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    layer: 0
+  - key: gis_landmarks
+    source_id: gis_landmarks
+    slug: ''
+    kind: paged_layer
+    title_en: Landmarks
+    publisher: national GIS centre
+    licence_id: ''
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: services.gisqatar.org.qa
+    url: https://services.gisqatar.org.qa/server/rest/services/Vector/Landmarks/MapServer
+    terms_url: ''
+    terms_words: terms to be read
+    terms_read_on: '2026-11-15'
+    landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/Landmarks/MapServer
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables:
+    - gazetteer
+    caveat_keys: []
+    columns:
+    - name: ENAME
+      type: string
+    - name: ANAME
+      type: string
+    - name: SHAPE
+      type: object
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    layer: 0
+  - key: gis_locator
+    source_id: gis_locator
+    slug: ''
+    kind: citation_only
+    title_en: QARS_Custom_Locator
+    publisher: national GIS centre
+    licence_id: ''
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: services.gisqatar.org.qa
+    url: https://services.gisqatar.org.qa/server/rest/services/Vector/QARS_Custom_Locator/GeocodeServer
+    terms_url: ''
+    terms_words: terms to be read
+    terms_read_on: '2026-11-15'
+    landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/QARS_Custom_Locator/GeocodeServer
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+  - key: gis_parcels
+    source_id: gis_parcels
+    slug: ''
+    kind: paged_layer
+    title_en: CadastrePlots
+    publisher: national GIS centre
+    licence_id: ''
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: services.gisqatar.org.qa
+    url: https://services.gisqatar.org.qa/server/rest/services/Vector/CadastrePlots/MapServer
+    terms_url: ''
+    terms_words: terms to be read
+    terms_read_on: '2026-11-15'
+    landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/CadastrePlots/MapServer
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables:
+    - pub_parcel
+    caveat_keys: []
+    columns:
+    - name: PIN
+      type: integer
+    - name: SHAPE.AREA
+      type: number
+    - name: STARTDATE
+      type: integer
+    - name: ENDDATE
+      type: integer
+    - name: SHAPE
+      type: object
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    layer: 0
+  - key: gis_phcc
+    source_id: gis_phcc
+    slug: ''
+    kind: paged_layer
+    title_en: PHCC_LOCATION_2026
+    publisher: national GIS centre
+    licence_id: ''
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: services.gisqatar.org.qa
+    url: https://services.gisqatar.org.qa/server/rest/services/Vector/PHCC_LOCATION_2026/MapServer
+    terms_url: ''
+    terms_words: terms to be read
+    terms_read_on: '2026-11-15'
+    landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/PHCC_LOCATION_2026/MapServer
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables:
+    - pub_health_centre
+    caveat_keys: []
+    columns:
+    - name: HC_NAME
+      type: string
+    - name: A_HC_NAME
+      type: string
+    - name: HC_CODE
+      type: string
+    - name: HC_ZONE
+      type: string
+    - name: SHAPE
+      type: object
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    layer: 1
+    basis_note: 'B2: also Vector/PHCC_CATCHMENT_2026_Q/MapServer layer 1; per-layer declarations in gis_layer_fields.yaml.'
+  - key: gis_poi_comm
+    source_id: gis_poi_comm
+    slug: ''
+    kind: paged_layer
+    title_en: POIs_COMM
+    publisher: national GIS centre
+    licence_id: ''
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: services.gisqatar.org.qa
+    url: https://services.gisqatar.org.qa/server/rest/services/Vector/POIs_COMM/MapServer
+    terms_url: ''
+    terms_words: terms to be read
+    terms_read_on: '2026-11-15'
+    landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/POIs_COMM/MapServer
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables:
+    - pub_poi_comm
+    caveat_keys: []
+    columns:
+    - name: ENAME
+      type: string
+    - name: ANAME
+      type: string
+    - name: ZONE_NO
+      type: integer
+    - name: STREET_NO
+      type: integer
+    - name: BUILDING_NO
+      type: integer
+    - name: SHAPE
+      type: object
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    layer: 0
+  - key: gis_rail
+    source_id: gis_rail
+    slug: ''
+    kind: paged_layer
+    title_en: QRAIL_NO_OPERATION
+    publisher: national GIS centre
+    licence_id: ''
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: services.gisqatar.org.qa
+    url: https://services.gisqatar.org.qa/server/rest/services/Vector/QRAIL_NO_OPERATION/MapServer
+    terms_url: ''
+    terms_words: terms to be read
+    terms_read_on: '2026-11-15'
+    landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/QRAIL_NO_OPERATION/MapServer
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables:
+    - pub_rail_plan
+    caveat_keys: []
+    columns:
+    - name: STATION_NAME_ENGLISH
+      type: string
+    - name: STATION_NAME_ARABIC
+      type: string
+    - name: PHASE
+      type: string
+    - name: LINE
+      type: integer
+    - name: RED_LINE_PHASE
+      type: string
+    - name: GREEN_LINE_PHASE
+      type: string
+    - name: GOLD_LINE_PHASE
+      type: string
+    - name: BLUE_LINE_PHASE
+      type: string
+    - name: BLACK_LINE_PHASE
+      type: string
+    - name: SHAPE
+      type: object
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    layer: 2
+    basis_note: 'B2: also layers 0 QRAIL.Metro_Tracks_Detailed and 1 QRAIL.Rail_Protection_Zones; per-layer declarations
+      in gis_layer_fields.yaml.'
+  - key: gis_zoning
+    source_id: gis_zoning
+    slug: ''
+    kind: paged_layer
+    title_en: Zoning
+    publisher: national GIS centre
+    licence_id: ''
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: services.gisqatar.org.qa
+    url: https://services.gisqatar.org.qa/server/rest/services/Vector/Zoning/MapServer
+    terms_url: ''
+    terms_words: terms to be read
+    terms_read_on: '2026-11-15'
+    landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/Zoning/MapServer
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables:
+    - pub_zoning
+    caveat_keys: []
+    columns:
+    - name: ZONING_COD
+      type: string
+    - name: LU_ENG
+      type: string
+    - name: LU_ARB
+      type: string
+    - name: P_COM_SHOP
+      type: string
+    - name: P_COM_OFF
+      type: string
+    - name: P_RES_VIL
+      type: string
+    - name: P_RES_APA
+      type: string
+    - name: P_RES_HOT
+      type: string
+    - name: HEIGHT
+      type: string
+    - name: HEIGHTS
+      type: string
+    - name: SET_NOW_FR
+      type: number
+    - name: SET_NOW_RE
+      type: number
+    - name: SET_NOW_S1
+      type: number
+    - name: SET_NOW_S2
+      type: number
+    - name: SET_W_FR
+      type: number
+    - name: SET_W_RE
+      type: number
+    - name: SET_W_S1
+      type: number
+    - name: SET_W_S2
+      type: number
+    - name: BUILD_COV
+      type: string
+    - name: ENTRANCE
+      type: string
+    - name: MINIMUM_LO
+      type: string
+    - name: LANDUSE
+      type: integer
+    - name: SUB_LANDUS
+      type: integer
+    - name: ZONE_ID
+      type: string
+    - name: SHAPE
+      type: object
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    layer: 1
+    basis_note: 'LR-G8: also layer 0 Zoning; per-layer declarations in gis_layer_fields.yaml.'
+  - key: hotel_ext/number-of-hotel-beds-by-hotel-class
+    source_id: hotel_ext
+    slug: number-of-hotel-beds-by-hotel-class
+    kind: portal_dataset
+    title_en: Number of Hotel Beds by Hotel Class
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-hotel-beds-by-hotel-class/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/number-of-hotel-beds-by-hotel-class/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: five_star
+      type: integer
+    - name: four_star
+      type: integer
+    - name: three_star
+      type: integer
+    - name: two_one_star
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 5
+    row_count_max: 5
+    period_first: '2019-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: hotel_ext/number-of-hotel-guests-and-nights-of-stay-by-month
+    source_id: hotel_ext
+    slug: number-of-hotel-guests-and-nights-of-stay-by-month
+    kind: portal_dataset
+    title_en: Number of Hotel Guests and Nights of Stay by Month
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-hotel-guests-and-nights-of-stay-by-month/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/number-of-hotel-guests-and-nights-of-stay-by-month/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: month
+      type: string
+    - name: month_ar
+      type: string
+    - name: year
+      type: string
+    - name: sn
+      type: string
+    - name: value
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 120
+    row_count_max: 120
+    period_first: 2019 Guests
+    period_last: 2023 Nights
+    period_field: year
+  - key: hotel_ext/number-of-hotel-guests-and-nights-of-stay-by-nationality
+    source_id: hotel_ext
+    slug: number-of-hotel-guests-and-nights-of-stay-by-nationality
+    kind: portal_dataset
+    title_en: Number of Hotel Guests and Nights of Stay by Nationality
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-hotel-guests-and-nights-of-stay-by-nationality/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/number-of-hotel-guests-and-nights-of-stay-by-nationality/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: arab_nationalities_guests
+      type: integer
+    - name: arab_nationalities_nights
+      type: integer
+    - name: foreign_nationalities_guest
+      type: number
+    - name: foreign_nationalities_nights
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 5
+    row_count_max: 5
+    period_first: '2018-01-01'
+    period_last: '2022-01-01'
+    period_field: year
+  - key: hotel_ext/number-of-hotel-rooms-by-hotel-class
+    source_id: hotel_ext
+    slug: number-of-hotel-rooms-by-hotel-class
+    kind: portal_dataset
+    title_en: Number of Hotel Rooms by Hotel Class
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-hotel-rooms-by-hotel-class/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/number-of-hotel-rooms-by-hotel-class/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: five_star
+      type: integer
+    - name: four_star
+      type: integer
+    - name: three_star
+      type: integer
+    - name: two_one_star
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 5
+    row_count_max: 5
+    period_first: '2019-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: hotel_ext/number-of-hotels-by-hotel-class
+    source_id: hotel_ext
+    slug: number-of-hotels-by-hotel-class
+    kind: portal_dataset
+    title_en: Number of Hotels by Hotel Class
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-hotels-by-hotel-class/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/number-of-hotels-by-hotel-class/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: five_star
+      type: integer
+    - name: four_star
+      type: integer
+    - name: three_star
+      type: integer
+    - name: two_one_star
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 5
+    row_count_max: 5
+    period_first: '2019-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: hotel_ext/number-of-hotels-rooms-and-beds-by-hotel-type
+    source_id: hotel_ext
+    slug: number-of-hotels-rooms-and-beds-by-hotel-type
+    kind: portal_dataset
+    title_en: Number of Hotels, Rooms and Beds by Hotel Type
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-hotels-rooms-and-beds-by-hotel-type/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/number-of-hotels-rooms-and-beds-by-hotel-type/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: hotel_class
+      type: string
+    - name: fy_lfndq
+      type: string
+    - name: number_of_hotels
+      type: integer
+    - name: number_of_rooms
+      type: integer
+    - name: number_of_beds
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 32
+    row_count_max: 32
+    period_first: '2015-01-01'
+    period_last: '2022-01-01'
+    period_field: year
+  - key: jobseekers/qatari-unemployed-15-by-gender-and-willingness-to-work-quarterly
+    source_id: jobseekers
+    slug: qatari-unemployed-15-by-gender-and-willingness-to-work-quarterly
+    kind: portal_dataset
+    title_en: Qatari Unemployed (15+) by Sex & Willingness to Work
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/qatari-unemployed-15-by-gender-and-willingness-to-work-quarterly/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/qatari-unemployed-15-by-gender-and-willingness-to-work-quarterly/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: quarter
+      type: string
+    - name: willingness_to_work
+      type: string
+    - name: lrgb_ll_ml
+      type: string
+    - name: gender
+      type: string
+    - name: ljns
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 128
+    row_count_max: 128
+    period_first: '2018-01-01'
+    period_last: '2025-01-01'
+    period_field: year
+  - key: jobseekers/qatari-unemployed-15-not-willing-to-work-by-reason-quarterly
+    source_id: jobseekers
+    slug: qatari-unemployed-15-not-willing-to-work-by-reason-quarterly
+    kind: portal_dataset
+    title_en: Qatari Unemployed (15 years & above) With Secondary Education not Willing to Work in Private Sector
+      by Reasons - Quarterly
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/qatari-unemployed-15-not-willing-to-work-by-reason-quarterly/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/qatari-unemployed-15-not-willing-to-work-by-reason-quarterly/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: quarter
+      type: string
+    - name: reason
+      type: string
+    - name: sbb_dm_lrgb
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 121
+    row_count_max: 121
+    period_first: '2018-01-01'
+    period_last: '2025-01-01'
+    period_field: year
+  - key: jobseekers/qatari-unemployed-15-with-secondary-education-and-training-quarterly
+    source_id: jobseekers
+    slug: qatari-unemployed-15-with-secondary-education-and-training-quarterly
+    kind: portal_dataset
+    title_en: Qatari Unemployed (15+) with Secondary Education & Training
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/qatari-unemployed-15-with-secondary-education-and-training-quarterly/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/qatari-unemployed-15-with-secondary-education-and-training-quarterly/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: quarter
+      type: string
+    - name: type_of_training
+      type: string
+    - name: nw_ltdryb
+      type: string
+    - name: gender
+      type: string
+    - name: ljns
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 158
+    row_count_max: 158
+    period_first: '2018-01-01'
+    period_last: '2025-01-01'
+    period_field: year
+  - key: jobseekers/unemployed-qataris-15-years-and-above-by-gender-and-whether-offered-work-in-private-sector
+    source_id: jobseekers
+    slug: unemployed-qataris-15-years-and-above-by-gender-and-whether-offered-work-in-private-sector
+    kind: portal_dataset
+    title_en: Unemployed Qataris (15 Years & Above) by Gender & Whether Offered Work in Private Sector
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/unemployed-qataris-15-years-and-above-by-gender-and-whether-offered-work-in-private-sector/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/unemployed-qataris-15-years-and-above-by-gender-and-whether-offered-work-in-private-sector/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: gender
+      type: string
+    - name: ljns
+      type: string
+    - name: offered_work_in_private_sector
+      type: string
+    - name: l_rd_ll_ml_fy_lqt_lkhs
+      type: string
+    - name: value
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 28
+    row_count_max: 28
+    period_first: '2017-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: jobseekers/unemployed-qataris-15-years-and-above-by-gender-and-willingness-to-work-in-private-sector
+    source_id: jobseekers
+    slug: unemployed-qataris-15-years-and-above-by-gender-and-willingness-to-work-in-private-sector
+    kind: portal_dataset
+    title_en: Unemployed Qataris (15 Years & Above) by Gender & Willingness to Work in Private Sector
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/unemployed-qataris-15-years-and-above-by-gender-and-willingness-to-work-in-private-sector/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/unemployed-qataris-15-years-and-above-by-gender-and-willingness-to-work-in-private-sector/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: gender
+      type: string
+    - name: ljns
+      type: string
+    - name: willingness_to_work_in_private_sector
+      type: string
+    - name: lrgb_ll_ml_fy_lqt_lkhs
+      type: string
+    - name: number
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 32
+    row_count_max: 32
+    period_first: '2017-01-01'
+    period_last: '2024-01-01'
+    period_field: year
+  - key: jobseekers/unemployed-qataris-15-years-and-above-with-secondary-education-who-attended-training-programs-by
+    source_id: jobseekers
+    slug: unemployed-qataris-15-years-and-above-with-secondary-education-who-attended-training-programs-by
+    kind: portal_dataset
+    title_en: Unemployed Qataris (15 Years & Above) With Secondary Education Who Attended Training Programs By Gender
+      & Type Of Training
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/unemployed-qataris-15-years-and-above-with-secondary-education-who-attended-training-programs-by/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/unemployed-qataris-15-years-and-above-with-secondary-education-who-attended-training-programs-by/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: type_of_training
+      type: string
+    - name: nw_ldwr
+      type: string
+    - name: gender
+      type: string
+    - name: lnw
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 46
+    row_count_max: 46
+    period_first: '2017-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: jobseekers/unemployed-qataris-less-than-secondary-by-gender-and-readiness-to-train-for-craft-work0
+    source_id: jobseekers
+    slug: unemployed-qataris-less-than-secondary-by-gender-and-readiness-to-train-for-craft-work0
+    kind: portal_dataset
+    title_en: Unemployed Qataris Less Than Secondary by Gender and Readiness to Train for Craft Work
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/unemployed-qataris-less-than-secondary-by-gender-and-readiness-to-train-for-craft-work0/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/unemployed-qataris-less-than-secondary-by-gender-and-readiness-to-train-for-craft-work0/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: readiness_to_train_for_craft_work
+      type: string
+    - name: md_lst_dd_lltdryb_fy_lmjl_lhrfy
+      type: string
+    - name: gender
+      type: string
+    - name: lnw
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 24
+    row_count_max: 24
+    period_first: '2017-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: jobseekers/unemployed-qataris-not-willing-to-work-in-the-private-sector-by-gender-and-reasons
+    source_id: jobseekers
+    slug: unemployed-qataris-not-willing-to-work-in-the-private-sector-by-gender-and-reasons
+    kind: portal_dataset
+    title_en: Unemployed Qataris Not Willing to Work in the Private Sector by Gender and Reasons
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/unemployed-qataris-not-willing-to-work-in-the-private-sector-by-gender-and-reasons/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/unemployed-qataris-not-willing-to-work-in-the-private-sector-by-gender-and-reasons/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: reason
+      type: string
+    - name: lsbb
+      type: string
+    - name: gender
+      type: string
+    - name: lnw
+      type: string
+    - name: number
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 54
+    row_count_max: 54
+    period_first: '2017-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: jobseekers/unemployed-qataris-with-secondary-education-and-training-courses-refusing-work-in-private-sector-by
+    source_id: jobseekers
+    slug: unemployed-qataris-with-secondary-education-and-training-courses-refusing-work-in-private-sector-by
+    kind: portal_dataset
+    title_en: Unemployed Qataris with Secondary Education & Training Courses Refusing Work in Private Sector by Gender
+      & Reasons
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/unemployed-qataris-with-secondary-education-and-training-courses-refusing-work-in-private-sector-by/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/unemployed-qataris-with-secondary-education-and-training-courses-refusing-work-in-private-sector-by/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: gender
+      type: string
+    - name: ljns
+      type: string
+    - name: reason
+      type: string
+    - name: lsbb
+      type: string
+    - name: number_of_repetitions
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 84
+    row_count_max: 84
+    period_first: '2017-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: price_ext/machinery-and-equipment-price-index-mepi
+    source_id: price_ext
+    slug: machinery-and-equipment-price-index-mepi
+    kind: portal_dataset
+    title_en: Machinery & Equipment Price Index (MEPI)
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/machinery-and-equipment-price-index-mepi/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/machinery-and-equipment-price-index-mepi/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: code
+      type: string
+    - name: group_desc_ar
+      type: string
+    - name: group_desc_en
+      type: string
+    - name: weight
+      type: number
+    - name: h1_20
+      type: number
+    - name: h2_20
+      type: number
+    - name: h1_21
+      type: number
+    - name: h2_21
+      type: number
+    - name: h1_22
+      type: number
+    - name: h2_22
+      type: number
+    - name: h1_23
+      type: number
+    - name: h2_23
+      type: number
+    - name: h1_24
+      type: number
+    - name: h2_24
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 10
+    row_count_max: 10
+    period_first: null
+    period_last: null
+    period_field: ''
+    basis_note: 'LR-P7: no period field; first column label H1-20, last column label H2-24; labels, not inferred dates.'
+  - key: price_ext/producer-price-index-ppi
+    source_id: price_ext
+    slug: producer-price-index-ppi
+    kind: portal_dataset
+    title_en: Producer Price Index (PPI)
+    publisher: National Planning Council
+    licence_id: ''
+    licence_basis: portal_terms
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/producer-price-index-ppi/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing
+      users to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes,
+      provided that proper attribution to the data source is maintained.
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/producer-price-index-ppi/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: month
+      type: string
+    - name: lshhr
+      type: string
+    - name: basket_code
+      type: string
+    - name: item
+      type: string
+    - name: lbnd
+      type: string
+    - name: value
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: ''
+    row_count_min: 1292
+    row_count_max: 1292
+    period_first: '2020-01-01'
+    period_last: '2026-01-01'
+    period_field: year
+  - key: price_ext/producer-price-index-ppi-by-activity-monthly
+    source_id: price_ext
+    slug: producer-price-index-ppi-by-activity-monthly
+    kind: portal_dataset
+    title_en: Producer Price Index (PPI) by Activity - Monthly
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/producer-price-index-ppi-by-activity-monthly/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/producer-price-index-ppi-by-activity-monthly/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: month
+      type: string
+    - name: lshhr
+      type: string
+    - name: basket_code
+      type: string
+    - name: item
+      type: string
+    - name: lbnd
+      type: string
+    - name: ppi_index
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 1224
+    row_count_max: 1224
+    period_first: '2020-01-01'
+    period_last: '2025-01-01'
+    period_field: year
+  - key: survey_ext/hotels-and-restaurants-statistics-production-value-by-type-of-revenue-and-main-economic-activity
+    source_id: survey_ext
+    slug: hotels-and-restaurants-statistics-production-value-by-type-of-revenue-and-main-economic-activity
+    kind: portal_dataset
+    title_en: Production Value of Hotels and Restaurants by Type of Revenue and Main Economic Activity
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-production-value-by-type-of-revenue-and-main-economic-activity/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-production-value-by-type-of-revenue-and-main-economic-activity/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: activity_code
+      type: integer
+    - name: main_economic_activity
+      type: string
+    - name: lnsht_lqtsdy_lry_ysy
+      type: string
+    - name: type_of_revenue
+      type: string
+    - name: nw_lyrdt
+      type: string
+    - name: production_value_value_in_1_000_qr
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 40
+    row_count_max: 40
+    period_first: null
+    period_last: null
+    period_field: year
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+  - key: survey_ext/hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity
+    source_id: survey_ext
+    slug: hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity
+    kind: portal_dataset
+    title_en: Hotels and Restaurants other Revenues by Revenue Item and Main Activity (Establishments with Less than
+      10 Employees)
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: main_activity
+      type: string
+    - name: lnsht_lry_ysy
+      type: string
+    - name: revenue_item
+      type: string
+    - name: bnwd_lyrdt_l_khr
+      type: string
+    - name: transformational_revenues_value_in_1_000_qr
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 126
+    row_count_max: 126
+    period_first: null
+    period_last: null
+    period_field: year
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+  - key: survey_ext/hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity0
+    source_id: survey_ext
+    slug: hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity0
+    kind: portal_dataset
+    title_en: Hotels and Restaurants Statistics - Transformational Revenues by Revenue Item and Main Activity
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity0/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity0/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: revenue_item
+      type: string
+    - name: bnd_lyrdt
+      type: string
+    - name: main_activity
+      type: string
+    - name: lnsht_lry_ysy
+      type: string
+    - name: transformational_revenues_value_in_1_000_qr
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 162
+    row_count_max: 162
+    period_first: null
+    period_last: null
+    period_field: year
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+  - key: survey_ext/production-value-hotels-and-restaurants-type-of-revenue-and-main-economic-activity-less-10-employees
+    source_id: survey_ext
+    slug: production-value-hotels-and-restaurants-type-of-revenue-and-main-economic-activity-less-10-employees
+    kind: portal_dataset
+    title_en: Production Value of Hotels and Restaurants by Type of Revenue and Main Economic Activity (Establishments
+      with less than 10 Employees)
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/production-value-hotels-and-restaurants-type-of-revenue-and-main-economic-activity-less-10-employees/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/production-value-hotels-and-restaurants-type-of-revenue-and-main-economic-activity-less-10-employees/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: activity_code
+      type: integer
+    - name: main_economic_activity
+      type: string
+    - name: lnsht_lqtsdy_lry_ysy
+      type: string
+    - name: type_of_revenue
+      type: string
+    - name: nw_lyrdt
+      type: string
+    - name: production_value_value_in_1_000_qr
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 40
+    row_count_max: 40
+    period_first: null
+    period_last: null
+    period_field: year
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+  - key: survey_ext/production-value-of-hotels-and-restaurants-type-revenue-economic-activity-10-employees-and-more
+    source_id: survey_ext
+    slug: production-value-of-hotels-and-restaurants-type-revenue-economic-activity-10-employees-and-more
+    kind: portal_dataset
+    title_en: Production Value of Hotels and Restaurants by Type of Revenue and Main Economic Activity (Establishments
+      with 10 Employees or More)
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/production-value-of-hotels-and-restaurants-type-revenue-economic-activity-10-employees-and-more/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/production-value-of-hotels-and-restaurants-type-revenue-economic-activity-10-employees-and-more/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: activity_code
+      type: integer
+    - name: main_economic_activity
+      type: string
+    - name: lnsht_lqtsdy_lry_ysy
+      type: string
+    - name: type_of_revenue
+      type: string
+    - name: nw_lyrdt
+      type: string
+    - name: production_value_value_in_1_000_qatari_riyals
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 40
+    row_count_max: 40
+    period_first: null
+    period_last: null
+    period_field: year
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+  - key: survey_ext/revenues-hotels-restaurants-current-activity-by-revenue-item-and-main-activity-10-employees-and-more
+    source_id: survey_ext
+    slug: revenues-hotels-restaurants-current-activity-by-revenue-item-and-main-activity-10-employees-and-more
+    kind: portal_dataset
+    title_en: Revenues of Hotels and Restaurants Current Activity by Revenue Item and Main Activity (Establishments
+      with 10 Employees or more)
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/revenues-hotels-restaurants-current-activity-by-revenue-item-and-main-activity-10-employees-and-more/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/revenues-hotels-restaurants-current-activity-by-revenue-item-and-main-activity-10-employees-and-more/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year_lsn
+      type: string
+    - name: revenue_item
+      type: string
+    - name: main_activity
+      type: string
+    - name: revenues_from_current_activity_value_in_1_000_qr_yrdt_lnsht_ljry_lqym_b_lf_ryl_qtry
+      type: number
+    - name: lnsht_lry_ysy
+      type: string
+    - name: bnd_lyrdt
+      type: string
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 50
+    row_count_max: 50
+    period_first: null
+    period_last: null
+    period_field: year_lsn
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+  - key: survey_ext/revenues-of-current-activity-by-revenue-item-and-main-activity-hotels-and-restaurants
+    source_id: survey_ext
+    slug: revenues-of-current-activity-by-revenue-item-and-main-activity-hotels-and-restaurants
+    kind: portal_dataset
+    title_en: Revenues of Hotels and Restaurants Current Activity by Revenue Item and Main Activity
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/revenues-of-current-activity-by-revenue-item-and-main-activity-hotels-and-restaurants/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/revenues-of-current-activity-by-revenue-item-and-main-activity-hotels-and-restaurants/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: main_activity
+      type: string
+    - name: lnsht_lry_ysy
+      type: string
+    - name: revenue_item
+      type: string
+    - name: bnd_lyrdt
+      type: string
+    - name: revenues_from_current_activity_value_in_1_000_qr
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 90
+    row_count_max: 90
+    period_first: null
+    period_last: null
+    period_field: year
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+  - key: survey_ext/transformational-revenues-by-revenue-item-and-main-activity-establishments-with-10-employees-or-more
+    source_id: survey_ext
+    slug: transformational-revenues-by-revenue-item-and-main-activity-establishments-with-10-employees-or-more
+    kind: portal_dataset
+    title_en: Other Hotels and Restaurants Revenues by Revenue Item and Main Activity (Establishments with 10 Employees
+      or More)
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/transformational-revenues-by-revenue-item-and-main-activity-establishments-with-10-employees-or-more/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/transformational-revenues-by-revenue-item-and-main-activity-establishments-with-10-employees-or-more/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: revenue_item
+      type: string
+    - name: bnwd_lyrdt_l_khr
+      type: string
+    - name: main_activity
+      type: string
+    - name: lnsht_lry_ysy
+      type: string
+    - name: transformational_revenues_value_in_1_000_qr
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 162
+    row_count_max: 162
+    period_first: null
+    period_last: null
+    period_field: year
+    basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only.'
+  - key: talent_ext/education-statistics-number-of-graduates-of-private-colleges-and-universities-by-educational
+    source_id: talent_ext
+    slug: education-statistics-number-of-graduates-of-private-colleges-and-universities-by-educational
+    kind: portal_dataset
+    title_en: Number of Graduates of Private Colleges and Universities by Educational Institution, Nationality, and
+      Gender
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/education-statistics-number-of-graduates-of-private-colleges-and-universities-by-educational/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/education-statistics-number-of-graduates-of-private-colleges-and-universities-by-educational/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: academic_year
+      type: string
+    - name: educational_institution
+      type: string
+    - name: educational_institution_arabic
+      type: string
+    - name: qataris_male
+      type: number
+    - name: qataris_female
+      type: number
+    - name: non_qataris_male
+      type: number
+    - name: non_qataris_female
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 56
+    row_count_max: 56
+    period_first: 2018/2019
+    period_last: 2023/2024
+    period_field: academic_year
+  - key: talent_ext/education-statistics-number-of-graduates-of-public-colleges-and-universities-by-academic-degree
+    source_id: talent_ext
+    slug: education-statistics-number-of-graduates-of-public-colleges-and-universities-by-academic-degree
+    kind: portal_dataset
+    title_en: Number of Graduates of Public Colleges and Universities by Academic Degree, Academic Program, Educational
+      Institution, Nationality, and Gender
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/education-statistics-number-of-graduates-of-public-colleges-and-universities-by-academic-degree/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/education-statistics-number-of-graduates-of-public-colleges-and-universities-by-academic-degree/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: academic_year
+      type: string
+    - name: academic_degree
+      type: string
+    - name: academic_degree_ar
+      type: string
+    - name: academic_program
+      type: string
+    - name: academic_program_ar
+      type: string
+    - name: educational_institution
+      type: string
+    - name: educational_institution_ar
+      type: string
+    - name: qataris_males
+      type: integer
+    - name: qataris_females
+      type: integer
+    - name: non_qataris_males
+      type: integer
+    - name: non_qataris_females
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 635
+    row_count_max: 635
+    period_first: 2011/2012
+    period_last: 2023/2024
+    period_field: academic_year
+  - key: talent_ext/education-statistics-number-of-graduates-of-public-colleges-and-universities-by-educational
+    source_id: talent_ext
+    slug: education-statistics-number-of-graduates-of-public-colleges-and-universities-by-educational
+    kind: portal_dataset
+    title_en: Graduates of Public Colleges and universities by college, type of specialization and nationality
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/education-statistics-number-of-graduates-of-public-colleges-and-universities-by-educational/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/education-statistics-number-of-graduates-of-public-colleges-and-universities-by-educational/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: college
+      type: string
+    - name: college_ar
+      type: string
+    - name: field_of_specialization
+      type: string
+    - name: field_of_specialization_ar
+      type: string
+    - name: qataris
+      type: string
+    - name: non_qataris
+      type: string
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 550
+    row_count_max: 550
+    period_first: 2018/2019
+    period_last: 2022/2023
+    period_field: year
+  - key: talent_ext/education-statistics-number-of-graduates-on-scholarships-abroad-by-field-of-study-and-gender
+    source_id: talent_ext
+    slug: education-statistics-number-of-graduates-on-scholarships-abroad-by-field-of-study-and-gender
+    kind: portal_dataset
+    title_en: Number of Graduates on Scholarships Abroad by Field of Study and Gender
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/education-statistics-number-of-graduates-on-scholarships-abroad-by-field-of-study-and-gender/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/education-statistics-number-of-graduates-on-scholarships-abroad-by-field-of-study-and-gender/
+    nightly_live_fetch: true
+    public_splits:
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: field_of_study
+      type: string
+    - name: field_of_study_ar
+      type: string
+    - name: gender
+      type: string
+    - name: lnw
+      type: string
+    - name: number_of_graduates
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 568
+    row_count_max: 568
+    period_first: '2010-01-01'
+    period_last: '2023-01-01'
+    period_field: year
+  - key: talent_ext/total-students-on-scholarships-at-home-and-abroad-by-degree-and-gender
+    source_id: talent_ext
+    slug: total-students-on-scholarships-at-home-and-abroad-by-degree-and-gender
+    kind: portal_dataset
+    title_en: Total Students on Scholarships (At Home and Abroad) by Degree and Gender
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/total-students-on-scholarships-at-home-and-abroad-by-degree-and-gender/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/total-students-on-scholarships-at-home-and-abroad-by-degree-and-gender/
+    nightly_live_fetch: true
+    public_splits:
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: type_of_scholarship
+      type: string
+    - name: nw_lmnh
+      type: string
+    - name: scientific_degree
+      type: string
+    - name: ldrj_l_lmy
+      type: string
+    - name: gender
+      type: string
+    - name: lnw
+      type: string
+    - name: number_of_students
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 80
+    row_count_max: 80
+    period_first: 2018/2019
+    period_last: 2022/2023
+    period_field: year
+  - key: talent_ext/trainees-at-the-private-training-centers-by-employment-status-gender-nationality-and-field-of
+    source_id: talent_ext
+    slug: trainees-at-the-private-training-centers-by-employment-status-gender-nationality-and-field-of
+    kind: portal_dataset
+    title_en: Trainees at Private Training Centers by Employment Status, Gender, Nationality, and Field of Training
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/trainees-at-the-private-training-centers-by-employment-status-gender-nationality-and-field-of/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/trainees-at-the-private-training-centers-by-employment-status-gender-nationality-and-field-of/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: field_of_training_ar
+      type: string
+    - name: field_of_training
+      type: string
+    - name: nationality_ar
+      type: string
+    - name: nationality
+      type: string
+    - name: employment_status_ar
+      type: string
+    - name: employment_status
+      type: string
+    - name: gender_ar
+      type: string
+    - name: gender
+      type: string
+    - name: value
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 120
+    row_count_max: 120
+    period_first: '2018-01-01'
+    period_last: '2022-01-01'
+    period_field: year
+  - key: talent_ext/trainees-at-the-private-training-centers-by-field-of-training-gender-nationality-and-age-groups
+    source_id: talent_ext
+    slug: trainees-at-the-private-training-centers-by-field-of-training-gender-nationality-and-age-groups
+    kind: portal_dataset
+    title_en: Trainees at the Private Training Centers by Field of Training, Gender, Nationality and Age Groups
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/trainees-at-the-private-training-centers-by-field-of-training-gender-nationality-and-age-groups/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/trainees-at-the-private-training-centers-by-field-of-training-gender-nationality-and-age-groups/
+    nightly_live_fetch: true
+    public_splits:
+    - nationality
+    - sex
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: age_group
+      type: string
+    - name: lfy_l_mry
+      type: string
+    - name: nationality
+      type: string
+    - name: nationality_ar
+      type: string
+    - name: field_of_training
+      type: string
+    - name: field_of_training_ar
+      type: string
+    - name: gender
+      type: string
+    - name: lnw
+      type: string
+    - name: number_of_trainees
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 240
+    row_count_max: 240
+    period_first: '2018-01-01'
+    period_last: '2022-01-01'
+    period_field: year
+  - key: tenders_pub
+    source_id: tenders_pub
+    slug: ''
+    kind: paged_cards
+    title_en: Public tenders
+    publisher: Ministry of Finance
+    licence_id: ''
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: monaqasat.mof.gov.qa
+    url: https://monaqasat.mof.gov.qa/TendersOnlineServices/AvailableMinistriesTenders/1
+    terms_url: ''
+    terms_words: If not stated otherwise, it must not reproduce, republish, upload, send, distribute or publicly display
+      or edit the contents of this website without the prior written consent of through the Ministry of Finance
+    terms_read_on: '2026-11-14'
+    landing_url: https://monaqasat.mof.gov.qa/TendersOnlineServices/AvailableMinistriesTenders/1
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables:
+    - pub_tender
+    caveat_keys: []
+    columns: []
+    reconciliation: none
+    skip_reason: ''
+    extension: html
+    chain_intermediate_sha256: ''
+    basis_note: 'S2-T19 LR-T4, LR-T6, LR-T9 and LR-T14: list paths /TendersOnlineServices/AvailableMinistriesTenders/<n>,
+      /TendersOnlineServices/ClosedTenders/<n>, /TendersOnlineServices/TechnicallyOpenedTenders/<n>, /TendersOnlineServices/FinanciallyOpenedTenders/<n>,
+      /TendersOnlineServices/AwardedTenders/<n>, /TendersOnlineServices/CancelledTenders/<n>; page size 20; Arabic
+      without a language header; English with Accept-Language: en-US,en;q=0.5; sequential requests at least three
+      seconds apart. Certificate pin awaits the lead; no certificate file committed.'
+  - key: trade_ext/imports-by-nature-of-items-and-year
+    source_id: trade_ext
+    slug: imports-by-nature-of-items-and-year
+    kind: portal_dataset
+    title_en: Imports by Nature of Items and Year
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/imports-by-nature-of-items-and-year/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/imports-by-nature-of-items-and-year/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: nature_of_items
+      type: string
+    - name: tby_lmwd
+      type: string
+    - name: value
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 30
+    row_count_max: 30
+    period_first: '2013-01-01'
+    period_last: '2022-01-01'
+    period_field: year
+  - key: trade_ext/imports-by-utilization-of-items-and-year
+    source_id: trade_ext
+    slug: imports-by-utilization-of-items-and-year
+    kind: portal_dataset
+    title_en: Imports by Utilization of Items and Year
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/imports-by-utilization-of-items-and-year/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/imports-by-utilization-of-items-and-year/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: utilization_of_items
+      type: string
+    - name: stkhdm_lmwd
+      type: string
+    - name: value
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 30
+    row_count_max: 30
+    period_first: '2013-01-01'
+    period_last: '2022-01-01'
+    period_field: year
+  - key: trade_ext/qatar-export-statistics-2019-2024
+    source_id: trade_ext
+    slug: qatar-export-statistics-2019-2024
+    kind: portal_dataset
+    title_en: Qatar Export Statistics 2014-2026
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/qatar-export-statistics-2019-2024/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/qatar-export-statistics-2019-2024/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: quarter
+      type: string
+    - name: month
+      type: integer
+    - name: hs4
+      type: integer
+    - name: ltfsyl
+      type: string
+    - name: details
+      type: string
+    - name: dwl_lmqsd
+      type: string
+    - name: country_of_destination
+      type: string
+    - name: quantity
+      type: integer
+    - name: weight_kg
+      type: integer
+    - name: value_qr
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 142720
+    row_count_max: 142720
+    period_first: '2014-01-01'
+    period_last: '2026-01-01'
+    period_field: year
+  - key: trade_ext/qatar-imports-2014-2018
+    source_id: trade_ext
+    slug: qatar-imports-2014-2018
+    kind: portal_dataset
+    title_en: Qatar Imports 2014-2018
+    publisher: National Planning Council
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/qatar-imports-2014-2018/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/qatar-imports-2014-2018/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: quarter
+      type: string
+    - name: month
+      type: integer
+    - name: hs8
+      type: integer
+    - name: ltfsyl
+      type: string
+    - name: details
+      type: string
+    - name: dwl_lmnsh
+      type: string
+    - name: country_of_origin
+      type: string
+    - name: quantity
+      type: integer
+    - name: weight_kg
+      type: integer
+    - name: value_qr
+      type: number
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 644486
+    row_count_max: 644486
+    period_first: '2014-01-01'
+    period_last: '2018-01-01'
+    period_field: year
+  - key: utilities_ext/operational-peak-district-cooling-load
+    source_id: utilities_ext
+    slug: operational-peak-district-cooling-load
+    kind: portal_dataset
+    title_en: Operational Peak District Cooling Load
+    publisher: KAHRAMAA
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/operational-peak-district-cooling-load/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/operational-peak-district-cooling-load/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: district_cooling_plant_peak_cooling_load_in_tons_of_refrigeration
+      type: integer
+    - name: district_cooling_plant_installed_cooling_capacity_in_tons_of_refrigeration
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 6
+    row_count_max: 6
+    period_first: '2019-01-01'
+    period_last: '2024-01-01'
+    period_field: year
+  - key: utilities_ext/sectoral-electricity-consumption-mwh
+    source_id: utilities_ext
+    slug: sectoral-electricity-consumption-mwh
+    kind: portal_dataset
+    title_en: Sectoral Electricity Consumption (MWh)
+    publisher: KAHRAMAA
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/sectoral-electricity-consumption-mwh/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/sectoral-electricity-consumption-mwh/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: bulk_industrial
+      type: integer
+    - name: domestic
+      type: integer
+    - name: auxiliary
+      type: integer
+    - name: transmission_and_distribution_losses
+      type: integer
+    - name: total_injected_generation
+      type: integer
+    - name: total_electricity_generation
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 2
+    row_count_max: 2
+    period_first: '2023-01-01'
+    period_last: '2024-01-01'
+    period_field: year
+  - key: utilities_ext/total-electricity-consumption-by-sectors
+    source_id: utilities_ext
+    slug: total-electricity-consumption-by-sectors
+    kind: portal_dataset
+    title_en: Total Electricity Consumption by Sectors
+    publisher: KAHRAMAA
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/total-electricity-consumption-by-sectors/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/total-electricity-consumption-by-sectors/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: month
+      type: string
+    - name: lshhr
+      type: string
+    - name: sector
+      type: string
+    - name: lqt
+      type: string
+    - name: value
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 576
+    row_count_max: 576
+    period_first: '2020-01-01'
+    period_last: '2025-01-01'
+    period_field: year
+  - key: utilities_ext/total-water-consumption-by-sectors
+    source_id: utilities_ext
+    slug: total-water-consumption-by-sectors
+    kind: portal_dataset
+    title_en: Total Water Consumption by Sectors
+    publisher: KAHRAMAA
+    licence_id: CC-BY-4.0
+    licence_basis: dataset
+    decision_record: ''
+    fetch_host: www.data.gov.qa
+    url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/total-water-consumption-by-sectors/exports/json
+    terms_url: https://www.data.gov.qa/pages/terms-of-use
+    terms_words: 'The Open Data License outlines the terms and conditions governing the use, reuse, and sharing of
+      datasets published through the State of Qatar''s Open Data Platform.
+
+      The license is based on the Creative Commons Attribution 4.0 International (CC BY 4.0) license, allowing users
+      to access, download, analyze, modify, and reuse open data for both commercial and non-commercial purposes, provided
+      that proper attribution to the data source is maintained.
+
+      Except as otherwise provided, the contents of this website shall not be reproduced, republished, uploaded, posted,
+      transmitted or otherwise distributed in any way, without the prior written permission of National Planning Council.'
+    terms_read_on: '2026-11-15'
+    landing_url: https://www.data.gov.qa/explore/dataset/total-water-consumption-by-sectors/
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: year
+      type: string
+    - name: month
+      type: string
+    - name: lshhr
+      type: string
+    - name: sector
+      type: string
+    - name: lqt
+      type: string
+    - name: value
+      type: integer
+    reconciliation: none
+    skip_reason: ''
+    extension: json
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    row_count_min: 648
+    row_count_max: 648
+    period_first: '2020-01-01'
+    period_last: '2025-01-01'
+    period_field: year
+# END S2-T19 sources
+
 forecast_series:
   - key: licence_issues
     state: held

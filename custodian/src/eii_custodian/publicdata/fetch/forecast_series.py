@@ -100,8 +100,6 @@ def _series(raw: object, entries: tuple[Entry, ...]) -> ForecastSeries:
         raise RegistryError("unknown forecast state")
     if key in DISTRICT_SERIES and text["subject"] != "district":
         raise RegistryError("property series requires district subject")
-    if key == "property_prices_quarterly" and state != "open":
-        raise RegistryError("quarterly series awaits S2-T19")
     sources = raw.get("source_keys")
     if not isinstance(sources, list) or not all(
         isinstance(item, str) for item in sources

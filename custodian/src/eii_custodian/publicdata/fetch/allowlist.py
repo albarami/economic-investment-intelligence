@@ -27,6 +27,8 @@ ALLOWED_HOSTS = frozenset(
         "data.source.coop",
         "ladsweb.modaps.eosdis.nasa.gov",
         "archive-api.open-meteo.com",
+        "services.gisqatar.org.qa",
+        "monaqasat.mof.gov.qa",
     }
 )
 

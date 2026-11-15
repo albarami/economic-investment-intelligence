@@ -1,0 +1,16 @@
+[
+  {
+    "registration_date": "2025-10-02",
+    "encrypted_transaction_number": "SYN-TX-E1",
+    "encrypted_parcel_number": "SYN-PX-E1",
+    "sm_lbldy": "SYN Coast AR",
+    "municipality_name": "SYN Coast",
+    "sm_lmntq": "SYN North AR",
+    "district_name": "SYN North",
+    "nw_l_qr": "SYN-UNIT",
+    "property_type": "SYN-EN-DISAGREEING-LAND",
+    "area_square_meters": 80,
+    "price_per_square_meter": 10,
+    "property_value": 800
+  }
+]

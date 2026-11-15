@@ -15,7 +15,12 @@ from eii_custodian.publicdata.fetch.checks import (
     period_failure,
     schema_failure,
 )
-from eii_custodian.publicdata.fetch.registry import Entry, RegistryError
+from eii_custodian.publicdata.fetch.registry import (
+    COLLECTED_FAMILIES,
+    Entry,
+    RegistryError,
+    undeclared_public_split,
+)
 from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 from eii_custodian.publicdata.fetch.transport import (
     ATTEMPT_LIMIT,
@@ -218,6 +223,21 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
     schema = schema_failure(entry, rows, export.final_url)
     if schema is not None:
         return _failed(entry, schema)
+    if rows is not None:
+        for record in rows:
+            if isinstance(record, dict) and undeclared_public_split(
+                entry, list(record)
+            ):
+                return _failed(
+                    entry,
+                    AttemptFailure(
+                        1,
+                        export.final_url,
+                        "public_split_undeclared",
+                        "declared Public split",
+                        "undeclared",
+                    ),
+                )
     period = period_failure(entry, rows, export.final_url)
     if period is not None:
         return _failed(entry, period)
@@ -251,6 +271,12 @@ def _observed_periods(entry: Entry, rows: list[object] | None) -> tuple[str, str
         parse_period_rule,
     )
 
+    if entry.source_id in COLLECTED_FAMILIES and rows is not None:
+        if not entry.period_field:
+            return "", "", True
+        # LR-P7/P8/P11: preserve the source's labels, including unsplit year text.
+        labels = [row[entry.period_field] for row in rows if isinstance(row, dict)]
+        return min(labels), max(labels), True
     if "form=" not in entry.period_field or rows is None:
         return "", "", False
     rule = parse_period_rule(entry.period_field)
@@ -284,6 +310,15 @@ def _measure_failure(
 
 
 def _paged(entry: Entry, reader: Read) -> Prepared:
+    from eii_custodian.publicdata.gis.fields import declaration_for
+
+    declared = declaration_for(entry.source_id)
+    if declared is None:
+        return _paged_undeclared(entry, reader)
+    return _paged_declared(entry, reader, declared)
+
+
+def _paged_undeclared(entry: Entry, reader: Read) -> Prepared:
     layer = entry.layer
     if layer is None:
         raise RegistryError("paged_layer requires layer")
@@ -534,3 +569,278 @@ def _features(body: bytes) -> list[object] | None:
 
 def _query(base: str, layer: int, params: dict[str, str]) -> str:
     return base.rstrip("/") + f"/{layer}/query?" + urlencode(params)
+
+
+def _paged_declared(
+    entry: Entry,
+    reader: Read,
+    source: object,
+) -> Prepared:
+    """Page a declared GIS source at the layer answer's own maximum."""
+    from eii_custodian.publicdata.gis.fields import SourceDecl
+
+    if not isinstance(source, SourceDecl):
+        raise RegistryError("gis declaration")
+    host = host_of(entry.url)
+    collected: list[dict[str, object]] = []
+    final = entry.url
+    total = 0
+    for layer in source.layers:
+        base = f"https://{host}{layer.service_path}"
+        meta_url = base.rstrip("/") + f"/{layer.layer_id}?f=json"
+        meta, failure = _call(entry, meta_url, reader)
+        if failure is not None or meta is None:
+            return _failed(entry, failure)
+        if _token_demand(meta.body):
+            return _unavailable(entry, meta.final_url)
+        counted_url = _query(
+            base,
+            layer.layer_id,
+            {"where": "1=1", "returnCountOnly": "true", "f": "json"},
+        )
+        counted, failure = _call(entry, counted_url, reader)
+        if failure is not None or counted is None:
+            return _failed(entry, failure)
+        if _token_demand(counted.body):
+            return _unavailable(entry, counted.final_url)
+        layer_total = _arcgis_count(counted.body)
+        if layer_total is None:
+            return _failed(
+                entry,
+                AttemptFailure(
+                    1, counted.final_url, "short_total", "count", "unreadable"
+                ),
+            )
+        page_size, oid_name = _layer_page(meta.body)
+        if page_size is None or oid_name is None:
+            return _failed(
+                entry,
+                AttemptFailure(
+                    1, meta.final_url, "schema_missing", "maxRecordCount", "missing"
+                ),
+            )
+        out_fields = ",".join(field.name for field in layer.fields)
+        features: list[dict[str, object]] = []
+        offset = 0
+        final = counted.final_url
+        while offset < layer_total:
+            page_url = _query(
+                base,
+                layer.layer_id,
+                {
+                    "where": "1=1",
+                    "outFields": out_fields,
+                    "orderByFields": oid_name,
+                    "resultOffset": str(offset),
+                    "resultRecordCount": str(page_size),
+                    "returnGeometry": "true",
+                    "outSR": "4326",
+                    "f": "json",
+                },
+            )
+            page, failure = _call(entry, page_url, reader)
+            if failure is not None or page is None:
+                return _failed(entry, failure)
+            if _token_demand(page.body):
+                return _unavailable(entry, page.final_url)
+            batch = _feature_maps(page.body)
+            if batch is None:
+                return _failed(
+                    entry,
+                    AttemptFailure(
+                        1, page.final_url, "short_total", "features", "unreadable"
+                    ),
+                )
+            final = page.final_url
+            refused = _declared_features(layer, batch, oid_name, page.final_url)
+            if refused is not None:
+                return _failed(entry, refused)
+            features.extend(batch)
+            if len(features) > layer_total:
+                return _failed(
+                    entry,
+                    AttemptFailure(
+                        1, final, "long_total", str(layer_total), str(len(features))
+                    ),
+                )
+            offset += page_size
+            if not batch:
+                break
+        if len(features) < layer_total:
+            return _failed(
+                entry,
+                AttemptFailure(
+                    1, final, "short_total", str(layer_total), str(len(features))
+                ),
+            )
+        if len(features) > layer_total:
+            return _failed(
+                entry,
+                AttemptFailure(
+                    1, final, "long_total", str(layer_total), str(len(features))
+                ),
+            )
+        total += layer_total
+        collected.append(
+            {
+                "layer_id": layer.layer_id,
+                "layer_name": layer.layer_name,
+                "service_path": layer.service_path,
+                "geometry": layer.geometry,
+                "count": layer_total,
+                "features": features,
+            }
+        )
+    body = json.dumps({"layers": collected}, sort_keys=True).encode("utf-8")
+    return Prepared(body, final, host, entry.publisher, "", total, "", None)
+
+
+def _unavailable(entry: Entry, url: str) -> Prepared:
+    return _failed(
+        entry, AttemptFailure(1, url, "unavailable", "no token", "token demand")
+    )
+
+
+def _token_demand(body: bytes) -> bool:
+    """ArcGIS JSON error for a token or a sign-in. Any other body is not one."""
+    try:
+        loaded = json.loads(body.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError):
+        return False
+    if not isinstance(loaded, dict):
+        return False
+    error = loaded.get("error")
+    if not isinstance(error, dict):
+        return False
+    code = error.get("code")
+    message = error.get("message")
+    text = message.casefold() if isinstance(message, str) else ""
+    if code in (498, 499):
+        return True
+    return "token" in text or "sign in" in text or "signin" in text
+
+
+def _layer_page(body: bytes) -> tuple[int | None, str | None]:
+    """Read maxRecordCount and the single esriFieldTypeOID name."""
+    try:
+        loaded = json.loads(body.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError):
+        return None, None
+    if not isinstance(loaded, dict):
+        return None, None
+    page_size = loaded.get("maxRecordCount")
+    if isinstance(page_size, bool) or not isinstance(page_size, int) or page_size < 1:
+        return None, None
+    fields = loaded.get("fields")
+    if not isinstance(fields, list):
+        return None, None
+    names: list[str] = []
+    for field in fields:
+        if not isinstance(field, dict) or field.get("type") != "esriFieldTypeOID":
+            continue
+        name = field.get("name")
+        if isinstance(name, str) and name:
+            names.append(name)
+    if len(names) != 1:
+        return page_size, None
+    return page_size, names[0]
+
+
+def _feature_maps(body: bytes) -> list[dict[str, object]] | None:
+    raw = _features(body)
+    if raw is None:
+        return None
+    rows: list[dict[str, object]] = []
+    for item in raw:
+        row = _text_dict(item)
+        if row is None:
+            return None
+        rows.append(row)
+    return rows
+
+
+def _text_dict(value: object) -> dict[str, object] | None:
+    if not isinstance(value, dict):
+        return None
+    result: dict[str, object] = {}
+    for key, item in value.items():
+        if not isinstance(key, str):
+            return None
+        result[key] = item
+    return result
+
+
+def _declared_features(
+    layer: object,
+    features: list[dict[str, object]],
+    oid_name: str,
+    url: str,
+) -> AttemptFailure | None:
+    from eii_custodian.publicdata.gis.fields import NEVER_TAKEN, LayerDecl
+
+    if not isinstance(layer, LayerDecl):
+        return AttemptFailure(1, url, "schema_missing", "layer", "missing")
+    declared = {field.name: field for field in layer.attribute_fields}
+    for feature in features:
+        attributes = _text_dict(feature.get("attributes"))
+        if attributes is None:
+            return AttemptFailure(1, url, "schema_missing", "attributes", "missing")
+        for name in attributes:
+            if name in NEVER_TAKEN:
+                return AttemptFailure(1, url, "never_taken", "absent", name)
+        if oid_name in attributes:
+            return AttemptFailure(1, url, "object_id_field", "absent", oid_name)
+        for name in attributes:
+            if name not in declared:
+                return AttemptFailure(1, url, "extra_field", "declared", name)
+        for field in layer.attribute_fields:
+            if field.name not in attributes:
+                return AttemptFailure(1, url, "schema_missing", field.name, "missing")
+            if not _json_kind_ok(attributes[field.name], field.json_kind):
+                return AttemptFailure(
+                    1,
+                    url,
+                    "schema_retyped",
+                    f"{field.name}:{field.json_kind}",
+                    _json_seen(attributes[field.name]),
+                )
+        geometry = _text_dict(feature.get("geometry"))
+        if geometry is None:
+            return AttemptFailure(
+                1, url, "schema_missing", layer.geometry_field, "missing"
+            )
+        if not _wkid_4326(geometry):
+            return AttemptFailure(1, url, "spatial_reference", "4326", "other")
+    return None
+
+
+def _wkid_4326(geometry: dict[str, object]) -> bool:
+    reference = geometry.get("spatialReference")
+    if not isinstance(reference, dict):
+        return False
+    wkid = reference.get("wkid")
+    return isinstance(wkid, int) and not isinstance(wkid, bool) and wkid == 4326
+
+
+def _json_kind_ok(value: object, kind: str) -> bool:
+    if value is None:
+        return True
+    if kind == "string":
+        return isinstance(value, str)
+    if kind in {"integer", "date"}:
+        return isinstance(value, int) and not isinstance(value, bool)
+    if kind == "number":
+        return isinstance(value, (int, float)) and not isinstance(value, bool)
+    return False
+
+
+def _json_seen(value: object) -> str:
+    if isinstance(value, bool):
+        return "boolean"
+    if isinstance(value, int):
+        return "integer"
+    if isinstance(value, float):
+        return "number"
+    if isinstance(value, str):
+        return "string"
+    return "other"

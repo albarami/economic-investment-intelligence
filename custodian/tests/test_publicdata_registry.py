@@ -296,6 +296,18 @@ LAYER_IDS = {
     "census_district_pop": 0,
     "bnd_zone_2020": 0,
     "bnd_district_2020": 12,
+    # S2-T19 B2 / LA-2: exact layer declarations, with two absent paths.
+    "gis_land_price": 0,
+    "gis_rail": 2,
+    "gis_phcc": 1,
+    "gis_landmarks": 0,
+    "gis_zoning": 1,
+    "gis_address": 0,
+    "gis_parcels": 0,
+    "gis_poi_comm": 0,
+    "gis_context": 0,
+    "gis_boundaries": None,
+    "gis_imagery_history": None,
 }
 
 
@@ -568,10 +580,10 @@ def test_skip_reason_must_not_name_a_licence_or_terms(tmp_path: Path) -> None:
 def test_registry_counts_follow_decision_0026() -> None:
     """No none_stated row remains, and every owner_decision row names 0026."""
     entries = load_registry()
-    assert len(entries) == 208
+    assert len(entries) == 282
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
-    assert len(owners) == 27
+    assert len(owners) == 27 + 13  # Twelve GIS rows and the tender portal.
     assert {entry.decision_record for entry in owners} == {"0026"}
 
 

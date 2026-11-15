@@ -113,6 +113,18 @@ The blocking proof of the sandbox on the build machine is `uv run --locked pytho
 
 S2-T11 completes the registry declarations of the eighteen decision-0017 families and builds every one of them from invented fixtures. The families are `prop_resi_units`, `visits_museum` and `visits_phcc` (the tables `pub_property_resi` and `pub_venue_visits`); `permits_muni`, `pop_muni_age`, `hotels_muni` and `est_census_2015_muni`; `est_size_act`, `mfg_industry`, `trade_wr` and `trade_logistics`; and `lf_muni_sex`, `pop_muni_age_sex`, `active_sex_age_act`, `active_nat_occ_act`, `comp_nat_act`, `students_muni` and `visitors_markets`. A slug is left pending only when its family has no parser, and each of these eighteen has one. No live fetch is required. The ./eii build-public invocation is unchanged; after fetching the addition slugs it also publishes their Public tables before the existing stages. The venue crosswalk and the district crosswalk are header-only until a reviewer adds rows, so a real file of those two families publishes no venue or district row until then.
 
+S2-T19 registers the national GIS centre's declared layers, bank credit by activity,
+district-cooling capacity, the tender portal and the ten open-data families in a delimited
+block of `custodian/publicdata/sources.yaml`. The families are cache-and-receipt inputs only;
+no family release table is added. The contracts cover `pub_property_quarter`, `pub_land_price`,
+`pub_bank_credit`, `pub_rail_plan`, `pub_health_centre`, `pub_zoning`, `pub_address_point`,
+`pub_parcel`, `pub_poi_comm`, `pub_tender` and `pub_district_cooling`, with landmarks entering
+`gazetteer`. Imagery and boundary service paths remain unconfirmed; the locator is registered
+but not called. The [source reading](docs/04_PUBLIC_DATA_PACK.md#s2-t19-source-reading-and-collection-boundary)
+and `custodian/publicdata/review/s2_t19_confirmation.yaml` record structure-only evidence and
+outstanding live checks. These declarations do not claim that the parallel parsers, full
+exports, source review, release or product display have passed; the lead joins and verifies them.
+
 ## Commit hooks
 
 `.pre-commit-config.yaml` holds eleven hooks of the pre-commit framework (pinned in the root `dev` group). None of them rewrites a file. Five run on every commit: the commit guard, the secret scanner (gitleaks), the documentation check (which also owns the identifier-shaped numbers, absolute paths, address-shaped strings and four secret shapes), the tree check and the version check. Six run only when a staged path matches: the Python lint, format and type checks when a Python file or a `pyproject.toml` is staged, and the web lint, format and type checks when a file under `web/` is staged. The same checks are meant to run again in continuous integration (`TASKS.md`, task S0-T07), with the repository settings of `TASKS.md`, task S0-T14 as a further backstop; the hooks do not judge a commit that skips them.

@@ -18,6 +18,7 @@ from eii_custodian.publicdata.fetch.registry import (
     load_registry,
     registry_path,
 )
+from eii_custodian.publicdata.property.quarter import forecast_window
 
 
 def test_series_without_a_table_is_not_forecastable() -> None:
@@ -125,14 +126,6 @@ def test_held_metadata_and_skip_reason() -> None:
         ({"table": ["pub_property_sale", "pub_property_quarter"]}, "table"),
         ({"source_keys": ["restaurant_production_value"]}, "source"),
         (
-            {
-                "key": "property_prices_quarterly",
-                "subject": "district",
-                "frequency": "quarter",
-            },
-            "quarterly",
-        ),
-        (
             {"key": "property_prices", "subject": "area", "frequency": "year"},
             "district",
         ),
@@ -194,6 +187,19 @@ def test_committed_metadata_or_open_reason() -> None:
             assert not forecastable(row.key, committed(), load_registry())
 
 
+def _quarters(first: str, last: str) -> set[str]:
+    """Every ``YYYY-Qn`` from ``first`` to ``last`` inclusive."""
+
+    def index(quarter: str) -> int:
+        year, _, quarter_number = quarter.partition("-Q")
+        return int(year) * 4 + int(quarter_number)
+
+    return {
+        f"{(step - 1) // 4}-Q{(step - 1) % 4 + 1}"
+        for step in range(index(first), index(last) + 1)
+    }
+
+
 def test_district_subject_and_quarterly_separation() -> None:
     rows = {row.key: row for row in committed()}
     annual = rows["property_prices"]
@@ -202,8 +208,43 @@ def test_district_subject_and_quarterly_separation() -> None:
     assert annual.table == "pub_property_sale"
     assert annual.frequency == "year"
     assert quarterly.table == "pub_property_quarter"
-    assert quarterly.state == "open"
-    assert quarterly.reason == "awaiting_s2_t19_period_frequency_past_count"
+    assert quarterly.state == "held"
+    assert quarterly.frequency == "quarter"
+    assert quarterly.reason == ""
+    first, _, last = quarterly.period.partition("/")
+    assert forecast_window(_quarters(first, last)) == (
+        first,
+        last,
+        quarterly.past_count,
+    )
+
+
+def test_a_held_quarterly_price_entry_validates() -> None:
+    """The former open-only guard now accepts the held C41 entry (DR11)."""
+    entries = (
+        source("prop_sales", "pub_property_quarter"),
+        source(
+            "prop_resi_units/weekly-residential-units-sales-bulletin",
+            "pub_property_quarter",
+        ),
+    )
+    row = dict(
+        key="property_prices_quarterly",
+        state="held",
+        subject="district",
+        source_keys=[
+            "prop_sales",
+            "prop_resi_units/weekly-residential-units-sales-bulletin",
+        ],
+        table="pub_property_quarter",
+        period="2020-Q3/2025-Q4",
+        frequency="quarter",
+        past_count=22,
+        reason="",
+    )
+    series = load_forecast_series([row], entries)
+    assert series[0].state == "held"
+    assert forecastable("property_prices_quarterly", series, entries) is True
 
 
 def test_confirmation_matches_record_and_names_open_questions() -> None:

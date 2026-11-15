@@ -1,0 +1,30 @@
+[
+  {
+    "registration_date": "2025-10-02",
+    "encrypted_transaction_number": "SYN-TX-M1",
+    "encrypted_parcel_number": "SYN-PX-M1",
+    "sm_lbldy": "SYN Coast AR",
+    "municipality_name": "SYN Coast",
+    "sm_lmntq": "SYN North AR",
+    "district_name": "SYN North",
+    "nw_l_qr": "SYN-UNIT",
+    "property_type": "SYN-EN-UNIT",
+    "area_square_meters": 80,
+    "price_per_square_meter": 10,
+    "property_value": 800
+  },
+  {
+    "registration_date": "2025-10-09",
+    "encrypted_transaction_number": "SYN-TX-M2",
+    "encrypted_parcel_number": "SYN-PX-M2",
+    "sm_lbldy": "SYN Coast AR",
+    "municipality_name": "SYN Coast",
+    "sm_lmntq": "SYN North AR",
+    "district_name": "SYN North",
+    "nw_l_qr": "SYN-UNIT",
+    "property_type": "SYN-EN-UNIT",
+    "area_square_meters": 0,
+    "price_per_square_meter": 0,
+    "property_value": 900
+  }
+]

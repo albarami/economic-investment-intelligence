@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import ssl
 import urllib.error
 import urllib.request
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from http.client import HTTPMessage
 from typing import IO
@@ -58,11 +59,20 @@ class TransportFault(Exception):
         super().__init__(f"{kind} {self.url}")
 
 
-def open_https(url: str, token: str = "") -> Response:
+def open_https(
+    url: str,
+    token: str = "",
+    headers: Mapping[str, str] | None = None,
+    ssl_context: ssl.SSLContext | None = None,
+) -> Response:
     """Open one HTTPS URL with the standard library. Redirects are checked first."""
     decision = approve(url)
     if not decision.ok:
         raise TransportFault("blocked_host", url)
+    if ssl_context is not None and (
+        ssl_context.verify_mode != ssl.CERT_REQUIRED or not ssl_context.check_hostname
+    ):
+        raise TransportFault("unreachable", url)
     hops: list[str] = []
 
     class _Guard(urllib.request.HTTPRedirectHandler):
@@ -92,10 +102,15 @@ def open_https(url: str, token: str = "") -> Response:
                     redirected.add_header(name, value)
             return redirected
 
-    opener = urllib.request.build_opener(_Guard)
-    request = urllib.request.Request(
-        url, method="GET", headers=authorization_header(url, token)
-    )
+    if ssl_context is None:
+        opener = urllib.request.build_opener(_Guard)
+    else:
+        opener = urllib.request.build_opener(
+            _Guard, urllib.request.HTTPSHandler(context=ssl_context)
+        )
+    request_headers = dict(headers) if headers else {}
+    request_headers.update(authorization_header(url, token))
+    request = urllib.request.Request(url, method="GET", headers=request_headers)
     try:
         with opener.open(request, timeout=HTTP_TIMEOUT_S) as response:
             body = response.read()

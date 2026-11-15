@@ -17,8 +17,44 @@ _DATE_TEXT = re.compile(r"\A\d{4}-\d{2}-\d{2}\Z")
 _SKIP_LICENCE = "licen"
 _SKIP_TERMS = "terms"
 KINDS = frozenset(
-    {"portal_dataset", "paged_layer", "https_file", "terms_page", "citation_only"}
+    {
+        "portal_dataset",
+        "paged_layer",
+        "https_file",
+        "terms_page",
+        "citation_only",
+        "paged_cards",
+    }
 )
+COLLECTED_FAMILIES = frozenset(
+    {
+        "trade_ext",
+        "survey_ext",
+        "price_ext",
+        "hotel_ext",
+        "talent_ext",
+        "jobseekers",
+        "utilities_ext",
+        "coverage_ext",
+        "fdi_stats",
+        "completions_ext",
+    }
+)
+
+
+def undeclared_public_split(entry: Entry, fields: list[str]) -> bool:
+    """PUB-90: family files keep published splits only with their declaration."""
+    if entry.source_id not in COLLECTED_FAMILIES:
+        return False
+    tokens = {token for field in fields for token in field.casefold().split("_")}
+    sex = {"sex", "gender", "male", "female", "males", "females"}
+    nationality = {"nationality", "nationalities", "qataris"}
+    return bool(
+        (tokens & sex and "sex" not in entry.public_splits)
+        or (tokens & nationality and "nationality" not in entry.public_splits)
+    )
+
+
 BANNED_SOURCE_IDS = frozenset({"traffic_tomtom_flow", "traffic_tomtom_range"})
 FIELDS = frozenset(
     {
@@ -27,6 +63,7 @@ FIELDS = frozenset(
         "slug",
         "kind",
         "layer",
+        "chain_intermediate_sha256",
         "title_en",
         "publisher",
         "licence_id",
@@ -166,8 +203,8 @@ class FileFields:
 class Entry:
     """One registry row. A decision-0017 family row is keyed source_id/slug.
 
-    layer is the ArcGIS layer id of a paged_layer row, required there with no
-    default, and absent on every other kind.
+    layer is the ArcGIS layer id of an available paged_layer row. An absent
+    row may omit it rather than invent an id; other kinds refuse it.
     """
 
     key: str
@@ -216,6 +253,7 @@ class Entry:
     point: tuple[float, float] | None = None
     variables: tuple[str, ...] = ()
     cache_role: str = ""
+    chain_intermediate_sha256: str = ""
 
 
 def registry_path() -> Path:
@@ -408,6 +446,7 @@ def _entry(row: object) -> Entry:
         point=file_fields.point,
         variables=file_fields.variables,
         cache_role=file_fields.cache_role,
+        chain_intermediate_sha256=_chain_pin(row),
     )
 
 
@@ -510,6 +549,14 @@ def _variables(row: dict[object, object]) -> tuple[str, ...]:
     return tuple(found)
 
 
+def _chain_pin(row: dict[object, object]) -> str:
+    """An empty pin awaits the lead's reading; it never disables verification."""
+    pin = _optional_text(row, "chain_intermediate_sha256")
+    if pin and re.fullmatch(r"[a-f0-9]{64}", pin) is None:
+        raise RegistryError("chain_intermediate_sha256 is not a SHA-256")
+    return pin
+
+
 def _terms_watch(row: dict[object, object]) -> bool:
     """Return the compatibility flag. It changes nothing about fetch or terms."""
     if "terms_watch" not in row:
@@ -556,6 +603,8 @@ def _layer(row: dict[object, object], kind: str) -> int | None:
             raise RegistryError("layer on a row that is not paged_layer")
         return None
     if "layer" not in row or row["layer"] is None:
+        if _text(row, "skip_reason"):
+            return None
         raise RegistryError("paged_layer requires layer")
     value = row["layer"]
     if isinstance(value, bool) or not isinstance(value, int):

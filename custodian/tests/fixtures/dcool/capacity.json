@@ -1,0 +1,22 @@
+[
+  {
+    "year": "2019-01-01",
+    "project_status": "Invented status",
+    "municipality": "Doha",
+    "other": 1,
+    "industrial": 2,
+    "real_estate_development": 3,
+    "sport": 4,
+    "culture": "5",
+    "health": 6,
+    "transport": 7,
+    "education": 9,
+    "hotels": 10,
+    "commercial": 12,
+    "district_cooling_service_supply": 13,
+    "lbldy": "الدوحة",
+    "hl_lmshry": "مخترع",
+    "geo_point": "invented-point",
+    "geo_shape": "invented-shape"
+  }
+]

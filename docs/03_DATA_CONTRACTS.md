@@ -647,7 +647,7 @@ Writers are modules of `custodian/`; readers are modules of `product/` (`store` 
 | `pub_health_centre` | Public | health centre or its catchment | `feature_key` | `publicdata` (from the source `gis_phcc`; decision 0023 item 3) | the site context of D2 and D5; the map |
 | `pub_zoning` | Public | zoning polygon | `feature_key` | `publicdata` (from the source `gis_zoning`; decision 0023 item 3) | site fit (the reverse of D2) and a ranking criterion; the plot label (DAT-168); the map |
 | `pub_address_point` | Public | official address point | `feature_key` | `publicdata` (from the source `gis_address`; decision 0023 item 3) | the map; the plot label (DAT-168) |
-| `pub_parcel` | Public | approved land parcel | `feature_key` | `publicdata` (from the source `gis_parcels`; decision 0023 item 3) | site fit; the plot label (DAT-168); the map |
+| `pub_parcel` | Public | published land parcel outline | `feature_key` | `publicdata` (from the source `gis_parcels`; decision 0023 item 3) | site fit; the plot label (DAT-168); the map |
 | `pub_poi_comm` | Public | commercial point | `feature_key` | `publicdata` (from the source `gis_poi_comm`, once the reviewed registry change of PUB-92 names it; decision 0023 item 3) | competitors as counts and distances; the map |
 | `pub_tender` | Public | tender | `tender_key` | `publicdata` (from the source `tenders_pub`, read as a visitor and shown in full in version 1 regardless of its terms, PUB-108; [decision 0026](decisions/0026-public-sources-used-in-full-locally.md)) | the demand signal for business suppliers (D4, PUB-93) |
 | `pub_district_cooling` | Public | municipality × sector × period × indicator | `municipality_code`, `sector_key`, `period`, `indicator` | `publicdata` (from the source `dcool_capacity`; decision 0023 item 10) | D1, D6, beside the utility series |
@@ -766,15 +766,15 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `pub_price_index` | `period`; `group_code` string; `index_value` decimal(10,2); `base_period` string |
 | `pub_property_resi` | `district_key`; `municipality_code`; `period` (`YYYY-MM`: the weekly bulletins aggregated by month); `unit_type` (published key); `deal_count` int; `median_price` decimal(14,2) (Y, null when `deal_count` is 0); `price_basis` (`per_m2` when `median_price` is per square metre of floor area, where the bulletin rows carry one; `per_unit` when it is per unit sold; one basis for all the sales of a row, and the fact unit is `qar_per_m2` or `qar` accordingly, as C14 names it); transaction and parcel identifiers are dropped before the release (PUB-14) |
 | `pub_property_quarter` | `district_key`; `municipality_code`; `period` (`YYYY-Qn`); `use_key` (a key of the reviewed use mapping of PUB-107); `unit_type` (`all` on the row of the use as a whole; otherwise a published unit-type key of `prop_resi_units`, card C41); `deal_count` int (the kept deals of the row); `deal_value` decimal(16,2) (the sum of their prices, fact unit `qar`); on an `all` row: `median_price_per_ft2` decimal(12,2) (Y, null when no kept deal has a positive floor area; areas converted by the exact factor of C41; fact unit `qar_per_ft2`), `land_deal_count` int (the kept deals whose reviewed property type is land without a building) and `land_median_price_per_ft2` decimal(12,2) (Y: the same median over those deals only, null when `land_deal_count` is 0); on a unit-type row: `median_price` decimal(14,2) (Y, null when `deal_count` is 0) and `price_basis` (`per_unit` or `per_m2`, one basis for all the sales of a row, as in `pub_property_resi`); a column of the other kind of row is null; no transaction or parcel identifier enters it (PUB-14) |
-| `pub_land_price` | `district_key`; `period` (`YYYY`, the year of the guide prices); `use_category` (published key); `guide_price` decimal(12,2); `price_basis` (`per_ft2` or `per_m2`, as the layer states it; the fact unit is `qar_per_ft2` or `qar_per_m2` accordingly); a guide price, never a deal price or a rent |
+| `pub_land_price` | `district_key`; `period` (`YYYY`, the year of the guide prices); `use_category` (published key); `guide_price` decimal(12,2); `price_basis` (`per_ft2`, confirmed by the layer alias in S2-T19; fact unit `qar_per_ft2`); a guide price, never a deal price or a rent |
 | `pub_bank_credit` | `activity_key` (published key, matched to a sector only through the reviewed sector crosswalk of C41); `period` (as published); `value` decimal(18,2) (outstanding credit as published); `unit`; national, no area figure |
 | `pub_rail_plan` | `feature_key` string (a key the release build assigns to each feature, never the layer's own object identifier, PUB-14; the same for every table of the GIS centre below); `feature_kind` (`line`, `planned_station`, `protection_zone`); `name_en`, `name_ar` string (Y: as published); `geometry` geometry (line, point or polygon); every row is a plan, and no column says that a line or station operates |
 | `pub_health_centre` | `feature_key`; `feature_kind` (`centre`, `catchment`); `name_en`, `name_ar` string (Y: as published); `period` (`YYYY`, the year of the layer); `geometry` geometry (point for a centre, polygon for a catchment) |
-| `pub_zoning` | `feature_key`; `zoning_code` string (the published zoning designation); `permitted_uses` string (as published); `height_rule`, `setback_rule` string (Y: as published); `geometry` geometry (polygon); a row states what zoning permits, never an approval, a permit or availability |
+| `pub_zoning` | `feature_key`; `zoning_code` string (the published zoning designation); `source_layer` string (published layer name); `permitted_uses` string (Y: as published, null where that layer publishes none); `height_rule`, `setback_rule` string (Y: as published); `geometry` geometry (polygon); a row states what zoning permits, never an approval, a permit or availability |
 | `pub_address_point` | `feature_key`; `zone_number`, `street_number`, `building_number` string (as published); `building_subtype` string (Y: as published); `survey_date` date (Y); `lon`, `lat` decimal(9,6); `cell` cell; nothing else: the utility account numbers and the internal editing fields are never taken, and the parcel number is a join key inside the build only, dropped before the release (PUB-105, PUB-14) |
-| `pub_parcel` | `feature_key` (never the parcel number, which is a join key inside the build only, PUB-14); `area_m2` decimal(14,2) (as published); the parcel's published dates, each a `date` column (Y) named at the first fetch; `geometry` geometry (polygon) |
-| `pub_poi_comm` | `feature_key`; `name` string (as published); `name_ar` string (Y: only where the source gives one); `category` string (as published; the reviewed mapping to the `place_category` nodes of section 10 is a committed configuration, as for `pub_place_fsq`); `lon`, `lat` decimal(9,6); `cell` cell; source-given fields only, so that no attribute is invented for a real named business |
-| `pub_tender` | `tender_key` string (a key the release build assigns, never the portal's own reference number, PUB-14); `buying_entity` string (as published, never looked up); `category` string (as published); `period` (`YYYY-MM-DD`, the publication date, or `YYYY-MM` where only the month is published); `closing_date` date (Y: as published); every further published field that S2-T19 declares |
+| `pub_parcel` | `feature_key` (never the parcel number, which is a join key inside the build only, PUB-14); `area_m2` decimal(14,2) (as published); `STARTDATE`, `ENDDATE` date (Y: both published dates; `area_m2` comes from `SHAPE.AREA`, not `PDAREA`); `geometry` geometry (polygon) |
+| `pub_poi_comm` | `feature_key`; `name` string (as published); `name_ar` string (Y: only where the source gives one); `category` string (Y: null on `POIs_COMM`, which publishes no category; `POI_KEY` is not mapped to it; any later mapping needs a reviewed configuration); `lon`, `lat` decimal(9,6); `cell` cell; source-given fields only, so that no attribute is invented for a real named business |
+| `pub_tender` | `tender_key` string (assigned from release columns as below, never a portal reference, PUB-14); `buying_entity` string (the card's Ministry in the English read, as published, never looked up), `buying_entity_ar` string (Y); `category`, `category_ar` string (Y: Requested Sector Type, as published); `tender_type`, `tender_type_ar` string (Y: Type, as published); `title`, `title_ar` string (Y: cleaned title-link text); `text_cleaned` boolean; `period` (`YYYY-MM-DD`, Y: Publish date only); `closing_date`, `award_date`, `cancel_date` date (Y); `cancel_reason`, `cancel_reason_ar` string (Y: cleaned); `bond_qar`, `documents_value_qar` decimal(18,2) (Y); `company_size` string (Y: page-order size words joined by a vertical bar); `lists` string (the list memberships in the order available, closed, technically_opened, financially_opened, awarded, cancelled, joined by a vertical bar); no derived state, award value, supplier or source reference number |
 | `pub_district_cooling` | `municipality_code` (through the municipality name map of PUB-27); `sector_key` (published key); `period` (as published); `indicator` (published key; capacity, never consumption); `value` decimal(18,2); `unit`; on the source's own geography |
 | `pub_venue_visits` | `venue_key` (the key of the committed, reviewed venue crosswalk, PUB-89); `venue_kind` (`museum_or_exhibition`, `health_centre`); `name_en` string; `name_ar` string (Y: null when no public Arabic name exists); `region` string (Y: the health region as published; null for museums and exhibitions); `place_id` (Y: the `pub_place` record that the crosswalk links; null otherwise, and the venue then has no map point); `period` (`YYYY-MM` for museums and exhibitions, `YYYY` for health centres); `indicator` (`visitors`, `patient_visits`); `value` int; `unit` (`visits`) |
 | `pub_building_permits` | `municipality_code`; `period` (`YYYY` or `YYYY-MM`, as published); `document_type` (`building_permit`, `completion_certificate`); `permit_type` (published key, or `all`); `building_type` (published key, or `all`); `document_count` int |
@@ -1774,23 +1774,36 @@ the quality measure of DAT-24.
   DAT-154).
 - OPEN: slice S2 confirms the columns and units of the four Public tables of decision 0019 (DAT-157),
   among them the unit of `radiance_nw_cm2_sr`.
-- OPEN ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) items 3, 8 and 10):
-  S2-T19 confirms at the first fetch the columns of `pub_property_quarter`, `pub_land_price`,
-  `pub_bank_credit`, `pub_rail_plan`, `pub_health_centre`, `pub_zoning`, `pub_address_point`,
-  `pub_parcel`, `pub_poi_comm`, `pub_tender` and `pub_district_cooling`, as for the four Public
-  tables of decision 0019 (DAT-157), and fixes the form of `feature_key` and `tender_key`. This
-  covers whether the deals of the two sales bulletins share a row or stay apart by `source_id`, the
-  published unit types and use categories, the price basis of the guide prices, the period and unit
-  of the credit series, the fields each GIS layer publishes and the dates of a parcel. The Public
-  series of each sector's growth that C41 reads joins section 7.2 when document 04 names it.
-- OPEN ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 10): the release
-  tables of the ten open-data families `trade_ext`, `survey_ext`, `price_ext`, `hotel_ext`,
-  `talent_ext`, `jobseekers`, `utilities_ext`, `coverage_ext`, `fdi_stats` and `completions_ext`
-  are named in S2-T19, which adds each table's catalogue row and columns here by a contract revision
-  (DAT-120) before its first load; until then the loader refuses them (DAT-83). A family published
-  by sex or nationality enters only as a Public split table (DAT-141). The same task records the
-  role of the GIS centre's boundary and context layers (`gis_boundaries`, `gis_context`), which hold
-  no table until then.
+- S2-T19 contract revision (DAT-120; lead rulings DR2, LR-G5, LR-G8, LR-G10 and
+  LR-T7/LR-T11 of 2026-11-15): the two sales bulletins share each `pub_property_quarter`
+  row; `source_id` is not part of its key. Section 7.3 records the parcel dates, guide-price
+  basis, nullable zoning uses and commercial-point category, and bilingual tender columns.
+  `source_layer` is the published zoning layer name. Unpublished values remain null, never
+  borrowed from a neighbour or the other layer. The published use labels and unit types still
+  require the reviewed property-use map (PUB-107). Bank credit uses its `year` field, 2012 to
+  2022; the unit must be recorded from its source, never inferred from a modified date.
+  The Public sector-growth series of C41 still needs a source before joining section 7.2.
+- S2-T19 GIS feature keys (DR1(d)): `feature_key` is a build-assigned string, never the
+  layer object id, parcel number or `PIN`, including a hash of those identifiers. The exact
+  generation form remains to be reconciled with the GIS builder's return before the join;
+  this declaration does not claim a feature export or stable-key run has passed.
+- S2-T19 tender keys (LR-T7): `tender_key` is `tnd_` followed by the first 16 hexadecimal
+  characters of SHA-256 over canonical JSON of all merged release columns except
+  `tender_key`, including nulls, with keys sorted. Identical release rows are ordered by
+  the source's internal integer inside the build; later ties receive `_2`, `_3` and so on.
+  Neither the internal integer nor the displayed tender number enters the hash or release.
+  Titles and cancel reasons replace contact-shaped text with `[...]` (LR-T13), recording
+  `text_cleaned`. Missing publication dates stay null; coverage counts them and missing
+  language counterparts. The live receipt and display proofs remain for the lead and S2-T08.
+- OPEN ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 10): S2-T19
+  collects the ten families `trade_ext`, `survey_ext`, `price_ext`, `hotel_ext`, `talent_ext`,
+  `jobseekers`, `utilities_ext`, `coverage_ext`, `fdi_stats` and `completions_ext` in the cache,
+  with receipts only; no family release table or catalogue row is named in this task (DR5).
+  Tables wait for a use and the columns as really published, then a DAT-120 revision before
+  first load (DAT-83). Sex and nationality splits stay declared Public splits (DAT-141).
+  `gis_boundaries` stays absent with `direct_url_unconfirmed`; PUB-24's frame geometry is
+  unchanged. `gis_context` is `ROADFlowlnA` layer 0 only: street centre lines with class and
+  names, no flow, volume, speed or direction field; no release table (LR-G11, LR-G12).
 - OPEN ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) items 3 and 12): the metric
   keys of the figures that the GIS layers feed (the distance to a planned station and the zoning
   criterion of a ranking) join section 9 when document 07 fixes their methods; the plot label is a
