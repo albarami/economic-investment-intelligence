@@ -215,7 +215,7 @@ of the live traffic provider, it is listed for its terms, price and attribution,
 | `places_ovt` | Overture Places, release 2026-10-21.0, schema 2.0.0 | Overture Maps Foundation (per-record sources) | `s3://overturemaps-us-west-2/release/2026-10-21.0/theme=places/type=place/`, STAC `https://stac.overturemaps.org/2026-10-21.0/catalog.json` | CDLA Permissive 2.0 per source; Foursquare records Apache 2.0; AllThePlaces CC0 1.0 |
 | `bldg_ovt` | Overture Buildings, release 2026-10-21.0 (named showcase buildings only) | Overture Maps Foundation | same release, `theme=buildings` | ODbL (theme licence) |
 | `roads_osm` | OpenStreetMap Qatar extract (road network) | OpenStreetMap contributors | `https://download.openstreetmap.fr/extracts/asia/qatar-latest.osm.pbf` | ODbL 1.0 |
-| `cls_isic4` | ISIC Rev.4 structure (English titles) | United Nations Statistics Division | landing page `https://unstats.un.org/unsd/classifications/Econ`; direct machine-readable URL to be confirmed at slice S2 | UN terms of use; exact publisher wording and date read to be recorded; basis: the owner's decision for a personal, local project (PUB-12) |
+| `cls_isic4` | ISIC Rev.4 structure (English titles) | United Nations Statistics Division | landing page `https://unstats.un.org/unsd/classifications/Econ`; `https://unstats.un.org/unsd/classifications/Econ/Download/In%20Text/ISIC_Rev_4_english_structure.Txt` | UN terms of use; exact publisher wording and date read to be recorded; basis: the owner's decision for a personal, local project (PUB-12) |
 | `ref_min_wage` | Qatar minimum wage (Law No. 17 of 2020), reference page | International Labour Organization | citation only: `https://www.ilo.org/resource/news/qatar-adopts-non-discriminatory-minimum-wage` | to be confirmed at slice S2 |
 | `ref_wps_report` | Wage Protection Systems in the Gulf Cooperation Council Countries, November 2025 | International Labour Organization | citation only: `https://www.ilo.org/sites/default/files/2025-11/ILO_Beirut_Wage-Protection_Report_R10.pdf` | to be confirmed at slice S2 |
 | `ref_expansion_method` | Mobility study methodology v3 | Spanish Ministry of Transport | citation only: `https://ropenspain.github.io/spanishoddata/codebooks/mitma_-_estudio_movilidad_covid-19_informe_metodologico_v3_en.pdf` | to be confirmed at slice S2 |
@@ -638,6 +638,10 @@ ISIC 5610 Restaurants. The correct result is the "not mappable" bucket. By contr
 | PUB-38 | Each mapped ISIC class used by a playbook links to Overture categories through a reviewed allow-list (for example ISIC 5610 to `restaurant` and its Italian subcategory). Pizza is included in "Italian" only when the label on screen says "Italian or pizza". |
 | PUB-39 | The spine records its code system version (`licence_codes_2025_05`). The commerce ministry began recoding activities to the GCC unified classification from 1 June 2026 (Qatar News Agency, 1 June 2026); a later snapshot with new codes needs a new reviewed version, never a silent remap. |
 | PUB-40 | English labels for codes come from the ISIC class title, marked as the class title, not as a translation of the Arabic activity name. |
+
+S2-T04 builds the offline activity spine from `custodian/publicdata/review/activity_spine.csv` and `custodian/publicdata/review/category_allowlist.csv`, with coverage method `activity_spine.v1`, and the classification source stays unconfirmed so titles derived from it stay barred from release (PUB-13).
+
+S2-T05's [offline triage command](../scripts/spine_triage.md) reuses the S2-T04 loader and refuses a stale queue before requesting evidence. Provider `none` preserves the baseline order; recorded or exactly qualified evidence may order and pre-fill only a separate suggestions file. The candidate binding is a title/version snapshot, never sign-off: a person signs every mapping through PUB-35, and the decision records stay under eval artefacts (DAT-126).
 
 ## 7. Playbook activities and customs baskets
 
