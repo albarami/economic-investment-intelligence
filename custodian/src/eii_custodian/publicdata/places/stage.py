@@ -400,7 +400,7 @@ def _decision_against_file(review: Path, check_text: str) -> str:
             validate_recorded_decision(loaded, check)
         except PlacesError as exc:
             return exc.reason
-    return str(loaded.get("candidate_key", "pending"))
+    return str(loaded["candidate_key"])
 
 
 def _source_points(config: StageConfig) -> dict[tuple[str, str], tuple[float, float]]:
