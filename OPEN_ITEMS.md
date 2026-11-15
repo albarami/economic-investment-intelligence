@@ -1791,6 +1791,77 @@
 - OPTIONS: **Decided by the owner (decision 0034):** the listed places stand; tasks build from the pack as it is written; item 5 of decision 0026 stays the rule for every new commit; no further audit, repair task or review is opened for a reason of licence or terms in version 1. The lead keeps one list of the places for the go-live, outside the pack.
 - NEEDED BY: a go-live; not before.
 
+## OI-196 — The contract of `pub_place_fsq` and the pack's facts about the copy, corrected to the source's real shape
+
+- ID: OI-196
+- TYPE: OPEN
+- NEEDED: The slice S2 gate confirms the corrections of fact that task S2-T15 made in its own change to documents 03 and 04, or names the one it does not accept.
+- WHY: The pack described the copy from a reading of 2026-11-12. The lead's helpers read the copy's structure on 2026-11-14 (structure and counts only): its listing holds four dated releases, not three; its schema has one name field and no Arabic name, two parallel category lists and no confidence field. A contract column that the source cannot fill is a contract question, and nothing is manufactured for it (the lead's rulings of 2026-11-14 on the task's briefs and on its first return).
+- DONE SO FAR: In the row of `pub_place_fsq` in document 03 section 7.3 the one `category` column gave way to `category_ids` and `category_labels`, semicolon-separated in the source's order, the form the pack already uses for `merged_ids` (the contract has no list type); the three dates are nullable as published; `name_ar` is always null. DAT-157 and the source row, the freshness row, the attribution text and PUB-102 of document 04 say four releases and the selection through the copy's own summary file. The release used stays the one the owner chose, dated 2025-01-10 (OI-96, closed, whose text still says three releases; this item is the correction of that count). The publisher now delivers newer releases only through a portal that needs an account, so the public copy is frozen; one release newer than the one used stands in the copy and is not used. Both confirmations of the task passed the changed rows.
+- OPTIONS: **Recommendation:** accept the corrections at the slice gate as facts of the source; the product category of a place is returned beside its row by the reviewed mapping and is not a column of the table. Alternative: a contract change of its own task, if a consumer needs a column the source does not give.
+- NEEDED BY: the slice S2 gate (PLN-25).
+
+## OI-197 — The live fetch of `places_fsq` and its checks on real files are owed
+
+- ID: OI-197
+- TYPE: OPEN
+- NEEDED: The lead runs `./eii build-public` for the source in its own shell and records the outcome; criteria 2 and 3 of S2-T15 stay open in TASKS.md until then.
+- WHY: Every test of the task reads hand-made files with invented values. No builder, no reviewer and no ledger command has contacted the copy. The second confirmation asks, in the reviewer's words: "lead live fetch: check where the copy places its geo key, which GeoParquet version its files declare, and whether the pinned engine then reports the geometry column as BLOB with conversion off (L3 and L5)." The first confirmation: "EVIDENCE.txt section 6 leaves the whole ./eii test, live fetch and reviewed category-mapping rows pending." and "run the pending spatial-loaded parser proof."
+- DONE SO FAR: The fetch, the selection and the parser are built and approved on fixtures. The lead ruled on 2026-11-14 that, if the real summary file carries no list of column orders, the source is refused by the stricter rule and that outcome is brought back as a ruling, not guessed. The whole test command runs with this ledger. The three checks that the second confirmation named are entered apart as OI-202, so that each gets its own recorded answer.
+- OPTIONS: **Recommendation:** one run records: that only allow-listed hosts were contacted; the files selected and that they are the ones that cover Qatar (the `ASSUMPTION` of criterion 3); whether the summary carries the column orders; the three points of the reviewer above (OI-202); the parser run with the engine's spatial extension loaded; the receipt and hash of each fetched file. Nothing fetched is committed, and no value of a fetched row is written to a record.
+- NEEDED BY: the slice S2 gate; before any task reads `pub_place_fsq` from real data.
+
+## OI-198 — The reviewed rows of the category mapping of `places_fsq` are owed
+
+- ID: OI-198
+- TYPE: OPEN
+- NEEDED: Reviewed rows in `custodian/publicdata/review/places_fsq_categories.csv`; criterion 7 of S2-T15 stays open in TASKS.md until then.
+- WHY: The committed file holds its header alone, so every place is unmapped and gets no product category. The code refuses an unsigned row, an unknown target and a conflicting repeat, and its tests prove that on invented rows; the criterion asks for "a reviewed, committed category mapping".
+- DONE SO FAR: The loader, its refusals and the count of unmapped places are built and approved. The first confirmation: "reviewed rows remain the lead's."
+- OPTIONS: **Recommendation:** the lead enters the rows after the live fetch shows which source categories occur in the fetched files, each row with its mapping version, review status, reviewer role, review date and rationale, and no value edited by hand in a place's record. A source category is an identifier and a label of the publisher's own category list; the registry row records the licence the copy states with basis `dataset`, and item 5 of [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) stays the rule for the commit of the rows.
+- NEEDED BY: the slice S2 gate; before S3-T12 shows a product category for a place of this source.
+
+## OI-199 — The terms of the copy of `places_fsq` are recorded as "terms to be read"
+
+- ID: OI-199
+- TYPE: OPEN
+- NEEDED: The pack requires the registry to record, for every source, the publisher's terms in its own words with the date read and the basis of use (PUB-97; [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md)). The cells `basis_note` of the registry row `places_fsq/copy-2025-01-10` and `host_terms` of `custodian/publicdata/review/places_fsq_policy.yaml` say "terms to be read; checked 2026-11-14"; criterion 1 of S2-T15 ("the terms as read") stays open in TASKS.md until they hold the words read and the date.
+- WHY: The row records the publisher, the licence the copy states (Apache License, Version 2.0, basis `dataset`), the licence address, the release and the publisher's copyright line. Terms of the host of the copy were not found on the day of the check. The first confirmation, in the reviewer's words: "Close the lead’s live terms reading and update the registry basis_note and policy host_terms from “terms to be read” ", and under its check K13: "The “terms to be read” cell is a lead record, not a code rejection." A source listed as "terms to be read" with the date checked stays in use; the terms never switch it off (decision 0026). This item is about the record alone: whether the terms allow a use is not weighed in version 1 and nothing is asked of the owner (item 1 of [decision 0034](docs/decisions/0034-licence-questions-of-public-sources-are-answered-at-a-go-live.md)).
+- DONE SO FAR: The row and its test (`test_registry_row_records_publisher_licence_terms_and_release`) are built and approved; a missing terms address does not stop the fetch and a missing basis of use does (`test_missing_terms_do_not_stop_the_fetch_and_missing_basis_does`).
+- OPTIONS: **Recommendation:** with the live fetch of OI-197, the two cells are filled with what the host's pages say on that day, in their own words with the date read, or with the sentence that none was found and the date; no other cell changes.
+- NEEDED BY: the slice S2 gate.
+
+## OI-200 — The engine's READ rows for the Parquet behaviour are owed in the reference notes
+
+- ID: OI-200
+- TYPE: OPEN
+- NEEDED: The READ rows of the engine's official pages in `docs/REFERENCE_NOTES.md`, entered by the lead with the notes check (rule 42).
+- WHY: The review's finding 6 found only observed entries for the Parquet behaviour the task uses. The lead ruled on 2026-11-14 that it enters the engine's rows (two pages, four statements) with the task's change, and that the facts of the file format, the compact protocol and GeoParquet are cited in the package README instead, because the checker's lists are closed. At the approved commit the notes hold the observed run R10 and statement S28 of the task and no new READ row. The first confirmation, in the reviewer's words: "The lead still owes the two DuckDB READ rows in docs/REFERENCE_NOTES.md; their absence is expressly a lead record, not a finding."
+The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added to an approved commit for them.
+- DONE SO FAR: The package README cites the engine's configuration page for the conversion setting with its date read and quote, and the format's pages for the rest; the second confirmation passed those citations.
+- OPTIONS: **Recommendation:** the lead enters the rows from the format check of 2026-11-14 in a documents change of its own after this task merges, and runs `uv run --locked python scripts/check_reference_notes.py`. Alternative: one line here says why the README's citation is the record and the rows are not entered.
+- NEEDED BY: the slice S2 gate.
+
+## OI-201 — Timeouts of the mutation campaigns of `places_fsq`: five to replay, two with no proven cause (rule 39)
+
+- ID: OI-201
+- TYPE: OPEN
+- NEEDED: (a) The replay, alone and at normal load, of the five mutants of `footer.py` that time out on the joined tree. (b) The cause of the two timeouts of `_rows` in `parse.py` in the final campaign of fix pass 2.
+- WHY: A timeout is reported apart from a kill, and a green re-run alone does not close an unexplained failure (rule 39). (a) The five are mutants of the fixture writer's loop for variable-length integers; the builder replayed each alone for eight seconds, none returned, and it names for each the change that keeps the loop from ending; the lead's campaign of the joined commit shows the same five (`timed_out=5`). (b) The two timed out while ordinary suites also ran on the machine and passed alone inside thirty seconds; in the lead's later campaign they did not time out and are survivors with their explained rows. The builder's words: "Concurrency is an observed circumstance, not a proven cause. Retain logs and investigate timing before closure; do not increase a timeout or erase failures to obtain green." The first confirmation: "Replay the five joined-footer timeout mutants alone; retain the two parser timeout incidents with their unproven timing cause."
+- DONE SO FAR: The counts are kept as they were in the task's log; no timeout was raised and no result replaced. No test of the task failed at random in any recorded run: each failing run in the returns has its named cause (unformatted files, an import-order line, a digit literal in a fixture) and its corrected run.
+- OPTIONS: **Recommendation:** the lead replays the five as a recorded step of this task and enters the outcome here; the two parser incidents stay open until a campaign of `parse.py` alone on a quiet machine and one under load are compared, or until one line says why the load is the cause.
+- NEEDED BY: the slice S2 gate.
+
+## OI-202 — Three checks of the live fetch of `places_fsq` that the second confirmation named
+
+- ID: OI-202
+- TYPE: OPEN
+- NEEDED: Three recorded answers from the first live fetch of the source (OI-197): (a) where the files of the copy place their `geo` key; (b) which GeoParquet version the files declare; (c) what the pinned engine then reports as the type of the geometry column, with its GeoParquet conversion set off.
+- WHY: The footer reader and the parser were built from the official pages and proved on hand-made files; no file of the copy has been read. The reading of the official pages of 2026-11-15 left twelve points; the lead ruled that none changes code, that five are stated in the package README as the reader's own allowances, and that two are checks of the live fetch. The second confirmation recorded them, in the reviewer's words: "lead live fetch: check where the copy places its geo key, which GeoParquet version its files declare, and whether the pinned engine then reports the geometry column as BLOB with conversion off (L3 and L5)." The answers decide whether the reader's allowances are ever used and whether the parser meets the column type it expects.
+- DONE SO FAR: The package README names the reader's allowances as its own: they touch only the recorded box of a file, which the selection does not use, or end in a named refusal. `test_fsq_connection_disables_geoparquet_conversion` proves that the conversion is set off before any read, on a hand-made file. The second confirmation passed the README's citations and the allowances paragraph (its checks N1a to N1d).
+- OPTIONS: **Recommendation:** the run of OI-197 records the three answers as header facts and yes-or-no answers only, with no value of a fetched row. If an answer differs from what the reader or the parser expects (a key in a place the reader does not read, a version the pages read do not cover, a column type other than the one the parser expects), the source is refused by its named error and the difference comes back as a ruling; nothing is guessed and no fixture is changed to fit.
+- NEEDED BY: the slice S2 gate; before any task reads `pub_place_fsq` from real data.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -2414,6 +2485,24 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: `web/spikes/performance/` (the loopback server of `npm run spike:performance:serve`, which writes a trace under `web/spikes/performance/evidence/`); `npm run format:check`; the README of the spike
 - EVIDENCE: The server writes a trace as one line of JSON. The web format check reads every JSON file under `web/`, so the first head of pull request 55 failed the hosted job static-checks at its step "Check web format" and the job planted-failures at its plant of the same check. The three traces were then rewritten by the project's formatter and the digests of their capture records updated, with a proof that nothing but whitespace differs; no check was changed. A later native trace would fail in the same way.
 - NEEDED: the follow-up task of slice S2 makes the server write a trace in the form the formatter keeps (or the spike's README tells the person who takes a trace to run the formatter and update the capture record's digest before committing); the format check and its ignore list are not changed for it; or one line says why it is not valid.
+
+### PO-S2-35 — Files of the copy that are not selected are not checked against the summary
+
+- ID: PO-S2-35
+- TYPE: OPEN
+- RAISED BY: the confirmations of S2-T15 (Moonshot AI Kimi K3.1 Pro High, 2026-11-15), outside their verdicts, as hardening; first proposed by the builder of the second fix pass (OpenAI, 2026-11-14) and ruled not built by the lead on 2026-11-14
+- CONCERNS: `custodian/src/eii_custodian/publicdata/places_fsq/select.py` (`select_partitions`); `custodian/src/eii_custodian/publicdata/places_fsq/fetch.py` (`fetch_release`); the section "Limits" of the package README; document 17
+- EVIDENCE: The reviewer's words, first confirmation: "Files not selected are not checked against the summary, as the package README’s limitation sentence records." Second confirmation: "files not selected remain outside summary verification, as the README's Limits section discloses." The fetch compares the footer of each selected file with the summary and refuses a difference before anything is stored; a file that the summary wrongly places outside the frame is never fetched, so a stale summary can hide it. The lead did not have the check built because it would fetch every footer of the release. The builder's words: "selected-file consistency does not prove correct exclusion of other files. Add a reviewed way to validate excluded-file coverage before deployment reliance, preserving the format’s warning that summary files were never formally specified."
+- NEEDED: the follow-up task of slice S2 assesses a bounded check of the files not selected (for example the footers alone, by byte range), with its planted stale file; or says in one line why the limit stands, and whether document 17 names it for real use.
+
+### PO-S2-36 — The later column orders of the file format are treated as unknown
+
+- ID: PO-S2-36
+- TYPE: OPEN
+- RAISED BY: the lead's ruling of 2026-11-14 on the format check of S2-T15 (defect D1), and the reading of the official pages by the lead's helper on 2026-11-15
+- CONCERNS: `custodian/src/eii_custodian/publicdata/places_fsq/footer.py` (`file_metadata`, the resolution of column orders); the package README
+- EVIDENCE: The reader uses a modern bound only where the file's list of column orders gives the column the type-defined order; under any other order it takes the deprecated bounds where present, and otherwise the statistic is missing and the file set is refused. The return of the second fix pass: "IEEE total order, member 2, is UNKNOWN in this pass". The reading of 2026-11-15 found that the format's definition now names two further column orders and a rule for a zero bound under the type-defined order that the reader does not apply; the lead ruled that none of its twelve points changes code, and the first confirmation passed the pair of bounds from mixed sources "unchanged as ruled" (its check K9). The reader fails closed: a copy written with a later order is refused by name and never read by a guessed order.
+- NEEDED: the follow-up task of slice S2 decides, after the live fetch shows which order the copy declares, whether the reader learns the later orders and the zero rule, each with its hand-encoded plant; or says in one line why refusal is enough.
 
 ## Sources
 
