@@ -27839,6 +27839,193 @@ Seed:      none
 Notes:     Both work commits have Conventional Commit subjects.
 ```
 
+#### Decision 0042: review round 1: REJECTED
+
+Reviewed the uncommitted draft on main `0c58364`; the one finding (public documentation links in Sources) was overruled by the lead under rules 5 and 15. Google Gemini 3.1 Pro through Droid; another maker than the drafter (OpenAI) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED
+TASK: decision record 0042 (the front-end foundation), review round 1
+REVIEWER: Google Gemini 3.1 Pro, through Droid
+SKILLS LOADED: strict-reviewer, sanad-provenance, al-muhasibi, muhasabah-gate
+CHECKS:
+C1 PASS
+C2 PASS
+S3-T10 — right (accurately reflects the criteria and scope before amendment)
+S3-T14 — right (accurately reflects the criteria and scope before amendment)
+S3-T16 — right (accurately reflects the criteria and scope before amendment)
+S3-T18 — right (accurately reflects the criteria and scope before amendment)
+Document 10 — right (accurately reflects the document state before amendment)
+Document 11 — right (accurately reflects the document state before amendment)
+Document 16 — right (accurately reflects the document state before amendment)
+C3 PASS
+C4 PASS
+C5 PASS
+C6 PASS
+C7 FAIL (docs/decisions/0042-the-front-end-foundation.md lines 74-77)
+FINDINGS:
+D1 (docs/decisions/0042-the-front-end-foundation.md, lines 74-77, Contains host and domain names in URLs such as react-aria.adobe.com and github.com, Remove the URLs and domain names to comply with the hygiene rule)
+PROPOSED OPEN ITEMS: none
+```
+
+#### Decision 0042: confirmation round 2: REJECTED
+
+Reviewed commit `a555fad`. Google Gemini 3.1 Pro through Droid; another maker than the drafter (OpenAI) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED
+TASK: decision record 0042 documents change, confirmation round 2
+COMMIT: a555fad55ea0f38be78ceacd293486f2b195ac0d
+REVIEWER: Google Gemini 3.1 Pro, through Droid
+SKILLS LOADED: strict-reviewer, sanad-provenance, muhasabah-gate
+CHECKS:
+  K1 PASS Public library links are kept and explicitly marked as reported by research and not checked; no private host, IP address, or private path appears anywhere in the diff.
+  K2 FAIL The new criteria boxes in S3-T10, S3-T14, S3-T16, and S3-T18 lack the required explicit planted violations for their guards.
+  K3 PASS Items OI-257, OI-258, and OI-259 are present as the newest items in OPEN_ITEMS.md, and all OI-[LEAD placeholders have been correctly replaced by their numbers.
+  K4 PASS Round-1 passes C1 to C6 still hold; no numbers or threshold IDs were invented, no gate passes were claimed, and no comparisons or "first/only/unique" claims were added.
+FINDINGS:
+  N1 (TASKS.md, S3-T10 criteria, The new `[ ]` criterion lacks a planted violation for its "never zero" guard, Add an explicit planted violation requirement for this guard)
+  N2 (TASKS.md, S3-T14 criteria, The new `[ ]` criterion lacks a planted violation for its "never zero" guard, Add an explicit planted violation requirement for this guard)
+  N3 (TASKS.md, S3-T16 criteria, The new `[ ]` criterion lacks a planted violation for its baseline and immediate reset guards, Add an explicit planted violation requirement for these guards)
+  N4 (TASKS.md, S3-T18 criteria, The new `[ ]` criterion lacks planted violations for the hidden count and origin label guards, Add explicit planted violation requirements for these guards)
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision 0042: confirmation round 3: APPROVED
+
+Reviewed commit `d1a64c4`. Google Gemini 3.1 Pro through Droid; another maker than the drafter (OpenAI) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED
+TASK: decision record 0042 documents change, confirmation round 3
+COMMIT: d1a64c45925e41f83a15594efa80919ad712d979
+REVIEWER: Google Gemini 3.1 Pro, through Droid
+SKILLS LOADED: strict-reviewer, sanad-provenance, muhasabah-gate
+CHECKS:
+  K2 PASS Each of the four guards named in the findings now carries a planted violation that must fail.
+  K5 PASS The fix commit changes only those four criteria, keeps every other word, and adds no number, threshold, requirement ID, comparison, or restricted claim.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision 0042: merge record
+
+- The head that was merged, `b21fe9d53cc37bb972917faa55acf535e737059e`, is the approved commit `d1a64c4` and one ledger commit that changes records only (decision 0039).
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43829891265 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43829891267 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43829891473.
+- The lead's ledger run on the head: exit 0, `./eii test --seed 2026111611`: 5252 passed.
+- The verdicts are quoted in the pull request's body (Review section) and in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/65 was squash-merged on 2026-11-16 at that head; merge commit `89ab3f0e7fe9d60fb174e1dfb4644659dba78136` on main; head tree `d93bffcfd62001449200d8fd05c380ad03174d77`, merge tree `d93bffcfd62001449200d8fd05c380ad03174d77`. CI on the merge commit: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43833495203 ; workflow ci running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43833495372 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43833495140.
+
+### DOCS-0044 — Decision record 0044 and task S3-T21: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/66 )
+
+- What it is: [decision 0044](docs/decisions/0044-the-conversation-test-lab.md), Accepted on 2026-11-16: the conversation test lab. Its eight items are the angle grid with its must-decline, must-suppress, out-of-scope, adversarial and injection sets; accuracy by deterministic oracles only; smoothness measured at p50, p95 and worst with budgets proposed by the task and never loosened; value by deterministic presence checks; visual checks by screenshots, automated checks and a review job by another maker (no model score in the run-time gateway, rule 30); scale and cost on idle seats with invented, screened questions and a sealed held-out set; one command added to rule 44 by the task that builds it; and EII's own properties as acceptance criteria, stated never as a comparison, their thresholds set by a later decision record. The same pull request adds task S3-T21 to TASKS.md with its gate sentences at slices S3, S8 and S10, pointers and amended passages in documents 12 and 14 and docs/README.md, and open item OI-260.
+- Why: the owner's relayed notes of 2026-11-16 ask to test the conversational experience with hundreds and thousands of questions from every angle. Decision 0038 accepted the question factory; this record widens its scope. A material amendment needs a decision record and never a silent edit (rule 46). Decision records keep their own pull request (rule 33).
+- Class: documents only, Deep in its subject (the oracle boundary of rules 16 to 25 and the gateway's closed classes). Lead: Anthropic (Claude Opus 5.5): the rulings, the briefs and the edits after review. Editor: Google Gemini 3.1 Pro through Droid, the draft in two rounds. Reviewer: OpenAI GPT-6 through Codex, which wrote none of the change.
+- Review: round 1 was REJECTED on two findings (speech and ranking parity made slice S3 depend on S6-T11 and S8-T10; persona checks undefined) and three record points; the lead fixed them. The confirmation was APPROVED with no finding, and the confirmation of the move onto decision 0042 was APPROVED at `67bb7218ef684d83f96839dcc2e7e8e05a920b76` with no finding. After decision 0042 merged as `89ab3f0`, the lead moved that approved commit onto the new main as the work commit `b3830a007b5f9d33d5af4935cb5e9c71004c21e7`; the moved patch equals the approved one line for line apart from the blob index lines (decision 0039: a move that changes no line keeps its approval).
+- Left unchanged: AGENTS.md and CLAUDE.md, every privacy rule, gate check, hard limit, sandbox rule and source permission; decision 0035 binds every audience surface. No code, check script, workflow file or test changes, and no result is measured: every budget is a proposal measured by its task and never loosened. The record claims no implemented lab, command or gate approval (rule 47).
+- The repository's checks cannot tell whether the record reads the owner's notes rightly. That judgement belongs to the reviewer, and the owner's choices stay with the owner.
+
+#### Evidence for the work commit `b3830a007b5f9d33d5af4935cb5e9c71004c21e7`
+
+```text
+### DOCS-0044 — Decision record 0044 and task S3-T21
+Commit:    b3830a007b5f9d33d5af4935cb5e9c71004c21e7
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 681 text files, 89 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with record 0044, task S3-T21, its gate sentences and the index rows: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### DOCS-0044 — Decision record 0044 and task S3-T21
+Commit:    b3830a007b5f9d33d5af4935cb5e9c71004c21e7
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### DOCS-0044 — Decision record 0044 and task S3-T21
+Commit:    b3830a007b5f9d33d5af4935cb5e9c71004c21e7
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files stay byte-identical; neither changes here.
+```
+
+```text
+### DOCS-0044 — Decision record 0044 and task S3-T21
+Commit:    b3830a007b5f9d33d5af4935cb5e9c71004c21e7
+Command:   bash -c "git diff --name-only 89ab3f0e7fe9d60fb174e1dfb4644659dba78136 HEAD -- docs/decisions/ | grep -v -E '/0044-' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no earlier decision record is changed)
+Seed:      none
+Notes:     Record 0044 is a new file (rule 46); this row proves on the committed tree that no earlier decision record was edited.
+```
+
+```text
+### DOCS-0044 — Decision record 0044 and task S3-T21
+Commit:    b3830a007b5f9d33d5af4935cb5e9c71004c21e7
+Command:   bash -c "git diff --name-only 89ab3f0e7fe9d60fb174e1dfb4644659dba78136 HEAD -- scripts .github web core custodian product gateway evals eii | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no code, check script or workflow file is changed)
+Seed:      none
+Notes:     The change is documents only.
+```
+
+```text
+### DOCS-0044 — Decision record 0044 and task S3-T21
+Commit:    b3830a007b5f9d33d5af4935cb5e9c71004c21e7
+Command:   bash -c "git diff --name-only 89ab3f0e7fe9d60fb174e1dfb4644659dba78136 HEAD | grep -v -E '[.]md$' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (only Markdown files change)
+Seed:      none
+Notes:     Every changed file is a Markdown document.
+```
+
+```text
+### DOCS-0044 — Decision record 0044 and task S3-T21
+Commit:    b3830a007b5f9d33d5af4935cb5e9c71004c21e7
+Command:   ./eii test --seed 2026111612
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    5252 passed, 0 failed, 0 skipped
+Seed:      2026111612
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### DOCS-0044 — Decision record 0044 and task S3-T21
+Commit:    b3830a007b5f9d33d5af4935cb5e9c71004c21e7
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','89ab3f0e7fe9d60fb174e1dfb4644659dba78136..b3830a007b5f9d33d5af4935cb5e9c71004c21e7'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
