@@ -615,7 +615,7 @@ def read_reconciliation(
             manifest["owner_report"] == owner_report(selection, pairs), "owner_report"
         )
         return ReconciliationRelease(inputs, pairs, manifest)
-    except (OSError, KeyError, TypeError):
+    except (OSError, KeyError, TypeError, json.JSONDecodeError, UnicodeError):
         raise ValueError("trade_reconciliation selected_manifest_invalid") from None
 
 

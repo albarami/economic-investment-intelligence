@@ -47,3 +47,10 @@ Recorded causes never claim to explain an entire gap. The manifest owner report
 retains cause evidence, access/free-plan obstacles and unknown prices as null.
 Benchmark access obstacles are written to benchmark_owner_report.json by dispatch.
 All these outputs remain cache-only. Different-maker build review is still required.
+
+Refusal plants cover policy, registry binding, acquisition, parsing, selected
+readers and trade comparison boundaries in the benchmark and reconciliation
+tests. Decoder failures use the selected reader's fixed diagnostic. Reconciliation
+dispatch converts native Comtrade, BACI and decimal refusals to comparison_invalid
+with NO_DATA and still writes the build log. The ZIP content-length recheck stays:
+a corrupt member can have an admitted declared size but shorter readable content.

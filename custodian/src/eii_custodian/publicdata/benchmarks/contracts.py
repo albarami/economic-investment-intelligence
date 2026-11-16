@@ -174,5 +174,5 @@ def read_selected(cache: Path, source_id: str, manifest_sha256: str) -> Release:
             "reparsed_output",
         )
         return Release(rows, receipt, manifest)
-    except (OSError, KeyError, TypeError):
+    except (OSError, KeyError, TypeError, json.JSONDecodeError, UnicodeError):
         raise ValueError(f"{source_id} selected_manifest_invalid") from None

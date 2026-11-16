@@ -138,3 +138,89 @@ def test_dispatch_records_owner_obstacle(tmp_path):
     assert result.failure is not None
     report = json.loads((tmp_path / "benchmark_owner_report.json").read_text())
     assert report[0]["reason"] == "paid_tier"
+
+
+@pytest.mark.parametrize(
+    "plant,reason",
+    [
+        ("stream", "stream_transport_missing"),
+        ("page", "metadata_changed_review_needed"),
+        ("date", "retrieval_date"),
+    ],
+    ids=["stream", "page", "date"],
+)
+def test_fetch_integrity_plants(tmp_path, plant, reason):
+    from eii_custodian.publicdata.benchmarks.fetch import _fetch_benchmark
+
+    from .test_benchmark_native import aligned_entry, native, payload
+
+    p = native()
+    entry = aligned_entry(p)
+    body = payload()
+
+    @contextmanager
+    def stream(url):
+        yield StreamResponse(url, (), len(body), iter((body,)))
+
+    args = [
+        entry,
+        p,
+        lambda u: Response(u, b"invented-page", ()),
+        stream,
+        tmp_path,
+        lambda: "2026-11-16T00:00:00Z",
+        lambda _: None,
+    ]
+    assert fetch_benchmark(*args).digest
+    # A separate empty cache makes non-publication observable on the failing call.
+    args[4] = tmp_path / "invented-refusal"
+    if plant == "stream":
+        args[3] = None
+    elif plant == "page":
+        args[2] = lambda u: Response(u, b"invented-changed-page", ())
+    else:
+        args[5] = lambda: "2026-1-1T00:00:00Z"
+    with pytest.raises(ValueError, match=rf"^{reason}$"):
+        _fetch_benchmark(*args)
+    with pytest.raises(ValueError, match=r"^wb_wdi benchmark_validation_failed$"):
+        fetch_benchmark(*args)
+    assert not list(args[4].rglob("*.manifest.json"))
+
+
+@pytest.mark.parametrize("plant", ["pending", "entry", "skip", "access"])
+def test_inner_fetch_preconditions(tmp_path, plant):
+    from eii_custodian.publicdata.benchmarks.fetch import (
+        BenchmarkRefusal,
+        _fetch_benchmark,
+        entry_check,
+    )
+
+    from .test_benchmark_native import aligned_entry, native
+
+    p = native()
+    entry = aligned_entry(p)
+    entry_check(entry, p)
+    if plant == "pending":
+        p = replace(p, confirmed=False)
+    elif plant == "entry":
+        entry = None
+    elif plant == "skip":
+        entry = replace(entry, skip_reason="invented-pending")
+    else:
+        p = replace(p, access="registration")
+
+    def forbidden(*args):
+        pytest.fail("inner precondition reached acquisition")
+
+    reason = "access_obstacle" if plant == "access" else "benchmark_validation_failed"
+    with pytest.raises(BenchmarkRefusal, match=rf"^{reason}$"):
+        _fetch_benchmark(entry, p, forbidden, None, tmp_path, forbidden, forbidden)
+    assert not list(tmp_path.rglob("*.manifest.json"))
+
+
+def test_benchmark_refusal_normalization():
+    from eii_custodian.publicdata.benchmarks.fetch import BenchmarkRefusal
+
+    assert BenchmarkRefusal("blocked_host").reason == "blocked_host"
+    refused = BenchmarkRefusal("invented")
+    assert refused.reason == str(refused) == "benchmark_validation_failed"

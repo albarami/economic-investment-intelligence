@@ -97,3 +97,32 @@ def test_historical_and_missing_are_not_reclassified():
     missing = replace(item, historical_value=None, value_status="source_missing")
     validate_row(missing)
     assert historical_rows((missing,)) == (missing,)
+
+
+@pytest.mark.parametrize(
+    "field,value,reason",
+    [
+        ("source_id", "fdi_projects", "source_id"),
+        ("unit", "", "row_schema"),
+        ("scale", 1, "row_schema"),
+        ("receipt_sha256", "a" * 63, "receipt_hash"),
+        ("receipt_sha256", "z" * 64, "receipt_hash"),
+        ("publisher_status", "invented", "status_values"),
+        ("value_status", "invented", "status_values"),
+    ],
+    ids=[
+        "source",
+        "empty",
+        "type",
+        "digest_length",
+        "digest_hex",
+        "publisher_status",
+        "value_status",
+    ],
+)
+def test_row_plants(field, value, reason):
+    from eii_custodian.publicdata.benchmarks.contracts import validate_row
+
+    validate_row(row())
+    with pytest.raises(ValueError, match=rf"^benchmark {reason}$"):
+        validate_row(replace(row(), **{field: value}))

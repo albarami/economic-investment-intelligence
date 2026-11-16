@@ -639,6 +639,9 @@ def run_build(
             json.dumps(benchmark_obstacles, sort_keys=True), encoding="utf-8"
         )
     if failure is None:
+        from eii_custodian.publicdata.comtrade.policy import SafeRefusal
+        from eii_custodian.publicdata.fetch.decimals import DecimalRefusal
+
         try:
             selected_comparison = reconciliation_selection or load_selection()
             if selected_comparison is not None:
@@ -657,7 +660,15 @@ def run_build(
                 manifests["trade_reconciliation"] = build_reconciliation(
                     cache, selected_comparison, comtrade_policy=native_policy
                 )
-        except (ValueError, KeyError, OSError, TypeError):
+        except (
+            ValueError,
+            KeyError,
+            OSError,
+            TypeError,
+            SafeRefusal,
+            BaciError,
+            DecimalRefusal,
+        ):
             failure = FetchFailure(
                 1,
                 "trade_reconciliation",

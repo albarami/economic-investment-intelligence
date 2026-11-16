@@ -255,3 +255,163 @@ def test_native_registry_schema_matches_mapping():
     )
     with pytest.raises(ValueError, match="native_schema"):
         entry_check(entry, p)
+
+
+def aligned_entry(p):
+    from eii_custodian.publicdata.fetch.registry import load_registry
+
+    return replace(
+        next(e for e in load_registry() if e.source_id == p.source_id),
+        skip_reason="",
+        publisher=p.publisher,
+        landing_url=p.page,
+        url=p.url,
+        fetch_host="example.test",
+        row_count_min=p.raw_rows[0],
+        row_count_max=p.raw_rows[1],
+        columns=tuple((c, "string") for c in p.native_columns),
+    )
+
+
+ENTRY_PLANTS = [
+    ("id", "source_id", "imf_weo", "source_id"),
+    ("key", "key", "invented-other", "source_id"),
+    ("commit", "commit_allowed", True, "registry_policy"),
+    ("nightly", "nightly_live_fetch", False, "registry_policy"),
+    ("publisher", "publisher", "invented-other", "source_chain"),
+    ("page", "landing_url", "https://example.test/other", "source_chain"),
+    ("url", "url", "https://example.test/other", "source_chain"),
+    ("host", "fetch_host", "invented-other.example", "blocked_host"),
+    ("tables", "release_tables", (), "release_contract"),
+    ("columns", "columns", (), "release_contract"),
+    ("raw_min", "row_count_min", 2, "raw_bounds"),
+    ("raw_max", "row_count_max", 6, "raw_bounds"),
+    ("licence", "licence_id", "", "terms_metadata"),
+    ("terms", "terms_words", "", "terms_metadata"),
+    ("terms_date", "terms_read_on", "", "terms_metadata"),
+]
+
+
+@pytest.mark.parametrize(
+    "case,field,value,reason", ENTRY_PLANTS, ids=[p[0] for p in ENTRY_PLANTS]
+)
+def test_entry_plants(case, field, value, reason):
+    from eii_custodian.publicdata.benchmarks.fetch import entry_check
+
+    p = native()
+    entry = aligned_entry(p)
+    entry_check(entry, p)
+    with pytest.raises(ValueError, match=rf"^{reason}$"):
+        entry_check(replace(entry, **{field: value}), p)
+
+
+PARSE_PLANTS = [
+    ("json_shape", "row_schema"),
+    ("native_keys", "native_schema"),
+    ("native_type", "native_types"),
+    ("pending", "benchmark_metadata_unconfirmed"),
+    ("bytes_low", "data_bytes"),
+    ("bytes_high", "data_bytes"),
+    ("raw_low", "raw_bounds"),
+    ("raw_high", "raw_bounds"),
+    ("flat_keys", "row_schema"),
+    ("source", "source_version"),
+    ("version", "source_version"),
+    ("unit", "row_mapping"),
+    ("status", "row_mapping"),
+    ("dimension", "row_mapping"),
+    ("period", "row_mapping"),
+    ("digits", "benchmark row_schema"),
+    ("fraction", "benchmark row_schema"),
+    ("selected_low", "selected_bounds"),
+    ("selected_high", "selected_bounds"),
+]
+
+
+@pytest.mark.parametrize("plant,reason", PARSE_PLANTS, ids=[p[0] for p in PARSE_PLANTS])
+def test_parse_plants(plant, reason):
+    p = native(fmt="json") if plant.startswith("native_") else policy()
+    if plant in {"raw_high", "selected_high"}:
+        p = replace(
+            p, **{"raw_rows" if plant == "raw_high" else "selected_rows": (1, 1)}
+        )
+    body = payload("json") if p.native_columns else json.dumps([asdict(row())]).encode()
+    assert len(parse(body, p, "a" * 64)) == 1
+    items = json.loads(body)
+    if plant == "json_shape":
+        body = b"{}"
+    elif plant == "native_keys":
+        items[0]["invented_extra"] = "invented"
+    elif plant == "native_type":
+        items[0]["invented_amount"] = 1
+    elif plant == "pending":
+        p = replace(p, confirmed=False)
+    elif plant.startswith("bytes_"):
+        p = replace(
+            p,
+            bytes=(len(body) + 1, len(body) + 2)
+            if plant.endswith("low")
+            else (1, len(body) - 1),
+        )
+    elif plant == "raw_low":
+        p = replace(p, raw_rows=(2, 3))
+    elif plant in {"raw_high", "selected_high"}:
+        items.append(asdict(row(status="publisher_forecast")))
+    elif plant == "flat_keys":
+        items[0].pop("scale")
+    elif plant in {"source", "version", "unit", "dimension", "period"}:
+        field = {
+            "source": "source_id",
+            "version": "source_version",
+            "dimension": "dimension_key",
+        }.get(plant, plant)
+        items[0][field] = "wb_wdi" if plant == "source" else "invented-other"
+    elif plant == "status":
+        p = replace(p, statuses=("publisher_forecast",))
+    elif plant == "digits":
+        items[0]["historical_value"] = "123456789.1234"
+    elif plant == "fraction":
+        items[0]["historical_value"] = "1.12345"
+    elif plant == "selected_low":
+        p = replace(p, selected_rows=(2, 3))
+    if plant != "json_shape":
+        body = json.dumps(items).encode()
+    with pytest.raises(ValueError, match=rf"^{reason}$"):
+        parse(body, p, "a" * 64)
+
+
+@pytest.mark.parametrize("bound", ["bytes", "raw_rows", "selected_rows"])
+@pytest.mark.parametrize("edge", ["low", "high", "equal"])
+def test_inclusive_parse_bounds(bound, edge):
+    body = json.dumps([asdict(row())]).encode()
+    count = len(body) if bound == "bytes" else 1
+    span = (
+        (count, count + 1)
+        if edge == "low"
+        else (0, count)
+        if edge == "high"
+        else (count, count)
+    )
+    p = Policy.from_mapping({**asdict(policy()), bound: span})
+    assert parse(body, p, "a" * 64) == (row(),)
+
+
+def test_zip_content_size_plant():
+    import struct
+
+    body = payload()
+    packed = archive(body + b"\n")
+    p = replace(
+        native(), members=(("invented.csv", len(body) + 1, len(body) + 1, 1, 1),)
+    )
+    assert len(parse(packed, p, "a" * 64)) == 1
+    # Truncate the member, retaining its declared uncompressed size and a valid
+    # CRC for the remaining content. getinfo still satisfies the unchanged bounds.
+    damaged = bytearray(archive(body))
+    central = damaged.index(b"PK\x01\x02")
+    struct.pack_into("<I", damaged, central + 24, len(body) + 1)
+    with zipfile.ZipFile(io.BytesIO(damaged)) as archive_file:
+        assert archive_file.getinfo("invented.csv").file_size == len(body) + 1
+        assert archive_file.read("invented.csv") == body
+    with pytest.raises(ValueError, match=r"^member_bytes$"):
+        parse(bytes(damaged), p, "a" * 64)

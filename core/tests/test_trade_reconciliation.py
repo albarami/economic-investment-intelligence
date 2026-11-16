@@ -156,3 +156,89 @@ def test_all_pairs_incomplete_calendar_is_explicit():
         ("invented-scope",),
     )
     assert "incomplete_calendar" in result[0].mismatch_codes
+
+
+@pytest.mark.parametrize("value", ["12,5", "1e5", "+1", ".5", "1.", "", 1])
+def test_decimal_format_plant(value):
+    from eii_core.calc.trade_reconciliation import compare_trade_sources
+
+    assert compare_trade_sources(figure(), figure()).gap == "0"
+    with pytest.raises(ValueError, match=r"^decimal_format$"):
+        compare_trade_sources(figure(), replace(figure(), value=value))
+
+
+def test_nonterminating_plant():
+    from fractions import Fraction
+
+    from eii_core.calc.trade_reconciliation import _text
+
+    assert _text(Fraction(1, 2)) == "0.5"
+    with pytest.raises(ValueError, match=r"^nonterminating$"):
+        _text(Fraction(1, 3))
+
+
+@pytest.mark.parametrize("side", ["left", "right"])
+def test_lineage_plant(side):
+    from eii_core.calc.trade_reconciliation import compare_trade_sources
+
+    rows = [figure(), figure()]
+    assert compare_trade_sources(*rows).gap == "0"
+    rows[0 if side == "left" else 1] = replace(figure(), lineage=())
+    with pytest.raises(ValueError, match=r"^lineage_missing$"):
+        compare_trade_sources(*rows)
+
+
+@pytest.mark.parametrize("side", ["left", "right"])
+def test_source_missing_plant(side):
+    from eii_core.calc.trade_reconciliation import compare_trade_sources
+
+    rows = [figure(), figure()]
+    assert compare_trade_sources(*rows).gap == "0"
+    rows[0 if side == "left" else 1] = replace(figure(), value=None)
+    result = compare_trade_sources(*rows)
+    assert result.mismatch_codes == ("source_missing",)
+    assert result.gap is None
+
+
+@pytest.mark.parametrize(
+    "field,value,reason",
+    [
+        ("currency", "invented-other", "annual_compatibility"),
+        ("currency", "unknown", "annual_compatibility"),
+        ("value", None, "annual_coverage"),
+        ("figure_kind", "calculated", "annual_coverage"),
+        ("lineage", (), "annual_coverage"),
+    ],
+    ids=["currency", "unknown", "missing", "calculated", "lineage"],
+)
+def test_annual_row_plants(field, value, reason):
+    from eii_core.calc.trade_reconciliation import annual_trade_sum
+
+    rows = [
+        replace(
+            figure(), input_id=f"invented-{m}", periods=(f"2020-{m:02}",), value="0.1"
+        )
+        for m in range(1, 13)
+    ]
+    assert annual_trade_sum(tuple(rows), output_id="invented-annual").value == "1.2"
+    rows[-1] = replace(rows[-1], **{field: value})
+    with pytest.raises(ValueError, match=rf"^{reason}$"):
+        annual_trade_sum(tuple(rows), output_id="invented-annual")
+
+
+@pytest.mark.parametrize("currency", ["", "unknown"])
+def test_annual_unknown_currency(currency):
+    from eii_core.calc.trade_reconciliation import annual_trade_sum
+
+    rows = tuple(
+        replace(
+            figure(), input_id=f"invented-{m}", periods=(f"2020-{m:02}",), value="0.1"
+        )
+        for m in range(1, 13)
+    )
+    assert annual_trade_sum(rows, output_id="invented-annual").value == "1.2"
+    with pytest.raises(ValueError, match=r"^annual_compatibility$"):
+        annual_trade_sum(
+            tuple(replace(row, currency=currency) for row in rows),
+            output_id="invented-annual",
+        )
