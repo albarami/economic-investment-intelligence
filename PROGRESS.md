@@ -28026,6 +28026,217 @@ Seed:      none
 Notes:     The work commit has a Conventional Commit subject.
 ```
 
+#### Decision 0044: review round 1: REJECTED
+
+Reviewed commit `71e85c8`. OpenAI GPT-6 through Codex; another maker than the drafter (Google, through Droid) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED
+TASK: decision record 0044 (the conversation test lab), review round 1
+COMMIT: 71e85c843ebf08fab8f7207de2106f048e8d1306
+REVIEWER: OpenAI GPT-6, through Codex
+SKILLS LOADED: strict-reviewer, sanad-provenance, al-muhasibi, muhasabah-gate
+CHECKS:
+C1 PASS — Decision 0044 items 1–8 carry the rulings into the record and task amendments. The question factory is widened; earlier decision records remain unchanged.
+C2 FAIL — S3-T21 names real same-slice dependencies, preserves pre-run budgets and requires planted violations and its own rule 44 amendment. However, its unconditional parity criterion introduces later-slice prerequisites, and its QA persona abbreviation is undefined.
+C3 PASS — All four amendment lines are unchecked criteria with planted violations. S8-T03 explicitly owns the build-time template scan and is an appropriate home for the catalogue/template claim scan.
+C4 PASS — Item 8 preserves backend provenance and evidence-thread access subject to decision 0035’s audience-label prohibition. Deterministic oracles, catalogue rendering and ranking safeguards preserve rules 21–25.
+C5 PASS — The added text contains no named competing product or service and no comparative positioning. Prohibited superiority and exclusivity claims appear as prohibitions.
+C6 FAIL — Execution evidence could not be independently verified under the read-only instruction. RETURN.r2.md reports exit 0 and last lines “checked 680 text files, 88 Markdown files: OK” and “checked 8 rules: OK”; neither checker was executed here.
+Twenty-three requirement anchors were located, alongside task and decision references. Gate paragraphs only gained sentences; the supporting document changes and OI-260 agree with the record.
+FINDINGS:
+D1 — File: TASKS.md. Place: S3-T21, decision 0044 parity amendment. Wrong: Speech and ranking-explanation parity are unconditional S3 completion criteria, although ranking is built by S6-T11 and speech by S8-T10. This implicitly blocks the S3 gate on later slices despite the same-slice Depends list. Fix: Keep an explicit parity-contract criterion and planted violation in S3-T21, limiting executed S3 checks to available cards and layout; assign ranking-explanation execution to S6-T11 and speech execution to S8-T10, with explicit unchecked criteria and planted violations. Retain the full eventual parity scope.
+D2 — File: TASKS.md. Place: S3-T21, Delivery; Difficulty and personas. Wrong: “QA” is not defined among the persona abbreviations and names neither its senior builder nor strict reviewer. Fix: Spell out the QA builder/reviewer pair in S3-T21’s Delivery line, retaining different-maker review.
+PROPOSED OPEN ITEMS:
+record — Checker outcomes are author-reported, not independently verified for this commit; the lead should attach exact-commit execution evidence through an authorised session. This evidence limitation alone does not reject the change.
+record — Decision 0044 item 1 refers to “the angle grid of the note” without preserving its axes. Include the note’s grid dimensions in the record or a stable referenced pack section so future implementers can recover the intended coverage.
+```
+
+#### Decision 0044: confirmation round 2: REJECTED
+
+Reviewed commit `9bf4696`. OpenAI GPT-6 through Codex; another maker than the drafter (Google, through Droid) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED
+TASK: decision record 0044, confirmation round 2
+COMMIT: 9bf4696557f5a56b3818e2885131be713f02e359
+REVIEWER: OpenAI GPT-6, through Codex
+SKILLS LOADED: strict-reviewer, sanad-provenance, muhasabah-gate
+CHECKS:
+K1 PASS — S3-T21 preserves the full parity contract while executing cards and layout; S6-T11 and S8-T10 carry unchecked execution criteria with planted violations. Item 8(iv) and Amended passages agree.
+K2 PASS — S3-T21 uses defined Frontend and AI abbreviations and spells out both builder/reviewer pairs.
+K3 FAIL — Item 8 omits L-686’s requirement that thresholds be set by a later decision record; Context does not name L-686. The comparison and exclusivity prohibitions remain.
+K4 FAIL — Grid axes match NOTE.lab.md and no gate sentence was removed, but the new S8-T10 amendment introduces full-card speech equivalence, conflicting with the existing Arabic headline requirement.
+FINDINGS:
+N1 — File: docs/decisions/0044-the-conversation-test-lab.md. Place: item 8. Wrong: The replacement drops “set by a later decision record” from the binding L-686 ruling. Fix: Restore that qualification immediately after “EII’s margins are its own thresholds”.
+N2 — File: docs/decisions/0044-the-conversation-test-lab.md. Place: Context. Wrong: L-686 is not named as K3 requires. Fix: Explicitly attribute the corrected repository comparison restriction to L-686.
+N3 — File: TASKS.md. Place: S8-T10, decision 0044 amendment. Wrong: Requiring the spoken answer to carry every card fact in the same order conflicts with S8-T10’s existing Arabic one-line headline criterion and AI-128. Fix: Test bilingual speech parity against the corresponding template-rendered spoken content, preserving Arabic headline-only speech; retain a planted omission of a fact required in that headline.
+PROPOSED OPEN ITEMS:
+record — Checker successes at HEAD are lead-reported in BRIEF.md; no checker was executed during this read-only review.
+```
+
+#### Decision 0044: confirmation round 3: APPROVED
+
+Reviewed commit `bb4acd5`. OpenAI GPT-6 through Codex; another maker than the drafter (Google, through Droid) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED
+TASK: decision record 0044, confirmation round 3
+COMMIT: bb4acd5870060acccfce9a9a6477c67051c35904
+REVIEWER: OpenAI GPT-6, through Codex
+SKILLS LOADED: strict-reviewer, sanad-provenance, muhasabah-gate
+CHECKS:
+K1 PASS — Decision 0044 item 8 explicitly states that EII’s margins are its own thresholds, set by a later decision record.
+K2 PASS — Decision 0044 Context names L-686 as the authority for keeping comparisons out of the repository.
+K3 PASS — TASKS.md S8-T10 checks each language’s speech against its template-rendered spoken content, preserves Arabic headline-only speech, and requires a planted headline-fact omission to fail.
+K4 PASS — The complete diff changes only the three requested passages. Round-2 passes on parity allocation and personas still hold; no new number, threshold, requirement ID, other product name or prohibited comparison claim is introduced.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+record — Checker successes are lead-reported in BRIEF.md; no checker was executed during this read-only review.
+```
+
+#### Decision 0044: confirmation of the move onto decision 0042: APPROVED
+
+Reviewed commit `67bb721`. OpenAI GPT-6 through Codex; another maker than the drafter (Google, through Droid) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED
+TASK: decision record 0044, the move onto decision 0042
+COMMIT: 67bb7218ef684d83f96839dcc2e7e8e05a920b76
+REVIEWER: OpenAI GPT-6
+SKILLS LOADED: strict-reviewer, muhasabah-gate
+CHECKS:
+  M1 PASS The complete moved diff preserves the approved change; changed-line comparison identifies the permitted README and S10 gate adjustments.
+  M2 PASS Decision 0042’s changes remain intact, including its README entry, S10 gate sentences and OI-257 through OI-259; OI-260 follows them.
+  M3 PASS Used .overnight/IN/LEAD_CHECKS.txt for the same HEAD; scripts were not executed during this review.
+    check_docs.py: “checked 681 text files, 89 Markdown files: OK”; exit 0.
+    check_tree.py: “checked 8 rules: OK”; exit 0.
+FINDINGS:
+  none
+```
+
+#### Decision 0044: merge record
+
+- The head that was merged, `f8b86c1e09e4f6a6a2d661b8274c708ac2eb34cb`, is `b3830a0` and one ledger commit that changes records only. `b3830a0` is the approved commit `67bb721` moved onto main `89ab3f0` after decision 0042 merged; its changed lines equal the approved commit's in every file (decision 0039):
+- OPEN_ITEMS.md: 6db3ac686996 / 6db3ac686996 identical
+- TASKS.md: 75aa643a0028 / 75aa643a0028 identical
+- docs/12_TESTING_AND_QUALITY.md: 6b60af712cf1 / 6b60af712cf1 identical
+- docs/14_IMPLEMENTATION_PLAN.md: dbcde8e949c5 / dbcde8e949c5 identical
+- docs/README.md: 3d02e39b98ae / 3d02e39b98ae identical
+- docs/decisions/0044-the-conversation-test-lab.md: 5cfcce6bcf03 / 5cfcce6bcf03 identical
+- same file set: yes; head f8b86c1 adds only PROGRESS.md (ledger records).
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43837102710 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43837102563 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43837102517.
+- The lead's ledger run on the head: exit 0, `./eii test --seed 2026111612`: 5252 passed, 0 failed, 0 skipped
+- The verdicts are quoted in the pull request's body (Review section) and in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/66 was squash-merged on 2026-11-16 at that head; merge commit `7a200d0c94e90c21cbfae8ee99dfb47a7384636a` on main; head tree `23022b36238a1b195b64daa856cef6ac7f088ef4`, merge tree `7a200d0c94e90c21cbfae8ee99dfb47a7384636a^{tree}`. CI on the merge commit: workflow sandbox running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43841019438 ; workflow docs running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43841019417 ; workflow ci running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43841019429.
+
+### DOCS-0045 — Decision record 0045, tasks S2-T27 and S8-T18: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/67 )
+
+- What it is: [decision 0045](docs/decisions/0045-eiis-own-capabilities-and-the-snapshot-archive.md), Accepted on 2026-11-16: EII's own capabilities and the public snapshot archive. It states the thirteen capabilities and the limits L1 to L7 as EII's own acceptance list, each with the task that delivers it; adds task S2-T27 (the public snapshot archive, immutable and hash-addressed, with EII's recorded re-fetch schedule: fixed daily, weekly and monthly families, a statistical series taking `as_published` only with a schedule recorded in document 04 and otherwise `none` with `frequency_unconfirmed`); moves the price "as of" criterion to S2-T19 and S2-T08 as amendment lines; adds task S8-T18 (the own-data overlay with its "nothing sent" receipt); and names the golden scenario's lead moments at the slice gates that run it. Decision 0035 binds every audience surface; no statement compares EII with any other product or service.
+- Why: the owner's relayed notes of 2026-11-16 at 11:00 and 11:02 ask that EII's own capabilities be stated as acceptance criteria and that public sources be archived so their history starts with EII's archive. A material amendment needs a decision record and never a silent edit (rule 46). Decision records keep their own pull request (rule 33).
+- Class: documents only, Deep in its subject (provenance of every public input, rules 5, 7 and 19; the oracle boundary of rules 16 to 25). Lead: Anthropic (Claude Opus 5.5): the rulings L-688, L-689 and L-697, the briefs and the edits after review. Editor: the draft in two rounds by other makers through Droid (round 1 too weak to review; round 2 reworked it in place). Reviewer: OpenAI GPT-6 through Codex, which wrote none of the change.
+- Review: round 2 was REJECTED on four findings (D1 to D4); the lead fixed them. Confirmation round 1 found D1 to D3 fixed and D4 (a statistical series against the blanket family precedence) not fixed; the lead fixed it in three passages (item 4, the S2-T27 cadence criterion, the slice S2 gate). Confirmation round 2 was APPROVED at `0910f2fde0b7d74d3e29892ac27ce28627d6eb48` with no new finding. After decision 0044 merged as `7a200d0`, the lead squashed the approved commits onto the new main as the work commit `c8c250e56648edb1c09d4c4c000f6bf1524ce6a3`; its patch equals the approved one line for line apart from the blob index lines (decision 0039: a move that changes no line keeps its approval).
+- Left unchanged: AGENTS.md and CLAUDE.md, every privacy rule, gate check, hard limit, sandbox rule and source permission; no new data source is added. No code, check script, workflow file or test changes, and no result is measured. The record claims no implemented archive, overlay or gate approval (rule 47).
+- The repository's checks cannot tell whether the record reads the owner's notes rightly. That judgement belongs to the reviewer, and the owner's choices stay with the owner.
+
+#### Evidence for the work commit `c8c250e56648edb1c09d4c4c000f6bf1524ce6a3`
+
+```text
+### DOCS-0045 — Decision record 0045, tasks S2-T27 and S8-T18
+Commit:    c8c250e56648edb1c09d4c4c000f6bf1524ce6a3
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 682 text files, 90 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with record 0045, tasks S2-T27 and S8-T18, its gate sentences and the index rows: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### DOCS-0045 — Decision record 0045, tasks S2-T27 and S8-T18
+Commit:    c8c250e56648edb1c09d4c4c000f6bf1524ce6a3
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### DOCS-0045 — Decision record 0045, tasks S2-T27 and S8-T18
+Commit:    c8c250e56648edb1c09d4c4c000f6bf1524ce6a3
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files stay byte-identical; neither changes here.
+```
+
+```text
+### DOCS-0045 — Decision record 0045, tasks S2-T27 and S8-T18
+Commit:    c8c250e56648edb1c09d4c4c000f6bf1524ce6a3
+Command:   bash -c "git diff --name-only 7a200d0c94e90c21cbfae8ee99dfb47a7384636a HEAD -- docs/decisions/ | grep -v -E '/0045-' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no earlier decision record is changed)
+Seed:      none
+Notes:     Record 0045 is a new file (rule 46); this row proves on the committed tree that no earlier decision record was edited.
+```
+
+```text
+### DOCS-0045 — Decision record 0045, tasks S2-T27 and S8-T18
+Commit:    c8c250e56648edb1c09d4c4c000f6bf1524ce6a3
+Command:   bash -c "git diff --name-only 7a200d0c94e90c21cbfae8ee99dfb47a7384636a HEAD -- scripts .github web core custodian product gateway evals eii | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no code, check script or workflow file is changed)
+Seed:      none
+Notes:     The change is documents only.
+```
+
+```text
+### DOCS-0045 — Decision record 0045, tasks S2-T27 and S8-T18
+Commit:    c8c250e56648edb1c09d4c4c000f6bf1524ce6a3
+Command:   bash -c "git diff --name-only 7a200d0c94e90c21cbfae8ee99dfb47a7384636a HEAD | grep -v -E '[.]md$' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (only Markdown files change)
+Seed:      none
+Notes:     Every changed file is a Markdown document.
+```
+
+```text
+### DOCS-0045 — Decision record 0045, tasks S2-T27 and S8-T18
+Commit:    c8c250e56648edb1c09d4c4c000f6bf1524ce6a3
+Command:   ./eii test --seed 2026111613
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    5252 passed, 0 failed, 0 skipped
+Seed:      2026111613
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### DOCS-0045 — Decision record 0045, tasks S2-T27 and S8-T18
+Commit:    c8c250e56648edb1c09d4c4c000f6bf1524ce6a3
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','7a200d0c94e90c21cbfae8ee99dfb47a7384636a..c8c250e56648edb1c09d4c4c000f6bf1524ce6a3'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
