@@ -59,6 +59,11 @@ def _rows(zipped: ZipFile, member: Member) -> Iterator[dict[str, str]]:
 
 def parse_archive(path: Path, config: Config, output: Path) -> dict[str, object]:
     """v1 deterministic transform; outputs go only to caller-owned staging."""
+    require(
+        sum(m.kind == "country" for m in config.members) == 1
+        and sum(m.kind == "product" for m in config.members) == 1,
+        "dictionaries",
+    )
     within(path.stat().st_size, config.archive_bytes, "archive_bytes")
     output.mkdir(parents=True, exist_ok=True)
     try:

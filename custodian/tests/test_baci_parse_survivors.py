@@ -377,13 +377,42 @@ def test_baci_direct_duplicate_inventory(tmp_path):
     from zipfile import ZipFile
 
     # Config.from_mapping refuses duplicate names at inventory first.
+    # The duplicated member is trade: a second dictionary is refused at entry.
     config = Config.from_mapping(configuration())
-    config = replace(config, members=(*config.members, config.members[0]))
+    trade = next(member for member in config.members if member.kind == "trade")
+    config = replace(config, members=(*config.members, trade))
     buffer = BytesIO(archive())
     with ZipFile(buffer, "a") as zipped:
         with pytest.warns(UserWarning, match="Duplicate name"):
-            zipped.writestr("invented-country.csv", MEMBERS["invented-country.csv"])
+            zipped.writestr(trade.name, MEMBERS[trade.name])
     path = tmp_path / "invented.zip"
     path.write_bytes(buffer.getvalue())
     with refusal("inventory"):
         parse.parse_archive(path, config, tmp_path)
+
+
+@pytest.mark.parametrize("kind", ["country", "product"])
+def test_baci_unconfirmed_second_dictionary_is_refused(tmp_path, kind):
+    raw = configuration()
+    raw["confirmed"] = False
+    original = next(member for member in raw["members"] if member["kind"] == kind)
+    extra_name = f"invented-{kind}-b.csv"
+    raw["members"].append({**original, "name": extra_name})
+    members = dict(MEMBERS)
+    if kind == "country":
+        members[extra_name] = (
+            "code,name,iso3\n00B,Invented other,\n00C,Invented further,\n"
+        )
+    else:
+        members[extra_name] = (
+            "code,description,revision\n000002,Invented other product,invented-HS-A\n"
+        )
+    path = tmp_path / "invented.zip"
+    path.write_bytes(archive(members))
+    output = tmp_path / "nested" / "output"
+    config = Config.from_mapping(raw)
+    assert config.confirmed is False
+    assert sum(member.kind == kind for member in config.members) == 2
+    with refusal("dictionaries"):
+        parse.parse_archive(path, config, output)
+    assert not output.exists()
