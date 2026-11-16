@@ -124,9 +124,11 @@ def test_invalid_catalogue_count(monkeypatch, count):
     refused(exported(entry, bodies), PLAN, "partition_plan")
 
 
-def test_zero_catalogue_total():
-    # The nonempty-plan check prevents an empty successful export.
-    assert partitions._total(b'{"records_count":0}') == 0
+def test_zero_catalogue_total(monkeypatch):
+    # Zero is a valid catalogue total, so a nonempty plan is refused by its sum.
+    entry, bodies = fixture(monkeypatch)
+    bodies[BASE] = b'{"records_count":0}'
+    refused(exported(entry, bodies), PLAN, "partition_total")
 
 
 @pytest.mark.parametrize(
