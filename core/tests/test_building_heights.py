@@ -1,6 +1,6 @@
-"""C42 / MTH-123: the PUB-106 height order, overlap choice and fallback errors.
+"""C47 / MTH-125: the PUB-106 height order, overlap choice and fallback errors.
 
-The worked fixture is card C42's worked example of document 07, word for word.
+The worked fixture is card C47's worked example of document 07, word for word.
 Every value is invented (fixture ids SYN-B-*); the storey height of the fixture
 is 4 m, an invented fixture value, not the asset manifest's stated constant.
 """
@@ -60,7 +60,7 @@ def _rows():
 
 
 def test_the_order_is_applied_building_by_building_and_the_source_is_kept():
-    """C42's worked fixture: the first present source wins, per building."""
+    """C47's worked fixture: the first present source wins, per building."""
     rows = _rows()
     expected = {
         "SYN-B-0001": (Decimal(30), "recorded"),

@@ -1,4 +1,4 @@
-"""C42 / MTH-123: the PUB-106 height order, overlap choice and fallback errors.
+"""C47 / MTH-125: the PUB-106 height order, overlap choice and fallback errors.
 
 Reads no file, network, clock or random source; callers pass the values. The
 closed list of height sources is `recorded`, `floor_count`, `3dglobfp`, `wsf3d`

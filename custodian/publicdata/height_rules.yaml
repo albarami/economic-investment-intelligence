@@ -1,4 +1,4 @@
-# S2-T20 — height rules of the PUB-106 order (decision 0023 item A2, card C42).
+# S2-T20 — height rules of the PUB-106 order (decision 0023 item A2, card C47).
 # storey_height_m is the only place the storey number lives: quoted text parsed
 # to Decimal, labelled ASSUMPTION and to be replaced by the owner.
 storey_height_m:

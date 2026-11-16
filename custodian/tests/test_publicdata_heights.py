@@ -2,7 +2,7 @@
 
 Every fixture is hand-made: invented buildings SYN-B-*, invented files and a
 tiny invented raster, written only into temporary folders (FE-95). The worked
-fixture is card C42's worked example; its error block is the card's.
+fixture is card C47's worked example; its error block is the card's.
 """
 
 from __future__ import annotations
@@ -131,8 +131,8 @@ def test_the_card_fixture_end_to_end(tmp_path: Path) -> None:
         if row["height_source"] != "none":
             assert row["reason"] == ""
     block = _manifest(out_dir)
-    assert block["card"] == "C42"
-    assert block["method"] == "MTH-123"
+    assert block["card"] == "C47"
+    assert block["method"] == "MTH-125"
     assert block["estimate_label"] == ESTIMATE_LABEL
     assert block["counts"] == {
         "recorded": 3,
@@ -2533,7 +2533,7 @@ def test_tied_footprints_with_the_same_height_count_none(tmp_path: Path) -> None
 def test_only_the_window_over_the_building_table_is_read(tmp_path: Path) -> None:
     """H5c/P3: the exact worked window, floored, ceiled, grown one cell, clipped.
 
-    Worked by hand (MTH-123): the invented raster spans x in [0, 8) and y in
+    Worked by hand (MTH-125): the invented raster spans x in [0, 8) and y in
     (0, 4] at one unit a cell, so bounds (3.6, 1.2, 3.9, 1.8) give fractional
     cells 3.6 to 3.9 across and 2.2 to 2.8 down. Floored at the start, ceiled
     at the end and grown one cell on each side, they give columns 2 to 5 and

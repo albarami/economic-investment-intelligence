@@ -24,8 +24,8 @@ from eii_core.calc.building_heights import (
 from .model import OUTPUT_COLUMNS, HeightError, Rules
 from .read import SourceResult
 
-CARD_ID = "C42"
-METHOD_ID = "MTH-123"
+CARD_ID = "C47"
+METHOD_ID = "MTH-125"
 METHOD_LINE = (
     "signed error = fallback height - recorded height, in metres; the median "
     "of an even count is the mean of the two central values"

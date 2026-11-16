@@ -1,7 +1,7 @@
 # heights
 
 The heights step of `./eii build-public` (task S2-T20, PUB-106, method card
-C42, requirement MTH-123).
+C47, requirement MTH-125).
 
 Every building of the basemap building table
 (`data/assets/buildings/buildings.geojson`) receives a height in the order of

@@ -418,7 +418,7 @@ def _raster_window(
 
     `from_bounds` gives fractional offsets. The start of the bounds is
     floored and their end ceiled in cell units, the window then grows one
-    cell on each side and is clipped to the raster, as document 07 (MTH-123)
+    cell on each side and is clipped to the raster, as document 07 (MTH-125)
     and the package README say. An empty window reads nothing.
     """
     windows = import_module("rasterio.windows")
