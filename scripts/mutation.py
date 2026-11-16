@@ -28,6 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 # Source-text checks inspect instrumentation, not calculated values (L-273 part 3).
 SOURCE_TEXT_GUARDS = {
     "core/tests/test_calculation_purity.py::test_purity_guard_and_planted_io_helper": "The AST import allow-list refuses mutmut.mutation.trampoline instrumentation.",
+    "custodian/tests/test_publicdata_heights.py::test_no_python_file_repeats_the_storey_literal": "The storey-literal scan reads the instrumented heights files, whose mutant copies hold changed numeric literals.",
 }
 
 EVAL_MODULES = {
