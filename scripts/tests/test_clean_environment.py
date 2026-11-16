@@ -2,15 +2,28 @@
 
 from __future__ import annotations
 
+import errno
 import json
 import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
+import tomllib
 import unittest
+import zipfile
+from collections.abc import Mapping, Sequence
+from functools import partial
 from pathlib import Path
+from typing import cast
 from unittest.mock import patch
+
+from packaging import markers
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import workspace_guard as guard
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -42,7 +55,7 @@ FROM_PARENT = (
 ALONE: dict[str, tuple[int, str]] = {
     "UV_PYTHON": (2, "No interpreter found at path"),
     "UV_NO_SOURCES": (1, "needs to be updated"),
-    "UV_EXCLUDE_NEWER": (1, "needs to be updated"),
+    "UV_EXCLUDE_NEWER": (1, "published after the exclude newer time"),
     "UV_RESOLUTION": (1, "needs to be updated"),
 }
 
@@ -151,12 +164,618 @@ def observe(envdir: Path, work: Path, env: dict[str, str]) -> list[list[object]]
     return rows
 
 
+def _seed_copy(src: str, dst: str, *, linked: dict[tuple[int, int], str]) -> str:
+    stat = os.stat(src)
+    key = (stat.st_dev, stat.st_ino)
+    previous = linked.get(key)
+    if previous is not None:
+        os.link(previous, dst)
+    else:
+        try:
+            os.link(src, dst)
+        except OSError:
+            shutil.copy2(src, dst)
+        linked[key] = dst
+    return dst
+
+
+def seed_cache(cache: Path, source: Path | None = None) -> None:
+    """Preserve links; only the class seed reads the original uv cache."""
+    if source is None:
+        proc = subprocess.run(
+            [UV, "cache", "dir"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=False,
+        )
+        if proc.returncode != 0:
+            raise RuntimeError(f"uv cache dir failed: {proc.stderr.strip()}")
+        source = Path(proc.stdout.strip())
+    shutil.copytree(
+        source,
+        cache,
+        symlinks=True,
+        copy_function=partial(_seed_copy, linked={}),
+        dirs_exist_ok=True,
+    )
+
+
+def member_manifest(root: Path, member: str) -> dict[str, object]:
+    """Parse one member manifest."""
+    text = (root / member / "pyproject.toml").read_text(encoding="utf-8")
+    return tomllib.loads(text)
+
+
+def workspace_package_names(root: Path) -> set[str]:
+    """Return the distribution names of the workspace members."""
+    names: set[str] = set()
+    for member in guard.MEMBER_DIRS:
+        project = member_manifest(root, member).get("project", {})
+        if isinstance(project, dict):
+            name = project.get("name")
+            if isinstance(name, str):
+                names.add(guard.normalise(name))
+    return names
+
+
+def expected_installed_names(root: Path) -> set[str]:
+    """Return the names a clean installation resolves to: members and locked closure."""
+    manifests = {member: member_manifest(root, member) for member in guard.MEMBER_DIRS}
+    lock = tomllib.loads((root / "uv.lock").read_text(encoding="utf-8"))
+    return reachable_locked_names(
+        manifests,
+        lock,
+        cast(dict[str, str], markers.default_environment()),
+    )
+
+
+def _entry_applies_to_environment(
+    package: Mapping[str, object],
+    environment: Mapping[str, str],
+) -> bool:
+    """Whether one lock package entry resolves for ``environment``.
+
+    An entry without ``resolution-markers`` applies to every environment.  One
+    with them applies only where one of its markers holds: uv's lock writes the
+    fork markers of a forked package in this field, and an entry whose markers
+    all fail names a fork this environment does not use.
+    """
+    listed = package.get("resolution-markers")
+    if listed is None:
+        return True
+    if not isinstance(listed, list):
+        raise AssertionError(
+            f"lock package entry has a non-list resolution-markers field: {listed!r}"
+        )
+    for one in listed:
+        if not isinstance(one, str):
+            raise AssertionError(
+                f"lock package entry has a non-string resolution-marker: {one!r}"
+            )
+        if markers.Marker(one).evaluate(environment):
+            return True
+    return False
+
+
+def reachable_locked_names(
+    manifests: Mapping[str, Mapping[str, object]],
+    lock: Mapping[str, object],
+    environment: Mapping[str, str],
+) -> set[str]:
+    """Compute the expected installed names from the manifests, lock and environment.
+
+    The workspace member names plus every package of the lock that is reachable
+    from them through the lock's own dependency edges: an entry of a package is
+    traversed only when its fork selection applies to ``environment`` (an entry
+    with ``resolution-markers`` only when one of them holds, an entry without
+    them always; two active entries of one name are refused as ambiguous), an
+    edge is followed only when its marker holds for ``environment``, an extra's
+    edges only when the edge that leads there selects that extra, and an
+    optional edge's marker is evaluated with ``extra`` set to that extra.  The
+    root manifest's dependency groups are never followed: the clean installation
+    installs the members' own dependencies only.
+    """
+    entries: dict[str, list[Mapping[str, object]]] = {}
+    packages = lock.get("package", [])
+    if isinstance(packages, list):
+        for package in packages:
+            if isinstance(package, dict) and isinstance(package.get("name"), str):
+                key = guard.normalise(str(package["name"]))
+                entries.setdefault(key, []).append(package)
+    queue: list[tuple[str, frozenset[str]]] = []
+    for manifest in manifests.values():
+        project = manifest.get("project", {})
+        if isinstance(project, dict) and isinstance(project.get("name"), str):
+            queue.append((guard.normalise(str(project["name"])), frozenset()))
+    expected: set[str] = set()
+    seen: set[tuple[str, frozenset[str]]] = set()
+    while queue:
+        name, extras = queue.pop()
+        if (name, extras) in seen:
+            continue
+        seen.add((name, extras))
+        expected.add(name)
+        active: list[Mapping[str, object]] = [
+            package
+            for package in entries.get(name, [])
+            if _entry_applies_to_environment(package, environment)
+        ]
+        if len(active) > 1:
+            raise AssertionError(
+                f"the lock is ambiguous for this test: {len(active)} active "
+                f"entries of package '{name}' for one environment"
+            )
+        for package in active:
+            edges: list[tuple[object, Mapping[str, str]]] = []
+            dependencies = package.get("dependencies", [])
+            if isinstance(dependencies, list):
+                for edge in dependencies:
+                    edges.append((edge, environment))
+            optional = package.get("optional-dependencies", {})
+            if isinstance(optional, dict):
+                for extra in extras:
+                    chosen = optional.get(extra)
+                    if isinstance(chosen, list):
+                        edge_env: Mapping[str, str] = {**environment, "extra": extra}
+                        for edge in chosen:
+                            edges.append((edge, edge_env))
+            for edge, edge_env in edges:
+                if not isinstance(edge, dict) or not isinstance(edge.get("name"), str):
+                    continue
+                marker = edge.get("marker")
+                if isinstance(marker, str) and not markers.Marker(marker).evaluate(
+                    edge_env
+                ):
+                    continue
+                selected: list[str] = []
+                wanted = edge.get("extra")
+                if isinstance(wanted, list):
+                    selected = [str(one) for one in wanted if isinstance(one, str)]
+                queue.append((guard.normalise(str(edge["name"])), frozenset(selected)))
+    return expected
+
+
+def installed_names_equal(installed: set[str], expected: set[str]) -> bool:
+    """The one comparison: installed names equal the expected names exactly."""
+    return installed == expected
+
+
+INVENTED_MEMBER_LOCK = """version = 1
+
+[[package]]
+name = "eii-core"
+version = "0.0.0"
+source = { editable = "core" }
+
+[[package]]
+name = "eii-custodian"
+version = "0.0.0"
+source = { editable = "custodian" }
+
+[[package]]
+name = "eii-gateway"
+version = "0.0.0"
+source = { editable = "gateway" }
+
+[[package]]
+name = "eii-product"
+version = "0.0.0"
+source = { editable = "product" }
+"""
+
+LOCK_TRANSITIVE = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-direct" },
+]
+
+[[package]]
+name = "plant-direct"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-transit" },
+]
+
+[[package]]
+name = "plant-transit"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+LOCK_MARKERS = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-marker-base" },
+]
+
+[[package]]
+name = "plant-marker-base"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-marker-true", marker = "python_version >= '3'" },
+    { name = "plant-marker-false", marker = "python_version < '3'" },
+]
+
+[[package]]
+name = "plant-marker-true"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-marker-false"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+LOCK_EXTRAS = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-extra-host", extra = ["picked"] },
+]
+
+[[package]]
+name = "plant-extra-host"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[package.optional-dependencies]
+picked = [
+    { name = "plant-extra-picked" },
+]
+skipped = [
+    { name = "plant-extra-skipped" },
+]
+
+[[package]]
+name = "plant-extra-picked"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-extra-skipped"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+LOCK_SPELLING = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-spelt" },
+]
+
+[[package]]
+name = "plant-spelt"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-spelt-child" },
+]
+
+[[package]]
+name = "plant-spelt-child"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+LOCK_UNREACHABLE = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-reached" },
+]
+
+[[package]]
+name = "plant-reached"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-deep" },
+]
+
+[[package]]
+name = "plant-deep"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-orphan"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-reached" },
+    { name = "plant-orphan-dep" },
+]
+
+[[package]]
+name = "plant-orphan-dep"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+
+LOCK_FORKS = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-fork-base" },
+]
+
+[[package]]
+name = "plant-fork-base"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+resolution-markers = [
+    "python_version >= '3.0'",
+]
+dependencies = [
+    { name = "plant-fork-active-child" },
+]
+
+[[package]]
+name = "plant-fork-base"
+version = "2.0"
+source = { registry = "https://example.com/simple" }
+resolution-markers = [
+    "python_version < '3.0'",
+]
+dependencies = [
+    { name = "plant-fork-phantom-child" },
+]
+
+[[package]]
+name = "plant-fork-active-child"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-fork-phantom-child"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+LOCK_EXTRA_MARKERS = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-extra-marker-host", extra = ["picked"] },
+]
+
+[[package]]
+name = "plant-extra-marker-host"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[package.optional-dependencies]
+picked = [
+    { name = "plant-extra-marker-match", marker = "extra == 'picked'" },
+    { name = "plant-extra-marker-cross", marker = "extra == 'skipped'" },
+]
+skipped = [
+    { name = "plant-extra-marker-skip", marker = "extra == 'skipped'" },
+]
+
+[[package]]
+name = "plant-extra-marker-match"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-extra-marker-cross"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-extra-marker-skip"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+LOCK_AMBIGUOUS = (
+    INVENTED_MEMBER_LOCK
+    + """dependencies = [
+    { name = "plant-fork-ambiguous" },
+]
+
+[[package]]
+name = "plant-fork-ambiguous"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-fork-first-child" },
+]
+
+[[package]]
+name = "plant-fork-ambiguous"
+version = "2.0"
+source = { registry = "https://example.com/simple" }
+dependencies = [
+    { name = "plant-fork-second-child" },
+]
+
+[[package]]
+name = "plant-fork-first-child"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+
+[[package]]
+name = "plant-fork-second-child"
+version = "1.0"
+source = { registry = "https://example.com/simple" }
+"""
+)
+
+
+def write_invented_workspace(
+    root: Path,
+    member_dependencies: Mapping[str, Sequence[str]],
+    lock_text: str,
+) -> None:
+    """Write an invented workspace: four member manifests and one invented lock."""
+    for member, name, _module in guard.MEMBER_ROWS:
+        lines = [
+            "[project]",
+            f'name = "{name}"',
+            'version = "0.0.0"',
+        ]
+        deps = member_dependencies.get(member, ())
+        if deps:
+            lines.append("dependencies = [")
+            lines.extend(f'  "{dep}",' for dep in deps)
+            lines.append("]")
+        folder = root / member
+        folder.mkdir(parents=True)
+        (folder / "pyproject.toml").write_text(
+            "\n".join(lines) + "\n", encoding="utf-8"
+        )
+    (root / "uv.lock").write_text(lock_text, encoding="utf-8")
+
+
+class ExpectedInstalledNames(unittest.TestCase):
+    """Invented workspaces pin the expected set to the lock's own resolution."""
+
+    def expected_for(
+        self,
+        product_dependencies: Sequence[str],
+        lock_text: str,
+    ) -> set[str]:
+        """Write one invented workspace and return its expected installed names."""
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        write_invented_workspace(root, {"product": product_dependencies}, lock_text)
+        return expected_installed_names(root)
+
+    def test_transitive_dependency_is_expected(self) -> None:
+        expected = self.expected_for(("plant-direct>=1",), LOCK_TRANSITIVE)
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES) | {"plant-direct", "plant-transit"},
+        )
+
+    def test_true_marker_transitive_is_expected_and_false_marker_one_is_not(
+        self,
+    ) -> None:
+        expected = self.expected_for(("plant-marker-base>=1",), LOCK_MARKERS)
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES) | {"plant-marker-base", "plant-marker-true"},
+        )
+
+    def test_selected_extra_is_expected_and_unselected_extra_is_not(self) -> None:
+        expected = self.expected_for(
+            ("plant-extra-host[picked]>=1",),
+            LOCK_EXTRAS,
+        )
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES) | {"plant-extra-host", "plant-extra-picked"},
+        )
+
+    def test_manifest_and_lock_spellings_are_one_expected_name(self) -> None:
+        expected = self.expected_for(("Plant_Spelt>=1",), LOCK_SPELLING)
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES) | {"plant-spelt", "plant-spelt-child"},
+        )
+
+    def test_package_no_member_reaches_is_not_expected(self) -> None:
+        expected = self.expected_for(("plant-reached>=1",), LOCK_UNREACHABLE)
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES) | {"plant-reached", "plant-deep"},
+        )
+
+    def test_inactive_fork_child_is_not_expected_and_active_fork_child_is(
+        self,
+    ) -> None:
+        expected = self.expected_for(("plant-fork-base>=1",), LOCK_FORKS)
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES) | {"plant-fork-base", "plant-fork-active-child"},
+        )
+
+    def test_extra_marker_expected_through_selected_extra_and_not_an_unselected_one(
+        self,
+    ) -> None:
+        expected = self.expected_for(
+            ("plant-extra-marker-host[picked]>=1",),
+            LOCK_EXTRA_MARKERS,
+        )
+        self.assertEqual(
+            expected,
+            set(guard.MEMBER_NAMES)
+            | {"plant-extra-marker-host", "plant-extra-marker-match"},
+        )
+
+    def test_two_active_entries_of_one_name_are_refused(self) -> None:
+        with self.assertRaises(AssertionError) as caught:
+            self.expected_for(("plant-fork-ambiguous>=1",), LOCK_AMBIGUOUS)
+        self.assertIn("plant-fork-ambiguous", str(caught.exception))
+        self.assertIn("ambiguous", str(caught.exception))
+
+
+class CacheSeeding(unittest.TestCase):
+    def test_seed_preserves_links_across_filesystems_and_children(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "source"
+            (source / "archive").mkdir(parents=True)
+            original = source / "archive" / "file"
+            original.write_text("invented cache entry", encoding="utf-8")
+            (source / "alias").hardlink_to(original)
+            (source / "directory-link").symlink_to("archive", target_is_directory=True)
+            (source / "file-link").symlink_to("archive/file")
+            first, second = root / "first", root / "second"
+            real_link = os.link
+
+            def cross_device_link(src: str, dst: str) -> None:
+                if Path(src).is_relative_to(source):
+                    raise OSError(errno.EXDEV, "invented cross-device link")
+                real_link(src, dst)
+
+            discoveries = [
+                subprocess.CompletedProcess([UV, "cache", "dir"], 0, str(folder), "")
+                for folder in (source, first)
+            ]
+            with (
+                patch.object(subprocess, "run", side_effect=discoveries),
+                patch.object(os, "link", side_effect=cross_device_link),
+                patch.object(shutil, "copy2", wraps=shutil.copy2) as copies,
+            ):
+                seed_cache(first)
+                seed_cache(second)
+            for child in (first, second):
+                for name, target in (
+                    ("directory-link", "archive"),
+                    ("file-link", "archive/file"),
+                ):
+                    self.assertTrue((child / name).is_symlink(), name)
+                    self.assertEqual(os.readlink(child / name), target)
+                    self.assertTrue((child / name).resolve().is_relative_to(child))
+                    self.assertTrue((child / name).exists())
+                self.assertTrue((child / "alias").samefile(child / "archive/file"))
+                self.assertEqual(
+                    (child / "archive/file").read_text(encoding="utf-8"),
+                    "invented cache entry",
+                )
+            self.assertTrue((first / "archive/file").samefile(second / "archive/file"))
+            self.assertEqual(copies.call_count, 1)
+
+
 class CleanEnvironment(unittest.TestCase):
     sync: subprocess.CompletedProcess[str]
     lock_before: bytes
     lock_after: bytes
     ws: Path
     cache: Path
+    seed: Path
     work: Path
     env: Path
     _tmp: tempfile.TemporaryDirectory[str]
@@ -166,6 +785,8 @@ class CleanEnvironment(unittest.TestCase):
         cls._tmp = tempfile.TemporaryDirectory()
         cls.addClassCleanup(cls._tmp.cleanup)
         base = Path(cls._tmp.name)
+        cls.seed = base / "seed"
+        seed_cache(cls.seed)
         cls.cache = base / "cache"
         cls.ws = base / "ws"
         cls.work = base / "work"
@@ -174,6 +795,7 @@ class CleanEnvironment(unittest.TestCase):
         cls.work.mkdir()
         cls.env = base / "env"
         copy_workspace(cls.ws)
+        seed_cache(cls.cache, cls.seed)
         cls.lock_before = (cls.ws / "uv.lock").read_bytes()
         cls.sync = run(
             [UV, *SYNC_OFFLINE],
@@ -185,24 +807,73 @@ class CleanEnvironment(unittest.TestCase):
     def test_lock_is_current(self) -> None:
         cache = Path(self._tmp.name) / "lock-cache"
         cache.mkdir(exist_ok=True)
+        seed_cache(cache, self.seed)
         proc = run([UV, "lock", "--check", "--offline"], REPO_ROOT, child_env(cache))
         self.assertEqual(proc.returncode, 0, proc.stderr)
 
+    def prepare_offline_resolution(self, ws: Path, cache: Path) -> None:
+        """Keep resolution plants independent of cached registry metadata.
+
+        Only these disposable fixtures omit registry requirements. The clean
+        installation checks still exercise the complete repository lock.
+        """
+        root_toml = (ws / "pyproject.toml").read_text(encoding="utf-8")
+        stripped, removed = re.subn(DEPENDENCY_GROUPS_TABLE, "", root_toml)
+        self.assertEqual(removed, 1)
+        (ws / "pyproject.toml").write_text(stripped, encoding="utf-8")
+        product = ws / "product/pyproject.toml"
+        text = product.read_text(encoding="utf-8")
+        requirement = ', "pyyaml==6.0.3"'
+        self.assertEqual(text.count(requirement), 1)
+        product.write_text(text.replace(requirement, "", 1), encoding="utf-8")
+        regen = run([UV, "lock", "--offline"], ws, child_env(cache))
+        self.assertEqual(regen.returncode, 0, regen.stderr)
+
+    def add_dated_dependency(self, ws: Path) -> Path:
+        """Provide an invented, dated wheel through a file-only package index."""
+        index = ws / "fixture-index"
+        package = index / "plant"
+        package.mkdir(parents=True)
+        wheel = package / "plant-0.0.0-py3-none-any.whl"
+        info = "plant-0.0.0.dist-info"
+        with zipfile.ZipFile(wheel, "w") as archive:
+            archive.writestr(
+                f"{info}/METADATA",
+                "Metadata-Version: 2.1\nName: plant\nVersion: 0.0.0\n",
+            )
+            archive.writestr(
+                f"{info}/WHEEL",
+                "Wheel-Version: 1.0\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
+            )
+            archive.writestr(f"{info}/RECORD", "")
+        (package / "index.html").write_text(
+            f'<a href="{wheel.name}" data-upload-time="2020-01-01T00:00:00Z">'
+            f"{wheel.name}</a>",
+            encoding="utf-8",
+        )
+        product = ws / "product/pyproject.toml"
+        text = product.read_text(encoding="utf-8")
+        original = 'dependencies = ["eii-core"]'
+        self.assertEqual(text.count(original), 1)
+        product.write_text(
+            text.replace(original, 'dependencies = ["eii-core", "plant==0.0.0"]'),
+            encoding="utf-8",
+        )
+        return index
+
     def test_stale_lock_is_detected(self) -> None:
-        tmp = tempfile.TemporaryDirectory()
+        tmp = tempfile.TemporaryDirectory(dir=self._tmp.name)
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
         cache = root / "cache"
         ws = root / "ws"
         cache.mkdir()
         ws.mkdir()
+        seed_cache(cache, self.seed)
         copy_workspace(ws)
-        root_toml = (ws / "pyproject.toml").read_text(encoding="utf-8")
-        stripped, removed = re.subn(DEPENDENCY_GROUPS_TABLE, "", root_toml)
-        self.assertEqual(removed, 1)
-        (ws / "pyproject.toml").write_text(stripped, encoding="utf-8")
-        regen = run([UV, "lock", "--offline"], ws, child_env(cache))
-        self.assertEqual(regen.returncode, 0, regen.stderr)
+        self.prepare_offline_resolution(ws, cache)
+        current = run([UV, "lock", "--check", "--offline"], ws, child_env(cache))
+        self.assertEqual(current.returncode, 0, current.stderr)
         text = (ws / "core/pyproject.toml").read_text(encoding="utf-8")
         replaced = text.replace('version = "0.0.0"', 'version = "0.0.1"', 1)
         self.assertNotEqual(text, replaced)
@@ -249,7 +920,7 @@ class CleanEnvironment(unittest.TestCase):
                 self.assertFalse(path.is_relative_to(src_repo))
 
     def test_bare_environment_cannot_import(self) -> None:
-        tmp = tempfile.TemporaryDirectory()
+        tmp = tempfile.TemporaryDirectory(dir=self._tmp.name)
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
         cache = root / "cache"
@@ -257,6 +928,7 @@ class CleanEnvironment(unittest.TestCase):
         work = root / "work"
         cache.mkdir()
         work.mkdir()
+        seed_cache(cache, self.seed)
         proc = run(
             [UV, "venv", "--python", "3.14", "--offline", str(bare)],
             root,
@@ -273,7 +945,9 @@ class CleanEnvironment(unittest.TestCase):
                 self.assertNotEqual(imp.returncode, 0)
                 self.assertIn("ModuleNotFoundError", imp.stderr)
 
-    def test_uv_pip_list_names_the_four_packages(self) -> None:
+    def test_installed_names_equal_the_workspace_and_the_locked_declared_packages(
+        self,
+    ) -> None:
         proc = run(
             [
                 UV,
@@ -289,13 +963,23 @@ class CleanEnvironment(unittest.TestCase):
             child_env(self.cache),
         )
         self.assertEqual(proc.returncode, 0, proc.stderr)
-        names = {row["name"] for row in json.loads(proc.stdout)}
-        self.assertEqual(
-            names, {"eii-core", "eii-custodian", "eii-gateway", "eii-product"}
+        installed = {
+            guard.normalise(str(row["name"])) for row in json.loads(proc.stdout)
+        }
+        expected = expected_installed_names(REPO_ROOT)
+        self.assertTrue(installed_names_equal(installed, expected))
+        declared = sorted(expected - workspace_package_names(REPO_ROOT))
+        self.assertTrue(declared)
+        plants = (
+            ("undeclared", installed | {"eii-undeclared-plant"}),
+            ("declared-missing", installed - {declared[0]}),
         )
+        for label, corrupted in plants:
+            with self.subTest(plant=label):
+                self.assertFalse(installed_names_equal(corrupted, expected))
 
     def test_hostile_surroundings_do_not_change_the_result(self) -> None:
-        tmp = tempfile.TemporaryDirectory()
+        tmp = tempfile.TemporaryDirectory(dir=self._tmp.name)
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
         cache = root / "cache"
@@ -320,6 +1004,9 @@ class CleanEnvironment(unittest.TestCase):
             hostile,
         ):
             path.mkdir(parents=True)
+        seed_cache(cache, self.seed)
+        seed_cache(cache2, self.seed)
+        seed_cache(cache3, self.seed)
         copy_workspace(ws)
         copy_workspace(ws3)
         (hostile / "uv").mkdir()
@@ -371,9 +1058,11 @@ class CleanEnvironment(unittest.TestCase):
                 ws,
                 e,
             )
-            names = {row["name"] for row in json.loads(pip.stdout)}
-            self.assertEqual(
-                names, {"eii-core", "eii-custodian", "eii-gateway", "eii-product"}
+            names = {
+                guard.normalise(str(row["name"])) for row in json.loads(pip.stdout)
+            }
+            self.assertTrue(
+                installed_names_equal(names, expected_installed_names(REPO_ROOT))
             )
             self.assertEqual(observe(self.env, work, e), clean)
 
@@ -400,20 +1089,32 @@ class CleanEnvironment(unittest.TestCase):
             self.assertIn("cannot be used with `UV_FROZEN`", tooth2.stderr)
 
         self.assertEqual(dict(os.environ), snapshot)
-        alone_text = (ws3 / "pyproject.toml").read_text(encoding="utf-8")
-        alone_text, removed_groups = re.subn(DEPENDENCY_GROUPS_TABLE, "", alone_text)
-        self.assertEqual(removed_groups, 1)
-        (ws3 / "pyproject.toml").write_text(alone_text, encoding="utf-8")
-        regen = run([UV, "lock", "--offline"], ws3, child_env(cache3))
+        self.prepare_offline_resolution(ws3, cache3)
+        # The cutoff plant needs a publication date, not a real registry or its
+        # cached metadata. All four alone cases use this same offline fixture.
+        index = self.add_dated_dependency(ws3)
+        fixture_env = child_env(cache3, root / "fixture-env")
+        fixture_env["UV_DEFAULT_INDEX"] = index.as_uri()
+        regen = run([UV, "lock", "--offline"], ws3, fixture_env)
         self.assertEqual(regen.returncode, 0, regen.stderr)
+        current = run([UV, "lock", "--check", "--offline"], ws3, fixture_env)
+        self.assertEqual(current.returncode, 0, current.stderr)
+        control = run([UV, *SYNC_OFFLINE], ws3, fixture_env)
+        self.assertEqual(control.returncode, 0, control.stderr)
         alone_count = 0
         for name, (want, fragment) in ALONE.items():
             with self.subTest(var=name):
                 alone_count += 1
                 folder = root / f"alone-{name}"
                 folder.mkdir()
+                seed_cache(folder, self.seed)
                 merged = with_process_tmp(
-                    {**snapshot, "UV_CACHE_DIR": str(folder), name: h[name]},
+                    {
+                        **snapshot,
+                        "UV_CACHE_DIR": str(folder),
+                        "UV_DEFAULT_INDEX": index.as_uri(),
+                        name: h[name],
+                    },
                     folder,
                 )
                 proc = run(

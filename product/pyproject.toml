@@ -3,7 +3,7 @@ name = "eii-product"
 version = "0.0.0"
 description = "Serving plane of the EII working-title project (package skeleton only)."
 requires-python = ">=3.14"
-dependencies = ["eii-core"]
+dependencies = ["eii-core", "pyyaml==6.0.3"]
 
 [tool.uv.sources]
 eii-core = { workspace = true }

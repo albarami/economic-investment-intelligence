@@ -373,7 +373,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: place and place-verification builders, four review files, recorded flagship data check and decision fixture.
 - Depends: S2-T01, S2-T02.
 - Requirements: PUB-47, PUB-49, PUB-50, PUB-57, PUB-78, PUB-91, PUB-92, PUB-93.
-- Delivery: hard; personas Data; status part A in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/62). All eight criteria stay unticked: the live steps (real fetches with receipts, the reviewed attribution and category rows, the real places build, the reviewed keys of the eighth criterion, the real area-producer run, the hand checks and the recorded check on the real candidates) are part B, owed before task S2-T08 and before any criterion is ticked (open items of this pull request).
+- Delivery: hard; personas Data; status part A done (pull request 62, merged 2026-11-16); part B is owed. All eight criteria stay unticked: the live steps (real fetches with receipts, the reviewed attribution and category rows, the real places build, the reviewed keys of the eighth criterion, the real area-producer run, the hand checks and the recorded check on the real candidates) are part B, owed before task S2-T08 and before any criterion is ticked (open items of this pull request).
 ### S2-T07 — Calculation layer and method regressions
 - Goal: Implement deterministic Public calculations in `eii_core.calc` with method-card regression tests.
 - Acceptance criteria: [x] no calculation reads files or databases; [ ] each implemented worked example has arithmetic and data tests; [x] comparisons return facts rather than prose.
@@ -557,11 +557,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: hard; personas Methods; status queued.
 ### S3-T07 — Catalogue foundations
 - Goal: Create the four closed, versioned catalogues with strict schemas.
-- Acceptance criteria: [ ] `claims.yaml`, `components.yaml`, `fragments.yaml` and `questions.yaml` exist under `product/assistant/catalogue/`; [ ] unknown claim, component, fragment and question keys and unknown properties fail; [ ] swapped valid fact slots fail; [ ] template scan rejects numerals.
+- Acceptance criteria: [x] `claims.yaml`, `components.yaml`, `fragments.yaml` and `questions.yaml` exist under `product/assistant/catalogue/`; [x] unknown claim, component, fragment and question keys and unknown properties fail; [x] swapped valid fact slots fail; [x] template scan rejects numerals.
 - Scope: `product/assistant/catalogue/` and catalogue validation tests for all four files.
 - Depends: S2-T07.
 - Requirements: AI-28, AI-36, AI-37, AI-42, AI-45, AI-46, AI-88.
-- Delivery: hard; personas AI; status queued.
+- Delivery: hard; personas AI; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/63).
 ### S3-T08 — Public playbook, API and template stream
 - Goal: Serve evidence before a catalogue-rendered Public brief with no model call. The brief is buffered until the accounting gate has passed.
 - Acceptance criteria: [ ] template output is deterministic; [ ] evidence cards may appear before the brief; [ ] the structured brief is buffered until the accounting gate passes; [ ] invalid components are not rendered.

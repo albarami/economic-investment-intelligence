@@ -26951,6 +26951,480 @@ Seed:      none
 Notes:     The eleven work commits of S2-T06 on main e30948d: the Part A join, Part B passes 1 to 3, the Part A mutation tests, explanations and close, mutation passes 4 to 6, the final join and mutation pass 7, each a Conventional Commit.
 ```
 
+#### Showcase places, part A: whole-task review, lens CODE: APPROVED
+
+Reviewed commit `b505c2d`. Cognition SWE-2 High through Devin; another maker than the builders (xAI, OpenAI, Alibaba, Mistral, Moonshot) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED
+TASK: S2-T06, whole-task review, lens CODE
+COMMIT: b505c2d7299a3134318c2a55fc8240e24df1c093
+REVIEWER: Cognition SWE-2 High (rvC), through Devin
+SKILLS LOADED: strict-reviewer, sanad-provenance, task-standards, project-orientation, muhasabah-gate
+
+EARLIER FINDINGS:
+  F1 FIXED places/flagship.py: both `_checks` and `_checks_from_inputs` call `_walk_5_and_drive_10_returned`, so check (d) needs walk_5 and drive_10 and ignores walk_10 errors; test_places_flagship.py::test_walk_10_error_fails_only_check_c_of_that_candidate shows (c) fails while (d) stays true, and test_check_d_needs_walk_5_and_drive_10_and_ignores_other_errors plants each operand.
+  F2 FIXED places/display.py `_folded_name` delegates to places_fsq.policy.normalise_duplicate_name; test_both_duplicate_paths_use_one_name_rule and test_case_and_arabic_names_merge_punctuation_does_not prove identical behaviour on both duplicate paths (punctuation no, case/whitespace yes, Arabic yes).
+  F3 FIXED places/read.py `_confidence` checks finiteness and the unrounded range (value < 0 or > 1) before stored_confidence; tests plant Decimal("1.00001"), Decimal("-0.00001"), exact 0/1 and signed zero.
+  F4 FIXED places/build.py `_fsq` raises fsq_licence_missing on absent or whitespace licence; test_further_source_without_a_licence_is_refused covers both with a valid attributed control.
+  F5 FIXED places/review.py `accept_verification` routes every field through `_normalised_field` before `_checked`; the whitespace-only reviewer_role plant fires missing_role on the in-memory and CSV paths alike.
+  F6 FIXED plants exist for each guard: not_provisional (test_places_flagship.py), verification_source_unknown and duplicate_token (test_places_review.py, test_places_review_survivors.py), missing place licence pub_place_field (test_places_build.py, test_places_stage.py::test_place_and_verification_rows_round_trip).
+  F7 FIXED test_places_flagship.py narrows candidates, the second candidate and checks with isinstance assertions before indexing; no type: ignore remains.
+  F8 FIXED places/review.py imports yaml with no comment and no suppression survives anywhere in the change; types-pyyaml==6.0.12.20261113 is pinned in pyproject.toml and uv.lock.
+
+CHECKS:
+  REV-10 PASS — all eight acceptance criteria implemented and independently tested (see AC1–AC8).
+  REV-11 PASS — EVIDENCE.md records a full run at this commit, seed 2026111500: exit 0, 4648 passed, 0 failed, 0 skipped; mutation campaign counts per module recorded with every survivor explained; hosted checks follow at the task's turn.
+  REV-12 PASS — the whole diff covers exactly the task's scope: places package, frame/live.py hook, fetch transport/registry rows, review CSV/YAML files, fixtures, docs and tests.
+  REV-13 PASS — no placeholder or fixed substitute; pending inputs (verified_places rows, gazetteer keys, areas) stay honest pending states, never fabricated results.
+  REV-14 PASS — no secret, private or real custodian data anywhere; every fixture row, name and link is invented (example.invalid, SYN- identifiers).
+  REV-15 PASS — no type: ignore, noqa, skip, xfail or suppression comment in the change (F7/F8 closed).
+  REV-16 PASS — architecture matches the plan and README: stage after boundary/grid/zones and before gazetteer resolution, AreaProvider protocol, area files binding inputs, road receipt, method and engine version.
+  REV-17 PASS — places README and docs/04_PUBLIC_DATA_PACK.md updated; test_pack_scopes_the_foursquare_line_and_the_readme_orders_the_build pins both texts.
+  REV-18 PASS — fetch guards all planted: blocked_host (transport never called), redirect hop refusal, byte_range, recorded_size/recorded_etag form, empty body, etag form/weak/unobserved; allowed hosts not widened (new rows reuse the Overture S3 host); no secret read or logged; writes confined to cache/<key>/<digest>.parquet.
+  REV-19 PASS — no settled decision reopened; the stand-in-is-not-evidence ruling and the OI-209 terms-to-be-read record are honoured, not relitigated.
+  REV-20 PASS — provenance is complete: attribution-token licences, source_release, receipts, recorded bytes/etag, manifest digests, census lineage via CensusFigure, caveat key on every written file.
+  REV-21 PASS — custodian pipeline only; no numerals outside Fact-chip territory; counts appear only in test data and report fields.
+  REV-22 PASS — no privacy invariant touched; nothing reads vault paths, adds person-level attributes, or weakens guards.
+  REV-23 PASS — import boundaries kept: custodian code only; no gateway, evals or product import anywhere in the change.
+  REV-24 PASS — Arabic names flow through duplicate resolution and inventory; the caveat carries EN and AR with "pending native review"; arabic_tag.txt is required before the stage runs (arabic_tag_missing plants writes nothing).
+  REV-25 PASS — no secrets or private data; confirmed by full-file reads of every production module.
+  REV-26 PASS — no prohibited claim or endorsement; copy is limited to licences, caveats and pending-review labels.
+  REV-27 PASS — AGENTS.md and CLAUDE.md do not appear in the diff; byte identity holds.
+  REV-28 PASS — all new identifiers carry the SYN- prefix; the only 8-digit run is built at runtime from "2468"+"1357" as the expressly ruled boundary control; other long runs are decimal/hex/H3 literals, not identifiers.
+  REV-29 PASS — synthetic-data rules kept: invented fixtures only, comments state all places/buildings/roads are invented, the committed road PBF digest and manifest are pinned and regenerated deterministically in tests.
+  REV-38 PASS — no gateway, provider-setting or runtime-decision misuse; nothing under gateway/ or evals/ is touched.
+  AC1 PASS — every pub_place row carries source_provider, licence and confidence; render_place_rows refuses a blank field (pub_place_field) and the round-trip test asserts all three on every written row.
+  AC2 PASS — pub_place_verification is keyed to pub_place (orphan_place_id refusal) and VERIFICATION_COLUMNS stores place_id, check_date, reviewer_role, verification_link, status.
+  AC3 PASS — the status vocabulary STATUSES is stored and enforced; all four statuses round-trip and "invented" refuses unknown_status.
+  AC4 PASS — the recorded candidate data check determines the flagship: validate_recorded_decision recomputes digest and checks and refuses stale_digest, stale_manifest, hand_edited, evidence_mismatch, passed_keys_mismatch and failed_candidate.
+  AC5 PASS — every flagship check is independently planted false (a footprint outside zones, short restaurant count, one Italian, missing drive area, residential use) and each blocks selection; stand-in areas can never be evidence.
+  AC6 PASS — the open_listings_incomplete caveat key must appear in every staged file; commit_files refuses caveat_missing and writes nothing.
+  AC7 PASS — map points come only from places_ovt rows (with provider/licence/confidence/release) and places_fsq rows (licence, PINNED_RELEASE, caveat); the 0.7000/0.6999 threshold step is planted; FSQ duplicates within 50 m are linked, not shown.
+  AC8 PASS — every showcase area and candidate resolves or the build refuses: record_missing for a filled key with no point, "pending S2-T06" for null keys, and the resolved set is reported.
+
+FINDINGS: none
+
+PROPOSED OPEN ITEMS:
+  One unproven random failure at seed 2026111499 (test_interrupt_kills_the_process_group timing) is already recorded in evidence; it needs a tracked open item, not a fix here.
+  OI-209 stands: the four new source-registry rows carry "terms to be read" until the publisher terms page is read; record-only.
+  The pass-6 frame/live.py locale.getencoding() mutant is environment-sensitive; carry the M6 reviewer's proposed note.
+  The REV-34 slice-gate manual check of twenty stored public figures is a gate concern at the slice's turn, not a task finding.
+```
+
+#### Showcase places, part A: whole-task review, lens DATA: APPROVED
+
+Reviewed commit `b505c2d`. Z.ai GLM-5.3 through Droid; another maker than the builders (xAI, OpenAI, Alibaba, Mistral, Moonshot) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED
+TASK: S2-T06, whole-task review, lens DATA
+COMMIT: b505c2d7299a3134318c2a55fc8240e24df1c093
+REVIEWER: Z.ai GLM-5.3 (review workspace S2-T06-rvD), through Droid
+SKILLS LOADED: strict-reviewer, sanad-provenance, security-review; code-review is not installed in this tool and was followed by its plain meaning
+CHECKS:
+  REV-10 PASS Each criterion maps to tests with planted violations: stage round-trip and refusal tests (custodian/tests/test_places_stage.py), review-loader plants (test_places_review.py), fetch guards (test_places_fetch.py), gazetteer resolution (test_frame_gazetteer.py, test_frame_seventh.py); the lead's live steps that tick the criteria are owed at the task's turn (P1, record).
+  REV-11 PASS Lead's run at b505c2d: `./eii test --seed 2026111500`, exit 0, "total: 4648 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", "RESULT: PASSED"; mutation campaigns of the ten modules end with every survivor killed or explained (ROWS.toml.patch, 360 rows; frame/live.py pass 6 approved by another maker in M6.review.verdict.md); the seed-2026111499 flake is P2; hosted checks follow at the task's turn.
+  REV-12 PASS WHOLE.prod.patch touches only the places package, its four review files, sources.yaml, fetch/build.py, fetch/transport.py, frame/live.py, frame/README.md, docs/03, docs/04 and the two READMEs; nothing under data/; no unrelated reformatting.
+  REV-13 PASS No TODO, stub or fixed stand-in; unfilled inputs are named refusals (arabic_tag_missing, showcase_areas_pending, census_comparison_pending, decision "pending"), never invented values.
+  REV-14 PASS No secret, .env or real custodian record in the diff; registry rows hold public URLs, byte sizes and ETags of public files; nothing fetched is committed (commit_allowed: false on all four rows).
+  REV-15 PASS No skip, expected-failure mark or suppression: grep of both patches and of the places package finds none; round-3 F8 is fixed (places/review.py line 13 imports yaml bare, no import-untyped comment anywhere in publicdata); the only changed assertions are the registry count 139→143 (exactly the four added rows, join confirmation J4) and the B2 skip-reason assertion to empty; every other test change is additive.
+  REV-16 PASS Pinned names used exactly (pub_place, pub_place_verification, places_s2_t06, showcase_areas.yaml, flagship.yaml, arabic_tag.txt); PUB-57 constants asserted against the pack (test_named_thresholds_match_the_pack); PUB-49's 0.7000 threshold and PUB-54's accepted and refused verification sources implemented as written.
+  REV-17 OPEN P1 P3 docs/03 (pub_place category wording), docs/04 (PUB-17, PUB-23, the places_ovt and bldg_ovt rows, the attribution table), the root README, places/README.md and frame/README.md are updated in the change; the ledger rows, the TASKS.md status line, the open items of S2-T06 and a documentation-check record at this exact commit follow at the task's turn (EVIDENCE.md names no check_docs.py run at b505c2d).
+  REV-18 PASS No secret is read or logged; build lines carry closed reason codes only (_note refuses non-closed codes); no model SQL; the routing engine runs on the receipted local road file with the pinned version 3.9.1 checked.
+  REV-19 PASS PUB-17 and PUB-23 are rewritten to the concrete-file, dataset-token design this task builds, as the task's own affected documents, carried from Part A's reviewed rounds; no dropped-list item is built.
+  REV-20 PASS Source chains resolve: pub_place rows carry source_provider, licence and confidence and are read only after the file receipt (sha256, retrieved_utc, publisher) is enforced (receipt_missing, receipt_mismatch, places_file_unreceipted plants); the census figure is accepted only with its lineage (six census_lineage plants); flagship counts are stored with full inputs, method, digest and manifest sha.
+  REV-21 N/A The change writes no screen, template, chip or model prose; no rendered numeral is touched.
+  REV-22 PASS No partition, parameter set, treatment, export register or attack surface is touched; the places pipeline stays in the custodian public plane.
+  REV-23 PASS product/ is untouched by the diff; no import of eii_custodian is added anywhere in product code.
+  REV-24 PASS The caveat's Arabic line is carried on every output and marked "pending native review" (OI-09); written numerals stay western and identical in both views.
+  REV-25 PASS No personal name, e-mail, absolute local path or run of exactly eight or eleven digits (recorded byte sizes are 9 digits; etags are hex with hyphens); fixtures are SYN-labelled; the four committed review files hold headers only, and test_committed_review_files_are_headers_only enforces that no invented row enters them.
+  REV-26 PASS No prohibited claim anywhere in the change; the caveat, the absent-category sentence ("not found in public places data") and the pending states avoid every forbidden wording; no go/no-go, probability or advice.
+  REV-27 PASS AGENTS.md and CLAUDE.md are untouched by the change and remain byte-identical as base 4f05fb6 left them, where cmp exited 0 at the last merges.
+  REV-28 PASS No synthetic identifier imitates a real registration; Overture part names appear only as source-given public identifiers inside the registered URLs; no named synthetic firm is introduced.
+  REV-29 PASS Every pub_place field comes from the source file, the token-keyed attribution table or a recorded verification; no Synthetic or Simulated value enters a place_public slot; showcase polygons are build-time outputs carrying method version, engine version, graph hash and inputs hash, and a stand-in flag is refused (area_stand_in).
+  REV-38 PASS No gateway import, no EII_DECISION_PROVIDER or key read anywhere in the change.
+  AC1 PASS _keep excludes source_provider_missing, attribution_missing, null_confidence and confidence_range rows; _require_fields and _place_row raise pub_place_field; the stage round trip asserts every written row carries source_provider, licence and confidence and a planted bare row stores nothing (test_place_and_verification_rows_round_trip).
+  AC2 PASS pub_place_verification is written in the contract column order, keyed to pub_place; an orphan row is refused on both the loader and the writer path (orphan_place_id plants in test_places_review.py and test_places_stage.py).
+  AC3 PASS All four statuses are stored and read back unchanged; a planted fifth status is refused (unknown_status).
+  AC4 PASS The flagship is decided only by the recorded check: the stage writes flagship_check.json with its body digest and the manifest sha; validate_recorded_decision refuses stale_digest, stale_manifest, hand_edited, not_provisional, no_provider, stand_in_area and failed_candidate; an absent or malformed flagship.yaml reads "pending", never a name.
+  AC5 PASS Checks (a) to (e) implement PUB-57's constants; on invented area files one invented candidate passes all five; with its drive 10 file removed, check (d) fails and no decision can name it.
+  AC6 PASS commit_files refuses caveat_missing before anything is written, and the plant proves no directory appears; the caveat key rides pub_place rows' outputs, the points file, the build report and the check record.
+  AC7 PASS The points come only from places_ovt (licence from the token-keyed attribution table, release 2026-10-21.0, receipted file) and places_fsq (every shown row carries licence, PINNED_RELEASE and source, through the reviewed places_fsq policy; fsq_licence_missing, fsq_release_missing and fsq_pending refusals); 0.7000 is shown, 0.6999 is not, half to even on the stored decimal; inside a showcase area the verification status overrides the threshold.
+  AC8 PASS Filled invented keys resolve to their points and get their area files (stage, frame and seventh-frame tests); a filled key naming no record is refused by record_missing; the committed null keys keep "pending S2-T06" for the 4 showcase entries and 7 candidates (11 report lines), and a stand-in area never counts as evidence.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-10) record: the lead's live steps 2 to 8 of the Part B brief are owed at the task's turn before the eight criteria are ticked and before S2-T08: the real fetch of the four files and the road file with receipts; the reviewed rows of places_ovt_attribution.csv and places_ovt_categories.csv; the Arabic tag; the census figure; the real places build and its report; the reviewed keys of the 4 showcase entries and 7 candidates and the rows of showcase_areas.yaml; the real area-producer run with its manifest and the rebuild comparison; the hand checks as rows of verified_places.csv (PUB-53, PUB-54); the recorded check and the provisional decision (PUB-58, PUB-59). Filling the review files also requires updating test_committed_review_files_are_headers_only, which enforces the header-only state.
+  P2 (REV-11) record: the seed-2026111499 random failure (scripts/tests/test_runner_failures.py test_interrupt_kills_the_process_group, "pid file never appeared" at load average 32) is to be entered in OPEN_ITEMS.md under rule 39; three single reruns and two stress runs passed and the cause is not proven.
+  P3 (REV-17) record: S2-T06's ledger rows, TASKS.md status line, its open items and a documentation-check record at b505c2d follow at the task's turn.
+  P4 (REV-16) record: the Part B brief's ARC-88 difference (document 02 places routing in the API process; the flagship build-time areas come from a custodian-side producer over the pinned engine) was ordered proposed to the lead; confirm the ledger enters it.
+  P5 (REV-17) record: the publisher's own terms words for the four new rows stay owed under the already-open OI-209; the blank terms_url with the "terms to be read" marker and terms_read_on 2026-11-15 is the decided interim state (decision 0026 item 3, join confirmation J2).
+```
+
+#### Showcase places, part A: confirmation of the join onto train C's registry and receipts: CONFIRMED
+
+Reviewed commit `b505c2d`. Cognition SWE-2 High through Devin; another maker than the joiner (the lead, Anthropic).
+
+```text
+VERDICT: CONFIRMED
+TASK: S2-T06, join confirmation
+COMMIT: b505c2d
+REVIEWER: Cognition SWE-2 High (Devin)
+SKILLS LOADED: strict-reviewer, sanad-provenance, project-orientation, task-standards, muhasabah-gate
+CHECKS:
+  J1 CONFIRMED — `sidecar_for` (custodian/src/eii_custodian/publicdata/fetch/receipts.py:56-105) has no `switched_off` parameter and writes `"switched_off": False`, as main 4f05fb6 left it. The join removed exactly the three stale `switched_off=False` keywords S2-T06 had introduced: `fetch_place_file` in places/fetch.py, `_store` in test_frame_live_survivors.py and `_store` in test_places_stage.py — identical meaning, since only False was ever passed. A workspace-wide search finds no remaining caller passing it; the only `True` at e5d4d62 and b505c2d is `write_cached(switched_off=True)` in test_activity_graph.py:486, a different function that keeps its own parameter, plus post-hoc receipt dict edits. S2-T06 never passed True.
+  J2 CONFIRMED — the four rows carry `terms_url: ""`, `terms_words: "terms to be read"`, `terms_read_on: "2026-11-15"`. No record in PROGRESS.md, OPEN_ITEMS.md or docs says the Overture attribution/terms page was read on a stated date for these rows; the only Overture mentions are de-dup precedence (decision 0019 item 21, OI-96) and the `overture_bucket_not_opened` skip record. Blank `terms_url` with the marker is the decided interim state: decision 0026 item 3 ("listed as 'terms to be read', with the date checked"), the parent rows `places_ovt`/`bldg_ovt` (identical fields, checked 2026-11-14), and S2-T21's ledger (136 of 138 rows carry the marker; the publisher's words are owed under OI-209). No field beyond the three terms fields changed: `licence_id`, `licence_basis`, `licence_url` (places keeps the attribution page; the three building parts keep the ODbL page, matching the briefed revert), `basis_note` with recorded bytes/etag/STAC words, `url`, `fetch_host` and `landing_url` are unchanged in the diff context and the rows.
+  J3 CONFIRMED — IN/JOIN.stat.txt lists only the six files; allowlist.py is untouched and already holds `overturemaps-us-west-2.s3.us-west-2.amazonaws.com` and `stac.overturemaps.org`. The four rows keep that allow-listed host; no host added. The frame/build and cache-reader `switched_off` refusals and every other control are outside the diff.
+  J4 CONFIRMED — `_entry` in custodian/tests/test_places_fetch.py gains only the two fields main's loader now requires (`REQUIRED` includes them). The only changed assertion is `len(entries)` 139 → 143 in `test_registry_counts_follow_decision_0026` (test_publicdata_registry.py:571); `owner_decision` stays 27 since the new rows are basis `dataset`. 139 is decided nowhere: the only "139"/"143" in docs are requirement ids (ARC-139, FE-139, DAT-139, BE-139, FE-143); decision 0026 and TASKS.md fix no count. FACTS.txt: 139 `- key:` lines at 4f05fb6, 143 at b505c2d — main's rows plus exactly the four S2-T06 rows.
+  J5 CONFIRMED — the whole 110-line JOIN.patch reviewed: four terms-field row edits, three keyword removals, two required test fields, one count correction. No skip, xfail, suppression, `# type: ignore`, deleted test, loosened assertion or widened tolerance.
+RUNS: none (read-only session; one `ls` of `.overnight/IN/` for file discovery, no test or build run)
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+- IN/S2-T06-PICK.patch holds only the mutation_explained.toml part of e5d4d62; the four registry rows as S2-T06 wrote them are not in the evidence set — file the row portion for the record if wanted.
+- The publisher's own terms words for the four rows remain owed under the already-open OI-209; no new item needed.
+```
+
+#### Showcase places, part A: review of mutation pass 7, places/fetch.py: APPROVED
+
+Reviewed commit `36fa382`. Cognition SWE-2 High through Devin; another maker than the builder of the pass (OpenAI).
+
+```text
+VERDICT: APPROVED
+TASK: S2-T06, review of mutation pass 7 (places/fetch.py)
+COMMIT: 36fa382
+REVIEWER: Cognition SWE-2 High, through Devin
+SKILLS LOADED: strict-reviewer, sanad-provenance; code-review not installed in this tool (followed its plain meaning: APPROVED/REJECTED with file, place, defect, exact fix)
+CHECKS:
+  K1 PASS all 157 first-campaign survivors/not-covered answered: 148 killed by custodian/tests/test_places_fetch_survivors.py, 9 explained; personally verified text, size, etag, ranged and registry-comparison mutants across every function (test_request_refusals, test_redirect_refusals, test_transport_faults, test_body_refusals, test_response_etags, test_recorded_refusals, test_success_receipt, test_file_selection).
+  K2 PASS expected values are hand-written literals; _failure compares the whole record via asdict and the success receipt is compared whole, every field (test_places_fetch_survivors.py).
+  K3 PASS the nine rows' mutation texts match campaign.after.txt exactly and each proof holds for every input: sidecar_for maps both '' and None to None (receipts.py), the malformed flags are truth-tested only, the sizes/etags empty branch is unreachable after the len != 1 short-circuit, and _recorded's two return shapes make or/and agree.
+  K4 PASS commit adds only the new test file and nine appended toml rows; no skip, xfail, suppression comment, retry or tolerance change; invented fixtures on .example hosts, no real names or credential-like values, no 8/11-digit runs, no socket, no reads outside tmp_path.
+  K5 PASS no test pins a defect; assertions agree with TASKS.md S2-T06, doc 04 PUB-03/PUB-17 and the sidecar of section 3.1, and with AGENTS.md rules 5, 7 and 19.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  nit: test_success_receipt derives the expected filename as `extension or "parquet"`, mirroring the production idiom; a literal suffix parameter would be stricter (kills are unaffected, both branches are parametrized).
+  record: this review read files only; no test or campaign was run by the reviewer, per the brief; the lead's fresh-seed full run remains due at the task's re-cut.
+```
+
+#### Showcase places, part A: merge record
+
+- The head that was merged, `fe929f3d403865e8d0b33a3c888f9b5224a6c8a0`, is the work commit `3f24fa1492c04f2b35827639411dfcf39c78372c` (the eleven approved commits replayed on main `e30948d5ab714ea8739abe251df663cc5dfad105` with equal patch ids, no forced difference) and one ledger commit that changes PROGRESS.md, OPEN_ITEMS.md and TASKS.md alone. The lead's check of it on the head: "TREE-IS-WORK ok: 805 paths at fe929f3d403865e8d0b33a3c888f9b5224a6c8a0".
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43768655200 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43768655204 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43768655189 .
+- The lead's head checks before the merge (evidence file S2-T06.head.txt of the run's records): 16 commands, every exit code 0; `uv run --locked python scripts/ci_history_scan.py scan`: "history scan: range HEAD, 72 commits, at least 72 to list, RESULT: PASSED"; `./eii test --seed 2026111505`: "total: 4688 passed, 0 failed, 0 skipped in 6 suites, 0 with problems", "RESULT: PASSED", exit code 0.
+- The branch stood on current main (`e30948d5ab714ea8739abe251df663cc5dfad105`), so the head was the exact merge result: the whole test above is the test of the merge result.
+- The verdicts were posted on the pull request before the merge: lens CODE https://github.com/albarami/economic-investment-intelligence/pull/62#issuecomment-6902306836 , lens DATA https://github.com/albarami/economic-investment-intelligence/pull/62#issuecomment-6902307130 , the join confirmation https://github.com/albarami/economic-investment-intelligence/pull/62#issuecomment-6902307430 , the mutation pass 7 review https://github.com/albarami/economic-investment-intelligence/pull/62#issuecomment-6902307702 .
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/62 was squash-merged on 2026-11-16 at that head; merge commit `bf46058cab670138113d6c3cd659dfe3e40caa4c` on main, with the same tree as the head (`6eef00b430297b498a5e676529ff5cc53e7065cc` on both). CI on the merge commit, triggered by the push: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43771094194 ; workflow ci, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43771094013 , and workflow sandbox, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43771094016 , were still running when this record was written; their results are given in the next closing record.
+- CI on the merge commit of pull request 61, which its closing record left running: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43765470992 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43765471012 .
+- Part B of S2-T06 (the live steps of ruling L-616) stays open.
+
+### S3-T07 — Catalogue foundations: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/63)
+
+- Approved-line commits, in order: catalogue build and two fixes `bf3294e5166303f8234682f8887e8fcb7e6df9b2`; first join `682ca30c14cbd076eab6f89d0a8618711adba45a`; join pass 2 `37b38ac`; join pass 3 `e57151bff9d1433af528ea9a2669119b9e80bcab`; mutation part A `5810007`; mutation part B `f9fd1166b0d2b17b111c01cb1d36c2371e947005`; mutation closing `5827d3e`; after the re-cut, fix pass 4 `1671de8cd9740d421150e11031557d6edfe332f3` and fix pass 5 `d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f`. Hashes containing a forbidden digit run are shortened; git holds their full forms.
+- Re-cut on main `bf46058`: `bf3294e5166303f8234682f8887e8fcb7e6df9b2` as `9cd75479b7f17591dff6780950f3988e53c2eeac`; `682ca30c14cbd076eab6f89d0a8618711adba45a` as `b570bae`; `37b38ac` as `d8f6733c31b9fc0c9332eabf908af098939a4207`; `e57151bff9d1433af528ea9a2669119b9e80bcab` as `2301f9f037e7f877f33b5a041e0641aefc7dfe3c`; `5810007` as `bb5be9fede4a3a03631e4b07ea34280f5a8f6824`; `f9fd1166b0d2b17b111c01cb1d36c2371e947005` as `8223850ba076a7a80d6e5bba8f1a7038f988f204`; `5827d3e` as `2342e21357f8d6bf2a4be3a23d1e7d33febfe63c`. The lead records six equal patch ids; the seventh differs only in the context of the append to `scripts/mutation_explained.toml`. Its resolution is main plus the task’s two explanation rows, 486 plus 2 giving 488 rows, parsed without markers. The identity record says all 27 task paths match their source, the changed paths are only task paths, and the TOML is main plus the task blocks. The re-cut ruling explicitly excepts that TOML from whole-file equality with the approved head. No forced code or test difference and no fresh confirmation were required by the lead; this is one task’s own pull request, not a train.
+- Class and people: TASKS.md calls delivery hard and the persona AI. The original plan, first build and both fix passes were xAI Grok 4.7 through Cursor; the original path explicitly had no design review. The lead was Anthropic Claude Fable 5.2 until its model changed to Anthropic Claude Opus 5.5 during the task. Brief drafting and internal verification used Anthropic Claude Opus helpers; the run's records name the model family only, and no version is claimed here. Personas, from the briefs: the builder a senior engineer for closed, typed catalogues of a governed assistant; the code reviewer a principal reviewer of AI safety and evaluation for governed assistants. This ledger was drafted by OpenAI GPT-6 Astra through Codex as an evidence-ledger editor and corrected by the lead; it is not a new code verdict.
+- The later duplicate plan is not the approved build’s plan: the 2026-11-15 log records Mistral Medium 3.5 through Droid, followed by DeepSeek V4.1 Flash through Devin, REJECTED on the duplicate plan, with no commit named. Its eleven findings covered incomplete schemas/templates/subject rules, an inadequate swap plant, no scan gate, uncollected tests and unchecked module placement, undeclared YAML and archive packaging, wrong version hash, optional playbooks, hardcoded companions, brief scope, omitted mutation targets and unspecified vocabulary/catalogue content. The lead then ruled the plan, design review and helper design check unused; nothing of the built task changed. The duplicate plan was Mistral Medium 3.5 through Droid and the discarded design check an Anthropic Claude Fable 5.2 helper, both by their job records. Thus “no design review” in the original review pack and the later REJECTED design verdict describe different work, not a reversal of the code approval.
+- Built, criterion 1: four version-1 YAML files under `product/assistant/catalogue/`; claims deliberately empty, one `foundation_note` component with max_count 1, two bilingual fragments and three bilingual site_check questions. `components.yaml` also holds the ten stage-directive schemas. The package under `product/src/eii_product/assistant/catalogue/` contains `schema.py`, `load.py`, `entries.py`, `directives.py`, `slots.py`, `brief.py`, `scan.py` and its exports; the assistant package initializer is added. The version is SHA-256 of canonical JSON of the four name-ordered file-name/hash pairs, not a git hash. `product/README.md` changes its status sentence; `product/pyproject.toml` and `uv.lock` declare the pinned run-time YAML reader. No other product document is changed.
+- Built, criterion 2: closed typed claims, components, fragments, questions, slots, field kinds, personas and playbooks; unknown entry keys, properties, kinds and malformed shapes refuse. The loader composes nodes with the safe loader before safe_load, rejects duplicate keys, aliases, merge keys and tags outside its closed core set. `check_brief` enforces ordered parts, catalogue version, fragment kinds, exactly three distinct questions, component property types and count limits, and stage alternatives. Application-selected still-to-test and not-measured lists must be empty in model input.
+- Built, criterion 3: slot matching checks returned identifiers, lineage shape, metric, unit, geography kind, period shape, provenance, evidence and breakdown; subject and split rules apply at load and match. The different-metric valid-fact swap plant is supplemented by breakdown swap plants, a valid correctly bound pair, identical/overlapping slot refusals and fact reuse refusal. Overlap means equal binding fields with intersecting allowed-provenance sets. Malformed metadata refuses without throwing; a shared helper checks slots, layout fact properties and highlights. Company employee counts are refused in question definitions and every brief fact-reference route identified by the review; application-owned company matching remains outside the brief.
+- Built, criterion 4: `scan.py` rejects Unicode Nd, Nl and No numerals, five numeral-symbol code points, character-reference starts, stray braces, unknown placeholders and omitted declared slots in either template language. The foundation test walks the running Unicode database and scans shipped templates; fixed examples and keycap/character-reference plants remain. This is template validation, not a complete language or advice scanner.
+- Tests and supporting changes: the task adds or changes `test_catalogue_foundations.py`, `test_catalogue_fix.py`, `test_catalogue_fix_render.py`, `test_catalogue_fix2.py`, the brief/slots/entries/directives survivor files and `test_catalogue_breakdown_table.py` under `product/tests/`; it also changes `scripts/tests/test_clean_environment.py` and appends two explanation entries to `scripts/mutation_explained.toml`. The evidence rows below hold one row per changed test file. `test_catalogue_breakdown_table.py` holds two named tests (one of them a 432-row parametrised table); its row names both.
+- Internal verification of the uncommitted first build: five Anthropic Claude Opus agents, four lenses, 596,525 tokens and 107 tool calls; runs green, 32 breaks with 28 caught, nine confirmed defects, twelve questions, files restored byte-identically. Defects were split restrictions, off-area estimate/share/score/rank rules, unchecked component props, a non-string strength exception, three missing plants, wrong fragment kinds and an extra suppression comment. The xAI first fix covered points A–V: 18 initially red, four existing guards given missing plants; its return reported 70 catalogue and 301 product tests, about sixty breaks caught and four equivalences. Both passes became c74d78b. Counts are historical, not results on the re-cut.
+- External code review round 1, OpenAI GPT-6 Astra through Codex, at `c74d78b`: REJECTED; F1 ambiguous breakdown/provenance swaps, F2 company facts entering brief routes, F3 malformed metadata exceptions, F4 layout/highlight lineage and suppression bypasses, F5 missing boolean/NaN coordinate and boolean-prop plants. All five adopted; xAI Grok 4.7 made the second fix.
+- External code review round 2, at `f1b498a`: APPROVED, F1–F5 FIXED, no findings; P1 retains records, dependency declaration and native Arabic review. Both rounds were launched on OpenAI GPT-6 Astra through Codex (the job records); the round-2 verdict names its model family, GPT-6, as the reviewer saw it. The reviewers loaded strict-reviewer, task-standards, project-orientation, sanad-provenance and muhasabah-gate; code-review and security-review were unavailable.
+- First join built by Cognition SWE-2 High through Devin: approved task bytes applied as bf3294e, then 682ca30 removes the now-unused YAML import suppression, declares pyyaml 6.0.3 with the lock, seeds child caches and retains offline sync and installed-set equality with two plants. Type check exit 1 before, 0 after; the lead proved 18 of 18 foundation files identical before the join change. The co-author trailer of every commit names the lead that committed it (Anthropic Claude Fable 5.2 before the lead's model changed, Anthropic Claude Opus 5.5 after); the builder of each commit is the one named in its body and in the job records: xAI for the foundation, Cognition for the first join.
+- Join confirmation 1, Moonshot AI Kimi K3.1 Pro High through Devin, at `682ca30c14cbd076eab6f89d0a8618711adba45a`: REJECTED, N1 direct declarations omit transitives, selected extras and applicable markers; other five checks pass. Join pass 2 actually ran on Z.ai GLM-5.3 through Droid, although the earlier assignment named Cognition; five plants red first and 12 tests passed in the return cited by the next review. The brief asked for seven planted cases; the five plant tests hold them all, two of them as pairs in one test each (true and false marker; selected and unselected extra), so no case is missing.
+- Join confirmation 2, the same Moonshot model, at `37b38ac`: REJECTED, N1 not fixed because inactive resolution-marker forks are traversed and optional-edge markers lose the selected extra. The lead recorded a third join round as an exception to one cycle; Z.ai GLM-5.3 built it. The brief asked for four planted cases; the three plant tests hold them all (inactive and active fork in one test, selected and unselected extra in one, and the refusal of two active entries of one name).
+- Join confirmation 3, the same Moonshot model, at `e57151bff9d1433af528ea9a2669119b9e80bcab`: APPROVED, N1 FIXED, no findings; resolution markers filter lock entries, ambiguous active entries refuse, selected extras enter marker evaluation, offline sync and equality remain. The return cited by the verdict records 15 tests passing and unchanged real installed names. The reviewer used strict-reviewer, task-standards, sanad-provenance and muhasabah-gate, with project-orientation in confirmations 1 and 3; unavailable code/security review skills were followed in plain meaning. This approval is not proof of a hosted cache.
+- Mutation parts A and B: Z.ai GLM-5.3 through Droid, original commits 63ebc9b and 3266d57 joined by the lead as 5810007 and f9fd116. Initial campaigns at 682ca30: brief 932 made/30 survived, slots 483/11, entries 988/53, directives 350/17. Part A’s twelve tests killed 37 of 41 survivors: brief 930 of 932 killed, slots 481 of 483 killed. Part B’s seventeen tests killed all 70: entries 988/988 and directives 350/350. Its supplied campaign records zero survived, timed out, not covered or incomplete, mutmut exit 0 and command exit 0.
+- Mutation closing: xAI Grok 4.7 through Cursor supplied the literal 432-row breakdown cross-product and removed the redundant none early return; the lead wrote two INF case-alias explanation rows. The lead’s deliberate removal of the Public provenance guard made 26 table rows red; restored, 786 product tests passed. Closing counts: slots 480/480 killed, brief 930/932 with both survivors explained. As above, the Opus 5.5 co-author trailers on these commits name the committing lead; Z.ai built join passes 2 and 3 and mutation parts A and B, xAI built the closing tests and removal, and the lead wrote the two explanation rows.
+- Mutation external review, Google Gemini 3.1 Pro through Droid, at `5827d3e`: APPROVED, K1–K6 PASS, no findings; twelve literal table rows checked, redundant return and two INF equivalences accepted. K1 reports more than ten survivors checked but names one example; the lead explicitly accepts that brief account on the campaigns’ mechanical evidence. Skills: strict-reviewer and sanad-provenance; unavailable code-review followed in plain meaning, retained as a record point.
+- Fix pass 4, after the re-cut (lead's ruling L-631), commit `1671de8cd9740d421150e11031557d6edfe332f3`: the lead's first ledger run stopped because the clean-environment test filled the temporary folder held in memory (error 28). Cause: the task's own cache seed from the first join copied the whole user uv cache into each child cache; across file systems the hard link failed, every symbolic link was followed and each hard-linked name was copied apart, about 5.3 GB per child cache and about eight at once. OpenAI GPT-6 Astra through Codex built the test-only fix: child caches keep symbolic and hard links, the user cache is copied once per class and every further child cache is made by links inside the class folder; the new test `CacheSeeding.test_seed_preserves_links_across_filesystems_and_children` was red first. The lead committed it unchanged and measured the whole file on that folder: 16 tests OK, exit 0, peak increase 1,489,660 KiB against the bound of 2,451,088 KiB (the cache's apparent size plus 1 GB); three planted violations (no symbolic links kept, no hard-link map, a plain copy) each made the new test fail. Confirmation, Google Gemini 3.1 Pro through Droid, at `1671de8cd9740d421150e11031557d6edfe332f3`: APPROVED, C1 to C6 PASS, no findings; it ruled the builder's observation that no seed file changed during the tests enough to show the shared files are safe for uv. Its reviewer line names the tool's company as maker; the job record names the Google model. Skills: strict-reviewer, code-review, superpowers:verification-before-completion.
+- Fix pass 5, after the lead's second ledger run (ruling L-633), commit `d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f`: row 22 of that run (`./eii test`) failed in `test_stale_lock_is_detected` and `test_hostile_surroundings_do_not_change_the_result`. Cause: both tests strip the root dependency groups from a workspace copy and relock it offline; since this task declares `pyyaml==6.0.3` in `product/pyproject.toml`, that relock needs the reader's registry metadata for the Python 3.15 split, which a cache filled only by a locked sync (the hosted tests job, and the default cache that `./eii test` gives its tests) does not hold. OpenAI GPT-6 Astra through Codex built the test-only fix: the disposable copies also drop that requirement before the offline relock; the stale-lock test proves the copy's lock current (`uv lock --check --offline`, exit 0) before the version bump and still requires exit 1 with "needs to be updated" after it; the four alone cases of the hostile test take an invented, dated pure-Python wheel from a `file://` index inside the test's own folder, relocked, checked and installed before the plants, so the publication-cutoff case keeps its cause. The full-repository installation and import tests still use the repository's own manifests and lock. Red first on a copy of a cache filled only by a locked sync: failures 2, exit 1; green on a fresh copy: 16 tests OK, exit 0. The lead committed it unchanged and reran the whole file on a fresh copy of that cache (16 tests OK, exit 0) and on the run cache (OK); pytest form 16 passed, 14 subtests; two planted violations (the requirement kept in the copy; the wheel dated before the cutoff) each failed at the tests' own assertions. Confirmation, Google Gemini 3.1 Pro through Droid, at `d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f`: APPROVED, C1 to C6 PASS, no findings; it ruled that the offline calls of the two tests need no registry metadata, that the dated local wheel isolates the cutoff case, and that the memory-backed temporary folder's file-entry limit with a large user cache is outside this fix and fit to be recorded as a limit (OI-254). Skills: strict-reviewer, code-review, superpowers:verification-before-completion.
+- Lead checks on f1b498a, 2026-11-14: custodian 536, core 109, product 324 and scripts 687 passed; every listed command exit 0. Lock resolved 61 packages; lint passed; format 284 files; mypy 235 source files; versions 66 components; reference notes 2 files/6 libraries/357 rows; docs including the private-pattern check 484 text files/66 Markdown files; tree 8 rules; agent-file comparison passed. Pipelines used pipefail; the check ran on processors 0–3. The earlier c74d78b check had 44 script failures/errors because the worktree lacked extensions, scanner and web modules; the equipped rerun passed 687, but that does not erase the earlier failure. The later stale-evidence correction expressly excludes S3-T07.
+- Lead checks on 682ca30, 2026-11-15: ordinary custodian selection excluding data_tests 1,578 passed, core 606 and product 324 passed, all exit 0; the whole-command interpreter form failed custodian with 1 failed/1,577 passed, exit 1, while core 606 and product 324 passed, exit 0. Scripts 835 passed; lock 62 packages; lint; format 392 files; mypy 285 files; versions 67; notes 2 files/6 libraries/359 rows; docs 613 text/79 Markdown files including private-pattern check; tree 8; agent comparison; history 65 commits, four findings on two known ledger entries left out: all exit 0. Overall RESULT FAILED is retained. The lead identifies the failing method-cache test as the base defect repaired in 8880304 and says it passes after re-cut; this pull request's whole-test row is the run at the re-cut.
+- Limits: the whole test with a fresh seed at the re-cut and the hosted checks are this pull request's own rows and checks; the earlier trees' results above are historical. The foundation is not a live assistant, release-aware validator, populated claim-family catalogue, public-data read, screen or model call. The helper resolves a repository-adjacent catalogue folder, not demonstrated archive packaging. Numeric forecast slots accept the series unit from the fact unit set; there is no named score metric in the closed list. Inferred items refuse still_to_test as the lead’s stricter reading. Rank and estimate/scenario/share restrictions off area are broader than a company-record family may later permit. Arabic strings remain pending native review.
+- Record completeness: the lead checked these drafts against the trial-join helper's twenty ledger points. Points 1 to 12, 14 to 17 and 20 are carried by the open items of this pull request or by the bullets above; point 13 is closed (next sentence); points 18 and 19 are records: the reused-fact test changed its fixture, not its assertion, and on a layout property or a highlight a fact stored under another identifier now returns `FACT_ID` where it returned `UNKNOWN_FACT`. The stricter breakdown and overlap fixes supersede the earlier proposal, in the lead's rulings to the reviewers, of a “not built” qualifier; only the returned-fact mapping/default remains open. In the lead's identity record, “paths differing from their source: none” covers every path but `scripts/mutation_explained.toml`, which the script leaves out of that loop and checks on its own line as main's file followed by the task's block.
+- Open items OI-236 to OI-254, added by this pull request: returned metric/subject/breakdown mapping and unsplit default; company rank/fit templates; off-area metric restrictions; Inferred/still_to_test interpretation; fly coordinate origin; brief-module placement; suppressed-slot contract conflict; forecast units and score vocabulary; numeral-language limits; release time-key lists; safe-loader duplicate pass; deferred catalogue families/caveats; template language/refusal ownership; archive packaging; native Arabic review; dependency declaration and other undeclared imports; hosted offline cache proof; clean-environment ownership; the cache seed that filled the temporary folder held in memory (OI-254, the held item of the S2-T06 pull request). The mutation reviewer's note that the code-review skill was not found, and the failed historical checks, stay as records in this log.
+
+#### Evidence for the work commit `d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f`
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python -m pytest product/tests/test_catalogue_breakdown_table.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    433 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S3-T07: `product/tests/test_catalogue_breakdown_table.py`, added by the task. Coverage anchors: test_breakdown_table_is_the_ruled_cross_product, test_breakdown_refusal_matches_the_literal_table.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python -m pytest product/tests/test_catalogue_brief_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    7 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S3-T07: `product/tests/test_catalogue_brief_survivors.py`, added by the task. Coverage anchors: test_non_string_fragment_keys_refuse, test_a_simulated_fact_on_a_place_claim_refuses_by_subject, test_layout_shows_props_for_a_non_string_property_key.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python -m pytest product/tests/test_catalogue_directives_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S3-T07: `product/tests/test_catalogue_directives_survivors.py`, added by the task. Coverage anchors: test_fly_one_of_holds_a_target_field, test_a_directive_with_both_fields_and_one_of_is_missing, test_an_identifier_field_keeps_empty_defaults.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python -m pytest product/tests/test_catalogue_entries_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    12 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S3-T07: `product/tests/test_catalogue_entries_survivors.py`, added by the task. Coverage anchors: test_claim_keeps_caveats_companions_and_fields, test_the_english_template_must_hold_every_slot, test_the_wider_personas_load.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python -m pytest product/tests/test_catalogue_fix.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S3-T07: `product/tests/test_catalogue_fix.py`, added by the task. Coverage anchors: test_fix_a_sex_and_nationality_breakdown, test_fix_b_estimate_share_score_and_rank, test_fix_c_component_prop_kinds.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python -m pytest product/tests/test_catalogue_fix2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    23 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S3-T07: `product/tests/test_catalogue_fix2.py`, added by the task. Coverage anchors: test_fix2_f1_exchanged_breakdowns_refuse, test_fix2_f1_overlapping_provenance_refuses_at_load, test_fix2_f1_breakdown_outside_the_closed_list.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python -m pytest product/tests/test_catalogue_fix_render.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S3-T07: `product/tests/test_catalogue_fix_render.py`, added by the task. Coverage anchors: test_fix_n_numeral_symbols_and_character_references, test_fix_o_highlight_fact_id, test_fix_p_duplicate_question.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python -m pytest product/tests/test_catalogue_foundations.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    53 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S3-T07: `product/tests/test_catalogue_foundations.py`, added by the task. Coverage anchors: test_four_catalogue_files_load, test_unknown_keys_and_properties_fail, test_swapped_fact_slots_fail.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python -m pytest product/tests/test_catalogue_slots_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S3-T07: `product/tests/test_catalogue_slots_survivors.py`, added by the task. Coverage anchors: test_match_slots_keeps_the_item_path_on_an_unknown_claim, test_match_slots_keeps_the_claim_section_evidence, test_match_slot_list_keeps_the_item_path.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python -m unittest scripts.tests.test_clean_environment -v
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    16 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S3-T07: `scripts/tests/test_clean_environment.py`, changed by the task's join passes and fix passes 4 and 5: the clean installation follows the lock with its resolution markers and selected extras, its child caches are seeded once, keeping links, and its offline relocks need no registry metadata. Coverage anchors: test_transitive_dependency_is_expected, test_true_marker_transitive_is_expected_and_false_marker_one_is_not, test_selected_extra_is_expected_and_unselected_extra_is_not, test_seed_preserves_links_across_filesystems_and_children, test_stale_lock_is_detected, test_hostile_surroundings_do_not_change_the_result. Run in the unittest form, as the scripts suite runs it.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python -P -s -m pytest -c pyproject.toml --rootdir . --collect-only -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "4405 tests collected in 1.02s"
+Seed:      none
+Notes:     The whole-tree collection under pytest -P on the work commit: every test module of the repository, the catalogue tests of S3-T07 among them, imports from the repository root, as the hosted sandbox proof collects it.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    844 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The scripts guard tests on the work commit: the clean-installation test that follows the lock (S3-T07's join passes), the mutation runner's explanation file with S3-T07's rows, the docs and tree guards.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The lint on the work commit: the catalogue package, its loader and every new test file of S3-T07.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "443 files already formatted"
+Seed:      none
+Notes:     The format check on the work commit; it changes no file.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 298 source files"
+Seed:      none
+Notes:     The type check on the work commit, with the drivers of the group engine: the catalogue package and its YAML reader.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 678 text files, 86 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the work commit: the documents and README changed by S3-T07.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the work commit: the catalogue files stand where the tree rules allow.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 359 rows: OK"
+Seed:      none
+Notes:     The reference-notes check on the work commit. S3-T07 changes no reference note; the row shows the anchors still resolve.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two rules files must be byte-identical. S3-T07 changes neither.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: range HEAD, 70 commits, at least 70 to list, RESULT: PASSED"
+Seed:      none
+Notes:     The pinned secret scanner over the history at the work commit: the catalogue files and invented fixtures of S3-T07 hold no secret pattern.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','bf46058cab670138113d6c3cd659dfe3e40caa4c...d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:product/assistant/catalogue/claims.yaml A:product/assistant/catalogue/components.yaml A:product/assistant/catalogue/fragments.yaml A:product/assistant/catalogue/questions.yaml A:product/src/eii_product/assistant/__init__.py A:product/src/eii_product/assistant/catalogue/__init__.py A:product/src/eii_product/assistant/catalogue/brief.py A:product/src/eii_product/assistant/catalogue/directives.py A:product/src/eii_product/assistant/catalogue/entries.py A:product/src/eii_product/assistant/catalogue/load.py A:product/src/eii_product/assistant/catalogue/scan.py A:product/src/eii_product/assistant/catalogue/schema.py A:product/src/eii_product/assistant/catalogue/slots.py A:product/tests/test_catalogue_breakdown_table.py A:product/tests/test_catalogue_brief_survivors.py A:product/tests/test_catalogue_directives_survivors.py A:product/tests/test_catalogue_entries_survivors.py A:product/tests/test_catalogue_fix.py A:product/tests/test_catalogue_fix2.py A:product/tests/test_catalogue_fix_render.py A:product/tests/test_catalogue_foundations.py A:product/tests/test_catalogue_slots_survivors.py M:product/README.md M:product/pyproject.toml M:scripts/mutation_explained.toml M:scripts/tests/test_clean_environment.py M:uv.lock'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "27 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The whole change against main bf46058: 27 files (22 added, 5 changed), the files of the nine work commits (the seven approved commits and fix passes 4 and 5) and nothing else.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   ./eii test --seed 2026111507
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    5252 passed, 0 failed, 0 skipped
+Seed:      2026111507
+Notes:     The whole test command with a fresh seed at the work commit, after the re-cut on main bf46058.
+```
+
+```text
+### S3-T07 — Catalogue foundations
+Commit:    d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','bf46058cab670138113d6c3cd659dfe3e40caa4c..d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The nine work commits of S3-T07 on main bf46058: the catalogues, the three join passes, mutation parts A and B, the mutation closing step and fix passes 4 and 5 of the clean-environment test, each a Conventional Commit.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
