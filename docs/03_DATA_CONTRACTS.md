@@ -959,6 +959,16 @@ host values remain pending the lead.
 
 ## 8. The manifest and the loader
 
+Public source selections identify a reviewed immutable snapshot by hash. Its
+retrieval UTC and publisher modification/version are separate from the source
+observation period and from later equal-byte checks. The cache reader verifies
+the body and receipt before parsing; retained history never implies newest-file
+selection. See document 04, section 3.1, for the dated cache/index contract.
+The price producer S2-T19 and release assembly S2-T08 must carry each price's
+dated "as of" from its selected snapshot and refuse a missing date. Those
+consumers remain unbuilt; S2-T27's existing-reader checks do not prove them.
+
+
 Every release directory holds `manifest.json`. Its scalar `release_kind` is `public_only` or
 `protected`. Scalars common to both kinds are `release_id`, `release_contract_version`
 (`release.v1`), `build_id`, `built_at` (provenance only), `code_version` (the full git commit hash),

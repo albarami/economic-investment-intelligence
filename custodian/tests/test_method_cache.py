@@ -84,9 +84,9 @@ def test_method_cache_named_failures(tmp_path, plant):
     digest = fixture(tmp_path)
     folder = tmp_path / "util_elec"
     if plant == "file":
-        (folder / f"{digest}.json").unlink()
+        (folder / "2026-11-14" / f"{digest}.json").unlink()
     elif plant == "receipt":
-        (folder / f"{digest}.meta.json").unlink()
+        (folder / "2026-11-14" / f"{digest}.meta.json").unlink()
     else:
         (folder / f"{digest}.json").write_text("[]")
     expected = "receipt_hash_mismatch" if plant == "hash" else "public_cache_missing"

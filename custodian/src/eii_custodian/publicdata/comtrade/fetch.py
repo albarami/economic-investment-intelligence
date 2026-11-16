@@ -50,7 +50,12 @@ from eii_custodian.publicdata.comtrade.state import (
     roll_budget,
     write_ledger,
 )
-from eii_custodian.publicdata.fetch.receipts import commit_pair, sha256_hex, sidecar_for
+from eii_custodian.publicdata.fetch.receipts import (
+    archive_auxiliary,
+    commit_pair,
+    sha256_hex,
+    sidecar_for,
+)
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 from eii_custodian.publicdata.fetch.transport import (
@@ -199,27 +204,42 @@ def _run(
         return _stopped(exc.check, policy)
     problem, _stored = _verified(directory, ledger, policy, entry)
     if problem is not None:
-        return _fail(policy, problem, ledger, directory, initial, api_class)
+        return _fail(
+            policy, problem, ledger, directory, initial, api_class, entry, clock
+        )
     index = {item.key(): item for item in closed_partitions(policy)}
     while ledger.pending:
         today = _day(clock())
         try:
             rolled = roll_budget(ledger, today, policy.reset_rule)
         except StateError as exc:
-            return _fail(policy, exc.check, ledger, directory, initial, api_class)
+            return _fail(
+                policy, exc.check, ledger, directory, initial, api_class, entry, clock
+            )
         if rolled is not ledger:
             ledger = rolled
             write_ledger(directory, ledger)
         key = ledger.pending[0]
         partition = index.get(key)
         if partition is None:
-            return _fail(policy, "stale_state", ledger, directory, initial, api_class)
+            return _fail(
+                policy,
+                "stale_state",
+                ledger,
+                directory,
+                initial,
+                api_class,
+                entry,
+                clock,
+            )
         slot = _slot(ledger, policy, api_class, requested_slot)
         if slot.startswith("fail:"):
             reason = slot.removeprefix("fail:")
             saved = note_incomplete(ledger, reason, _next_day(today))
             write_ledger(directory, saved)
-            _write_coverage(directory, policy, initial, saved)
+            _write_coverage(
+                directory, policy, initial, saved, entry=entry, retrieved=clock()
+            )
             return _result(policy, _refusal(policy, reason), initial, saved, api_class)
         header = ""
         if api_class != "public":
@@ -228,7 +248,9 @@ def _run(
                 reason = "primary_absent" if slot == "primary" else "budget_exhausted"
                 saved = note_incomplete(ledger, reason, _next_day(today))
                 write_ledger(directory, saved)
-                _write_coverage(directory, policy, initial, saved)
+                _write_coverage(
+                    directory, policy, initial, saved, entry=entry, retrieved=clock()
+                )
                 return _result(
                     policy, _refusal(policy, reason), initial, saved, api_class
                 )
@@ -238,7 +260,9 @@ def _run(
         outcome, ledger = _send(policy, descriptor, header, opener, ledger)
         if isinstance(outcome, SafeRefusal):
             write_ledger(directory, ledger)
-            _write_coverage(directory, policy, initial, ledger)
+            _write_coverage(
+                directory, policy, initial, ledger, entry=entry, retrieved=clock()
+            )
             return _result(policy, outcome, initial, ledger, api_class)
         if isinstance(outcome, _Split):
             for child in outcome.children:
@@ -263,35 +287,67 @@ def _run(
                 clock(),
             )
         except OSError:
-            return _fail(policy, "write_failed", ledger, directory, initial, api_class)
+            return _fail(
+                policy,
+                "write_failed",
+                ledger,
+                directory,
+                initial,
+                api_class,
+                entry,
+                clock,
+            )
         try:
             ledger = accept(ledger, key, receipt_sha)
         except StateError as exc:
-            return _fail(policy, exc.check, ledger, directory, initial, api_class)
+            return _fail(
+                policy, exc.check, ledger, directory, initial, api_class, entry, clock
+            )
         write_ledger(directory, ledger)
     problem, stored = _verified(directory, ledger, policy, entry)
     if problem is not None:
-        return _fail(policy, problem, ledger, directory, initial, api_class)
+        return _fail(
+            policy, problem, ledger, directory, initial, api_class, entry, clock
+        )
     total = sum(item.count for item in stored)
     if total < policy.count_bounds.minimum or total > policy.count_bounds.maximum:
-        return _fail(policy, "count_bounds", ledger, directory, initial, api_class)
+        return _fail(
+            policy, "count_bounds", ledger, directory, initial, api_class, entry, clock
+        )
     seen_periods = {period for item in stored for period in item.periods}
     if any(period not in seen_periods for period in policy.expected_last_periods):
-        return _fail(policy, "missing_period", ledger, directory, initial, api_class)
+        return _fail(
+            policy,
+            "missing_period",
+            ledger,
+            directory,
+            initial,
+            api_class,
+            entry,
+            clock,
+        )
     try:
         reject_duplicate_rows([row for item in stored for row in item.rows])
     except ParseError:
-        return _fail(policy, "duplicate_key", ledger, directory, initial, api_class)
+        return _fail(
+            policy, "duplicate_key", ledger, directory, initial, api_class, entry, clock
+        )
     missing = missing_cells(initial, ledger.pending, ledger.completed)
-    _write_coverage(directory, policy, initial, ledger, missing)
+    _write_coverage(
+        directory, policy, initial, ledger, missing, entry=entry, retrieved=clock()
+    )
     if missing:
         return _result(
             policy, _refusal(policy, "coverage_gap"), initial, ledger, api_class
         )
     try:
-        digest = _write_manifest(directory, policy, initial, ledger, missing)
+        digest = _write_manifest(
+            directory, policy, initial, ledger, missing, entry=entry, retrieved=clock()
+        )
     except OSError:
-        return _fail(policy, "write_failed", ledger, directory, initial, api_class)
+        return _fail(
+            policy, "write_failed", ledger, directory, initial, api_class, entry, clock
+        )
     return FetchResult(
         None,
         digest,
@@ -485,6 +541,9 @@ def _write_coverage(
     initial: tuple[Partition, ...],
     ledger: Ledger,
     missing: tuple[str, ...] | None = None,
+    *,
+    entry: Entry,
+    retrieved: str,
 ) -> None:
     absent = (
         missing
@@ -504,7 +563,17 @@ def _write_coverage(
         "requested_cells": len(initial),
         "source_id": SOURCE_ID,
     }
-    _atomic_text(directory / COVERAGE_NAME, json.dumps(payload, sort_keys=True) + "\n")
+    text = json.dumps(payload, sort_keys=True) + "\n"
+    archive_auxiliary(
+        entry,
+        directory,
+        "coverage",
+        text.encode(),
+        retrieved,
+        entry.url,
+        version=policy.version,
+    )
+    _atomic_text(directory / COVERAGE_NAME, text)
 
 
 def _write_manifest(
@@ -513,6 +582,9 @@ def _write_manifest(
     initial: tuple[Partition, ...],
     ledger: Ledger,
     missing: tuple[str, ...],
+    *,
+    entry: Entry,
+    retrieved: str,
 ) -> str:
     children = []
     for key, receipt_sha in sorted(ledger.child_sha256, key=lambda item: item[0]):
@@ -535,6 +607,25 @@ def _write_manifest(
         "source_id": SOURCE_ID,
     }
     text = json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n"
+    body = text.encode("utf-8")
+    commit_pair(
+        directory / "manifests",
+        sha256_hex(body),
+        "json",
+        body,
+        sidecar_for(
+            entry,
+            digest=sha256_hex(body),
+            nbytes=len(body),
+            fetch_url=entry.url,
+            fetch_host=entry.fetch_host,
+            retrieved_utc=retrieved,
+            publisher=entry.publisher,
+            source_modified=policy.version,
+            row_count=None,
+            terms_sha256="",
+        ),
+    )
     _atomic_text(directory / MANIFEST_NAME, text)
     return sha256_hex(text.encode("utf-8"))
 
@@ -586,9 +677,11 @@ def _fail(
     directory: Path,
     initial: tuple[Partition, ...],
     api_class: str,
+    entry: Entry,
+    clock: Clock,
 ) -> FetchResult:
     write_ledger(directory, ledger)
-    _write_coverage(directory, policy, initial, ledger)
+    _write_coverage(directory, policy, initial, ledger, entry=entry, retrieved=clock())
     return _result(policy, _refusal(policy, check), initial, ledger, api_class)
 
 

@@ -13,12 +13,12 @@ from typing import NoReturn
 
 from eii_custodian.publicdata.fetch.allowlist import host_of
 from eii_custodian.publicdata.fetch.bounded import (
-    publish_complete,
     read_metadata,
     stream_download,
 )
-from eii_custodian.publicdata.fetch.receipts import sidecar_for
+from eii_custodian.publicdata.fetch.receipts import archive_auxiliary, sidecar_for
 from eii_custodian.publicdata.fetch.registry import LICENCE_BASES, Entry
+from eii_custodian.publicdata.fetch.snapshots import SnapshotError, publish_file
 from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 from eii_custodian.publicdata.fetch.transport import StreamTransport, Transport
 
@@ -112,9 +112,19 @@ def _metadata(
     )
 
 
-def _publish(path: Path, destination: Path) -> None:
+def _publish(path: Path, destination: Path, receipt: dict[str, object]) -> None:
     """Content-addressed writes never remove or overwrite earlier complete bytes."""
-    publish_complete(path, destination, _refuse)
+    digest = file_hash(path)
+    try:
+        publish_file(
+            destination.parent,
+            destination.name.split(".", 1)[1],
+            path,
+            dict(receipt, sha256=digest, bytes=path.stat().st_size),
+            compatibility=True,
+        )
+    except SnapshotError:
+        _refuse("cache_integrity")
 
 
 def fetch_atlas(
@@ -137,13 +147,13 @@ def fetch_atlas(
         hashlib.sha256(page).hexdigest() == config.page_sha256,
         "metadata_changed_review_needed",
     )
+    terms_body = b""
     terms_hash = ""
     terms_unread = "terms_to_be_read"
     if entry.terms_url:
         try:
-            terms_hash = terms_text_sha256(
-                _metadata(entry.terms_url, metadata_transport, config, sleep)
-            )
+            terms_body = _metadata(entry.terms_url, metadata_transport, config, sleep)
+            terms_hash = terms_text_sha256(terms_body)
             terms_unread = ""
         except AtlasError as exc:
             if str(exc) != "network_exhausted":
@@ -218,6 +228,11 @@ def fetch_atlas(
                         if key
                         not in {"layer", "basis_note", "columns", "comtrade_policy"}
                     },
+                    "refetch": {
+                        key: value
+                        for key, value in asdict(entry.refetch).items()
+                        if key != "family" or value
+                    },
                     "columns": [
                         {"name": name, "type": kind} for name, kind in entry.columns
                     ],
@@ -236,15 +251,38 @@ def fetch_atlas(
             manifest_digest = file_hash(manifest_file)
             for grain in FINISHED:
                 item = archives[grain]
-                _publish(paths[grain], directory / f"{item['sha256']}.zip")
+                _publish(paths[grain], directory / f"{item['sha256']}.zip", receipt)
             outputs = parsed["outputs"]
             assert isinstance(outputs, dict)
             for table in TABLES:
                 item = outputs[table]
                 _publish(
-                    stage / f"{table}.jsonl", directory / f"{item['sha256']}.jsonl"
+                    stage / f"{table}.jsonl",
+                    directory / f"{item['sha256']}.jsonl",
+                    receipt,
                 )
-            _publish(manifest_file, directory / f"{manifest_digest}.manifest.json")
+            archive_auxiliary(
+                entry,
+                directory,
+                "metadata",
+                page,
+                retrieved,
+                config.page,
+                version=config.source_version,
+            )
+            if terms_body:
+                archive_auxiliary(
+                    entry,
+                    directory,
+                    "terms",
+                    terms_body,
+                    retrieved,
+                    entry.terms_url,
+                    version=config.source_version,
+                )
+            _publish(
+                manifest_file, directory / f"{manifest_digest}.manifest.json", receipt
+            )
             return Result(manifest_digest, host, terms_hash, terms_unread, retrieved)
     except (OSError, TypeError, AttributeError, RuntimeError, ValueError):
         raise AtlasError("write_or_stream_failed") from None

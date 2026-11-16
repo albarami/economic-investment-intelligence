@@ -12,6 +12,7 @@ from typing import Any
 import pytest
 
 from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.review.activity import (
     CODE_SYSTEM_VERSION,
     ActivityRow,
@@ -128,7 +129,13 @@ def test_unknown_feeds_are_named() -> None:
         "unknown activity feed invented_feed",
     )
     _refuses(
-        lambda: read_cached_classes(Path("invented-cache"), entry),
+        lambda: read_cached_classes(
+            Path("invented-cache"),
+            entry,
+            digest=reviewed_selections(Path("invented-cache")).get(
+                (entry).key, "0" * 64
+            ),
+        ),
         "unknown class feed invented_feed",
     )
 

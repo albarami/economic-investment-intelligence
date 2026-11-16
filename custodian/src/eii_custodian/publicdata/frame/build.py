@@ -4,14 +4,19 @@ Tests and real builds use build_frame and the same raw-source assembler.
 """
 
 import json
+from collections.abc import Mapping
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from eii_custodian.publicdata.fetch.receipts import cache_directory, sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.snapshots import (
+    SnapshotError,
+    read_snapshot,
+    reviewed_selections,
+)
 
 from .census import GEOGRAPHY
 from .checks import FrameError
@@ -30,13 +35,15 @@ class FrameResult:
     )
 
 
-def read_cached(cache: Path, entry: Entry) -> tuple[Any, dict[str, Any]]:
-    """Require one unambiguous, complete receipt and its exact content hash."""
-    directory = cache_directory(cache, entry.key)
-    receipts = sorted(directory.glob("*.meta.json"))
-    if len(receipts) != 1:
-        raise FrameError(f"{entry.source_id}: expected one cache receipt")
-    receipt = json.loads(receipts[0].read_text(encoding="utf-8"))
+def read_cached(
+    cache: Path, entry: Entry, *, digest: str
+) -> tuple[Any, dict[str, Any]]:
+    """Read a reviewed hash and verify its dated receipt and bytes."""
+    try:
+        selected = read_snapshot(cache / entry.key, digest)
+    except SnapshotError as exc:
+        raise FrameError(str(exc)) from None
+    receipt = selected.sidecar
     for key, expected in (
         ("source_id", entry.source_id),
         ("key", entry.key),
@@ -50,12 +57,7 @@ def read_cached(cache: Path, entry: Entry) -> tuple[Any, dict[str, Any]]:
             raise FrameError(f"{entry.source_id}: missing receipt {field}")
     if receipt.get("switched_off") is not False:
         raise FrameError(f"{entry.source_id}: source switched off")
-    digest = receipt["sha256"]
-    if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
-        raise FrameError(f"{entry.source_id}: malformed hash")
-    body = (directory / f"{digest}.{entry.extension}").read_bytes()
-    if sha256_hex(body) != digest:
-        raise FrameError(f"{entry.source_id}: content hash mismatch")
+    body = selected.body
     receipt["method"] = "frame.v1"
     if entry.extension == "zip":
         return body, receipt
@@ -79,7 +81,10 @@ def records(payload: Any, source: str) -> list[dict[str, Any]]:
 
 
 def inspect_cache(
-    cache: Path, registry: tuple[Entry, ...], review: Path
+    cache: Path,
+    registry: tuple[Entry, ...],
+    review: Path,
+    selections: Mapping[str, str],
 ) -> FrameResult:
     """Inspect confirmed cached exports; never substitute unconfirmed geometry.
 
@@ -117,7 +122,9 @@ def inspect_cache(
         if name not in CONFIRMED_SOURCES:
             report.append(f"{name}: cache_shape_unconfirmed; no mapping attempted")
             continue
-        payload, receipt = read_cached(cache, entry)
+        payload, receipt = read_cached(
+            cache, entry, digest=selections.get(entry.key, "")
+        )
         sources[name] = receipt
         inspected = inspect_source(
             name, payload, load_indicators(review) if name == "pop_muni" else None
@@ -135,7 +142,12 @@ def inspect_cache(
 
 
 def build_frame(
-    cache: Path, registry: tuple[Entry, ...], review: Path, output: Path | None = None
+    cache: Path,
+    registry: tuple[Entry, ...],
+    review: Path,
+    output: Path | None = None,
+    *,
+    selections: Mapping[str, str] | None = None,
 ) -> FrameResult:
     """Build from confirmed raw shapes, with optional generated review output."""
     from .live import build_live_frame
@@ -144,11 +156,12 @@ def build_frame(
         destination = output.resolve()
         if any(destination.is_relative_to(path.resolve()) for path in (cache, review)):
             raise FrameError("review output overlaps inputs")
-    result = inspect_cache(cache, registry, review)
+    selected = reviewed_selections(cache) if selections is None else selections
+    result = inspect_cache(cache, registry, review, selected)
     entries = {entry.source_id: entry for entry in registry}
     hdx = entries.get("bnd_hdx")
     if hdx is None or hdx.skip_reason:
         report = [line for line in result.report if "unlisted zone numbers" not in line]
         propose_reviews(review, output, set(), result.inventory, report)
         return FrameResult(result.tables, report, result.sources, result.inventory)
-    return build_live_frame(cache, registry, review, output, result)
+    return build_live_frame(cache, registry, review, output, result, selected)

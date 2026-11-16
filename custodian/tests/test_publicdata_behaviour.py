@@ -14,6 +14,7 @@ import pytest
 from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
+from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.kinds import (
     _terms_fingerprint,
     prepare,
@@ -68,6 +69,7 @@ def _sleep(_seconds: float) -> None:
 
 def _entry() -> Entry:
     return Entry(
+        refetch=Cadence("none", "frequency_unconfirmed", ""),
         key="planted",
         source_id="planted",
         slug="planted-slug",
@@ -124,7 +126,11 @@ def _portal_meta(
 
 
 def _sidecar(folder: Path) -> dict[str, object]:
-    found = list(folder.rglob("*.meta.json"))
+    found = [
+        p
+        for p in folder.glob("*/*/*.meta.json")
+        if len(p.parent.name) == 10 and p.parent.name[4] == "-"
+    ]
     if not found:
         found = [path for path in folder.rglob("citation.json")]
     assert len(found) == 1
@@ -630,7 +636,9 @@ def test_skipped_watched_row_hashes_terms_and_does_not_switch_off(
     stored = [
         path
         for path in tmp_path.rglob("*")
-        if path.is_file() and path.name != "build-log.json"
+        if path.is_file()
+        and path.name != "build-log.json"
+        and "terms" not in path.parts
     ]
     assert stored == []
     loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
@@ -690,7 +698,7 @@ def _watched_entry() -> Entry:
 def _stored_page(folder: Path, key: str) -> Path:
     found = [
         path
-        for path in (folder / key).rglob("*")
+        for path in (folder / key).glob("*")
         if path.is_file() and not path.name.endswith(".meta.json")
     ]
     assert len(found) == 1
@@ -770,7 +778,9 @@ def test_changed_terms_on_a_skipped_row_store_nothing(tmp_path: Path) -> None:
     stored = [
         path
         for path in tmp_path.rglob("*")
-        if path.is_file() and path.name != "build-log.json"
+        if path.is_file()
+        and path.name != "build-log.json"
+        and "terms" not in path.parts
     ]
     assert stored == []
     assert seen == [_FILE_TERMS, _FILE_TERMS]
@@ -1071,7 +1081,9 @@ def test_failed_check_records_the_reason_and_stores_nothing(tmp_path: Path) -> N
     stored = [
         path
         for path in tmp_path.rglob("*")
-        if path.is_file() and path.name != "build-log.json"
+        if path.is_file()
+        and path.name != "build-log.json"
+        and "terms" not in path.parts
     ]
     assert stored == []
 
@@ -1231,7 +1243,7 @@ def test_interrupted_write_leaves_no_partial_file(
     def boom(*_args: object, **_kwargs: object) -> None:
         raise OSError("planted")
 
-    monkeypatch.setattr(receipts.os, "replace", boom)
+    monkeypatch.setattr(receipts.os, "link", boom)
 
     def transport(url: str) -> Response:
         return _ok(url, b"invented-bytes")

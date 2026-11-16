@@ -6,6 +6,7 @@ from io import BytesIO
 from types import SimpleNamespace
 from zipfile import ZipFile, ZipInfo
 
+from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.transport import Response
 
@@ -54,6 +55,7 @@ def cpp_archive(members: dict[str, str] | None = None) -> bytes:
 def entry():
     return replace(
         load_registry()[0],
+        refetch=Cadence("none", "frequency_unconfirmed", ""),
         key="atlas_complexity",
         source_id="atlas_complexity",
         slug="",

@@ -22,6 +22,7 @@ from eii_custodian.publicdata.fetch.kinds import (
     read_terms_page,
 )
 from eii_custodian.publicdata.fetch.receipts import (
+    archive_auxiliary,
     cache_directory,
     commit_citation,
     commit_pair,
@@ -191,7 +192,7 @@ def _fetch_row(
         )
     try:
         prepared = prepare(entry, transport, sleep)
-    except OSError:
+    except (OSError, ValueError):
         return None, FetchFailure(
             1, entry.source_id, entry.url, "write_failed", "stored file", "write failed"
         )
@@ -228,7 +229,16 @@ def _fetch_row(
             prepared.body,
             sidecar,
         )
-    except OSError:
+        for response in prepared.auxiliary:
+            archive_auxiliary(
+                entry,
+                cache / entry.key,
+                "inputs",
+                response.body,
+                retrieved,
+                response.final_url,
+            )
+    except (OSError, ValueError):
         return None, FetchFailure(
             1,
             entry.source_id,
@@ -420,7 +430,7 @@ def run_build(
         if entry.skip_reason:
             if entry.terms_url:
                 _read_terms_apart(
-                    entry, transport, sleep, clock, lines, terms, previous
+                    entry, transport, sleep, clock, lines, terms, previous, cache
                 )
             lines.append(skip_line(entry.key, entry.skip_reason))
             continue
@@ -503,7 +513,9 @@ def run_build(
         if entry.kind == "terms_page":
             _note_fetched_terms(entry, fetched, lines, terms, previous)
         elif entry.terms_url:
-            _read_terms_apart(entry, transport, sleep, clock, lines, terms, previous)
+            _read_terms_apart(
+                entry, transport, sleep, clock, lines, terms, previous, cache
+            )
         batch = publish_investment(
             entry, cache, fetched.digest, transport, sleep, clock
         )
@@ -621,6 +633,7 @@ def _read_terms_apart(
     lines: list[str],
     terms: list[dict[str, object]],
     previous: dict[str, str],
+    cache: Path,
 ) -> None:
     """Read a terms page that the row's own fetch does not read."""
     if not approve(entry.terms_url).ok:
@@ -632,7 +645,11 @@ def _read_terms_apart(
     if read.failure is not None:
         lines.append(terms_unread_line(entry.key, read.failure.check, entry.terms_url))
         return
-    _record_terms(entry, read.sha256, clock(), previous, lines, terms)
+    retrieved = clock()
+    archive_auxiliary(
+        entry, cache / entry.key, "terms", read.body, retrieved, entry.terms_url
+    )
+    _record_terms(entry, read.sha256, retrieved, previous, lines, terms)
 
 
 def _record_terms(

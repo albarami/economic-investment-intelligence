@@ -9,6 +9,8 @@ from pathlib import Path
 
 import yaml
 
+from eii_custodian.publicdata.fetch.cadence import Cadence, parse_cadence
+
 LICENCE_BASES = frozenset(
     {"dataset", "portal_terms", "provider_terms", "owner_decision"}
 )
@@ -29,6 +31,7 @@ KINDS = frozenset(
 BANNED_SOURCE_IDS = frozenset({"traffic_tomtom_flow", "traffic_tomtom_range"})
 FIELDS = frozenset(
     {
+        "refetch",
         "key",
         "source_id",
         "slug",
@@ -67,6 +70,7 @@ FIELDS = frozenset(
 )
 REQUIRED = frozenset(
     {
+        "refetch",
         "key",
         "source_id",
         "slug",
@@ -113,6 +117,7 @@ class Entry:
     default, and absent on every other kind.
     """
 
+    refetch: Cadence
     key: str
     source_id: str
     slug: str
@@ -238,7 +243,12 @@ def _entry(row: object) -> Entry:
     folded_skip = skip_reason.casefold()
     if _SKIP_LICENCE in folded_skip or _SKIP_TERMS in folded_skip:
         raise RegistryError("skip_reason names a licence or terms")
+    try:
+        refetch = parse_cadence(row["refetch"], source_id=source_id)
+    except ValueError as exc:
+        raise RegistryError(str(exc)) from None
     return Entry(
+        refetch=refetch,
         key=_text(row, "key"),
         source_id=source_id,
         slug=_text(row, "slug"),

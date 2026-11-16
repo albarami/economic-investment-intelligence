@@ -687,3 +687,26 @@ inventories, source-specific refusal and inclusive-boundary plants, and fake
 opener acquisition limits for metadata and terms. The default transport test
 retains other sources' existing unbounded interface. No publisher response is
 used by these tests.
+
+## Public snapshot archive checks (S2-T27)
+
+`test_public_snapshots.py` uses invented temporary-cache bytes for immutable
+publication, retained history, equal-byte check events, older-hash selection,
+receipt/index/body tampering, dated metadata/terms and Comtrade coverage.
+`test_public_cadence.py` tests closed registry schedules, unconfirmed-frequency
+refusal, injected UTC clocks, calendar clamping and verified check events.
+Existing source-specific integrity, source-chain and boundary suites remain
+required. All automated checks are offline and keyless; publisher frequency
+confirmation and off-machine restore-and-hash evidence are the lead's live
+steps. The price dated-as-of criterion belongs to S2-T19 and S2-T08; no price
+producer or final release builder is represented as tested here.
+
+Round 2 adds `test_snapshot_refusals.py`: parametrized, exact-message plants
+isolate each snapshot and cadence refusal and the refusals added to existing
+readers and publishers. `test_exact_due_boundary` checks a second before and at
+the daily, weekly, monthly (common and leap February), quarterly and annual
+anniversaries. Family assignments and cadence mismatches are tested separately
+from publisher frequency. Activity and graph readers have separate history
+cases; Comtrade `state.json`, `state.lock` and `coverage.json` have separate
+classification cases. Temporary guard reversals are restored before final checks;
+the task return records observed red and green results, not inferred coverage.

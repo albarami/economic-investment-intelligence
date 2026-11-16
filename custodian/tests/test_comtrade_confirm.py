@@ -282,7 +282,9 @@ def _rewrite(folder: Path, field: str, value: object) -> str:
         child["receipt_sha256"] = receipt
     text = json.dumps(manifest, sort_keys=True, separators=(",", ":")) + "\n"
     manifest_path.write_text(text, encoding="utf-8")
-    return sha256_hex(text.encode("utf-8"))
+    from custodian.tests.snapshot_fixture import manifest as publish_manifest
+
+    return publish_manifest(folder, text.encode("utf-8"))
 
 
 def test_resume_refuses_a_tampered_count(tmp_path: Path) -> None:

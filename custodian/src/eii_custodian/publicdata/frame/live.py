@@ -2,6 +2,7 @@
 
 import csv
 import json
+from collections.abc import Mapping
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
@@ -38,6 +39,7 @@ def build_live_frame(
     review: Path,
     output: Path | None,
     result: FrameResult,
+    selections: Mapping[str, str],
 ) -> FrameResult:
     entries = {e.source_id: e for e in registry}
     tables, sources, inventory = result.tables, result.sources, result.inventory
@@ -50,7 +52,7 @@ def build_live_frame(
     for table in ("municipality", "zone", "district", "gazetteer"):
         if hdx.licence_basis == "none_stated" or table not in hdx.release_tables:
             raise FrameError(f"bnd_hdx: invalid release source for {table}")
-    body, receipt = read_cached(cache, hdx)
+    body, receipt = read_cached(cache, hdx, digest=selections.get(hdx.key, ""))
     sources["bnd_hdx"] = receipt
     frame = read_archive(body)
     raw_layers: dict[str, list[dict[str, Any]]] = {}
@@ -61,7 +63,9 @@ def build_live_frame(
                 report.append(f"{name}: unavailable; no census rows")
                 continue
             raise FrameError(f"{name}: required join source unavailable")
-        payload, receipt = read_cached(cache, entries[name])
+        payload, receipt = read_cached(
+            cache, entries[name], digest=selections.get(entries[name].key, "")
+        )
         sources[name] = receipt
         raw_layers[name] = layer_rows(name, payload)
     mapping, municipality_review = join_municipalities(
@@ -119,7 +123,11 @@ def build_live_frame(
     report = [line for line in report if "unlisted zone numbers" not in line]
     staged_population: list[dict[str, Any]] = []
     if "pop_muni" in sources:
-        payload, _ = read_cached(cache, entries["pop_muni"])
+        payload, _ = read_cached(
+            cache,
+            entries["pop_muni"],
+            digest=selections.get(entries["pop_muni"].key, ""),
+        )
         staged_population, population_reason = population_rows(
             payload,
             review,
@@ -184,7 +192,9 @@ def build_live_frame(
     zone_layers = {}
     for name in COUNTS:
         if name != "census_district_pop" and name in sources:
-            payload, _ = read_cached(cache, entries[name])
+            payload, _ = read_cached(
+                cache, entries[name], digest=selections.get(entries[name].key, "")
+            )
             zone_layers[name] = layer_rows(name, payload)
     staged_zones, ignored = zone_measures(zone_layers, entries)
     report.extend(ignored)
@@ -205,7 +215,11 @@ def build_live_frame(
         )
         report.extend(ignored)
     if "est_census" in sources:
-        payload, _ = read_cached(cache, entries["est_census"])
+        payload, _ = read_cached(
+            cache,
+            entries["est_census"],
+            digest=selections.get(entries["est_census"].key, ""),
+        )
         tables["pub_census_national"], ignored = census_rows(
             entries["est_census"],
             inspect_source("est_census", payload).rows,

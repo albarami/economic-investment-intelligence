@@ -8,6 +8,7 @@ from pathlib import Path
 from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.fetch.build import run_build
+from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response
@@ -348,6 +349,7 @@ def _entry(size: int, url: str = "") -> Entry:
         "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/invented.parquet"
     )
     return Entry(
+        refetch=Cadence("none", "frequency_unconfirmed", ""),
         key="places_ovt/part-00014",
         source_id="places_ovt",
         slug="",

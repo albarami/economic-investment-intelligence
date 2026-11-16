@@ -10,6 +10,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.review.activity import (
     CODE_SYSTEM_VERSION,
     ActivityInputs,
@@ -106,10 +107,12 @@ def load_context(
     for path in cache.rglob("*"):
         contained(root, path)
     contained(root, binding_path(review))
+    selected = reviewed_selections(cache)
     inputs = load_activity_inputs(
         cache,
         codes(payload["playbook_codes"]),
         review_path=review,
+        selections=selected,
         supplier_membership=SupplierMembership(codes(payload["supplier_codes"]), True),
     )
     supplied = read_review_csv(queue)
@@ -130,7 +133,7 @@ def load_context(
     receipts = []
     for entry in load_registry():
         if entry.key in ("lic_active", "lic_cancelled", "cls_isic4"):
-            body = read_cached(cache, entry)
+            body = read_cached(cache, entry, digest=selected[entry.key])
             side = body.path.with_name(body.path.stem + ".meta.json")
             hashes[entry.key + "_receipt"] = file_hash(side)
             receipts.append(

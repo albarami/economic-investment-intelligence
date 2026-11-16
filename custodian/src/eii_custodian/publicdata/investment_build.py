@@ -14,8 +14,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.kinds import read_bounded
-from eii_custodian.publicdata.fetch.receipts import sha256_hex
+from eii_custodian.publicdata.fetch.receipts import commit_pair, sha256_hex, sidecar_for
 from eii_custodian.publicdata.fetch.registry import Entry, RegistryError, read_yaml
+from eii_custodian.publicdata.fetch.snapshots import SnapshotError
 from eii_custodian.publicdata.fetch.transport import Transport
 from eii_custodian.publicdata.investment_contracts import (
     AGENCY_KINDS,
@@ -452,28 +453,25 @@ def _fetch_page(
         return InvestmentFailure(code, entry.source_id, url, check, expected, observed)
     page_digest = sha256_hex(response.body)
     directory = cache / entry.key
-    body_path = directory / f"{page_digest}.{entry.extension}"
-    if not body_path.is_file():
-        _atomic_bytes(body_path, response.body)
-    side = directory / f"{page_digest}.meta.json"
     retrieved = clock()
-    if not side.is_file():
-        _atomic_json(
-            side,
-            {
-                "source_id": entry.source_id,
-                "fetch_url": url,
-                "sha256": page_digest,
-                "retrieved_utc": retrieved,
-                "terms_sha256": terms,
-            },
+    side = sidecar_for(
+        entry,
+        digest=page_digest,
+        nbytes=len(response.body),
+        fetch_url=url,
+        fetch_host=entry.fetch_host,
+        retrieved_utc=retrieved,
+        publisher=entry.publisher,
+        source_modified="",
+        row_count=None,
+        terms_sha256=terms,
+    )
+    try:
+        commit_pair(directory, page_digest, entry.extension, response.body, side)
+    except SnapshotError:
+        return InvestmentFailure(
+            1, entry.source_id, url, "snapshot_invalid", "verified snapshot", "invalid"
         )
-    else:
-        existing = _read_json(side)
-        if isinstance(existing, dict) and isinstance(
-            existing.get("retrieved_utc"), str
-        ):
-            retrieved = existing["retrieved_utc"]
     return page_digest, retrieved, response.body
 
 

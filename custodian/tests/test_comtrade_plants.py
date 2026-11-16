@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import email.message
-import hashlib
 import io
 import json
 import urllib.error
@@ -389,12 +388,14 @@ def test_assembly_identity_plants(tmp_path: Path) -> None:
             manifest_sha256="cd" * 32,
             **trusted_source(),
         )
-    assert hashed.value.check == "manifest_hash"
+    assert hashed.value.check == "manifest_missing"
     original = manifest.read_text(encoding="utf-8")
     loaded = json.loads(original)
     loaded["present_cells"] = True
     manifest.write_text(json.dumps(loaded) + "\n", encoding="utf-8")
-    digest = hashlib.sha256(manifest.read_bytes()).hexdigest()
+    from custodian.tests.snapshot_fixture import manifest as publish_manifest
+
+    digest = publish_manifest(folder, manifest.read_bytes())
     with pytest.raises(SafeRefusal) as counted:
         assemble(
             tmp_path,
@@ -407,7 +408,7 @@ def test_assembly_identity_plants(tmp_path: Path) -> None:
     restored = json.loads(original)
     restored["requested_cells"] = 0
     manifest.write_text(json.dumps(restored) + "\n", encoding="utf-8")
-    gap_digest = hashlib.sha256(manifest.read_bytes()).hexdigest()
+    gap_digest = publish_manifest(folder, manifest.read_bytes())
     with pytest.raises(SafeRefusal) as gap:
         assemble(
             tmp_path,
@@ -473,6 +474,7 @@ def test_dispatcher_refuses_an_uninjected_transport(tmp_path: Path) -> None:
 
 def _registry_row(kind: str) -> dict[str, object]:
     return {
+        "refetch": {"value": "none", "reason": "frequency_unconfirmed"},
         "key": "planted",
         "source_id": "planted",
         "slug": "",

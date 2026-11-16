@@ -314,7 +314,9 @@ def test_success_receipt(tmp_path: Path, extension: str) -> None:
         "caveat_keys": [],
         "switched_off": False,
     }
-    assert len(list(directory.iterdir())) == 2
+    assert len(list(directory.iterdir())) == 5
+    assert (directory / "index").is_dir()
+    assert (directory / "checks").is_dir()
 
 
 @pytest.mark.parametrize(

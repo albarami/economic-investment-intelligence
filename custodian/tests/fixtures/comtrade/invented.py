@@ -7,6 +7,7 @@ from hashlib import sha256
 from urllib.parse import parse_qsl, urlsplit
 
 from eii_custodian.publicdata.comtrade.policy import Policy, parse_policy, period_ends
+from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 from eii_custodian.publicdata.fetch.transport import AttemptResult, PreparedRequest
@@ -135,6 +136,7 @@ def invented_entry(policy: Policy | None = None) -> Entry:
     chosen = policy if policy is not None else invented_policy()
     first, last = period_ends(chosen.periods)
     return Entry(
+        refetch=Cadence("none", "frequency_unconfirmed", ""),
         key="un_comtrade",
         source_id="un_comtrade",
         slug="",

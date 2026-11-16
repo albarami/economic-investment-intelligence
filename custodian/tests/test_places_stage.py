@@ -494,14 +494,9 @@ def _buildings(tmp: Path) -> None:
 
 def _areas(tmp: Path) -> None:
     cache = tmp / "cache"
-    body = b"SYN-ROAD"
-    digest = sha256_hex(body)
-    road = cache / "roads_osm"
-    road.mkdir(parents=True)
-    (road / f"{digest}.pbf").write_bytes(body)
-    (road / f"{digest}.meta.json").write_text(
-        json.dumps({"sha256": digest}), encoding="utf-8"
-    )
+    from custodian.tests.snapshot_fixture import road
+
+    road(cache, b"SYN-ROAD")
     from eii_custodian.publicdata.places.read import read_building_file
 
     building = next(iter(read_building_file(tmp / "buildings.parquet")))
@@ -700,6 +695,9 @@ def _store(cache: Path, source_entry: object, body: bytes) -> None:
         terms_sha256="",
     )
     commit_pair(cache / source_entry.key, digest, source_entry.extension, body, receipt)
+    from eii_custodian.publicdata.review.cache_fixture import select_fixture
+
+    select_fixture(cache, source_entry.key, digest)
 
 
 def _ring() -> tuple[tuple[float, float], ...]:

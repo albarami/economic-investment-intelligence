@@ -73,7 +73,7 @@ def assemble(
 ) -> Assembly:
     """Assemble cached children. A missing receipt or a bad child hash is refused."""
     directory = cache / key
-    path = directory / MANIFEST_NAME
+    path = directory / "manifests" / f"{manifest_sha256}.json"
     if not path.is_file():
         raise SafeRefusal("manifest_missing", _bare(policy), "assemble")
     raw = path.read_bytes()

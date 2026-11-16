@@ -350,12 +350,18 @@ def test_baci_dispatch_isolated(tmp_path):
     assert [line for line in alone.lines if "invented_other" in line] == [
         line for line in joined.lines if "invented_other" in line
     ]
-    files = sorted((tmp_path / "alone/invented_other").iterdir())
+    files = sorted(
+        p for p in (tmp_path / "alone/invented_other").rglob("*") if p.is_file()
+    )
     assert files
     for path in files:
         assert (
             path.read_bytes()
-            == (tmp_path / "joined/invented_other" / path.name).read_bytes()
+            == (
+                tmp_path
+                / "joined/invented_other"
+                / path.relative_to(tmp_path / "alone/invented_other")
+            ).read_bytes()
         )
 
 

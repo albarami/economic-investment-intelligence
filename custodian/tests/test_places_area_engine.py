@@ -57,12 +57,9 @@ def test_pinned_engine_writes_one_polygon_from_the_invented_road(
     engine = PinnedEngine()
     assert engine.version == "3.9.1"
     assert engine.version == ENGINE_PIN
-    directory = tmp_path / "roads_osm"
-    directory.mkdir()
-    (directory / f"{_ROAD_SHA}.pbf").write_bytes(road)
-    (directory / f"{_ROAD_SHA}.meta.json").write_text(
-        json.dumps({"sha256": _ROAD_SHA}), encoding="utf-8"
-    )
+    from custodian.tests.snapshot_fixture import road as publish_road
+
+    assert publish_road(tmp_path, road) == _ROAD_SHA
     walk = AreaRequest(
         "SYN-POINT", "51.410000", "25.209000", AreaMode.WALK, AreaCutoff.MINUTES_5
     )

@@ -22,21 +22,12 @@ def commit_pair(
     body: bytes,
     sidecar: dict[str, object],
 ) -> None:
-    """Write the body and its sidecar, or leave the directory without either."""
-    directory.mkdir(parents=True, exist_ok=True)
-    body_final = directory / f"{digest}.{extension}"
-    side_final = directory / f"{digest}.meta.json"
-    body_partial = directory / f".{digest}.{extension}.partial"
-    side_partial = directory / f".{digest}.meta.json.partial"
-    try:
-        body_partial.write_bytes(body)
-        side_partial.write_text(_dump(sidecar), encoding="utf-8")
-        os.replace(body_partial, body_final)
-        os.replace(side_partial, side_final)
-    except OSError:
-        for path in (body_partial, side_partial, body_final, side_final):
-            path.unlink(missing_ok=True)
-        raise
+    """Publish an immutable dated pair and record an equal-byte recheck."""
+    from eii_custodian.publicdata.fetch.snapshots import publish_snapshot
+
+    publish_snapshot(
+        directory, extension, body, sidecar, identity=digest, compatibility=True
+    )
 
 
 def commit_citation(directory: Path, sidecar: dict[str, object]) -> None:
@@ -113,3 +104,32 @@ def cache_directory(cache: Path, key: str) -> Path:
 
 def _dump(sidecar: dict[str, object]) -> str:
     return json.dumps(sidecar, sort_keys=True, ensure_ascii=True) + "\n"
+
+
+def archive_auxiliary(
+    entry: Entry,
+    directory: Path,
+    role: str,
+    body: bytes,
+    retrieved: str,
+    url: str,
+    *,
+    version: str = "",
+) -> None:
+    """Retain fetched metadata or terms with their own byte hash and URL."""
+    from eii_custodian.publicdata.fetch.allowlist import host_of
+    from eii_custodian.publicdata.fetch.snapshots import publish_snapshot
+
+    side = sidecar_for(
+        entry,
+        digest=sha256_hex(body),
+        nbytes=len(body),
+        fetch_url=url,
+        fetch_host=host_of(url),
+        retrieved_utc=retrieved,
+        publisher=entry.publisher,
+        source_modified=version,
+        row_count=None,
+        terms_sha256="",
+    )
+    publish_snapshot(directory / role, "html", body, side)

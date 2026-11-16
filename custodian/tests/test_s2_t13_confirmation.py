@@ -14,6 +14,7 @@ from eii_custodian.publicdata.confirm_s2_t13 import (
     load_confirmation,
     tender_disposition,
 )
+from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.receipts import sidecar_for
 from eii_custodian.publicdata.fetch.registry import Entry
 
@@ -23,6 +24,7 @@ RECORD = (
 
 
 REGISTRY_FIXTURE_BASE = Entry(
+    refetch=Cadence("none", "frequency_unconfirmed", ""),
     key="tenders_pub",
     source_id="tenders_pub",
     slug="",

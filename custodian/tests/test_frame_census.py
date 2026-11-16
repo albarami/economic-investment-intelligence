@@ -9,8 +9,10 @@ import pytest
 from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.frame.census import census_rows, validate_tables
 from eii_custodian.publicdata.frame.checks import FrameError
+from eii_custodian.publicdata.review.cache_fixture import select_fixture
 
 REVIEW = repository_root(Path(__file__)) / "custodian/publicdata/review"
 
@@ -130,6 +132,7 @@ def cache_fixture(tmp_path, source, payload):
         terms_sha256="",
     )
     commit_pair(tmp_path / source.key, digest, source.extension, body, metadata)
+    select_fixture(tmp_path, str(metadata["key"]), digest)
     return tmp_path / source.key / f"{digest}.{source.extension}"
 
 
@@ -165,13 +168,21 @@ def test_cache_hash_and_receipt_are_checked(tmp_path):
 
     source = entry("pop_muni")
     path = cache_fixture(tmp_path, source, [])
-    rows, receipt = read_cached(tmp_path, source)
+    rows, receipt = read_cached(
+        tmp_path,
+        source,
+        digest=reviewed_selections(tmp_path).get((source).key, "0" * 64),
+    )
     assert rows == []
     assert receipt["publisher"] == "Invented test publisher"
     assert receipt["retrieved_utc"] == "2026-11-14T00:00:00Z"
     path.write_text("tampered")
     with pytest.raises(FrameError, match="hash"):
-        read_cached(tmp_path, source)
+        read_cached(
+            tmp_path,
+            source,
+            digest=reviewed_selections(tmp_path).get((source).key, "0" * 64),
+        )
 
 
 def test_population_column_on_geometry_and_substitution_fail():
@@ -197,8 +208,12 @@ def test_cache_missing_provenance_fails(tmp_path, field):
     receipt = json.loads(path.read_text())
     del receipt[field]
     path.write_text(json.dumps(receipt))
-    with pytest.raises(FrameError, match="missing receipt"):
-        read_cached(tmp_path, source)
+    with pytest.raises(FrameError, match="snapshot_hash_mismatch"):
+        read_cached(
+            tmp_path,
+            source,
+            digest=reviewed_selections(tmp_path).get((source).key, "0" * 64),
+        )
 
 
 @pytest.mark.parametrize("field", ["source_id", "key", "licence_id", "licence_basis"])
@@ -214,7 +229,11 @@ def test_cache_mismatched_receipt_fails(tmp_path, field):
     receipt[field] = "SYN-WRONG"
     path.write_text(json.dumps(receipt))
     with pytest.raises(FrameError, match="mismatch"):
-        read_cached(tmp_path, source)
+        read_cached(
+            tmp_path,
+            source,
+            digest=reviewed_selections(tmp_path).get((source).key, "0" * 64),
+        )
 
 
 def test_cache_missing_ambiguous_and_switched_off_fail(tmp_path):
@@ -223,19 +242,31 @@ def test_cache_missing_ambiguous_and_switched_off_fail(tmp_path):
     from eii_custodian.publicdata.frame.build import read_cached
 
     source = entry("pop_muni")
-    with pytest.raises(FrameError, match="one cache receipt"):
-        read_cached(tmp_path, source)
+    with pytest.raises(FrameError, match="snapshot_"):
+        read_cached(
+            tmp_path,
+            source,
+            digest=reviewed_selections(tmp_path).get((source).key, "0" * 64),
+        )
     cache_fixture(tmp_path, source, [])
     path = next((tmp_path / source.key).glob("*.meta.json"))
     receipt = json.loads(path.read_text())
     receipt["switched_off"] = True
     path.write_text(json.dumps(receipt))
-    with pytest.raises(FrameError, match="switched off"):
-        read_cached(tmp_path, source)
+    with pytest.raises(FrameError, match="snapshot_hash_mismatch"):
+        read_cached(
+            tmp_path,
+            source,
+            digest=reviewed_selections(tmp_path).get((source).key, "0" * 64),
+        )
     extra = path.with_name("duplicate.meta.json")
     extra.write_text(path.read_text())
-    with pytest.raises(FrameError, match="one cache receipt"):
-        read_cached(tmp_path, source)
+    with pytest.raises(FrameError, match="snapshot_"):
+        read_cached(
+            tmp_path,
+            source,
+            digest=reviewed_selections(tmp_path).get((source).key, "0" * 64),
+        )
 
 
 @pytest.mark.parametrize("digest", ["a" * 63, "z" * 64])
@@ -250,8 +281,12 @@ def test_cache_malformed_hash_fails(tmp_path, digest):
     receipt = json.loads(path.read_text())
     receipt["sha256"] = digest
     path.write_text(json.dumps(receipt))
-    with pytest.raises(FrameError, match="malformed hash"):
-        read_cached(tmp_path, source)
+    with pytest.raises(FrameError, match="snapshot_hash_mismatch"):
+        read_cached(
+            tmp_path,
+            source,
+            digest=reviewed_selections(tmp_path).get((source).key, "0" * 64),
+        )
 
 
 def test_record_envelopes_and_unsupported_shapes():
@@ -420,7 +455,12 @@ def test_cache_preserves_published_decimal_digits(tmp_path):
         terms_sha256="",
     )
     commit_pair(tmp_path / source.key, digest, source.extension, body, metadata)
-    rows, _ = read_cached(tmp_path, source)
+    select_fixture(tmp_path, str(metadata["key"]), digest)
+    rows, _ = read_cached(
+        tmp_path,
+        source,
+        digest=reviewed_selections(tmp_path).get((source).key, "0" * 64),
+    )
     assert rows[0]["value"] == Decimal("0.1234567890123456789")
 
 
@@ -696,7 +736,7 @@ def test_layer_envelope_field_changes_refuse(source):
 def test_unfetched_boundary_shape_never_accepts_guessed_fields(tmp_path):
     from eii_custodian.publicdata.frame.build import build_frame
 
-    with pytest.raises(FrameError, match="bnd_hdx: expected one cache receipt"):
+    with pytest.raises(FrameError, match="snapshot_path_invalid"):
         build_frame(
             tmp_path,
             (entry("bnd_hdx"), entry("bnd_muni_2025")),
@@ -914,10 +954,22 @@ def test_cached_zip_is_verified_before_parsing(tmp_path):
         terms_sha256="",
     )
     commit_pair(tmp_path / source.key, digest, source.extension, body, receipt)
-    assert read_cached(tmp_path, source)[0] == body
+    select_fixture(tmp_path, str(receipt["key"]), digest)
+    assert (
+        read_cached(
+            tmp_path,
+            source,
+            digest=reviewed_selections(tmp_path).get((source).key, "0" * 64),
+        )[0]
+        == body
+    )
     (tmp_path / source.key / f"{digest}.{source.extension}").write_bytes(b"tampered")
-    with pytest.raises(FrameError, match="content hash mismatch"):
-        read_cached(tmp_path, source)
+    with pytest.raises(FrameError, match="snapshot_hash_mismatch"):
+        read_cached(
+            tmp_path,
+            source,
+            digest=reviewed_selections(tmp_path).get((source).key, "0" * 64),
+        )
 
 
 @pytest.mark.parametrize(
@@ -1032,6 +1084,7 @@ def test_raw_build_uses_licensed_geometry_and_writes_derived_review(
             terms_sha256="",
         )
         commit_pair(cache_dir / source.key, digest, source.extension, body, receipt)
+        select_fixture(cache_dir, str(receipt["key"]), digest)
     before = {
         p: p.read_bytes()
         for root in (cache_dir, review)
@@ -1157,7 +1210,9 @@ def test_raw_archive_release_admission_for_each_table(tmp_path, table):
         source, release_tables=tuple(t for t in source.release_tables if t != table)
     )
     with pytest.raises(FrameError, match=f"invalid release source for {table}"):
-        build_live_frame(tmp_path, (source,), tmp_path, None, FrameResult({}, [], {}))
+        build_live_frame(
+            tmp_path, (source,), tmp_path, None, FrameResult({}, [], {}), {}
+        )
 
 
 def test_all_raw_geometry_columns_have_licensed_lineage():
@@ -1194,7 +1249,7 @@ def test_confirmed_portal_licences_do_not_hide_missing_adapters(tmp_path):
 
     names = {"zone_population", "census_hh_type_2020"}
     entries = tuple(e for e in load_registry() if e.source_id in names)
-    result = inspect_cache(tmp_path, entries, REVIEW)
+    result = inspect_cache(tmp_path, entries, REVIEW, reviewed_selections(tmp_path))
     for name in names:
         assert f"{name}: cache_fields_unconfirmed; adapter_unavailable" in result.report
     assert all(not rows for rows in result.tables.values())
@@ -1279,6 +1334,7 @@ def measure_build(tmp_path):
                 terms_sha256="",
             )
             commit_pair(cache_dir / source.key, digest, source.extension, body, receipt)
+            select_fixture(cache_dir, str(receipt["key"]), digest)
         return build_frame(cache_dir, entries, review)
 
     return run
