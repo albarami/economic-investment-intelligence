@@ -2447,3 +2447,193 @@ reason = "float() reads the names inf and -inf without regard to letter case, so
 module = "product/src/eii_product/assistant/catalogue/brief.py"
 mutation = "--- src/eii_product/assistant/catalogue/brief.py\n+++ src/eii_product/assistant/catalogue/brief.py\n@@ -2,5 +2,5 @@\n     if type(value) not in {int, float}:\n         return False\n     if isinstance(value, float):\n-        return value == value and value not in {float(\"inf\"), float(\"-inf\")}\n+        return value == value and value not in {float(\"inf\"), float(\"-INF\")}\n     return True"
 reason = "float() reads the names inf and -inf without regard to letter case, so float(\"INF\") and float(\"-INF\") equal float(\"inf\") and float(\"-inf\"); the set holds the same two members and the membership test is the same for every value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/benchmarks/parse.py"
+mutation = "--- src/eii_custodian/publicdata/benchmarks/parse.py\n+++ src/eii_custodian/publicdata/benchmarks/parse.py\n@@ -1,5 +1,5 @@\n def _decode(body: bytes, policy: Policy) -> list[dict[str, Any]]:\n-    text = body.decode(\"utf-8\")\n+    text = body.decode(\"UTF-8\")\n     if policy.format == \"json\":\n         raw = json.loads(text)\n     else:"
+reason = "Python's codec lookup normalises \"UTF-8\" and \"utf-8\" to the same utf_8 codec, for valid and invalid bytes alike."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/benchmarks/parse.py"
+mutation = "--- src/eii_custodian/publicdata/benchmarks/parse.py\n+++ src/eii_custodian/publicdata/benchmarks/parse.py\n@@ -12,4 +12,4 @@\n             )\n         raw = list(reader)\n     require(isinstance(raw, list), \"row_schema\")\n-    return cast(list[dict[str, Any]], raw)\n+    return cast(None, raw)"
+reason = "typing.cast returns its second argument unchanged; its type argument has no run-time effect."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/benchmarks/parse.py"
+mutation = "--- src/eii_custodian/publicdata/benchmarks/parse.py\n+++ src/eii_custodian/publicdata/benchmarks/parse.py\n@@ -19,7 +19,7 @@\n                         within(info.file_size, (low_bytes, high_bytes)), \"member_bytes\"\n                     )\n                     with archive.open(info) as member:\n-                        content = member.read(high_bytes + 1)\n+                        content = member.read(None)\n                     require(\n                         within(len(content), (low_bytes, high_bytes)), \"member_bytes\"\n                     )"
+reason = "The preceding check bounds the member's declared file_size by high_bytes, and ZipExtFile never returns more than the declared size, so reading high_bytes + 1, high_bytes + 2 or everything reads the same bytes to the end of the member with the same CRC check, and the length check that follows is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/benchmarks/parse.py"
+mutation = "--- src/eii_custodian/publicdata/benchmarks/parse.py\n+++ src/eii_custodian/publicdata/benchmarks/parse.py\n@@ -19,7 +19,7 @@\n                         within(info.file_size, (low_bytes, high_bytes)), \"member_bytes\"\n                     )\n                     with archive.open(info) as member:\n-                        content = member.read(high_bytes + 1)\n+                        content = member.read(high_bytes + 2)\n                     require(\n                         within(len(content), (low_bytes, high_bytes)), \"member_bytes\"\n                     )"
+reason = "The preceding check bounds the member's declared file_size by high_bytes, and ZipExtFile never returns more than the declared size, so reading high_bytes + 1, high_bytes + 2 or everything reads the same bytes to the end of the member with the same CRC check, and the length check that follows is unchanged."
+
+[[survivors]]
+module = "core/src/eii_core/calc/trade_reconciliation.py"
+mutation = "--- src/eii_core/calc/trade_reconciliation.py\n+++ src/eii_core/calc/trade_reconciliation.py\n@@ -14,6 +14,6 @@\n         mismatches.append(\"source_missing\")\n     if mismatches:\n         return Comparison(left, right, None, tuple(mismatches))\n-    assert left.value is not None and right.value is not None\n+    assert left.value is not None or right.value is not None\n     gap = exact(subtract(_number(right.value), _number(left.value)))\n     return Comparison(left, right, _text(gap), ())"
+reason = "The assertion is reached only after a missing value on either side has returned through mismatches, so both values are present and the conjunction and the disjunction are both true."
+
+[[survivors]]
+module = "core/src/eii_core/calc/trade_reconciliation.py"
+mutation = "--- src/eii_core/calc/trade_reconciliation.py\n+++ src/eii_core/calc/trade_reconciliation.py\n@@ -25,8 +25,7 @@\n         if row.value is None or not row.lineage or row.figure_kind != \"published\":\n             raise ValueError(\"annual_coverage\")\n     total = sum(\n-        (_number(row.value) for row in rows if row.value is not None), Fraction()\n-    )\n+        (_number(row.value) for row in rows if row.value is not None), )\n     return replace(\n         first,\n         input_id=output_id,"
+reason = "annual_trade_sum refuses unless all twelve rows carry a value, so the sum always adds twelve Fractions; starting from int 0 or Fraction 0 yields the same exact Fraction."
+
+[[survivors]]
+module = "core/src/eii_core/calc/trade_reconciliation.py"
+mutation = "--- src/eii_core/calc/trade_reconciliation.py\n+++ src/eii_core/calc/trade_reconciliation.py\n@@ -13,7 +13,7 @@\n         groups.setdefault(key, []).append(row)\n     aggregates = []\n     for group in groups.values():\n-        if any(r.periods == (str(r.year),) for r in group):\n+        if any(r.periods == (str(None),) for r in group):\n             continue\n         ordered = tuple(sorted(group, key=lambda r: r.periods))\n         try:"
+reason = "Any group holding an annual row cannot pass annual_trade_sum's calendar-month coverage, which raises the ValueError that comparison_figures catches; skipping such a group or attempting and failing it leaves exactly the same rows."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -122,7 +122,7 @@\n                     o[\"price_amount\"],\n                     total_digits=12,\n                     fractional_digits=4,\n-                    signed=False,\n+                    signed=None,\n                 )\n             except DecimalRefusal:\n                 raise ValueError(\"price_evidence\") from None"
+reason = "exact_decimal uses signed only as a truth value, so False and None choose the same pattern, the same slicing and the same refusals."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -15,7 +15,7 @@\n                 cache, item.source_id, item.selected_hash\n             )\n             source_version = str(receipt.get(\"source_modified\") or \"unknown\")\n-            receipt_hash = str(receipt.get(\"sha256\", \"\"))\n+            receipt_hash = str(receipt.get(\"sha256\", None))\n             table = \"pub_customs_import\"\n         elif item.source_id == \"cepii_baci\":\n             baci = read_baci(cache, item.selected_hash)"
+reason = "selected_source refuses unless the receipt's sha256 equals the selected digest, so the key is always present and the missing-key default is never used."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -15,7 +15,7 @@\n                 cache, item.source_id, item.selected_hash\n             )\n             source_version = str(receipt.get(\"source_modified\") or \"unknown\")\n-            receipt_hash = str(receipt.get(\"sha256\", \"\"))\n+            receipt_hash = str(receipt.get(\"sha256\", ))\n             table = \"pub_customs_import\"\n         elif item.source_id == \"cepii_baci\":\n             baci = read_baci(cache, item.selected_hash)"
+reason = "selected_source refuses unless the receipt's sha256 equals the selected digest, so the key is always present and the missing-key default is never used."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -15,7 +15,7 @@\n                 cache, item.source_id, item.selected_hash\n             )\n             source_version = str(receipt.get(\"source_modified\") or \"unknown\")\n-            receipt_hash = str(receipt.get(\"sha256\", \"\"))\n+            receipt_hash = str(receipt.get(\"sha256\", \"XXXX\"))\n             table = \"pub_customs_import\"\n         elif item.source_id == \"cepii_baci\":\n             baci = read_baci(cache, item.selected_hash)"
+reason = "selected_source refuses unless the receipt's sha256 equals the selected digest, so the key is always present and the missing-key default is never used."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -20,7 +20,7 @@\n         elif item.source_id == \"cepii_baci\":\n             baci = read_baci(cache, item.selected_hash)\n             native_rows = [asdict(r) for r in baci.trade]\n-            source_version = str(baci.source_registry.get(\"source_version\", \"unknown\"))\n+            source_version = None\n             receipt_hash = item.selected_hash\n             table = \"pub_baci_trade\"\n         else:"
+reason = "BACI Trade rows always carry source_version and asdict keeps it, so native.get('source_version', ...) never falls back to this value; an empty trade list never uses it at all."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -20,7 +20,7 @@\n         elif item.source_id == \"cepii_baci\":\n             baci = read_baci(cache, item.selected_hash)\n             native_rows = [asdict(r) for r in baci.trade]\n-            source_version = str(baci.source_registry.get(\"source_version\", \"unknown\"))\n+            source_version = str(None)\n             receipt_hash = item.selected_hash\n             table = \"pub_baci_trade\"\n         else:"
+reason = "BACI Trade rows always carry source_version and asdict keeps it, so native.get('source_version', ...) never falls back to this value; an empty trade list never uses it at all."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -20,7 +20,7 @@\n         elif item.source_id == \"cepii_baci\":\n             baci = read_baci(cache, item.selected_hash)\n             native_rows = [asdict(r) for r in baci.trade]\n-            source_version = str(baci.source_registry.get(\"source_version\", \"unknown\"))\n+            source_version = str(baci.source_registry.get(None, \"unknown\"))\n             receipt_hash = item.selected_hash\n             table = \"pub_baci_trade\"\n         else:"
+reason = "BACI Trade rows always carry source_version and asdict keeps it, so native.get('source_version', ...) never falls back to this value; an empty trade list never uses it at all."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -20,7 +20,7 @@\n         elif item.source_id == \"cepii_baci\":\n             baci = read_baci(cache, item.selected_hash)\n             native_rows = [asdict(r) for r in baci.trade]\n-            source_version = str(baci.source_registry.get(\"source_version\", \"unknown\"))\n+            source_version = str(baci.source_registry.get(\"source_version\", None))\n             receipt_hash = item.selected_hash\n             table = \"pub_baci_trade\"\n         else:"
+reason = "BACI Trade rows always carry source_version and asdict keeps it, so native.get('source_version', ...) never falls back to this value; an empty trade list never uses it at all."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -20,7 +20,7 @@\n         elif item.source_id == \"cepii_baci\":\n             baci = read_baci(cache, item.selected_hash)\n             native_rows = [asdict(r) for r in baci.trade]\n-            source_version = str(baci.source_registry.get(\"source_version\", \"unknown\"))\n+            source_version = str(baci.source_registry.get(\"unknown\"))\n             receipt_hash = item.selected_hash\n             table = \"pub_baci_trade\"\n         else:"
+reason = "BACI Trade rows always carry source_version and asdict keeps it, so native.get('source_version', ...) never falls back to this value; an empty trade list never uses it at all."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -20,7 +20,7 @@\n         elif item.source_id == \"cepii_baci\":\n             baci = read_baci(cache, item.selected_hash)\n             native_rows = [asdict(r) for r in baci.trade]\n-            source_version = str(baci.source_registry.get(\"source_version\", \"unknown\"))\n+            source_version = str(baci.source_registry.get(\"source_version\", ))\n             receipt_hash = item.selected_hash\n             table = \"pub_baci_trade\"\n         else:"
+reason = "BACI Trade rows always carry source_version and asdict keeps it, so native.get('source_version', ...) never falls back to this value; an empty trade list never uses it at all."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -20,7 +20,7 @@\n         elif item.source_id == \"cepii_baci\":\n             baci = read_baci(cache, item.selected_hash)\n             native_rows = [asdict(r) for r in baci.trade]\n-            source_version = str(baci.source_registry.get(\"source_version\", \"unknown\"))\n+            source_version = str(baci.source_registry.get(\"XXsource_versionXX\", \"unknown\"))\n             receipt_hash = item.selected_hash\n             table = \"pub_baci_trade\"\n         else:"
+reason = "BACI Trade rows always carry source_version and asdict keeps it, so native.get('source_version', ...) never falls back to this value; an empty trade list never uses it at all."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -20,7 +20,7 @@\n         elif item.source_id == \"cepii_baci\":\n             baci = read_baci(cache, item.selected_hash)\n             native_rows = [asdict(r) for r in baci.trade]\n-            source_version = str(baci.source_registry.get(\"source_version\", \"unknown\"))\n+            source_version = str(baci.source_registry.get(\"SOURCE_VERSION\", \"unknown\"))\n             receipt_hash = item.selected_hash\n             table = \"pub_baci_trade\"\n         else:"
+reason = "BACI Trade rows always carry source_version and asdict keeps it, so native.get('source_version', ...) never falls back to this value; an empty trade list never uses it at all."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -20,7 +20,7 @@\n         elif item.source_id == \"cepii_baci\":\n             baci = read_baci(cache, item.selected_hash)\n             native_rows = [asdict(r) for r in baci.trade]\n-            source_version = str(baci.source_registry.get(\"source_version\", \"unknown\"))\n+            source_version = str(baci.source_registry.get(\"source_version\", \"XXunknownXX\"))\n             receipt_hash = item.selected_hash\n             table = \"pub_baci_trade\"\n         else:"
+reason = "BACI Trade rows always carry source_version and asdict keeps it, so native.get('source_version', ...) never falls back to this value; an empty trade list never uses it at all."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -20,7 +20,7 @@\n         elif item.source_id == \"cepii_baci\":\n             baci = read_baci(cache, item.selected_hash)\n             native_rows = [asdict(r) for r in baci.trade]\n-            source_version = str(baci.source_registry.get(\"source_version\", \"unknown\"))\n+            source_version = str(baci.source_registry.get(\"source_version\", \"UNKNOWN\"))\n             receipt_hash = item.selected_hash\n             table = \"pub_baci_trade\"\n         else:"
+reason = "BACI Trade rows always carry source_version and asdict keeps it, so native.get('source_version', ...) never falls back to this value; an empty trade list never uses it at all."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -21,7 +21,7 @@\n             baci = read_baci(cache, item.selected_hash)\n             native_rows = [asdict(r) for r in baci.trade]\n             source_version = str(baci.source_registry.get(\"source_version\", \"unknown\"))\n-            receipt_hash = item.selected_hash\n+            receipt_hash = None\n             table = \"pub_baci_trade\"\n         else:\n             require(comtrade_policy is not None, \"comtrade_policy_required\")"
+reason = "BACI Trade rows always carry member_sha256 and Comtrade TradeRow rows always carry receipt_sha256, so the row receipt never falls back to receipt_hash."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -37,7 +37,7 @@\n             native_rows = [\n                 asdict(r) for r in assembled.rows if r.series_role == item.role\n             ]\n-            source_version = \"unknown\"\n+            source_version = None\n             receipt_hash = item.selected_hash\n             table = \"pub_comtrade_trade\"\n         for index, native in enumerate(native_rows):"
+reason = "Comtrade TradeRow rows always carry source_version, so native.get('source_version', ...) never falls back to this value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -37,7 +37,7 @@\n             native_rows = [\n                 asdict(r) for r in assembled.rows if r.series_role == item.role\n             ]\n-            source_version = \"unknown\"\n+            source_version = \"XXunknownXX\"\n             receipt_hash = item.selected_hash\n             table = \"pub_comtrade_trade\"\n         for index, native in enumerate(native_rows):"
+reason = "Comtrade TradeRow rows always carry source_version, so native.get('source_version', ...) never falls back to this value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -37,7 +37,7 @@\n             native_rows = [\n                 asdict(r) for r in assembled.rows if r.series_role == item.role\n             ]\n-            source_version = \"unknown\"\n+            source_version = \"UNKNOWN\"\n             receipt_hash = item.selected_hash\n             table = \"pub_comtrade_trade\"\n         for index, native in enumerate(native_rows):"
+reason = "Comtrade TradeRow rows always carry source_version, so native.get('source_version', ...) never falls back to this value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -38,7 +38,7 @@\n                 asdict(r) for r in assembled.rows if r.series_role == item.role\n             ]\n             source_version = \"unknown\"\n-            receipt_hash = item.selected_hash\n+            receipt_hash = None\n             table = \"pub_comtrade_trade\"\n         for index, native in enumerate(native_rows):\n             key = (item.source_id, item.role, str(index))"
+reason = "BACI Trade rows always carry member_sha256 and Comtrade TradeRow rows always carry receipt_sha256, so the row receipt never falls back to receipt_hash."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -92,7 +92,7 @@\n                 require(binding.flow == \"import\", \"binding_direction\")\n             # Reviewed country/direction bindings are retained alongside the complete\n             # source-native row; native units and valuation cannot be overwritten.\n-            period = str(native.get(\"period\", native.get(\"year\", \"\")))\n+            period = str(native.get(\"period\", native.get(\"year\", None)))\n             require(period[:4] == str(binding.year), \"binding_period\")\n             require(\n                 str("
+reason = "Portal rows from contract_rows and Comtrade TradeRow rows always carry period, and BACI Trade rows always carry year, so the innermost default is never reached."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -92,7 +92,7 @@\n                 require(binding.flow == \"import\", \"binding_direction\")\n             # Reviewed country/direction bindings are retained alongside the complete\n             # source-native row; native units and valuation cannot be overwritten.\n-            period = str(native.get(\"period\", native.get(\"year\", \"\")))\n+            period = str(native.get(\"period\", native.get(\"year\", )))\n             require(period[:4] == str(binding.year), \"binding_period\")\n             require(\n                 str("
+reason = "Portal rows from contract_rows and Comtrade TradeRow rows always carry period, and BACI Trade rows always carry year, so the innermost default is never reached."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -92,7 +92,7 @@\n                 require(binding.flow == \"import\", \"binding_direction\")\n             # Reviewed country/direction bindings are retained alongside the complete\n             # source-native row; native units and valuation cannot be overwritten.\n-            period = str(native.get(\"period\", native.get(\"year\", \"\")))\n+            period = str(native.get(\"period\", native.get(\"year\", \"XXXX\")))\n             require(period[:4] == str(binding.year), \"binding_period\")\n             require(\n                 str("
+reason = "Portal rows from contract_rows and Comtrade TradeRow rows always carry period, and BACI Trade rows always carry year, so the innermost default is never reached."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -98,7 +98,7 @@\n                 str(\n                     native.get(\n                         \"tariff_code\",\n-                        native.get(\"product_code\", native.get(\"hs_code\", \"\")),\n+                        native.get(\"product_code\", native.get(\"hs_code\", None)),\n                     )\n                 )\n                 == binding.product_scope,"
+reason = "Portal rows carry tariff_code, Comtrade rows product_code and BACI rows hs_code, so each source meets its own mandatory key before this missing-key default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -98,7 +98,7 @@\n                 str(\n                     native.get(\n                         \"tariff_code\",\n-                        native.get(\"product_code\", native.get(\"hs_code\", \"\")),\n+                        native.get(\"product_code\", native.get(\"hs_code\", )),\n                     )\n                 )\n                 == binding.product_scope,"
+reason = "Portal rows carry tariff_code, Comtrade rows product_code and BACI rows hs_code, so each source meets its own mandatory key before this missing-key default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -98,7 +98,7 @@\n                 str(\n                     native.get(\n                         \"tariff_code\",\n-                        native.get(\"product_code\", native.get(\"hs_code\", \"\")),\n+                        native.get(\"product_code\", native.get(\"hs_code\", \"XXXX\")),\n                     )\n                 )\n                 == binding.product_scope,"
+reason = "Portal rows carry tariff_code, Comtrade rows product_code and BACI rows hs_code, so each source meets its own mandatory key before this missing-key default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -124,7 +124,7 @@\n                 from eii_custodian.publicdata.fetch.decimals import exact_decimal\n \n                 exact_decimal(\n-                    value_text, total_digits=1000, fractional_digits=1000, signed=False\n+                    value_text, total_digits=1000, fractional_digits=1000, signed=None\n                 )\n             native = json.loads(\n                 json.dumps("
+reason = "exact_decimal uses signed only as a truth value, so False and None choose the same pattern, the same slicing and the same refusals."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -128,7 +128,7 @@\n                 )\n             native = json.loads(\n                 json.dumps(\n-                    native, default=lambda v: str(v) if isinstance(v, Decimal) else v\n+                    native, default=lambda v: str(v) if (isinstance(v, Decimal)) or True else v\n                 )\n             )\n             identifier = \":\".join(key)"
+reason = "Native rows hold only text, integers, Decimals, None and lists or dicts of these (confirmed_rows' type checks and the TradeRow and Trade fields), so json.dumps calls the default function only for a Decimal, where both forms return str(v)."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/trade_reconciliation.py"
+mutation = "--- src/eii_custodian/publicdata/trade_reconciliation.py\n+++ src/eii_custodian/publicdata/trade_reconciliation.py\n@@ -6,7 +6,7 @@\n         or Path(__file__).resolve().parents[3] / \"publicdata/trade_reconciliation.yaml\"\n     )\n     try:\n-        data = yaml.safe_load(target.read_text(encoding=\"utf-8\"))\n+        data = yaml.safe_load(target.read_text(encoding=\"UTF-8\"))\n         if data == {\"confirmed\": False}:\n             return None\n         return Selection.from_mapping(data)"
+reason = "Python's codec lookup normalises \"UTF-8\" and \"utf-8\" to the same utf_8 codec, for valid and invalid bytes alike."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/benchmarks/config.py"
+mutation = "--- src/eii_custodian/publicdata/benchmarks/config.py\n+++ src/eii_custodian/publicdata/benchmarks/config.py\n@@ -1,7 +1,7 @@\n def load_policies(path: Path | None = None) -> dict[str, Policy]:\n     target = path or Path(__file__).resolve().parents[4] / \"publicdata/benchmarks.yaml\"\n     try:\n-        data = yaml.safe_load(target.read_text(encoding=\"utf-8\"))\n+        data = yaml.safe_load(target.read_text(encoding=\"UTF-8\"))\n         require(isinstance(data, dict) and set(data) == set(TABLES), \"policy_schema\")\n         result = {key: Policy.from_mapping(value) for key, value in data.items()}\n         require("
+reason = "Python's codec lookup normalises \"UTF-8\" and \"utf-8\" to the same utf_8 codec, for valid and invalid bytes alike."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/benchmarks/contracts.py"
+mutation = "--- src/eii_custodian/publicdata/benchmarks/contracts.py\n+++ src/eii_custodian/publicdata/benchmarks/contracts.py\n@@ -16,7 +16,7 @@\n     try:\n         path = directory / f\"{manifest_sha256}.manifest.json\"\n         require(file_hash(path) == manifest_sha256, \"manifest_hash\")\n-        manifest = json.loads(path.read_text(encoding=\"utf-8\"))\n+        manifest = json.loads(path.read_text(encoding=\"UTF-8\"))\n         require(\n             manifest[\"complete\"] is True\n             and manifest[\"commit_allowed\"] is False"
+reason = "Python's codec lookup normalises \"UTF-8\" and \"utf-8\" to the same utf_8 codec, for valid and invalid bytes alike."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/benchmarks/contracts.py"
+mutation = "--- src/eii_custodian/publicdata/benchmarks/contracts.py\n+++ src/eii_custodian/publicdata/benchmarks/contracts.py\n@@ -72,7 +72,7 @@\n         expected_receipt[\"coverage\"] = parsed.coverage\n         require(receipt == expected_receipt, \"source_chain\")\n         require(\n-            json.loads(output.read_text(encoding=\"utf-8\"))\n+            json.loads(output.read_text(encoding=\"UTF-8\"))\n             == [asdict(row) for row in rows]\n             and manifest[\"selected\"] == len(rows),\n             \"reparsed_output\","
+reason = "Python's codec lookup normalises \"UTF-8\" and \"utf-8\" to the same utf_8 codec, for valid and invalid bytes alike."
