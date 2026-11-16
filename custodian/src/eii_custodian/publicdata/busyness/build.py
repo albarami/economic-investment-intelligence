@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from eii_custodian.publicdata.busyness.address import read_addresses
 from eii_custodian.publicdata.busyness.parse import (
     FORECAST_URL,
     QUERY_URL,
@@ -33,6 +34,7 @@ from eii_custodian.publicdata.busyness.security import assert_clean
 from eii_custodian.publicdata.fetch.receipts import commit_pair, sha256_hex, sidecar_for
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.transport import KeyedRequest, Transport
+from eii_custodian.publicdata.places.read import SOURCE_RELEASE
 
 REVIEW = Path(__file__).resolve().parents[4] / "publicdata/review"
 DAYS = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
@@ -95,7 +97,7 @@ def _inputs(
             raise BuildInputError(f"pub_place missing {identifier}")
         if identifier not in crosswalk:
             raise BuildInputError(f"crosswalk missing {identifier}")
-        for field in ("name", "address"):
+        for field in ("name",):
             if (
                 not isinstance(places[identifier].get(field), str)
                 or not places[identifier][field].strip()
@@ -130,6 +132,8 @@ def build_busyness(
                 raise ValueError(f"{variable}: required")
         forecast_cost, query_cost = load_requests(review / REQUEST_FILE)
     places, crosswalk = _inputs(cache, review, venues)
+    addresses = read_addresses(cache) if venues else {}
+    asked = 0
     rows: list[dict[str, object]] = []
     answers: list[dict[str, object]] = []
     reasons: dict[str, str] = {}
@@ -137,19 +141,26 @@ def build_busyness(
     retrieved = clock()
     for venue in venues:
         identifier = venue["place_id"]
+        if (
+            places[identifier].get("source_release") != SOURCE_RELEASE
+            or identifier not in addresses
+        ):
+            reasons[identifier] = "venue_address_absent"
+            continue
         if crosswalk[identifier]["match"] != "matched":
             reasons[identifier] = "no_match"
             continue
         if not budget.reserve(identifier, "forecast", forecast_cost):
             reasons[identifier] = "credit_limit"
             continue
+        asked += 1
         body, answer_digest = _request(
             transport,
             FORECAST_URL,
             "POST",
             {
                 "venue_name": places[identifier]["name"],
-                "venue_address": places[identifier]["address"],
+                "venue_address": addresses[identifier],
             },
             environ,
         )
@@ -206,7 +217,8 @@ def build_busyness(
                     }
                 )
     coverage = {
-        "asked": len(venues),
+        "asked": asked,
+        "not_asked": len(venues) - asked,
         "with_figure": sum(categories.values()),
         "without_figure": sum(reason == "no_forecast" for reason in reasons.values()),
         "not_found": sum(reason == "not_found" for reason in reasons.values()),

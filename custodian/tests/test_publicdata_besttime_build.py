@@ -37,13 +37,14 @@ def setup(tmp_path, count=1):
                 {
                     "place_id": f"SYN-place-{i}",
                     "name": "Invented cafe",
-                    "address": "Invented address",
+                    "source_release": "2026-10-21.0",
                 }
             )
             + "\n"
             for i in range(count)
         )
     )
+    write_addresses(cache, count)
     env = {
         "BESTTIME_API_KEY_PRIVATE": "SYN-invented-private",
         "BESTTIME_API_KEY_PUBLIC": "SYN-invented-public",
@@ -51,6 +52,53 @@ def setup(tmp_path, count=1):
     }
     entry = next(row for row in load_registry() if row.source_id == "busy_besttime")
     return entry, review, cache, env
+
+
+def write_addresses(cache, count=1, addresses=None, identifier=None):
+    import duckdb
+
+    from eii_custodian.publicdata.fetch.receipts import sha256_hex
+    from eii_custodian.publicdata.places.fetch import FILE_KEYS
+
+    directory = cache / FILE_KEYS[0]
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / "invented.parquet"
+    values = (
+        addresses
+        if addresses is not None
+        else [
+            {
+                "freeform": "Invented street",
+                "locality": "Invented town",
+                "postcode": "Invented postal",
+                "region": "Invented region",
+                "country": "Invented country",
+            }
+        ]
+    )
+    connection = duckdb.connect()
+    try:
+        connection.execute(
+            "CREATE TABLE places (id VARCHAR, addresses STRUCT(freeform VARCHAR, locality VARCHAR, postcode VARCHAR, region VARCHAR, country VARCHAR)[])"
+        )
+        for i in range(count):
+            connection.execute(
+                "INSERT INTO places VALUES (?, ?)",
+                [identifier or f"SYN-place-{i}", values],
+            )
+        connection.execute("COPY places TO ? (FORMAT PARQUET)", [str(path)])
+    finally:
+        connection.close()
+    (directory / "invented.meta.json").write_text(
+        json.dumps(
+            {
+                "sha256": sha256_hex(path.read_bytes()),
+                "retrieved_utc": "2026-11-16T00:00:00Z",
+                "publisher": "Invented publisher",
+            }
+        )
+    )
+    return path
 
 
 def run(entry, review, cache, env, answers=None):
@@ -146,15 +194,11 @@ def test_besttime_missing_environment_before_request(tmp_path, variable):
         )
 
 
-@pytest.mark.parametrize("kind", ["place", "address", "crosswalk", "cost"])
+@pytest.mark.parametrize("kind", ["place", "crosswalk", "cost"])
 def test_besttime_review_preconditions_before_request(tmp_path, kind):
     entry, review, cache, env = setup(tmp_path)
     if kind == "place":
         (cache / "places_s2_t06/pub_place.jsonl").write_text("")
-    elif kind == "address":
-        (cache / "places_s2_t06/pub_place.jsonl").write_text(
-            json.dumps({"place_id": "SYN-place-0", "name": "Invented cafe"})
-        )
     elif kind == "crosswalk":
         (cache / "review/venue_busyness_crosswalk.csv").write_text(CROSSWALK)
     else:
@@ -328,7 +372,7 @@ def test_besttime_registry_guards_before_request(tmp_path, field, value):
         )
 
 
-@pytest.mark.parametrize("field", ["name", "address"])
+@pytest.mark.parametrize("field", ["name"])
 def test_besttime_blank_place_field_refused(tmp_path, field):
     entry, review, cache, env = setup(tmp_path)
     path = cache / "places_s2_t06/pub_place.jsonl"
@@ -498,3 +542,183 @@ def test_besttime_input_secret_is_not_logged(tmp_path, monkeypatch):
     assert outcome.failure is not None
     assert outcome.failure.check == "secret_in_input"
     assert env["BESTTIME_API_KEY_PRIVATE"] not in (cache / "build-log.json").read_text()
+
+
+@pytest.mark.parametrize("kind", ["not_overture", "absent_record", "empty_entry"])
+def test_besttime_address_absent_not_asked_and_other_venue_unaffected(tmp_path, kind):
+    entry, review, cache, env = setup(tmp_path, 2)
+    path = cache / "places_s2_t06/pub_place.jsonl"
+    places = [json.loads(line) for line in path.read_text().splitlines()]
+    if kind == "not_overture":
+        places[0]["source_release"] = "invented-other-release"
+    elif kind == "absent_record":
+        places[0]["place_id"] = "SYN-place-absent"
+        for file in (
+            review / "busy_besttime_venues.csv",
+            cache / "review/venue_busyness_crosswalk.csv",
+        ):
+            file.write_text(file.read_text().replace("SYN-place-0", "SYN-place-absent"))
+    else:
+        write_addresses(
+            cache,
+            1,
+            [{"freeform": "", "locality": "", "country": "Invented country"}],
+            "SYN-place-0",
+        )
+        # Keep the unaffected venue in the same receipted file.
+        import duckdb
+
+        from eii_custodian.publicdata.fetch.receipts import sha256_hex
+        from eii_custodian.publicdata.places.fetch import FILE_KEYS
+
+        source = cache / FILE_KEYS[0] / "invented.parquet"
+        con = duckdb.connect()
+        con.execute(
+            "CREATE TABLE places AS SELECT * FROM read_parquet(?)", [str(source)]
+        )
+        con.execute(
+            "INSERT INTO places VALUES ('SYN-place-1', [{'freeform': 'Invented street', 'locality': NULL, 'postcode': NULL, 'region': NULL, 'country': NULL}])"
+        )
+        con.execute("COPY places TO ? (FORMAT PARQUET)", [str(source)])
+        con.close()
+        meta = source.with_suffix(".meta.json")
+        receipt = json.loads(meta.read_text())
+        receipt["sha256"] = sha256_hex(source.read_bytes())
+        meta.write_text(json.dumps(receipt))
+    path.write_text("".join(json.dumps(row) + "\n" for row in places))
+    calls, rows, manifest, _ = run(entry, review, cache, env)
+    assert len(calls) == 2
+    assert {row["place_id"] for row in rows} == {"SYN-place-1"}
+    assert manifest["coverage"]["asked"] == 1
+    assert manifest["coverage"]["not_asked"] == 1
+    assert manifest["coverage"]["reasons"] == {
+        places[0]["place_id"]: "venue_address_absent"
+    }
+
+
+def test_besttime_address_receipt_checked_before_parquet(tmp_path, monkeypatch):
+    from eii_custodian.publicdata.places import read
+    from eii_custodian.publicdata.places.fetch import FILE_KEYS
+
+    entry, review, cache, env = setup(tmp_path)
+    source = cache / FILE_KEYS[0] / "invented.parquet"
+    source.write_bytes(b"invented corrupt file")
+    monkeypatch.setattr(
+        read, "_connect", lambda: pytest.fail("parquet opened before receipt")
+    )
+    with pytest.raises(ValueError, match="places_file_digest"):
+        build_busyness(
+            entry, lambda req: pytest.fail("sent"), cache, lambda: "unused", env, review
+        )
+    assert not (cache / "busy_besttime").exists()
+
+
+@pytest.mark.parametrize(
+    "parts, expected",
+    [
+        (
+            [
+                {
+                    "freeform": "Invented street",
+                    "locality": "Invented town",
+                    "country": "Invented country",
+                },
+                {"freeform": "Invented ignored"},
+            ],
+            "Invented street, Invented town, Invented country",
+        ),
+        (
+            [{"freeform": None, "locality": "Invented town", "country": ""}],
+            "Invented town",
+        ),
+        (
+            [{"freeform": "Invented street", "locality": "", "country": None}],
+            "Invented street",
+        ),
+    ],
+)
+def test_besttime_composed_address_transport_only(tmp_path, parts, expected):
+    entry, review, cache, env = setup(tmp_path)
+    write_addresses(cache, addresses=parts)
+    before = {p: p.read_bytes() for p in cache.rglob("*") if p.is_file()}
+    calls = []
+
+    def transport(request):
+        calls.append(request)
+        if len(calls) == 1:
+            assert request.parameters == {
+                "venue_name": "Invented cafe",
+                "venue_address": expected,
+            }
+        return Response(
+            str(request), encode(forecast() if len(calls) == 1 else query()), ()
+        )
+
+    build_busyness(entry, transport, cache, lambda: "2026-11-16T00:00:00Z", env, review)
+    assert len(calls) == 2
+    for path in cache.rglob("*"):
+        if path.is_file() and path not in before:
+            assert b"Invented street" not in path.read_bytes()
+            assert b"Invented town" not in path.read_bytes()
+            assert b"Invented country" not in path.read_bytes()
+    assert all(path.read_bytes() == body for path, body in before.items())
+
+
+@pytest.mark.parametrize(
+    "addresses",
+    [
+        [],
+        [None],
+        [
+            {"freeform": "", "locality": "", "country": ""},
+            {"freeform": "Invented ignored", "locality": "", "country": ""},
+        ],
+    ],
+)
+def test_besttime_empty_first_address_not_asked(tmp_path, addresses):
+    entry, review, cache, env = setup(tmp_path)
+    write_addresses(cache, addresses=addresses if addresses is not None else [])
+    calls, rows, manifest, _ = run(entry, review, cache, env, [])
+    assert calls == []
+    assert rows == []
+    assert manifest["coverage"]["asked"] == 0
+    assert manifest["coverage"]["not_asked"] == 1
+    assert manifest["coverage"]["reasons"] == {"SYN-place-0": "venue_address_absent"}
+
+
+def test_besttime_no_overture_cache_not_asked(tmp_path):
+    from eii_custodian.publicdata.places.fetch import FILE_KEYS
+
+    entry, review, cache, env = setup(tmp_path)
+    for path in (cache / FILE_KEYS[0]).iterdir():
+        path.unlink()
+    calls, rows, manifest, _ = run(entry, review, cache, env, [])
+    assert calls == [] and rows == []
+    assert manifest["coverage"]["reasons"] == {"SYN-place-0": "venue_address_absent"}
+
+
+def test_besttime_incomplete_address_receipt_before_parquet(tmp_path, monkeypatch):
+    from eii_custodian.publicdata.places import PlacesError, read
+    from eii_custodian.publicdata.places.fetch import FILE_KEYS
+
+    entry, review, cache, env = setup(tmp_path)
+    meta = cache / FILE_KEYS[0] / "invented.meta.json"
+    receipt = json.loads(meta.read_text())
+    receipt["publisher"] = ""
+    meta.write_text(json.dumps(receipt))
+    monkeypatch.setattr(read, "_connect", lambda: pytest.fail("parquet opened"))
+    with pytest.raises(PlacesError, match="receipt_missing"):
+        build_busyness(
+            entry, lambda req: pytest.fail("sent"), cache, lambda: "unused", env, review
+        )
+
+
+def test_besttime_empty_venue_list_never_reads_address_cache(tmp_path):
+    from eii_custodian.publicdata.places.fetch import FILE_KEYS
+
+    entry, review, cache, env = setup(tmp_path, 0)
+    (cache / FILE_KEYS[0] / "invented.parquet").write_bytes(b"invented corrupt file")
+    calls, rows, manifest, _ = run(entry, review, cache, env, [])
+    assert calls == [] and rows == []
+    assert manifest["coverage"]["asked"] == 0
+    assert manifest["coverage"]["not_asked"] == 0

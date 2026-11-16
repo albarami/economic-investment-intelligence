@@ -574,7 +574,7 @@ def test_registry_counts_follow_decision_0026() -> None:
     assert len(entries) == 143
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
-    assert len(owners) == 27
+    assert len(owners) == 26
     assert {entry.decision_record for entry in owners} == {"0026"}
 
 
