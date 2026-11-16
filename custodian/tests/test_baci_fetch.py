@@ -157,8 +157,8 @@ def test_baci_manifest_atomicity(tmp_path, monkeypatch):
 
 def test_baci_command_injection(tmp_path, monkeypatch, capsys):
     from custodian.tests.fixtures.baci.invented import configuration
-    from scripts.commands import build_public
 
+    import commands.build_public as build_public
     import eii_custodian.publicdata.fetch.build as module
     from eii_custodian.publicdata.baci.config import Config
 
@@ -441,8 +441,8 @@ def test_baci_redirect_exact_review_before_contact(monkeypatch):
 
 def test_baci_production_transports_bind_reviewed_urls(tmp_path, monkeypatch):
     from custodian.tests.fixtures.baci.invented import configuration
-    from scripts.commands import build_public
 
+    import commands.build_public as build_public
     from eii_custodian.publicdata.baci.config import Config
 
     config = Config.from_mapping(configuration())
