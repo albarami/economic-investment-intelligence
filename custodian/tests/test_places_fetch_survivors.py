@@ -308,6 +308,8 @@ def test_success_receipt(tmp_path: Path, extension: str) -> None:
         "period_first": None,
         "period_last": None,
         "row_count": None,
+        "file": None,
+        "coverage_note": None,
         "columns": [],
         "reconciliation": "none",
         "release_tables": ["pub_place"],
