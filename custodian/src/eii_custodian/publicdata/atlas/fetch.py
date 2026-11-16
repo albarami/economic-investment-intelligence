@@ -215,7 +215,8 @@ def fetch_atlas(
                     **{
                         key: value
                         for key, value in asdict(entry).items()
-                        if key not in {"layer", "basis_note", "columns"}
+                        if key
+                        not in {"layer", "basis_note", "columns", "comtrade_policy"}
                     },
                     "columns": [
                         {"name": name, "type": kind} for name, kind in entry.columns

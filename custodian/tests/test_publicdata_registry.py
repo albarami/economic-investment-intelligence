@@ -722,6 +722,7 @@ def test_baci_registry_pending_and_nightly_policy() -> None:
         "ntl_blackmarble",
         "traffic_tomtom_flow",
         "traffic_tomtom_range",
+        "un_comtrade",
     }
     assert exclusions(entries) == expected
     planted = [
