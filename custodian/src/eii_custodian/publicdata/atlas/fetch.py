@@ -108,6 +108,7 @@ def _metadata(
         max_bytes=max(item.archive_bytes[1] for item in config.downloads),
         sleep=sleep,
         refuse=_refuse,
+        bounded_read=True,
     )
 
 

@@ -149,3 +149,49 @@ def test_metadata_limit_resets_after_exception(monkeypatch):
             raise LookupError("invented failure")
     transport.open_https(url)
     assert reads == [8, 4, 8, -1]
+
+
+def test_baci_metadata_read_stays_unbounded():
+    """BACI's production metadata binding reads without the scoped byte limit.
+
+    Only Gravity and Atlas opt in to the bounded read (confirmation finding F1).
+    """
+    from custodian.tests.fixtures.baci.invented import PAGE, configuration
+
+    from eii_custodian.publicdata.baci import fetch as baci_fetch
+    from eii_custodian.publicdata.baci.config import Config
+    from eii_custodian.publicdata.fetch import transport as shared
+
+    seen = []
+
+    def fake(url):
+        seen.append(shared._METADATA_LIMIT.get())
+        return SimpleNamespace(hops=(), final_url=url, body=b"invented page")
+
+    config = Config.from_mapping(configuration())
+    body = baci_fetch._metadata(PAGE, fake, config, lambda _seconds: None)
+    assert body == b"invented page"
+    assert seen == [None]
+
+
+def test_gravity_and_atlas_metadata_reads_are_bounded():
+    """Gravity and Atlas enter the scoped limit with their configured maximum."""
+    from eii_custodian.publicdata.fetch import bounded
+    from eii_custodian.publicdata.fetch import transport as shared
+
+    seen = []
+
+    def fake(url):
+        seen.append(shared._METADATA_LIMIT.get())
+        return SimpleNamespace(hops=(), final_url=url, body=b"ok")
+
+    common = {
+        "review": lambda _address: None,
+        "max_bytes": 5,
+        "sleep": lambda _seconds: None,
+        "refuse": lambda reason: (_ for _ in ()).throw(ValueError(reason)),
+    }
+    url = "https://invented.example/page"
+    assert bounded.read_metadata(url, fake, **common) == b"ok"
+    assert bounded.read_metadata(url, fake, bounded_read=True, **common) == b"ok"
+    assert seen == [None, 5]

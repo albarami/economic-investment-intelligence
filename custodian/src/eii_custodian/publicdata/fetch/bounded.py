@@ -70,12 +70,20 @@ def read_metadata(
     max_bytes: int,
     sleep: Callable[[float], None],
     refuse: Refuse,
+    bounded_read: bool = False,
 ) -> bytes:
-    """Read one reviewed metadata body. Access markers stop the fetch."""
+    """Read one reviewed metadata body. Access markers stop the fetch.
+
+    Only callers that opt in with ``bounded_read`` (Gravity and Atlas) read through
+    the scoped byte limit; every other caller keeps the unbounded transport read.
+    """
     review(url)
     for attempt in range(ATTEMPT_LIMIT):
         try:
-            with metadata_limit(max_bytes):
+            if bounded_read:
+                with metadata_limit(max_bytes):
+                    response = transport(url)
+            else:
                 response = transport(url)
             for address in (*response.hops, response.final_url):
                 review(address)

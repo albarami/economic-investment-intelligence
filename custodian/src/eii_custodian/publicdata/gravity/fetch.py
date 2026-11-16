@@ -93,6 +93,7 @@ def _metadata(
         max_bytes=config.archive_bytes[1],
         sleep=sleep,
         refuse=_refuse,
+        bounded_read=True,
     )
 
 
