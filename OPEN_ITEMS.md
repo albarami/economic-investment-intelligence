@@ -2418,6 +2418,16 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - OPTIONS: **Recommendation:** Extend the existing remote-check evidence to inspector, search, lenses/state restore, map-first response, ambiguity, selection context and stop controls in both languages on phone, preserving S3-T20's existing boundaries.
 - NEEDED BY: Once S3-T20 remote mode and the relevant Explore/assistant tasks both exist.
 
+## OI-260 — Automated look score gateway class
+
+- ID: OI-260
+- TYPE: OPEN
+- NEEDED: A decision on whether to add an automated look score as a new closed class to the run-time gateway.
+- WHY: An automated look score inside the product's run-time gateway would need a new closed class ([AGENTS.md](AGENTS.md) rule 30) and its own decision record; until then it is an advisory maker review job only (decision 0044).
+- DONE SO FAR: Decision 0044 specifies that a model look score is NOT added to the run-time gateway. It remains a maker review job by another maker with design-audit and dataviz on a curated sample, advisory only.
+- OPTIONS: **Default:** Keep it as a maker review job only. Adding a gateway class requires a new decision record.
+- NEEDED BY: Any future attempt to add a run-time look score.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.

@@ -607,7 +607,7 @@ ASSUMPTIONS (each also listed in the return message):
 - Committed public fixtures keep pull-request CI offline (TST-51).
 - The 3840x2160 and 1920x1080 sizes are wall, 1440x900 laptop and 1024x768 tablet (TST-90).
 - Dates, codes, release identifiers and licence versions are rendered through the Fact chip (TST-102).
-- The golden set has at least eight questions per playbook in each language: 208 for the thirteen playbooks of document 09 (TST-110).
+- The golden set has at least eight questions per playbook in each language: 208 for the thirteen playbooks of document 09 (TST-110). The conversation test lab of decision 0044 widens the question factory with a multi-turn angle grid and deterministic judgements of accuracy, smoothness, value, visual appeal and map behaviour.
 - Stable suppression across months means that a leaf is published in every month of the window or in none (TST-205); document 06 sets the rule, and the test follows it.
 - Area snapping lives in the shared `eii_core` grid helpers, so the release audit can draw areas without importing product code (TST-21).
 - The p95 latency sample is at least 200 requests after 20 warm-ups (TST-130).
