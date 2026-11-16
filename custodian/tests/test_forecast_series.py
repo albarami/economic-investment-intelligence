@@ -53,6 +53,8 @@ def source(key: str = "lic_issued", table: str = "pub_licence_issued") -> Entry:
         fetch_host="example.test",
         url="https://example.test/invented",
         terms_url="",
+        terms_words="invented terms words for a test",
+        terms_read_on="2026-11-14",
         nightly_live_fetch=False,
         public_splits=(),
         commit_allowed=False,

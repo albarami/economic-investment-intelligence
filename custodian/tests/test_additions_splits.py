@@ -1338,6 +1338,8 @@ def _entry_from(values: dict[str, object]) -> Entry:
         fetch_host=_map_text(values, "fetch_host"),
         url=_map_text(values, "url"),
         terms_url=_map_text(values, "terms_url"),
+        terms_words="invented terms words for a test",
+        terms_read_on="2026-11-14",
         nightly_live_fetch=_map_flag(values, "nightly_live_fetch"),
         public_splits=_map_texts(values, "public_splits"),
         commit_allowed=_map_flag(values, "commit_allowed"),

@@ -50,6 +50,8 @@ def _entry() -> Entry:
         fetch_host="www.data.gov.qa",
         url="https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/invented/exports/json",
         terms_url="",
+        terms_words="invented terms words for a test",
+        terms_read_on="2026-11-14",
         nightly_live_fetch=False,
         public_splits=(),
         commit_allowed=False,
