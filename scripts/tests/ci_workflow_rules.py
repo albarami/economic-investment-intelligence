@@ -18,12 +18,15 @@ PINNED_SHA256 = {
     "docs.yml": "9c3ed0f74b8106e6797d5d010f9da20d4166d52a6f693d195a9920d0e95727a6",
     "sandbox.yml": "e33d0f21d42874da8d944d65b3824fff44ceaba4f17a538e06df9d8c087852e3",
 }
+PILOT_WORKFLOW = "mutation-pilot.yml"
+PILOT_SHA256 = "3db8ef97ad71b00cb936e205d7390b21560dc362d4e8500081081fad8193179d"
 RULES = (
     "workflow-files",
     "events-and-permissions",
     "required-jobs",
     "required-steps",
     "no-weakeners",
+    "pilot-workflow",
 )
 REQUIRED_CHECKS: tuple[tuple[str, str, str], ...] = (
     ("docs.yml", "check-docs", "check-docs"),
@@ -117,11 +120,12 @@ def pinned_text_problems(workflows_dir: Path) -> list[str]:
 
 
 def check_workflow_files(workflows_dir: Path) -> list[str]:
-    """Rule 1: exactly three workflow files exist."""
+    """Rule 1: the required workflows and the separately pinned pilot only."""
     if not workflows_dir.is_dir():
         return ["workflows directory is missing"]
     found = {path.name for path in workflows_dir.glob("*.yml")}
-    extra = sorted(found - WORKFLOW_NAMES)
+    found.update(path.name for path in workflows_dir.glob("*.yaml"))
+    extra = sorted(found - WORKFLOW_NAMES - {PILOT_WORKFLOW})
     missing = sorted(WORKFLOW_NAMES - found)
     problems: list[str] = []
     if extra:
@@ -338,10 +342,99 @@ def check_no_weakeners(raw_texts: dict[str, str]) -> list[str]:
     return problems
 
 
+def check_pilot_workflow(workflows_dir: Path) -> list[str]:
+    """Separate dispatch-only contract; never changes the required workflows."""
+    path = workflows_dir / PILOT_WORKFLOW
+    if not path.is_file():
+        return ["missing: pilot workflow"]
+    text = path.read_text(encoding="utf-8")
+    problems: list[str] = []
+    try:
+        document = _parse_workflow(text)
+    except yaml.YAMLError:
+        return ["yaml: pilot is not valid YAML"]
+    if not isinstance(document, dict):
+        return ["yaml: pilot is not a mapping"]
+    trigger = document.get("on")
+    if not isinstance(trigger, dict) or set(trigger) != {"workflow_dispatch"}:
+        problems.append("trigger: expected workflow_dispatch only")
+    if document.get("permissions") != {"contents": "read"}:
+        problems.append("workflow-permissions: expected contents read only")
+    if "secrets." in text:
+        problems.append("secrets-reference: forbidden secrets reference")
+    if "continue-on-error" in text:
+        problems.append("continue-on-error: forbidden")
+    if any(token in text for token in RUN_WEAKENERS):
+        problems.append("softened-command: forbidden")
+    if re.search(r"\bretry\b", text, re.IGNORECASE):
+        problems.append("retry: forbidden")
+    # Bind action identity as well as the commit to the existing ci.yml pins.
+    allowed_actions = set(
+        re.findall(
+            r"(?m)^\s*(?:- )?uses:\s*(\S+)",
+            (WORKFLOW_DIR / "ci.yml").read_text(encoding="utf-8"),
+        )
+    )
+    reserved_names = {
+        value for _, job, name in REQUIRED_CHECKS for value in (job, name)
+    }
+    jobs = document.get("jobs")
+    if not isinstance(jobs, dict) or not jobs:
+        return [*problems, "yaml: pilot jobs must be a nonempty mapping"]
+    for job_id, job in jobs.items():
+        if not isinstance(job, dict):
+            problems.append("yaml: pilot job must be a mapping")
+            continue
+        if job_id in reserved_names or str(job.get("name")) in reserved_names:
+            problems.append("required-check: pilot shadows a required check")
+        if job.get("runs-on") != RUNNER:
+            problems.append("runner: expected ubuntu-24.04")
+        permissions = job.get("permissions", {})
+        if (
+            not (
+                isinstance(permissions, dict)
+                and all(value in ("read", "none") for value in permissions.values())
+            )
+            and permissions != "read-all"
+        ):
+            problems.append("job-permissions: write or unrecognised permission")
+        if "uses" in job:
+            problems.append("action-pin: reusable job is outside the pilot contract")
+        steps = job.get("steps")
+        if not isinstance(steps, list):
+            problems.append("yaml: pilot steps must be a list")
+            continue
+        for step in steps:
+            if not isinstance(step, dict):
+                problems.append("yaml: pilot step must be a mapping")
+                continue
+            if "uses" not in step:
+                continue
+            action = str(step["uses"])
+            if not PIN_RE.fullmatch(action):
+                problems.append("action-pin: expected full commit pin")
+            elif action not in allowed_actions:
+                problems.append("action-allowlist: action is not a ci.yml pin")
+            if action.startswith("actions/checkout@"):
+                settings = step.get("with")
+                if (
+                    not isinstance(settings, dict)
+                    or settings.get("persist-credentials") is not False
+                ):
+                    problems.append(
+                        "checkout-credentials: expected persist-credentials false"
+                    )
+    if hashlib.sha256(path.read_bytes()).hexdigest() != PILOT_SHA256:
+        problems.append("pin: workflow text differs")
+    return problems
+
+
 def rule_problems(
     rule: str, workflows_dir: Path, reference: dict[str, Any] | None = None
 ) -> list[str]:
     """Return problems for one named rule."""
+    if rule == "pilot-workflow":
+        return check_pilot_workflow(workflows_dir)
     ref = reference if reference is not None else _reference_workflows()
     if rule == "workflow-files":
         return check_workflow_files(workflows_dir)
