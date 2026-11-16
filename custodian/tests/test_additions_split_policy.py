@@ -241,14 +241,14 @@ def test_public_split_columns_need_the_listed_table_and_every_declaration() -> N
 
 
 def test_movement_gender_passes_and_a_worker_gender_fails() -> None:
-    """DAT-169 admits gender on a movement split. The same column on a worker table fails."""
+    """DAT-169 admits gender on a movement split. The same column on a worker table other than employment_spell fails (decision 0037)."""
     movement = TableSpec(
         "presence_split",
         "movement_split",
         (ColumnSpec("gender"), ColumnSpec("split_kind")),
     )
     assert validate_table_dimensions(movement).reason == "admitted"
-    worker = TableSpec("employment_spell", "worker_source", (ColumnSpec("gender"),))
+    worker = TableSpec("salary_record", "worker_source", (ColumnSpec("gender"),))
     assert validate_table_dimensions(worker).reason == "forbidden_dimension"
     sex_on_movement = TableSpec(
         "flow_split",
