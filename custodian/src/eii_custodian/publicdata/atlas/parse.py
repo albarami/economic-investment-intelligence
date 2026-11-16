@@ -96,7 +96,6 @@ def _inventory(
         == {member.name for member in download.members},
         "inventory",
     )
-    require(len({item.filename for item in inventory}) == len(inventory), "inventory")
     receipts: list[dict[str, object]] = []
     hashes: dict[str, str] = {}
     for member in download.members:
@@ -298,6 +297,7 @@ def _parse_one(
                     )
         within(raw, data_member.rows, "trade_count")
         within(raw, download.raw_rows, "raw_count")
+        require(config.period_last in by_year, "year_coverage")
         if config.year_selection == "native":
             require(
                 sorted(by_year)

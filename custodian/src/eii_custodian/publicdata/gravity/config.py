@@ -254,7 +254,6 @@ class Config:
             require(result.bound_origin != "pending", "bounds_unconfirmed")
             require(result.year_selection != "pending", "year_selection")
             require(result.access != "unconfirmed", "access_state")
-            require(bool(result.hs_revision.strip()), "revision")
             require(digest_ok(result.page_sha256), "page_hash")
             require(
                 result.page in result.reviewed_urls

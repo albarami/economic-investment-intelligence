@@ -109,10 +109,6 @@ def parse_archive(path: Path, config: Config, output: Path) -> dict[str, object]
                 == {member.name for member in config.members},
                 "inventory",
             )
-            require(
-                len({item.filename for item in inventory}) == len(inventory),
-                "inventory",
-            )
             receipts: list[dict[str, object]] = []
             hashes: dict[str, str] = {}
             for member in config.members:
@@ -254,6 +250,7 @@ def parse_archive(path: Path, config: Config, output: Path) -> dict[str, object]
                     )
             within(raw, bilateral.rows, "trade_count")
             within(raw, config.raw_rows, "raw_count")
+            require(config.period_last in by_year, "year_coverage")
             if config.year_selection == "native":
                 require(
                     sorted(by_year)

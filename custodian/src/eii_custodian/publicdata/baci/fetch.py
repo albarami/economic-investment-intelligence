@@ -36,7 +36,7 @@ class Result:
 
 
 def _refuse(reason: str) -> NoReturn:
-    raise BaciError(reason)
+    raise BaciError(reason) from None
 
 
 def _reviewed(url: str, config: Config) -> None:

@@ -17,6 +17,7 @@ from eii_custodian.publicdata.fetch.transport import (
     Transport,
     TransportFault,
     TransportReadError,
+    metadata_limit,
 )
 
 CHUNK_BYTES = 65536
@@ -53,6 +54,14 @@ def publish_complete(path: Path, destination: Path, refuse: Refuse) -> None:
     os.link(path, destination)
 
 
+def _converted_refusal(refuse: Refuse, reason: str) -> NoReturn:
+    """Discard upstream diagnostics even for an injected refusal callback."""
+    try:
+        refuse(reason)
+    except Exception as exc:
+        raise exc from None
+
+
 def read_metadata(
     url: str,
     transport: Transport,
@@ -66,7 +75,8 @@ def read_metadata(
     review(url)
     for attempt in range(ATTEMPT_LIMIT):
         try:
-            response = transport(url)
+            with metadata_limit(max_bytes):
+                response = transport(url)
             for address in (*response.hops, response.final_url):
                 review(address)
             if len(response.body) > max_bytes:
@@ -77,10 +87,10 @@ def read_metadata(
                     refuse("access_obstacle")
             return response.body
         except (RuntimeError, TypeError, AttributeError, ValueError):
-            refuse("transport_metadata_invalid")
+            _converted_refusal(refuse, "transport_metadata_invalid")
         except (TransportFault, OSError, TransportReadError) as exc:
             if isinstance(exc, TransportFault) and exc.kind == "blocked_host":
-                refuse("blocked_host")
+                _converted_refusal(refuse, "blocked_host")
             if attempt < MAX_RETRIES:
                 sleep(BACKOFF_S[attempt])
     refuse("network_exhausted")
@@ -123,7 +133,7 @@ def stream_download(
                 return host_of(response.final_url)
         except (TransportFault, OSError, TransportReadError) as exc:
             if isinstance(exc, TransportFault) and exc.kind == "blocked_host":
-                refuse("blocked_host")
+                _converted_refusal(refuse, "blocked_host")
             target.unlink(missing_ok=True)
             if attempt < MAX_RETRIES:
                 sleep(BACKOFF_S[attempt])

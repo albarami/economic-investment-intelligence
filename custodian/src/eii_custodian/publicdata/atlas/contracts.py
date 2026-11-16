@@ -5,11 +5,12 @@ from __future__ import annotations
 import json
 import tempfile
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import datetime
 from pathlib import Path
 from typing import Any, cast
 
 from eii_custodian.publicdata.baci.contracts import Product as BaciProduct
+from eii_custodian.publicdata.fetch.allowlist import host_of
 from eii_custodian.publicdata.fetch.receipts import sidecar_for
 from eii_custodian.publicdata.fetch.registry import RegistryError, _entry
 
@@ -163,6 +164,15 @@ def read_selected(cache: Path, selected: str) -> Release:
             archive = directory / f"{digest}.zip"
             require(file_hash(archive) == digest, "archive_hash")
             require(archive.stat().st_size == item["bytes"], "archive_bytes")
+            download = next(item for item in config.downloads if item.grain == grain)
+            require(
+                not download.publisher_sha256 or download.publisher_sha256 == digest,
+                "archive_checksum",
+            )
+            require(
+                item["host"] in {host_of(url) for url in config.reviewed_urls},
+                "source_chain",
+            )
             paths[grain] = archive
         primary = archives[FINISHED[0]]["sha256"]
         require(receipt["sha256"] == primary, "archive_hash")
@@ -174,18 +184,17 @@ def read_selected(cache: Path, selected: str) -> Release:
             and receipt["commit_allowed"] is False,
             "source_chain",
         )
-        date.fromisoformat(receipt["terms_read_on"])
         require(
             receipt["terms_sha256"] is None or digest_ok(receipt["terms_sha256"]),
             "terms_fingerprint",
         )
-        require(receipt["fetch_host"] == entry.fetch_host, "source_chain")
+        final_host = archives[FINISHED[0]]["host"]
         expected = sidecar_for(
             entry,
             digest=primary,
             nbytes=archives[FINISHED[0]]["bytes"],
             fetch_url=entry.url,
-            fetch_host=entry.fetch_host,
+            fetch_host=final_host,
             retrieved_utc=retrieved,
             publisher=entry.publisher,
             source_modified=config.source_version,

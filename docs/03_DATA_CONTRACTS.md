@@ -728,6 +728,12 @@ activated by these contracts (decision 0040 items 3 and 4).
 
 #### Gravity and Atlas table contracts (S2-T25)
 
+Selected manifests bind each archive's actual final host to that source's
+reviewed addresses. Gravity records `archive_host`; Atlas records `host` for
+each grain in `archives`. Readers reconstruct the receipt with the recorded
+final host and recheck every configured publisher checksum. The initial
+registry host still matches the initial download address.
+
 `pub_gravity_bilateral` is Public, keyed by `source_version`, `hs_revision`,
 `year`, `origin_code`, `destination_code`. `pub_gravity_country` is Public,
 keyed by `source_version`, `country_code`. `pub_atlas_country_product_year` is

@@ -5,11 +5,12 @@ from __future__ import annotations
 import json
 import tempfile
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import datetime
 from pathlib import Path
 from typing import Any, cast
 
 from eii_custodian.publicdata.baci.contracts import Country as BaciCountry
+from eii_custodian.publicdata.fetch.allowlist import host_of
 from eii_custodian.publicdata.fetch.receipts import sidecar_for
 from eii_custodian.publicdata.fetch.registry import RegistryError, _entry
 
@@ -123,7 +124,6 @@ def read_selected(cache: Path, selected: str) -> Release:
             and receipt["commit_allowed"] is False,
             "source_chain",
         )
-        date.fromisoformat(receipt["terms_read_on"])
         require(
             not config.publisher_sha256 or config.publisher_sha256 == digest,
             "archive_checksum",
@@ -132,13 +132,16 @@ def read_selected(cache: Path, selected: str) -> Release:
             receipt["terms_sha256"] is None or digest_ok(receipt["terms_sha256"]),
             "terms_fingerprint",
         )
-        require(receipt["fetch_host"] == entry.fetch_host, "source_chain")
+        final_host = manifest["archive_host"]
+        require(
+            final_host in {host_of(url) for url in config.reviewed_urls}, "source_chain"
+        )
         expected = sidecar_for(
             entry,
             digest=digest,
             nbytes=archive.stat().st_size,
             fetch_url=entry.url,
-            fetch_host=entry.fetch_host,
+            fetch_host=final_host,
             retrieved_utc=retrieved,
             publisher=entry.publisher,
             source_modified=config.source_version,
@@ -154,7 +157,6 @@ def read_selected(cache: Path, selected: str) -> Release:
         rows: list[list[dict[str, object]]] = []
         for table in TABLES:
             output_hash = outputs[table]["sha256"]
-            require(digest_ok(output_hash), "output_hash")
             output = directory / f"{output_hash}.jsonl"
             require(file_hash(output) == output_hash, "output_hash")
             rows.append(

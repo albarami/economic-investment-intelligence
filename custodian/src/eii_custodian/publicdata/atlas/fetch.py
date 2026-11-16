@@ -45,7 +45,7 @@ class Result:
 
 
 def _refuse(reason: str) -> NoReturn:
-    raise AtlasError(reason)
+    raise AtlasError(reason) from None
 
 
 def _reviewed(url: str, config: Config) -> None:

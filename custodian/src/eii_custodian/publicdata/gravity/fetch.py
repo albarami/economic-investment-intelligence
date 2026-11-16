@@ -36,7 +36,7 @@ class Result:
 
 
 def _refuse(reason: str) -> NoReturn:
-    raise GravityError(reason)
+    raise GravityError(reason) from None
 
 
 def _reviewed(url: str, config: Config) -> None:
@@ -206,6 +206,7 @@ def fetch_gravity(
                 "terms_fingerprint_kind": "visible_text",
                 "terms_unread": terms_unread,
                 "archive_sha256": digest,
+                "archive_host": host,
                 **parsed,
             }
             manifest_file = stage / "manifest.json"

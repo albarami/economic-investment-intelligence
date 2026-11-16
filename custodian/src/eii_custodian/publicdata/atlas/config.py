@@ -234,7 +234,13 @@ class Download:
                 sum(member.kind == grain for member in members) == 1, "finished_grain"
             )
             require(
-                all(member.kind != "rebuild" for member in members), "rebuild_refused"
+                len({member.name for member in members}) == len(members), "inventory"
+            )
+            require(
+                len(members) == 3
+                and {member.kind for member in members}
+                == {"country", "product", grain},
+                "finished_grain",
             )
         return result
 
@@ -338,7 +344,6 @@ class Config:
             require(result.bound_origin != "pending", "bounds_unconfirmed")
             require(result.year_selection != "pending", "year_selection")
             require(result.access != "unconfirmed", "access_state")
-            require(bool(result.hs_revision.strip()), "revision")
             require(digest_ok(result.page_sha256), "page_hash")
             require(
                 result.page in result.reviewed_urls

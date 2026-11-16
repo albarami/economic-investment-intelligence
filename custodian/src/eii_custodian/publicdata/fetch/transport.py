@@ -6,6 +6,7 @@ import urllib.error
 import urllib.request
 from collections.abc import Callable, Iterator
 from contextlib import AbstractContextManager, contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 from http.client import HTTPException, HTTPMessage
 from typing import IO
@@ -17,6 +18,25 @@ HTTP_TIMEOUT_S = 60.0
 MAX_RETRIES = 3
 ATTEMPT_LIMIT = MAX_RETRIES + 1
 BACKOFF_S = (1.0, 2.0, 4.0)
+
+_METADATA_LIMIT: ContextVar[int | None] = ContextVar(
+    "metadata_byte_limit", default=None
+)
+
+
+@contextmanager
+def metadata_limit(max_bytes: int) -> Iterator[None]:
+    """Bound HTTPS reads through existing one-argument transport wrappers.
+
+    The scope is local to this call context and reset even after a refusal.
+    Other callers retain the unbounded interface.
+    """
+    token = _METADATA_LIMIT.set(max_bytes)
+    try:
+        yield
+    finally:
+        _METADATA_LIMIT.reset(token)
+
 
 Transport = Callable[[str], "Response"]
 Sleeper = Callable[[float], None]
@@ -73,7 +93,8 @@ def open_https(url: str, *, reviewed_urls: tuple[str, ...] | None = None) -> Res
     request = urllib.request.Request(url, method="GET")
     try:
         with opener.open(request, timeout=HTTP_TIMEOUT_S) as response:
-            body = response.read()
+            limit = _METADATA_LIMIT.get()
+            body = response.read() if limit is None else response.read(limit + 1)
             final = str(response.geturl())
             if reviewed_urls is not None and (
                 final not in reviewed_urls or not _stream_allowed(final)

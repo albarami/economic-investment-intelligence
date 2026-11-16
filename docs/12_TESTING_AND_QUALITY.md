@@ -679,3 +679,11 @@ both bilateral directions, host and query-string refusal, access obstacles,
 bounded retries, interrupted publication and secret-free diagnostics. Fixtures
 use invented codes and values. They do not verify a publisher page, a licence,
 a version or a host. This paragraph makes no completion claim.
+
+The S2-T25 review regression suites add formatted exception-chain plants for
+BACI, Gravity and Atlas, final-period plants for narrower selections, rehashed
+manifest tampering, reviewed cross-host round trips, exact Atlas member-kind
+inventories, source-specific refusal and inclusive-boundary plants, and fake
+opener acquisition limits for metadata and terms. The default transport test
+retains other sources' existing unbounded interface. No publisher response is
+used by these tests.

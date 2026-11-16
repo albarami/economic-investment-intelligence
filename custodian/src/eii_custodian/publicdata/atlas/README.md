@@ -20,3 +20,13 @@ year selection records the excluded coverage.
 Completion is published last in the caller's uncommitted `atlas_complexity`
 cache. Both archive hashes are bound in the manifest. Registration or a paid
 tier fetches nothing.
+
+Review repairs (S2-T25): the declared final period must be present even for a
+narrower selection; other years remain in excluded coverage. Metadata and terms
+acquisition reads at most the configured archive upper bound plus one byte,
+then refuses overflow. Upstream exception context is suppressed at conversion.
+The manifest records the actual final host; the reader checks that host against
+this source's reviewed addresses and reconstructs the receipt with it.
+Each finished download has unique member names and exactly one country, one
+product and one own-grain member. The reader rechecks each configured publisher
+checksum as well as both archives' stored hashes, sizes and final hosts.

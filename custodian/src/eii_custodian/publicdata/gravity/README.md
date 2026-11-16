@@ -24,3 +24,12 @@ Missing partners are recorded and are not zeros.
 Completion is published last in the caller's uncommitted `cepii_gravity` cache.
 `contracts.read_selected` requires an explicit digest. Registration or a paid
 tier fetches nothing.
+
+Review repairs (S2-T25): the declared final period must be present even for a
+narrower selection; other years remain in excluded coverage. Metadata and terms
+acquisition reads at most the configured archive upper bound plus one byte,
+then refuses overflow. Upstream exception context is suppressed at conversion.
+The manifest records the actual final host; the reader checks that host against
+this source's reviewed addresses and reconstructs the receipt with it.
+The manifest's `archive_host` binds the final host independently of the receipt;
+the registry continues to bind the initial address to its initial host.
