@@ -28702,6 +28702,206 @@ Seed:      none
 Notes:     The work commit has a Conventional Commit subject.
 ```
 
+#### Decision 0047: review A: REJECTED
+
+Reviewed commit `7ba3ccc`. Alibaba Qwen 3.8 Max through Droid; another maker than the drafters (Google Gemini and Moonshot Kimi, through Droid) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED**
+
+**RECORD:** 0047 — EII's own decision backlog and acceptance targets (new tasks S2-T30, S7-T24)
+**COMMIT:** 7ba3ccc
+**REVIEWER:** Droid (Factory), running Claude (Anthropic) — a different maker from the record's drafter, Kimi of Moonshot
+**SKILLS LOADED:** strict-reviewer, sanad-provenance, al-muhasibi, muhasabah-gate
+
+## First-draft findings X1 to X9
+
+| # | Verdict | Evidence |
+|---|---|---|
+| X1 | **FIXED** | Item 4 (hotel/restaurant) now maps to S7-T01's unit economics; item 22 (summer) to S7-T01 amendment A22 with S4-T09; item 29 (accident geography) to S3-T12 amendment A29; items 11, 21, 27 to new S7-T24, whose Context explains why S7-T06 and S7-T07 do not deliver them; item 28 to S6-T12 amendment A28, the site-fit and readiness host |
+| X2 | **FIXED** | Every one of the thirty rows of item A carries cards and requirement IDs; every ID and card cited exists in its document (all verified this session across docs 03, 04, 06, 07, 08, 09, 10, 11, 12) |
+| X3 | **FIXED** | The diffstat changes exactly the six files the record's Amended passages name: TASKS.md, docs 06, 12, 14, README.md and the decision record |
+| X4 | **FIXED** | Documents only; no script, code or test file is touched |
+| X5 | **FIXED** | TST-130 appears in no diff hunk; item D and TST-273 both state it stays unchanged |
+| X6 | **FIXED** | Blocks 1 and 5 (days 1–6, 22–26) sit at the slice S6 gate, blocks 2–4 (days 7–21) at the slice S7 gate, block 6 (days 27–30) at the slice S10 gate, each matching the slice that builds those scenes; the S10 gate keeps story assembly |
+| X7 | **FIXED** | Every amendment criterion is a `[ ]` guard naming what is checked, the tested code that computes it and a planted violation (e.g. A4's "a planted room-yield that combines `hotel_ext` supply and rate with a protected figure must fail", A29's "a planted accident rate per 1,000 people must fail") |
+| X8 | **FIXED** | Both new tasks carry the full form: Goal, Acceptance, Scope, Depends, Requirements, Delivery with class, reason, two personas and queued status. The class itself is defective for S7-T24; that is finding F1 under check 2, a substance failure, not a form failure |
+| X9 | **FIXED** | PRV-137 and PRV-138 each name the planted attacks (suppressed cell zeroed; differing whole-cell aggregate against the same drawn polygon under both parameter sets), the protected tables, the expected result, where the test runs, and state that no parameter, size or tolerance changes and version 1 builds no second protected window |
+
+## Check items 1 to 6
+
+**1. Item A mapping — PASS.** All thirty rows map to task IDs whose exact titles and Goals exist in TASKS.md and deliver the item (verified row by row, including every "Decision 0045 … as written" citation against decision 0045's own Capability and requirement mapping: items 1–13 and L1–L7 all exist and name the cited tasks; the O-row preamble's "item 6" is decision 0045's Decision-section own-data item, which exists). Status letters match the masked backlog section 1 exactly (P/O/D/C/G, rows 14 and 16 compound). Item 29 names S2-T28 for the offline year-partition plan and S2-T29 for the activation through the shared bounded reader, matching lead ruling L-707 in decision 0046 item 4 and S2-T29's Depends on S2-T28. The row 21 note keeps the school directory away from capacity and enrolment, matching decision 0046 item 7.
+
+**2. New and amended tasks — FAIL.** Criteria are testable, every guard has a planted violation (rule 37), Depends are real task IDs and acyclic (S2-T08→S2-T30→{S2-T12 done, S2-T27}; S7-T24's eight dependencies all precede it; S7-T13 and S7-T21 depend forward on S7-T24; no cycle), and no criterion claims a fetch, count, gate result or capability as done (S2-T30's criteria are all "can parse", "can answer", "fails"; TST-276 is the slice S10 gate's own criterion, and the record says no gate result is pre-declared). But two defects remain: F1 (S7-T24's Delivery class) and F2 (S7-T01's Depends), below.
+
+**3. Targets — PASS.** TST-268 to TST-276, PRV-137 and PRV-138 are absolute and match the masked backlog section 4 exactly; no relative target appears anywhere in the record. TST-130, TST-123, TST-221 and PRV-53 are untouched by any hunk and therefore byte-identical to base 4dff9ee. No privacy rule is weakened or tuned (rule 12): PRV-137 and PRV-138 add planted attacks and refusals only, state no parameter, size or tolerance change, keep both attacks inside the custodian plane, and build no second protected window; the S5 gate sentence runs the new attack beside every existing attack under both parameter sets.
+
+**4. Rules 10, 16, 17, 21, 24, 25 — PASS.** No forecast of venture success, no probability, no go/no-go and no advice to act appears in any new text; the 1,000 runs are framed as model sensitivity in item A row 3's note and in TST-270 ("no result is a probability of success"), matching decision 0045's Context. Missing data is never shown as zero: TST-271, PRV-137's planted zeroed cell, the S2 and S6 gate sentences ("missing evidence rather than an invented value") and planted-violation clauses in A7, A9, A20, A24, A26, A28, A29 and both new tasks. Whole-cell summing is the only exact aggregation inside a drawn area (S7-T24 criterion 3, row 27's note, consistent with DAT-141 and FE-135). Decision 0035 is kept: item B, TST-274 ("no origin word or texture reaches an audience surface") and the S10 gate sentence; DES-115 and S7-T21 are unchanged.
+
+**5. No comparison, no first/only, counts stay leads — PASS.** No named product comparison and no "first" or "only" superiority claim exists in the record or any amended passage; item E forbids both explicitly. Helper-reported counts stay leads and press-reported figures are not facts in item E, TST-275 and the S10 gate sentence; item C states that until S2-T27's registry records them, the re-fetch schedule is the advisor's report, matching decision 0046 item 5.
+
+**6. Anchors — PASS.** Every citation is a requirement ID, a heading, a task ID, a rule number, a numbered decision item or a lead-ruling identifier (L-700, L-707, the pattern the accepted base records already use). No line number appears. Spot-verified this session: decision 0046 items 5 to 7 exist, document 11's storyboard scenes 0 to 9 exist (DES-113), PRV-18, PRV-41, TST-246, BE-140, DAT-164, DAT-167 and DAT-169 exist.
+
+## Findings
+
+**F1 — S7-T24 must be Deep: it computes and releases numbers.**
+- File: TASKS.md. Place: S7-T24, Delivery line. Also docs/14_IMPLEMENTATION_PLAN.md, slice S7, task list, the S7-T24 row.
+- Defect: S7-T24 is classified "Standard" with a reason addressed only to ingress and privacy controls, but its own Acceptance has tested code computing and releasing new numbers: health, school and age-specific service-catchment shortlists (criterion 1), whole-cell population sums over drawn areas (criterion 3) and reach sets (criterion 4), on an audience surface. The review rule for this record is Deep where a task computes or releases numbers, so Standard violates it. (S2-T30's Standard is correct and must not change: it parses, archives and reports source state and computes no released figure.)
+- Exact fix: in TASKS.md replace the S7-T24 Delivery line with: `- Delivery: Deep; reason: the task computes and releases new numbers — service-catchment shortlists, whole-cell population sums and reach sets — on audience surfaces, which the delivery-class rule makes Deep; no ingress or privacy control changes. Builder persona: senior applied economist and calculation engineer; strict reviewer persona: principal economic-methods and provenance reviewer from another maker; status queued.` In docs/14_IMPLEMENTATION_PLAN.md's slice S7 task list, change the S7-T24 row's `Standard; full criteria and personas: TASKS.md, S7-T24.` to `Deep; full criteria and personas: TASKS.md, S7-T24.`
+
+**F2 — S7-T01's amended Depends omit S2-T19, the fetcher of two sources its new amendments name.**
+- File: TASKS.md. Place: S7-T01, Depends line (amended by this record).
+- Defect: Amendment A4 names dated `hotel_ext` room-supply and rate context and A5 names `survey_ext` activity accounts. Both are fetched only by S2-T19 (docs/04's hotel_ext row, "to fetch in S2-T19", and PUB-108; decision 0046 item 4 confirms neither is one of S2-T28's twelve rows). The record added S2-T11, S2-T28 and S4-T09 to S7-T01's Depends for the other named inputs of the same amendments, but not S2-T19, while S7-T08 and S7-T07 carry explicit S2-T19 wiring for the same sources. The listed Depends therefore do not carry the amendments' own inputs; the slice-gate path through S6-T05 is not source wiring.
+- Exact fix: change `- Depends: S6-T05, S2-T12, S2-T11, S2-T28, S4-T09.` to `- Depends: S6-T05, S2-T12, S2-T11, S2-T19, S2-T28, S4-T09.`
+
+Readings taken, stated for the record: "Deep where they compute or release numbers" binds the Delivery class of the tasks this record classifies (the two new tasks; amended tasks keep their untouched legacy class), and "Depends real" requires the amended dependency list to carry the inputs the record's own amendments name.
+
+No re-review until both fixes are submitted.
+```
+
+#### Decision 0047: confirmation A: APPROVED
+
+Reviewed commit `b610b06`. Alibaba Qwen 3.8 Max through Droid; another maker than the drafters (Google Gemini and Moonshot Kimi, through Droid) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED**
+
+**RECORD:** 0047 — EII's own decision backlog and acceptance targets (tasks S2-T30, S7-T24)
+**COMMIT:** b610b06
+**REVIEWER:** Droid (built by Factory), running the model Qwen3.8 Max, whose maker is Alibaba. Checked as the brief directs: the launcher's report (qwen3.8-max) is what my tool reports this session and is the true one; review A's naming of Anthropic/Claude does not match what this tool reports. I remain a different maker from the record's drafter.
+**SKILLS LOADED:** strict-reviewer, sanad-provenance, muhasabah-gate (all three loaded by name this session)
+
+**F1 — FIXED.** TASKS.md, S7-T24, Delivery line now reads:
+> `- Delivery: Deep; reason: the task computes and releases new numbers (service-catchment shortlists, whole-cell population sums and reach sets) on audience surfaces; it changes no ingress or privacy control. Builder persona: senior applied economist and calculation engineer; strict reviewer persona: principal economic-methods and provenance reviewer from another maker; status queued.`
+
+And docs/14_IMPLEMENTATION_PLAN.md, slice S7 task list, the S7-T24 row now ends:
+> `Depends: S6-T05, S6-T13, S3-T12, S3-T14, S2-T11, S2-T19, S2-T28, S2-T29. Deep; full criteria and personas: TASKS.md, S7-T24.`
+
+The class is now Deep with the reason I gave, both documents agree, and the line matches the form of the existing Deep rows in TASKS.md. S2-T30's Standard class is untouched, as review A required.
+
+**F2 — FIXED.** TASKS.md, S7-T01, Depends line now reads:
+> `- Depends: S6-T05, S2-T12, S2-T11, S2-T19, S2-T28, S4-T09.`
+
+Exactly the exact fix of review A: S2-T19, the fetcher of the `hotel_ext` and `survey_ext` sources that amendments A4 and A5 name, is now in the list; the addition keeps the dependency graph acyclic (slice S2 tasks precede slice S7 tasks).
+
+**NEW FINDINGS:** none in the changed lines. Consistency checks run on the change itself, all clean: the docs/14 row's Depends list matches S7-T24's Depends in TASKS.md; no other Standard/Deep statement for S7-T24 survives anywhere in docs/14 or TASKS.md; decision record 0047 states no delivery class for S7-T24, so the record and the amended task files do not conflict; the new Delivery line's "changes no ingress or privacy control" agrees with S7-T24's own Scope line; no personal name, private path, comparison or prohibited claim enters the changed text; the fix touches only the two files review A named.
+```
+
+#### Decision 0047: merge record
+
+- The head that was merged, `e2e9118346146eaddf7e76357d2778a7c42be5e6`, is `a81cbb9` and one ledger commit that changes `PROGRESS.md` only. `a81cbb9` is the approved commit `b610b06` (base `4dff9ee`) moved onto main `dab34b7` after decision 0046 merged; `git diff dab34b7 a81cbb9` equals `git diff 4dff9ee b610b06` apart from blob index lines and hunk line numbers (decision 0039), six files; the line numbers moved because decision 0046's last review round added lines to TASKS.md above.
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43859555911 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43859556010 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43859556192.
+- The lead's ledger run on the head: exit 0, `./eii test --seed 2026111615`: 5252 passed, 0 failed, 0 skipped, 1071 s.
+- The verdicts are quoted in the pull request's body (Review section) and in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/69 was squash-merged on 2026-11-16 at that head; merge commit `16f5d1346a9a56e9547dc4c407ebf8d60b45731d` on main; head tree `bc0a48517f8a4f1033d3dd9549097f1d84de8e36`, merge tree `bc0a48517f8a4f1033d3dd9549097f1d84de8e36`. CI on the merge commit: workflow sandbox running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43863068705 ; workflow ci running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43863068720 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43863068825.
+
+### DOCS-0048 — Decision record 0048, the shadow clock serves every area: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/70 )
+
+- What it is: [decision 0048](docs/decisions/0048-the-shadow-clock-serves-every-area.md), Accepted on 2026-11-16: the clock's sunlight and shadows serve the buildings in view wherever a height exists, under a building cap that the build measures from the slice S1 frame-rate configuration with shadows on (the record sets no number), instead of one focus district; the clock keeps one setting, its day basis; it amends decision 0023 item 2 by a new record, BRF-97, ARC-140, FE-143, DES-57, DES-207, DES-146, the glossary, S3-T16, the slice S3 paragraph of document 14, README.md and docs/README.md.
+- Why: the owner's words relayed by the advisor on 2026-11-16 at 12:48, applied by the lead's ruling L-710, ask that the shadow clock serve every place where someone would use it. A material amendment needs a decision record and never a silent edit (rule 46). Decision records keep their own pull request (rule 33).
+- Class: documents only, Standard in its subject (it changes the acceptance criteria of a queued interface task and adds planted violations for the cap and its words). Lead and editor: Anthropic (Claude Opus 5.5): the ruling L-710, the draft and the fix after review. Reviewer: Google Gemini 3.1 Pro through Droid, another maker than the editor.
+- Review: review A was REJECTED on four findings (DES-57 and ARC-140 still named one focus district, and the record's Amends row and amended passages did not list them); the lead fixed them. The confirmation was APPROVED at `e6a3efa` with the four findings fixed and checks 1 to 6 passed, naming the files and searches it read. After decision 0047 merged, the approved change (`da57f19` and `e6a3efa` on `b610b06`) was moved onto main `16f5d13` as one commit: `git diff 16f5d13 HEAD` equals `git diff b610b06 e6a3efa` apart from blob index lines and one hunk's line numbers in TASKS.md (decision 0039: a records-only move keeps approval).
+- Left unchanged: AGENTS.md and CLAUDE.md, every privacy rule, gate check, hard limit, sandbox rule and source permission. No code, check script, workflow file or test changes, and no frame rate or cap is measured. The record claims no implemented shadow, measured cap or gate approval (rule 47).
+- The repository's checks cannot tell whether the record reads the owner's words rightly. That judgement belongs to the reviewer, and the owner's choices stay with the owner.
+
+#### Evidence for the work commit `db34ab8e50a947a6d7ca585f3522e20bf58936f5`
+
+```text
+### DOCS-0048 — Decision record 0048, the shadow clock serves every area
+Commit:    db34ab8e50a947a6d7ca585f3522e20bf58936f5
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 685 text files, 93 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with record 0048 and the amended passages of documents 01, 02, 10, 11 and 14, the glossary, TASKS.md, README.md and the index rows: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### DOCS-0048 — Decision record 0048, the shadow clock serves every area
+Commit:    db34ab8e50a947a6d7ca585f3522e20bf58936f5
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### DOCS-0048 — Decision record 0048, the shadow clock serves every area
+Commit:    db34ab8e50a947a6d7ca585f3522e20bf58936f5
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files stay byte-identical; neither changes here.
+```
+
+```text
+### DOCS-0048 — Decision record 0048, the shadow clock serves every area
+Commit:    db34ab8e50a947a6d7ca585f3522e20bf58936f5
+Command:   bash -c "git diff --name-only 16f5d1346a9a56e9547dc4c407ebf8d60b45731d HEAD -- docs/decisions/ | grep -v -E '/0048-' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no earlier decision record is changed)
+Seed:      none
+Notes:     Record 0048 is a new file (rule 46); this row proves on the committed tree that no earlier decision record was edited.
+```
+
+```text
+### DOCS-0048 — Decision record 0048, the shadow clock serves every area
+Commit:    db34ab8e50a947a6d7ca585f3522e20bf58936f5
+Command:   bash -c "git diff --name-only 16f5d1346a9a56e9547dc4c407ebf8d60b45731d HEAD -- scripts .github web core custodian product gateway evals eii | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no code, check script or workflow file is changed)
+Seed:      none
+Notes:     The change is documents only.
+```
+
+```text
+### DOCS-0048 — Decision record 0048, the shadow clock serves every area
+Commit:    db34ab8e50a947a6d7ca585f3522e20bf58936f5
+Command:   bash -c "git diff --name-only 16f5d1346a9a56e9547dc4c407ebf8d60b45731d HEAD | grep -v -E '[.]md$' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (only Markdown files change)
+Seed:      none
+Notes:     Every changed file is a Markdown document.
+```
+
+```text
+### DOCS-0048 — Decision record 0048, the shadow clock serves every area
+Commit:    db34ab8e50a947a6d7ca585f3522e20bf58936f5
+Command:   ./eii test --seed 2026111616
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    5252 passed, 0 failed, 0 skipped
+Seed:      2026111616
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### DOCS-0048 — Decision record 0048, the shadow clock serves every area
+Commit:    db34ab8e50a947a6d7ca585f3522e20bf58936f5
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','16f5d1346a9a56e9547dc4c407ebf8d60b45731d..db34ab8e50a947a6d7ca585f3522e20bf58936f5'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
