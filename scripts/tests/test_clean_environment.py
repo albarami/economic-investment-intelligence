@@ -12,6 +12,7 @@ import sys
 import tempfile
 import tomllib
 import unittest
+import zipfile
 from collections.abc import Mapping, Sequence
 from functools import partial
 from pathlib import Path
@@ -810,6 +811,56 @@ class CleanEnvironment(unittest.TestCase):
         proc = run([UV, "lock", "--check", "--offline"], REPO_ROOT, child_env(cache))
         self.assertEqual(proc.returncode, 0, proc.stderr)
 
+    def prepare_offline_resolution(self, ws: Path, cache: Path) -> None:
+        """Keep resolution plants independent of cached registry metadata.
+
+        Only these disposable fixtures omit registry requirements. The clean
+        installation checks still exercise the complete repository lock.
+        """
+        root_toml = (ws / "pyproject.toml").read_text(encoding="utf-8")
+        stripped, removed = re.subn(DEPENDENCY_GROUPS_TABLE, "", root_toml)
+        self.assertEqual(removed, 1)
+        (ws / "pyproject.toml").write_text(stripped, encoding="utf-8")
+        product = ws / "product/pyproject.toml"
+        text = product.read_text(encoding="utf-8")
+        requirement = ', "pyyaml==6.0.3"'
+        self.assertEqual(text.count(requirement), 1)
+        product.write_text(text.replace(requirement, "", 1), encoding="utf-8")
+        regen = run([UV, "lock", "--offline"], ws, child_env(cache))
+        self.assertEqual(regen.returncode, 0, regen.stderr)
+
+    def add_dated_dependency(self, ws: Path) -> Path:
+        """Provide an invented, dated wheel through a file-only package index."""
+        index = ws / "fixture-index"
+        package = index / "plant"
+        package.mkdir(parents=True)
+        wheel = package / "plant-0.0.0-py3-none-any.whl"
+        info = "plant-0.0.0.dist-info"
+        with zipfile.ZipFile(wheel, "w") as archive:
+            archive.writestr(
+                f"{info}/METADATA",
+                "Metadata-Version: 2.1\nName: plant\nVersion: 0.0.0\n",
+            )
+            archive.writestr(
+                f"{info}/WHEEL",
+                "Wheel-Version: 1.0\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
+            )
+            archive.writestr(f"{info}/RECORD", "")
+        (package / "index.html").write_text(
+            f'<a href="{wheel.name}" data-upload-time="2020-01-01T00:00:00Z">'
+            f"{wheel.name}</a>",
+            encoding="utf-8",
+        )
+        product = ws / "product/pyproject.toml"
+        text = product.read_text(encoding="utf-8")
+        original = 'dependencies = ["eii-core"]'
+        self.assertEqual(text.count(original), 1)
+        product.write_text(
+            text.replace(original, 'dependencies = ["eii-core", "plant==0.0.0"]'),
+            encoding="utf-8",
+        )
+        return index
+
     def test_stale_lock_is_detected(self) -> None:
         tmp = tempfile.TemporaryDirectory(dir=self._tmp.name)
         self.addCleanup(tmp.cleanup)
@@ -820,12 +871,9 @@ class CleanEnvironment(unittest.TestCase):
         ws.mkdir()
         seed_cache(cache, self.seed)
         copy_workspace(ws)
-        root_toml = (ws / "pyproject.toml").read_text(encoding="utf-8")
-        stripped, removed = re.subn(DEPENDENCY_GROUPS_TABLE, "", root_toml)
-        self.assertEqual(removed, 1)
-        (ws / "pyproject.toml").write_text(stripped, encoding="utf-8")
-        regen = run([UV, "lock", "--offline"], ws, child_env(cache))
-        self.assertEqual(regen.returncode, 0, regen.stderr)
+        self.prepare_offline_resolution(ws, cache)
+        current = run([UV, "lock", "--check", "--offline"], ws, child_env(cache))
+        self.assertEqual(current.returncode, 0, current.stderr)
         text = (ws / "core/pyproject.toml").read_text(encoding="utf-8")
         replaced = text.replace('version = "0.0.0"', 'version = "0.0.1"', 1)
         self.assertNotEqual(text, replaced)
@@ -1041,12 +1089,18 @@ class CleanEnvironment(unittest.TestCase):
             self.assertIn("cannot be used with `UV_FROZEN`", tooth2.stderr)
 
         self.assertEqual(dict(os.environ), snapshot)
-        alone_text = (ws3 / "pyproject.toml").read_text(encoding="utf-8")
-        alone_text, removed_groups = re.subn(DEPENDENCY_GROUPS_TABLE, "", alone_text)
-        self.assertEqual(removed_groups, 1)
-        (ws3 / "pyproject.toml").write_text(alone_text, encoding="utf-8")
-        regen = run([UV, "lock", "--offline"], ws3, child_env(cache3))
+        self.prepare_offline_resolution(ws3, cache3)
+        # The cutoff plant needs a publication date, not a real registry or its
+        # cached metadata. All four alone cases use this same offline fixture.
+        index = self.add_dated_dependency(ws3)
+        fixture_env = child_env(cache3, root / "fixture-env")
+        fixture_env["UV_DEFAULT_INDEX"] = index.as_uri()
+        regen = run([UV, "lock", "--offline"], ws3, fixture_env)
         self.assertEqual(regen.returncode, 0, regen.stderr)
+        current = run([UV, "lock", "--check", "--offline"], ws3, fixture_env)
+        self.assertEqual(current.returncode, 0, current.stderr)
+        control = run([UV, *SYNC_OFFLINE], ws3, fixture_env)
+        self.assertEqual(control.returncode, 0, control.stderr)
         alone_count = 0
         for name, (want, fragment) in ALONE.items():
             with self.subTest(var=name):
@@ -1055,7 +1109,12 @@ class CleanEnvironment(unittest.TestCase):
                 folder.mkdir()
                 seed_cache(folder, self.seed)
                 merged = with_process_tmp(
-                    {**snapshot, "UV_CACHE_DIR": str(folder), name: h[name]},
+                    {
+                        **snapshot,
+                        "UV_CACHE_DIR": str(folder),
+                        "UV_DEFAULT_INDEX": index.as_uri(),
+                        name: h[name],
+                    },
                     folder,
                 )
                 proc = run(
