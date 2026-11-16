@@ -201,5 +201,6 @@ def invented_archive():
                 f"qat_admin{level}.geojson", date_time=(1980, 1, 1, 0, 0, 0)
             )
             member.external_attr = 0o600 << 16
+            member.compress_type = zipfile.ZIP_STORED
             archive.writestr(member, json.dumps(document))
     return stream.getvalue()
