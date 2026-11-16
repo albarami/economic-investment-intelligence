@@ -2447,3 +2447,48 @@ reason = "float() reads the names inf and -inf without regard to letter case, so
 module = "product/src/eii_product/assistant/catalogue/brief.py"
 mutation = "--- src/eii_product/assistant/catalogue/brief.py\n+++ src/eii_product/assistant/catalogue/brief.py\n@@ -2,5 +2,5 @@\n     if type(value) not in {int, float}:\n         return False\n     if isinstance(value, float):\n-        return value == value and value not in {float(\"inf\"), float(\"-inf\")}\n+        return value == value and value not in {float(\"inf\"), float(\"-INF\")}\n     return True"
 reason = "float() reads the names inf and -inf without regard to letter case, so float(\"INF\") and float(\"-INF\") equal float(\"inf\") and float(\"-inf\"); the set holds the same two members and the membership test is the same for every value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/listing.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/listing.py\n+++ src/eii_custodian/publicdata/fetch/listing.py\n@@ -13,8 +13,7 @@\n         key = urlsplit(part.url).path.lstrip(\"/\")\n         recorded, invalid = _recorded(part)\n         if (\n-            invalid is not None\n-            or recorded is None\n+            invalid is not None and recorded is None\n             or not key.startswith(prefix)\n             or host_of(part.url) != HOST\n         ):"
+reason = "_recorded returns either (None, a FileFailure) or ((size, etag), None), so `invalid is not None` and `recorded is None` are always both true or both false, and joining them by `and` instead of `or` changes no outcome."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/listing.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/listing.py\n+++ src/eii_custodian/publicdata/fetch/listing.py\n@@ -29,7 +29,7 @@\n     url = base\n     while True:\n         page, failure = _call_url(url, reader)\n-        if failure is not None or page is None:\n+        if failure is not None and page is None:\n             return _failed(entry, failure)\n         if any(host_of(hop) != HOST for hop in (*page.hops, page.final_url)):\n             return _refuse(entry, \"listing_redirect\")"
+reason = "_call_url returns either (None, an AttemptFailure) or (the reader's Response, None), so `failure is not None` and `page is None` are always both true or both false, and joining them by `and` instead of `or` changes no outcome."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/listing.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/listing.py\n+++ src/eii_custodian/publicdata/fetch/listing.py\n@@ -41,7 +41,7 @@\n             return _refuse(entry, \"listing_xml\")\n         objects = root.findall(_NS + \"Contents\")\n         for item in objects:\n-            key = item.findtext(_NS + \"Key\", \"\")\n+            key = item.findtext(_NS + \"Key\", \"XXXX\")\n             if not key.startswith(prefix):\n                 return _refuse(entry, \"listing_prefix\")\n             if key in found:"
+reason = "The default applies only to a Contents item without a Key; neither \"\" nor \"XXXX\" starts with either fixed release prefix in PREFIXES, so both refuse with listing_prefix, and a present Key ignores the default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/listing.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/listing.py\n+++ src/eii_custodian/publicdata/fetch/listing.py\n@@ -54,7 +54,7 @@\n                 if item.findtext(_NS + \"ETag\") != '\"' + etag + '\"':\n                     return _refuse(entry, \"listing_etag\")\n         requests.append(request_receipt(page, len(objects)))\n-        raw_pages.append(base64.b64encode(page.body).decode(\"ascii\"))\n+        raw_pages.append(base64.b64encode(page.body).decode(\"ASCII\"))\n         truncated = root.findtext(_NS + \"IsTruncated\")\n         if truncated == \"false\":\n             break"
+reason = "Python's codec lookup normalises \"ASCII\" and \"ascii\" to the same codec, and base64 output is ASCII text, so the decoded page text is identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/listing.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/listing.py\n+++ src/eii_custodian/publicdata/fetch/listing.py\n@@ -58,7 +58,7 @@\n         truncated = root.findtext(_NS + \"IsTruncated\")\n         if truncated == \"false\":\n             break\n-        token = root.findtext(_NS + \"NextContinuationToken\", \"\")\n+        token = root.findtext(_NS + \"NextContinuationToken\", None)\n         if truncated != \"true\" or not token or token in tokens:\n             return _refuse(entry, \"listing_continuation\")\n         tokens.add(token)"
+reason = "The default applies only to a page without NextContinuationToken; None (given or omitted) and \"\" are both false, so `not token` refuses with listing_continuation before the token is used, and a present token ignores the default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/listing.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/listing.py\n+++ src/eii_custodian/publicdata/fetch/listing.py\n@@ -58,7 +58,7 @@\n         truncated = root.findtext(_NS + \"IsTruncated\")\n         if truncated == \"false\":\n             break\n-        token = root.findtext(_NS + \"NextContinuationToken\", \"\")\n+        token = root.findtext(_NS + \"NextContinuationToken\", )\n         if truncated != \"true\" or not token or token in tokens:\n             return _refuse(entry, \"listing_continuation\")\n         tokens.add(token)"
+reason = "The default applies only to a page without NextContinuationToken; None (given or omitted) and \"\" are both false, so `not token` refuses with listing_continuation before the token is used, and a present token ignores the default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/listing.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/listing.py\n+++ src/eii_custodian/publicdata/fetch/listing.py\n@@ -65,7 +65,7 @@\n         url = base + \"&\" + urlencode({\"continuation-token\": token})\n     if not expected.keys() <= found:\n         return _refuse(entry, \"listing_missing\")\n-    body = json.dumps({\"listing_pages_base64\": raw_pages}, sort_keys=True).encode()\n+    body = json.dumps({\"listing_pages_base64\": raw_pages}, sort_keys=None).encode()\n     return Prepared(\n         body,\n         base,"
+reason = "The dumped object has exactly one key, listing_pages_base64, holding a list of strings, so sorting keys or not gives the same bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/listing.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/listing.py\n+++ src/eii_custodian/publicdata/fetch/listing.py\n@@ -65,7 +65,7 @@\n         url = base + \"&\" + urlencode({\"continuation-token\": token})\n     if not expected.keys() <= found:\n         return _refuse(entry, \"listing_missing\")\n-    body = json.dumps({\"listing_pages_base64\": raw_pages}, sort_keys=True).encode()\n+    body = json.dumps({\"listing_pages_base64\": raw_pages}, ).encode()\n     return Prepared(\n         body,\n         base,"
+reason = "The dumped object has exactly one key, listing_pages_base64, holding a list of strings, so sorting keys or not gives the same bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/listing.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/listing.py\n+++ src/eii_custodian/publicdata/fetch/listing.py\n@@ -65,7 +65,7 @@\n         url = base + \"&\" + urlencode({\"continuation-token\": token})\n     if not expected.keys() <= found:\n         return _refuse(entry, \"listing_missing\")\n-    body = json.dumps({\"listing_pages_base64\": raw_pages}, sort_keys=True).encode()\n+    body = json.dumps({\"listing_pages_base64\": raw_pages}, sort_keys=False).encode()\n     return Prepared(\n         body,\n         base,"
+reason = "The dumped object has exactly one key, listing_pages_base64, holding a list of strings, so sorting keys or not gives the same bytes."
