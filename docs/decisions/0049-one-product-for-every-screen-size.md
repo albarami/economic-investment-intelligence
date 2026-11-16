@@ -6,7 +6,7 @@
 | Date | 2026-11-16 |
 | Owner | The owner |
 | Decided by | The owner's relayed note of 2026-11-16 16:40 as applied by the lead's ruling L-720 |
-| Amends | [TASKS.md](../../TASKS.md) (S3-T16, S3-T20, S3-T21, S6-T37, S8-T15); [docs/10_FRONTEND.md](../10_FRONTEND.md) (Layouts, FE-69, FE-73); [docs/11_DESIGN_DIRECTION.md](../11_DESIGN_DIRECTION.md) (DES-01); [docs/12_TESTING_AND_QUALITY.md](../12_TESTING_AND_QUALITY.md) (TST-90); [docs/16_DEMO_RUNBOOK.md](../16_DEMO_RUNBOOK.md); [docs/README.md](../README.md) |
+| Amends | [TASKS.md](../../TASKS.md) (S3-T09, S3-T16, S3-T18, S3-T20, S3-T21, S6-T37, S6-T38, S8-T15); [docs/10_FRONTEND.md](../10_FRONTEND.md) (Layouts, FE-69, FE-70, FE-72, FE-73, FE-143, ASSUMPTIONS 5 and 6); [docs/11_DESIGN_DIRECTION.md](../11_DESIGN_DIRECTION.md) (DES-01, DES-27); [docs/12_TESTING_AND_QUALITY.md](../12_TESTING_AND_QUALITY.md) (TST-90); [docs/14_IMPLEMENTATION_PLAN.md](../14_IMPLEMENTATION_PLAN.md) (slice S6 gate); [docs/16_DEMO_RUNBOOK.md](../16_DEMO_RUNBOOK.md); [docs/README.md](../README.md) |
 | Purpose | One product, one codebase, one layout that responds to the screen: phone, tablet, normal laptop or PC, widescreen and ultrawide, and a big presentation screen or TV. |
 | Read first | Decisions 0041, 0042, 0044, 0048; documents 10, 11, 12, 16. |
 
@@ -35,14 +35,18 @@ The owner's relayed note of 2026-11-16 16:40 specifies that the product must be 
 
 ## Amended passages
 
-- **10_FRONTEND.md:** Layouts section and FE-69 are amended to replace the breakpoints with the named sizes; FE-73 explicitly maintains 44 px targets on phones.
-- **11_DESIGN_DIRECTION.md:** DES-01 is amended to reflect the eight named sizes instead of the original breakpoints.
+- **10_FRONTEND.md:** Layouts section, FE-69, FE-70, FE-72, FE-143, and ASSUMPTIONS 5 and 6 are amended to say the breakpoints are retained and extended by 768 CSS px, with the eight named sizes added as the proof set; FE-73 explicitly maintains 44 px targets on phones.
+- **11_DESIGN_DIRECTION.md:** DES-01 and DES-27 are amended to say the breakpoints are retained and extended by 768 CSS px, with the eight named sizes added as the proof set.
 - **12_TESTING_AND_QUALITY.md:** TST-90 is amended (stricter) to cover the eight named sizes instead of four.
+- **14_IMPLEMENTATION_PLAN.md:** slice S6 gate line amended to require visual tests pass at the eight named sizes.
 - **TASKS.md:** 
+  - S3-T09: Amendment line added that the Stage, Brief and answer card hold at the eight named sizes, with nothing overflowing or hiding the answer card, and the phone layout uses a bottom sheet.
   - S3-T16: Amendment line added that controls hold at the named sizes and the building cap scales with the measured frame rate.
+  - S3-T18: Amendment line added that controls hold at the eight named sizes.
   - S3-T20: Amendment line added that the phone evidence is widened to include the named size matrix.
   - S3-T21: Amendment line added to produce screenshots of each named size in both languages.
   - S6-T37 (Explore screen): Amendment line added to ensure layout responds to the named sizes without overflow.
+  - S6-T38: Amendment line added that visuals pass at the eight named sizes.
   - S8-T15 (Map-first answers): Amendment line added that the map answers first at every size.
 - **docs/README.md:** 0049 is added to the list of accepted records.
 

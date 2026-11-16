@@ -701,13 +701,13 @@ Keys are physical: the clicker's next key and the Right arrow key always mean "n
 | Tablet | width 768 to 1199 CSS px, touch first | Stage full width; the Brief is a bottom sheet over the map; drawers are full-height sheets |
 | Phone | widths below 768 CSS px | Answer card as a bottom sheet, reachable one-hand controls. Map answers first. |
 
-Breakpoint values are ASSUMPTIONS chosen so that each pinned viewport below falls in its named layout; they are adjusted after the first visual review. Pinned visual-test viewports are 3840 × 2160 (Wall, presenter mode), 3440x1440 and 2560x1440 (Wall arrangement with Laptop sizes), 1920 × 1080 (Wall arrangement with Laptop sizes), 1440 × 900 (Laptop), 1366x768 (Laptop), 1024 × 768 (Tablet), 768x1024 (Tablet), 390x844 and 360x640 (portrait and landscape, Phone) (decision 0049). The 3840 × 2160 case measures the pixel-ratio cap; presenter mode still expects a 1920 × 1080 CSS viewport.
+Breakpoint values are ASSUMPTIONS chosen so that each pinned viewport below falls in its named layout; they are adjusted after the first visual review. Pinned visual-test viewports are 3840 × 2160 (Wall, presenter mode), 3440x1440 and 2560x1440 (Wall arrangement with Laptop sizes), 1920 × 1080 (Wall arrangement with Laptop sizes), 1440 × 900 (Laptop), 1366x768 (Laptop), 1024 × 768 (Tablet), 768x1024 (Tablet), 390x844 and 360x640 (portrait and landscape, Phone) (decision 0049). Where a named size and a width band disagree, the layout named for that size in this list governs. The 3840 × 2160 case measures the pixel-ratio cap; presenter mode still expects a 1920 × 1080 CSS viewport.
 
 **Presenter mode** (`EII_PRESENTER=1`, or the presenter control) applies the big-screen rules of the master design: the 1920 × 1080 design canvas, no text under 28 px, 5% safe margins (96 px left and right and 54 px top and bottom at 1080 lines, design research), no hover-only information, and a pixel-ratio cap for 4K. Presenter mode expects a 1920 × 1080 CSS viewport; the 3840 × 2160 test measures the cap. Theme, room scale, Pause motion and the 40 px presenter pointer remain available. The cap is applied to both MapLibre (`pixelRatio`, and `maxCanvasSize`, which lowers the ratio to fit; MapLibre MapOptions page, retrieved 2026-11-11) and deck.gl (`useDevicePixels` set to a number). The default cap value is set at slice S1 from the frame-rate measurement.
 
 **No hover-only information.** Nothing important is shown only on hover. Every chip, legend entry and map feature that has detail opens it on tap, click or Enter. The `title` attribute is not used for information.
 
-**Touch targets.** Interactive targets are at least 24 x 24 CSS px everywhere (WCAG 2.2 success criterion 2.5.8, Level AA) and at least 44 x 44 CSS px in tablet layout and presenter mode (ASSUMPTION: a larger target for fingers and for a room). An optional idle timer that returns to the opening view is available to the presenter and is off by default (ASSUMPTION: a timer can surprise a company's user who is exploring alone; the users are the three personas of [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 15).
+**Touch targets.** Interactive targets are at least 24 x 24 CSS px everywhere (WCAG 2.2 success criterion 2.5.8, Level AA) and at least 44 x 44 CSS px in tablet layout, phones, big screen and presenter mode (ASSUMPTION: a larger target for fingers and for a room). An optional idle timer that returns to the opening view is available to the presenter and is off by default (ASSUMPTION: a timer can surprise a company's user who is exploring alone; the users are the three personas of [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 15).
 
 | ID | Requirement | Slice |
 |---|---|---|
@@ -861,7 +861,7 @@ ASSUMPTIONS (each with its reason):
 3. No state library; one store with selectors is enough for one session per window (section 3.3).
 4. Zone numbers inside official place names are Public geography labels, not facts, and are exempt from the lint (section 5).
 5. Breakpoints 1600, 1200 and 768 CSS px (section 9).
-6. 44 x 44 CSS px targets in tablet layout, phones, and presenter mode; idle timer off by default (section 9).
+6. 44 x 44 CSS px targets in tablet layout, phones, big screen and presenter mode; idle timer off by default (section 9).
 7. Definition of the 60-frames gate, dial frame limit, map-ready and memory targets (section 12).
 8. Vitest, React Testing Library, Playwright with Chromium and axe-core as test tools, pinned at slice S0 (section 13).
 9. Ten routes, with case stories on a route of their own (section 3.2); the oversight route left with the oversight seat ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 15).
