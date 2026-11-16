@@ -7810,6 +7810,7 @@ sources:
     point: [25.2854, 51.531]
     variables: ["temperature_2m"]
     cache_role: "generator_input"
+# BEGIN S2-T19 sources
   - key: bank_credit_act/local-banks-credit-by-economic-activity
     source_id: bank_credit_act
     slug: local-banks-credit-by-economic-activity
