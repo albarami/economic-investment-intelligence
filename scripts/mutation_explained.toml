@@ -2638,3 +2638,203 @@ reason = "rows and match_rows have equal length at that statement: the refusal t
 module = "core/src/eii_core/calc/building_heights.py"
 mutation = "--- src/eii_core/calc/building_heights.py\n+++ src/eii_core/calc/building_heights.py\n@@ -20,7 +20,7 @@\n     no_value: dict[str, int] = {}\n     fallback_buildings = 0\n     tied_height_buildings = 0\n-    for choice, matches in zip(rows, match_rows, strict=True):\n+    for choice, matches in zip(rows, match_rows, strict=False):\n         if choice.source not in HEIGHT_SOURCES:\n             raise ValueError(\"height source outside the closed list\")\n         by_source[choice.source] += 1"
 reason = "rows and match_rows have equal length at that statement: the refusal three statements above raises \"match list length differs from the choices\" on any difference, and both are lists built in this function. zip of two equal-length lists yields the same pairs whether strict is True, False, None or absent, so no input can tell the mutant from the original."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -1,6 +1,6 @@\n def _portal(entry: Entry, reader: Read) -> Prepared:\n     meta_url = _metadata_url(entry.url)\n-    meta, failure = _call(entry, meta_url, reader)\n+    meta, failure = _call(None, meta_url, reader)\n     if failure is not None or meta is None:\n         return _failed(entry, failure)\n     export, failure = _call(entry, entry.url, reader)"
+reason = "_call deletes its entry argument at once and passes only the URL and the reader to _call_url, so replacing entry with None changes no result or side effect."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -3,7 +3,7 @@\n     meta, failure = _call(entry, meta_url, reader)\n     if failure is not None or meta is None:\n         return _failed(entry, failure)\n-    export, failure = _call(entry, entry.url, reader)\n+    export, failure = _call(None, entry.url, reader)\n     if failure is not None or export is None:\n         return _failed(entry, failure)\n     observed = _portal_meta(meta.body)"
+reason = "_call deletes its entry argument at once and passes only the URL and the reader to _call_url, so replacing entry with None changes no result or side effect."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -7,7 +7,7 @@\n         layer,\n         {\"where\": \"1=1\", \"returnCountOnly\": \"true\", \"f\": \"json\"},\n     )\n-    counted, failure = _call(entry, count_url, reader)\n+    counted, failure = _call(None, count_url, reader)\n     if failure is not None or counted is None:\n         return _failed(entry, failure)\n     total = _arcgis_count(counted.body)"
+reason = "_call deletes its entry argument at once and passes only the URL and the reader to _call_url, so replacing entry with None changes no result or side effect."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -31,7 +31,7 @@\n                 \"f\": \"json\",\n             },\n         )\n-        page, failure = _call(entry, page_url, reader)\n+        page, failure = _call(None, page_url, reader)\n         if failure is not None or page is None:\n             return _failed(entry, failure)\n         batch = _features(page.body)"
+reason = "_call deletes its entry argument at once and passes only the URL and the reader to _call_url, so replacing entry with None changes no result or side effect."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -55,6 +55,6 @@\n             AttemptFailure(1, final, \"short_total\", str(total), str(len(features))),\n         )\n     body = json.dumps({\"count\": total, \"features\": features}, sort_keys=True).encode(\n-        \"utf-8\"\n+        \"UTF-8\"\n     )\n     return Prepared(body, final, host_of(final), entry.publisher, \"\", total, \"\", None)"
+reason = "Python's codec lookup normalises \"UTF-8\" and \"utf-8\" to the same utf_8 codec, for valid and invalid bytes alike."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -14,7 +14,7 @@\n     page_cache = None if cache is None else cache_directory(cache, entry.key)\n     try:\n         _fetched = fetch_tenders(\n-            tender_https(entry, chain_file=CHAIN_PATH),\n+            tender_https(entry, chain_file=None),\n             chain_file=CHAIN_PATH,\n             chain_sha256=entry.chain_intermediate_sha256,\n             sleep=sleep,"
+reason = "tender_https resolves chain_file None to the module CHAIN_PATH that _paged_cards passes explicitly, so None, omission and CHAIN_PATH select the same file and checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -14,7 +14,7 @@\n     page_cache = None if cache is None else cache_directory(cache, entry.key)\n     try:\n         _fetched = fetch_tenders(\n-            tender_https(entry, chain_file=CHAIN_PATH),\n+            tender_https(entry, ),\n             chain_file=CHAIN_PATH,\n             chain_sha256=entry.chain_intermediate_sha256,\n             sleep=sleep,"
+reason = "tender_https resolves chain_file None to the module CHAIN_PATH that _paged_cards passes explicitly, so None, omission and CHAIN_PATH select the same file and checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -6,7 +6,7 @@\n     the final address ever reach the receipt, the manifest, a check's error\n     text or the log, and `hops` are never stored anywhere.\n     \"\"\"\n-    response, failure = _call(entry, entry.url, reader)\n+    response, failure = _call(None, entry.url, reader)\n     if failure is not None or response is None:\n         return _failed(entry, failure)\n     final = public_address(response.final_url)"
+reason = "_call deletes its entry argument at once and passes only the URL and the reader to _call_url, so replacing entry with None changes no result or side effect."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -1,5 +1,5 @@\n def _terms(entry: Entry, reader: Read) -> Prepared:\n-    page, failure = _call(entry, entry.url, reader)\n+    page, failure = _call(None, entry.url, reader)\n     if failure is not None or page is None:\n         return _failed(entry, failure)\n     terms_hash, unread = _terms_fingerprint(entry, reader)"
+reason = "_call deletes its entry argument at once and passes only the URL and the reader to _call_url, so replacing entry with None changes no result or side effect."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -6,7 +6,7 @@\n     The source URL is not read. A failure does not decide the row's data.\n     \"\"\"\n     reader = _reader(transport, sleep)\n-    terms, failure = _call(entry, entry.terms_url, reader)\n+    terms, failure = _call(None, entry.terms_url, reader)\n     if failure is not None or terms is None:\n         return TermsPage(\"\", failure)\n     return TermsPage(terms_text_sha256(terms.body), None)"
+reason = "_call deletes its entry argument at once and passes only the URL and the reader to _call_url, so replacing entry with None changes no result or side effect."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -1,6 +1,6 @@\n def _portal_meta(body: bytes) -> tuple[str, str, str, str] | None:\n     try:\n-        loaded = json.loads(body.decode(\"utf-8\"))\n+        loaded = json.loads(body.decode(\"UTF-8\"))\n     except (UnicodeError, json.JSONDecodeError):\n         return None\n     if not isinstance(loaded, dict):"
+reason = "Python's codec lookup normalises \"UTF-8\" and \"utf-8\" to the same utf_8 codec, for valid and invalid bytes alike."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -1,6 +1,6 @@\n def _json_rows(body: bytes) -> list[object] | None:\n     try:\n-        loaded = json.loads(body.decode(\"utf-8\"))\n+        loaded = json.loads(body.decode(\"UTF-8\"))\n     except (UnicodeError, json.JSONDecodeError):\n         return None\n     if isinstance(loaded, list):"
+reason = "Python's codec lookup normalises \"UTF-8\" and \"utf-8\" to the same utf_8 codec, for valid and invalid bytes alike."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -1,6 +1,6 @@\n def _arcgis_count(body: bytes) -> int | None:\n     try:\n-        loaded = json.loads(body.decode(\"utf-8\"))\n+        loaded = json.loads(body.decode(\"UTF-8\"))\n     except (UnicodeError, json.JSONDecodeError):\n         return None\n     if not isinstance(loaded, dict):"
+reason = "Python's codec lookup normalises \"UTF-8\" and \"utf-8\" to the same utf_8 codec, for valid and invalid bytes alike."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -1,6 +1,6 @@\n def _features(body: bytes) -> list[object] | None:\n     try:\n-        loaded = json.loads(body.decode(\"utf-8\"))\n+        loaded = json.loads(body.decode(\"UTF-8\"))\n     except (UnicodeError, json.JSONDecodeError):\n         return None\n     if not isinstance(loaded, dict):"
+reason = "Python's codec lookup normalises \"UTF-8\" and \"utf-8\" to the same utf_8 codec, for valid and invalid bytes alike."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -15,7 +15,7 @@\n     for layer in source.layers:\n         base = f\"https://{host}{layer.service_path}\"\n         meta_url = base.rstrip(\"/\") + f\"/{layer.layer_id}?f=json\"\n-        meta, failure = _call(entry, meta_url, reader)\n+        meta, failure = _call(None, meta_url, reader)\n         if failure is not None or meta is None:\n             return _failed(entry, failure)\n         if _token_demand(meta.body):"
+reason = "_call deletes its entry argument at once and passes only the URL and the reader to _call_url, so replacing entry with None changes no result or side effect."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -25,7 +25,7 @@\n             layer.layer_id,\n             {\"where\": \"1=1\", \"returnCountOnly\": \"true\", \"f\": \"json\"},\n         )\n-        counted, failure = _call(entry, counted_url, reader)\n+        counted, failure = _call(None, counted_url, reader)\n         if failure is not None or counted is None:\n             return _failed(entry, failure)\n         if _token_demand(counted.body):"
+reason = "_call deletes its entry argument at once and passes only the URL and the reader to _call_url, so replacing entry with None changes no result or side effect."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -65,7 +65,7 @@\n                     \"f\": \"json\",\n                 },\n             )\n-            page, failure = _call(entry, page_url, reader)\n+            page, failure = _call(None, page_url, reader)\n             if failure is not None or page is None:\n                 return _failed(entry, failure)\n             if _token_demand(page.body):"
+reason = "_call deletes its entry argument at once and passes only the URL and the reader to _call_url, so replacing entry with None changes no result or side effect."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -103,9 +103,7 @@\n         if len(features) > layer_total:\n             return _failed(\n                 entry,\n-                AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n-                ),\n+                None,\n             )\n         total += layer_total\n         collected.append("
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -103,10 +103,7 @@\n         if len(features) > layer_total:\n             return _failed(\n                 entry,\n-                AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n-                ),\n-            )\n+                )\n         total += layer_total\n         collected.append(\n             {"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    None, final, \"long_total\", str(layer_total), str(len(features))\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    1, None, \"long_total\", str(layer_total), str(len(features))\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    1, final, None, str(layer_total), str(len(features))\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    1, final, \"long_total\", None, str(len(features))\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    1, final, \"long_total\", str(layer_total), None\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    final, \"long_total\", str(layer_total), str(len(features))\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    1, \"long_total\", str(layer_total), str(len(features))\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    1, final, str(layer_total), str(len(features))\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    1, final, \"long_total\", str(len(features))\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,8 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n-                ),\n+                    1, final, \"long_total\", str(layer_total), ),\n             )\n         total += layer_total\n         collected.append("
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    2, final, \"long_total\", str(layer_total), str(len(features))\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    1, final, \"XXlong_totalXX\", str(layer_total), str(len(features))\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    1, final, \"LONG_TOTAL\", str(layer_total), str(len(features))\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    1, final, \"long_total\", str(None), str(len(features))\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -104,7 +104,7 @@\n             return _failed(\n                 entry,\n                 AttemptFailure(\n-                    1, final, \"long_total\", str(layer_total), str(len(features))\n+                    1, final, \"long_total\", str(layer_total), str(None)\n                 ),\n             )\n         total += layer_total"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -118,5 +118,5 @@\n                 \"features\": features,\n             }\n         )\n-    body = json.dumps({\"layers\": collected}, sort_keys=True).encode(\"utf-8\")\n+    body = json.dumps({\"layers\": collected}, sort_keys=True).encode(\"UTF-8\")\n     return Prepared(body, final, host, entry.publisher, \"\", total, \"\", None)"
+reason = "Python's codec lookup normalises \"UTF-8\" and \"utf-8\" to the same utf_8 codec, for valid and invalid bytes alike."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -1,7 +1,7 @@\n def _token_demand(body: bytes) -> bool:\n     \"\"\"ArcGIS JSON error for a token or a sign-in. Any other body is not one.\"\"\"\n     try:\n-        loaded = json.loads(body.decode(\"utf-8\"))\n+        loaded = json.loads(body.decode(\"UTF-8\"))\n     except (UnicodeError, json.JSONDecodeError):\n         return False\n     if not isinstance(loaded, dict):"
+reason = "Python's codec lookup normalises \"UTF-8\" and \"utf-8\" to the same utf_8 codec, for valid and invalid bytes alike."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -11,7 +11,7 @@\n         return False\n     code = error.get(\"code\")\n     message = error.get(\"message\")\n-    text = message.casefold() if isinstance(message, str) else \"\"\n+    text = message.casefold() if isinstance(message, str) else \"XXXX\"\n     if code in (498, 499):\n         return True\n     return \"token\" in text or \"sign in\" in text or \"signin\" in text"
+reason = "The fallback text is used only when the message is not a string; neither the empty text nor XXXX contains token, sign in or signin, and the code check is unchanged, so every input returns the same result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -1,7 +1,7 @@\n def _layer_page(body: bytes) -> tuple[int | None, str | None]:\n     \"\"\"Read maxRecordCount and the single esriFieldTypeOID name.\"\"\"\n     try:\n-        loaded = json.loads(body.decode(\"utf-8\"))\n+        loaded = json.loads(body.decode(\"UTF-8\"))\n     except (UnicodeError, json.JSONDecodeError):\n         return None, None\n     if not isinstance(loaded, dict):"
+reason = "Python's codec lookup normalises \"UTF-8\" and \"utf-8\" to the same utf_8 codec, for valid and invalid bytes alike."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -102,7 +102,7 @@\n             )\n         if len(features) > layer_total:\n             return _failed(\n-                entry,\n+                None,\n                 AttemptFailure(\n                     1, final, \"long_total\", str(layer_total), str(len(features))\n                 ),"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -102,7 +102,6 @@\n             )\n         if len(features) > layer_total:\n             return _failed(\n-                entry,\n                 AttemptFailure(\n                     1, final, \"long_total\", str(layer_total), str(len(features))\n                 ),"
+reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
