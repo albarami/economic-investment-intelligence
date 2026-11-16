@@ -442,8 +442,7 @@ def test_besttime_build_failure_names_missing_place(tmp_path, monkeypatch):
 
 
 def test_besttime_command_environment_reaches_build(tmp_path, monkeypatch):
-    from scripts.commands import build_public
-
+    import commands.build_public as build_public
     from eii_custodian.publicdata.fetch.build import BuildOutcome
 
     seen = []
