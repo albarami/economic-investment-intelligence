@@ -121,6 +121,78 @@ class PilotRunnerTests(unittest.TestCase):
             self.assertEqual(outputs[0], outputs[1])
             self.assertEqual(calls[0], calls[1])
 
+    def test_foreign_manifest_refused_before_campaign(self) -> None:
+        with TemporaryDirectory(prefix="synthetic-pilot-foreign-") as temporary:
+            folder = Path(temporary)
+            (folder / "src").mkdir()
+            (folder / "tests").mkdir()
+            (folder / "src/toy.py").write_text("def value():\n    return 2 + 3 + 4\n")
+            (folder / "tests/test_toy.py").write_text(
+                "from toy import value\ndef test_value():\n    assert value() == 9\n"
+            )
+            (folder / "pyproject.toml").write_text(
+                '[tool.pytest]\npythonpath=["src"]\n'
+            )
+            ledger = folder / "ledger.toml"
+            ledger.write_text("survivors=[]\n")
+            context = {
+                "commit": "a" * 40,
+                "module": pilot.MODULE,
+                "hashes": {
+                    "source": pilot.digest((folder / "src/toy.py").read_bytes())
+                },
+            }
+            manifest_path = folder / "manifest.json"
+            code, _ = mutation.run_copy(
+                folder,
+                ["src/toy.py"],
+                ["tests"],
+                ledger,
+                pilot_options={"context": context, "list_mutants": manifest_path},
+            )
+            self.assertEqual(code, 0)
+            universe = pilot.read(manifest_path)
+            rows = universe["mutants"]
+            rows[0] = {"name": "toy.x_foreign__mutmut_1", "diff_sha256": "c" * 64}
+            supplied = pilot.manifest(context, rows)
+            pilot.verify_manifest(supplied)
+            pilot.write(manifest_path, supplied)
+            run_pilot = mutation.run_pilot_copy
+
+            def assert_refusal(*args: Any, **kwargs: Any) -> Any:
+                with self.assertRaisesRegex(
+                    pilot.Refusal, "regenerated-universe"
+                ) as caught:
+                    run_pilot(*args, **kwargs)
+                raise caught.exception
+
+            with (
+                patch.object(mutation, "run_pilot_copy", side_effect=assert_refusal),
+                patch.object(
+                    mutation.subprocess, "run", wraps=mutation.subprocess.run
+                ) as calls,
+            ):
+                code, _ = mutation.run_copy(
+                    folder,
+                    ["src/toy.py"],
+                    ["tests"],
+                    ledger,
+                    pilot_options={
+                        "context": context,
+                        "mutant_list": manifest_path,
+                        "shard_index": 0,
+                        "report": folder / "part.json",
+                    },
+                )
+            self.assertEqual(code, 2)
+            self.assertEqual(
+                pilot.read(folder / "part.json")["incidents"], ["regenerated-universe"]
+            )
+            self.assertFalse(
+                any("run" in call.args[0] for call in calls.call_args_list),
+                "mutation campaign started before manifest rejection",
+            )
+
     def test_baseline_failure_exports_and_propagates(self) -> None:
         with TemporaryDirectory(prefix="synthetic-pilot-baseline-") as temporary:
             folder = Path(temporary)

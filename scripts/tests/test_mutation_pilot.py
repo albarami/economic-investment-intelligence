@@ -223,6 +223,19 @@ class PilotTests(unittest.TestCase):
 
     def test_comparison_rejects_incomplete_equal_reports(self) -> None:
         merged = pilot.merge(self.manifest, self.parts, ["success"] * 4)
-        merged["records"] = []
-        with self.assertRaisesRegex(pilot.Refusal, "missing-mutant"):
-            pilot.compare(merged, merged)
+        records = merged["records"]
+        records[0]["raw_exit"] = None
+        records[0]["status"] = "infrastructure_failure"
+        left = pilot.summary(self.manifest, records)
+        right = pilot.summary(self.manifest, copy.deepcopy(records))
+        with self.assertRaisesRegex(pilot.Refusal, "incomplete-campaign"):
+            pilot.compare(left, right)
+
+    def test_comparison_rejects_different_manifest_commits(self) -> None:
+        merged = pilot.merge(self.manifest, self.parts, ["success"] * 4)
+        context = dict(self.manifest["context"], commit="b" * 40)
+        other_manifest = pilot.manifest(context, self.manifest["mutants"])
+        left = pilot.summary(self.manifest, merged["records"])
+        right = pilot.summary(other_manifest, copy.deepcopy(merged["records"]))
+        with self.assertRaisesRegex(pilot.Refusal, "comparison-manifest"):
+            pilot.compare(left, right)
