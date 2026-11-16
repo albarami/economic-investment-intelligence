@@ -2197,6 +2197,197 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - OPTIONS: **Default:** Reference the slice’s existing gate work; do not create a duplicate task or mark it passed from this approval.
 - NEEDED BY: S2-T08 and the slice S2 gate.
 
+## OI-236 — Returned-fact metadata and unsplit default
+
+- ID: OI-236
+- TYPE: OPEN
+- NEEDED: Resolve where the release-aware validator obtains metric, subject and breakdown, and whether an omitted breakdown may remain none.
+- WHY: The section-9 fact object has no metric_key or subject field; slot binding needs metadata beside it.
+- DONE SO FAR: Shared review rulings section 4 items 1–2 defer the mapping. Round-1 F1 and the adopted fix add checked breakdown matching and overlapping-slot refusal; round-2 rulings item 3 retains the none default. That fixes the earlier swap defect, not the tool-to-fact mapping.
+- OPTIONS: **Default:** Keep typed returned metadata; map the split qualifier explicitly and review removal of the default when tool outputs exist. Fact-id recomputation is separately deferred hardening under the original brief.
+- NEEDED BY: Release-aware validator and tool integration.
+
+## OI-237 — Register-company rank and fit templates
+
+- ID: OI-237
+- TYPE: OPEN
+- NEEDED: Reconcile the current rank refusal with application-owned company record templates.
+- WHY: DAT-145 and AI-42 allow list rank/fit facts while this foundation refuses rank on register_company.
+- DONE SO FAR: Shared review rulings section 4 item 3 records the stricter current behaviour; the brief refuses company items and employee-count references, while match_slots remains available outside it.
+- OPTIONS: **Default:** Implement any allowance only in the family task that builds company record templates; do not relax brief isolation.
+- NEEDED BY: Register-company record-family task.
+
+## OI-238 — Off-area estimates, shares and scenarios
+
+- ID: OI-238
+- TYPE: ASSUMPTION
+- NEEDED: Record the lead’s every-subject-other-than-area restriction and settle its intended scope.
+- WHY: The restriction also covers municipality, sector, national and scenario subjects.
+- DONE SO FAR: Shared review rulings section 4 item 4 and slots.subject_refusal record this rule; fixture tests plant off-area metrics and rank units.
+- OPTIONS: **Default:** Retain the stricter rule until a ruled contract change; do not describe it as limited to named places.
+- NEEDED BY: Relevant claim-family task and validator integration.
+
+## OI-239 — Inferred items and still-to-test evidence
+
+- ID: OI-239
+- TYPE: ASSUMPTION
+- NEEDED: Resolve what evidence statuses an Inferred item may bind.
+- WHY: The lead states that the pack does not explicitly settle the Inferred case.
+- DONE SO FAR: Shared review rulings section 4 item 5: observed and inferred accepted, still_to_test refused as the stricter reading; test_fix_l_evidence_status_by_section pins all six combinations.
+- OPTIONS: **Default:** Keep the refusal until the contract is settled.
+- NEEDED BY: Release-aware validator.
+
+## OI-240 — Fly coordinate origin
+
+- ID: OI-240
+- TYPE: OPEN
+- NEEDED: Bind a coordinate target to a tool-returned or user-placed point.
+- WHY: Document 08’s fly target admits lat/lon while rule 18 forbids model-written numbers.
+- DONE SO FAR: Shared review rulings section 4 item 6 defers origin checking; brief.py checks shape, finite numeric type and inclusive coordinate ranges, with boolean and NaN plants from round-1 F5.
+- OPTIONS: **Default:** Add the origin check in the validator task; range checks alone do not establish origin.
+- NEEDED BY: Release-aware validator before model-driven stage use.
+
+## OI-241 — Brief-check module placement
+
+- ID: OI-241
+- TYPE: ASSUMPTION
+- NEEDED: Record that the brief check lives in the catalogue package.
+- WHY: Document 09 section 16 is a layout assumption in the lead’s ruling.
+- DONE SO FAR: Shared review rulings section 4 item 7 and brief.py establish the actual location; entries.py and directives.py are the two modules beyond the original file list.
+- OPTIONS: **Default:** Keep this implementation location explicit when the later validator calls it.
+- NEEDED BY: Task ledger and validator integration.
+
+## OI-242 — Suppressed facts and the slot contract
+
+- ID: OI-242
+- TYPE: OPEN
+- NEEDED: Resolve AI-40 against document 03 section 9.1.
+- WHY: One rejects a brief containing a suppressed fact; the other permits a suppressed fact to fill a slot.
+- DONE SO FAR: Shared review rulings section 4 item 8 adopts the stricter refusal. Code-review F4 closes the layout/highlight bypass through shared returned_fact_refusal.
+- OPTIONS: **Default:** Retain rejection across every brief route; amend the contract explicitly if needed.
+- NEEDED BY: Validator contract work.
+
+## OI-243 — Forecast units and score vocabulary
+
+- ID: OI-243
+- TYPE: PENDING
+- NEEDED: Record the actual metric vocabulary and forecast-unit rule.
+- WHY: The three forecast interval/value metrics use the series unit, and no metric is named score in this closed list.
+- DONE SO FAR: Shared review rulings section 4 items 9–10; schema.METRIC_UNITS assigns FACT_UNITS to forecast_value, forecast_low and forecast_high; the off-area estimate/share set comes from DAT-161 and DAT-162.
+- OPTIONS: **Default:** Document the rule without inventing a score metric or implying forecasts are implemented here.
+- NEEDED BY: Forecast/claim-family integration and task records.
+
+## OI-244 — Numeral and language scan limits
+
+- ID: OI-244
+- TYPE: OPEN
+- NEEDED: Carry clock-face pictographs and number words in other scripts to the appropriate language controls.
+- WHY: Unicode categories and the five-symbol list do not cover these forms.
+- DONE SO FAR: Shared review rulings section 4 item 11 explicitly defers them; scan.py implements categories, symbols, character-reference and placeholder checks.
+- OPTIONS: **Default:** Keep the structural scan claim narrow; resolve additional language controls without claiming native approval.
+- NEEDED BY: Template language validation.
+
+## OI-245 — Release-aware time keys
+
+- ID: OI-245
+- TYPE: OPEN
+- NEEDED: Validate hour, day and month keys against the release’s closed lists.
+- WHY: Any identifier-shaped time key is presently accepted.
+- DONE SO FAR: Shared review rulings section 4 item 12 and components.yaml defer the lists to the release-aware validator.
+- OPTIONS: **Default:** Resolve returned identifiers against the current release before stage use.
+- NEEDED BY: Release-aware validator.
+
+## OI-246 — Safe-loader duplicate-key record
+
+- ID: OI-246
+- TYPE: PENDING
+- NEEDED: Publish the accepted two-stage YAML reading behaviour.
+- WHY: Duplicate-key rejection must not construct objects while inspecting nodes.
+- DONE SO FAR: Shared review rulings section 4 item 14 accepts yaml.compose with the safe loader followed by safe_load; the foundation and fix-render tests cover duplicate mappings/entries, forbidden tags, aliases and merge keys.
+- OPTIONS: **Default:** Close as a record point when the implemented behaviour and plants are recorded; no new parser requested.
+- NEEDED BY: S3-T07 ledger publication.
+
+## OI-247 — Catalogue families and caveat-key ownership
+
+- ID: OI-247
+- TYPE: PENDING
+- NEEDED: Keep the empty claims catalogue and later family/caveat work explicit.
+- WHY: A schema foundation is not the populated families or all AI-105 family-specific plants.
+- DONE SO FAR: The original brief expressly requires empty claims, two fragments and three questions; the discarded design review raised caveat-key ownership and family coverage but its plan was not adopted.
+- OPTIONS: **Default:** Populate claims, required caveats and companions in their owning family tasks; confirm the caveat/coverage key source there.
+- NEEDED BY: Public playbook/context families and later family owners; lead to assign exact ownership.
+
+## OI-248 — Refusal and language-template ownership
+
+- ID: OI-248
+- TYPE: OPEN
+- NEEDED: Disposition the discarded design review’s proposals on refusal/status fragments and language/advice scans.
+- WHY: The draft design report asks which task owns document 09 section 7 text and AI-38/AI-43 scans; it does not supply a binding assignment.
+- DONE SO FAR: review.S3-T07.designreview.r1.md lists those questions; the lead later discards that plan, review and design check. No implementation completion is inferred from the discarded proposals.
+- OPTIONS: **Default:** Lead decides whether to carry or omit these proposals, with later validator/application-template ownership; do not reopen the approved foundation silently.
+- NEEDED BY: Before later template/writer integration.
+
+## OI-249 — Installed archive catalogue discovery
+
+- ID: OI-249
+- TYPE: PENDING
+- NEEDED: Prove how the four YAML files are delivered and resolved in an installed application.
+- WHY: Repository folder discovery does not prove archive packaging.
+- DONE SO FAR: The original brief takes a folder argument and a repository helper; load.catalogue_directory searches parents for assistant/catalogue. The discarded design review raises packaging; supplied records have no installed-layout catalogue proof.
+- OPTIONS: **Default:** Assign packaging and an installed-layout test to the application archive owner; keep this separate from declaring PyYAML.
+- NEEDED BY: Application archive integration.
+
+## OI-250 — Native Arabic review
+
+- ID: OI-250
+- TYPE: PENDING
+- NEEDED: Carry the foundation strings into existing OI-09.
+- WHY: Bilingual fixtures and numeral scans do not establish native Arabic approval.
+- DONE SO FAR: Both local code verdicts retain P1; the original brief explicitly labels the Arabic as not native-reviewed.
+- OPTIONS: **Default:** Keep the pending designation and obtain native review; no duplicate approval claim.
+- NEEDED BY: Bilingual task and OI-09 closure.
+
+## OI-251 — Run-time dependency declarations
+
+- ID: OI-251
+- TYPE: OPEN
+- NEEDED: Record the completed PyYAML declaration and disposition the other undeclared run-time imports.
+- WHY: Root development groups can conceal missing package dependencies.
+- DONE SO FAR: Join confirmation 1 accepts pyyaml 6.0.3 in product/pyproject.toml and uv.lock. Its proposed record lists custodian imports duckdb, h3, shapely, yaml and product imports fastapi, starlette, h3, valhalla; none listed for core/gateway at that historical check.
+- OPTIONS: **Default:** Check each declaration in its owning task and current base; do not claim this historical list remains wholly undeclared or repair another task here.
+- NEEDED BY: Dependent package tasks and slice follow-up.
+
+## OI-252 — Hosted offline cache proof
+
+- ID: OI-252
+- TYPE: PENDING
+- NEEDED: Record the hosted run proving seeded caches contain the needed locked artifacts.
+- WHY: Local cache seeding and offline sync do not prove hosted availability.
+- DONE SO FAR: Join confirmation 1 explicitly leaves this to the hosted run; confirmations 2/3 retain seeding and offline rules. No hosted S3-T07 result is supplied; it is the hosted tests job of this pull request. Before it, the lead copied a cache filled only by `uv sync --managed-python --all-packages --locked --group engine` (the form of the hosted tests job, about 0.5 GB) and ran `scripts/tests/test_clean_environment.py` against it: at the eighth commit two tests failed (an offline relock needed registry metadata the cache does not hold), and at fix pass 5 all 16 tests pass, exit 0.
+- OPTIONS: **Default:** Keep the equality guard and offline sync; attach the actual hosted evidence when run.
+- NEEDED BY: S3-T07 hosted checks.
+
+## OI-253 — Clean-environment test ownership at downstream joins
+
+- ID: OI-253
+- TYPE: PENDING
+- NEEDED: Preserve this task’s single lock-closure helper when dependent declarations join.
+- WHY: Parallel task rewrites previously lost seeded offline cache behaviour.
+- DONE SO FAR: The lead’s clean-install ownership ruling assigns this file to S3-T07 and requires S3-T02/S3-T06 to drop their versions; the later S3-base ruling also supersedes S3-T04’s rewrite. Join pass 3 checks resolution-marker forks and selected-extra contexts.
+- OPTIONS: **Default:** Use the approved helper unchanged and validate new declarations through it; do not claim dependent joins completed in this task.
+- NEEDED BY: Dependent task re-cuts.
+
+
+## OI-254 — A test that copied the user's uv cache filled the temporary folder held in memory
+
+- ID: OI-254
+- TYPE: RANDOM FAILURE (environment)
+- NEEDED: A guard that no test copies the whole user uv cache, beyond the bounded seed of the clean-installation test.
+- WHY: On 2026-11-15 at 23:43 the build machine's temporary folder (a 48 GB file system held in memory) filled, and on 2026-11-16 the lead's ledger run of this task met the same error. The cause was this task's own cache seed in `scripts/tests/test_clean_environment.py`, carried into the joined S3-T06 tree: it copied the whole user uv cache into each child cache; across file systems the hard link failed, every symbolic link was followed and hard-linked files were copied once per name, so a 1.5 GB cache became about 5.3 GB per child cache, and the file held about eight at once. Seven cases failed with error 28 (no space left), and two unrelated mutation campaigns on the same machine died of the same full disk.
+- DONE SO FAR: Fix pass 4 of this task: child caches keep symbolic and hard links, the user cache is copied at most once per run of the file and every further child cache is made by links; a new test with a planted plain copy proves it, and the lead measured the peak use of the temporary folder against the bound. S3-T06 and S3-T02 drop their own versions of the file at their re-cuts. The lead's mutation campaigns keep their temporary folder on the main disk. A limit found (2026-11-16, at fix pass 5): with no temporary folder set, Python uses the memory-backed `/tmp`, and the one class copy of a large user cache (about 22 GB apparent on the build machine) fails there with error 28 because the file system's table of 1,048,576 file entries runs out, not its bytes. The lead's ledger and head checks set the temporary folder on the disk that holds the cache, where the seed links instead of copying; the hosted tests job's cache is about 0.5 GB.
+- OPTIONS: **Default:** keep the bounded seed; a later task may add a planted-violation check that a test's temporary copies stay under a size bound.
+- NEEDED BY: Before the next joined whole test on the build machine.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
