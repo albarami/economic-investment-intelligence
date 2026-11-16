@@ -67,6 +67,8 @@ Run instructions use the pinned command boundaries: `./eii preflight` only probe
 
 ## 2. Stack and pins
 
+[Decision 0042](decisions/0042-the-front-end-foundation.md) items 1 to 3 and 8 amend this stack: React Aria under EII-owned components, one overlay and focus system; ECharts with selective imports, ARIA descriptions, non-origin decal textures and an accessible table for every chart; Motion with LazyMotion. Every numeral, including chart and accessible text, remains in the Fact chip family. Pins, retreat pins and reference notes are recorded by the task that first imports each library; none is installed by the record.
+
 The versions below are the latest releases found by the stack research on 2026-11-11. Exact pins are confirmed at the spike in slice S1 with written retreat pins, and recorded in `web/package.json` with exact versions (no `^` or `~`) and a committed lock file.
 
 | Package | Pin (research, 2026-11-11) | Role | Licence |
@@ -83,7 +85,7 @@ The versions below are the latest releases found by the stack research on 2026-1
 | `apache-arrow` | 21.2.0 | decoding layer payloads above about 10,000 rows | Apache-2.0 |
 | IBM Plex Sans, IBM Plex Sans Arabic | pinned at slice S0 | interface fonts | SIL OFL 1.1 |
 
-Retreat pins (stack research): `maplibre-gl` 5.x with `@mapbox/mapbox-gl-rtl-text` 0.3.0 for Arabic shaping, and deck.gl 9.3.12 with `@deck.gl/mapbox`. The last 5.x MapLibre version must be confirmed on npm before it is relied on. Retreat loses built-in Arabic shaping.
+Retreat pins (stack research): `maplibre-gl` 5.x with `@mapbox/mapbox-gl-rtl-text` 0.3.0 for Arabic shaping, and deck.gl 9.3.12 with `@deck.gl/mapbox`. The last 5.x MapLibre version must be confirmed on npm before it is relied on. Plugin removal on the current pin requires S6-T35 evidence (decision 0042 item 7).
 
 Not used in v1, with the reason:
 
@@ -93,12 +95,12 @@ Not used in v1, with the reason:
 | deck.gl `GlobeView` | Experimental; the opening uses MapLibre's own projection if a globe shot is chosen in [11](11_DESIGN_DIRECTION.md) |
 | Client-side aggregation layers (`HexagonLayer`, `HeatmapLayer`, `ScreenGridLayer`) and DuckDB-Wasm | Aggregation and suppression happen before release; the browser receives released aggregates only |
 | `react-map-gl` | Mounting MapLibre imperatively in one component has fewer moving parts (stack research) |
-| A charting library | Bars, the people-by-hour chart, trend lines with projections, the forecast chart with its interval band, the base-rate table, the pay-band and busyness charts, the estimate and scenario charts, ranking tables and the supplier lens are small SVG components so that every label goes through the Fact chip |
+| Vega-Lite as a runtime | Decision 0042 item 2 chooses ECharts first; Observable Plot and visx require S6-T34 evidence. No model-authored chart specification, expression or data address reaches a renderer. |
 | Any CDN, hosted font, hosted tile or analytics service | Offline operation and the no-third-party rule (section 7); the optional live traffic tiles are fetched by the local server, so the browser still contacts its own origin only |
 
 **Drawing tools.** Free-drawn areas return with [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) (item 19). The polygon, radius and travel-time tools are built either on a drawing library that supports MapLibre GL JS 6 or in house over MapLibre pointer events. The spike of slice S1 chooses one and records it with an exact pin and a written retreat; the stack research of 2026-11-11 did not cover a drawing library, so no version is named here.
 
-**Newer than most training data.** MapLibre GL JS 6 (released 22 July 2026) is ESM-only and WebGL2-only, removed `map.transform`, needs one worker-URL call under a bundler, throws an initialisation error when WebGL2 is missing, and since 6.9.0 shapes Arabic itself, which deprecates `setRTLTextPlugin`. deck.gl 9.4 (5 September 2026) added `@deck.gl/maplibre`. Coding agents default to v4 and v5 idioms (default imports, UMD script tags, `setRTLTextPlugin`, `MapboxOverlay` from `@deck.gl/mapbox`). Before writing map code, a builder reads the MapLibre v5-to-v6 migration guide, the MapLibre v6 API pages, the deck.gl "What's new" and `@deck.gl/maplibre` pages, and loads the MapLibre agent skills (`maplibre-v6-migration`, `maplibre-pmtiles-patterns`, `maplibre-fonts-glyphs`). No API in this document is to be taken as certain without that check.
+**Newer than most training data.** MapLibre GL JS 6 (released 22 July 2026) is ESM-only and WebGL2-only, removed `map.transform`, needs one worker-URL call under a bundler, throws an initialisation error when WebGL2 is missing, and the older research reports built-in Arabic shaping since 6.9.0. Under decision 0042 item 7, keep the right-to-left text plugin until the pinned minor version is demonstrated not to need it; the older report alone does not justify removal. deck.gl 9.4 (5 September 2026) added `@deck.gl/maplibre`. Coding agents default to v4 and v5 idioms (default imports, UMD script tags, `setRTLTextPlugin`, `MapboxOverlay` from `@deck.gl/mapbox`). Before writing map code, a builder reads the MapLibre v5-to-v6 migration guide, the MapLibre v6 API pages, the deck.gl "What's new" and `@deck.gl/maplibre` pages, and loads the MapLibre agent skills (`maplibre-v6-migration`, `maplibre-pmtiles-patterns`, `maplibre-fonts-glyphs`). No API in this document is to be taken as certain without that check.
 
 | ID | Requirement | Slice |
 |---|---|---|
@@ -250,6 +252,10 @@ Names follow the pinned interface vocabulary. Visual specification of each compo
 
 ### 4.1 Shell and session
 
+[Decision 0042](decisions/0042-the-front-end-foundation.md) item 10 makes explore mode a first-class Explore screen, with its inspector, search, lenses and restore controls; item 11 adds map-first answers and map input through item 4’s shared validated dispatcher.
+
+Decision 0042 item 7 adds the question "What decision are you making?" over the quiet map, one Public evidence layer with its dated Fact chip, visible actions for site choice, suppliers, talent, competition and forecasts, and Guided story beside Explore. These are entry actions into the existing catalogue, not a replacement of the seven journeys of section 4.9. Public is a backend class here, never an audience label (decision 0035 items 1 and 4). Disclosure proceeds through answer, comparison, then evidence and method; each numerical view resolves to the same fact object (section 5).
+
 | Component | Responsibility | Inputs | States | Capability |
 |---|---|---|---|---|
 | Standing strip | the permanent demonstrator notice; never dismissible; present on every route, in presenter mode and in the pack | language | always shown | capability M5 |
@@ -264,6 +270,21 @@ Names follow the pinned interface vocabulary. Visual specification of each compo
 | Presenter pointer | shows the 40 px room-visible presenter pointer | presenter setting, pointer position | hidden, shown | story |
 
 The seat picker writes the signed `eii_seat` cookie. The stage window and presenter console share one browser profile, so they share the selected seat and `BroadcastChannel`; the other company's window uses a separate profile.
+
+### The golden scenario: an Italian restaurant in Lusail
+
+This storyboard extends, never replaces, document 01 section 7 (D2), under decision 0042 item 12 and the owner golden-scenario note as placed by L-679. Every scene uses application-owned catalogue text and Fact chips for every number; complete-brief validation precedes any model-selected answer item (AI-50). No advice, verdict or probability is shown; presence belongs only to an area, never a named place (AGENTS.md rules 8, 18, 21, 22, 24 and 25). No audience origin word or mark appears (decision 0035).
+
+- **Ask.** Enter the Italian-restaurant question in Arabic or English; acceptance: understanding chips show the spine activity, cuisine and place, with candidate chips resolving ambiguity before a place-specific answer.
+- **Map and place at a glance.** Focus Lusail during the reply; acceptance: the map is on the resolved place before the first sentence ends, with the district's available Public facts only in its place-at-a-glance card, numbers through Fact chips.
+- **Activity pins and density.** Show real restaurants around the selection; acceptance: pins and activity density from Public places data appear during the reply with the open-listings incompleteness note, without attributing area presence to a pin.
+- **Evidence.** Draw the flagship walk and drive areas and show the evidence blocks; acceptance: document 01 section 7's snap report, working/living blocks, hourly area presence with its range, nearby restaurants and walking distances, and cost structure precede narrative, preserving AI-131's order and withheld states.
+- **Best-fit areas by default.** After the evidence, display the ranking; acceptance: candidates equal the tested ranking tool's output, with visible, editable competition density, chosen-hour area presence and access criteria, weights and rank-stability sentence; where else and the reverse view remain available.
+- **Clarifying chips.** Ask at least three questions from the reviewed activity-family set, each with its catalogue reason; acceptance: each closed enumeration answer changes weights or filters as typed input and visibly re-ranks with an interruptible transition and catalogue text; skip, undo and reset restore the corresponding state.
+- **Brief.** Show Observed, Inferred and Still to test after accounting; acceptance: only validated catalogue text and Fact chips render, with limitations and the cheapest next test, retaining the flagship's optional user-input costs/scenarios and hand-over.
+- **Evidence drawer.** Follow a number; acceptance: the chip opens its source chain, method, period, coverage, licence and release, with backend origin retained but no audience origin word or mark.
+- **Arabic flip.** Switch language; acceptance: chrome and reading order mirror while map, charts, numerals and dial retain the same facts and values.
+- **Phone.** Repeat on the phone; acceptance: the bottom sheet, persistent selection, questions, evidence, interrupt and reversal controls remain usable in both languages; repeat the flow for pharmacy and industrial maintenance services from document 09 section 3 as well as the restaurant (S8-T17; slice S10 gate).
 
 ### 4.2 Question and brief
 
@@ -652,7 +673,7 @@ The route sets `lang` and `dir` on the root element. All component styles use CS
 
 Keys are physical: the clicker's next key and the Right arrow key always mean "next" in the story, in both languages, because a presenter's hand must not depend on the language. In the Dial, the Right arrow key always moves to the next situation in its fixed order; in the Hour control it always moves to the next stored hour.
 
-**Numbers.** All numbers are formatted in `src/facts/` with `Intl.NumberFormat` using `en-QA` and `ar-QA-u-nu-latn`, and with the `numberingSystem: 'latn'` option set as well (MDN: the option takes precedence over the locale key). CLDR's default numbering system for `ar-QA` is Arabic-Indic, so the explicit setting is required; Qatari official Arabic sites use Western digits (design research). The same applies to dates. A test asserts that, for every fact in a fixture brief, the digit sequence shown in Arabic equals the one shown in English, and that grouping and decimal separators are identical. The formatter removes bidirectional control characters that `Intl` may insert, because isolation is done by markup.
+**Numbers.** Decision 0042 item 2 requires one canonical Western-digit numeric formatter in `src/facts/` shared by both languages; language-specific units and surrounding templates remain separate. It replaces separate numeric locale formatting with `en-QA` and `ar-QA-u-nu-latn`; the `numberingSystem: 'latn'` option alone is not the parity contract. CLDR's default numbering system for `ar-QA` is Arabic-Indic, so the explicit setting is required; Qatari official Arabic sites use Western digits (design research). The same applies to dates. A test asserts that, for every fact in a fixture brief, the digit sequence shown in Arabic equals the one shown in English, and that grouping and decimal separators are identical. The formatter removes bidirectional control characters that `Intl` may insert, because isolation is done by markup.
 
 **Isolation.** Every Fact chip root is an isolate (`bdi`, or `unicode-bidi: isolate`), and its numeric run sits in its own left-to-right isolate, so ranges, signs, percentages and units do not reorder inside an Arabic sentence. Place names, activity names and ids from the API are wrapped in `bdi`. A test renders, inside Arabic sentences, a band range, a negative change, a percentage, a currency amount with an Arabic unit word and a Latin place name, and compares against reviewed screenshots.
 
@@ -698,6 +719,8 @@ Breakpoint values are ASSUMPTIONS chosen so that each pinned viewport below fall
 
 ## 10. States
 
+Decision 0042 item 7 adds the privacy-boundary moment: a withheld small-area result offers only approved broader aggregations, never its hidden count. The scenario-fork moment keeps the baseline visible while an assumption changes and provides immediate reset; document 11, Where the impact comes from, and document 16, Scenes 5 and 6, own their presentation. Existing eligibility and withholding rules remain.
+
 The front end never writes its own refusal or caveat wording. Each status arrives with a template key chosen by the application ([09](09_AI_ASSISTANT.md)); the front end renders that template from the catalogue.
 
 Before an answer is shown, the product plane runs the fixed accounting gate: Sources, Assumptions, Nothing invented, Scope and Limits stated. The front end renders an answer only with the gate result, shown in its receipt under "Checked before display". If any check fails, it removes any withdrawn items and renders the template writer's default answer. The Arabic labels for "Source chain" and "Checked before display" remain pending the owner's review.
@@ -729,7 +752,7 @@ Before an answer is shown, the product plane runs the fixed accounting gate: Sou
 
 ## 11. Accessibility
 
-Target: WCAG 2.2 Level AA for every route, with these specific requirements.
+Target: WCAG 2.2 Level AA for every route, with these specific requirements. Decision 0042 item 7 adds a single-pointer non-drag alternative to every drag, including named-area choice and click-to-place vertices for area drawing; keyboard support alone does not meet this requirement.
 
 | ID | Requirement | Slice |
 |---|---|---|
