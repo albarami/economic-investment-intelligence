@@ -6,11 +6,10 @@ import re
 from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import Any, cast
-from urllib.parse import urlsplit
 
 import yaml
 
-from eii_custodian.publicdata.fetch.allowlist import approve
+from eii_custodian.publicdata.fetch.allowlist import reviewed_url
 
 METHOD = "eii_custodian.publicdata.baci.parse.parse_archive@v1"
 TABLES = ("pub_baci_trade", "pub_baci_country", "pub_baci_product")
@@ -44,19 +43,7 @@ def digest_ok(value: str) -> bool:
 
 def safe_url(url: str) -> bool:
     """BACI addresses carry no credentials, query, fragment or control text."""
-    try:
-        parts = urlsplit(url)
-        return (
-            not any(ord(c) <= 32 for c in url)
-            and parts.username is None
-            and parts.password is None
-            and not parts.query
-            and not parts.fragment
-            and parts.port in (None, 443)
-            and approve(url).ok
-        )
-    except ValueError:
-        return False
+    return reviewed_url(url)
 
 
 def mapping(value: object, keys: set[str]) -> dict[str, object]:

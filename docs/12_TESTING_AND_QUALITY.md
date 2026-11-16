@@ -670,3 +670,12 @@ selected-manifest tampering and command injection. These are invented fixtures,
 not publisher verification. Full guard-by-guard red evidence and the manual break
 inventory belong to the task return and independent review; this paragraph makes
 no completion claim. TST-50, TST-52 and TST-237 are unchanged.
+
+## Gravity and Atlas invented-response evidence (S2-T25)
+
+The Gravity and Atlas suites exercise pending metadata refusal, two finished
+Atlas grains, rebuild refusal, exact decimal text, excluded-row validation,
+both bilateral directions, host and query-string refusal, access obstacles,
+bounded retries, interrupted publication and secret-free diagnostics. Fixtures
+use invented codes and values. They do not verify a publisher page, a licence,
+a version or a host. This paragraph makes no completion claim.

@@ -4,29 +4,26 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import tempfile
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import date, datetime
 from pathlib import Path
+from typing import NoReturn
 
 from eii_custodian.publicdata.fetch.allowlist import host_of
+from eii_custodian.publicdata.fetch.bounded import (
+    publish_complete,
+    read_metadata,
+    stream_download,
+)
 from eii_custodian.publicdata.fetch.receipts import sidecar_for
 from eii_custodian.publicdata.fetch.registry import LICENCE_BASES, Entry
 from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
-from eii_custodian.publicdata.fetch.transport import (
-    ATTEMPT_LIMIT,
-    BACKOFF_S,
-    MAX_RETRIES,
-    StreamTransport,
-    Transport,
-    TransportFault,
-    TransportReadError,
-)
+from eii_custodian.publicdata.fetch.transport import StreamTransport, Transport
 
 from .config import METHOD, TABLES, BaciError, Config, require, safe_url
-from .parse import file_hash, parse_archive, within
+from .parse import file_hash, parse_archive
 
 
 @dataclass(frozen=True)
@@ -36,6 +33,10 @@ class Result:
     terms_sha256: str
     terms_unread: str
     retrieved_utc: str
+
+
+def _refuse(reason: str) -> NoReturn:
+    raise BaciError(reason)
 
 
 def _reviewed(url: str, config: Config) -> None:
@@ -80,33 +81,21 @@ def _entry_check(entry: Entry, config: Config) -> None:
         _reviewed(entry.terms_url, config)
 
 
+def _review(url: str, config: Config) -> None:
+    _reviewed(url, config)
+
+
 def _metadata(
     url: str, transport: Transport, config: Config, sleep: Callable[[float], None]
 ) -> bytes:
-    _reviewed(url, config)
-    for attempt in range(ATTEMPT_LIMIT):
-        try:
-            response = transport(url)
-            for address in (*response.hops, response.final_url):
-                _reviewed(address, config)
-            require(len(response.body) <= config.archive_bytes[1], "metadata_bytes")
-            folded = response.body.lower()
-            for marker in (
-                b"registration required",
-                b"sign in",
-                b"robot check",
-                b"paid tier",
-            ):
-                require(marker not in folded, "access_obstacle")
-            return response.body
-        except (RuntimeError, TypeError, AttributeError, ValueError):
-            raise BaciError("transport_metadata_invalid") from None
-        except (TransportFault, OSError, TransportReadError) as exc:
-            if isinstance(exc, TransportFault) and exc.kind == "blocked_host":
-                raise BaciError("blocked_host") from None
-            if attempt < MAX_RETRIES:
-                sleep(BACKOFF_S[attempt])
-    raise BaciError("network_exhausted")
+    return read_metadata(
+        url,
+        transport,
+        review=lambda address: _review(address, config),
+        max_bytes=config.archive_bytes[1],
+        sleep=sleep,
+        refuse=_refuse,
+    )
 
 
 def _download(
@@ -116,42 +105,20 @@ def _download(
     target: Path,
     sleep: Callable[[float], None],
 ) -> str:
-    for attempt in range(ATTEMPT_LIMIT):
-        try:
-            with transport(entry.url) as response:
-                for address in (*response.hops, response.final_url):
-                    _reviewed(address, config)
-                length = response.declared_length
-                require(length is None or type(length) is int, "declared_length")
-                if length is not None:
-                    within(length, config.archive_bytes, "archive_bytes")
-                count = 0
-                with target.open("wb") as output:
-                    for chunk in response.chunks:
-                        require(
-                            type(chunk) is bytes and len(chunk) <= 65536, "stream_chunk"
-                        )
-                        count += len(chunk)
-                        require(count <= config.archive_bytes[1], "archive_bytes")
-                        output.write(chunk)
-                within(count, config.archive_bytes, "archive_bytes")
-                require(length is None or length == count, "length_mismatch")
-                return host_of(response.final_url)
-        except (TransportFault, OSError, TransportReadError) as exc:
-            if isinstance(exc, TransportFault) and exc.kind == "blocked_host":
-                raise BaciError("blocked_host") from None
-            target.unlink(missing_ok=True)
-            if attempt < MAX_RETRIES:
-                sleep(BACKOFF_S[attempt])
-    raise BaciError("network_exhausted")
+    return stream_download(
+        entry.url,
+        transport,
+        target,
+        review=lambda address: _review(address, config),
+        byte_bounds=config.archive_bytes,
+        sleep=sleep,
+        refuse=_refuse,
+    )
 
 
 def _publish(path: Path, destination: Path) -> None:
     """Content addressed writes never remove or overwrite earlier complete bytes."""
-    if destination.exists():
-        require(file_hash(destination) == file_hash(path), "cache_integrity")
-    else:
-        os.link(path, destination)
+    publish_complete(path, destination, _refuse)
 
 
 def fetch_baci(

@@ -435,11 +435,38 @@ The future source keeps its own bilateral series; Qatar exporter-or-importer
 selection does not replace or average portal or Comtrade figures. Missing
 coverage stays explicit. Exact attribution awaits the lead's page reading.
 
+#### Gravity pending identity and coverage (S2-T25)
+
+`cepii_gravity` identifies the CEPII Gravity lead of decision 0040. Its
+placeholder registry row has `gravity_metadata_unconfirmed`,
+`commit_allowed: false` and `nightly_live_fetch: true`. The pending record was
+checked on 2026-11-16; the publisher page, version, licence words, Etalab lead,
+access state, country keys, units and year coverage are NOT READ. This date is
+not page-reading evidence. The page lead carries a query string and is not a
+reviewed data URL. Terms remain `terms to be read` on basis `owner_decision`,
+decision 0026. No Gravity host is admitted under PUB-03 yet. Qatar origin or
+destination selection does not replace another series. Missing coverage stays
+explicit and is not zero.
+
+#### Atlas pending identity and coverage (S2-T25)
+
+`atlas_complexity` identifies the Harvard Growth Lab Atlas lead of decision
+0040. Its placeholder registry row has `atlas_metadata_unconfirmed`,
+`commit_allowed: false` and `nightly_live_fetch: true`. The pending record was
+checked on 2026-11-16; the publisher pages, licence words, native revision,
+available history, access tier and units are NOT READ. This date is not
+page-reading evidence. The row names two finished downloads,
+country-product-year and country-partner-product-year. A rebuild input is
+refused. Terms remain `terms to be read` on basis `owner_decision`, decision
+0026. No Atlas host is admitted under PUB-03 yet. Registration or a paid tier
+fetches nothing. A narrower year selection records the excluded coverage and
+infers no concordance.
+
 ### 2.3 Trade and benchmark source plan — decision 0040
 
-[decision 0040](decisions/0040-public-trade-sources-and-held-tables-in-use.md) items 1 to 9 govern this addition. These are planned sources, not rows already added to the registry or claims that a file is held. Their full fetch/security contract is in that decision; S2-T23 to S2-T26 own implementation.
+[decision 0040](decisions/0040-public-trade-sources-and-held-tables-in-use.md) items 1 to 9 govern this addition. Pending registry rows for the named trade sources do not confirm that a file is held or that a page was read. Their full fetch/security contract is in that decision; S2-T23 to S2-T26 own implementation.
 
-The advisor's 20:43 note supplies these addresses and descriptions. No external page was opened in the decision 0040 documentation task. “The page states” below means the supplied lead, **to be verified by the named task**, not a confirmed licence, version, schema or availability. Source ids are planned metadata names; the registry is unchanged.
+The advisor's 20:43 note supplies these addresses and descriptions. No external page was opened in the decision 0040 documentation task. “The page states” below means the supplied lead, **to be verified by the named task**, not a confirmed licence, version, schema or availability. Pending registry rows for `cepii_baci`, `cepii_gravity` and `atlas_complexity` record that planned identity only. They do not confirm a page lead, a licence, a version or a host. The addresses in this table remain unverified leads. A Gravity page lead that carries a query string is not stored as a reviewed data URL.
 
 | Planned source_id | Publisher, dataset and page address | Page lead and verification task | Intended use |
 |---|---|---|---|
@@ -540,6 +567,23 @@ S2-T08 must select an explicitly reviewed hash, never a latest file. Archive,
 outputs and manifests stay in the uncommitted source cache. Live source-page,
 licence, format and access verification and the first actual archive checks remain
 lead work. No invented response proves those live acceptance criteria.
+
+#### Gravity and Atlas archive receipt (S2-T25)
+
+Each source has its own closed configuration and its own reviewed-address
+binding. Gravity binds one finished archive. Atlas binds the two finished
+downloads in order and refuses a rebuild member or a third grain. Inclusive
+bounds for the compressed file, each expanded member, the inventory count, the
+dictionaries and the raw rows are required before a confirmed configuration can
+activate. A missing bound is a closed-schema failure. Pending rows keep zero
+bounds and `bound_origin: pending`, which cannot activate a download. Digit
+limits in the configuration notes are an ASSUMPTION from invented fixtures.
+Completion is published last. An interrupted write leaves the previous complete
+manifest readable. Registration, a sign-in, a robot check or a paid tier
+returns `access_obstacle` and `NO_DATA` and fetches nothing. Unread, absent or
+restrictive terms text does not by itself block a confirmed visitor-readable
+source. Failures name the source and a fixed reason. Invented sentinels are not
+copied into the result.
 
 ### 3.2 Investment sources and page parsers
 

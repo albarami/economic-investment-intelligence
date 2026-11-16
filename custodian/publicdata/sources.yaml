@@ -4241,3 +4241,73 @@ sources:
     reconciliation: "open"
     skip_reason: "baci_metadata_unconfirmed"
     extension: "bin"
+  - key: "cepii_gravity"
+    source_id: "cepii_gravity"
+    slug: ""
+    kind: "https_file"
+    title_en: "CEPII Gravity (unverified source lead)"
+    publisher: "CEPII"
+    licence_id: "unconfirmed"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-16"
+    terms_watch: false
+    basis_note: "Decision 0026. Pending record checked on this date; no publisher page was read. The decision 0040 page lead carries a query string and is not stored as a reviewed data URL. Source metadata awaits the lead."
+    landing_url: ""
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_gravity_bilateral", "pub_gravity_country"]
+    caveat_keys: ["gravity_separate_series", "gravity_coverage_incomplete"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    period_first: ""
+    period_last: ""
+    period_field: "year"
+    reconciliation: "open"
+    skip_reason: "gravity_metadata_unconfirmed"
+    extension: "bin"
+  - key: "atlas_complexity"
+    source_id: "atlas_complexity"
+    slug: ""
+    kind: "https_file"
+    title_en: "Atlas finished complexity files (unverified source lead)"
+    publisher: "Harvard Growth Lab"
+    licence_id: "unconfirmed"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-16"
+    terms_watch: false
+    basis_note: "Decision 0026. Pending record checked on this date; no publisher page was read. Finished country-product-year and country-partner-product-year downloads only. Source metadata awaits the lead."
+    landing_url: ""
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables:
+      - "pub_atlas_country_product_year"
+      - "pub_atlas_cpy_country"
+      - "pub_atlas_cpy_product"
+      - "pub_atlas_country_partner_product_year"
+      - "pub_atlas_cppy_country"
+      - "pub_atlas_cppy_product"
+    caveat_keys: ["atlas_finished_only", "atlas_coverage_incomplete"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    period_first: ""
+    period_last: ""
+    period_field: "year"
+    reconciliation: "open"
+    skip_reason: "atlas_metadata_unconfirmed"
+    extension: "bin"

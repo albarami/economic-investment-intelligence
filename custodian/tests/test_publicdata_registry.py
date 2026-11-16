@@ -568,10 +568,10 @@ def test_skip_reason_must_not_name_a_licence_or_terms(tmp_path: Path) -> None:
 def test_registry_counts_follow_decision_0026() -> None:
     """No none_stated row remains, and every owner_decision row names 0026."""
     entries = load_registry()
-    assert len(entries) == 144
+    assert len(entries) == 146
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
-    assert len(owners) == 28
+    assert len(owners) == 30
     assert {entry.decision_record for entry in owners} == {"0026"}
 
 
@@ -729,3 +729,40 @@ def test_baci_registry_pending_and_nightly_policy() -> None:
         for e in entries
     ]
     assert exclusions(planted) != expected
+
+
+def test_gravity_and_atlas_registry_pending_and_nightly_policy() -> None:
+    """Pending trade rows stay eligible and do not enlarge the closed exclusion set."""
+    from dataclasses import replace
+
+    entries = load_registry()
+    expected = {
+        "busy_gmaps",
+        "ntl_blackmarble",
+        "traffic_tomtom_flow",
+        "traffic_tomtom_range",
+    }
+    for source_id, reason in (
+        ("cepii_gravity", "gravity_metadata_unconfirmed"),
+        ("atlas_complexity", "atlas_metadata_unconfirmed"),
+    ):
+        row = next(entry for entry in entries if entry.source_id == source_id)
+        assert row.skip_reason == reason
+        assert row.commit_allowed is False
+        assert row.nightly_live_fetch is True
+        assert row.url == ""
+        assert row.landing_url == ""
+        assert "?" not in row.basis_note
+        assert nightly_blocked([replace(row, skip_reason="")], (source_id,)) == ()
+    planted = [
+        replace(entry, nightly_live_fetch=False)
+        if entry.source_id in {"cepii_gravity", "atlas_complexity"}
+        else entry
+        for entry in entries
+    ]
+    changed = {
+        entry.source_id
+        for entry in planted
+        if not entry.nightly_live_fetch and entry.kind != "citation_only"
+    }
+    assert changed != expected

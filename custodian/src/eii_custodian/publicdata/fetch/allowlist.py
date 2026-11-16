@@ -58,3 +58,20 @@ def approve(url: str) -> HostDecision:
 def host_of(url: str) -> str:
     """Return the lowercase host of a URL, or an empty string."""
     return (urlsplit(url).hostname or "").casefold()
+
+
+def reviewed_url(url: str) -> bool:
+    """True for an allow-listed HTTPS URL with no query, fragment or credential."""
+    try:
+        parts = urlsplit(url)
+        return (
+            not any(ord(char) <= 32 for char in url)
+            and parts.username is None
+            and parts.password is None
+            and not parts.query
+            and not parts.fragment
+            and parts.port in (None, 443)
+            and approve(url).ok
+        )
+    except ValueError:
+        return False

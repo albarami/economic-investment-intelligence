@@ -9,6 +9,10 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
+from eii_custodian.publicdata.atlas.config import AtlasError
+from eii_custodian.publicdata.atlas.config import Config as AtlasConfig
+from eii_custodian.publicdata.atlas.config import load_config as load_atlas_config
+from eii_custodian.publicdata.atlas.fetch import fetch_atlas
 from eii_custodian.publicdata.baci.config import BaciError, Config, load_config
 from eii_custodian.publicdata.baci.fetch import fetch_baci
 from eii_custodian.publicdata.fetch.allowlist import approve, host_of
@@ -37,6 +41,10 @@ from eii_custodian.publicdata.fetch.report import (
 )
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
 from eii_custodian.publicdata.fetch.transport import StreamTransport, Transport
+from eii_custodian.publicdata.gravity.config import Config as GravityConfig
+from eii_custodian.publicdata.gravity.config import GravityError
+from eii_custodian.publicdata.gravity.config import load_config as load_gravity_config
+from eii_custodian.publicdata.gravity.fetch import fetch_gravity
 from eii_custodian.publicdata.investment_build import publish_investment
 from eii_custodian.publicdata.places.fetch import fetch_place_file, is_place_file
 from eii_custodian.publicdata.places_fsq.fetch import fetch_release, is_release_entry
@@ -190,6 +198,10 @@ def run_build(
     sleep: Sleeper,
     stream_transport: StreamTransport | None = None,
     baci_config: Config | None = None,
+    gravity_config: GravityConfig | None = None,
+    atlas_config: AtlasConfig | None = None,
+    gravity_stream: StreamTransport | None = None,
+    atlas_stream: StreamTransport | None = None,
 ) -> BuildOutcome:
     """Fetch each row in order, then run the public_data stage."""
     manifests: dict[str, str] = {}
@@ -237,6 +249,110 @@ def run_build(
                 )
                 lines.append(
                     fail_line("cepii_baci", "", reason, "validated source", "NO_DATA")
+                )
+                break
+            continue
+        if entry.source_id == "cepii_gravity":
+            try:
+                gravity_loaded = (
+                    gravity_config
+                    if gravity_config is not None
+                    else load_gravity_config()
+                )
+                gravity_result = fetch_gravity(
+                    entry,
+                    gravity_loaded,
+                    transport,
+                    gravity_stream,
+                    cache,
+                    clock,
+                    sleep,
+                )
+                manifests[entry.source_id] = gravity_result.digest
+                lines.append(
+                    pass_line(entry.key, gravity_result.digest, gravity_result.host)
+                )
+                if gravity_result.terms_sha256:
+                    _record_terms(
+                        entry,
+                        gravity_result.terms_sha256,
+                        gravity_result.retrieved_utc,
+                        previous,
+                        lines,
+                        terms,
+                    )
+                else:
+                    lines.append(
+                        terms_unread_line(entry.key, gravity_result.terms_unread, "")
+                    )
+            except GravityError as exc:
+                reason = str(exc)
+                if reason == "gravity_metadata_unconfirmed":
+                    lines.append(skip_line("cepii_gravity", reason))
+                    lines.append(
+                        terms_unread_line("cepii_gravity", "terms_to_be_read", "")
+                    )
+                    continue
+                failure = FetchFailure(
+                    6 if reason == "network_exhausted" else 1,
+                    "cepii_gravity",
+                    "",
+                    reason,
+                    "validated source",
+                    "NO_DATA",
+                )
+                lines.append(
+                    fail_line(
+                        "cepii_gravity", "", reason, "validated source", "NO_DATA"
+                    )
+                )
+                break
+            continue
+        if entry.source_id == "atlas_complexity":
+            try:
+                atlas_loaded = (
+                    atlas_config if atlas_config is not None else load_atlas_config()
+                )
+                atlas_result = fetch_atlas(
+                    entry, atlas_loaded, transport, atlas_stream, cache, clock, sleep
+                )
+                manifests[entry.source_id] = atlas_result.digest
+                lines.append(
+                    pass_line(entry.key, atlas_result.digest, atlas_result.host)
+                )
+                if atlas_result.terms_sha256:
+                    _record_terms(
+                        entry,
+                        atlas_result.terms_sha256,
+                        atlas_result.retrieved_utc,
+                        previous,
+                        lines,
+                        terms,
+                    )
+                else:
+                    lines.append(
+                        terms_unread_line(entry.key, atlas_result.terms_unread, "")
+                    )
+            except AtlasError as exc:
+                reason = str(exc)
+                if reason == "atlas_metadata_unconfirmed":
+                    lines.append(skip_line("atlas_complexity", reason))
+                    lines.append(
+                        terms_unread_line("atlas_complexity", "terms_to_be_read", "")
+                    )
+                    continue
+                failure = FetchFailure(
+                    6 if reason == "network_exhausted" else 1,
+                    "atlas_complexity",
+                    "",
+                    reason,
+                    "validated source",
+                    "NO_DATA",
+                )
+                lines.append(
+                    fail_line(
+                        "atlas_complexity", "", reason, "validated source", "NO_DATA"
+                    )
                 )
                 break
             continue

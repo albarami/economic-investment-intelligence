@@ -228,3 +228,12 @@ mirrors are deferred. No BACI real-use permission obligation is added to DHA-102
 the publisher's terms have not been read in this worker pass. The lead supplies
 actual words and date before adding any such obligation. Archive size alone does
 not change BACI nightly eligibility or TST-52 (decision 0040 item 9).
+
+## Deferred Gravity and Atlas archive hardening (S2-T25)
+
+Resumable downloads, scheduled freshness monitoring and independent archive
+mirrors are deferred for Gravity and for both finished Atlas downloads. No
+real-use permission obligation is added: the publisher terms have not been
+read in this worker pass. Archive size alone does not change nightly
+eligibility or TST-52 (decision 0040 item 9). Registration or a paid tier
+stays an owner obstacle and fetches nothing.

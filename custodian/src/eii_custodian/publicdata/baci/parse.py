@@ -9,33 +9,35 @@ import json
 import re
 import zlib
 from collections.abc import Iterator
-from decimal import Decimal
 from pathlib import Path
 from zipfile import BadZipFile, ZipFile
+
+from eii_custodian.publicdata.fetch.bounded import file_hash as shared_file_hash
+from eii_custodian.publicdata.fetch.bounded import within as shared_within
+from eii_custodian.publicdata.fetch.decimals import DecimalRefusal, exact_decimal
 
 from .config import TABLES, BaciError, Config, Member, require
 
 
 def decimal_text(value: str, config: Config) -> str:
     """Unsigned fixed-point ASCII; count all written digits, including zeros."""
-    require(re.fullmatch(r"[0-9]+(?:\.[0-9]+)?", value) is not None, "decimal_format")
-    whole, _, fraction = value.partition(".")
-    require(len(fraction) <= config.fractional_digits, "decimal_fractional_digits")
-    require(len(whole) + len(fraction) <= config.total_digits, "decimal_total_digits")
-    require(Decimal(value).is_finite(), "decimal_format")
-    return value
+    try:
+        return exact_decimal(
+            value,
+            total_digits=config.total_digits,
+            fractional_digits=config.fractional_digits,
+            signed=False,
+        )
+    except DecimalRefusal as exc:
+        raise BaciError(exc.reason) from None
 
 
 def file_hash(path: Path) -> str:
-    result = hashlib.sha256()
-    with path.open("rb") as source:
-        while chunk := source.read(65536):
-            result.update(chunk)
-    return result.hexdigest()
+    return shared_file_hash(path)
 
 
 def within(value: int, span: tuple[int, int], reason: str) -> None:
-    require(span[0] <= value <= span[1], reason)
+    require(shared_within(value, span), reason)
 
 
 def _rows(zipped: ZipFile, member: Member) -> Iterator[dict[str, str]]:

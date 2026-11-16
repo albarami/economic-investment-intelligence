@@ -726,6 +726,21 @@ by `source_version`, `country_code`. `pub_baci_product` is Public, keyed by
 the dictionaries and S2-T26 receives the separate series. No live source is
 activated by these contracts (decision 0040 items 3 and 4).
 
+#### Gravity and Atlas table contracts (S2-T25)
+
+`pub_gravity_bilateral` is Public, keyed by `source_version`, `hs_revision`,
+`year`, `origin_code`, `destination_code`. `pub_gravity_country` is Public,
+keyed by `source_version`, `country_code`. `pub_atlas_country_product_year` is
+Public, keyed by `source_version`, `hs_revision`, `year`, `country_code`,
+`product_code`. `pub_atlas_country_partner_product_year` is Public, keyed by
+`source_version`, `hs_revision`, `year`, `reporter_code`, `partner_code`,
+`product_code`. Each finished Atlas download has its own country dictionary
+(`pub_atlas_cpy_country`, `pub_atlas_cppy_country`) and product dictionary
+(`pub_atlas_cpy_product`, `pub_atlas_cppy_product`), keyed with `grain` so the
+two files are not merged. Publisher country and product mappings stay
+`pending`. These contracts do not activate a live source (decision 0040 items
+3 and 4). S2-T26 receives the separate series.
+
 ### 7.3 Columns
 
 Types follow section 1.2; a column without a stated type is `string`. Every Public table also has
@@ -891,6 +906,48 @@ Every table has a `fact_lineage` binding to
 and protected partition, measure, breakdown, family role and rules fields are null.
 The manifest connects this binding to the archive and dictionary/member hashes.
 No latest-file discovery or successful-fetch inference from a registry row is allowed.
+
+#### Gravity and Atlas columns and source chain (S2-T25)
+
+Gravity bilateral columns hold `source_version`, `hs_revision`, `hs_detail`,
+`year`, `origin_code`, `destination_code`, `distance`, `distance_unit`,
+`distance_status`, `gdp_origin`, `gdp_origin_unit`, `gdp_origin_status`,
+`gdp_destination`, `gdp_destination_unit`, `gdp_destination_status`, `contig`,
+`common_language`, `colonial_link`, `trade_agreement`, `source_id` and
+`member_sha256`. The three measures are nullable decimal strings. Each has a
+configured unit and a status of `present` or `source_missing`. The four flags
+are configured tokens. Country columns hold `source_id`, `source_version`,
+`country_code` and `source_name`. `hs_revision` is the configured marker and
+`hs_detail` records that no revision was inferred. Atlas
+country-product rows hold `source_version`, `grain`, `year`, `country_code`,
+`product_code`, `finished_measure`, `measure_unit`, `measure_status`,
+`hs_revision`, `hs_detail`, `source_id` and `member_sha256`. Atlas
+country-partner-product rows hold `reporter_code` and `partner_code` in place
+of `country_code`, with the same measure and lineage columns. Dictionary rows
+record `grain`, `source_name` or `source_description`, and products also record
+`product_code`. The fixture schema is not the publisher's schema.
+
+ASSUMPTION pending the lead's reading: Gravity distance allows `total_digits: 9`
+and `fractional_digits: 3`; each GDP measure allows `total_digits: 16` and
+`fractional_digits: 4`; the Atlas finished measure allows `total_digits: 12`
+and `fractional_digits: 6` and may be signed. Count every written digit,
+including leading and trailing zeros. Gravity measures accept unsigned ASCII
+fixed-point text. The Atlas finished measure accepts an optional leading minus.
+Exponents, whitespace, nonfinite text, floats and rounding fail. A declared
+missing token becomes null; a written zero stays present. Units and the HS
+revision come from configuration. No concordance is inferred. A narrower year
+selection records the excluded years; it does not fill them.
+
+`contracts.read_selected` verifies the selected manifest, every finished
+archive and every output hash, then reparses before returning typed tables.
+`source_registry` uses `cepii_gravity` or `atlas_complexity`, kind
+`public_dataset`, publisher, page, licence, basis, retrieval date, selected
+manifest hash, false commit flag and attribution. Lineage binds to
+`eii_custodian.publicdata.gravity.parse.parse_archive@v1` or
+`eii_custodian.publicdata.atlas.parse.parse_archives@v1`. Input class is
+`public`. Protected partition, measure, breakdown, family role and rules fields
+are null. No latest-file discovery is allowed. Live page, licence, version and
+host values remain pending the lead.
 
 ## 8. The manifest and the loader
 

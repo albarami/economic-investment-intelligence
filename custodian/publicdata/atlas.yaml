@@ -1,0 +1,41 @@
+# Pending placeholders only. No publisher page, licence, version or host is confirmed.
+# Two finished grains are named. Neither file is fetched and neither measure is rebuilt.
+config_version: atlas-v1
+method_version: v1
+source_version: ""
+access: unconfirmed
+confirmed: false
+bound_origin: pending
+finished_only: true
+reviewed_urls: []
+publisher: ""
+page: ""
+page_sha256: ""
+attribution: ""
+evidence: ""
+licence_words: ""
+hs_revision: ""
+publisher_mapping: pending
+qatar_key: ""
+country_width: 1
+product_width: 1
+period_first: 1
+period_last: 1
+year_selection: pending
+raw_rows: [0, 0]
+measures: []
+downloads:
+  - grain: country_product_year
+    url: ""
+    archive_bytes: [0, 0]
+    raw_rows: [0, 0]
+    member_count: [0, 0]
+    publisher_sha256: ""
+    members: []
+  - grain: country_partner_product_year
+    url: ""
+    archive_bytes: [0, 0]
+    raw_rows: [0, 0]
+    member_count: [0, 0]
+    publisher_sha256: ""
+    members: []
