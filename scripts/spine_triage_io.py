@@ -134,8 +134,7 @@ def load_context(
     for entry in load_registry():
         if entry.key in ("lic_active", "lic_cancelled", "cls_isic4"):
             body = read_cached(cache, entry, digest=selected[entry.key])
-            side = body.path.with_name(body.path.stem + ".meta.json")
-            hashes[entry.key + "_receipt"] = file_hash(side)
+            hashes[entry.key + "_receipt"] = file_hash(body.receipt_path)
             receipts.append(
                 {
                     key: body.sidecar[key]

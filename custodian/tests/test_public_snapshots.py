@@ -661,3 +661,41 @@ def test_overture_removal_note_is_separate_and_verbatim():
     cells = [line for line in document.read_text().splitlines() if sentence in line]
     assert len(cells) == 4
     assert all("<br>" + sentence in line for line in cells)
+
+
+def test_reused_body_date_tamper_is_confined(tmp_path):
+    from eii_custodian.publicdata.fetch.snapshots import (
+        SnapshotError,
+        publish_snapshot,
+        read_snapshot,
+    )
+
+    body = b"syn-shared-body"
+    older_id = sha256_hex(b"syn-older-receipt")
+    newer_id = sha256_hex(b"syn-newer-receipt")
+    for identity, stamp in (
+        (older_id, "2024-01-31T00:00:00Z"),
+        (newer_id, "2024-02-29T00:00:00Z"),
+    ):
+        publish_snapshot(
+            tmp_path,
+            "json",
+            body,
+            {"source_id": "syn_source", "key": "syn_source", "retrieved_utc": stamp},
+            identity=identity,
+        )
+    older = read_snapshot(tmp_path, older_id)
+    newer = read_snapshot(tmp_path, newer_id)
+    assert older.path == newer.path
+    assert older.body == newer.body == body
+    index = tmp_path / "index" / f"{newer_id}.json"
+    row = json.loads(index.read_text())
+    assert row["body_date"] == "2024-01-31"
+    before = dict(row)
+    row["body_date"] = "2024-03-31"
+    assert row["path"] == before["path"]
+    assert {key for key in row if row[key] != before[key]} == {"body_date"}
+    index.write_text(json.dumps(row))
+    with pytest.raises(SnapshotError, match=r"^snapshot_path_invalid$"):
+        read_snapshot(tmp_path, newer_id)
+    assert read_snapshot(tmp_path, older_id).body == body

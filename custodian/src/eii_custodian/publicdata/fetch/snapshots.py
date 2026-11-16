@@ -66,6 +66,7 @@ def _publish(directory: Path, target: Path, body: bytes) -> None:
 
 @dataclass(frozen=True)
 class Snapshot:
+    receipt_path: Path
     path: Path
     sha256: str
     sidecar: dict[str, object]
@@ -123,7 +124,7 @@ def read_snapshot(directory: Path, identity: str) -> Snapshot:
     for key in ("source_id", "key", "retrieved_utc", "sha256", "bytes"):
         if side.get(key) != row.get(key):
             _refuse("snapshot_index_invalid")
-    return Snapshot(path, digest, side)
+    return Snapshot(receipt_path=receipt, path=path, sha256=digest, sidecar=side)
 
 
 def publish_snapshot(

@@ -59,6 +59,7 @@ class CacheError(ValueError):
 class CachedBody:
     """One verified cache body with its sidecar."""
 
+    receipt_path: Path
     path: Path
     body: bytes
     sidecar: dict[str, object]
@@ -200,7 +201,9 @@ def read_cached(
         raise CacheError("cache sidecar names another source")
     if sidecar.get("switched_off") is not False:
         raise CacheError("cache body is switched off")
-    return CachedBody(path=body_path, body=body, sidecar=sidecar)
+    return CachedBody(
+        receipt_path=selected.receipt_path, path=body_path, body=body, sidecar=sidecar
+    )
 
 
 def read_rows(cached: CachedBody) -> tuple[dict[str, Any], ...]:
