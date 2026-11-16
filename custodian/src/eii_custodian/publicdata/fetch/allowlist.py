@@ -25,6 +25,7 @@ ALLOWED_HOSTS = frozenset(
         "fdiprojects.invest.qa",
         "www.invest.qa",
         "data.source.coop",
+        "besttime.app",
     }
 )
 

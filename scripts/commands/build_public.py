@@ -24,7 +24,6 @@ def run(
     sleep: Sleeper | None = None,
 ) -> int:
     """Fetch the registry. Extra arguments are a usage error and open nothing."""
-    del environ
     if len(args) != 0:
         table.write_usage()
         return 2
@@ -34,7 +33,9 @@ def run(
         entries = load_registry()
     except RegistryError as exc:
         return exits.finish(1, "build-public", exc.detail)
-    outcome = run_build(entries, opener, root / CACHE_RELATIVE, utc_now, pause)
+    outcome = run_build(
+        entries, opener, root / CACHE_RELATIVE, utc_now, pause, environ=environ
+    )
     for line in outcome.lines:
         print(line)
     print(log_line(f"{CACHE_RELATIVE}/build-log.json"))

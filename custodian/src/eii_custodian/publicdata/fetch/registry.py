@@ -17,7 +17,14 @@ _DATE_TEXT = re.compile(r"\A\d{4}-\d{2}-\d{2}\Z")
 _SKIP_LICENCE = "licen"
 _SKIP_TERMS = "terms"
 KINDS = frozenset(
-    {"portal_dataset", "paged_layer", "https_file", "terms_page", "citation_only"}
+    {
+        "portal_dataset",
+        "paged_layer",
+        "https_file",
+        "terms_page",
+        "citation_only",
+        "besttime",
+    }
 )
 BANNED_SOURCE_IDS = frozenset({"traffic_tomtom_flow", "traffic_tomtom_range"})
 FIELDS = frozenset(

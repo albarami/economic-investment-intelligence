@@ -59,6 +59,17 @@ def prepare(
     entry: Entry, transport: Transport, sleep: Callable[[float], None]
 ) -> Prepared:
     """Fetch one row through the transport seam and apply its declared checks."""
+    if entry.kind == "besttime":
+        return _failed(
+            entry,
+            AttemptFailure(
+                1,
+                "https://besttime.app/api/v1/forecasts",
+                "build_context_required",
+                "build-public context",
+                "absent",
+            ),
+        )
     reader = _reader(transport, sleep)
     if entry.kind == "portal_dataset":
         return _portal(entry, reader)

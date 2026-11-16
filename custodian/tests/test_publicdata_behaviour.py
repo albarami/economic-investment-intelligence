@@ -455,12 +455,12 @@ def test_forbidding_terms_leave_the_source_fetched_and_stored(tmp_path: Path) ->
     assert not any("OWNER" in line for line in log["lines"])
 
 
-def test_busy_gmaps_stays_on_when_terms_name_the_use(tmp_path: Path) -> None:
-    """busy_gmaps is not switched off, because the owner decided to use it."""
+def test_busy_besttime_stays_on_when_terms_name_the_use(tmp_path: Path) -> None:
+    """busy_besttime is not switched off, because the owner decided to use it."""
     entry = replace(
         _entry(),
-        key="busy_gmaps",
-        source_id="busy_gmaps",
+        key="busy_besttime",
+        source_id="busy_besttime",
         kind="terms_page",
         extension="html",
         url=PAGE,

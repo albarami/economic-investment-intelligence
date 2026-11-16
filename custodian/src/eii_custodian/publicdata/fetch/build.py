@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import os
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -185,13 +185,19 @@ def run_build(
     cache: Path,
     clock: Clock,
     sleep: Sleeper,
+    *,
+    environ: Mapping[str, str] | None = None,
 ) -> BuildOutcome:
     """Fetch each row in order, then run the public_data stage."""
     lines: list[str] = []
+    pending: list[Entry] = []
     terms: list[dict[str, object]] = []
     previous = _previous_term_hashes(cache)
     failure: FetchFailure | None = None
     for entry in entries:
+        if entry.kind == "besttime":
+            pending.append(entry)
+            continue
         if entry.skip_reason:
             if entry.terms_url:
                 _read_terms_apart(
@@ -345,6 +351,70 @@ def run_build(
                     "missing",
                 )
             )
+    if failure is None:
+        from eii_custodian.publicdata.busyness.build import (
+            BuildInputError,
+            build_busyness,
+        )
+        from eii_custodian.publicdata.busyness.parse import FORECAST_URL, QUERY_URL
+        from eii_custodian.publicdata.busyness.review import ReviewError
+        from eii_custodian.publicdata.busyness.security import assert_clean
+
+        for entry in pending:
+            detail = ""
+            trusted = False
+            try:
+                digest = build_busyness(
+                    entry,
+                    transport,
+                    cache,
+                    clock,
+                    environ if environ is not None else {},
+                )
+            except (ValueError, OSError) as exc:
+                detail = str(exc)
+                trusted = isinstance(exc, (BuildInputError, ReviewError))
+            if detail:
+                # Only static schema/variable tokens cross into the build log.
+                tokens = (
+                    "BESTTIME_API_KEY_PRIVATE",
+                    "BESTTIME_API_KEY_PUBLIC",
+                    "EII_BESTTIME_RUN_CREDIT_LIMIT",
+                    "forecast_credits",
+                    "query_credits",
+                    "source_page",
+                    "read_on",
+                    "terms_words",
+                )
+                check = next(
+                    (token for token in tokens if token in detail),
+                    "busyness_build_failed",
+                )
+                if trusted:
+                    try:
+                        assert_clean(environ if environ is not None else {}, detail)
+                        check = detail
+                    except ValueError:
+                        check = "secret_in_input"
+                endpoint = QUERY_URL if QUERY_URL in detail else FORECAST_URL
+                failure = FetchFailure(
+                    1,
+                    "busy_besttime",
+                    endpoint,
+                    check,
+                    "valid build inputs and answer",
+                    "refused",
+                )
+                lines.append(
+                    fail_line(
+                        entry.key, endpoint, check, failure.expected, failure.observed
+                    )
+                )
+                break
+            lines.append(pass_line(entry.key, digest, "besttime.app"))
+    from eii_custodian.publicdata.busyness.security import assert_clean
+
+    assert_clean(environ if environ is not None else {}, lines)
     _write_log(cache, lines, terms)
     return BuildOutcome(tuple(lines), failure)
 
