@@ -501,7 +501,7 @@ Table `residence` (grain: one row per person per `as_of_date`).
 | DAT-51 | Every non-null `residence_cell` is a base cell selected under section 1.1 and is present in `grid_cell`. | Every non-null value joins `grid_cell`. |
 | DAT-52 | One row per person per `as_of_date`. | Uniqueness check. |
 | DAT-53 | Residents with `unresolved` cells are counted in the coverage report and never placed in a cell. | Fixture: unresolved residents absent from every unit. |
-| DAT-54 | Quality: at least 97% of rows `resolved`; `unknown` housing class under 2%. | Share checks. |
+| DAT-54 | Quality: at least 97% of rows `resolved`; `unknown` housing class under 2%. The generator's `unknown` share is the manifest entry `pop.residence_not_measured`, whose default is the lowest value of its own sweep, so a feed built at the default conforms here ([decision 0050](decisions/0050-the-homes-of-the-generated-workers.md) item 1); a sweep run at a value at or above this threshold is refused and recorded as refused, and this threshold moves only through a decision record, never to pass a run. | Share checks. |
 
 ### 6.5 `mobility.v1`
 
