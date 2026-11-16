@@ -37,7 +37,7 @@ Method honesty stays: intervals and backtests, measured errors, rank stability a
 | Kit | Note |
 |---|---|
 | Stage machine | Runs the frozen bundle ([13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md), section 7) |
-| Wall display over HDMI | Shows the stage window, presenter mode, 1920×1080 design canvas |
+| Big screen / Wall display over HDMI | Shows the stage window, presenter mode, layout responding to the screen up to 3840×2160 (decision 0049), using the 1920×1080 design canvas |
 | Second monitor | Presenter console only; never mirrored to the wall |
 | Clicker | Next and Back on the presenter console |
 | Separate device with the backup recording | Last line of defence; plugged into the display's second HDMI input before the audience arrives |
