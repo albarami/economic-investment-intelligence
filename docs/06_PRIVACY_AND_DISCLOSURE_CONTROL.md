@@ -1034,21 +1034,35 @@ classes: target employer group, insiders and colluders.
     non-negative integer cohort counts with their wage sums in each month, counted as leavers of
     their origin leaf and joiners of their destination leaf; the stayers of each leaf are a further
     cohort count with their wage sums in each month; and the later month's variables equal the
-    earlier month's after those cohorts. Every cohort is held as parts at the tuples of item 1:
-    for each pair of adjacent months, a non-negative integer count `K` for each origin tuple of
-    the earlier month and destination tuple of the later month, "outside the frame" being one
-    further origin and destination, with wage sums `Q_q` at the origin in the earlier month and
-    at the destination in the later month. The `N` and `W_q` of an earlier-month tuple are the
-    sums over its destinations, and those of a later-month tuple the sums over its origins; each
-    cohort of a published leaf, its stayers included, is the sum of the parts whose origin and
-    destination match it. Every part satisfies item 2 on its own in each month, with the bands of
-    its tuple of that month: `L(b_q) K <= Q_q`, for a finite band `Q_q <= U(b_q) K`, and a binary
-    `z_c` with `z_c <= K` and the indicator constraint
-    `z_c = 0 => Q_net = 0 and Q_basic = 0`; where the tuple maps to a published wage-bill leaf `l`,
-    `Q_q <= A_wage[l,m,q] z_c` is its linear form. The target variables of item 1 are split over
-    the same parts, and its target and remaining-population lines hold at every part with `K`
-    and `Q_q` in place of `N` and `W_q`. The stayer wage variables of item 4 are the sums of the
-    stayer parts. The `month_change` equalities of item 4 are included
+    earlier month's after those cohorts.
+    Every cohort is held as parts within each contributor universe over that universe's tuples of
+    item 1 (`N` and `S` in `residence` and `workplace`, `R` in `register`) and one further origin
+    and destination, "outside the frame" (with no part from "outside the frame" to "outside the
+    frame"): for each pair of adjacent months `m` and `m+1`, each origin of `m` and destination of
+    `m+1` has a non-negative integer count `K` — split in `residence` and `workplace`, when both
+    endpoints are in-frame tuples of the aggregate contribution class, into two parts, one for
+    unchanged employer group and one for changed employer group — and, at each endpoint that is an
+    eligible-pay tuple (`N`), non-negative wage sums `Q_q` (`q` in `{net, basic}`) for that
+    endpoint's month `t` (`m` at the origin, `m+1` at the destination). At every tuple of `m`, its
+    count (`N`, `S` or `R`) and, where eligible, its `W_q` equal the sums of `K` and `Q_q` over its
+    outgoing parts; at every tuple of `m+1`, they equal the sums over its incoming parts; and each
+    cohort of a published leaf, its stayers included, with its wage sums in each month where
+    applicable, is the sum of the parts whose origin, destination and employer-group-change status
+    match it. At each eligible-pay endpoint (month `t` in `{m, m+1}`), every part satisfies item 2
+    on its own with the bands of that endpoint's tuple: `L(b_q) K <= Q_q`, for a finite band
+    `Q_q <= U(b_q) K`, and a binary `z_c` with `z_c <= K` and the indicator constraint
+    `z_c = 0 => Q_net = 0 and Q_basic = 0`; where that tuple maps to a wage-bill leaf `l` that the
+    release shows for month `t`, `Q_q <= A_wage[l,t,q] z_c` is its linear form. For each person
+    target, `x_p`, `x_p_side` and `w_p_q` of item 1 (`loc_p` remains at `(u,c,t)` under item 3) are
+    split over the parts of `residence` and `workplace`: each part has a binary `x_p_part <= K`
+    summing to `x_p` or `x_p_side` at each in-frame endpoint, summing across all parts of the pair
+    to at most one in `residence` and, for each `h` in `H` in `workplace`, summing to at most one
+    over the parts with `h` at either endpoint, and at each eligible-pay endpoint (month `t`) has
+    target wages `w_p_q_part` summing to `w_p_q` and satisfying item 1's target and
+    remaining-population lines with `K`, `Q_q`, `x_p_part` and `w_p_q_part` in place of `N`, `W_q`,
+    `x_p` and `w_p_q` (using `A_wage[l,t,q]` in their linear forms where that tuple maps to a
+    wage-bill leaf `l` that the release shows for month `t`). The stayer wage variables of item 4
+    are the sums of the stayer parts. The `month_change` equalities of item 4 are included
     for every published component, and its latent stayer-bill constraints for every published
     `stayer_wage_index`; the changed cohorts of the status-only rows of `occupation_pay`,
     `home_area_share` and `outlet_register` enter only through these identities. For every change that the release
@@ -1133,7 +1147,7 @@ classes: target employer group, insiders and colluders.
 
 | ID | Requirement |
 |---|---|
-| PRV-121 | Exact reduction. The model of PRV-113 is written over base cells so that it is unambiguous; an implementation need not build it at that size. It may remove or merge variables and constraints only by exact presolve: substituting a constant for a sum that an equality fixes; merging variables that enter every constraint and every target expression only through their sum; and dropping a variable that no constraint links, directly or through other variables, to the target expression of the run. A reduction that changes the feasible set of any target expression is a defect. The audit tests solve one small fixture world in both the full and the reduced form and require identical statuses and identical minimum and maximum for every target class. That world holds a published `stayer_wage_index`, and the three fixtures of PRV-113 item 4 are solved in both forms as well: their statuses must be identical, `INFEASIBLE` for the relaxation fixture included, and so must the minimum and maximum of every rounded stayer bill `k[l,t]`. Replacing the draw digits of item 4 by a continuous factor, admitting the factor `1 + delta`, closing a rounding interval, giving the stayer bills of one unit, table and pair of months separate draws or rounding a coefficient of item 4 to floating point changes the feasible set and is a defect. Omitting item 11's origin-destination parts, tuple and cohort sum identities, per-part band bounds or empty-part indicator in either month, target and remaining-population lines, or stayer wage sum identities changes the feasible set and is a defect. No other approximation, no sampling of targets and no relaxation is allowed (PRV-112), with one stated exception: the model does not tie together the draws shared between stayer bills of nested or overlapping units and of different pairs of months (PRV-113 item 4; section 17). |
+| PRV-121 | Exact reduction. The model of PRV-113 is written over base cells so that it is unambiguous; an implementation need not build it at that size. It may remove or merge variables and constraints only by exact presolve: substituting a constant for a sum that an equality fixes; merging variables that enter every constraint and every target expression only through their sum; and dropping a variable that no constraint links, directly or through other variables, to the target expression of the run. A reduction that changes the feasible set of any target expression is a defect. The audit tests solve one small fixture world in both the full and the reduced form and require identical statuses and identical minimum and maximum for every target class. That world holds a published `stayer_wage_index`, and the three fixtures of PRV-113 item 4 are solved in both forms as well: their statuses must be identical, `INFEASIBLE` for the relaxation fixture included, and so must the minimum and maximum of every rounded stayer bill `k[l,t]`. Replacing the draw digits of item 4 by a continuous factor, admitting the factor `1 + delta`, closing a rounding interval, giving the stayer bills of one unit, table and pair of months separate draws or rounding a coefficient of item 4 to floating point changes the feasible set and is a defect. Omitting item 11's origin-destination parts (including the unchanged-group and changed-group split in the aggregate class), tuple and cohort sum identities, per-part band bounds or empty-part indicator at either eligible-pay endpoint, cross-part target conservation, target and remaining-population lines, or stayer wage sum identities changes the feasible set and is a defect. No other approximation, no sampling of targets and no relaxation is allowed (PRV-112), with one stated exception: the model does not tie together the draws shared between stayer bills of nested or overlapping units and of different pairs of months (PRV-113 item 4; section 17). |
 
 ### 10.3 Treatment consistency and movement intervals
 
