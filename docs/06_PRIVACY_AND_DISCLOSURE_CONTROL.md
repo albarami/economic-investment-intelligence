@@ -1423,6 +1423,15 @@ service and not general injection detection.
 
 S5-T11 names each proposed gender breakdown in the closed release schema and its existing governing contributor family before export. It must prove the same controls-off recovery and controls-on non-recovery for gender as nationality group, with planted small cells, differencing, complement and company-isolation attacks. This is a requirement to extend coverage, never permission to reduce the attack suite, its sizes or tolerances, or to export an unlisted dimension. Movement PRV-134 is unchanged.
 
+## Successive-window and drawn-polygon differencing tests (decision 0047)
+
+These requirements add to every existing attack. They change no privacy parameter, attack size or tolerance.
+
+| ID | Requirement |
+|---|---|
+| PRV-137 | Today's design protects one released window, so successive windows are tested before any rolling release. Version 1 builds no second protected window, including a test-only window (PRV-53, TST-123). At the custodian-plane release gate of the first deployment that proposes rolling, plant a successive-window differencing attack against `resident_pay`, `worker_pay` and every other protected table proposed for rolling: subtract two successive releases with a known contributor change to target a sealed pay, count or wage-bill value. With controls off the planted target is recovered; with controls on nothing is recovered under each candidate parameter set. No rolling release occurs without that signed evidence, and every existing attack still runs. |
+| PRV-138 | At the slice S5 custodian-plane attack gate, plant nested, adjacent and nudged drawn-polygon differences against `resident_pay`, `worker_pay`, `occupation_pay`, `home_area_share`, `outlet_register` and every other protected table exposed to an area query. The attack subtracts the snapped protected results to target a withheld group or sub-unit value. With controls off the planted target is recovered; with controls on nothing is recovered under each candidate parameter set. This names explicit acceptance for the drawn-shape and apportioning attack already covered by TST-221 and PRV-76, runs beside TST-120 to TST-123 and TST-220 to TST-222, and leaves every existing attack and control intact. |
+
 ## Open questions and assumptions
 
 Each ASSUMPTION is the simplest safe choice where the master design is silent.

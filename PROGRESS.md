@@ -28426,6 +28426,282 @@ Seed:      none
 Notes:     The work commit has a Conventional Commit subject.
 ```
 
+#### Decision 0046: review A: REJECTED
+
+Z.ai GLM-5.3 through Droid; another maker than the drafter (Moonshot Kimi, through Droid) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED
+
+**C1 — FAIL.** The note, L-694, L-700 items 2 to 4 and L-705 are carried (N1 retired whole; twelve rows to S2-T28; the S2-T29 set, TLS pins, cadences, leads-not-facts; the bank counts; the age-and-sex path correctly reuses the existing `worldpop_qat_agesex` row, which the base really has — a factual improvement on L-700's lead addition). But L-701 is folded in only in part, and one L-694 sentence is dropped: defects D2 to D6. The registry's actual skip strings (`publisher_or_schema_unconfirmed`, `overture_bucket_not_opened`) differ from L-701's flag names; the entry's generic "skip reason removed" wording covers them safely.
+
+**C2 — FAIL.** Retirement is clean where made: S7-T18 keeps its heading and withdrawn form, only S7-T13's dependency (and the doc 14 slice S7 line) drop it; MTH-124 and TST-267 now name C42, C43, C44, C46 and C34's fitted variant; MTH-83's C45 sentence and section 6's tightness row are gone; docs 03/05/06 shared structures (DAT-32–34/71/73/137/164, `employment_spell`, SYN-25/29/72/90, PRV-29 to PRV-121, mover/joiner canaries, `stayer_wage_index`) are untouched and live; remaining S7-T18/C45 references are intentional history. One stale live line survives: defect D1.
+
+**C3 — PASS.** 109/16, 8, 3, 98/15 are stated identically in the record's Context and OI-[LEAD-3] and nowhere contradicted; BRF-104, AI-129 and the glossary all qualify 109 as the declared historical total, never a recount; S6-T04 recounts the supplied bank with a planted N1 question refused and S8-T05 refuses a planted N1 evaluation question; no total is inferred from gap labels ("no one-question-per-gap assumption").
+
+**C4 — FAIL.** Both entries have the neighbour form (Goal, Acceptance, Scope, Depends, Requirements, Delivery with personas and status); criteria state input and check with plants; depends are real same-slice tasks; licence handling follows decision 0034; TLS wrong-pin/other-host refusals are stated; nothing claims a live fetch. But "L-701 folded in exactly" fails: D2, D3, D5.
+
+**C5 — PASS.** No synthetic stand-in (record item 3; S2-T29 scope "no synthetic substitute"); fetch tasks require publisher, terms read with date, retrieval date, hash; no invented place attribute; rule 10 restated whole in S2-T29 and unchanged in AGENTS.md; no verdict, forecast or advice; event pages stay dated Public snapshots with N4/OI-137 open exactly as the record says.
+
+**C6 — PASS.** Only EII, the pack's publishers and public pages are named (Visit Qatar, QNCC, Tawteen, Manateq, Monaqasat, education ministry, National Planning Council, ministries, WorldPop, Overture, the archive host); no comparison and no "first/only/unique".
+
+**C7 — PASS.** Form matches decision 0045 (Status/Date/authority table, Context, numbered Decision, Consequences, Amended passages, Proposed open items, Sources); no line-number citations; no invented ID or threshold; doc 14, the README and both gate paragraphs agree and only gained sentences. One record-completeness gap: D7.
+
+**Defects**
+
+D1. File: docs/04_PUBLIC_DATA_PACK.md; place: "Open items touching this document" passage. It still reads "OI-135 to OI-139 (the gaps of the decision question bank that section 12 lists)": OI-135 is now closed and its hiring-and-leaving row is gone from section 12. Fix: change to "OI-136 to OI-139", optionally noting OI-135's closure by decision 0046.
+
+D2. File: TASKS.md; place: S2-T28, L-701 amendment line. L-701 item G2's column-value guard is missing: "one planted malformed value of each new type refused where the fetch validates columns; if the fetch validates no column values today, say so and record the value check as hardening, not built" (only the planted unknown type is stated), and G2's exact publisher text "National open data portal (dataset publisher field empty, read 2026-11-16)" is paraphrased without the read date. Fix: add both sentences to the amendment line.
+
+D3. File: TASKS.md; place: S2-T28, amendment line (and record item 4). L-701 item G3's accident-column ruling is missing: the sixteen fields of the lead's facts file with mapped types; `public_splits: ["nationality"]` for `nationality_group_of_accident_perpetr`'s neighbour `nationality_group_of_accident`; and `birth_year_of_accident_perpetr` kept in the table as a public age attribute in the source's own categories, never joined to a synthetic record, never used by a card until a later ruling, added to `caveat_keys` only if a key for that use exists, otherwise a proposed open item. No trace of this appears anywhere in the change. Fix: add it to the amendment line and the record's proposed open items.
+
+D4. File: docs/decisions/0046-...md; place: Proposed open items. Two items L-701 asks for are absent: G2's "the lead reads the portal's dataset page for a publisher and licence statement" (bnd_muni_2025) and G4's "selecting Qatar parts at a later release is a proposed open item for a later task". Fix: add them (for example OI-[LEAD-4] and OI-[LEAD-5]).
+
+D5. File: TASKS.md; place: S2-T28, Scope. L-701 G4's scope restriction "`places/fetch.py` may change only to share a constant, nothing else" is not stated; only the new listing module's import rule is. Fix: add the sentence to Scope.
+
+D6. File: docs/decisions/0046-...md item 4 and TASKS.md S2-T28. L-694's snapshot-timing decision for the twelve rows is carried nowhere: "dated snapshots by S2-T27 once it merges (until then no live re-fetch overwrites a cached file)". Fix: add it as a criterion or a sentence in item 4, so a builder cannot ship a re-fetch that overwrites cached files before S2-T27's archive exists.
+
+D7. File: docs/decisions/0046-...md; place: Amended passages, Document 04. The change adds a new document 04 section "2.4 Public pages outside the registry — decision 0046" with the seven planned-source rows, but the record's Document 04 passage names only section 12 and sections 2.1/2.2. Fix: add a "Section 2.4" line naming the new section and its planned rows.
+
+**Anchors spot-checked** (all exist): 0023 items A9/A10/12/15/16; 0036 items 4 and 6; 0034; 0045 items 4 and 7 and its OI-[LEAD-3]; BRF-104; AI-129; AI-132; MTH-48/78/80/83/123/124; TST-206/267; cards C19, C20, C31, C34, C39, C42–C46 and C45's heading; doc 07 section 6; doc 04 section 12, PUB-19/78/82/85/86/90/97/99/105/108; OI-135–OI-139; SYN-25/29/72/90; PRV-29/44/45/55/56/69/71/75/76/112/113/116/121; DAT-32/33/34/71/73/137/164 and `employment_spell`; registry keys wage_sector, wage_bands_priv, work_hours_act, cpi_group, zone_population, census_hh_type_2020, accident, bnd_muni_2025, places_ovt, bldg_ovt, worldpop_qat_2020, census_2020_workbook, worldpop_qat_agesex, `pub_pop_agesex_grid`, `direct_url_unconfirmed`; tasks S2-T01/03/06/08/14/19/21/27/28/29, S6-T04, S7-T13, S8-T05; gaps N4/N6/N7.
+
+**Skills loaded**: strict-reviewer, sanad-provenance, al-muhasibi, muhasabah-gate (all loaded by name; the five-stage reasoning and the self-audit gate were applied to this review).
+```
+
+#### Decision 0046: confirmation round 1: REJECTED
+
+Reviewed commit `4dff9ee`. Z.ai GLM-5.3 through Droid; another maker than the drafter (Moonshot Kimi, through Droid) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED**
+
+**RECORD 0046**
+
+**COMMIT 4dff9ee**
+
+**REVIEWER:** Z.ai GLM-5.3, running as Factory Droid
+
+**SKILLS LOADED:** strict-reviewer, sanad-provenance, al-muhasibi, muhasabah-gate — all four loaded by name; the five-stage reasoning protocol and the self-audit gate were applied to this review. The gate passes with one stated limitation: no shell command could be run in this session, so `check_docs.py` and `check_tree.py` were not executed; every passage cited below was verified instead by direct reading of the workspace files at 4dff9ee, and every passage read matches the fix patch's post-state.
+
+## D1 to D7
+
+**D1 — FIXED.** docs/04_PUBLIC_DATA_PACK.md, "Open items touching this document": "OI-136 to OI-139 (the gaps of the decision question bank that section 12 lists; OI-135 is closed by decision 0046)." Section 12's rows now cite OI-136 and OI-139 in the places OI-135 once appeared, and no OI-135 reference remains live in the section.
+
+**D2 — FIXED.** TASKS.md, S2-T28, the fix's amendment line: "one planted malformed value of each new column type is refused where the fetch validates column values; if the fetch validates no column values today, the return says so and the value check is recorded as hardening, not built" and "the `bnd_muni_2025` publisher reads 'National open data portal (dataset publisher field empty, read 2026-11-16)'", with the no-publisher/licence/description/frequency registry record beside it. Both sentences of the finding's fix are present, the publisher text verbatim with its read date.
+
+**D3 — FIXED.** TASKS.md, the same amendment line: "the accident table declares its sixteen fields as the lead read them on 2026-11-16 with mapped types; its nationality column carries `public_splits: ["nationality"]`; its perpetrator birth-year column stays in the table as a public age attribute in the source's own categories, never joined to a synthetic record and never used by a card until a later ruling, and joins `caveat_keys` only where a key for that use exists, otherwise it is a proposed open item". Record item 4 carries the same ruling in summary. The G3 guard itself ("a declared column whose name contains `nationality` requires the `nationality` split, as the sex guard does (planted)") was already in the base L-701 amendment line. One residual is reported as finding 6 below.
+
+**D4 — FIXED.** The record's Proposed open items now hold OI-[LEAD-4] (the municipality polygons' publisher and licence, folded with the advisor's reading of the portal page) and OI-[LEAD-5] (Overture parts of a later release left to a later task; S2-T28 checks the registered release only), exactly the two items L-701 G2 and G4 asked for.
+
+**D5 — FIXED.** TASKS.md, S2-T28, Scope: "a new listing-check module under `custodian/src/eii_custodian/publicdata/places/` that imports the existing transport and allow-list (lead ruling L-701 item G4), while `places/fetch.py` may change only to share a constant, nothing else".
+
+**D6 — FIXED.** TASKS.md, the fix's amendment line: "no live re-fetch overwrites a cached file before S2-T27's archive merges; after it, these rows' files enter that archive as dated snapshots (lead ruling L-694)". Record item 4 carries the same sentence, so a builder cannot ship a re-fetch that overwrites cached files before the archive exists.
+
+**D7 — FIXED.** Record, Amended passages, Document 04: "**Section 2.4, Public pages outside the registry — decision 0046:** new; it lists the planned rows `insurance_tables`, `events_visit_qatar`, `events_qncc`, `suppliers_tawteen`, `manateq_tariffs`, `monaqasat_classified`, `schools_private_directory` and `awards_owner_scrape` with their snapshot and use limits." The section exists in document 04 with exactly those eight rows.
+
+## NEW FINDINGS
+
+The rejection rests on findings 1 to 3; findings 4 to 7 are smaller but each is a real point of the binding rulings or of the repository's own rules. Anchors spot-checked and found real: `review.graph.build_cached_graph` (custodian/src/eii_custodian/publicdata/review/graph.py), S2-T01, S2-T14, S2-T19, S2-T21, S2-T25 (whose shared fetch helpers S2-T27's scope also names), S2-T27, S2-T28 and S2-T29 as headings; decisions 0026 and 0034 files; OI-136 to OI-139 in document 04; the "eleven of the twelve" sentence is consistent in the record's Consequences, the TASKS.md slice S2 gate, and document 14's paragraph, task lines and gate line. No sentence in the new material claims a fetch, a count or a gate result; the advisor's readings carry their reader and date, and counts stay leads.
+
+**Finding 1 — S2-T28's base criteria contradict the L-707 carry.** File: TASKS.md; place: S2-T28, the Goal and acceptance boxes 1 and 4. Defect: the Goal still reads "Lift each, with the facts it needs, so that `./eii build-public` fetches it through the normal seam with a receipt and a hash"; box 1 still reads "each of the twelve rows has its skip reason removed and carries publisher, licence id and basis, URL, fetch host, extension…"; box 4 still reads "the accident dataset fetches in bounded pages with one receipt…". All three demand that the accident row be lifted, skip-free and fetched, which the fix's own amendment line forbids ("the accident row is not activated here… the row keeps a skip reason `partition_byte_bound_unconfirmed`… built and tested offline", L-707 K1) and the gate sentence contradicts ("Eleven of the twelve… the accident table's year-partition plan and refusals pass offline"). A reviewer ticking box 1 must fail the correct build, or pass a wrong one. Exact fix: amend the Goal and boxes 1 and 4 to except the accident row — for example, Goal: "…fetches it through the normal seam with a receipt and a hash; the accident row is the exception: its year-partition plan, receipt and refusals are built and tested offline and its activation is S2-T29's through S2-T25's shared bounded reader (L-707 item K1)"; box 1: "each of the twelve rows has its resolved skip reason removed — the accident row then carries `partition_byte_bound_unconfirmed` until S2-T29 — and carries publisher…"; box 4: "the accident dataset's bounded-page fetch is planned offline with one receipt that names every page and its hash and a total that must equal the published count, or the fetch is refused (planted short page, planted duplicate page); it is not activated in this task".
+
+**Finding 2 — L-708 item 2's press-figure clause is carried nowhere.** File: TASKS.md (and docs/04_PUBLIC_DATA_PACK.md); place: S2-T29's fix amendment, private-school item, and the school rows of document 04. Defect: L-708 rules "the press-reported seat figure is no feed"; the change carries the user-agent, browser-driven capture, access-failure recording and one-line-tell clauses, but no passage excludes a press-reported seat or capacity figure as a feed — the amendment's "no figure stands in for the directory" sits inside the access-failure branch, and the school rows guard only what the directory itself supplies. Exact fix: add to the private-school item of the S2-T29 amendment line (and, in one clause, to the school rows of document 04 section 2.4 and section 12): "the press-reported seat figure is no feed: no press-reported capacity or seat figure is registered, fetched or shown".
+
+**Finding 3 — L-709's tools clause is carried nowhere.** File: TASKS.md; place: S2-T29's fix amendment, awards item. Defect: L-709 rules "tools get only the advisor's aggregate profile, never a row"; the amendment carries "no value of the workbook is committed and tests use invented rows", which governs commits and tests but not what a build tool may read of the real workbook. Exact fix: add to the awards item: "builder tools receive only the advisor's aggregate profile of the workbook, never a row of it".
+
+**Finding 4 — L-709's supplier-certification-gap mapping is carried nowhere.** File: docs/decisions/0046 (and docs/04_PUBLIC_DATA_PACK.md); place: item 8 and the `awards_owner_scrape` row. Defect: L-709 states the awards source "serves backlog item 9 and the supplier-certification gap"; no passage maps the awards source to the supplier-certification gap (N6, OI-138), which is a repository anchor. The "backlog item 9" half has no repository anchor (the repository's backlog item 9 is the product-space context line, a different thing), so leaving that half out or rewording it without a false anchor is right; the supplier-certification half is carryable and uncarried. Exact fix: add one clause to record item 8 or the `awards_owner_scrape` row: "the awards source serves the supplier-certification gap (N6, OI-138) as evidence, without closing it".
+
+**Finding 5 — the Decision list numbers 1, 2, 3, 4, 5, 8, 6, 7 in that order.** File: docs/decisions/0046; place: Decision section, item 8 physically sits between items 5 and 6. Defect: rule 33 anchors a decision record by its numbered items, and a Markdown renderer renumbers a loose ordered list sequentially, so the rendered awards item becomes "item 6", colliding with the written item 6 that document 14 cites as "decision 0046 items 5 and 6"; raw-text and rendered readers get different referents. Exact fix: move item 8 to the end of the Decision list, after item 7; its number stays 8 and the sequence becomes 1 to 8.
+
+**Finding 6 — L-707 K3's birth-year point is carried only conditionally.** File: docs/decisions/0046; place: Proposed open items (with TASKS.md S2-T28's amendment line). Defect: K3 reads "the birth-year use is a proposed open item", stated flat; the change carries only L-701 G3's conditional ("joins `caveat_keys` only where a key for that use exists, otherwise it is a proposed open item"), so if a caveat key for that use exists at build time, the still-binding "never used by a card until a later ruling" question is tracked nowhere. Exact fix: add a proposed open item, for example "OI-[LEAD-8] — Accident perpetrator birth-year use: whether any card may use `birth_year_of_accident_perpetr`, and under which caveat key, is a proposed open item; no card uses the column until it is answered."
+
+**Finding 7 — rule 37: the school access-failure guard has no planted violation.** File: TASKS.md; place: S2-T29's fix amendment, private-school item. Defect: the item requires the access failure to be recorded with its date, but names no planted case; every other guard of the fix names one. Exact fix: append "(a planted connection reset asserts the failure is recorded with its date)" to that item.
+
+**Why rejected:** findings D1 to D7 are all genuinely fixed, and the fix is a competent fold-in of the three rulings. But findings 1 to 3 are of the same class round A rejected for — a passage left unreconciled with the new state, and binding points of rulings the documents do not carry — and the brief makes those rulings binding as written with every point carried. Approving with them present would be the "close enough" that this review exists to refuse. All seven fixes are small, local and exactly as stated above.
+```
+
+#### Decision 0046: confirmation round 2: APPROVED
+
+Reviewed commit `234aa01`. Z.ai GLM-5.3 through Droid; another maker than the drafter (Moonshot Kimi, through Droid) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED**
+
+**RECORD 0046**
+
+**COMMIT 234aa01**
+
+**REVIEWER:** Z.ai GLM-5.3, running as Factory Droid.
+
+**SKILLS LOADED:** strict-reviewer, sanad-provenance, al-muhasibi, muhasabah-gate — all four loaded by name; the five-stage reasoning protocol and the self-audit gate were applied to this review. The gate passes with the same stated limitation as round 2: this session runs no shell command, so `check_docs.py` and `check_tree.py` were not executed; every passage below was verified by direct reading of the workspace files, whose state matches the fix patch's post-state, with the workspace at commit 234aa01 as the session's recorded head.
+
+## Findings 1 to 7
+
+**1 — FIXED.** TASKS.md, S2-T28: the Goal now ends "The accident row is the exception: its year-partition plan, receipt and refusals are built and tested offline, and its activation is S2-T29's through S2-T25's shared bounded reader (lead ruling L-707 item K1)". Box 1 now reads "each of the twelve rows has its resolved skip reason removed (the accident row then carries `partition_byte_bound_unconfirmed` until S2-T29) and carries publisher, licence id and basis, URL, fetch host, extension…". Box 4 now reads "the accident dataset's bounded-page fetch is planned offline with one receipt that names every page and its hash and a total that must equal the published count, or the fetch is refused (planted short page, planted duplicate page); it is not activated in this task". No criterion of the task still demands the accident row's activation; the amendment line, the slice S2 gate and document 14 all state the same exception.
+
+**2 — FIXED.** TASKS.md, S2-T29 amendment, private-school item: "the press-reported seat figure is no feed: no press-reported capacity or seat figure is registered, fetched or shown". Document 04 section 2.4's school row carries the same clause, and section 12's school-capacity row now reads "which supplies no capacity, enrolment or catchment, and no press-reported seat figure is a feed".
+
+**3 — FIXED.** TASKS.md, S2-T29 amendment, awards item: "builder tools receive only the advisor's aggregate profile of the workbook, never a row of it".
+
+**4 — FIXED.** Record item 8 now ends "The awards source serves the supplier-certification gap (N6, OI-138) as evidence, without closing it", and document 04's `awards_owner_scrape` row carries the same clause. The "backlog item 9" half stays out, as the finding required (no repository anchor for it).
+
+**5 — FIXED.** Record, Decision section: item 8 now sits after item 7, so the list reads 1 to 8 in file order and a renderer's sequential numbering matches the raw text; document 14's citation of "decision 0046 items 5 and 6" resolves to the S2-T29 and transport items in both readings.
+
+**6 — FIXED.** Record, Proposed open items: "**OI-[LEAD-8] — Accident perpetrator birth-year use:** whether any card may use the accident table's perpetrator birth-year column, and under which caveat key, is a proposed open item (lead ruling L-707 item K3); no card uses the column until it is answered." The column is named in words rather than by field name; the referent is unambiguous (the same column the TASKS.md D3 passage names in words and L-701 G3 identifies), so the fix holds. I note for accuracy that L-701 G3 does record the field's name; the words-versus-name choice changes nothing in meaning.
+
+**7 — FIXED.** TASKS.md, S2-T29 amendment, private-school item: "if neither opens, the row records the access failure with its date (a planted connection reset asserts the failure is recorded with its date) and the lead tells the advisor in one line".
+
+## D1 to D7
+
+**D1 — FIXED.** Document 04, open-items passage: "OI-136 to OI-139 (the gaps of the decision question bank that section 12 lists; OI-135 is closed by decision 0046)". Section 12 carries no live OI-135 reference, and OPEN_ITEMS.md closes OI-135 by decision 0046 item 1 with its earlier text kept.
+
+**D2 — FIXED.** TASKS.md, S2-T28 fix amendment: "one planted malformed value of each new column type is refused where the fetch validates column values; if the fetch validates no column values today, the return says so and the value check is recorded as hardening, not built" and "the `bnd_muni_2025` publisher reads 'National open data portal (dataset publisher field empty, read 2026-11-16)'", with the no-publisher/licence/description/frequency registry record beside it.
+
+**D3 — FIXED.** The same amendment: "the accident table declares its sixteen fields as the lead read them on 2026-11-16 with mapped types; its nationality column carries `public_splits: ["nationality"]`; its perpetrator birth-year column stays in the table as a public age attribute in the source's own categories, never joined to a synthetic record and never used by a card until a later ruling, and joins `caveat_keys` only where a key for that use exists, otherwise it is a proposed open item"; record item 4 carries the summary, and OI-[LEAD-8] tracks the open branch.
+
+**D4 — FIXED.** OI-[LEAD-4] (the portal's dataset page states no publisher, licence, description or update frequency; open until a publisher statement is found) and OI-[LEAD-5] (Overture parts of a later release left to a later task; S2-T28 checks the registered release only) are in the record's proposed open items.
+
+**D5 — FIXED.** TASKS.md, S2-T28, Scope: "a new listing-check module under `custodian/src/eii_custodian/publicdata/places/` that imports the existing transport and allow-list (lead ruling L-701 item G4), while `places/fetch.py` may change only to share a constant, nothing else".
+
+**D6 — FIXED.** The S2-T28 amendment: "no live re-fetch overwrites a cached file before S2-T27's archive merges; after it, these rows' files enter that archive as dated snapshots (lead ruling L-694)"; record item 4 carries the same sentence.
+
+**D7 — FIXED.** Record, Amended passages, Document 04: "**Section 2.4, Public pages outside the registry — decision 0046:** new; it lists the planned rows `insurance_tables`, `events_visit_qatar`, `events_qncc`, `suppliers_tawteen`, `manateq_tariffs`, `monaqasat_classified`, `schools_private_directory` and `awards_owner_scrape` with their snapshot and use limits." The section exists with exactly those eight rows.
+
+## Fresh read of the round-2 material
+
+Checked as a fresh reader: the S2-T28 fix amendment line, the S2-T29 amendment line, record items 4, 5 and 8, Consequences, Amended passages, the proposed open items OI-[LEAD-4] to OI-[LEAD-8], the document 04 section 2.4 rows and the document 14 lines.
+
+- **The three rulings, every point carried:** L-707's K1 to K4 are carried (non-activation with `partition_byte_bound_unconfirmed`, activation in S2-T29 through S2-T25's shared bounded reader with lead-read byte spans, no invented bound, no copied reader; the cache-reader shape invariant with the planted-envelope test; the column-value guard with its return statement; `places/fetch.py` constant-only; the birth-year open item; the S2-T27 merge before any live re-fetch). The rulings' instructions addressed to the build round's return (listing every cache reader checked, quoting the diff stat) are process duties whose substantive invariants are carried in the criteria; I hold them carried, as round 2 did on the same text. L-708's four points are carried (Monaqasat intermediate pin with verification on and the count taken after the first fetch; the school directory's user agent, browser-driven capture, dated access failure with its plant, one-line tell and no-feed press clause; the municipality metadata gap; no change to the other items). L-709's points are all carried in item 8, the S2-T29 amendment and the document 04 row, including the aggregate-profile-only tooling, the intake through `./eii build-public` from a documented uncommitted folder with hash and receipt, the 30-link sample with planted mismatch, the registration-number join after the name-consistency check, the weekly `award_reports` family assigned to this row only, and decision 0034's commit boundary; the unanchorable "backlog item 9" half is correctly left out.
+- **Nothing added beyond them:** the fix commit's diff touches only the three files, and every hunk maps to a finding fix or a ruling point.
+- **Rules 5, 7, 13, 19 and 37:** publisher, page, licence or basis, terms-read date, retrieval date and SHA-256 required on every new row (rule 5); helper-read counts stay leads and no count is invented (rule 7); the workbook's intake goes through the fetch seam into a documented folder, never a private copy (rule 13); page hash and snapshot date enter lineage (rule 19); every new testable guard names its plant — malformed column value, unknown type, nationality split, listing-envelope, short and duplicate pages, span over-read, disabled verification, wrong pin, other host, connection-reset recording, match mismatch, other family assignment, unsupported-fact claims (rule 37). Rule 10 holds whole: sex and nationality splits stay Public facts in the source's own categories and geography, never joined to or segmenting worker, residence or company records, never combined with a protected figure, no apportionment, whole-cell sums only; the birth-year column stays a public attribute never joined to a synthetic record.
+- **Decisions 0026 and 0034:** the awards workbook is Public under 0026, never an official table, completeness unknown; no value of it or of any unlicensed source enters the repository; commit flags stay false.
+- **No sentence claims a fetch, a count or a gate result:** the record's Consequences say the gate additions "are gate conditions, not claims that the sources have already been fetched"; document 04's section 2.4 header says the rows "are planned source IDs and fetch assignments under S2-T29, not claims that a page or file has been fetched"; document 14's paragraph ends "no registry row is a successful-fetch claim"; S2-T08's amendment says "no registry row alone is evidence of a successful fetch". The 109/16, 8, 3, 98/15 figures stay attributed to ruling L-705 and S6-T04's test.
+- **"Eleven of the twelve" is consistent** in the record's Consequences, the TASKS.md slice S2 gate, document 14's gate line, and document 14's paragraph (eleven rows end skip-free and fetched; the accident row keeps `partition_byte_bound_unconfirmed` and passes offline, activation in S2-T29).
+- **S2-T29's Depends lists real tasks:** S2-T01, S2-T14, S2-T19, S2-T21, S2-T25, S2-T27 and S2-T28 all exist as task headings; S2-T28's own depends (S2-T01, S2-T03, S2-T06) also exist. S7-T18 survives only as its withdrawn heading, S7-T13 no longer names it, and document 14's slice S7 carries no S7-T18 line.
+- **Anchors checked and found real:** decisions 0023, 0026, 0034, 0035, 0036, 0044, 0045 (its item 4 and OI-[LEAD-3]); `review.graph.build_cached_graph` in the custodian public-data review graph module; document 04 sections 2.1/2.2/2.4/12 and the open-items passage; PUB-78's six-gap caveat-key sentence; OI-135 (closed), OI-136 to OI-139, N4, N6, N7; the eight section 2.4 row IDs; the twelve registry row keys; the decisions index entry and table row for 0046 in the docs README; task headings S2-T01/03/06/08/14/19/21/25/27/28/29, S6-T04, S7-T13, S7-T18, S8-T05.
+
+## NEW FINDINGS
+
+None.
+
+Why approved: all seven findings and all seven defects are fixed exactly as prescribed, the fresh read of the named material finds every point of rulings L-707, L-708 and L-709 carried and nothing added beyond them, the repository's own rules and decisions 0026 and 0034 hold, no passage claims a fetch, a count or a gate result, and every anchor relied on exists. The one wording note (OI-[LEAD-8] naming the column in words) is stated above and is not a defect.
+```
+
+#### Decision 0046: merge record
+
+- The head that was merged, `7e149b468db433aebde0d46bc9c24ed12c56b87f`, is `4e96ff2` and one ledger commit that changes `PROGRESS.md` only. `4e96ff2` is the approved commit `234aa01` (base `c8c250e`) moved onto main `14c6f84` after decision 0045 merged; `git diff 14c6f84 4e96ff2` equals `git diff c8c250e 234aa01` apart from blob index lines (decision 0039), eleven files.
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43852605532 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43852605422 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43852605379.
+- The lead's ledger run on the head: exit 0, `./eii test --seed 2026111614`: 5252 passed, 0 failed, 0 skipped, 1094 s.
+- The verdicts are quoted in the pull request's body (Review section) and in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/68 was squash-merged on 2026-11-16 at that head; merge commit `dab34b765fdc661a7c06120e0b2560b7c97096f5` on main; head tree `69c13cbb1ed684326461e24559099ba248b346b7`, merge tree `69c13cbb1ed684326461e24559099ba248b346b7`. CI on the merge commit: workflow ci running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43856323855 ; workflow sandbox running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43856323807 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43856323765.
+
+### DOCS-0047 — Decision record 0047, tasks S2-T30 and S7-T24: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/69 )
+
+- What it is: [decision 0047](docs/decisions/0047-eiis-own-decision-backlog-and-acceptance-targets.md), Accepted on 2026-11-16: it places EII's thirty decision-backlog items, the demonstration order, the recorded archive schedule, absolute acceptance targets and their limits in the existing build, mapping each item to existing tasks or to the two new tasks S2-T30 and S7-T24, without duplicating covered work or weakening a control; it amends TASKS.md, documents 06, 12 and 14 and docs/README.md.
+- Why: the advisor's round-2 note of 2026-11-16 at 11:35, applied by the lead's ruling L-700, asks that EII's own decision backlog be placed in the build with acceptance targets. A material amendment needs a decision record and never a silent edit (rule 46). Decision records keep their own pull request (rule 33).
+- Class: documents only, Deep in its subject (it names acceptance targets and states privacy attacks and limits in documents 06 and 12; rules 12 and 16 to 25). Lead: Anthropic (Claude Opus 5.5): the rulings L-700, L-706 and L-707, the findings X1 to X9 on the first draft, the brief and the edits after review. Editor: a first draft by Google Gemini 3.1 Pro through Droid, found too weak to review (X1 to X9), and the reworked draft by Moonshot Kimi K3.1 Pro through Droid. Reviewer: Alibaba Qwen 3.8 Max through Droid, another maker than the editors and the lead.
+- Review: review A found X1 to X9 fixed and was REJECTED on two findings (F1, S7-T24 must be Deep; F2, S7-T01 must depend on S2-T19); the lead fixed them. The confirmation was APPROVED at `b610b06` with F1 and F2 fixed. After decision 0046 merged, the approved change was moved onto main `dab34b7`: `git diff dab34b7 HEAD` equals `git diff 4dff9ee b610b06` apart from blob index lines and hunk line numbers (decision 0039: a records-only move keeps approval); the line numbers moved because 0046's last review round added lines to TASKS.md above, and its accident wording agrees with record 0047 item 29.
+- Left unchanged: AGENTS.md and CLAUDE.md, every privacy rule, attack size, tolerance, gate check, hard limit, sandbox rule and source permission. No code, check script, workflow file or test changes, and no result is measured. The record claims no implemented feature, met target or gate approval (rule 47).
+- The repository's checks cannot tell whether the record reads the advisor's note rightly. That judgement belongs to the reviewer, and the owner's choices stay with the owner.
+
+#### Evidence for the work commit `a81cbb9ecbf9f359e24e3b1f1cab3c72e9d2ef36`
+
+```text
+### DOCS-0047 — Decision record 0047, tasks S2-T30 and S7-T24
+Commit:    a81cbb9ecbf9f359e24e3b1f1cab3c72e9d2ef36
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 684 text files, 92 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with record 0047, tasks S2-T30 and S7-T24, the amended passages of documents 06, 12 and 14 and the index rows: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### DOCS-0047 — Decision record 0047, tasks S2-T30 and S7-T24
+Commit:    a81cbb9ecbf9f359e24e3b1f1cab3c72e9d2ef36
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### DOCS-0047 — Decision record 0047, tasks S2-T30 and S7-T24
+Commit:    a81cbb9ecbf9f359e24e3b1f1cab3c72e9d2ef36
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files stay byte-identical; neither changes here.
+```
+
+```text
+### DOCS-0047 — Decision record 0047, tasks S2-T30 and S7-T24
+Commit:    a81cbb9ecbf9f359e24e3b1f1cab3c72e9d2ef36
+Command:   bash -c "git diff --name-only dab34b765fdc661a7c06120e0b2560b7c97096f5 HEAD -- docs/decisions/ | grep -v -E '/0047-' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no earlier decision record is changed)
+Seed:      none
+Notes:     Record 0047 is a new file (rule 46); this row proves on the committed tree that no earlier decision record was edited.
+```
+
+```text
+### DOCS-0047 — Decision record 0047, tasks S2-T30 and S7-T24
+Commit:    a81cbb9ecbf9f359e24e3b1f1cab3c72e9d2ef36
+Command:   bash -c "git diff --name-only dab34b765fdc661a7c06120e0b2560b7c97096f5 HEAD -- scripts .github web core custodian product gateway evals eii | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no code, check script or workflow file is changed)
+Seed:      none
+Notes:     The change is documents only.
+```
+
+```text
+### DOCS-0047 — Decision record 0047, tasks S2-T30 and S7-T24
+Commit:    a81cbb9ecbf9f359e24e3b1f1cab3c72e9d2ef36
+Command:   bash -c "git diff --name-only dab34b765fdc661a7c06120e0b2560b7c97096f5 HEAD | grep -v -E '[.]md$' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (only Markdown files change)
+Seed:      none
+Notes:     Every changed file is a Markdown document.
+```
+
+```text
+### DOCS-0047 — Decision record 0047, tasks S2-T30 and S7-T24
+Commit:    a81cbb9ecbf9f359e24e3b1f1cab3c72e9d2ef36
+Command:   ./eii test --seed 2026111615
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    5252 passed, 0 failed, 0 skipped
+Seed:      2026111615
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### DOCS-0047 — Decision record 0047, tasks S2-T30 and S7-T24
+Commit:    a81cbb9ecbf9f359e24e3b1f1cab3c72e9d2ef36
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','dab34b765fdc661a7c06120e0b2560b7c97096f5..a81cbb9ecbf9f359e24e3b1f1cab3c72e9d2ef36'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
