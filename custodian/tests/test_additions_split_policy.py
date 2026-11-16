@@ -69,6 +69,58 @@ def test_workspace_contracts_admit_only_the_named_nationality_fields() -> None:
     }
 
 
+def test_record_gender_is_admitted_only_on_employment_spell() -> None:
+    """Decision 0037 admits exact gender on employment_spell and refuses every other placement."""
+    salary_record = TableSpec("salary_record", "worker_source", (ColumnSpec("gender"),))
+    assert validate_table_dimensions(salary_record).reason == "forbidden_dimension"
+    salary_file = TableSpec("salary_file", "worker_source", (ColumnSpec("gender"),))
+    assert validate_table_dimensions(salary_file).reason == "forbidden_dimension"
+    residence = TableSpec("residence", "residence_source", (ColumnSpec("gender"),))
+    assert validate_table_dimensions(residence).reason == "forbidden_dimension"
+    establishment = TableSpec(
+        "establishment", "company_source", (ColumnSpec("gender"),)
+    )
+    assert validate_table_dimensions(establishment).reason == "forbidden_dimension"
+    legal_entity = TableSpec("legal_entity", "company_source", (ColumnSpec("gender"),))
+    assert validate_table_dimensions(legal_entity).reason == "forbidden_dimension"
+    employment_gender = TableSpec(
+        "employment_spell",
+        "worker_source",
+        (ColumnSpec("employment_gender"),),
+    )
+    assert validate_table_dimensions(employment_gender).reason == "forbidden_dimension"
+    gender_code = TableSpec(
+        "employment_spell",
+        "worker_source",
+        (ColumnSpec("gender_code"),),
+    )
+    assert validate_table_dimensions(gender_code).reason == "forbidden_dimension"
+    padded = TableSpec(
+        "employment_spell",
+        "worker_source",
+        (ColumnSpec(" Gender"),),
+    )
+    assert validate_table_dimensions(padded).reason == "name_unreadable"
+    upper = TableSpec(
+        "employment_spell",
+        "worker_source",
+        (ColumnSpec("Gender"),),
+    )
+    assert validate_table_dimensions(upper).reason == "forbidden_dimension"
+    qatari = TableSpec(
+        "employment_spell",
+        "worker_source",
+        (ColumnSpec("gender", ("qatari",)),),
+    )
+    assert validate_table_dimensions(qatari).reason == "forbidden_closed_value"
+    visitors = TableSpec(
+        "employment_spell",
+        "worker_source",
+        (ColumnSpec("gender", ("international_visitors",)),),
+    )
+    assert validate_table_dimensions(visitors).reason == "forbidden_closed_value"
+
+
 def test_a_sex_column_on_a_worker_table_fails_and_the_clean_table_passes() -> None:
     """A forbidden word in a column name is refused. A table without one is kept."""
     clean = TableSpec(

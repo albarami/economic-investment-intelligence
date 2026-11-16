@@ -91,6 +91,11 @@ _EXCEPTIONS = frozenset(
         ("establishment", "establishment_nationality"),
     }
 )
+_EMPLOYMENT_GENDER = frozenset(
+    {
+        ("employment_spell", "gender"),
+    }
+)
 _MOVEMENT_COLUMNS = frozenset({"age_band", "gender", "nationality_group"})
 _PRESENCE_SPLIT_FIELDS = (
     "observation_start",
@@ -252,13 +257,19 @@ def workspace_descriptors() -> tuple[TableSpec, ...]:
 
 def _record(table: TableSpec) -> Verdict:
     for column in table.columns:
-        if (table.name, _folded(column.name)) in _EXCEPTIONS:
+        folded = _folded(column.name)
+        if (table.name, folded) in _EXCEPTIONS:
             for value in column.closed_values:
                 if _names_sex_or_gender(value):
                     return Verdict(False, "forbidden_closed_value")
                 if value == "international_visitors":
                     return Verdict(False, "international_visitors_on_worker")
                 if value not in _NATIONALITY:
+                    return Verdict(False, "forbidden_closed_value")
+            continue
+        if (table.name, folded) in _EMPLOYMENT_GENDER and column.name == folded:
+            for value in column.closed_values:
+                if value in _NATIONALITY:
                     return Verdict(False, "forbidden_closed_value")
             continue
         if _parts(column.name) & _FORBIDDEN_PARTS:
