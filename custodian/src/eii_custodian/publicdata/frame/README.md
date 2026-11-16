@@ -30,6 +30,10 @@ not resolve through the reviewed municipality names refuses. This
 selects the explicit set after the key-based join; it does not join the two
 municipality sources by name.
 
+The same build also writes the joined municipality codes and exact names to
+`cache/frame_s2_t02/municipalities.json`; the public-series stage reads that
+file back, never the review alias map, to code the licence rows of its run.
+
 The district population field `POP2020` maps to the closed residents/persons
 pair in `pub_census_district`, on its joined district, with receipt lineage.
 All map attributes are inventoried. L-212 M1–M5 and the lead's service-description

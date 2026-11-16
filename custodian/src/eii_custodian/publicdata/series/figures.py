@@ -30,6 +30,10 @@ from eii_custodian.publicdata.series.baskets import (
     reviewed_inputs,
     validate_source_review,
 )
+from eii_custodian.publicdata.series.frame import (
+    MunicipalityFrameRefused,
+    frame_municipalities,
+)
 from eii_custodian.publicdata.series.parse import (
     FIELD_MAP,
     Municipality,
@@ -790,8 +794,27 @@ def finish_build(
                 1, entry.key, "", "selected_receipt", "one selected hash", "missing"
             )
         selected[entry.source_id] = matches[0]
+    licence = sorted(
+        entry.source_id for entry in owned if entry.source_id.startswith("lic_")
+    )
+    municipalities: tuple[Municipality, ...] = ()
+    if licence:
+        try:
+            municipalities = frame_municipalities(cache)
+        except MunicipalityFrameRefused as exc:
+            lines.append(
+                "FAIL series municipality_frame_not_supplied " + " ".join(licence)
+            )
+            return FetchFailure(
+                1,
+                "series",
+                "",
+                "public_data",
+                "the municipalities of this build's frame",
+                exc.reason,
+            )
     try:
-        result = build_series(cache, owned, selected)
+        result = build_series(cache, owned, selected, municipalities=municipalities)
     except (OSError, ValueError, KeyError) as exc:
         lines.append("FAIL series selected input refused")
         return FetchFailure(

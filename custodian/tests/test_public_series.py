@@ -997,7 +997,7 @@ def test_r1_match_records_the_confirmed_field_and_scope(tmp_path: Path) -> None:
 
 
 @pytest.mark.public_data
-def test_missing_contract_mapping_refuses_even_with_matching_numbers(
+def test_missing_frame_output_refuses_even_with_matching_numbers(
     tmp_path: Path, monkeypatch
 ) -> None:
     from eii_custodian.publicdata.series.figures import finish_build
@@ -1023,9 +1023,10 @@ def test_missing_contract_mapping_refuses_even_with_matching_numbers(
     lines = [f"PASS lic_cancelled sha256={digest} host=invented"]
     result = finish_build([entry], tmp_path, lines)
     assert result is not None
-    assert result.source_id == "series_mapping"
+    assert result.source_id == "series"
     assert result.check == "public_data"
-    assert lines[-1] == "FAIL series_mapping public_data selected-cache check"
+    assert result.observed == "municipality_frame_absent"
+    assert lines[-1] == "FAIL series municipality_frame_not_supplied lic_cancelled"
 
 
 @pytest.mark.parametrize(
