@@ -179,6 +179,8 @@ The flagship building is the one chosen in slice S2 after its public places were
 
 ### Scene 0 — The living map, real public evidence first (30 s)
 
+Decision 0042 item 7: the entry frame is the quiet map with one Public evidence layer and its dated Fact chip, the question "What decision are you making?", visible site choice, suppliers, talent, competition and forecasts actions, and Guided story beside Explore. Public describes the backend class only; no origin word or mark appears (decision 0035). The following beats retain one evidence layer at a time.
+
 | | |
 |---|---|
 | Tap | Next |
@@ -211,6 +213,8 @@ If OI-03 is open, do not show the unit-economics hero or the national pay card. 
 
 ### Scene 3 — The flagship: one location, drawn (target set at rehearsal, step D20)
 
+Decision 0042 item 7: reveal answer, comparison, then evidence and method, with the same fact object behind each numerical view. Area drawing offers named-area choice and click-to-place vertices as single-pointer alternatives to dragging; every other drag also has a non-drag alternative.
+
 | | |
 |---|---|
 | Tap | Next through its three acts |
@@ -231,6 +235,8 @@ If OI-03 is open, do not show the unit-economics hero or the national pay card. 
 
 ### Scene 5 — Costs and suppliers (60 s)
 
+Scenario fork (decision 0042 item 7): while the prepared assumption changes, keep the baseline visible beside the returned scenario and provide immediate reset to it. This beat runs only when the existing scene eligibility permits the scenario; it adds no invented value or origin mark.
+
 | | |
 |---|---|
 | Tap | Break-even; on the presenter console enter rent 40000, seats 60, average bill 120, opening days 30, expected covers 50; then change rent to 60000; then, when the release holds one for this activity, Next applies the prepared incentive package; then the supplier lens |
@@ -240,6 +246,8 @@ If OI-03 is open, do not show the unit-economics hero or the national pay card. 
 | Fallback | If OI-03 is open, skip the break-even and the scenario tools and show the supplier lens only. Calculator error: Reload; if it still fails, show the break-even page of the printed pack. Supplier lens missing: move on without comment |
 
 ### Scene 6 — Try to break it (90 s)
+
+Privacy boundary (decision 0042 item 7): show a withheld small-area result with its reason, never zero or the hidden count, and offer only the approved broader aggregations returned by the application. Keep the existing prepared attack fixtures and privacy rules unchanged.
 
 | | |
 |---|---|
@@ -323,6 +331,8 @@ If the Proof room is opened, the only machine-assistance sentence is the activit
 | After | Check the PMTiles file hash, range requests and the browser cache |
 
 ### R5 — Missing Arabic glyphs
+
+Retain the MapLibre 6 right-to-left text plugin until S6-T35 proves the pinned minor version does not need it (decision 0042 item 7); a newer-version claim alone is not a recovery step.
 
 | | |
 |---|---|

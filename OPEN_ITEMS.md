@@ -2388,6 +2388,36 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - OPTIONS: **Default:** keep the bounded seed; a later task may add a planted-violation check that a test's temporary copies stay under a size bound.
 - NEEDED BY: Before the next joined whole test on the build machine.
 
+## OI-257 — Owner recruitment for bilingual usability tests
+
+- ID: OI-257
+- TYPE: PENDING
+- NEEDED: The owner recruits 12 to 16 real users balanced by working language once the S6 flagship journey runs; the lead assigns this item's number.
+- WHY: Decision 0042 item 9 and L-674 item 6 require real-user usability evidence; no library spike establishes it.
+- DONE SO FAR: Recruitment and testing are not performed by this documents-only change. Proposed gates are SUS at least 80 (a score, not a percentage) and at least 90 per cent correct reading of the source chain and of withheld results; no audience origin classification is tested (decision 0035 items 1 and 4).
+- OPTIONS: **Recommendation:** The owner recruits from his own network, balanced by working language; record the protocol before the test and report measured results against the proposed gates.
+- NEEDED BY: After the S6 flagship journey runs; the build never waits for recruitment or these tests (L-674 item 6).
+
+## OI-258 — Request limits on free exploration
+
+- ID: OI-258
+- TYPE: PENDING
+- NEEDED: The lead assigns the number and confirms whether existing PRV requirements cover every free-exploration request; if not, a privacy decision record is needed before S6-T37 ships.
+- WHY: The Explore note of 2026-11-16, recommendation 7, requests limits; L-677 records this question rather than silently adding a privacy control (decision 0042 item 10; AGENTS.md rule 46).
+- DONE SO FAR: Document 06 PRV-89 rate-limits area requests per seat and makes the reply depend only on request rate; it explicitly calls limits operational, not a privacy guarantee. PRV-49 to PRV-51 cover drawn-area closure, PRV-71 cross-family consistency and PRV-76 attacks including repeated questions; none establishes that every new Explore action is an area request. PRV-24 minimum counts and PRV-83 to PRV-86 release and suppression controls still bind.
+- OPTIONS: **Recommendation:** Map inspector, search, compare and handle actions to their existing routes and PRV-89; record complete coverage or obtain a privacy decision for uncovered limits. No limit or attack tolerance is changed here.
+- NEEDED BY: Before S6-T37 ships; lead assigns the number.
+
+## OI-259 — Explore in the remote-mode check
+
+- ID: OI-259
+- TYPE: PENDING
+- NEEDED: Include the Explore screen and conversational-map interactions in the remote check of S3-T20 once both remote mode and Explore exist; the lead assigns the number.
+- WHY: The Explore note of 2026-11-16, recommendation 8 and What to do, and the conversational-map note, Acceptance, request remote and phone use; L-677 assigns the later check without editing S3-T20 now (decision 0042 items 10 and 11).
+- DONE SO FAR: S6-T37 to S6-T39 and S8-T15/S8-T16 name the local screen and interactions; this documentation pass ran no remote or phone check and changed no S3-T20 criterion.
+- OPTIONS: **Recommendation:** Extend the existing remote-check evidence to inspector, search, lenses/state restore, map-first response, ambiguity, selection context and stop controls in both languages on phone, preserving S3-T20's existing boundaries.
+- NEEDED BY: Once S3-T20 remote mode and the relevant Explore/assistant tasks both exist.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
