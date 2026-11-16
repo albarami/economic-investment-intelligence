@@ -191,6 +191,11 @@ def test_exact_hosts_and_pack_list():
         "fdiprojects.invest.qa",
         "www.invest.qa",
         "data.source.coop",
+        "archive-api.open-meteo.com",
+        "ladsweb.modaps.eosdis.nasa.gov",
+        "ndownloader.figshare.com",
+        "download.geoservice.dlr.de",
+        "44c1cec316ec56bca76dfd65d2882b20.r2.cloudflarestorage.com",
     }
     added = {"services.gisqatar.org.qa", "monaqasat.mof.gov.qa"}
     assert ALLOWED_HOSTS == baseline | added
