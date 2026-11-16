@@ -195,5 +195,11 @@ def invented_archive():
                     }
                 ],
             }
-            archive.writestr(f"qat_admin{level}.geojson", json.dumps(document))
+            # A fixed member time keeps the bytes off the clock: a caller may
+            # build the archive twice and compare hashes.
+            member = zipfile.ZipInfo(
+                f"qat_admin{level}.geojson", date_time=(1980, 1, 1, 0, 0, 0)
+            )
+            member.external_attr = 0o600 << 16
+            archive.writestr(member, json.dumps(document))
     return stream.getvalue()
