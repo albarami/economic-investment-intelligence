@@ -12,6 +12,7 @@ from eii_custodian.publicdata.additions.split_policy import (
     ColumnSpec,
     TableSpec,
     UseRequest,
+    Verdict,
     _repository_root,
     validate_split_use,
     validate_table_dimensions,
@@ -135,13 +136,25 @@ def test_record_gender_refuses_a_nationality_value_in_any_case_or_part() -> None
             "worker_source",
             (ColumnSpec("gender", (value,)),),
         )
-        assert validate_table_dimensions(spec).reason == "forbidden_closed_value", value
+        assert validate_table_dimensions(spec) == Verdict(
+            False, "forbidden_closed_value"
+        ), value
     lawful = TableSpec(
         "employment_spell",
         "worker_source",
         (ColumnSpec("gender", ("female", "male")),),
     )
     assert validate_table_dimensions(lawful).reason == "admitted"
+
+
+def test_a_forbidden_column_after_the_record_gender_column_is_still_refused() -> None:
+    """The lawful gender column ends only its own check: a later column is still read."""
+    spec = TableSpec(
+        "employment_spell",
+        "worker_source",
+        (ColumnSpec("gender", ("female", "male")), ColumnSpec("sex")),
+    )
+    assert validate_table_dimensions(spec) == Verdict(False, "forbidden_dimension")
 
 
 def test_a_sex_column_on_a_worker_table_fails_and_the_clean_table_passes() -> None:
