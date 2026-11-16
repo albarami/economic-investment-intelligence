@@ -975,7 +975,9 @@ def test_fetch_row_stores_no_query_whatever_address_the_fetcher_returns(
     row = invented.entry("bldg_3dglobfp", extension="zip")
     globfp = invented.globfp_zip([(invented.square(0.05, 0.05, 0.6), "7")])
 
-    def stand_in(_entry: Entry, _transport: object, _sleep: object) -> Prepared:
+    def stand_in(
+        _entry: Entry, _transport: object, _sleep: object, cache: object = None
+    ) -> Prepared:
         """The stand-in fetcher: a prepared result with a signed address."""
         return Prepared(
             body=globfp,
