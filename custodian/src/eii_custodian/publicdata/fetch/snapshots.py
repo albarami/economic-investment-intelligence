@@ -91,7 +91,12 @@ def read_snapshot(directory: Path, identity: str) -> Snapshot:
         _refuse("snapshot_index_invalid")
     if not isinstance(extension, str) or _EXT.fullmatch(extension) is None:
         _refuse("snapshot_index_invalid")
-    relative = f"{stamp.date().isoformat()}/{digest}.{extension}"
+    body_day = (
+        utc(str(row.get("body_date", stamp.date().isoformat())) + "T00:00:00Z")
+        .date()
+        .isoformat()
+    )
+    relative = f"{body_day}/{digest}.{extension}"
     if row.get("path") != relative or row.get("identity") != identity:
         _refuse("snapshot_path_invalid")
     path = directory / relative
@@ -208,7 +213,9 @@ def _publish_file(
                     _refuse("snapshot_conflict")
         else:
             day = stamp.date().isoformat()
-            relative = f"{day}/{digest}.{extension}"
+            bodies = sorted(directory.glob(f"????-??-??/{digest}.{extension}"))
+            body_day = bodies[0].parent.name if bodies else day
+            relative = f"{body_day}/{digest}.{extension}"
             receipt = f"{day}/{selected}.meta.json"
             side = dict(sidecar, sha256=digest, bytes=size)
             receipt_body = _dump(side)
@@ -220,6 +227,8 @@ def _publish_file(
                 receipt=receipt,
                 receipt_sha256=hashlib.sha256(receipt_body).hexdigest(),
             )
+            if body_day != day:
+                row["body_date"] = body_day
             (directory / day).mkdir(parents=True, exist_ok=True)
             publish_complete(staged, directory / relative, _refuse)
             _publish(directory, directory / receipt, receipt_body)
@@ -230,7 +239,9 @@ def _publish_file(
                 snapshot.path, directory / f"{selected}.{extension}", _refuse
             )
             publish_complete(
-                snapshot.path.parent / f"{selected}.meta.json",
+                directory
+                / utc(snapshot.sidecar["retrieved_utc"]).date().isoformat()
+                / f"{selected}.meta.json",
                 directory / f"{selected}.meta.json",
                 _refuse,
             )

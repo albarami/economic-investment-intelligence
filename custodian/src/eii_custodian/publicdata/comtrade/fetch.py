@@ -151,7 +151,7 @@ def fetch_source(
                 api_class,
                 requested_slot,
             )
-        except OSError:
+        except (OSError, ValueError):
             result = _stopped("write_failed", policy)
     finally:
         try:
@@ -286,7 +286,7 @@ def _run(
                 api_class,
                 clock(),
             )
-        except OSError:
+        except (OSError, ValueError):
             return _fail(
                 policy,
                 "write_failed",
@@ -344,7 +344,7 @@ def _run(
         digest = _write_manifest(
             directory, policy, initial, ledger, missing, entry=entry, retrieved=clock()
         )
-    except OSError:
+    except (OSError, ValueError):
         return _fail(
             policy, "write_failed", ledger, directory, initial, api_class, entry, clock
         )

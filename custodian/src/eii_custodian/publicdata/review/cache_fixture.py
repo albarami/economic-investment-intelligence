@@ -183,7 +183,7 @@ def read_cached(
     try:
         selected = read_snapshot(cache / entry.key, digest)
     except SnapshotError as exc:
-        raise CacheError(str(exc)) from None
+        raise CacheError(f"{entry.key}: {exc}") from None
     body_path, body, sidecar = selected.path, selected.body, selected.sidecar
     suffix = extension if extension is not None else entry.extension
     if body_path.suffix != "." + suffix:

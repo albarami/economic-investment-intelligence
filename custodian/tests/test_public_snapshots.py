@@ -359,3 +359,305 @@ def test_failed_compatibility_publication_records_no_successful_check(
             },
         )
     assert not list((tmp_path / "checks").glob("*.json"))
+
+
+def test_comtrade_equal_body_reuses_object_across_receipts(comtrade_archive):
+    from custodian.tests.fixtures.comtrade.invented import (
+        invented_entry,
+        invented_policy,
+        trusted_source,
+    )
+
+    from eii_custodian.publicdata.comtrade.assemble import verify_child
+    from eii_custodian.publicdata.comtrade.fetch import _store_child
+    from eii_custodian.publicdata.comtrade.partition import initial_partitions
+    from eii_custodian.publicdata.comtrade.policy import (
+        policy_sha256,
+        selection_sha256,
+    )
+    from eii_custodian.publicdata.comtrade.state import fresh
+    from eii_custodian.publicdata.fetch.snapshots import checked_times, read_snapshot
+
+    policy = invented_policy()
+    partition = initial_partitions(policy)[0]
+    manifest = json.loads((comtrade_archive / "manifest.json").read_text())
+    child = next(row for row in manifest["children"] if row["key"] == partition.key())
+    older_id = child["receipt_sha256"]
+    older = read_snapshot(comtrade_archive, older_id)
+    before = {p: p.read_bytes() for p in comtrade_archive.rglob("*") if p.is_file()}
+    checks_before = len(checked_times(comtrade_archive))
+    stamp = "2026-11-17T08:00:00Z"
+    ledger = fresh(
+        policy_sha256(policy), selection_sha256(policy), (partition.key(),), stamp[:10]
+    )
+    newer_id = _store_child(
+        invented_entry(policy),
+        comtrade_archive,
+        policy,
+        partition,
+        older.body,
+        1,
+        policy.public_record_limit,
+        ledger,
+        "public",
+        stamp,
+    )
+    assert newer_id != older_id
+    newer = read_snapshot(comtrade_archive, newer_id)
+    assert newer.path == older.path
+    assert list(comtrade_archive.glob(f"????-??-??/{older.sha256}.json")) == [
+        older.path
+    ]
+    assert (comtrade_archive / f"{newer_id}.json").samefile(older.path)
+    assert len(checked_times(comtrade_archive)) == checks_before + 1
+    assert all(path.read_bytes() == body for path, body in before.items())
+    for identity, expected_stamp in (
+        (older_id, older.sidecar["retrieved_utc"]),
+        (newer_id, stamp),
+    ):
+        snapshot = read_snapshot(comtrade_archive, identity)
+        assert snapshot.body == older.body
+        assert snapshot.sidecar["retrieved_utc"] == expected_stamp
+        verified = verify_child(
+            comtrade_archive,
+            policy,
+            child_key=partition.key(),
+            receipt_sha256=identity,
+            **trusted_source(policy),
+        )
+        assert verified.retrieved_utc == expected_stamp
+        assert verified.body_sha256 == older.sha256
+        assert verified.count == 1
+
+
+@pytest.mark.parametrize("phase", ["child", "manifest", "coverage"])
+def test_comtrade_snapshot_storage_failure_is_safe(tmp_path, monkeypatch, phase):
+    from custodian.tests.fixtures.comtrade.invented import invented_entry
+    from custodian.tests.test_comtrade import _clock, _ok, _sleep
+
+    from eii_custodian.publicdata.comtrade.fetch import fetch_source
+    from eii_custodian.publicdata.fetch import snapshots
+    from eii_custodian.publicdata.fetch.transport import SlotSecrets
+
+    directory = tmp_path / "un_comtrade"
+    target = (
+        directory
+        if phase == "child"
+        else directory / ("manifests" if phase == "manifest" else "coverage")
+    )
+    original = snapshots.publish_file
+    entered = []
+
+    def fail_archive(folder, *args, **kwargs):
+        if folder == target:
+            entered.append(folder)
+            assert (directory / "state.json").is_file()
+            raise snapshots.SnapshotError("snapshot_conflict syn-upstream-diagnostic")
+        return original(folder, *args, **kwargs)
+
+    monkeypatch.setattr(snapshots, "publish_file", fail_archive)
+    result = fetch_source(
+        invented_entry(),
+        tmp_path,
+        _clock,
+        _sleep,
+        _ok,
+        SlotSecrets("", ""),
+        api_class="public",
+    )
+    assert entered == [target]
+    assert result.failure is not None
+    assert result.failure.check == "write_failed"
+    assert "un_comtrade" in str(result.failure)
+    assert "syn-upstream-diagnostic" not in repr(result)
+    assert "snapshot_conflict" not in repr(result)
+    assert result.digest == ""
+    if phase != "coverage":
+        assert result.requested_cells == 8
+    assert not (directory / "state.lock").exists()
+
+
+@pytest.mark.parametrize(
+    "field,value,reason",
+    [
+        ("key", "syn-other", "selected receipt mismatch"),
+        ("publisher", "", "incomplete receipt"),
+    ],
+)
+def test_method_selected_receipt_integrity_reason(
+    tmp_path, monkeypatch, field, value, reason
+):
+    from dataclasses import replace
+
+    import custodian.data_tests.cache as module
+
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    entry = replace(load_registry()[0], key="syn_source", source_id="syn_source")
+    monkeypatch.setattr(module, "load_registry", lambda: (entry,))
+    path = write_cached(tmp_path, entry, b"[]")
+    directory = tmp_path / entry.key
+    index = directory / "index" / f"{path.stem}.json"
+    row = json.loads(index.read_text())
+    receipt = directory / row["receipt"]
+    side = json.loads(receipt.read_text())
+    side[field] = row[field] = value
+    receipt.write_text(json.dumps(side))
+    row["receipt_sha256"] = sha256_hex(receipt.read_bytes())
+    index.write_text(json.dumps(row))
+    with pytest.raises(ValueError, match="^" + reason + "$"):
+        module.cached(tmp_path, entry.key, path.stem)
+
+
+@pytest.mark.parametrize("kind", ["baci", "gravity", "atlas", "comtrade"])
+@pytest.mark.parametrize("tamper", [False, True], ids=["older", "tamper"])
+def test_trade_reader_older_of_two_and_tamper(tmp_path, kind, tamper):
+    import re
+    from dataclasses import replace
+    from decimal import Decimal
+    from importlib import import_module
+
+    from eii_custodian.publicdata.fetch.build import run_build
+    from eii_custodian.publicdata.fetch.snapshots import read_snapshot
+    from eii_custodian.publicdata.fetch.transport import SlotSecrets
+
+    stamps = ("2026-11-16T08:00:00Z", "2026-11-17T08:00:00Z")
+    if kind == "comtrade":
+        from custodian.tests.fixtures.comtrade.invented import (
+            invented_entry,
+            invented_policy,
+            trusted_source,
+        )
+        from custodian.tests.test_comtrade import _ok, _sleep
+
+        from eii_custodian.publicdata.comtrade.assemble import assemble
+        from eii_custodian.publicdata.comtrade.fetch import fetch_source
+        from eii_custodian.publicdata.comtrade.policy import SafeRefusal
+
+        policy = invented_policy()
+        entry = invented_entry(policy)
+        directory = tmp_path / entry.key / "manifests"
+        error = SafeRefusal
+        reason = "un_comtrade https://invented.example/cached manifest_hash endpoint=assemble"
+
+        def read(digest):
+            return assemble(
+                tmp_path,
+                entry.key,
+                policy,
+                manifest_sha256=digest,
+                **trusted_source(policy),
+            )
+
+        def build_version(index):
+            state = tmp_path / entry.key / "state.json"
+            if index:
+                state.unlink()  # Begin another run; archived snapshots stay untouched.
+
+            def supplied(request):
+                response = _ok(request)
+                return replace(
+                    response,
+                    body=response.body.replace(b"1.25", b"2.50")
+                    if index
+                    else response.body,
+                )
+
+            result = fetch_source(
+                entry,
+                tmp_path,
+                lambda: stamps[index],
+                _sleep,
+                supplied,
+                SlotSecrets("", ""),
+                api_class="public",
+            )
+            assert result.failure is None
+            return result.digest
+
+    else:
+        fixture = import_module(f"custodian.tests.fixtures.{kind}.invented")
+        config_module = import_module(f"eii_custodian.publicdata.{kind}.config")
+        contracts = import_module(f"eii_custodian.publicdata.{kind}.contracts")
+        entry = fixture.entry()
+        directory = tmp_path / entry.key
+        error = getattr(config_module, kind.title() + "Error")
+        reason = "manifest_hash"
+
+        def read(digest):
+            return contracts.read_selected(tmp_path, digest)
+
+        def build_version(index):
+            config = fixture.configuration()
+            config["source_version"] = ("syn-older-release", "syn-newer-release")[index]
+            stream_key = "stream_transport" if kind == "baci" else kind + "_stream"
+            result = run_build(
+                [entry],
+                fixture.metadata,
+                tmp_path,
+                lambda: stamps[index],
+                lambda _: None,
+                **{
+                    stream_key: fixture.stream,
+                    kind + "_config": config_module.Config.from_mapping(config),
+                },
+            )
+            assert result.failure is None
+            return result.manifests[entry.source_id]
+
+    older_id = build_version(0)
+    older = read(older_id)
+    older_body = read_snapshot(directory, older_id)
+    newer_id = build_version(1)
+    newer = read(newer_id)
+    assert older_id != newer_id
+    assert older != newer
+    newer_body = read_snapshot(directory, newer_id)
+    assert older_body.sidecar["retrieved_utc"] == stamps[0]
+    assert newer_body.sidecar["retrieved_utc"] == stamps[1]
+    assert older_body.body != newer_body.body
+    if kind == "comtrade":
+        assert older.retrieved_utc == stamps[0]
+        assert newer.retrieved_utc == stamps[1]
+        assert {(row.measure, row.value) for row in older.rows} == {
+            ("trade_value", Decimal("1.25")),
+            ("net_weight", None),
+        }
+        assert {(row.measure, row.value) for row in newer.rows} == {
+            ("trade_value", Decimal("2.50")),
+            ("net_weight", None),
+        }
+    else:
+        assert older.manifest["config"]["source_version"] == "syn-older-release"
+        assert newer.manifest["config"]["source_version"] == "syn-newer-release"
+        table = {
+            "baci": "trade",
+            "gravity": "bilateral",
+            "atlas": "country_product_year",
+        }[kind]
+        assert {row.source_version for row in getattr(older, table)} == {
+            "syn-older-release"
+        }
+        assert {row.source_version for row in getattr(newer, table)} == {
+            "syn-newer-release"
+        }
+
+    if tamper:
+        older_body.path.write_bytes(older_body.body + b" ")
+        with pytest.raises(error, match="^" + re.escape(reason) + "$"):
+            read(older_id)
+        assert read(newer_id) == newer
+    else:
+        assert read(older_id) == older
+
+
+def test_overture_removal_note_is_separate_and_verbatim():
+    document = Path(__file__).resolve().parents[2] / "docs/04_PUBLIC_DATA_PACK.md"
+    sentence = (
+        "the advisor's reading of 2026-11-16 reports that a release is removed "
+        "after at most 60 days; not yet confirmed from a public page"
+    )
+    cells = [line for line in document.read_text().splitlines() if sentence in line]
+    assert len(cells) == 4
+    assert all("<br>" + sentence in line for line in cells)

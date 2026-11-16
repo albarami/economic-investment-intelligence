@@ -141,20 +141,36 @@ def test_atlas_interrupt_keeps_the_complete_manifest(
 
     first = build(tmp_path)
     digest = first.manifests["atlas_complexity"]
+    manifest = read_selected(tmp_path, digest).manifest
+    directory = tmp_path / "atlas_complexity"
+    expected = [
+        directory / f"{manifest['archives'][grain]['sha256']}.zip"
+        for grain in ("country_product_year", "country_partner_product_year")
+    ]
+    expected.extend(
+        directory / f"{manifest['outputs'][table]['sha256']}.jsonl"
+        for table in fetch.TABLES
+    )
+    expected.append(directory / f"{digest}.manifest.json")
     original = fetch._publish
     for boundary in range(1, 10):
         seen = []
 
-        def interrupted(source, destination, seen=seen, boundary=boundary):
+        def interrupted(source, destination, receipt, seen=seen, boundary=boundary):
             seen.append(destination)
             if len(seen) == boundary:
                 raise OSError("invented-interruption")
-            original(source, destination)
+            original(source, destination, receipt)
 
         with monkeypatch.context() as patch:
             patch.setattr(fetch, "_publish", interrupted)
             result = build(tmp_path)
+        assert len(seen) == boundary
+        assert seen == expected[:boundary]
+        assert len(list((directory / "index").glob("*.json"))) == 9
         assert result.failure is not None
+        assert result.failure.check == "write_or_stream_failed"
+        assert "invented-interruption" not in repr(result)
         assert len(read_selected(tmp_path, digest).country_product_year) == 1
 
 

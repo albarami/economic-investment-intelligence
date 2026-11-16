@@ -42,7 +42,7 @@ def read_cached(
     try:
         selected = read_snapshot(cache / entry.key, digest)
     except SnapshotError as exc:
-        raise FrameError(str(exc)) from None
+        raise FrameError(f"{entry.source_id}: {exc}") from None
     receipt = selected.sidecar
     for key, expected in (
         ("source_id", entry.source_id),

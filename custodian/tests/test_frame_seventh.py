@@ -452,7 +452,7 @@ def test_required_establishment_cache_missing(tmp_path):
 
     from eii_custodian.publicdata.frame.build import build_frame
 
-    with pytest.raises(FrameError, match="snapshot_path_invalid"):
+    with pytest.raises(FrameError, match=r"^est_census: snapshot_path_invalid$"):
         build_frame(tmp_path / "cache", (entry("est_census"),), tmp_path / "review")
 
 
@@ -737,5 +737,7 @@ def test_live_frame_retains_reviewed_older_snapshot(seventh_build):
     result = seventh_build()
     assert result.sources[entry.source_id]["sha256"] == older.sha256
     older.path.write_bytes(b"syn-tamper")
-    with pytest.raises(FrameError, match="snapshot_hash_mismatch"):
+    with pytest.raises(
+        FrameError, match=rf"^{entry.source_id}: snapshot_hash_mismatch$"
+    ):
         seventh_build()

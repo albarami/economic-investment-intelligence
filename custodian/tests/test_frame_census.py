@@ -208,7 +208,9 @@ def test_cache_missing_provenance_fails(tmp_path, field):
     receipt = json.loads(path.read_text())
     del receipt[field]
     path.write_text(json.dumps(receipt))
-    with pytest.raises(FrameError, match="snapshot_hash_mismatch"):
+    with pytest.raises(
+        FrameError, match=rf"^{source.source_id}: snapshot_hash_mismatch$"
+    ):
         read_cached(
             tmp_path,
             source,
@@ -253,7 +255,9 @@ def test_cache_missing_ambiguous_and_switched_off_fail(tmp_path):
     receipt = json.loads(path.read_text())
     receipt["switched_off"] = True
     path.write_text(json.dumps(receipt))
-    with pytest.raises(FrameError, match="snapshot_hash_mismatch"):
+    with pytest.raises(
+        FrameError, match=rf"^{source.source_id}: snapshot_hash_mismatch$"
+    ):
         read_cached(
             tmp_path,
             source,
@@ -281,7 +285,9 @@ def test_cache_malformed_hash_fails(tmp_path, digest):
     receipt = json.loads(path.read_text())
     receipt["sha256"] = digest
     path.write_text(json.dumps(receipt))
-    with pytest.raises(FrameError, match="snapshot_hash_mismatch"):
+    with pytest.raises(
+        FrameError, match=rf"^{source.source_id}: snapshot_hash_mismatch$"
+    ):
         read_cached(
             tmp_path,
             source,
@@ -736,7 +742,7 @@ def test_layer_envelope_field_changes_refuse(source):
 def test_unfetched_boundary_shape_never_accepts_guessed_fields(tmp_path):
     from eii_custodian.publicdata.frame.build import build_frame
 
-    with pytest.raises(FrameError, match="snapshot_path_invalid"):
+    with pytest.raises(FrameError, match=r"^bnd_hdx: snapshot_path_invalid$"):
         build_frame(
             tmp_path,
             (entry("bnd_hdx"), entry("bnd_muni_2025")),
@@ -964,7 +970,9 @@ def test_cached_zip_is_verified_before_parsing(tmp_path):
         == body
     )
     (tmp_path / source.key / f"{digest}.{source.extension}").write_bytes(b"tampered")
-    with pytest.raises(FrameError, match="snapshot_hash_mismatch"):
+    with pytest.raises(
+        FrameError, match=rf"^{source.source_id}: snapshot_hash_mismatch$"
+    ):
         read_cached(
             tmp_path,
             source,

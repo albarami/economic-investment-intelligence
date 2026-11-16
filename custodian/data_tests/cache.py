@@ -18,7 +18,13 @@ def cached(cache: Path, source: str, digest: str):
     except ValueError as error:
         if "hash_mismatch" in str(error) or "hash mismatch" in str(error):
             raise ValueError("receipt_hash_mismatch:" + source) from error
-        raise ValueError("public_cache_missing:" + source) from None
+        if str(error) in {
+            "snapshot_missing",
+            "snapshot_index_invalid",
+            "snapshot_path_invalid",
+        }:
+            raise ValueError("public_cache_missing:" + source) from None
+        raise
     rows = confirmed_rows(entry, rows)
     chain = SourceChain(
         source,

@@ -223,8 +223,8 @@ def test_clock_refusal_site():
 @pytest.mark.parametrize(
     "reader,reason",
     [
-        ("review", "snapshot_index_invalid"),
-        ("frame", "snapshot_index_invalid"),
+        ("review", "syn_source: snapshot_index_invalid"),
+        ("frame", "syn_source: snapshot_index_invalid"),
         ("method", "public_cache_missing:syn_source"),
         ("method_hash", "receipt_hash_mismatch:syn_source"),
         ("extension", "snapshot extension mismatch"),

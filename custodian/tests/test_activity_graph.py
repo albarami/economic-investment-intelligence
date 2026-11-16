@@ -1154,5 +1154,5 @@ def test_activity_and_graph_retain_reviewed_older_snapshot(tmp_path, consumer):
 
     assert consume()
     older.path.write_bytes(b"syn-tamper")
-    with pytest.raises(CacheError, match=r"^snapshot_hash_mismatch$"):
+    with pytest.raises(CacheError, match=rf"^{entry.key}: snapshot_hash_mismatch$"):
         consume()

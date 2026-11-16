@@ -183,20 +183,33 @@ def test_gravity_retries_and_interrupt(tmp_path: Path, monkeypatch) -> None:
 
     first = build(tmp_path / "keep")
     digest = first.manifests["cepii_gravity"]
+    manifest = read_selected(tmp_path / "keep", digest).manifest
+    directory = tmp_path / "keep" / "cepii_gravity"
+    expected = [directory / f"{manifest['archive_sha256']}.zip"]
+    expected.extend(
+        directory / f"{manifest['outputs'][table]['sha256']}.jsonl"
+        for table in fetch.TABLES
+    )
+    expected.append(directory / f"{digest}.manifest.json")
     original = fetch._publish
     for boundary in range(1, 5):
         seen = []
 
-        def interrupted(source, destination, seen=seen, boundary=boundary):
+        def interrupted(source, destination, receipt, seen=seen, boundary=boundary):
             seen.append(destination)
             if len(seen) == boundary:
                 raise OSError("invented-interruption")
-            original(source, destination)
+            original(source, destination, receipt)
 
         with monkeypatch.context() as patch:
             patch.setattr(fetch, "_publish", interrupted)
             result = build(tmp_path / "keep")
+        assert len(seen) == boundary
+        assert seen == expected[:boundary]
+        assert len(list((directory / "index").glob("*.json"))) == 4
         assert result.failure is not None
+        assert result.failure.check == "write_or_stream_failed"
+        assert "invented-interruption" not in repr(result)
         assert len(read_selected(tmp_path / "keep", digest).bilateral) == 2
 
 

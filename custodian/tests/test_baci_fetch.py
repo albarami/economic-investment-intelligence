@@ -134,20 +134,33 @@ def test_baci_manifest_atomicity(tmp_path, monkeypatch):
 
     first = build(tmp_path)
     digest = first.manifests["cepii_baci"]
+    manifest = read_selected(tmp_path, digest).manifest
+    directory = tmp_path / "cepii_baci"
+    expected = [directory / f"{manifest['archive_sha256']}.zip"]
+    expected.extend(
+        directory / f"{manifest['outputs'][table]['sha256']}.jsonl"
+        for table in fetch.TABLES
+    )
+    expected.append(directory / f"{digest}.manifest.json")
     original = fetch._publish
     for boundary in range(1, 6):
         calls = []
 
-        def interrupted(source, destination, calls=calls, boundary=boundary):
+        def interrupted(source, destination, receipt, calls=calls, boundary=boundary):
             calls.append(destination)
             if len(calls) == boundary:
                 raise OSError("invented-interruption")
-            original(source, destination)
+            original(source, destination, receipt)
 
         with monkeypatch.context() as patch:
             patch.setattr(fetch, "_publish", interrupted)
             result = build(tmp_path)
+        assert len(calls) == boundary
+        assert calls == expected[:boundary]
+        assert len(list((directory / "index").glob("*.json"))) == 5
         assert result.failure is not None
+        assert result.failure.check == "write_or_stream_failed"
+        assert "invented-interruption" not in repr(result)
         assert result.manifests == {}
         assert len(read_selected(tmp_path, digest).trade) == 3
         assert list((tmp_path / "cepii_baci").glob("*.manifest.json")) == [
