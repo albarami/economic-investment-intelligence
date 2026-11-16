@@ -561,7 +561,7 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Scope: `product/assistant/catalogue/` and catalogue validation tests for all four files.
 - Depends: S2-T07.
 - Requirements: AI-28, AI-36, AI-37, AI-42, AI-45, AI-46, AI-88.
-- Delivery: hard; personas AI; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/63).
+- Delivery: hard; personas AI; status done (pull request 63, merged 2026-11-16).
 ### S3-T08 — Public playbook, API and template stream
 - Goal: Serve evidence before a catalogue-rendered Public brief with no model call. The brief is buffered until the accounting gate has passed.
 - Acceptance criteria: [ ] template output is deterministic; [ ] evidence cards may appear before the brief; [ ] the structured brief is buffered until the accounting gate passes; [ ] invalid components are not rendered.
