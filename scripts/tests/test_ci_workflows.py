@@ -176,3 +176,96 @@ class WorkflowRules(unittest.TestCase):
         (folder / "ci.yml").write_text("jobs: [", encoding="utf-8")
         problems = rules.validate(folder)
         self.assertTrue(any("not valid YAML" in item for item in problems))
+
+
+class PilotWorkflowRules(unittest.TestCase):
+    def fixture(self) -> tuple[Path, Path, str]:
+        home, _env = support.temp_home(self)
+        folder = support.workflow_fixture(home)
+        path = folder / "mutation-pilot.yml"
+        text = (support.WORKFLOW_DIR / path.name).read_text(encoding="utf-8")
+        path.write_text(text, encoding="utf-8")
+        return folder, path, text
+
+    def test_valid_pilot_and_separate_pin(self) -> None:
+        folder, path, text = self.fixture()
+        self.assertEqual(rules.validate(folder), [])
+        path.write_text(text + "# changed bytes\n", encoding="utf-8")
+        self.assertIn(
+            "pin: workflow text differs",
+            "\n".join(rules.rule_problems("pilot-workflow", folder)),
+        )
+
+    def test_unknown_extra_workflow_still_refused(self) -> None:
+        folder, _path, _text = self.fixture()
+        (folder / "extra.yml").write_text("name: extra\n", encoding="utf-8")
+        self.assertEqual(
+            rules.rule_problems("workflow-files", folder),
+            ["unexpected workflow files: extra.yml"],
+        )
+
+    def test_pilot_refusals_reach_named_lines(self) -> None:
+        checkout = "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1"
+        plants = [
+            ("trigger", "  workflow_dispatch:", "  push:"),
+            ("workflow-permissions", "  contents: read", "  contents: write"),
+            (
+                "workflow-permissions",
+                "permissions:\n  contents: read",
+                "permissions: read-all",
+            ),
+            (
+                "job-permissions",
+                "  discovery:\n",
+                "  discovery:\n    permissions:\n      contents: write\n",
+            ),
+            (
+                "job-permissions",
+                "  discovery:\n",
+                "  discovery:\n    permissions: write-all\n",
+            ),
+            ("secrets-reference", "${{ inputs.module }}", "${{ secrets.PLANTED }}"),
+            ("action-pin", checkout, "actions/checkout@v7"),
+            ("action-pin", checkout, checkout + "a"),
+            ("action-pin", checkout, "./local-action"),
+            ("action-allowlist", checkout, "invented/action@" + "a" * 40),
+            ("runner", "runs-on: ubuntu-24.04", "runs-on: self-hosted"),
+            (
+                "continue-on-error",
+                "    timeout-minutes: 90",
+                "    continue-on-error: true\n    timeout-minutes: 90",
+            ),
+            ("softened-command", "set -euo pipefail", "set -euo pipefail || true"),
+            ("softened-command", "set -euo pipefail", "set -euo pipefail ||true"),
+            ("softened-command", "set -euo pipefail", "set +e"),
+            ("retry", "set -euo pipefail", "retry command"),
+            ("required-check", "  discovery:\n", "  tests:\n"),
+            (
+                "required-check",
+                "  discovery:\n",
+                "  discovery:\n    name: sandbox proof\n",
+            ),
+            (
+                "checkout-credentials",
+                "persist-credentials: false",
+                "persist-credentials: true",
+            ),
+            ("checkout-credentials", "          persist-credentials: false\n", ""),
+            ("yaml", "jobs:\n", "jobs: [\n"),
+        ]
+        for refusal, before, after in plants:
+            with self.subTest(refusal=refusal, after=after):
+                folder, path, text = self.fixture()
+                self.assertIn(before, text)
+                path.write_text(text.replace(before, after, 1), encoding="utf-8")
+                problems = rules.rule_problems("pilot-workflow", folder)
+                self.assertTrue(
+                    any(item.startswith(refusal + ":") for item in problems), problems
+                )
+
+    def test_missing_pilot(self) -> None:
+        folder, path, _text = self.fixture()
+        path.unlink()
+        self.assertIn(
+            "missing: pilot workflow", rules.rule_problems("pilot-workflow", folder)
+        )

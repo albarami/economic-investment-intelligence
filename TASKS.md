@@ -305,6 +305,14 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S1-T11; S2-T12 (merged with pull request 52).
 - Requirements: AGENTS.md rule 44.
 - Delivery: routine; personas Platform; status done (pull request 54, merged 2026-11-15). Added to slice S1 by a re-plan of 2026-11-15, after another task's builder found that a package test's bare import of a script module stopped collection in the mutation copy; the lead checked the fault in the files. The task computes no number. The remaining differences of pytest settings and of git's answers are proposed open items (PO-S2-25, PO-S2-26, PO-S2-28).
+### S1-T20 — The hosted mutation pilot
+- Goal: Run a manually dispatched mutation campaign in deterministic hosted shards and compare complete evidence with an unpartitioned local run at the same commit.
+- Acceptance criteria: [x] exact-name discovery, regeneration and partition identity proved on invented fixtures; [x] legacy command and output preserved; [x] planted input, merge, baseline and exit guards pass; [ ] synthetic dispatch proves all four outputs arrive; [ ] real hosted and local campaigns agree or every differing mutant is explained; [ ] hosted elapsed time and local CPU saved are recorded; [x] another-maker correctness and CI-security reviews approve.
+- Scope: `.github/workflows/mutation-pilot.yml`, `scripts/mutation_pilot.py`, `scripts/tests/test_mutation_pilot.py`, `scripts/tests/mutation_pilot_runner.py`, `scripts/mutation.py`, AGENTS.md and CLAUDE.md rule 44, document 12 sections 4 and 6.3, document 13 section 4.5 and this entry.
+- Depends: S1-T19.
+- Requirements: AGENTS.md rules 33, 36, 37, 38 and 44; document 12 section 4 and TST-170.
+- Delivery: routine; personas Platform; status merged by pull request https://github.com/albarami/economic-investment-intelligence/pull/75; the synthetic dispatch, the real hosted campaign with its comparison, and the timings follow after the merge and are recorded by a records change (OI-261). Added to slice S1 by a re-plan of 2026-11-16 (ruling of the lead after the advisor's note of 18:47).
+
 ### S1-T10 — Review follow-up for slice S1
 - Goal: Close every proposed open item that the reviews of slice S1 entered in `OPEN_ITEMS.md`, before the slice S1 gate.
 - Acceptance criteria: [x] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [x] the reviewer checks every closure; [x] no item is deferred out of this task; [x] no item of the slice is left open.

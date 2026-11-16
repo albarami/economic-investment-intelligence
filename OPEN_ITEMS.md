@@ -2429,6 +2429,15 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - OPTIONS: **Default:** Keep it as a maker review job only. Adding a gateway class requires a new decision record.
 - NEEDED BY: Any future attempt to add a run-time look score.
 
+## OI-261 — The hosted mutation pilot is dispatched after its merge
+
+- ID: OI-261
+- TYPE: OPEN
+- NEEDED: After the merge of S1-T20, the lead dispatches `.github/workflows/mutation-pilot.yml` on the base branch: first the synthetic dispatch, which must prove that all four shard outputs arrive intact; then the real campaign of the one module that the dispatch input allows, compared by `scripts/mutation_pilot.py compare` with an unpartitioned local run of the same commit. Every differing mutant is explained, and the hosted elapsed time and the local processor time saved are recorded in the task log of S1-T20 in PROGRESS.md by a records change, which also ticks the three remaining acceptance criteria of S1-T20 in TASKS.md.
+- WHY: a workflow that is triggered only by dispatch can be run only once its file is on the base branch; the plan of the task puts the dispatch after the merge and the synthetic proof before the real campaign.
+- OWNER: the lead.
+- CLOSES WHEN: the records change holds the run addresses of both dispatches, the comparison's result and the two timings.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
