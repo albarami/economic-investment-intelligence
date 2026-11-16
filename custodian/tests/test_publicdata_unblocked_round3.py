@@ -35,6 +35,7 @@ from eii_custodian.publicdata.places.integrate import (
 from eii_custodian.publicdata.places.read import read_building_file, read_place_file
 from eii_custodian.publicdata.review.activity import SupplierMembership
 from eii_custodian.publicdata.review.cache_fixture import (
+    CacheError,
     class_csv,
     read_cached,
     read_rows,
@@ -132,6 +133,23 @@ def test_listing_build_preserves_parent_graph(tmp_path: Path) -> None:
     )
     assert actual == expected
     assert _parent_files(cache, "places_ovt") == before
+    # Planted violation (lead ruling L-707 item K2): the listing envelope written at
+    # the parent key, the shape round 2 wrote, must fail the same graph build.
+    parent = next(e for e in entries if e.key == "places_ovt")
+    envelope = json.dumps(
+        {"pages": [{"sha256": sha256_hex(bodies[parent.url])}], "etag": '"syn-etag"'}
+    ).encode()
+    write_cached(cache, parent, envelope, extension="json")
+    planted = replace(parent, extension="json")
+    with pytest.raises(CacheError, match=r"^cache json body is not a list of rows$"):
+        build_cached_graph(
+            cache,
+            review,
+            allowlist,
+            (),
+            supplier_membership=suppliers,
+            registry=tuple(planted if e.key == "places_ovt" else e for e in registry),
+        )
 
 
 @pytest.mark.parametrize("key", PARENTS)
