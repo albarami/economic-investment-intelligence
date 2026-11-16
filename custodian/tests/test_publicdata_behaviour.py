@@ -1310,8 +1310,11 @@ def key_offenders(root: Path) -> tuple[str, ...]:
     for folder_name in ("custodian/src", "scripts/commands"):
         folder = root / folder_name
         if not folder.is_dir():
-            continue
-        for path in folder.rglob("*.py"):
+            raise ValueError(f"key scan folder missing: {folder_name}")
+        modules = sorted(folder.rglob("*.py"))
+        if not modules:
+            raise ValueError(f"key scan folder holds no Python file: {folder_name}")
+        for path in modules:
             text = path.read_text(encoding="utf-8")
             rel = path.relative_to(root).as_posix()
             for name in KEY_NAMES:
@@ -1348,7 +1351,30 @@ def test_planted_comtrade_module_naming_a_key_fails(tmp_path: Path) -> None:
     module.write_text(
         "value = os.environ['COMTRADE_PRIMARY_API_KEY']\n", encoding="utf-8"
     )
+    command = tmp_path / "scripts/commands/plain.py"
+    command.parent.mkdir(parents=True)
+    command.write_text("value = 1\n", encoding="utf-8")
     assert key_offenders(tmp_path) == (
         "custodian/src/eii_custodian/publicdata/comtrade/planted.py:COMTRADE_PRIMARY_API_KEY",
         "custodian/src/eii_custodian/publicdata/comtrade/planted.py:os.environ",
     )
+
+
+def test_key_scan_refuses_a_missing_folder(tmp_path: Path) -> None:
+    """A scan folder that does not exist is refused, never silently skipped."""
+    module = tmp_path / "custodian/src/plain.py"
+    module.parent.mkdir(parents=True)
+    module.write_text("value = 1\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="scripts/commands"):
+        key_offenders(tmp_path)
+
+
+def test_key_scan_refuses_a_folder_without_python_files(tmp_path: Path) -> None:
+    """A scan folder that holds no Python file is refused, never silently passed."""
+    module = tmp_path / "custodian/src/plain.py"
+    module.parent.mkdir(parents=True)
+    module.write_text("value = 1\n", encoding="utf-8")
+    (tmp_path / "scripts/commands").mkdir(parents=True)
+    (tmp_path / "scripts/commands/notes.txt").write_text("x\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="scripts/commands"):
+        key_offenders(tmp_path)

@@ -191,7 +191,7 @@ def test_header_marker_stays_in_the_opener_only(tmp_path: Path) -> None:
 
 def test_injected_transport_reads_no_environment() -> None:
     """An injected transport does not read the environment. The live boundary reads two names."""
-    from scripts.commands.build_public import PRIMARY_ENV, SECONDARY_ENV, slot_secrets
+    from commands.build_public import PRIMARY_ENV, SECONDARY_ENV, slot_secrets
 
     class Spy(Mapping[str, str]):
         def __init__(self) -> None:

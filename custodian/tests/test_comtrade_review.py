@@ -794,7 +794,7 @@ class _Spy(Mapping[str, str]):
 
 def test_accessor_reads_only_the_selected_slot(tmp_path: Path) -> None:
     """Skipped activation reads nothing. The secondary name is read only when used."""
-    from scripts.commands.build_public import slot_secrets
+    from commands.build_public import slot_secrets
 
     idle = _Spy()
     accessor = slot_secrets(idle, injected=False)
