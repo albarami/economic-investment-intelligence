@@ -11,6 +11,7 @@ from eii_custodian.publicdata.comtrade.policy import (
     SOURCE_ID,
     Descriptor,
     Policy,
+    products_for,
 )
 
 MEASURE_VALUE = "trade_value"
@@ -84,10 +85,7 @@ def parse_body(
     receipt_sha256: str,
 ) -> ParsedBody:
     """Parse one body. A short count, a duplicate key or a bad decimal is refused."""
-    try:
-        loaded = json.loads(body.decode("utf-8"))
-    except (UnicodeError, json.JSONDecodeError) as exc:
-        raise ParseError("metadata_unreadable") from exc
+    loaded = decode_members(body)
     if not isinstance(loaded, dict):
         raise ParseError("metadata_unreadable")
     schema = policy.response_schema
@@ -123,6 +121,27 @@ class ParseError(Exception):
     def __init__(self, check: str) -> None:
         self.check = check
         super().__init__(check)
+
+
+def decode_members(body: bytes) -> object:
+    """Decode JSON and refuse duplicate members before they collapse."""
+
+    def pairs(found: list[tuple[str, object]]) -> dict[str, object]:
+        seen: set[str] = set()
+        built: dict[str, object] = {}
+        for key, value in found:
+            if key in seen:
+                raise ParseError("duplicate_member")
+            seen.add(key)
+            built[key] = value
+        return built
+
+    try:
+        return json.loads(body.decode("utf-8"), object_pairs_hook=pairs)
+    except ParseError:
+        raise
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise ParseError("metadata_unreadable") from exc
 
 
 def _rows_for(
@@ -356,11 +375,9 @@ def _product_member(policy: Policy, descriptor: Descriptor, product: str) -> Non
             raise ParseError("product_membership")
     requested = dict(descriptor.subdivision)
     if "product" in requested:
-        allowed = dict(policy.subdivision_values).get("product", ())
+        allowed = products_for(policy, descriptor.chapter)
         chosen = requested["product"]
-        chapter = descriptor.chapter
-        bound = product.startswith(chapter) and len(product) > len(chapter)
-        if chosen not in allowed or product != chosen or not bound:
+        if chosen not in allowed or product != chosen:
             raise ParseError("product_membership")
         return
     if product != descriptor.chapter:

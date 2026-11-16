@@ -13,6 +13,7 @@ from urllib.parse import quote
 from eii_custodian.publicdata.comtrade.assemble import VerifiedChild, verify_child
 from eii_custodian.publicdata.comtrade.parse import (
     ParseError,
+    decode_members,
     parse_body,
     reject_duplicate_rows,
 )
@@ -347,8 +348,6 @@ def _classify(
         if field is None:
             return _refusal(policy, "unresolved_truncation", descriptor, header)
         children = subdivide(policy, _partition_from_descriptor(descriptor), field)
-        if not children:
-            return _refusal(policy, "unresolved_truncation", descriptor, header)
         return _Split(children)
     return _Accepted(result.body, parsed.raw_count, limit)
 
@@ -367,8 +366,8 @@ def _body_holds(body: bytes, secret: str) -> bool:
 
 def _json_holds(body: bytes, secret: str) -> bool:
     try:
-        loaded = json.loads(body.decode("utf-8"))
-    except (UnicodeError, json.JSONDecodeError):
+        loaded = decode_members(body)
+    except ParseError:
         return False
     return _value_holds(loaded, secret)
 

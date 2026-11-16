@@ -13,7 +13,7 @@ Until that reading is recorded, activation refuses the fetch.
 
 ## Confirmed mapping
 
-None. Field names in the tests are invented. The release columns are the contract in document 03, section 7.3, table `pub_comtrade_trade`. A production row copies each dimension from the response through the closed schema mapping. A dimension the answer does not hold is refused. A null source measure stays null only when the answer states null. The mapping stays unreviewed, and activation refuses, until the lead records the source schema. Measure and unit pairs come only from the reviewed mapping. No currency is converted.
+None. Field names in the tests are invented. The release columns are the contract in document 03, section 7.3, table `pub_comtrade_trade`. A production row copies each dimension from the response through the closed schema mapping. A dimension the answer does not hold is refused. A null source measure stays null only when the answer states null. The mapping stays unreviewed, and activation refuses, until the lead records the source schema. The chapter-to-product mapping is pending on the same terms: a product subdivision refuses activation until that reviewed mapping is recorded, and invented mappings appear only in fixtures. Measure and unit pairs come only from the reviewed mapping. No currency is converted.
 
 ## Limits
 

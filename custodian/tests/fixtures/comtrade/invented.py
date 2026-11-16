@@ -66,6 +66,7 @@ def policy_document(**overrides: object) -> dict[str, object]:
         "chapters": [CHAPTER],
         "subdivision_fields": ["product"],
         "subdivision_values": {"product": ["ch-a-1", "ch-a-2"]},
+        "chapter_products": {CHAPTER: ["ch-a-1", "ch-a-2"]},
         "response_schema": {
             "record_array": "data",
             "count_field": "count",

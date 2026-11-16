@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from eii_custodian.publicdata.comtrade.policy import Descriptor, Policy
+from eii_custodian.publicdata.comtrade.policy import Descriptor, Policy, products_for
 
 ROLE_REPORTER = "reporter"
 ROLE_MIRROR = "mirror"
@@ -136,8 +136,12 @@ def subdivide(
     policy: Policy, partition: Partition, field: str
 ) -> tuple[Partition, ...]:
     """Split one cell into disjoint values of one field. The parent is not a leaf."""
-    values = dict(policy.subdivision_values).get(field)
-    if values is None:
+    if field == "product":
+        values = products_for(policy, partition.chapter)
+    else:
+        found = dict(policy.subdivision_values).get(field)
+        values = () if found is None else found
+    if not values:
         return ()
     parent = partition.key()
     children: list[Partition] = []

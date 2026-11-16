@@ -56,6 +56,7 @@ POLICY_FIELDS = frozenset(
         "chapters",
         "subdivision_fields",
         "subdivision_values",
+        "chapter_products",
         "response_schema",
         "count_bounds",
         "expected_last_periods",
@@ -195,6 +196,7 @@ class Policy:
     chapters: tuple[str, ...]
     subdivision_fields: tuple[str, ...]
     subdivision_values: tuple[tuple[str, tuple[str, ...]], ...]
+    chapter_products: tuple[tuple[str, tuple[str, ...]], ...] | None
     response_schema: ResponseSchema
     count_bounds: CountBounds
     expected_last_periods: tuple[str, ...]
@@ -323,7 +325,24 @@ def activation_check(
         return "quota_scope"
     if policy.schema_reviewed is not True:
         return "schema_pending"
+    if "product" in policy.subdivision_fields and not _chapter_mapping_ready(policy):
+        return "chapter_products_pending"
     return None
+
+
+def _chapter_mapping_ready(policy: Policy) -> bool:
+    """Return whether every selected chapter has reviewed product children."""
+    if policy.chapter_products is None:
+        return False
+    mapped = dict(policy.chapter_products)
+    return all(bool(mapped.get(chapter)) for chapter in policy.chapters)
+
+
+def products_for(policy: Policy, chapter: str) -> tuple[str, ...]:
+    """Return the reviewed products of one chapter. A pending mapping yields none."""
+    if policy.chapter_products is None:
+        return ()
+    return dict(policy.chapter_products).get(chapter, ())
 
 
 def period_ends(periods: tuple[str, ...]) -> tuple[str, str]:
@@ -473,6 +492,7 @@ def _activated(raw: Mapping[object, object]) -> Policy:
     subdivisions = _subdivision(
         raw.get("subdivision_fields"), raw.get("subdivision_values")
     )
+    chapter_products = _chapter_products(raw.get("chapter_products"))
     verified = _text_value(raw, "verified_on")
     if _DATE_TEXT.fullmatch(verified) is None:
         raise PolicyError("verified_on is not a date")
@@ -510,6 +530,7 @@ def _activated(raw: Mapping[object, object]) -> Policy:
         chapters=_text_list(raw, "chapters"),
         subdivision_fields=subdivisions[0],
         subdivision_values=subdivisions[1],
+        chapter_products=chapter_products,
         response_schema=schema,
         count_bounds=bounds,
         expected_last_periods=_expected_periods(raw.get("expected_last_periods")),
@@ -654,6 +675,28 @@ def _subdivision(
             raise PolicyError("subdivision_values")
         pairs.append((name, tuple(str(item) for item in options)))
     return names, tuple(pairs)
+
+
+def _chapter_products(
+    value: object,
+) -> tuple[tuple[str, tuple[str, ...]], ...] | None:
+    """Read the reviewed chapter mapping. Null means the mapping is still pending."""
+    if value is None:
+        return None
+    if not isinstance(value, dict) or not value:
+        raise PolicyError("chapter_products")
+    pairs: list[tuple[str, tuple[str, ...]]] = []
+    for key, item in value.items():
+        if not isinstance(key, str) or key == "":
+            raise PolicyError("chapter_products")
+        if not isinstance(item, list) or not item:
+            raise PolicyError("chapter_products")
+        if not all(isinstance(code, str) and code != "" for code in item):
+            raise PolicyError("chapter_products")
+        if len(item) != len(set(item)):
+            raise PolicyError("chapter_products")
+        pairs.append((key, tuple(code for code in item if isinstance(code, str))))
+    return tuple(sorted(pairs))
 
 
 def _pairs(value: object) -> tuple[tuple[str, str], ...]:
@@ -804,6 +847,13 @@ def _policy_payload(policy: Policy) -> dict[str, object]:
             "value_field": schema.value_field,
         },
         "schema_reviewed": policy.schema_reviewed,
+        "chapter_products": (
+            None
+            if policy.chapter_products is None
+            else {
+                chapter: list(products) for chapter, products in policy.chapter_products
+            }
+        ),
         "subdivision_fields": list(policy.subdivision_fields),
         "subdivision_values": {
             name: list(values) for name, values in policy.subdivision_values

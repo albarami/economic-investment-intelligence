@@ -6,6 +6,7 @@ import json
 import os
 import pickle
 from collections.abc import Mapping
+from dataclasses import replace
 from pathlib import Path
 from urllib.parse import parse_qsl, quote, urlsplit
 
@@ -776,10 +777,8 @@ def test_policy_hash_changes_every_semantic_field() -> None:
             {"reporter_key": "QAB"},
             {"mirror_partner_keys": ["ZZB"]},
             {"frequencies": ["annual"]},
-            {"periods": ["2098"], "expected_last_periods": ["2099"]},
             {"flows": ["flow-in"]},
             {"chapters": ["ch-b"]},
-            {"subdivision_fields": [], "subdivision_values": {}},
             {"subdivision_values": {"product": ["ch-a-1", "ch-a-9"]}},
             {"count_bounds": {"minimum": 2, "maximum": 64}},
             {"count_bounds": {"minimum": 1, "maximum": 63}},
@@ -794,15 +793,29 @@ def test_policy_hash_changes_every_semantic_field() -> None:
             },
             {"value_precision": 7},
             {"value_scale": 1},
-            {"price_amount": "1", "price_unavailable_reason": ""},
             {"price_currency": "XXX"},
             {"price_retrieved_on": "2026-11-15"},
             {"price_source": "invented-note"},
             {"price_unavailable_reason": "price_absent"},
+            {"chapter_products": {"ch-a": ["ch-a-1", "ch-a-3"]}},
         ]
     )
+    base = invented_policy()
     for override in overrides:
-        assert policy_sha256(invented_policy(**override)) != original
+        assert policy_sha256(invented_policy(**override)) != original, tuple(override)
+    alone = {
+        "periods": policy_sha256(replace(base, periods=("2098", "2099-01"))),
+        "subdivision_fields": policy_sha256(replace(base, subdivision_fields=())),
+        "price_amount": policy_sha256(
+            invented_policy(price_amount="2", price_unavailable_reason="")
+        ),
+    }
+    amount_base = policy_sha256(
+        invented_policy(price_amount="1", price_unavailable_reason="")
+    )
+    for name, digest in alone.items():
+        expected = amount_base if name == "price_amount" else original
+        assert digest != expected, name
 
 
 def test_unsupported_reset_and_a_boundary_crossing(tmp_path: Path) -> None:

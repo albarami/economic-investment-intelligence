@@ -561,6 +561,7 @@ def test_duplicate_row_across_two_leaves_is_refused(tmp_path: Path) -> None:
     policy = _narrow(
         chapters=["ch", "ch-a"],
         subdivision_values={"product": ["ch-a-1"]},
+        chapter_products={"ch": ["ch-a-1"], "ch-a": ["ch-a-1"]},
         keyed_record_limit=2,
         daily_calls=20,
     )
