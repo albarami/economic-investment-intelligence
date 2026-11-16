@@ -1,0 +1,31 @@
+# Pending placeholders only. No publisher metadata or host is confirmed.
+# Decimal limits are ASSUMPTION from invented fixtures, awaiting lead verification.
+config_version: baci-v1
+method_version: v1
+source_version: ""
+hs_revision: ""
+access: unconfirmed
+confirmed: false
+reviewed_urls: []
+publisher: ""
+page: ""
+page_sha256: ""
+attribution: ""
+evidence: ""
+qatar_key: ""
+country_width: 1
+product_width: 1
+value_unit: ""
+quantity_unit: ""
+currency: ""
+valuation_basis: unknown
+reconciliation: unknown
+missing_quantity: []
+period_first: 1
+period_last: 1
+archive_bytes: [0, 0]
+raw_rows: [0, 0]
+total_digits: 18
+fractional_digits: 6
+publisher_sha256: ""
+members: []

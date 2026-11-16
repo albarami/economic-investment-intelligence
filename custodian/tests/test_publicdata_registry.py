@@ -568,10 +568,10 @@ def test_skip_reason_must_not_name_a_licence_or_terms(tmp_path: Path) -> None:
 def test_registry_counts_follow_decision_0026() -> None:
     """No none_stated row remains, and every owner_decision row names 0026."""
     entries = load_registry()
-    assert len(entries) == 143
+    assert len(entries) == 144
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
-    assert len(owners) == 27
+    assert len(owners) == 28
     assert {entry.decision_record for entry in owners} == {"0026"}
 
 
@@ -697,3 +697,35 @@ def test_cache_path_is_gitignored(tmp_path: Path) -> None:
         check=False,
     )
     assert open_cache.returncode == 1
+
+
+def test_baci_registry_pending_and_nightly_policy() -> None:
+    """BACI stays eligible; citation-only metadata is not a live fetch exclusion."""
+    from dataclasses import replace
+
+    entries = load_registry()
+    baci = next(entry for entry in entries if entry.source_id == "cepii_baci")
+    assert baci.skip_reason == "baci_metadata_unconfirmed"
+    assert baci.commit_allowed is False
+    assert baci.url == ""
+    assert nightly_blocked([replace(baci, skip_reason="")], ("cepii_baci",)) == ()
+
+    def exclusions(rows):
+        return {
+            e.source_id
+            for e in rows
+            if not e.nightly_live_fetch and e.kind != "citation_only"
+        } | BANNED_SOURCE_IDS
+
+    expected = {
+        "busy_gmaps",
+        "ntl_blackmarble",
+        "traffic_tomtom_flow",
+        "traffic_tomtom_range",
+    }
+    assert exclusions(entries) == expected
+    planted = [
+        replace(e, nightly_live_fetch=False) if e.source_id == "cepii_baci" else e
+        for e in entries
+    ]
+    assert exclusions(planted) != expected

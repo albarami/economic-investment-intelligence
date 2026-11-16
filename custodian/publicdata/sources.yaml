@@ -4209,3 +4209,35 @@ sources:
       USGS 3D Elevation Program Digital Elevation Program.
       Qian Shi, et al. A First High-quality Vector Data of Buildings in East Asian Countries Based on a Comprehensive Large-scale Mapping Framework. Zenodo, 22 July 2023, doi:10.5281/zenodo.8174931. Available under CC BY 4.0.
       Work derived from BTN 2024 ign.es. Available under CC BY 4.0.
+  - key: "cepii_baci"
+    source_id: "cepii_baci"
+    slug: ""
+    kind: "https_file"
+    title_en: "BACI bilateral trade (unverified source lead)"
+    publisher: "CEPII"
+    licence_id: "unconfirmed"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-16"
+    terms_watch: false
+    basis_note: "Decision 0026. Pending record checked on this date; no publisher page was read. Source metadata and configuration await the lead."
+    landing_url: "https://www.cepii.fr/DATA_DOWNLOAD/baci/doc/baci_webpage.html"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_baci_trade", "pub_baci_country", "pub_baci_product"]
+    caveat_keys: ["baci_separate_series", "baci_coverage_incomplete"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    period_first: ""
+    period_last: ""
+    period_field: "year"
+    reconciliation: "open"
+    skip_reason: "baci_metadata_unconfirmed"
+    extension: "bin"

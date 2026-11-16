@@ -659,3 +659,14 @@ Open items touching this document: OI-01 (recorded provider and template writer 
 - Arabic judge leniency: arXiv 2607.00139 (June 2026), https://arxiv.org/abs/2607.00139, as cited in the project's AI-patterns research, 2026-11-11.
 - Qatar Open Data Portal (CC BY), figures as verified on 2026-11-11 and recorded in the project design; per-dataset links are kept in [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md).
 - Store measurements (PostgreSQL first-boot socket behaviour, missing image health check, role privileges versus `default_transaction_read_only`, row-level security bypass by table owners, browser software rendering inside WSL): project architecture and engineering research reports, 2026-11-11.
+
+## BACI invented-response evidence (S2-T24)
+
+The BACI suites exercise the separate typed trade/dictionary series through
+injected metadata and stream transports, pending metadata refusal, exact decimal
+text and limits, excluded-row validation, schema/inventory/revision/key refusal,
+access obstacles, byte bounds, interrupted streams, immutable publication,
+selected-manifest tampering and command injection. These are invented fixtures,
+not publisher verification. Full guard-by-guard red evidence and the manual break
+inventory belong to the task return and independent review; this paragraph makes
+no completion claim. TST-50, TST-52 and TST-237 are unchanged.

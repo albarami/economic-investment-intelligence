@@ -220,3 +220,11 @@ Hardening points raised during the build that go beyond a task's acceptance crit
 - [Decision 0002](decisions/0002-three-planes-and-the-release-boundary.md) and [decision 0007](decisions/0007-disclosure-control-by-pooling-and-stable-treatment.md): the release boundary and the stable treatment that a deployment keeps.
 - [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) (sections 9 and 17), [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md) (sections 2 and 11), [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md) and [OPEN_ITEMS.md](../OPEN_ITEMS.md).
 - No external source was used.
+
+## Deferred BACI archive hardening (S2-T24)
+
+Resumable downloads, scheduled freshness monitoring and independent archive
+mirrors are deferred. No BACI real-use permission obligation is added to DHA-102:
+the publisher's terms have not been read in this worker pass. The lead supplies
+actual words and date before adding any such obligation. Archive size alone does
+not change BACI nightly eligibility or TST-52 (decision 0040 item 9).

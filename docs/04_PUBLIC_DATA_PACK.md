@@ -422,6 +422,19 @@ GADM's licence is recorded in its publisher's words with the date read; its term
 it from local use under PUB-12. Any permission needed for real use belongs on document 17's list.
 This does not add a source or change the frame geometry of PUB-24.
 
+#### BACI pending identity and coverage (S2-T24)
+
+`cepii_baci` identifies the CEPII BACI lead of decision 0040. Its placeholder
+registry row has `baci_metadata_unconfirmed`, `commit_allowed: false` and
+`nightly_live_fetch: true`. The pending record was checked on 2026-11-16; the
+publisher page, version, licence words, Etalab lead, access state, HS revision,
+units, full year coverage and reporter reconciliation are NOT READ. This date
+is not page-reading evidence. Terms remain `terms to be read` on basis
+`owner_decision`, decision 0026. No BACI host is admitted under PUB-03 yet.
+The future source keeps its own bilateral series; Qatar exporter-or-importer
+selection does not replace or average portal or Comtrade figures. Missing
+coverage stays explicit. Exact attribution awaits the lead's page reading.
+
 ### 2.3 Trade and benchmark source plan — decision 0040
 
 [decision 0040](decisions/0040-public-trade-sources-and-held-tables-in-use.md) items 1 to 9 govern this addition. These are planned sources, not rows already added to the registry or claims that a file is held. Their full fetch/security contract is in that decision; S2-T23 to S2-T26 own implementation.
@@ -511,6 +524,22 @@ reconciliation: none           # none | open | resolved:<decision record>
 release_tables: [pub_zone_utility]
 caveat_keys: [proxy_not_population, partial_latest_year]
 ```
+
+#### BACI archive receipt (S2-T24)
+
+The closed configuration and immutable complete manifest bind one source version,
+one HS revision, reviewed URLs, page hash, exact member inventory, ordered
+headers, inclusive byte/count limits, dictionaries, source units, missing tokens,
+attribution and evidence reference. Decimal limits of 18 total and 6 fractional
+digits are an ASSUMPTION from invented fixtures, pending the lead's verification.
+All member rows pass validation before Qatar selection, including excluded rows.
+The manifest records local archive/member/output hashes separately from optional
+publisher checksums, retrieval UTC, terms visible-text fingerprint and unread
+state, raw/selected/excluded counts and coverage. Completion is published last;
+S2-T08 must select an explicitly reviewed hash, never a latest file. Archive,
+outputs and manifests stay in the uncommitted source cache. Live source-page,
+licence, format and access verification and the first actual archive checks remain
+lead work. No invented response proves those live acceptance criteria.
 
 ### 3.2 Investment sources and page parsers
 

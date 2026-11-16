@@ -717,6 +717,15 @@ release kinds; the times behind it are not stored (DAT-154).
 The loader materialises it in each store from the verified `manifest.json`, as specified in section
 8. It has no Parquet file and is never an input to its own release hash.
 
+#### BACI table contracts (S2-T24)
+
+`pub_baci_trade` is Public, keyed by `source_version`, `hs_revision`, `year`,
+`exporter_code`, `importer_code`, `hs_code`. `pub_baci_country` is Public, keyed
+by `source_version`, `country_code`. `pub_baci_product` is Public, keyed by
+`source_version`, `hs_revision`, `hs_code`. S2-T08 owns assembly; S2-T25 receives
+the dictionaries and S2-T26 receives the separate series. No live source is
+activated by these contracts (decision 0040 items 3 and 4).
+
 ### 7.3 Columns
 
 Types follow section 1.2; a column without a stated type is `string`. Every Public table also has
@@ -852,6 +861,36 @@ families, and `fact_lineage` names both with `family_role` values `numerator` an
 This closed list, the one closed presence/pay case of DAT-160, and the talent ratio of card C39 (DAT-165, PRV-127) are the only exceptions to one home family per figure (PRV-30).
 The talent pool and the competing demand of DAT-165 each name one home family.
 The talent ratio is the quotient of those two released figures, and its lineage names both tables (DAT-94).
+
+#### BACI columns and source chain (S2-T24)
+
+All keys are non-null strings except `year`, an integer from the data. Trade
+columns additionally hold `value` (non-null decimal string), `quantity` (nullable
+decimal string), `value_unit`, `quantity_unit`, `currency`, `valuation_basis`
+(explicit `unknown` when unpublished), `quantity_status` (`present` or
+`source_missing`), `source_id` and `member_sha256`. Country columns additionally
+hold `source_id`, `source_name` and nullable `iso3`, only where published.
+Product columns additionally hold `source_id` and `source_description`.
+Leading code zeros and accepted decimal text are preserved unchanged.
+
+ASSUMPTION pending the lead's dictionary reading: `total_digits: 18` and
+`fractional_digits: 6` for both value and quantity. Count every written digit,
+including leading and trailing zeros. Accept unsigned ASCII fixed-point text
+only, no exponents, signs, whitespace, nonfinite text, floats or rounding.
+Declared missing quantity becomes null; zero stays present. Units are configured
+from the source, never inferred or converted. Inventory, dictionary hashes,
+member hashes/headers/counts, raw/selected/excluded counts and year/partner/product
+coverage bind to the selected complete manifest. Absence never becomes zero.
+
+`contracts.read_selected` verifies the selected manifest, archive and output
+hashes and reparses every row before returning typed tables. `source_registry`
+uses `source_id: cepii_baci`, kind `public_dataset`, publisher, page, licence,
+basis, retrieval date, selected manifest hash, false commit flag and attribution.
+Every table has a `fact_lineage` binding to
+`eii_custodian.publicdata.baci.parse.parse_archive@v1`; its input class is `public`
+and protected partition, measure, breakdown, family role and rules fields are null.
+The manifest connects this binding to the archive and dictionary/member hashes.
+No latest-file discovery or successful-fetch inference from a registry row is allowed.
 
 ## 8. The manifest and the loader
 

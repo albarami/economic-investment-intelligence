@@ -5,10 +5,12 @@ from __future__ import annotations
 import json
 import os
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
+from eii_custodian.publicdata.baci.config import BaciError, Config, load_config
+from eii_custodian.publicdata.baci.fetch import fetch_baci
 from eii_custodian.publicdata.fetch.allowlist import approve, host_of
 from eii_custodian.publicdata.fetch.kinds import (
     TERMS_HOST_UNLISTED,
@@ -34,7 +36,7 @@ from eii_custodian.publicdata.fetch.report import (
     terms_unread_line,
 )
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
-from eii_custodian.publicdata.fetch.transport import Transport
+from eii_custodian.publicdata.fetch.transport import StreamTransport, Transport
 from eii_custodian.publicdata.investment_build import publish_investment
 from eii_custodian.publicdata.places.fetch import fetch_place_file, is_place_file
 from eii_custodian.publicdata.places_fsq.fetch import fetch_release, is_release_entry
@@ -72,6 +74,7 @@ class BuildOutcome:
 
     lines: tuple[str, ...]
     failure: FetchFailure | None
+    manifests: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -185,13 +188,58 @@ def run_build(
     cache: Path,
     clock: Clock,
     sleep: Sleeper,
+    stream_transport: StreamTransport | None = None,
+    baci_config: Config | None = None,
 ) -> BuildOutcome:
     """Fetch each row in order, then run the public_data stage."""
+    manifests: dict[str, str] = {}
     lines: list[str] = []
     terms: list[dict[str, object]] = []
     previous = _previous_term_hashes(cache)
     failure: FetchFailure | None = None
     for entry in entries:
+        if entry.source_id == "cepii_baci":
+            try:
+                config = baci_config if baci_config is not None else load_config()
+                baci_result = fetch_baci(
+                    entry, config, transport, stream_transport, cache, clock, sleep
+                )
+                manifests[entry.source_id] = baci_result.digest
+                lines.append(pass_line(entry.key, baci_result.digest, baci_result.host))
+                if baci_result.terms_sha256:
+                    _record_terms(
+                        entry,
+                        baci_result.terms_sha256,
+                        baci_result.retrieved_utc,
+                        previous,
+                        lines,
+                        terms,
+                    )
+                else:
+                    lines.append(
+                        terms_unread_line(entry.key, baci_result.terms_unread, "")
+                    )
+            except BaciError as exc:
+                reason = str(exc)
+                if reason == "baci_metadata_unconfirmed":
+                    lines.append(skip_line("cepii_baci", reason))
+                    lines.append(
+                        terms_unread_line("cepii_baci", "terms_to_be_read", "")
+                    )
+                    continue
+                failure = FetchFailure(
+                    6 if reason == "network_exhausted" else 1,
+                    "cepii_baci",
+                    "",
+                    reason,
+                    "validated source",
+                    "NO_DATA",
+                )
+                lines.append(
+                    fail_line("cepii_baci", "", reason, "validated source", "NO_DATA")
+                )
+                break
+            continue
         if entry.skip_reason:
             if entry.terms_url:
                 _read_terms_apart(
@@ -346,7 +394,7 @@ def run_build(
                 )
             )
     _write_log(cache, lines, terms)
-    return BuildOutcome(tuple(lines), failure)
+    return BuildOutcome(tuple(lines), failure, manifests)
 
 
 def _note_fetched_terms(
