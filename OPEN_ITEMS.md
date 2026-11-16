@@ -1162,6 +1162,7 @@
 - DONE SO FAR: Not built. The questions of the bank that need them are recorded as gaps (AI-129).
 - OPTIONS: **Recommendation:** leave them out of version 1 until the owner's session decides; any later build is an analysis of the attached employment records released under document 06.
 - NEEDED BY: the owner's session on value extraction.
+- CLOSED: 2026-11-16, by [decision 0046](docs/decisions/0046-drop-hiring-flows-and-fetch-every-public-source.md) item 1: gap N1, card C45 and task S7-T18 are withdrawn; the earlier text is kept as history.
 
 ## OI-136 — Rents (the decision question bank's gap N3)
 

@@ -488,9 +488,10 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Goal: Assemble the Public pack and close the slice S2 evidence bundle.
 - Acceptance criteria: [ ] source completeness passes for every Public input required by the pack, the 77 added portal datasets, the two investment sources and the sources of decision 0019 among them; [ ] every Public source in the release carries the publisher's terms in its own words with the date read and the basis of use, with no terms-based exclusion under [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md); [ ] the coverage bar uses and names the finest geography available from a visitor-readable source (PUB-82); [ ] OI-03 is closed; [ ] a different-maker reviewer checks twenty random figures; [ ] every regression and licence check passes; [ ] the confirmations of S2-T12, S2-T13, S2-T15 and S2-T17 are recorded.
 - Scope: public build orchestration, slice S2 reports and review evidence.
-- Depends: S2-T02, S2-T03, S2-T05, S2-T06, S2-T07, S2-T11, S2-T12, S2-T13, S2-T14, S2-T15, S2-T16, S2-T17, S2-T19, S2-T20, S2-T21, S2-T22, S2-T27. Additional source-wiring inputs under decision 0040: S2-T23, S2-T24, S2-T25, S2-T26.
+- Depends: S2-T02, S2-T03, S2-T05, S2-T06, S2-T07, S2-T11, S2-T12, S2-T13, S2-T14, S2-T15, S2-T16, S2-T17, S2-T19, S2-T20, S2-T21, S2-T22, S2-T27, S2-T28, S2-T29. Additional source-wiring inputs under decision 0040: S2-T23, S2-T24, S2-T25, S2-T26.
 - Amendment ([decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) items A2, A3, A8 and A10): [ ] source completeness also passes for every source of S2-T19 and S2-T20, the ten open-data families among them, and the confirmations of S2-T19 and S2-T20 are recorded.
 - Amendment ([decision 0045](docs/decisions/0045-eiis-own-capabilities-and-the-snapshot-archive.md) item 4): [ ] the release build reads each public input by the snapshot hash recorded in its reviewed reference, with no latest-file fallback; a planted substituted hash is refused and an older-of-two fixture selects the referenced older snapshot (PUB-01, PUB-04, PUB-07, PUB-16).
+- Amendment ([decision 0046](docs/decisions/0046-drop-hiring-flows-and-fetch-every-public-source.md) items 4 and 5): [ ] source completeness includes the twelve S2-T28 rows and every S2-T29 source, with their receipts, hashes, dated snapshots and recorded access failures; no registry row alone is evidence of a successful fetch.
 - Requirements: REV-34, TST-50, PLN-07, PLN-25.
 - Delivery: hard; personas Data; status queued.
 ### S2-T09 — Method-card pins from the public build
@@ -517,6 +518,146 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Delivery: Deep (it pins hashes of released inputs); personas: principal data-platform engineer for provenance and immutable archives (builder); strict provenance and security reviewer (reviewer); status queued.
 Open question to settle in your plan with options: where the archive persists so that it survives the loss of the build machine (the cache folder is ignored by git), within AGENTS.md rules 13 and 14 and decision 0034.
 
+### S2-T28 - The public sources the advisor unblocked.
+- Goal: the owner's standing direction is that every public source is fetched (decision 0023 item 12; decision 0026,
+  used in full locally). Twelve registry rows still carry a skip reason that the advisor's reading now resolves. Lift
+  each, with the facts it needs, so that `./eii build-public` fetches it through the normal seam with a receipt and a
+  hash. The accident row is the exception: its year-partition plan, receipt and refusals are built and tested offline,
+  and its activation is S2-T29's through S2-T25's shared bounded reader (lead ruling L-707 item K1).
+- The twelve rows and what the advisor read (publisher; licence; record count; fields; modified):
+  wage_sector: National Planning Council; CC BY; 98; year, sector, gender, paid_employment_workers,
+    monthly_average_wage_qr; 2026-07-09.
+  wage_bands_priv: Ministry of Labour; CC BY; 71; year, wage_group, number_of_occupations, percentage; 2026-09-26.
+  work_hours_act: National Planning Council; CC BY; 266; year, gender, economic_activity, employed_persons,
+    average_work_hours.
+  cpi_group: National Planning Council; CC BY; 936; year, month, group_code, group, cpi_index; 2026-08-02.
+  zone_population: National Planning Council; CC BY; 552; year, number_of_zone, zone, population, area_in_km,
+    population_density_km2.
+  census_hh_type_2020: National Planning Council; CC BY; 480; year, place_of_residency_on_census_night,
+    type_of_household, gender, value.
+  accident: Ministry of Interior; CC BY; 1,000,500 records (road accidents with zone, street, time, weather, road
+    status and type, classification, nature, reason, severity, deaths); 2025-07-29. Fetched in bounded pages and kept
+    as a table, never as map points.
+  bnd_muni_2025: 8 records with geo_shape (the municipality polygons).
+  places_ovt and bldg_ovt: the release bucket answers anonymously over plain HTTPS; a listing request of the form
+    `https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/?list-type=2&prefix=release/2026-10-21.0/theme=places/type=place/`
+    (and `theme=buildings/type=building/`) returns the object list. The parent rows check that listing against the
+    registered part rows, which keep their existing whole-file fetch (lead ruling L-701 item G4); never a byte-range
+    read and never a second Overture reader.
+  worldpop_qat_2020: the registry URL is a folder; the file is
+    `https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/QAT/v1/100m/constrained/qat_pop_2020_CN_100m_R2025A_v1.tif`
+    (about 1.6 MB).
+  census_2020_workbook: the archived URL returns an HTML frame; the raw file is the same archive address with `id_`
+    after the timestamp:
+    `https://web.archive.org/web/20240422094401id_/https://www.psa.gov.qa/Style%20Library/PSA/CensusDetailedResults/documents/Qatar_Census_2022_Final_Results.xlsx`
+    (about 5.7 MB, an Office Open XML workbook). Its file name says 2022 while the row's title says Census 2020
+    results: keep the row's identity, record the file name as found, and list the question for the lead.
+- Acceptance:
+  [ ] each of the twelve rows has its resolved skip reason removed (the accident row then carries
+      `partition_byte_bound_unconfirmed` until S2-T29) and carries publisher, licence id and basis, URL, fetch
+      host, extension and, for the portal datasets, its columns as read; a row whose licence basis is CC BY says
+      `dataset` with the licence's public address, and the decision record field follows the registry rule; the
+      registry reader accepts the file and its existing tests stay green;
+  [ ] row-count bounds follow exactly the convention the already-active portal rows use (read it; never invent a
+      tolerance); where no convention fits, the bounds stay empty and the return says why;
+  [ ] every row split by sex (wage_sector, work_hours_act, census_hh_type_2020 and any other the fields show) carries
+      the `public_splits` value the registry uses for that split, and AGENTS.md rule 10 holds whole: such a figure is
+      a Public fact in the source's own categories on its own geography, never joined to a synthetic record, never
+      used to segment worker, residence or company records, never combined with a protected figure; reuse the
+      existing guard and add a planted violation for a new row if the guard does not already cover it;
+  [ ] the accident dataset's bounded-page fetch is planned offline with one receipt that names every page and its hash
+      and a total that must equal the published count, or the fetch is refused (planted short page, planted duplicate
+      page); it is not activated in this task;
+  [ ] Overture places and buildings are discovered from the HTTPS listing and fetched by the existing part-row path,
+      with the listing's own bytes hashed in the receipt (planted listing with a key outside the release prefix
+      refused; planted off-host redirect refused);
+  [ ] the WorldPop and census rows fetch their direct files; the census fetch refuses an HTML body where a workbook is
+      declared (planted HTML frame refused by its content, not its name);
+  [ ] the five rows owned by S2-T14, S2-T15 and S2-T16 keep their skip reasons; no other row changes;
+  [ ] commit flags stay false; decision 0034 holds (no value of a source without an open licence enters the
+      repository); every value stays in the uncommitted public cache;
+  [ ] no network or key in any automated test; invented responses only; failures name the source and reason without
+      secrets.
+- Amendment (lead ruling L-701 of 2026-11-16, after the first build round): [ ] each portal row's `columns` holds every
+  field with the portal type mapped to the registry's closed types (`int` integer, `double` number, `text` and `date`
+  string), read from the publisher's metadata by the lead on 2026-11-16 and attributed so in document 04; row-count
+  bounds are min = max = the catalogue record count; [ ] the registry's closed column types add `point_2d` and
+  `geojson_geometry` for `bnd_muni_2025` (planted unknown type still refused); its publisher field records that the
+  dataset's own publisher field is empty; [ ] the accident table is fetched by year partitions: one hashed aggregate
+  request whose year groups are the page plan, one hashed catalogue request whose record count is the published total,
+  and one hashed export page per year built only from the closed template and integer years of the plan; the fetch is
+  refused, storing nothing, on a short or long page against its year's count, two pages sharing a year or a hash, a
+  plan sum that differs from the published total, or a page over the existing byte bound (each planted); [ ] a
+  declared column whose name contains `nationality` requires the `nationality` split, as the sex guard does (planted);
+  [ ] the Overture parent rows check the anonymous listing of their release prefix, every listing page hashed, and are
+  refused, storing nothing, on a listed key outside the prefix, an off-host redirect, a registered part key missing
+  from the listing or a listed size or ETag that differs from the part row's (each planted); [ ] document 04 records
+  the census workbook's file name as found, with the year in the name unresolved.
+- Amendment (decision 0046 fix of 2026-11-16, review findings D2, D3 and D6 and lead ruling L-707): [ ] one planted
+  malformed value of each new column type is refused where the fetch validates column values; if the fetch validates
+  no column values today, the return says so and the value check is recorded as hardening, not built; [ ] the
+  `bnd_muni_2025` publisher reads "National open data portal (dataset publisher field empty, read 2026-11-16)", and
+  the registry records that the portal's metadata states no publisher, licence, description or update frequency;
+  [ ] the accident table declares its sixteen fields as the lead read them on 2026-11-16 with mapped types; its
+  nationality column carries `public_splits: ["nationality"]`; its perpetrator birth-year column stays in the table
+  as a public age attribute in the source's own categories, never joined to a synthetic record and never used by a
+  card until a later ruling, and joins `caveat_keys` only where a key for that use exists, otherwise it is a proposed
+  open item; [ ] the accident row is not activated here: the main line has no bounded transport read, so the row
+  keeps a skip reason `partition_byte_bound_unconfirmed` while its year-partition plan, receipt and every planted
+  refusal above are built and tested offline; its activation is S2-T29's, through the shared bounded reader of S2-T25
+  with byte spans from the lead's live reading, with no invented bound and no copied reader (L-707 item K1);
+  [ ] every existing reader of the place and building cache, `review.graph.build_cached_graph` among them, receives
+  exactly the rows it received before this task: the listing envelope sits beside those rows, never at their key,
+  proven by an end-to-end test on the build's real output with a planted envelope at the parent key refused
+  (L-707 item K2); [ ] no live re-fetch overwrites a cached file before S2-T27's archive merges; after it, these
+  rows' files enter that archive as dated snapshots (lead ruling L-694).
+- Scope: `custodian/publicdata/sources.yaml`; `custodian/src/eii_custodian/publicdata/fetch/` where a criterion needs
+  it; a new listing-check module under `custodian/src/eii_custodian/publicdata/places/` that imports the existing
+  transport and allow-list (lead ruling L-701 item G4), while `places/fetch.py` may change only to share a constant,
+  nothing else; the allow-list where a new host is needed (a reviewed public
+  host only); their tests under `custodian/tests/`; document 04's rows of these sources where its text states the
+  skip. Parsing these sources into release tables
+  belongs to the tasks that consume them and is not built here.
+- Depends: S2-T01, S2-T03 (portal datasets), S2-T06 part A (the Overture part rows).
+- Requirements: PUB-01 to PUB-16 of document 04 (search each); AGENTS.md rules 3, 5, 7, 10, 13, 14, 19 and 37;
+  decisions 0023 item 12, 0026 and 0034.
+- Delivery: Standard; personas: principal public-data engineer (builder); strict public-data and provenance reviewer
+  (reviewer); status queued.
+
+### S2-T29 — The public sources outside every registry
+- Goal: fetch the public pages the owner's source review adds, through the normal registry and `./eii build-public` seam, with dated snapshots, receipts and hashes; confirm the two remaining GIS direct URLs without widening S2-T19.
+- Acceptance criteria: [ ] the insurance tables, Visit Qatar and Qatar National Convention Centre event calendars, Tawteen supplier page, Manateq tariff page, Monaqasat classified list and education ministry private-school directory each receive a normal-seam registry row with publisher, dataset or page, licence or documented basis of use, terms read with their date, retrieval date and SHA-256; reviewed source and redirect hosts join the allow-list, and a planted off-host request, missing basis or missing receipt fails; [ ] each calendar or list page is parsed into a dated Public table snapshot in S2-T27's immutable archive, with its page hash and snapshot date carried into lineage; a planted latest-file fallback, overwritten snapshot, changed hash or missing "as of" fails (PUB-01, PUB-04, PUB-07, PUB-16, PUB-19, PUB-86); [ ] event pages use the daily cadence of decision 0045 item 4, and the Tawteen supplier page and the Monaqasat classified-company list, both supplier credentials, its weekly cadence; each other row uses a fitting closed cadence or the existing `none` with `frequency_unconfirmed`, never an invented schedule; a planted unknown cadence or missing scheduled-family cadence fails; [ ] TLS verification remains enabled everywhere, with a planted disabled-verification setting refused; for the leaf-only chains of Monaqasat and the education ministry, host-scoped SHA-256 pins identify each issuing intermediate certificate, another-maker security review covers the pin contract, and planted wrong-pin, other-host and unpinned-chain cases fail without fetching; [ ] the existing `worldpop_qat_agesex` row and S2-T14 fetcher are extended to the confirmed age-and-sex file folder, with no second WorldPop source ID or reader, and its Public split, whole-cell sum and cache guards remain (PUB-90, PUB-97, PUB-99); [ ] after S2-T19, the direct URLs of `gis_boundaries` and `gis_imagery_history` are confirmed and only their `direct_url_unconfirmed` flags lift; schema, skip and other guards stay unchanged, and planted premature flag removal fails (PUB-105); [ ] every sex or nationality split remains a Public fact in the source's own categories and geography, no such split joins to or segments a worker, residence or company record or combines with a protected figure, no tabulated split is apportioned, and only whole published grid cells may be summed over an area; planted record joins, segmentation, apportionment and split-cell cases fail under rule 10 and PUB-90; [ ] helper-read counts and schemas remain leads until fetched, declared bounds follow the existing registry convention or stay empty with the reason recorded, and no count is invented; [ ] commit flags stay false, decision 0034 holds, every fetched value stays in the uncommitted public cache, tests use invented responses with no network or key, and failures name source and reason without secrets; [ ] the event snapshots do not claim complete events coverage or close N4/OI-137, the school directory supplies no capacity, enrolment or catchment, and supplier and tariff pages do not close N6/OI-138; planted claims of those unsupported facts fail.
+- Amendment (decision 0046 fix of 2026-11-16, lead rulings L-707, L-708 and L-709): [ ] the `accident` row of S2-T28
+  is activated: each year partition is read through the shared bounded reader of S2-T25 with the byte span the lead
+  read live and recorded in document 04, and S2-T28's offline plan, receipt and refusals stay whole; a planted page
+  over its span is refused and no bound is invented; [ ] the Monaqasat server omits its intermediate certificate (the
+  advisor's reading of 2026-11-16): the host-scoped pin of that intermediate opens it with verification on; the
+  record count is taken after the first fetch and no helper-reported count is used; [ ] the private-school directory
+  resets the connection with verification on or off (the same reading): the fetch tries a normal browser user agent,
+  then a browser-driven capture through the same receipt seam; if neither opens, the row records the access failure
+  with its date (a planted connection reset asserts the failure is recorded with its date) and the lead tells the
+  advisor in one line, and no figure stands in for the directory; the press-reported seat figure is no feed: no
+  press-reported capacity or seat figure is registered, fetched or shown; [ ] the state
+  procurement awards workbook is registered as `awards_owner_scrape`: "owner scrape of public award reports, retrieved
+  2026-11-03", Public under decision 0026 and never called an official table; builder tools receive only the
+  advisor's aggregate profile of the workbook, never a row of it; `./eii build-public` takes the owner's
+  file from a documented uncommitted intake folder with its SHA-256 and receipt; the original column names are kept and
+  each row's `report_url` is its proof link; the day/month/year text dates are normalised with the count of rows that
+  do not parse reported; the row count, the count of dated rows and their date range are recorded, completeness is
+  unknown and no total is stated as all state awards; blank cells stay blank, never zero; [ ] a seeded random sample of
+  30 `report_url` links is re-fetched through the normal seam and its company, registration number and approved value
+  compared with the row; the match rate is recorded in the registry as the check on the scrape, with a planted
+  mismatch counted; [ ] a match report joins the awards to the company registers by registration number only after
+  the independent name-consistency check used elsewhere, keeps and counts unmatched rows and never joins by name alone;
+  [ ] the closed family list adds `award_reports` with a weekly cadence for new award reports, appended with each row's
+  retrieval date, assigned to this row only (planted other assignment refused); [ ] awarded values are shown only as
+  awarded values by company with their source link and date, never as turnover or sales (planted refused); no value
+  of the workbook is committed and tests use invented rows.
+- Scope: the new source registry rows and normal fetch/parsing seam under `custodian/publicdata/` and `custodian/src/eii_custodian/publicdata/fetch/`; the reviewed allow-list and host-scoped certificate-pin configuration; S2-T27 archive integration; the existing S2-T14 WorldPop path and S2-T19 URL flags; typed Public snapshot contracts, invented fixtures and tests; document 04 source rows. No second Overture or WorldPop reader and no synthetic substitute. Among the five rows whose skip reasons S2-T28 preserves, only `worldpop_qat_agesex` changes here, through S2-T14's existing path; the other four rows are untouched.
+- Depends: S2-T01, S2-T14, S2-T19, S2-T21, S2-T25, S2-T27, S2-T28.
+- Requirements: PUB-01 to PUB-16, PUB-19, PUB-82, PUB-85, PUB-86, PUB-90, PUB-97, PUB-99, PUB-105 of document 04 (search each); AGENTS.md rules 3, 5, 7, 10, 12, 13, 14, 19 and 37; decisions 0023 item 12, 0026, 0034 and 0045 item 4.
+- Delivery: Deep; reason: host-scoped intermediate-certificate pins and hash-pinned released inputs change security and provenance controls; builder persona principal public-data/platform security engineer; strict reviewer persona independent provenance and transport-security reviewer from another maker; status queued.
+
 ### S2-T10 — Review follow-up for slice S2
 - Goal: Close every proposed open item that the reviews of slice S2 entered in `OPEN_ITEMS.md`, before the slice S2 gate.
 - Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open; [ ] the suite `web-checks` finishes in under 1,200 s on four processors, measured twice (moved here word for word from task S1-T15 by a re-plan of 2026-11-14, with open item OI-158: no test, assertion, planted case or bound is removed or weakened for it); [ ] the hosted value of 3,000 s is removed from the whole test command, so that the limit of the suite `web-checks` is 1,800 s on every runner again, with the planted cases of task S1-T16 brought to that state (decision 0027 item 4; open item OI-158, whose three-run condition is met; added by the gate-fix task S1-T17).
@@ -525,7 +666,7 @@ Open question to settle in your plan with options: where the archive persists so
 - Requirements: REV-41, TST-168.
 - Delivery: routine; personas as the items require; status queued.
 
-**slice S2 gate.** Every stored Public figure has URL, licence, retrieval date and hash; the reviewer checks twenty random figures against their sources; every section 9 public regression example passes; regression values that the method cards could not pin are produced, checked against the source and written into the cards; no file without a stated licence is committed; every added portal dataset and both investment sources have registry rows, with the host of each file and, for every source, the publisher's terms in its own words with the date read and the basis of use; no fetched investment page, record or project is committed, and the parsers pass on synthetic pages of the same shape; the visitor-readable tender portal or its absence for an access or technical reason, never its terms, the apportioning weight for drawn shapes and the page structure of the investment sources are recorded (PLN-25); every source of decision 0019 has its registry row with publisher, licence or terms and retrieval date, every fetched file has its hash, nothing fetched is committed, the relative-busyness source is registered on the owner's decision for a personal, local project and is left out of the nightly live fetch, the live traffic provider has no registry row and no cached file, and the fetchers pass on hand-made fixtures with no key and no network; and the release of the places copy used, with its date, and the Public source of each series that card C30 forecasts, or that it has none, are recorded (PLN-25); and every source of [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md), the ten open-data families of item A10 among them, has its registry row with its publisher, licence or basis of use, terms read and retrieval date; terms never switch off a visitor-readable source or limit its release or display; a planted registry row with no basis of use (`licence_basis`) fails; a planted source whose terms are not yet recorded stays in use and is listed as 'terms to be read', with the date checked; planted fixtures with absent or prohibitive terms remain in use with those terms recorded truthfully in the registry; no field the decision says is never taken is stored, and every building has a height with its source and the measured error of each fallback (S2-T19, S2-T20). The release reads every public input through S2-T27's reviewed snapshot hash with no latest-file fallback, every price carries that snapshot's dated "as of", and the offline due listing counts from each source's latest successful check, applies EII's fixed daily, weekly and monthly family schedules whether or not the publisher's frequency is confirmed, and preserves an unconfirmed frequency, including that of a statistical series without a recorded publication-driven schedule, as `none` with `frequency_unconfirmed`.
+**slice S2 gate.** Every stored Public figure has URL, licence, retrieval date and hash; the reviewer checks twenty random figures against their sources; every section 9 public regression example passes; regression values that the method cards could not pin are produced, checked against the source and written into the cards; no file without a stated licence is committed; every added portal dataset and both investment sources have registry rows, with the host of each file and, for every source, the publisher's terms in its own words with the date read and the basis of use; no fetched investment page, record or project is committed, and the parsers pass on synthetic pages of the same shape; the visitor-readable tender portal or its absence for an access or technical reason, never its terms, the apportioning weight for drawn shapes and the page structure of the investment sources are recorded (PLN-25); every source of decision 0019 has its registry row with publisher, licence or terms and retrieval date, every fetched file has its hash, nothing fetched is committed, the relative-busyness source is registered on the owner's decision for a personal, local project and is left out of the nightly live fetch, the live traffic provider has no registry row and no cached file, and the fetchers pass on hand-made fixtures with no key and no network; and the release of the places copy used, with its date, and the Public source of each series that card C30 forecasts, or that it has none, are recorded (PLN-25); and every source of [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md), the ten open-data families of item A10 among them, has its registry row with its publisher, licence or basis of use, terms read and retrieval date; terms never switch off a visitor-readable source or limit its release or display; a planted registry row with no basis of use (`licence_basis`) fails; a planted source whose terms are not yet recorded stays in use and is listed as 'terms to be read', with the date checked; planted fixtures with absent or prohibitive terms remain in use with those terms recorded truthfully in the registry; no field the decision says is never taken is stored, and every building has a height with its source and the measured error of each fallback (S2-T19, S2-T20). The release reads every public input through S2-T27's reviewed snapshot hash with no latest-file fallback, every price carries that snapshot's dated "as of", and the offline due listing counts from each source's latest successful check, applies EII's fixed daily, weekly and monthly family schedules whether or not the publisher's frequency is confirmed, and preserves an unconfirmed frequency, including that of a statistical series without a recorded publication-driven schedule, as `none` with `frequency_unconfirmed`. Eleven of the twelve unblocked public sources fetch through the normal seam with receipts and hashes, and the accident table's year-partition plan and refusals pass offline until S2-T29 activates it through the shared bounded reader. The sources of S2-T29 have normal-seam registry rows and dated Public snapshots, with wrong-pin and other-host TLS attempts refused.
 
 ## slice S3 — Living map and Public-only answer
 
@@ -1131,6 +1272,7 @@ These coarse tasks are refined at the slice S5 gate without weakening their crit
 - Scope: assistant catalogues, template writer, accounting gate and mutation tests.
 - Depends: S3-T07, S6-T01, S6-T02, S6-T03, S6-T07, S6-T08, S6-T09, S6-T10, S6-T11, S6-T12, S6-T13, S6-T14, S6-T15, S6-T16, S6-T17, S6-T18, S6-T19, S6-T20, S6-T21.
 - Amendment ([decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) items A9 and 15): [ ] the question catalogue is seeded from the decision question bank without its ministries' group, which item 15 removes; every question kept is written for the three personas of item 15 and names the personas it serves (AI-132); a question with no playbook is recorded as a gap and offers no answer, and a planted bank question with neither a playbook nor a gap record fails the catalogue check (AI-129, BRF-104); [ ] no claim, component, fragment, question or stage directive is written for a ministry, an official or an oversight role, none shows the question log, and a planted catalogue entry that shows it fails (AI-132).
+- Amendment ([decision 0046](docs/decisions/0046-drop-hiring-flows-and-fetch-every-public-source.md) item 1): [ ] no N1 hiring-and-leaving question enters the catalogue, and a planted N1 question fails; [ ] S6-T04 recounts the actual supplied bank, records the N1 exclusion count and resulting total, and keeps the declared historical 109 separate; an unavailable bank blocks the seed and no total is inferred from gap labels (AI-129, BRF-104).
 - Requirements: AI-14, AI-18, AI-28, AI-42, BE-107, DAT-105, DAT-135, AI-105, AI-106, AI-107, AI-108, AI-109, AI-110, AI-111, AI-112, AI-113, AI-114, AI-115, AI-116, AI-117, AI-118, AI-119, AI-120, AI-121, AI-122, AI-123, AI-124, AI-125, AI-126, AI-127.
 - Delivery: hard; personas AI; status queued.
 ### S6-T26 — Remove audience origin marks from the flagship
@@ -1397,12 +1539,8 @@ These coarse tasks are refined at the slice S6 gate without weakening their crit
 - Delivery: hard; builder persona senior statistician and data-governance engineer; strict reviewer persona independent statistical/privacy reviewer from another maker; status queued.
 
 ### S7-T18 — Hiring, leaving and tightness measures (card C45)
-- Goal: Build source-supported employment-flow measures without a generated-input exclusion.
-- Acceptance criteria: [ ] closed measure, cohort and denominator contracts defined; [ ] arithmetic and privacy tests pass; [ ] counts and period accompany rates; [ ] no vacancy or unemployment source is invented; [ ] missing fields fail; [ ] C39 ratio remains distinct.
-- Scope: C45 calculation, privacy sufficiency and catalogue tests.
-- Depends: S7-T08, S4-T14, S5-T03.
-- Requirements: MTH-124, MTH-48, TST-267.
-- Delivery: hard; builder persona senior statistician and data-governance engineer; strict reviewer persona independent statistical/privacy reviewer from another maker; status queued.
+- Withdrawn by [decision 0046](docs/decisions/0046-drop-hiring-flows-and-fetch-every-public-source.md) item 1: question-bank gap N1 and its hiring, leaving and tightness analysis leave version 1. The shared employment-spell, monthly-cohort, privacy and aggregate-calibration structures remain.
+- Delivery: status withdrawn; never built.
 
 ### S7-T19 — Relatedness over confirmed relationships (card C46)
 - Goal: Evaluate relatedness only over relationships actually present in a confirmed source.
@@ -1433,7 +1571,7 @@ These coarse tasks are refined at the slice S6 gate without weakening their crit
 - Goal: Prove that each journey ends with its own answer end to end with no model call, pin every method's worked example and audit every slice S7 card. The slice S7 gate fails while any value listed by MTH-03 is unpinned.
 - Acceptance criteria: [ ] each of journeys D1 and D3 to D7 ends with its own answer, with no model call; [ ] each method reproduces its public worked example; [ ] no regression value is left unpinned, including every value listed by MTH-03; [ ] each card passes the provenance audit; [ ] no answer forecasts the success of a venture or estimates anything for a named real business or competitor, a forecast, estimate or base rate appears only as the output of tested code with its interval, range or counts, method and source, a scenario is the user's and is never called a forecast, and no answer gives a verdict, a probability, a confidence claim or advice to act; [ ] visual tests pass at wall, laptop and tablet sizes in both languages.
 - Scope: slice S7 end-to-end, audit and visual tests; gate evidence.
-- Depends: S7-T01, S7-T02, S7-T03, S7-T04, S7-T05, S7-T07, S7-T08, S7-T09, S7-T10, S7-T11, S7-T12, S7-T14, S7-T15, S7-T16, S7-T17, S7-T18, S7-T19, S7-T20; S7-T21.
+- Depends: S7-T01, S7-T02, S7-T03, S7-T04, S7-T05, S7-T07, S7-T08, S7-T09, S7-T10, S7-T11, S7-T12, S7-T14, S7-T15, S7-T16, S7-T17, S7-T19, S7-T20; S7-T21.
 - Requirements: MTH-03, TST-50, TST-90, BRF-40, PLN-07.
 - Delivery: hard; personas Methods; status queued.
 **Decision 0038 spike protocol.** Step one audits blocking facts (G: register geocodes; D: issue/cancellation dates; R: road network/speed profile; S: real-series number/length; F: go-live fields/volumes/keys). A failed audit stops that spike with its reason. Settle missing measurement contracts before execution, never guess them. Failures retain the baseline and record measured results. A pass follows decision 0036's same pipeline, invented real-shaped swap fixture, go-live re-fit/re-backtest, own interval/error procedure, fixed seeds, pinned versions/retreat pins and CPU fallback, with rule 25 and decision 0035 display honesty. Gates, controls and reviews remain. No capability is claimed built.
@@ -1520,6 +1658,7 @@ These coarse tasks are refined at the slice S7 gate without weakening their crit
 - Scope: golden, decline, structured-brief and injection evals; slice S8 report.
 - Depends: S8-T02, S8-T03, S8-T04, S8-T09.
 - Amendment ([decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) items A9 and 15): [ ] the golden and exceed sets are seeded from the decision question bank without its ministries' group, which item 15 removes, and every evaluation question is written for the three personas of item 15 and names the personas it serves (AI-132); every question of the bank has a playbook or is recorded as a gap, and the questions that need the joined labour, residence and movement records lead the final comparison (AI-129, BRF-104).
+- Amendment ([decision 0046](docs/decisions/0046-drop-hiring-flows-and-fetch-every-public-source.md) item 1): [ ] the golden and exceed sets use S6-T04's recounted bank and exclude every N1 question, with a planted N1 evaluation question refused; no post-removal total is inferred without the supplied bank (AI-129).
 - Requirements: AI-90, TST-110, TST-114, TST-155.
 - Delivery: hard; personas AI; status queued.
 ### S8-T06 — Memo, replay and offline completeness

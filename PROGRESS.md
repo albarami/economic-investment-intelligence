@@ -28237,6 +28237,195 @@ Seed:      none
 Notes:     The work commit has a Conventional Commit subject.
 ```
 
+#### Decision 0045: review round 2: REJECTED
+
+Reviewed commit `6a9ea45`. OpenAI GPT-6 through Codex; another maker than the drafter (Moonshot Kimi, through Droid) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED
+TASK: decision record 0045 (EII's own capabilities and the public snapshot archive), review round 1
+COMMIT: 6a9ea452efcfe1fffbdb94d8566b7d915cabf6d0
+REVIEWER: OpenAI GPT-6, through Codex
+SKILLS LOADED: strict-reviewer, sanad-provenance, al-muhasibi, muhasabah-gate, task-standards, project-orientation
+CHECKS:
+C1 FAIL — Price dating and release-hash reads correctly land on S2-T19 and S2-T08 with planted violations. L-697’s path-specific obligations and its interaction with L-700 are not carried unambiguously; see D3 and D4.
+C2 FAIL — Both new tasks have scoped delivery, personas, dependencies and queued status. The archive’s acceptance contract has conflicting scheduling inputs and lacks the expressly required path-by-path tests; see D2 and D3.
+C3 PASS — Movement remains governed by DAT-169/PRV-134. The CSV exception preserves local session/seat isolation, model and external-egress prohibitions, persistence refusals and planted receipt failures.
+C4 PASS — Items 7–9 preserve limitations, backend metadata, deterministic calculations, catalogue rendering and decision 0035. No new verdict, success probability or plot-availability permission is introduced.
+C5 FAIL — Immutable local storage, Comtrade classification and the qualified Overture statement are present. Equal-byte scheduling and precedence between EII’s schedule and unconfirmed publisher frequency remain inconsistent; see D2 and D4.
+C6 PASS — No prohibited comparison or product-superiority claim found in the change.
+C7 FAIL — Requirement definitions were spot-checked beyond 25 anchors, including the IDs for capabilities 4, 8, 12 and 13; decision-item citations nevertheless fail D1. Gate changes append sentences.
+Checks were not executed under the read-only instruction. RETURN.r2.md reports exit 0 and last lines “checked 682 text files, 90 Markdown files: OK” and “checked 8 rules: OK”; these are not independently verified results for this commit.
+FINDINGS:
+D1 — File: TASKS.md; docs/14_IMPLEMENTATION_PLAN.md; docs/decisions/0045-eiis-own-capabilities-and-the-snapshot-archive.md. Place: decision 0045 amendment citations, S8-T18’s Requirements, and Amended passages. Wrong: the numbered Decision section ends at item 9, but citations name items 10, 11, 12 and 13. Other citations confuse capability numbers with decision items: S10-T03 cites item 3 for the demonstration order, which is item 2. Fix: distinguish “Capability and requirement mapping, capability N” from numbered decision items throughout. Cite item 6 for S8-T18, item 2 for demonstration order, and the actual relevant item or mapping row for every amendment.
+
+D2 — File: TASKS.md. Place: S2-T27’s offline due-list criterion, read against decision 0045 item 4. Wrong: the criterion derives due status from the newest snapshot date, but unchanged bytes create no new snapshot and must reset due under L-697. An immutable snapshot’s retrieval date cannot represent that later successful check. Fix: add a binding clarification separating immutable retrieval metadata from the latest successful check timestamp used for scheduling; require an unchanged-byte re-fetch fixture that resets due without creating or altering a snapshot.
+
+D3 — File: docs/decisions/0045-eiis-own-capabilities-and-the-snapshot-archive.md. Place: item 4’s reader paragraph and S2-T27’s implementation obligations. Wrong: generic reader categories and generic fixtures do not carry L-697’s explicit path-by-path requirement, including review/activity.py, review/graph.py, both cache-fixture functions and frame read_cached callers. Fix: enumerate all paths named by L-697 item 1 in a binding implementation addendum, requiring an older-of-two selection test and planted tamper refusal for each applicable path. Also carry L-697 item 2’s planted refusal of an unconfirmed cadence explicitly.
+
+D4 — File: docs/decisions/0045-eiis-own-capabilities-and-the-snapshot-archive.md; TASKS.md. Place: item 4’s cadence paragraph and slice S2 gate. Wrong: fixed EII family schedules coexist with an unconditional instruction to assign none/frequency_unconfirmed when publisher frequency is unconfirmed. A scheduled family can satisfy one instruction only by violating the other. Fix: state the precedence explicitly: L-700’s named EII checking schedules do not depend on publisher-frequency confirmation; apply the unconfirmed-frequency fallback where no EII schedule is assigned, retaining publisher confirmation for as_published. Align the gate and add a fixture for a scheduled family with unknown publisher frequency.
+PROPOSED OPEN ITEMS:
+record — Current-head check results remain independently unverified because this review permits file-reading commands only; no RETURN.md was written.
+```
+
+#### Decision 0045: confirmation round 1: REJECTED
+
+Reviewed commit `a5755cf`. OpenAI GPT-6 through Codex; another maker than the drafter (Moonshot Kimi, through Droid) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED
+TASK: Decision record 0045, confirmation of D1–D4 fixes
+COMMIT: a5755cff9935d1166705a2a4e330e7d36f3e1239
+REVIEWER: OpenAI GPT-6, through Codex; senior provenance architect and strict reviewer
+SKILLS LOADED: strict-reviewer, sanad-provenance, muhasabah-gate, task-standards. Self-audit: PASS.
+
+D1: FIXED — TASKS.md amendment citations, S8-T18 Requirements, document 14’s S8-T18 entry, and decision 0045’s Capability and requirement mapping and Amended passages. Decision-item references resolve within items 1–9; cited capability rows include the corresponding tasks.
+
+D2: FIXED — Decision 0045 item 4; TASKS.md S2-T27 acceptance and slice S2 gate. Scheduling uses the latest successful check separately from immutable retrieval metadata. An unchanged-byte re-fetch fixture must reset due without creating or altering a snapshot.
+
+D3: FIXED — Decision 0045 item 4’s reader paragraph and TASKS.md S2-T27 reader criterion enumerate L-697 item 1’s paths, including both cache-fixture operations and frame cached-read callers. Each requires older-of-two selection and tamper-refusal tests. The cadence criterion also requires a planted unconfirmed-frequency refusal.
+
+D4: NOT FIXED — TASKS.md, S2-T27 cadence criterion and slice S2 gate; decision 0045 item 4’s cadence paragraph. The statistical-series exception remains inconsistent with the blanket family rule. S2-T27 requires a scheduled family with unknown publisher frequency to retain its cadence, but permits statistical-series `as_published` only with publisher confirmation. The gate applies family schedules unconditionally and restricts fallback to rows “with no family”; an unconfirmed statistical series belongs to a family and therefore has no explicit fallback.
+
+Exact fix: In all three passages, limit unconditional precedence to EII’s fixed daily, weekly and monthly schedules. Explicitly assign statistical series without a confirmed publication-driven schedule `none` with `frequency_unconfirmed`. Extend the planted refusal to that case, while retaining the fixture proving that a fixed-schedule family keeps its cadence despite unknown publisher frequency.
+
+NEW FINDINGS: None beyond the remaining D4 defect.
+
+PROPOSED OPEN ITEMS: Record only — executable checks were not run under the read-only brief; no RETURN.md was written.
+```
+
+#### Decision 0045: confirmation round 2: APPROVED
+
+Reviewed commit `0910f2f`. OpenAI GPT-6 through Codex; another maker than the drafter (Moonshot Kimi, through Droid) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED
+TASK: Decision record 0045 — confirmation of D4 fix only
+COMMIT: 0910f2fde0b7d74d3e29892ac27ce28627d6eb48
+REVIEWER: OpenAI GPT-6, through Codex; senior provenance architect and strict reviewer
+SKILLS LOADED: strict-reviewer, sanad-provenance, muhasabah-gate. Self-audit: PASS.
+
+D4: FIXED — Decision 0045 item 4, TASKS.md S2-T27 cadence criterion and slice S2 gate explicitly preserve fixed daily, weekly and monthly schedules despite unknown publisher frequency, and assign unconfirmed statistical-series schedules `none` with `frequency_unconfirmed`. Item 4 and S2-T27 extend the planted refusal to unconfirmed statistical series and retain the fixed-family fixture. These provisions satisfy `.overnight/IN/CONFIRM.r1.md` and introduce no new inconsistency with rulings L-697 and L-700 item 3 or document 04. D1–D3 remain FIXED; their provisions are unchanged. This confirms documentary requirements only; no executable checks were run.
+
+NEW FINDINGS: None.
+```
+
+#### Decision 0045: merge record
+
+- The head that was merged, `578650d547f1e97f928ccc88cfe19b6c9213c2d0`, is `c8c250e` and one ledger commit that changes `PROGRESS.md` only. `c8c250e` is the approved commit `0910f2f` (base `b3830a0`) moved onto main `7a200d0` after decision 0044 merged; `git diff 7a200d0 c8c250e` equals `git diff b3830a0 0910f2f` byte for byte (decision 0039), four files: TASKS.md, docs/14_IMPLEMENTATION_PLAN.md, docs/README.md and the record.
+- A Google Gemini review through Droid that approved without check evidence or anchor spot-checks was not counted.
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43845334848 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43845334576 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43845334666.
+- The lead's ledger run on the head: exit 0, `./eii test --seed 2026111613`: 5252 passed, 0 failed, 0 skipped
+- The verdicts are quoted in the pull request's body (Review section) and in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/67 was squash-merged on 2026-11-16 at that head; merge commit `14c6f841f2109a2912f87c6c1fba565fda357c9e` on main; head tree `7918f4eafa6a9d6df1245f31e2e1db999d47d855`, merge tree `7918f4eafa6a9d6df1245f31e2e1db999d47d855`. CI on the merge commit: workflow ci running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43849156453 ; workflow sandbox running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43849156343 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43849156370.
+
+### DOCS-0046 — Decision record 0046, tasks S2-T28 and S2-T29: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/68 )
+
+- What it is: [decision 0046](docs/decisions/0046-drop-hiring-flows-and-fetch-every-public-source.md), Accepted on 2026-11-16: it retires the hiring-and-leaving flows (task S7-T18 and method card C45, IDs kept) while keeping every shared world-build structure; restates that every visitor-readable public source is fetched through the normal seam, with uncertain terms recorded and never blocking the fetch, and decision 0034 still keeping any value of a source without an open licence out of the repository; adds task S2-T28 for the twelve newly unblocked registry rows and task S2-T29 for public sources outside every registry; and records the owner's ruling that the procurement awards workbook is the owner's own scrape of public award reports.
+- Why: the owner's note relayed by the lead at 11:10 and the owner's words relayed by the advisor at 12:41 and 12:52 on 2026-11-16 retire the hiring-and-leaving gap and ask that every public source be fetched. A material amendment needs a decision record and never a silent edit (rule 46). Decision records keep their own pull request (rule 33).
+- Class: documents only, Deep in its subject (provenance of every public input, rules 5, 7 and 19; decision 0034 on values without an open licence). Lead: Anthropic (Claude Opus 5.5): the rulings L-694, L-700, L-701, L-705, L-707, L-708 and L-709, the brief and the edits after review. Editor: the draft by Moonshot Kimi K3.1 Pro through Droid. Reviewer: Zhipu GLM-5.3 through Droid, another maker than the editor and the lead.
+- Review: review A was REJECTED on seven findings (D1 to D7); the lead fixed them. Confirmation round 1 found D1 to D7 fixed and seven new findings (the accident exception in S2-T28, the press figures, the workbook rows, item order, a birth-year use and a planted reset); the lead fixed them. Confirmation round 2 was APPROVED at `234aa01` with no new finding. After decision 0045 merged, the approved change was moved onto main `14c6f84` with an identical patch (decision 0039: a records-only move keeps approval).
+- Left unchanged: AGENTS.md and CLAUDE.md, every privacy rule, gate check, hard limit, sandbox rule and source permission. No code, check script, workflow file or test changes, and no result is measured. No value of the awards workbook enters the repository (decision 0034). The record claims no implemented fetch or gate approval (rule 47).
+- The repository's checks cannot tell whether the record reads the owner's notes rightly. That judgement belongs to the reviewer, and the owner's choices stay with the owner.
+
+#### Evidence for the work commit `4e96ff29ded08715ba82f83fbaad42ce5188cdad`
+
+```text
+### DOCS-0046 — Decision record 0046, tasks S2-T28 and S2-T29
+Commit:    4e96ff29ded08715ba82f83fbaad42ce5188cdad
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 683 text files, 91 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with record 0046, tasks S2-T28 and S2-T29, its gate sentences and the index rows: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### DOCS-0046 — Decision record 0046, tasks S2-T28 and S2-T29
+Commit:    4e96ff29ded08715ba82f83fbaad42ce5188cdad
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### DOCS-0046 — Decision record 0046, tasks S2-T28 and S2-T29
+Commit:    4e96ff29ded08715ba82f83fbaad42ce5188cdad
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files stay byte-identical; neither changes here.
+```
+
+```text
+### DOCS-0046 — Decision record 0046, tasks S2-T28 and S2-T29
+Commit:    4e96ff29ded08715ba82f83fbaad42ce5188cdad
+Command:   bash -c "git diff --name-only 14c6f841f2109a2912f87c6c1fba565fda357c9e HEAD -- docs/decisions/ | grep -v -E '/0046-' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no earlier decision record is changed)
+Seed:      none
+Notes:     Record 0046 is a new file (rule 46); this row proves on the committed tree that no earlier decision record was edited.
+```
+
+```text
+### DOCS-0046 — Decision record 0046, tasks S2-T28 and S2-T29
+Commit:    4e96ff29ded08715ba82f83fbaad42ce5188cdad
+Command:   bash -c "git diff --name-only 14c6f841f2109a2912f87c6c1fba565fda357c9e HEAD -- scripts .github web core custodian product gateway evals eii | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no code, check script or workflow file is changed)
+Seed:      none
+Notes:     The change is documents only.
+```
+
+```text
+### DOCS-0046 — Decision record 0046, tasks S2-T28 and S2-T29
+Commit:    4e96ff29ded08715ba82f83fbaad42ce5188cdad
+Command:   bash -c "git diff --name-only 14c6f841f2109a2912f87c6c1fba565fda357c9e HEAD | grep -v -E '[.]md$' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (only Markdown files change)
+Seed:      none
+Notes:     Every changed file is a Markdown document.
+```
+
+```text
+### DOCS-0046 — Decision record 0046, tasks S2-T28 and S2-T29
+Commit:    4e96ff29ded08715ba82f83fbaad42ce5188cdad
+Command:   ./eii test --seed 2026111614
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    5252 passed, 0 failed, 0 skipped
+Seed:      2026111614
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### DOCS-0046 — Decision record 0046, tasks S2-T28 and S2-T29
+Commit:    4e96ff29ded08715ba82f83fbaad42ce5188cdad
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','14c6f841f2109a2912f87c6c1fba565fda357c9e..4e96ff29ded08715ba82f83fbaad42ce5188cdad'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The work commit has a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
