@@ -4367,3 +4367,135 @@ sources:
     basis_note: "Keyed provider interface under decision 0040 item 2. Terms, hosts, budgets, schema and the selection are unconfirmed."
     comtrade_policy:
       confirmed: false
+
+  - key: "wb_wdi"
+    source_id: "wb_wdi"
+    slug: ""
+    kind: "https_file"
+    title_en: "World Development Indicators (unverified identity lead)"
+    publisher: "World Bank (unverified identity lead)"
+    landing_url: "https://data.worldbank.org/"
+    url: ""
+    fetch_host: ""
+    terms_url: ""
+    licence_url: ""
+    licence_id: "unconfirmed"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-16"
+    terms_watch: false
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_wdi_benchmark"]
+    caveat_keys: ["benchmark_coverage_gap", "publisher_status_separate"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    period_first: ""
+    period_last: ""
+    period_field: "period"
+    reconciliation: "none"
+    skip_reason: "benchmark_metadata_unconfirmed"
+    extension: "bin"
+    basis_note: "Pending independent page verification under decision 0026; identity and page lead only."
+
+  - key: "unctad_fdi"
+    source_id: "unctad_fdi"
+    slug: ""
+    kind: "https_file"
+    title_en: "UNCTADstat (unverified identity lead)"
+    publisher: "UNCTAD (unverified identity lead)"
+    landing_url: "https://unctadstat.unctad.org/"
+    url: ""
+    fetch_host: ""
+    terms_url: ""
+    licence_url: ""
+    licence_id: "unconfirmed"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-16"
+    terms_watch: false
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_unctad_fdi_benchmark"]
+    caveat_keys: ["benchmark_coverage_gap", "publisher_status_separate"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    period_first: ""
+    period_last: ""
+    period_field: "period"
+    reconciliation: "none"
+    skip_reason: "benchmark_metadata_unconfirmed"
+    extension: "bin"
+    basis_note: "Pending independent page verification under decision 0026; identity and page lead only."
+
+  - key: "imf_weo"
+    source_id: "imf_weo"
+    slug: ""
+    kind: "https_file"
+    title_en: "World Economic Outlook (unverified identity lead)"
+    publisher: "International Monetary Fund (unverified identity lead)"
+    landing_url: "https://www.imf.org/"
+    url: ""
+    fetch_host: ""
+    terms_url: ""
+    licence_url: ""
+    licence_id: "unconfirmed"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-16"
+    terms_watch: false
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_weo_benchmark"]
+    caveat_keys: ["benchmark_coverage_gap", "publisher_status_separate"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    period_first: ""
+    period_last: ""
+    period_field: "period"
+    reconciliation: "none"
+    skip_reason: "benchmark_metadata_unconfirmed"
+    extension: "bin"
+    basis_note: "Pending independent page verification under decision 0026; identity and page lead only."
+
+  - key: "ilostat_qat"
+    source_id: "ilostat_qat"
+    slug: ""
+    kind: "https_file"
+    title_en: "ILOSTAT (unverified identity lead)"
+    publisher: "International Labour Organization (unverified identity lead)"
+    landing_url: "https://www.ilo.org/ilostat"
+    url: ""
+    fetch_host: ""
+    terms_url: ""
+    licence_url: ""
+    licence_id: "unconfirmed"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-16"
+    terms_watch: false
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_ilostat_benchmark"]
+    caveat_keys: ["benchmark_coverage_gap", "publisher_status_separate"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    period_first: ""
+    period_last: ""
+    period_field: "period"
+    reconciliation: "none"
+    skip_reason: "benchmark_metadata_unconfirmed"
+    extension: "bin"
+    basis_note: "Pending independent page verification under decision 0026; identity and page lead only."

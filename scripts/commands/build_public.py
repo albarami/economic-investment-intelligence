@@ -11,6 +11,8 @@ from eii_custodian.publicdata.atlas.config import AtlasError
 from eii_custodian.publicdata.atlas.config import Config as AtlasConfig
 from eii_custodian.publicdata.atlas.config import load_config as load_atlas_config
 from eii_custodian.publicdata.baci.config import BaciError, Config, load_config
+from eii_custodian.publicdata.benchmarks.config import Policy as BenchmarkPolicy
+from eii_custodian.publicdata.benchmarks.config import load_policies
 from eii_custodian.publicdata.fetch.build import CACHE_RELATIVE, run_build, utc_now
 from eii_custodian.publicdata.fetch.registry import RegistryError, load_registry
 from eii_custodian.publicdata.fetch.report import log_line
@@ -76,6 +78,7 @@ def run(
     stream_transport: StreamTransport | None = None,
     gravity_stream: StreamTransport | None = None,
     atlas_stream: StreamTransport | None = None,
+    benchmark_stream: StreamTransport | None = None,
 ) -> int:
     """Fetch the registry. Extra arguments are a usage error and open nothing."""
     if len(args) != 0:
@@ -95,6 +98,8 @@ def run(
     stream = stream_transport
     gravity_bound = gravity_stream
     atlas_bound = atlas_stream
+    benchmark_bound = benchmark_stream
+    benchmark_policies: dict[str, BenchmarkPolicy] | None = None
     if transport is None:
         groups: list[tuple[str, ...]] = []
         if any(entry.source_id == "cepii_baci" for entry in entries):
@@ -135,6 +140,22 @@ def run(
                 atlas_bound = partial(
                     open_https_stream, reviewed_urls=atlas_config.reviewed_urls
                 )
+        try:
+            benchmark_policies = load_policies()
+        except ValueError:
+            return exits.finish(
+                1, "build-public", "benchmark configuration_unreadable NO_DATA"
+            )
+        benchmark_urls = tuple(
+            dict.fromkeys(
+                url
+                for policy in benchmark_policies.values()
+                for url in policy.reviewed_urls
+            )
+        )
+        groups.append(benchmark_urls)
+        if benchmark_bound is None:
+            benchmark_bound = partial(open_https_stream, reviewed_urls=benchmark_urls)
         if groups:
 
             def reviewed_metadata(url: str) -> Response:
@@ -156,6 +177,8 @@ def run(
         atlas_config=atlas_config,
         gravity_stream=gravity_bound,
         atlas_stream=atlas_bound,
+        benchmark_policies=benchmark_policies,
+        benchmark_stream=benchmark_bound,
         opener=bound,
         slots=slots,
     )
