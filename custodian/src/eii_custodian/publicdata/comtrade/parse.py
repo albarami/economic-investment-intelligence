@@ -6,7 +6,12 @@ import json
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 
-from eii_custodian.publicdata.comtrade.policy import SOURCE_ID, Descriptor, Policy
+from eii_custodian.publicdata.comtrade.policy import (
+    REVIEWED_SUBDIVISIONS,
+    SOURCE_ID,
+    Descriptor,
+    Policy,
+)
 
 MEASURE_VALUE = "trade_value"
 MEASURE_QUANTITY = "net_weight"
@@ -335,11 +340,27 @@ def _aggregation(record: dict[str, object], field: str) -> int:
     return value
 
 
+def reject_duplicate_rows(rows: tuple[TradeRow, ...] | list[TradeRow]) -> None:
+    """Refuse a dimensional key that already appeared in another row."""
+    seen: set[tuple[str, ...]] = set()
+    for row in rows:
+        key = row.full_key()
+        if key in seen:
+            raise ParseError("duplicate_key")
+        seen.add(key)
+
+
 def _product_member(policy: Policy, descriptor: Descriptor, product: str) -> None:
+    for name, value in descriptor.subdivision:
+        if name not in REVIEWED_SUBDIVISIONS or value == "":
+            raise ParseError("product_membership")
     requested = dict(descriptor.subdivision)
     if "product" in requested:
         allowed = dict(policy.subdivision_values).get("product", ())
-        if requested["product"] not in allowed or product != requested["product"]:
+        chosen = requested["product"]
+        chapter = descriptor.chapter
+        bound = product.startswith(chapter) and len(product) > len(chapter)
+        if chosen not in allowed or product != chosen or not bound:
             raise ParseError("product_membership")
         return
     if product != descriptor.chapter:

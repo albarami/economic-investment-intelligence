@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from eii_custodian.publicdata.comtrade.parse import ParseError, TradeRow, parse_body
+from eii_custodian.publicdata.comtrade.parse import (
+    ParseError,
+    TradeRow,
+    parse_body,
+    reject_duplicate_rows,
+)
 from eii_custodian.publicdata.comtrade.partition import (
     covered_leaves,
     gap_size,
@@ -26,7 +30,6 @@ from eii_custodian.publicdata.comtrade.policy import (
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 
 MANIFEST_NAME = "manifest.json"
-_SHA = re.compile(r"\A[0-9a-f]{64}\Z")
 
 
 @dataclass(frozen=True)
@@ -55,10 +58,18 @@ class Assembly:
     evidence_sha256: str
     retrieved_utc: str
     fetch_host: str
+    child_retrieved_utc: tuple[tuple[str, str], ...] = ()
 
 
 def assemble(
-    cache: Path, key: str, policy: Policy, *, manifest_sha256: str
+    cache: Path,
+    key: str,
+    policy: Policy,
+    *,
+    manifest_sha256: str,
+    publisher: str,
+    licence_basis: str,
+    terms_sha256: str,
 ) -> Assembly:
     """Assemble cached children. A missing receipt or a bad child hash is refused."""
     directory = cache / key
@@ -91,32 +102,36 @@ def assemble(
     keys = _child_keys(children)
     if keys is None:
         raise SafeRefusal("duplicate_child", _bare(policy), "assemble")
-    if not _selection_covered(policy, {key for key, _digest in keys}):
+    if not _selection_covered(policy, {key for key, _body, _receipt in keys}):
         raise SafeRefusal("manifest_incomplete", _bare(policy), "assemble")
     rows: list[TradeRow] = []
-    chain: dict[str, str] | None = None
-    for child_key, digest in keys:
-        owners = {item for item, item_digest in keys if item_digest == digest}
-        side = _receipt(directory, policy, child_key, digest, owners)
-        if chain is None:
-            chain = side
-        elif side != chain:
+    identity: tuple[tuple[str, str], ...] | None = None
+    retrievals: list[tuple[str, str]] = []
+    for child_key, body_sha, receipt_sha in keys:
+        verified = verify_child(
+            directory,
+            policy,
+            child_key=child_key,
+            receipt_sha256=receipt_sha,
+            publisher=publisher,
+            licence_basis=licence_basis,
+            terms_sha256=terms_sha256,
+        )
+        if verified.body_sha256 != body_sha:
+            raise SafeRefusal("child_hash", _bare(policy), child_key)
+        if identity is None:
+            identity = verified.identity
+        elif verified.identity != identity:
             raise SafeRefusal("lineage_missing", _bare(policy), child_key)
-        body_path = directory / f"{digest}.json"
-        body = body_path.read_bytes()
-        try:
-            parsed = parse_body(
-                body,
-                policy,
-                _descriptor(policy, child_key),
-                source_version=policy.version,
-                receipt_sha256=digest,
-            )
-        except ParseError as exc:
-            raise SafeRefusal(exc.check, _bare(policy), child_key) from None
-        rows.extend(parsed.rows)
-    if chain is None:
+        retrievals.append((child_key, verified.retrieved_utc))
+        rows.extend(verified.rows)
+    if identity is None:
         raise SafeRefusal("lineage_missing", _bare(policy), "assemble")
+    try:
+        reject_duplicate_rows(rows)
+    except ParseError as exc:
+        raise SafeRefusal(exc.check, _bare(policy), "assemble") from None
+    chain = dict(identity)
     requested = len(initial_partitions(policy))
     if loaded.get("requested_cells") != requested or loaded.get("gap_cells") != 0:
         raise SafeRefusal("coverage_gap", _bare(policy), "assemble")
@@ -150,26 +165,34 @@ def assemble(
         publisher=chain["publisher"],
         licence_basis=chain["licence_basis"],
         terms_sha256=chain["terms_sha256"],
-        evidence_sha256=chain["evidence_sha256"],
-        retrieved_utc=chain["retrieved_utc"],
+        evidence_sha256=policy.evidence_sha256,
+        retrieved_utc=retrievals[0][1]
+        if len({item[1] for item in retrievals}) == 1
+        else "",
         fetch_host=chain["fetch_host"],
+        child_retrieved_utc=tuple(retrievals),
     )
 
 
-def _child_keys(children: list[object]) -> list[tuple[str, str]] | None:
-    found: list[tuple[str, str]] = []
+def _child_keys(children: list[object]) -> list[tuple[str, str, str]] | None:
+    found: list[tuple[str, str, str]] = []
     seen: set[str] = set()
     for child in children:
         if not isinstance(child, dict):
             return None
         child_key = child.get("key")
         digest = child.get("sha256")
-        if not isinstance(child_key, str) or not isinstance(digest, str):
+        receipt = child.get("receipt_sha256")
+        if (
+            not isinstance(child_key, str)
+            or not isinstance(digest, str)
+            or not isinstance(receipt, str)
+        ):
             return None
         if child_key in seen:
             return None
         seen.add(child_key)
-        found.append((child_key, digest))
+        found.append((child_key, digest, receipt))
     return found
 
 
@@ -183,64 +206,105 @@ def _selection_covered(policy: Policy, present: set[str]) -> bool:
     return set(covered) == present
 
 
-def _receipt(
+@dataclass(frozen=True)
+class VerifiedChild:
+    """One receipt checked against the body, the registry and the policy."""
+
+    child_key: str
+    retrieved_utc: str
+    count: int
+    periods: tuple[str, ...]
+    rows: tuple[TradeRow, ...]
+    identity: tuple[tuple[str, str], ...]
+    body_sha256: str
+
+
+def verify_child(
     directory: Path,
     policy: Policy,
+    *,
     child_key: str,
-    digest: str,
-    owners: set[str],
-) -> dict[str, str]:
-    body_path = directory / f"{digest}.json"
-    side_path = directory / f"{digest}.meta.json"
+    receipt_sha256: str,
+    publisher: str,
+    licence_basis: str,
+    terms_sha256: str,
+) -> VerifiedChild:
+    """Read one child. Counts come from the body. The receipt hash is pinned."""
+    body_path = directory / f"{receipt_sha256}.json"
+    side_path = directory / f"{receipt_sha256}.meta.json"
     if not body_path.is_file():
         raise SafeRefusal("child_missing", _bare(policy), child_key)
-    if sha256_hex(body_path.read_bytes()) != digest:
-        raise SafeRefusal("child_hash", _bare(policy), child_key)
     if not side_path.is_file():
         raise SafeRefusal("receipt_missing", _bare(policy), child_key)
     try:
-        loaded = json.loads(side_path.read_text(encoding="utf-8"))
+        side_bytes = side_path.read_bytes()
+        loaded = json.loads(side_bytes.decode("utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise SafeRefusal("receipt_missing", _bare(policy), child_key) from exc
+    if sha256_hex(side_bytes) != receipt_sha256:
+        raise SafeRefusal("receipt_hash", _bare(policy), child_key)
     if not isinstance(loaded, dict):
         raise SafeRefusal("receipt_missing", _bare(policy), child_key)
-    if loaded.get("sha256") != digest or loaded.get("partition_key") not in owners:
+    body = body_path.read_bytes()
+    body_sha = sha256_hex(body)
+    if loaded.get("sha256") != body_sha or loaded.get("partition_key") != child_key:
         raise SafeRefusal("child_hash", _bare(policy), child_key)
+    api_class = loaded.get("api_class")
+    host = loaded.get("fetch_host")
+    template = (
+        policy.template(api_class, "data") if isinstance(api_class, str) else None
+    )
+    expected_host = template.host if template is not None else ""
     source_id = loaded.get("source_id")
-    publisher = loaded.get("publisher")
+    found_publisher = loaded.get("publisher")
     basis = loaded.get("licence_basis")
     terms = loaded.get("terms_sha256")
     evidence = loaded.get("evidence_sha256")
     retrieved = loaded.get("retrieved_utc")
-    host = loaded.get("fetch_host")
     if (
-        not isinstance(source_id, str)
-        or source_id != SOURCE_ID
-        or not isinstance(publisher, str)
-        or publisher == ""
-        or not isinstance(basis, str)
-        or basis == ""
-        or not isinstance(terms, str)
-        or _SHA.fullmatch(terms) is None
-        or not isinstance(evidence, str)
+        source_id != SOURCE_ID
+        or found_publisher != publisher
+        or basis != licence_basis
+        or terms != terms_sha256
         or evidence != policy.evidence_sha256
         or not isinstance(retrieved, str)
         or "T" not in retrieved
-        or not isinstance(host, str)
-        or host == ""
+        or host != expected_host
+        or loaded.get("policy_sha256") != policy_sha256(policy)
     ):
+        if loaded.get("policy_sha256") != policy_sha256(policy):
+            raise SafeRefusal("policy_changed", _bare(policy), child_key)
         raise SafeRefusal("lineage_missing", _bare(policy), child_key)
-    if loaded.get("policy_sha256") != policy_sha256(policy):
-        raise SafeRefusal("policy_changed", _bare(policy), child_key)
-    return {
-        "source_id": source_id,
-        "publisher": publisher,
-        "licence_basis": basis,
-        "terms_sha256": terms,
-        "evidence_sha256": evidence,
-        "retrieved_utc": retrieved,
-        "fetch_host": host,
-    }
+    try:
+        parsed = parse_body(
+            body,
+            policy,
+            _descriptor(
+                policy, child_key, api_class if isinstance(api_class, str) else ""
+            ),
+            source_version=policy.version,
+            receipt_sha256=receipt_sha256,
+        )
+    except ParseError as exc:
+        raise SafeRefusal(exc.check, _bare(policy), child_key) from None
+    if loaded.get("count") != parsed.raw_count:
+        raise SafeRefusal("receipt_count", _bare(policy), child_key)
+    identity = (
+        ("fetch_host", expected_host),
+        ("licence_basis", licence_basis),
+        ("publisher", publisher),
+        ("source_id", SOURCE_ID),
+        ("terms_sha256", terms_sha256),
+    )
+    return VerifiedChild(
+        child_key=child_key,
+        retrieved_utc=retrieved,
+        count=parsed.raw_count,
+        periods=tuple(row.period for row in parsed.rows),
+        rows=parsed.rows,
+        identity=identity,
+        body_sha256=body_sha,
+    )
 
 
 def _bare(policy: Policy) -> str:
@@ -255,7 +319,7 @@ def _int_field(loaded: dict[str, object], name: str) -> int:
     return value
 
 
-def _descriptor(policy: Policy, key: str) -> Descriptor:
+def _descriptor(policy: Policy, key: str, api_class: str) -> Descriptor:
     from eii_custodian.publicdata.comtrade.partition import Partition
 
     fields = dict(part.split("=", 1) for part in key.split("|") if "=" in part)
@@ -275,4 +339,4 @@ def _descriptor(policy: Policy, key: str) -> Descriptor:
         chapter=fields.get("chapter", ""),
         subdivision=tuple(subdivision),
     )
-    return partition.descriptor(policy, "keyed")
+    return partition.descriptor(policy, api_class)

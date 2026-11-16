@@ -6,6 +6,7 @@ import json
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
+from urllib.parse import quote
 
 from eii_custodian.publicdata.fetch.allowlist import approve_closed, canonical_https
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
@@ -22,6 +23,7 @@ PERIOD_YEAR_LENGTH = 4
 PERIOD_MONTH_LENGTH = 7
 DAY_LENGTH = 10
 FORBIDDEN_FAMILIES = frozenset({"deliver", "bulk", "async"})
+REVIEWED_SUBDIVISIONS = frozenset({"product"})
 API_CLASSES = frozenset({"keyed", "public"})
 ROLES = frozenset({"reporter", "mirror"})
 FREQUENCIES = frozenset({"annual", "monthly"})
@@ -370,40 +372,52 @@ def url_approved(policy: Policy, descriptor: Descriptor) -> bool:
 def refusal_hiding(
     policy: Policy, descriptor: Descriptor, check: str, secret: str
 ) -> SafeRefusal:
-    """Build a refusal whose URL and endpoint id omit a credential-bearing selector."""
-    if secret == "" or secret not in descriptor.endpoint_id():
-        return refusal(policy, descriptor, check)
-    template = policy.template(descriptor.api_class, descriptor.endpoint_family)
-    host = "invalid.example"
-    path = "/refused"
-    if (
-        template is not None
-        and secret not in template.host
-        and secret not in template.path
-    ):
-        host = template.host
-        path = template.path
-    selectors = tuple(
-        (name, value)
-        for name, value in descriptor.selectors()
-        if secret not in name and secret not in value
-    )
-    try:
-        url = canonical_https(host, path, selectors)
-    except ValueError:
-        url = "https://invalid.example/refused"
-    if secret in url:
-        url = "https://invalid.example/refused"
-    return SafeRefusal(check, url, "redacted")
+    """Build a refusal whose rendered fields cannot carry a credential."""
+    return refusal(policy, descriptor, check, secret)
 
 
-def refusal(policy: Policy, descriptor: Descriptor, check: str) -> SafeRefusal:
-    """Build a refusal. The URL is canonical even when the check is a bad family."""
+def refusal(
+    policy: Policy, descriptor: Descriptor, check: str, secret: str = ""
+) -> SafeRefusal:
+    """Build a refusal. A secret is removed before any descriptor field is rendered."""
+    if _descriptor_holds(descriptor, secret):
+        return SafeRefusal(check, "https://invalid.example/refused", "redacted")
     try:
         url = safe_url(policy, descriptor)
     except ValueError:
         url = "https://invalid.example/refused"
-    return SafeRefusal(check, url, descriptor.endpoint_id())
+    endpoint = descriptor.endpoint_id()
+    if _text_holds(url, secret) or _text_holds(endpoint, secret):
+        return SafeRefusal(check, "https://invalid.example/refused", "redacted")
+    return SafeRefusal(check, url, endpoint)
+
+
+def _text_holds(text: str, secret: str) -> bool:
+    if secret == "":
+        return False
+    encoded = quote(secret, safe="")
+    return secret in text or (encoded != secret and encoded in text)
+
+
+def _descriptor_holds(descriptor: Descriptor, secret: str) -> bool:
+    if secret == "":
+        return False
+    parts = (
+        descriptor.api_class,
+        descriptor.endpoint_family,
+        descriptor.series_role,
+        descriptor.reporter_code,
+        descriptor.partner_code,
+        descriptor.frequency,
+        descriptor.period,
+        descriptor.flow_code,
+        descriptor.chapter,
+        descriptor.classification_revision,
+    )
+    extra = tuple(name for name, _value in descriptor.subdivision) + tuple(
+        value for _name, value in descriptor.subdivision
+    )
+    return any(_text_holds(part, secret) for part in parts + extra)
 
 
 def policy_sha256(policy: Policy) -> str:
@@ -625,6 +639,8 @@ def _subdivision(
     fields: object, values: object
 ) -> tuple[tuple[str, ...], tuple[tuple[str, tuple[str, ...]], ...]]:
     names = _plain_list(fields, "subdivision_fields")
+    if any(name not in REVIEWED_SUBDIVISIONS for name in names):
+        raise PolicyError("subdivision_fields")
     if not isinstance(values, dict) or set(values) != set(names):
         raise PolicyError("subdivision_values")
     pairs: list[tuple[str, tuple[str, ...]]] = []

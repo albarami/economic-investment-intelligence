@@ -10,7 +10,12 @@ from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import quote
 
-from eii_custodian.publicdata.comtrade.parse import ParseError, parse_body
+from eii_custodian.publicdata.comtrade.assemble import VerifiedChild, verify_child
+from eii_custodian.publicdata.comtrade.parse import (
+    ParseError,
+    parse_body,
+    reject_duplicate_rows,
+)
 from eii_custodian.publicdata.comtrade.partition import (
     Partition,
     closed_partitions,
@@ -23,6 +28,7 @@ from eii_custodian.publicdata.comtrade.policy import (
     PARSER_METHOD,
     PARSER_VERSION,
     SOURCE_ID,
+    Descriptor,
     Policy,
     SafeRefusal,
     UnconfirmedPolicy,
@@ -126,21 +132,29 @@ def fetch_source(
         acquire(directory)
     except StateError as exc:
         return _stopped(exc.check, policy)
+    result: FetchResult | None = None
     try:
-        return _run(
-            entry,
-            policy,
-            directory,
-            clock,
-            opener,
-            slots if slots is not None else _EmptySlots(),
-            api_class,
-            requested_slot,
-        )
-    except OSError:
-        return _stopped("write_failed", policy)
+        try:
+            result = _run(
+                entry,
+                policy,
+                directory,
+                clock,
+                opener,
+                slots if slots is not None else _EmptySlots(),
+                api_class,
+                requested_slot,
+            )
+        except OSError:
+            result = _stopped("write_failed", policy)
     finally:
-        release(directory)
+        try:
+            release(directory)
+        except StateError:
+            result = _stopped("write_failed", policy)
+    if result is None:
+        return _stopped("write_failed", policy)
+    return result
 
 
 def refuse_committed_sentinel(entry: Entry, candidate: Path, sentinel: str) -> None:
@@ -182,7 +196,7 @@ def _run(
         )
     except StateError as exc:
         return _stopped(exc.check, policy)
-    problem = _verify_stored(directory, ledger)
+    problem, _stored = _verified(directory, ledger, policy, entry)
     if problem is not None:
         return _fail(policy, problem, ledger, directory, initial, api_class)
     index = {item.key(): item for item in closed_partitions(policy)}
@@ -235,12 +249,11 @@ def _run(
             continue
         assert isinstance(outcome, _Accepted)
         try:
-            _store_child(
+            receipt_sha = _store_child(
                 entry,
                 directory,
                 policy,
                 partition,
-                sha256_hex(outcome.body),
                 outcome.body,
                 outcome.count,
                 outcome.limit,
@@ -251,18 +264,23 @@ def _run(
         except OSError:
             return _fail(policy, "write_failed", ledger, directory, initial, api_class)
         try:
-            ledger = accept(ledger, key, sha256_hex(outcome.body))
+            ledger = accept(ledger, key, receipt_sha)
         except StateError as exc:
             return _fail(policy, exc.check, ledger, directory, initial, api_class)
         write_ledger(directory, ledger)
-    problem = _verify_stored(directory, ledger)
+    problem, stored = _verified(directory, ledger, policy, entry)
     if problem is not None:
         return _fail(policy, problem, ledger, directory, initial, api_class)
-    total = _stored_count(directory, ledger)
+    total = sum(item.count for item in stored)
     if total < policy.count_bounds.minimum or total > policy.count_bounds.maximum:
         return _fail(policy, "count_bounds", ledger, directory, initial, api_class)
-    if not _periods_observed(policy, ledger):
+    seen_periods = {period for item in stored for period in item.periods}
+    if any(period not in seen_periods for period in policy.expected_last_periods):
         return _fail(policy, "missing_period", ledger, directory, initial, api_class)
+    try:
+        reject_duplicate_rows([row for item in stored for row in item.rows])
+    except ParseError:
+        return _fail(policy, "duplicate_key", ledger, directory, initial, api_class)
     missing = missing_cells(initial, ledger.pending, ledger.completed)
     _write_coverage(directory, policy, initial, ledger, missing)
     if missing:
@@ -285,40 +303,32 @@ def _run(
 
 def _send(
     policy: Policy,
-    descriptor: object,
+    descriptor: Descriptor,
     header: str,
     opener: Opener,
     ledger: Ledger,
 ) -> tuple[SafeRefusal | _Split | _Accepted, Ledger]:
     """Send once. A throttle stops the run and does not reserve another call."""
-    from eii_custodian.publicdata.comtrade.policy import Descriptor
-
-    if not isinstance(descriptor, Descriptor):
-        return _refusal(policy, "mirror_direction"), ledger
     try:
         result = perform(policy, descriptor, header or None, opener)
     except SafeRefusal as exc:
         return exc, ledger
     if result.category == "auth":
-        return _refusal(policy, "authentication", descriptor), ledger
+        return _refusal(policy, "authentication", descriptor, header), ledger
     if result.category == "throttle":
-        return _refusal(policy, "throttled", descriptor), ledger
+        return _refusal(policy, "throttled", descriptor, header), ledger
     if result.category != "ok":
-        return _refusal(policy, "http_status", descriptor), ledger
+        return _refusal(policy, "http_status", descriptor, header), ledger
     return _classify(policy, descriptor, result, header), ledger
 
 
 def _classify(
-    policy: Policy, descriptor: object, result: AttemptResult, header: str
+    policy: Policy, descriptor: Descriptor, result: AttemptResult, header: str
 ) -> SafeRefusal | _Split | _Accepted:
-    from eii_custodian.publicdata.comtrade.policy import Descriptor
-
-    if not isinstance(descriptor, Descriptor):
-        return _refusal(policy, "mirror_direction")
     if header and (result.header_echo or _body_holds(result.body, header)):
-        return _refusal(policy, "provider_error", descriptor)
+        return _refusal(policy, "provider_error", descriptor, header)
     if result.error_text or _body_holds(result.body, header):
-        return _refusal(policy, "provider_error", descriptor)
+        return _refusal(policy, "provider_error", descriptor, header)
     limit = policy.limit_for(descriptor.api_class)
     try:
         parsed = parse_body(
@@ -329,16 +339,16 @@ def _classify(
             receipt_sha256="",
         )
     except ParseError as exc:
-        return _refusal(policy, exc.check, descriptor)
+        return _refusal(policy, exc.check, descriptor, header)
     if parsed.truncated or parsed.raw_count > limit:
-        return _refusal(policy, "truncation", descriptor)
+        return _refusal(policy, "truncation", descriptor, header)
     if parsed.raw_count == limit:
         field = next_subdivision(policy, _partition_from_descriptor(descriptor))
         if field is None:
-            return _refusal(policy, "unresolved_truncation", descriptor)
+            return _refusal(policy, "unresolved_truncation", descriptor, header)
         children = subdivide(policy, _partition_from_descriptor(descriptor), field)
         if not children:
-            return _refusal(policy, "unresolved_truncation", descriptor)
+            return _refusal(policy, "unresolved_truncation", descriptor, header)
         return _Split(children)
     return _Accepted(result.body, parsed.raw_count, limit)
 
@@ -350,16 +360,33 @@ def _body_holds(body: bytes, secret: str) -> bool:
     if raw in body:
         return True
     encoded = quote(secret, safe="").encode("utf-8")
-    return encoded != raw and encoded in body
+    if encoded != raw and encoded in body:
+        return True
+    return _json_holds(body, secret)
 
 
-def _partition_from_descriptor(descriptor: object) -> Partition:
-    from eii_custodian.publicdata.comtrade.policy import Descriptor
+def _json_holds(body: bytes, secret: str) -> bool:
+    try:
+        loaded = json.loads(body.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError):
+        return False
+    return _value_holds(loaded, secret)
 
-    if not isinstance(descriptor, Descriptor):
-        raise SafeRefusal(
-            "mirror_direction", "https://invalid.example/refused", "descriptor"
+
+def _value_holds(value: object, secret: str) -> bool:
+    if isinstance(value, str):
+        return secret in value
+    if isinstance(value, dict):
+        return any(
+            (isinstance(key, str) and secret in key) or _value_holds(item, secret)
+            for key, item in value.items()
         )
+    if isinstance(value, list):
+        return any(_value_holds(item, secret) for item in value)
+    return False
+
+
+def _partition_from_descriptor(descriptor: Descriptor) -> Partition:
     return Partition(
         series_role=descriptor.series_role,
         partner_code=descriptor.partner_code
@@ -400,18 +427,18 @@ def _store_child(
     directory: Path,
     policy: Policy,
     partition: Partition,
-    digest: str,
     body: bytes,
     count: int,
     limit: int,
     ledger: Ledger,
     api_class: str,
     retrieved_utc: str,
-) -> None:
+) -> str:
+    body_sha = sha256_hex(body)
     host = _host_for(policy, api_class)
     side = sidecar_for(
         entry,
-        digest=digest,
+        digest=body_sha,
         nbytes=len(body),
         fetch_url=_fetch_url(policy, partition, api_class),
         fetch_host=host,
@@ -438,7 +465,13 @@ def _store_child(
             },
         }
     )
-    commit_pair(directory, digest, "json", body, side)
+    text = json.dumps(side, sort_keys=True, ensure_ascii=True) + "\n"
+    receipt_sha = sha256_hex(text.encode("utf-8"))
+    commit_pair(directory, receipt_sha, "json", body, side)
+    written = (directory / f"{receipt_sha}.meta.json").read_bytes()
+    if sha256_hex(written) != receipt_sha:
+        raise OSError("receipt")
+    return receipt_sha
 
 
 def _fetch_url(policy: Policy, partition: Partition, api_class: str) -> str:
@@ -482,10 +515,13 @@ def _write_manifest(
     ledger: Ledger,
     missing: tuple[str, ...],
 ) -> str:
-    children = [
-        {"key": key, "sha256": digest}
-        for key, digest in sorted(ledger.child_sha256, key=lambda item: item[0])
-    ]
+    children = []
+    for key, receipt_sha in sorted(ledger.child_sha256, key=lambda item: item[0]):
+        side = json.loads(
+            (directory / f"{receipt_sha}.meta.json").read_text(encoding="utf-8")
+        )
+        body_sha = side.get("sha256") if isinstance(side, dict) else ""
+        children.append({"key": key, "receipt_sha256": receipt_sha, "sha256": body_sha})
     payload = {
         "children": children,
         "complete": True,
@@ -514,53 +550,27 @@ def _atomic_text(path: Path, text: str) -> None:
         raise
 
 
-def _verify_stored(directory: Path, ledger: Ledger) -> str | None:
-    for _key, digest in ledger.child_sha256:
-        body = directory / f"{digest}.json"
-        side_path = directory / f"{digest}.meta.json"
-        if not body.is_file():
-            return "child_missing"
-        if sha256_hex(body.read_bytes()) != digest:
-            return "child_hash"
-        if not side_path.is_file():
-            return "receipt_missing"
+def _verified(
+    directory: Path, ledger: Ledger, policy: Policy, entry: Entry
+) -> tuple[str | None, tuple[VerifiedChild, ...]]:
+    terms = terms_text_sha256(entry.terms_words.encode("utf-8"))
+    found: list[VerifiedChild] = []
+    for key, receipt_sha in ledger.child_sha256:
         try:
-            loaded = json.loads(side_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            return "receipt_missing"
-        if not isinstance(loaded, dict):
-            return "receipt_missing"
-        owners = {
-            item for item, item_digest in ledger.child_sha256 if item_digest == digest
-        }
-        if loaded.get("sha256") != digest or loaded.get("partition_key") not in owners:
-            return "child_hash"
-    return None
-
-
-def _stored_count(directory: Path, ledger: Ledger) -> int:
-    total = 0
-    for _key, digest in ledger.child_sha256:
-        loaded = json.loads(
-            (directory / f"{digest}.meta.json").read_text(encoding="utf-8")
-        )
-        count = loaded.get("count") if isinstance(loaded, dict) else None
-        if isinstance(count, bool) or not isinstance(count, int):
-            return -1
-        total += count
-    return total
-
-
-def _periods_observed(policy: Policy, ledger: Ledger) -> bool:
-    seen = {_period_of(key) for key, _digest in ledger.child_sha256}
-    return all(period in seen for period in policy.expected_last_periods)
-
-
-def _period_of(key: str) -> str:
-    for part in key.split("|"):
-        if part.startswith("period="):
-            return part.removeprefix("period=")
-    return ""
+            found.append(
+                verify_child(
+                    directory,
+                    policy,
+                    child_key=key,
+                    receipt_sha256=receipt_sha,
+                    publisher=entry.publisher,
+                    licence_basis=entry.licence_basis,
+                    terms_sha256=terms,
+                )
+            )
+        except SafeRefusal as exc:
+            return exc.check, ()
+    return None, tuple(found)
 
 
 def _host_for(policy: Policy, api_class: str) -> str:
@@ -612,12 +622,15 @@ def _stopped(check: str, policy: Policy | UnconfirmedPolicy | None) -> FetchResu
 
 
 def _refusal(
-    policy: Policy, check: str, descriptor: object | None = None
+    policy: Policy,
+    check: str,
+    descriptor: Descriptor | None = None,
+    secret: str = "",
 ) -> SafeRefusal:
-    from eii_custodian.publicdata.comtrade.policy import Descriptor, refusal
+    from eii_custodian.publicdata.comtrade.policy import refusal
 
-    if isinstance(descriptor, Descriptor):
-        return refusal(policy, descriptor, check)
+    if descriptor is not None:
+        return refusal(policy, descriptor, check, secret)
     host = policy.endpoint_templates[0].host
     return SafeRefusal(check, f"https://{host}/refused", check)
 

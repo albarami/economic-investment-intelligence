@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import email.message
 import hashlib
+import io
 import json
 import urllib.error
 import urllib.request
@@ -17,6 +18,7 @@ from custodian.tests.fixtures.comtrade.invented import (
     body_for,
     invented_entry,
     invented_policy,
+    trusted_source,
 )
 
 from eii_custodian.publicdata.comtrade.assemble import assemble
@@ -42,6 +44,7 @@ from eii_custodian.publicdata.fetch.transport import (
     PreparedRequest,
     SlotSecrets,
     open_attempt,
+    perform,
 )
 
 MARKER = "invented-query-marker"
@@ -119,6 +122,20 @@ def _stored(cache: Path) -> str:
     )
 
 
+def test_perform_refuses_a_non_descriptor() -> None:
+    """Transport refuses a value that is not a closed descriptor before any opener call."""
+    opened: list[str] = []
+
+    def opener(request: PreparedRequest) -> AttemptResult:
+        opened.append(request.url)
+        return AttemptResult("ok", b"")
+
+    with pytest.raises(OpenerFault) as caught:
+        perform(invented_policy(), object(), None, opener)
+    assert str(caught.value) == "descriptor"
+    assert opened == []
+
+
 def test_canonical_host_and_path_are_refused() -> None:
     """A host or path outside the canonical form is refused."""
     with pytest.raises(ValueError, match="host"):
@@ -169,7 +186,7 @@ def test_opener_refuses_host_http_network_and_redirect(
         stop = cast(type[urllib.request.HTTPRedirectHandler], handler)()
         stop.redirect_request(
             urllib.request.Request("https://www.data.gov.qa/planted"),
-            cast(object, None),  # type: ignore[arg-type]
+            io.BytesIO(b""),
             302,
             "see",
             email.message.Message(),
@@ -345,7 +362,13 @@ def test_ledger_shape_and_slot(tmp_path: Path) -> None:
 def test_assembly_identity_plants(tmp_path: Path) -> None:
     """A missing, rehashed or non-integer manifest is refused."""
     with pytest.raises(SafeRefusal) as missing:
-        assemble(tmp_path, "none", _narrow(), manifest_sha256="ab" * 32)
+        assemble(
+            tmp_path,
+            "none",
+            _narrow(),
+            manifest_sha256="ab" * 32,
+            **trusted_source(),
+        )
     assert missing.value.check == "manifest_missing"
     fetched = fetch_source(
         invented_entry(_narrow()),
@@ -359,7 +382,13 @@ def test_assembly_identity_plants(tmp_path: Path) -> None:
     folder = tmp_path / "un_comtrade"
     manifest = folder / "manifest.json"
     with pytest.raises(SafeRefusal) as hashed:
-        assemble(tmp_path, "un_comtrade", _narrow(), manifest_sha256="cd" * 32)
+        assemble(
+            tmp_path,
+            "un_comtrade",
+            _narrow(),
+            manifest_sha256="cd" * 32,
+            **trusted_source(),
+        )
     assert hashed.value.check == "manifest_hash"
     original = manifest.read_text(encoding="utf-8")
     loaded = json.loads(original)
@@ -367,14 +396,26 @@ def test_assembly_identity_plants(tmp_path: Path) -> None:
     manifest.write_text(json.dumps(loaded) + "\n", encoding="utf-8")
     digest = hashlib.sha256(manifest.read_bytes()).hexdigest()
     with pytest.raises(SafeRefusal) as counted:
-        assemble(tmp_path, "un_comtrade", _narrow(), manifest_sha256=digest)
+        assemble(
+            tmp_path,
+            "un_comtrade",
+            _narrow(),
+            manifest_sha256=digest,
+            **trusted_source(),
+        )
     assert counted.value.check == "manifest_unreadable"
     restored = json.loads(original)
     restored["requested_cells"] = 0
     manifest.write_text(json.dumps(restored) + "\n", encoding="utf-8")
     gap_digest = hashlib.sha256(manifest.read_bytes()).hexdigest()
     with pytest.raises(SafeRefusal) as gap:
-        assemble(tmp_path, "un_comtrade", _narrow(), manifest_sha256=gap_digest)
+        assemble(
+            tmp_path,
+            "un_comtrade",
+            _narrow(),
+            manifest_sha256=gap_digest,
+            **trusted_source(),
+        )
     assert gap.value.check == "coverage_gap"
 
 

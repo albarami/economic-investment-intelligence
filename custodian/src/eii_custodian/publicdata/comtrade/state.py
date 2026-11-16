@@ -70,18 +70,29 @@ def fresh(
 
 
 def acquire(directory: Path) -> None:
-    """Create the lock exclusively. A second writer is refused."""
-    directory.mkdir(parents=True, exist_ok=True)
+    """Create the lock exclusively. A filesystem failure keeps any lock already created."""
+    try:
+        directory.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        raise StateError("write_failed") from exc
     try:
         fd = os.open(directory / LOCK_NAME, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
     except FileExistsError as exc:
         raise StateError("state_locked") from exc
-    os.close(fd)
+    except OSError as exc:
+        raise StateError("write_failed") from exc
+    try:
+        os.close(fd)
+    except OSError as exc:
+        raise StateError("write_failed") from exc
 
 
 def release(directory: Path) -> None:
-    """Remove the lock. A missing lock is already released."""
-    (directory / LOCK_NAME).unlink(missing_ok=True)
+    """Remove the lock. A filesystem failure leaves the lock in place."""
+    try:
+        (directory / LOCK_NAME).unlink(missing_ok=True)
+    except OSError as exc:
+        raise StateError("write_failed") from exc
 
 
 def load_or_new(
@@ -175,12 +186,16 @@ def note_incomplete(ledger: Ledger, reason: str, next_eligible: str) -> Ledger:
 
 
 def write_ledger(directory: Path, ledger: Ledger) -> None:
-    """Atomically replace the ledger. A failed replace leaves the previous file."""
-    directory.mkdir(parents=True, exist_ok=True)
-    target = directory / STATE_NAME
+    """Atomically replace the ledger. A failed write removes its partial."""
     partial = directory / ".state.json.partial"
-    partial.write_text(_dump(ledger), encoding="utf-8")
-    os.replace(partial, target)
+    try:
+        directory.mkdir(parents=True, exist_ok=True)
+        target = directory / STATE_NAME
+        partial.write_text(_dump(ledger), encoding="utf-8")
+        os.replace(partial, target)
+    except OSError:
+        partial.unlink(missing_ok=True)
+        raise
 
 
 def read_ledger(path: Path) -> Ledger:

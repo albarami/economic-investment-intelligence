@@ -8,6 +8,7 @@ from urllib.parse import parse_qsl, urlsplit
 
 from eii_custodian.publicdata.comtrade.policy import Policy, parse_policy, period_ends
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 from eii_custodian.publicdata.fetch.transport import AttemptResult, PreparedRequest
 
 HOST = "invented.example"
@@ -116,6 +117,16 @@ def invented_policy(**overrides: object) -> Policy:
     if not isinstance(parsed, Policy):
         raise AssertionError("policy")
     return parsed
+
+
+def trusted_source(policy: Policy | None = None) -> dict[str, str]:
+    """Return the registry fields assembly checks against a receipt."""
+    entry = invented_entry(policy)
+    return {
+        "publisher": entry.publisher,
+        "licence_basis": entry.licence_basis,
+        "terms_sha256": terms_text_sha256(entry.terms_words.encode("utf-8")),
+    }
 
 
 def invented_entry(policy: Policy | None = None) -> Entry:

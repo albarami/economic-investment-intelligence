@@ -17,6 +17,7 @@ from custodian.tests.fixtures.comtrade.invented import (
     invented_entry,
     invented_policy,
     policy_document,
+    trusted_source,
 )
 
 from eii_custodian.publicdata.comtrade.assemble import assemble
@@ -350,17 +351,22 @@ def test_published_dimensions_come_from_the_response() -> None:
 
 
 def test_wrong_chapter_subdivision_and_missing_measure_are_refused() -> None:
-    """A product outside the request, or a missing measure, is not stored as a row."""
+    """A product outside the requested child, or a missing measure, is not a row."""
     policy = invented_policy()
     cell = next(
         item for item in initial_partitions(policy) if item.series_role == "reporter"
     )
     descriptor = cell.descriptor(policy, "keyed")
+    descriptor = descriptor.__class__(
+        **{**descriptor.__dict__, "subdivision": (("product", "ch-a-1"),)}
+    )
     wrong = _record(descriptor)
-    wrong["cmdCode"] = "ch-other"
+    wrong["cmdCode"] = "ch-a-2"
     missing = _record(descriptor)
+    missing["cmdCode"] = "ch-a-1"
     del missing["primaryValue"]
     explicit = _record(descriptor)
+    explicit["cmdCode"] = "ch-a-1"
     explicit["primaryValue"] = None
     bodies = (
         (
@@ -471,7 +477,13 @@ def test_deleted_sidecar_blocks_assembly(tmp_path: Path) -> None:
     for path in folder.glob("*.meta.json"):
         path.unlink()
     with pytest.raises(SafeRefusal) as caught:
-        assemble(tmp_path, "un_comtrade", _narrow(), manifest_sha256=digest)
+        assemble(
+            tmp_path,
+            "un_comtrade",
+            _narrow(),
+            manifest_sha256=digest,
+            **trusted_source(),
+        )
     assert caught.value.check == "receipt_missing"
 
 
@@ -499,6 +511,7 @@ def test_manifest_without_a_child_or_with_a_duplicate_is_refused(
             "un_comtrade",
             policy,
             manifest_sha256=sha256_hex(manifest_path.read_bytes()),
+            **trusted_source(),
         )
     again = fetch_source(
         invented_entry(policy),
@@ -519,24 +532,24 @@ def test_manifest_without_a_child_or_with_a_duplicate_is_refused(
             "un_comtrade",
             policy,
             manifest_sha256=sha256_hex(dup_path.read_bytes()),
+            **trusted_source(),
         )
 
 
 def test_second_subdivision_resumes_the_next_day(tmp_path: Path) -> None:
-    """A pending grandchild is fetched on the next day, and a changed child is not."""
+    """A product split paused at the budget finishes the next day and assembles."""
     policy = _narrow(
         daily_calls=4,
-        keyed_record_limit=1,
-        subdivision_fields=["band", "product"],
-        subdivision_values={"band": ["b1", "b2"], "product": ["ch-a-1", "ch-a-2"]},
+        keyed_record_limit=2,
+        subdivision_fields=["product"],
+        subdivision_values={"product": ["ch-a-1", "ch-a-2"]},
     )
     seen: list[str] = []
 
     def opener(request: PreparedRequest) -> AttemptResult:
         seen.append(request.url)
         query = dict(parse_qsl(urlsplit(request.url).query))
-        depth = int("band" in query) + int("product" in query)
-        count = 0 if depth == 2 else 1
+        count = 1 if "product" in query else 2
         return AttemptResult("ok", body_for(request, count=count))
 
     cache = tmp_path / "deep"
@@ -548,14 +561,22 @@ def test_second_subdivision_resumes_the_next_day(tmp_path: Path) -> None:
     state = json.loads(
         (cache / "un_comtrade" / "state.json").read_text(encoding="utf-8")
     )
-    assert any("," in key for key in state["pending"])
+    assert any("product=" in key for key in state["pending"])
     before = len(seen)
     second = fetch_source(
         invented_entry(policy), cache, _later, _sleep, opener, SlotSecrets(PRIMARY, "")
     )
-    assert second.failure is None or second.failure.check != "stale_state"
+    assert second.failure is None
     assert len(seen) > before
-    assert any("band=" in url and "product=" in url for url in seen[before:])
+    assert any("product=" in url for url in seen[before:])
+    assembled = assemble(
+        cache,
+        "un_comtrade",
+        policy,
+        manifest_sha256=second.digest,
+        **trusted_source(),
+    )
+    assert assembled.rows
     body = next(
         path
         for path in (cache / "un_comtrade").glob("*.json")
@@ -634,7 +655,13 @@ def test_retrieval_host_terms_and_source_are_the_selected_ones(tmp_path: Path) -
     assert side["retrieved_utc"] == "2026-11-16T08:00:00Z"
     assert side["fetch_host"] == public_host
     assert side["terms_sha256"] == terms_text_sha256(b"terms to be read")
-    assembled = assemble(tmp_path, "un_comtrade", policy, manifest_sha256=result.digest)
+    assembled = assemble(
+        tmp_path,
+        "un_comtrade",
+        policy,
+        manifest_sha256=result.digest,
+        **trusted_source(),
+    )
     assert assembled.rows[0].source_id == "un_comtrade"
     assert assembled.source_id == "un_comtrade"
 
@@ -673,6 +700,109 @@ def test_policy_hash_covers_schema_and_blocks_reuse(tmp_path: Path) -> None:
     )
     assert reused.failure is not None
     assert reused.failure.check == "stale_state"
+
+
+def test_policy_hash_changes_every_semantic_field() -> None:
+    """Each semantic policy field changes the hash on its own."""
+    original = policy_sha256(invented_policy())
+    schema = dict(policy_document()["response_schema"])
+    overrides: list[dict[str, object]] = []
+    for name, value in schema.items():
+        copied = dict(schema)
+        copied[name] = str(value) + "X"
+        overrides.append({"response_schema": copied})
+    overrides.extend(
+        [
+            {"version": "invented-2"},
+            {"verified_on": "2026-11-15"},
+            {"evidence_url": "https://invented.example/evidence-2"},
+            {"evidence_sha256": "ab" * 32},
+            {"access_tier": "invented-other"},
+            {
+                "endpoint_templates": [
+                    {
+                        "api_class": "keyed",
+                        "family": "data",
+                        "host": "invented-other.example",
+                        "path": "/data/v1/get",
+                    },
+                    {
+                        "api_class": "public",
+                        "family": "data",
+                        "host": HOST,
+                        "path": "/public/v1/preview",
+                    },
+                ]
+            },
+            {
+                "endpoint_templates": [
+                    {
+                        "api_class": "keyed",
+                        "family": "data",
+                        "host": HOST,
+                        "path": "/data/v2/get",
+                    },
+                    {
+                        "api_class": "public",
+                        "family": "data",
+                        "host": HOST,
+                        "path": "/public/v1/preview",
+                    },
+                ]
+            },
+            {
+                "endpoint_templates": [
+                    {
+                        "api_class": "keyed",
+                        "family": "preview",
+                        "host": HOST,
+                        "path": "/data/v1/get",
+                    },
+                    {
+                        "api_class": "public",
+                        "family": "data",
+                        "host": HOST,
+                        "path": "/public/v1/preview",
+                    },
+                ]
+            },
+            {"allowed_redirect_hosts": [HOST]},
+            {"daily_calls": 21},
+            {"keyed_record_limit": 4},
+            {"public_record_limit": 3},
+            {"reset_rule": "rolling_window"},
+            {"quota_scope": "account"},
+            {"daily_exhaustion_signal": "other_signal"},
+            {"reporter_key": "QAB"},
+            {"mirror_partner_keys": ["ZZB"]},
+            {"frequencies": ["annual"]},
+            {"periods": ["2098"], "expected_last_periods": ["2099"]},
+            {"flows": ["flow-in"]},
+            {"chapters": ["ch-b"]},
+            {"subdivision_fields": [], "subdivision_values": {}},
+            {"subdivision_values": {"product": ["ch-a-1", "ch-a-9"]}},
+            {"count_bounds": {"minimum": 2, "maximum": 64}},
+            {"count_bounds": {"minimum": 1, "maximum": 63}},
+            {"expected_last_periods": ["2098"]},
+            {"schema_reviewed": False},
+            {"classification_revision": "HS-OTHER"},
+            {
+                "measure_units": [
+                    {"measure": "trade_value", "unit": "YYY"},
+                    {"measure": "net_weight", "unit": "invented-mass"},
+                ]
+            },
+            {"value_precision": 7},
+            {"value_scale": 1},
+            {"price_amount": "1", "price_unavailable_reason": ""},
+            {"price_currency": "XXX"},
+            {"price_retrieved_on": "2026-11-15"},
+            {"price_source": "invented-note"},
+            {"price_unavailable_reason": "price_absent"},
+        ]
+    )
+    for override in overrides:
+        assert policy_sha256(invented_policy(**override)) != original
 
 
 def test_unsupported_reset_and_a_boundary_crossing(tmp_path: Path) -> None:

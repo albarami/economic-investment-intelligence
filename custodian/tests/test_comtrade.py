@@ -17,6 +17,7 @@ from custodian.tests.fixtures.comtrade.invented import (
     invented_entry,
     invented_policy,
     policy_document,
+    trusted_source,
 )
 
 from eii_custodian.publicdata.comtrade.assemble import assemble
@@ -752,7 +753,11 @@ def test_null_measure_and_unit_mapping(tmp_path: Path) -> None:
     )
     assert result.failure is None
     assembled = assemble(
-        tmp_path, "un_comtrade", invented_policy(), manifest_sha256=result.digest
+        tmp_path,
+        "un_comtrade",
+        invented_policy(),
+        manifest_sha256=result.digest,
+        **trusted_source(),
     )
     quantities = [row for row in assembled.rows if row.measure == "net_weight"]
     assert quantities
@@ -953,6 +958,7 @@ def test_assemble_refuses_a_changed_child(tmp_path: Path) -> None:
             "un_comtrade",
             invented_policy(),
             manifest_sha256=fetched.digest,
+            **trusted_source(),
         )
     except SafeRefusal as exc:
         assert exc.check == "child_hash"

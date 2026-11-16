@@ -315,16 +315,17 @@ def perform(
 
     if not isinstance(policy, Policy) or not isinstance(descriptor, Descriptor):
         raise OpenerFault("descriptor")
+    secret = header_value or ""
     if not direction_ok(policy, descriptor):
-        raise refusal(policy, descriptor, "mirror_direction") from None
+        raise refusal(policy, descriptor, "mirror_direction", secret) from None
     family = descriptor.endpoint_family.casefold()
     forbidden = family in FORBIDDEN_FAMILIES or any(
         token in family for token in FORBIDDEN_FAMILIES
     )
     if forbidden:
-        raise refusal(policy, descriptor, "forbidden_endpoint") from None
+        raise refusal(policy, descriptor, "forbidden_endpoint", secret) from None
     if not url_approved(policy, descriptor):
-        raise refusal(policy, descriptor, "blocked_host") from None
+        raise refusal(policy, descriptor, "blocked_host", secret) from None
     url = _checked_url(policy, descriptor)
     if header_value and _url_has_secret(url, header_value):
         raise refusal_hiding(policy, descriptor, "query_key", header_value) from None
@@ -337,9 +338,9 @@ def perform(
     try:
         result = opener(request)
     except OpenerFault:
-        raise refusal(policy, descriptor, "provider_error") from None
+        raise refusal(policy, descriptor, "provider_error", secret) from None
     except (OSError, ValueError, UnicodeError):
-        raise refusal(policy, descriptor, "provider_error") from None
+        raise refusal(policy, descriptor, "provider_error", secret) from None
     if result.location:
         _refuse_redirect(policy, descriptor, result.location, header_value)
     return result
@@ -377,8 +378,9 @@ def _refuse_redirect(
     if not isinstance(policy, Policy) or not isinstance(descriptor, Descriptor):
         raise OpenerFault("descriptor")
     lowered = location.casefold()
+    header = header_value or ""
     if any(token in lowered for token in FORBIDDEN_FAMILIES):
-        raise refusal(policy, descriptor, "forbidden_endpoint") from None
+        raise refusal(policy, descriptor, "forbidden_endpoint", header) from None
     parts = urlsplit(location)
     template = policy.template(descriptor.api_class, descriptor.endpoint_family)
     request_host = template.host if template is not None else ""
@@ -392,8 +394,8 @@ def _refuse_redirect(
     allowed = frozenset(item.casefold() for item in policy.allowed_redirect_hosts)
     allowed = allowed | {request_host}
     if parts.scheme.casefold() != "https" or secret or keyed_query:
-        raise refusal(policy, descriptor, "redirect_host") from None
+        raise refusal(policy, descriptor, "redirect_host", header) from None
     if redirect_host not in allowed:
-        raise refusal(policy, descriptor, "redirect_host") from None
+        raise refusal(policy, descriptor, "redirect_host", header) from None
     if header_value and redirect_host != request_host:
-        raise refusal(policy, descriptor, "cross_origin_credential") from None
+        raise refusal(policy, descriptor, "cross_origin_credential", header) from None
