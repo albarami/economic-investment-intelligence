@@ -97,6 +97,7 @@ class Schema:
     fields: tuple[str, ...]
     kind: str
     context: tuple[str, ...]
+    splits: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -170,7 +171,7 @@ def _violations(schema: Schema) -> tuple[Violation, ...]:
     for field in schema.fields:
         name = _normalised(field)
         category = DENIED_BY_NAME.get(name)
-        if category is None or name in allowed:
+        if category is None or name in allowed or name in schema.splits:
             continue
         found.append(Violation(schema.path, schema.name, field, category))
     return tuple(found)
@@ -341,8 +342,13 @@ def _yaml_schemas(
         )
         declared = tuple(name for name in ("sex", "age_code") if name in row)
         declarations.extend((str(path), key, name) for name in declared)
+        splits = tuple(
+            _normalised(str(item)) for item in row.get("public_splits") or ()
+        )
         if columns or declared:
-            schemas.append(Schema(str(path), key, columns + declared, "yaml", context))
+            schemas.append(
+                Schema(str(path), key, columns + declared, "yaml", context, splits)
+            )
     return tuple(schemas), tuple(declarations)
 
 
@@ -585,6 +591,40 @@ def test_scan_refuses_a_root_that_is_not_a_folder(tmp_path: Path) -> None:
     with pytest.raises(ValueError) as caught:
         scan_tree((missing,))
     assert str(caught.value) == f"scan root is not a folder: {missing}"
+
+
+def test_public_splits_allow_only_the_named_column(tmp_path: Path) -> None:
+    """A public split allows that column name and no other column."""
+    bare = tmp_path / "bare.yaml"
+    bare.write_text(
+        "sources:\n"
+        "  - key: invented-employees-bare\n"
+        "    source_id: invented_employees\n"
+        "    columns:\n"
+        "      - name: nationality\n"
+        "        type: string\n",
+        encoding="utf-8",
+    )
+    shifted = tmp_path / "shifted.yaml"
+    shifted.write_text(
+        "sources:\n"
+        "  - key: invented-employees-shifted\n"
+        "    source_id: invented_employees\n"
+        "    public_splits:\n"
+        "      - nationality\n"
+        "    columns:\n"
+        "      - name: nationality_code\n"
+        "        type: string\n",
+        encoding="utf-8",
+    )
+    bare_scan = scan_tree((tmp_path,), bare)
+    shifted_scan = scan_tree((tmp_path,), shifted)
+    assert [
+        (item.schema, item.field, item.category) for item in bare_scan.violations
+    ] == [("invented-employees-bare", "nationality", "nationality")]
+    assert [
+        (item.schema, item.field, item.category) for item in shifted_scan.violations
+    ] == [("invented-employees-shifted", "nationality_code", "nationality")]
 
 
 def test_scan_refuses_a_named_registry_that_is_not_a_file(tmp_path: Path) -> None:
