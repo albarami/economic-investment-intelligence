@@ -16,6 +16,8 @@ QATAR_REPORTER = "QAT"
 PARSER_METHOD = "comtrade.parse"
 PARSER_VERSION = "1"
 SCHEMA_VERSION = 1
+CALENDAR_DAY = "calendar_day"
+KEYED_SLOT = "keyed_slot"
 PERIOD_YEAR_LENGTH = 4
 PERIOD_MONTH_LENGTH = 7
 DAY_LENGTH = 10
@@ -54,6 +56,8 @@ POLICY_FIELDS = frozenset(
         "subdivision_values",
         "response_schema",
         "count_bounds",
+        "expected_last_periods",
+        "schema_reviewed",
         "classification_revision",
         "measure_units",
         "value_precision",
@@ -81,6 +85,12 @@ SCHEMA_FIELDS = frozenset(
         "value_field",
         "quantity_field",
         "flag_field",
+        "classification_field",
+        "revision_field",
+        "aggregation_field",
+        "customs_field",
+        "transport_field",
+        "valuation_field",
     }
 )
 
@@ -135,6 +145,12 @@ class ResponseSchema:
     value_field: str
     quantity_field: str
     flag_field: str
+    classification_field: str
+    revision_field: str
+    aggregation_field: str
+    customs_field: str
+    transport_field: str
+    valuation_field: str
 
 
 @dataclass(frozen=True)
@@ -179,6 +195,8 @@ class Policy:
     subdivision_values: tuple[tuple[str, tuple[str, ...]], ...]
     response_schema: ResponseSchema
     count_bounds: CountBounds
+    expected_last_periods: tuple[str, ...]
+    schema_reviewed: bool
     classification_revision: str
     measure_units: tuple[tuple[str, str], ...]
     value_precision: int
@@ -297,6 +315,12 @@ def activation_check(
         return "period_bounds"
     if not _frequencies_match(policy):
         return "period_frequency"
+    if policy.reset_rule != CALENDAR_DAY:
+        return "reset_rule"
+    if policy.quota_scope != KEYED_SLOT:
+        return "quota_scope"
+    if policy.schema_reviewed is not True:
+        return "schema_pending"
     return None
 
 
@@ -341,6 +365,36 @@ def url_approved(policy: Policy, descriptor: Descriptor) -> bool:
     hosts = frozenset(item.host for item in policy.endpoint_templates)
     decision = approve_closed(url, hosts=hosts, selectors=descriptor.selectors())
     return decision.ok
+
+
+def refusal_hiding(
+    policy: Policy, descriptor: Descriptor, check: str, secret: str
+) -> SafeRefusal:
+    """Build a refusal whose URL and endpoint id omit a credential-bearing selector."""
+    if secret == "" or secret not in descriptor.endpoint_id():
+        return refusal(policy, descriptor, check)
+    template = policy.template(descriptor.api_class, descriptor.endpoint_family)
+    host = "invalid.example"
+    path = "/refused"
+    if (
+        template is not None
+        and secret not in template.host
+        and secret not in template.path
+    ):
+        host = template.host
+        path = template.path
+    selectors = tuple(
+        (name, value)
+        for name, value in descriptor.selectors()
+        if secret not in name and secret not in value
+    )
+    try:
+        url = canonical_https(host, path, selectors)
+    except ValueError:
+        url = "https://invalid.example/refused"
+    if secret in url:
+        url = "https://invalid.example/refused"
+    return SafeRefusal(check, url, "redacted")
 
 
 def refusal(policy: Policy, descriptor: Descriptor, check: str) -> SafeRefusal:
@@ -444,6 +498,8 @@ def _activated(raw: Mapping[object, object]) -> Policy:
         subdivision_values=subdivisions[1],
         response_schema=schema,
         count_bounds=bounds,
+        expected_last_periods=_expected_periods(raw.get("expected_last_periods")),
+        schema_reviewed=_reviewed(raw.get("schema_reviewed")),
         classification_revision=_text_value(raw, "classification_revision"),
         measure_units=measures,
         value_precision=precision,
@@ -556,6 +612,12 @@ def _schema(value: object) -> ResponseSchema:
         value_field=texts["value_field"],
         quantity_field=texts["quantity_field"],
         flag_field=texts["flag_field"],
+        classification_field=texts["classification_field"],
+        revision_field=texts["revision_field"],
+        aggregation_field=texts["aggregation_field"],
+        customs_field=texts["customs_field"],
+        transport_field=texts["transport_field"],
+        valuation_field=texts["valuation_field"],
     )
 
 
@@ -640,9 +702,33 @@ def _non_negative(raw: Mapping[object, object], name: str) -> int:
     return value
 
 
+def _expected_periods(value: object) -> tuple[str, ...]:
+    if not isinstance(value, list) or not value:
+        raise PolicyError("expected_last_periods")
+    found: list[str] = []
+    for item in value:
+        if not isinstance(item, str):
+            raise PolicyError("expected_last_periods")
+        if _YEAR_TEXT.fullmatch(item) or _MONTH_TEXT.fullmatch(item):
+            found.append(item)
+            continue
+        raise PolicyError("expected_last_periods")
+    if len(found) != len(set(found)):
+        raise PolicyError("expected_last_periods")
+    return tuple(sorted(found))
+
+
+def _reviewed(value: object) -> bool:
+    if not isinstance(value, bool):
+        raise PolicyError("schema_reviewed")
+    return value
+
+
 def _policy_payload(policy: Policy) -> dict[str, object]:
+    schema = policy.response_schema
     return {
         "access_tier": policy.access_tier,
+        "allowed_redirect_hosts": list(policy.allowed_redirect_hosts),
         "chapters": list(policy.chapters),
         "classification_revision": policy.classification_revision,
         "count_bounds": {
@@ -660,6 +746,9 @@ def _policy_payload(policy: Policy) -> dict[str, object]:
             }
             for item in policy.endpoint_templates
         ],
+        "evidence_sha256": policy.evidence_sha256,
+        "evidence_url": policy.evidence_url,
+        "expected_last_periods": list(policy.expected_last_periods),
         "flows": list(policy.flows),
         "frequencies": list(policy.frequencies),
         "keyed_record_limit": policy.keyed_record_limit,
@@ -668,13 +757,44 @@ def _policy_payload(policy: Policy) -> dict[str, object]:
         ],
         "mirror_partner_keys": list(policy.mirror_partner_keys),
         "periods": list(policy.periods),
+        "price_amount": policy.price_amount,
+        "price_currency": policy.price_currency,
+        "price_retrieved_on": policy.price_retrieved_on,
+        "price_source": policy.price_source,
+        "price_unavailable_reason": policy.price_unavailable_reason,
         "public_record_limit": policy.public_record_limit,
         "quota_scope": policy.quota_scope,
         "reporter_key": policy.reporter_key,
         "reset_rule": policy.reset_rule,
+        "response_schema": {
+            "aggregation_field": schema.aggregation_field,
+            "classification_field": schema.classification_field,
+            "count_field": schema.count_field,
+            "customs_field": schema.customs_field,
+            "error_field": schema.error_field,
+            "flag_field": schema.flag_field,
+            "flow_field": schema.flow_field,
+            "partner2_field": schema.partner2_field,
+            "partner_field": schema.partner_field,
+            "period_field": schema.period_field,
+            "product_field": schema.product_field,
+            "quantity_field": schema.quantity_field,
+            "record_array": schema.record_array,
+            "reporter_field": schema.reporter_field,
+            "revision_field": schema.revision_field,
+            "transport_field": schema.transport_field,
+            "truncation_field": schema.truncation_field,
+            "valuation_field": schema.valuation_field,
+            "value_field": schema.value_field,
+        },
+        "schema_reviewed": policy.schema_reviewed,
         "subdivision_fields": list(policy.subdivision_fields),
+        "subdivision_values": {
+            name: list(values) for name, values in policy.subdivision_values
+        },
         "value_precision": policy.value_precision,
         "value_scale": policy.value_scale,
+        "verified_on": policy.verified_on,
         "version": policy.version,
     }
 

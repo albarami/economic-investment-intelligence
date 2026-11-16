@@ -42,7 +42,7 @@ from eii_custodian.publicdata.fetch.report import (
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
 from eii_custodian.publicdata.fetch.transport import (
     Opener,
-    SlotSecrets,
+    SlotReader,
     StreamTransport,
     Transport,
 )
@@ -107,7 +107,7 @@ def _comtrade_dispatch(
     clock: Clock,
     sleep: Sleeper,
     opener: Opener | None,
-    slots: SlotSecrets | None,
+    slots: SlotReader | None,
     lines: list[str],
 ) -> FetchFailure | None:
     """Dispatch one Comtrade row. A missing opener never opens a socket."""
@@ -262,7 +262,7 @@ def run_build(
     gravity_stream: StreamTransport | None = None,
     atlas_stream: StreamTransport | None = None,
     opener: Opener | None = None,
-    slots: SlotSecrets | None = None,
+    slots: SlotReader | None = None,
 ) -> BuildOutcome:
     """Fetch each row in order, then run the public_data stage."""
     manifests: dict[str, str] = {}

@@ -9,6 +9,7 @@ from dataclasses import replace
 from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
 
+import pytest
 from custodian.tests.fixtures.comtrade.invented import (
     HOST,
     MARKER,
@@ -153,10 +154,9 @@ def test_reversed_fetch_leaves_no_manifest(tmp_path: Path) -> None:
     cells = initial_partitions(policy)
     bad = cells[0].descriptor(policy, "keyed")
     bad = replace(bad, series_role="reporter", reporter_code="ZZA", partner_code="QAT")
-    try:
+    with pytest.raises(SafeRefusal) as caught:
         perform(policy, bad, "invented-header", opener)
-    except SafeRefusal as exc:
-        assert exc.check == "mirror_direction"
+    assert caught.value.check == "mirror_direction"
     assert not (tmp_path / entry.key / "manifest.json").exists()
 
 
@@ -214,8 +214,8 @@ def test_injected_transport_reads_no_environment() -> None:
     live = Spy()
     found = slot_secrets(live, injected=False)
     assert found is not None
-    assert live.seen == [PRIMARY_ENV, SECONDARY_ENV]
-    assert repr(found) == "SlotSecrets(redacted)"
+    assert live.seen == []
+    assert "redacted" in repr(found)
     assert MARKER not in repr(found)
 
 
@@ -293,12 +293,12 @@ def test_exact_limit_splits_and_an_indivisible_leaf_does_not_complete(
     tmp_path: Path,
 ) -> None:
     """A count equal to the cap is split. A capped leaf with no further split writes no manifest."""
-    policy = invented_policy(keyed_record_limit=1, daily_calls=30)
+    policy = invented_policy(keyed_record_limit=2, daily_calls=40)
     entry = invented_entry(policy)
 
     def opener(request: PreparedRequest) -> AttemptResult:
         query = dict(parse_qsl(urlsplit(request.url).query))
-        count = 0 if "product" in query else 1
+        count = 1 if "product" in query else 2
         return AttemptResult("ok", body_for(request, count=count))
 
     result = fetch_source(
@@ -340,7 +340,7 @@ def test_exact_limit_splits_and_an_indivisible_leaf_does_not_complete(
 def test_public_cap_and_truncation_flag(tmp_path: Path) -> None:
     """The public class uses its own cap, and a truncation flag writes no manifest."""
     policy = invented_policy(
-        public_record_limit=1,
+        public_record_limit=2,
         frequencies=["annual"],
         periods=["2099"],
         flows=["flow-in"],
@@ -351,7 +351,7 @@ def test_public_cap_and_truncation_flag(tmp_path: Path) -> None:
     def opener(request: PreparedRequest) -> AttemptResult:
         seen.append(request.header_name)
         query = dict(parse_qsl(urlsplit(request.url).query))
-        count = 0 if "product" in query else 1
+        count = 1 if "product" in query else 2
         return AttemptResult("ok", body_for(request, count=count))
 
     result = fetch_source(
@@ -474,9 +474,8 @@ def test_secondary_follows_only_primary_exhaustion(tmp_path: Path) -> None:
     )
     assert throttled.failure is not None
     assert throttled.failure.check == "throttled"
-    assert set(headers) == {"primary-marker"}
-    assert slept
-    assert max(slept) < 86_400
+    assert headers == ["primary-marker"]
+    assert slept == []
 
     absent_calls: list[str] = []
 
@@ -522,19 +521,15 @@ def test_forbidden_hosts_and_redirects_do_not_send(tmp_path: Path) -> None:
 
     for family in ("deliver", "bulk", "async"):
         planted = replace(cell, endpoint_family=family)
-        try:
+        with pytest.raises(SafeRefusal) as caught:
             perform(policy, planted, "invented-header", opener)
-        except SafeRefusal as exc:
-            assert exc.check == "forbidden_endpoint"
-        else:
-            raise AssertionError(family)
+        assert caught.value.check == "forbidden_endpoint"
     assert sent == []
-    try:
+    with pytest.raises(SafeRefusal) as missing:
         perform(
             policy, replace(cell, endpoint_family="missing"), "invented-header", opener
         )
-    except SafeRefusal as exc:
-        assert exc.check == "blocked_host"
+    assert missing.value.check == "blocked_host"
     redirected = AttemptResult(
         "ok",
         body_for(cell and _dummy_request()),
@@ -547,11 +542,10 @@ def test_forbidden_hosts_and_redirects_do_not_send(tmp_path: Path) -> None:
             "ok", body_for(request), location="https://evil.example/data"
         )
 
-    try:
+    with pytest.raises(SafeRefusal) as redirected_refusal:
         perform(policy, cell, "invented-header", redirect_opener)
-    except SafeRefusal as exc:
-        assert exc.check == "redirect_host"
-        assert "evil.example" not in str(exc)
+    assert redirected_refusal.value.check == "redirect_host"
+    assert "evil.example" not in str(redirected_refusal.value)
     assert all("evil.example" not in url for url in sent)
 
     def cross(request: PreparedRequest) -> AttemptResult:
@@ -562,11 +556,10 @@ def test_forbidden_hosts_and_redirects_do_not_send(tmp_path: Path) -> None:
             header_echo=MARKER,
         )
 
-    try:
+    with pytest.raises(SafeRefusal) as crossed:
         perform(policy, cell, "invented-header", cross)
-    except SafeRefusal as exc:
-        assert exc.check == "cross_origin_credential"
-        assert MARKER not in str(exc)
+    assert crossed.value.check == "cross_origin_credential"
+    assert MARKER not in str(crossed.value)
     result = fetch_source(
         entry,
         tmp_path,
@@ -758,35 +751,25 @@ def test_null_measure_and_unit_mapping(tmp_path: Path) -> None:
         SlotSecrets("invented-header", ""),
     )
     assert result.failure is None
-    assembled = assemble(tmp_path, "un_comtrade", invented_policy())
+    assembled = assemble(
+        tmp_path, "un_comtrade", invented_policy(), manifest_sha256=result.digest
+    )
     quantities = [row for row in assembled.rows if row.measure == "net_weight"]
     assert quantities
     assert all(row.value is None for row in quantities)
     assert all(row.unit == "invented-mass" for row in quantities)
     assert assembled.gap_cells == 0
     bad = invented_policy(measure_units=[{"measure": "trade_value", "unit": "XXX"}])
-    try:
-        fetch_source(
-            invented_entry(bad),
-            tmp_path / "unit",
-            _clock,
-            _sleep,
-            _ok,
-            SlotSecrets("invented-header", ""),
-        )
-    except SafeRefusal as exc:
-        assert exc.check == "unit_mapping"
-    else:
-        refused = fetch_source(
-            invented_entry(bad),
-            tmp_path / "unit2",
-            _clock,
-            _sleep,
-            _ok,
-            SlotSecrets("invented-header", ""),
-        )
-        assert refused.failure is not None
-        assert refused.failure.check == "unit_mapping"
+    refused = fetch_source(
+        invented_entry(bad),
+        tmp_path / "unit",
+        _clock,
+        _sleep,
+        _ok,
+        SlotSecrets("invented-header", ""),
+    )
+    assert refused.failure is not None
+    assert refused.failure.check == "unit_mapping"
 
 
 def test_duplicate_accept_is_refused() -> None:
@@ -818,20 +801,20 @@ def test_interrupted_manifest_is_not_complete(tmp_path: Path) -> None:
 
     os.replace = boom
     try:
-        try:
-            fetch_source(
-                invented_entry(),
-                tmp_path,
-                _clock,
-                _sleep,
-                _ok,
-                SlotSecrets("invented-header", ""),
-            )
-        except OSError:
-            pass
+        result = fetch_source(
+            invented_entry(),
+            tmp_path,
+            _clock,
+            _sleep,
+            _ok,
+            SlotSecrets("invented-header", ""),
+        )
     finally:
         os.replace = real
+    assert result.failure is not None
+    assert result.failure.check == "write_failed"
     assert not (tmp_path / "un_comtrade" / "manifest.json").exists()
+    assert not (tmp_path / "un_comtrade" / ".manifest.json.partial").exists()
 
 
 def test_planted_policy_shapes_are_refused() -> None:
@@ -901,6 +884,12 @@ def test_parser_refuses_a_number_a_short_total_and_extra_scale() -> None:
         "primaryValue": "1.25",
         "qty": None,
         "flag": "",
+        "classificationCode": "HS-INVENTED",
+        "classificationRevision": descriptor.classification_revision,
+        "aggregationLevel": 2,
+        "customsCode": "customs-invented",
+        "transportCode": "mode-invented",
+        "valuationBasis": "value-invented",
     }
     numbered = dict(record)
     numbered["primaryValue"] = 1.25
@@ -941,7 +930,7 @@ def test_parser_refuses_a_number_a_short_total_and_extra_scale() -> None:
 
 def test_assemble_refuses_a_changed_child(tmp_path: Path) -> None:
     """A child whose bytes no longer match the manifest digest is refused."""
-    fetch_source(
+    fetched = fetch_source(
         invented_entry(),
         tmp_path,
         _clock,
@@ -949,6 +938,7 @@ def test_assemble_refuses_a_changed_child(tmp_path: Path) -> None:
         _ok,
         SlotSecrets("invented-header", ""),
     )
+    assert fetched.failure is None
     folder = tmp_path / "un_comtrade"
     skipped = {"manifest.json", "coverage.json", "state.json"}
     children = [
@@ -958,7 +948,12 @@ def test_assemble_refuses_a_changed_child(tmp_path: Path) -> None:
     ]
     children[0].write_bytes(children[0].read_bytes() + b" ")
     try:
-        assemble(tmp_path, "un_comtrade", invented_policy())
+        assemble(
+            tmp_path,
+            "un_comtrade",
+            invented_policy(),
+            manifest_sha256=fetched.digest,
+        )
     except SafeRefusal as exc:
         assert exc.check == "child_hash"
     else:

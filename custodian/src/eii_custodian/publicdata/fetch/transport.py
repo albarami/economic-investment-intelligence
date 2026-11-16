@@ -9,8 +9,8 @@ from contextlib import AbstractContextManager, contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass
 from http.client import HTTPException, HTTPMessage
-from typing import IO
-from urllib.parse import urlsplit
+from typing import IO, Protocol
+from urllib.parse import unquote, urlsplit
 
 from eii_custodian.publicdata.fetch.allowlist import approve
 
@@ -243,6 +243,10 @@ class SlotSecrets:
 
     def for_slot(self, slot: str) -> str:
         """Return one slot's header value. An unknown slot is empty."""
+        return self.read_slot(slot)
+
+    def read_slot(self, slot: str) -> str:
+        """Return one slot's header value. An unknown slot is empty."""
         if slot == "primary":
             return self.primary
         if slot == "secondary":
@@ -259,6 +263,9 @@ class PreparedRequest:
     header_value: str
     endpoint_id: str
 
+    def __repr__(self) -> str:
+        return "PreparedRequest(redacted)"
+
 
 @dataclass(frozen=True)
 class AttemptResult:
@@ -269,6 +276,16 @@ class AttemptResult:
     location: str = ""
     error_text: str = ""
     header_echo: str = ""
+
+    def __repr__(self) -> str:
+        return f"AttemptResult(category={self.category!r})"
+
+
+class SlotReader(Protocol):
+    """Reads one slot variable when a permitted request is about to be sent."""
+
+    def read_slot(self, slot: str) -> str:
+        """Return the header value for the named slot."""
 
 
 class OpenerFault(Exception):
@@ -292,9 +309,9 @@ def perform(
         Policy,
         direction_ok,
         refusal,
+        refusal_hiding,
         url_approved,
     )
-    from eii_custodian.publicdata.fetch.allowlist import secret_in_url
 
     if not isinstance(policy, Policy) or not isinstance(descriptor, Descriptor):
         raise OpenerFault("descriptor")
@@ -309,8 +326,8 @@ def perform(
     if not url_approved(policy, descriptor):
         raise refusal(policy, descriptor, "blocked_host") from None
     url = _checked_url(policy, descriptor)
-    if header_value and secret_in_url(url, header_value):
-        raise refusal(policy, descriptor, "query_key") from None
+    if header_value and _url_has_secret(url, header_value):
+        raise refusal_hiding(policy, descriptor, "query_key", header_value) from None
     request = PreparedRequest(
         url=url,
         header_name=HEADER_NAME if header_value else "",
@@ -326,6 +343,14 @@ def perform(
     if result.location:
         _refuse_redirect(policy, descriptor, result.location, header_value)
     return result
+
+
+def _url_has_secret(url: str, secret: str) -> bool:
+    from eii_custodian.publicdata.fetch.allowlist import secret_in_url
+
+    if secret_in_url(url, secret):
+        return True
+    return secret in unquote(url)
 
 
 def _checked_url(policy: object, descriptor: object) -> str:

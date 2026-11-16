@@ -6,13 +6,8 @@ import json
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 
-from eii_custodian.publicdata.comtrade.policy import Descriptor, Policy
+from eii_custodian.publicdata.comtrade.policy import SOURCE_ID, Descriptor, Policy
 
-AGGREGATION_CHAPTER = 2
-CLASSIFICATION = "HS-INVENTED"
-CUSTOMS = "customs-invented"
-TRANSPORT = "mode-invented"
-VALUATION = "value-invented"
 MEASURE_VALUE = "trade_value"
 MEASURE_QUANTITY = "net_weight"
 
@@ -21,6 +16,7 @@ MEASURE_QUANTITY = "net_weight"
 class TradeRow:
     """One published measure. A null measure stays null and is never zero."""
 
+    source_id: str
     series_role: str
     reporter_code: str
     partner_code: str
@@ -91,6 +87,8 @@ def parse_body(
         raise ParseError("metadata_unreadable")
     schema = policy.response_schema
     error_text = _optional_text(loaded.get(schema.error_field))
+    if error_text:
+        raise ParseError("provider_error")
     records = loaded.get(schema.record_array)
     if not isinstance(records, list):
         raise ParseError("metadata_unreadable")
@@ -111,7 +109,7 @@ def parse_body(
                 raise ParseError("duplicate_key")
             seen.add(row.full_key())
             rows.append(row)
-    return ParsedBody(tuple(rows), counted, truncated, error_text)
+    return ParsedBody(tuple(rows), counted, truncated, "")
 
 
 class ParseError(Exception):
@@ -136,27 +134,21 @@ def _rows_for(
     _expect(record, schema.partner_field, descriptor.partner_code)
     _expect(record, schema.period_field, descriptor.period)
     _expect(record, schema.flow_field, descriptor.flow_code)
-    product = record.get(schema.product_field)
-    if not isinstance(product, str) or product == "":
-        raise ParseError("schema_retyped")
-    if descriptor.chapter not in product and descriptor.subdivision:
-        product = _product_from_subdivision(descriptor, product)
-    partner2 = record.get(schema.partner2_field)
-    if partner2 is None:
-        partner2_code = ""
-    elif isinstance(partner2, str):
-        partner2_code = partner2
-    else:
-        raise ParseError("schema_retyped")
-    flags = record.get(schema.flag_field)
-    if flags is None:
-        flag_text = ""
-    elif isinstance(flags, str):
-        flag_text = flags
-    else:
-        raise ParseError("schema_retyped")
+    product = _required_text(record, schema.product_field)
+    _product_member(policy, descriptor, product)
+    revision = _required_text(record, schema.revision_field)
+    if revision != descriptor.classification_revision:
+        raise ParseError("selection_membership")
+    classification = _required_text(record, schema.classification_field)
+    customs = _required_text(record, schema.customs_field)
+    transport = _required_text(record, schema.transport_field)
+    valuation = _required_text(record, schema.valuation_field)
+    aggregation = _aggregation(record, schema.aggregation_field)
+    partner2_code = _optional_code(record, schema.partner2_field)
+    flag_text = _optional_code(record, schema.flag_field)
     value_row = _measure(
-        record.get(schema.value_field),
+        record,
+        schema.value_field,
         policy,
         MEASURE_VALUE,
         descriptor,
@@ -165,9 +157,16 @@ def _rows_for(
         flag_text,
         source_version,
         receipt_sha256,
+        classification,
+        revision,
+        aggregation,
+        customs,
+        transport,
+        valuation,
     )
     quantity_row = _measure(
-        record.get(schema.quantity_field),
+        record,
+        schema.quantity_field,
         policy,
         MEASURE_QUANTITY,
         descriptor,
@@ -176,12 +175,19 @@ def _rows_for(
         flag_text,
         source_version,
         receipt_sha256,
+        classification,
+        revision,
+        aggregation,
+        customs,
+        transport,
+        valuation,
     )
-    return tuple(row for row in (value_row, quantity_row) if row is not None)
+    return (value_row, quantity_row)
 
 
 def _measure(
-    raw: object,
+    record: dict[str, object],
+    field: str,
     policy: Policy,
     measure: str,
     descriptor: Descriptor,
@@ -190,7 +196,16 @@ def _measure(
     flags: str,
     source_version: str,
     receipt_sha256: str,
-) -> TradeRow | None:
+    classification: str,
+    revision: str,
+    aggregation: int,
+    customs: str,
+    transport: str,
+    valuation: str,
+) -> TradeRow:
+    if field not in record:
+        raise ParseError("measure_missing")
+    raw = record[field]
     if raw is None:
         value: Decimal | None = None
     elif isinstance(raw, str):
@@ -200,30 +215,6 @@ def _measure(
     unit = dict(policy.measure_units).get(measure)
     if unit is None:
         raise ParseError("unit_mapping")
-    if raw is None and measure == MEASURE_QUANTITY:
-        return _row(
-            descriptor,
-            product,
-            partner2_code,
-            measure,
-            None,
-            unit,
-            flags,
-            source_version,
-            receipt_sha256,
-        )
-    if raw is None:
-        return _row(
-            descriptor,
-            product,
-            partner2_code,
-            measure,
-            None,
-            unit,
-            flags,
-            source_version,
-            receipt_sha256,
-        )
     return _row(
         descriptor,
         product,
@@ -234,6 +225,12 @@ def _measure(
         flags,
         source_version,
         receipt_sha256,
+        classification,
+        revision,
+        aggregation,
+        customs,
+        transport,
+        valuation,
     )
 
 
@@ -247,8 +244,15 @@ def _row(
     flags: str,
     source_version: str,
     receipt_sha256: str,
+    classification: str,
+    revision: str,
+    aggregation: int,
+    customs: str,
+    transport: str,
+    valuation: str,
 ) -> TradeRow:
     return TradeRow(
+        source_id=SOURCE_ID,
         series_role=descriptor.series_role,
         reporter_code=descriptor.reporter_code,
         partner_code=descriptor.partner_code,
@@ -256,13 +260,13 @@ def _row(
         frequency=descriptor.frequency,
         period=descriptor.period,
         flow_code=descriptor.flow_code,
-        classification=CLASSIFICATION,
-        classification_revision=descriptor.classification_revision,
+        classification=classification,
+        classification_revision=revision,
         product_code=product,
-        aggregation_level=AGGREGATION_CHAPTER,
-        customs_code=CUSTOMS,
-        transport_mode_code=TRANSPORT,
-        valuation_basis=VALUATION,
+        aggregation_level=aggregation,
+        customs_code=customs,
+        transport_mode_code=transport,
+        valuation_basis=valuation,
         measure=measure,
         value=value,
         unit=unit,
@@ -279,16 +283,20 @@ def _decimal(text: str, policy: Policy) -> Decimal:
         raise ParseError("value_type") from exc
     if not value.is_finite():
         raise ParseError("value_type")
-    exponent = value.as_tuple().exponent
-    digits = value.as_tuple().digits
+    numeric = value.as_tuple()
+    exponent = numeric.exponent
     if not isinstance(exponent, int):
         raise ParseError("value_overflow")
-    if exponent < -policy.value_scale:
+    fractional = -exponent if exponent < 0 else 0
+    if value == 0:
+        integer_digits = 0
+    elif exponent >= 0:
+        integer_digits = len(numeric.digits) + exponent
+    else:
+        integer_digits = max(0, len(numeric.digits) + exponent)
+    capacity = policy.value_precision - policy.value_scale
+    if fractional > policy.value_scale or integer_digits > capacity:
         raise ParseError("value_overflow")
-    if len(digits) > policy.value_precision:
-        raise ParseError("value_overflow")
-    if value == 0 and text.strip() in {"", "null"}:
-        raise ParseError("substituted_zero")
     return value
 
 
@@ -298,7 +306,19 @@ def _expect(record: dict[str, object], field: str, expected: str) -> None:
         raise ParseError("selection_membership")
 
 
-def _optional_text(value: object) -> str:
+def _required_text(record: dict[str, object], field: str) -> str:
+    if field not in record:
+        raise ParseError("dimension_missing")
+    value = record[field]
+    if not isinstance(value, str) or value == "":
+        raise ParseError("dimension_missing")
+    return value
+
+
+def _optional_code(record: dict[str, object], field: str) -> str:
+    if field not in record:
+        return ""
+    value = record[field]
     if value is None:
         return ""
     if isinstance(value, str):
@@ -306,6 +326,29 @@ def _optional_text(value: object) -> str:
     raise ParseError("schema_retyped")
 
 
-def _product_from_subdivision(descriptor: Descriptor, product: str) -> str:
-    del descriptor
-    return product
+def _aggregation(record: dict[str, object], field: str) -> int:
+    if field not in record:
+        raise ParseError("dimension_missing")
+    value = record[field]
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ParseError("schema_retyped")
+    return value
+
+
+def _product_member(policy: Policy, descriptor: Descriptor, product: str) -> None:
+    requested = dict(descriptor.subdivision)
+    if "product" in requested:
+        allowed = dict(policy.subdivision_values).get("product", ())
+        if requested["product"] not in allowed or product != requested["product"]:
+            raise ParseError("product_membership")
+        return
+    if product != descriptor.chapter:
+        raise ParseError("product_membership")
+
+
+def _optional_text(value: object) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value
+    raise ParseError("schema_retyped")

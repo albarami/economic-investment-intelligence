@@ -16,7 +16,7 @@ from eii_custodian.publicdata.fetch.registry import RegistryError, load_registry
 from eii_custodian.publicdata.fetch.report import log_line
 from eii_custodian.publicdata.fetch.transport import (
     Response,
-    SlotSecrets,
+    SlotReader,
     StreamTransport,
     Transport,
     open_attempt,
@@ -34,14 +34,37 @@ PRIMARY_ENV = "COMTRADE_PRIMARY_API_KEY"
 SECONDARY_ENV = "COMTRADE_SECONDARY_API_KEY"
 
 
-def slot_secrets(environ: Mapping[str, str], *, injected: bool) -> SlotSecrets | None:
-    """Read the two slot names only when this command itself opens the connection."""
+class _SlotAccess:
+    """Reads one slot variable at the moment a permitted request is sent."""
+
+    def __init__(self, environ: Mapping[str, str]) -> None:
+        self._environ = environ
+
+    def read_slot(self, slot: str) -> str:
+        """Return the selected slot's variable. The other slot is not read."""
+        if slot == "primary":
+            name = PRIMARY_ENV
+        elif slot == "secondary":
+            name = SECONDARY_ENV
+        else:
+            return ""
+        try:
+            return self._environ[name]
+        except KeyError:
+            return ""
+
+    def __repr__(self) -> str:
+        return "_SlotAccess(redacted)"
+
+    def __getstate__(self) -> object:
+        raise TypeError("credential accessor is not serializable")
+
+
+def slot_secrets(environ: Mapping[str, str], *, injected: bool) -> SlotReader | None:
+    """Pass a reader only when this command itself opens the connection."""
     if injected:
         return None
-    return SlotSecrets(
-        primary=environ.get(PRIMARY_ENV, ""),
-        secondary=environ.get(SECONDARY_ENV, ""),
-    )
+    return _SlotAccess(environ)
 
 
 def run(

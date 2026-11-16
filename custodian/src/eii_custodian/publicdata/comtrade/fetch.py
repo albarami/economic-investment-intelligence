@@ -1,4 +1,4 @@
-"""Orchestrate one Comtrade run. Reservations happen before each send."""
+"""Orchestrate one Comtrade run. One reservation is consumed before each send."""
 
 from __future__ import annotations
 
@@ -8,10 +8,12 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, timedelta
 from pathlib import Path
+from urllib.parse import quote
 
 from eii_custodian.publicdata.comtrade.parse import ParseError, parse_body
 from eii_custodian.publicdata.comtrade.partition import (
     Partition,
+    closed_partitions,
     initial_partitions,
     missing_cells,
     next_subdivision,
@@ -38,17 +40,16 @@ from eii_custodian.publicdata.comtrade.state import (
     release,
     replace_pending,
     reserve,
+    roll_budget,
     write_ledger,
 )
-from eii_custodian.publicdata.fetch.receipts import sha256_hex, sidecar_for
+from eii_custodian.publicdata.fetch.receipts import commit_pair, sha256_hex, sidecar_for
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 from eii_custodian.publicdata.fetch.transport import (
-    BACKOFF_S,
-    MAX_RETRIES,
     AttemptResult,
     Opener,
-    OpenerFault,
-    SlotSecrets,
+    SlotReader,
     perform,
 )
 
@@ -57,7 +58,6 @@ Clock = Callable[[], str]
 MANIFEST_NAME = "manifest.json"
 COVERAGE_NAME = "coverage.json"
 EXHAUSTION_SIGNAL = "calls_reached"
-TERMS_MARKER = "terms to be read"
 
 
 @dataclass(frozen=True)
@@ -84,18 +84,28 @@ class FetchResult:
     gap_cells: int
 
 
+class _EmptySlots:
+    """A reader for a run that was not given credentials."""
+
+    def read_slot(self, slot: str) -> str:
+        """Return an empty header. Nothing is read from the environment."""
+        del slot
+        return ""
+
+
 def fetch_source(
     entry: Entry,
     cache: Path,
     clock: Clock,
     sleep: Sleeper,
     opener: Opener,
-    slots: SlotSecrets | None,
+    slots: SlotReader | None,
     *,
     api_class: str = "keyed",
     requested_slot: str | None = None,
 ) -> FetchResult:
     """Fetch one activated row through an injected opener. No complete manifest on failure."""
+    del sleep
     policy = entry.comtrade_policy
     check = activation_check(
         policy if isinstance(policy, (Policy, UnconfirmedPolicy)) else None,
@@ -112,7 +122,6 @@ def fetch_source(
     if entry.commit_allowed or entry.terms_words == "":
         return _stopped("commit_forbidden", policy)
     directory = cache / entry.key
-    today = _day(clock())
     try:
         acquire(directory)
     except StateError as exc:
@@ -123,13 +132,13 @@ def fetch_source(
             policy,
             directory,
             clock,
-            sleep,
             opener,
-            slots or SlotSecrets("", ""),
+            slots if slots is not None else _EmptySlots(),
             api_class,
             requested_slot,
-            today,
         )
+    except OSError:
+        return _stopped("write_failed", policy)
     finally:
         release(directory)
 
@@ -155,14 +164,13 @@ def _run(
     policy: Policy,
     directory: Path,
     clock: Clock,
-    sleep: Sleeper,
     opener: Opener,
-    slots: SlotSecrets,
+    slots: SlotReader,
     api_class: str,
     requested_slot: str | None,
-    today: str,
 ) -> FetchResult:
     initial = initial_partitions(policy)
+    today = _day(clock())
     try:
         ledger = load_or_new(
             directory,
@@ -170,35 +178,53 @@ def _run(
             selection_sha256=selection_sha256(policy),
             pending=tuple(item.key() for item in initial),
             today=today,
+            reset_rule=policy.reset_rule,
         )
     except StateError as exc:
         return _stopped(exc.check, policy)
-    index = {item.key(): item for item in _all_known(initial, policy)}
+    problem = _verify_stored(directory, ledger)
+    if problem is not None:
+        return _fail(policy, problem, ledger, directory, initial, api_class)
+    index = {item.key(): item for item in closed_partitions(policy)}
     while ledger.pending:
+        today = _day(clock())
+        try:
+            rolled = roll_budget(ledger, today, policy.reset_rule)
+        except StateError as exc:
+            return _fail(policy, exc.check, ledger, directory, initial, api_class)
+        if rolled is not ledger:
+            ledger = rolled
+            write_ledger(directory, ledger)
         key = ledger.pending[0]
         partition = index.get(key)
         if partition is None:
-            return _fail(policy, "stale_state", ledger, directory, initial)
-        slot = _slot(ledger, policy, slots, api_class, requested_slot)
+            return _fail(policy, "stale_state", ledger, directory, initial, api_class)
+        slot = _slot(ledger, policy, api_class, requested_slot)
         if slot.startswith("fail:"):
             reason = slot.removeprefix("fail:")
             saved = note_incomplete(ledger, reason, _next_day(today))
             write_ledger(directory, saved)
             _write_coverage(directory, policy, initial, saved)
-            return _result(policy, _refusal(policy, reason), initial, saved)
-        header = "" if api_class == "public" else slots.for_slot(slot)
-        if api_class == "keyed" and header == "":
-            return _fail(policy, "primary_absent", ledger, directory, initial)
+            return _result(policy, _refusal(policy, reason), initial, saved, api_class)
+        header = ""
+        if api_class != "public":
+            header = slots.read_slot(slot)
+            if header == "":
+                reason = "primary_absent" if slot == "primary" else "budget_exhausted"
+                saved = note_incomplete(ledger, reason, _next_day(today))
+                write_ledger(directory, saved)
+                _write_coverage(directory, policy, initial, saved)
+                return _result(
+                    policy, _refusal(policy, reason), initial, saved, api_class
+                )
         ledger = reserve(ledger, slot)
         write_ledger(directory, ledger)
         descriptor = partition.descriptor(policy, api_class)
-        outcome, ledger = _send(
-            policy, descriptor, header, opener, sleep, ledger, slot, directory
-        )
+        outcome, ledger = _send(policy, descriptor, header, opener, ledger)
         if isinstance(outcome, SafeRefusal):
             write_ledger(directory, ledger)
             _write_coverage(directory, policy, initial, ledger)
-            return _result(policy, outcome, initial, ledger)
+            return _result(policy, outcome, initial, ledger, api_class)
         if isinstance(outcome, _Split):
             for child in outcome.children:
                 index[child.key()] = child
@@ -208,35 +234,52 @@ def _run(
             write_ledger(directory, ledger)
             continue
         assert isinstance(outcome, _Accepted)
-        body = outcome.body
-        parsed_count = outcome.count
-        limit = outcome.limit
-        digest = sha256_hex(body)
-        _store_child(
-            entry,
-            directory,
-            policy,
-            partition,
-            digest,
-            body,
-            parsed_count,
-            limit,
-            ledger,
-            api_class,
-        )
         try:
-            ledger = accept(ledger, key, digest)
+            _store_child(
+                entry,
+                directory,
+                policy,
+                partition,
+                sha256_hex(outcome.body),
+                outcome.body,
+                outcome.count,
+                outcome.limit,
+                ledger,
+                api_class,
+                clock(),
+            )
+        except OSError:
+            return _fail(policy, "write_failed", ledger, directory, initial, api_class)
+        try:
+            ledger = accept(ledger, key, sha256_hex(outcome.body))
         except StateError as exc:
-            return _fail(policy, exc.check, ledger, directory, initial)
+            return _fail(policy, exc.check, ledger, directory, initial, api_class)
         write_ledger(directory, ledger)
+    problem = _verify_stored(directory, ledger)
+    if problem is not None:
+        return _fail(policy, problem, ledger, directory, initial, api_class)
+    total = _stored_count(directory, ledger)
+    if total < policy.count_bounds.minimum or total > policy.count_bounds.maximum:
+        return _fail(policy, "count_bounds", ledger, directory, initial, api_class)
+    if not _periods_observed(policy, ledger):
+        return _fail(policy, "missing_period", ledger, directory, initial, api_class)
     missing = missing_cells(initial, ledger.pending, ledger.completed)
     _write_coverage(directory, policy, initial, ledger, missing)
     if missing:
-        return _result(policy, _refusal(policy, "coverage_gap"), initial, ledger)
-    digest = _write_manifest(directory, policy, initial, ledger, missing)
-    host = policy.endpoint_templates[0].host
+        return _result(
+            policy, _refusal(policy, "coverage_gap"), initial, ledger, api_class
+        )
+    try:
+        digest = _write_manifest(directory, policy, initial, ledger, missing)
+    except OSError:
+        return _fail(policy, "write_failed", ledger, directory, initial, api_class)
     return FetchResult(
-        None, digest, host, len(initial), len(initial) - len(missing), len(missing)
+        None,
+        digest,
+        _host_for(policy, api_class),
+        len(initial),
+        len(initial) - len(missing),
+        len(missing),
     )
 
 
@@ -245,39 +288,24 @@ def _send(
     descriptor: object,
     header: str,
     opener: Opener,
-    sleep: Sleeper,
     ledger: Ledger,
-    slot: str,
-    directory: Path,
 ) -> tuple[SafeRefusal | _Split | _Accepted, Ledger]:
-    """Return a body, child partitions, or a refusal. Retries consume reservations."""
+    """Send once. A throttle stops the run and does not reserve another call."""
     from eii_custodian.publicdata.comtrade.policy import Descriptor
 
     if not isinstance(descriptor, Descriptor):
         return _refusal(policy, "mirror_direction"), ledger
-    attempt = 0
-    current = ledger
-    while True:
-        try:
-            result = perform(policy, descriptor, header or None, opener)
-        except SafeRefusal as exc:
-            return exc, current
-        except OpenerFault:
-            return _refusal(policy, "provider_error", descriptor), current
-        if result.category == "auth":
-            return _refusal(policy, "authentication", descriptor), current
-        if result.category == "throttle":
-            if attempt < MAX_RETRIES:
-                sleep(BACKOFF_S[attempt])
-                attempt += 1
-                current = reserve(current, slot)
-                write_ledger(directory, current)
-                continue
-            return _refusal(policy, "throttled", descriptor), current
-        if result.category != "ok":
-            return _refusal(policy, "http_status", descriptor), current
-        classified = _classify(policy, descriptor, result, header)
-        return classified, current
+    try:
+        result = perform(policy, descriptor, header or None, opener)
+    except SafeRefusal as exc:
+        return exc, ledger
+    if result.category == "auth":
+        return _refusal(policy, "authentication", descriptor), ledger
+    if result.category == "throttle":
+        return _refusal(policy, "throttled", descriptor), ledger
+    if result.category != "ok":
+        return _refusal(policy, "http_status", descriptor), ledger
+    return _classify(policy, descriptor, result, header), ledger
 
 
 def _classify(
@@ -287,9 +315,9 @@ def _classify(
 
     if not isinstance(descriptor, Descriptor):
         return _refusal(policy, "mirror_direction")
-    if header and result.header_echo:
+    if header and (result.header_echo or _body_holds(result.body, header)):
         return _refusal(policy, "provider_error", descriptor)
-    if result.error_text:
+    if result.error_text or _body_holds(result.body, header):
         return _refusal(policy, "provider_error", descriptor)
     limit = policy.limit_for(descriptor.api_class)
     try:
@@ -305,30 +333,33 @@ def _classify(
     if parsed.truncated or parsed.raw_count > limit:
         return _refusal(policy, "truncation", descriptor)
     if parsed.raw_count == limit:
-        field = _field_for(policy, descriptor)
+        field = next_subdivision(policy, _partition_from_descriptor(descriptor))
         if field is None:
             return _refusal(policy, "unresolved_truncation", descriptor)
-        partition = _partition_from_descriptor(descriptor)
-        children = subdivide(policy, partition, field)
+        children = subdivide(policy, _partition_from_descriptor(descriptor), field)
         if not children:
             return _refusal(policy, "unresolved_truncation", descriptor)
         return _Split(children)
     return _Accepted(result.body, parsed.raw_count, limit)
 
 
-def _field_for(policy: Policy, descriptor: object) -> str | None:
-    from eii_custodian.publicdata.comtrade.policy import Descriptor
-
-    if not isinstance(descriptor, Descriptor):
-        return None
-    return next_subdivision(policy, _partition_from_descriptor(descriptor))
+def _body_holds(body: bytes, secret: str) -> bool:
+    if secret == "":
+        return False
+    raw = secret.encode("utf-8")
+    if raw in body:
+        return True
+    encoded = quote(secret, safe="").encode("utf-8")
+    return encoded != raw and encoded in body
 
 
 def _partition_from_descriptor(descriptor: object) -> Partition:
     from eii_custodian.publicdata.comtrade.policy import Descriptor
 
     if not isinstance(descriptor, Descriptor):
-        raise OpenerFault("descriptor")
+        raise SafeRefusal(
+            "mirror_direction", "https://invalid.example/refused", "descriptor"
+        )
     return Partition(
         series_role=descriptor.series_role,
         partner_code=descriptor.partner_code
@@ -345,7 +376,6 @@ def _partition_from_descriptor(descriptor: object) -> Partition:
 def _slot(
     ledger: Ledger,
     policy: Policy,
-    slots: SlotSecrets,
     api_class: str,
     requested: str | None,
 ) -> str:
@@ -357,12 +387,10 @@ def _slot(
     if requested == "secondary" and primary_open:
         return "fail:premature_secondary"
     if primary_open:
-        if slots.primary == "":
-            return "fail:primary_absent"
         return "primary"
     if policy.daily_exhaustion_signal != EXHAUSTION_SIGNAL:
         return "fail:exhaustion_signal"
-    if ledger.secondary_calls >= policy.daily_calls or slots.secondary == "":
+    if ledger.secondary_calls >= policy.daily_calls:
         return "fail:budget_exhausted"
     return "secondary"
 
@@ -378,22 +406,25 @@ def _store_child(
     limit: int,
     ledger: Ledger,
     api_class: str,
+    retrieved_utc: str,
 ) -> None:
+    host = _host_for(policy, api_class)
     side = sidecar_for(
         entry,
         digest=digest,
         nbytes=len(body),
         fetch_url=_fetch_url(policy, partition, api_class),
-        fetch_host=policy.endpoint_templates[0].host,
-        retrieved_utc=ledger.budget_period + "T00:00:00Z",
+        fetch_host=host,
+        retrieved_utc=retrieved_utc,
         publisher=entry.publisher,
         source_modified="",
         row_count=count,
-        terms_sha256="",
+        terms_sha256=terms_text_sha256(entry.terms_words.encode("utf-8")),
     )
     side.update(
         {
             "policy_sha256": policy_sha256(policy),
+            "evidence_sha256": policy.evidence_sha256,
             "source_version": policy.version,
             "partition_key": partition.key(),
             "parent_key": partition.parent_key,
@@ -407,16 +438,7 @@ def _store_child(
             },
         }
     )
-    target = directory / f"{digest}.json"
-    partial = directory / f".{digest}.json.partial"
-    partial.write_bytes(body)
-    os.replace(partial, target)
-    meta = directory / f"{digest}.meta.json"
-    meta_partial = directory / f".{digest}.meta.json.partial"
-    meta_partial.write_text(
-        json.dumps(side, sort_keys=True, ensure_ascii=True) + "\n", encoding="utf-8"
-    )
-    os.replace(meta_partial, meta)
+    commit_pair(directory, digest, "json", body, side)
 
 
 def _fetch_url(policy: Policy, partition: Partition, api_class: str) -> str:
@@ -450,8 +472,7 @@ def _write_coverage(
         "requested_cells": len(initial),
         "source_id": SOURCE_ID,
     }
-    path = directory / COVERAGE_NAME
-    path.write_text(json.dumps(payload, sort_keys=True) + "\n", encoding="utf-8")
+    _atomic_text(directory / COVERAGE_NAME, json.dumps(payload, sort_keys=True) + "\n")
 
 
 def _write_manifest(
@@ -479,21 +500,74 @@ def _write_manifest(
         "source_id": SOURCE_ID,
     }
     text = json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n"
-    partial = directory / ".manifest.json.partial"
-    target = directory / MANIFEST_NAME
-    partial.write_text(text, encoding="utf-8")
-    os.replace(partial, target)
+    _atomic_text(directory / MANIFEST_NAME, text)
     return sha256_hex(text.encode("utf-8"))
 
 
-def _all_known(initial: tuple[Partition, ...], policy: Policy) -> tuple[Partition, ...]:
-    """Include one generation of children so a resumed split can be indexed."""
-    found = list(initial)
-    for partition in initial:
-        field = next_subdivision(policy, partition)
-        if field is not None:
-            found.extend(subdivide(policy, partition, field))
-    return tuple(found)
+def _atomic_text(path: Path, text: str) -> None:
+    partial = path.with_name("." + path.name + ".partial")
+    try:
+        partial.write_text(text, encoding="utf-8")
+        os.replace(partial, path)
+    except OSError:
+        partial.unlink(missing_ok=True)
+        raise
+
+
+def _verify_stored(directory: Path, ledger: Ledger) -> str | None:
+    for _key, digest in ledger.child_sha256:
+        body = directory / f"{digest}.json"
+        side_path = directory / f"{digest}.meta.json"
+        if not body.is_file():
+            return "child_missing"
+        if sha256_hex(body.read_bytes()) != digest:
+            return "child_hash"
+        if not side_path.is_file():
+            return "receipt_missing"
+        try:
+            loaded = json.loads(side_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return "receipt_missing"
+        if not isinstance(loaded, dict):
+            return "receipt_missing"
+        owners = {
+            item for item, item_digest in ledger.child_sha256 if item_digest == digest
+        }
+        if loaded.get("sha256") != digest or loaded.get("partition_key") not in owners:
+            return "child_hash"
+    return None
+
+
+def _stored_count(directory: Path, ledger: Ledger) -> int:
+    total = 0
+    for _key, digest in ledger.child_sha256:
+        loaded = json.loads(
+            (directory / f"{digest}.meta.json").read_text(encoding="utf-8")
+        )
+        count = loaded.get("count") if isinstance(loaded, dict) else None
+        if isinstance(count, bool) or not isinstance(count, int):
+            return -1
+        total += count
+    return total
+
+
+def _periods_observed(policy: Policy, ledger: Ledger) -> bool:
+    seen = {_period_of(key) for key, _digest in ledger.child_sha256}
+    return all(period in seen for period in policy.expected_last_periods)
+
+
+def _period_of(key: str) -> str:
+    for part in key.split("|"):
+        if part.startswith("period="):
+            return part.removeprefix("period=")
+    return ""
+
+
+def _host_for(policy: Policy, api_class: str) -> str:
+    template = policy.template(api_class, "data")
+    if template is None:
+        return policy.endpoint_templates[0].host
+    return template.host
 
 
 def _fail(
@@ -502,19 +576,28 @@ def _fail(
     ledger: Ledger,
     directory: Path,
     initial: tuple[Partition, ...],
+    api_class: str,
 ) -> FetchResult:
     write_ledger(directory, ledger)
     _write_coverage(directory, policy, initial, ledger)
-    return _result(policy, _refusal(policy, check), initial, ledger)
+    return _result(policy, _refusal(policy, check), initial, ledger, api_class)
 
 
 def _result(
-    policy: Policy, failure: SafeRefusal, initial: tuple[Partition, ...], ledger: Ledger
+    policy: Policy,
+    failure: SafeRefusal,
+    initial: tuple[Partition, ...],
+    ledger: Ledger,
+    api_class: str,
 ) -> FetchResult:
     missing = missing_cells(initial, ledger.pending, ledger.completed)
-    host = policy.endpoint_templates[0].host
     return FetchResult(
-        failure, "", host, len(initial), len(initial) - len(missing), len(missing)
+        failure,
+        "",
+        _host_for(policy, api_class),
+        len(initial),
+        len(initial) - len(missing),
+        len(missing),
     )
 
 

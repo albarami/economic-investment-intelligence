@@ -79,8 +79,15 @@ def policy_document(**overrides: object) -> dict[str, object]:
             "value_field": "primaryValue",
             "quantity_field": "qty",
             "flag_field": "flag",
+            "classification_field": "classificationCode",
+            "revision_field": "classificationRevision",
+            "aggregation_field": "aggregationLevel",
+            "customs_field": "customsCode",
+            "transport_field": "transportCode",
+            "valuation_field": "valuationBasis",
         },
         "count_bounds": {"minimum": 1, "maximum": 64},
+        "schema_reviewed": True,
         "classification_revision": REVISION,
         "measure_units": [
             {"measure": "trade_value", "unit": "XXX"},
@@ -95,6 +102,11 @@ def policy_document(**overrides: object) -> dict[str, object]:
         "price_unavailable_reason": "price_not_recorded",
     }
     document.update(overrides)
+    if "expected_last_periods" not in overrides:
+        periods = document["periods"]
+        document["expected_last_periods"] = (
+            list(periods) if isinstance(periods, list) else []
+        )
     return document
 
 
@@ -151,18 +163,26 @@ def body_for(
     query = dict(parse_qsl(urlsplit(request.url).query))
     product = query.get("product", query.get("chapter", CHAPTER))
     records = []
-    for _index in range(count):
+    for index in range(count):
         records.append(
             {
                 "reporterCode": query.get("reporter", ""),
                 "partnerCode": query.get("partner", ""),
-                "partner2Code": None,
+                "partner2Code": None
+                if index == 0
+                else f"row-{chr(ord('b') + index - 1)}",
                 "period": query.get("period", ""),
                 "flowCode": query.get("flow", ""),
                 "cmdCode": product,
                 "primaryValue": "1.25",
                 "qty": None,
                 "flag": "",
+                "classificationCode": "HS-INVENTED",
+                "classificationRevision": query.get("revision", REVISION),
+                "aggregationLevel": 2 + index,
+                "customsCode": "customs-invented",
+                "transportCode": "mode-invented",
+                "valuationBasis": "value-invented",
                 "error": None,
             }
         )

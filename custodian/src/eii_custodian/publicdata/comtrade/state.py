@@ -91,6 +91,7 @@ def load_or_new(
     selection_sha256: str,
     pending: tuple[str, ...],
     today: str,
+    reset_rule: str,
 ) -> Ledger:
     """Load the ledger. A changed selection keeps the old counters and is refused."""
     path = directory / STATE_NAME
@@ -103,7 +104,17 @@ def load_or_new(
         raise StateError("selection_changed")
     if ledger.policy_sha256 != policy_sha256:
         raise StateError("stale_state")
-    if len(ledger.budget_period) != CLOCK_DATE_LENGTH:
+    return roll_budget(ledger, today, reset_rule)
+
+
+def roll_budget(ledger: Ledger, today: str, reset_rule: str) -> Ledger:
+    """Apply the one supported reset. A later calendar day clears both slot counters."""
+    if reset_rule != "calendar_day":
+        raise StateError("reset_rule")
+    if (
+        len(today) != CLOCK_DATE_LENGTH
+        or len(ledger.budget_period) != CLOCK_DATE_LENGTH
+    ):
         raise StateError("stale_state")
     if ledger.budget_period > today:
         raise StateError("stale_state")

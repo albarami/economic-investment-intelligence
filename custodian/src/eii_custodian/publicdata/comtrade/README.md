@@ -13,7 +13,7 @@ Until that reading is recorded, activation refuses the fetch.
 
 ## Confirmed mapping
 
-None. Field names in the tests are invented. The release columns are the contract in document 03, section 7.3, table `pub_comtrade_trade`. A null source measure stays null. Measure and unit pairs come only from the reviewed mapping. No currency is converted.
+None. Field names in the tests are invented. The release columns are the contract in document 03, section 7.3, table `pub_comtrade_trade`. A production row copies each dimension from the response through the closed schema mapping. A dimension the answer does not hold is refused. A null source measure stays null only when the answer states null. The mapping stays unreviewed, and activation refuses, until the lead records the source schema. Measure and unit pairs come only from the reviewed mapping. No currency is converted.
 
 ## Limits
 
@@ -21,7 +21,7 @@ Budgets and record caps are fields of `comtrade_policy`, not constants in code. 
 
 ## Credentials
 
-Only `scripts/commands/build_public.py` reads the two environment names, and only when that command itself opens the connection. The header name is `Ocp-Apim-Subscription-Key`. Tests pass an invented marker in memory and never open a socket.
+Only `scripts/commands/build_public.py` can read the two environment names, and only when that command itself opens the connection. It passes an accessor that reads the selected slot's variable at the moment of that slot's permitted request. A skipped row, a failed activation and an injected transport read neither name. The header name is `Ocp-Apim-Subscription-Key`. Tests pass an invented marker in memory and never open a socket. There is no automatic retry: a throttle stops the run with the ledger written, and the next permitted run continues.
 
 ## Failure text
 

@@ -55,6 +55,57 @@ class Partition:
         )
 
 
+def closed_partitions(policy: Policy) -> tuple[Partition, ...]:
+    """Return every cell the closed subdivision tree can name, at every depth."""
+    found: dict[str, Partition] = {}
+    queue = list(initial_partitions(policy))
+    while queue:
+        partition = queue.pop(0)
+        if partition.key() in found:
+            continue
+        found[partition.key()] = partition
+        field = next_subdivision(policy, partition)
+        if field is None:
+            continue
+        queue.extend(subdivide(policy, partition, field))
+    return tuple(found[key] for key in sorted(found))
+
+
+def covered_leaves(
+    policy: Policy, partition: Partition, present: set[str]
+) -> tuple[str, ...] | None:
+    """Return the disjoint leaves that cover one cell, or None when the cover is partial."""
+    field = next_subdivision(policy, partition)
+    children = subdivide(policy, partition, field) if field is not None else ()
+    if partition.key() in present:
+        if _descendant_present(policy, children, present):
+            return None
+        return (partition.key(),)
+    if not children:
+        return None
+    leaves: list[str] = []
+    for child in children:
+        found = covered_leaves(policy, child, present)
+        if found is None:
+            return None
+        leaves.extend(found)
+    return tuple(leaves)
+
+
+def _descendant_present(
+    policy: Policy, children: tuple[Partition, ...], present: set[str]
+) -> bool:
+    for child in children:
+        if child.key() in present:
+            return True
+        field = next_subdivision(policy, child)
+        if field is None:
+            continue
+        if _descendant_present(policy, subdivide(policy, child, field), present):
+            return True
+    return False
+
+
 def initial_partitions(policy: Policy) -> tuple[Partition, ...]:
     """Expand the closed selection. Nothing is chosen from a fetched ranking."""
     found: list[Partition] = []
