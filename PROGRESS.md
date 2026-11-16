@@ -27425,6 +27425,257 @@ Seed:      none
 Notes:     The nine work commits of S3-T07 on main bf46058: the catalogues, the three join passes, mutation parts A and B, the mutation closing step and fix passes 4 and 5 of the clean-environment test, each a Conventional Commit.
 ```
 
+#### Catalogue foundations: code review round 2: APPROVED
+
+Reviewed commit `f1b498a`. OpenAI GPT-6 Astra through Codex; a maker other than that commit's builder.
+
+```text
+VERDICT: APPROVED
+TASK: S3-T07 (local commit), round 2
+COMMIT: f1b498a8e370da1199fe2fab42929061a9f1c5cf
+REVIEWER: OpenAI GPT-6 (Codex)
+SKILLS LOADED: strict-reviewer; task-standards; project-orientation; sanad-provenance; muhasabah-gate; code-review unavailable; security-review unavailable
+EARLIER FINDINGS:
+  F1 FIXED ReturnedFact carries validated breakdown metadata; _match_one checks it against the slot; _overlapping_slot refuses overlapping provenance sets with otherwise equal binding fields. test_fix2_f1_* plants both earlier failures and preserves the correctly bound pair.
+  F2 FIXED _slot rejects employee_count question slots. Brief questions, layout fact properties and stage highlights refuse employee_count facts. test_fix2_f2_* covers all four routes; application-owned match_slots remains available.
+  F3 FIXED returned_fact_refusal and _fact_fields check string types before regex and membership operations. test_fix2_f3_* covers numeric lineage and unhashable metadata; breakdown type plants are also present.
+  F4 FIXED Slots, layout fact properties and stage highlights share returned_fact_refusal, including identifier, lineage, field and suppression checks. test_fix2_f4_* supplies separate suppression and missing-lineage plants with valid controls.
+  F5 FIXED test_fix2_f5_* plants boolean and NaN coordinates and numeric and string boolean-property values, asserting literal refusal codes and paths with positive controls.
+CHECKS:
+  REV-10 PASS TASKS.md S3-T07 acceptance criteria remain covered by the foundation tests; the added breakdown and overlapping-provenance plants close the earlier swapped-slot gap.
+  REV-11 PASS Under the brief's local-review arrangement, EVIDENCE.md records the lead's product suite with 324 passed, core suite with 109 passed, custodian suite with 536 passed, script suite with 687 tests, and documentation check, all exit 0. New guards have plants and recorded break checks. The complete ./eii test and browser stage were not run; hosted checks follow at the task's turn. No tests were run during this read-only review.
+  REV-12 PASS DIFF.patch changes only four catalogue implementation files and two catalogue test files; all address F1–F5.
+  REV-13 PASS Changed production functions implement concrete validation. No placeholder, stub or fabricated release table is introduced.
+  REV-14 PASS No secret or real record appears in the fix patch. EVIDENCE.md records the lead's private-pattern documentation check exiting 0.
+  REV-15 PASS The existing reuse test changes only its fixture to avoid the newly forbidden overlap; its SLOT_FACT_REUSED assertion remains intact. No threshold, skip, suppression or existing assertion is weakened.
+  REV-16 PASS The fix preserves the catalogue foundation scope and pinned vocabulary. Runtime metadata validation now addresses the earlier malformed-type defect.
+  REV-17 OPEN P1 Documentation checking exits 0 in the lead's evidence; the deferred ledger, status and dependency records remain explicitly outstanding in RULINGS.md.
+  REV-18 PASS The changed paths perform local validation only; they introduce no network access, query execution, credentials or record logging.
+  REV-19 PASS The patch implements the five accepted findings without reopening a settled decision or adding deferred product functionality.
+  REV-20 PASS Shared metadata validation closes the lineage and suppression bypasses; checked breakdown binding and overlap refusal close the earlier semantic ambiguity. The fix adds no calculation or displayed figure.
+  REV-21 PASS Company facts and invalid fact metadata now refuse at the brief entry points identified in round 1. The fix introduces no rendered prose or numeral-scanner bypass.
+  REV-22 PASS No partition, treatment, export, privacy parameter or attack-suite code changes.
+  REV-23 PASS Changed product modules import only standard-library and product catalogue modules; EVIDENCE.md records the product suite passing.
+  REV-24 OPEN P1 No shipped bilingual template changes in this fix; the pending native-Arabic-review designation remains deferred.
+  REV-25 PASS No private path, personal identifier, confidential content or prohibited comparison appears in the fix patch; the lead records both documentation scans exiting 0.
+  REV-26 PASS No prohibited product claim is introduced. Test wording remains invented validation input.
+  REV-27 PASS Neither instruction file changes; EVIDENCE.md records cmp AGENTS.md CLAUDE.md exiting 0.
+  REV-28 PASS Added tests use artificial fact identifiers and invented metadata; no register row or realistic personal identifier is introduced.
+  REV-29 PASS employee_count is refused at question-slot loading and at question, layout and highlight fact-reference routes. Existing subject restrictions remain intact.
+  REV-38 PASS The changed modules introduce no gateway import, provider setting, live call or gateway-derived screen content.
+FINDINGS: none
+PROPOSED OPEN ITEMS:
+  P1 (REV-17; REV-24) record — Carry forward the earlier deferred task ledger/status, product PyYAML dependency/lock work and pending native-Arabic-review designation. RULINGS.md item 4 expressly preserves these deferrals; complete their records at the task's turn.
+```
+
+#### Catalogue foundations: confirmation of join pass 3: APPROVED
+
+Reviewed commit `e57151b`. Moonshot AI Kimi K3.1 Pro High through Devin; a maker other than that commit's builder.
+
+```text
+VERDICT: APPROVED
+TASK: S3-T07, confirmation of join pass 3
+COMMIT: e57151bff9d1433af528ea9a2669119b9e80bcab
+REVIEWER: Moonshot AI Kimi K3.1 Pro High, through Devin
+SKILLS LOADED: strict-reviewer, task-standards, project-orientation, sanad-provenance, muhasabah-gate; code-review and security-review were unavailable under those names, so their plain meanings were followed
+EARLIER FINDING: N1 FIXED
+CHECKS:
+  J1 PASS reachable_locked_names now filters per-entry resolution-markers, refuses multiple active same-name entries, and evaluates optional-edge markers with the selected extra. Existing traversal still handles multi-path extras, cycles, normalised names and root-group exclusion.
+  J2 PASS packaging.markers is used without a hand-written parser or new dependency; packaging 26.3 remains locked and is reachable through pytest and virtualenv.
+  J3 PASS The invented-lock plants pin inactive/active forks, selected and unselected extra markers, and ambiguity refusal; RETURN.join3.md records red-first failures and 15 passing tests with an unchanged real installed set. The transitive-child red drivers are sound exact-set plants, not disguised passes.
+  J4 PASS JOIN3.patch changes only scripts/tests/test_clean_environment.py. Offline sync, cache seeding, the original three assertions, manifests, lock and forced line remain unchanged; no suppression, skip, retry or weakened assertion was added.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Catalogue foundations: review of the mutation pass: APPROVED
+
+Reviewed commit `5827d3e`. Google Gemini 3.1 Pro through Droid; a maker other than that commit's builder.
+
+```text
+VERDICT: APPROVED
+TASK: S3-T07, review of the mutation pass (parts A and B and the closing step)
+COMMIT: 5827d3eec239090a496c8a69f19854340dd3c8fd
+REVIEWER: Google Gemini 3.1 Pro, through Droid
+SKILLS LOADED: strict-reviewer, sanad-provenance
+CHECKS:
+  K1 PASS 10+ survivors checked across all 4 modules (e.g. `test_non_string_fragment_keys_refuse` in `test_catalogue_brief_survivors.py`); refusal text mutants correctly fail against full-text literal assertions.
+  K2 PASS Checked 12 literal rows against AGENTS.md rule 10 in `test_catalogue_breakdown_table.py`; expectations are hand-written and independent.
+  K3 PASS `breakdown == "none"` falls through because "none" is in `BREAKDOWNS` but not in `PUBLIC_BREAKDOWNS` nor `SIMULATED_BREAKDOWNS`, returning `None`.
+  K4 PASS The diffs match `campaignClosing.txt` exactly; `float("INF") == float("inf")` is checkable standard Python behavior.
+  K5 PASS Only new test files added, 2 lines removed from `slots.py`, 2 rows added to `mutation_explained.toml`; no `# noqa`, real PII, or widened tolerances.
+  K6 PASS No defects pinned; tests strictly assert the exact schema validation rules required by document 09 and rules 21/22.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  Record: code-review skill was not found; followed its plain meaning as instructed.
+```
+
+#### Catalogue foundations: confirmation of fix pass 4: APPROVED
+
+Reviewed commit `1671de8`. Google Gemini 3.1 Pro through Droid; a maker other than that commit's builder.
+
+```text
+VERDICT: APPROVED
+TASK: S3-T07, confirmation of fix pass 4
+COMMIT: 1671de8cd9740d421150e11031557d6edfe332f3
+REVIEWER: Factory Gemini 3.1 Pro, through Droid
+SKILLS LOADED: strict-reviewer, code-review, superpowers:verification-before-completion
+CHECKS:
+  C1 PASS `_seed_copy` uses a `st_dev, st_ino` dictionary to preserve hard links and falls back to copy only on `OSError`; `seed_cache` passes `symlinks=True` to `copytree`.
+  C2 PASS `setUpClass` caches the user cache once into `cls.seed`. Ruling on the lead's note: the observation is enough. Because child caches share inodes with the seed via hard links, any in-place file rewrite by `uv` during testing would mutate the shared inode and alter the seed file's size, mtime, or hash.
+  C3 PASS Changed integration tests (`test_lock_is_current`, `test_stale_lock_is_detected`, `test_bare_environment_cannot_import`, `test_hostile_surroundings_do_not_change_the_result`) only update `dir=self._tmp.name` and the seed source; all logic, assertions, and bounds are unchanged.
+  C4 PASS `CacheSeeding.test_seed_preserves_links_across_filesystems_and_children` explicitly mocks `os.link` with `errno.EXDEV` to simulate cross-device failure on an invented fixture, asserting symlink integrity, inter-child inode sharing, and fallback limits. 
+  C5 PASS The size proof in `EVIDENCE.lead.md` shows a peak increase on `/tmp` of 1,489,660 KiB, which is well below the requested bound of 2,451,088 KiB.
+  C6 PASS All changes are confined to `scripts/tests/test_clean_environment.py`; no assertions are weakened, no tests are skipped, and fences are strictly respected.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Catalogue foundations: confirmation of fix pass 5: APPROVED
+
+Reviewed commit `d13b3cc`. Google Gemini 3.1 Pro through Droid; a maker other than that commit's builder.
+
+```text
+VERDICT: APPROVED
+TASK: S3-T07, confirmation of fix pass 5
+COMMIT: d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f
+REVIEWER: Google Gemini 3.1 Pro, through Droid
+SKILLS LOADED: strict-reviewer, code-review, superpowers:verification-before-completion
+CHECKS:
+  C1 PASS `prepare_offline_resolution` and the two tests call `uv lock --offline`, `uv lock --check --offline`, and `uv sync --offline`. None need registry metadata because `pyyaml` is removed and `plant` uses a local file index.
+  C2 PASS `test_stale_lock_is_detected` asserts `current.returncode == 0` before the bump, then asserts exit 1 and "needs to be updated" after the bump.
+  C3 PASS `test_hostile_surroundings_do_not_change_the_result` keeps all checks. The control sync proves the pure-Python wheel installs; the local index and wheel isolate the cutoff failure without causing unrelated errors.
+  C4 PASS The builder's account matches the code. `prepare_offline_resolution` modifies only the disposable copies; full-repository tests still use the unmodified repository lock and manifests.
+  C5 PASS Only the permitted file changed. No weakened assertions, skips, or network calls. The red run and plants reach the tests' own assertions.
+  C6 PASS The `/tmp` inode limit is a pre-existing constraint of `seed_cache` copying across filesystems, outside this fix's scope. It is fit to be recorded as a limit.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  Record the /tmp inode limit when copying a large user cache as a known environment constraint.
+```
+
+#### Catalogue foundations: merge record
+
+- The head that was merged, `3c0fb0ff73e6bb6267e60812b85ae934716bbe1e`, is the work commit `d13b3cc72b2c8b3b81f660713ffe4eb1054ff76f` (approved by the confirmation of fix pass 5) and one ledger commit that changes records only.
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43785574411 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43785574352 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43785574406.
+- The lead's head checks before the merge (evidence file PR63.head.txt of the run's records): every exit code 0; `./eii test --seed 2026111508`: 5252 passed, 0 failed, 0 skipped in 6 suites, RESULT: PASSED.
+- The branch stood on current main (`bf46058cab670138113d6c3cd659dfe3e40caa4c`), so the head was the exact merge result: the whole test above is the test of the merge result.
+- The verdicts were posted on the pull request before the merge: https://github.com/albarami/economic-investment-intelligence/pull/63#issuecomment-6904675507 , https://github.com/albarami/economic-investment-intelligence/pull/63#issuecomment-6904675842 , https://github.com/albarami/economic-investment-intelligence/pull/63#issuecomment-6904676161 , https://github.com/albarami/economic-investment-intelligence/pull/63#issuecomment-6904676669 , https://github.com/albarami/economic-investment-intelligence/pull/63#issuecomment-6904677168 .
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/63 was squash-merged on 2026-11-16 at that head; merge commit `5cfff64819f57fdd490f2261b4e6f82d177dad18` on main, with the same tree as the head (`fb4d84e1594004e90f6b0969fa88e8e9172dd12f` on both). CI on the merge commit, triggered by the push: workflow Dependency Graph success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43788191349 ; workflow Dependency Graph success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43788191509 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43788185706 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43788185636 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43788185686.
+
+### DOCS-0041 — Decision record 0041 and task S3-T20: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/64 )
+
+- What it is: [decision 0041](docs/decisions/0041-remote-mode-through-the-owners-own-host.md), Accepted on 2026-11-16 as the owner's decision of that day: remote mode through the owner's own host. It has ten items: one web entry on the loopback reached through the owner's own tunnel at a host name read from `EII_REMOTE_HOST` and never committed; host and origin rules that accept that name and localhost only; the presenter console kept on the stage machine; the assistant on recorded replays unless the owner's own switch is set; the hosting-off sources kept off; the remote evidence command `./eii remote-check`, authorised here and added to rule 44 by the pull request that builds it; start on boot; phone evidence; the owner's no-login choice and what it means; and placement after the slice S3 gate. The same pull request adds task S3-T20 to TASKS.md after the slice S3 gate paragraph, notes in S3-T11's Depends line that S3-T20 follows the gate, adds the S3-T20 line to document 14, the hardening register line DHA-133 to document 17, and the record to the accepted list and decision index of docs/README.md.
+- Why: the owner's relayed note of 2026-11-16 asked for remote access to the locally running product. A material amendment needs a decision record and never a silent edit (rule 46). Decision records keep their own pull request (rule 33).
+- Class: documents only, Deep in its subject (host and origin boundaries, paid-call control, the hosting-off sources). Lead: Anthropic (Claude Opus 5.5): the placement and timing rulings, the brief, the fix of round 1. Editor: OpenAI GPT-6 through Codex, the draft. Reviewer: Moonshot AI Kimi K3.1 Pro through Droid, which wrote none of the change.
+- Review: round 1 at `0f1dc0add59bf8fa4d1166fe1456728cb15aa082` was REJECTED with two findings: the S3-T20 guards lacked separate planted violations (a second public port, a non-loopback API bind, a cookie without Secure, a cookie without SameSite, a provider-key read and a paid call), and the reviewer's tool could not run the documentation checks. Both were adopted: the lead rewrote three S3-T20 criteria (work commit `65e833d9ab9fba5d9706f0b6b707cedc82e6d337`) and ran the documentation check and the tree check on it, each exit 0. The same reviewer confirmed round 2 APPROVED at the work commit with no finding.
+- Left unchanged: AGENTS.md and CLAUDE.md (S3-T20 adds the remote-check line to rule 44 in its own pull request), every privacy rule, gate, check, hard limit, sandbox rule and source permission. No code, check script, workflow file or test changes. The owner's host name is written nowhere. The record claims no implemented command, remote request, gate approval, source clearance or phone check (rule 47). The S3-gate addendum timing of the remote-check result is the record's stated assumption.
+- The repository's checks cannot tell whether the record reads the owner's note rightly. That judgement belongs to the reviewer, and the owner's choices stay with the owner.
+- Evidence: the commands below, run at the work commit.
+
+#### Evidence for the work commit `65e833d9ab9fba5d9706f0b6b707cedc82e6d337`
+
+```text
+### DOCS-0041 — Decision record 0041 and task S3-T20
+Commit:    65e833d9ab9fba5d9706f0b6b707cedc82e6d337
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 679 text files, 87 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with record 0041, task S3-T20 and the index rows: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### DOCS-0041 — Decision record 0041 and task S3-T20
+Commit:    65e833d9ab9fba5d9706f0b6b707cedc82e6d337
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### DOCS-0041 — Decision record 0041 and task S3-T20
+Commit:    65e833d9ab9fba5d9706f0b6b707cedc82e6d337
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files stay byte-identical; neither changes here.
+```
+
+```text
+### DOCS-0041 — Decision record 0041 and task S3-T20
+Commit:    65e833d9ab9fba5d9706f0b6b707cedc82e6d337
+Command:   bash -c "git diff --name-only 5cfff64819f57fdd490f2261b4e6f82d177dad18 HEAD -- docs/decisions/ | grep -v -E '/0041-' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no earlier decision record is changed)
+Seed:      none
+Notes:     Record 0041 is a new file (rule 46); this row proves on the committed tree that no earlier decision record was edited.
+```
+
+```text
+### DOCS-0041 — Decision record 0041 and task S3-T20
+Commit:    65e833d9ab9fba5d9706f0b6b707cedc82e6d337
+Command:   bash -c "git diff --name-only 5cfff64819f57fdd490f2261b4e6f82d177dad18 HEAD -- scripts .github web core custodian product gateway evals eii | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no code, check script or workflow file is changed)
+Seed:      none
+Notes:     The change is documents only.
+```
+
+```text
+### DOCS-0041 — Decision record 0041 and task S3-T20
+Commit:    65e833d9ab9fba5d9706f0b6b707cedc82e6d337
+Command:   bash -c "git diff --name-only 5cfff64819f57fdd490f2261b4e6f82d177dad18 HEAD | grep -v -E '[.]md$' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (only Markdown files change)
+Seed:      none
+Notes:     Every changed file is a Markdown document.
+```
+
+```text
+### DOCS-0041 — Decision record 0041 and task S3-T20
+Commit:    65e833d9ab9fba5d9706f0b6b707cedc82e6d337
+Command:   ./eii test --seed 2026111509
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    5252 passed, 0 failed, 0 skipped
+Seed:      2026111509
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### DOCS-0041 — Decision record 0041 and task S3-T20
+Commit:    65e833d9ab9fba5d9706f0b6b707cedc82e6d337
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','5cfff64819f57fdd490f2261b4e6f82d177dad18..65e833d9ab9fba5d9706f0b6b707cedc82e6d337'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Both work commits have Conventional Commit subjects.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

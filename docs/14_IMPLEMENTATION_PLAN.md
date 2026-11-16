@@ -435,6 +435,7 @@ Decision 0035 replaces visible-origin clauses in the slice scopes and existing t
 - S3-T17 — Draw the financial centre's firms counted per tower beside the commerce register's companies (decision 0023 item A6).
 - S3-T18 — Remove audience origin marks from the map foundation: Stage, Brief, Fact chips, accessible labels, legends, source drawer, map modes and captures; remove visible origin labels, add scripted absence tests with planted violations and verify backend origin/generator metadata and unchanged method honesty (decision 0035). Depends: S3-T08, S3-T09, S3-T12, S3-T13, S3-T14, S3-T16, S3-T17. Runs before S3-T10 and this slice's review follow-up and gate.
 - S3-T19 — Script the standing audience-origin check: built-screen extraction, templates, catalogue text, audience URLs, speech text and export text, filenames and column headings; remove visible origin labels, add scripted absence tests with planted violations and verify backend origin/generator metadata and unchanged method honesty (decision 0035). Depends: S3-T18. Runs before S3-T10 and this slice's review follow-up and gate.
+- S3-T20 — Remote mode through the owner's own host (decision 0041 items 1 to 10). Runs after the slice S3 gate approves, outside that gate; S3-T10 and S3-T11 do not depend on it. Add the remote-check result to the S3 gate record when it merges and record it at every slice gate from S4 on.
 - S3-T10 — Deliver the bilingual opening scene, end-to-end tests and design audit.
 - S3-T11 — Close every proposed open item of the slice's reviews before the gate (REV-41).
 
