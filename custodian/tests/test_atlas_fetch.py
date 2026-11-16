@@ -160,8 +160,8 @@ def test_atlas_interrupt_keeps_the_complete_manifest(
 
 def test_atlas_hosts_and_binding(tmp_path: Path, monkeypatch) -> None:
     from custodian.tests.fixtures.atlas.invented import configuration
-    from scripts.commands import build_public
 
+    import commands.build_public as build_public
     import eii_custodian.publicdata.fetch.transport as transport
     from eii_custodian.publicdata.atlas.config import Config, safe_url
 

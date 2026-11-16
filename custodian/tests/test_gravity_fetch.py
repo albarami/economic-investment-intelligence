@@ -225,8 +225,8 @@ def test_gravity_entry_and_command(tmp_path: Path, monkeypatch, capsys) -> None:
     from dataclasses import replace
 
     from custodian.tests.fixtures.gravity.invented import configuration
-    from scripts.commands import build_public
 
+    import commands.build_public as build_public
     import eii_custodian.publicdata.fetch.build as module
     from eii_custodian.publicdata.gravity.config import Config
 
@@ -287,8 +287,8 @@ def test_gravity_entry_and_command(tmp_path: Path, monkeypatch, capsys) -> None:
 
 def test_gravity_production_binding_is_separate(tmp_path: Path, monkeypatch) -> None:
     from custodian.tests.fixtures.gravity.invented import configuration
-    from scripts.commands import build_public
 
+    import commands.build_public as build_public
     from eii_custodian.publicdata.gravity.config import Config
 
     config = Config.from_mapping(configuration())
