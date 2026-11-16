@@ -3359,6 +3359,15 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: At `5147fdecdcac222a150464e0e43644d26f89d24d` the campaign of the module made 630 mutants: 494 killed, 131 survived, 5 not covered, exit 1. Placed by `git blame` over the train's commits, all 136 stand on lines main already held (S2-T01, train A, S2-T22, S2-T15) and none on the 61 lines of S2-T21; the explanations file holds no row for the module.
 - NEEDED: a thin test pass of slice S2 kills each survivor or proves it equivalent with a row of the explanations file, before the slice S2 gate; no test of the module is weakened.
 
+### PO-S2-69 — The invented boundary archive followed the clock, so one frame test failed at random
+
+- ID: PO-S2-69
+- TYPE: RANDOM FAILURE
+- RAISED BY: the lead (Anthropic Claude), 2026-11-16, from the clean test run of a local mutation campaign of task S4-T03
+- CONCERNS: `custodian/tests/fixtures/frame/invented.py` (`invented_archive`); `custodian/tests/test_frame_live_survivors.py` (`test_bnd_hdx_receipt_is_kept_under_that_source_id`)
+- EVIDENCE: The mutation tester's clean run failed once: 1 failed, 1,510 passed; the test compared the receipt's hash of the archive built inside the world with the hash of a second build in its assertion, and the two differed. The same test passed alone (13 passed). Cause: `invented_archive` wrote each member with `ZipFile.writestr(name, ...)`, which stamps the member with the current local time, so two builds on either side of a two-second step of the zip time give different bytes; two builds 2.1 seconds apart were reproduced with different hashes.
+- RESOLUTION: the fixture writes each member with a fixed member time and the same permission bits, and the planted test `custodian/tests/test_frame_fixture_archive.py::test_invented_archive_bytes_do_not_follow_the_clock` builds the archive at two clock readings an hour apart and requires one hash; it failed before the fix and passes after it. This closes the item by a found cause, not by a green re-run (rule 39). The inline archive of `custodian/tests/test_frame_coverage.py` is built and read once per test and is not hashed twice; it is left unchanged.
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).
