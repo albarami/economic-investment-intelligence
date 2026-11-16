@@ -698,7 +698,7 @@ The slice gate includes these tasks and their planted violations; no existing ga
 - Every number resolves to a fact with a complete source chain.
 - Every receipt carries the accounting-gate result.
 - The evidence bundle is under 1.5 seconds at the 95th percentile locally.
-- Visual tests pass at wall, laptop and tablet sizes in English and Arabic.
+- Visual tests pass at the eight named sizes in English and Arabic.
 - A drawn area, a radius and a walk or drive time at a chosen hour each return the location evidence; protected figures snap with the snap sentence, and Public and Simulated layers use the exact shape.
 - Presence shows estimated counts with ranges for every situation, the summer switch and the three event days, worded “estimated people around this location”, never as the footfall of a named building or business.
 - Every rank and fit shows its criteria, weights, values and rank-stability sentence; a Public-only mode exists; and no rank is worded as a verdict, a probability, a confidence claim, a forecast or advice to act. A forecast, base-rate or estimate criterion shows its interval, range or counts, method and source in the criteria table, and the site estimate and any criterion with a Simulated or Synthetic input are off in the Public-only mode.
