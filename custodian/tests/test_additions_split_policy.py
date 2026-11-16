@@ -121,6 +121,29 @@ def test_record_gender_is_admitted_only_on_employment_spell() -> None:
     assert validate_table_dimensions(visitors).reason == "forbidden_closed_value"
 
 
+def test_record_gender_refuses_a_nationality_value_in_any_case_or_part() -> None:
+    """Decision 0037's gender column refuses a nationality value as the shared value check reads it."""
+    for value in (
+        "QATARI",
+        "Non-Qatari",
+        "INTERNATIONAL_VISITORS",
+        "note_qatari",
+        "x-citizen",
+    ):
+        spec = TableSpec(
+            "employment_spell",
+            "worker_source",
+            (ColumnSpec("gender", (value,)),),
+        )
+        assert validate_table_dimensions(spec).reason == "forbidden_closed_value", value
+    lawful = TableSpec(
+        "employment_spell",
+        "worker_source",
+        (ColumnSpec("gender", ("female", "male")),),
+    )
+    assert validate_table_dimensions(lawful).reason == "admitted"
+
+
 def test_a_sex_column_on_a_worker_table_fails_and_the_clean_table_passes() -> None:
     """A forbidden word in a column name is refused. A table without one is kept."""
     clean = TableSpec(

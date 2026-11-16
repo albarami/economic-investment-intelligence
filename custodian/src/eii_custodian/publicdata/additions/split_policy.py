@@ -269,7 +269,7 @@ def _record(table: TableSpec) -> Verdict:
             continue
         if (table.name, folded) in _EMPLOYMENT_GENDER and column.name == folded:
             for value in column.closed_values:
-                if value in _NATIONALITY:
+                if _value_parts(value) & _NATIONALITY:
                     return Verdict(False, "forbidden_closed_value")
             continue
         if _parts(column.name) & _FORBIDDEN_PARTS:
@@ -488,7 +488,11 @@ def _category(categories: str) -> Verdict | None:
     return None
 
 
-def _forbidden_value(value: str) -> bool:
+def _value_parts(value: str) -> set[str]:
     folded = value.casefold()
-    parts = {folded, *folded.split("_"), *folded.split("-")}
+    return {folded, *folded.split("_"), *folded.split("-")}
+
+
+def _forbidden_value(value: str) -> bool:
+    parts = _value_parts(value)
     return bool(parts & _SEX_GENDER or parts & _NATIONALITY)
