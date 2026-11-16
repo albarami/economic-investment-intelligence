@@ -16,8 +16,10 @@ from eii_custodian.publicdata.fetch.registry import RegistryError, load_registry
 from eii_custodian.publicdata.fetch.report import log_line
 from eii_custodian.publicdata.fetch.transport import (
     Response,
+    SlotSecrets,
     StreamTransport,
     Transport,
+    open_attempt,
     open_https,
     open_https_stream,
 )
@@ -28,6 +30,18 @@ from eii_custodian.publicdata.gravity.config import load_config as load_gravity_
 from . import exits, table
 
 Sleeper = Callable[[float], None]
+PRIMARY_ENV = "COMTRADE_PRIMARY_API_KEY"
+SECONDARY_ENV = "COMTRADE_SECONDARY_API_KEY"
+
+
+def slot_secrets(environ: Mapping[str, str], *, injected: bool) -> SlotSecrets | None:
+    """Read the two slot names only when this command itself opens the connection."""
+    if injected:
+        return None
+    return SlotSecrets(
+        primary=environ.get(PRIMARY_ENV, ""),
+        secondary=environ.get(SECONDARY_ENV, ""),
+    )
 
 
 def run(
@@ -41,12 +55,13 @@ def run(
     atlas_stream: StreamTransport | None = None,
 ) -> int:
     """Fetch the registry. Extra arguments are a usage error and open nothing."""
-    del environ
     if len(args) != 0:
         table.write_usage()
         return 2
     opener = open_https if transport is None else transport
     pause = time.sleep if sleep is None else sleep
+    bound = None if transport is not None else open_attempt
+    slots = slot_secrets(environ, injected=transport is not None)
     try:
         entries = load_registry()
     except RegistryError as exc:
@@ -118,6 +133,8 @@ def run(
         atlas_config=atlas_config,
         gravity_stream=gravity_bound,
         atlas_stream=atlas_bound,
+        opener=bound,
+        slots=slots,
     )
     for line in outcome.lines:
         print(line)

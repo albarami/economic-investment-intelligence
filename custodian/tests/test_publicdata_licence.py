@@ -10,7 +10,12 @@ from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.transport import Response, Transport
 
-KEY_NAMES = ("EARTHDATA_API_KEY", "TOMTOM_API_KEY")
+KEY_NAMES = (
+    "EARTHDATA_API_KEY",
+    "TOMTOM_API_KEY",
+    "COMTRADE_PRIMARY_API_KEY",
+    "COMTRADE_SECONDARY_API_KEY",
+)
 
 PORTAL = "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/planted-slug/exports/json"
 META = PORTAL[: -len("/exports/json")]

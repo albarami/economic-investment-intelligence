@@ -194,3 +194,181 @@ def _stream_allowed(url: str) -> bool:
         )
     except ValueError:
         return False
+
+
+def open_attempt(request: PreparedRequest) -> AttemptResult:
+    """Open one checked HTTPS request. Redirects are not followed."""
+
+    class _Stop(urllib.request.HTTPRedirectHandler):
+        def redirect_request(
+            self,
+            req: urllib.request.Request,
+            fp: IO[bytes],
+            code: int,
+            msg: str,
+            headers: HTTPMessage,
+            newurl: str,
+        ) -> urllib.request.Request | None:
+            del req, fp, code, msg, headers, newurl
+            raise OpenerFault("redirect")
+
+    decision = approve(request.url)
+    if not decision.ok:
+        raise OpenerFault("blocked_host")
+    call = urllib.request.Request(request.url, method="GET")
+    if request.header_name and request.header_value:
+        call.add_header(request.header_name, request.header_value)
+    opener = urllib.request.build_opener(_Stop)
+    try:
+        with opener.open(call, timeout=HTTP_TIMEOUT_S) as response:
+            body = response.read()
+    except OpenerFault:
+        raise
+    except urllib.error.HTTPError:
+        raise OpenerFault("http") from None
+    except urllib.error.URLError:
+        raise OpenerFault("unreachable") from None
+    return AttemptResult("ok", body)
+
+
+@dataclass(frozen=True)
+class SlotSecrets:
+    """Header values for the two slots. The text form never includes them."""
+
+    primary: str
+    secondary: str
+
+    def __repr__(self) -> str:
+        return "SlotSecrets(redacted)"
+
+    def for_slot(self, slot: str) -> str:
+        """Return one slot's header value. An unknown slot is empty."""
+        if slot == "primary":
+            return self.primary
+        if slot == "secondary":
+            return self.secondary
+        return ""
+
+
+@dataclass(frozen=True)
+class PreparedRequest:
+    """What the opener receives after the address has been checked."""
+
+    url: str
+    header_name: str
+    header_value: str
+    endpoint_id: str
+
+
+@dataclass(frozen=True)
+class AttemptResult:
+    """A classified opener result. Error text is not a failure message."""
+
+    category: str
+    body: bytes
+    location: str = ""
+    error_text: str = ""
+    header_echo: str = ""
+
+
+class OpenerFault(Exception):
+    """An opener failure whose text must not be copied into a receipt or a message."""
+
+
+Opener = Callable[[PreparedRequest], AttemptResult]
+HEADER_NAME = "Ocp-Apim-Subscription-Key"
+
+
+def perform(
+    policy: object,
+    descriptor: object,
+    header_value: str | None,
+    opener: Opener,
+) -> AttemptResult:
+    """Check the descriptor, then call the opener. A redirect is not followed."""
+    from eii_custodian.publicdata.comtrade.policy import (
+        FORBIDDEN_FAMILIES,
+        Descriptor,
+        Policy,
+        direction_ok,
+        refusal,
+        url_approved,
+    )
+    from eii_custodian.publicdata.fetch.allowlist import secret_in_url
+
+    if not isinstance(policy, Policy) or not isinstance(descriptor, Descriptor):
+        raise OpenerFault("descriptor")
+    if not direction_ok(policy, descriptor):
+        raise refusal(policy, descriptor, "mirror_direction") from None
+    family = descriptor.endpoint_family.casefold()
+    forbidden = family in FORBIDDEN_FAMILIES or any(
+        token in family for token in FORBIDDEN_FAMILIES
+    )
+    if forbidden:
+        raise refusal(policy, descriptor, "forbidden_endpoint") from None
+    if not url_approved(policy, descriptor):
+        raise refusal(policy, descriptor, "blocked_host") from None
+    url = _checked_url(policy, descriptor)
+    if header_value and secret_in_url(url, header_value):
+        raise refusal(policy, descriptor, "query_key") from None
+    request = PreparedRequest(
+        url=url,
+        header_name=HEADER_NAME if header_value else "",
+        header_value=header_value or "",
+        endpoint_id=descriptor.endpoint_id(),
+    )
+    try:
+        result = opener(request)
+    except OpenerFault:
+        raise refusal(policy, descriptor, "provider_error") from None
+    except (OSError, ValueError, UnicodeError):
+        raise refusal(policy, descriptor, "provider_error") from None
+    if result.location:
+        _refuse_redirect(policy, descriptor, result.location, header_value)
+    return result
+
+
+def _checked_url(policy: object, descriptor: object) -> str:
+    from eii_custodian.publicdata.comtrade.policy import Descriptor, Policy, safe_url
+
+    if not isinstance(policy, Policy) or not isinstance(descriptor, Descriptor):
+        raise OpenerFault("descriptor")
+    return safe_url(policy, descriptor)
+
+
+def _refuse_redirect(
+    policy: object, descriptor: object, location: str, header_value: str | None
+) -> None:
+    from urllib.parse import parse_qsl, urlsplit
+
+    from eii_custodian.publicdata.comtrade.policy import (
+        FORBIDDEN_FAMILIES,
+        Descriptor,
+        Policy,
+        refusal,
+    )
+    from eii_custodian.publicdata.fetch.allowlist import CREDENTIAL_QUERY_NAMES
+
+    if not isinstance(policy, Policy) or not isinstance(descriptor, Descriptor):
+        raise OpenerFault("descriptor")
+    lowered = location.casefold()
+    if any(token in lowered for token in FORBIDDEN_FAMILIES):
+        raise refusal(policy, descriptor, "forbidden_endpoint") from None
+    parts = urlsplit(location)
+    template = policy.template(descriptor.api_class, descriptor.endpoint_family)
+    request_host = template.host if template is not None else ""
+    redirect_host = (parts.hostname or "").casefold()
+    names = {
+        name.casefold()
+        for name, _value in parse_qsl(parts.query, keep_blank_values=True)
+    }
+    secret = bool(parts.username or parts.password or parts.fragment)
+    keyed_query = bool(names & CREDENTIAL_QUERY_NAMES)
+    allowed = frozenset(item.casefold() for item in policy.allowed_redirect_hosts)
+    allowed = allowed | {request_host}
+    if parts.scheme.casefold() != "https" or secret or keyed_query:
+        raise refusal(policy, descriptor, "redirect_host") from None
+    if redirect_host not in allowed:
+        raise refusal(policy, descriptor, "redirect_host") from None
+    if header_value and redirect_host != request_host:
+        raise refusal(policy, descriptor, "cross_origin_credential") from None

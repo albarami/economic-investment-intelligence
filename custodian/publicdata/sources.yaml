@@ -4311,3 +4311,59 @@ sources:
     reconciliation: "open"
     skip_reason: "atlas_metadata_unconfirmed"
     extension: "bin"
+
+  # S2-T23. Metadata is unconfirmed until the lead's live reading.
+  - key: "un_comtrade"
+    source_id: "un_comtrade"
+    slug: ""
+    kind: "comtrade_api"
+    title_en: "UN Comtrade"
+    publisher: "United Nations Statistics Division"
+    licence_id: ""
+    licence_basis: "provider_terms"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-15"
+    landing_url: "https://uncomtrade.org/docs/un-comtrade-tools/"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_comtrade_trade"]
+    caveat_keys: ["trade_coverage_gap", "trade_mirror_separate"]
+    columns:
+      - {name: source_id, type: string}
+      - {name: series_role, type: string}
+      - {name: reporter_code, type: string}
+      - {name: partner_code, type: string}
+      - {name: partner2_code, type: string}
+      - {name: frequency, type: string}
+      - {name: period, type: string}
+      - {name: flow_code, type: string}
+      - {name: classification, type: string}
+      - {name: classification_revision, type: string}
+      - {name: product_code, type: string}
+      - {name: aggregation_level, type: integer}
+      - {name: customs_code, type: string}
+      - {name: transport_mode_code, type: string}
+      - {name: valuation_basis, type: string}
+      - {name: measure, type: string}
+      - {name: value, type: number}
+      - {name: unit, type: string}
+      - {name: source_flags, type: string}
+      - {name: source_version, type: string}
+      - {name: receipt_sha256, type: string}
+    row_count_min: null
+    row_count_max: null
+    period_first: ""
+    period_last: ""
+    period_field: "period"
+    reconciliation: "open"
+    skip_reason: "metadata_unconfirmed"
+    extension: "json"
+    basis_note: "Keyed provider interface under decision 0040 item 2. Terms, hosts, budgets, schema and the selection are unconfirmed."
+    comtrade_policy:
+      confirmed: false

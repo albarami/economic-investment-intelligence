@@ -40,7 +40,12 @@ from eii_custodian.publicdata.fetch.report import (
     terms_unread_line,
 )
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
-from eii_custodian.publicdata.fetch.transport import StreamTransport, Transport
+from eii_custodian.publicdata.fetch.transport import (
+    Opener,
+    SlotSecrets,
+    StreamTransport,
+    Transport,
+)
 from eii_custodian.publicdata.gravity.config import Config as GravityConfig
 from eii_custodian.publicdata.gravity.config import GravityError
 from eii_custodian.publicdata.gravity.config import load_config as load_gravity_config
@@ -94,6 +99,60 @@ class _Fetched:
     retrieved_utc: str
     terms_sha256: str
     terms_unread: str
+
+
+def _comtrade_dispatch(
+    entry: Entry,
+    cache: Path,
+    clock: Clock,
+    sleep: Sleeper,
+    opener: Opener | None,
+    slots: SlotSecrets | None,
+    lines: list[str],
+) -> FetchFailure | None:
+    """Dispatch one Comtrade row. A missing opener never opens a socket."""
+    from eii_custodian.publicdata.comtrade.fetch import fetch_source
+
+    if opener is None:
+        failure = FetchFailure(
+            1,
+            entry.source_id,
+            "https://invalid.example/refused",
+            "transport_uninjected",
+            "injected opener",
+            "absent",
+        )
+        lines.append(
+            fail_line(
+                entry.key,
+                failure.url,
+                failure.check,
+                failure.expected,
+                failure.observed,
+            )
+        )
+        return failure
+    traded = fetch_source(entry, cache, clock, sleep, opener, slots)
+    if traded.failure is not None:
+        lines.append(
+            fail_line(
+                entry.key,
+                traded.failure.safe_url,
+                traded.failure.check,
+                traded.failure.check,
+                traded.failure.endpoint_id,
+            )
+        )
+        return FetchFailure(
+            1,
+            entry.source_id,
+            traded.failure.safe_url,
+            traded.failure.check,
+            traded.failure.check,
+            traded.failure.endpoint_id,
+        )
+    lines.append(pass_line(entry.key, traded.digest, traded.host))
+    return None
 
 
 def utc_now() -> str:
@@ -202,6 +261,8 @@ def run_build(
     atlas_config: AtlasConfig | None = None,
     gravity_stream: StreamTransport | None = None,
     atlas_stream: StreamTransport | None = None,
+    opener: Opener | None = None,
+    slots: SlotSecrets | None = None,
 ) -> BuildOutcome:
     """Fetch each row in order, then run the public_data stage."""
     manifests: dict[str, str] = {}
@@ -366,6 +427,14 @@ def run_build(
         if entry.kind == "citation_only":
             _write_citation(entry, cache, clock())
             lines.append(citation_line(entry.key))
+            continue
+        if entry.kind == "comtrade_api":
+            traded_failure = _comtrade_dispatch(
+                entry, cache, clock, sleep, opener, slots, lines
+            )
+            if traded_failure is not None:
+                failure = traded_failure
+                break
             continue
         if is_release_entry(entry):
             released, refused = fetch_release(entry, transport, cache, clock, sleep)

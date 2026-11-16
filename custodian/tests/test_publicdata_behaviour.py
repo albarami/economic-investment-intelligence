@@ -46,7 +46,16 @@ REPO = repository_root(Path(__file__))
 _SCRIPTS = REPO / "scripts"
 if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
-KEY_NAMES = ("EARTHDATA_API_KEY", "TOMTOM_API_KEY")
+KEY_NAMES = (
+    "EARTHDATA_API_KEY",
+    "TOMTOM_API_KEY",
+    "COMTRADE_PRIMARY_API_KEY",
+    "COMTRADE_SECONDARY_API_KEY",
+)
+KEY_ALLOWANCE = {
+    "COMTRADE_PRIMARY_API_KEY": "scripts/commands/build_public.py",
+    "COMTRADE_SECONDARY_API_KEY": "scripts/commands/build_public.py",
+}
 
 
 def _clock() -> str:
@@ -1295,16 +1304,30 @@ def test_build_writes_only_under_the_cache(tmp_path: Path) -> None:
             assert "public_cache" in path.parts
 
 
+def key_offenders(root: Path) -> tuple[str, ...]:
+    """Return production files that name a key outside the one allowed path."""
+    found: list[str] = []
+    for folder_name in ("custodian/src", "scripts/commands"):
+        folder = root / folder_name
+        if not folder.is_dir():
+            continue
+        for path in folder.rglob("*.py"):
+            text = path.read_text(encoding="utf-8")
+            rel = path.relative_to(root).as_posix()
+            for name in KEY_NAMES:
+                if name in text and KEY_ALLOWANCE.get(name) != rel:
+                    found.append(f"{rel}:{name}")
+            comtrade = "eii_custodian/publicdata/comtrade/"
+            if comtrade in rel and "os.environ" in text:
+                found.append(f"{rel}:os.environ")
+    return tuple(found)
+
+
 def test_production_code_does_not_name_a_key(tmp_path: Path) -> None:
     """The fetch code does not name a key, and a planted value is absent from a receipt."""
     secret = "planted-token-value"
-    for folder in (REPO / "custodian" / "src", REPO / "scripts" / "commands"):
-        assert folder.is_dir()
-        assert any(folder.rglob("*.py"))
-        for path in folder.rglob("*.py"):
-            text = path.read_text(encoding="utf-8")
-            for name in KEY_NAMES:
-                assert name not in text
+    assert set(KEY_ALLOWANCE.values()) == {"scripts/commands/build_public.py"}
+    assert key_offenders(REPO) == ()
 
     def transport(url: str) -> Response:
         return _ok(url, b"invented-bytes")
@@ -1316,3 +1339,16 @@ def test_production_code_does_not_name_a_key(tmp_path: Path) -> None:
         if path.is_file()
     )
     assert secret not in blob
+
+
+def test_planted_comtrade_module_naming_a_key_fails(tmp_path: Path) -> None:
+    """A copy of a Comtrade module that names a key, or reads the environment, fails."""
+    module = tmp_path / "custodian/src/eii_custodian/publicdata/comtrade/planted.py"
+    module.parent.mkdir(parents=True)
+    module.write_text(
+        "value = os.environ['COMTRADE_PRIMARY_API_KEY']\n", encoding="utf-8"
+    )
+    assert key_offenders(tmp_path) == (
+        "custodian/src/eii_custodian/publicdata/comtrade/planted.py:COMTRADE_PRIMARY_API_KEY",
+        "custodian/src/eii_custodian/publicdata/comtrade/planted.py:os.environ",
+    )

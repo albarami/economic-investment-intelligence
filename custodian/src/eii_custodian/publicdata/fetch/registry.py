@@ -17,7 +17,14 @@ _DATE_TEXT = re.compile(r"\A\d{4}-\d{2}-\d{2}\Z")
 _SKIP_LICENCE = "licen"
 _SKIP_TERMS = "terms"
 KINDS = frozenset(
-    {"portal_dataset", "paged_layer", "https_file", "terms_page", "citation_only"}
+    {
+        "portal_dataset",
+        "paged_layer",
+        "https_file",
+        "terms_page",
+        "citation_only",
+        "comtrade_api",
+    }
 )
 BANNED_SOURCE_IDS = frozenset({"traffic_tomtom_flow", "traffic_tomtom_range"})
 FIELDS = frozenset(
@@ -55,6 +62,7 @@ FIELDS = frozenset(
         "reconciliation",
         "skip_reason",
         "extension",
+        "comtrade_policy",
     }
 )
 REQUIRED = frozenset(
@@ -138,6 +146,7 @@ class Entry:
     layer: int | None = None
     terms_watch: bool = False
     basis_note: str = ""
+    comtrade_policy: object | None = None
 
 
 def registry_path() -> Path:
@@ -204,6 +213,7 @@ def _entry(row: object) -> Entry:
     if kind not in KINDS:
         raise RegistryError("unknown kind")
     layer = _layer(row, kind)
+    comtrade_policy = _comtrade_policy(row, kind)
     basis = _text(row, "licence_basis")
     if basis not in LICENCE_BASES:
         raise RegistryError("unknown licence_basis")
@@ -262,6 +272,7 @@ def _entry(row: object) -> Entry:
         layer=layer,
         terms_watch=terms_watch,
         basis_note=basis_note,
+        comtrade_policy=comtrade_policy,
     )
 
 
@@ -303,6 +314,22 @@ def _calendar_date(row: dict[object, object], name: str) -> str:
     except ValueError:
         raise RegistryError(f"{name} is not a date") from None
     return value
+
+
+def _comtrade_policy(row: dict[object, object], kind: str) -> object | None:
+    """Return the closed policy. Any other kind refuses the field."""
+    if kind != "comtrade_api":
+        if "comtrade_policy" in row:
+            raise RegistryError("comtrade_policy on a row that is not comtrade_api")
+        return None
+    if "comtrade_policy" not in row:
+        raise RegistryError("comtrade_api requires comtrade_policy")
+    from eii_custodian.publicdata.comtrade.policy import PolicyError, parse_policy
+
+    try:
+        return parse_policy(row["comtrade_policy"])
+    except PolicyError as exc:
+        raise RegistryError(exc.detail) from None
 
 
 def _layer(row: dict[object, object], kind: str) -> int | None:
