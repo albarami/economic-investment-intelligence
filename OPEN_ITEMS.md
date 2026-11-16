@@ -2432,11 +2432,12 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 ## OI-261 — The hosted mutation pilot is dispatched after its merge
 
 - ID: OI-261
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - NEEDED: After the merge of S1-T20, the lead dispatches `.github/workflows/mutation-pilot.yml` on the base branch: first the synthetic dispatch, which must prove that all four shard outputs arrive intact; then the real campaign of the one module that the dispatch input allows, compared by `scripts/mutation_pilot.py compare` with an unpartitioned local run of the same commit. Every differing mutant is explained, and the hosted elapsed time and the local processor time saved are recorded in the task log of S1-T20 in PROGRESS.md by a records change, which also ticks the three remaining acceptance criteria of S1-T20 in TASKS.md.
 - WHY: a workflow that is triggered only by dispatch can be run only once its file is on the base branch; the plan of the task puts the dispatch after the merge and the synthetic proof before the real campaign.
 - OWNER: the lead.
 - CLOSES WHEN: the records change holds the run addresses of both dispatches, the comparison's result and the two timings.
+- CLOSED: 2026-11-16, by the records change of S1-T20: the synthetic dispatch https://github.com/albarami/economic-investment-intelligence/actions/runs/43940084757 succeeded with all four shard outputs intact; the real campaign https://github.com/albarami/economic-investment-intelligence/actions/runs/43940437765 succeeded (killed 304, survived 3) in 21 minutes 31 seconds; the unpartitioned local run at the same commit gave the same counts in 517.41 seconds elapsed and about 523 processor seconds; `scripts/mutation_pilot.py compare` exited 0 with no differing mutant. Evidence rows are in [PROGRESS.md](PROGRESS.md) under S1-T20.
 
 ## Change control
 

@@ -29095,6 +29095,54 @@ Seed:      none
 Notes:     The two work commits of the task (the build with fix pass 1, and fix pass 2) each have a Conventional Commit subject.
 ```
 
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    e9eb1ed44d4dbed8a8f3d98b729d357535b52922
+Command:   workflow_dispatch of .github/workflows/mutation-pilot.yml on main, inputs module=custodian/src/eii_custodian/publicdata/places_fsq/policy.py, ref=e9eb1ed44d4dbed8a8f3d98b729d357535b52922, synthetic=true
+Exit code: 0 (run conclusion success)
+Date:      2026-11-16
+Run by:    lead (hosted), https://github.com/albarami/economic-investment-intelligence/actions/runs/43940084757
+Counts:    jobs discovery, shards 0 to 3 and merge each success; all four shard outputs arrived intact and merged
+Seed:      none
+Notes:     The synthetic dispatch after the merge of pull request 75 (OI-261): the invented transport proof. Wall time 85 seconds; each shard 15 to 28 seconds.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    e9eb1ed44d4dbed8a8f3d98b729d357535b52922
+Command:   workflow_dispatch of .github/workflows/mutation-pilot.yml on main, inputs module=custodian/src/eii_custodian/publicdata/places_fsq/policy.py, ref=e9eb1ed44d4dbed8a8f3d98b729d357535b52922, synthetic=false
+Exit code: 0 (run conclusion success)
+Date:      2026-11-16
+Run by:    lead (hosted), https://github.com/albarami/economic-investment-intelligence/actions/runs/43940437765
+Counts:    killed 304, survived 3, timeout 0, not_covered 0, infrastructure_failure 0 (merged.json of the artifact mutation-merged)
+Seed:      none
+Notes:     The real hosted campaign. Hosted elapsed time 21 minutes 31 seconds, from 19:32:45Z to 19:54:16Z: discovery 4 minutes 41 seconds, shards 0 and 1 then shards 2 and 3, two at a time, about 8 minutes each, merge 15 seconds.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    e9eb1ed44d4dbed8a8f3d98b729d357535b52922
+Command:   uv run --locked python scripts/mutation.py --report pilot.local.report.json custodian/src/eii_custodian/publicdata/places_fsq/policy.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    killed 304, survived 3, timeout 0, not_covered 0, infrastructure_failure 0
+Seed:      none
+Notes:     The unpartitioned local run at the same commit, after uv sync with the groups engine and mutation. Elapsed 517.41 seconds; processor time user 479.75 seconds and system 43.20 seconds, so a hosted campaign of this module saves about 523 processor seconds of the build machine while taking longer in elapsed time. A first attempt with an absolute report path was refused by the runner with unsafe-evidence-path (relative evidence paths only); the run above used a relative path.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    e9eb1ed44d4dbed8a8f3d98b729d357535b52922
+Command:   uv run --locked python scripts/mutation_pilot.py compare pilot.local.report.json pilot.hosted.merged.json
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    {"differences":[]}
+Seed:      none
+Notes:     The local report against merged.json downloaded from the real hosted run above: no differing mutant, so none needs an explanation. OI-261 closes with this row and the three above.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
