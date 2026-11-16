@@ -25,7 +25,9 @@ OUTCOMES = frozenset(
         "none_found",
     }
 )
-BASES = frozenset({"dataset", "portal_terms", "provider_terms", "none_stated", ""})
+BASES = frozenset(
+    {"dataset", "portal_terms", "provider_terms", "none_stated", "owner_decision", ""}
+)
 RECORDED = OUTCOMES - {"not_yet_recorded", "none_found"}
 CAVEAT = "No public tender source is recorded"
 
