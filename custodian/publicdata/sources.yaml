@@ -521,10 +521,10 @@ sources:
     slug: "workers-in-paid-employment-and-average-monthly-wage-by-gender-and-sector"
     kind: "portal_dataset"
     title_en: "Workers in paid employment and average monthly wage by gender and sector"
-    publisher: "to be confirmed at slice S2"
+    publisher: "National Planning Council"
     licence_id: "CC-BY-4.0"
     licence_basis: "dataset"
-    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/workers-in-paid-employment-and-average-monthly-wage-by-gender-and-sector/exports/json"
@@ -537,22 +537,30 @@ sources:
     commit_allowed: false
     release_tables: ["pub_wage_table"]
     caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
+    # Lead metadata reading, 2026-11-16 (L-701).
+    columns:
+      - {name: "year", type: "string"}
+      - {name: "sector", type: "string"}
+      - {name: "lqt", type: "string"}
+      - {name: "gender", type: "string"}
+      - {name: "lnw", type: "string"}
+      - {name: "paid_employment_workers", type: "integer"}
+      - {name: "monthly_average_wage_qr", type: "integer"}
+    row_count_min: 98
+    row_count_max: 98
     reconciliation: "none"
-    skip_reason: "publisher_or_schema_unconfirmed"
+    skip_reason: ""
     extension: "json"
   - key: "wage_bands_priv"
     source_id: "wage_bands_priv"
     slug: "average-monthly-wage-q-r-for-workers-in-private-sector-in-qatar-2021-2025"
     kind: "portal_dataset"
     title_en: "Average monthly wage for workers in the private sector"
-    publisher: "to be confirmed at slice S2"
-    licence_id: "unconfirmed"
-    licence_basis: "owner_decision"
-    licence_url: "https://www.data.gov.qa/pages/license/annexes"
-    decision_record: "0026"
+    publisher: "Ministry of Labour"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
+    decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/average-monthly-wage-q-r-for-workers-in-private-sector-in-qatar-2021-2025/exports/json"
     terms_url: ""
@@ -564,22 +572,28 @@ sources:
     commit_allowed: false
     release_tables: ["pub_wage_table"]
     caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
+    # Lead metadata reading, 2026-11-16 (L-701).
+    columns:
+      - {name: "year", type: "string"}
+      - {name: "wage_group", type: "string"}
+      - {name: "fy_l_jr", type: "string"}
+      - {name: "number_of_occupations", type: "integer"}
+      - {name: "percentage", type: "number"}
+    row_count_min: 71
+    row_count_max: 71
     reconciliation: "none"
-    skip_reason: "publisher_or_schema_unconfirmed"
+    skip_reason: ""
     extension: "json"
   - key: "work_hours_act"
     source_id: "work_hours_act"
     slug: "employed-persons-15-years-and-above-and-average-work-hours-by-gender-and-economic-activity"
     kind: "portal_dataset"
     title_en: "Employed persons and average work hours by gender and economic activity"
-    publisher: "to be confirmed at slice S2"
-    licence_id: "unconfirmed"
-    licence_basis: "owner_decision"
-    licence_url: "https://www.data.gov.qa/pages/license/annexes"
-    decision_record: "0026"
+    publisher: "National Planning Council"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
+    decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/employed-persons-15-years-and-above-and-average-work-hours-by-gender-and-economic-activity/exports/json"
     terms_url: ""
@@ -591,11 +605,19 @@ sources:
     commit_allowed: false
     release_tables: []
     caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
+    # Lead metadata reading, 2026-11-16 (L-701).
+    columns:
+      - {name: "year", type: "string"}
+      - {name: "gender", type: "string"}
+      - {name: "ljns", type: "string"}
+      - {name: "economic_activity", type: "string"}
+      - {name: "lnsht_lqtsdy", type: "string"}
+      - {name: "employed_persons", type: "integer"}
+      - {name: "average_work_hours", type: "integer"}
+    row_count_min: 266
+    row_count_max: 266
     reconciliation: "none"
-    skip_reason: "publisher_or_schema_unconfirmed"
+    skip_reason: ""
     extension: "json"
   - key: "util_elec"
     source_id: "util_elec"
@@ -728,10 +750,10 @@ sources:
     slug: "consumer-price-index-cpi-by-expenditure-group-monthly"
     kind: "portal_dataset"
     title_en: "Consumer price index by expenditure group, monthly"
-    publisher: "to be confirmed at slice S2"
+    publisher: "National Planning Council"
     licence_id: "CC-BY-4.0"
     licence_basis: "dataset"
-    licence_url: "https://www.data.gov.qa/pages/license/annexes"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/consumer-price-index-cpi-by-expenditure-group-monthly/exports/json"
@@ -744,11 +766,19 @@ sources:
     commit_allowed: false
     release_tables: ["pub_price_index"]
     caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
+    # Lead metadata reading, 2026-11-16 (L-701).
+    columns:
+      - {name: "year", type: "string"}
+      - {name: "month", type: "string"}
+      - {name: "lshhr", type: "string"}
+      - {name: "group_code", type: "string"}
+      - {name: "group", type: "string"}
+      - {name: "lmjmw", type: "string"}
+      - {name: "cpi_index", type: "number"}
+    row_count_min: 936
+    row_count_max: 936
     reconciliation: "none"
-    skip_reason: "publisher_or_schema_unconfirmed"
+    skip_reason: ""
     extension: "json"
   - key: "prop_sales"
     source_id: "prop_sales"
@@ -825,11 +855,19 @@ sources:
     commit_allowed: false
     release_tables: []
     caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
+    # Lead metadata reading, 2026-11-16 (L-701).
+    columns:
+      - {name: "year", type: "string"}
+      - {name: "number_of_zone", type: "string"}
+      - {name: "lmntq", type: "string"}
+      - {name: "zone", type: "string"}
+      - {name: "population", type: "number"}
+      - {name: "area_in_km", type: "number"}
+      - {name: "population_density_km2", type: "number"}
+    row_count_min: 552
+    row_count_max: 552
     reconciliation: "none"
-    skip_reason: "cache_fields_unconfirmed; adapter_unavailable"
+    skip_reason: ""
     extension: "json"
   - key: "est_census"
     source_id: "est_census"
@@ -882,26 +920,35 @@ sources:
     terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/population-by-type-of-household-gender-and-place-of-residence-on-the-census-night-december-2020/"
     nightly_live_fetch: true
-    public_splits: []
+    public_splits: ["sex"]
     commit_allowed: false
     release_tables: []
     caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
+    # Lead metadata reading, 2026-11-16 (L-701).
+    columns:
+      - {name: "year", type: "string"}
+      - {name: "mkn_ltwjd_lyl_lt_dd", type: "string"}
+      - {name: "place_of_residency_on_census_night", type: "string"}
+      - {name: "nw_lsr", type: "string"}
+      - {name: "type_of_household", type: "string"}
+      - {name: "lnw", type: "string"}
+      - {name: "gender", type: "string"}
+      - {name: "value", type: "number"}
+    row_count_min: 480
+    row_count_max: 480
     reconciliation: "none"
-    skip_reason: "cache_fields_unconfirmed; adapter_unavailable"
+    skip_reason: ""
     extension: "json"
   - key: "accident"
     source_id: "accident"
     slug: "accident"
     kind: "portal_dataset"
     title_en: "Accident"
-    publisher: "to be confirmed at slice S2"
-    licence_id: "unconfirmed"
-    licence_basis: "owner_decision"
-    licence_url: "https://www.data.gov.qa/pages/license/annexes"
-    decision_record: "0026"
+    publisher: "Ministry of Interior"
+    licence_id: "CC-BY-4.0"
+    licence_basis: "dataset"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
+    decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/accident/exports/json"
     terms_url: ""
@@ -909,15 +956,32 @@ sources:
     terms_read_on: "2026-11-14"
     landing_url: "https://www.data.gov.qa/explore/dataset/accident/"
     nightly_live_fetch: true
-    public_splits: []
+    public_splits: ["nationality"]
     commit_allowed: false
     release_tables: []
     caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
+    # Lead metadata reading, 2026-11-16 (L-701).
+    columns:
+      - {name: "accident_year", type: "string"}
+      - {name: "accident_time", type: "string"}
+      - {name: "weather", type: "string"}
+      - {name: "road_status", type: "string"}
+      - {name: "road_type", type: "string"}
+      - {name: "accident_classification", type: "string"}
+      - {name: "accident_nature", type: "string"}
+      - {name: "accident_reason", type: "string"}
+      - {name: "city", type: "string"}
+      - {name: "zone", type: "integer"}
+      - {name: "street", type: "integer"}
+      - {name: "accident_severity", type: "string"}
+      - {name: "death_count", type: "integer"}
+      - {name: "birth_year_of_accident_perpetr", type: "string"}
+      - {name: "nationality_group_of_accident", type: "string"}
+      - {name: "total", type: "integer"}
+    row_count_min: 1000500
+    row_count_max: 1000500
     reconciliation: "none"
-    skip_reason: "publisher_or_schema_unconfirmed"
+    skip_reason: "partition_byte_bound_unconfirmed"
     extension: "json"
   - key: "census_2020_workbook"
     source_id: "census_2020_workbook"
@@ -930,7 +994,7 @@ sources:
     licence_url: ""
     decision_record: "0026"
     fetch_host: "web.archive.org"
-    url: "https://web.archive.org/web/20240422094401/https://www.psa.gov.qa/Style%20Library/PSA/CensusDetailedResults/documents/Qatar_Census_2022_Final_Results.xlsx"
+    url: "https://web.archive.org/web/20240422094401id_/https://www.psa.gov.qa/Style%20Library/PSA/CensusDetailedResults/documents/Qatar_Census_2022_Final_Results.xlsx"
     terms_url: ""
     terms_words: "terms to be read"
     terms_read_on: "2026-11-14"
@@ -940,11 +1004,13 @@ sources:
     commit_allowed: false
     release_tables: []
     caveat_keys: []
+    # Advisor reading, 2026-11-16: direct OOXML file; sheet parsing is downstream.
+    # File name says 2022; source identity stays Census 2020 pending lead review.
     columns: []
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "schema_unconfirmed"
+    skip_reason: ""
     extension: "xlsx"
   - key: "worldpop_qat_2020"
     source_id: "worldpop_qat_2020"
@@ -957,7 +1023,7 @@ sources:
     licence_url: "https://creativecommons.org/licenses/by/4.0/"
     decision_record: ""
     fetch_host: "data.worldpop.org"
-    url: "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/QAT/v1/100m/constrained/"
+    url: "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/QAT/v1/100m/constrained/qat_pop_2020_CN_100m_R2025A_v1.tif"
     terms_url: ""
     terms_words: "terms to be read"
     terms_read_on: "2026-11-14"
@@ -971,7 +1037,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "direct_url_unconfirmed"
+    skip_reason: ""
     extension: "tif"
   - key: "census_zone_sector"
     source_id: "census_zone_sector"
@@ -1201,7 +1267,7 @@ sources:
     slug: "municipalities-in-qatar-2025"
     kind: "portal_dataset"
     title_en: "Municipalities in Qatar 2025"
-    publisher: "to be confirmed at slice S2"
+    publisher: "National open data portal (dataset publisher field empty, read 2026-11-16)"
     licence_id: "portal-terms"
     licence_basis: "portal_terms"
     licence_url: "https://www.data.gov.qa/pages/license/annexes"
@@ -1217,11 +1283,15 @@ sources:
     commit_allowed: false
     release_tables: ["municipality"]
     caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
+    # Lead metadata reading, 2026-11-16 (L-701).
+    columns:
+      - {name: "name", type: "string"}
+      - {name: "geo_point", type: "point_2d"}
+      - {name: "geo_shape", type: "geojson_geometry"}
+    row_count_min: 8
+    row_count_max: 8
     reconciliation: "none"
-    skip_reason: "publisher_or_schema_unconfirmed"
+    skip_reason: ""
     extension: "json"
   - key: "bnd_geob"
     source_id: "bnd_geob"
@@ -1261,7 +1331,7 @@ sources:
     licence_url: ""
     decision_record: ""
     fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
-    url: "s3://overturemaps-us-west-2/release/2026-10-21.0/theme=places/type=place/"
+    url: "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/?list-type=2&prefix=release/2026-10-21.0/theme=places/type=place/"
     terms_url: ""
     terms_words: "terms to be read"
     terms_read_on: "2026-11-14"
@@ -1275,7 +1345,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "overture_bucket_not_opened"
+    skip_reason: ""
     extension: "parquet"
   - key: "bldg_ovt"
     source_id: "bldg_ovt"
@@ -1288,7 +1358,7 @@ sources:
     licence_url: ""
     decision_record: ""
     fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
-    url: "s3://overturemaps-us-west-2/release/2026-10-21.0/theme=buildings/"
+    url: "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/?list-type=2&prefix=release/2026-10-21.0/theme=buildings/type=building/"
     terms_url: ""
     terms_words: "terms to be read"
     terms_read_on: "2026-11-14"
@@ -1302,7 +1372,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "overture_bucket_not_opened"
+    skip_reason: ""
     extension: "parquet"
   - key: "roads_osm"
     source_id: "roads_osm"

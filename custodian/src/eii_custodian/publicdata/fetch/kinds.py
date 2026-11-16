@@ -6,7 +6,9 @@ import json
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
+from io import BytesIO
 from urllib.parse import urlencode
+from zipfile import BadZipFile, ZipFile
 
 from eii_custodian.publicdata.fetch.allowlist import approve, host_of
 from eii_custodian.publicdata.fetch.checks import (
@@ -50,16 +52,24 @@ class Prepared:
     portal_licence: str = ""
     portal_licence_url: str = ""
     terms_unread: str = ""
+    requests: tuple[dict[str, object], ...] = ()
 
 
 TERMS_HOST_UNLISTED = "host_unlisted"
 
 
 def prepare(
-    entry: Entry, transport: Transport, sleep: Callable[[float], None]
+    entry: Entry,
+    transport: Transport,
+    sleep: Callable[[float], None],
+    registry_entries: tuple[Entry, ...] | None = None,
 ) -> Prepared:
     """Fetch one row through the transport seam and apply its declared checks."""
     reader = _reader(transport, sleep)
+    if entry.key in {"places_ovt", "bldg_ovt"}:
+        from eii_custodian.publicdata.fetch.listing import prepare_listing
+
+        return prepare_listing(entry, reader, registry_entries)
     if entry.kind == "portal_dataset":
         return _portal(entry, reader)
     if entry.kind == "paged_layer":
@@ -149,9 +159,6 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
     meta, failure = _call(entry, meta_url, reader)
     if failure is not None or meta is None:
         return _failed(entry, failure)
-    export, failure = _call(entry, entry.url, reader)
-    if failure is not None or export is None:
-        return _failed(entry, failure)
     observed = _portal_meta(meta.body)
     if observed is None:
         return _failed(
@@ -165,6 +172,14 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
             ),
         )
     publisher, licence, licence_url, modified = observed
+    if (
+        publisher == ""
+        and entry.key == "bnd_muni_2025"
+        and entry.publisher
+        == "National open data portal (dataset publisher field empty, read 2026-11-16)"
+        and entry.licence_basis == "portal_terms"
+    ):
+        publisher = entry.publisher
     if publisher == "":
         return _failed(
             entry,
@@ -208,6 +223,17 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
                 _licence_observed(licence, licence_url),
             ),
         )
+    requests: tuple[dict[str, object], ...] = ()
+    export: Response | None
+    if entry.key == "accident":
+        from eii_custodian.publicdata.fetch.partitions import partition_export
+
+        body, requests, failure = partition_export(entry, meta, reader)
+        export = Response(entry.url, body, ())
+    else:
+        export, failure = _call(entry, entry.url, reader)
+    if failure is not None or export is None:
+        return _failed(entry, failure)
     rows = _json_rows(export.body)
     counted = count_failure(entry, rows, export.final_url)
     if counted is not None:
@@ -230,6 +256,7 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
         None,
         licence,
         licence_url,
+        requests=requests,
     )
 
 
@@ -299,6 +326,17 @@ def _file(entry: Entry, reader: Read) -> Prepared:
     response, failure = _call(entry, entry.url, reader)
     if failure is not None or response is None:
         return _failed(entry, failure)
+    if entry.extension == "xlsx" and not _workbook_container(response.body):
+        return _failed(
+            entry,
+            AttemptFailure(
+                1,
+                response.final_url,
+                "workbook_content",
+                "OOXML workbook",
+                "invalid body",
+            ),
+        )
     rows = _json_rows(response.body)
     counted = count_failure(entry, rows, response.final_url)
     if counted is not None:
@@ -313,6 +351,16 @@ def _file(entry: Entry, reader: Read) -> Prepared:
         "",
         None,
     )
+
+
+def _workbook_container(body: bytes) -> bool:
+    """Recognise the workbook container, without extracting or parsing sheet values."""
+    try:
+        with ZipFile(BytesIO(body)) as archive:
+            names = set(archive.namelist())
+    except BadZipFile:
+        return False
+    return {"[Content_Types].xml", "_rels/.rels", "xl/workbook.xml"} <= names
 
 
 def _terms(entry: Entry, reader: Read) -> Prepared:

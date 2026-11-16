@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import os
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -108,6 +108,7 @@ def _fetch_row(
     cache: Path,
     clock: Clock,
     sleep: Sleeper,
+    registry_entries: tuple[Entry, ...] | None = None,
 ) -> tuple[_Fetched | None, FetchFailure | None]:
     """Fetch one row and return the receipt values this run wrote."""
     if entry.url and not approve(entry.url).ok:
@@ -120,7 +121,7 @@ def _fetch_row(
             entry.url,
         )
     try:
-        prepared = prepare(entry, transport, sleep)
+        prepared = prepare(entry, transport, sleep, registry_entries)
     except OSError:
         return None, FetchFailure(
             1, entry.source_id, entry.url, "write_failed", "stored file", "write failed"
@@ -136,8 +137,12 @@ def _fetch_row(
         )
     digest = sha256_hex(prepared.body)
     retrieved = clock()
+    stored_entry = entry
+    if entry.key in {"places_ovt", "bldg_ovt"}:
+        # Listing evidence must not replace the parent's cached Parquet rows.
+        stored_entry = replace(entry, key=entry.key + "/listing", extension="json")
     sidecar = sidecar_for(
-        entry,
+        stored_entry,
         digest=digest,
         nbytes=len(prepared.body),
         fetch_url=prepared.fetch_url,
@@ -150,11 +155,13 @@ def _fetch_row(
         portal_licence=prepared.portal_licence,
         portal_licence_url=prepared.portal_licence_url,
     )
+    if prepared.requests:
+        sidecar["requests"] = list(prepared.requests)
     try:
         commit_pair(
-            cache_directory(cache, entry.key),
+            cache_directory(cache, stored_entry.key),
             digest,
-            entry.extension,
+            stored_entry.extension,
             prepared.body,
             sidecar,
         )
@@ -253,7 +260,9 @@ def run_build(
             assert placed is not None
             lines.append(pass_line(entry.key, placed.digest, placed.host))
             continue
-        fetched, result = _fetch_row(entry, transport, cache, clock, sleep)
+        fetched, result = _fetch_row(
+            entry, transport, cache, clock, sleep, tuple(entries)
+        )
         if result is not None:
             lines.append(
                 fail_line(

@@ -228,6 +228,14 @@ def _entry(row: object) -> Entry:
     folded_skip = skip_reason.casefold()
     if _SKIP_LICENCE in folded_skip or _SKIP_TERMS in folded_skip:
         raise RegistryError("skip_reason names a licence or terms")
+    columns = _columns(row.get("columns"))
+    public_splits = _strings(row, "public_splits")
+    if any(name in {"sex", "gender"} for name, _kind in columns):
+        if "sex" not in public_splits:
+            raise RegistryError("sex field requires public_splits sex")
+    if any("nationality" in name for name, _kind in columns):
+        if "nationality" not in public_splits:
+            raise RegistryError("nationality field requires public_splits nationality")
     return Entry(
         key=_text(row, "key"),
         source_id=source_id,
@@ -242,11 +250,11 @@ def _entry(row: object) -> Entry:
         url=_text(row, "url"),
         terms_url=_text(row, "terms_url"),
         nightly_live_fetch=_bool(row, "nightly_live_fetch"),
-        public_splits=_strings(row, "public_splits"),
+        public_splits=public_splits,
         commit_allowed=commit,
         release_tables=_strings(row, "release_tables"),
         caveat_keys=_strings(row, "caveat_keys"),
-        columns=_columns(row.get("columns")),
+        columns=columns,
         row_count_min=_optional_int(row, "row_count_min"),
         row_count_max=_optional_int(row, "row_count_max"),
         period_first=_optional_text(row, "period_first"),
@@ -373,7 +381,7 @@ def _columns(value: object) -> tuple[tuple[str, str], ...]:
         kind = item.get("type")
         if not isinstance(name, str) or not isinstance(kind, str):
             raise RegistryError("column name or type is not text")
-        if kind not in {"integer", "number", "string"}:
+        if kind not in {"integer", "number", "string", "point_2d", "geojson_geometry"}:
             raise RegistryError("unknown column type")
         found.append((name, kind))
     return tuple(found)

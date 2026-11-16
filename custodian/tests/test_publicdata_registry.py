@@ -571,7 +571,17 @@ def test_registry_counts_follow_decision_0026() -> None:
     assert len(entries) == 143
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
-    assert len(owners) == 27
+    # S2-T28 moves exactly these advisor-confirmed CC BY rows to dataset basis.
+    confirmed = {"wage_bands_priv", "work_hours_act", "accident"}
+    assert len(owners) == 24
+    assert {
+        entry.key
+        for entry in entries
+        if entry.key in confirmed
+        and entry.licence_basis == "dataset"
+        and entry.licence_id == "CC-BY-4.0"
+        and entry.decision_record == ""
+    } == confirmed
     assert {entry.decision_record for entry in owners} == {"0026"}
 
 

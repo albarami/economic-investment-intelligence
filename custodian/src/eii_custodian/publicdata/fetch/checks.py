@@ -107,4 +107,14 @@ def _type_ok(value: object, kind: str) -> bool:
         return isinstance(value, int) and not isinstance(value, bool)
     if kind == "number":
         return isinstance(value, (int, float)) and not isinstance(value, bool)
+    if kind == "point_2d":
+        return isinstance(value, dict) and all(
+            _type_ok(value.get(axis), "number") for axis in ("lon", "lat")
+        )
+    if kind == "geojson_geometry":
+        return (
+            isinstance(value, dict)
+            and value.get("type") in ("Polygon", "MultiPolygon")
+            and isinstance(value.get("coordinates"), list)
+        )
     return False
