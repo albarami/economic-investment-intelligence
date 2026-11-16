@@ -27676,6 +27676,169 @@ Seed:      none
 Notes:     Both work commits have Conventional Commit subjects.
 ```
 
+#### Decision 0041: review round 1: REJECTED
+
+Reviewed commit `0f1dc0a`. Moonshot AI Kimi K3.1 Pro through Droid; another maker than the drafter (OpenAI) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED
+TASK: decision 0041 and task S3-T20, documents only
+COMMIT: 0f1dc0add59bf8fa4d1166fe1456728cb15aa082
+REVIEWER: Moonshot AI Kimi K3.1 Pro, through Droid
+SKILLS LOADED: strict-reviewer, sanad-provenance, task-standards, muhasabah-gate
+CHECKS:
+  D1 PASS docs/decisions/0041-remote-mode-through-the-owners-own-host.md, Decision items 1–8 faithfully carry the seven points and no-login choice. Items 9–10 stay within L-663/L-667, and the S3-gate addendum is explicitly an ASSUMPTION.
+  D2 PASS Decision items 1–5 and 9 preserve the loopback bind, hosting-off sources, offline controls, gates, privacy rules and sandbox. Rule 44 is unchanged; S3-T20 is assigned its later byte-identical amendment.
+  D3 PASS The cited ARC and DHA requirements and section headings exist and support their uses. No line-number citation appears; DHA-133 follows DHA-132 in the register's established form.
+  D4 FAIL TASKS.md, S3-T20 has the required form, dependencies, personas and post-gate placement, but several required guards lack planted violations. The assistant criterion also permits testing only one of the key-read and paid-call guards.
+  D5 PASS The added text contains no withheld host, domain, IP literal, personal name, e-mail address, local path, secret, forbidden digit run or gendered wording. It claims neither an implemented remote mode nor a passed gate.
+  D6 FAIL docs/README.md and document 14 match decision 0040's index and task-entry forms. The required checks were not run because the user prohibited shell commands, so exit-0 results and last lines cannot be quoted.
+FINDINGS:
+  F1 (TASKS.md, S3-T20 Acceptance criteria, Wrong: the second-public-port, non-loopback-bind and cookie guards have no planted violations, while “a planted key-read or paid-call attempt” allows only one assistant guard to be tested. Fix: require separate planted failures for a second public port, a non-loopback API bind, a non-Secure cookie, a wrong-SameSite cookie, a provider-key read and a paid call, using invented loopback fixtures.)
+  F2 (scripts/check_docs.py and scripts/check_tree.py, D6 validation, Wrong: required exit-0 evidence is absent because neither command could be run under the no-shell instruction. Fix: run both commands on the reviewed commit and record each exit code and final output line.)
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision 0041: confirmation round 2: APPROVED
+
+Reviewed commit `65e833d`. Moonshot AI Kimi K3.1 Pro through Droid; another maker than the drafter (OpenAI) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED
+TASK: decision 0041 and task S3-T20, documents only, round 2
+COMMIT: 65e833d9ab9fba5d9706f0b6b707cedc82e6d337
+REVIEWER: Moonshot AI Kimi K3.1 Pro, through Droid
+SKILLS LOADED: strict-reviewer, sanad-provenance, task-standards, muhasabah-gate
+CHECKS:
+  C1 PASS TASKS.md, S3-T20 now requires separate planted failures for a second public port, a non-loopback API bind, a cookie without Secure, a cookie without SameSite, a provider-key read and a paid call.
+  The planted third-host and third-origin rejections remain.
+  C2 PASS The round-2 brief confirms that the commit touches only three S3-T20 acceptance criteria in TASKS.md. The current text adds the required planted violations without removing or weakening any criterion.
+  The decision record and other files remain unchanged since 0f1dc0a.
+  C3 PASS I accept the lead's record: python3 scripts/check_docs.py exited 0 with "checked 679 text files, 87 Markdown files: OK", and python3 scripts/check_tree.py exited 0 with "checked 8 rules: OK".
+  These recorded runs on 65e833d settle D6.
+FINDINGS:
+  none
+PROPOSED OPEN ITEMS:
+  none
+```
+
+#### Decision 0041: merge record
+
+- The head that was merged, `19138770d0e3c74ff535f731021c98a5ae4449d2`, is the approved commit `65e833d` and one ledger commit that changes records only (decision 0039).
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43815899457 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43815899371 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43815899293.
+- The lead's ledger run on the head: exit 0, `./eii test --seed 2026111509`: 5252 passed.
+- The verdicts are quoted in the pull request's body (Review section) and in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/64 was squash-merged on 2026-11-16 at that head; merge commit `0c5836425ec55726fe7baed683de77ba6bf56107` on main; head tree `43508770b34cde63cf360050acd779fbb74aaec3`, merge tree `43508770b34cde63cf360050acd779fbb74aaec3`. CI on the merge commit: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43819084569 ; workflow ci running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43819084591 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43819084509.
+
+### DOCS-0042 — Decision record 0042 and tasks S6-T33 to S6-T39 and S8-T15 to S8-T17: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/65 )
+
+- What it is: [decision 0042](docs/decisions/0042-the-front-end-foundation.md), Accepted on 2026-11-16 as the owner's decisions of that day: the front-end foundation, the Explore screen, the conversational map and the golden scenario. Its thirteen items are the component layer, charts, motion, the catalogue protocol (one validated action dispatcher for the story, Explore and the assistant), the assistant transport, the skipped options, the design amendments, the pins (confirmed at the spikes under rule 42), the spikes, the Explore screen, the conversational map (map-first answers, the map as the question's context, typed directives carrying identifiers, enumeration keys and coordinates only), the golden scenario and the unchanged controls. The same pull request adds tasks S6-T33 to S6-T39 and S8-T15 to S8-T17 to TASKS.md, criteria to S3-T10, S3-T14, S3-T16 and S3-T18 each with a planted violation, an amendment line to S8-T15 and one sentence to the slice S10 gate; pointers and amended passages in documents 01, 09, 10, 11, 14 and 16 and docs/README.md; and open items OI-257 to OI-259.
+- Why: the owner's relayed notes of 2026-11-16 chose the front-end foundation, Explore, the conversational map and the golden scenario. A material amendment needs a decision record and never a silent edit (rule 46). Decision records keep their own pull request (rule 33).
+- Class: documents only, Deep in its subject (the catalogue boundary of rules 16 to 25 on every audience surface). Lead: Anthropic (Claude Opus 5.5): the placement rulings, the briefs, the gap-check criteria and the planted violations of round 2. Editor: OpenAI GPT-6 through Codex, the draft in three rounds. Reviewer: Google Gemini 3.1 Pro through Droid, which wrote none of the change.
+- Review: round 1 was REJECTED on one finding only, the public library documentation links in Sources; the lead overruled it, because rules 5 and 15 require public attribution and forbid only private details and product comparisons, and the links stay marked as reported by the research and not checked. Confirmation round 2 at `a555fad55ea0f38be78ceacd293486f2b195ac0d` was REJECTED on four findings: the new S3-T10, S3-T14, S3-T16 and S3-T18 guards lacked planted violations. The lead added them (work commit `d1a64c45925e41f83a15594efa80919ad712d979`) and ran the documentation check and the tree check on it, each exit 0. The same reviewer confirmed round 3 APPROVED at the work commit with no finding.
+- Left unchanged: AGENTS.md and CLAUDE.md, every privacy rule, gate check, hard limit, sandbox rule and source permission; decision 0035 binds every audience surface. No library is installed, no code, check script, workflow file or test changes, and no result is measured: every target is a proposal measured by its task and never loosened. The record claims no implemented screen, spike result, pin or gate approval (rule 47).
+- The repository's checks cannot tell whether the record reads the owner's notes rightly. That judgement belongs to the reviewer, and the owner's choices stay with the owner.
+- Evidence: the commands below, run at the work commit.
+
+#### Evidence for the work commit `d1a64c45925e41f83a15594efa80919ad712d979`
+
+```text
+### DOCS-0042 — Decision record 0042 and tasks S6-T33 to S6-T39 and S8-T15 to S8-T17
+Commit:    d1a64c45925e41f83a15594efa80919ad712d979
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 680 text files, 88 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the whole pack with record 0042, its ten new tasks, the S3 criteria and the index rows: headers, links, requirement identifiers (each cited identifier exists once), the forbidden patterns.
+```
+
+```text
+### DOCS-0042 — Decision record 0042 and tasks S6-T33 to S6-T39 and S8-T15 to S8-T17
+Commit:    d1a64c45925e41f83a15594efa80919ad712d979
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the committed tree.
+```
+
+```text
+### DOCS-0042 — Decision record 0042 and tasks S6-T33 to S6-T39 and S8-T15 to S8-T17
+Commit:    d1a64c45925e41f83a15594efa80919ad712d979
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two agent files stay byte-identical; neither changes here.
+```
+
+```text
+### DOCS-0042 — Decision record 0042 and tasks S6-T33 to S6-T39 and S8-T15 to S8-T17
+Commit:    d1a64c45925e41f83a15594efa80919ad712d979
+Command:   bash -c "git diff --name-only 0c5836425ec55726fe7baed683de77ba6bf56107 HEAD -- docs/decisions/ | grep -v -E '/0042-' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no earlier decision record is changed)
+Seed:      none
+Notes:     Record 0042 is a new file (rule 46); this row proves on the committed tree that no earlier decision record was edited.
+```
+
+```text
+### DOCS-0042 — Decision record 0042 and tasks S6-T33 to S6-T39 and S8-T15 to S8-T17
+Commit:    d1a64c45925e41f83a15594efa80919ad712d979
+Command:   bash -c "git diff --name-only 0c5836425ec55726fe7baed683de77ba6bf56107 HEAD -- scripts .github web core custodian product gateway evals eii | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (no code, check script or workflow file is changed)
+Seed:      none
+Notes:     The change is documents only.
+```
+
+```text
+### DOCS-0042 — Decision record 0042 and tasks S6-T33 to S6-T39 and S8-T15 to S8-T17
+Commit:    d1a64c45925e41f83a15594efa80919ad712d979
+Command:   bash -c "git diff --name-only 0c5836425ec55726fe7baed683de77ba6bf56107 HEAD | grep -v -E '[.]md$' | wc -l"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "0" (only Markdown files change)
+Seed:      none
+Notes:     Every changed file is a Markdown document.
+```
+
+```text
+### DOCS-0042 — Decision record 0042 and tasks S6-T33 to S6-T39 and S8-T15 to S8-T17
+Commit:    d1a64c45925e41f83a15594efa80919ad712d979
+Command:   ./eii test --seed 2026111611
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    5252 passed, 0 failed, 0 skipped
+Seed:      2026111611
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit.
+```
+
+```text
+### DOCS-0042 — Decision record 0042 and tasks S6-T33 to S6-T39 and S8-T15 to S8-T17
+Commit:    d1a64c45925e41f83a15594efa80919ad712d979
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','0c5836425ec55726fe7baed683de77ba6bf56107..d1a64c45925e41f83a15594efa80919ad712d979'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Both work commits have Conventional Commit subjects.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
