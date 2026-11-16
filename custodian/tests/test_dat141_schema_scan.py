@@ -48,6 +48,10 @@ DENIED_FIELDS: dict[str, frozenset[str]] = {
 DENIED_BY_NAME = {
     name: category for category, names in DENIED_FIELDS.items() for name in names
 }
+SPLIT_ADMITTED_COLUMNS: dict[str, frozenset[str]] = {
+    "sex": frozenset({"sex", "gender"}),
+    "nationality": frozenset({"nationality"}),
+}
 CONTEXT_MARKERS: dict[str, frozenset[str]] = {
     "worker": _names("worker workers workforce employee employees employment payroll"),
     "residence": _names(
@@ -171,7 +175,12 @@ def _violations(schema: Schema) -> tuple[Violation, ...]:
     for field in schema.fields:
         name = _normalised(field)
         category = DENIED_BY_NAME.get(name)
-        if category is None or name in allowed or name in schema.splits:
+        admitted = any(
+            name in SPLIT_ADMITTED_COLUMNS[split]
+            for split in schema.splits
+            if split in SPLIT_ADMITTED_COLUMNS
+        )
+        if category is None or name in allowed or admitted:
             continue
         found.append(Violation(schema.path, schema.name, field, category))
     return tuple(found)
@@ -594,7 +603,7 @@ def test_scan_refuses_a_root_that_is_not_a_folder(tmp_path: Path) -> None:
 
 
 def test_public_splits_allow_only_the_named_column(tmp_path: Path) -> None:
-    """A public split allows that column name and no other column."""
+    """A public split allows the columns its name admits, and no other column."""
     bare = tmp_path / "bare.yaml"
     bare.write_text(
         "sources:\n"
@@ -617,14 +626,47 @@ def test_public_splits_allow_only_the_named_column(tmp_path: Path) -> None:
         "        type: string\n",
         encoding="utf-8",
     )
+    sex_word = tmp_path / "sex-word.yaml"
+    sex_word.write_text(
+        "sources:\n"
+        "  - key: invented-employees-sex-word\n"
+        "    source_id: invented_employees\n"
+        "    public_splits:\n"
+        "      - sex\n"
+        "    columns:\n"
+        "      - name: gender\n"
+        "        type: string\n",
+        encoding="utf-8",
+    )
+    nationality_only = tmp_path / "nationality-only.yaml"
+    nationality_only.write_text(
+        "sources:\n"
+        "  - key: invented-employees-nationality-only\n"
+        "    source_id: invented_employees\n"
+        "    public_splits:\n"
+        "      - nationality\n"
+        "    columns:\n"
+        "      - name: gender\n"
+        "        type: string\n",
+        encoding="utf-8",
+    )
     bare_scan = scan_tree((tmp_path,), bare)
     shifted_scan = scan_tree((tmp_path,), shifted)
+    sex_word_scan = scan_tree((tmp_path,), sex_word)
+    nationality_only_scan = scan_tree((tmp_path,), nationality_only)
     assert [
         (item.schema, item.field, item.category) for item in bare_scan.violations
     ] == [("invented-employees-bare", "nationality", "nationality")]
     assert [
         (item.schema, item.field, item.category) for item in shifted_scan.violations
     ] == [("invented-employees-shifted", "nationality_code", "nationality")]
+    assert [
+        (item.schema, item.field, item.category) for item in sex_word_scan.violations
+    ] == []
+    assert [
+        (item.schema, item.field, item.category)
+        for item in nationality_only_scan.violations
+    ] == [("invented-employees-nationality-only", "gender", "sex")]
 
 
 def test_scan_refuses_a_named_registry_that_is_not_a_file(tmp_path: Path) -> None:
