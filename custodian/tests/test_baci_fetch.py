@@ -520,3 +520,268 @@ def test_baci_transport_refusal_is_not_retried(tmp_path, phase):
     )
     assert result.failure.check == "blocked_host"
     assert len(calls) == 1
+
+
+def _baci_refused_fetch(
+    tmp_path,
+    reason,
+    *,
+    source=None,
+    config=None,
+    byte_transport=metadata,
+    stream_transport=stream,
+    clock=lambda: "2026-11-16T00:00:00Z",
+    payload=b"Invented publisher page",
+):
+    from custodian.tests.fixtures.baci.invented import configuration
+
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+    from eii_custodian.publicdata.baci.fetch import fetch_baci
+
+    source = entry() if source is None else source
+    config = Config.from_mapping(configuration() if config is None else config)
+    directory = tmp_path / "cepii_baci"
+    before = {p.name: p.read_bytes() for p in directory.glob("*.manifest.json")}
+    with pytest.raises(BaciError, match=f"^{reason}$") as caught:
+        fetch_baci(
+            source,
+            config,
+            byte_transport,
+            stream_transport,
+            tmp_path,
+            clock,
+            lambda _: None,
+        )
+    assert str(caught.value) == reason
+    assert "invented-secret-marker" not in repr(caught.value)
+    assert payload.decode() not in repr(caught.value)
+    assert {p.name: p.read_bytes() for p in directory.glob("*.manifest.json")} == before
+    # A different source id cannot enter BACI dispatch; exercise it directly above.
+    if source.source_id == "cepii_baci":
+        result = run_build(
+            [source],
+            byte_transport,
+            tmp_path,
+            clock,
+            lambda _: None,
+            stream_transport=stream_transport,
+            baci_config=config,
+        )
+        assert result.failure is not None
+        assert result.failure.check == reason
+        assert result.manifests == {}
+        assert "invented-secret-marker" not in repr(result)
+        assert payload.decode() not in repr(result)
+        assert {
+            p.name: p.read_bytes() for p in directory.glob("*.manifest.json")
+        } == before
+    assert not list(directory.glob(".stage-*"))
+
+
+@pytest.mark.parametrize("field", ["source_id", "key"])
+def test_baci_entry_source_id_guard(tmp_path, field):
+    from dataclasses import replace
+
+    source = replace(entry(), **{field: "invented-other"})
+    _baci_refused_fetch(tmp_path, "source_id", source=source)
+
+
+@pytest.mark.parametrize("basis,record", [("owner_decision", ""), ("dataset", "0026")])
+def test_baci_entry_decision_record_guard(tmp_path, basis, record):
+    from dataclasses import replace
+
+    _baci_refused_fetch(
+        tmp_path,
+        "licence_basis",
+        source=replace(entry(), licence_basis=basis, decision_record=record),
+    )
+
+
+def test_baci_entry_terms_url_guard(tmp_path):
+    from dataclasses import replace
+
+    source = replace(entry(), terms_url=entry().url + "-unreviewed")
+
+    def forbidden(_):
+        raise AssertionError("metadata requested before terms URL approval")
+
+    _baci_refused_fetch(
+        tmp_path, "blocked_host", source=source, byte_transport=forbidden
+    )
+
+
+def test_baci_metadata_bytes_guard(tmp_path):
+    from custodian.tests.fixtures.baci.invented import configuration
+
+    from eii_custodian.publicdata.fetch.transport import Response
+
+    config = configuration()
+    payload = b"invented-secret-marker " + b"x" * config["archive_bytes"][1]
+    _baci_refused_fetch(
+        tmp_path,
+        "metadata_bytes",
+        byte_transport=lambda url: Response(url, payload, ()),
+        payload=payload,
+    )
+
+
+@pytest.mark.parametrize(
+    "marker", ["registration required", "sign in", "robot check", "paid tier"]
+)
+def test_baci_metadata_response_obstacle_guard(tmp_path, marker):
+    from hashlib import sha256
+
+    from custodian.tests.fixtures.baci.invented import configuration
+
+    from eii_custodian.publicdata.fetch.transport import Response
+
+    config = configuration()
+    payload = f"Invented {marker.upper()} invented-secret-marker".encode()
+    config["page_sha256"] = sha256(payload).hexdigest()
+    _baci_refused_fetch(
+        tmp_path,
+        "access_obstacle",
+        config=config,
+        byte_transport=lambda url: Response(url, payload, ()),
+        payload=payload,
+    )
+
+
+@pytest.mark.parametrize("length", [True, "invented-secret-marker"])
+def test_baci_declared_length_type_guard(tmp_path, length):
+    from contextlib import contextmanager
+    from types import SimpleNamespace
+
+    from custodian.tests.fixtures.baci.invented import archive
+
+    @contextmanager
+    def supplied(url):
+        yield SimpleNamespace(
+            final_url=url, hops=(), declared_length=length, chunks=iter([archive()])
+        )
+
+    _baci_refused_fetch(tmp_path, "declared_length", stream_transport=supplied)
+
+
+@pytest.mark.parametrize("kind", ["text", "bytearray", "oversized"])
+def test_baci_stream_chunk_guard(tmp_path, kind):
+    from contextlib import contextmanager
+    from types import SimpleNamespace
+
+    from custodian.tests.fixtures.baci.invented import configuration
+
+    payload = b"invented-secret-marker"
+    chunk = {
+        "text": payload.decode(),
+        "bytearray": bytearray(payload),
+        "oversized": payload + b"x" * 65536,
+    }[kind]
+    config = configuration()
+    config["archive_bytes"] = [1, 131072]
+
+    @contextmanager
+    def supplied(url):
+        yield SimpleNamespace(
+            final_url=url, hops=(), declared_length=None, chunks=iter([chunk])
+        )
+
+    _baci_refused_fetch(
+        tmp_path,
+        "stream_chunk",
+        config=config,
+        stream_transport=supplied,
+        payload=payload,
+    )
+
+
+def test_baci_publish_cache_integrity_guard(tmp_path):
+    import json
+
+    from eii_custodian.publicdata.baci.contracts import read_selected
+
+    original = build(tmp_path)
+    assert original.failure is None
+    selected = original.manifests["cepii_baci"]
+    assert len(read_selected(tmp_path, selected).trade) == 3
+    directory = tmp_path / "cepii_baci"
+    manifest = json.loads((directory / f"{selected}.manifest.json").read_text())
+    cached = directory / f"{manifest['archive_sha256']}.zip"
+    payload = b"invented-secret-marker invented-cache-payload"
+    cached.write_bytes(payload)
+    _baci_refused_fetch(tmp_path, "cache_integrity", payload=payload)
+    assert cached.read_bytes() == payload
+
+
+@pytest.mark.parametrize("clock", ["2026-1-16T00:00:00Z", "invented-secret-marker"])
+def test_baci_retrieval_clock_guard(tmp_path, clock):
+    _baci_refused_fetch(tmp_path, "retrieval_date", clock=lambda: clock)
+
+
+def test_baci_publisher_archive_checksum_guard(tmp_path):
+    from custodian.tests.fixtures.baci.invented import configuration
+
+    config = configuration()
+    config["publisher_sha256"] = "f" * 64
+    _baci_refused_fetch(tmp_path, "archive_checksum", config=config)
+
+
+def test_baci_terms_unread_network_path(tmp_path):
+    import json
+    from dataclasses import replace
+
+    from custodian.tests.fixtures.baci.invented import configuration
+
+    from eii_custodian.publicdata.baci.contracts import read_selected
+    from eii_custodian.publicdata.fetch.transport import ATTEMPT_LIMIT
+
+    source = replace(entry(), terms_url=entry().url + "-terms")
+    config = configuration()
+    config["reviewed_urls"].append(source.terms_url)
+    attempts = []
+    payload = "invented-secret-marker invented-terms-payload"
+
+    def unread(url):
+        if url == source.terms_url:
+            attempts.append(url)
+            raise OSError(payload)
+        return metadata(url)
+
+    result = build(tmp_path, source=source, config=config, byte_transport=unread)
+    assert result.failure is None
+    assert len(attempts) == ATTEMPT_LIMIT
+    selected = result.manifests["cepii_baci"]
+    release = read_selected(tmp_path, selected)
+    assert release.manifest["terms_unread"] == "network_exhausted"
+    assert release.manifest["receipt"]["terms_sha256"] is None
+    assert any("network_exhausted" in line for line in result.lines)
+    assert "invented-secret-marker" not in repr(result)
+    assert payload not in repr(result)
+    assert payload not in json.dumps(release.manifest)
+    assert list((tmp_path / "cepii_baci").glob("*.manifest.json")) == [
+        tmp_path / "cepii_baci" / f"{selected}.manifest.json"
+    ]
+
+
+def test_baci_terms_unread_refuses_other_errors(tmp_path):
+    from dataclasses import replace
+
+    from custodian.tests.fixtures.baci.invented import configuration
+
+    from eii_custodian.publicdata.fetch.transport import Response
+
+    source = replace(entry(), terms_url=entry().url + "-terms")
+    config = configuration()
+    config["reviewed_urls"].append(source.terms_url)
+    payload = b"Invented sign in invented-secret-marker"
+
+    def obstacle(url):
+        return Response(url, payload, ()) if url == source.terms_url else metadata(url)
+
+    _baci_refused_fetch(
+        tmp_path,
+        "access_obstacle",
+        source=source,
+        config=config,
+        byte_transport=obstacle,
+        payload=payload,
+    )

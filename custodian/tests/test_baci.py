@@ -373,3 +373,393 @@ def test_baci_deflate_failure_is_safe(tmp_path, monkeypatch):
     monkeypatch.setattr(parse.ZipFile, "open", broken)
     with pytest.raises(BaciError, match="archive_integrity"):
         parse.parse_archive(path, Config.from_mapping(configuration()), tmp_path)
+
+
+@pytest.mark.parametrize("width", ["missing", "extra"])
+def test_baci_row_schema_guard(tmp_path, width):
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+    from eii_custodian.publicdata.baci.parse import parse_archive
+
+    members = dict(MEMBERS)
+    lines = members["invented-year.csv"].splitlines()
+    fields = lines[-1].split(",")
+    fields = fields[:-1] if width == "missing" else [*fields, "invented-extra"]
+    lines[-1] = ",".join(fields)
+    members["invented-year.csv"] = "\n".join(lines) + "\n"
+    path = tmp_path / "archive.zip"
+    path.write_bytes(archive(members))
+    with pytest.raises(BaciError, match=r"^row_schema$"):
+        parse_archive(path, Config.from_mapping(configuration()), tmp_path)
+
+
+def test_baci_running_member_bytes_guard(tmp_path, monkeypatch):
+    from io import BytesIO
+    from zipfile import ZipInfo
+
+    from eii_custodian.publicdata.baci import parse
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+
+    raw = configuration()
+    member = raw["members"][0]
+    content = MEMBERS[member["name"]].encode()
+    member["bytes"] = [1, len(content)]
+    path = tmp_path / "archive.zip"
+    path.write_bytes(archive())
+    original = parse.ZipFile.open
+    reads = []
+
+    class Overrun(BytesIO):
+        def read(self, size=-1):
+            assert not reads, "read continued past the running member bound"
+            reads.append(size)
+            return super().read(size)
+
+    def supplied(zipped, name, *args, **kwargs):
+        if isinstance(name, ZipInfo) and name.filename == member["name"]:
+            assert name.file_size == len(content)
+            return Overrun(content + b"x")
+        return original(zipped, name, *args, **kwargs)
+
+    monkeypatch.setattr(parse.ZipFile, "open", supplied)
+    with pytest.raises(BaciError, match=r"^member_bytes$"):
+        parse.parse_archive(path, Config.from_mapping(raw), tmp_path)
+    assert reads == [65536]
+
+
+def test_baci_member_size_consistency_guard(tmp_path, monkeypatch):
+    from io import BytesIO
+    from zipfile import ZipInfo
+
+    from eii_custodian.publicdata.baci import parse
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+
+    raw = configuration()
+    member = raw["members"][0]
+    content = MEMBERS[member["name"]].encode()
+    path = tmp_path / "archive.zip"
+    path.write_bytes(archive())
+    original = parse.ZipFile.open
+
+    def supplied(zipped, name, *args, **kwargs):
+        if isinstance(name, ZipInfo) and name.filename == member["name"]:
+            assert name.file_size == len(content)
+            assert member["bytes"][0] <= len(content) + 1 <= member["bytes"][1]
+            return BytesIO(content + b"x")
+        return original(zipped, name, *args, **kwargs)
+
+    monkeypatch.setattr(parse.ZipFile, "open", supplied)
+    with pytest.raises(BaciError, match=r"^member_bytes$"):
+        parse.parse_archive(path, Config.from_mapping(raw), tmp_path)
+
+
+def test_baci_final_member_bytes_guard(tmp_path, monkeypatch):
+    from io import BytesIO
+    from zipfile import ZipInfo
+
+    from eii_custodian.publicdata.baci import parse
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+
+    raw = configuration()
+    member = raw["members"][0]
+    content = MEMBERS[member["name"]].encode()
+    member["bytes"] = [len(content), len(content)]
+    path = tmp_path / "archive.zip"
+    path.write_bytes(archive())
+    original_open = parse.ZipFile.open
+    original_within = parse.within
+    member_sizes = []
+
+    def supplied(zipped, name, *args, **kwargs):
+        if isinstance(name, ZipInfo) and name.filename == member["name"]:
+            assert name.file_size == len(content)
+            return BytesIO(content[:-1])
+        return original_open(zipped, name, *args, **kwargs)
+
+    def checked(value, span, reason):
+        # The final bounds check must refuse before the size-consistency check.
+        if reason == "member_bytes":
+            member_sizes.append(value)
+        original_within(value, span, reason)
+
+    monkeypatch.setattr(parse.ZipFile, "open", supplied)
+    monkeypatch.setattr(parse, "within", checked)
+    with pytest.raises(BaciError, match=r"^member_bytes$"):
+        parse.parse_archive(path, Config.from_mapping(raw), tmp_path)
+    assert member_sizes == [len(content), len(content) - 1]
+
+
+@pytest.mark.parametrize("kind", ["country", "product"])
+def test_baci_dictionary_description_guard(tmp_path, kind):
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+    from eii_custodian.publicdata.baci.parse import parse_archive
+
+    members = dict(MEMBERS)
+    name = f"invented-{kind}.csv"
+    old = "Invented target" if kind == "country" else "Invented product"
+    members[name] = members[name].replace(old, " ")
+    path = tmp_path / "archive.zip"
+    path.write_bytes(archive(members))
+    with pytest.raises(BaciError, match=r"^dictionary_description$"):
+        parse_archive(path, Config.from_mapping(configuration()), tmp_path)
+
+
+def test_baci_iso3_guard(tmp_path):
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+    from eii_custodian.publicdata.baci.parse import parse_archive
+
+    members = dict(MEMBERS)
+    members["invented-country.csv"] = members["invented-country.csv"].replace(
+        "Invented target,", "Invented target,xx"
+    )
+    path = tmp_path / "archive.zip"
+    path.write_bytes(archive(members))
+    with pytest.raises(BaciError, match=r"^iso3$"):
+        parse_archive(path, Config.from_mapping(configuration()), tmp_path)
+
+
+def test_baci_qatar_key_guard(tmp_path):
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+    from eii_custodian.publicdata.baci.parse import parse_archive
+
+    raw = configuration()
+    raw["qatar_key"] = "00Z"
+    path = tmp_path / "archive.zip"
+    path.write_bytes(archive())
+    with pytest.raises(BaciError, match=r"^qatar_key$"):
+        parse_archive(path, Config.from_mapping(raw), tmp_path)
+
+
+def test_baci_config_text_type_guard():
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+
+    raw = configuration()
+    raw["publisher"] = 1
+    with pytest.raises(BaciError, match=r"^configuration_type$"):
+        Config.from_mapping(raw)
+
+
+def test_baci_config_strings_type_guard():
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+
+    raw = configuration()
+    raw["reviewed_urls"] = tuple(raw["reviewed_urls"])
+    with pytest.raises(BaciError, match=r"^configuration_type$"):
+        Config.from_mapping(raw)
+
+
+@pytest.mark.parametrize("value", [(1, 4096), [1], [1, 4096, 4096]])
+def test_baci_config_bounds_type_guard(value):
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+
+    raw = configuration()
+    raw["archive_bytes"] = value
+    with pytest.raises(BaciError, match=r"^configuration_bounds$"):
+        Config.from_mapping(raw)
+
+
+def test_baci_config_confirmed_access_guard():
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+
+    raw = configuration()
+    raw["access"] = "unconfirmed"
+    with pytest.raises(BaciError, match=r"^access_state$"):
+        Config.from_mapping(raw)
+
+
+def test_baci_config_duplicate_inventory_guard():
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+
+    raw = configuration()
+    raw["members"].append(deepcopy(raw["members"][-1]))
+    with pytest.raises(BaciError, match=r"^inventory$"):
+        Config.from_mapping(raw)
+
+
+@pytest.mark.parametrize("change", ["missing", "extra", "duplicate"])
+def test_baci_config_year_coverage_guard(change):
+    from eii_custodian.publicdata.baci.config import BaciError, Config
+
+    raw = configuration()
+    if change == "missing":
+        raw["period_last"] += 1
+    else:
+        member = deepcopy(raw["members"][-1])
+        member["name"] = "invented-other-year.csv"
+        if change == "extra":
+            member["year"] += 1
+        raw["members"].append(member)
+    with pytest.raises(BaciError, match=r"^year_coverage$"):
+        Config.from_mapping(raw)
+
+
+def _baci_selected_fixture(tmp_path):
+    import json
+
+    from custodian.tests.test_baci_fetch import build
+
+    from eii_custodian.publicdata.baci.contracts import read_selected
+
+    result = build(tmp_path)
+    assert result.failure is None
+    selected = result.manifests["cepii_baci"]
+    assert len(read_selected(tmp_path, selected).trade) == 3
+    directory = tmp_path / "cepii_baci"
+    manifest = json.loads((directory / f"{selected}.manifest.json").read_text())
+    return directory, selected, manifest
+
+
+def _baci_write_manifest(directory, manifest):
+    import json
+    from hashlib import sha256
+
+    payload = json.dumps(manifest, sort_keys=True).encode()
+    selected = sha256(payload).hexdigest()
+    (directory / f"{selected}.manifest.json").write_bytes(payload)
+    return selected
+
+
+def test_baci_selected_manifest_guard(tmp_path):
+    from eii_custodian.publicdata.baci.config import BaciError
+    from eii_custodian.publicdata.baci.contracts import read_selected
+
+    directory, selected, _ = _baci_selected_fixture(tmp_path)
+    invalid = "invented-selection"
+    (directory / f"{invalid}.manifest.json").write_bytes(
+        (directory / f"{selected}.manifest.json").read_bytes()
+    )
+    with pytest.raises(BaciError, match=r"^selected_manifest$"):
+        read_selected(tmp_path, invalid)
+
+
+def test_baci_manifest_hash_guard(tmp_path):
+    from eii_custodian.publicdata.baci.config import BaciError
+    from eii_custodian.publicdata.baci.contracts import read_selected
+
+    directory, selected, _ = _baci_selected_fixture(tmp_path)
+    path = directory / f"{selected}.manifest.json"
+    path.write_bytes(path.read_bytes() + b" ")
+    with pytest.raises(BaciError, match=r"^manifest_hash$"):
+        read_selected(tmp_path, selected)
+
+
+@pytest.mark.parametrize(
+    "field,value", [("confirmed", False), ("access", "registration")]
+)
+def test_baci_manifest_configuration_guard(tmp_path, field, value):
+    from eii_custodian.publicdata.baci.config import BaciError
+    from eii_custodian.publicdata.baci.contracts import read_selected
+
+    directory, _, manifest = _baci_selected_fixture(tmp_path)
+    manifest["config"][field] = value
+    selected = _baci_write_manifest(directory, manifest)
+    with pytest.raises(BaciError, match=r"^manifest_configuration$"):
+        read_selected(tmp_path, selected)
+
+
+@pytest.mark.parametrize("field", ["kind", "digest"])
+def test_baci_terms_fingerprint_guard(tmp_path, field):
+    from eii_custodian.publicdata.baci.config import BaciError
+    from eii_custodian.publicdata.baci.contracts import read_selected
+
+    directory, _, manifest = _baci_selected_fixture(tmp_path)
+    if field == "kind":
+        manifest["terms_fingerprint_kind"] = "invented-kind"
+    else:
+        manifest["receipt"]["terms_sha256"] = "invented-digest"
+    selected = _baci_write_manifest(directory, manifest)
+    with pytest.raises(BaciError, match=r"^terms_fingerprint$"):
+        read_selected(tmp_path, selected)
+
+
+def test_baci_manifest_retrieval_date_guard(tmp_path):
+    from eii_custodian.publicdata.baci.config import BaciError
+    from eii_custodian.publicdata.baci.contracts import read_selected
+
+    directory, _, manifest = _baci_selected_fixture(tmp_path)
+    manifest["receipt"]["retrieved_utc"] = "2026-1-16T00:00:00Z"
+    selected = _baci_write_manifest(directory, manifest)
+    with pytest.raises(BaciError, match=r"^retrieval_date$"):
+        read_selected(tmp_path, selected)
+
+
+@pytest.mark.parametrize("change", ["format", "cache", "receipt"])
+def test_baci_archive_hash_guard(tmp_path, change):
+    from eii_custodian.publicdata.baci.config import BaciError
+    from eii_custodian.publicdata.baci.contracts import read_selected
+
+    directory, selected, manifest = _baci_selected_fixture(tmp_path)
+    if change == "cache":
+        archive_path = directory / f"{manifest['archive_sha256']}.zip"
+        archive_path.write_bytes(archive_path.read_bytes() + b"invented-tamper")
+    else:
+        if change == "format":
+            manifest["archive_sha256"] = "invented-digest"
+        else:
+            manifest["receipt"]["sha256"] = "f" * 64
+        selected = _baci_write_manifest(directory, manifest)
+    with pytest.raises(BaciError, match=r"^archive_hash$"):
+        read_selected(tmp_path, selected)
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("publisher", "invented-other"),
+        ("landing_url", "invented-other"),
+        ("licence_basis", "dataset"),
+        ("terms_read_on", "2026-11-15"),
+        ("commit_allowed", True),
+        ("fetch_host", "invented.invalid"),
+        ("bytes", 1),
+    ],
+)
+def test_baci_source_chain_guard(tmp_path, monkeypatch, field, value):
+    from eii_custodian.publicdata.baci import contracts
+    from eii_custodian.publicdata.baci.config import BaciError
+    from eii_custodian.publicdata.baci.contracts import read_selected
+
+    directory, _, manifest = _baci_selected_fixture(tmp_path)
+    manifest["receipt"][field] = value
+    selected = _baci_write_manifest(directory, manifest)
+    if field != "bytes":
+
+        def forbidden(*args, **kwargs):
+            raise AssertionError("receipt reconstruction reached past source guard")
+
+        monkeypatch.setattr(contracts, "sidecar_for", forbidden)
+    with pytest.raises(BaciError, match=r"^source_chain$"):
+        read_selected(tmp_path, selected)
+
+
+def test_baci_manifest_archive_checksum_guard(tmp_path):
+    from eii_custodian.publicdata.baci.config import BaciError
+    from eii_custodian.publicdata.baci.contracts import read_selected
+
+    directory, _, manifest = _baci_selected_fixture(tmp_path)
+    manifest["config"]["publisher_sha256"] = "f" * 64
+    selected = _baci_write_manifest(directory, manifest)
+    with pytest.raises(BaciError, match=r"^archive_checksum$"):
+        read_selected(tmp_path, selected)
+
+
+@pytest.mark.parametrize(
+    "field", ["members", "outputs", "raw", "selected", "excluded", "coverage"]
+)
+def test_baci_manifest_content_guard(tmp_path, field):
+    from eii_custodian.publicdata.baci.config import BaciError
+    from eii_custodian.publicdata.baci.contracts import read_selected
+
+    directory, _, manifest = _baci_selected_fixture(tmp_path)
+    if field == "members":
+        manifest[field][0]["bytes"] += 1
+    elif field == "outputs":
+        manifest[field]["pub_baci_trade"]["rows"] += 1
+    elif field == "coverage":
+        manifest[field][0]["selected"] += 1
+    else:
+        manifest[field] += 1
+        if field == "raw":
+            manifest["receipt"]["row_count"] = manifest[field]
+    selected = _baci_write_manifest(directory, manifest)
+    with pytest.raises(BaciError, match=r"^manifest_content$"):
+        read_selected(tmp_path, selected)
