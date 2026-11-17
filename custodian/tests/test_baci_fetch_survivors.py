@@ -224,3 +224,87 @@ def test_baci_manifest_explicit_encoding(tmp_path, monkeypatch):
 
     monkeypatch.setattr(Path, "write_text", other_default)
     test_baci_result_and_manifest(tmp_path, False)
+
+
+@pytest.mark.parametrize("redirect_part", ["hop", "final"])
+def test_baci_metadata_refuses_unreviewed_redirect(tmp_path, redirect_part):
+    unreviewed = "https://unlisted.invalid/invented-page"
+
+    def redirected(url):
+        return Response(
+            unreviewed if redirect_part == "final" else url,
+            b"Invented publisher page",
+            (unreviewed,) if redirect_part == "hop" else (),
+        )
+
+    with refusal("blocked_host"):
+        call(tmp_path, byte=redirected)
+    assert not (tmp_path / "cepii_baci").exists()
+
+
+@pytest.mark.parametrize("terms_state", ["absent", "unreachable"])
+def test_baci_unread_terms_have_no_snapshot(tmp_path, terms_state):
+    raw = configuration()
+    source = entry()
+    if terms_state == "unreachable":
+        source = replace(source, terms_url=source.url + "-terms")
+        raw["reviewed_urls"].append(source.terms_url)
+
+    def supplied(url):
+        if url == source.terms_url:
+            raise OSError("invented unavailable terms")
+        return metadata(url)
+
+    result = call(tmp_path, raw=raw, source=source, byte=supplied)
+    assert result.terms_sha256 == ""
+    assert result.terms_unread == (
+        "network_exhausted" if terms_state == "unreachable" else "terms_to_be_read"
+    )
+    directory = tmp_path / "cepii_baci"
+    assert (directory / f"{result.digest}.manifest.json").is_file()
+    assert not (directory / "terms").exists()
+
+
+def test_baci_manifest_keeps_empty_refetch_evidence(tmp_path):
+    result = call(tmp_path)
+    manifest = json.loads(
+        (tmp_path / "cepii_baci" / f"{result.digest}.manifest.json").read_bytes()
+    )
+    assert manifest["entry"]["refetch"] == {
+        "value": "none",
+        "reason": "frequency_unconfirmed",
+        "evidence": "",
+    }
+
+
+@pytest.mark.parametrize("role", ["metadata", "terms"])
+def test_baci_auxiliary_snapshots_preserve_source_chain(tmp_path, role):
+    from eii_custodian.publicdata.fetch.snapshots import read_snapshot
+
+    raw = configuration()
+    source = entry()
+    source = replace(source, terms_url=source.url + "-terms")
+    raw["reviewed_urls"].append(source.terms_url)
+    bodies = {
+        raw["page"]: b"Invented publisher page",
+        source.terms_url: b"Invented terms text",
+    }
+
+    def supplied(url):
+        return Response(url, bodies[url], ())
+
+    call(tmp_path, raw=raw, source=source, byte=supplied)
+    url = raw["page"] if role == "metadata" else source.terms_url
+    body = bodies[url]
+    digest = sha256(body).hexdigest()
+    snapshot = read_snapshot(tmp_path / "cepii_baci" / role, digest)
+    assert snapshot.path.read_bytes() == body
+    assert snapshot.sha256 == digest
+    assert snapshot.sidecar["sha256"] == digest
+    assert snapshot.sidecar["bytes"] == len(body)
+    assert snapshot.sidecar["fetch_url"] == url
+    assert snapshot.sidecar["fetch_host"] == "www.data.gov.qa"
+    assert snapshot.sidecar["source_modified"] == "invented-release"
+    assert snapshot.sidecar["retrieved_utc"] == "2026-11-16T00:00:00Z"
+    assert snapshot.sidecar["source_id"] == "cepii_baci"
+    assert snapshot.sidecar["publisher"] == "Invented publisher"
