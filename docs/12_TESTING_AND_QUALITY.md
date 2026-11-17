@@ -755,3 +755,31 @@ release tests replay explicit selections, preserve native units and directions,
 reject output/input/binding tampering, enumerate absent pairs, and preserve
 recorded causes and free-plan gaps in the owner report. Fixtures do not verify
 live publisher layouts or Qatar bindings; independent review remains required.
+
+## S2-T29 invented-response checks
+
+`test_s2_t29_pages.py` exercises page evidence holds, registry declarations,
+page schema/types/counts, raw-to-parsed hash lineage, explicit history selection,
+missing receipts, closed claim meanings, Public-split use refusals and the real
+build-public page dispatch. `test_s2_t29_transport.py` plants wrong/missing and
+other-host pins, missing approval, disabled TLS, capture evidence/access failures,
+a dated connection reset and intake escape, and checks browser headers and the
+joined Earthdata/Comtrade command boundary. School integration plants retain the
+typed capture refusal in the output and dated failure receipt without publishing
+capture bytes. `test_s2_t29_awards.py` exercises
+CSV/OOXML invented intake, ambiguous day-first dates, blanks, invalid-date counts,
+path/hash/profile refusals, exact and short/large distinct proof frames,
+reproducibility, mismatch/failed-fetch denominators, receipt placement,
+registration/name matching and immutable appends.
+
+The accident and population-grid test files add bounded acquisition and explicit
+older-snapshot selection plants. Cadence tests extend the closed source assignment
+map. Existing grid fixtures now explicitly select the archived object they create;
+receipt tampering is rejected by the archive hash check before semantic checks.
+Night-light, weather and grid semantic plants use consistently rehashed invented
+receipts to retain their metadata guards. Registry tests account for the eight
+held rows while retaining the closed nightly exclusions and their planted change.
+No existing split, native-cell, schema, TLS, archive or partition guard is relaxed.
+Commands and their actual results belong in PROGRESS.md and the builder return.
+The lead runs mutation campaigns and live evidence checks; invented fixtures do
+not establish page access, reviewed pins or another-maker approval.

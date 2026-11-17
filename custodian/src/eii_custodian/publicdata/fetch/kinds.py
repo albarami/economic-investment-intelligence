@@ -82,6 +82,13 @@ def prepare(
     registry_entries: tuple[Entry, ...] | None = None,
 ) -> Prepared:
     """Fetch one row through the transport seam and apply its declared checks."""
+    if entry.kind in {"public_page", "awards_intake"}:
+        return _failed(
+            entry,
+            AttemptFailure(
+                1, "", "build_context_required", "reviewed page dispatch", "absent"
+            ),
+        )
     if entry.kind == "besttime":
         return _failed(
             entry,

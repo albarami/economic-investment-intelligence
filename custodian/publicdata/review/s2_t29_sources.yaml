@@ -1,0 +1,85 @@
+# S2-T29 reviewed declarations. L-876: no live values supplied.
+sources:
+  insurance_tables:
+    url: "[LEAD: evidence 1]"
+    reviewed_urls: "[LEAD: evidence 1]"
+    table_id: "[LEAD: evidence 1]"
+    columns: "[LEAD: evidence 1]"
+    as_of: "[LEAD: evidence 1]"
+    period: "[LEAD: evidence 1]"
+    bounds_basis: unconfirmed
+    pin: "[LEAD: evidence 2]"
+    profile: "[LEAD: evidence 3]"
+  events_visit_qatar:
+    url: "[LEAD: evidence 1]"
+    reviewed_urls: "[LEAD: evidence 1]"
+    table_id: "[LEAD: evidence 1]"
+    columns: "[LEAD: evidence 1]"
+    as_of: "[LEAD: evidence 1]"
+    period: "[LEAD: evidence 1]"
+    bounds_basis: unconfirmed
+    pin: "[LEAD: evidence 2]"
+    profile: "[LEAD: evidence 3]"
+  events_qncc:
+    url: "[LEAD: evidence 1]"
+    reviewed_urls: "[LEAD: evidence 1]"
+    table_id: "[LEAD: evidence 1]"
+    columns: "[LEAD: evidence 1]"
+    as_of: "[LEAD: evidence 1]"
+    period: "[LEAD: evidence 1]"
+    bounds_basis: unconfirmed
+    pin: "[LEAD: evidence 2]"
+    profile: "[LEAD: evidence 3]"
+  suppliers_tawteen:
+    url: "[LEAD: evidence 1]"
+    reviewed_urls: "[LEAD: evidence 1]"
+    table_id: "[LEAD: evidence 1]"
+    columns: "[LEAD: evidence 1]"
+    as_of: "[LEAD: evidence 1]"
+    period: "[LEAD: evidence 1]"
+    bounds_basis: unconfirmed
+    pin: "[LEAD: evidence 2]"
+    profile: "[LEAD: evidence 3]"
+  manateq_tariffs:
+    url: "[LEAD: evidence 1]"
+    reviewed_urls: "[LEAD: evidence 1]"
+    table_id: "[LEAD: evidence 1]"
+    columns: "[LEAD: evidence 1]"
+    as_of: "[LEAD: evidence 1]"
+    period: "[LEAD: evidence 1]"
+    bounds_basis: unconfirmed
+    pin: "[LEAD: evidence 2]"
+    profile: "[LEAD: evidence 3]"
+  monaqasat_classified:
+    url: "[LEAD: evidence 1]"
+    reviewed_urls: "[LEAD: evidence 1]"
+    table_id: "[LEAD: evidence 1]"
+    columns: "[LEAD: evidence 1]"
+    as_of: "[LEAD: evidence 1]"
+    period: "[LEAD: evidence 1]"
+    bounds_basis: unconfirmed
+    pin: "[LEAD: evidence 2]"
+    profile: "[LEAD: evidence 3]"
+  schools_private_directory:
+    url: "[LEAD: evidence 1]"
+    reviewed_urls: "[LEAD: evidence 1]"
+    table_id: "[LEAD: evidence 1]"
+    columns: "[LEAD: evidence 1]"
+    as_of: "[LEAD: evidence 1]"
+    period: "[LEAD: evidence 1]"
+    bounds_basis: unconfirmed
+    pin: "[LEAD: evidence 2]"
+    profile: "[LEAD: evidence 3]"
+  awards_owner_scrape:
+    url: "[LEAD: evidence 1]"
+    reviewed_urls: "[LEAD: evidence 1]"
+    table_id: "[LEAD: evidence 1]"
+    columns: "[LEAD: evidence 1]"
+    as_of: "[LEAD: evidence 1]"
+    period: "[LEAD: evidence 1]"
+    bounds_basis: unconfirmed
+    pin: "[LEAD: evidence 2]"
+    profile: "[LEAD: evidence 3]"
+accident_spans: "[LEAD: evidence 5]"
+worldpop_confirmation: "[LEAD: evidence 6]"
+gis_confirmation: "[LEAD: evidence 6]"

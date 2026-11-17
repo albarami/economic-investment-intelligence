@@ -240,3 +240,13 @@ real-use permission obligation is added: the publisher terms have not been
 read in this worker pass. Archive size alone does not change nightly
 eligibility or TST-52 (decision 0040 item 9). Registration or a paid tier
 stays an owner obstacle and fetches nothing.
+
+## S2-T29 deferred source hardening
+
+Document 04 section 2.4 retains the pending publisher words and reading dates for
+the new pages and awards reports. Add their actual permission requirements to the
+single DHA-102 list as the lead reads them; no guessed publisher quotation or
+permission requirement is added here. Automatic certificate rotation, remote
+archive backup, continuous browser monitoring and fuzzy entity matching are not
+implemented by S2-T29. Independent review of the exact-host DER pin contract is
+required before any new live pinned request, even for local use.

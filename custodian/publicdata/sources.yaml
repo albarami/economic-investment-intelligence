@@ -12197,6 +12197,223 @@ sources:
     extension: "bin"
     basis_note: "Pending independent page verification under decision 0026; identity and page lead only."
 
+  - key: "insurance_tables"
+    source_id: "insurance_tables"
+    refetch: {value: none, reason: frequency_unconfirmed}
+    slug: ""
+    kind: "public_page"
+    title_en: "Public insurance tables"
+    publisher: "Insurance regulator"
+    licence_id: "terms to be read"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-17"
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "page_evidence_pending"
+    extension: "html"
+  - key: "events_visit_qatar"
+    source_id: "events_visit_qatar"
+    refetch: {value: daily, family: event_pages, evidence: "decision 0045 item 4; decision 0046 item 8"}
+    slug: ""
+    kind: "public_page"
+    title_en: "Events calendar"
+    publisher: "Visit Qatar"
+    licence_id: "terms to be read"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-17"
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "page_evidence_pending"
+    extension: "html"
+  - key: "events_qncc"
+    source_id: "events_qncc"
+    refetch: {value: daily, family: event_pages, evidence: "decision 0045 item 4; decision 0046 item 8"}
+    slug: ""
+    kind: "public_page"
+    title_en: "Events calendar"
+    publisher: "Qatar National Convention Centre"
+    licence_id: "terms to be read"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-17"
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "page_evidence_pending"
+    extension: "html"
+  - key: "suppliers_tawteen"
+    source_id: "suppliers_tawteen"
+    refetch: {value: weekly, family: supplier_credentials, evidence: "decision 0045 item 4; decision 0046 item 8"}
+    slug: ""
+    kind: "public_page"
+    title_en: "Supplier page"
+    publisher: "Tawteen"
+    licence_id: "terms to be read"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-17"
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "page_evidence_pending"
+    extension: "html"
+  - key: "manateq_tariffs"
+    source_id: "manateq_tariffs"
+    refetch: {value: none, reason: frequency_unconfirmed}
+    slug: ""
+    kind: "public_page"
+    title_en: "Tariff page"
+    publisher: "Manateq"
+    licence_id: "terms to be read"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-17"
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "page_evidence_pending"
+    extension: "html"
+  - key: "monaqasat_classified"
+    source_id: "monaqasat_classified"
+    refetch: {value: weekly, family: supplier_credentials, evidence: "decision 0045 item 4; decision 0046 item 8"}
+    slug: ""
+    kind: "public_page"
+    title_en: "Classified-company list"
+    publisher: "Monaqasat"
+    licence_id: "terms to be read"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-17"
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "page_evidence_pending"
+    extension: "html"
+  - key: "schools_private_directory"
+    source_id: "schools_private_directory"
+    refetch: {value: none, reason: frequency_unconfirmed}
+    slug: ""
+    kind: "public_page"
+    title_en: "Private-school directory"
+    publisher: "Education ministry"
+    licence_id: "terms to be read"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-17"
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "page_evidence_pending"
+    extension: "html"
+  - key: "awards_owner_scrape"
+    source_id: "awards_owner_scrape"
+    refetch: {value: weekly, family: award_reports, evidence: "decision 0045 item 4; decision 0046 item 8"}
+    slug: ""
+    kind: "awards_intake"
+    title_en: "owner scrape of public award reports, retrieved 2026-11-03"
+    publisher: "Owner scrape of public award reports"
+    licence_id: "terms to be read"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-17"
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "page_evidence_pending"
+    extension: "html"
+
 forecast_series:
   - key: licence_issues
     state: held

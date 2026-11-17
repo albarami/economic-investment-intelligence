@@ -3383,3 +3383,27 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).
 - Additional open questions and assumptions recorded in documents 01 to 16 and the decision records indexed in [docs/README.md](docs/README.md).
+
+### S2-T29 build holds — 2026-11-17
+
+The lead's L-876 evidence hold remains open: page structures/URLs
+`[LEAD: evidence 1]`, approved host-scoped DER pins `[LEAD: evidence 2]`, workbook
+aggregate profile `[LEAD: evidence 3]`, sample seed `[LEAD: evidence 4]`, accident
+partition spans `[LEAD: evidence 5]`, and WorldPop/GIS confirmations
+`[LEAD: evidence 6]`. No live source or owner workbook was read by the builder.
+The lead supplies these and runs the source/sample checks before acceptance;
+independent another-maker security/provenance review is pending.
+
+L-790 resolves the plan's OI-n1 through OI-n5 respectively: closed exact name
+normalization; exact-host DER pins with security approval; lead-operated capture
+with verified chain and redirect evidence (amended by L-797 F3); aggregate-only
+workbook profile with lead-only real intake; seeded distinct-link sampling with
+all-links/incomplete short frames and registry-receipt results. L-801 specifies
+day-first dates, exactly thirty selections above thirty and the all-selected
+match-rate denominator, with failed fetches nonmatching and empty rate null.
+These design resolutions are not evidence that the real inputs have been read.
+
+OI-137, OI-138 and OI-139 remain open, as do S2-T21 part B's OI-209 to OI-212,
+the accident birth-year-use ruling and the previously reported WorldPop grid-key
+contract wording difference. If both real school access attempts fail, the lead
+must record the dated reason and give the advisor the required one-line notice.

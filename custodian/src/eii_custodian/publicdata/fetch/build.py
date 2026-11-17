@@ -29,6 +29,11 @@ from eii_custodian.publicdata.fetch.kinds import (
     prepare,
     read_terms_page,
 )
+from eii_custodian.publicdata.fetch.partitions import (
+    PartitionError,
+    bounded_partition_reader,
+    load_partition_spans,
+)
 from eii_custodian.publicdata.fetch.receipts import (
     archive_auxiliary,
     cache_directory,
@@ -226,6 +231,10 @@ def _fetch_row(
                 entry, transport, sleep, cache=cache, registry_entries=registry_entries
             )
         )
+    except PartitionError as exc:
+        return None, FetchFailure(
+            1, entry.source_id, entry.url, str(exc), "reviewed byte span", "refused"
+        )
     except (OSError, ValueError):
         return None, FetchFailure(
             1, entry.source_id, entry.url, "write_failed", "stored file", "write failed"
@@ -361,6 +370,45 @@ def run_build(
     fetched_entries: list[Entry] = []
     told_absent = False
     for entry in entries:
+        if entry.kind in {"public_page", "awards_intake"}:
+            from .award_checks import AwardError
+            from .awards import fetch_awards
+            from .certificate_pins import PinError
+            from .page_records import PageError, fetch_page
+
+            try:
+                page = (
+                    fetch_awards(entry, transport, cache, clock, sleep)
+                    if entry.kind == "awards_intake"
+                    else fetch_page(entry, transport, cache, clock, sleep)
+                )
+                manifests[entry.key] = page.sha256
+                lines.append(pass_line(entry.key, page.sha256, entry.fetch_host))
+            except (PageError, AwardError, PinError) as exc:
+                reason = str(exc)
+                failure = FetchFailure(
+                    1, entry.source_id, "", reason, "verified snapshot", "NO_DATA"
+                )
+                lines.append(
+                    fail_line(entry.key, "", reason, "verified snapshot", "NO_DATA")
+                )
+                break
+            except (OSError, ValueError, KeyError, TypeError):
+                failure = FetchFailure(
+                    1,
+                    entry.source_id,
+                    "",
+                    "page_validation_failed",
+                    "verified snapshot",
+                    "NO_DATA",
+                )
+                lines.append(
+                    fail_line(
+                        entry.key, "", failure.check, "verified snapshot", "NO_DATA"
+                    )
+                )
+                break
+            continue
         if not token and _token_file(entry):
             if not told_absent:
                 lines.append(
@@ -629,9 +677,28 @@ def run_build(
             assert placed is not None
             lines.append(pass_line(entry.key, placed.digest, placed.host))
             continue
+        row_transport = transport
+        if entry.key == "accident":
+            try:
+                row_transport = bounded_partition_reader(
+                    transport, load_partition_spans(), sleep
+                )
+            except PartitionError as exc:
+                failure = FetchFailure(
+                    1,
+                    entry.source_id,
+                    entry.url,
+                    str(exc),
+                    "reviewed byte span",
+                    "NO_DATA",
+                )
+                lines.append(
+                    fail_line(entry.key, "", str(exc), "reviewed byte span", "NO_DATA")
+                )
+                break
         fetched, result = _fetch_row(
             entry,
-            transport,
+            row_transport,
             cache,
             clock,
             sleep,

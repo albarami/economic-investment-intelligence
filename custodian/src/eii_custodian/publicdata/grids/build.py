@@ -14,9 +14,13 @@ from shapely.geometry.base import BaseGeometry
 from eii_custodian.publicdata.fetch.receipts import (
     cache_directory,
     file_metadata,
-    sha256_hex,
 )
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.snapshots import (
+    SnapshotError,
+    read_snapshot,
+    reviewed_selections,
+)
 
 from .contracts import GridError
 from .night_lights import FrameGeometry, aggregate, read_night_lights
@@ -65,14 +69,18 @@ def _entry_directory(cache: Path, entry: Entry) -> Path:
 
 
 def cached_bytes(cache: Path, entry: Entry) -> tuple[bytes, dict[str, Any]]:
-    """Require one complete receipt and its exact content hash."""
+    """Read only the explicitly reviewed archive identity, never the latest file."""
     directory = _entry_directory(cache, entry)
-    receipts = sorted(directory.glob("*.meta.json"))
-    if len(receipts) != 1:
-        raise GridError(f"{entry.source_id}: expected one cache receipt")
-    loaded = json.loads(receipts[0].read_text(encoding="utf-8"))
-    if not isinstance(loaded, dict):
-        raise GridError(f"{entry.source_id}: unreadable receipt")
+    try:
+        identity = reviewed_selections(cache).get(entry.key)
+        if identity is None:
+            raise SnapshotError("snapshot_selection_invalid")
+        snapshot = read_snapshot(directory, identity)
+        loaded = snapshot.sidecar
+        body = snapshot.body
+    except (SnapshotError, OSError) as exc:
+        reason = str(exc) if isinstance(exc, SnapshotError) else "snapshot_missing"
+        raise GridError(f"{entry.source_id}: {reason}") from None
     for name, expected in (
         ("source_id", entry.source_id),
         ("key", entry.key),
@@ -88,11 +96,12 @@ def cached_bytes(cache: Path, entry: Entry) -> tuple[bytes, dict[str, Any]]:
     if loaded.get("switched_off") is not False:
         raise GridError(f"{entry.source_id}: source switched off")
     digest = loaded["sha256"]
-    if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
+    if (
+        not isinstance(digest, str)
+        or len(digest) != 64
+        or any(c not in "0123456789abcdef" for c in digest)
+    ):
         raise GridError(f"{entry.source_id}: malformed hash")
-    body = (directory / f"{digest}.{entry.extension}").read_bytes()
-    if sha256_hex(body) != digest:
-        raise GridError(f"{entry.source_id}: content hash mismatch")
     return body, loaded
 
 
@@ -195,7 +204,7 @@ def build_grids(
 
 def _cached(cache: Path, entry: Entry) -> bool:
     """True when the row holds at least one receipt in its cache directory."""
-    return bool(sorted(_entry_directory(cache, entry).glob("*.meta.json")))
+    return bool(sorted((_entry_directory(cache, entry) / "index").glob("*.json")))
 
 
 def _year_files(entries: list[Entry]) -> None:
@@ -259,7 +268,11 @@ def _weather(
 
 def _store(cache: Path, entry: Entry, body: bytes) -> Path:
     """Return the verified cache path of one file entry."""
-    return _entry_directory(cache, entry) / f"{sha256_hex(body)}.{entry.extension}"
+    del body
+    identity = reviewed_selections(cache).get(entry.key)
+    if identity is None:
+        raise GridError(f"{entry.source_id}: snapshot_selection_invalid")
+    return read_snapshot(_entry_directory(cache, entry), identity).path
 
 
 def _fact(

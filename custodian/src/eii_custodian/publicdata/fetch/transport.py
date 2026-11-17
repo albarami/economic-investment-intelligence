@@ -130,6 +130,11 @@ def open_https(
     reviewed_urls: tuple[str, ...] | None = None,
 ) -> Response:
     """Open one HTTPS URL with the standard library. Redirects are checked first."""
+    from .certificate_pins import browser_agent, current_pin, verified_context
+
+    pin = current_pin()
+    if pin is not None:
+        ssl_context = verified_context(host_of(url), pin, context=ssl_context)
     decision = approve(url)
     if not decision.ok or (
         reviewed_urls is not None
@@ -156,6 +161,8 @@ def open_https(
             guard, urllib.request.HTTPSHandler(context=ssl_context)
         )
     request_headers = dict(headers) if headers else {}
+    if browser_agent():
+        request_headers["User-Agent"] = "Mozilla/5.0"
     request_headers.update(authorization_header(url, token))
     address = str(url)
     method = "GET"
@@ -234,6 +241,11 @@ def _redirect_guard(
             if keyed_url is not None:
                 # No redirected send can become a second chargeable request.
                 raise TransportFault("blocked_host", keyed_url)
+            from .certificate_pins import current_pin, validate_pin
+
+            pin = current_pin()
+            if pin is not None:
+                validate_pin(host_of(newurl), pin)
             hops.append(newurl)
             if host_of(newurl) == SIGN_IN_HOST:
                 raise TransportFault("credential_missing_or_not_accepted", newurl)

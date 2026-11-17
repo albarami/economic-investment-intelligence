@@ -957,6 +957,54 @@ manifest hash, false commit flag and attribution. Lineage binds to
 are null. No latest-file discovery is allowed. Live page, licence, version and
 host values remain pending the lead.
 
+### S2-T29 cached page and awards contracts
+
+These are custodian cache contracts under section 7.3, not new release-manifest
+entries. `page_records.parse_page_snapshot@v1` retains `source_id`, typed `rows`,
+`page_sha256`, `raw_identity`, source `as_of`, `source_period`, `retrieved_utc`,
+`method`, `provenance: Public` and `completeness: unknown`. The raw page and parsed
+table each have their own immutable archive receipt and byte hash. Consumers use
+an explicit reviewed identity and verify both objects. Missing schema, provenance,
+date or selection refuses; a directory or calendar implies no complete coverage.
+School capacity, enrolment, catchment and press-seat fields are not admitted.
+Public split uses retain PUB-90 through the existing typed split policy.
+
+A lead-operated school capture requires initial/final URLs and ordered redirect
+URLs, capture tool, UTC capture date, raw SHA-256, verified issuing-intermediate
+DER hash and exact host, TLS verification enabled, and visitor access. Every URL
+must pass the normal allow-list and reviewed URL set. No browser is installed or
+operated by this adapter. Missing evidence records a dated technical failure.
+The normal browser user agent attempt precedes capture intake.
+
+`awards.ingest_awards@v1` reads a hash-pinned file from the uncommitted intake folder
+`data/public_cache/intake/awards_owner_scrape/`. Its reviewed aggregate profile
+names the original columns and their string/integer/number types, format, sheet and company,
+registration, value and date columns; no real profile or row is committed here.
+CSV and OOXML cells are supported; formulas and unknown structures refuse.
+Aggregate-profile row and dated-row counts remain leads; measured counts always
+come from the admitted bytes. The intake manifest names `file`, `sha256`, `seed`
+and `register_selections`. Each register selection names an archived public
+register key and identity, JSON-records or CSV-records format, and the registration
+and name columns. The receipt retains those input hashes; no inline register
+rows are accepted by this manifest.
+Each row keeps `original`, `normalised_date`, `report_url` and `retrieved_utc`.
+Dates use day/month/year; blanks remain blank and invalid dates are counted.
+The summary records row count, dated/invalid/blank counts, date range and unknown
+completeness. The original scrape date is distinct from the intake UTC date.
+
+The `awards_owner_scrape` archive registry receipt carries `award_check`: lead
+seed, distinct nonblank URL frame count, selected count, matched/mismatched/failed
+counts, match rate, incomplete status and per-link result. Above thirty links the
+seed selects exactly thirty without replacement; otherwise all links are read.
+The rate is matching selected links divided by all selected links, including
+failed fetches; an empty frame has null rate. Short frames and failed fetches
+are incomplete. There is no passing threshold. A duplicate proof link must agree
+with every row using it. The registration match report retains every original
+row and its match/refusal reason. Registration equality precedes exact company
+name equality after the closed normalization in document 04, section 2.4.
+Awarded values never become turnover or sales, and identifiers stay in the
+custodian matching boundary. Release consumers remain separate tasks.
+
 ## 8. The manifest and the loader
 
 Public source selections identify a reviewed immutable snapshot by hash. Its

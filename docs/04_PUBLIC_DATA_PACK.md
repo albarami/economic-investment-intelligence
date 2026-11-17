@@ -542,6 +542,50 @@ The age-and-sex grid already has the `worldpop_qat_agesex` row and `pub_pop_ages
 
 Calendar and list pages enter S2-T27's immutable archive as dated table snapshots. Their parsing follows PUB-86's deterministic cached-page contract and hand-made fixtures. No network or key enters an automated test, no live response is committed, and no helper-read count is a fact until fetched and recorded.
 
+### S2-T29 offline implementation and lead evidence holds
+
+The normal registry now declares the eight source IDs of section 2.4, with
+`commit_allowed: false`, owner-decision basis, no invented count bounds or columns,
+and `page_evidence_pending`. Their reviewed declarations are in
+`custodian/publicdata/review/s2_t29_sources.yaml`. Loading a pending declaration
+refuses before a request. No new host is admitted without the lead's review.
+Terms remain “terms to be read”; the row date records this declaration check,
+not a reading of a publisher page. S2-T21 part B remains an independent hold.
+
+The build's live-evidence ruling L-876 supplies these explicit open slots:
+
+- Page URLs, redirect URLs, structures, typed columns, dates and periods:
+  `[LEAD: evidence 1]`.
+- Exact-host issuing-intermediate DER pins and independent security approval:
+  `[LEAD: evidence 2]`. Tender PEM-byte pins retain their existing convention.
+- Owner workbook aggregate profile: `[LEAD: evidence 3]`; only the lead reads
+  the real workbook. Intake files and receipts remain uncommitted.
+- Awards sample seed: `[LEAD: evidence 4]`, recorded in the source receipt and
+  PROGRESS.md when the lead selects it. Invented tests use their own seed.
+- Accident year-partition byte spans: `[LEAD: evidence 5]`. The bounded adapter
+  uses the shared metadata reader with acquisition-time maximum plus full-span
+  validation. The existing `partition_byte_bound_unconfirmed` remains until
+  observed spans are supplied. Catalogue, plan, duplicate and total checks stay.
+- WorldPop folder/year/units/DOI/category confirmation and both GIS direct URLs:
+  `[LEAD: evidence 6]`. Existing WorldPop metadata guards and GIS
+  `direct_url_unconfirmed` flags remain. On evidenced GIS confirmation only,
+  replace that flag with `schema_unconfirmed`; invent no layer, schema or view.
+
+The grid cache consumer selects reviewed archive identities and rechecks their
+hashes and file metadata; it uses the existing decoder and native grid cells.
+No second WorldPop source or reader is added. The known native-grid-key wording
+difference remains for the owning contract review.
+
+The awards registration-name check is exact equality after Unicode NFKC, case
+fold, whitespace collapse and punctuation removal, in that order (L-790(a)).
+There is no fuzzy score or tolerance. Missing/ambiguous registration and name
+disagreement retain unmatched rows with reasons. The awards check rate follows
+the denominator and incomplete rules of document 03, S2-T29 cached page and
+awards contracts (L-801). School access failure is recorded with UTC date;
+the lead's one-line advisor notice is still required after real attempts.
+No offline pass closes N4/OI-137, N6/OI-138, N7/OI-139, the birth-year-use ruling,
+or the source-completion gate. No live fetch is claimed by this implementation.
+
 ### S2-T19 source reading and collection boundary
 
 The lead's structure readings of 2026-11-15 confirm the declarations below (PUB-07,

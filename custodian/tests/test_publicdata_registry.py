@@ -583,12 +583,12 @@ def test_skip_reason_must_not_name_a_licence_or_terms(tmp_path: Path) -> None:
 def test_registry_counts_follow_decision_0026() -> None:
     """No none_stated row remains, and every owner_decision row names 0026."""
     entries = load_registry()
-    assert len(entries) == 285 + 4 + 4
+    assert len(entries) == 285 + 4 + 4 + 8
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
     # S2-T28 moves exactly these advisor-confirmed CC BY rows to dataset basis.
     confirmed = {"wage_bands_priv", "work_hours_act", "accident"}
-    assert len(owners) == 26 + 13 + 3 + 4 - 3  # Joined additions, then CC BY moves.
+    assert len(owners) == 26 + 13 + 3 + 4 - 3 + 8  # S2-T29 held page/intake rows.
     assert {
         entry.key
         for entry in entries
@@ -754,6 +754,14 @@ def test_baci_registry_pending_and_nightly_policy() -> None:
         "traffic_tomtom_flow",
         "traffic_tomtom_range",
         "un_comtrade",
+        "insurance_tables",
+        "events_visit_qatar",
+        "events_qncc",
+        "suppliers_tawteen",
+        "manateq_tariffs",
+        "monaqasat_classified",
+        "schools_private_directory",
+        "awards_owner_scrape",
     }
     assert exclusions(entries) == expected
     planted = [
