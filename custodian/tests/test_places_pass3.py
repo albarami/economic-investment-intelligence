@@ -22,7 +22,6 @@ from custodian.tests.test_publicdata_behaviour import _clock, _entry, _sleep
 from shapely.geometry import Point, Polygon, box
 
 from eii_custodian.publicdata.fetch.build import run_build
-from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.frame.checks import FrameError
 from eii_custodian.publicdata.places import PlacesError
@@ -143,6 +142,7 @@ def test_places_body_that_misses_its_receipt_is_refused(tmp_path: Path) -> None:
     folder.mkdir(parents=True)
     body_path = folder / "syn.parquet"
     write_places(body_path, [place_row()])
+    _matching_receipt(body_path)
     (folder / "syn.meta.json").write_text(
         json.dumps(
             {
@@ -350,22 +350,15 @@ def _write_place(cache: Path, row: dict[str, object]) -> None:
     folder = cache / "places_ovt" / "part-00014"
     folder.mkdir(parents=True, exist_ok=True)
     path = folder / "syn.parquet"
+    path.unlink(missing_ok=True)
     write_places(path, [row])
     _matching_receipt(path)
 
 
 def _matching_receipt(path: Path) -> None:
-    digest = sha256_hex(path.read_bytes())
-    (path.parent / "syn.meta.json").write_text(
-        json.dumps(
-            {
-                "sha256": digest,
-                "retrieved_utc": "2026-11-14T00:00:00Z",
-                "publisher": "SYN",
-            }
-        ),
-        encoding="utf-8",
-    )
+    from custodian.tests.snapshot_fixture import place
+
+    place(path)
 
 
 def _again(cache: Path, review: Path) -> None:

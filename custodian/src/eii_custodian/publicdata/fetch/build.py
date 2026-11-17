@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import os
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -13,6 +13,12 @@ from eii_custodian.publicdata.additions.common import (
     ADDITION_FAMILIES as _ADDITION_FAMILIES,
 )
 from eii_custodian.publicdata.additions.common import AdditionError
+from eii_custodian.publicdata.atlas.config import AtlasError
+from eii_custodian.publicdata.atlas.config import Config as AtlasConfig
+from eii_custodian.publicdata.atlas.config import load_config as load_atlas_config
+from eii_custodian.publicdata.atlas.fetch import fetch_atlas
+from eii_custodian.publicdata.baci.config import BaciError, Config, load_config
+from eii_custodian.publicdata.baci.fetch import fetch_baci
 from eii_custodian.publicdata.fetch.allowlist import approve, host_of
 from eii_custodian.publicdata.fetch.kinds import (
     TERMS_HOST_UNLISTED,
@@ -20,6 +26,7 @@ from eii_custodian.publicdata.fetch.kinds import (
     read_terms_page,
 )
 from eii_custodian.publicdata.fetch.receipts import (
+    archive_auxiliary,
     cache_directory,
     commit_citation,
     commit_pair,
@@ -38,7 +45,17 @@ from eii_custodian.publicdata.fetch.report import (
     terms_unread_line,
 )
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
-from eii_custodian.publicdata.fetch.transport import Transport, public_address
+from eii_custodian.publicdata.fetch.transport import (
+    Opener,
+    SlotReader,
+    StreamTransport,
+    Transport,
+    public_address,
+)
+from eii_custodian.publicdata.gravity.config import Config as GravityConfig
+from eii_custodian.publicdata.gravity.config import GravityError
+from eii_custodian.publicdata.gravity.config import load_config as load_gravity_config
+from eii_custodian.publicdata.gravity.fetch import fetch_gravity
 from eii_custodian.publicdata.grids.fetch import GRID_SOURCES, prepare_grid
 from eii_custodian.publicdata.investment_build import publish_investment
 from eii_custodian.publicdata.places.fetch import fetch_place_file, is_place_file
@@ -81,6 +98,7 @@ class BuildOutcome:
 
     lines: tuple[str, ...]
     failure: FetchFailure | None
+    manifests: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -98,6 +116,60 @@ def _digest_pages(directory: Path) -> str:
     """Hash the stored page files. An empty body is not one of them."""
     chunks = [path.read_bytes() for path in sorted(directory.rglob("*.html"))]
     return sha256_hex(b"".join(chunks))
+
+
+def _comtrade_dispatch(
+    entry: Entry,
+    cache: Path,
+    clock: Clock,
+    sleep: Sleeper,
+    opener: Opener | None,
+    slots: SlotReader | None,
+    lines: list[str],
+) -> FetchFailure | None:
+    """Dispatch one Comtrade row. A missing opener never opens a socket."""
+    from eii_custodian.publicdata.comtrade.fetch import fetch_source
+
+    if opener is None:
+        failure = FetchFailure(
+            1,
+            entry.source_id,
+            "https://invalid.example/refused",
+            "transport_uninjected",
+            "injected opener",
+            "absent",
+        )
+        lines.append(
+            fail_line(
+                entry.key,
+                failure.url,
+                failure.check,
+                failure.expected,
+                failure.observed,
+            )
+        )
+        return failure
+    traded = fetch_source(entry, cache, clock, sleep, opener, slots)
+    if traded.failure is not None:
+        lines.append(
+            fail_line(
+                entry.key,
+                traded.failure.safe_url,
+                traded.failure.check,
+                traded.failure.check,
+                traded.failure.endpoint_id,
+            )
+        )
+        return FetchFailure(
+            1,
+            entry.source_id,
+            traded.failure.safe_url,
+            traded.failure.check,
+            traded.failure.check,
+            traded.failure.endpoint_id,
+        )
+    lines.append(pass_line(entry.key, traded.digest, traded.host))
+    return None
 
 
 def utc_now() -> str:
@@ -142,7 +214,7 @@ def _fetch_row(
             if entry.source_id in GRID_SOURCES
             else prepare(entry, transport, sleep, cache=cache)
         )
-    except OSError:
+    except (OSError, ValueError):
         return None, FetchFailure(
             1, entry.source_id, entry.url, "write_failed", "stored file", "write failed"
         )
@@ -204,7 +276,16 @@ def _fetch_row(
             prepared.body,
             sidecar,
         )
-    except OSError:
+        for response in prepared.auxiliary:
+            archive_auxiliary(
+                entry,
+                cache / entry.key,
+                "inputs",
+                response.body,
+                retrieved,
+                response.final_url,
+            )
+    except (OSError, ValueError):
         return None, FetchFailure(
             1,
             entry.source_id,
@@ -231,14 +312,23 @@ def run_build(
     cache: Path,
     clock: Clock,
     sleep: Sleeper,
+    stream_transport: StreamTransport | None = None,
+    baci_config: Config | None = None,
+    gravity_config: GravityConfig | None = None,
+    atlas_config: AtlasConfig | None = None,
+    gravity_stream: StreamTransport | None = None,
+    atlas_stream: StreamTransport | None = None,
+    opener: Opener | None = None,
+    slots: SlotReader | None = None,
+    *,
     token: str = "",
     key_name: str = "",
-    *,
     additions_review: Path | None = None,
     additions_frame: Path | None = None,
     additions_output: Path | None = None,
 ) -> BuildOutcome:
     """Fetch each row in order, then run the public_data stage."""
+    manifests: dict[str, str] = {}
     lines: list[str] = []
     terms: list[dict[str, object]] = []
     previous = _previous_term_hashes(cache)
@@ -255,16 +345,170 @@ def run_build(
                 )
                 told_absent = True
             continue
+        if entry.source_id == "cepii_baci":
+            try:
+                config = baci_config if baci_config is not None else load_config()
+                baci_result = fetch_baci(
+                    entry, config, transport, stream_transport, cache, clock, sleep
+                )
+                manifests[entry.source_id] = baci_result.digest
+                lines.append(pass_line(entry.key, baci_result.digest, baci_result.host))
+                if baci_result.terms_sha256:
+                    _record_terms(
+                        entry,
+                        baci_result.terms_sha256,
+                        baci_result.retrieved_utc,
+                        previous,
+                        lines,
+                        terms,
+                    )
+                else:
+                    lines.append(
+                        terms_unread_line(entry.key, baci_result.terms_unread, "")
+                    )
+            except BaciError as exc:
+                reason = str(exc)
+                if reason == "baci_metadata_unconfirmed":
+                    lines.append(skip_line("cepii_baci", reason))
+                    lines.append(
+                        terms_unread_line("cepii_baci", "terms_to_be_read", "")
+                    )
+                    continue
+                failure = FetchFailure(
+                    6 if reason == "network_exhausted" else 1,
+                    "cepii_baci",
+                    "",
+                    reason,
+                    "validated source",
+                    "NO_DATA",
+                )
+                lines.append(
+                    fail_line("cepii_baci", "", reason, "validated source", "NO_DATA")
+                )
+                break
+            continue
+        if entry.source_id == "cepii_gravity":
+            try:
+                gravity_loaded = (
+                    gravity_config
+                    if gravity_config is not None
+                    else load_gravity_config()
+                )
+                gravity_result = fetch_gravity(
+                    entry,
+                    gravity_loaded,
+                    transport,
+                    gravity_stream,
+                    cache,
+                    clock,
+                    sleep,
+                )
+                manifests[entry.source_id] = gravity_result.digest
+                lines.append(
+                    pass_line(entry.key, gravity_result.digest, gravity_result.host)
+                )
+                if gravity_result.terms_sha256:
+                    _record_terms(
+                        entry,
+                        gravity_result.terms_sha256,
+                        gravity_result.retrieved_utc,
+                        previous,
+                        lines,
+                        terms,
+                    )
+                else:
+                    lines.append(
+                        terms_unread_line(entry.key, gravity_result.terms_unread, "")
+                    )
+            except GravityError as exc:
+                reason = str(exc)
+                if reason == "gravity_metadata_unconfirmed":
+                    lines.append(skip_line("cepii_gravity", reason))
+                    lines.append(
+                        terms_unread_line("cepii_gravity", "terms_to_be_read", "")
+                    )
+                    continue
+                failure = FetchFailure(
+                    6 if reason == "network_exhausted" else 1,
+                    "cepii_gravity",
+                    "",
+                    reason,
+                    "validated source",
+                    "NO_DATA",
+                )
+                lines.append(
+                    fail_line(
+                        "cepii_gravity", "", reason, "validated source", "NO_DATA"
+                    )
+                )
+                break
+            continue
+        if entry.source_id == "atlas_complexity":
+            try:
+                atlas_loaded = (
+                    atlas_config if atlas_config is not None else load_atlas_config()
+                )
+                atlas_result = fetch_atlas(
+                    entry, atlas_loaded, transport, atlas_stream, cache, clock, sleep
+                )
+                manifests[entry.source_id] = atlas_result.digest
+                lines.append(
+                    pass_line(entry.key, atlas_result.digest, atlas_result.host)
+                )
+                if atlas_result.terms_sha256:
+                    _record_terms(
+                        entry,
+                        atlas_result.terms_sha256,
+                        atlas_result.retrieved_utc,
+                        previous,
+                        lines,
+                        terms,
+                    )
+                else:
+                    lines.append(
+                        terms_unread_line(entry.key, atlas_result.terms_unread, "")
+                    )
+            except AtlasError as exc:
+                reason = str(exc)
+                if reason == "atlas_metadata_unconfirmed":
+                    lines.append(skip_line("atlas_complexity", reason))
+                    lines.append(
+                        terms_unread_line("atlas_complexity", "terms_to_be_read", "")
+                    )
+                    continue
+                failure = FetchFailure(
+                    6 if reason == "network_exhausted" else 1,
+                    "atlas_complexity",
+                    "",
+                    reason,
+                    "validated source",
+                    "NO_DATA",
+                )
+                lines.append(
+                    fail_line(
+                        "atlas_complexity", "", reason, "validated source", "NO_DATA"
+                    )
+                )
+                break
+            continue
         if entry.skip_reason:
             if entry.terms_url:
                 _read_terms_apart(
-                    entry, transport, sleep, clock, lines, terms, previous
+                    entry, transport, sleep, clock, lines, terms, previous, cache
                 )
             lines.append(skip_line(entry.key, entry.skip_reason))
             continue
         if entry.kind == "citation_only":
             _write_citation(entry, cache, clock())
             lines.append(citation_line(entry.key))
+            continue
+        if entry.kind == "comtrade_api":
+            traded_failure = _comtrade_dispatch(
+                entry, cache, clock, sleep, opener, slots, lines
+            )
+            if traded_failure is not None:
+                failure = traded_failure
+                break
             continue
         if is_release_entry(entry):
             released, refused = fetch_release(entry, transport, cache, clock, sleep)
@@ -333,7 +577,9 @@ def run_build(
         if entry.kind == "terms_page":
             _note_fetched_terms(entry, fetched, lines, terms, previous)
         elif entry.terms_url:
-            _read_terms_apart(entry, transport, sleep, clock, lines, terms, previous)
+            _read_terms_apart(
+                entry, transport, sleep, clock, lines, terms, previous, cache
+            )
         if entry.source_id in _ADDITION_FAMILIES:
             selected.append((entry.key, fetched.digest))
             fetched_entries.append(entry)
@@ -424,7 +670,7 @@ def run_build(
         if failure is None:
             failure = _heights(cache, entries, lines)
     _write_log(cache, lines, terms)
-    return BuildOutcome(tuple(lines), failure)
+    return BuildOutcome(tuple(lines), failure, manifests)
 
 
 def _publish_additions(
@@ -542,6 +788,7 @@ def _read_terms_apart(
     lines: list[str],
     terms: list[dict[str, object]],
     previous: dict[str, str],
+    cache: Path,
 ) -> None:
     """Read a terms page that the row's own fetch does not read."""
     if not approve(entry.terms_url).ok:
@@ -553,7 +800,11 @@ def _read_terms_apart(
     if read.failure is not None:
         lines.append(terms_unread_line(entry.key, read.failure.check, entry.terms_url))
         return
-    _record_terms(entry, read.sha256, clock(), previous, lines, terms)
+    retrieved = clock()
+    archive_auxiliary(
+        entry, cache / entry.key, "terms", read.body, retrieved, entry.terms_url
+    )
+    _record_terms(entry, read.sha256, retrieved, previous, lines, terms)
 
 
 def _record_terms(

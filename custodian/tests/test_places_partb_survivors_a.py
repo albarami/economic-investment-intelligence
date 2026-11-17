@@ -269,8 +269,8 @@ def test_a_provider_returns_the_stored_input_hash(tmp_path: Path) -> None:
 
 def test_a_road_folder_with_no_receipt_is_refused_by_name(tmp_path: Path) -> None:
     cache = tmp_path / "cache"
-    road = _install_road(cache)
-    (_road_folder(cache) / f"{road}.meta.json").unlink()
+    _install_road(cache)
+    next(_road_folder(cache).glob("*/*.meta.json")).unlink()
     with pytest.raises(AreaError) as caught:
         _load_road(cache)
     assert caught.value.reason == "road_file_unreceipted"
@@ -278,9 +278,15 @@ def test_a_road_folder_with_no_receipt_is_refused_by_name(tmp_path: Path) -> Non
 
 def test_a_road_receipt_is_read_as_utf_8(tmp_path: Path) -> None:
     cache = tmp_path / "cache"
-    road = _install_road(cache)
-    receipt = _road_folder(cache) / f"{road}.meta.json"
-    receipt.write_bytes(_road_receipt(road, publisher="ناشر"))
+    from dataclasses import replace
+
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    entry = replace(
+        next(row for row in load_registry() if row.key == "roads_osm"), publisher="ناشر"
+    )
+    road = write_cached(cache, entry, _ROAD_BODY).stem
     with _ascii_locale():
         assert _load_road(cache) == (_ROAD_BODY, road)
 

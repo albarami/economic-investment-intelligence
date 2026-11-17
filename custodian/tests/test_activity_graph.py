@@ -13,6 +13,7 @@ import duckdb
 import pytest
 
 from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.review import graph as graph_module
 from eii_custodian.publicdata.review.activity import (
     ActivityRow,
@@ -457,7 +458,9 @@ def test_cache_reader_accepts_a_written_pair(tmp_path: Path) -> None:
         ],
     )
     write_cached(tmp_path, entry, body)
-    cached = read_cached(tmp_path, entry)
+    cached = read_cached(
+        tmp_path, entry, digest=reviewed_selections(tmp_path).get((entry).key, "0" * 64)
+    )
     assert cached.body == body
     assert cached.sidecar["key"] == "lic_active"
     assert read_json(cached.body) == json.loads(body)
@@ -466,9 +469,8 @@ def test_cache_reader_accepts_a_written_pair(tmp_path: Path) -> None:
 def test_cache_reader_refuses_a_stale_pair(tmp_path: Path) -> None:
     """A sidecar digest that differs from the body fails."""
     entry = _entry("lic_active")
-    write_cached(tmp_path, entry, b"{}", digest="0" * 64)
-    with pytest.raises(CacheError):
-        read_cached(tmp_path, entry)
+    with pytest.raises(ValueError, match="snapshot_hash_mismatch"):
+        write_cached(tmp_path, entry, b"{}", digest="0" * 64)
 
 
 def test_cache_reader_refuses_missing_ambiguous_and_switched_off(
@@ -477,15 +479,27 @@ def test_cache_reader_refuses_missing_ambiguous_and_switched_off(
     """No body, two bodies and a switched-off body each fail."""
     entry = _entry("lic_active")
     with pytest.raises(CacheError):
-        read_cached(tmp_path, entry)
+        read_cached(
+            tmp_path,
+            entry,
+            digest=reviewed_selections(tmp_path).get((entry).key, "0" * 64),
+        )
     write_cached(tmp_path, entry, b"{}")
-    write_cached(tmp_path, entry, b"[]")
+    write_cached(tmp_path, entry, b"[]", select=False)
+    assert (
+        read_cached(
+            tmp_path, entry, digest=reviewed_selections(tmp_path)[entry.key]
+        ).body
+        == b"{}"
+    )
     with pytest.raises(CacheError):
-        read_cached(tmp_path, entry)
+        read_cached(tmp_path, entry, digest="0" * 64)
     other = tmp_path / "other"
     write_cached(other, entry, b"{}", switched_off=True)
     with pytest.raises(CacheError):
-        read_cached(other, entry)
+        read_cached(
+            other, entry, digest=reviewed_selections(other).get((entry).key, "0" * 64)
+        )
 
 
 def test_cache_reader_refuses_another_key(tmp_path: Path) -> None:
@@ -497,7 +511,11 @@ def test_cache_reader_refuses_another_key(tmp_path: Path) -> None:
     sidecar["key"] = "lic_cancelled"
     side.write_text(json.dumps(sidecar), encoding="utf-8")
     with pytest.raises(CacheError):
-        read_cached(tmp_path, entry)
+        read_cached(
+            tmp_path,
+            entry,
+            digest=reviewed_selections(tmp_path).get((entry).key, "0" * 64),
+        )
 
 
 def test_csv_and_xlsx_bodies_read(tmp_path: Path) -> None:
@@ -505,7 +523,14 @@ def test_csv_and_xlsx_bodies_read(tmp_path: Path) -> None:
     entry = _entry("lic_active")
     body = b"code,label\n5610,Restaurants\n"
     write_cached(tmp_path, entry, body, extension="csv")
-    rows = read_csv(read_cached(tmp_path, entry, extension="csv").body)
+    rows = read_csv(
+        read_cached(
+            tmp_path,
+            entry,
+            extension="csv",
+            digest=reviewed_selections(tmp_path).get((entry).key, "0" * 64),
+        ).body
+    )
     assert rows == ({"code": "5610", "label": "Restaurants"},)
     sheet = _xlsx((("code", "label"), ("5610", "Restaurants")))
     assert read_xlsx(sheet) == ({"code": "5610", "label": "Restaurants"},)
@@ -516,7 +541,13 @@ def test_parquet_places_fixture_feeds_the_graph(tmp_path: Path) -> None:
     entry = _entry("places_ovt")
     body = _places_parquet(tmp_path, ("restaurant", "cafe"))
     write_cached(tmp_path, entry, body)
-    rows = read_parquet(read_cached(tmp_path, entry).body)
+    rows = read_parquet(
+        read_cached(
+            tmp_path,
+            entry,
+            digest=reviewed_selections(tmp_path).get((entry).key, "0" * 64),
+        ).body
+    )
     categories = parse_place_categories(rows)
     assert categories == ("cafe", "restaurant")
     allow = (AllowlistRow("5610", "restaurant", "data_reviewer", "2026-11-01"),)
@@ -807,7 +838,13 @@ def test_parquet_reader_batches_preserve_order(tmp_path: Path) -> None:
     entry = _entry("places_ovt")
     categories = tuple(f"category-{index}" for index in range(2500))
     write_cached(tmp_path, entry, _places_parquet(tmp_path, categories))
-    rows = read_parquet(read_cached(tmp_path, entry).body)
+    rows = read_parquet(
+        read_cached(
+            tmp_path,
+            entry,
+            digest=reviewed_selections(tmp_path).get((entry).key, "0" * 64),
+        ).body
+    )
     assert len(rows) == 2500
     assert [row["place_id"] for row in rows] == sorted(
         f"place-{index}" for index in range(2500)
@@ -821,7 +858,11 @@ def test_cache_reader_refuses_a_malformed_sidecar(tmp_path: Path) -> None:
     side = path.with_name(path.stem + ".meta.json")
     side.write_text("{not json", encoding="utf-8")
     with pytest.raises(CacheError):
-        read_cached(tmp_path, entry)
+        read_cached(
+            tmp_path,
+            entry,
+            digest=reviewed_selections(tmp_path).get((entry).key, "0" * 64),
+        )
 
 
 def _mapped_inputs() -> tuple[tuple[ActivityRow, ...], tuple[IsicClass, ...], Spine]:
@@ -1080,3 +1121,38 @@ def _allowlist_csv(folder: Path) -> Path:
         encoding="utf-8",
     )
     return path
+
+
+@pytest.mark.parametrize("consumer", ["activity", "graph"])
+def test_activity_and_graph_retain_reviewed_older_snapshot(tmp_path, consumer):
+    from eii_custodian.publicdata.fetch.snapshots import (
+        read_snapshot,
+        reviewed_selections,
+    )
+
+    _write_cached_feeds(tmp_path)
+    review = _review_csv(tmp_path)
+    _binding_beside(review, titles=(("5610", _RESTAURANT, ""),))
+    entry = _entry("lic_active")
+    older = read_snapshot(
+        tmp_path / entry.key, reviewed_selections(tmp_path)[entry.key]
+    )
+    write_cached(tmp_path, entry, b"syn-newer-invalid-rows", select=False)
+
+    def consume():
+        if consumer == "activity":
+            return load_activity_inputs(
+                tmp_path, (), review_path=review, supplier_membership=_NO_SUPPLIERS
+            ).activities
+        return build_cached_graph(
+            tmp_path,
+            review,
+            _allowlist_csv(tmp_path),
+            (),
+            supplier_membership=_NO_SUPPLIERS,
+        ).nodes
+
+    assert consume()
+    older.path.write_bytes(b"syn-tamper")
+    with pytest.raises(CacheError, match=rf"^{entry.key}: snapshot_hash_mismatch$"):
+        consume()

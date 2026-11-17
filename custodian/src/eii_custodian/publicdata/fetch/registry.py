@@ -9,6 +9,8 @@ from pathlib import Path
 
 import yaml
 
+from eii_custodian.publicdata.fetch.cadence import Cadence, parse_cadence
+
 LICENCE_BASES = frozenset(
     {"dataset", "portal_terms", "provider_terms", "owner_decision"}
 )
@@ -24,6 +26,7 @@ KINDS = frozenset(
         "terms_page",
         "citation_only",
         "paged_cards",
+        "comtrade_api",
     }
 )
 COLLECTED_FAMILIES = frozenset(
@@ -58,6 +61,7 @@ def undeclared_public_split(entry: Entry, fields: list[str]) -> bool:
 BANNED_SOURCE_IDS = frozenset({"traffic_tomtom_flow", "traffic_tomtom_range"})
 FIELDS = frozenset(
     {
+        "refetch",
         "key",
         "source_id",
         "slug",
@@ -105,6 +109,7 @@ FIELDS = frozenset(
         "point",
         "variables",
         "cache_role",
+        "comtrade_policy",
     }
 )
 FILE_FIELDS = {
@@ -142,6 +147,7 @@ TILE_TEXT = re.compile(r"\Ah[0-9]{2}v[0-9]{2}\Z")
 YEAR_TEXT = re.compile(r"\A[0-9]{4}\Z")
 REQUIRED = frozenset(
     {
+        "refetch",
         "key",
         "source_id",
         "slug",
@@ -170,6 +176,7 @@ REQUIRED = frozenset(
 )
 
 _REGISTRY = Path(__file__).resolve().parents[4] / "publicdata" / "sources.yaml"
+_UNCONFIRMED_REFETCH = Cadence("none", "frequency_unconfirmed", "")
 
 
 class RegistryError(Exception):
@@ -254,6 +261,8 @@ class Entry:
     variables: tuple[str, ...] = ()
     cache_role: str = ""
     chain_intermediate_sha256: str = ""
+    comtrade_policy: object | None = None
+    refetch: Cadence = _UNCONFIRMED_REFETCH
 
 
 def registry_path() -> Path:
@@ -384,6 +393,7 @@ def _entry(row: object) -> Entry:
     if kind not in KINDS:
         raise RegistryError("unknown kind")
     layer = _layer(row, kind)
+    comtrade_policy = _comtrade_policy(row, kind)
     basis = _text(row, "licence_basis")
     if basis not in LICENCE_BASES:
         raise RegistryError("unknown licence_basis")
@@ -409,7 +419,12 @@ def _entry(row: object) -> Entry:
     if _SKIP_LICENCE in folded_skip or _SKIP_TERMS in folded_skip:
         raise RegistryError("skip_reason names a licence or terms")
     file_fields = _file_fields(row, source_id)
+    try:
+        refetch = parse_cadence(row["refetch"], source_id=source_id)
+    except ValueError as exc:
+        raise RegistryError(str(exc)) from None
     return Entry(
+        refetch=refetch,
         key=_text(row, "key"),
         source_id=source_id,
         slug=_text(row, "slug"),
@@ -457,6 +472,7 @@ def _entry(row: object) -> Entry:
         variables=file_fields.variables,
         cache_role=file_fields.cache_role,
         chain_intermediate_sha256=_chain_pin(row),
+        comtrade_policy=comtrade_policy,
     )
 
 
@@ -625,6 +641,22 @@ def _technical_reason(reason: str) -> bool:
     """A layer may be omitted only for this closed vocabulary, one token or several."""
     tokens = [part.strip() for part in reason.split(";") if part.strip()]
     return bool(tokens) and all(token in TECHNICAL_SKIP_REASONS for token in tokens)
+
+
+def _comtrade_policy(row: dict[object, object], kind: str) -> object | None:
+    """Return the closed policy. Any other kind refuses the field."""
+    if kind != "comtrade_api":
+        if "comtrade_policy" in row:
+            raise RegistryError("comtrade_policy on a row that is not comtrade_api")
+        return None
+    if "comtrade_policy" not in row:
+        raise RegistryError("comtrade_api requires comtrade_policy")
+    from eii_custodian.publicdata.comtrade.policy import PolicyError, parse_policy
+
+    try:
+        return parse_policy(row["comtrade_policy"])
+    except PolicyError as exc:
+        raise RegistryError(exc.detail) from None
 
 
 def _layer(row: dict[object, object], kind: str) -> int | None:

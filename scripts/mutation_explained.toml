@@ -2948,3 +2948,253 @@ reason = "Validated window endpoints are nonempty and slash-free: with one slash
 module = "custodian/src/eii_custodian/publicdata/property/use_map.py"
 mutation = "--- src/eii_custodian/publicdata/property/use_map.py\n+++ src/eii_custodian/publicdata/property/use_map.py\n@@ -21,6 +21,6 @@\n         pair = (mapping.source_id, mapping.arabic_label, mapping.usage_value)\n         if pair in seen:\n             raise AdditionError(\"use_map_conflict\")\n-        seen[pair] = mapping\n+        seen[pair] = None\n         result.append(mapping)\n     return tuple(result)"
 reason = "seen is read only for key membership; its values are never read or returned, and the mapping itself is appended to the result, so keys, duplicate refusals and output agree at run time. The repository type check also refuses this mutant (seen holds UseMapping values, so assigning None is an assignment error); the mutation runner runs no type check."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -13,7 +13,7 @@\n     del sleep\n     policy = entry.comtrade_policy\n     check = activation_check(\n-        policy if isinstance(policy, (Policy, UnconfirmedPolicy)) else None,\n+        policy if (isinstance(policy, (Policy, UnconfirmedPolicy))) or True else None,\n         row_count_min=entry.row_count_min,\n         row_count_max=entry.row_count_max,\n         period_first=entry.period_first,"
+reason = "activation_check returns metadata_unconfirmed for any value that is not a confirmed Policy, including None, and only check is used afterwards."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -22,7 +22,7 @@\n         decision_record=entry.decision_record,\n     )\n     if check is not None or not isinstance(policy, Policy):\n-        held = policy if isinstance(policy, UnconfirmedPolicy) else None\n+        held = None\n         return _stopped(check or \"metadata_unconfirmed\", held)\n     if entry.commit_allowed or entry.terms_words == \"\":\n         return _stopped(\"commit_forbidden\", policy)"
+reason = "_stopped special-cases only a Policy. UnconfirmedPolicy and None share the placeholder. A failed Policy is not UnconfirmedPolicy, so held is already None."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -22,7 +22,7 @@\n         decision_record=entry.decision_record,\n     )\n     if check is not None or not isinstance(policy, Policy):\n-        held = policy if isinstance(policy, UnconfirmedPolicy) else None\n+        held = policy if (isinstance(policy, UnconfirmedPolicy)) and False else None\n         return _stopped(check or \"metadata_unconfirmed\", held)\n     if entry.commit_allowed or entry.terms_words == \"\":\n         return _stopped(\"commit_forbidden\", policy)"
+reason = "_stopped special-cases only a Policy. UnconfirmedPolicy and None share the placeholder. A failed Policy is not UnconfirmedPolicy, so held is already None."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -23,7 +23,7 @@\n     )\n     if check is not None or not isinstance(policy, Policy):\n         held = policy if isinstance(policy, UnconfirmedPolicy) else None\n-        return _stopped(check or \"metadata_unconfirmed\", held)\n+        return _stopped(check or \"metadata_unconfirmed\", None)\n     if entry.commit_allowed or entry.terms_words == \"\":\n         return _stopped(\"commit_forbidden\", policy)\n     directory = cache / entry.key"
+reason = "_stopped special-cases only a Policy. UnconfirmedPolicy and None share the placeholder. A failed Policy is not UnconfirmedPolicy, so held is already None."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -23,7 +23,7 @@\n     )\n     if check is not None or not isinstance(policy, Policy):\n         held = policy if isinstance(policy, UnconfirmedPolicy) else None\n-        return _stopped(check or \"metadata_unconfirmed\", held)\n+        return _stopped(check or \"XXmetadata_unconfirmedXX\", held)\n     if entry.commit_allowed or entry.terms_words == \"\":\n         return _stopped(\"commit_forbidden\", policy)\n     directory = cache / entry.key"
+reason = "The literal is used only when check is falsy. None is returned only for a confirmed Policy that passed, which does not enter the branch."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -23,7 +23,7 @@\n     )\n     if check is not None or not isinstance(policy, Policy):\n         held = policy if isinstance(policy, UnconfirmedPolicy) else None\n-        return _stopped(check or \"metadata_unconfirmed\", held)\n+        return _stopped(check or \"METADATA_UNCONFIRMED\", held)\n     if entry.commit_allowed or entry.terms_words == \"\":\n         return _stopped(\"commit_forbidden\", policy)\n     directory = cache / entry.key"
+reason = "The literal is used only when check is falsy. None is returned only for a confirmed Policy that passed, which does not enter the branch."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -31,7 +31,7 @@\n         acquire(directory)\n     except StateError as exc:\n         return _stopped(exc.check, policy)\n-    result: FetchResult | None = None\n+    result: FetchResult | None = \"\"\n     try:\n         try:\n             result = _run("
+reason = "_run returns a FetchResult or raises. Handlers assign one, or the exception leaves before the None check. result = None is repaired by that check. The check body never runs. Hunks @@ -45,7 +45,7 @@ and @@ -50,7 +50,7 @@."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -45,7 +45,7 @@\n                 requested_slot,\n             )\n         except (OSError, ValueError):\n-            result = _stopped(\"write_failed\", policy)\n+            result = None\n     finally:\n         try:\n             release(directory)"
+reason = "_run returns a FetchResult or raises. Handlers assign one, or the exception leaves before the None check. result = None is repaired by that check. The check body never runs. Hunks @@ -45,7 +45,7 @@ and @@ -50,7 +50,7 @@."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -50,7 +50,7 @@\n         try:\n             release(directory)\n         except StateError:\n-            result = _stopped(\"write_failed\", policy)\n+            result = None\n     if result is None:\n         return _stopped(\"write_failed\", policy)\n     return result"
+reason = "_run returns a FetchResult or raises. Handlers assign one, or the exception leaves before the None check. result = None is repaired by that check. The check body never runs. Hunks @@ -45,7 +45,7 @@ and @@ -50,7 +50,7 @@."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -52,5 +52,5 @@\n         except StateError:\n             result = _stopped(\"write_failed\", policy)\n     if result is None:\n-        return _stopped(\"write_failed\", policy)\n+        return _stopped(None, policy)\n     return result"
+reason = "_run returns a FetchResult or raises. Handlers assign one, or the exception leaves before the None check. result = None is repaired by that check. The check body never runs. Hunks @@ -45,7 +45,7 @@ and @@ -50,7 +50,7 @@."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -52,5 +52,5 @@\n         except StateError:\n             result = _stopped(\"write_failed\", policy)\n     if result is None:\n-        return _stopped(\"write_failed\", policy)\n+        return _stopped(\"write_failed\", None)\n     return result"
+reason = "_run returns a FetchResult or raises. Handlers assign one, or the exception leaves before the None check. result = None is repaired by that check. The check body never runs. Hunks @@ -45,7 +45,7 @@ and @@ -50,7 +50,7 @@."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -52,5 +52,5 @@\n         except StateError:\n             result = _stopped(\"write_failed\", policy)\n     if result is None:\n-        return _stopped(\"write_failed\", policy)\n+        return _stopped(policy)\n     return result"
+reason = "_run returns a FetchResult or raises. Handlers assign one, or the exception leaves before the None check. result = None is repaired by that check. The check body never runs. Hunks @@ -45,7 +45,7 @@ and @@ -50,7 +50,7 @@."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -52,5 +52,5 @@\n         except StateError:\n             result = _stopped(\"write_failed\", policy)\n     if result is None:\n-        return _stopped(\"write_failed\", policy)\n+        return _stopped(\"write_failed\", )\n     return result"
+reason = "_run returns a FetchResult or raises. Handlers assign one, or the exception leaves before the None check. result = None is repaired by that check. The check body never runs. Hunks @@ -45,7 +45,7 @@ and @@ -50,7 +50,7 @@."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -52,5 +52,5 @@\n         except StateError:\n             result = _stopped(\"write_failed\", policy)\n     if result is None:\n-        return _stopped(\"write_failed\", policy)\n+        return _stopped(\"XXwrite_failedXX\", policy)\n     return result"
+reason = "_run returns a FetchResult or raises. Handlers assign one, or the exception leaves before the None check. result = None is repaired by that check. The check body never runs. Hunks @@ -45,7 +45,7 @@ and @@ -50,7 +50,7 @@."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -52,5 +52,5 @@\n         except StateError:\n             result = _stopped(\"write_failed\", policy)\n     if result is None:\n-        return _stopped(\"write_failed\", policy)\n+        return _stopped(\"WRITE_FAILED\", policy)\n     return result"
+reason = "_run returns a FetchResult or raises. Handlers assign one, or the exception leaves before the None check. result = None is repaired by that check. The check body never runs. Hunks @@ -45,7 +45,7 @@ and @@ -50,7 +50,7 @@."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -7,7 +7,7 @@\n     if (\n         sentinel\n         and candidate.is_file()\n-        and sentinel in candidate.read_text(encoding=\"utf-8\")\n+        and sentinel in candidate.read_text(encoding=\"UTF-8\")\n     ):\n         raise SafeRefusal(\n             \"commit_forbidden\", \"https://invalid.example/refused\", \"commit\""
+reason = "codecs.lookup(\"UTF-8\").name == codecs.lookup(\"utf-8\").name == \"utf-8\"."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -153,7 +153,7 @@\n         )\n     missing = missing_cells(initial, ledger.pending, ledger.completed)\n     _write_coverage(\n-        directory, policy, initial, ledger, missing, entry=entry, retrieved=clock()\n+        directory, policy, initial, None, missing, entry=entry, retrieved=clock()\n     )\n     if missing:\n         return _result("
+reason = "This call passes missing_cells. Ledger is read only if missing is None. None and the omitted default recompute the same tuple."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -153,7 +153,7 @@\n         )\n     missing = missing_cells(initial, ledger.pending, ledger.completed)\n     _write_coverage(\n-        directory, policy, initial, ledger, missing, entry=entry, retrieved=clock()\n+        directory, policy, initial, ledger, None, entry=entry, retrieved=clock()\n     )\n     if missing:\n         return _result("
+reason = "This call passes missing_cells. Ledger is read only if missing is None. None and the omitted default recompute the same tuple."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -153,7 +153,7 @@\n         )\n     missing = missing_cells(initial, ledger.pending, ledger.completed)\n     _write_coverage(\n-        directory, policy, initial, ledger, missing, entry=entry, retrieved=clock()\n+        directory, policy, initial, ledger, entry=entry, retrieved=clock()\n     )\n     if missing:\n         return _result("
+reason = "This call passes missing_cells. Ledger is read only if missing is None. None and the omitted default recompute the same tuple."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -172,6 +172,6 @@\n         digest,\n         _host_for(policy, api_class),\n         len(initial),\n-        len(initial) - len(missing),\n+        len(initial) + len(missing),\n         len(missing),\n     )"
+reason = "Both lines run only after if missing: return, so missing is empty."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -11,7 +11,7 @@\n             result.body,\n             policy,\n             descriptor,\n-            source_version=policy.version,\n+            source_version=None,\n             receipt_sha256=\"\",\n         )\n     except ParseError as exc:"
+reason = "full_key omits both fields. _classify keeps raw_count and drops the rows."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -12,7 +12,7 @@\n             policy,\n             descriptor,\n             source_version=policy.version,\n-            receipt_sha256=\"\",\n+            receipt_sha256=None,\n         )\n     except ParseError as exc:\n         return _refusal(policy, exc.check, descriptor, header)"
+reason = "full_key omits both fields. _classify keeps raw_count and drops the rows."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -12,7 +12,7 @@\n             policy,\n             descriptor,\n             source_version=policy.version,\n-            receipt_sha256=\"\",\n+            receipt_sha256=\"XXXX\",\n         )\n     except ParseError as exc:\n         return _refusal(policy, exc.check, descriptor, header)"
+reason = "full_key omits both fields. _classify keeps raw_count and drops the rows."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -1,7 +1,7 @@\n def _body_holds(body: bytes, secret: str) -> bool:\n     if secret == \"\":\n         return False\n-    raw = secret.encode(\"utf-8\")\n+    raw = secret.encode(\"UTF-8\")\n     if raw in body:\n         return True\n     encoded = quote(secret, safe=\"\").encode(\"utf-8\")"
+reason = "codecs.lookup(\"UTF-8\").name == codecs.lookup(\"utf-8\").name == \"utf-8\"."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -4,7 +4,7 @@\n     raw = secret.encode(\"utf-8\")\n     if raw in body:\n         return True\n-    encoded = quote(secret, safe=\"\").encode(\"utf-8\")\n+    encoded = quote(secret, safe=\"XXXX\").encode(\"utf-8\")\n     if encoded != raw and encoded in body:\n         return True\n     return _json_holds(body, secret)"
+reason = "X is unreserved, so quote(s, safe=\"\") == quote(s, safe=\"XXXX\") for every str."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -4,7 +4,7 @@\n     raw = secret.encode(\"utf-8\")\n     if raw in body:\n         return True\n-    encoded = quote(secret, safe=\"\").encode(\"utf-8\")\n+    encoded = quote(secret, safe=\"\").encode(\"UTF-8\")\n     if encoded != raw and encoded in body:\n         return True\n     return _json_holds(body, secret)"
+reason = "codecs.lookup(\"UTF-8\").name == codecs.lookup(\"utf-8\").name == \"utf-8\"."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -20,7 +20,7 @@\n         fetch_host=host,\n         retrieved_utc=retrieved_utc,\n         publisher=entry.publisher,\n-        source_modified=\"\",\n+        source_modified=None,\n         row_count=count,\n         terms_sha256=terms_text_sha256(entry.terms_words.encode(\"utf-8\")),\n     )"
+reason = "sidecar_for stores `x or None`, so \"\" and None are JSON null."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -22,7 +22,7 @@\n         publisher=entry.publisher,\n         source_modified=\"\",\n         row_count=count,\n-        terms_sha256=terms_text_sha256(entry.terms_words.encode(\"utf-8\")),\n+        terms_sha256=terms_text_sha256(entry.terms_words.encode(\"UTF-8\")),\n     )\n     side.update(\n         {"
+reason = "codecs.lookup(\"UTF-8\").name == codecs.lookup(\"utf-8\").name == \"utf-8\"."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -41,7 +41,7 @@\n             },\n         }\n     )\n-    text = json.dumps(side, sort_keys=True, ensure_ascii=True) + \"\\n\"\n+    text = json.dumps(side, sort_keys=True, ) + \"\\n\"\n     receipt_sha = sha256_hex(text.encode(\"utf-8\"))\n     commit_pair(directory, receipt_sha, \"json\", body, side)\n     written = (directory / f\"{receipt_sha}.meta.json\").read_bytes()"
+reason = "json.dumps defaults ensure_ascii to True."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -42,7 +42,7 @@\n         }\n     )\n     text = json.dumps(side, sort_keys=True, ensure_ascii=True) + \"\\n\"\n-    receipt_sha = sha256_hex(text.encode(\"utf-8\"))\n+    receipt_sha = sha256_hex(text.encode(\"UTF-8\"))\n     commit_pair(directory, receipt_sha, \"json\", body, side)\n     written = (directory / f\"{receipt_sha}.meta.json\").read_bytes()\n     if sha256_hex(written) != receipt_sha:"
+reason = "codecs.lookup(\"UTF-8\").name == codecs.lookup(\"utf-8\").name == \"utf-8\"."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -46,5 +46,5 @@\n     commit_pair(directory, receipt_sha, \"json\", body, side)\n     written = (directory / f\"{receipt_sha}.meta.json\").read_bytes()\n     if sha256_hex(written) != receipt_sha:\n-        raise OSError(\"receipt\")\n+        raise OSError(None)\n     return receipt_sha"
+reason = "except (OSError, ValueError) maps the raise to write_failed and drops the message."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -46,5 +46,5 @@\n     commit_pair(directory, receipt_sha, \"json\", body, side)\n     written = (directory / f\"{receipt_sha}.meta.json\").read_bytes()\n     if sha256_hex(written) != receipt_sha:\n-        raise OSError(\"receipt\")\n+        raise OSError(\"XXreceiptXX\")\n     return receipt_sha"
+reason = "except (OSError, ValueError) maps the raise to write_failed and drops the message."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -46,5 +46,5 @@\n     commit_pair(directory, receipt_sha, \"json\", body, side)\n     written = (directory / f\"{receipt_sha}.meta.json\").read_bytes()\n     if sha256_hex(written) != receipt_sha:\n-        raise OSError(\"receipt\")\n+        raise OSError(\"RECEIPT\")\n     return receipt_sha"
+reason = "except (OSError, ValueError) maps the raise to write_failed and drops the message."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -26,7 +26,7 @@\n         \"requested_cells\": len(initial),\n         \"source_id\": SOURCE_ID,\n     }\n-    text = json.dumps(payload, sort_keys=True) + \"\\n\"\n+    text = json.dumps(payload, sort_keys=None) + \"\\n\"\n     archive_auxiliary(\n         entry,\n         directory,"
+reason = "Those dicts are inserted in alphabetical order. sort_keys sorts only when true. None and False do not. Omitted defaults to False."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -26,7 +26,7 @@\n         \"requested_cells\": len(initial),\n         \"source_id\": SOURCE_ID,\n     }\n-    text = json.dumps(payload, sort_keys=True) + \"\\n\"\n+    text = json.dumps(payload, ) + \"\\n\"\n     archive_auxiliary(\n         entry,\n         directory,"
+reason = "Those dicts are inserted in alphabetical order. sort_keys sorts only when true. None and False do not. Omitted defaults to False."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -26,7 +26,7 @@\n         \"requested_cells\": len(initial),\n         \"source_id\": SOURCE_ID,\n     }\n-    text = json.dumps(payload, sort_keys=True) + \"\\n\"\n+    text = json.dumps(payload, sort_keys=False) + \"\\n\"\n     archive_auxiliary(\n         entry,\n         directory,"
+reason = "Those dicts are inserted in alphabetical order. sort_keys sorts only when true. None and False do not. Omitted defaults to False."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -9,7 +9,7 @@\n     retrieved: str,\n ) -> str:\n     children = []\n-    for key, receipt_sha in sorted(ledger.child_sha256, key=lambda item: item[0]):\n+    for key, receipt_sha in sorted(ledger.child_sha256, key=None):\n         side = json.loads(\n             (directory / f\"{receipt_sha}.meta.json\").read_text(encoding=\"utf-8\")\n         )"
+reason = "Keys are unique, so tuple order equals key order. Omitted key is None."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -9,7 +9,7 @@\n     retrieved: str,\n ) -> str:\n     children = []\n-    for key, receipt_sha in sorted(ledger.child_sha256, key=lambda item: item[0]):\n+    for key, receipt_sha in sorted(ledger.child_sha256, ):\n         side = json.loads(\n             (directory / f\"{receipt_sha}.meta.json\").read_text(encoding=\"utf-8\")\n         )"
+reason = "Keys are unique, so tuple order equals key order. Omitted key is None."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -11,7 +11,7 @@\n     children = []\n     for key, receipt_sha in sorted(ledger.child_sha256, key=lambda item: item[0]):\n         side = json.loads(\n-            (directory / f\"{receipt_sha}.meta.json\").read_text(encoding=\"utf-8\")\n+            (directory / f\"{receipt_sha}.meta.json\").read_text(encoding=\"UTF-8\")\n         )\n         body_sha = side.get(\"sha256\") if isinstance(side, dict) else \"\"\n         children.append({\"key\": key, \"receipt_sha256\": receipt_sha, \"sha256\": body_sha})"
+reason = "codecs.lookup(\"UTF-8\").name == codecs.lookup(\"utf-8\").name == \"utf-8\"."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -23,7 +23,7 @@\n         \"parser_method\": PARSER_METHOD,\n         \"parser_version\": PARSER_VERSION,\n         \"policy_sha256\": policy_sha256(policy),\n-        \"present_cells\": len(initial) - len(missing),\n+        \"present_cells\": len(initial) + len(missing),\n         \"requested_cells\": len(initial),\n         \"selection_sha256\": selection_sha256(policy),\n         \"source_id\": SOURCE_ID,"
+reason = "Both lines run only after if missing: return, so missing is empty."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -28,7 +28,7 @@\n         \"selection_sha256\": selection_sha256(policy),\n         \"source_id\": SOURCE_ID,\n     }\n-    text = json.dumps(payload, sort_keys=True, separators=(\",\", \":\")) + \"\\n\"\n+    text = json.dumps(payload, sort_keys=None, separators=(\",\", \":\")) + \"\\n\"\n     body = text.encode(\"utf-8\")\n     commit_pair(\n         directory / \"manifests\","
+reason = "Those dicts are inserted in alphabetical order. sort_keys sorts only when true. None and False do not. Omitted defaults to False."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -28,7 +28,7 @@\n         \"selection_sha256\": selection_sha256(policy),\n         \"source_id\": SOURCE_ID,\n     }\n-    text = json.dumps(payload, sort_keys=True, separators=(\",\", \":\")) + \"\\n\"\n+    text = json.dumps(payload, separators=(\",\", \":\")) + \"\\n\"\n     body = text.encode(\"utf-8\")\n     commit_pair(\n         directory / \"manifests\","
+reason = "Those dicts are inserted in alphabetical order. sort_keys sorts only when true. None and False do not. Omitted defaults to False."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -28,7 +28,7 @@\n         \"selection_sha256\": selection_sha256(policy),\n         \"source_id\": SOURCE_ID,\n     }\n-    text = json.dumps(payload, sort_keys=True, separators=(\",\", \":\")) + \"\\n\"\n+    text = json.dumps(payload, sort_keys=False, separators=(\",\", \":\")) + \"\\n\"\n     body = text.encode(\"utf-8\")\n     commit_pair(\n         directory / \"manifests\","
+reason = "Those dicts are inserted in alphabetical order. sort_keys sorts only when true. None and False do not. Omitted defaults to False."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -29,7 +29,7 @@\n         \"source_id\": SOURCE_ID,\n     }\n     text = json.dumps(payload, sort_keys=True, separators=(\",\", \":\")) + \"\\n\"\n-    body = text.encode(\"utf-8\")\n+    body = text.encode(\"UTF-8\")\n     commit_pair(\n         directory / \"manifests\",\n         sha256_hex(body),"
+reason = "codecs.lookup(\"UTF-8\").name == codecs.lookup(\"utf-8\").name == \"utf-8\"."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -32,7 +32,7 @@\n     body = text.encode(\"utf-8\")\n     commit_pair(\n         directory / \"manifests\",\n-        sha256_hex(body),\n+        None,\n         \"json\",\n         body,\n         sidecar_for("
+reason = "identity None selects file_hash, SHA-256 of the same bytes, and the sidecar sha256 is overwritten with it."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -45,7 +45,7 @@\n             publisher=entry.publisher,\n             source_modified=policy.version,\n             row_count=None,\n-            terms_sha256=\"\",\n+            terms_sha256=None,\n         ),\n     )\n     _atomic_text(directory / MANIFEST_NAME, text)"
+reason = "sidecar_for stores `x or None`, so \"\" and None are JSON null."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -49,4 +49,4 @@\n         ),\n     )\n     _atomic_text(directory / MANIFEST_NAME, text)\n-    return sha256_hex(text.encode(\"utf-8\"))\n+    return sha256_hex(text.encode(\"UTF-8\"))"
+reason = "codecs.lookup(\"UTF-8\").name == codecs.lookup(\"utf-8\").name == \"utf-8\"."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -1,7 +1,7 @@\n def _atomic_text(path: Path, text: str) -> None:\n     partial = path.with_name(\".\" + path.name + \".partial\")\n     try:\n-        partial.write_text(text, encoding=\"utf-8\")\n+        partial.write_text(text, encoding=\"UTF-8\")\n         os.replace(partial, path)\n     except OSError:\n         partial.unlink(missing_ok=True)"
+reason = "codecs.lookup(\"UTF-8\").name == codecs.lookup(\"utf-8\").name == \"utf-8\"."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -1,7 +1,7 @@\n def _verified(\n     directory: Path, ledger: Ledger, policy: Policy, entry: Entry\n ) -> tuple[str | None, tuple[VerifiedChild, ...]]:\n-    terms = terms_text_sha256(entry.terms_words.encode(\"utf-8\"))\n+    terms = terms_text_sha256(entry.terms_words.encode(\"UTF-8\"))\n     found: list[VerifiedChild] = []\n     for key, receipt_sha in ledger.child_sha256:\n         try:"
+reason = "codecs.lookup(\"UTF-8\").name == codecs.lookup(\"utf-8\").name == \"utf-8\"."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/comtrade/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/comtrade/fetch.py\n+++ src/eii_custodian/publicdata/comtrade/fetch.py\n@@ -2,7 +2,7 @@\n     policy: Policy,\n     check: str,\n     descriptor: Descriptor | None = None,\n-    secret: str = \"\",\n+    secret: str = \"XXXX\",\n ) -> SafeRefusal:\n     from eii_custodian.publicdata.comtrade.policy import refusal"
+reason = "secret is read only with a descriptor. _stopped passes none. Other calls pass the header."

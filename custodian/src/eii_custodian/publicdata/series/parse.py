@@ -11,18 +11,16 @@ from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
-from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 
 
 def selected_source(
     cache: Path, entry: Entry, digest: str
 ) -> tuple[list[dict[str, object]], dict[str, object]]:
     """No latest-file search and no network; bind the body to its exact receipt."""
-    body = (cache / entry.key / f"{digest}.{entry.extension}").read_bytes()
-    if sha256_hex(body) != digest:
-        raise ValueError("selected body hash mismatch")
-    receipt = json.loads((cache / entry.key / f"{digest}.meta.json").read_text())
+    selected = read_snapshot(cache / entry.key, digest)
+    body, receipt = selected.body, selected.sidecar
     expected = {
         "sha256": digest,
         "key": entry.key,
@@ -36,7 +34,8 @@ def selected_source(
     if any(receipt.get(key) != value for key, value in expected.items()):
         raise ValueError("selected receipt mismatch")
     for key in ("publisher", "retrieved_utc", "licence_id", "fetch_url"):
-        if not isinstance(receipt.get(key), str) or not receipt[key].strip():
+        value = receipt.get(key)
+        if not isinstance(value, str) or not value.strip():
             raise ValueError("incomplete receipt")
     rows = json.loads(body, parse_float=Decimal)
     if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):

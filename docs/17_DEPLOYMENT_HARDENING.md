@@ -110,6 +110,7 @@ Document 04 supplies the terms records; the relative-busyness quotations also co
 | National GIS centre's layers, `gis_*` of PUB-105 | terms to be read and recorded (document 04) | Record and obtain any permission or licence needed for real use. |
 | WSF 3D building-height cells, `bldg_wsf3d` | Three dataset statements, read 2026-11-15 in S2-T20 (document 04; PUB-106): the landing page "License: CC-BY-4.0"; the README "The WSF3D is licensed under CC-BY-4.0."; the catalogue record "Nutzungsbedingungen: Lizenz, https://creativecommons.org/licenses/by/4.0 / terms of use: https://creativecommons.org/licenses/by/4.0/", which also records "Use Limitations: DLR not liable for damage resulting from use". The site terms say: "If expressly stated (e.g. in a caption, on a text section, under "Information" for the respective work), certain images, videos, images and texts are licensed to you under a Creative Commons license. ... the most frequently used version is CC-BY . This means that you may reproduce, distribute and make the work or content publicly available, make modifications and adaptations of the work or content and use the respective work commercially if you reproduce the licenser's legal notice concerning the rights required in the license text AND make the content available under the same license CC-BY 3.0." | Attribution for real use, with the catalogue record's credit "Copyright DLR (year of production)"; the reading is the owner's (PUB-106). |
 | Weather history, `weather_openmeteo` | Document 04's registry summary: free interface for non-commercial use; data CC BY 4.0, with the attribution the publisher asks for. Terms and licence pages read 2026-11-12. Publisher's exact terms to be read and recorded (document 04). | Settle the interface's permission or licence for real use under DHA-87. |
+| UN Comtrade, `un_comtrade` | terms to be read and recorded (document 04). The keyed interface is `provider_terms` under decision 0040 item 2. No publisher quotation is recorded until the lead reads the page. | Record the permission or licence needed for real use. Remote budget coordination and a hosted scheduler are deferred and are not a local-use gate. |
 | Traffic provider, `traffic_tomtom_flow` and `traffic_tomtom_range` | Developer terms to be read and recorded (document 04); document 04 records that they were not read on 2026-11-12. | Settle the developer terms and allowance under DHA-85; the optional keyed provider keeps its existing version 1 rules. |
 | Public tender portal, `tenders_pub` | "If not stated otherwise, it must not reproduce, republish, upload, send, distribute or publicly display or edit the contents of this website without the prior written consent of through the Ministry of Finance", read 2026-11-14 (document 04). | Before real use: obtain the Ministry's prior written consent before anyone outside the owner's organisation is given access, any page showing tenders is published, or the product is used commercially. |
 
@@ -222,3 +223,20 @@ Hardening points raised during the build that go beyond a task's acceptance crit
 - [Decision 0002](decisions/0002-three-planes-and-the-release-boundary.md) and [decision 0007](decisions/0007-disclosure-control-by-pooling-and-stable-treatment.md): the release boundary and the stable treatment that a deployment keeps.
 - [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) (sections 9 and 17), [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md) (sections 2 and 11), [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md) and [OPEN_ITEMS.md](../OPEN_ITEMS.md).
 - No external source was used.
+
+## Deferred BACI archive hardening (S2-T24)
+
+Resumable downloads, scheduled freshness monitoring and independent archive
+mirrors are deferred. No BACI real-use permission obligation is added to DHA-102:
+the publisher's terms have not been read in this worker pass. The lead supplies
+actual words and date before adding any such obligation. Archive size alone does
+not change BACI nightly eligibility or TST-52 (decision 0040 item 9).
+
+## Deferred Gravity and Atlas archive hardening (S2-T25)
+
+Resumable downloads, scheduled freshness monitoring and independent archive
+mirrors are deferred for Gravity and for both finished Atlas downloads. No
+real-use permission obligation is added: the publisher terms have not been
+read in this worker pass. Archive size alone does not change nightly
+eligibility or TST-52 (decision 0040 item 9). Registration or a paid tier
+stays an owner obstacle and fetches nothing.

@@ -674,6 +674,7 @@ Writers are modules of `custodian/`; readers are modules of `product/` (`store` 
 | `pub_venue_busyness` | Public | named venue × day of week × hour | `place_id`, `day_of_week`, `hour` | `publicdata` (from the source `busy_gmaps`, inside `./eii build-public` only, DAT-157) | named public places (`place_public`); card C37; the pooled hourly anchor of the simulation |
 | `pub_night_lights` | Public | frame cell × month | `cell`, `period` | `publicdata` (from the source `ntl_blackmarble`, aggregated to the frame) | night-time radiance map layer; card C36 |
 | `pub_place_fsq` | Public | place | `fsq_place_id` | `publicdata` (from the source `places_fsq`, fetched from the public copy on Source Cooperative and read without an account, DAT-157) | `scan_places`, `resolve`; competitors and typical neighbours |
+| `pub_comtrade_trade` | Public | reporter or mirror trade cell | `series_role`, `reporter_code`, `partner_code`, `partner2_code`, `frequency`, `period`, `flow_code`, `classification`, `classification_revision`, `product_code`, `aggregation_level`, `customs_code`, `transport_mode_code`, `valuation_basis`, `measure` | `publicdata` (from the source `un_comtrade`, inside `./eii build-public` only; S2-T26 reads the rows, S2-T08 reads the manifest) | trade comparison input for S2-T26; not a customs-import value |
 | `pub_pop_agesex_grid` | Public (split) | grid cell × age band × sex × year | `grid_key`, `age_band`, `sex`, `period` | `publicdata` (from the source `worldpop_qat_agesex`) | card C38 |
 | `graph_node` | Graph | node | `node_id` | `publicdata`, `release` (lineage nodes) | `resolve`, `supplier_lens`, `scan_places`, `sector_facts` |
 | `graph_edge` | Graph | edge | `edge_id` | `publicdata`, `release` (lineage edges) | same as `graph_node` |
@@ -716,6 +717,36 @@ release kinds; the times behind it are not stored (DAT-154).
 `release_manifest` is deliberately absent from this Parquet catalogue and from `manifest.tables`.
 The loader materialises it in each store from the verified `manifest.json`, as specified in section
 8. It has no Parquet file and is never an input to its own release hash.
+
+#### BACI table contracts (S2-T24)
+
+`pub_baci_trade` is Public, keyed by `source_version`, `hs_revision`, `year`,
+`exporter_code`, `importer_code`, `hs_code`. `pub_baci_country` is Public, keyed
+by `source_version`, `country_code`. `pub_baci_product` is Public, keyed by
+`source_version`, `hs_revision`, `hs_code`. S2-T08 owns assembly; S2-T25 receives
+the dictionaries and S2-T26 receives the separate series. No live source is
+activated by these contracts (decision 0040 items 3 and 4).
+
+#### Gravity and Atlas table contracts (S2-T25)
+
+Selected manifests bind each archive's actual final host to that source's
+reviewed addresses. Gravity records `archive_host`; Atlas records `host` for
+each grain in `archives`. Readers reconstruct the receipt with the recorded
+final host and recheck every configured publisher checksum. The initial
+registry host still matches the initial download address.
+
+`pub_gravity_bilateral` is Public, keyed by `source_version`, `hs_revision`,
+`year`, `origin_code`, `destination_code`. `pub_gravity_country` is Public,
+keyed by `source_version`, `country_code`. `pub_atlas_country_product_year` is
+Public, keyed by `source_version`, `hs_revision`, `year`, `country_code`,
+`product_code`. `pub_atlas_country_partner_product_year` is Public, keyed by
+`source_version`, `hs_revision`, `year`, `reporter_code`, `partner_code`,
+`product_code`. Each finished Atlas download has its own country dictionary
+(`pub_atlas_cpy_country`, `pub_atlas_cppy_country`) and product dictionary
+(`pub_atlas_cpy_product`, `pub_atlas_cppy_product`), keyed with `grain` so the
+two files are not merged. Publisher country and product mappings stay
+`pending`. These contracts do not activate a live source (decision 0040 items
+3 and 4). S2-T26 receives the separate series.
 
 ### 7.3 Columns
 
@@ -799,10 +830,11 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `pub_venue_busyness` | `place_id` string (the `pub_place` record of a venue on the build-time list of the source `busy_gmaps`); `day_of_week` (`sunday`, `monday`, `tuesday`, `wednesday`, `thursday`, `friday`, `saturday`); `hour` int (0 to 23, local time); `busyness_index` int (0 to 100: the relative busyness of that hour as the source publishes it, never a count of people); `retrieved_on` date (the retrieval date, which a fact from the table takes as its `period` and shows beside the label "Google Maps popular times"); `source_id` |
 | `pub_night_lights` | `cell` cell (a base cell of `grid_cell`: the public-data build aggregates the monthly product to the frame from whole pixels, none split, and the table is never keyed by release unit); `period` (`YYYY-MM`); `radiance` decimal(14,4) (night-time radiance in nW per cm² per sr, fact unit `radiance_nw_cm2_sr`); `source_id` |
 | `pub_place_fsq` | `fsq_place_id` string (the source's own identifier); `name` string; `name_ar` string (Y: null on every row, because the source has no Arabic or other-language name); `category_ids` string (the source's category identifiers in the source's order, joined by a semicolon; empty when the source gives none); `category_labels` string (the source's labels the same way); the reviewed mapping to the `place_category` nodes of section 10 reads the identifiers and is a committed, reviewed configuration, not a column; a place none of whose identifiers has a reviewed row keeps its source categories and gets no product category; `lon`, `lat` decimal(9,6); `cell` cell; `source_release` string (the release date taken from the folder name of the copy used, `2025-01-10`; the copy holds the releases 2024-11-19, 2024-12-03, 2025-01-10 and 2025-02-06; a change of release is a reviewed registry change, PUB-10); `licence` string; `date_created`, `date_refreshed`, `date_closed` date (Y: as published, parsed from the file's text; null when the source leaves the field empty); source-given fields only, so that no attribute is invented for a real named place. There is no confidence field and no unresolved flag |
+| `pub_comtrade_trade` | One row is one published measure at one complete dimensional key. `source_id` string; `series_role` string (`reporter` or `mirror`); `reporter_code`, `partner_code` and `partner2_code` string (partner2 empty when the source gives none); `frequency` string (`annual` or `monthly`); `period` string (`YYYY` or `YYYY-MM`); `flow_code`, `classification`, `classification_revision` and `product_code` string; `aggregation_level` integer; `customs_code`, `transport_mode_code` and `valuation_basis` string; `measure` and `unit` string, a closed pair from the reviewed mapping; `value` number (exact decimal, null when the source measure is null, never a substituted zero, and never converted); `source_flags` string; `source_version` string; `receipt_sha256` string. Reporter rows keep Qatar as reporter. Mirror rows keep the selected partner as reporter and Qatar as partner. Totals and chapters stay separate aggregation levels. S2-T26 reads these rows and does not merge them. The precision and scale stay those recorded on the activated policy; an overflow is refused. |
 | `pub_pop_agesex_grid` | `grid_key` string (the cell's row and column in the grid files of `worldpop_qat_agesex`, written as for `access_score_grid` with the prefix `wa_`, so that the keys of the two grids never collide: one of the grid's own 100 m cells, never a frame cell or a release unit); `lon`, `lat` decimal(9,6) (the cell's centre, which decides whether the cell lies inside an area, DAT-141); `age_band` string (the grid's own band key); `sex` (`female`, `male`); `people` decimal(18,4) (people in the cell, as the grid gives them); `period` (`YYYY`, the year of the grid); `source_id` |
 | `graph_node`, `graph_edge` | section 10 |
 | `fact_lineage` | `lineage_id` string (`lin_` plus the table name, with a suffix when one table has several transforms); `table_name` string; `partition_id` string (Y: required for a protected-table home family, null otherwise); `measure` string (Y: `net` or `basic` where the protected table has that dimension, null otherwise); `breakdown` string (Y: required for a protected-table home family and one of `none`, `band`, `housing_class`, `occupation_group_by_band`, `home_municipality`, `side_count_type`, `activity_class_by_size_band`, `cohort` (a `month_change` component), `company_row` (a `register_company_list` row, decision 0022); null otherwise); `family_role` (`single`, `numerator`, `denominator`; Y for a protected-table home family, null otherwise); `source_id` string; `input_class` (`public`, `synthetic`, `simulated`); `transform` string (`module.function@version`); `rules_version_id` string (Y, null for Public tables) |
-| `source_registry` | `source_id` string; `kind` (`public_dataset`, `public_document`, `reviewed_config`, `synthetic_feed`, `simulation_output`); `title`; `publisher`; `url` (Y for synthetic and simulated); `licence` string; `licence_basis` string (Y: the basis of use that the registry entry records, [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) section 3.1, `dataset` for a stated open dataset licence, `portal_terms` where only portal terms exist, `provider_terms` for the provider interfaces of PUB-95 and PUB-97, and `owner_decision` for every other source with no open licence covering the use, meaning the owner's decision for a personal, local project ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)); `licence` records what the publisher states, with the publisher's words and date read held in document 04; null for synthetic and simulated sources); `retrieved_on` date; `sha256` string; `commit_allowed` bool; `attribution` string; `public_splits` string (Y: semicolon-separated subset of `sex` and `nationality` that the registry entry declares in `public_splits`, DAT-141; null when it declares none). For a figure from a decision-0017 slug, this `source_id` is the registry key `<source_id>/<slug>` (PUB-85); the fetch metadata keeps the family `source_id` |
+| `source_registry` | `source_id` string; `kind` (`public_dataset`, `public_document`, `reviewed_config`, `synthetic_feed`, `simulation_output`); `title`; `publisher`; `url` (Y for synthetic and simulated); `licence` string; `licence_basis` string (Y: the basis of use that the registry entry records, [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) section 3.1, `dataset` for a stated open dataset licence, `portal_terms` where only portal terms exist, `provider_terms` for the provider interfaces of PUB-95 and PUB-97 and for the Comtrade keyed interface `un_comtrade` (decision 0040 item 2), and `owner_decision` for every other source with no open licence covering the use, meaning the owner's decision for a personal, local project ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)); `licence` records what the publisher states, with the publisher's words and date read held in document 04; null for synthetic and simulated sources); `retrieved_on` date; `sha256` string; `commit_allowed` bool; `attribution` string; `public_splits` string (Y: semicolon-separated subset of `sex` and `nationality` that the registry entry declares in `public_splits`, DAT-141; null when it declares none). For a figure from a decision-0017 slug, this `source_id` is the registry key `<source_id>/<slug>` (PUB-85); the fetch metadata keeps the family `source_id` |
 | `release_manifest` (loader-materialised store table only) | One row per entry of verified `manifest.tables`: `release_id`; `table_name`; `provenance_class` (`frame`, `protected`, `simulated`, `public`, `graph`, `lineage`, `control`); `file`; `sha256`; `row_count` int; `schema_sha256`; plus the scalar fields of section 8 repeated on every row. It has no row for itself. |
 | `rules_version` | `rules_version_id`; `parameter_set` (`A`, `B`, `shared`); `rule_code`; `value` string; `unit` string; `description_en` string |
 | `suppression_reason` | `code` (upper snake case, for example `BELOW_MIN_EARNERS`, `EMPLOYER_DOMINANCE`, `TOP_TWO_DOMINANCE`, `PERSON_CONCENTRATION`, `REMAINDER_FAILED`); `label_en`; `label_ar` (pending native review); `explanation_en`; `explanation_ar` |
@@ -853,7 +885,89 @@ This closed list, the one closed presence/pay case of DAT-160, and the talent ra
 The talent pool and the competing demand of DAT-165 each name one home family.
 The talent ratio is the quotient of those two released figures, and its lineage names both tables (DAT-94).
 
+#### BACI columns and source chain (S2-T24)
+
+All keys are non-null strings except `year`, an integer from the data. Trade
+columns additionally hold `value` (non-null decimal string), `quantity` (nullable
+decimal string), `value_unit`, `quantity_unit`, `currency`, `valuation_basis`
+(explicit `unknown` when unpublished), `quantity_status` (`present` or
+`source_missing`), `source_id` and `member_sha256`. Country columns additionally
+hold `source_id`, `source_name` and nullable `iso3`, only where published.
+Product columns additionally hold `source_id` and `source_description`.
+Leading code zeros and accepted decimal text are preserved unchanged.
+
+ASSUMPTION pending the lead's dictionary reading: `total_digits: 18` and
+`fractional_digits: 6` for both value and quantity. Count every written digit,
+including leading and trailing zeros. Accept unsigned ASCII fixed-point text
+only, no exponents, signs, whitespace, nonfinite text, floats or rounding.
+Declared missing quantity becomes null; zero stays present. Units are configured
+from the source, never inferred or converted. Inventory, dictionary hashes,
+member hashes/headers/counts, raw/selected/excluded counts and year/partner/product
+coverage bind to the selected complete manifest. Absence never becomes zero.
+
+`contracts.read_selected` verifies the selected manifest, archive and output
+hashes and reparses every row before returning typed tables. `source_registry`
+uses `source_id: cepii_baci`, kind `public_dataset`, publisher, page, licence,
+basis, retrieval date, selected manifest hash, false commit flag and attribution.
+Every table has a `fact_lineage` binding to
+`eii_custodian.publicdata.baci.parse.parse_archive@v1`; its input class is `public`
+and protected partition, measure, breakdown, family role and rules fields are null.
+The manifest connects this binding to the archive and dictionary/member hashes.
+No latest-file discovery or successful-fetch inference from a registry row is allowed.
+
+#### Gravity and Atlas columns and source chain (S2-T25)
+
+Gravity bilateral columns hold `source_version`, `hs_revision`, `hs_detail`,
+`year`, `origin_code`, `destination_code`, `distance`, `distance_unit`,
+`distance_status`, `gdp_origin`, `gdp_origin_unit`, `gdp_origin_status`,
+`gdp_destination`, `gdp_destination_unit`, `gdp_destination_status`, `contig`,
+`common_language`, `colonial_link`, `trade_agreement`, `source_id` and
+`member_sha256`. The three measures are nullable decimal strings. Each has a
+configured unit and a status of `present` or `source_missing`. The four flags
+are configured tokens. Country columns hold `source_id`, `source_version`,
+`country_code` and `source_name`. `hs_revision` is the configured marker and
+`hs_detail` records that no revision was inferred. Atlas
+country-product rows hold `source_version`, `grain`, `year`, `country_code`,
+`product_code`, `finished_measure`, `measure_unit`, `measure_status`,
+`hs_revision`, `hs_detail`, `source_id` and `member_sha256`. Atlas
+country-partner-product rows hold `reporter_code` and `partner_code` in place
+of `country_code`, with the same measure and lineage columns. Dictionary rows
+record `grain`, `source_name` or `source_description`, and products also record
+`product_code`. The fixture schema is not the publisher's schema.
+
+ASSUMPTION pending the lead's reading: Gravity distance allows `total_digits: 9`
+and `fractional_digits: 3`; each GDP measure allows `total_digits: 16` and
+`fractional_digits: 4`; the Atlas finished measure allows `total_digits: 12`
+and `fractional_digits: 6` and may be signed. Count every written digit,
+including leading and trailing zeros. Gravity measures accept unsigned ASCII
+fixed-point text. The Atlas finished measure accepts an optional leading minus.
+Exponents, whitespace, nonfinite text, floats and rounding fail. A declared
+missing token becomes null; a written zero stays present. Units and the HS
+revision come from configuration. No concordance is inferred. A narrower year
+selection records the excluded years; it does not fill them.
+
+`contracts.read_selected` verifies the selected manifest, every finished
+archive and every output hash, then reparses before returning typed tables.
+`source_registry` uses `cepii_gravity` or `atlas_complexity`, kind
+`public_dataset`, publisher, page, licence, basis, retrieval date, selected
+manifest hash, false commit flag and attribution. Lineage binds to
+`eii_custodian.publicdata.gravity.parse.parse_archive@v1` or
+`eii_custodian.publicdata.atlas.parse.parse_archives@v1`. Input class is
+`public`. Protected partition, measure, breakdown, family role and rules fields
+are null. No latest-file discovery is allowed. Live page, licence, version and
+host values remain pending the lead.
+
 ## 8. The manifest and the loader
+
+Public source selections identify a reviewed immutable snapshot by hash. Its
+retrieval UTC and publisher modification/version are separate from the source
+observation period and from later equal-byte checks. The cache reader verifies
+the body and receipt before parsing; retained history never implies newest-file
+selection. See document 04, section 3.1, for the dated cache/index contract.
+The price producer S2-T19 and release assembly S2-T08 must carry each price's
+dated "as of" from its selected snapshot and refuse a missing date. Those
+consumers remain unbuilt; S2-T27's existing-reader checks do not prove them.
+
 
 Every release directory holds `manifest.json`. Its scalar `release_kind` is `public_only` or
 `protected`. Scalars common to both kinds are `release_id`, `release_contract_version`
@@ -939,7 +1053,7 @@ both release kinds. A run-time privacy receipt of an answer is not a release art
 | DAT-82 | The loader verifies each table and artefact's SHA-256, each table's row count and each table's schema hash before loading and refuses the whole release on any mismatch. `schema_sha256` is SHA-256 over canonical JSON containing the ordered column name, logical type, nullability and, for geometry columns, geometry type and SRID. | Tampered-file and reordered-or-retyped-schema fixtures are refused; independent writers compute the same schema hash. |
 | DAT-83 | The loader refuses any table whose name is not in section 7.2, any protected-table column outside the DAT-71 allowlist, any closed-list value or placement that fails DAT-127 to DAT-130, any within-family total that differs from the exact sum of its own additive-family leaves, any column named `person_id`, `establishment_id`, `legal_entity_id`, `group_id` or `file_id`, and any string value in any column matching one of the five identifier prefixes `SYN-E-`, `SYN-L-`, `SYN-G-`, `SYN-P-` or `SYN-F-`: since [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) retired the firm list and its `firm_key`, no release holds a value of these forms. A `registration_number` column exists only in `register_company_list`, `pub_register_company` and `pub_register_snapshot` ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12, DAT-164), and every `registration_number` of `register_company_list` is one of `pub_register_company` (DAT-140). The loader does not compare two different additive families for equality; PRV-71 performs the custodian-plane cross-family bound check before export. | One fixture per refusal reason, including every closed list, a wrong within-family sum and each of the five identifier forms; a `SYN-E-` value in any column, a `firm_list` table and a `firm_key` column each fail; a `registration_number` column in any table but these three, and a `register_company_list` row whose number is absent from `pub_register_company`, fail; the fixtures use the invented stand-in register; a cross-family difference loads without an equality or reconciliation check. |
 | DAT-84 | The loader writes the same tables to PostgreSQL (schema `r_` plus the first 16 hexadecimal characters of the full `release_id`) and to the DuckDB standby file, and materialises `release_manifest` in both from verified `manifest.json`. Both stores are staged and verified before `load_receipt.json`, which is not listed in `manifest.artefacts`, is written with `state: complete` and `release_id` equal to the mounted manifest's id. A protected-release receipt also carries matching `window_key`, `protected_sha256`, `rules_version_id` and `parameter_set`; a `public_only` receipt omits those protected-window fields. Preflight and the API refuse a release without the receipt, without `state: complete`, with a mismatched `release_id`, or, for a protected release, with any mismatched protected-window field. The parity suite compares the stores after the rounding rule stated in [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md). | Parity suite green on both engines, including `release_unit.geometry`, `district` and `grid_cell.district_key`; an absent, incomplete or wrong-release receipt refuses service; protected and `public_only` receipt fixtures enforce their conditional fields. |
-| DAT-85 | Every source in `manifest.sources` has a truthful licence record and a retrieval date, with its publisher's terms in the publisher's words and the date read recorded in document 04; the registry records `licence_basis` as `dataset` for a stated open dataset licence, `portal_terms` where only portal terms exist, `provider_terms` for the provider interfaces of PUB-95 and PUB-97, and `owner_decision` for every other source without an open licence covering the use, the owner's decision for a personal, local project ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)). A source whose terms are not yet recorded stays in use and is listed as "terms to be read", with the date checked. A source whose `commit_allowed` is false (for example the census map layers, the FDI dashboard, the agency's pages and the relative-busyness source `busy_gmaps`) is read at build time and never committed. A response of the live traffic provider is not a source of the release: it is fetched at run time, nothing of it is stored, and no `manifest.sources` row exists for it (DAT-163). | Manifest check; repository scan finds no such file; a `manifest.sources` row for a provider response fails. |
+| DAT-85 | Every source in `manifest.sources` has a truthful licence record and a retrieval date, with its publisher's terms in the publisher's words and the date read recorded in document 04; the registry records `licence_basis` as `dataset` for a stated open dataset licence, `portal_terms` where only portal terms exist, `provider_terms` for the provider interfaces of PUB-95 and PUB-97 and for the Comtrade keyed interface `un_comtrade` (decision 0040 item 2), and `owner_decision` for every other source without an open licence covering the use, the owner's decision for a personal, local project ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)). A source whose terms are not yet recorded stays in use and is listed as "terms to be read", with the date checked. A source whose `commit_allowed` is false (for example the census map layers, the FDI dashboard, the agency's pages and the relative-busyness source `busy_gmaps`) is read at build time and never committed. A response of the live traffic provider is not a source of the release: it is fetched at run time, nothing of it is stored, and no `manifest.sources` row exists for it (DAT-163). | Manifest check; repository scan finds no such file; a `manifest.sources` row for a provider response fails. |
 | DAT-131 | For a `protected` release, the manifest lists every privacy artefact at the exact path in the inventory above and no second file with the same role. A `public_only` release does not require a privacy artefact. Every signed JSON artefact is one canonical envelope containing its payload, `signature_algorithm` equal to `Ed25519`, `public_key_id` and `signature`; its manifest SHA-256 covers the complete envelope. The fixture identifier for each scene artefact is `scene:` followed by that lowercase manifest SHA-256. Every artefact and report follows the release-identity rule of DAT-80. The artefact scan also fails on any untreated aggregate, knowledge-fixture value, target value or other person-level or employer-level true value. | Protected-release exact-path and one-role checks; missing, renamed, duplicate-role, unsigned, tampered, wrong-release-name, forbidden-identity-field and true-value fixtures fail. A `public_only` fixture without privacy artefacts passes. The attacker-view report fixture proves that target-class counts, solve counts, outward-rounded interval widths, elapsed time and pass or fail are representable without a true value. |
 | DAT-132 | For a `protected` release, `manifest.parameter_set` equals the shared `export_parameter_set` and exactly that set's protected tables occur in `manifest.tables`. The default `export_parameter_set` is `A` and is fixed, with `window_months`, at the slice S1 gate before the first world build; OI-35 permits an owner or data owner to overrule it only before that gate. `survival_report`, `artefacts/reports/survival_detail_report.json` and `artefacts/reports/attack_report.json` retain aggregate A and B results. No unselected protected table or row occurs anywhere in the release. A `public_only` release has no `parameter_set`, protected table, Simulated table or protected-window field and is never frozen or registered. | Protected candidate build with both table sets fails; a protected candidate with the wrong selected set fails; a missing or post-gate selection fails; aggregate report fixtures for both sets pass; a `public_only` fixture with any forbidden table or field, freeze descriptor or register line fails. |
 | DAT-133 | `./eii freeze` accepts a `protected` release only, is run twice and takes no new flag; a `public_only` release is never frozen or entered in the export register. On its first run on the build machine, it requires the current test pass and a recorded human release review with fields `reviewer_role`, `review_date`, `survival_report_read`, `attack_report_read`, `window_key`, `protected_sha256`, `rules_version_id` and `parameter_set`; the two report-read fields are true and the four release fields equal the verified manifest. It writes the data bundle and checksum list, copies the review record into the bundle as `review.json`, writes `freeze.json` with `release_id`, `window_key`, `protected_sha256`, `world_seed`, `frozen_commit`, `review_record` equal to `review.json` and `state: pending`, and appends exactly one JSON line to `infra/export_register.jsonl` with these fields in order: `window_key`, `protected_sha256`, `world_seed`, `rules_version_id`, `parameter_set`, `release_id`, `code_version`; every value equals the verified manifest. The line reaches the base branch through a normal pull request. On its second run, from a base-branch commit containing that line, the same command builds the application archive from that commit, verifies an offline installation, writes the archive checksum beside the bundle and changes only `freeze.json.state` to `complete`. A protected release is frozen when its bundle has `freeze.json`. For a frozen release only, the installer and `./eii up` require `state: complete` and the matching `window_key` and `protected_sha256` line in the register shipped inside the installed application; either failure exits 7. A release under `data/releases/` on the build machine has no `freeze.json` and is not checked. Continuous integration checks the register alone: existing lines are immutable, one `protected_sha256` is allowed per `window_key`, and one `window_key` per `world_seed`. A freeze is refused when the release is `public_only`, the same `window_key` is registered with different protected tables or the same `world_seed` with a different `window_key`. After a freeze, any change of rules version, exported set, treatment code or world generator requires a new `world_seed` and a new build before another freeze (PRV-120). A frozen bundle refused at install or start because its line is missing from the installed application's register or its freeze is incomplete is remedied by finishing this two-run freeze, not by changing the seed. No signed export-register receipt or substitute file is created. | A `public_only` freeze or register-entry attempt fails; missing-role, missing-date, unread-report, missing-`world_seed` and manifest-mismatch fixtures fail; the first run writes the bundle, checksum list, pending descriptor, `review.json` and one register line; the second no-flag run appends no line, runs only from the containing base-branch commit, verifies offline installation, writes the archive checksum and marks the descriptor complete. A second protected hash for one window key, a second window key for one world seed, a changed line or a removed line fails in a clean continuous-integration checkout using the register alone. Installation and start of a frozen bundle exit 7 when its line is absent from the installed application's register or `freeze.json` is not complete; an unfrozen build release is not checked. A planted signed export-register receipt does not satisfy any check. |
@@ -1137,6 +1251,8 @@ fixture proves each refusal. The caveat keys are the fixed sentences of
 | `base_rate_not_your_chance` | every fact of a base rate (DAT-159) |
 | `present_by_pay_band_assumed` | the figure of people present by pay band (DAT-160) |
 | `relative_busyness_not_people` | every fact from `pub_venue_busyness` (DAT-157) |
+| `trade_coverage_gap` | a Comtrade cell the requested selection does not cover (`pub_comtrade_trade`) |
+| `trade_mirror_separate` | a partner-mirror row, kept apart from the reporter series (`pub_comtrade_trade`) |
 | `night_lights_not_activity` | every fact from `pub_night_lights` (DAT-157) |
 | `live_traffic_provider` | every fact computed over a traffic-aware area from the provider (DAT-163) |
 | `grid_cells_summed` | the whole-cell sum of `pub_pop_agesex_grid` (DAT-141) |

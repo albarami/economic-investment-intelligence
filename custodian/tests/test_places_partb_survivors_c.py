@@ -8,7 +8,6 @@ reason taken from the refusal itself.
 from __future__ import annotations
 
 import contextlib
-import hashlib
 import json
 import locale
 from collections.abc import Iterator
@@ -65,25 +64,28 @@ def _row(key: str, source_id: str, *, skip: str = "") -> Entry:
 
 def _receipt(path: Path, **field: object) -> None:
     """Write the receipt of one file, its digest the digest of its own bytes."""
-    payload: dict[str, object] = {
-        "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-        "retrieved_utc": _RETRIEVED,
-        "publisher": _PUBLISHER,
-    }
-    payload.update(field)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    (path.parent / f"{path.stem}.meta.json").write_text(
-        json.dumps(payload, ensure_ascii=False), encoding="utf-8"
+    from custodian.tests.snapshot_fixture import place
+
+    publisher = field.get("publisher", _PUBLISHER)
+    selected = place(
+        path,
+        publisher=publisher if isinstance(publisher, str) else _PUBLISHER,
+        retrieved=_RETRIEVED,
     )
+    if field and (set(field) != {"publisher"} or not isinstance(publisher, str)):
+        receipt = selected.with_suffix(".meta.json")
+        payload = json.loads(receipt.read_text())
+        payload.update(field)
+        receipt.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
 
 
-def _receipted(cache: Path, key: str, body: bytes) -> Path:
+def _receipted(cache: Path, key: str, body: bytes, **field: object) -> Path:
     """Write one receipted file under a registry key and return its path."""
     folder = cache / key
     folder.mkdir(parents=True, exist_ok=True)
     path = folder / "syn.parquet"
     path.write_bytes(body)
-    _receipt(path)
+    _receipt(path, **field)
     return path
 
 
@@ -193,9 +195,9 @@ def test_the_stage_receives_the_frame_inputs(
     assert config.zones is zones
     assert config.grid == ()
     assert config.boundary is _BOUNDARY
-    assert config.places_path == places_path
+    assert config.places_path == next(places_path.parent.glob("*/*.parquet"))
     assert config.places_receipt == receipt_for(places_path, "places_ovt/part-00014")
-    assert config.buildings_paths == (building_path,)
+    assert config.buildings_paths == (next(building_path.parent.glob("*/*.parquet")),)
     assert config.buildings_receipts == (
         receipt_for(building_path, "bldg_ovt/part-90001"),
     )

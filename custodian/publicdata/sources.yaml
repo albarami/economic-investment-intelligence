@@ -6,6 +6,7 @@
 # terms_words and terms_read_on: the publisher's own words, or the marker "terms to be read", and the date read or the date checked.
 sources:
   - key: "lic_active"
+    refetch: {value: weekly, family: registers, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "lic_active"
     slug: "moci-active-certificates-by-municipality-and-business-activity"
     kind: "portal_dataset"
@@ -41,6 +42,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "lic_cancelled"
+    refetch: {value: weekly, family: registers, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "lic_cancelled"
     slug: "moci-canceled-certificates-by-municipality-and-business-activity"
     kind: "portal_dataset"
@@ -80,6 +82,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "lic_issued"
+    refetch: {value: weekly, family: registers, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "lic_issued"
     slug: "moci-issued-certificates-by-municipality-and-business-activity"
     kind: "portal_dataset"
@@ -119,6 +122,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "cus_imp_2025"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "cus_imp_2025"
     slug: "qatar-imports-2025-2026"
     kind: "portal_dataset"
@@ -170,6 +174,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "cus_imp_2019"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "cus_imp_2019"
     slug: "qatar-imports-2019-2024-copy"
     kind: "portal_dataset"
@@ -219,6 +224,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_ind"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "sec_hr_ind"
     slug: "hotels-and-restaurants-statistics-economic-indicators-in-hotels-and-restaurants-by-activity1"
     kind: "portal_dataset"
@@ -276,6 +282,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_goods"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "sec_hr_goods"
     slug: "hotels-and-restaurants-statistics-estimates-of-intermediate-goods-value-in-hotels-and-restaurants-by0"
     kind: "portal_dataset"
@@ -319,6 +326,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_serv"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "sec_hr_serv"
     slug: "hotels-and-restaurants-statistics-estimates-of-intermediate-services-value-in-hotels-and-restaurants0"
     kind: "portal_dataset"
@@ -362,6 +370,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_size"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "sec_hr_size"
     slug: "hotels-and-restaurants-number-establishments-employees-by-size-of-establishment-economic-activity"
     kind: "portal_dataset"
@@ -408,6 +417,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_comp_occ"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "sec_hr_comp_occ"
     slug: "hotels-and-restaurants-statistics-estimates-of-compensation-in-hotels-and-restaurants-by-occupation1"
     kind: "portal_dataset"
@@ -435,6 +445,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "wage_occ"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "wage_occ"
     slug: "workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q1"
     kind: "portal_dataset"
@@ -476,6 +487,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "wage_act"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "wage_act"
     slug: "workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q"
     kind: "portal_dataset"
@@ -517,6 +529,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "wage_sector"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "wage_sector"
     slug: "workers-in-paid-employment-and-average-monthly-wage-by-gender-and-sector"
     kind: "portal_dataset"
@@ -544,6 +557,7 @@ sources:
     skip_reason: "publisher_or_schema_unconfirmed"
     extension: "json"
   - key: "wage_bands_priv"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "wage_bands_priv"
     slug: "average-monthly-wage-q-r-for-workers-in-private-sector-in-qatar-2021-2025"
     kind: "portal_dataset"
@@ -571,6 +585,7 @@ sources:
     skip_reason: "publisher_or_schema_unconfirmed"
     extension: "json"
   - key: "work_hours_act"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "work_hours_act"
     slug: "employed-persons-15-years-and-above-and-average-work-hours-by-gender-and-economic-activity"
     kind: "portal_dataset"
@@ -598,6 +613,7 @@ sources:
     skip_reason: "publisher_or_schema_unconfirmed"
     extension: "json"
   - key: "util_elec"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "util_elec"
     slug: "electricity-total-consumption-by-zone-number"
     kind: "portal_dataset"
@@ -631,6 +647,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "util_water"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "util_water"
     slug: "water-total-consumption-by-zone-number"
     kind: "portal_dataset"
@@ -658,6 +675,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "transit_monthly"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "transit_monthly"
     slug: "public-transport-users"
     kind: "portal_dataset"
@@ -697,6 +715,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "hotel_segment"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "hotel_segment"
     slug: "accommodation-data-by-segment-date-and-key-metrics-supply-demand-occupancy-adr-revpar"
     kind: "portal_dataset"
@@ -724,6 +743,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "cpi_group"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "cpi_group"
     slug: "consumer-price-index-cpi-by-expenditure-group-monthly"
     kind: "portal_dataset"
@@ -751,6 +771,7 @@ sources:
     skip_reason: "publisher_or_schema_unconfirmed"
     extension: "json"
   - key: "prop_sales"
+    refetch: {value: weekly, evidence: "document 04, weekly sales bulletins; ruling L-697 item 2"}
     source_id: "prop_sales"
     slug: "weekly-real-estates-sales-bulletin"
     kind: "portal_dataset"
@@ -806,6 +827,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "pop_muni"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "pop_muni"
     slug: "population-and-labour-force-by-municipality"
     kind: "portal_dataset"
@@ -833,6 +855,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "zone_population"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "zone_population"
     slug: "population-area-and-population-density-per-square-kilometers-by-zone"
     kind: "portal_dataset"
@@ -860,6 +883,7 @@ sources:
     skip_reason: "cache_fields_unconfirmed; adapter_unavailable"
     extension: "json"
   - key: "est_census"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "est_census"
     slug: "number-of-business-establishments-by-economic-activity-in-census-2010-2020"
     kind: "portal_dataset"
@@ -894,6 +918,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "census_hh_type_2020"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "census_hh_type_2020"
     slug: "population-by-type-of-household-gender-and-place-of-residence-on-the-census-night-december-2020"
     kind: "portal_dataset"
@@ -921,6 +946,7 @@ sources:
     skip_reason: "cache_fields_unconfirmed; adapter_unavailable"
     extension: "json"
   - key: "accident"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "accident"
     slug: "accident"
     kind: "portal_dataset"
@@ -948,6 +974,7 @@ sources:
     skip_reason: "publisher_or_schema_unconfirmed"
     extension: "json"
   - key: "census_2020_workbook"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "census_2020_workbook"
     slug: ""
     kind: "https_file"
@@ -975,6 +1002,7 @@ sources:
     skip_reason: "schema_unconfirmed"
     extension: "xlsx"
   - key: "worldpop_qat_2020"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_2020"
     slug: ""
     kind: "https_file"
@@ -1002,6 +1030,7 @@ sources:
     skip_reason: "direct_url_unconfirmed"
     extension: "tif"
   - key: "census_zone_sector"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "census_zone_sector"
     slug: ""
     kind: "paged_layer"
@@ -1030,6 +1059,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "census_zone_occ"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "census_zone_occ"
     slug: ""
     kind: "paged_layer"
@@ -1058,6 +1088,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "census_zone_hh"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "census_zone_hh"
     slug: ""
     kind: "paged_layer"
@@ -1086,6 +1117,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "census_zone_lab"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "census_zone_lab"
     slug: ""
     kind: "paged_layer"
@@ -1114,6 +1146,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "census_district_pop"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "census_district_pop"
     slug: ""
     kind: "paged_layer"
@@ -1142,6 +1175,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "bnd_zone_2020"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bnd_zone_2020"
     slug: ""
     kind: "paged_layer"
@@ -1170,6 +1204,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "bnd_district_2020"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bnd_district_2020"
     slug: ""
     kind: "paged_layer"
@@ -1198,6 +1233,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "bnd_hdx"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bnd_hdx"
     slug: ""
     kind: "https_file"
@@ -1225,6 +1261,7 @@ sources:
     skip_reason: ""
     extension: "zip"
   - key: "bnd_muni_2025"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bnd_muni_2025"
     slug: "municipalities-in-qatar-2025"
     kind: "portal_dataset"
@@ -1252,6 +1289,7 @@ sources:
     skip_reason: "publisher_or_schema_unconfirmed"
     extension: "json"
   - key: "bnd_geob"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bnd_geob"
     slug: ""
     kind: "https_file"
@@ -1279,6 +1317,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "places_ovt"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "places_ovt"
     slug: ""
     kind: "https_file"
@@ -1306,6 +1345,7 @@ sources:
     skip_reason: "overture_bucket_not_opened"
     extension: "parquet"
   - key: "bldg_ovt"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "bldg_ovt"
     slug: ""
     kind: "https_file"
@@ -1333,6 +1373,7 @@ sources:
     skip_reason: "overture_bucket_not_opened"
     extension: "parquet"
   - key: "roads_osm"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "roads_osm"
     slug: ""
     kind: "https_file"
@@ -1360,6 +1401,7 @@ sources:
     skip_reason: ""
     extension: "pbf"
   - key: "cls_isic4"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "cls_isic4"
     slug: ""
     kind: "https_file"
@@ -1391,6 +1433,7 @@ sources:
     skip_reason: ""
     extension: "csv"
   - key: "ref_min_wage"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ref_min_wage"
     slug: ""
     kind: "citation_only"
@@ -1418,6 +1461,7 @@ sources:
     skip_reason: ""
     extension: ""
   - key: "ref_wps_report"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ref_wps_report"
     slug: ""
     kind: "citation_only"
@@ -1445,6 +1489,7 @@ sources:
     skip_reason: ""
     extension: ""
   - key: "ref_expansion_method"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ref_expansion_method"
     slug: ""
     kind: "citation_only"
@@ -1472,6 +1517,7 @@ sources:
     skip_reason: ""
     extension: ""
   - key: "ref_gov_hours"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ref_gov_hours"
     slug: ""
     kind: "citation_only"
@@ -1499,6 +1545,7 @@ sources:
     skip_reason: ""
     extension: ""
   - key: "ref_friday_closure"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ref_friday_closure"
     slug: ""
     kind: "citation_only"
@@ -1526,6 +1573,7 @@ sources:
     skip_reason: ""
     extension: ""
   - key: "ref_transit_hours"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ref_transit_hours"
     slug: ""
     kind: "citation_only"
@@ -1553,6 +1601,7 @@ sources:
     skip_reason: ""
     extension: ""
   - key: "ref_summer_work"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ref_summer_work"
     slug: ""
     kind: "citation_only"
@@ -1580,6 +1629,7 @@ sources:
     skip_reason: ""
     extension: ""
   - key: "ref_truck_hours"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ref_truck_hours"
     slug: ""
     kind: "citation_only"
@@ -1607,6 +1657,7 @@ sources:
     skip_reason: ""
     extension: ""
   - key: "ref_ramadan_public_hours"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ref_ramadan_public_hours"
     slug: ""
     kind: "citation_only"
@@ -1634,6 +1685,7 @@ sources:
     skip_reason: ""
     extension: ""
   - key: "ref_ramadan_private_hours"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ref_ramadan_private_hours"
     slug: ""
     kind: "citation_only"
@@ -1661,6 +1713,7 @@ sources:
     skip_reason: ""
     extension: ""
   - key: "ref_ramadan_transit_hours"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ref_ramadan_transit_hours"
     slug: ""
     kind: "citation_only"
@@ -1688,6 +1741,7 @@ sources:
     skip_reason: ""
     extension: ""
   - key: "ref_traffic_index"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ref_traffic_index"
     slug: ""
     kind: "citation_only"
@@ -1715,6 +1769,7 @@ sources:
     skip_reason: ""
     extension: ""
   - key: "prop_resi_units/weekly-residential-units-sales-bulletin"
+    refetch: {value: weekly, evidence: "document 04, weekly sales bulletins; ruling L-697 item 2"}
     source_id: "prop_resi_units"
     slug: "weekly-residential-units-sales-bulletin"
     kind: "portal_dataset"
@@ -1769,6 +1824,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "visits_museum"
     slug: "visitors-of-museums-and-exhibition-by-month-and-museum"
     kind: "portal_dataset"
@@ -1811,6 +1867,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "visits_phcc/phcc-patient-visits-by-health-center-and-region"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "visits_phcc"
     slug: "phcc-patient-visits-by-health-center-and-region"
     kind: "portal_dataset"
@@ -1855,6 +1912,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "permits_muni/total-building-permits-issued-by-municipality-and-type-of-building-type-of-permit"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "permits_muni"
     slug: "total-building-permits-issued-by-municipality-and-type-of-building-type-of-permit"
     kind: "portal_dataset"
@@ -1901,6 +1959,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "permits_muni/total-building-completion-certificates-issued-by-municipality-and-type-of-building-type-of"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "permits_muni"
     slug: "total-building-completion-certificates-issued-by-municipality-and-type-of-building-type-of"
     kind: "portal_dataset"
@@ -1947,6 +2006,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-daayen-municipality"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "permits_muni"
     slug: "building-permits-issued-by-type-of-permit-and-month-al-daayen-municipality"
     kind: "portal_dataset"
@@ -1989,6 +2049,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-khor-and-al-thakhira-municipality"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "permits_muni"
     slug: "building-permits-issued-by-type-of-permit-and-month-al-khor-and-al-thakhira-municipality"
     kind: "portal_dataset"
@@ -2031,6 +2092,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-rayyan-municipality"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "permits_muni"
     slug: "building-permits-issued-by-type-of-permit-and-month-al-rayyan-municipality"
     kind: "portal_dataset"
@@ -2073,6 +2135,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-shahhaniya-municipality"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "permits_muni"
     slug: "building-permits-issued-by-type-of-permit-and-month-al-shahhaniya-municipality"
     kind: "portal_dataset"
@@ -2115,6 +2178,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-shamal-municipality"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "permits_muni"
     slug: "building-permits-issued-by-type-of-permit-and-month-al-shamal-municipality"
     kind: "portal_dataset"
@@ -2157,6 +2221,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "permits_muni"
     slug: "building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality"
     kind: "portal_dataset"
@@ -2199,6 +2264,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-doha-municipality"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "permits_muni"
     slug: "building-permits-issued-by-type-of-permit-and-month-doha-municipality"
     kind: "portal_dataset"
@@ -2241,6 +2307,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "permits_muni/building-permits-issued-by-type-of-permit-and-month-umm-slal-municipality"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "permits_muni"
     slug: "building-permits-issued-by-type-of-permit-and-month-umm-slal-municipality"
     kind: "portal_dataset"
@@ -2283,6 +2350,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "est_size_act/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-two"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "est_size_act"
     slug: "number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-two"
     kind: "portal_dataset"
@@ -2327,6 +2395,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "est_size_act/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-wholesale-and-retail-trade-four-digits"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "est_size_act"
     slug: "number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-wholesale-and-retail-trade-four-digits"
     kind: "portal_dataset"
@@ -2371,6 +2440,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "est_size_act/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-transport"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "est_size_act"
     slug: "number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-transport"
     kind: "portal_dataset"
@@ -2415,6 +2485,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "est_size_act/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-social-and-personal-services-two-digits"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "est_size_act"
     slug: "number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-social-and-personal-services-two-digits"
     kind: "portal_dataset"
@@ -2459,6 +2530,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "est_size_act/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-energy"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "est_size_act"
     slug: "number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-energy"
     kind: "portal_dataset"
@@ -2503,6 +2575,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "est_size_act/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-one"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "est_size_act"
     slug: "number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-one"
     kind: "portal_dataset"
@@ -2547,6 +2620,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "est_size_act/establishments-employees-and-compensation-of-employees-by-economic-activity-business-services"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "est_size_act"
     slug: "establishments-employees-and-compensation-of-employees-by-economic-activity-business-services"
     kind: "portal_dataset"
@@ -2591,6 +2665,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-basic-metals"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-basic-metals"
     kind: "portal_dataset"
@@ -2633,6 +2708,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-basic-pharmaceutical-products-and-pharmaceutical-preparations"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-basic-pharmaceutical-products-and-pharmaceutical-preparations"
     kind: "portal_dataset"
@@ -2673,6 +2749,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-beverages"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-beverages"
     kind: "portal_dataset"
@@ -2715,6 +2792,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-chemicals-and-chemical-products"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-chemicals-and-chemical-products"
     kind: "portal_dataset"
@@ -2755,6 +2833,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-coke-and-refined-petroleum-products"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-coke-and-refined-petroleum-products"
     kind: "portal_dataset"
@@ -2795,6 +2874,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-computer-electronic-and-optical-products"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-computer-electronic-and-optical-products"
     kind: "portal_dataset"
@@ -2837,6 +2917,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-electrical-equipment"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-electrical-equipment"
     kind: "portal_dataset"
@@ -2877,6 +2958,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-fabricated-metal-products-except-machinery-and-equipment"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-fabricated-metal-products-except-machinery-and-equipment"
     kind: "portal_dataset"
@@ -2917,6 +2999,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-food-products"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-food-products"
     kind: "portal_dataset"
@@ -2959,6 +3042,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-furniture"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-furniture"
     kind: "portal_dataset"
@@ -3001,6 +3085,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-leather-and-related-products"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-leather-and-related-products"
     kind: "portal_dataset"
@@ -3041,6 +3126,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-machinery-and-equipment-nec"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-machinery-and-equipment-nec"
     kind: "portal_dataset"
@@ -3081,6 +3167,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-manufacture-of-wood-and-of-products-of-wood-and-cork-except-furniture-manufacture"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-manufacture-of-wood-and-of-products-of-wood-and-cork-except-furniture-manufacture"
     kind: "portal_dataset"
@@ -3121,6 +3208,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-motor-vehicles-trailers-and-semi-trailers"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-motor-vehicles-trailers-and-semi-trailers"
     kind: "portal_dataset"
@@ -3163,6 +3251,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-other-non-metallic-mineral-products"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-other-non-metallic-mineral-products"
     kind: "portal_dataset"
@@ -3203,6 +3292,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-other-transport-equipment"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-other-transport-equipment"
     kind: "portal_dataset"
@@ -3243,6 +3333,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-paper-and-paper-products"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-paper-and-paper-products"
     kind: "portal_dataset"
@@ -3283,6 +3374,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-rubber-and-plastics-products"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-rubber-and-plastics-products"
     kind: "portal_dataset"
@@ -3325,6 +3417,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-textiles"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-textiles"
     kind: "portal_dataset"
@@ -3367,6 +3460,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/manufacture-of-wearing-apparel"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "manufacture-of-wearing-apparel"
     kind: "portal_dataset"
@@ -3407,6 +3501,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "mfg_industry/main-manufacturing-products"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "mfg_industry"
     slug: "main-manufacturing-products"
     kind: "portal_dataset"
@@ -3453,6 +3548,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "trade_wr/purchases-sales-and-stocks-during-the-year-by-type-of-trade-wholesale-and-retail-trade-all"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "trade_wr"
     slug: "purchases-sales-and-stocks-during-the-year-by-type-of-trade-wholesale-and-retail-trade-all"
     kind: "portal_dataset"
@@ -3499,6 +3595,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "pop_muni_age/population-by-municipality-and-age-groups"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "pop_muni_age"
     slug: "population-by-municipality-and-age-groups"
     kind: "portal_dataset"
@@ -3539,6 +3636,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "hotels_muni/hotels-and-hotel-apartments-by-municipality"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "hotels_muni"
     slug: "hotels-and-hotel-apartments-by-municipality"
     kind: "portal_dataset"
@@ -3581,6 +3679,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "trade_logistics/annual-certificates-of-origin-by-type-and-importing-country"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "trade_logistics"
     slug: "annual-certificates-of-origin-by-type-and-importing-country"
     kind: "portal_dataset"
@@ -3623,6 +3722,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "trade_logistics/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-previous-port"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "trade_logistics"
     slug: "arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-previous-port"
     kind: "portal_dataset"
@@ -3669,6 +3769,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "trade_logistics/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-registration-hamad-port0"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "trade_logistics"
     slug: "arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-registration-hamad-port0"
     kind: "portal_dataset"
@@ -3727,6 +3828,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "est_census_2015_muni/distribution-of-business-establishments-and-employees-by-municipalities-according-to-census-2015"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "est_census_2015_muni"
     slug: "distribution-of-business-establishments-and-employees-by-municipalities-according-to-census-2015"
     kind: "portal_dataset"
@@ -3775,6 +3877,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "lf_muni_sex/female-population-and-labour-force-by-municipality"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "lf_muni_sex"
     slug: "female-population-and-labour-force-by-municipality"
     kind: "portal_dataset"
@@ -3817,6 +3920,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "lf_muni_sex/male-population-and-labour-force-by-municipality"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "lf_muni_sex"
     slug: "male-population-and-labour-force-by-municipality"
     kind: "portal_dataset"
@@ -3859,6 +3963,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "lf_muni_sex/employed-persons-15-years-and-above-by-gender-and-municipality"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "lf_muni_sex"
     slug: "employed-persons-15-years-and-above-by-gender-and-municipality"
     kind: "portal_dataset"
@@ -3901,6 +4006,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "lf_muni_sex/unemployed-persons-15-years-and-above-by-gender-and-municipality"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "lf_muni_sex"
     slug: "unemployed-persons-15-years-and-above-by-gender-and-municipality"
     kind: "portal_dataset"
@@ -3943,6 +4049,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "pop_muni_age_sex/females-population-by-municipality-and-age-groups-december-2020"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "pop_muni_age_sex"
     slug: "females-population-by-municipality-and-age-groups-december-2020"
     kind: "portal_dataset"
@@ -3989,6 +4096,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "pop_muni_age_sex/males-population-by-municipality-and-age-groups-december-2020"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "pop_muni_age_sex"
     slug: "males-population-by-municipality-and-age-groups-december-2020"
     kind: "portal_dataset"
@@ -4031,6 +4139,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "active_sex_age_act/economically-active-females-15-years-and-above-by-age-group-and-economic-activity"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "active_sex_age_act"
     slug: "economically-active-females-15-years-and-above-by-age-group-and-economic-activity"
     kind: "portal_dataset"
@@ -4071,6 +4180,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "active_sex_age_act/economically-active-males-15-years-and-above-by-age-group-and-economic-activity"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "active_sex_age_act"
     slug: "economically-active-males-15-years-and-above-by-age-group-and-economic-activity"
     kind: "portal_dataset"
@@ -4111,6 +4221,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "active_nat_occ_act/economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "active_nat_occ_act"
     slug: "economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity"
     kind: "portal_dataset"
@@ -4153,6 +4264,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "active_nat_occ_act/economically-active-non-qatari-males-15-years-and-above-by-occupation-and-economic-activity"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "active_nat_occ_act"
     slug: "economically-active-non-qatari-males-15-years-and-above-by-occupation-and-economic-activity"
     kind: "portal_dataset"
@@ -4195,6 +4307,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "active_nat_occ_act/economically-active-non-qatari-population-15-years-and-above-by-occupation-and-economic-activity"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "active_nat_occ_act"
     slug: "economically-active-non-qatari-population-15-years-and-above-by-occupation-and-economic-activity"
     kind: "portal_dataset"
@@ -4237,6 +4350,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "active_nat_occ_act/economically-active-qatari-females-15-years-and-above-by-occupation-and-economic-activity"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "active_nat_occ_act"
     slug: "economically-active-qatari-females-15-years-and-above-by-occupation-and-economic-activity"
     kind: "portal_dataset"
@@ -4279,6 +4393,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "active_nat_occ_act/economically-active-qatari-males-15-years-and-above-by-occupation-and-economic-activity"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "active_nat_occ_act"
     slug: "economically-active-qatari-males-15-years-and-above-by-occupation-and-economic-activity"
     kind: "portal_dataset"
@@ -4321,6 +4436,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "active_nat_occ_act/economically-active-qatari-population-15-years-and-above-by-occupation-and-economic-activity"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "active_nat_occ_act"
     slug: "economically-active-qatari-population-15-years-and-above-by-occupation-and-economic-activity"
     kind: "portal_dataset"
@@ -4363,6 +4479,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "comp_nat_act"
     slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity"
     kind: "portal_dataset"
@@ -4415,6 +4532,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-building"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "comp_nat_act"
     slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-building"
     kind: "portal_dataset"
@@ -4463,6 +4581,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-business"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "comp_nat_act"
     slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-business"
     kind: "portal_dataset"
@@ -4511,6 +4630,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "comp_nat_act"
     slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy"
     kind: "portal_dataset"
@@ -4559,6 +4679,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy0"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "comp_nat_act"
     slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy0"
     kind: "portal_dataset"
@@ -4607,6 +4728,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy1"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "comp_nat_act"
     slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy1"
     kind: "portal_dataset"
@@ -4655,6 +4777,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-one"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "comp_nat_act"
     slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-one"
     kind: "portal_dataset"
@@ -4703,6 +4826,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "comp_nat_act"
     slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social"
     kind: "portal_dataset"
@@ -4751,6 +4875,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social0"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "comp_nat_act"
     slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social0"
     kind: "portal_dataset"
@@ -4799,6 +4924,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social1"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "comp_nat_act"
     slug: "number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social1"
     kind: "portal_dataset"
@@ -4847,6 +4973,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "students_muni/students-by-level-of-education-municipality-gender-type-of-education-and-nationality-2025-2026"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "students_muni"
     slug: "students-by-level-of-education-municipality-gender-type-of-education-and-nationality-2025-2026"
     kind: "portal_dataset"
@@ -4901,6 +5028,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "visitors_markets/hotel-guests-by-nationality-hotel-rating-and-hotel-stays"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "visitors_markets"
     slug: "hotel-guests-by-nationality-hotel-rating-and-hotel-stays"
     kind: "portal_dataset"
@@ -4947,6 +5075,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "visitors_markets/visitor-arrivals-by-mode-of-entry"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "visitors_markets"
     slug: "visitor-arrivals-by-mode-of-entry"
     kind: "portal_dataset"
@@ -4993,6 +5122,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "visitors_markets/visitor-arrivals-by-region"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "visitors_markets"
     slug: "visitor-arrivals-by-region"
     kind: "portal_dataset"
@@ -5039,6 +5169,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "visitors_markets/visitor-arrivals-trends-by-mode-of-transport-air-land-sea"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "visitors_markets"
     slug: "visitor-arrivals-trends-by-mode-of-transport-air-land-sea"
     kind: "portal_dataset"
@@ -5077,6 +5208,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "fdi_projects"
+    refetch: {value: daily, family: investment_pages, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "fdi_projects"
     slug: ""
     kind: "terms_page"
@@ -5145,6 +5277,7 @@ sources:
     skip_reason: ""
     extension: "html"
   - key: "investqa_pages"
+    refetch: {value: daily, family: investment_pages, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "investqa_pages"
     slug: ""
     kind: "terms_page"
@@ -5199,6 +5332,7 @@ sources:
     skip_reason: ""
     extension: "html"
   - key: "busy_gmaps"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "busy_gmaps"
     slug: ""
     kind: "terms_page"
@@ -5226,6 +5360,7 @@ sources:
     skip_reason: "fetcher_owned_by_S2-T16"
     extension: "html"
   - key: "ntl_blackmarble"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5253,6 +5388,7 @@ sources:
     skip_reason: "fetcher_owned_by_S2-T14"
     extension: "h5"
   - key: "places_fsq"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "places_fsq"
     slug: ""
     kind: "https_file"
@@ -5280,6 +5416,7 @@ sources:
     skip_reason: "fetcher_owned_by_S2-T15"
     extension: "parquet"
   - key: "worldpop_qat_agesex"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -5307,6 +5444,7 @@ sources:
     skip_reason: "fetcher_owned_by_S2-T14"
     extension: "tif"
   - key: "weather_openmeteo"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "weather_openmeteo"
     slug: ""
     kind: "https_file"
@@ -5335,6 +5473,7 @@ sources:
     extension: "json"
   # S2-T15
   - key: "places_fsq/copy-2025-01-10"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "places_fsq"
     slug: ""
     kind: "https_file"
@@ -5367,6 +5506,7 @@ sources:
     basis_note: "terms to be read; checked 2026-11-14. Host terms of the copy were not found. Copyright 2024 Foursquare Labs, Inc. All rights reserved."
   # S2-T06
   - key: "places_ovt/part-00014"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "places_ovt"
     slug: ""
     kind: "https_file"
@@ -5410,6 +5550,7 @@ sources:
       Data from Foursquare. Copyright 2024 Foursquare Labs, Inc. All rights reserved. Available under Apache 2.0. Foursquare data was transformed to the Overture schema. Changed: 2026-03-18. NOTICE.txt.
       Data from AllThePlaces. Available under CC0 1.0.
   - key: "bldg_ovt/part-00288"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "bldg_ovt"
     slug: ""
     kind: "https_file"
@@ -5447,6 +5588,7 @@ sources:
       Qian Shi, et al. A First High-quality Vector Data of Buildings in East Asian Countries Based on a Comprehensive Large-scale Mapping Framework. Zenodo, 22 July 2023, doi:10.5281/zenodo.8174931. Available under CC BY 4.0.
       Work derived from BTN 2024 ign.es. Available under CC BY 4.0.
   - key: "bldg_ovt/part-00384"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "bldg_ovt"
     slug: ""
     kind: "https_file"
@@ -5484,6 +5626,7 @@ sources:
       Qian Shi, et al. A First High-quality Vector Data of Buildings in East Asian Countries Based on a Comprehensive Large-scale Mapping Framework. Zenodo, 22 July 2023, doi:10.5281/zenodo.8174931. Available under CC BY 4.0.
       Work derived from BTN 2024 ign.es. Available under CC BY 4.0.
   - key: "bldg_ovt/part-00385"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "bldg_ovt"
     slug: ""
     kind: "https_file"
@@ -5523,6 +5666,7 @@ sources:
 
 # S2-T17 — PUB-103 / C30 source admission, not backtest eligibility.
   - key: "ntl_blackmarble/2024-01"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5557,6 +5701,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2024-02"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5591,6 +5736,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2024-03"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5625,6 +5771,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2024-04"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5659,6 +5806,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2024-05"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5693,6 +5841,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2024-06"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5727,6 +5876,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2024-07"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5761,6 +5911,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2024-08"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5795,6 +5946,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2024-09"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5829,6 +5981,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2024-10"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5863,6 +6016,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2024-11"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5897,6 +6051,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2024-12"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5931,6 +6086,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2025-01"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5965,6 +6121,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2025-02"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -5999,6 +6156,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2025-03"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -6033,6 +6191,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2025-04"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -6067,6 +6226,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2025-05"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -6101,6 +6261,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2025-06"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -6135,6 +6296,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2025-07"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -6169,6 +6331,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2025-08"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -6203,6 +6366,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2025-09"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -6237,6 +6401,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2025-10"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -6271,6 +6436,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2025-11"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -6305,6 +6471,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "ntl_blackmarble/2025-12"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "ntl_blackmarble"
     slug: ""
     kind: "https_file"
@@ -6339,6 +6506,7 @@ sources:
     doi: "10.5067/VIIRS/VNP46A3.002"
     acknowledgement: "NASA should be acknowledged as the source of the material where applicable."
   - key: "worldpop_qat_agesex/2025/f/00"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6375,6 +6543,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/01"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6411,6 +6580,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/05"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6447,6 +6617,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/10"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6483,6 +6654,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/15"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6519,6 +6691,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/20"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6555,6 +6728,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/25"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6591,6 +6765,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/30"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6627,6 +6802,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/35"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6663,6 +6839,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/40"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6699,6 +6876,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/45"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6735,6 +6913,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/50"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6771,6 +6950,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/55"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6807,6 +6987,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/60"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6843,6 +7024,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/65"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6879,6 +7061,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/70"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6915,6 +7098,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/75"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6951,6 +7135,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/80"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -6987,6 +7172,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/85"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7023,6 +7209,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/f/90"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7059,6 +7246,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/00"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7095,6 +7283,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/01"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7131,6 +7320,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/05"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7167,6 +7357,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/10"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7203,6 +7394,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/15"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7239,6 +7431,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/20"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7275,6 +7468,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/25"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7311,6 +7505,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/30"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7347,6 +7542,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/35"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7383,6 +7579,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/40"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7419,6 +7616,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/45"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7455,6 +7653,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/50"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7491,6 +7690,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/55"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7527,6 +7727,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/60"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7563,6 +7764,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/65"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7599,6 +7801,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/70"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7635,6 +7838,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/75"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7671,6 +7875,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/80"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7707,6 +7912,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/85"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7743,6 +7949,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "worldpop_qat_agesex/2025/m/90"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
     slug: ""
     kind: "https_file"
@@ -7779,6 +7986,7 @@ sources:
     doi: "10.5258/SOTON/WP00841"
     doi_confirmed: false
   - key: "weather_openmeteo/2024-2025/point"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "weather_openmeteo"
     slug: ""
     kind: "https_file"
@@ -7812,6 +8020,7 @@ sources:
     cache_role: "generator_input"
 # BEGIN S2-T19 sources
   - key: bank_credit_act/local-banks-credit-by-economic-activity
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: bank_credit_act
     slug: local-banks-credit-by-economic-activity
     kind: portal_dataset
@@ -7859,6 +8068,7 @@ sources:
     period_last: '2022-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
     slug: building-completion-certificates-issued-by-type-of-certificate-and-month
     kind: portal_dataset
@@ -7909,6 +8119,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-daayen-municipality
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
     slug: building-completion-certificates-issued-by-type-of-certificate-and-month-al-daayen-municipality
     kind: portal_dataset
@@ -7959,6 +8170,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-khor-and-al-thakhira
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
     slug: building-completion-certificates-issued-by-type-of-certificate-and-month-al-khor-and-al-thakhira
     kind: portal_dataset
@@ -8009,6 +8221,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-rayyan-municipality
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
     slug: building-completion-certificates-issued-by-type-of-certificate-and-month-al-rayyan-municipality
     kind: portal_dataset
@@ -8059,6 +8272,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-shahhaniya-municipality
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
     slug: building-completion-certificates-issued-by-type-of-certificate-and-month-al-shahhaniya-municipality
     kind: portal_dataset
@@ -8109,6 +8323,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-shamal-municipality
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
     slug: building-completion-certificates-issued-by-type-of-certificate-and-month-al-shamal-municipality
     kind: portal_dataset
@@ -8159,6 +8374,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-wakrah-municipality
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
     slug: building-completion-certificates-issued-by-type-of-certificate-and-month-al-wakrah-municipality
     kind: portal_dataset
@@ -8209,6 +8425,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-doha-municipality
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
     slug: building-completion-certificates-issued-by-type-of-certificate-and-month-doha-municipality
     kind: portal_dataset
@@ -8259,6 +8476,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-umm-slal-municipality0
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
     slug: building-completion-certificates-issued-by-type-of-certificate-and-month-umm-slal-municipality0
     kind: portal_dataset
@@ -8309,6 +8527,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: coverage_ext/electricity-network-coverage
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
     slug: electricity-network-coverage
     kind: portal_dataset
@@ -8351,6 +8570,7 @@ sources:
     period_last: '2025-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: coverage_ext/electricity-network-coverage-by-municipality
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
     slug: electricity-network-coverage-by-municipality
     kind: portal_dataset
@@ -8397,6 +8617,7 @@ sources:
     period_last: '2025-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: coverage_ext/proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
     slug: proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender
     kind: portal_dataset
@@ -8448,6 +8669,7 @@ sources:
     period_last: '2025-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: coverage_ext/proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender-and-municipality
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
     slug: proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender-and-municipality
     kind: portal_dataset
@@ -8503,6 +8725,7 @@ sources:
     period_last: '2025-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: coverage_ext/sdg-9-c-1-proportion-of-population-covered-by-a-mobile-network-by-technology
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
     slug: sdg-9-c-1-proportion-of-population-covered-by-a-mobile-network-by-technology
     kind: portal_dataset
@@ -8549,6 +8772,7 @@ sources:
     period_last: '2021-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: coverage_ext/water-supply-coverage
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
     slug: water-supply-coverage
     kind: portal_dataset
@@ -8595,6 +8819,7 @@ sources:
     period_last: '2025-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: coverage_ext/water-supply-coverage-by-municipality
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
     slug: water-supply-coverage-by-municipality
     kind: portal_dataset
@@ -8641,6 +8866,7 @@ sources:
     period_last: '2025-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: dcool_capacity/design-cooling-capacity-by-status-municipality-and-sector-tr
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: dcool_capacity
     slug: design-cooling-capacity-by-status-municipality-and-sector-tr
     kind: portal_dataset
@@ -8716,6 +8942,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: fdi_stats/foreign-direct-investment
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: fdi_stats
     slug: foreign-direct-investment
     kind: portal_dataset
@@ -8763,6 +8990,7 @@ sources:
     period_field: "sit=row;form=published_label;field=period"
     basis_note: 'Two shapes.'
   - key: fdi_stats/sdg-17-3-1-foreign-direct-investment-inflows
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: fdi_stats
     slug: sdg-17-3-1-foreign-direct-investment-inflows
     kind: portal_dataset
@@ -8805,6 +9033,7 @@ sources:
     period_last: '2024-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: gis_address
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: gis_address
     slug: ''
     kind: paged_layer
@@ -8845,6 +9074,7 @@ sources:
     extension: json
     layer: 0
   - key: gis_boundaries
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: gis_boundaries
     slug: ''
     kind: paged_layer
@@ -8869,6 +9099,7 @@ sources:
     skip_reason: direct_url_unconfirmed
     extension: json
   - key: gis_context
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: gis_context
     slug: ''
     kind: paged_layer
@@ -8911,6 +9142,7 @@ sources:
     layer: 0
     basis_note: 'LR-G11: street centre lines with class and names; no flow, volume, speed or direction field.'
   - key: gis_imagery_history
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: gis_imagery_history
     slug: ''
     kind: paged_layer
@@ -8935,6 +9167,7 @@ sources:
     skip_reason: direct_url_unconfirmed
     extension: json
   - key: gis_land_price
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: gis_land_price
     slug: ''
     kind: paged_layer
@@ -8981,6 +9214,7 @@ sources:
     extension: json
     layer: 0
   - key: gis_landmarks
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: gis_landmarks
     slug: ''
     kind: paged_layer
@@ -9013,6 +9247,7 @@ sources:
     extension: json
     layer: 0
   - key: gis_locator
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: gis_locator
     slug: ''
     kind: citation_only
@@ -9037,6 +9272,7 @@ sources:
     skip_reason: ''
     extension: json
   - key: gis_parcels
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: gis_parcels
     slug: ''
     kind: paged_layer
@@ -9073,6 +9309,7 @@ sources:
     extension: json
     layer: 0
   - key: gis_phcc
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: gis_phcc
     slug: ''
     kind: paged_layer
@@ -9110,6 +9347,7 @@ sources:
     layer: 1
     basis_note: 'B2: also Vector/PHCC_CATCHMENT_2026_Q/MapServer layer 1; per-layer declarations in gis_layer_fields.yaml.'
   - key: gis_poi_comm
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: gis_poi_comm
     slug: ''
     kind: paged_layer
@@ -9148,6 +9386,7 @@ sources:
     extension: json
     layer: 0
   - key: gis_rail
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: gis_rail
     slug: ''
     kind: paged_layer
@@ -9196,6 +9435,7 @@ sources:
     basis_note: 'B2: also layers 0 QRAIL.Metro_Tracks_Detailed and 1 QRAIL.Rail_Protection_Zones; per-layer declarations
       in gis_layer_fields.yaml.'
   - key: gis_zoning
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: gis_zoning
     slug: ''
     kind: paged_layer
@@ -9273,6 +9513,7 @@ sources:
     layer: 1
     basis_note: 'LR-G8: also layer 0 Zoning; per-layer declarations in gis_layer_fields.yaml.'
   - key: hotel_ext/number-of-hotel-beds-by-hotel-class
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: hotel_ext
     slug: number-of-hotel-beds-by-hotel-class
     kind: portal_dataset
@@ -9321,6 +9562,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: hotel_ext/number-of-hotel-guests-and-nights-of-stay-by-month
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: hotel_ext
     slug: number-of-hotel-guests-and-nights-of-stay-by-month
     kind: portal_dataset
@@ -9370,6 +9612,7 @@ sources:
     period_field: "sit=row;form=published_label;field=year"
     basis_note: 'Text kept unsplit.'
   - key: hotel_ext/number-of-hotel-guests-and-nights-of-stay-by-nationality
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: hotel_ext
     slug: number-of-hotel-guests-and-nights-of-stay-by-nationality
     kind: portal_dataset
@@ -9419,6 +9662,7 @@ sources:
     period_last: '2022-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: hotel_ext/number-of-hotel-rooms-by-hotel-class
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: hotel_ext
     slug: number-of-hotel-rooms-by-hotel-class
     kind: portal_dataset
@@ -9467,6 +9711,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: hotel_ext/number-of-hotels-by-hotel-class
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: hotel_ext
     slug: number-of-hotels-by-hotel-class
     kind: portal_dataset
@@ -9515,6 +9760,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: hotel_ext/number-of-hotels-rooms-and-beds-by-hotel-type
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: hotel_ext
     slug: number-of-hotels-rooms-and-beds-by-hotel-type
     kind: portal_dataset
@@ -9565,6 +9811,7 @@ sources:
     period_last: '2022-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: jobseekers/qatari-unemployed-15-by-gender-and-willingness-to-work-quarterly
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
     slug: qatari-unemployed-15-by-gender-and-willingness-to-work-quarterly
     kind: portal_dataset
@@ -9619,6 +9866,7 @@ sources:
     period_last: '2025-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: jobseekers/qatari-unemployed-15-not-willing-to-work-by-reason-quarterly
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
     slug: qatari-unemployed-15-not-willing-to-work-by-reason-quarterly
     kind: portal_dataset
@@ -9669,6 +9917,7 @@ sources:
     period_last: '2025-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: jobseekers/qatari-unemployed-15-with-secondary-education-and-training-quarterly
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
     slug: qatari-unemployed-15-with-secondary-education-and-training-quarterly
     kind: portal_dataset
@@ -9723,6 +9972,7 @@ sources:
     period_last: '2025-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: jobseekers/unemployed-qataris-15-years-and-above-by-gender-and-whether-offered-work-in-private-sector
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
     slug: unemployed-qataris-15-years-and-above-by-gender-and-whether-offered-work-in-private-sector
     kind: portal_dataset
@@ -9775,6 +10025,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: jobseekers/unemployed-qataris-15-years-and-above-by-gender-and-willingness-to-work-in-private-sector
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
     slug: unemployed-qataris-15-years-and-above-by-gender-and-willingness-to-work-in-private-sector
     kind: portal_dataset
@@ -9827,6 +10078,7 @@ sources:
     period_last: '2024-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: jobseekers/unemployed-qataris-15-years-and-above-with-secondary-education-who-attended-training-programs-by
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
     slug: unemployed-qataris-15-years-and-above-with-secondary-education-who-attended-training-programs-by
     kind: portal_dataset
@@ -9880,6 +10132,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: jobseekers/unemployed-qataris-less-than-secondary-by-gender-and-readiness-to-train-for-craft-work0
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
     slug: unemployed-qataris-less-than-secondary-by-gender-and-readiness-to-train-for-craft-work0
     kind: portal_dataset
@@ -9932,6 +10185,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: jobseekers/unemployed-qataris-not-willing-to-work-in-the-private-sector-by-gender-and-reasons
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
     slug: unemployed-qataris-not-willing-to-work-in-the-private-sector-by-gender-and-reasons
     kind: portal_dataset
@@ -9984,6 +10238,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: jobseekers/unemployed-qataris-with-secondary-education-and-training-courses-refusing-work-in-private-sector-by
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
     slug: unemployed-qataris-with-secondary-education-and-training-courses-refusing-work-in-private-sector-by
     kind: portal_dataset
@@ -10037,6 +10292,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: price_ext/machinery-and-equipment-price-index-mepi
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: price_ext
     slug: machinery-and-equipment-price-index-mepi
     kind: portal_dataset
@@ -10104,6 +10360,7 @@ sources:
     period_field: ''
     basis_note: 'LR-P7: no period field; first column label H1-20, last column label H2-24; labels, not inferred dates.'
   - key: price_ext/producer-price-index-ppi
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: price_ext
     slug: producer-price-index-ppi
     kind: portal_dataset
@@ -10150,6 +10407,7 @@ sources:
     period_last: '2026-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: price_ext/producer-price-index-ppi-by-activity-monthly
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: price_ext
     slug: producer-price-index-ppi-by-activity-monthly
     kind: portal_dataset
@@ -10202,6 +10460,7 @@ sources:
     period_last: '2025-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: survey_ext/hotels-and-restaurants-statistics-production-value-by-type-of-revenue-and-main-economic-activity
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: survey_ext
     slug: hotels-and-restaurants-statistics-production-value-by-type-of-revenue-and-main-economic-activity
     kind: portal_dataset
@@ -10255,6 +10514,7 @@ sources:
     period_field: "sit=row;form=published_label;field=year"
     basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: survey_ext
     slug: hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity
     kind: portal_dataset
@@ -10307,6 +10567,7 @@ sources:
     period_field: "sit=row;form=published_label;field=year"
     basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity0
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: survey_ext
     slug: hotels-and-restaurants-statistics-transformational-revenues-by-revenue-item-and-main-activity0
     kind: portal_dataset
@@ -10358,6 +10619,7 @@ sources:
     period_field: "sit=row;form=published_label;field=year"
     basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/production-value-hotels-and-restaurants-type-of-revenue-and-main-economic-activity-less-10-employees
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: survey_ext
     slug: production-value-hotels-and-restaurants-type-of-revenue-and-main-economic-activity-less-10-employees
     kind: portal_dataset
@@ -10412,6 +10674,7 @@ sources:
     period_field: "sit=row;form=published_label;field=year"
     basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/production-value-of-hotels-and-restaurants-type-revenue-economic-activity-10-employees-and-more
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: survey_ext
     slug: production-value-of-hotels-and-restaurants-type-revenue-economic-activity-10-employees-and-more
     kind: portal_dataset
@@ -10466,6 +10729,7 @@ sources:
     period_field: "sit=row;form=published_label;field=year"
     basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/revenues-hotels-restaurants-current-activity-by-revenue-item-and-main-activity-10-employees-and-more
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: survey_ext
     slug: revenues-hotels-restaurants-current-activity-by-revenue-item-and-main-activity-10-employees-and-more
     kind: portal_dataset
@@ -10518,6 +10782,7 @@ sources:
     period_field: "sit=row;form=published_label;field=year_lsn"
     basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/revenues-of-current-activity-by-revenue-item-and-main-activity-hotels-and-restaurants
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: survey_ext
     slug: revenues-of-current-activity-by-revenue-item-and-main-activity-hotels-and-restaurants
     kind: portal_dataset
@@ -10569,6 +10834,7 @@ sources:
     period_field: "sit=row;form=published_label;field=year"
     basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: survey_ext/transformational-revenues-by-revenue-item-and-main-activity-establishments-with-10-employees-or-more
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: survey_ext
     slug: transformational-revenues-by-revenue-item-and-main-activity-establishments-with-10-employees-or-more
     kind: portal_dataset
@@ -10621,6 +10887,7 @@ sources:
     period_field: "sit=row;form=published_label;field=year"
     basis_note: 'LR-P3: hotels-and-restaurants revenue items; period bounds not read; cache only. Labels not read yet.'
   - key: talent_ext/education-statistics-number-of-graduates-of-private-colleges-and-universities-by-educational
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: talent_ext
     slug: education-statistics-number-of-graduates-of-private-colleges-and-universities-by-educational
     kind: portal_dataset
@@ -10677,6 +10944,7 @@ sources:
     period_field: "sit=row;form=published_label;field=academic_year"
     basis_note: 'School years with a slash.'
   - key: talent_ext/education-statistics-number-of-graduates-of-public-colleges-and-universities-by-academic-degree
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: talent_ext
     slug: education-statistics-number-of-graduates-of-public-colleges-and-universities-by-academic-degree
     kind: portal_dataset
@@ -10741,6 +11009,7 @@ sources:
     period_field: "sit=row;form=published_label;field=academic_year"
     basis_note: 'School years with a slash.'
   - key: talent_ext/education-statistics-number-of-graduates-of-public-colleges-and-universities-by-educational
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: talent_ext
     slug: education-statistics-number-of-graduates-of-public-colleges-and-universities-by-educational
     kind: portal_dataset
@@ -10795,6 +11064,7 @@ sources:
     period_field: "sit=row;form=published_label;field=year"
     basis_note: 'School years with a slash.'
   - key: talent_ext/education-statistics-number-of-graduates-on-scholarships-abroad-by-field-of-study-and-gender
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: talent_ext
     slug: education-statistics-number-of-graduates-on-scholarships-abroad-by-field-of-study-and-gender
     kind: portal_dataset
@@ -10846,6 +11116,7 @@ sources:
     period_last: '2023-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: talent_ext/total-students-on-scholarships-at-home-and-abroad-by-degree-and-gender
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: talent_ext
     slug: total-students-on-scholarships-at-home-and-abroad-by-degree-and-gender
     kind: portal_dataset
@@ -10902,6 +11173,7 @@ sources:
     period_field: "sit=row;form=published_label;field=year"
     basis_note: 'School years with a slash.'
   - key: talent_ext/trainees-at-the-private-training-centers-by-employment-status-gender-nationality-and-field-of
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: talent_ext
     slug: trainees-at-the-private-training-centers-by-employment-status-gender-nationality-and-field-of
     kind: portal_dataset
@@ -10962,6 +11234,7 @@ sources:
     period_last: '2022-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: talent_ext/trainees-at-the-private-training-centers-by-field-of-training-gender-nationality-and-age-groups
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: talent_ext
     slug: trainees-at-the-private-training-centers-by-field-of-training-gender-nationality-and-age-groups
     kind: portal_dataset
@@ -11022,6 +11295,7 @@ sources:
     period_last: '2022-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: tenders_pub
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: tenders_pub
     slug: ''
     kind: paged_cards
@@ -11054,6 +11328,7 @@ sources:
       without a language header; English with Accept-Language: en-US,en;q=0.5; sequential requests at least three
       seconds apart. Certificate pin awaits the lead; no certificate file committed. nightly_live_fetch is false because the chain file is not in the repository and a hosted nightly job could not open the connection.'
   - key: trade_ext/imports-by-nature-of-items-and-year
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: trade_ext
     slug: imports-by-nature-of-items-and-year
     kind: portal_dataset
@@ -11100,6 +11375,7 @@ sources:
     period_last: '2022-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: trade_ext/imports-by-utilization-of-items-and-year
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: trade_ext
     slug: imports-by-utilization-of-items-and-year
     kind: portal_dataset
@@ -11146,6 +11422,7 @@ sources:
     period_last: '2022-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: trade_ext/qatar-export-statistics-2019-2024
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: trade_ext
     slug: qatar-export-statistics-2019-2024
     kind: portal_dataset
@@ -11206,6 +11483,7 @@ sources:
     period_last: '2026-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: trade_ext/qatar-imports-2014-2018
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: trade_ext
     slug: qatar-imports-2014-2018
     kind: portal_dataset
@@ -11266,6 +11544,7 @@ sources:
     period_last: '2018-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: utilities_ext/operational-peak-district-cooling-load
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: utilities_ext
     slug: operational-peak-district-cooling-load
     kind: portal_dataset
@@ -11310,6 +11589,7 @@ sources:
     period_last: '2024-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: utilities_ext/sectoral-electricity-consumption-mwh
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: utilities_ext
     slug: sectoral-electricity-consumption-mwh
     kind: portal_dataset
@@ -11362,6 +11642,7 @@ sources:
     period_last: '2024-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: utilities_ext/total-electricity-consumption-by-sectors
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: utilities_ext
     slug: total-electricity-consumption-by-sectors
     kind: portal_dataset
@@ -11412,6 +11693,7 @@ sources:
     period_last: '2025-01-01'
     period_field: "sit=row;form=date;field=year"
   - key: utilities_ext/total-water-consumption-by-sectors
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: utilities_ext
     slug: total-water-consumption-by-sectors
     kind: portal_dataset
@@ -11465,6 +11747,7 @@ sources:
 
 # S2-T20 — the two height sources of PUB-106 (decision 0023 item A2).
   - key: "bldg_3dglobfp/1636"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bldg_3dglobfp"
     slug: "1636"
     kind: "https_file"
@@ -11491,6 +11774,7 @@ sources:
     skip_reason: ""
     extension: "zip"
   - key: "bldg_3dglobfp/1639"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bldg_3dglobfp"
     slug: "1639"
     kind: "https_file"
@@ -11517,6 +11801,7 @@ sources:
     skip_reason: ""
     extension: "zip"
   - key: "bldg_wsf3d"
+    refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bldg_wsf3d"
     slug: ""
     kind: "https_file"
@@ -11543,6 +11828,168 @@ sources:
     skip_reason: ""
     extension: "tif"
 
+  - key: "cepii_baci"
+    refetch: {value: none, reason: frequency_unconfirmed}
+    source_id: "cepii_baci"
+    slug: ""
+    kind: "https_file"
+    title_en: "BACI bilateral trade (unverified source lead)"
+    publisher: "CEPII"
+    licence_id: "unconfirmed"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-16"
+    terms_watch: false
+    basis_note: "Decision 0026. Pending record checked on this date; no publisher page was read. Source metadata and configuration await the lead."
+    landing_url: "https://www.cepii.fr/DATA_DOWNLOAD/baci/doc/baci_webpage.html"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_baci_trade", "pub_baci_country", "pub_baci_product"]
+    caveat_keys: ["baci_separate_series", "baci_coverage_incomplete"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    period_first: ""
+    period_last: ""
+    period_field: "year"
+    reconciliation: "open"
+    skip_reason: "baci_metadata_unconfirmed"
+    extension: "bin"
+  - key: "cepii_gravity"
+    refetch: {value: none, reason: frequency_unconfirmed}
+    source_id: "cepii_gravity"
+    slug: ""
+    kind: "https_file"
+    title_en: "CEPII Gravity (unverified source lead)"
+    publisher: "CEPII"
+    licence_id: "unconfirmed"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-16"
+    terms_watch: false
+    basis_note: "Decision 0026. Pending record checked on this date; no publisher page was read. The decision 0040 page lead carries a query string and is not stored as a reviewed data URL. Source metadata awaits the lead."
+    landing_url: ""
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_gravity_bilateral", "pub_gravity_country"]
+    caveat_keys: ["gravity_separate_series", "gravity_coverage_incomplete"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    period_first: ""
+    period_last: ""
+    period_field: "year"
+    reconciliation: "open"
+    skip_reason: "gravity_metadata_unconfirmed"
+    extension: "bin"
+  - key: "atlas_complexity"
+    refetch: {value: none, reason: frequency_unconfirmed}
+    source_id: "atlas_complexity"
+    slug: ""
+    kind: "https_file"
+    title_en: "Atlas finished complexity files (unverified source lead)"
+    publisher: "Harvard Growth Lab"
+    licence_id: "unconfirmed"
+    licence_basis: "owner_decision"
+    licence_url: ""
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-16"
+    terms_watch: false
+    basis_note: "Decision 0026. Pending record checked on this date; no publisher page was read. Finished country-product-year and country-partner-product-year downloads only. Source metadata awaits the lead."
+    landing_url: ""
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables:
+      - "pub_atlas_country_product_year"
+      - "pub_atlas_cpy_country"
+      - "pub_atlas_cpy_product"
+      - "pub_atlas_country_partner_product_year"
+      - "pub_atlas_cppy_country"
+      - "pub_atlas_cppy_product"
+    caveat_keys: ["atlas_finished_only", "atlas_coverage_incomplete"]
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    period_first: ""
+    period_last: ""
+    period_field: "year"
+    reconciliation: "open"
+    skip_reason: "atlas_metadata_unconfirmed"
+    extension: "bin"
+
+  # S2-T23. Metadata is unconfirmed until the lead's live reading.
+  - key: "un_comtrade"
+    refetch: {value: none, reason: frequency_unconfirmed}
+    source_id: "un_comtrade"
+    slug: ""
+    kind: "comtrade_api"
+    title_en: "UN Comtrade"
+    publisher: "United Nations Statistics Division"
+    licence_id: ""
+    licence_basis: "provider_terms"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-15"
+    landing_url: "https://uncomtrade.org/docs/un-comtrade-tools/"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: ["pub_comtrade_trade"]
+    caveat_keys: ["trade_coverage_gap", "trade_mirror_separate"]
+    columns:
+      - {name: source_id, type: string}
+      - {name: series_role, type: string}
+      - {name: reporter_code, type: string}
+      - {name: partner_code, type: string}
+      - {name: partner2_code, type: string}
+      - {name: frequency, type: string}
+      - {name: period, type: string}
+      - {name: flow_code, type: string}
+      - {name: classification, type: string}
+      - {name: classification_revision, type: string}
+      - {name: product_code, type: string}
+      - {name: aggregation_level, type: integer}
+      - {name: customs_code, type: string}
+      - {name: transport_mode_code, type: string}
+      - {name: valuation_basis, type: string}
+      - {name: measure, type: string}
+      - {name: value, type: number}
+      - {name: unit, type: string}
+      - {name: source_flags, type: string}
+      - {name: source_version, type: string}
+      - {name: receipt_sha256, type: string}
+    row_count_min: null
+    row_count_max: null
+    period_first: ""
+    period_last: ""
+    period_field: "period"
+    reconciliation: "open"
+    skip_reason: "metadata_unconfirmed"
+    extension: "json"
+    basis_note: "Keyed provider interface under decision 0040 item 2. Terms, hosts, budgets, schema and the selection are unconfirmed."
+    comtrade_policy:
+      confirmed: false
 forecast_series:
   - key: licence_issues
     state: held

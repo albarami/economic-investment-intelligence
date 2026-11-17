@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from collections.abc import Mapping, Sequence
 from contextvars import ContextVar
 from pathlib import Path
@@ -11,8 +10,12 @@ import yaml
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
-from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+from eii_custodian.publicdata.fetch.snapshots import (
+    SnapshotError,
+    read_snapshot,
+    reviewed_selections,
+)
 from eii_custodian.publicdata.places import PlacesError
 from eii_custodian.publicdata.places.area_files import (
     manifest_agrees,
@@ -196,15 +199,10 @@ def _cache_points(
 
 def _opened_place(cache: Path, key: str) -> tuple[Path, FileReceipt] | None:
     """Return one body only after its receipt matches. A bare file is refused."""
-    directory = cache / key
-    if not directory.is_dir():
+    if key not in reviewed_selections(cache):
+        if (cache / key).is_dir():
+            raise AreaError("places_file_unreceipted")
         return None
-    files = sorted(path for path in directory.glob("*.parquet") if path.is_file())
-    metas = sorted(path for path in directory.glob("*.meta.json") if path.is_file())
-    if not files:
-        return None
-    if len(files) != 1 or len(metas) != 1:
-        raise AreaError("places_file_unreceipted")
     entry = next((item for item in load_registry() if item.key == key), None)
     if entry is None:
         raise AreaError("places_file_unreceipted")
@@ -242,32 +240,22 @@ def _buildings_from_registry(
 
 
 def _receipt_of(cache: Path, entry: Entry) -> tuple[Path, FileReceipt] | None:
-    directory = cache / entry.key
-    if not directory.is_dir():
-        return None
-    files = sorted(
-        path for path in directory.glob(f"*.{entry.extension}") if path.is_file()
-    )
-    metas = sorted(path for path in directory.glob("*.meta.json") if path.is_file())
-    if len(files) != 1 or len(metas) != 1:
+    selected = reviewed_selections(cache).get(entry.key)
+    if selected is None:
         return None
     try:
-        loaded = json.loads(metas[0].read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
+        snapshot = read_snapshot(cache / entry.key, selected)
+        loaded = snapshot.sidecar
+        if loaded.get("key") != entry.key or loaded.get("source_id") != entry.source_id:
+            return None
+        retrieved, publisher = loaded.get("retrieved_utc"), loaded.get("publisher")
+        if not isinstance(retrieved, str) or not isinstance(publisher, str):
+            return None
+        return snapshot.path, FileReceipt(
+            entry.key, snapshot.sha256, retrieved, publisher
+        )
+    except SnapshotError:
         return None
-    if not isinstance(loaded, dict):
-        return None
-    digest = loaded.get("sha256")
-    retrieved = loaded.get("retrieved_utc")
-    publisher = loaded.get("publisher")
-    if (
-        not isinstance(digest, str)
-        or not isinstance(retrieved, str)
-        or not isinstance(publisher, str)
-        or sha256_hex(files[0].read_bytes()) != digest
-    ):
-        return None
-    return files[0], FileReceipt(entry.key, digest, retrieved, publisher)
 
 
 def _refuse_stage(cache: Path, lines: list[str] | None, reason: str) -> None:

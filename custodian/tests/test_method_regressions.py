@@ -365,6 +365,6 @@ def test_method_receipt_plants(tmp_path, plant):
         del receipt["licence_basis"]
         (tmp_path / entry.key / f"{digest}.meta.json").write_text(json.dumps(receipt))
     else:
-        (tmp_path / entry.key / f"{digest}.json").unlink()
+        (tmp_path / entry.key / "2026-11-14" / f"{digest}.json").unlink()
     with pytest.raises((ValueError, FileNotFoundError)):
         selected_source(tmp_path, entry, digest)

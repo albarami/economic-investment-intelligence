@@ -682,3 +682,54 @@ Open items touching this document: OI-01 (recorded provider and template writer 
 - Arabic judge leniency: arXiv 2607.00139 (June 2026), https://arxiv.org/abs/2607.00139, as cited in the project's AI-patterns research, 2026-11-11.
 - Qatar Open Data Portal (CC BY), figures as verified on 2026-11-11 and recorded in the project design; per-dataset links are kept in [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md).
 - Store measurements (PostgreSQL first-boot socket behaviour, missing image health check, role privileges versus `default_transaction_read_only`, row-level security bypass by table owners, browser software rendering inside WSL): project architecture and engineering research reports, 2026-11-11.
+
+## BACI invented-response evidence (S2-T24)
+
+The BACI suites exercise the separate typed trade/dictionary series through
+injected metadata and stream transports, pending metadata refusal, exact decimal
+text and limits, excluded-row validation, schema/inventory/revision/key refusal,
+access obstacles, byte bounds, interrupted streams, immutable publication,
+selected-manifest tampering and command injection. These are invented fixtures,
+not publisher verification. Full guard-by-guard red evidence and the manual break
+inventory belong to the task return and independent review; this paragraph makes
+no completion claim. TST-50, TST-52 and TST-237 are unchanged.
+
+## Gravity and Atlas invented-response evidence (S2-T25)
+
+The Gravity and Atlas suites exercise pending metadata refusal, two finished
+Atlas grains, rebuild refusal, exact decimal text, excluded-row validation,
+both bilateral directions, host and query-string refusal, access obstacles,
+bounded retries, interrupted publication and secret-free diagnostics. Fixtures
+use invented codes and values. They do not verify a publisher page, a licence,
+a version or a host. This paragraph makes no completion claim.
+
+The S2-T25 review regression suites add formatted exception-chain plants for
+BACI, Gravity and Atlas, final-period plants for narrower selections, rehashed
+manifest tampering, reviewed cross-host round trips, exact Atlas member-kind
+inventories, source-specific refusal and inclusive-boundary plants, and fake
+opener acquisition limits for metadata and terms. The default transport test
+retains other sources' existing unbounded interface. No publisher response is
+used by these tests.
+
+## Public snapshot archive checks (S2-T27)
+
+`test_public_snapshots.py` uses invented temporary-cache bytes for immutable
+publication, retained history, equal-byte check events, older-hash selection,
+receipt/index/body tampering, dated metadata/terms and Comtrade coverage.
+`test_public_cadence.py` tests closed registry schedules, unconfirmed-frequency
+refusal, injected UTC clocks, calendar clamping and verified check events.
+Existing source-specific integrity, source-chain and boundary suites remain
+required. All automated checks are offline and keyless; publisher frequency
+confirmation and off-machine restore-and-hash evidence are the lead's live
+steps. The price dated-as-of criterion belongs to S2-T19 and S2-T08; no price
+producer or final release builder is represented as tested here.
+
+Round 2 adds `test_snapshot_refusals.py`: parametrized, exact-message plants
+isolate each snapshot and cadence refusal and the refusals added to existing
+readers and publishers. `test_exact_due_boundary` checks a second before and at
+the daily, weekly, monthly (common and leap February), quarterly and annual
+anniversaries. Family assignments and cadence mismatches are tested separately
+from publisher frequency. Activity and graph readers have separate history
+cases; Comtrade `state.json`, `state.lock` and `coverage.json` have separate
+classification cases. Temporary guard reversals are restored before final checks;
+the task return records observed red and green results, not inferred coverage.

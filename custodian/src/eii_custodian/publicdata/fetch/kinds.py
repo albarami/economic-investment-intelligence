@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -62,6 +62,7 @@ class Prepared:
     periods_observed: bool = False
     terms_unread: str = ""
     coverage_note: str = ""
+    auxiliary: tuple[Response, ...] = ()
 
 
 TERMS_HOST_UNLISTED = "host_unlisted"
@@ -74,16 +75,27 @@ def prepare(
     cache: Path | None = None,
 ) -> Prepared:
     """Fetch one row through the transport seam and apply its declared checks."""
-    reader = _reader(transport, sleep)
+    responses: list[Response] = []
+    original = _reader(transport, sleep)
+
+    def reader(url: str) -> Response:
+        response = original(url)
+        responses.append(response)
+        return response
+
     if entry.kind == "portal_dataset":
-        return _portal(entry, reader)
-    if entry.kind == "paged_layer":
-        return _paged(entry, reader)
-    if entry.kind == "terms_page":
-        return _terms(entry, reader)
-    if entry.kind == "paged_cards":
-        return _paged_cards(entry, sleep, cache)
-    return _file(entry, reader)
+        result = _portal(entry, reader)
+    elif entry.kind == "paged_layer":
+        result = _paged(entry, reader)
+    elif entry.kind == "terms_page":
+        result = _terms(entry, reader)
+    elif entry.kind == "paged_cards":
+        result = _paged_cards(entry, sleep, cache)
+    else:
+        result = _file(entry, reader)
+    return replace(
+        result, auxiliary=tuple(r for r in responses if r.body != result.body)
+    )
 
 
 def _reader(transport: Transport, sleep: Callable[[float], None]) -> Read:
@@ -546,6 +558,7 @@ class TermsPage:
 
     sha256: str
     failure: AttemptFailure | None
+    body: bytes = b""
 
 
 def read_terms_page(
@@ -559,7 +572,7 @@ def read_terms_page(
     terms, failure = _call(entry, entry.terms_url, reader)
     if failure is not None or terms is None:
         return TermsPage("", failure)
-    return TermsPage(terms_text_sha256(terms.body), None)
+    return TermsPage(terms_text_sha256(terms.body), None, terms.body)
 
 
 def _failed(entry: Entry, failure: AttemptFailure | None) -> Prepared:

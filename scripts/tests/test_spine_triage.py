@@ -47,6 +47,57 @@ class SpineTriageTest(unittest.TestCase):
             guard.start()
             self.addCleanup(guard.stop)
 
+    def test_retains_reviewed_older_snapshot_and_refuses_tamper(self) -> None:
+        from eii_custodian.publicdata.fetch.registry import load_registry
+        from eii_custodian.publicdata.fetch.snapshots import (
+            read_snapshot,
+            reviewed_selections,
+        )
+        from eii_custodian.publicdata.review.cache_fixture import (
+            CacheError,
+            write_cached,
+        )
+
+        entry = next(row for row in load_registry() if row.key == "lic_active")
+        older = read_snapshot(
+            self.cache / entry.key, reviewed_selections(self.cache)[entry.key]
+        )
+        write_cached(self.cache, entry, b"syn-newer-invalid-rows", select=False)
+        self.assertTrue(self.context().receipts)
+        older.path.write_bytes(b"syn-tamper")
+        with self.assertRaisesRegex(CacheError, "snapshot_hash_mismatch"):
+            self.context()
+
+    def test_orphan_body_reuse_hashes_verified_receipt(self) -> None:
+        from eii_custodian.publicdata.fetch.registry import load_registry
+        from eii_custodian.publicdata.fetch.snapshots import (
+            read_snapshot,
+            reviewed_selections,
+        )
+        from eii_custodian.publicdata.review.cache_fixture import write_cached
+        from spine_triage_io import file_hash
+
+        entry = next(row for row in load_registry() if row.key == "lic_active")
+        identity = reviewed_selections(self.cache)[entry.key]
+        directory = self.cache / entry.key
+        older = read_snapshot(directory, identity)
+        body = older.body
+        receipt = older.path.with_name(f"{identity}.meta.json")
+        receipt.unlink()
+        (directory / f"{identity}.meta.json").unlink()
+        (directory / "index" / f"{identity}.json").unlink()
+        self.assertTrue(older.path.exists())
+        reused = write_cached(
+            self.cache, entry, body, retrieved_utc="2026-11-02T00:00:00Z"
+        )
+        self.assertEqual(reused, older.path)
+        self.assertFalse(receipt.exists())
+        actual_receipt = directory / "2026-11-02" / f"{identity}.meta.json"
+        self.assertTrue(actual_receipt.is_file())
+        self.assertEqual(
+            self.context().hashes["lic_active_receipt"], file_hash(actual_receipt)
+        )
+
     def context(self) -> Any:
         from spine_triage_io import load_context
 

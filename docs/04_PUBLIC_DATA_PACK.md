@@ -210,8 +210,8 @@ of the live traffic provider, it is listed for its terms, price and attribution,
 | `bnd_hdx` | Qatar Subnational Administrative Boundaries (COD-AB) | HDX, source Planning and Statistics Authority | landing page `https://data.humdata.org/dataset/cod-ab-qat`; direct machine-readable URL to be confirmed at slice S2 | CC BY-IGO |
 | `bnd_muni_2025` | Municipalities in Qatar 2025 | to be confirmed at slice S2 | portal `municipalities-in-qatar-2025` | portal terms, exact publisher wording and date read to be recorded; `licence_basis: owner_decision` where no open licence covers the use (PUB-12) |
 | `bnd_geob` | geoBoundaries Qatar ADM1, ADM2 (fallback only) | geoBoundaries | `https://www.geoboundaries.org/api/current/gbOpen/QAT/ALL/` | CC BY 4.0 |
-| `places_ovt` | Overture Places, release 2026-10-21.0, schema 2.0.0 | Overture Maps Foundation (per-record sources) | `https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/release/2026-10-21.0/theme=places/type=place/part-00014-dcceff87-235e-5a0e-a4b4-5f25ccb873e7-c000.zstd.parquet`, STAC `https://stac.overturemaps.org/2026-10-21.0/places/place/collection.json` | STAC `other`. "The theme is published under the CDLA Permissive 2.0 and Apache 2.0 licenses." Per-record lines are in section 4 |
-| `bldg_ovt` | Overture Buildings, release 2026-10-21.0 (named showcase buildings only) | Overture Maps Foundation | `https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/release/2026-10-21.0/theme=buildings/type=building/part-00288-28a3d046-de24-53bb-bd50-0444cb513967-c000.zstd.parquet`, `part-00384-3eb496b1-cc75-5748-a633-0449cf44f528-c000.zstd.parquet`, `part-00385-82be6408-14fb-51c1-89b0-93ae23c9516a-c000.zstd.parquet`, STAC `https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json` | STAC `ODbL-1.0`. "License for theme: ODbL" |
+| `places_ovt` | Overture Places, release 2026-10-21.0, schema 2.0.0 | Overture Maps Foundation (per-record sources) | `https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/release/2026-10-21.0/theme=places/type=place/part-00014-dcceff87-235e-5a0e-a4b4-5f25ccb873e7-c000.zstd.parquet`, STAC `https://stac.overturemaps.org/2026-10-21.0/places/place/collection.json` | STAC `other`. "The theme is published under the CDLA Permissive 2.0 and Apache 2.0 licenses." Per-record lines are in section 4<br>the advisor's reading of 2026-11-16 reports that a release is removed after at most 60 days; not yet confirmed from a public page |
+| `bldg_ovt` | Overture Buildings, release 2026-10-21.0 (named showcase buildings only) | Overture Maps Foundation | `https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/release/2026-10-21.0/theme=buildings/type=building/part-00288-28a3d046-de24-53bb-bd50-0444cb513967-c000.zstd.parquet`, `part-00384-3eb496b1-cc75-5748-a633-0449cf44f528-c000.zstd.parquet`, `part-00385-82be6408-14fb-51c1-89b0-93ae23c9516a-c000.zstd.parquet`, STAC `https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json` | STAC `ODbL-1.0`. "License for theme: ODbL"<br>the advisor's reading of 2026-11-16 reports that a release is removed after at most 60 days; not yet confirmed from a public page |
 | `roads_osm` | OpenStreetMap Qatar extract (road network) | OpenStreetMap contributors | `https://download.openstreetmap.fr/extracts/asia/qatar-latest.osm.pbf` | ODbL 1.0 |
 | `cls_isic4` | ISIC Rev.4 structure (English titles) | United Nations Statistics Division | landing page `https://unstats.un.org/unsd/classifications/Econ`; `https://unstats.un.org/unsd/classifications/Econ/Download/In%20Text/ISIC_Rev_4_english_structure.Txt` | UN terms of use; exact publisher wording and date read to be recorded; basis: the owner's decision for a personal, local project (PUB-12) |
 | `ref_min_wage` | Qatar minimum wage (Law No. 17 of 2020), reference page | International Labour Organization | citation only: `https://www.ilo.org/resource/news/qatar-adopts-non-discriminatory-minimum-wage` | to be confirmed at slice S2 |
@@ -253,6 +253,7 @@ of the live traffic provider, it is listed for its terms, price and attribution,
 | `places_fsq` | Foursquare Open Source Places (public copy on Source Cooperative) | Foursquare | inside `./eii build-public`, from the public copy on Source Cooperative, `https://data.source.coop/fused/fsq-os-places/` (host `data.source.coop`, PUB-03), geospatially partitioned GeoParquet, read without an account; only the files that cover Qatar are fetched (confirmed by S2-T15: found through the release folder's `places/_metadata` file, by the row-group statistics of longitude and latitude against the frame box; a file's own geographic bounding box is not the extent and is not used; the whole of each file found is fetched); the release used is recorded in the registry and shown with the places; the copy's README `https://data.source.coop/fused/fsq-os-places/README.md` and the access page `https://docs.foursquare.com/data-products/docs/access-fsq-os-places`, read 2026-11-12 | Apache License, Version 2.0, with the publisher's copyright line, as the copy's README states them (read 2026-11-14); the copy holds the releases 2024-11-19, 2024-12-03, 2025-01-10 and 2025-02-06; the release used is 2025-01-10; a change of release is a reviewed registry change (PUB-10). The release identifier of a row comes from the folder name. The publisher now delivers newer releases only through a portal that needs an account, so the public copy is frozen |
 | `worldpop_qat_agesex` | WorldPop age and sex structures, 100 m grids, Qatar | WorldPop | inside `./eii build-public`; pages `https://hub.worldpop.org/project/categories?id=8` and `https://hub.worldpop.org/geodata/listing?id=138`, read 2026-11-12; host data.worldpop.org (S2-T14) | CC BY 4.0 (DOI 10.5258/SOTON/WP00841) |
 | `weather_openmeteo` | Open-Meteo historical weather, hourly | Open-Meteo | inside `./eii build-public`, into the public cache as a hashed file; documentation `https://open-meteo.com/en/docs/historical-weather-api`, terms `https://open-meteo.com/en/terms` and licence page `https://open-meteo.com/en/licence`, read 2026-11-12; host archive-api.open-meteo.com (S2-T14); location and variables to be recorded at the first fetch | free interface for non-commercial use (`licence_basis: provider_terms`); data CC BY 4.0, with the attribution the publisher asks for |
+| `un_comtrade` | UN Comtrade reporter imports and exports, and partner-mirror tables | United Nations Statistics Division | registry row `un_comtrade`; landing lead `https://uncomtrade.org/docs/un-comtrade-tools/`; source and redirect hosts stay off the PUB-03 allow-list until the lead reviews them | terms to be read; `licence_basis: provider_terms` for the keyed interface (decision 0040 item 2, PUB-12); `commit_allowed` false; nothing fetched is committed |
 | `biz_register` | Public establishment records of the public business register: each field its public card shows, person names excluded ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)) | to be recorded in `source_registry` when the file is first read | not fetched: one file collected by the owner's advisor as a visitor's browser receives it, kept outside the repository and read only through `EII_REGISTER_FILE`; no fetcher for the register's site is in the repository (decision 0022 item 1) | publisher's terms in its own words with the date read, recorded when the file is first read; basis of use: the owner's decision for a personal, local project; permission needs for real use go on document 17's list (PUB-12) |
 | `fc_register` | Public company records of the financial centre's public register, under the same rules as `biz_register` ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 1) | to be recorded in `source_registry` when the file is first read | as `biz_register`: not fetched; a file of its own, kept outside the repository and opened read-only only through `EII_FC_REGISTER_FILE` (decision 0022 item 1) | publisher's terms in its own words with the date read, recorded when the file is first read; basis of use: the owner's decision for a personal, local project; permission needs for real use go on document 17's list (PUB-12) |
 | `gis_land_price` | Land pricing by district, 2026 guide prices (`LandPricing2026`: residential, city-centre residential, flats, villas and commercial) | national GIS centre | `https://services.gisqatar.org.qa/server/rest/services/Vector/LandPricing2026/MapServer`; layer `0`; additional layers and fields in the S2-T19 reading below | `terms to be read`, checked 2026-11-15; `owner_decision`, decision 0026 (PUB-12) |
@@ -351,8 +352,8 @@ no table (PUB-109).
 | `bnd_hdx` | 8 municipalities, 91 zones, 781 districts in the files; geometry dated 2015-11-30; modified 2026-08-19 | bilingual names; frame geometry | `zone`, `municipality`, `gazetteer` | description says 87 zones and 718 districts, files hold 91 and 781; 2015 geometry: check Lusail against the 2020 layer |
 | `bnd_muni_2025` | municipality polygons; count recorded locally at fetch | municipality geometry | `municipality` | no dataset-level licence metadata |
 | `bnd_geob` | 8 municipalities, 79 zones (some merged, e.g. '18-19') | fallback if no usable zone geometry | `zone` (fallback) | coarser, 2015 |
-| `places_ovt` | 26,383 records with country QA (26,404 in the bounding box) | capability M3 named places with network distances; capability S9 neighbours; showcase verification; real business points on the map (PUB-92); venue points (PUB-89) | `pub_place` | incomplete (PUB-50); duplicates and junk records; Meta-dominated; taxonomy changed in late 2026; 'Italian' includes pizza through the category hierarchy; a further places source (`places_fsq`) brings its own categories, which map through a reviewed category mapping (PUB-102) |
-| `bldg_ovt` | 4,400 footprints in the Lusail box; 73 with a height | flagship and showcase building points | `gazetteer` | most heights unknown; ODbL |
+| `places_ovt` | 26,383 records with country QA (26,404 in the bounding box) | capability M3 named places with network distances; capability S9 neighbours; showcase verification; real business points on the map (PUB-92); venue points (PUB-89) | `pub_place` | incomplete (PUB-50); duplicates and junk records; Meta-dominated; taxonomy changed in late 2026; 'Italian' includes pizza through the category hierarchy; a further places source (`places_fsq`) brings its own categories, which map through a reviewed category mapping (PUB-102)<br>the advisor's reading of 2026-11-16 reports that a release is removed after at most 60 days; not yet confirmed from a public page |
+| `bldg_ovt` | 4,400 footprints in the Lusail box; 73 with a height | flagship and showcase building points | `gazetteer` | most heights unknown; ODbL<br>the advisor's reading of 2026-11-16 reports that a release is removed after at most 60 days; not yet confirmed from a public page |
 | `roads_osm` | Qatar; about 24.5 MB; changes daily | pyvalhalla graph for `walk` and `drive` areas and network distances; the real road network for simulated congestion by hour and for drive-time areas that change with the hour ([05](05_SYNTHETIC_WORLD_AND_SIMULATION.md), decision 0016); with the traffic provider switched on, traffic-aware drive-time areas also come from `traffic_tomtom_range` as areas of the session (PUB-95) | none (routing graph is a build artefact) | free-flow only; "latest" URL is not a version: the hash is the pin; ODbL share-alike |
 | `cls_isic4` | ISIC Rev.4 classes (now a previous ISIC version on the UNSD page) | spine validity check; English class titles | `graph_node` | no Arabic file confirmed (open question); not committed |
 | `ref_min_wage` | QAR 1,000 basic plus at least 500 housing and 300 food when not provided in kind | capability S2 statutory minimum line | `pub_wage_table` (one reference row) | a legal fact, not a survey figure; `public_document`, citation-only |
@@ -426,15 +427,55 @@ GADM's licence is recorded in its publisher's words with the date read; its term
 it from local use under PUB-12. Any permission needed for real use belongs on document 17's list.
 This does not add a source or change the frame geometry of PUB-24.
 
+#### BACI pending identity and coverage (S2-T24)
+
+`cepii_baci` identifies the CEPII BACI lead of decision 0040. Its placeholder
+registry row has `baci_metadata_unconfirmed`, `commit_allowed: false` and
+`nightly_live_fetch: true`. The pending record was checked on 2026-11-16; the
+publisher page, version, licence words, Etalab lead, access state, HS revision,
+units, full year coverage and reporter reconciliation are NOT READ. This date
+is not page-reading evidence. Terms remain `terms to be read` on basis
+`owner_decision`, decision 0026. No BACI host is admitted under PUB-03 yet.
+The future source keeps its own bilateral series; Qatar exporter-or-importer
+selection does not replace or average portal or Comtrade figures. Missing
+coverage stays explicit. Exact attribution awaits the lead's page reading.
+
+#### Gravity pending identity and coverage (S2-T25)
+
+`cepii_gravity` identifies the CEPII Gravity lead of decision 0040. Its
+placeholder registry row has `gravity_metadata_unconfirmed`,
+`commit_allowed: false` and `nightly_live_fetch: true`. The pending record was
+checked on 2026-11-16; the publisher page, version, licence words, Etalab lead,
+access state, country keys, units and year coverage are NOT READ. This date is
+not page-reading evidence. The page lead carries a query string and is not a
+reviewed data URL. Terms remain `terms to be read` on basis `owner_decision`,
+decision 0026. No Gravity host is admitted under PUB-03 yet. Qatar origin or
+destination selection does not replace another series. Missing coverage stays
+explicit and is not zero.
+
+#### Atlas pending identity and coverage (S2-T25)
+
+`atlas_complexity` identifies the Harvard Growth Lab Atlas lead of decision
+0040. Its placeholder registry row has `atlas_metadata_unconfirmed`,
+`commit_allowed: false` and `nightly_live_fetch: true`. The pending record was
+checked on 2026-11-16; the publisher pages, licence words, native revision,
+available history, access tier and units are NOT READ. This date is not
+page-reading evidence. The row names two finished downloads,
+country-product-year and country-partner-product-year. A rebuild input is
+refused. Terms remain `terms to be read` on basis `owner_decision`, decision
+0026. No Atlas host is admitted under PUB-03 yet. Registration or a paid tier
+fetches nothing. A narrower year selection records the excluded coverage and
+infers no concordance.
+
 ### 2.3 Trade and benchmark source plan — decision 0040
 
-[decision 0040](decisions/0040-public-trade-sources-and-held-tables-in-use.md) items 1 to 9 govern this addition. These are planned sources, not rows already added to the registry or claims that a file is held. Their full fetch/security contract is in that decision; S2-T23 to S2-T26 own implementation.
+[decision 0040](decisions/0040-public-trade-sources-and-held-tables-in-use.md) items 1 to 9 govern this addition. Pending registry rows for the named trade sources do not confirm that a file is held or that a page was read. Their full fetch/security contract is in that decision; S2-T23 to S2-T26 own implementation.
 
-The advisor's 20:43 note supplies these addresses and descriptions. No external page was opened in the decision 0040 documentation task. “The page states” below means the supplied lead, **to be verified by the named task**, not a confirmed licence, version, schema or availability. Source ids are planned metadata names; the registry is unchanged.
+The advisor's 20:43 note supplies these addresses and descriptions. No external page was opened in the decision 0040 documentation task. “The page states” below means the supplied lead, **to be verified by the named task**, not a confirmed licence, version, schema or availability. Pending registry rows for `cepii_baci`, `cepii_gravity` and `atlas_complexity` record that planned identity only. They do not confirm a page lead, a licence, a version or a host. The addresses in this table remain unverified leads. A Gravity page lead that carries a query string is not stored as a reviewed data URL. S2-T23 adds the `un_comtrade` registry row with metadata unconfirmed; `wb_wdi`, `unctad_fdi`, `imf_weo` and `ilostat_qat` are not registry rows yet.
 
 | Planned source_id | Publisher, dataset and page address | Page lead and verification task | Intended use |
 |---|---|---|---|
-| `un_comtrade` | United Nations Statistics Division, UN Comtrade; https://comtradeapi.un.org/public/v1 ; https://comtradeapi.un.org/data/v1 ; https://comtradeapi.un.org/tools/v1 ; https://uncomtrade.org/docs/un-comtrade-tools/ | Free API limits as supplied in the owner's notes, to be verified by S2-T23; licence/terms text not verified | Qatar imports/exports by product/partner; annual and monthly where available; partner mirror only |
+| `un_comtrade` | United Nations Statistics Division, UN Comtrade; https://comtradeapi.un.org/public/v1 ; https://comtradeapi.un.org/data/v1 ; https://comtradeapi.un.org/tools/v1 ; https://uncomtrade.org/docs/un-comtrade-tools/ | Registry row added by S2-T23 with `licence_basis` `provider_terms`, empty `decision_record`, `commit_allowed` false and `skip_reason` `metadata_unconfirmed`. Free API limits, licence words, hosts, schema and the selection remain to be verified by the lead; nothing is committed | Qatar imports/exports by product/partner; annual and monthly where available; partner mirror only |
 | `cepii_baci` | CEPII, BACI; https://www.cepii.fr/DATA_DOWNLOAD/baci/doc/baci_webpage.html | The page states HS6 bilateral value/quantity reconciled between reporters, version 202501, Etalab 2.0, to be verified by S2-T24 | Free substitute for Comtrade bulk files; separate comparison series |
 | `cepii_gravity` | CEPII, Gravity; https://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=8 | The page states bilateral distance, contiguity, language, colonial links, trade agreements and GDP, version 202211, Etalab 2.0, to be verified by S2-T25 | Bilateral gravity and relatedness covariates; not local catchment observations |
 | `atlas_complexity` | Harvard Growth Lab, Atlas of Economic Complexity; https://atlas.hks.harvard.edu/data-downloads/ ; https://intl-atlas-downloads.s3.amazonaws.com/index.html ; https://dataverse.harvard.edu/dataverse/atlas | The page states finished country-product-year and country-partner-product-year files at four-digit HS with complexity measures, to be verified by S2-T25; licence read on its own page | Finished files only, product/country relatedness comparison and RCA |
@@ -695,7 +736,7 @@ The tender terms remain the quotation in section 2.1, read 2026-11-14.
 | PUB-09 | For portal sources, the fetcher reads the dataset metadata and records licence, publisher and modified date. A publisher different from the named publisher fails the build; a publisher marked to be confirmed at slice S2 blocks the source until a reviewer records the exact metadata. A missing licence is recorded truthfully and does not block use. A licence different from the registry fails the build until a reviewer records the changed metadata under PUB-10; the terms themselves do not exclude the source (PUB-12). |
 | PUB-10 | When an upstream file changes (new SHA-256), the new version is stored beside the old one. The release manifest names exactly one hash per source, and changing it is a reviewed registry change. |
 | PUB-11 | No file is committed unless its licence is stated and permits redistribution. `data/` is never committed. Committed derived files (section 6 configs, test fixtures) record the `source_id` they derive from. |
-| PUB-12 | Version 1 is a personal, local project that nobody outside the owner's organisation sees. Every source readable as a visitor is used and shown in full, whoever owns it, under [decision 0026](decisions/0026-public-sources-used-in-full-locally.md). Public means what a visitor's browser receives: no sign-in, paywall, robot check passed or back-end call with a key or token found in its pages, and at a visitor's pace. A source needing any of these is not read. PUB-03 and every fetch rule stay. Reuse terms never switch a source off, make it validation-only, bar it from a release or limit display. Each source's terms are read and recorded here in the publisher's own words with the date read; the registry's licence fields state what the publisher states. `licence_basis: dataset` records a dataset's open licence; `portal_terms` records portal terms where only those exist; `provider_terms` records a provider's interface used under its own terms (PUB-95, PUB-97); for every other source without an open licence covering the use, `owner_decision` means the owner's decision for a personal, local project, with `decision_record: 0026`. No source needs its own decision record. The `fdi_projects` footer states: "Reproduction of these pages, whether in whole or in part, is only permissible with the prior written authorization of Investment Promotion Agency LLC. These pages are to be used for information purposes only", read 2026-11-14 from the fetch of 2026-11-13. A changed terms page is a reviewed registry change (PUB-10). Sources without an open licence are never committed: no record, name or value enters the repository, tests, fixtures, committed screenshots, briefs or documents. Fetched data stays in the uncommitted cache; tests use stand-ins of the same shape with invented values. Document [17](17_DEPLOYMENT_HARDENING.md) keeps one list of sources needing permission or a licence before real use, with the publisher's words and the date read. Real use means access by anyone outside the owner's organisation, publication of a page showing the records, or commercial use. Nothing on that list holds back version 1. Decision 0040 items 1 to 3 add a narrow provider-interface exception for Comtrade using the already-authorised header keys in the lead's shell; no other registration or paid access is authorised. New download tasks read and record their own pages before fetching. |
+| PUB-12 | Version 1 is a personal, local project that nobody outside the owner's organisation sees. Every source readable as a visitor is used and shown in full, whoever owns it, under [decision 0026](decisions/0026-public-sources-used-in-full-locally.md). Public means what a visitor's browser receives: no sign-in, paywall, robot check passed or back-end call with a key or token found in its pages, and at a visitor's pace. A source needing any of these is not read. PUB-03 and every fetch rule stay. Reuse terms never switch a source off, make it validation-only, bar it from a release or limit display. Each source's terms are read and recorded here in the publisher's own words with the date read; the registry's licence fields state what the publisher states. `licence_basis: dataset` records a dataset's open licence; `portal_terms` records portal terms where only those exist; `provider_terms` records a provider's interface used under its own terms (PUB-95, PUB-97, and the Comtrade keyed interface `un_comtrade` under decision 0040 item 2); for every other source without an open licence covering the use, `owner_decision` means the owner's decision for a personal, local project, with `decision_record: 0026`. No source needs its own decision record. The `fdi_projects` footer states: "Reproduction of these pages, whether in whole or in part, is only permissible with the prior written authorization of Investment Promotion Agency LLC. These pages are to be used for information purposes only", read 2026-11-14 from the fetch of 2026-11-13. A changed terms page is a reviewed registry change (PUB-10). Sources without an open licence are never committed: no record, name or value enters the repository, tests, fixtures, committed screenshots, briefs or documents. Fetched data stays in the uncommitted cache; tests use stand-ins of the same shape with invented values. Document [17](17_DEPLOYMENT_HARDENING.md) keeps one list of sources needing permission or a licence before real use, with the publisher's words and the date read. Real use means access by anyone outside the owner's organisation, publication of a page showing the records, or commercial use. Nothing on that list holds back version 1. Decision 0040 items 1 to 3 add a narrow provider-interface exception for Comtrade using the already-authorised header keys in the lead's shell; no other registration or paid access is authorised. New download tasks read and record their own pages before fetching. |
 | PUB-13 | The census map layers, the archived census workbook, the boundary layers, the classification source, the population grid, the investment sources, relative busyness and the national GIS layers follow PUB-12 like every other source; none is a terms-based exception. Publicly readable sources are used and shown in full. The frame's geometry still comes from `bnd_hdx`, checked against the 2020 layers by keys (PUB-24). A source remains absent, with `NO_DATA` and its own caveat, if not fetched, if its file, address or schema is unconfirmed, if its checks fail or if it is not visitor-readable. Terms alone never cause that result. Every figure keeps its source, date and publisher's own caveat; estimates are labelled. Records, names and values of a source without an open licence are never committed (PUB-12). |
 | PUB-14 | Transaction and parcel identifiers in `prop_sales` and `prop_resi_units`, and any other identifier column in a public source, are dropped before the release; only aggregates with their deal counts are stored. This identifier-dropping rule does not apply to `fdi_projects`: every project field is kept and may appear on its card, in lists and on the map (PUB-87). |
 | PUB-15 | `./eii build-public` prints, for the slice S2 gate, 20 randomly drawn stored figures, each with its `source_id`, URL, filter and value, so a reviewer can check them against the source. The seed and the list are saved with the build log. |
@@ -722,6 +763,59 @@ fetch kinds; the source registry's public-dataset/document classification below 
 to disable certificate verification. A technically absent `paged_layer` may omit its unconfirmed
 `layer`; an available row must declare a non-negative layer id (LA-2 of S2-T19).
 
+S2-T27's local archive extends this cache. An immutable `index/<identity>.json`
+records source id, entry key, retrieval UTC, byte size, body SHA-256, extension,
+relative body and receipt paths, receipt SHA-256 and publisher modification/version
+when supplied. The index is published after the body and receipt. Equal bytes
+reuse the original dated body across receipt identities; a distinct identity keeps
+its own receipt and index, with `body_date` naming the reused body's date when it
+differs from the receipt's retrieval date. An unchanged identity keeps its receipt.
+Immutable `checks/<sha256>.json` records a later successful check. Different bytes
+retain both objects. Existing
+hash-addressed compatibility names are hard links, never latest selections or
+additional byte copies. Comtrade child receipt identities remain distinct from
+body hashes. Complete manifests are retained by hash. `state.json` and `state.lock`
+are mutable Comtrade operational files; coverage is an archived fetch output.
+
+Every registry row has an explicit `refetch` mapping: `value` is `daily`, `weekly`,
+`monthly`, `quarterly`, `annual`, `as_published` or `none`. A periodic or publication
+date rule requires recorded publisher evidence or an EII schedule family; `none` requires a reason.
+Unconfirmed frequencies use `none` with `frequency_unconfirmed`. A source's
+observation period is not evidence of its publication frequency. The weekly sales
+bulletins are weekly. `fetch.cadence.due_registry` is an offline Python interface
+with an injected UTC clock: daily means elapsed UTC days (03:00 Asia/Qatar,
+00:00 UTC); weekly means elapsed weeks; monthly, quarterly and
+annual mean calendar anniversaries with end-of-month clamping. A successful
+identical-byte check resets the anniversary. Never fetched is due;
+`as_published` returns `publication_check_required`; `none` returns an exclusion
+and its reason. The schedule does not select release inputs or change nightly
+source eligibility.
+
+The optional closed `family` inside `refetch` records EII's check schedule,
+not publisher frequency (S2-T27, decision 0045 item 4 as supplied in the task).
+`investment_pages` is daily for `fdi_projects` and `investqa_pages`;
+`registers` is weekly for `lic_active`, `lic_cancelled` and `lic_issued`;
+`overture_release` is monthly for every `places_ovt` and `bldg_ovt` row.
+The closed families `tender_notices`, `event_pages`, `incentive_windows` (daily),
+`gis_layers`, `supplier_credentials` (weekly), `register_snapshots` (monthly)
+have no registry rows yet. `statistical_series` requires a publisher-stated
+publication-driven schedule with `as_published`; none is recorded for a current
+row. Statistical rows retain `none`, `frequency_unconfirmed` and no family.
+Weekly sales bulletins retain weekly with no family. No other row takes a family.
+
+The lead supplies `snapshot_pins.json` in the public cache as an explicit map
+from registry entry key to reviewed hash for frame, activity/graph, places and
+spine-triage readers. Series and method readers accept an explicit digest; trade
+readers accept a manifest hash. No reader chooses the newest file. Missing or
+ambiguous legacy provenance requires a reviewed migration; no date is invented.
+
+The archive remains in the uncommitted local cache. Off-machine survival is not
+yet proved. Open item for the lead: arrange an owner-managed copy to separately
+held storage, then restore into the documented cache and verify every hash. This
+build adds no remote path, key or network integration. Publisher frequencies
+marked `frequency_unconfirmed` remain an open item for the lead's live reading.
+
+
 ```yaml
 source_id: util_elec            # decision 0017 source-id families: one entry per slug, <source_id>/<slug> (PUB-85)
 kind: public_dataset            # public_dataset | public_document
@@ -732,7 +826,7 @@ fetch_host: www.data.gov.qa    # host that served the file; portal: www.data.gov
 fetch_url: https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/electricity-total-consumption-by-zone-number/exports/json
 landing_url: https://www.data.gov.qa/explore/dataset/electricity-total-consumption-by-zone-number/
 licence_id: CC-BY-4.0          # one of the ids in section 4
-licence_basis: dataset         # dataset | portal_terms | owner_decision (personal, local project, PUB-12) | provider_terms (PUB-95, PUB-97)
+licence_basis: dataset         # dataset | portal_terms | owner_decision (personal, local project, PUB-12) | provider_terms (PUB-95, PUB-97, and the Comtrade keyed interface un_comtrade under decision 0040 item 2)
 licence_url: https://www.data.gov.qa/pages/license/annexes
 terms_sha256: null             # hash of every source's terms or licence page: SHA-256 of the terms or licence page's normalised visible text (scripts, styles, comments and tags removed; entities decoded; white space collapsed; Unicode NFC). The build log records terms_fingerprint visible_text beside it; a previous raw-byte digest has no such kind and is not compared; its own wording and date read are recorded in document 04 (PUB-12)
 terms_words: "terms to be read" # the publisher's own words, or the marker `terms to be read` (PUB-12, decision 0026 item 3)
@@ -754,6 +848,41 @@ caveat_keys: [proxy_not_population, partial_latest_year]
 ```
 
 For a decision-0017 family slug, `period_first` and `period_last` are the first and last period observed in the file. `source_modified` stays portal metadata and is never used as a period. When the period field is still unnamed, both period values are null rather than copies of the registry declaration.
+
+#### BACI archive receipt (S2-T24)
+
+The closed configuration and immutable complete manifest bind one source version,
+one HS revision, reviewed URLs, page hash, exact member inventory, ordered
+headers, inclusive byte/count limits, dictionaries, source units, missing tokens,
+attribution and evidence reference. Decimal limits of 18 total and 6 fractional
+digits are an ASSUMPTION from invented fixtures, pending the lead's verification.
+All member rows pass validation before Qatar selection, including excluded rows.
+The manifest records local archive/member/output hashes separately from optional
+publisher checksums, retrieval UTC, terms visible-text fingerprint and unread
+state, raw/selected/excluded counts and coverage. Completion is published last;
+S2-T08 must select an explicitly reviewed hash, never a latest file. Archive,
+outputs and manifests stay in the uncommitted source cache. Live source-page,
+licence, format and access verification and the first actual archive checks remain
+lead work. No invented response proves those live acceptance criteria.
+
+#### Gravity and Atlas archive receipt (S2-T25)
+
+Each source has its own closed configuration and its own reviewed-address
+binding. Gravity binds one finished archive. Atlas binds the two finished
+downloads in order and refuses a rebuild member or a third grain. Inclusive
+bounds for the compressed file, each expanded member, the inventory count, the
+dictionaries and the raw rows are required before a confirmed configuration can
+activate. A missing bound is a closed-schema failure. Pending rows keep zero
+bounds and `bound_origin: pending`, which cannot activate a download. Digit
+limits in the configuration notes are an ASSUMPTION from invented fixtures.
+Completion is published last. An interrupted write leaves the previous complete
+manifest readable. Registration, a sign-in, a robot check or a paid tier
+returns `access_obstacle` and `NO_DATA` and fetches nothing. Unread, absent or
+restrictive terms text does not by itself block a confirmed visitor-readable
+source. Failures name the source and a fixed reason. Invented sentinels are not
+copied into the result.
+
+A completed `un_comtrade` child adds, on that same sidecar, `policy_sha256`, `source_version`, `partition_key`, `parent_key`, `api_class`, `applied_limit`, `count`, `budget_period` and `daily_counts` for the primary and secondary slots. Those counts are call counts. The sidecar has no credential, no request header and no address that is not the canonical allow-listed URL. A complete manifest records the selection hash, the policy hash, the ordered child hashes, coverage and the parser method and version. The release pins that one manifest hash and keeps every child hash (PUB-10, PUB-19).
 
 ### 3.2 Investment sources and page parsers
 
@@ -795,6 +924,7 @@ implied.
 | CC BY 4.0 (data); free interface for non-commercial use | `weather_openmeteo` | "{Attribution as the publisher's licence page asks, recorded at the first fetch}, retrieved {date}. Licensed under CC BY 4.0." | link to the licence page |
 | NASA data and information guidance | `ntl_blackmarble` | "Night-time lights: NASA Black Marble VNP46A3, DOI 10.5067/VIIRS/VNP46A3.002, retrieved {date}. NASA is acknowledged as the source. No endorsement implied." (wording confirmed at the first fetch) | acknowledge NASA and cite the product DOI |
 | Provider terms | `traffic_tomtom_flow`, `traffic_tomtom_range` | "© TomTom", visible while the live layer is on | nothing stored; no endorsement implied (PUB-95) |
+| terms to be read; basis `provider_terms` for the keyed interface (decision 0040 item 2) | `un_comtrade` | "Source: United Nations Statistics Division, UN Comtrade, retrieved {date}. Terms to be read. No endorsement implied." | nothing fetched is committed until an open licence is confirmed; reporter and mirror series stay separate |
 | Publisher's terms in its own words and date read, to be recorded; basis: the owner's decision for a personal, local project (PUB-12) | `busy_gmaps` | "Google Maps popular times, relative busyness, retrieved {date}. A relative index, not a count of people. No endorsement implied." | the Trust centre shows the terms as read at fetch and the basis of use; nothing fetched is committed (PUB-12, PUB-101) |
 | Publisher's terms in its own words and date read, to be recorded; basis: the owner's decision for a personal, local project (PUB-12) | `gis_*` layers of the national GIS centre | "Source: {publisher}, {service name}, public map service, retrieved {date}. {Terms as recorded from the publisher, read on the recorded date}. No endorsement implied." | every figure shows its source and retrieval date; nothing fetched is committed (PUB-105) |
 | CC BY 4.0 | `bldg_3dglobfp` | "Building heights: 3D-GloBFP, Che et al. 2024, CC BY 4.0, retrieved {date}. Heights are estimates." | the credit "Che et al. 2024"; state modifications (used as a fallback height, PUB-106) |

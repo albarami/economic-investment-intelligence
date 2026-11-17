@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 from eii_custodian.publicdata.fetch.allowlist import HostDecision, approve
+from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.investment_build import load_source_spec
 from eii_custodian.publicdata.investment_contracts import (
@@ -717,6 +718,7 @@ def _allow_reserved(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def _fdi_entry() -> Entry:
     return Entry(
+        refetch=Cadence("none", "frequency_unconfirmed", ""),
         key="fdi_projects",
         source_id="fdi_projects",
         slug="",

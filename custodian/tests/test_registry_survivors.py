@@ -63,6 +63,7 @@ def full_refusal(exc: RegistryError, text: str) -> None:
 def invented_row(**overrides: object) -> dict[str, object]:
     """One invented registry row. Optional fields stay absent until set."""
     row: dict[str, object] = {
+        "refetch": {"value": "none", "reason": "frequency_unconfirmed"},
         "key": "planted-key",
         "source_id": "planted_source",
         "slug": "planted-slug",
