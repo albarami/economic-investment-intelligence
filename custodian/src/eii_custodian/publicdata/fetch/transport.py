@@ -130,7 +130,7 @@ def open_https(
     reviewed_urls: tuple[str, ...] | None = None,
 ) -> Response:
     """Open one HTTPS URL with the standard library. Redirects are checked first."""
-    from .certificate_pins import browser_agent, current_pin, verified_context
+    from .certificate_pins import PinError, browser_agent, current_pin, verified_context
 
     pin = current_pin()
     if pin is not None:
@@ -191,6 +191,8 @@ def open_https(
             ):
                 raise TransportFault("blocked_host", "")
             etag = response.headers.get("ETag")
+    except PinError:
+        raise
     except TransportFault:
         if not keyed:
             raise
@@ -199,7 +201,7 @@ def open_https(
         if not keyed:
             raise TransportFault("http", url) from None
         fault = "http"
-    except (urllib.error.URLError, OSError, ValueError):
+    except (urllib.error.URLError, OSError, ValueError, TransportReadError):
         if not keyed:
             raise TransportFault("unreachable", url) from None
         fault = "unreachable"

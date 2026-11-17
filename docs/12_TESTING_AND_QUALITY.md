@@ -778,6 +778,13 @@ blank and duplicate registrations, stale periods, null numeric cells and the
 missing-coverage zero-claim refusal. It also checks every award row's retrieval
 date, existing-identity conflicts, retained proof snapshots, sanitized page/intake
 errors and interruptions between terms, raw, parsed and proof writes.
+`test_s2_t29_fix2.py` drives the real HTTPS opener and redirect guard with invented
+I/O: other-host pin refusals stop page and awards builds before publication;
+incomplete body reads count as failed award proofs or retry to `unreachable` for
+an existing registry source, with a separate keyed-request check. It also plants
+a nested source symlink and a failure at the final staged replacement rename,
+asserting closed refusals, no outside copy and byte-identical prior trees. Each
+staging plant fails when its specific guard is removed and passes with it restored.
 
 The accident and population-grid test files add bounded acquisition and explicit
 older-snapshot selection plants. Cadence tests extend the closed source assignment

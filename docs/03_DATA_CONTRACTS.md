@@ -1002,7 +1002,15 @@ counts, match rate, incomplete status and per-link result. Above thirty links th
 seed selects exactly thirty without replacement; otherwise all links are read.
 The rate is matching selected links divided by all selected links, including
 failed fetches; an empty frame has null rate. Short frames and failed fetches
-are incomplete. Only transport or bounded-read failures count as failed fetches;
+are incomplete. Only transport or bounded-read failures count as failed fetches.
+The shared `open_https` transport classifies a response-body `HTTPException`
+(including `IncompleteRead`) as `TransportFault("unreachable")`, with no upstream
+diagnostic text; keyed requests retain the same closed fault. Existing registry
+sources now retry this mid-body failure and record `unreachable` after the
+existing attempt limit, instead of letting it crash the build. Award proofs use
+the same retries, count an exhausted read as a failed fetch and mark the check
+incomplete. Certificate refusals retain their exact closed reason even when
+raised by the redirect guard before a redirected send;
 blocked or unreviewed URLs/redirects, pin and TLS refusals, and archive integrity
 failures refuse the intake with their closed reason. There is no passing threshold. A duplicate proof link must agree
 with every row using it. The registration match report retains every original
