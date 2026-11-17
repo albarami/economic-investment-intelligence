@@ -1075,6 +1075,94 @@ def test_milestone_assertions_and_lineage_must_match_archived_parser(
         assert getattr(refused, "check", "") == "invalid_evidence_metadata"
 
 
+def test_coordinated_project_sidecar_and_row_substitution_is_refused(
+    tmp_path: Path,
+) -> None:
+    """F3 round 2: caller-held lineage cannot replace the verified receipt."""
+    project = _project_snapshot(
+        tmp_path, day="2026-11-14", capex="12.5", marker="receipt-substitution"
+    )
+    original_body = project.snapshot.path.read_bytes()
+    substituted_terms = "cd" * 32
+    planted = replace(
+        project,
+        snapshot=replace(
+            project.snapshot,
+            sidecar={**project.snapshot.sidecar, "terms_sha256": substituted_terms},
+        ),
+        rows=({**project.rows[0], "terms_sha256": substituted_terms},),
+    )
+    refused = build_project_evidence((planted,))
+    assert getattr(refused, "check", "") == "invalid_evidence_metadata"
+    assert project.snapshot.path.read_bytes() == original_body
+
+
+def test_coordinated_milestone_sidecar_and_candidate_substitution_is_refused(
+    tmp_path: Path,
+) -> None:
+    """F3 round 2: a candidate and its mutable sidecar cannot collude."""
+    candidate, link = _valid_milestone_parts(tmp_path)
+    original_body = candidate.snapshot.path.read_bytes()
+    substituted_terms = "cd" * 32
+    planted = replace(
+        candidate,
+        snapshot=replace(
+            candidate.snapshot,
+            sidecar={**candidate.snapshot.sidecar, "terms_sha256": substituted_terms},
+        ),
+        source_chain={**candidate.source_chain, "terms_sha256": substituted_terms},
+    )
+    refused = evidence_module.require_independent_milestone(
+        planted, link, frozenset({"fdi_projects:project:1001"})
+    )
+    assert getattr(refused, "check", "") == "invalid_evidence_metadata"
+    assert candidate.snapshot.path.read_bytes() == original_body
+
+
+def test_project_receipt_tamper_is_refused_with_unchanged_body(
+    tmp_path: Path,
+) -> None:
+    """F3 round 2: project validation rereads and authenticates the receipt."""
+    project = _project_snapshot(
+        tmp_path, day="2026-11-14", capex="12.5", marker="receipt-tamper"
+    )
+    original_body = project.snapshot.path.read_bytes()
+    project.snapshot.receipt_path.write_bytes(
+        (
+            json.dumps(
+                {**project.snapshot.sidecar, "terms_sha256": "cd" * 32},
+                sort_keys=True,
+            )
+            + "\n"
+        ).encode()
+    )
+    with pytest.raises(SnapshotError, match="snapshot_hash_mismatch"):
+        build_project_evidence((project,))
+    assert project.snapshot.path.read_bytes() == original_body
+
+
+def test_milestone_receipt_tamper_is_refused_with_unchanged_body(
+    tmp_path: Path,
+) -> None:
+    """F3 round 2: milestone validation rereads and authenticates the receipt."""
+    candidate, link = _valid_milestone_parts(tmp_path)
+    original_body = candidate.snapshot.path.read_bytes()
+    candidate.snapshot.receipt_path.write_bytes(
+        (
+            json.dumps(
+                {**candidate.snapshot.sidecar, "terms_sha256": "cd" * 32},
+                sort_keys=True,
+            )
+            + "\n"
+        ).encode()
+    )
+    with pytest.raises(SnapshotError, match="snapshot_hash_mismatch"):
+        evidence_module.require_independent_milestone(
+            candidate, link, frozenset({"fdi_projects:project:1001"})
+        )
+    assert candidate.snapshot.path.read_bytes() == original_body
+
+
 def test_parser_snapshot_keeps_geography_per_project_row(tmp_path: Path) -> None:
     """F4: two locations and an unstated location survive independently."""
     adapter = getattr(evidence_module, "build_cache_evidence", None)
@@ -1183,13 +1271,13 @@ def test_registration_cannot_substitute_another_sources_archive(
     assert getattr(milestone_kind, "check", "") == "evidence_audit_incomplete"
 
 
-def test_valid_empty_snapshot_satisfies_its_own_registration(tmp_path: Path) -> None:
-    """F5: an archived empty snapshot needs no invented revision row."""
+def test_nonempty_archived_dashboard_rejects_omitted_rows(tmp_path: Path) -> None:
+    """F8: empty supplied rows cannot erase a nonempty verified archive."""
     project = _project_snapshot(
-        tmp_path, day="2026-11-14", capex="12.5", marker="first"
+        tmp_path, day="2026-11-14", capex="12.5", marker="omitted-row"
     )
     empty = replace(project, rows=())
-    valid_empty = evidence_module.audit_project_evidence(
+    refused = evidence_module.audit_project_evidence(
         (evidence_contracts.ExpectedInput("fdi_projects", "fdi_projects", "project"),),
         evidence_contracts.ProjectEvidence(()),
         (
@@ -1199,7 +1287,116 @@ def test_valid_empty_snapshot_satisfies_its_own_registration(tmp_path: Path) -> 
         ),
         snapshots=(empty,),
     )
-    assert not hasattr(valid_empty, "check")
+    assert getattr(refused, "check", "") == "evidence_audit_incomplete"
+
+
+def test_empty_milestone_archive_satisfies_its_own_registration(
+    tmp_path: Path,
+) -> None:
+    """F8: the milestone parser genuinely supports an empty archived page."""
+    cache = tmp_path / "cache"
+    shape = _milestone_shape()
+    envelope = _milestone_envelope()
+    body = b'{"milestones": []}\n'
+    sidecar = {
+        "source_id": envelope.source_id,
+        "key": envelope.source_id,
+        "retrieved_utc": envelope.retrieved_utc,
+        "publisher": envelope.publisher,
+        "fetch_url": envelope.page_url,
+        "licence_id": envelope.licence_id,
+        "licence_basis": envelope.licence_basis,
+        "decision_record": envelope.decision_record,
+        "terms_sha256": envelope.terms_sha256,
+        "terms_url": envelope.terms_url,
+        "method": envelope.method,
+        "method_version": envelope.method_version,
+    }
+    archived = publish_snapshot(cache / envelope.source_id, "json", body, sidecar)
+    projection = evidence_module.build_cache_evidence(
+        cache,
+        projects=(),
+        milestones=(
+            evidence_contracts.MilestoneArchiveSelection(
+                envelope.source_id,
+                archived.sha256,
+                shape,
+                envelope,
+                (),
+                "",
+            ),
+        ),
+        expected=(
+            evidence_contracts.ExpectedInput(
+                envelope.source_id, envelope.source_id, "milestone"
+            ),
+        ),
+        attempts=(
+            evidence_contracts.FetchAttempt(
+                envelope.source_id,
+                envelope.source_id,
+                "success",
+                archived.sha256,
+                "",
+            ),
+        ),
+    )
+    assert not hasattr(projection, "check")
+    assert projection.evidence.milestones == ()
+    assert projection.audit.entries == ()
+
+
+def test_dashboard_parser_still_refuses_an_empty_project_batch(
+    tmp_path: Path,
+) -> None:
+    """F8: empty milestone coverage does not relax the dashboard parser."""
+    cache = tmp_path / "cache"
+    identity = _archive_dashboard(cache, "2026-11-14", ())
+    snapshot = read_snapshot(cache / "fdi_projects", identity)
+    refused = evidence_module._parse_project_snapshot(snapshot, coverage={})
+    assert getattr(refused, "check", "") == "schema_missing"
+
+
+def test_standalone_audit_rereads_missing_and_tampered_archives(
+    tmp_path: Path,
+) -> None:
+    """F8: registration matching alone never authenticates archive contents."""
+    for plant in ("missing", "tampered"):
+        project = _project_snapshot(
+            tmp_path / plant,
+            day="2026-11-14",
+            capex="12.5",
+            marker=plant,
+        )
+        archive = evidence_contracts.VerifiedArchive(
+            "fdi_projects",
+            "fdi_projects",
+            "project",
+            project.identity,
+            project.snapshot,
+        )
+        arguments = {
+            "expected": (
+                evidence_contracts.ExpectedInput(
+                    "fdi_projects", "fdi_projects", "project"
+                ),
+            ),
+            "evidence": build_project_evidence((project,)),
+            "attempts": (
+                evidence_contracts.FetchAttempt(
+                    "fdi_projects", "fdi_projects", "success", project.identity, ""
+                ),
+            ),
+            "archives": (archive,),
+        }
+        intact = evidence_module.audit_project_evidence(**arguments)
+        assert not hasattr(intact, "check")
+        if plant == "missing":
+            project.snapshot.path.unlink()
+        else:
+            project.snapshot.path.write_bytes(b"invented audit substitution")
+        with pytest.raises(SnapshotError, match=r"snapshot_(missing|hash_mismatch)"):
+            evidence_module.audit_project_evidence(**arguments)
 
 
 def test_evidence_report_uses_only_registry_keys_and_closed_reasons() -> None:
@@ -1222,6 +1419,135 @@ def test_evidence_report_uses_only_registry_keys_and_closed_reasons() -> None:
     ):
         with pytest.raises(ValueError, match=r"^unsafe_report$"):
             evidence_line("fdi_projects", "failed", reason)
+
+
+def test_report_digit_run_guard_is_reached_for_registered_keys() -> None:
+    """F9: registry membership cannot short-circuit the key digit-run guard."""
+    from eii_custodian.publicdata.fetch.report import evidence_line
+
+    for digits in ("1" * 8, "1" * 11):
+        key = "a" + digits
+        with pytest.raises(ValueError, match=r"^unsafe_report$"):
+            evidence_line(
+                key,
+                "failed",
+                "fetch_failed",
+                registry_keys=frozenset({key}),
+            )
+
+
+def test_report_digit_run_guard_is_reached_for_otherwise_closed_reasons(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """F9: the reason digit-run guard is exercised past vocabulary membership."""
+    from eii_custodian.publicdata.fetch import report
+
+    for digits in ("1" * 8, "1" * 11):
+        reason = "a" + digits
+        monkeypatch.setattr(
+            report, "_EVIDENCE_REASONS", frozenset({*report._EVIDENCE_REASONS, reason})
+        )
+        with pytest.raises(ValueError, match=r"^unsafe_report$"):
+            report.evidence_line(
+                "fdi_projects",
+                "failed",
+                reason,
+                registry_keys=frozenset({"fdi_projects"}),
+            )
+
+
+def test_crosswalk_rejects_mismatched_registry_key(tmp_path: Path) -> None:
+    """F9: the archived crosswalk key must equal the reviewed link key."""
+    candidate, link = _crosswalk_guard_case(tmp_path)
+    refused = evidence_module.require_independent_milestone(
+        candidate,
+        replace(link, crosswalk_key="review/other_crosswalk"),
+        frozenset({"fdi_projects:project:1001"}),
+    )
+    assert getattr(refused, "check", "") == "project_identity_unresolved"
+
+
+def test_crosswalk_rejects_mismatched_receipt_review_reference(
+    tmp_path: Path,
+) -> None:
+    """F9: the verified receipt must carry the link's review reference."""
+    candidate, link = _crosswalk_guard_case(
+        tmp_path, receipt_review_reference="invented-other-review"
+    )
+    refused = evidence_module.require_independent_milestone(
+        candidate, link, frozenset({"fdi_projects:project:1001"})
+    )
+    assert getattr(refused, "check", "") == "project_identity_unresolved"
+
+
+def test_crosswalk_rejects_mismatched_body_review_reference(
+    tmp_path: Path,
+) -> None:
+    """F9: the verified body must carry the link's review reference."""
+    candidate, link = _crosswalk_guard_case(
+        tmp_path, body_review_reference="invented-other-review"
+    )
+    refused = evidence_module.require_independent_milestone(
+        candidate, link, frozenset({"fdi_projects:project:1001"})
+    )
+    assert getattr(refused, "check", "") == "project_identity_unresolved"
+
+
+def test_crosswalk_rejects_duplicate_candidate_mappings(tmp_path: Path) -> None:
+    """F9: exactly one archived mapping may name a milestone candidate."""
+    candidate, link = _crosswalk_guard_case(tmp_path, duplicate_mapping=True)
+    refused = evidence_module.require_independent_milestone(
+        candidate, link, frozenset({"fdi_projects:project:1001"})
+    )
+    assert getattr(refused, "check", "") == "project_identity_unresolved"
+
+
+def test_crosswalk_rejects_an_actually_missing_receipt_file(tmp_path: Path) -> None:
+    """F9: a supplied snapshot object cannot substitute for its receipt file."""
+    candidate, link = _crosswalk_guard_case(tmp_path)
+    link.crosswalk.receipt_path.unlink()
+    refused = evidence_module.require_independent_milestone(
+        candidate, link, frozenset({"fdi_projects:project:1001"})
+    )
+    assert getattr(refused, "check", "") == "project_identity_unresolved"
+
+
+def _crosswalk_guard_case(
+    root: Path,
+    *,
+    receipt_review_reference: str | None = None,
+    body_review_reference: str | None = None,
+    duplicate_mapping: bool = False,
+):
+    candidate, direct_link = _valid_milestone_parts(root)
+    crosswalk_candidate = _milestone_candidate(
+        root,
+        evidence_module.parse_milestone_page,
+        candidate.shape,
+        _milestone_envelope(),
+        independence="independent_report",
+        marker="guard-crosswalk",
+        direct=False,
+    )
+    key = "review/milestone_crosswalk"
+    archived = _archive_crosswalk(
+        root / "crosswalk-case",
+        key,
+        crosswalk_candidate.candidate_id,
+        "fdi_projects:project:1001",
+        direct_link.review_reference,
+        receipt_review_reference=receipt_review_reference,
+        body_review_reference=body_review_reference,
+        duplicate_mapping=duplicate_mapping,
+    )
+    link = replace(
+        direct_link,
+        candidate_id=crosswalk_candidate.candidate_id,
+        crosswalk_sha256=archived.sha256,
+        crosswalk_key=key,
+        crosswalk=archived,
+    )
+    return crosswalk_candidate, link
 
 
 def test_assertion_precision_equals_parsed_granularity() -> None:
@@ -1267,19 +1593,23 @@ def _archive_crosswalk(
     candidate_id: str,
     project_identity: str,
     review_reference: str,
+    *,
+    receipt_review_reference: str | None = None,
+    body_review_reference: str | None = None,
+    duplicate_mapping: bool = False,
 ):
+    mapping = {
+        "candidate_id": candidate_id,
+        "project_identity": project_identity,
+        "independence": "independent_report",
+    }
+    mappings = [mapping, mapping] if duplicate_mapping else [mapping]
     body = (
         json.dumps(
             {
                 "schema_version": "reviewed_milestone_crosswalk.v1",
-                "review_reference": review_reference,
-                "mappings": [
-                    {
-                        "candidate_id": candidate_id,
-                        "project_identity": project_identity,
-                        "independence": "independent_report",
-                    }
-                ],
+                "review_reference": body_review_reference or review_reference,
+                "mappings": mappings,
             },
             sort_keys=True,
         )
@@ -1289,7 +1619,7 @@ def _archive_crosswalk(
         "source_id": "independent_milestone_review",
         "key": key,
         "retrieved_utc": "2026-11-15T08:00:00Z",
-        "review_reference": review_reference,
+        "review_reference": receipt_review_reference or review_reference,
     }
     directory = root / "cache" / key
     published = publish_snapshot(directory, "json", body, sidecar)

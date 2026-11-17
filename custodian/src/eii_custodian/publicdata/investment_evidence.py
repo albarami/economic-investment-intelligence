@@ -136,6 +136,7 @@ def build_cache_evidence(
                 "milestone",
                 milestone_selection.identity,
                 snapshot,
+                milestone_shape=milestone_selection.shape,
             )
         )
 
@@ -219,6 +220,18 @@ def _snapshot_envelope(snapshot: Snapshot, method: str, version: str) -> SourceE
         method_version=version,
     )
     return dashboard_envelope(base) if method == FDI_METHOD else base
+
+
+def _reread_snapshot(snapshot: Snapshot, identity: str) -> Snapshot:
+    """Authenticate the selected archive again; caller-held metadata is not proof."""
+    selected = read_snapshot(snapshot.receipt_path.parent.parent, identity)
+    if (
+        selected.receipt_path != snapshot.receipt_path
+        or selected.path != snapshot.path
+        or selected.sha256 != snapshot.sha256
+    ):
+        raise SnapshotError("snapshot_path_invalid")
+    return selected
 
 
 def _snapshot_failure(
@@ -387,30 +400,44 @@ def audit_project_evidence(
         if key in attempt_by_key:
             return _audit_failure(attempt.source_id, "duplicate fetch attempt")
         attempt_by_key[key] = attempt
-    if snapshots:
-        expected_revisions = {
-            (
-                item.identity,
-                f"{row.get('source_id', '')}:project:{row.get('project_id', '')}",
-            )
-            for item in snapshots
-            for row in item.rows
-        }
-        retained_revisions = {
-            (row.snapshot_identity, row.project_identity) for row in evidence.revisions
-        }
-        expected_absences = _expected_absence_keys(snapshots)
-        retained_absences = {
-            (row.snapshot_identity, row.project_identity) for row in evidence.absences
-        }
-        if (
-            expected_revisions != retained_revisions
-            or expected_absences != retained_absences
-        ):
-            return _audit_failure("", "revision or absence projection differs")
+    verified_archives = _audit_archives(snapshots, archives, evidence.milestones)
+    if isinstance(verified_archives, InvestmentFailure):
+        return verified_archives
+    canonical_snapshots = _audit_project_snapshots(verified_archives, snapshots)
+    if isinstance(canonical_snapshots, InvestmentFailure):
+        return canonical_snapshots
+    canonical_projects = build_project_evidence(canonical_snapshots)
+    if isinstance(canonical_projects, InvestmentFailure):
+        return canonical_projects
+    if (
+        evidence.revisions != canonical_projects.revisions
+        or evidence.absences != canonical_projects.absences
+    ):
+        return _audit_failure("", "revision or absence projection differs")
+    canonical_candidates = _audit_milestone_candidates(verified_archives)
+    if isinstance(canonical_candidates, InvestmentFailure):
+        return canonical_candidates
+    expected_milestones = sorted(
+        (row.snapshot_identity, row.candidate_id) for row in canonical_candidates
+    )
+    retained_milestones = sorted(
+        (row.candidate.snapshot_identity, row.candidate.candidate_id)
+        for row in evidence.milestones
+    )
+    if expected_milestones != retained_milestones:
+        return _audit_failure("", "milestone projection differs")
+    for row in evidence.milestones:
+        canonical = next(
+            candidate
+            for candidate in canonical_candidates
+            if candidate.candidate_id == row.candidate.candidate_id
+            and candidate.snapshot_identity == row.candidate.snapshot_identity
+        )
+        if replace(row.candidate, snapshot=None) != replace(canonical, snapshot=None):
+            return _audit_failure("", "milestone parser output differs")
 
     entries: list[EvidenceAuditEntry] = []
-    ordered_snapshots = snapshots
+    ordered_snapshots = canonical_snapshots
     for item in ordered_snapshots:
         for revision in evidence.revisions:
             if revision.snapshot_identity == item.identity:
@@ -429,7 +456,7 @@ def audit_project_evidence(
                         absence.reason,
                     )
                 )
-    if not snapshots:
+    if not ordered_snapshots:
         entries.extend(_revision_entry(revision) for revision in evidence.revisions)
         entries.extend(
             EvidenceAuditEntry(
@@ -459,29 +486,6 @@ def audit_project_evidence(
                 milestone.missing_reason,
             )
         )
-
-    verified_archives = list(archives)
-    verified_archives.extend(
-        VerifiedArchive(
-            str(item.snapshot.sidecar.get("source_id", "")),
-            str(item.snapshot.sidecar.get("key", "")),
-            "project",
-            item.identity,
-            item.snapshot,
-        )
-        for item in snapshots
-    )
-    verified_archives.extend(
-        VerifiedArchive(
-            row.candidate.source_id,
-            str(row.candidate.snapshot.sidecar.get("key", "")),
-            "milestone",
-            row.candidate.snapshot_identity,
-            row.candidate.snapshot,
-        )
-        for row in evidence.milestones
-        if row.candidate.snapshot is not None
-    )
 
     for registration in expected:
         current_attempt = attempt_by_key.get((registration.source_id, registration.key))
@@ -518,6 +522,111 @@ def audit_project_evidence(
                 registration.source_id, "registered input has no archived evidence"
             )
     return EvidenceAudit(tuple(entries))
+
+
+def _audit_archives(
+    snapshots: tuple[ProjectSnapshot, ...],
+    archives: tuple[VerifiedArchive, ...],
+    milestones: tuple[MilestoneEvidence, ...],
+) -> tuple[VerifiedArchive, ...] | InvestmentFailure:
+    """Reread every audit input and deduplicate only identical archive selections."""
+    selected_archives: dict[tuple[str, str, str], VerifiedArchive] = {}
+
+    def add(archive: VerifiedArchive) -> InvestmentFailure | None:
+        if archive.kind not in ("project", "milestone"):
+            return _audit_failure(archive.source_id, "unknown archive kind")
+        selected = _reread_snapshot(archive.snapshot, archive.identity)
+        if (
+            selected.sidecar.get("source_id") != archive.source_id
+            or selected.sidecar.get("key") != archive.key
+        ):
+            return _audit_failure(archive.source_id, "archive metadata differs")
+        verified = replace(archive, snapshot=selected)
+        selection = (archive.kind, archive.key, archive.identity)
+        previous = selected_archives.get(selection)
+        if previous is not None and previous != verified:
+            return _audit_failure(archive.source_id, "conflicting archive selection")
+        selected_archives[selection] = verified
+        return None
+
+    for archive in archives:
+        failure = add(archive)
+        if failure is not None:
+            return failure
+    for item in snapshots:
+        selected = _reread_snapshot(item.snapshot, item.identity)
+        failure = add(
+            VerifiedArchive(
+                str(selected.sidecar.get("source_id", "")),
+                str(selected.sidecar.get("key", "")),
+                "project",
+                item.identity,
+                selected,
+            )
+        )
+        if failure is not None:
+            return failure
+    for row in milestones:
+        candidate = row.candidate
+        if candidate.snapshot is None:
+            continue
+        selected = _reread_snapshot(candidate.snapshot, candidate.snapshot_identity)
+        failure = add(
+            VerifiedArchive(
+                candidate.source_id,
+                str(selected.sidecar.get("key", "")),
+                "milestone",
+                candidate.snapshot_identity,
+                selected,
+                milestone_shape=candidate.shape,
+            )
+        )
+        if failure is not None:
+            return failure
+    return tuple(selected_archives.values())
+
+
+def _audit_project_snapshots(
+    archives: tuple[VerifiedArchive, ...],
+    supplied: tuple[ProjectSnapshot, ...],
+) -> tuple[ProjectSnapshot, ...] | InvestmentFailure:
+    """Derive expected revisions and absences from verified dashboard bytes."""
+    coverage: dict[str, Mapping[str, object]] = {}
+    for item in supplied:
+        coverage.setdefault(item.identity, item.coverage)
+    parsed_snapshots: list[ProjectSnapshot] = []
+    for archive in archives:
+        if archive.kind != "project":
+            continue
+        parsed = _parse_project_snapshot(
+            archive.snapshot, coverage=coverage.get(archive.identity, {})
+        )
+        if isinstance(parsed, InvestmentFailure):
+            return parsed
+        parsed_snapshots.append(parsed)
+    return tuple(parsed_snapshots)
+
+
+def _audit_milestone_candidates(
+    archives: tuple[VerifiedArchive, ...],
+) -> tuple[MilestoneCandidate, ...] | InvestmentFailure:
+    """Derive expected candidates, including a genuinely empty milestone page."""
+    candidates: list[MilestoneCandidate] = []
+    for archive in archives:
+        if archive.kind != "milestone":
+            continue
+        if archive.milestone_shape is None:
+            return _audit_failure(archive.source_id, "milestone parser shape absent")
+        envelope = _snapshot_envelope(
+            archive.snapshot, _MILESTONE_METHOD, PARSER_VERSION
+        )
+        parsed = parse_milestone_page(
+            archive.snapshot.body, archive.milestone_shape, envelope
+        )
+        if isinstance(parsed, InvestmentFailure):
+            return parsed
+        candidates.extend(replace(row, snapshot=archive.snapshot) for row in parsed)
+    return tuple(candidates)
 
 
 def _archive_matches(
@@ -657,23 +766,6 @@ def _row_observation(row: Mapping[str, object]) -> SourceAssertion:
         return _UNKNOWN_ASSERTION
     precision = {4: "year", 7: "month", 10: "day"}[len(value)]
     return SourceAssertion(value, precision, "")
-
-
-def _expected_absence_keys(
-    snapshots: tuple[ProjectSnapshot, ...],
-) -> set[tuple[str, str]]:
-    expected: set[tuple[str, str]] = set()
-    seen: dict[str, set[str]] = {}
-    for item in snapshots:
-        source = str(item.snapshot.sidecar.get("source_id", ""))
-        current = {
-            f"{row.get('source_id', '')}:project:{row.get('project_id', '')}"
-            for row in item.rows
-        }
-        previous = seen.setdefault(source, set())
-        expected.update((item.identity, identity) for identity in previous - current)
-        previous.update(current)
-    return expected
 
 
 def _revision_entry(revision: ProjectRevision) -> EvidenceAuditEntry:
@@ -824,7 +916,7 @@ def require_independent_milestone(
         return _candidate_failure(
             candidate, "missing_artifact", "archived milestone", "missing"
         )
-    snapshot = candidate.snapshot
+    snapshot = _reread_snapshot(candidate.snapshot, candidate.snapshot_identity)
     _ = snapshot.body
     for name in (*LINEAGE_FIELDS, "terms_url", "method", "method_version"):
         value = candidate.source_chain.get(name)
@@ -940,6 +1032,7 @@ def require_independent_milestone(
 def _receipt_lineage(
     snapshot: Snapshot, method: str, version: str
 ) -> dict[str, object]:
+    snapshot = _reread_snapshot(snapshot, snapshot.sha256)
     side = snapshot.sidecar
     terms_url = side.get("terms_url")
     if not isinstance(terms_url, str) or not terms_url:
@@ -1080,11 +1173,12 @@ def _candidate_failure(
 
 
 def _metadata_failure(item: ProjectSnapshot) -> InvestmentFailure | None:
-    side = item.snapshot.sidecar
-    _ = item.snapshot.body
+    snapshot = _reread_snapshot(item.snapshot, item.identity)
+    side = snapshot.sidecar
+    _ = snapshot.body
     if (
-        item.snapshot.receipt_path.name != f"{item.identity}.meta.json"
-        or item.snapshot.sha256 != item.identity
+        snapshot.receipt_path.name != f"{item.identity}.meta.json"
+        or snapshot.sha256 != item.identity
         or item.schema != SCHEMA_FDI
     ):
         return _refusal(
@@ -1102,7 +1196,7 @@ def _metadata_failure(item: ProjectSnapshot) -> InvestmentFailure | None:
                 "source assertion or explicit absence",
                 "invalid",
             )
-    receipt_lineage = _receipt_lineage(item.snapshot, FDI_METHOD, PARSER_VERSION)
+    receipt_lineage = _receipt_lineage(snapshot, FDI_METHOD, PARSER_VERSION)
     for row in item.rows:
         for name in LINEAGE_FIELDS:
             value = row.get(name)
@@ -1130,7 +1224,7 @@ def _metadata_failure(item: ProjectSnapshot) -> InvestmentFailure | None:
                 "matching source metadata",
                 "mismatch",
             )
-    canonical = _parse_project_snapshot(item.snapshot, coverage=item.coverage)
+    canonical = _parse_project_snapshot(snapshot, coverage=item.coverage)
     if isinstance(canonical, InvestmentFailure):
         return canonical
     if (

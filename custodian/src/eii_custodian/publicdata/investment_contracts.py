@@ -445,6 +445,7 @@ class VerifiedArchive:
     kind: str
     identity: str
     snapshot: Snapshot
+    milestone_shape: MilestoneShape | None = None
 
 
 @dataclass(frozen=True)
