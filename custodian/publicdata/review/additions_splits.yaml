@@ -1,0 +1,286 @@
+# Reviewed maps for the Public split families. Categories are the inventory's own
+# labels. A label that is not listed is not stored under another name.
+version: 1
+vocab:
+  sex:
+    Females: female
+    Males: male
+    Female: female
+    Male: male
+  nationality:
+    Qatari: qatari
+    Qataris: qatari
+    Non-Qatari: non_qatari
+    "Non Qataris": non_qatari
+    "Non Qatari": non_qatari
+  labour_omit:
+    "Economically Active": indicator_unheld
+    "Economically Inactive": indicator_unheld
+    Employed: published_twice
+    "Female Population (15 Years & above)": indicator_unheld
+    "Female Population": indicator_unheld
+    "Male Population (15 Years & above)": indicator_unheld
+    "Male Population": indicator_unheld
+  ages_population:
+    - "0"
+    - "1 - 4"
+    - "5 - 9"
+    - "10 - 14"
+    - "15 - 19"
+    - "20 - 24"
+    - "25 - 29"
+    - "30 - 34"
+    - "35 - 39"
+    - "40 - 44"
+    - "45 - 49"
+    - "50 - 54"
+    - "55 - 59"
+    - "60 - 64"
+    - "65 - 69"
+    - "70 - 74"
+    - "75 - 79"
+    - "80 +"
+  ages_active:
+    - "15 - 19"
+    - "20 - 24"
+    - "25 - 29"
+    - "30 - 34"
+    - "35 - 39"
+    - "40 - 44"
+    - "45 - 49"
+    - "50 - 54"
+    - "55 - 59"
+    - "60 - 64"
+    - "65 +"
+  activities:
+    - "Accommodation and food service activities"
+    - "Activities of extraterritorial organizations and bodies"
+    - "Activities of households as employers; undifferentiated goods- and services-producing activities of households for own use"
+    - "Administrative and support service activities"
+    - "Agriculture, forestry and fishing"
+    - "Arts, entertainment and recreation"
+    - Construction
+    - Education
+    - "Electricity, gas, steam and air conditioning supply"
+    - "Financial and insurance activities"
+    - "Human health and social work activities"
+    - "Information and communication"
+    - Manufacturing
+    - "Mining and quarrying"
+    - "Other service activities"
+    - "Professional, scientific and technical activities"
+    - "Public administration and defence; compulsory social security"
+    - "Real estate activities"
+    - "Transportation and storage"
+    - "Water supply; sewerage, waste management and remediation activities"
+    - "Wholesale and retail trade; repair of motor vehicles and motorcycles"
+  occupations:
+    - Clerks
+    - "Craft and Related Trades Workers"
+    - "Elementary Occupations"
+    - "Legislators, Senior Officials and Managers"
+    - "Plant and Machine Operators and Assemblers"
+    - Professionals
+    - "Service Workers and Shop and Market Sales Workers"
+    - "Skilled Agricultural and Fishery Workers"
+    - "Technicians and Associate Professionals"
+  hotel_nationality:
+    - "Africans (except Arabs)"
+    - Americans
+    - "Asians (except Arabs)"
+    - "Australian and New Zealanders"
+    - "C.C.A.S.G (Other)"
+    - Europeans
+    - "Other Arabs"
+    - Qataris
+  hotel_rating:
+    - "Five Star"
+    - "Four Star"
+    - "Three Star"
+    - "Two & One Star"
+  metrics:
+    Guests: guests
+    Nights: nights
+  modes:
+    - Air
+    - Land
+    - Sea
+  regions:
+    - Americas
+    - Europe
+    - "Gulf Cooperation Council (GCC)"
+    - "Other Africa"
+    - "Other Arab"
+    - "Other Asia inc. Oceania"
+  compensation_indicator:
+    "Compensation of Employees": compensation
+    "Number of Employees": employees
+  education_level:
+    - "Pre primary"
+    - Primary
+    - Preparatory
+    - Secondary
+    - "Specialized Preparatory"
+    - "Specialized Secondary"
+  education_type:
+    - Government
+    - Private
+  visitor_table_code:
+    hotel-guests-by-nationality-hotel-rating-and-hotel-stays: hotel_guests
+    visitor-arrivals-by-mode-of-entry: arrivals_by_mode
+    visitor-arrivals-by-region: arrivals_by_region
+    visitor-arrivals-trends-by-mode-of-transport-air-land-sea: arrival_trends
+roles:
+  "lf_muni_sex/female-population-and-labour-force-by-municipality":
+    kind: labour_population
+    sex: female
+    measure: count
+  "lf_muni_sex/male-population-and-labour-force-by-municipality":
+    kind: labour_population
+    sex: male
+    measure: count
+  "lf_muni_sex/employed-persons-15-years-and-above-by-gender-and-municipality":
+    kind: labour_gender
+    indicator: employed
+    measure: number
+  "lf_muni_sex/unemployed-persons-15-years-and-above-by-gender-and-municipality":
+    kind: labour_gender
+    indicator: unemployed
+    measure: number
+  "pop_muni_age_sex/females-population-by-municipality-and-age-groups-december-2020":
+    kind: population_age
+    sex: female
+    measure: value
+  "pop_muni_age_sex/males-population-by-municipality-and-age-groups-december-2020":
+    kind: population_age
+    sex: male
+    measure: value
+  "active_sex_age_act/economically-active-females-15-years-and-above-by-age-group-and-economic-activity":
+    kind: active_sex
+    sex: female
+    measure: total
+  "active_sex_age_act/economically-active-males-15-years-and-above-by-age-group-and-economic-activity":
+    kind: active_sex
+    sex: male
+    measure: total
+  "active_nat_occ_act/economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity":
+    kind: active_nat
+    sex: female
+    nationality: non_qatari
+    measure: number
+  "active_nat_occ_act/economically-active-non-qatari-males-15-years-and-above-by-occupation-and-economic-activity":
+    kind: active_nat
+    sex: male
+    nationality: non_qatari
+    measure: total
+  "active_nat_occ_act/economically-active-non-qatari-population-15-years-and-above-by-occupation-and-economic-activity":
+    kind: active_nat
+    sex: all
+    nationality: non_qatari
+    measure: number
+  "active_nat_occ_act/economically-active-qatari-females-15-years-and-above-by-occupation-and-economic-activity":
+    kind: active_nat
+    sex: female
+    nationality: qatari
+    measure: number
+  "active_nat_occ_act/economically-active-qatari-males-15-years-and-above-by-occupation-and-economic-activity":
+    kind: active_nat
+    sex: male
+    nationality: qatari
+    measure: number
+  "active_nat_occ_act/economically-active-qatari-population-15-years-and-above-by-occupation-and-economic-activity":
+    kind: active_nat
+    sex: all
+    nationality: qatari
+    measure: number
+  "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity":
+    kind: compensation
+    table_code: bulletin
+    code_field: code
+    indicator_field: labor_indicator
+    measure: value
+    integral: false
+  "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-building":
+    kind: compensation
+    table_code: building
+    code_field: activity_code
+    indicator_field: indicator
+    measure: value
+    integral: false
+  "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-business":
+    kind: compensation
+    table_code: business
+    code_field: activity_code
+    indicator_field: indicator
+    measure: value
+    integral: false
+  "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy":
+    kind: compensation
+    table_code: energy
+    code_field: activity_code
+    indicator_field: indicator
+    measure: value
+    integral: false
+  "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy0":
+    kind: compensation
+    table_code: energy0
+    code_field: activity_code
+    indicator_field: indicator
+    measure: value
+    integral: false
+  "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy1":
+    kind: compensation
+    table_code: energy1
+    code_field: activity_code
+    indicator_field: indicator
+    measure: value
+    integral: false
+  "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-one":
+    kind: compensation
+    table_code: one
+    code_field: activity_code
+    indicator_field: indicator
+    measure: value
+    integral: false
+  "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social":
+    kind: compensation
+    table_code: social
+    code_field: activity_code
+    indicator_field: indicator
+    measure: value
+    integral: false
+  "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social0":
+    kind: compensation
+    table_code: social0
+    code_field: activity_code
+    indicator_field: indicator
+    measure: value
+    integral: false
+  "comp_nat_act/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social1":
+    kind: compensation
+    table_code: social1
+    code_field: activity_code
+    indicator_field: indicator
+    measure: value
+    integral: false
+  "students_muni/students-by-level-of-education-municipality-gender-type-of-education-and-nationality-2025-2026":
+    kind: students
+    measure: number_of_students
+    as_int: true
+  "visitors_markets/hotel-guests-by-nationality-hotel-rating-and-hotel-stays":
+    kind: hotel
+    measure: number
+    integral: false
+    table_code: hotel_guests
+  "visitors_markets/visitor-arrivals-by-mode-of-entry":
+    kind: arrivals_mode
+    integral: true
+    table_code: arrivals_by_mode
+  "visitors_markets/visitor-arrivals-by-region":
+    kind: arrivals_region
+    integral: true
+    table_code: arrivals_by_region
+  "visitors_markets/visitor-arrivals-trends-by-mode-of-transport-air-land-sea":
+    kind: arrivals_trends
+    measure: arrivals
+    table_code: arrival_trends

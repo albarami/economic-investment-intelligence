@@ -25,12 +25,22 @@ ALLOWED_HOSTS = frozenset(
         "fdiprojects.invest.qa",
         "www.invest.qa",
         "data.source.coop",
+        "ladsweb.modaps.eosdis.nasa.gov",
+        "archive-api.open-meteo.com",
+        "services.gisqatar.org.qa",
+        "monaqasat.mof.gov.qa",
+        "ndownloader.figshare.com",
+        "44c1cec316ec56bca76dfd65d2882b20.r2.cloudflarestorage.com",
+        "download.geoservice.dlr.de",
     }
 )
 
 NAMED_PORTAL_HOSTS = frozenset({"www.data.gov.qa", "www.data.qa"})
 NAMED_INVESTMENT_HOSTS = frozenset({"fdiprojects.invest.qa", "www.invest.qa"})
 NAMED_PLACES_HOST = "data.source.coop"
+NAMED_RADIANCE_HOST = "ladsweb.modaps.eosdis.nasa.gov"
+NAMED_POPULATION_HOST = "data.worldpop.org"
+NAMED_WEATHER_HOST = "archive-api.open-meteo.com"
 
 
 @dataclass(frozen=True)

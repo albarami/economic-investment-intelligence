@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.grids.build import build_grids
 
 from .build import FrameResult, read_cached
 from .census import census_rows, validate_tables
@@ -131,6 +132,20 @@ def build_live_frame(
     free_zones = district_free_zones(review)
     grid = build_grid(municipalities, zones, districts, doha, free_zones, report)
     tables["grid_cell"] = grid
+    grids = build_grids(
+        cache,
+        registry,
+        {
+            int(row["cell"]): row["geometry"]
+            for row in grid
+            if "cell" in row and "geometry" in row
+        },
+    )
+    for name, rows in grids.tables.items():
+        tables[name] = rows
+    sources.update(grids.sources)
+    for key, reason in sorted(grids.coverage.items()):
+        report.append(f"grids: {key} {reason}")
     for kind, boundaries in (
         ("municipality", municipalities),
         ("zone", zones),

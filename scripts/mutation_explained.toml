@@ -2447,3 +2447,194 @@ reason = "float() reads the names inf and -inf without regard to letter case, so
 module = "product/src/eii_product/assistant/catalogue/brief.py"
 mutation = "--- src/eii_product/assistant/catalogue/brief.py\n+++ src/eii_product/assistant/catalogue/brief.py\n@@ -2,5 +2,5 @@\n     if type(value) not in {int, float}:\n         return False\n     if isinstance(value, float):\n-        return value == value and value not in {float(\"inf\"), float(\"-inf\")}\n+        return value == value and value not in {float(\"inf\"), float(\"-INF\")}\n     return True"
 reason = "float() reads the names inf and -inf without regard to letter case, so float(\"INF\") and float(\"-INF\") equal float(\"inf\") and float(\"-inf\"); the set holds the same two members and the membership test is the same for every value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/additions/split_policy.py"
+mutation = "--- src/eii_custodian/publicdata/additions/split_policy.py\n+++ src/eii_custodian/publicdata/additions/split_policy.py\n@@ -2,7 +2,7 @@\n     parts = re.split(r\"(?m)^Table `([a-z0-9_]+)`\", section)\n     tables: list[tuple[str, tuple[str, ...]]] = []\n     index = 1\n-    while index + 1 < len(parts):\n+    while index + 1 <= len(parts):\n         name = parts[index]\n         body = parts[index + 1]\n         fields: list[str] = []"
+reason = "re.split with one capturing group always returns an odd number of parts. The index starts at 1 and steps by 2, so it stays odd, while an extra <= iteration would require index + 1 == len(parts), an even index. That index is never reached, for an empty section or any number of tables."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/additions/split_policy.py"
+mutation = "--- src/eii_custodian/publicdata/additions/split_policy.py\n+++ src/eii_custodian/publicdata/additions/split_policy.py\n@@ -1,3 +1,3 @@\n def _contracts_text() -> str:\n     root = _repository_root(Path(__file__).resolve())\n-    return (root / \"docs\" / \"03_DATA_CONTRACTS.md\").read_text(encoding=\"utf-8\")\n+    return (root / \"docs\" / \"03_DATA_CONTRACTS.md\").read_text(encoding=\"UTF-8\")"
+reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same decoder, so the contracts file is read as the same text. No locale and no file bytes distinguish the two names."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/additions/splits.py"
+mutation = "--- src/eii_custodian/publicdata/additions/splits.py\n+++ src/eii_custodian/publicdata/additions/splits.py\n@@ -1,6 +1,6 @@\n def _month_of(key: str) -> str | None:\n     try:\n-        first, last = observe_period_bounds([{key: 0}], _MONTHS)\n+        first, last = observe_period_bounds([{key: 1}], _MONTHS)\n     except AdditionError as error:\n         if error.name == \"period_absent\":\n             return None"
+reason = "observe_period_bounds on the month-column rule reads only dictionary keys. _month_of always passes a one-key row, so the stored 0 is never read. Replacing it with 1 leaves the parsed month, the absent-period result, and every refusal unchanged."
+# S2-T14 night lights: equivalent mutants and unread defaults.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -1,2 +1,2 @@\n def _text(value: Any) -> str:\n-    return value.decode(\"utf-8\") if isinstance(value, bytes) else str(value)\n+    return value.decode(\"UTF-8\") if isinstance(value, bytes) else str(value)"
+reason = "Python codec lookup treats the names UTF-8 and utf-8 as the same encoding, so both decode the same attribute bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -12,7 +12,7 @@\n     \"\"\"Decode local arrays; filter fill before scale and preserve source centres.\"\"\"\n     checked = local_file(cache, path)\n     h5py = import_module(\"h5py\")\n-    with h5py.File(checked, \"r\") as source:\n+    with h5py.File(checked, ) as source:\n         short_name = _root_text(source.attrs, \"ShortName\")\n         version = _root_text(source.attrs, \"VersionID\")\n         if short_name != \"VNP46A3\" or version != \"002\":"
+reason = "The installed h5py File defaults mode to r, so omitting the explicit mode opens the same read-only file."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -37,7 +37,7 @@\n         lat, lon = latitude[:], longitude[:]\n         if radiance.shape != (len(lat), len(lon)) or quality.shape != radiance.shape:\n             raise GridError(\"ntl_blackmarble: array shape mismatch\")\n-        if getattr(radiance.dtype, \"name\", \"\") != \"float32\":\n+        if getattr(radiance.dtype, \"name\", None) != \"float32\":\n             raise GridError(\"ntl_blackmarble: radiance type\")\n         if getattr(quality.dtype, \"name\", \"\") != \"uint8\":\n             raise GridError(\"ntl_blackmarble: quality type\")"
+reason = "numpy dtype.name is always present on these arrays, so changing or omitting getattr's default still returns that name and the type comparison is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -37,7 +37,7 @@\n         lat, lon = latitude[:], longitude[:]\n         if radiance.shape != (len(lat), len(lon)) or quality.shape != radiance.shape:\n             raise GridError(\"ntl_blackmarble: array shape mismatch\")\n-        if getattr(radiance.dtype, \"name\", \"\") != \"float32\":\n+        if getattr(radiance.dtype, \"name\", ) != \"float32\":\n             raise GridError(\"ntl_blackmarble: radiance type\")\n         if getattr(quality.dtype, \"name\", \"\") != \"uint8\":\n             raise GridError(\"ntl_blackmarble: quality type\")"
+reason = "numpy dtype.name is always present on these arrays, so changing or omitting getattr's default still returns that name and the type comparison is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -37,7 +37,7 @@\n         lat, lon = latitude[:], longitude[:]\n         if radiance.shape != (len(lat), len(lon)) or quality.shape != radiance.shape:\n             raise GridError(\"ntl_blackmarble: array shape mismatch\")\n-        if getattr(radiance.dtype, \"name\", \"\") != \"float32\":\n+        if getattr(radiance.dtype, \"name\", \"XXXX\") != \"float32\":\n             raise GridError(\"ntl_blackmarble: radiance type\")\n         if getattr(quality.dtype, \"name\", \"\") != \"uint8\":\n             raise GridError(\"ntl_blackmarble: quality type\")"
+reason = "numpy dtype.name is always present on these arrays, so changing or omitting getattr's default still returns that name and the type comparison is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -39,7 +39,7 @@\n             raise GridError(\"ntl_blackmarble: array shape mismatch\")\n         if getattr(radiance.dtype, \"name\", \"\") != \"float32\":\n             raise GridError(\"ntl_blackmarble: radiance type\")\n-        if getattr(quality.dtype, \"name\", \"\") != \"uint8\":\n+        if getattr(quality.dtype, \"name\", None) != \"uint8\":\n             raise GridError(\"ntl_blackmarble: quality type\")\n         if (\n             getattr(latitude.dtype, \"name\", \"\") != \"float64\""
+reason = "numpy dtype.name is always present on these arrays, so changing or omitting getattr's default still returns that name and the type comparison is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -39,7 +39,7 @@\n             raise GridError(\"ntl_blackmarble: array shape mismatch\")\n         if getattr(radiance.dtype, \"name\", \"\") != \"float32\":\n             raise GridError(\"ntl_blackmarble: radiance type\")\n-        if getattr(quality.dtype, \"name\", \"\") != \"uint8\":\n+        if getattr(quality.dtype, \"name\", ) != \"uint8\":\n             raise GridError(\"ntl_blackmarble: quality type\")\n         if (\n             getattr(latitude.dtype, \"name\", \"\") != \"float64\""
+reason = "numpy dtype.name is always present on these arrays, so changing or omitting getattr's default still returns that name and the type comparison is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -39,7 +39,7 @@\n             raise GridError(\"ntl_blackmarble: array shape mismatch\")\n         if getattr(radiance.dtype, \"name\", \"\") != \"float32\":\n             raise GridError(\"ntl_blackmarble: radiance type\")\n-        if getattr(quality.dtype, \"name\", \"\") != \"uint8\":\n+        if getattr(quality.dtype, \"name\", \"XXXX\") != \"uint8\":\n             raise GridError(\"ntl_blackmarble: quality type\")\n         if (\n             getattr(latitude.dtype, \"name\", \"\") != \"float64\""
+reason = "numpy dtype.name is always present on these arrays, so changing or omitting getattr's default still returns that name and the type comparison is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -42,7 +42,7 @@\n         if getattr(quality.dtype, \"name\", \"\") != \"uint8\":\n             raise GridError(\"ntl_blackmarble: quality type\")\n         if (\n-            getattr(latitude.dtype, \"name\", \"\") != \"float64\"\n+            getattr(latitude.dtype, \"name\", None) != \"float64\"\n             or getattr(longitude.dtype, \"name\", \"\") != \"float64\"\n         ):\n             raise GridError(\"ntl_blackmarble: coordinate type\")"
+reason = "numpy dtype.name is always present on these arrays, so changing or omitting getattr's default still returns that name and the type comparison is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -42,7 +42,7 @@\n         if getattr(quality.dtype, \"name\", \"\") != \"uint8\":\n             raise GridError(\"ntl_blackmarble: quality type\")\n         if (\n-            getattr(latitude.dtype, \"name\", \"\") != \"float64\"\n+            getattr(latitude.dtype, \"name\", ) != \"float64\"\n             or getattr(longitude.dtype, \"name\", \"\") != \"float64\"\n         ):\n             raise GridError(\"ntl_blackmarble: coordinate type\")"
+reason = "numpy dtype.name is always present on these arrays, so changing or omitting getattr's default still returns that name and the type comparison is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -42,7 +42,7 @@\n         if getattr(quality.dtype, \"name\", \"\") != \"uint8\":\n             raise GridError(\"ntl_blackmarble: quality type\")\n         if (\n-            getattr(latitude.dtype, \"name\", \"\") != \"float64\"\n+            getattr(latitude.dtype, \"name\", \"XXXX\") != \"float64\"\n             or getattr(longitude.dtype, \"name\", \"\") != \"float64\"\n         ):\n             raise GridError(\"ntl_blackmarble: coordinate type\")"
+reason = "numpy dtype.name is always present on these arrays, so changing or omitting getattr's default still returns that name and the type comparison is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -43,7 +43,7 @@\n             raise GridError(\"ntl_blackmarble: quality type\")\n         if (\n             getattr(latitude.dtype, \"name\", \"\") != \"float64\"\n-            or getattr(longitude.dtype, \"name\", \"\") != \"float64\"\n+            or getattr(longitude.dtype, \"name\", None) != \"float64\"\n         ):\n             raise GridError(\"ntl_blackmarble: coordinate type\")\n         fill = _field_number(radiance.attrs, \"_FillValue\")"
+reason = "numpy dtype.name is always present on these arrays, so changing or omitting getattr's default still returns that name and the type comparison is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -43,7 +43,7 @@\n             raise GridError(\"ntl_blackmarble: quality type\")\n         if (\n             getattr(latitude.dtype, \"name\", \"\") != \"float64\"\n-            or getattr(longitude.dtype, \"name\", \"\") != \"float64\"\n+            or getattr(longitude.dtype, \"name\", ) != \"float64\"\n         ):\n             raise GridError(\"ntl_blackmarble: coordinate type\")\n         fill = _field_number(radiance.attrs, \"_FillValue\")"
+reason = "numpy dtype.name is always present on these arrays, so changing or omitting getattr's default still returns that name and the type comparison is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -43,7 +43,7 @@\n             raise GridError(\"ntl_blackmarble: quality type\")\n         if (\n             getattr(latitude.dtype, \"name\", \"\") != \"float64\"\n-            or getattr(longitude.dtype, \"name\", \"\") != \"float64\"\n+            or getattr(longitude.dtype, \"name\", \"XXXX\") != \"float64\"\n         ):\n             raise GridError(\"ntl_blackmarble: coordinate type\")\n         fill = _field_number(radiance.attrs, \"_FillValue\")"
+reason = "numpy dtype.name is always present on these arrays, so changing or omitting getattr's default still returns that name and the type comparison is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -43,7 +43,7 @@\n                 {\n                     \"cell\": key,\n                     \"period\": period,\n-                    \"radiance\": (sum(values, Decimal(0)) / len(values)).quantize(\n+                    \"radiance\": (sum(values, ) / len(values)).quantize(\n                         Decimal(\"0.0001\"), rounding=ROUND_HALF_UP\n                     ),\n                     \"source_id\": \"ntl_blackmarble\","
+reason = "Removing the explicit Decimal zero leaves the same sum for a nonempty sequence of Decimal values; an empty bucket and an empty area mean return before the sum."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/night_lights.py"
+mutation = "--- src/eii_custodian/publicdata/grids/night_lights.py\n+++ src/eii_custodian/publicdata/grids/night_lights.py\n@@ -7,4 +7,4 @@\n     for row in rows:\n         if type(row[\"radiance\"]) is not Decimal:\n             raise GridError(\"ntl_blackmarble: radiance not decimal\")\n-    return sum((row[\"radiance\"] for row in rows), Decimal(0)) / len(rows)\n+    return sum((row[\"radiance\"] for row in rows), ) / len(rows)"
+reason = "Only exact Decimals reach the sum, and an int start added to a Decimal gives the same value, sign and exponent."
+
+# S2-T14 sixth pass: equivalent mutants no test can observe.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/weather.py"
+mutation = "--- src/eii_custodian/publicdata/grids/weather.py\n+++ src/eii_custodian/publicdata/grids/weather.py\n@@ -12,7 +12,7 @@\n     if data.get(\"hourly_units\") != {\"time\": \"iso8601\", \"temperature_2m\": \"°C\"}:\n         raise GridError(\"weather_openmeteo: units mismatch\")\n     hourly = data.get(\"hourly\", {})\n-    times, values = hourly.get(\"time\", []), hourly.get(\"temperature_2m\", [])\n+    times, values = hourly.get(\"time\", None), hourly.get(\"temperature_2m\", [])\n     start, end = datetime.fromisoformat(first), datetime.fromisoformat(last)\n     expected = []\n     cursor = start"
+reason = "A missing time key yields None when the default is None or omitted, and an empty list when the default is []. Both fail the comparison with the requested hour list, so the same missing-hour refusal is raised before the value is used again. When the key is present the default is unread."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/weather.py"
+mutation = "--- src/eii_custodian/publicdata/grids/weather.py\n+++ src/eii_custodian/publicdata/grids/weather.py\n@@ -12,7 +12,7 @@\n     if data.get(\"hourly_units\") != {\"time\": \"iso8601\", \"temperature_2m\": \"°C\"}:\n         raise GridError(\"weather_openmeteo: units mismatch\")\n     hourly = data.get(\"hourly\", {})\n-    times, values = hourly.get(\"time\", []), hourly.get(\"temperature_2m\", [])\n+    times, values = hourly.get(\"time\", ), hourly.get(\"temperature_2m\", [])\n     start, end = datetime.fromisoformat(first), datetime.fromisoformat(last)\n     expected = []\n     cursor = start"
+reason = "A missing time key yields None when the default is None or omitted, and an empty list when the default is []. Both fail the comparison with the requested hour list, so the same missing-hour refusal is raised before the value is used again. When the key is present the default is unread."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/build.py"
+mutation = "--- src/eii_custodian/publicdata/grids/build.py\n+++ src/eii_custodian/publicdata/grids/build.py\n@@ -4,7 +4,7 @@\n     receipts = sorted(directory.glob(\"*.meta.json\"))\n     if len(receipts) != 1:\n         raise GridError(f\"{entry.source_id}: expected one cache receipt\")\n-    loaded = json.loads(receipts[0].read_text(encoding=\"utf-8\"))\n+    loaded = json.loads(receipts[0].read_text(encoding=\"UTF-8\"))\n     if not isinstance(loaded, dict):\n         raise GridError(f\"{entry.source_id}: unreadable receipt\")\n     for name, expected in ("
+reason = "Python codec lookup treats the names UTF-8 and utf-8 as the same encoding, so the decoded text is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/build.py"
+mutation = "--- src/eii_custodian/publicdata/grids/build.py\n+++ src/eii_custodian/publicdata/grids/build.py\n@@ -11,7 +11,7 @@\n     files: list[dict[str, Any]] = []\n     coverage: dict[str, str] = {}\n     sources: dict[str, dict[str, Any]] = {}\n-    geometries = cast(\"dict[int, FrameGeometry]\", cells)\n+    geometries = cast(None, cells)\n     bounds = None\n     if cells:\n         cell_bounds = [geometry.bounds for geometry in geometries.values()]"
+reason = "typing.cast returns its argument unchanged. The text passed to cast is not read at run time, so the cells object is the same."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/build.py"
+mutation = "--- src/eii_custodian/publicdata/grids/build.py\n+++ src/eii_custodian/publicdata/grids/build.py\n@@ -11,7 +11,7 @@\n     files: list[dict[str, Any]] = []\n     coverage: dict[str, str] = {}\n     sources: dict[str, dict[str, Any]] = {}\n-    geometries = cast(\"dict[int, FrameGeometry]\", cells)\n+    geometries = cast(\"XXdict[int, FrameGeometry]XX\", cells)\n     bounds = None\n     if cells:\n         cell_bounds = [geometry.bounds for geometry in geometries.values()]"
+reason = "typing.cast returns its argument unchanged. The text passed to cast is not read at run time, so the cells object is the same."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/build.py"
+mutation = "--- src/eii_custodian/publicdata/grids/build.py\n+++ src/eii_custodian/publicdata/grids/build.py\n@@ -11,7 +11,7 @@\n     files: list[dict[str, Any]] = []\n     coverage: dict[str, str] = {}\n     sources: dict[str, dict[str, Any]] = {}\n-    geometries = cast(\"dict[int, FrameGeometry]\", cells)\n+    geometries = cast(\"dict[int, framegeometry]\", cells)\n     bounds = None\n     if cells:\n         cell_bounds = [geometry.bounds for geometry in geometries.values()]"
+reason = "typing.cast returns its argument unchanged. The text passed to cast is not read at run time, so the cells object is the same."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/build.py"
+mutation = "--- src/eii_custodian/publicdata/grids/build.py\n+++ src/eii_custodian/publicdata/grids/build.py\n@@ -11,7 +11,7 @@\n     files: list[dict[str, Any]] = []\n     coverage: dict[str, str] = {}\n     sources: dict[str, dict[str, Any]] = {}\n-    geometries = cast(\"dict[int, FrameGeometry]\", cells)\n+    geometries = cast(\"DICT[INT, FRAMEGEOMETRY]\", cells)\n     bounds = None\n     if cells:\n         cell_bounds = [geometry.bounds for geometry in geometries.values()]"
+reason = "typing.cast returns its argument unchanged. The text passed to cast is not read at run time, so the cells object is the same."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/build.py"
+mutation = "--- src/eii_custodian/publicdata/grids/build.py\n+++ src/eii_custodian/publicdata/grids/build.py\n@@ -43,7 +43,7 @@\n     population_rows = active(entries, \"worldpop_qat_agesex\")\n     _year_files(population_rows)\n     population_grids: dict[str, tuple[Any, ...]] = {}\n-    refused_unconfirmed = False\n+    refused_unconfirmed = None\n     for entry in population_rows:\n         if not _cached(cache, entry):\n             coverage[f\"{entry.key}:omitted\"] = \"NO_CACHE\""
+reason = "The flag is read only by a falsiness test. None and False are both false, and the first unconfirmed file then stores True, so the warning is still printed once."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/build.py"
+mutation = "--- src/eii_custodian/publicdata/grids/build.py\n+++ src/eii_custodian/publicdata/grids/build.py\n@@ -2,5 +2,5 @@\n     \"\"\"True for a both-sexes file or a total file, from the published names.\"\"\"\n     if entry.sex not in {\"f\", \"m\"}:\n         return True\n-    name = urlsplit(entry.url).path.rsplit(\"/\", 1)[-1]\n+    name = urlsplit(entry.url).path.rsplit(\"/\", )[-1]\n     return name.startswith((\"qat_t_\", \"qat_T_F_\", \"qat_T_M_\"))"
+reason = "Splitting off every slash, or at most two, still leaves the final path segment at index -1 for every string. The prefix test reads only that segment."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/build.py"
+mutation = "--- src/eii_custodian/publicdata/grids/build.py\n+++ src/eii_custodian/publicdata/grids/build.py\n@@ -2,5 +2,5 @@\n     \"\"\"True for a both-sexes file or a total file, from the published names.\"\"\"\n     if entry.sex not in {\"f\", \"m\"}:\n         return True\n-    name = urlsplit(entry.url).path.rsplit(\"/\", 1)[-1]\n+    name = urlsplit(entry.url).path.rsplit(\"/\", 2)[-1]\n     return name.startswith((\"qat_t_\", \"qat_T_F_\", \"qat_T_M_\"))"
+reason = "Splitting off every slash, or at most two, still leaves the final path segment at index -1 for every string. The prefix test reads only that segment."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/build.py"
+mutation = "--- src/eii_custodian/publicdata/grids/build.py\n+++ src/eii_custodian/publicdata/grids/build.py\n@@ -16,7 +16,7 @@\n     if entry.point is None:\n         raise GridError(\"weather_openmeteo: point not recorded\")\n     body, receipt = cached_bytes(cache, entry)\n-    loaded = json.loads(body.decode(\"utf-8\"))\n+    loaded = json.loads(body.decode(\"UTF-8\"))\n     if not isinstance(loaded, dict):\n         raise GridError(\"weather_openmeteo: unreadable response\")\n     validated = validate_weather("
+reason = "Python codec lookup treats the names UTF-8 and utf-8 as the same encoding, so the decoded text is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/build.py"
+mutation = "--- src/eii_custodian/publicdata/grids/build.py\n+++ src/eii_custodian/publicdata/grids/build.py\n@@ -5,7 +5,6 @@\n     method, version = METHODS[entry.source_id]\n     for row in rows:\n         row.update(\n-            source_id=entry.source_id,\n             source_key=entry.key,\n             source_sha256=receipt[\"sha256\"],\n             method=method,"
+reason = "Every row passed into this update already has source_id equal to the entry: night rows carry ntl_blackmarble and population rows carry worldpop_qat_agesex. Deleting the repeated assignment leaves that value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/build.py"
+mutation = "--- src/eii_custodian/publicdata/grids/build.py\n+++ src/eii_custodian/publicdata/grids/build.py\n@@ -2,7 +2,7 @@\n     \"\"\"Replace one generated file below the cache, or leave no partial file.\"\"\"\n     path.parent.mkdir(exist_ok=True)\n     partial = path.with_name(f\".{path.name}.partial\")\n-    text = json.dumps(payload, sort_keys=True, ensure_ascii=True) + \"\\n\"\n+    text = json.dumps(payload, sort_keys=True, ) + \"\\n\"\n     try:\n         partial.write_text(text, encoding=\"utf-8\")\n         os.replace(partial, path)"
+reason = "ensure_ascii defaults to True, so omitting the argument still escapes non-ASCII and still sorts keys."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/grids/build.py"
+mutation = "--- src/eii_custodian/publicdata/grids/build.py\n+++ src/eii_custodian/publicdata/grids/build.py\n@@ -4,7 +4,7 @@\n     partial = path.with_name(f\".{path.name}.partial\")\n     text = json.dumps(payload, sort_keys=True, ensure_ascii=True) + \"\\n\"\n     try:\n-        partial.write_text(text, encoding=\"utf-8\")\n+        partial.write_text(text, encoding=\"UTF-8\")\n         os.replace(partial, path)\n     except OSError:\n         partial.unlink(missing_ok=True)"
+reason = "The codec name is normalised before lookup, so both spellings are one codec."
+
+[[survivors]]
+module = "core/src/eii_core/calc/building_heights.py"
+mutation = "--- src/eii_core/calc/building_heights.py\n+++ src/eii_core/calc/building_heights.py\n@@ -42,7 +42,7 @@\n             )\n             result[name] = FallbackError(\n                 total,\n-                metres(sum(errors, ZERO) / total),\n+                metres(sum(errors, ) / total),\n                 metres(sum(absolutes, ZERO) / total),\n                 metres(median),\n                 \"\","
+reason = "errors is nonempty at that statement: an empty pair list returns count 0 with the no_pairs reason one branch earlier. For a nonempty Decimal iterable, sum's default integer-zero start computes 0 + first_element through Decimal.__radd__, exactly Decimal(0) + first_element under the same fully specified CALC_CONTEXT, so every partial sum keeps the same coefficient, exponent, sign and signals as sum(errors, ZERO)."
+
+[[survivors]]
+module = "core/src/eii_core/calc/building_heights.py"
+mutation = "--- src/eii_core/calc/building_heights.py\n+++ src/eii_core/calc/building_heights.py\n@@ -43,7 +43,7 @@\n             result[name] = FallbackError(\n                 total,\n                 metres(sum(errors, ZERO) / total),\n-                metres(sum(absolutes, ZERO) / total),\n+                metres(sum(absolutes, ) / total),\n                 metres(median),\n                 \"\",\n             )"
+reason = "absolutes is nonempty at that statement: it sorts the errors of a nonempty pair list, and an empty pair list returns count 0 with the no_pairs reason one branch earlier. For a nonempty Decimal iterable, sum's default integer-zero start computes 0 + first_element through Decimal.__radd__, exactly Decimal(0) + first_element under the same fully specified CALC_CONTEXT, so every partial sum keeps the same coefficient, exponent, sign and signals as sum(absolutes, ZERO)."
+
+[[survivors]]
+module = "core/src/eii_core/calc/building_heights.py"
+mutation = "--- src/eii_core/calc/building_heights.py\n+++ src/eii_core/calc/building_heights.py\n@@ -20,7 +20,7 @@\n     no_value: dict[str, int] = {}\n     fallback_buildings = 0\n     tied_height_buildings = 0\n-    for choice, matches in zip(rows, match_rows, strict=True):\n+    for choice, matches in zip(rows, match_rows, strict=None):\n         if choice.source not in HEIGHT_SOURCES:\n             raise ValueError(\"height source outside the closed list\")\n         by_source[choice.source] += 1"
+reason = "rows and match_rows have equal length at that statement: the refusal three statements above raises \"match list length differs from the choices\" on any difference, and both are lists built in this function. zip of two equal-length lists yields the same pairs whether strict is True, False, None or absent, so no input can tell the mutant from the original."
+
+[[survivors]]
+module = "core/src/eii_core/calc/building_heights.py"
+mutation = "--- src/eii_core/calc/building_heights.py\n+++ src/eii_core/calc/building_heights.py\n@@ -20,7 +20,7 @@\n     no_value: dict[str, int] = {}\n     fallback_buildings = 0\n     tied_height_buildings = 0\n-    for choice, matches in zip(rows, match_rows, strict=True):\n+    for choice, matches in zip(rows, match_rows, ):\n         if choice.source not in HEIGHT_SOURCES:\n             raise ValueError(\"height source outside the closed list\")\n         by_source[choice.source] += 1"
+reason = "rows and match_rows have equal length at that statement: the refusal three statements above raises \"match list length differs from the choices\" on any difference, and both are lists built in this function. zip of two equal-length lists yields the same pairs whether strict is True, False, None or absent, so no input can tell the mutant from the original."
+
+[[survivors]]
+module = "core/src/eii_core/calc/building_heights.py"
+mutation = "--- src/eii_core/calc/building_heights.py\n+++ src/eii_core/calc/building_heights.py\n@@ -20,7 +20,7 @@\n     no_value: dict[str, int] = {}\n     fallback_buildings = 0\n     tied_height_buildings = 0\n-    for choice, matches in zip(rows, match_rows, strict=True):\n+    for choice, matches in zip(rows, match_rows, strict=False):\n         if choice.source not in HEIGHT_SOURCES:\n             raise ValueError(\"height source outside the closed list\")\n         by_source[choice.source] += 1"
+reason = "rows and match_rows have equal length at that statement: the refusal three statements above raises \"match list length differs from the choices\" on any difference, and both are lists built in this function. zip of two equal-length lists yields the same pairs whether strict is True, False, None or absent, so no input can tell the mutant from the original."

@@ -9,6 +9,10 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
+from eii_custodian.publicdata.additions.common import (
+    ADDITION_FAMILIES as _ADDITION_FAMILIES,
+)
+from eii_custodian.publicdata.additions.common import AdditionError
 from eii_custodian.publicdata.fetch.allowlist import approve, host_of
 from eii_custodian.publicdata.fetch.kinds import (
     TERMS_HOST_UNLISTED,
@@ -34,7 +38,8 @@ from eii_custodian.publicdata.fetch.report import (
     terms_unread_line,
 )
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
-from eii_custodian.publicdata.fetch.transport import Transport
+from eii_custodian.publicdata.fetch.transport import Transport, public_address
+from eii_custodian.publicdata.grids.fetch import GRID_SOURCES, prepare_grid
 from eii_custodian.publicdata.investment_build import publish_investment
 from eii_custodian.publicdata.places.fetch import fetch_place_file, is_place_file
 from eii_custodian.publicdata.places_fsq.fetch import fetch_release, is_release_entry
@@ -44,6 +49,7 @@ CACHE_RELATIVE = "data/public_cache"
 LOG_NAME = "build-log.json"
 Sleeper = Callable[[float], None]
 Clock = Callable[[], str]
+TOKEN_SOURCE = "ntl_blackmarble"
 
 
 @dataclass(frozen=True)
@@ -56,6 +62,9 @@ class FetchFailure:
     check: str
     expected: str
     observed: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "url", public_address(self.url))
 
     @property
     def detail(self) -> str:
@@ -85,6 +94,12 @@ class _Fetched:
     terms_unread: str
 
 
+def _digest_pages(directory: Path) -> str:
+    """Hash the stored page files. An empty body is not one of them."""
+    chunks = [path.read_bytes() for path in sorted(directory.rglob("*.html"))]
+    return sha256_hex(b"".join(chunks))
+
+
 def utc_now() -> str:
     """Return the current UTC time as the retrieval timestamp."""
     return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -96,9 +111,10 @@ def fetch_entry(
     cache: Path,
     clock: Clock,
     sleep: Sleeper,
+    token: str = "",
 ) -> FetchFailure | None:
     """Fetch one row. An unlisted host is refused before the transport is called."""
-    _fetched, failure = _fetch_row(entry, transport, cache, clock, sleep)
+    _fetched, failure = _fetch_row(entry, transport, cache, clock, sleep, token)
     return failure
 
 
@@ -108,6 +124,7 @@ def _fetch_row(
     cache: Path,
     clock: Clock,
     sleep: Sleeper,
+    token: str = "",
 ) -> tuple[_Fetched | None, FetchFailure | None]:
     """Fetch one row and return the receipt values this run wrote."""
     if entry.url and not approve(entry.url).ok:
@@ -120,7 +137,11 @@ def _fetch_row(
             entry.url,
         )
     try:
-        prepared = prepare(entry, transport, sleep)
+        prepared = (
+            prepare_grid(entry, transport, sleep, token)
+            if entry.source_id in GRID_SOURCES
+            else prepare(entry, transport, sleep, cache=cache)
+        )
     except OSError:
         return None, FetchFailure(
             1, entry.source_id, entry.url, "write_failed", "stored file", "write failed"
@@ -134,13 +155,32 @@ def _fetch_row(
             prepared.failure.expected,
             prepared.failure.observed,
         )
+    if entry.kind == "paged_cards" and prepared.body == b"":
+        return (
+            _Fetched(
+                _digest_pages(cache_directory(cache, entry.key)),
+                prepared.fetch_host,
+                clock(),
+                prepared.terms_sha256,
+                prepared.terms_unread,
+            ),
+            None,
+        )
     digest = sha256_hex(prepared.body)
     retrieved = clock()
+    # What is stored of a final address is scheme, host and path only (rule
+    # 14): a storage host's signed redirect query never reaches a receipt,
+    # whichever fetcher built the row. Hops are never stored at all.
+    stored_url = (
+        public_address(prepared.fetch_url)
+        if entry.kind == "https_file"
+        else prepared.fetch_url
+    )
     sidecar = sidecar_for(
         entry,
         digest=digest,
         nbytes=len(prepared.body),
-        fetch_url=prepared.fetch_url,
+        fetch_url=stored_url,
         fetch_host=prepared.fetch_host,
         retrieved_utc=retrieved,
         publisher=prepared.publisher,
@@ -149,6 +189,12 @@ def _fetch_row(
         terms_sha256=prepared.terms_sha256,
         portal_licence=prepared.portal_licence,
         portal_licence_url=prepared.portal_licence_url,
+        observed_periods=(
+            (prepared.period_first, prepared.period_last)
+            if prepared.periods_observed
+            else None
+        ),
+        coverage_note=prepared.coverage_note,
     )
     try:
         commit_pair(
@@ -162,7 +208,7 @@ def _fetch_row(
         return None, FetchFailure(
             1,
             entry.source_id,
-            prepared.fetch_url,
+            stored_url,
             "write_failed",
             "stored file",
             "write failed",
@@ -185,13 +231,30 @@ def run_build(
     cache: Path,
     clock: Clock,
     sleep: Sleeper,
+    token: str = "",
+    key_name: str = "",
+    *,
+    additions_review: Path | None = None,
+    additions_frame: Path | None = None,
+    additions_output: Path | None = None,
 ) -> BuildOutcome:
     """Fetch each row in order, then run the public_data stage."""
     lines: list[str] = []
     terms: list[dict[str, object]] = []
     previous = _previous_term_hashes(cache)
     failure: FetchFailure | None = None
+    selected: list[tuple[str, str]] = []
+    fetched_entries: list[Entry] = []
+    told_absent = False
     for entry in entries:
+        if not token and _token_file(entry):
+            if not told_absent:
+                lines.append(
+                    f"OMIT {TOKEN_SOURCE}: {key_name} absent; "
+                    "night-lights layer left out"
+                )
+                told_absent = True
+            continue
         if entry.skip_reason:
             if entry.terms_url:
                 _read_terms_apart(
@@ -253,7 +316,7 @@ def run_build(
             assert placed is not None
             lines.append(pass_line(entry.key, placed.digest, placed.host))
             continue
-        fetched, result = _fetch_row(entry, transport, cache, clock, sleep)
+        fetched, result = _fetch_row(entry, transport, cache, clock, sleep, token)
         if result is not None:
             lines.append(
                 fail_line(
@@ -271,6 +334,9 @@ def run_build(
             _note_fetched_terms(entry, fetched, lines, terms, previous)
         elif entry.terms_url:
             _read_terms_apart(entry, transport, sleep, clock, lines, terms, previous)
+        if entry.source_id in _ADDITION_FAMILIES:
+            selected.append((entry.key, fetched.digest))
+            fetched_entries.append(entry)
         batch = publish_investment(
             entry, cache, fetched.digest, transport, sleep, clock
         )
@@ -297,6 +363,16 @@ def run_build(
         counted = cache / entry.source_id / "empty_coordinates.txt"
         if counted.is_file():
             lines.append(counted.read_text(encoding="utf-8").strip())
+    if failure is None and selected:
+        failure = _publish_additions(
+            tuple(fetched_entries),
+            tuple(selected),
+            cache,
+            additions_review,
+            additions_frame,
+            additions_output,
+            lines,
+        )
     if failure is None:
         from eii_custodian.publicdata.places.integrate import (
             areas_before_stage,
@@ -345,8 +421,86 @@ def run_build(
                     "missing",
                 )
             )
+        if failure is None:
+            failure = _heights(cache, entries, lines)
     _write_log(cache, lines, terms)
     return BuildOutcome(tuple(lines), failure)
+
+
+def _publish_additions(
+    entries: tuple[Entry, ...],
+    selected: tuple[tuple[str, str], ...],
+    cache: Path,
+    review: Path | None,
+    frame: Path | None,
+    output: Path | None,
+    lines: list[str],
+) -> FetchFailure | None:
+    """Publish addition tables after the fetches. A parser failure leaves no tables."""
+    from eii_custodian.publicdata.additions.build import build_additions
+
+    review_dir = review if review is not None else _review_dir()
+    frame_dir = frame if frame is not None else review_dir
+    destination = output if output is not None else cache / "additions"
+    try:
+        build_additions(cache, entries, selected, review_dir, frame_dir, destination)
+    except AdditionError as error:
+        lines.append(
+            fail_line("additions", "", error.name, "published tables", error.name)
+        )
+        return FetchFailure(
+            1, "additions", "", error.name, "published tables", error.name
+        )
+    return None
+
+
+def _review_dir() -> Path:
+    return Path(__file__).resolve().parents[4] / "publicdata" / "review"
+
+
+def _token_file(entry: Entry) -> bool:
+    """True for a per-month radiance file entry that needs the archive token."""
+    return (
+        entry.source_id == TOKEN_SOURCE and "/" in entry.key and not entry.skip_reason
+    )
+
+
+def _heights(
+    cache: Path,
+    entries: tuple[Entry, ...] | list[Entry],
+    lines: list[str],
+) -> FetchFailure | None:
+    """Run the heights step after the stage; a missing table only skips (B10)."""
+    from eii_custodian.publicdata.heights.step import (
+        BUILDINGS_RELATIVE,
+        HEIGHTS_RELATIVE,
+        HeightError,
+        build_heights,
+    )
+
+    root = cache.parent
+    try:
+        build_heights(
+            cache,
+            entries,
+            root / BUILDINGS_RELATIVE,
+            root / HEIGHTS_RELATIVE,
+            lines,
+        )
+    except HeightError as error:
+        lines.append(
+            fail_line(
+                "heights",
+                "",
+                error.name,
+                "valid height inputs",
+                error.name,
+            )
+        )
+        return FetchFailure(
+            1, "heights", "", error.name, "valid height inputs", error.name
+        )
+    return None
 
 
 def _note_fetched_terms(

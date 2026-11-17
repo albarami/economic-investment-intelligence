@@ -15,7 +15,12 @@ def pass_line(key: str, digest: str, host: str) -> str:
 
 def fail_line(key: str, url: str, check: str, expected: str, observed: str) -> str:
     """Return the failure line naming the check, the expected value and the observed value."""
-    return f"FAIL {key} {url} {check} expected={expected} observed={observed}"
+    from eii_custodian.publicdata.fetch.transport import public_address
+
+    return (
+        f"FAIL {key} {public_address(url)} {check} "
+        f"expected={expected} observed={observed}"
+    )
 
 
 def terms_changed_line(key: str, terms_url: str) -> str:
@@ -41,6 +46,16 @@ def citation_line(key: str) -> str:
 def coverage_line(figure_id: str) -> str:
     """Return the coverage line for a section 10 figure that is not measured yet."""
     return f"COVERAGE {figure_id} not_measured"
+
+
+def coverage_count_line(key: str, reason: str, count: int) -> str:
+    """Return the coverage line counting rows not kept for a named reason."""
+    return f"COVERAGE {key} {reason} {count}"
+
+
+def pin_share_line(inside: int, total: int) -> str:
+    """Return the same-PIN address share line of LR-G4 for the build report."""
+    return f"address_points_inside_same_pin: {inside}/{total}"
 
 
 def log_line(relative: str) -> str:
