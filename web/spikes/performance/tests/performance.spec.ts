@@ -484,6 +484,46 @@ async function framesAfter(page: Page, frames: number): Promise<Spike> {
   }, frames);
 }
 
+// The stored-hour wait is not under assertion, so the page waits on its own
+// animation frames and returns its snapshot in one call; the host keeps the
+// same 170 s bound as readiness through the race below.
+async function storedHoursDone(page: Page, hours: number[]): Promise<Spike> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let value: Spike;
+  try {
+    value = await Promise.race([
+      page.evaluate(
+        (hours: number[]) =>
+          new Promise<Spike>((resolve) => {
+            const read = () => {
+              const spike = window.__spike;
+              if (
+                spike !== undefined &&
+                spike.roadStates.at(-1)?.hour === hours.at(-1)
+              ) {
+                resolve(structuredClone(spike));
+              } else {
+                requestAnimationFrame(read);
+              }
+            };
+            read();
+          }),
+        hours,
+      ),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error('stored-hour wait timed out')),
+          170000,
+        );
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+  if (value === undefined) throw new Error('spike diagnostics are absent');
+  return value;
+}
+
 type RoadScene = { page: Page; spike: Spike };
 type PauseObservation = { paused: Spike; after: Spike; resumed: Spike };
 
@@ -592,6 +632,10 @@ function visibilityTest(
   });
 }
 
+// The pause tests toggle playback, and the toggle sets `interrupted`. The
+// uninterrupted scene must reach its full stored-hour cycle without any
+// click, so the two English road scenes keep separate pages: their initial
+// states do not match in the sense of the sharing rule.
 sharedRoadScene(
   'uninterrupted English road scene',
   ROAD_TRACE_SCENE,
@@ -638,12 +682,7 @@ sharedRoadScene(
     test('roads playback visits each stored hour and holds the recorded bands across the load cycle', async () => {
       const { page } = scene();
       test.setTimeout(600000);
-      await page.waitForFunction(
-        (hours) => window.__spike?.roadStates.at(-1)?.hour === hours.at(-1),
-        roadData.hours,
-        { timeout: 170000 },
-      );
-      const spike = (await page.evaluate(() => window.__spike))!;
+      const spike = await storedHoursDone(page, roadData.hours);
       expect(spike.hoursShown).toEqual(roadData.hours);
       const links = roadData.roads.links;
       const indexes = [

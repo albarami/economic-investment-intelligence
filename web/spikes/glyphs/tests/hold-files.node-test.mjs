@@ -7,7 +7,10 @@ import { withHeldFiles } from './hold-files.mjs';
 
 function fixture(action) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-held-files-'));
-  const source = fs.mkdtempSync(new URL('./eii-held-source-', import.meta.url));
+  // The source fixtures live under the system temporary folder too: a
+  // prefix inside this spike's tree would appear in the glyph no-output
+  // watch listing while another file of the same suite run holds it.
+  const source = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-held-source-'));
   const held = path.join(root, 'held');
   fs.mkdirSync(held);
   fs.writeFileSync(path.join(source, 'first.png'), 'synthetic first');

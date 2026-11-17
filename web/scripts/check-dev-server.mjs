@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { scanTags, scanText } from './host-scan-rules.mjs';
 import {
   announcesNetwork,
+  announcedPort,
   childEnvironment,
-  choosePort,
   hasLocalLine,
   httpGet,
   probePort,
@@ -214,16 +214,32 @@ function isFile(target) {
 
 async function poll(child, output, port, timeoutMs, outer) {
   const deadline = Date.now() + timeoutMs;
-  const pageUrl = `http://127.0.0.1:${port}/`;
+  // A null port means the check named no port: the child picked and bound
+  // its own ephemeral port, and the port it bound appears in its Local
+  // line. The check itself held and released no port; the child's own
+  // startup still probes before it binds (see the chosen-port comment in
+  // run()).
+  let actual = port;
   while (Date.now() < deadline) {
     if (outer.fired) return { fail: 'FAIL timeout: outer bound' };
     const gone = childGone(child);
     if (gone) return { fail: gone };
+    if (actual === null) actual = announcedPort(output.text());
+    if (actual === null) {
+      const goneAnnouncing = childGone(child);
+      if (goneAnnouncing) return { fail: goneAnnouncing };
+      await new Promise((resolve) => {
+        setTimeout(resolve, POLL_INTERVAL_MS);
+      });
+      continue;
+    }
+    const pageUrl = `http://127.0.0.1:${actual}/`;
     try {
       const response = await httpGet(pageUrl, REQUEST_TIMEOUT_MS);
       const goneAfter = childGone(child);
       if (goneAfter) return { fail: goneAfter };
-      if (hasLocalLine(output.text(), port)) return { response };
+      if (hasLocalLine(output.text(), actual))
+        return { response, port: actual };
     } catch (error) {
       if (!isNotYet(error)) throw error;
     }
@@ -233,8 +249,13 @@ async function poll(child, output, port, timeoutMs, outer) {
       setTimeout(resolve, POLL_INTERVAL_MS);
     });
   }
+  if (actual === null) {
+    return {
+      fail: `FAIL timeout: no accepted answer from the announced dev server within ${timeoutMs} ms`,
+    };
+  }
   return {
-    fail: `FAIL timeout: no accepted answer from http://127.0.0.1:${port}/ within ${timeoutMs} ms`,
+    fail: `FAIL timeout: no accepted answer from http://127.0.0.1:${actual}/ within ${timeoutMs} ms`,
   };
 }
 
@@ -265,9 +286,21 @@ async function run() {
     process.exitCode = 1;
     return;
   }
-  const port = args.port ?? (await choosePort());
-  if ((await probePort(port)) !== 'free') {
-    process.stdout.write(`FAIL start-failed: port ${port} is already in use\n`);
+  // Port ownership: a named port is verified free before the child binds it
+  // (the caller owns that choice). With no named port this check binds and
+  // releases no port itself: the dev server picks its own ephemeral port
+  // and reports the port it bound in its Local line. A short window
+  // remains inside the dev server: vite 8.3.8 probes the port it picked
+  // with a socket it closes before binding (httpServerStart calls
+  // getAvailableEphemeralPort, whose tryListen probe servers close before
+  // returning the port, and only then tryBindServer binds it), a window of
+  // a few consecutive awaits that this check cannot remove without
+  // patching or replacing the dev server.
+  const namedPort = args.port;
+  if (namedPort !== null && (await probePort(namedPort)) !== 'free') {
+    process.stdout.write(
+      `FAIL start-failed: port ${namedPort} is already in use\n`,
+    );
     process.exitCode = 1;
     return;
   }
@@ -296,7 +329,11 @@ async function run() {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-dev-home-'));
   const started = startChild({
     bin,
-    args: [...dev.flags, '--port', String(port)],
+    args: [
+      ...dev.flags,
+      '--port',
+      namedPort === null ? '0' : String(namedPort),
+    ],
     cwd: root,
     env: childEnvironment(home),
   });
@@ -308,7 +345,7 @@ async function run() {
     const polled = await poll(
       started.child,
       started,
-      port,
+      namedPort,
       args.timeoutMs,
       outer,
     );
@@ -317,6 +354,8 @@ async function run() {
       process.exitCode = 1;
       return;
     }
+    // The port the child bound: the named port, or the port it announced.
+    const port = polled.port;
     if (polled.response.status !== 200) {
       process.stdout.write(`FAIL bad-status: /: ${polled.response.status}\n`);
       process.exitCode = 1;
