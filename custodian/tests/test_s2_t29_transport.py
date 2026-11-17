@@ -285,7 +285,7 @@ def test_browser_agent_and_bounded_normal_seam(monkeypatch):
             return Body()
 
     monkeypatch.setattr(module.urllib.request, "build_opener", lambda *args: Opener())
-    with page_transport(None), module.metadata_limit(9):
+    with page_transport(None, browser=True), module.metadata_limit(9):
         assert module.open_https(URL).body == b"SYN-body"
     assert captured == ["Mozilla/5.0", 10]
 
@@ -376,3 +376,292 @@ def test_pin_requires_root_chain(monkeypatch):
     context = Context()
     verified_context(pin().host, pin(), context=context)
     assert not context.verify_flags & ssl.VERIFY_X509_PARTIAL_CHAIN
+
+
+@pytest.mark.parametrize("source", ["baci", "gravity", "atlas"])
+@pytest.mark.parametrize("plant", ["none", "config", "stream"])
+def test_build_public_joined_trade_bindings(
+    tmp_path, monkeypatch, capsys, source, plant
+):
+    """T18 keeps the real command closure, dispatch and source parsers."""
+    from custodian.tests.test_gravity_atlas_review import CLOCK, modules
+
+    from commands import build_public as command
+    from eii_custodian.publicdata.fetch import build
+    from eii_custodian.publicdata.fetch.transport import Response
+
+    m = modules(source)
+    entry = m.fixture.entry()
+    config = m.config.Config.from_mapping(m.fixture.configuration())
+    loader = "load_config" if source == "baci" else "load_" + source + "_config"
+    error = getattr(m.config, source.capitalize() + "Error")
+    calls = []
+
+    def load():
+        if plant == "config":
+            raise error("SYN-configuration-secret")
+        return config
+
+    def metadata(url, *, reviewed_urls=None, **kwargs):
+        assert reviewed_urls == config.reviewed_urls
+        assert url in reviewed_urls
+        calls.append(("metadata", url))
+        response = m.fixture.metadata(url)
+        return Response(url, response.body, ())
+
+    def stream(url, *, reviewed_urls):
+        assert reviewed_urls == config.reviewed_urls
+        assert url in reviewed_urls
+        calls.append(("stream", url))
+        return m.fixture.stream(url)
+
+    monkeypatch.setattr(command, "load_registry", lambda: (entry,))
+    monkeypatch.setattr(command, "utc_now", lambda: CLOCK)
+    monkeypatch.setattr(command, "load_policies", lambda: {})
+    monkeypatch.setattr(command, loader, load)
+    monkeypatch.setattr(build, loader, load)
+    monkeypatch.setattr(command, "open_https", metadata)
+    monkeypatch.setattr(command, "open_https_stream", stream)
+    # Injecting a byte seam deliberately leaves the stream/config unbound;
+    # run_build loads the invented config and must refuse before any request.
+    code = command.run(
+        tmp_path,
+        {},
+        [],
+        transport=metadata if plant == "stream" else None,
+        sleep=lambda _: None,
+    )
+    captured = capsys.readouterr()
+    output = captured.out + captured.err
+    assert "SYN-configuration-secret" not in output
+    cache = tmp_path / "data/public_cache"
+    if plant == "none":
+        assert code == 0
+        assert any(kind == "metadata" for kind, _ in calls)
+        assert any(kind == "stream" for kind, _ in calls)
+        assert list(cache.rglob("*.manifest.json"))
+        assert f"PASS {entry.key}" in output
+    else:
+        assert code == 1
+        reason = (
+            "configuration_unreadable"
+            if plant == "config"
+            else "stream_transport_missing"
+        )
+        assert reason in output
+        assert calls == []
+        assert not list(cache.rglob("*.manifest.json"))
+        assert not list(cache.rglob("index/*.json"))
+
+
+@pytest.mark.parametrize("plant", ["none", "primary", "query", "secret", "opener"])
+def test_build_public_joined_comtrade(tmp_path, monkeypatch, capsys, plant):
+    from custodian.tests.fixtures.comtrade.invented import (
+        body_for,
+        invented_entry,
+        invented_policy,
+    )
+
+    from commands import build_public as command
+    from eii_custodian.publicdata.fetch.transport import AttemptResult, OpenerFault
+
+    secret = "SYN-header-marker"
+    policy = (
+        invented_policy(reporter_key=secret) if plant == "query" else invented_policy()
+    )
+    entry = invented_entry(policy)
+    monkeypatch.setattr(command, "load_registry", lambda: (entry,))
+    monkeypatch.setattr(command, "load_policies", lambda: {})
+    monkeypatch.setattr(command, "utc_now", lambda: "2026-11-16T08:00:00Z")
+    reads, calls = [], []
+
+    class Environment(dict):
+        def __getitem__(self, name):
+            reads.append(name)
+            assert name == command.PRIMARY_ENV
+            return super().__getitem__(name)
+
+    def opener(request):
+        calls.append(request.url)
+        assert request.header_value == secret
+        if plant == "secret":
+            raise OpenerFault("SYN-error-marker " + secret)
+        return AttemptResult("ok", body_for(request))
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("non-Comtrade transport requested")
+
+    monkeypatch.setattr(command, "open_attempt", opener)
+    monkeypatch.setattr(command, "open_https", forbidden)
+    env = Environment({} if plant == "primary" else {command.PRIMARY_ENV: secret})
+    code = command.run(
+        tmp_path,
+        env,
+        [],
+        transport=forbidden if plant == "opener" else None,
+        sleep=lambda _: None,
+    )
+    captured = capsys.readouterr()
+    output = captured.out + captured.err
+    cache = tmp_path / "data/public_cache"
+    if plant == "none":
+        assert code == 0 and calls and reads
+        assert f"PASS {entry.key}" in output
+        assert list(cache.rglob("manifest.json"))
+    else:
+        assert code == 1
+        reason = {
+            "primary": "primary_absent",
+            "query": "query_key",
+            "secret": "provider_error",
+            "opener": "transport_uninjected",
+        }[plant]
+        assert reason in output
+        assert not list(cache.rglob("manifest.json"))
+        if plant != "secret":
+            assert calls == []
+        if plant == "opener":
+            assert reads == []
+    assert secret not in output and "SYN-error-marker" not in output
+    for path in cache.rglob("*"):
+        if path.is_file():
+            assert secret.encode() not in path.read_bytes()
+            assert b"SYN-error-marker" not in path.read_bytes()
+
+
+def test_build_public_joined_grid_headers(tmp_path, monkeypatch, capsys):
+    """The real HTTP opener scopes the token to Earthdata, including terms reads."""
+    from types import SimpleNamespace
+
+    from commands import build_public as command
+    from eii_custodian.publicdata.fetch import transport
+    from eii_custodian.publicdata.fetch.registry import load_registry
+
+    entry = next(
+        e for e in load_registry() if e.source_id == "ntl_blackmarble" and "/" in e.key
+    )
+    terms = "https://www.data.gov.qa/syn-terms"
+    entry = replace(entry, skip_reason="", terms_url=terms)
+    monkeypatch.setattr(command, "load_registry", lambda: (entry,))
+    monkeypatch.setattr(command, "load_policies", lambda: {})
+    sent = []
+
+    class Body:
+        def __init__(self, url):
+            self.headers = {}
+            self.url = url
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return None
+
+        def geturl(self):
+            return self.url
+
+        def read(self, size=-1):
+            return b"SYN-no-day-folder"
+
+    def open_request(request, **kwargs):
+        sent.append((request.full_url, request.get_header("Authorization")))
+        return Body(request.full_url)
+
+    monkeypatch.setattr(
+        transport.urllib.request,
+        "build_opener",
+        lambda *args: SimpleNamespace(open=open_request),
+    )
+    assert (
+        command.run(
+            tmp_path, {"EARTHDATA_API_KEY": "SYN-earthdata"}, [], sleep=lambda _: None
+        )
+        == 1
+    )
+    assert "day_missing" in capsys.readouterr().out
+    assert sent == [(entry.url, None)]
+    # A held row preserves the normal terms read while keeping the same token.
+    sent.clear()
+    monkeypatch.setattr(
+        command, "load_registry", lambda: (replace(entry, skip_reason="SYN-held"),)
+    )
+    assert (
+        command.run(
+            tmp_path / "held",
+            {"EARTHDATA_API_KEY": "SYN-earthdata"},
+            [],
+            sleep=lambda _: None,
+        )
+        == 0
+    )
+    assert sent == [(terms, None)]
+    assert not list((tmp_path / "data/public_cache" / entry.key).rglob("index/*.json"))
+    from custodian.tests.fixtures.grids.invented import night_file
+
+    body = night_file(tmp_path / "SYN-grid.h5").read_bytes()
+    entry = replace(entry, period="2024-01", tile="h23v06", terms_url="")
+    day = entry.url + "001/"
+    granule = day + "VNP46A3.A2024001.h23v06.SYN.h5"
+
+    def read_body(self, size=-1):
+        if self.url == entry.url:
+            return b'<a href="001/">SYN-day</a>'
+        if self.url == day:
+            return b'<a href="VNP46A3.A2024001.h23v06.SYN.h5">SYN-granule</a>'
+        assert self.url == granule
+        return body
+
+    monkeypatch.setattr(Body, "read", read_body)
+    monkeypatch.setattr(command, "load_registry", lambda: (entry,))
+    sent.clear()
+    assert (
+        command.run(
+            tmp_path / "complete",
+            {"EARTHDATA_API_KEY": "SYN-earthdata"},
+            [],
+            sleep=lambda _: None,
+        )
+        == 0
+    )
+    assert sent == [(entry.url, None), (day, None), (granule, "Bearer SYN-earthdata")]
+    assert list(
+        (tmp_path / "complete/data/public_cache" / entry.key / "index").glob("*.json")
+    )
+
+
+def test_build_public_joined_tender_dispatch(tmp_path, monkeypatch, capsys):
+    from custodian.tests.singles_entries import tender_entry
+    from custodian.tests.test_tenders import _chain
+
+    from commands import build_public as command
+    from eii_custodian.publicdata.fetch.transport import Response
+    from eii_custodian.publicdata.singles import tenders
+
+    chain, digest = _chain(tmp_path)
+    entry = replace(
+        tender_entry(), skip_reason="", chain_intermediate_sha256=digest, terms_url=""
+    )
+    monkeypatch.setattr(tenders, "CHAIN_PATH", chain)
+    monkeypatch.setattr(command, "load_registry", lambda: (entry,))
+    monkeypatch.setattr(command, "load_policies", lambda: {})
+    sent = []
+
+    def open_page(url, *, headers, ssl_context):
+        assert ssl_context.verify_mode == ssl.CERT_REQUIRED
+        assert ssl_context.check_hostname is True
+        sent.append(url)
+        return Response(url, b"SYN-invalid-tender-page", ())
+
+    monkeypatch.setattr(tenders, "open_https", open_page)
+    monkeypatch.setattr(
+        command,
+        "open_https",
+        lambda *args, **kwargs: pytest.fail("tender reached generic file reader"),
+    )
+    assert command.run(tmp_path, {}, [], sleep=lambda _: None) == 1
+    assert sent and "/AvailableMinistriesTenders/1" in sent[0]
+    captured = capsys.readouterr()
+    output = captured.out + captured.err
+    assert "FAIL tenders_pub" in output
+    assert "language" in output
+    assert not list((tmp_path / "data/public_cache" / entry.key).rglob("index/*.json"))

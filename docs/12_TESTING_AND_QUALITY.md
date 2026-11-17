@@ -764,13 +764,20 @@ missing receipts, closed claim meanings, Public-split use refusals and the real
 build-public page dispatch. `test_s2_t29_transport.py` plants wrong/missing and
 other-host pins, missing approval, disabled TLS, capture evidence/access failures,
 a dated connection reset and intake escape, and checks browser headers and the
-joined Earthdata/Comtrade command boundary. School integration plants retain the
+joined grid/tender and BACI/Gravity/Atlas/Comtrade command boundary, including
+missing configuration/stream/opener, lazy slot reads, query-key refusal and
+sanitized provider failures. School integration plants retain the
 typed capture refusal in the output and dated failure receipt without publishing
 capture bytes. `test_s2_t29_awards.py` exercises
 CSV/OOXML invented intake, ambiguous day-first dates, blanks, invalid-date counts,
 path/hash/profile refusals, exact and short/large distinct proof frames,
 reproducibility, mismatch/failed-fetch denominators, receipt placement,
-registration/name matching and immutable appends.
+registration/name matching and immutable appends. `test_s2_t29_fix.py` adds held
+row continuation, school-only browser scope, proof security/integrity refusals,
+blank and duplicate registrations, stale periods, null numeric cells and the
+missing-coverage zero-claim refusal. It also checks every award row's retrieval
+date, existing-identity conflicts, retained proof snapshots, sanitized page/intake
+errors and interruptions between terms, raw, parsed and proof writes.
 
 The accident and population-grid test files add bounded acquisition and explicit
 older-snapshot selection plants. Cadence tests extend the closed source assignment

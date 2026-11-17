@@ -254,9 +254,10 @@ def test_receipt_shape_and_fields_are_named(tmp_path: Path) -> None:
     digest = _digest(body)
     meta = tmp_path / KEY / f"{digest}.meta.json"
     meta.write_text("[]\n", encoding="utf-8")
+    _reseal_invented_receipt(tmp_path, digest, meta)
     with pytest.raises(GridError) as caught:
         cached_bytes(tmp_path, row)
-    assert str(caught.value) == "worldpop_qat_agesex: snapshot_hash_mismatch"
+    assert str(caught.value) == "worldpop_qat_agesex: snapshot_index_invalid"
     fields_cache = tmp_path / "fields"
     store(fields_cache, row, body)
     meta = fields_cache / KEY / f"{digest}.meta.json"
@@ -290,14 +291,24 @@ def test_hash_must_be_64_lower_hex_digits(tmp_path: Path) -> None:
     loaded = json.loads(meta.read_text(encoding="utf-8"))
     loaded["sha256"] = "ab" * 31 + "a"
     meta.write_text(json.dumps(loaded), encoding="utf-8")
+    _reseal_invented_receipt(tmp_path, digest, meta)
+    index = tmp_path / KEY / "index" / f"{digest}.json"
+    envelope = json.loads(index.read_text())
+    envelope["sha256"] = loaded["sha256"]
+    index.write_text(json.dumps(envelope))
     with pytest.raises(GridError) as caught:
         cached_bytes(tmp_path, row)
-    assert str(caught.value) == "worldpop_qat_agesex: snapshot_hash_mismatch"
+    assert str(caught.value) == "worldpop_qat_agesex: snapshot_index_invalid"
     loaded["sha256"] = "X" * 64
     meta.write_text(json.dumps(loaded), encoding="utf-8")
+    _reseal_invented_receipt(tmp_path, digest, meta)
+    index = tmp_path / KEY / "index" / f"{digest}.json"
+    envelope = json.loads(index.read_text())
+    envelope["sha256"] = loaded["sha256"]
+    index.write_text(json.dumps(envelope))
     with pytest.raises(GridError) as caught:
         cached_bytes(tmp_path, row)
-    assert str(caught.value) == "worldpop_qat_agesex: snapshot_hash_mismatch"
+    assert str(caught.value) == "worldpop_qat_agesex: snapshot_index_invalid"
 
 
 def test_each_missing_citation_is_refused(tmp_path: Path) -> None:

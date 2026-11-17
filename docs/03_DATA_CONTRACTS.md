@@ -974,7 +974,9 @@ URLs, capture tool, UTC capture date, raw SHA-256, verified issuing-intermediate
 DER hash and exact host, TLS verification enabled, and visitor access. Every URL
 must pass the normal allow-list and reviewed URL set. No browser is installed or
 operated by this adapter. Missing evidence records a dated technical failure.
-The normal browser user agent attempt precedes capture intake.
+Only the school directory's normal fetch attempt uses the browser user agent;
+terms reads, other pages and award proofs retain the default agent. The school
+attempt precedes capture intake.
 
 `awards.ingest_awards@v1` reads a hash-pinned file from the uncommitted intake folder
 `data/public_cache/intake/awards_owner_scrape/`. Its reviewed aggregate profile
@@ -987,8 +989,10 @@ and `register_selections`. Each register selection names an archived public
 register key and identity, JSON-records or CSV-records format, and the registration
 and name columns. The receipt retains those input hashes; no inline register
 rows are accepted by this manifest.
-Each row keeps `original`, `normalised_date`, `report_url` and `retrieved_utc`.
-Dates use day/month/year; blanks remain blank and invalid dates are counted.
+Each row keeps `original`, typed `parsed` cells, `normalised_date`, `report_url`
+and `retrieved_utc`. Original blanks remain blank; parsed empty numeric cells
+are null, never zero. Every row requires a valid UTC retrieval timestamp before
+proof checks or publication. Dates use day/month/year; invalid dates are counted.
 The summary records row count, dated/invalid/blank counts, date range and unknown
 completeness. The original scrape date is distinct from the intake UTC date.
 
@@ -998,12 +1002,22 @@ counts, match rate, incomplete status and per-link result. Above thirty links th
 seed selects exactly thirty without replacement; otherwise all links are read.
 The rate is matching selected links divided by all selected links, including
 failed fetches; an empty frame has null rate. Short frames and failed fetches
-are incomplete. There is no passing threshold. A duplicate proof link must agree
+are incomplete. Only transport or bounded-read failures count as failed fetches;
+blocked or unreviewed URLs/redirects, pin and TLS refusals, and archive integrity
+failures refuse the intake with their closed reason. There is no passing threshold. A duplicate proof link must agree
 with every row using it. The registration match report retains every original
 row and its match/refusal reason. Registration equality precedes exact company
 name equality after the closed normalization in document 04, section 2.4.
-Awarded values never become turnover or sales, and identifiers stay in the
-custodian matching boundary. Release consumers remain separate tasks.
+Whitespace-only registrations never match, and duplicate register entries remain
+ambiguous. Awarded values never become turnover or sales, and identifiers stay in
+the custodian matching boundary. Release consumers remain separate tasks.
+
+Page terms, raw bytes and parsed tables, and intake proofs, raw bytes and parsed
+rows, are staged together within the cache. A failed write or final validation
+publishes none of that attempt's source tree and preserves its previous tree.
+The single-writer build validates the complete staged archive before replacing
+the source directory; replacement may briefly make an existing source unavailable.
+Dated school access-failure receipts remain separate from successful page output.
 
 ## 8. The manifest and the loader
 

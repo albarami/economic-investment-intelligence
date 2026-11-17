@@ -27,6 +27,7 @@ from .certificate_pins import (
     validate_pin,
 )
 from .kinds import read_bounded, read_terms_page
+from .page_archive import staged_source
 from .receipts import archive_auxiliary, sha256_hex, sidecar_for
 from .registry import Entry, read_yaml
 from .snapshots import (
@@ -296,7 +297,7 @@ def fetch_page(
             pin = load_pin(cache, entry.source_id, review.get("pin"))
         validate_pin(host_of(entry.url), pin)
     evidence: dict[str, object] = {}
-    with page_transport(pin):
+    with page_transport(pin, browser=entry.source_id == "schools_private_directory"):
         response, failure = read_bounded(transport, sleep, entry.url)
     if failure is not None or response is None:
         if entry.source_id != "schools_private_directory":
@@ -346,28 +347,36 @@ def fetch_page(
         method=METHOD,
         capture=evidence,
     )
-    if entry.terms_url:
-        with page_transport(pin):
-            terms = read_terms_page(entry, transport, sleep)
-        side["terms_sha256"] = terms.sha256 or None
-        side["terms_unread"] = terms.failure.check if terms.failure else ""
-        if terms.failure is None:
-            archive_auxiliary(
-                entry, cache / entry.key, "terms", terms.body, stamp, entry.terms_url
-            )
-    raw = publish_snapshot(cache / entry.key / "raw", "html", response.body, side)
-    raw_identity = raw.sha256
-    raw = read_snapshot(cache / entry.key / "raw", raw_identity)
-    payload = parse_page_snapshot(raw, entry, review)
-    parsed = json.dumps(payload, sort_keys=True).encode()
-    parsed_side = dict(
-        side,
-        sha256=sha256_hex(parsed),
-        bytes=len(parsed),
-        page_sha256=raw.sha256,
-        raw_identity=raw_identity,
-    )
-    return publish_snapshot(cache / entry.key, "json", parsed, parsed_side)
+    destination = cache
+    with staged_source(cache, entry.key) as cache:
+        if entry.terms_url:
+            with page_transport(pin):
+                terms = read_terms_page(entry, transport, sleep)
+            side["terms_sha256"] = terms.sha256 or None
+            side["terms_unread"] = terms.failure.check if terms.failure else ""
+            if terms.failure is None:
+                archive_auxiliary(
+                    entry,
+                    cache / entry.key,
+                    "terms",
+                    terms.body,
+                    stamp,
+                    entry.terms_url,
+                )
+        raw = publish_snapshot(cache / entry.key / "raw", "html", response.body, side)
+        raw_identity = raw.sha256
+        raw = read_snapshot(cache / entry.key / "raw", raw_identity)
+        payload = parse_page_snapshot(raw, entry, review)
+        parsed = json.dumps(payload, sort_keys=True).encode()
+        parsed_side = dict(
+            side,
+            sha256=sha256_hex(parsed),
+            bytes=len(parsed),
+            page_sha256=raw.sha256,
+            raw_identity=raw_identity,
+        )
+        result = publish_snapshot(cache / entry.key, "json", parsed, parsed_side)
+    return read_snapshot(destination / entry.key, result.sha256)
 
 
 def parse_page_snapshot(

@@ -64,15 +64,15 @@ _BROWSER: ContextVar[bool] = ContextVar("page_browser_agent", default=False)
 
 
 @contextmanager
-def page_transport(pin: Pin | None) -> Iterator[None]:
+def page_transport(pin: Pin | None, *, browser: bool = False) -> Iterator[None]:
     """Scope the browser user agent and optional exact-host pin to one fetch."""
     token = _CURRENT.set(pin)
-    browser = _BROWSER.set(True)
+    browser_token = _BROWSER.set(browser)
     try:
         yield
     finally:
         _CURRENT.reset(token)
-        _BROWSER.reset(browser)
+        _BROWSER.reset(browser_token)
 
 
 def current_pin() -> Pin | None:

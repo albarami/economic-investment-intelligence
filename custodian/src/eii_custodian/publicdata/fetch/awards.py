@@ -26,6 +26,7 @@ from .award_checks import (
     validate_check_receipt,
 )
 from .certificate_pins import intake_file, load_pin, page_transport
+from .page_archive import staged_source
 from .page_records import (
     _value,
     cache_directory,
@@ -35,7 +36,7 @@ from .page_records import (
 )
 from .receipts import sha256_hex, sidecar_for
 from .registry import Entry
-from .snapshots import Snapshot, publish_snapshot, read_snapshot, utc
+from .snapshots import Snapshot, SnapshotError, publish_snapshot, read_snapshot, utc
 from .transport import Transport
 
 SOURCE = "awards_owner_scrape"
@@ -200,8 +201,10 @@ def ingest_awards(
             cells += [""] * (len(raw[0]) - len(cells))
         if len(cells) != len(raw[0]):
             raise AwardError("schema_missing")
-        for cell, kind in zip(cells, schema["types"], strict=True):
-            _value(cell, kind)
+        values = {
+            column: _value(cell, kind)
+            for column, cell, kind in zip(raw[0], cells, schema["types"], strict=True)
+        }
         original = dict(zip(raw[0], cells, strict=True))
         value = original[schema["date"]].strip()
         parsed: str | None = None
@@ -216,6 +219,7 @@ def ingest_awards(
         rows.append(
             {
                 "original": original,
+                "parsed": values,
                 "normalised_date": parsed,
                 "report_url": original["report_url"],
                 "retrieved_utc": stamp,
@@ -244,9 +248,39 @@ def publish_awards(
     registers: list[dict[str, str]],
     registration_inputs: list[dict[str, object]] | None = None,
 ) -> Snapshot:
+    """Stage a complete standalone intake before publishing either archive."""
+    cache_directory(cache, entry)
+    with staged_source(cache, entry.key) as stage:
+        result = _publish_awards(
+            entry,
+            stage,
+            batch,
+            profile,
+            stamp,
+            seed,
+            proof_reader,
+            registers,
+            registration_inputs,
+        )
+    return read_snapshot(cache / entry.key, result.sha256)
+
+
+def _publish_awards(
+    entry: Entry,
+    cache: Path,
+    batch: AwardBatch,
+    profile: Mapping[str, Any],
+    stamp: str,
+    seed: int,
+    proof_reader: Callable[[str], Mapping[str, str]],
+    registers: list[dict[str, str]],
+    registration_inputs: list[dict[str, object]] | None = None,
+) -> Snapshot:
     """Append one intake snapshot with the sample check on its registry receipt."""
     if entry.source_id != SOURCE or entry.commit_allowed or not entry.licence_basis:
         raise AwardError("receipt_missing")
+    for row in batch.rows:
+        utc(row.get("retrieved_utc"))
     cache_directory(cache, entry)
     validate_claim(SOURCE, "awarded_value")
     originals = [row["original"] for row in batch.rows]
@@ -286,12 +320,13 @@ def publish_awards(
         },
         sort_keys=True,
     ).encode()
-    return publish_snapshot(
+    result = publish_snapshot(
         cache / entry.key,
         "json",
         body,
         dict(side, sha256=sha256_hex(body), bytes=len(body)),
     )
+    return result
 
 
 def fetch_awards(
@@ -338,53 +373,65 @@ def fetch_awards(
         else None
     )
 
-    def proof_reader(url: str) -> Mapping[str, str]:
-        if url not in declaration["reviewed_urls"]:
-            raise AwardError("blocked_host")
-        with page_transport(pin):
-            response, failure = read_bounded(transport, sleep, url)
-        if failure or response is None:
-            raise AwardError("proof_fetch_failed")
-        if any(
-            address not in declaration["reviewed_urls"]
-            for address in (*response.hops, response.final_url)
-        ):
-            raise AwardError("blocked_host")
-        _obstacle(response.body)
-        proof_entry = replace(
-            entry, columns=tuple(tuple(pair) for pair in declaration["columns"])
-        )
-        rows = parse_body(response.body, proof_entry, declaration)
-        if len(rows) != 1:
-            raise AwardError("schema_missing")
-        side = sidecar_for(
-            entry,
-            digest=sha256_hex(response.body),
-            nbytes=len(response.body),
-            fetch_url=response.final_url,
-            fetch_host=entry.fetch_host,
-            retrieved_utc=stamp,
-            publisher=entry.publisher,
-            source_modified="",
-            row_count=1,
-            terms_sha256="",
-        )
-        publish_snapshot(cache / entry.key / "proofs", "html", response.body, side)
-        return {
-            key: "" if value is None else str(value) for key, value in rows[0].items()
-        }
+    destination = cache
+    with staged_source(cache, entry.key) as cache:
 
-    return publish_awards(
-        entry,
-        cache,
-        batch,
-        profile,
-        stamp,
-        seed,
-        proof_reader,
-        registers,
-        registration_inputs,
-    )
+        def proof_reader(url: str) -> Mapping[str, str]:
+            if url not in declaration["reviewed_urls"]:
+                raise AwardError("blocked_host")
+            with page_transport(pin):
+                response, failure = read_bounded(transport, sleep, url)
+            if failure is not None and failure.check == "blocked_host":
+                raise AwardError("blocked_host")
+            if failure or response is None:
+                raise AwardError("proof_fetch_failed")
+            if any(
+                address not in declaration["reviewed_urls"]
+                for address in (*response.hops, response.final_url)
+            ):
+                raise AwardError("blocked_host")
+            _obstacle(response.body)
+            proof_entry = replace(
+                entry, columns=tuple(tuple(pair) for pair in declaration["columns"])
+            )
+            rows = parse_body(response.body, proof_entry, declaration)
+            if len(rows) != 1:
+                raise AwardError("schema_missing")
+            side = sidecar_for(
+                entry,
+                digest=sha256_hex(response.body),
+                nbytes=len(response.body),
+                fetch_url=response.final_url,
+                fetch_host=entry.fetch_host,
+                retrieved_utc=stamp,
+                publisher=entry.publisher,
+                source_modified="",
+                row_count=1,
+                terms_sha256="",
+            )
+            try:
+                publish_snapshot(
+                    cache / entry.key / "proofs", "html", response.body, side
+                )
+            except OSError:
+                raise SnapshotError("snapshot_write_failed") from None
+            return {
+                key: "" if value is None else str(value)
+                for key, value in rows[0].items()
+            }
+
+        result = _publish_awards(
+            entry,
+            cache,
+            batch,
+            profile,
+            stamp,
+            seed,
+            proof_reader,
+            registers,
+            registration_inputs,
+        )
+    return read_snapshot(destination / entry.key, result.sha256)
 
 
 def read_registers(

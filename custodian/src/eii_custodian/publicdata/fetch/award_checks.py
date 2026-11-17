@@ -9,6 +9,8 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from .allowlist import approve
+from .certificate_pins import PinError
+from .snapshots import SnapshotError
 
 
 class AwardError(ValueError):
@@ -69,7 +71,15 @@ def check_awards(
     for url in selected:
         try:
             proof = proof_reader(url)
-        except (OSError, ValueError, RuntimeError):
+        except (PinError, SnapshotError):
+            raise
+        except AwardError as exc:
+            if str(exc) != "proof_fetch_failed":
+                raise
+            failed += 1
+            results.append({"report_url": url, "result": "fetch_failed"})
+            continue
+        except OSError:
             failed += 1
             results.append({"report_url": url, "result": "fetch_failed"})
             continue
@@ -155,7 +165,7 @@ def match_register(
     by_registration: dict[str, list[str]] = {}
     for company in registers:
         registration = company.get("registration", "")
-        if registration:
+        if registration.strip():
             by_registration.setdefault(registration, []).append(company.get("name", ""))
     report: list[dict[str, object]] = []
     matched = 0
@@ -164,7 +174,7 @@ def match_register(
         names = by_registration.get(registration, [])
         name = normalise_name(row.get(profile["company"], ""))
         reason = "registration_unmatched"
-        if names:
+        if registration.strip() and names:
             reason = "registration_ambiguous" if len(names) != 1 else "name_mismatch"
             if len(names) == 1 and name.strip() and name == normalise_name(names[0]):
                 reason = "matched"

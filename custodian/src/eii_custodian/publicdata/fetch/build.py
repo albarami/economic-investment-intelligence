@@ -370,45 +370,6 @@ def run_build(
     fetched_entries: list[Entry] = []
     told_absent = False
     for entry in entries:
-        if entry.kind in {"public_page", "awards_intake"}:
-            from .award_checks import AwardError
-            from .awards import fetch_awards
-            from .certificate_pins import PinError
-            from .page_records import PageError, fetch_page
-
-            try:
-                page = (
-                    fetch_awards(entry, transport, cache, clock, sleep)
-                    if entry.kind == "awards_intake"
-                    else fetch_page(entry, transport, cache, clock, sleep)
-                )
-                manifests[entry.key] = page.sha256
-                lines.append(pass_line(entry.key, page.sha256, entry.fetch_host))
-            except (PageError, AwardError, PinError) as exc:
-                reason = str(exc)
-                failure = FetchFailure(
-                    1, entry.source_id, "", reason, "verified snapshot", "NO_DATA"
-                )
-                lines.append(
-                    fail_line(entry.key, "", reason, "verified snapshot", "NO_DATA")
-                )
-                break
-            except (OSError, ValueError, KeyError, TypeError):
-                failure = FetchFailure(
-                    1,
-                    entry.source_id,
-                    "",
-                    "page_validation_failed",
-                    "verified snapshot",
-                    "NO_DATA",
-                )
-                lines.append(
-                    fail_line(
-                        entry.key, "", failure.check, "verified snapshot", "NO_DATA"
-                    )
-                )
-                break
-            continue
         if not token and _token_file(entry):
             if not told_absent:
                 lines.append(
@@ -614,6 +575,46 @@ def run_build(
                     entry, transport, sleep, clock, lines, terms, previous, cache
                 )
             lines.append(skip_line(entry.key, entry.skip_reason))
+            continue
+        if entry.kind in {"public_page", "awards_intake"}:
+            from .award_checks import AwardError
+            from .awards import fetch_awards
+            from .certificate_pins import PinError
+            from .page_records import PageError, fetch_page
+            from .snapshots import SnapshotError
+
+            try:
+                page = (
+                    fetch_awards(entry, transport, cache, clock, sleep)
+                    if entry.kind == "awards_intake"
+                    else fetch_page(entry, transport, cache, clock, sleep)
+                )
+                manifests[entry.key] = page.sha256
+                lines.append(pass_line(entry.key, page.sha256, entry.fetch_host))
+            except (PageError, AwardError, PinError, SnapshotError) as exc:
+                reason = str(exc)
+                failure = FetchFailure(
+                    1, entry.source_id, "", reason, "verified snapshot", "NO_DATA"
+                )
+                lines.append(
+                    fail_line(entry.key, "", reason, "verified snapshot", "NO_DATA")
+                )
+                break
+            except (OSError, ValueError, KeyError, TypeError):
+                failure = FetchFailure(
+                    1,
+                    entry.source_id,
+                    "",
+                    "page_validation_failed",
+                    "verified snapshot",
+                    "NO_DATA",
+                )
+                lines.append(
+                    fail_line(
+                        entry.key, "", failure.check, "verified snapshot", "NO_DATA"
+                    )
+                )
+                break
             continue
         if entry.kind == "citation_only":
             _write_citation(entry, cache, clock())

@@ -270,7 +270,7 @@ def test_awards_normal_command_intake(tmp_path, monkeypatch):
     schema = profile()
     columns = [[c, "string"] for c in schema["columns"]]
     link = row()["report_url"]
-    entry = replace(entry, url=link, fetch_host="www.data.gov.qa")
+    entry = replace(entry, url=link, fetch_host="www.data.gov.qa", skip_reason="")
     declaration = {
         "url": link,
         "reviewed_urls": [link],

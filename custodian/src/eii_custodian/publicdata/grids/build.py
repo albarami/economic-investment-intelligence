@@ -95,13 +95,7 @@ def cached_bytes(cache: Path, entry: Entry) -> tuple[bytes, dict[str, Any]]:
             raise GridError(f"{entry.source_id}: missing receipt {name}")
     if loaded.get("switched_off") is not False:
         raise GridError(f"{entry.source_id}: source switched off")
-    digest = loaded["sha256"]
-    if (
-        not isinstance(digest, str)
-        or len(digest) != 64
-        or any(c not in "0123456789abcdef" for c in digest)
-    ):
-        raise GridError(f"{entry.source_id}: malformed hash")
+    # read_snapshot validates the index digest and equality with the receipt.
     return body, loaded
 
 

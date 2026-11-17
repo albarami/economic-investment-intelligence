@@ -548,7 +548,9 @@ The normal registry now declares the eight source IDs of section 2.4, with
 `commit_allowed: false`, owner-decision basis, no invented count bounds or columns,
 and `page_evidence_pending`. Their reviewed declarations are in
 `custodian/publicdata/review/s2_t29_sources.yaml`. Loading a pending declaration
-refuses before a request. No new host is admitted without the lead's review.
+refuses before a request. Held rows first emit their normal skip line and allow
+the build to continue; clearing a skip without supplying evidence still refuses.
+No new host is admitted without the lead's review.
 Terms remain “terms to be read”; the row date records this declaration check,
 not a reading of a publisher page. S2-T21 part B remains an independent hold.
 
