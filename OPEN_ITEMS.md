@@ -3407,3 +3407,29 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).
 - Additional open questions and assumptions recorded in documents 01 to 16 and the decision records indexed in [docs/README.md](docs/README.md).
+
+### OI-301 — PUB-67 missing selected-input calculations
+
+- ID: OI-301
+- Status: OPEN; reserved by lead ruling L-806; closure requires the lead's live run 3.
+- Scope: S2-T03/S2-T04 integration, the structural groups and the Al Daayen
+  municipality/code intersection of document 04, section 10, PUB-67.
+- LR3 implements the existing bucket calculator, reviewed municipality-name
+  resolution with the frame's actual key, selected CSV support through the shared
+  receipt helper, and the typed supporting block specified in document 03,
+  **PUB-67 supporting provenance**. PO-LR3-1 is held here: another-maker
+  provenance review of that block is pending with the code review, before merge.
+- Fixture corruption and check evidence are in the appended LR3 PROGRESS.md row.
+  The lead's selected-cache probe and live run 3 have not been run by this worker.
+
+### OI-302 — Places build date missing at the frame seam
+
+- ID: OI-302
+- Status: OPEN; reserved by lead ruling L-806; closure requires the lead's live run 3.
+- Scope: S2-T06 verification date forwarding, under L-808 item 3 and L-810 item 1.
+- LR3 forwards one validated build-start UTC date to the real loader. Header-only
+  verification files stay empty; refusal and showcase/flagship gates remain.
+  PO-LR3-2 is the named adjacent-midnight integration test and planted previous
+  date, with fixture evidence in the appended LR3 PROGRESS.md row.
+- Another-maker code review and the lead's live run 3 are pending. This does not
+  close or change OI-256, the separate places Arabic-name reader gap.

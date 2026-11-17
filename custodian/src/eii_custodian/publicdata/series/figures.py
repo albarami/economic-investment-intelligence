@@ -25,7 +25,13 @@ from eii_core.calc.public_series import (
     rounded,
     unit_value,
 )
-from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+from eii_custodian.publicdata.review.activity import (
+    IsicClass,
+    SpineError,
+    class_bucket_counts,
+    parse_feed_rows,
+)
 from eii_custodian.publicdata.series.baskets import (
     reviewed_inputs,
     validate_source_review,
@@ -52,6 +58,7 @@ from eii_custodian.publicdata.series.reconcile import (
     emit_fact,
     wage_evidence,
 )
+from eii_custodian.publicdata.series.support import SUPPORT_KEYS, load_support
 
 if TYPE_CHECKING:
     from eii_custodian.publicdata.fetch.build import FetchFailure
@@ -291,6 +298,10 @@ def contract_rows(
 
 def compute_checks(
     data: Mapping[str, list[dict[str, object]]],
+    *,
+    isic_classes: Sequence[IsicClass] = (),
+    municipalities: Sequence[Municipality] = (),
+    activity_entry: Entry | None = None,
 ) -> dict[str, dict[str, str]]:
     """Only computable checks; no anchor is ever copied into an observed result."""
     checks: dict[str, dict[str, str]] = {}
@@ -417,18 +428,68 @@ def compute_checks(
         checks["PUB-65"] = check
     if "lic_active" in data:
         active = data["lic_active"]
+        if not isic_classes:
+            raise ValueError("PUB-67 ISIC classes required")
+        entry = activity_entry or next(
+            e for e in load_registry() if e.key == "lic_active"
+        )
+        try:
+            parsed = parse_feed_rows(active, entry)
+            if parsed.left_out:
+                raise ValueError("PUB-67 unparsed activity codes")
+            buckets = class_bucket_counts(parsed.rows, isic_classes)
+        except SpineError as exc:
+            raise ValueError(str(exc)) from exc
+        from eii_custodian.publicdata.frame.crosswalk import read_csv
+
+        review = (
+            Path(__file__).resolve().parents[4]
+            / "publicdata/review/municipality_names.csv"
+        )
+        target_names = {
+            row["name"] for row in read_csv(review) if row["municipality_code"] == "5"
+        }
+        targets = [item.code for item in municipalities if item.name_ar in target_names]
+        if len(targets) != 1:
+            raise ValueError("PUB-67 target municipality absent or ambiguous")
+        converted = contract_rows("lic_active", active, municipalities=municipalities)
+        if any(row["municipality_code"] is None for row in converted):
+            raise ValueError("PUB-67 unresolved source municipality")
+        active_total = sum(int(str(row["dd_lrkhs_lnsht"])) for row in active)
+        if (
+            buckets.total_active != active_total
+            or sum(
+                (
+                    buckets.seven_valid_prefix,
+                    buckets.seven_invalid_prefix,
+                    buckets.six_legacy,
+                    buckets.other_length,
+                )
+            )
+            != active_total
+        ):
+            raise ValueError("PUB-67 bucket reconciliation")
         checks["PUB-67"] = {
             "rows": str(len(active)),
-            "sum_count": str(sum((int(str(r["dd_lrkhs_lnsht"])) for r in active), 0)),
-            "distinct_codes": str(len({r["rmz_lnsht_ltjry"] for r in active})),
+            "sum_count": str(active_total),
+            "distinct_codes": str(len(parsed.rows)),
+            "isic_prefix": str(buckets.seven_valid_prefix),
+            "other_seven": str(buckets.seven_invalid_prefix),
+            "legacy_six": str(buckets.six_legacy),
+            "other_lengths": str(buckets.other_length),
+            "al_daayen_5610101": str(
+                sum(
+                    int(str(row["active_count"]))
+                    for row in converted
+                    if row["municipality_code"] == targets[0]
+                    and row["activity_code"] == "5610101"
+                )
+            ),
             "national_5610101": str(
                 sum(
-                    (
-                        int(str(r["dd_lrkhs_lnsht"]))
-                        for r in active
-                        if r["rmz_lnsht_ltjry"] == "5610101"
-                    ),
-                    0,
+                    int(str(row["active_count"]))
+                    for row in converted
+                    if row["activity_code"] == "5610101"
                 )
             ),
         }
@@ -568,6 +629,7 @@ def build_series(
     resolutions: Sequence[Resolution] = (),
     basket_review: Path | None = None,
     municipalities: Sequence[Municipality] = (),
+    supporting_selected: Mapping[str, str] | None = None,
 ) -> dict[str, object]:
     """Build selected versions only, clearing prior owned outputs before any refusal."""
     from eii_custodian.publicdata.stage import run_stage
@@ -726,21 +788,48 @@ def build_series(
         if set(sources) & selected.keys()
     )
     checks: dict[str, dict[str, str]] = {}
+    support = None
     groups = [{source: data[source]} for source in data if source not in R1_SOURCES]
     if R1_SOURCES <= data.keys():
         groups.append({source: data[source] for source in R1_SOURCES})
     for group in groups:
         source = next(iter(group))
         try:
-            checks.update(compute_checks(group))
-        except (ValueError, KeyError) as exc:
+            if source == "lic_active":
+                if not municipalities:
+                    continue  # The existing frame blocker already prevents release.
+                classes, support = load_support(
+                    cache, entries, supporting_selected or {}, municipalities
+                )
+                checks.update(
+                    compute_checks(
+                        group,
+                        isic_classes=classes,
+                        municipalities=municipalities,
+                        activity_entry=by_source[source],
+                    )
+                )
+            else:
+                checks.update(compute_checks(group))
+        except (OSError, ValueError, KeyError, SpineError) as exc:
             blocked[source] = (*blocked.get(source, ()), "regression: " + str(exc))
     if "PUB-65" in checks:
         checks["PUB-65"]["basket_excludes_noodles"] = str(basket_checked).lower()
     for figure, values in checks.items():
         envelope = {**_envelope(DEPENDENCIES[figure], receipts), "values": values}
+        if figure == "PUB-67":
+            envelope["supporting_provenance"] = support
         validate_figure(envelope)
         _write(root / "regression" / f"{figure}.json", envelope)
+    if support is not None and "PUB-67" in checks:
+        table = "pub_licence_active"
+        envelope = {
+            **_envelope(table_sources[table], receipts),
+            "rows": tables[table],
+            "row_sources": row_sources[table],
+            "supporting_provenance": support,
+        }
+        _write(root / "internal" / f"{table}.json", envelope)
     stage = run_stage(cache, required=required, evidence=True)
     if not stage.mismatch:
         states = {source: entry.reconciliation for source, entry in by_source.items()}
@@ -750,6 +839,8 @@ def build_series(
                 "rows": tables[table],
                 "row_sources": row_sources[table],
             }
+            if table == "pub_licence_active":
+                envelope["supporting_provenance"] = support
             if any(source in blocked for source in table_sources[table]):
                 continue
             if (
@@ -814,7 +905,27 @@ def finish_build(
                 exc.reason,
             )
     try:
-        result = build_series(cache, owned, selected, municipalities=municipalities)
+        supporting_selected = {}
+        if "lic_active" in selected:
+            for key in SUPPORT_KEYS:
+                if len([entry for entry in entries if entry.key == key]) != 1:
+                    raise ValueError("supporting registry identity required")
+                prefix = "PASS " + key + " sha256="
+                hashes = [
+                    line[len(prefix) :].split(" ", 1)[0]
+                    for line in lines
+                    if line.startswith(prefix)
+                ]
+                if len(hashes) != 1:
+                    raise ValueError("one supporting selected hash required")
+                supporting_selected[key] = hashes[0]
+        result = build_series(
+            cache,
+            entries,
+            selected,
+            municipalities=municipalities,
+            supporting_selected=supporting_selected,
+        )
     except (OSError, ValueError, KeyError) as exc:
         lines.append("FAIL series selected input refused")
         return FetchFailure(

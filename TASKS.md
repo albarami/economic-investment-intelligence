@@ -361,6 +361,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S2-T01.
 - Requirements: PUB-04, PUB-08, PUB-10, PUB-11, PUB-19, PLN-25, PUB-86, PUB-87, PUB-88, DAT-142, DAT-143, TST-210, TST-211.
 - Delivery: hard; personas Data; status done (pull request 52, merged 2026-11-15).
+S2-T03 correction OI-301: the LR3 change computes the missing PUB-67 groups and
+municipality value with selected supporting lineage (document 03, **PUB-67
+supporting provenance**). Fixture checks are recorded in PROGRESS.md; closure
+awaits the lead's selected-cache probe, live run 3 and independent code review.
+
 ### S2-T04 — Activity spine and graph tables
 - Goal: Build the reviewed activity spine, not-mappable bucket, graph tables and human review queue.
 - Acceptance criteria: [ ] largest 200 codes, all food-service codes and all playbook codes are reviewed; [ ] every admitted mapping has human sign-off; [ ] the remainder is flagged; [x] graph edges obey the Public-or-lineage rule.
@@ -382,6 +387,11 @@ slice S0 begins with the environment, repository structure and dependencies.
 - Depends: S2-T01, S2-T02.
 - Requirements: PUB-47, PUB-49, PUB-50, PUB-57, PUB-78, PUB-91, PUB-92, PUB-93.
 - Delivery: hard; personas Data; status part A done (pull request 62, merged 2026-11-16); part B is owed. All eight criteria stay unticked: the live steps (real fetches with receipts, the reviewed attribution and category rows, the real places build, the reviewed keys of the eighth criterion, the real area-producer run, the hand checks and the recorded check on the real candidates) are part B, owed before task S2-T08 and before any criterion is ticked (open items of this pull request).
+S2-T06 correction OI-302: the LR3 change forwards one build-start UTC date to
+the real verification loader, including the named midnight plant. Fixture
+checks are recorded in PROGRESS.md; closure awaits the lead's live run 3 and
+independent code review. The separate Arabic-name reader gap remains OI-256.
+
 ### S2-T07 — Calculation layer and method regressions
 - Goal: Implement deterministic Public calculations in `eii_core.calc` with method-card regression tests.
 - Acceptance criteria: [x] no calculation reads files or databases; [ ] each implemented worked example has arithmetic and data tests; [x] comparisons return facts rather than prose.

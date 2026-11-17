@@ -444,7 +444,11 @@ def test_fetch_build_runs_selected_cache_checks(tmp_path: Path, monkeypatch) -> 
     monkeypatch.setattr(build, "_fetch_row", fetched)
     monkeypatch.setattr("eii_custodian.publicdata.series.figures.finish_build", wrapped)
     result = build.run_build(
-        [entry], lambda url: None, tmp_path, lambda: "", lambda n: None
+        [entry],
+        lambda url: None,
+        tmp_path,
+        lambda: "2026-11-14T00:00:00Z",
+        lambda n: None,
     )
     assert observed == [(entry,)]
     assert result.failure is not None
@@ -625,6 +629,10 @@ def test_reconciliations_compute_while_all_display_is_blocked(tmp_path: Path) ->
     fixtures["cus_imp_2019"][0]["hs8"] = fixtures["cus_imp_2019"][0]["hs8"].replace(
         ".", ""
     )
+    from custodian.tests.test_pub67 import FRAME, active_rows, selected_fixture
+
+    support_entries, support_hashes = selected_fixture(tmp_path)
+    fixtures["lic_active"] = active_rows()
     # Decimal JSON fixture numbers are decoded exactly by selected_source.
     entries, selected = [], {}
     for source, rows in fixtures.items():
@@ -641,7 +649,17 @@ def test_reconciliations_compute_while_all_display_is_blocked(tmp_path: Path) ->
             }
         )
     )
-    result = build_series(tmp_path, entries, selected, basket_review=review)
+    entries.extend(support_entries[1:])
+    result = build_series(
+        tmp_path,
+        entries,
+        selected,
+        basket_review=review,
+        municipalities=FRAME,
+        supporting_selected={
+            k: v for k, v in support_hashes.items() if k != "lic_active"
+        },
+    )
     evidence = json.loads(
         (tmp_path / "series/internal/reconciliations.json").read_text()
     )
@@ -1264,7 +1282,8 @@ def test_r3_licence_periods_and_reports(tmp_path):
     assert result["coverage"]["lic_active.municipality_exact_match"] == [
         "بلدية غير مطابقة"
     ]
-    assert result["blocked"] == {}
+    assert "lic_active" in result["blocked"]
+    assert "PUB-67" not in result["checks"]
 
 
 def test_r3_reference_review_remains_explicit():
@@ -1345,6 +1364,9 @@ def test_r3_remaining_numeric_checks_do_not_claim_basket_or_spine_review():
         (Path(__file__).parent / "fixtures/series/confirmed_shapes.json").read_text(),
         parse_float=Decimal,
     )
+    from custodian.tests.test_pub67 import FRAME, classes
+
+    fixtures["lic_active"][0].update(lbldy=FRAME[0].name_ar, rmz_lnsht_ltjry="561010")
     row = fixtures["cus_imp_2025"][0]
     checks = compute_checks(
         {
@@ -1376,7 +1398,9 @@ def test_r3_remaining_numeric_checks_do_not_claim_basket_or_spine_review():
             ],
             "lic_active": fixtures["lic_active"],
             "lic_issued": fixtures["lic_issued"],
-        }
+        },
+        isic_classes=classes(),
+        municipalities=FRAME,
     )
     assert checks["PUB-65"] == {
         "italy_2dp": "6.00",
@@ -1388,6 +1412,11 @@ def test_r3_remaining_numeric_checks_do_not_claim_basket_or_spine_review():
         "sum_count": "3",
         "distinct_codes": "1",
         "national_5610101": "0",
+        "isic_prefix": "0",
+        "other_seven": "0",
+        "legacy_six": "3",
+        "other_lengths": "0",
+        "al_daayen_5610101": "0",
     }
     assert checks["PUB-69"] == {
         "sum_count": "3",

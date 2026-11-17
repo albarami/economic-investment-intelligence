@@ -15,14 +15,18 @@ from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry
 
 
-def selected_source(
+def selected_body(
     cache: Path, entry: Entry, digest: str
-) -> tuple[list[dict[str, object]], dict[str, object]]:
+) -> tuple[bytes, dict[str, object]]:
     """No latest-file search and no network; bind the body to its exact receipt."""
+    if re.fullmatch(r"[a-f0-9]{64}", digest) is None:
+        raise ValueError("invalid selected hash")
     body = (cache / entry.key / f"{digest}.{entry.extension}").read_bytes()
     if sha256_hex(body) != digest:
         raise ValueError("selected body hash mismatch")
     receipt = json.loads((cache / entry.key / f"{digest}.meta.json").read_text())
+    if not isinstance(receipt, dict):
+        raise ValueError("selected receipt mismatch")
     expected = {
         "sha256": digest,
         "key": entry.key,
@@ -38,6 +42,14 @@ def selected_source(
     for key in ("publisher", "retrieved_utc", "licence_id", "fetch_url"):
         if not isinstance(receipt.get(key), str) or not receipt[key].strip():
             raise ValueError("incomplete receipt")
+    return body, receipt
+
+
+def selected_source(
+    cache: Path, entry: Entry, digest: str
+) -> tuple[list[dict[str, object]], dict[str, object]]:
+    """Decode JSON rows after the shared selected body/receipt checks."""
+    body, receipt = selected_body(cache, entry, digest)
     rows = json.loads(body, parse_float=Decimal)
     if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
         raise ValueError("source must contain rows")

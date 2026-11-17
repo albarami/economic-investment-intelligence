@@ -6,6 +6,7 @@ Tests and real builds use build_frame and the same raw-source assembler.
 import json
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
+from datetime import date
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -135,7 +136,12 @@ def inspect_cache(
 
 
 def build_frame(
-    cache: Path, registry: tuple[Entry, ...], review: Path, output: Path | None = None
+    cache: Path,
+    registry: tuple[Entry, ...],
+    review: Path,
+    output: Path | None = None,
+    *,
+    build_date: date | None = None,
 ) -> FrameResult:
     """Build from confirmed raw shapes, with optional generated review output."""
     from .live import build_live_frame
@@ -151,4 +157,6 @@ def build_frame(
         report = [line for line in result.report if "unlisted zone numbers" not in line]
         propose_reviews(review, output, set(), result.inventory, report)
         return FrameResult(result.tables, report, result.sources, result.inventory)
-    return build_live_frame(cache, registry, review, output, result)
+    return build_live_frame(
+        cache, registry, review, output, result, build_date=build_date
+    )

@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from collections.abc import Mapping, Sequence
 from contextvars import ContextVar
+from datetime import date
 from pathlib import Path
 
 import yaml
@@ -44,7 +45,11 @@ _READER_ERRORS = (yaml.YAMLError, OSError, UnicodeError, ValueError, TypeError)
 
 
 def frame_when_ready(
-    cache: Path, entries: Sequence[Entry], lines: list[str] | None = None
+    cache: Path,
+    entries: Sequence[Entry],
+    lines: list[str] | None = None,
+    *,
+    build_date: date | None = None,
 ) -> None:
     """Build the frame only when its boundary source is already in the cache."""
     from eii_custodian.publicdata.frame.municipality_output import (
@@ -75,12 +80,16 @@ def frame_when_ready(
     token = _BUILD_LINES.set(log)
     try:
         try:
-            result = build_frame(cache, tuple(entries), review, None)
+            result = build_frame(
+                cache, tuple(entries), review, None, build_date=build_date
+            )
         except FrameError:
             _note(log, "frame", "frame_refused")
         else:
             if result is not None:
-                write_municipality_output(cache, result.tables["municipality"])
+                write_municipality_output(
+                    cache, result.tables["municipality"], result.sources
+                )
     finally:
         _BUILD_LINES.reset(token)
 
@@ -125,6 +134,8 @@ def run_places_before_gazetteer(
     grid: Sequence[Mapping[str, object]],
     zones: Mapping[str, BaseGeometry],
     lines: list[str] | None = None,
+    *,
+    build_date: date | None = None,
 ) -> None:
     """Run the stage where the frame can hand over boundary, grid and zones."""
     log = lines if lines is not None else _BUILD_LINES.get()
@@ -147,6 +158,7 @@ def run_places_before_gazetteer(
             StageConfig(
                 cache=cache,
                 review=review,
+                build_date=build_date,
                 arabic_tag=tag,
                 boundary=boundary,
                 grid=grid,

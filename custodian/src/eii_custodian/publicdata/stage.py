@@ -210,6 +210,10 @@ def run_stage(
             from eii_custodian.publicdata.series.figures import validate_figure
 
             validate_figure(got)
+            if figure_id == "PUB-67":
+                from eii_custodian.publicdata.series.support import validate_support
+
+                validate_support(got.get("supporting_provenance"))
             got = got["values"]
         if got != expected:
             return StageResult(tuple(missing), figure_id)

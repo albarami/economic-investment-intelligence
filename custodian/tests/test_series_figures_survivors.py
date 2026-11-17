@@ -162,9 +162,17 @@ def test_restaurant_selection_requires_both_axes():
 
 def test_present_restaurant_and_sparse_repeated_cancellations():
     shapes = _shapes()
-    active = dict(shapes["lic_active"][0], rmz_lnsht_ltjry="5610101")
+    from custodian.tests.test_pub67 import FRAME, classes
+
+    active = dict(
+        shapes["lic_active"][0], rmz_lnsht_ltjry="5610101", lbldy=FRAME[0].name_ar
+    )
     issued = dict(shapes["lic_issued"][0], rmz_lnsht_ltjry="5610101")
-    checks = figures.compute_checks({"lic_active": [active], "lic_issued": [issued]})
+    checks = figures.compute_checks(
+        {"lic_active": [active], "lic_issued": [issued]},
+        isic_classes=classes(),
+        municipalities=FRAME,
+    )
     assert checks["PUB-67"]["national_5610101"] == "3"
     assert checks["PUB-69"]["restaurant_contract_rows"] == "1"
     assert figures.compute_checks(
@@ -201,7 +209,7 @@ def test_finish_selected_line_separator(tmp_path, suffix):
         _whole_text(lines[-1], "FAIL PUB-62 public_data selected-cache check")
     else:
         assert got == FetchFailure(
-            1, "series", "", "public_data", "valid selected input", "FileNotFoundError"
+            1, "series", "", "public_data", "valid selected input", "ValueError"
         )
         _whole_text(lines[-1], "FAIL series selected input refused")
 

@@ -28,3 +28,14 @@ The hashes bind an area to its inputs and to the manifest the check saw. The reb
 The four concrete files are registry rows under the S2-T06 block. Each file's
 receipt is checked before the file is read. Tests use invented Parquet and a
 stand-in transport. They do not fetch those files.
+
+The public build samples its injected UTC clock at build start, validates the
+UTC timestamp and forwards that date through the frame to `StageConfig` and the
+verification loader. Receipt retrieval timestamps continue to sample their own
+clock; crossing midnight does not change the build date. Direct callers supply
+an explicit date when loading verifications. A header-only `verified_places.csv`
+with that date is an empty verification set and writes an empty verification
+output. Without the date it still refuses with `bad_check_date`. Empty bytes,
+a wrong header, malformed or future dates, duplicate place/date pairs, orphan
+places, unknown statuses and refused sources keep their existing refusals;
+showcase and flagship checks and pending coverage are unchanged.

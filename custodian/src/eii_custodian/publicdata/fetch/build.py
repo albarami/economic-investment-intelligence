@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -187,6 +188,17 @@ def run_build(
     sleep: Sleeper,
 ) -> BuildOutcome:
     """Fetch each row in order, then run the public_data stage."""
+    # One injected UTC clock sample governs every verification in this build.
+    started = clock()
+    if (
+        re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", started)
+        is None
+    ):
+        raise ValueError("invalid build-start UTC timestamp")
+    try:
+        build_date = datetime.strptime(started, "%Y-%m-%dT%H:%M:%SZ").date()
+    except ValueError:
+        raise ValueError("invalid build-start UTC timestamp") from None
     lines: list[str] = []
     terms: list[dict[str, object]] = []
     previous = _previous_term_hashes(cache)
@@ -304,7 +316,7 @@ def run_build(
         )
 
         areas_before_stage(cache, lines)
-        frame_when_ready(cache, entries, lines)
+        frame_when_ready(cache, entries, lines, build_date=build_date)
         failure = run_stage(cache, build_entries=entries, build_lines=lines).failure
         stage = run_stage(cache)
         for figure_id in stage.missing:
