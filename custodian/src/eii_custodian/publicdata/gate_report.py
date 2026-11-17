@@ -1,0 +1,320 @@
+"""Pure gate evidence gatherer; only the lead records acceptance or closure.
+
+Task-specific producers validate their loaded confirmations before handing over
+the named checks below. Joined forecast/height/additions adapters are Part B;
+this module neither imports their unmerged code nor assumes their file shapes.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import re
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, field
+from pathlib import PurePosixPath
+
+from eii_custodian.publicdata.completeness import in_use
+from eii_custodian.publicdata.confirm_s2_t13 import Confirmation, completion_evidence
+from eii_custodian.publicdata.fetch.registry import Entry
+
+CONFIRMATION_TASKS = ("S2-T12", "S2-T13", "S2-T15", "S2-T17", "S2-T19", "S2-T20")
+INVESTMENT_FLAGS = (
+    "inventory_recorded",
+    "field_coverage_recorded",
+    "fixture_comparison_recorded",
+    "live_page_compared",
+)
+CONFIRMATION_CHECKS = {
+    "S2-T12": frozenset(
+        key + ":" + flag
+        for key in ("fdi_projects", "investqa_pages")
+        for flag in INVESTMENT_FLAGS
+    ),
+    "S2-T13": frozenset({"completion_evidence"}),
+    "S2-T15": frozenset({"release_matches"}),
+    "S2-T17": frozenset({"series_validated", "record_present"}),
+    "S2-T19": frozenset({"confirmed"}),
+    "S2-T20": frozenset(
+        {
+            "storey_height_recorded",
+            "fallback_errors_recorded",
+            "asset_manifest_recorded",
+            "rules_recorded",
+        }
+    ),
+}
+
+
+def coverage_geography(
+    entries: Sequence[Entry],
+    receipts: Mapping[str, Mapping[str, object]],
+    share_columns: set[str] | frozenset[str],
+) -> dict[str, str]:
+    """PUB-82/MTH-39 order; caller passes the frame's existing share columns.
+
+    A nonempty total/private column contract is required for a zone. District
+    population cannot supply a private-employer share and never wins this order.
+    Terms have no bearing on the geography selection.
+    """
+    used = {row.source_id: row for row in entries if in_use(row, receipts)}
+    zone = used.get("census_zone_sector")
+    if (
+        zone is not None
+        and share_columns
+        and share_columns <= dict(zone.columns).keys()
+    ):
+        return {"geography": "ZONE", "row": zone.key, "reason": ""}
+    municipality = used.get("pop_muni")
+    if municipality is not None:
+        return {
+            "geography": "MUNICIPALITY",
+            "row": municipality.key,
+            "reason": "zone_row_absent"
+            if zone is None
+            else "zone_row_without_share_columns",
+        }
+    return {"geography": "NATIONAL", "row": "", "reason": "municipality_row_absent"}
+
+
+def oi03_line(
+    *,
+    entries: Sequence[Entry],
+    decision: bytes,
+    decision_name: str,
+    signoff: Mapping[str, object],
+    sources: frozenset[str],
+    open_item_type: str,
+    dispositions: Mapping[str, Mapping[str, object]],
+) -> dict[str, object]:
+    """Gather accepted decision, bound sign-off, registry rows and dispositions.
+
+    Inputs are loaded evidence, never guessed from narrative words. Binding
+    mirrors series.reconcile.Resolution's owner-delegated sign-off contract.
+    The existing series producer's closed/reconciled dispositions are retained
+    verbatim; an open or unknown disposition stays pending.
+    """
+    text = decision.decode("utf-8")
+    match = re.search(r"^\| Status \| ([^|]+) \|$", text, re.M)
+    status = match.group(1).strip() if match else "not recorded"
+    binding = "resolved:" + PurePosixPath(decision_name).stem
+    signed_sources = signoff.get("sources")
+    bound = (
+        signoff.get("approved") is True
+        and signoff.get("reviewer_role") == "owner-delegated advisor"
+        and signoff.get("record") == decision_name
+        and signoff.get("record_sha256") == hashlib.sha256(decision).hexdigest()
+        and isinstance(signed_sources, list)
+        and all(isinstance(source, str) for source in signed_sources)
+        and set(signed_sources) == sources
+        and bool(sources)
+    )
+    open_rows = sorted(row.key for row in entries if row.reconciliation == "open")
+    affected_rows = [row for row in entries if row.source_id in sources]
+    resolved = {row.source_id for row in affected_rows} == sources and all(
+        row.reconciliation == binding for row in affected_rows
+    )
+    states = {
+        key: dispositions.get(key, {}).get("status", "pending") for key in ("R1", "R2")
+    }
+    dispositions_resolved = states["R1"] == "closed: not published" and states[
+        "R2"
+    ] in (
+        "reconciled: means equal, occupation table used",
+        "reconciled: tables differ, occupation table used",
+    )
+    recorded = (
+        (status == "Accepted" or status.startswith("Accepted,"))
+        and bound
+        and resolved
+        and not open_rows
+        and open_item_type == "CLOSED"
+        and dispositions_resolved
+    )
+    return {
+        "id": "OI-03",
+        "state": "recorded" if recorded else "pending",
+        "decision_status": status,
+        "open_item_state": open_item_type,
+        "open_rows": open_rows,
+        "binding": binding if bound else "open",
+        "dispositions": states,
+    }
+
+
+def display_allowed(
+    lineage: Sequence[str],
+    registry: Mapping[str, str],
+    oi03: Mapping[str, object],
+    affected: frozenset[str],
+) -> bool:
+    """Refuse facts with any open transitive dependency (PUB-74 through PUB-77).
+
+    Assembly must provide the complete transitive lineage, not only a leaf.
+    This gate is additional to the existing series emit_fact boundary.
+    """
+    if not lineage:
+        return False
+    for source in lineage:
+        state = registry.get(source, "open")
+        if state == "open":
+            return False
+        if source in affected or state.startswith("resolved:"):
+            if (
+                source not in affected
+                or oi03.get("state") != "recorded"
+                or state != oi03.get("binding")
+            ):
+                return False
+    return True
+
+
+@dataclass(frozen=True)
+class ConfirmationEvidence:
+    """Producer-validated checks and references, never a human-approval claim.
+
+    References name the source-owner's confirmation/rules/manifest records;
+    source_keys bind them to fetched receipts. Open-series entries survive
+    gathering. Numerical height constants/errors remain in those references.
+    """
+
+    task: str
+    source_keys: tuple[str, ...]
+    references: tuple[str, ...]
+    checks: Mapping[str, bool]
+    open_entries: tuple[str, ...] = ()
+    receipt_sha256: Mapping[str, str] = field(default_factory=dict)
+    absence_reasons: Mapping[str, str] = field(default_factory=dict)
+
+
+def confirmations(
+    evidence: Sequence[ConfirmationEvidence],
+    entries: Sequence[Entry],
+    receipts: Mapping[str, Mapping[str, object]],
+) -> list[dict[str, object]]:
+    """List all six tasks; pending or mismatched inputs can never disappear."""
+    if any(item.task not in CONFIRMATION_TASKS for item in evidence):
+        raise ValueError("confirmation_task_unknown")
+    if len({item.task for item in evidence}) != len(evidence):
+        raise ValueError("confirmation_task_duplicate")
+    by_task = {item.task: item for item in evidence}
+    rows = {row.key: row for row in entries}
+    result: list[dict[str, object]] = []
+    for task in CONFIRMATION_TASKS:
+        item = by_task.get(task)
+        recorded = bool(
+            item
+            and item.source_keys
+            and item.references
+            and all(ref.strip() for ref in item.references)
+            and set(item.checks) == CONFIRMATION_CHECKS[task]
+            and all(check is True for check in item.checks.values())
+            and all(
+                key in rows
+                and (
+                    (
+                        in_use(rows[key], receipts)
+                        and item.receipt_sha256.get(key) == receipts[key].get("sha256")
+                        and key not in item.absence_reasons
+                    )
+                    or (
+                        bool(rows[key].skip_reason)
+                        and item.absence_reasons.get(key) == rows[key].skip_reason
+                        and key not in receipts
+                    )
+                )
+                for key in item.source_keys
+            )
+        )
+        result.append(
+            {
+                "task": task,
+                "state": "recorded" if recorded else "pending",
+                "reason": "" if recorded else "confirmation_pending",
+                "references": list(item.references) if item else [],
+                "open_entries": list(item.open_entries) if item else [],
+                "absences": dict(item.absence_reasons) if item else {},
+            }
+        )
+    return result
+
+
+def tender_evidence(
+    confirmation: Confirmation,
+    row: Entry | None,
+    receipt: Mapping[str, object] | None,
+    reference: str,
+) -> ConfirmationEvidence:
+    """Reuse S2-T13's existing validation instead of duplicating its loader."""
+    try:
+        completion_evidence(confirmation, row, receipt)
+    except ValueError:
+        confirmed = False
+    else:
+        confirmed = True
+    return ConfirmationEvidence(
+        "S2-T13",
+        (row.key,) if row else (),
+        (reference,),
+        {"completion_evidence": confirmed},
+        receipt_sha256={row.key: str(receipt["sha256"])}
+        if row and receipt and "sha256" in receipt
+        else {},
+        absence_reasons={row.key: row.skip_reason}
+        if row and row.skip_reason and confirmed
+        else {},
+    )
+
+
+def investment_evidence(
+    document: Mapping[str, object], reference: str
+) -> ConfirmationEvidence:
+    """Read the existing investment_pages.yaml confirmation blocks (S2-T12)."""
+    keys = ("fdi_projects", "investqa_pages")
+    checks: dict[str, bool] = {}
+    sources = document.get("sources")
+    for key in keys:
+        source = sources.get(key) if isinstance(sources, dict) else None
+        block = source.get("confirmation") if isinstance(source, dict) else None
+        for flag in INVESTMENT_FLAGS:
+            checks[key + ":" + flag] = (
+                isinstance(block, dict) and block.get(flag) is True
+            )
+    return ConfirmationEvidence("S2-T12", keys, (reference,), checks)
+
+
+def fsq_evidence(
+    registry_release: str, policy: Mapping[str, object], reference: str
+) -> ConfirmationEvidence:
+    """Compare the caller's registered release with places_fsq_policy.yaml."""
+    return ConfirmationEvidence(
+        "S2-T15",
+        ("places_fsq",),
+        (reference,),
+        {
+            "release_matches": bool(registry_release)
+            and policy.get("release") == registry_release
+        },
+    )
+
+
+def terms_evidence(
+    entries: Sequence[Entry], own_words_confirmed: frozenset[str] = frozenset()
+) -> list[dict[str, str]]:
+    """Preserve wording/dated markers; P6 never completes own-words review.
+
+    The caller supplies separately confirmed keys from the source-owner review.
+    Nothing here changes source admission or infers a live reading from text.
+    """
+    return [
+        {
+            "id": row.key,
+            "terms_words": row.terms_words,
+            "terms_read_on": row.terms_read_on,
+            "licence_basis": row.licence_basis,
+            "decision_record": row.decision_record,
+            "own_words_state": "recorded"
+            if row.key in own_words_confirmed
+            else "pending",
+        }
+        for row in entries
+    ]
