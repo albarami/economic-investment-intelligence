@@ -6,6 +6,7 @@ from dataclasses import asdict, replace
 from pathlib import Path
 
 import pytest
+from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.draw import Figure
 from eii_custodian.publicdata.figures_review import compare, validate_record
@@ -97,7 +98,7 @@ def test_script_emits_only_value_free_verdict(tmp_path, capsys):
 
 
 def load_script():
-    path = Path(__file__).resolve().parents[2] / "scripts" / "figures_review.py"
+    path = repository_root(Path(__file__)) / "scripts" / "figures_review.py"
     spec = importlib.util.spec_from_file_location("figures_review_entry", path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
