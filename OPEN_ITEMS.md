@@ -3403,6 +3403,18 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: The mutation tester's clean run failed once: 1 failed, 1,510 passed; the test compared the receipt's hash of the archive built inside the world with the hash of a second build in its assertion, and the two differed. The same test passed alone (13 passed). Cause: `invented_archive` wrote each member with `ZipFile.writestr(name, ...)`, which stamps the member with the current local time, so two builds on either side of a two-second step of the zip time give different bytes; two builds 2.1 seconds apart were reproduced with different hashes.
 - RESOLUTION: the fixture writes each member with a fixed member time and the same permission bits, and the planted test `custodian/tests/test_frame_fixture_archive.py::test_invented_archive_bytes_do_not_follow_the_clock` builds the archive at two clock readings an hour apart and requires one hash; it failed before the fix and passes after it. This closes the item by a found cause, not by a green re-run (rule 39). The inline archive of `custodian/tests/test_frame_coverage.py` is built and read once per test and is not hashed twice; it is left unchanged.
 
+## OI-300 — PUB-64 anchors and selected-source acceptance
+
+- ID: OI-300
+- TYPE: OPEN
+- RAISED BY: the S2-T08 planner; recorded by the PUB64-fix prerequisite, 2026-11-17.
+- CONCERNS: [04_PUBLIC_DATA_PACK.md](docs/04_PUBLIC_DATA_PACK.md), section 10, PUB-64; `publicdata/stage.py::EXPECTED` and `series/figures.py::compute_checks`.
+- WHY: The stage and series adapter omitted published output per employee and the five C4 computed shares required by PUB-64. Existing core arithmetic tests did not establish that the selected-source build checked those anchors.
+- DONE SO FAR: This prerequisite adds the pack-copied anchors, reuses `sector_norms` and `Component`, and tests the adapter on invented source-shaped rows and receipt chains. Under lead ruling L-802 item 1, component selection follows `custodian/data_tests/test_pinned_methods.py::test_pinned_c4`: case-insensitive Food Stuff, Beverages and Rents of Buildings, with group totals summed over the selected activity/year source rows. No separate total row or category-label confirmation is required.
+- NEEDED: Lead-only live evidence: `test_pinned_c4` against the pinned cache and the `./eii build-public` selected-hash stage check. Missing cache, mismatch or refusal is a failure, never a pass. Both are PENDING until the lead records actual results; this worker does not read the cache or run either live step.
+- CLOSE WHEN: The lead records both live checks and their selected source hashes, commands and real exit codes. Another-maker code review remains required before merge. This item does not close OI-03 or change any display or licence gate.
+- NEEDED BY: S2-T08 part B; this fix remains a separate prerequisite.
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).

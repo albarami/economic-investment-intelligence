@@ -103,9 +103,27 @@
       "activity_code": 561,
       "main_economic_activity": "invented-activity",
       "lnsht_lqtsdy_lry_ysy": "نشاط تجريبي",
-      "type_of_commodity": "invented-kind",
+      "type_of_commodity": "Food Stuff",
       "nw_lsl": "نوع تجريبي",
       "estimates_of_intermediate_goods_value_value_in_1_000_qr": 11
+    },
+    {
+      "year": "2022",
+      "activity_code": 561,
+      "main_economic_activity": "invented-activity",
+      "lnsht_lqtsdy_lry_ysy": "نشاط تجريبي",
+      "type_of_commodity": "Beverages",
+      "nw_lsl": "نوع تجريبي",
+      "estimates_of_intermediate_goods_value_value_in_1_000_qr": 3
+    },
+    {
+      "year": "2022",
+      "activity_code": 561,
+      "main_economic_activity": "invented-activity",
+      "lnsht_lqtsdy_lry_ysy": "نشاط تجريبي",
+      "type_of_commodity": "invented-other",
+      "nw_lsl": "نوع تجريبي",
+      "estimates_of_intermediate_goods_value_value_in_1_000_qr": 2
     }
   ],
   "sec_hr_serv": [
@@ -114,9 +132,18 @@
       "activity_code": 561,
       "main_economic_activity": "invented-activity",
       "lnsht_lqtsdy_lry_ysy": "نشاط تجريبي",
-      "type_of_service": "invented-kind",
+      "type_of_service": "Rents of Buildings",
       "nw_lkhdm": "نوع تجريبي",
       "estimates_of_intermediate_services_value_value_in_1_000_qr": 11
+    },
+    {
+      "year": "2022",
+      "activity_code": 561,
+      "main_economic_activity": "invented-activity",
+      "lnsht_lqtsdy_lry_ysy": "نشاط تجريبي",
+      "type_of_service": "invented-other",
+      "nw_lkhdm": "نوع تجريبي",
+      "estimates_of_intermediate_services_value_value_in_1_000_qr": 5
     }
   ],
   "sec_hr_size": [
