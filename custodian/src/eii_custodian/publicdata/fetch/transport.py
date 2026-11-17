@@ -2,16 +2,18 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import ssl
 import urllib.error
 import urllib.request
 from collections.abc import Callable, Iterator, Mapping
 from contextlib import AbstractContextManager, contextmanager
 from contextvars import ContextVar
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from http.client import HTTPException, HTTPMessage
 from typing import IO, Protocol
-from urllib.parse import unquote, urlsplit, urlunsplit
+from urllib.parse import unquote, urlencode, urlsplit, urlunsplit
 
 from eii_custodian.publicdata.fetch.allowlist import approve, host_of
 
@@ -70,9 +72,10 @@ class Response:
     """One completed response. hops are redirect targets, in order."""
 
     final_url: str
-    body: bytes
+    body: bytes = field(repr=False)
     hops: tuple[str, ...]
     etag: str | None = None
+    body_sha256: str = ""
 
 
 class TransportFault(Exception):
@@ -97,6 +100,27 @@ class StreamResponse:
 StreamTransport = Callable[[str], AbstractContextManager[StreamResponse]]
 
 
+class KeyedRequest(str):
+    """A key-free endpoint; credentials are resolved by the transport at send time."""
+
+    method: str
+    parameters: Mapping[str, str]
+    environ: Mapping[str, str]
+
+    def __new__(
+        cls,
+        url: str,
+        method: str,
+        parameters: Mapping[str, str],
+        environ: Mapping[str, str],
+    ) -> KeyedRequest:
+        instance = super().__new__(cls, url)
+        instance.method = method
+        instance.parameters = parameters
+        instance.environ = environ
+        return instance
+
+
 def open_https(
     url: str,
     token: str = "",
@@ -116,9 +140,14 @@ def open_https(
         ssl_context.verify_mode != ssl.CERT_REQUIRED or not ssl_context.check_hostname
     ):
         raise TransportFault("unreachable", url)
+    keyed = isinstance(url, KeyedRequest)
     hops: list[str] = []
     guard = _redirect_guard(
-        hops, token, strict=reviewed_urls is not None, reviewed_urls=reviewed_urls
+        hops,
+        token,
+        strict=reviewed_urls is not None,
+        reviewed_urls=reviewed_urls,
+        keyed_url=str(url) if keyed else None,
     )
     if ssl_context is None:
         opener = urllib.request.build_opener(guard)
@@ -128,7 +157,23 @@ def open_https(
         )
     request_headers = dict(headers) if headers else {}
     request_headers.update(authorization_header(url, token))
-    request = urllib.request.Request(url, method="GET", headers=request_headers)
+    address = str(url)
+    method = "GET"
+    if isinstance(url, KeyedRequest):
+        from eii_custodian.publicdata.busyness.parse import FORECAST_URL, QUERY_URL
+
+        specs = {
+            FORECAST_URL: ("POST", "api_key_private", "BESTTIME_API_KEY_PRIVATE"),
+            QUERY_URL: ("GET", "api_key_public", "BESTTIME_API_KEY_PUBLIC"),
+        }
+        if str(url) not in specs:
+            raise TransportFault("blocked_host", FORECAST_URL)
+        method, parameter, variable = specs[str(url)]
+        if url.method != method or not url.environ.get(variable, "").strip():
+            raise TransportFault("credentials", str(url))
+        address += "?" + urlencode({**url.parameters, parameter: url.environ[variable]})
+    request = urllib.request.Request(address, method=method, headers=request_headers)
+    fault: str | None = None
     try:
         with opener.open(request, timeout=HTTP_TIMEOUT_S) as response:
             limit = _METADATA_LIMIT.get()
@@ -140,14 +185,31 @@ def open_https(
                 raise TransportFault("blocked_host", "")
             etag = response.headers.get("ETag")
     except TransportFault:
-        raise
+        if not keyed:
+            raise
+        fault = "blocked_host"
     except urllib.error.HTTPError:
-        raise TransportFault("http", url) from None
-    except urllib.error.URLError:
-        raise TransportFault("unreachable", url) from None
-    except OSError:
-        raise TransportFault("unreachable", url) from None
-    return Response(final_url=final, body=body, hops=tuple(hops), etag=etag)
+        if not keyed:
+            raise TransportFault("http", url) from None
+        fault = "http"
+    except (urllib.error.URLError, OSError, ValueError):
+        if not keyed:
+            raise TransportFault("unreachable", url) from None
+        fault = "unreachable"
+    if fault is not None:
+        raise TransportFault(fault, str(url)) from None
+    digest = hashlib.sha256(body).hexdigest()
+    if keyed:
+        from eii_custodian.publicdata.busyness.parse import _clean
+
+        try:
+            body = json.dumps(_clean(json.loads(body))).encode()
+        except (ValueError, UnicodeError):
+            body = b"null"
+        final, hops, etag = str(url), [], None
+    return Response(
+        final_url=final, body=body, hops=tuple(hops), etag=etag, body_sha256=digest
+    )
 
 
 def _redirect_guard(
@@ -155,6 +217,8 @@ def _redirect_guard(
     token: str = "",
     strict: bool = False,
     reviewed_urls: tuple[str, ...] | None = None,
+    *,
+    keyed_url: str | None = None,
 ) -> type[urllib.request.HTTPRedirectHandler]:
 
     class _Guard(urllib.request.HTTPRedirectHandler):
@@ -167,6 +231,9 @@ def _redirect_guard(
             headers: HTTPMessage,
             newurl: str,
         ) -> urllib.request.Request | None:
+            if keyed_url is not None:
+                # No redirected send can become a second chargeable request.
+                raise TransportFault("blocked_host", keyed_url)
             hops.append(newurl)
             if host_of(newurl) == SIGN_IN_HOST:
                 raise TransportFault("credential_missing_or_not_accepted", newurl)

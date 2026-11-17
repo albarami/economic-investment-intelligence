@@ -78,6 +78,17 @@ def prepare(
     cache: Path | None = None,
 ) -> Prepared:
     """Fetch one row through the transport seam and apply its declared checks."""
+    if entry.kind == "besttime":
+        return _failed(
+            entry,
+            AttemptFailure(
+                1,
+                "https://besttime.app/api/v1/forecasts",
+                "build_context_required",
+                "build-public context",
+                "absent",
+            ),
+        )
     responses: list[Response] = []
     original = _reader(transport, sleep)
 

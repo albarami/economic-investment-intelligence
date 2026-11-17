@@ -27,6 +27,7 @@ KINDS = frozenset(
         "citation_only",
         "paged_cards",
         "comtrade_api",
+        "besttime",
     }
 )
 COLLECTED_FAMILIES = frozenset(

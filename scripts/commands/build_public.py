@@ -190,6 +190,7 @@ def run(
         slots=slots,
         token=token,
         key_name=VARIABLE,
+        environ=environ,
     )
     for line in outcome.lines:
         print(line)
