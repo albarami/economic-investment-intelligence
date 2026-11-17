@@ -2838,3 +2838,93 @@ reason = "The second long_total refusal after the page loop is unreachable: feat
 module = "custodian/src/eii_custodian/publicdata/fetch/kinds.py"
 mutation = "--- src/eii_custodian/publicdata/fetch/kinds.py\n+++ src/eii_custodian/publicdata/fetch/kinds.py\n@@ -102,7 +102,6 @@\n             )\n         if len(features) > layer_total:\n             return _failed(\n-                entry,\n                 AttemptFailure(\n                     1, final, \"long_total\", str(layer_total), str(len(features))\n                 ),"
 reason = "The second long_total refusal after the page loop is unreachable: features starts empty for each layer and grows only inside the loop, where every extension returns long_total at once when it exceeds the layer total."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/imagery_views.py"
+mutation = "--- src/eii_custodian/publicdata/gis/imagery_views.py\n+++ src/eii_custodian/publicdata/gis/imagery_views.py\n@@ -1,6 +1,6 @@\n def _read(path: Path) -> ImageryViews:\n     try:\n-        text = path.read_text(encoding=\"utf-8\")\n+        text = path.read_text(encoding=\"UTF-8\")\n     except OSError as exc:\n         raise ImageryViewsError(\"views_file\") from exc\n     try:"
+reason = "\"UTF-8\" and \"utf-8\" name the same codec (codecs.lookup returns the identical utf-8 codec), so the read, decode or encode is byte-identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/imagery_views.py"
+mutation = "--- src/eii_custodian/publicdata/gis/imagery_views.py\n+++ src/eii_custodian/publicdata/gis/imagery_views.py\n@@ -1,7 +1,7 @@\n def _number_text(value: int | float) -> str:\n     if isinstance(value, int):\n         return str(value)\n-    rendered = format(value, \"f\").rstrip(\"0\").rstrip(\".\")\n+    rendered = format(value, \"f\").rstrip(\"XX0XX\").rstrip(\".\")\n     if rendered in {\"\", \"-\", \"-0\"}:\n         return \"0\"\n     return rendered"
+reason = "format(float, \"f\") never emits the letter X, and after stripping zeros then a dot the result always keeps a digit or is inf or nan (0.0 gives \"0\", -0.0 gives \"-0\"), so it is never \"\" or \"-\": the changed strip characters and the removed set members change no output; int inputs return before this line."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/imagery_views.py"
+mutation = "--- src/eii_custodian/publicdata/gis/imagery_views.py\n+++ src/eii_custodian/publicdata/gis/imagery_views.py\n@@ -1,7 +1,7 @@\n def _number_text(value: int | float) -> str:\n     if isinstance(value, int):\n         return str(value)\n-    rendered = format(value, \"f\").rstrip(\"0\").rstrip(\".\")\n+    rendered = format(value, \"f\").rstrip(\"0\").rstrip(\"XX.XX\")\n     if rendered in {\"\", \"-\", \"-0\"}:\n         return \"0\"\n     return rendered"
+reason = "format(float, \"f\") never emits the letter X, and after stripping zeros then a dot the result always keeps a digit or is inf or nan (0.0 gives \"0\", -0.0 gives \"-0\"), so it is never \"\" or \"-\": the changed strip characters and the removed set members change no output; int inputs return before this line."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/imagery_views.py"
+mutation = "--- src/eii_custodian/publicdata/gis/imagery_views.py\n+++ src/eii_custodian/publicdata/gis/imagery_views.py\n@@ -2,6 +2,6 @@\n     if isinstance(value, int):\n         return str(value)\n     rendered = format(value, \"f\").rstrip(\"0\").rstrip(\".\")\n-    if rendered in {\"\", \"-\", \"-0\"}:\n+    if rendered in {\"XXXX\", \"-\", \"-0\"}:\n         return \"0\"\n     return rendered"
+reason = "format(float, \"f\") never emits the letter X, and after stripping zeros then a dot the result always keeps a digit or is inf or nan (0.0 gives \"0\", -0.0 gives \"-0\"), so it is never \"\" or \"-\": the changed strip characters and the removed set members change no output; int inputs return before this line."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/imagery_views.py"
+mutation = "--- src/eii_custodian/publicdata/gis/imagery_views.py\n+++ src/eii_custodian/publicdata/gis/imagery_views.py\n@@ -2,6 +2,6 @@\n     if isinstance(value, int):\n         return str(value)\n     rendered = format(value, \"f\").rstrip(\"0\").rstrip(\".\")\n-    if rendered in {\"\", \"-\", \"-0\"}:\n+    if rendered in {\"\", \"XX-XX\", \"-0\"}:\n         return \"0\"\n     return rendered"
+reason = "format(float, \"f\") never emits the letter X, and after stripping zeros then a dot the result always keeps a digit or is inf or nan (0.0 gives \"0\", -0.0 gives \"-0\"), so it is never \"\" or \"-\": the changed strip characters and the removed set members change no output; int inputs return before this line."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/layers.py"
+mutation = "--- src/eii_custodian/publicdata/gis/layers.py\n+++ src/eii_custodian/publicdata/gis/layers.py\n@@ -5,7 +5,7 @@\n     if kind == \"point\":\n         return shape(\n             {\n-                \"type\": \"Point\",\n+                \"type\": \"point\",\n                 \"coordinates\": [\n                     _number(geometry.get(\"x\")),\n                     _number(geometry.get(\"y\")),"
+reason = "Shapely lowercases the GeoJSON type before choosing the constructor (checked: Point, point and POINT give the same POINT geometry; likewise LineString, MultiLineString and Polygon), so the built geometry is identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/layers.py"
+mutation = "--- src/eii_custodian/publicdata/gis/layers.py\n+++ src/eii_custodian/publicdata/gis/layers.py\n@@ -5,7 +5,7 @@\n     if kind == \"point\":\n         return shape(\n             {\n-                \"type\": \"Point\",\n+                \"type\": \"POINT\",\n                 \"coordinates\": [\n                     _number(geometry.get(\"x\")),\n                     _number(geometry.get(\"y\")),"
+reason = "Shapely lowercases the GeoJSON type before choosing the constructor (checked: Point, point and POINT give the same POINT geometry; likewise LineString, MultiLineString and Polygon), so the built geometry is identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/layers.py"
+mutation = "--- src/eii_custodian/publicdata/gis/layers.py\n+++ src/eii_custodian/publicdata/gis/layers.py\n@@ -15,7 +15,7 @@\n     if kind == \"line\":\n         paths = _paths(geometry.get(\"paths\"))\n         if len(paths) == 1:\n-            return shape({\"type\": \"LineString\", \"coordinates\": paths[0]})\n+            return shape({\"type\": \"linestring\", \"coordinates\": paths[0]})\n         return shape({\"type\": \"MultiLineString\", \"coordinates\": paths})\n     if kind == \"polygon\":\n         rings = _paths(geometry.get(\"rings\"))"
+reason = "Shapely lowercases the GeoJSON type before choosing the constructor (checked: Point, point and POINT give the same POINT geometry; likewise LineString, MultiLineString and Polygon), so the built geometry is identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/layers.py"
+mutation = "--- src/eii_custodian/publicdata/gis/layers.py\n+++ src/eii_custodian/publicdata/gis/layers.py\n@@ -15,7 +15,7 @@\n     if kind == \"line\":\n         paths = _paths(geometry.get(\"paths\"))\n         if len(paths) == 1:\n-            return shape({\"type\": \"LineString\", \"coordinates\": paths[0]})\n+            return shape({\"type\": \"LINESTRING\", \"coordinates\": paths[0]})\n         return shape({\"type\": \"MultiLineString\", \"coordinates\": paths})\n     if kind == \"polygon\":\n         rings = _paths(geometry.get(\"rings\"))"
+reason = "Shapely lowercases the GeoJSON type before choosing the constructor (checked: Point, point and POINT give the same POINT geometry; likewise LineString, MultiLineString and Polygon), so the built geometry is identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/layers.py"
+mutation = "--- src/eii_custodian/publicdata/gis/layers.py\n+++ src/eii_custodian/publicdata/gis/layers.py\n@@ -16,7 +16,7 @@\n         paths = _paths(geometry.get(\"paths\"))\n         if len(paths) == 1:\n             return shape({\"type\": \"LineString\", \"coordinates\": paths[0]})\n-        return shape({\"type\": \"MultiLineString\", \"coordinates\": paths})\n+        return shape({\"type\": \"multilinestring\", \"coordinates\": paths})\n     if kind == \"polygon\":\n         rings = _paths(geometry.get(\"rings\"))\n         return shape({\"type\": \"Polygon\", \"coordinates\": rings})"
+reason = "Shapely lowercases the GeoJSON type before choosing the constructor (checked: Point, point and POINT give the same POINT geometry; likewise LineString, MultiLineString and Polygon), so the built geometry is identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/layers.py"
+mutation = "--- src/eii_custodian/publicdata/gis/layers.py\n+++ src/eii_custodian/publicdata/gis/layers.py\n@@ -16,7 +16,7 @@\n         paths = _paths(geometry.get(\"paths\"))\n         if len(paths) == 1:\n             return shape({\"type\": \"LineString\", \"coordinates\": paths[0]})\n-        return shape({\"type\": \"MultiLineString\", \"coordinates\": paths})\n+        return shape({\"type\": \"MULTILINESTRING\", \"coordinates\": paths})\n     if kind == \"polygon\":\n         rings = _paths(geometry.get(\"rings\"))\n         return shape({\"type\": \"Polygon\", \"coordinates\": rings})"
+reason = "Shapely lowercases the GeoJSON type before choosing the constructor (checked: Point, point and POINT give the same POINT geometry; likewise LineString, MultiLineString and Polygon), so the built geometry is identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/layers.py"
+mutation = "--- src/eii_custodian/publicdata/gis/layers.py\n+++ src/eii_custodian/publicdata/gis/layers.py\n@@ -19,5 +19,5 @@\n         return shape({\"type\": \"MultiLineString\", \"coordinates\": paths})\n     if kind == \"polygon\":\n         rings = _paths(geometry.get(\"rings\"))\n-        return shape({\"type\": \"Polygon\", \"coordinates\": rings})\n+        return shape({\"type\": \"polygon\", \"coordinates\": rings})\n     raise LayerError(\"geometry\")"
+reason = "Shapely lowercases the GeoJSON type before choosing the constructor (checked: Point, point and POINT give the same POINT geometry; likewise LineString, MultiLineString and Polygon), so the built geometry is identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/layers.py"
+mutation = "--- src/eii_custodian/publicdata/gis/layers.py\n+++ src/eii_custodian/publicdata/gis/layers.py\n@@ -19,5 +19,5 @@\n         return shape({\"type\": \"MultiLineString\", \"coordinates\": paths})\n     if kind == \"polygon\":\n         rings = _paths(geometry.get(\"rings\"))\n-        return shape({\"type\": \"Polygon\", \"coordinates\": rings})\n+        return shape({\"type\": \"POLYGON\", \"coordinates\": rings})\n     raise LayerError(\"geometry\")"
+reason = "Shapely lowercases the GeoJSON type before choosing the constructor (checked: Point, point and POINT give the same POINT geometry; likewise LineString, MultiLineString and Polygon), so the built geometry is identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/layers.py"
+mutation = "--- src/eii_custodian/publicdata/gis/layers.py\n+++ src/eii_custodian/publicdata/gis/layers.py\n@@ -1,6 +1,6 @@\n def _parse_body(body: bytes) -> tuple[ParsedLayer, ...]:\n     try:\n-        loaded = json.loads(body.decode(\"utf-8\"))\n+        loaded = json.loads(body.decode(\"UTF-8\"))\n     except (UnicodeError, json.JSONDecodeError) as error:\n         raise LayerError(\"layer body\") from error\n     if not isinstance(loaded, dict):"
+reason = "\"UTF-8\" and \"utf-8\" name the same codec (codecs.lookup returns the identical utf-8 codec), so the read, decode or encode is byte-identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/layers.py"
+mutation = "--- src/eii_custodian/publicdata/gis/layers.py\n+++ src/eii_custodian/publicdata/gis/layers.py\n@@ -1,3 +1,3 @@\n def _published(attributes: dict[str, object], names: tuple[str, ...]) -> str:\n     payload = {name: attributes.get(name) for name in names}\n-    return json.dumps(payload, sort_keys=True, ensure_ascii=False)\n+    return json.dumps(payload, sort_keys=True, ensure_ascii=None)"
+reason = "json.dumps tests ensure_ascii only for truth: None and False select the same non-ASCII-preserving encoder, so the output text is identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/layers.py"
+mutation = "--- src/eii_custodian/publicdata/gis/layers.py\n+++ src/eii_custodian/publicdata/gis/layers.py\n@@ -1,4 +1,4 @@\n def _canonical(value: object) -> bytes:\n     return json.dumps(\n-        _canon(value), sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False\n+        _canon(value), sort_keys=True, separators=(\",\", \":\"), ensure_ascii=None\n     ).encode(\"utf-8\")"
+reason = "json.dumps tests ensure_ascii only for truth: None and False select the same non-ASCII-preserving encoder, so the output text is identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/layers.py"
+mutation = "--- src/eii_custodian/publicdata/gis/layers.py\n+++ src/eii_custodian/publicdata/gis/layers.py\n@@ -1,4 +1,4 @@\n def _canonical(value: object) -> bytes:\n     return json.dumps(\n         _canon(value), sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False\n-    ).encode(\"utf-8\")\n+    ).encode(\"UTF-8\")"
+reason = "\"UTF-8\" and \"utf-8\" name the same codec (codecs.lookup returns the identical utf-8 codec), so the read, decode or encode is byte-identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gis/layers.py"
+mutation = "--- src/eii_custodian/publicdata/gis/layers.py\n+++ src/eii_custodian/publicdata/gis/layers.py\n@@ -1,6 +1,6 @@\n def _canon(value: object) -> object:\n     if isinstance(value, Decimal):\n-        return format(value, \"f\")\n+        return format(value, \"F\")\n     if isinstance(value, bytes):\n         return value.hex()\n     if isinstance(value, dict):"
+reason = "Decimal format types \"f\" and \"F\" render identically for every Decimal, including Infinity, -Infinity and NaN (checked in the pinned interpreter); floats never reach this branch."
