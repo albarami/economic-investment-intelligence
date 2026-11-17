@@ -2652,3 +2652,43 @@ reason = "With a fixed nonempty separator \" \", the first split component is un
 module = "custodian/src/eii_custodian/publicdata/series/figures.py"
 mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -12,7 +12,7 @@\n     for entry in owned:\n         prefix = \"PASS \" + entry.key + \" sha256=\"\n         matches = [\n-            line[len(prefix) :].split(\" \", 1)[0]\n+            line[len(prefix) :].split(\" \", 2)[0]\n             for line in lines\n             if line.startswith(prefix)\n         ]"
 reason = "With a fixed nonempty separator \" \", the first split component is unchanged by maxsplit=1, maxsplit=2 or no bound, for every input string (including empty, leading-space and repeated-space strings). Only later components differ, and none are read."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -76,7 +76,7 @@\n \n     def size_total(slot: str) -> Decimal:\n         field = _pub64_field(\"sec_hr_size\", \"value:\" + slot)\n-        return sum((number(row[field]) for row in chosen[\"sec_hr_size\"]), ZERO)\n+        return sum((number(row[field]) for row in chosen[\"sec_hr_size\"]), )\n \n     employees = size_total(\"employees\")\n     components = []"
+reason = "PUB64 8 [P3]: Nonempty size/goods/services guards precede sums. number returns Decimal; first int 0 + Decimal is exactly Decimal(0) + Decimal under any precision/rounding/traps. Same operands/order; no empty sum escapes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -99,7 +99,7 @@\n     ):\n         label = _pub64_field(source, \"indicator\")\n         field = _pub64_field(source, \"value:\" + slot)\n-        total = sum((number(row[field]) for row in chosen[source]), ZERO)\n+        total = sum((number(row[field]) for row in chosen[source]), )\n         for key, published_label in wanted:\n             matching = [\n                 row"
+reason = "PUB64 9 [P3]: Nonempty size/goods/services guards precede sums. number returns Decimal; first int 0 + Decimal is exactly Decimal(0) + Decimal under any precision/rounding/traps. Same operands/order; no empty sum escapes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -15,8 +15,7 @@\n         before, after = values[(\"69\", \"2021\")], values[(\"69\", \"2025\")]\n         totals = {\n             year: sum(\n-                (value for (_, period), value in values.items() if period == year), ZERO\n-            )\n+                (value for (_, period), value in values.items() if period == year), )\n             for year in (\"2021\", \"2025\")\n         }\n         checks[\"PUB-62\"] = {"
+reason = "PUB64 10 [P4]: Both utility year keys are accessed first, ensuring nonempty Decimal sums (P3); missing keys refuse earlier."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -46,7 +46,7 @@\n         checks[\"PUB-64\"] = _pub64_checks(data, receipts)\n     if \"cus_imp_2025\" in data:\n         rows = [r for r in data[\"cus_imp_2025\"] if r[\"year\"] == \"2025\"]\n-        total = sum((Decimal(str(r[\"value_in_qatari_riyals\"])) for r in rows), ZERO)\n+        total = sum((Decimal(str(r[\"value_in_qatari_riyals\"])) for r in rows), )\n         checks[\"PUB-66\"] = {\n             \"rows_2025\": str(len(rows)),\n             \"value_bn_2dp\": rounded(total / Decimal(10**9), 2),"
+reason = "PUB64 11 [P5]: Nonempty: P3. Empty int 0 / Decimal(10**9) coerces to Decimal zero exactly before rounded; result/context identical to Decimal(0). Raw type unexposed."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -84,7 +84,7 @@\n         active = data[\"lic_active\"]\n         checks[\"PUB-67\"] = {\n             \"rows\": str(len(active)),\n-            \"sum_count\": str(sum((int(str(r[\"dd_lrkhs_lnsht\"])) for r in active), 0)),\n+            \"sum_count\": str(sum((int(str(r[\"dd_lrkhs_lnsht\"])) for r in active), )),\n             \"distinct_codes\": str(len({r[\"rmz_lnsht_ltjry\"] for r in active})),\n             \"national_5610101\": str(\n                 sum("
+reason = "PUB64 12 [P6]: Default start is exactly int 0; all operands, types and results identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -93,8 +93,7 @@\n                         for r in active\n                         if r[\"rmz_lnsht_ltjry\"] == \"5610101\"\n                     ),\n-                    0,\n-                )\n+                    )\n             ),\n         }\n     if \"lic_issued\" in data:"
+reason = "PUB64 13 [P6]: Default start is exactly int 0; all operands, types and results identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -101,7 +101,7 @@\n         issued = data[\"lic_issued\"]\n         converted = contract_rows(\"lic_issued\", issued)\n         checks[\"PUB-69\"] = {\n-            \"sum_count\": str(sum((int(str(r[\"dd_lrkhs_lsdr\"])) for r in issued), 0)),\n+            \"sum_count\": str(sum((int(str(r[\"dd_lrkhs_lsdr\"])) for r in issued), )),\n             \"distinct_codes\": str(len({r[\"rmz_lnsht_ltjry\"] for r in issued})),\n             \"restaurant_source_rows\": str(\n                 sum(r[\"rmz_lnsht_ltjry\"] == \"5610101\" for r in issued)"
+reason = "PUB64 14 [P6]: Default start is exactly int 0; all operands, types and results identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -149,8 +149,7 @@\n                 \"combined_share_0dp\": rounded(\n                     ratio(\n                         sum(\n-                            (cancellations.get(m, ZERO) for m in months.values()), ZERO\n-                        ),\n+                            (cancellations.get(m, ZERO) for m in months.values()), ),\n                         dated,\n                     )\n                     * 100,"
+reason = "PUB64 15 [P7]: Three fixed months always yield Decimal or ZERO (P3); zero-denominator refusal unchanged."
