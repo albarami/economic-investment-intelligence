@@ -273,8 +273,9 @@ def build_project_evidence(
             )
         seen_snapshots.add(item.identity)
         metadata = _metadata_failure(item)
-        if metadata is not None:
+        if isinstance(metadata, InvestmentFailure):
             return metadata
+        item = replace(item, snapshot=metadata)
         source_id = str(item.snapshot.sidecar.get("source_id", ""))
         current = {
             f"{row.get('source_id', '')}:project:{row.get('project_id', '')}"
@@ -1172,10 +1173,15 @@ def _candidate_failure(
     )
 
 
-def _metadata_failure(item: ProjectSnapshot) -> InvestmentFailure | None:
+def _metadata_failure(item: ProjectSnapshot) -> Snapshot | InvestmentFailure:
+    """Return the verified snapshot, refusing conflicting receipt metadata."""
     snapshot = _reread_snapshot(item.snapshot, item.identity)
     side = snapshot.sidecar
     _ = snapshot.body
+    if any(item.snapshot.sidecar.get(name) != value for name, value in side.items()):
+        return _snapshot_failure(
+            snapshot, "supplied receipt metadata", "differs from verified receipt"
+        )
     if (
         snapshot.receipt_path.name != f"{item.identity}.meta.json"
         or snapshot.sha256 != item.identity
@@ -1237,7 +1243,7 @@ def _metadata_failure(item: ProjectSnapshot) -> InvestmentFailure | None:
         return _refusal(
             item, "invalid_evidence_metadata", "archived parser output", "mismatch"
         )
-    return None
+    return snapshot
 
 
 def _valid_assertion(assertion: SourceAssertion, *, correction: bool = False) -> bool:

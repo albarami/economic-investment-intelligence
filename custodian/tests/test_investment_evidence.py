@@ -1097,6 +1097,55 @@ def test_coordinated_project_sidecar_and_row_substitution_is_refused(
     assert project.snapshot.path.read_bytes() == original_body
 
 
+def _assert_sidecar_only_substitution_is_refused(
+    project: ProjectSnapshot, field: str, substituted: str
+) -> None:
+    original_rows = project.rows
+    original_body = project.snapshot.path.read_bytes()
+    original_receipt = project.snapshot.receipt_path.read_bytes()
+    index_path = (
+        project.snapshot.receipt_path.parent.parent
+        / "index"
+        / f"{project.identity}.json"
+    )
+    original_index = index_path.read_bytes()
+    planted = replace(
+        project,
+        snapshot=replace(
+            project.snapshot,
+            sidecar={**project.snapshot.sidecar, field: substituted},
+        ),
+    )
+    refused = build_project_evidence((planted,))
+    assert getattr(refused, "check", "") == "invalid_evidence_metadata"
+    assert planted.rows == original_rows
+    assert project.snapshot.path.read_bytes() == original_body
+    assert project.snapshot.receipt_path.read_bytes() == original_receipt
+    assert index_path.read_bytes() == original_index
+
+
+def test_sidecar_only_retrieval_time_substitution_is_refused(
+    tmp_path: Path,
+) -> None:
+    """F3 round 3: retrieval time comes only from the verified receipt."""
+    project = _project_snapshot(
+        tmp_path, day="2026-11-14", capex="12.5", marker="retrieval-sidecar"
+    )
+    _assert_sidecar_only_substitution_is_refused(
+        project, "retrieved_utc", "2026-11-15T09:00:00Z"
+    )
+
+
+def test_sidecar_only_source_id_substitution_is_refused(tmp_path: Path) -> None:
+    """F3 round 3: source grouping comes only from the verified receipt."""
+    project = _project_snapshot(
+        tmp_path, day="2026-11-14", capex="12.5", marker="source-sidecar"
+    )
+    _assert_sidecar_only_substitution_is_refused(
+        project, "source_id", "invented_other_source"
+    )
+
+
 def test_coordinated_milestone_sidecar_and_candidate_substitution_is_refused(
     tmp_path: Path,
 ) -> None:
