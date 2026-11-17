@@ -90,6 +90,11 @@ def test_reviewer_sheet_has_exact_seed_and_only_links():
 class DifferentDefaultEncodingPath(type(Path())):
     """Caller-supplied Path whose unspecified text codec is deliberately UTF-16."""
 
+    def read_text(self, encoding=None, errors=None, newline=None):
+        if encoding is None:
+            encoding = "utf-16"
+        return super().read_text(encoding, errors, newline)
+
     def open(self, mode="r", buffering=-1, encoding=None, errors=None, newline=None):
         if "b" not in mode and encoding in (None, "locale"):
             encoding = "utf-16"

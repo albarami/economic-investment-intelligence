@@ -52,6 +52,12 @@ def test_pack_empty_blocks_short_rows_and_header_width():
         assert_message(error, "pack_section_missing")
 
 
+def test_pack_four_cell_family_row_refuses_with_exact_text():
+    with pytest.raises(ValueError) as error:
+        c.pack_sources(pack_text("| `invented` | text |"), {"invented": 1})
+    assert_message(error, "pack_family_row_truncated")
+
+
 def test_catalogue_reads_multiple_lines_and_excludes_next_section():
     assert c.table_catalogue(
         "### 7.2 Table catalogue\n"
@@ -144,7 +150,7 @@ def test_exact_independent_refusals(plant, expected):
 @pytest.mark.parametrize(
     "source", ["traffic_tomtom_flow", "traffic_tomtom_range", "tiles3d_google"]
 )
-@pytest.mark.parametrize("plant", ["receipt", "cache", "row"])
+@pytest.mark.parametrize("plant", ["receipt", "cache", "row", "row_absence"])
 def test_exact_forbidden_refusals(source, plant):
     args = inputs()
     if plant == "receipt":
@@ -175,6 +181,11 @@ def test_exact_forbidden_refusals(source, plant):
         args["entries"].append(row)
         args["receipts"][source] = receipt(row)
         args["outputs"][source] = ("pub_invented",)
+        if plant == "row_absence":
+            args["outputs"][source] = ()
+            args["absences"][source] = c.Absence(
+                "Invented unavailable", "invented_caveat"
+            )
         expected = [
             {
                 "id": source,
@@ -187,7 +198,12 @@ def test_exact_forbidden_refusals(source, plant):
                 "reason": "source_completeness: forbidden row",
             },
         ]
-    assert failed(c.check(**args)) == expected
+    records = c.check(**args)
+    assert failed(records) == expected
+    if plant in {"row", "row_absence"}:
+        assert all(
+            record["state"] == "failed" for record in records if record["id"] == source
+        )
 
 
 @pytest.mark.parametrize(

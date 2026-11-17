@@ -103,6 +103,8 @@ def pack_sources(text: str, family_counts: Mapping[str, int]) -> Pack:
             source = cells[1].strip("`")
             if source in sources:
                 raise ValueError("pack_source_duplicate")
+            if source in family_counts and len(cells) < 5:
+                raise ValueError("pack_family_row_truncated")
             sources[source] = (
                 tuple(re.findall(r"`([^`]+)`", cells[4]))
                 if source in family_counts
@@ -275,6 +277,7 @@ def check(
     for row in entries:
         if row.source_id in forbidden:
             fail(row.key, "source_completeness: forbidden row")
+            continue
         elif row.source_id not in pack.sources and row.source_id not in REGISTER_IDS:
             fail(row.key, "source_completeness: extra registry source")
         if sum(other.key == row.key for other in entries) != 1:
