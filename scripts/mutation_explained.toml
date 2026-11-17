@@ -2657,4 +2657,4 @@ reason = "Validated window endpoints are nonempty and slash-free: with one slash
 [[survivors]]
 module = "custodian/src/eii_custodian/publicdata/property/use_map.py"
 mutation = "--- src/eii_custodian/publicdata/property/use_map.py\n+++ src/eii_custodian/publicdata/property/use_map.py\n@@ -21,6 +21,6 @@\n         pair = (mapping.source_id, mapping.arabic_label, mapping.usage_value)\n         if pair in seen:\n             raise AdditionError(\"use_map_conflict\")\n-        seen[pair] = mapping\n+        seen[pair] = None\n         result.append(mapping)\n     return tuple(result)"
-reason = "seen is read only for key membership; its values are never read or returned, and the mapping itself is appended to the result, so keys, duplicate refusals and output agree."
+reason = "seen is read only for key membership; its values are never read or returned, and the mapping itself is appended to the result, so keys, duplicate refusals and output agree at run time. The repository type check also refuses this mutant (seen holds UseMapping values, so assigning None is an assignment error); the mutation runner runs no type check."
