@@ -16,7 +16,7 @@ from eii_custodian.publicdata.fetch.bounded import file_hash as shared_file_hash
 from eii_custodian.publicdata.fetch.bounded import within as shared_within
 from eii_custodian.publicdata.fetch.decimals import DecimalRefusal, exact_decimal
 
-from .config import TABLES, BaciError, Config, Member, require
+from .config import SCHEMAS, TABLES, BaciError, Config, Member, require
 
 
 def decimal_text(value: str, config: Config) -> str:
@@ -59,6 +59,7 @@ def _rows(zipped: ZipFile, member: Member) -> Iterator[dict[str, str]]:
 
 def parse_archive(path: Path, config: Config, output: Path) -> dict[str, object]:
     """v1 deterministic transform; outputs go only to caller-owned staging."""
+    require(all(m.kind in SCHEMAS for m in config.members), "member_kind")
     require(
         sum(m.kind == "country" for m in config.members) == 1
         and sum(m.kind == "product" for m in config.members) == 1,

@@ -3433,3 +3433,173 @@ reason = "The dumped object has exactly one key, listing_pages_base64, holding a
 module = "custodian/src/eii_custodian/publicdata/fetch/listing.py"
 mutation = "--- src/eii_custodian/publicdata/fetch/listing.py\n+++ src/eii_custodian/publicdata/fetch/listing.py\n@@ -65,7 +65,7 @@\n         url = base + \"&\" + urlencode({\"continuation-token\": token})\n     if not expected.keys() <= found:\n         return _refuse(entry, \"listing_missing\")\n-    body = json.dumps({\"listing_pages_base64\": raw_pages}, sort_keys=True).encode()\n+    body = json.dumps({\"listing_pages_base64\": raw_pages}, sort_keys=False).encode()\n     return Prepared(\n         body,\n         base,"
 reason = "The dumped object has exactly one key, listing_pages_base64, holding a list of strings, so sorting keys or not gives the same bytes."
+
+# S2-T24 r3, L-807 and L-809: exact supplied diffs, re-evaluated after the parser fix.
+
+# Campaign r3 survivor 1.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/parse.py"
+mutation = "--- src/eii_custodian/publicdata/baci/parse.py\n+++ src/eii_custodian/publicdata/baci/parse.py\n@@ -5,7 +5,7 @@\n             value,\n             total_digits=config.total_digits,\n             fractional_digits=config.fractional_digits,\n-            signed=False,\n+            signed=None,\n         )\n     except DecimalRefusal as exc:\n         raise BaciError(exc.reason) from None"
+reason = "decimal_text passes signed to exact_decimal in fetch/decimals.py. That helper uses signed only as a truth condition when selecting _SIGNED versus _UNSIGNED and when stripping a minus. False and None are both false, so the same unsigned grammar, digit checks, returned string and refusals apply to every input."
+
+# Campaign r3 survivor 2.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/parse.py"
+mutation = "--- src/eii_custodian/publicdata/baci/parse.py\n+++ src/eii_custodian/publicdata/baci/parse.py\n@@ -1,7 +1,7 @@\n def _rows(zipped: ZipFile, member: Member) -> Iterator[dict[str, str]]:\n     with zipped.open(member.name) as source:\n         reader = csv.reader(\n-            io.TextIOWrapper(source, encoding=\"utf-8\", newline=\"\"), strict=True\n+            io.TextIOWrapper(source, encoding=\"UTF-8\", newline=\"\"), strict=True\n         )\n         require(next(reader, None) == list(member.header), \"header\")\n         for fields in reader:"
+reason = "Only the explicit codec alias changes from utf-8 to UTF-8. Both names select the same UTF-8 codec; the supplied mode, newline and error arguments are unchanged. Decoded rows or serialized bytes, hashes and refusal behavior are therefore identical."
+
+# Campaign r3 survivor 3.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/config.py"
+mutation = "--- src/eii_custodian/publicdata/baci/config.py\n+++ src/eii_custodian/publicdata/baci/config.py\n@@ -1,3 +1,3 @@\n def mapping(value: object, keys: set[str]) -> dict[str, object]:\n     require(isinstance(value, dict) and set(value) == keys, \"configuration_fields\")\n-    return cast(dict[str, object], value)\n+    return cast(None, value)"
+reason = "Only the first argument of typing.cast changes. cast returns its second argument unchanged without runtime validation. The same value reaches the same guards, iteration or constructor; no value, identity or exception changes for inputs reaching this statement."
+
+# Campaign r3 survivor 8.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/config.py"
+mutation = "--- src/eii_custodian/publicdata/baci/config.py\n+++ src/eii_custodian/publicdata/baci/config.py\n@@ -1,5 +1,5 @@\n def text(value: object, *, empty: bool = False) -> str:\n     require(isinstance(value, str), \"configuration_type\")\n-    result = cast(str, value)\n+    result = cast(None, value)\n     require(empty or bool(result.strip()), \"metadata_missing\")\n     return result"
+reason = "Only the first argument of typing.cast changes. cast returns its second argument unchanged without runtime validation. The same value reaches the same guards, iteration or constructor; no value, identity or exception changes for inputs reaching this statement."
+
+# Campaign r3 survivor 9.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/config.py"
+mutation = "--- src/eii_custodian/publicdata/baci/config.py\n+++ src/eii_custodian/publicdata/baci/config.py\n@@ -1,3 +1,3 @@\n def integer(value: object) -> int:\n     require(type(value) is int, \"configuration_count\")\n-    return cast(int, value)\n+    return cast(None, value)"
+reason = "Only the first argument of typing.cast changes. cast returns its second argument unchanged without runtime validation. The same value reaches the same guards, iteration or constructor; no value, identity or exception changes for inputs reaching this statement."
+
+# Campaign r3 survivor 10.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/config.py"
+mutation = "--- src/eii_custodian/publicdata/baci/config.py\n+++ src/eii_custodian/publicdata/baci/config.py\n@@ -1,6 +1,6 @@\n def bounds(value: object) -> tuple[int, int]:\n     require(isinstance(value, list) and len(value) == 2, \"configuration_bounds\")\n-    items = cast(list[object], value)\n+    items = cast(None, value)\n     low, high = integer(items[0]), integer(items[1])\n     require(0 <= low <= high, \"configuration_bounds\")\n     return low, high"
+reason = "Only the first argument of typing.cast changes. cast returns its second argument unchanged without runtime validation. The same value reaches the same guards, iteration or constructor; no value, identity or exception changes for inputs reaching this statement."
+
+# Campaign r3 survivor 11.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/config.py"
+mutation = "--- src/eii_custodian/publicdata/baci/config.py\n+++ src/eii_custodian/publicdata/baci/config.py\n@@ -1,3 +1,3 @@\n def strings(value: object) -> tuple[str, ...]:\n     require(isinstance(value, list), \"configuration_type\")\n-    return tuple(text(item) for item in cast(list[object], value))\n+    return tuple(text(item) for item in cast(None, value))"
+reason = "Only the first argument of typing.cast changes. cast returns its second argument unchanged without runtime validation. The same value reaches the same guards, iteration or constructor; no value, identity or exception changes for inputs reaching this statement."
+
+# Campaign r3 survivor 12.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/config.py"
+mutation = "--- src/eii_custodian/publicdata/baci/config.py\n+++ src/eii_custodian/publicdata/baci/config.py\n@@ -9,7 +9,7 @@\n     columns = row[\"columns\"]\n     require(isinstance(columns, dict), \"member_schema\")\n     columns = {\n-        text(k): text(v) for k, v in cast(dict[object, object], columns).items()\n+        text(k): text(v) for k, v in cast(None, columns).items()\n     }\n     require(\n         set(columns.values()) == SCHEMAS[kind]"
+reason = "Only the first argument of typing.cast changes. cast returns its second argument unchanged without runtime validation. The same value reaches the same guards, iteration or constructor; no value, identity or exception changes for inputs reaching this statement."
+
+# Campaign r3 survivor 13.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/config.py"
+mutation = "--- src/eii_custodian/publicdata/baci/config.py\n+++ src/eii_custodian/publicdata/baci/config.py\n@@ -22,7 +22,7 @@\n         elif name == \"members\":\n             require(isinstance(item, list), \"configuration_type\")\n             kw[name] = tuple(\n-                Member.load(member) for member in cast(list[object], item)\n+                Member.load(member) for member in cast(None, item)\n             )\n         elif name == \"confirmed\":\n             kw[name] = item"
+reason = "Only the first argument of typing.cast changes. cast returns its second argument unchanged without runtime validation. The same value reaches the same guards, iteration or constructor; no value, identity or exception changes for inputs reaching this statement."
+
+# Campaign r3 survivor 14.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/config.py"
+mutation = "--- src/eii_custodian/publicdata/baci/config.py\n+++ src/eii_custodian/publicdata/baci/config.py\n@@ -31,7 +31,7 @@\n                 item, empty=not bool(row[\"confirmed\"]) or name == \"publisher_sha256\"\n             )\n     # All fields have been checked above; construction does not coerce values.\n-    result = cls(**cast(dict[str, Any], kw))\n+    result = cls(**cast(None, kw))\n     require(\n         result.config_version == \"baci-v1\" and result.method_version == \"v1\",\n         \"method_version\","
+reason = "Only the first argument of typing.cast changes. cast returns its second argument unchanged without runtime validation. The same value reaches the same guards, iteration or constructor; no value, identity or exception changes for inputs reaching this statement."
+
+# Campaign r3 survivor 15.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/config.py"
+mutation = "--- src/eii_custodian/publicdata/baci/config.py\n+++ src/eii_custodian/publicdata/baci/config.py\n@@ -79,7 +79,7 @@\n         years = [\n             m.year\n             for m in result.members\n-            if m.kind == \"trade\" and m.year is not None\n+            if m.kind == \"trade\" or m.year is not None\n         ]\n         require(\n             sorted(years)"
+reason = "Member.load is applied to every input member before this comprehension and requires (kind == \"trade\") == (year is not None). Consequently both operands have the same truth value for every member reaching this code. AND and OR select exactly the same years; direct Config construction does not execute from_mapping."
+
+# Campaign r3 survivor 16.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/config.py"
+mutation = "--- src/eii_custodian/publicdata/baci/config.py\n+++ src/eii_custodian/publicdata/baci/config.py\n@@ -1,6 +1,6 @@\n def load_config(path: Path | None = None) -> Config:\n     target = path or Path(__file__).resolve().parents[4] / \"publicdata/baci.yaml\"\n     try:\n-        return Config.from_mapping(yaml.safe_load(target.read_text(encoding=\"utf-8\")))\n+        return Config.from_mapping(yaml.safe_load(target.read_text(encoding=\"UTF-8\")))\n     except (OSError, yaml.YAMLError):\n         raise BaciError(\"configuration_unreadable\") from None"
+reason = "Only the explicit codec alias changes from utf-8 to UTF-8. Both names select the same UTF-8 codec; the supplied mode, newline and error arguments are unchanged. Decoded rows or serialized bytes, hashes and refusal behavior are therefore identical."
+
+# Campaign r3 survivor 17.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/contracts.py"
+mutation = "--- src/eii_custodian/publicdata/baci/contracts.py\n+++ src/eii_custodian/publicdata/baci/contracts.py\n@@ -5,7 +5,7 @@\n     try:\n         path = directory / f\"{selected}.manifest.json\"\n         require(file_hash(path) == selected, \"manifest_hash\")\n-        manifest = json.loads(path.read_text(encoding=\"utf-8\"))\n+        manifest = json.loads(path.read_text(encoding=\"UTF-8\"))\n         require(\n             isinstance(manifest, dict) and manifest.get(\"complete\") is True,\n             \"manifest_complete\","
+reason = "Only the explicit codec alias changes from utf-8 to UTF-8. Both names select the same UTF-8 codec; the supplied mode, newline and error arguments are unchanged. Decoded rows or serialized bytes, hashes and refusal behavior are therefore identical."
+
+# Campaign r3 survivor 18.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/contracts.py"
+mutation = "--- src/eii_custodian/publicdata/baci/contracts.py\n+++ src/eii_custodian/publicdata/baci/contracts.py\n@@ -78,7 +78,7 @@\n         rows: list[list[dict[str, object]]] = []\n         for table in TABLES:\n             output_hash = outputs[table][\"sha256\"]\n-            require(digest_ok(output_hash), \"output_hash\")\n+            require(digest_ok(output_hash), None)\n             output = directory / f\"{output_hash}.jsonl\"\n             require(file_hash(output) == output_hash, \"output_hash\")\n             rows.append("
+reason = "read_selected reparses the archive and requires parsed[\"outputs\"] == manifest[\"outputs\"] before this loop. parse_archive supplies each output SHA-256 via hexdigest, hence 64 lowercase hexadecimal characters. This digest_ok condition cannot be false for a manifest reaching it, so its changed refusal reason is unreachable. Malformed manifest hashes fail manifest_content earlier; modified output bytes use the separate subsequent output_hash check."
+
+# Campaign r3 survivor 19.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/contracts.py"
+mutation = "--- src/eii_custodian/publicdata/baci/contracts.py\n+++ src/eii_custodian/publicdata/baci/contracts.py\n@@ -78,7 +78,7 @@\n         rows: list[list[dict[str, object]]] = []\n         for table in TABLES:\n             output_hash = outputs[table][\"sha256\"]\n-            require(digest_ok(output_hash), \"output_hash\")\n+            require(digest_ok(output_hash), \"XXoutput_hashXX\")\n             output = directory / f\"{output_hash}.jsonl\"\n             require(file_hash(output) == output_hash, \"output_hash\")\n             rows.append("
+reason = "read_selected reparses the archive and requires parsed[\"outputs\"] == manifest[\"outputs\"] before this loop. parse_archive supplies each output SHA-256 via hexdigest, hence 64 lowercase hexadecimal characters. This digest_ok condition cannot be false for a manifest reaching it, so its changed refusal reason is unreachable. Malformed manifest hashes fail manifest_content earlier; modified output bytes use the separate subsequent output_hash check."
+
+# Campaign r3 survivor 20.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/contracts.py"
+mutation = "--- src/eii_custodian/publicdata/baci/contracts.py\n+++ src/eii_custodian/publicdata/baci/contracts.py\n@@ -78,7 +78,7 @@\n         rows: list[list[dict[str, object]]] = []\n         for table in TABLES:\n             output_hash = outputs[table][\"sha256\"]\n-            require(digest_ok(output_hash), \"output_hash\")\n+            require(digest_ok(output_hash), \"OUTPUT_HASH\")\n             output = directory / f\"{output_hash}.jsonl\"\n             require(file_hash(output) == output_hash, \"output_hash\")\n             rows.append("
+reason = "read_selected reparses the archive and requires parsed[\"outputs\"] == manifest[\"outputs\"] before this loop. parse_archive supplies each output SHA-256 via hexdigest, hence 64 lowercase hexadecimal characters. This digest_ok condition cannot be false for a manifest reaching it, so its changed refusal reason is unreachable. Malformed manifest hashes fail manifest_content earlier; modified output bytes use the separate subsequent output_hash check."
+
+# Campaign r3 survivor 21.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/contracts.py"
+mutation = "--- src/eii_custodian/publicdata/baci/contracts.py\n+++ src/eii_custodian/publicdata/baci/contracts.py\n@@ -84,7 +84,7 @@\n             rows.append(\n                 [\n                     json.loads(line)\n-                    for line in output.read_text(encoding=\"utf-8\").splitlines()\n+                    for line in output.read_text(encoding=\"UTF-8\").splitlines()\n                 ]\n             )\n         registry = {"
+reason = "Only the explicit codec alias changes from utf-8 to UTF-8. Both names select the same UTF-8 codec; the supplied mode, newline and error arguments are unchanged. Decoded rows or serialized bytes, hashes and refusal behavior are therefore identical."
+
+# Campaign r3 survivor 22.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/contracts.py"
+mutation = "--- src/eii_custodian/publicdata/baci/contracts.py\n+++ src/eii_custodian/publicdata/baci/contracts.py\n@@ -117,7 +117,7 @@\n             for table in TABLES\n         )\n         return Release(\n-            tuple(Trade(**cast(dict[str, Any], row)) for row in rows[0]),\n+            tuple(Trade(**cast(None, row)) for row in rows[0]),\n             tuple(Country(**cast(dict[str, Any], row)) for row in rows[1]),\n             tuple(Product(**cast(dict[str, Any], row)) for row in rows[2]),\n             registry,"
+reason = "Only the first argument of typing.cast changes. cast returns its second argument unchanged without runtime validation. The same value reaches the same guards, iteration or constructor; no value, identity or exception changes for inputs reaching this statement."
+
+# Campaign r3 survivor 23.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/contracts.py"
+mutation = "--- src/eii_custodian/publicdata/baci/contracts.py\n+++ src/eii_custodian/publicdata/baci/contracts.py\n@@ -118,7 +118,7 @@\n         )\n         return Release(\n             tuple(Trade(**cast(dict[str, Any], row)) for row in rows[0]),\n-            tuple(Country(**cast(dict[str, Any], row)) for row in rows[1]),\n+            tuple(Country(**cast(None, row)) for row in rows[1]),\n             tuple(Product(**cast(dict[str, Any], row)) for row in rows[2]),\n             registry,\n             lineage,"
+reason = "Only the first argument of typing.cast changes. cast returns its second argument unchanged without runtime validation. The same value reaches the same guards, iteration or constructor; no value, identity or exception changes for inputs reaching this statement."
+
+# Campaign r3 survivor 24.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/contracts.py"
+mutation = "--- src/eii_custodian/publicdata/baci/contracts.py\n+++ src/eii_custodian/publicdata/baci/contracts.py\n@@ -119,7 +119,7 @@\n         return Release(\n             tuple(Trade(**cast(dict[str, Any], row)) for row in rows[0]),\n             tuple(Country(**cast(dict[str, Any], row)) for row in rows[1]),\n-            tuple(Product(**cast(dict[str, Any], row)) for row in rows[2]),\n+            tuple(Product(**cast(None, row)) for row in rows[2]),\n             registry,\n             lineage,\n             manifest,"
+reason = "Only the first argument of typing.cast changes. cast returns its second argument unchanged without runtime validation. The same value reaches the same guards, iteration or constructor; no value, identity or exception changes for inputs reaching this statement."
+
+# Campaign r3 survivor 26.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/baci/fetch.py\n+++ src/eii_custodian/publicdata/baci/fetch.py\n@@ -17,7 +17,7 @@\n         hashlib.sha256(page).hexdigest() == config.page_sha256,\n         \"metadata_changed_review_needed\",\n     )\n-    terms_body = b\"\"\n+    terms_body = None\n     terms_hash = \"\"\n     terms_unread = \"terms_to_be_read\"\n     if entry.terms_url:"
+reason = "terms_body is used only by the final if terms_body and within that branch. With no terms URL or a network_exhausted read, the initial b\"\" and None are both false and no auxiliary terms snapshot is published. A successful _metadata call overwrites either initializer before it is tested. Any other metadata refusal exits before publication; terms_hash and terms_unread are unaffected."
+
+# Campaign r3 survivor 28.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/baci/fetch.py\n+++ src/eii_custodian/publicdata/baci/fetch.py\n@@ -74,7 +74,7 @@\n                         key: value\n                         for key, value in asdict(entry).items()\n                         if key\n-                        not in {\"layer\", \"basis_note\", \"columns\", \"comtrade_policy\"}\n+                        not in {\"layer\", \"basis_note\", \"XXcolumnsXX\", \"comtrade_policy\"}\n                     },\n                     \"refetch\": {\n                         key: value"
+reason = "Changing the excluded columns spelling admits entry.columns into the unpacked dictionary. The following explicit \"columns\" key always overwrites it with the same list of name/type mappings; the intervening refetch comprehension neither reads nor changes columns. json.dumps uses sort_keys=True, so the differing insertion order cannot change manifest bytes, its hash or its parsed values."
+
+# Campaign r3 survivor 29.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/baci/fetch.py\n+++ src/eii_custodian/publicdata/baci/fetch.py\n@@ -74,7 +74,7 @@\n                         key: value\n                         for key, value in asdict(entry).items()\n                         if key\n-                        not in {\"layer\", \"basis_note\", \"columns\", \"comtrade_policy\"}\n+                        not in {\"layer\", \"basis_note\", \"COLUMNS\", \"comtrade_policy\"}\n                     },\n                     \"refetch\": {\n                         key: value"
+reason = "Changing the excluded columns spelling admits entry.columns into the unpacked dictionary. The following explicit \"columns\" key always overwrites it with the same list of name/type mappings; the intervening refetch comprehension neither reads nor changes columns. json.dumps uses sort_keys=True, so the differing insertion order cannot change manifest bytes, its hash or its parsed values."
+
+# Campaign r3 survivor 31.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/fetch.py"
+mutation = "--- src/eii_custodian/publicdata/baci/fetch.py\n+++ src/eii_custodian/publicdata/baci/fetch.py\n@@ -94,7 +94,7 @@\n             }\n             manifest_file = stage / \"manifest.json\"\n             manifest_file.write_text(\n-                json.dumps(manifest, sort_keys=True) + \"\\n\", encoding=\"utf-8\"\n+                json.dumps(manifest, sort_keys=True) + \"\\n\", encoding=\"UTF-8\"\n             )\n             manifest_digest = file_hash(manifest_file)\n             _publish(archive, directory / f\"{digest}.zip\", receipt)"
+reason = "Only the explicit codec alias changes from utf-8 to UTF-8. Both names select the same UTF-8 codec; the supplied mode, newline and error arguments are unchanged. Decoded rows or serialized bytes, hashes and refusal behavior are therefore identical."
+
+# Post-fix anchor of r3 survivor 3; no new equivalence claim.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/parse.py"
+mutation = "--- src/eii_custodian/publicdata/baci/parse.py\n+++ src/eii_custodian/publicdata/baci/parse.py\n@@ -42,7 +42,7 @@\n                         \"sha256\": checksum,\n                         \"bytes\": size,\n                         \"header\": list(member.header),\n-                        \"rows\": 0,\n+                        \"rows\": 1,\n                     }\n                 )\n             countries: set[str] = set()"
+reason = "After L-809, parse_archive rejects kinds outside SCHEMAS before output. Its dictionaries guard permits exactly one country and one product; inventory checks require unique matching member names. Each dictionary receipt is overwritten with its validated count, and the trade loop overwrites every trade receipt, including zero-row members. A refusal returns no receipt. Thus every successful receipt replaces this initializer before it can be observed, also for direct Config inputs. This is the same r3 survivor 3 re-anchored to the fixed function; only its hunk line moved by one."
+
+# Post-fix anchor of r3 survivor 4; no new equivalence claim.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/parse.py"
+mutation = "--- src/eii_custodian/publicdata/baci/parse.py\n+++ src/eii_custodian/publicdata/baci/parse.py\n@@ -54,7 +54,7 @@\n             ):\n                 member = next(m for m in config.members if m.kind == kind)\n                 count = 0\n-                with (output / f\"{table}.jsonl\").open(\"w\", encoding=\"utf-8\") as target:\n+                with (output / f\"{table}.jsonl\").open(\"w\", encoding=\"UTF-8\") as target:\n                     for row in _rows(zipped, member):\n                         key = row[key_field]\n                         require(len(key) == width and key not in keys, \"dictionary_key\")"
+reason = "Only the explicit codec alias changes from utf-8 to UTF-8. Both names select the same UTF-8 codec; the supplied mode, newline and error arguments are unchanged. Decoded rows or serialized bytes, hashes and refusal behavior are therefore identical. This is the same r3 survivor 4 re-anchored to the fixed function; only its hunk line moved by one."
+
+# Post-fix anchor of r3 survivor 5; no new equivalence claim.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/parse.py"
+mutation = "--- src/eii_custodian/publicdata/baci/parse.py\n+++ src/eii_custodian/publicdata/baci/parse.py\n@@ -96,7 +96,7 @@\n             require(config.qatar_key in countries, \"qatar_key\")\n             raw = selected = 0\n             coverage: list[dict[str, object]] = []\n-            with (output / f\"{TABLES[0]}.jsonl\").open(\"w\", encoding=\"utf-8\") as target:\n+            with (output / f\"{TABLES[0]}.jsonl\").open(\"w\", encoding=\"UTF-8\") as target:\n                 for member in config.members:\n                     if member.kind != \"trade\":\n                         continue"
+reason = "Only the explicit codec alias changes from utf-8 to UTF-8. Both names select the same UTF-8 codec; the supplied mode, newline and error arguments are unchanged. Decoded rows or serialized bytes, hashes and refusal behavior are therefore identical. This is the same r3 survivor 5 re-anchored to the fixed function; only its hunk line moved by one."
+
+# Post-fix anchor of r3 survivor 6; no new equivalence claim.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/baci/parse.py"
+mutation = "--- src/eii_custodian/publicdata/baci/parse.py\n+++ src/eii_custodian/publicdata/baci/parse.py\n@@ -141,7 +141,6 @@\n                         result: dict[str, object] = dict(record)\n                         result.update(\n                             year=member.year,\n-                            value=value,\n                             quantity=quantity,\n                             source_id=\"cepii_baci\",\n                             source_version=config.source_version,"
+reason = "decimal_text delegates to exact_decimal, which validates and returns the original input string without conversion. record and result already copy row, including this identical value string. Removing value=value from update leaves the same fields, values and sorted JSON bytes; the preceding validation still runs. This is the same r3 survivor 6 re-anchored to the fixed function; only its hunk line moved by one."
