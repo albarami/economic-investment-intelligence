@@ -2652,3 +2652,228 @@ reason = "With a fixed nonempty separator \" \", the first split component is un
 module = "custodian/src/eii_custodian/publicdata/series/figures.py"
 mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -12,7 +12,7 @@\n     for entry in owned:\n         prefix = \"PASS \" + entry.key + \" sha256=\"\n         matches = [\n-            line[len(prefix) :].split(\" \", 1)[0]\n+            line[len(prefix) :].split(\" \", 2)[0]\n             for line in lines\n             if line.startswith(prefix)\n         ]"
 reason = "With a fixed nonempty separator \" \", the first split component is unchanged by maxsplit=1, maxsplit=2 or no bound, for every input string (including empty, leading-space and repeated-space strings). Only later components differ, and none are read."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -17,8 +17,7 @@\n         before, after = values[(\"69\", \"2021\")], values[(\"69\", \"2025\")]\n         totals = {\n             year: sum(\n-                (value for (_, period), value in values.items() if period == year), ZERO\n-            )\n+                (value for (_, period), value in values.items() if period == year), )\n             for year in (\"2021\", \"2025\")\n         }\n         checks[\"PUB-62\"] = {"
+reason = "LR3 m7 [S]: All terms are Decimal; both zero starts use Decimal addition. Required utility/size groups are nonempty; empty customs sums divide by Decimal before rendering; cancellation sums have three Decimal terms."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -65,8 +65,7 @@\n                         Decimal(str(r[\"number_of_establishments\"]))\n                         for r in chosen[\"sec_hr_size\"]\n                     ),\n-                    ZERO,\n-                )\n+                    )\n             ),\n             \"employees\": str(\n                 sum("
+reason = "LR3 m8 [S]: All terms are Decimal; both zero starts use Decimal addition. Required utility/size groups are nonempty; empty customs sums divide by Decimal before rendering; cancellation sums have three Decimal terms."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -74,8 +74,7 @@\n                         Decimal(str(r[\"number_of_employees\"]))\n                         for r in chosen[\"sec_hr_size\"]\n                     ),\n-                    ZERO,\n-                )\n+                    )\n             ),\n             \"compensation\": str(\n                 indicator[\"compensation_of_employees_value_in_1_000_qr\"]"
+reason = "LR3 m9 [S]: All terms are Decimal; both zero starts use Decimal addition. Required utility/size groups are nonempty; empty customs sums divide by Decimal before rendering; cancellation sums have three Decimal terms."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -94,7 +94,7 @@\n         }\n     if \"cus_imp_2025\" in data:\n         rows = [r for r in data[\"cus_imp_2025\"] if r[\"year\"] == \"2025\"]\n-        total = sum((Decimal(str(r[\"value_in_qatari_riyals\"])) for r in rows), ZERO)\n+        total = sum((Decimal(str(r[\"value_in_qatari_riyals\"])) for r in rows), )\n         checks[\"PUB-66\"] = {\n             \"rows_2025\": str(len(rows)),\n             \"value_bn_2dp\": rounded(total / Decimal(10**9), 2),"
+reason = "LR3 m10 [S]: All terms are Decimal; both zero starts use Decimal addition. Required utility/size groups are nonempty; empty customs sums divide by Decimal before rendering; cancellation sums have three Decimal terms."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -201,7 +201,7 @@\n         issued = data[\"lic_issued\"]\n         converted = contract_rows(\"lic_issued\", issued)\n         checks[\"PUB-69\"] = {\n-            \"sum_count\": str(sum((int(str(r[\"dd_lrkhs_lsdr\"])) for r in issued), 0)),\n+            \"sum_count\": str(sum((int(str(r[\"dd_lrkhs_lsdr\"])) for r in issued), )),\n             \"distinct_codes\": str(len({r[\"rmz_lnsht_ltjry\"] for r in issued})),\n             \"restaurant_source_rows\": str(\n                 sum(r[\"rmz_lnsht_ltjry\"] == \"5610101\" for r in issued)"
+reason = "LR3 m16 [Z]: The omitted sum start defaults to the same integer 0."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -249,8 +249,7 @@\n                 \"combined_share_0dp\": rounded(\n                     ratio(\n                         sum(\n-                            (cancellations.get(m, ZERO) for m in months.values()), ZERO\n-                        ),\n+                            (cancellations.get(m, ZERO) for m in months.values()), ),\n                         dated,\n                     )\n                     * 100,"
+reason = "LR3 m17 [S]: All terms are Decimal; both zero starts use Decimal addition. Required utility/size groups are nonempty; empty customs sums divide by Decimal before rendering; cancellation sums have three Decimal terms."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -28,7 +28,7 @@\n     table_sources: dict[str, list[str]] = {}\n     row_sources: dict[str, list[str]] = {}\n     coverage: dict[str, object] = {}\n-    basket_checked = False\n+    basket_checked = None\n     countries = country_crosswalk()\n     for source, digest in selected.items():\n         rows, receipts[source] = selected_source(cache, by_source[source], digest)"
+reason = "LR3 m18 [B]: Only cus_imp_2025 can produce PUB-65, and always overwrites basket_checked first."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -28,7 +28,7 @@\n     table_sources: dict[str, list[str]] = {}\n     row_sources: dict[str, list[str]] = {}\n     coverage: dict[str, object] = {}\n-    basket_checked = False\n+    basket_checked = True\n     countries = country_crosswalk()\n     for source, digest in selected.items():\n         rows, receipts[source] = selected_source(cache, by_source[source], digest)"
+reason = "LR3 m19 [B]: Only cus_imp_2025 can produce PUB-65, and always overwrites basket_checked first."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -55,7 +55,7 @@\n             coverage[source + \".country_unmatched\"] = sorted(\n                 {\n                     str(r[\"country_of_origin\"])\n-                    for r, c in zip(rows, converted, strict=True)\n+                    for r, c in zip(rows, converted, strict=None)\n                     if r[\"country_of_origin\"] is not None\n                     and str(r[\"country_of_origin\"]) not in countries\n                 }"
+reason = "LR3 m21 [L]: JSON rows and contract_rows outputs are equal-length built-in lists: each customs/licence row appends exactly once or raises first."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -55,7 +55,7 @@\n             coverage[source + \".country_unmatched\"] = sorted(\n                 {\n                     str(r[\"country_of_origin\"])\n-                    for r, c in zip(rows, converted, strict=True)\n+                    for r, c in zip(rows, converted, )\n                     if r[\"country_of_origin\"] is not None\n                     and str(r[\"country_of_origin\"]) not in countries\n                 }"
+reason = "LR3 m22 [L]: JSON rows and contract_rows outputs are equal-length built-in lists: each customs/licence row appends exactly once or raises first."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -55,7 +55,7 @@\n             coverage[source + \".country_unmatched\"] = sorted(\n                 {\n                     str(r[\"country_of_origin\"])\n-                    for r, c in zip(rows, converted, strict=True)\n+                    for r, c in zip(rows, converted, strict=False)\n                     if r[\"country_of_origin\"] is not None\n                     and str(r[\"country_of_origin\"]) not in countries\n                 }"
+reason = "LR3 m23 [L]: JSON rows and contract_rows outputs are equal-length built-in lists: each customs/licence row appends exactly once or raises first."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -78,7 +78,7 @@\n             coverage[source + \".municipality_exact_match\"] = sorted(\n                 {\n                     str(r[\"lbldy\"])\n-                    for r, c in zip(rows, converted, strict=True)\n+                    for r, c in zip(rows, converted, strict=None)\n                     if c[\"municipality_code\"] is None\n                 }\n             )"
+reason = "LR3 m24 [L]: JSON rows and contract_rows outputs are equal-length built-in lists: each customs/licence row appends exactly once or raises first."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -78,7 +78,7 @@\n             coverage[source + \".municipality_exact_match\"] = sorted(\n                 {\n                     str(r[\"lbldy\"])\n-                    for r, c in zip(rows, converted, strict=True)\n+                    for r, c in zip(rows, converted, )\n                     if c[\"municipality_code\"] is None\n                 }\n             )"
+reason = "LR3 m25 [L]: JSON rows and contract_rows outputs are equal-length built-in lists: each customs/licence row appends exactly once or raises first."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -78,7 +78,7 @@\n             coverage[source + \".municipality_exact_match\"] = sorted(\n                 {\n                     str(r[\"lbldy\"])\n-                    for r, c in zip(rows, converted, strict=True)\n+                    for r, c in zip(rows, converted, strict=False)\n                     if c[\"municipality_code\"] is None\n                 }\n             )"
+reason = "LR3 m26 [L]: JSON rows and contract_rows outputs are equal-length built-in lists: each customs/licence row appends exactly once or raises first."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -110,7 +110,7 @@\n         # The reference row has several published measures and no production\n         # field. Compare the actual indicators, never manufacture that measure.\n         indicator_measures = [\n-            target.split(\":\", 1)[1]\n+            target.split(\":\", )[1]\n             for _, target in FIELD_MAP[\"sec_hr_ind\"].values()\n             if target.startswith(\"value:\")\n         ]"
+reason = "LR3 m27 [T]: Closed FIELD_MAP targets have at most one colon; split[1] is guarded by value:. Splits/rsplits listed give identical selected components."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -110,7 +110,7 @@\n         # The reference row has several published measures and no production\n         # field. Compare the actual indicators, never manufacture that measure.\n         indicator_measures = [\n-            target.split(\":\", 1)[1]\n+            target.rsplit(\":\", 1)[1]\n             for _, target in FIELD_MAP[\"sec_hr_ind\"].values()\n             if target.startswith(\"value:\")\n         ]"
+reason = "LR3 m28 [T]: Closed FIELD_MAP targets have at most one colon; split[1] is guarded by value:. Splits/rsplits listed give identical selected components."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -110,7 +110,7 @@\n         # The reference row has several published measures and no production\n         # field. Compare the actual indicators, never manufacture that measure.\n         indicator_measures = [\n-            target.split(\":\", 1)[1]\n+            target.split(\":\", 2)[1]\n             for _, target in FIELD_MAP[\"sec_hr_ind\"].values()\n             if target.startswith(\"value:\")\n         ]"
+reason = "LR3 m29 [T]: Closed FIELD_MAP targets have at most one colon; split[1] is guarded by value:. Splits/rsplits listed give identical selected components."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -121,7 +121,7 @@\n                 \"year\": row[\"year\"],\n                 \"activity_scope\": row[\"main_economic_activity\"],\n                 \"value\": value,\n-                \"measure\": FIELD_MAP[source][field][1].split(\":\", 1)[-1],\n+                \"measure\": FIELD_MAP[source][field][1].split(\":\", )[-1],\n                 \"establishments\": row.get(\n                     \"number_of_establishments\", \"not on this row\"\n                 ),"
+reason = "LR3 m30 [T]: Closed FIELD_MAP targets have at most one colon; split[1] is guarded by value:. Splits/rsplits listed give identical selected components."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -121,7 +121,7 @@\n                 \"year\": row[\"year\"],\n                 \"activity_scope\": row[\"main_economic_activity\"],\n                 \"value\": value,\n-                \"measure\": FIELD_MAP[source][field][1].split(\":\", 1)[-1],\n+                \"measure\": FIELD_MAP[source][field][1].rsplit(\":\", 1)[-1],\n                 \"establishments\": row.get(\n                     \"number_of_establishments\", \"not on this row\"\n                 ),"
+reason = "LR3 m31 [T]: Closed FIELD_MAP targets have at most one colon; split[1] is guarded by value:. Splits/rsplits listed give identical selected components."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -121,7 +121,7 @@\n                 \"year\": row[\"year\"],\n                 \"activity_scope\": row[\"main_economic_activity\"],\n                 \"value\": value,\n-                \"measure\": FIELD_MAP[source][field][1].split(\":\", 1)[-1],\n+                \"measure\": FIELD_MAP[source][field][1].split(\":\", 2)[-1],\n                 \"establishments\": row.get(\n                     \"number_of_establishments\", \"not on this row\"\n                 ),"
+reason = "LR3 m32 [T]: Closed FIELD_MAP targets have at most one colon; split[1] is guarded by value:. Splits/rsplits listed give identical selected components."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -133,7 +133,7 @@\n                         ),\n                         \"measure\": (\n                             indicator_measures,\n-                            FIELD_MAP[source][field][1].split(\":\", 1)[-1],\n+                            FIELD_MAP[source][field][1].split(\":\", )[-1],\n                         ),\n                         \"year\": (reference[\"year\"], row[\"year\"]),\n                         \"establishments\": ("
+reason = "LR3 m33 [T]: Closed FIELD_MAP targets have at most one colon; split[1] is guarded by value:. Splits/rsplits listed give identical selected components."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -133,7 +133,7 @@\n                         ),\n                         \"measure\": (\n                             indicator_measures,\n-                            FIELD_MAP[source][field][1].split(\":\", 1)[-1],\n+                            FIELD_MAP[source][field][1].rsplit(\":\", 1)[-1],\n                         ),\n                         \"year\": (reference[\"year\"], row[\"year\"]),\n                         \"establishments\": ("
+reason = "LR3 m34 [T]: Closed FIELD_MAP targets have at most one colon; split[1] is guarded by value:. Splits/rsplits listed give identical selected components."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -133,7 +133,7 @@\n                         ),\n                         \"measure\": (\n                             indicator_measures,\n-                            FIELD_MAP[source][field][1].split(\":\", 1)[-1],\n+                            FIELD_MAP[source][field][1].split(\":\", 2)[-1],\n                         ),\n                         \"year\": (reference[\"year\"], row[\"year\"]),\n                         \"establishments\": ("
+reason = "LR3 m35 [T]: Closed FIELD_MAP targets have at most one colon; split[1] is guarded by value:. Splits/rsplits listed give identical selected components."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -138,7 +138,7 @@\n                         \"year\": (reference[\"year\"], row[\"year\"]),\n                         \"establishments\": (\n                             reference.get(\n-                                \"number_of_establishments\", \"not on this row\"\n+                                None, \"not on this row\"\n                             ),\n                             row.get(\"number_of_establishments\", \"not on this row\"),\n                         ),"
+reason = "LR3 m36 [R]: confirmed_rows rejects keys outside sec_hr_ind's closed mapping, which excludes every mutated get key; all get calls return their default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -138,7 +138,7 @@\n                         \"year\": (reference[\"year\"], row[\"year\"]),\n                         \"establishments\": (\n                             reference.get(\n-                                \"number_of_establishments\", \"not on this row\"\n+                                \"XXnumber_of_establishmentsXX\", \"not on this row\"\n                             ),\n                             row.get(\"number_of_establishments\", \"not on this row\"),\n                         ),"
+reason = "LR3 m37 [R]: confirmed_rows rejects keys outside sec_hr_ind's closed mapping, which excludes every mutated get key; all get calls return their default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -138,7 +138,7 @@\n                         \"year\": (reference[\"year\"], row[\"year\"]),\n                         \"establishments\": (\n                             reference.get(\n-                                \"number_of_establishments\", \"not on this row\"\n+                                \"NUMBER_OF_ESTABLISHMENTS\", \"not on this row\"\n                             ),\n                             row.get(\"number_of_establishments\", \"not on this row\"),\n                         ),"
+reason = "LR3 m38 [R]: confirmed_rows rejects keys outside sec_hr_ind's closed mapping, which excludes every mutated get key; all get calls return their default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -166,7 +166,7 @@\n         if set(sources) & selected.keys()\n     )\n     checks: dict[str, dict[str, str]] = {}\n-    support = None\n+    support = \"\"\n     groups = [{source: data[source]} for source in data if source not in R1_SOURCES]\n     if R1_SOURCES <= data.keys():\n         groups.append({source: data[source] for source in R1_SOURCES})"
+reason = "LR3 m39 [I]: PUB-67 requires load_support to overwrite support. Failure/frame absence blocks active display; other tables omit support."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -54,7 +54,7 @@\n                     raise ValueError(\"supporting registry identity required\") from None\n                 prefix = \"PASS \" + key + \" sha256=\"\n                 hashes = [\n-                    line[len(prefix) :].split(\" \", 1)[0]\n+                    line[len(prefix) :].split(\" \", )[0]\n                     for line in lines\n                     if line.startswith(prefix)\n                 ]"
+reason = "LR3 m69 [F]: Explicit space split's first token is identical for maxsplit 1, 2 and unlimited, including empty tokens."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -54,7 +54,7 @@\n                     raise ValueError(\"supporting registry identity required\") from None\n                 prefix = \"PASS \" + key + \" sha256=\"\n                 hashes = [\n-                    line[len(prefix) :].split(\" \", 1)[0]\n+                    line[len(prefix) :].split(\" \", 2)[0]\n                     for line in lines\n                     if line.startswith(prefix)\n                 ]"
+reason = "LR3 m71 [F]: Explicit space split's first token is identical for maxsplit 1, 2 and unlimited, including empty tokens."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/support.py"
+mutation = "--- src/eii_custodian/publicdata/series/support.py\n+++ src/eii_custodian/publicdata/series/support.py\n@@ -21,7 +21,7 @@\n     if not classes:\n         raise ValueError(\"supporting provenance has no ISIC classes\")\n     frame_body = (cache / MUNICIPALITY_OUTPUT).read_bytes()\n-    payload = json.loads(frame_body.decode(\"utf-8\"))\n+    payload = json.loads(frame_body.decode(\"UTF-8\"))\n     if not isinstance(payload, dict) or payload.get(\"upstream_sha256\") != {\n         key: selected[key] for key in SUPPORT_KEYS[1:]\n     }:"
+reason = "LR3 m79 [U]: UTF-8 and utf-8 resolve to the identical built-in codec under every locale."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/frame.py"
+mutation = "--- src/eii_custodian/publicdata/series/frame.py\n+++ src/eii_custodian/publicdata/series/frame.py\n@@ -4,7 +4,7 @@\n     if not path.is_file():\n         raise MunicipalityFrameRefused(FRAME_ABSENT)\n     try:\n-        payload = json.loads(path.read_text(encoding=\"utf-8\"))\n+        payload = json.loads(path.read_text(encoding=\"UTF-8\"))\n     except (OSError, ValueError) as exc:\n         raise MunicipalityFrameRefused(FRAME_ABSENT) from exc\n     return parse_frame_municipalities(payload)"
+reason = "LR3 m87 [U]: UTF-8 and utf-8 resolve to the identical built-in codec under every locale."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/parse.py"
+mutation = "--- src/eii_custodian/publicdata/series/parse.py\n+++ src/eii_custodian/publicdata/series/parse.py\n@@ -1,7 +1,7 @@\n def country_crosswalk(*, aliases: Path | None = None) -> dict[str, str | None]:\n     \"\"\"ISO reference plus explicit source aliases; unmatched names stay null.\"\"\"\n     root = Path(__file__).resolve().parents[4] / \"publicdata/review\"\n-    with (root / \"country_iso3.csv\").open(newline=\"\", encoding=\"utf-8\") as stream:\n+    with (root / \"country_iso3.csv\").open(newline=\"\", encoding=\"UTF-8\") as stream:\n         countries: dict[str, str | None] = {\n             row[\"name_en\"]: row[\"iso3\"] for row in csv.DictReader(stream)\n         }"
+reason = "LR3 m111 [U]: UTF-8 and utf-8 resolve to the identical built-in codec under every locale."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/parse.py"
+mutation = "--- src/eii_custodian/publicdata/series/parse.py\n+++ src/eii_custodian/publicdata/series/parse.py\n@@ -7,7 +7,7 @@\n         }\n     codes = set(countries.values())\n     alias_path = root / \"country_aliases.csv\" if aliases is None else aliases\n-    with alias_path.open(newline=\"\", encoding=\"utf-8\") as stream:\n+    with alias_path.open(newline=\"\", encoding=\"UTF-8\") as stream:\n         for row in csv.DictReader(stream):\n             if not row[\"iso3\"]:\n                 if row.get(\"reason\") not in {"
+reason = "LR3 m116 [U]: UTF-8 and utf-8 resolve to the identical built-in codec under every locale."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/places/integrate.py"
+mutation = "--- src/eii_custodian/publicdata/places/integrate.py\n+++ src/eii_custodian/publicdata/places/integrate.py\n@@ -35,7 +35,7 @@\n     try:\n         try:\n             result = build_frame(\n-                cache, tuple(entries), review, None, build_date=build_date\n+                cache, tuple(entries), review, build_date=build_date\n             )\n         except FrameError:\n             _note(log, \"frame\", \"frame_refused\")"
+reason = "LR3 m126 [D]: build_frame output defaults to the same omitted None."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/frame/build.py"
+mutation = "--- src/eii_custodian/publicdata/frame/build.py\n+++ src/eii_custodian/publicdata/frame/build.py\n@@ -4,7 +4,7 @@\n     receipts = sorted(directory.glob(\"*.meta.json\"))\n     if len(receipts) != 1:\n         raise FrameError(f\"{entry.source_id}: expected one cache receipt\")\n-    receipt = json.loads(receipts[0].read_text(encoding=\"utf-8\"))\n+    receipt = json.loads(receipts[0].read_text(encoding=\"UTF-8\"))\n     for key, expected in (\n         (\"source_id\", entry.source_id),\n         (\"key\", entry.key),"
+reason = "LR3 m131 [U]: UTF-8 and utf-8 resolve to the identical built-in codec under every locale."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/frame/build.py"
+mutation = "--- src/eii_custodian/publicdata/frame/build.py\n+++ src/eii_custodian/publicdata/frame/build.py\n@@ -49,6 +49,6 @@\n                 if inspected.reason.startswith(name + \":\")\n                 else f\"{name}: {inspected.reason}\"\n             )\n-    propose_reviews(review, None, set(), inventory, report)\n+    propose_reviews(review, None, None, inventory, report)\n     report.append(\"frame: required geometry unavailable; dependent tables not built\")\n     return FrameResult(tables, report, sources, inventory)"
+reason = "LR3 m135 [N]: propose_reviews returns on output=None before using frame_zones; inspect_cache always passes output=None."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/frame/municipality_output.py"
+mutation = "--- src/eii_custodian/publicdata/frame/municipality_output.py\n+++ src/eii_custodian/publicdata/frame/municipality_output.py\n@@ -22,6 +22,6 @@\n             key: sources[key][\"sha256\"] for key in (\"bnd_hdx\", \"bnd_zone_2020\")\n         }\n     (cache / MUNICIPALITY_OUTPUT).write_text(\n-        json.dumps(payload, ensure_ascii=False, sort_keys=True) + \"\\n\",\n+        json.dumps(payload, ensure_ascii=None, sort_keys=True) + \"\\n\",\n         encoding=\"utf-8\",\n     )"
+reason = "LR3 m140 [J]: JSON ensure_ascii branches on truthiness: False and None select identical output."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/frame/municipality_output.py"
+mutation = "--- src/eii_custodian/publicdata/frame/municipality_output.py\n+++ src/eii_custodian/publicdata/frame/municipality_output.py\n@@ -23,5 +23,5 @@\n         }\n     (cache / MUNICIPALITY_OUTPUT).write_text(\n         json.dumps(payload, ensure_ascii=False, sort_keys=True) + \"\\n\",\n-        encoding=\"utf-8\",\n+        encoding=\"UTF-8\",\n     )"
+reason = "LR3 m141 [U]: UTF-8 and utf-8 resolve to the identical built-in codec under every locale."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/frame/live.py"
+mutation = "--- src/eii_custodian/publicdata/frame/live.py\n+++ src/eii_custodian/publicdata/frame/live.py\n@@ -27,7 +27,7 @@\n             if name == \"census_district_pop\":\n                 raw_layers[name] = []\n                 report.append(f\"{name}: unavailable; no census rows\")\n-                continue\n+                break\n             raise FrameError(f\"{name}: required join source unavailable\")\n         payload, receipt = read_cached(cache, entries[name])\n         sources[name] = receipt"
+reason = "LR3 m143 [E]: census_district_pop is the last fixed loop item; break/continue both finish it identically; no loop else."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/frame/live.py"
+mutation = "--- src/eii_custodian/publicdata/frame/live.py\n+++ src/eii_custodian/publicdata/frame/live.py\n@@ -38,7 +38,7 @@\n     if output is not None:\n         output.mkdir(parents=True, exist_ok=True)\n         with (output / \"municipality_names.csv\").open(\n-            \"w\", encoding=\"utf-8\", newline=\"\"\n+            \"w\", encoding=\"utf-8\", newline=None\n         ) as handle:\n             writer = csv.DictWriter(\n                 handle,"
+reason = "LR3 m144 [W]: On supported Linux/Ubuntu, newline=None/default maps LF to LF; empty newline also preserves all CSV bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/frame/live.py"
+mutation = "--- src/eii_custodian/publicdata/frame/live.py\n+++ src/eii_custodian/publicdata/frame/live.py\n@@ -38,8 +38,7 @@\n     if output is not None:\n         output.mkdir(parents=True, exist_ok=True)\n         with (output / \"municipality_names.csv\").open(\n-            \"w\", encoding=\"utf-8\", newline=\"\"\n-        ) as handle:\n+            \"w\", encoding=\"utf-8\", ) as handle:\n             writer = csv.DictWriter(\n                 handle,\n                 fieldnames=["
+reason = "LR3 m145 [W]: On supported Linux/Ubuntu, newline=None/default maps LF to LF; empty newline also preserves all CSV bytes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/frame/live.py"
+mutation = "--- src/eii_custodian/publicdata/frame/live.py\n+++ src/eii_custodian/publicdata/frame/live.py\n@@ -38,7 +38,7 @@\n     if output is not None:\n         output.mkdir(parents=True, exist_ok=True)\n         with (output / \"municipality_names.csv\").open(\n-            \"w\", encoding=\"utf-8\", newline=\"\"\n+            \"w\", encoding=\"UTF-8\", newline=\"\"\n         ) as handle:\n             writer = csv.DictWriter(\n                 handle,"
+reason = "LR3 m146 [U]: UTF-8 and utf-8 resolve to the identical built-in codec under every locale."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/frame/live.py"
+mutation = "--- src/eii_custodian/publicdata/frame/live.py\n+++ src/eii_custodian/publicdata/frame/live.py\n@@ -77,7 +77,7 @@\n         for d in frame[\"district\"]\n     ]\n     inventory[\"bnd_hdx\"] = {\"zone_code\": tuple(sorted(z.key for z in zones))}\n-    report = [line for line in report if \"unlisted zone numbers\" not in line]\n+    report = [line for line in report if \"XXunlisted zone numbersXX\" not in line]\n     propose_reviews(review, output, {z.key for z in zones}, inventory, report)\n     check_zones(\n         read_csv(review / \"zone_crosswalk.csv\"),"
+reason = "LR3 m149 [P]: The marker contains the original lowercase substring, so it removes a subset of original matches. The second filter removes every extra retained line. propose_reviews only appends; check_zones never sees report."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/frame/live.py"
+mutation = "--- src/eii_custodian/publicdata/frame/live.py\n+++ src/eii_custodian/publicdata/frame/live.py\n@@ -85,7 +85,7 @@\n         {z.key for z in zones},\n     )\n     report = [line for line in report if \"unlisted zone numbers\" not in line]\n-    staged_population: list[dict[str, Any]] = []\n+    staged_population: list[dict[str, Any]] = None\n     if \"pop_muni\" in sources:\n         payload, _ = read_cached(cache, entries[\"pop_muni\"])\n         staged_population, population_reason = population_rows("
+reason = "LR3 m151 [V]: Every staged_population use is guarded by pop_muni in sources, which overwrites it from population_rows first; otherwise unused."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/frame/live.py"
+mutation = "--- src/eii_custodian/publicdata/frame/live.py\n+++ src/eii_custodian/publicdata/frame/live.py\n@@ -122,7 +122,7 @@\n     points = _place_points(cache)\n     resolved: list[dict[str, Any]] = []\n     for filename in (\"showcase_gazetteer.yaml\", \"flagship_candidates.yaml\"):\n-        specs = json.loads((review / filename).read_text(encoding=\"utf-8\"))\n+        specs = json.loads((review / filename).read_text(encoding=\"UTF-8\"))\n         resolved.extend(\n             resolve_reviewed_specs(specs, points, tables[\"grid_cell\"], report)\n         )"
+reason = "LR3 m152 [U]: UTF-8 and utf-8 resolve to the identical built-in codec under every locale."
