@@ -149,12 +149,20 @@ def test_restaurant_selection_requires_both_axes():
     for rows in data.values():
         row = rows[0]
         rows.extend([dict(row, activity_code=551), dict(row, year="2021")])
-    assert figures.compute_checks(data)["PUB-64"] == {
+    from custodian.tests.test_series_exact_regressions import pub64_receipts
+
+    assert figures.compute_checks(data, receipts=pub64_receipts(data))["PUB-64"] == {
         "establishments": "12",
         "employees": "11",
         "compensation": "12",
         "operating_surplus": "11",
         "average_annual_wage": "17",
+        "output_per_employee": "14",
+        "compensation_share_1dp": "7792.2",
+        "operating_surplus_share_1dp": "7142.9",
+        "food_share_1dp": "1.7",
+        "beverages_share_1dp": "0.5",
+        "building_rent_share_1dp": "0.9",
         "goods_share_1dp": "2.5",
         "services_share_1dp": "1.3",
     }
