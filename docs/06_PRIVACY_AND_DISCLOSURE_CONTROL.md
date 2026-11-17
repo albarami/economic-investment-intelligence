@@ -1067,8 +1067,12 @@ classes: target employer group, insiders and colluders.
     `stayer_wage_index`; the changed cohorts of the status-only rows of `occupation_pay`,
     `home_area_share` and `outlet_register` enter only through these identities. For every change that the release
     shows, each non-empty changed cohort satisfies the linear tests of item 6. A unit and tier
-    carried forward add no equality for the later month; their variables still satisfy items 6
-    and 7, and the next comparison runs from the month the release shows. Successive windows add a
+    carried forward add no equality for the later month; their variables still satisfy items 6 and
+    7, and the next comparison runs from the month the release shows: that comparison is held by its
+    own parts, as above, over the universe's tuples, with the month the release shows in place of
+    `m` and the later month of the comparison in place of `m+1`, and the cohorts of each published
+    leaf for that comparison, the `month_change` components and stayers included, are the sums of
+    those parts and not of the parts of the adjacent pair. Successive windows add a
     window index only in a deployment ([17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md)).
 
     *Empty-cohort fixture (invented values).* One `residence` B01/B01 tuple has one earner, the
