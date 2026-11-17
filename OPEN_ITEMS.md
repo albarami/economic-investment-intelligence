@@ -409,12 +409,13 @@
 ## OI-37 — Independent review of the last privacy corrections
 
 - ID: OI-37
-- TYPE: PENDING
+- TYPE: CLOSED (was PENDING)
 - NEEDED: A maker other than the one that last edited [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md) to review the lead's last ten corrections (made on 2026-11-11 after the second confirmation review) and record the review in [PROGRESS.md](PROGRESS.md).
 - WHY: The privacy document was reviewed four times by three makers, but its last ten corrections have not been reviewed by another maker.
 - DONE SO FAR: The lead applied the ten corrections. No independent review of that final correction set is recorded.
 - OPTIONS: **Recommendation:** do not start slice S5 until the different-maker review is complete and recorded.
 - NEEDED BY: Before slice S5 starts.
+- CLOSED: 2026-11-17. Five review rounds by four makers other than the last editor of each round's text found and corrected the remaining defects of PRV-113 and PRV-127; the confirmation of the last correction set returned APPROVED. The chain is recorded in [PROGRESS.md](PROGRESS.md) under "OI-37 — different-maker review of the privacy corrections".
 
 ## OI-38 — Confirmation of the corrections made after the final read-through
 

@@ -29178,3 +29178,17 @@ Notes:     The local report against merged.json downloaded from the real hosted 
 - Required final run: `./eii test --seed 2026111388` executed exactly once, exit 1, wall 1394.619 seconds. Runner counts: 1877 passed, two failed, zero skipped across six suites. Python guards: 582 passed and one failed; core: two passed; custodian: 232 passed; product: 231 passed; web-checks: 829 passed and one failed; web-unit: one passed. No rerun replaced this evidence.
 - Final performance browser: all 41 tests passed, with zero skipped or flaky tests. Comparable launcher-measured browser wall 1227.994 seconds, versus 1692.482 seconds in D1; final Playwright JSON duration 1227.424 seconds. Observed web-checks completion interval 1230.182 seconds, below the unchanged 1800-second limit by 569.818 seconds. The under-twelve-minute target remains unmet. The final launcher waited 777.110 seconds before starting at load 7.50; ending load was 14.50, so sustained below-eight load is not claimed.
 - Final failures: the command exit-table test's nested launcher could not initialize uv's default home cache under the closed suite environment and read-only boundary; the glyph missing-baseline test failed with EXDEV while renaming its baseline into the suite temporary directory. Both are open in OPEN_ITEMS. Neither the environment boundary nor any test or baseline was weakened, and no baseline was refreshed. Only evidence files were finalized after the single D4 run.
+
+## OI-37 — different-maker review of the privacy corrections
+
+- Scope: the ten corrections of 2026-11-11 to [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md) named by open item OI-37, and every correction the reviews below required (PRV-113 items 1, 2, 6 and 11, PRV-116 and PRV-127, with the aligned guard sentences in documents 01, 03, 07, 08, 12 and the glossary).
+- Review 1, OpenAI GPT-6 through Codex, on base 16ca234: REJECTED. Nine of the ten corrections resolved; finding F1 open (remaining-population band constraints missing from PRV-113 and PRV-116).
+- Correction 1, Google Gemini 4 Carbon through Droid: commit 710ac47.
+- Review 2, Anthropic Claude Fable 5.2, on 710ac47: REJECTED. F1 and F2 closed and findings 1 to 10 resolved, with a mechanical check of 1,859 points in agreement; new finding N1: PRV-113 item 11 tied no cohort wage sum to a cohort count.
+- Correction 2, OpenAI GPT-6 through Codex: commit 3d499a3.
+- Confirmation 3, Google Gemini 4 Carbon through Abacus, on 3d499a3: REJECTED on PRV-113 item 11 (the wage-bill cap used the earlier month at the later endpoint).
+- Correction 3, by the lead (Anthropic Claude Opus 5.5): commit 1396568.
+- Confirmation 4, Anthropic Claude Opus 5.5, on 1396568: REJECTED on PRV-113 item 11 (a) (after a carried-forward month the next published comparison was held by no part).
+- Correction 4, by the lead (Anthropic Claude Opus 5.5): commit 04ee6e6.
+- Confirmation 5, Moonshot Kimi K3.1 Pro through the Codex harness, on 04ee6e6: APPROVED, every check of item 11 (a) to (f) passing with quoted text.
+- Each review or confirmation came from a maker other than the one that made the text it read. Documentation-only change: `python3 scripts/check_docs.py` is run on the pull-request head and its exit code is recorded in the pull request.
