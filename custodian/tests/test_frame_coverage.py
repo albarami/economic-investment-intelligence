@@ -276,12 +276,9 @@ def test_registry_pass_three_attribution_and_archive():
         assert row.licence_id == "CC-BY-4.0"
         assert row.licence_basis == "dataset"
         assert row.licence_url == "https://creativecommons.org/licenses/by/4.0/"
-        assert row.skip_reason == (
-            ""
-            if source == "est_census"
-            else "cache_fields_unconfirmed; adapter_unavailable"
-        )
-    assert entries["bnd_muni_2025"].skip_reason == "publisher_or_schema_unconfirmed"
+        assert row.skip_reason == ""
+    assert entries["bnd_muni_2025"].skip_reason == ""
+    assert dict(entries["bnd_muni_2025"].columns)["geo_shape"] == "geojson_geometry"
 
 
 def test_archive_all_property_types_parent_codes_and_multipolygon():

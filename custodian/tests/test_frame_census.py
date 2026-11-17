@@ -1259,7 +1259,7 @@ def test_confirmed_portal_licences_do_not_hide_missing_adapters(tmp_path):
     entries = tuple(e for e in load_registry() if e.source_id in names)
     result = inspect_cache(tmp_path, entries, REVIEW, reviewed_selections(tmp_path))
     for name in names:
-        assert f"{name}: cache_fields_unconfirmed; adapter_unavailable" in result.report
+        assert f"{name}: cache_shape_unconfirmed; no mapping attempted" in result.report
     assert all(not rows for rows in result.tables.values())
     assert result.sources == {}
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import os
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -206,6 +206,7 @@ def _fetch_row(
     clock: Clock,
     sleep: Sleeper,
     token: str = "",
+    registry_entries: tuple[Entry, ...] | None = None,
 ) -> tuple[_Fetched | None, FetchFailure | None]:
     """Fetch one row and return the receipt values this run wrote."""
     if entry.url and not approve(entry.url).ok:
@@ -221,7 +222,9 @@ def _fetch_row(
         prepared = (
             prepare_grid(entry, transport, sleep, token)
             if entry.source_id in GRID_SOURCES
-            else prepare(entry, transport, sleep, cache=cache)
+            else prepare(
+                entry, transport, sleep, cache=cache, registry_entries=registry_entries
+            )
         )
     except (OSError, ValueError):
         return None, FetchFailure(
@@ -257,8 +260,12 @@ def _fetch_row(
         if entry.kind == "https_file"
         else prepared.fetch_url
     )
+    stored_entry = entry
+    if entry.key in {"places_ovt", "bldg_ovt"}:
+        # Listing evidence must not replace the parent's cached Parquet rows.
+        stored_entry = replace(entry, key=entry.key + "/listing", extension="json")
     sidecar = sidecar_for(
-        entry,
+        stored_entry,
         digest=digest,
         nbytes=len(prepared.body),
         fetch_url=stored_url,
@@ -277,11 +284,13 @@ def _fetch_row(
         ),
         coverage_note=prepared.coverage_note,
     )
+    if prepared.requests:
+        sidecar["requests"] = list(prepared.requests)
     try:
         commit_pair(
-            cache_directory(cache, entry.key),
+            cache_directory(cache, stored_entry.key),
             digest,
-            entry.extension,
+            stored_entry.extension,
             prepared.body,
             sidecar,
         )
@@ -620,7 +629,15 @@ def run_build(
             assert placed is not None
             lines.append(pass_line(entry.key, placed.digest, placed.host))
             continue
-        fetched, result = _fetch_row(entry, transport, cache, clock, sleep, token)
+        fetched, result = _fetch_row(
+            entry,
+            transport,
+            cache,
+            clock,
+            sleep,
+            token,
+            registry_entries=tuple(entries),
+        )
         if result is not None:
             lines.append(
                 fail_line(

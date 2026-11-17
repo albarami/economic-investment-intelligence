@@ -36,13 +36,15 @@ class _Body:
 
 
 def test_registry_block_names_the_four_files() -> None:
-    """The appended rows are fetched. The parent rows stay skipped."""
+    """The appended rows fetch whole files; the parents check HTTPS listings."""
     entries = load_registry()
     parents = {
         entry.key: entry for entry in entries if entry.key in {"places_ovt", "bldg_ovt"}
     }
-    assert parents["places_ovt"].skip_reason == "overture_bucket_not_opened"
-    assert parents["bldg_ovt"].skip_reason == "overture_bucket_not_opened"
+    assert parents["places_ovt"].skip_reason == ""
+    assert "?list-type=2&prefix=" in parents["places_ovt"].url
+    assert parents["bldg_ovt"].skip_reason == ""
+    assert parents["bldg_ovt"].url.endswith("theme=buildings/type=building/")
     concrete = [entry for entry in entries if entry.key in FILE_KEYS]
     assert {entry.key for entry in concrete} == set(FILE_KEYS)
     for entry in concrete:

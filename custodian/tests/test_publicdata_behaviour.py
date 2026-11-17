@@ -128,11 +128,14 @@ def _portal_meta(
 def _sidecar(folder: Path) -> dict[str, object]:
     found = [
         p
-        for p in folder.glob("*/*/*.meta.json")
-        if len(p.parent.name) == 10 and p.parent.name[4] == "-"
+        for p in sorted(folder.rglob("*.meta.json"))
+        if p.is_file() and len(p.parent.name) == 10 and p.parent.name[4] == "-"
     ]
     if not found:
-        found = [path for path in folder.rglob("citation.json")]
+        found = [
+            path for path in sorted(folder.rglob("citation.json")) if path.is_file()
+        ]
+    assert found
     assert len(found) == 1
     loaded = json.loads(found[0].read_text(encoding="utf-8"))
     assert isinstance(loaded, dict)

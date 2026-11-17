@@ -426,7 +426,7 @@ def test_fetch_build_runs_selected_cache_checks(tmp_path: Path, monkeypatch) -> 
     entry, digest = series_cache(tmp_path, "sec_hr_ind", [])
     observed = []
 
-    def fetched(*args):
+    def fetched(*args, registry_entries=None):
         return build._Fetched(
             digest, entry.fetch_host, "2026-11-14T00:00:00Z", "", ""
         ), None
