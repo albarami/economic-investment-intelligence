@@ -39,6 +39,9 @@ _EXPORT_SUFFIX = "/exports/json"
 _CC_BY_4_TEXT = "CC BY"
 _CC_BY_4_URL = "https://creativecommons.org/licenses/by/4.0/"
 _SPACE_RUN = re.compile(r"\s+")
+_TRADE_AUXILIARY_SOURCES = frozenset(
+    {"un_comtrade", "cepii_baci", "cepii_gravity", "atlas_complexity"}
+)
 
 Read = Callable[[str], Response]
 
@@ -93,6 +96,8 @@ def prepare(
         result = _paged_cards(entry, sleep, cache)
     else:
         result = _file(entry, reader)
+    if entry.source_id not in _TRADE_AUXILIARY_SOURCES:
+        return result
     return replace(
         result, auxiliary=tuple(r for r in responses if r.body != result.body)
     )
