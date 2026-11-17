@@ -5,6 +5,10 @@ Each package runs from its own folder with source_paths=["src/"] and its own
 tests/ only. Cross-plane scripts/tests/ are not part of a package run.
 For a package run the copy's root is made an empty git repository, so that a
 package test that asks git about an ignore rule gets git's own answer.
+The copy has an empty index: a path tracked despite an ignore rule can differ
+from the checkout (nothing under the cache path is tracked). Its local exclude
+file is the fresh template, not the checkout's local excludes. User-level
+excludes apply to both. This does not reproduce the checkout's complete git state.
 The four typed-decision modules run from the copy's root with evals/ as their
 source root and scripts/tests/test_requalify.py as their test selection.
 Optional S1-T20 pilot discovery, subset and report exports; the default path is local.
@@ -70,19 +74,55 @@ def package_environment() -> dict[str, str]:
     }
 
 
+# OI-168: every tester process, including pilot discovery, gets its own PID space.
+# The inner check refuses a launcher that did not isolate it; no shared-space fallback.
+ISOLATION_PREFIX = (
+    "/usr/bin/bwrap",
+    "--unshare-pid",
+    "--die-with-parent",
+    "--bind",
+    "/",
+    "/",
+    "--proc",
+    "/proc",
+    "--",
+)
+
+
+def isolated_command(
+    folder: Path, arguments: list[str], environment: dict[str, str] | None
+) -> subprocess.CompletedProcess[str]:
+    probe = (
+        "import os,sys; "
+        "current=os.readlink('/proc/self/ns/pid'); "
+        "parent=sys.argv[1]; "
+        "current != parent or sys.exit('Refusing shared process namespace'); "
+        "os.execv(sys.argv[2], sys.argv[2:])"
+    )
+    try:
+        namespace = os.readlink("/proc/self/ns/pid")
+        return subprocess.run(
+            [*ISOLATION_PREFIX, sys.executable, "-c", probe, namespace, *arguments],
+            cwd=folder,
+            env={
+                **(os.environ if environment is None else environment),
+                "PYTHONDONTWRITEBYTECODE": "1",
+            },
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+    except OSError:
+        return subprocess.CompletedProcess(
+            arguments, 2, "", "Refusing unavailable process namespace isolation\n"
+        )
+
+
 def command(
     folder: Path, *arguments: str, environment: dict[str, str] | None = None
 ) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        [sys.executable, "-m", "mutmut", *arguments],
-        cwd=folder,
-        env={
-            **(os.environ if environment is None else environment),
-            "PYTHONDONTWRITEBYTECODE": "1",
-        },
-        text=True,
-        capture_output=True,
-        check=False,
+    return isolated_command(
+        folder, [sys.executable, "-m", "mutmut", *arguments], environment
     )
 
 
@@ -102,7 +142,7 @@ def run_copy(
         if test.startswith("-"):
             print(f"Refusing test selection option: {test}", file=sys.stderr)
             return 2, []
-    if os.environ.get("PYTEST_ADDOPTS"):
+    if os.environ.get("PYTEST_ADDOPTS") or (environment or {}).get("PYTEST_ADDOPTS"):
         print("Refusing PYTEST_ADDOPTS in mutation run", file=sys.stderr)
         return 2, []
     pytest_args = ["-p", "no:cacheprovider"]
@@ -253,17 +293,7 @@ def run_pilot_copy(
             "create_mutants(max_children=1)",
         ]
     )
-    generated = subprocess.run(
-        [sys.executable, "-c", adapter],
-        cwd=folder,
-        env={
-            **(os.environ if environment is None else environment),
-            "PYTHONDONTWRITEBYTECODE": "1",
-        },
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    generated = isolated_command(folder, [sys.executable, "-c", adapter], environment)
     if generated.returncode:
         print("mutation-pilot: generation-failed")
         if options.get("report"):
@@ -336,7 +366,8 @@ def run_pilot_copy(
         ]
     )
     before_cpu = resource.getrusage(resource.RUSAGE_CHILDREN)
-    result = subprocess.run(
+    result = isolated_command(
+        folder,
         [
             sys.executable,
             "-c",
@@ -346,14 +377,7 @@ def run_pilot_copy(
             "--max-children",
             "1",
         ],
-        cwd=folder,
-        env={
-            **(os.environ if environment is None else environment),
-            "PYTHONDONTWRITEBYTECODE": "1",
-        },
-        text=True,
-        capture_output=True,
-        check=False,
+        environment,
     )
     after_cpu = resource.getrusage(resource.RUSAGE_CHILDREN)
     codes = json.loads(meta.read_text())["exit_code_by_key"]

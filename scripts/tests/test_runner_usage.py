@@ -107,7 +107,7 @@ class RunnerUsage(unittest.TestCase):
                     "GITHUB_ACTIONS": "true",
                     "RUNNER_ENVIRONMENT": "github-hosted",
                 },
-                3000,
+                1800,
             ),
             ({"GITHUB_ACTIONS": "true"}, 1800),
             ({"RUNNER_ENVIRONMENT": "github-hosted"}, 1800),

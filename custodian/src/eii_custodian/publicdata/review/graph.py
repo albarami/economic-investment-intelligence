@@ -109,10 +109,6 @@ class GraphError(Exception):
         super().__init__(detail)
 
 
-class GraphRefused(GraphError):
-    """A release graph was requested while its source is refused."""
-
-
 class GraphNode(NamedTuple):
     """One ``graph_node`` row."""
 
@@ -760,7 +756,6 @@ __all__ = [
     "GraphEdge",
     "GraphError",
     "GraphNode",
-    "GraphRefused",
     "build_cached_graph",
     "build_graph",
     "parse_place_categories",

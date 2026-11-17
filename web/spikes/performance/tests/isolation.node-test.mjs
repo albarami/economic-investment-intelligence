@@ -1,7 +1,7 @@
+import { temporaryFolder } from './temporary-folder.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import http from 'node:http';
-import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -94,7 +94,7 @@ test('an isolation check fails when either header is missing', () => {
 });
 
 test('the static server isolates the document, an asset and the trace routes', async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-perf-static-'));
+  const root = temporaryFolder('eii-perf-static-');
   const sink = path.join(root, 'sink');
   const evidence = path.join(root, 'evidence');
   fs.mkdirSync(evidence);
@@ -144,7 +144,7 @@ test('the static server isolates the document, an asset and the trace routes', a
 });
 
 test('the development server isolates the document, an asset and the trace routes', async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-perf-vite-'));
+  const root = temporaryFolder('eii-perf-vite-');
   const sink = path.join(root, 'sink');
   const evidence = path.join(root, 'evidence');
   fs.mkdirSync(evidence);

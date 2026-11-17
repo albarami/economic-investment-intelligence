@@ -1,7 +1,8 @@
+import { waitForResponse } from './response-deadline.mjs';
+import { temporaryFolder } from './temporary-folder.mjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { EventEmitter } from 'node:events';
 import * as trace from '../trace.mjs';
@@ -171,7 +172,7 @@ test('trace names have separated random groups and a fixed collision budget', as
   );
   const chosen = () => 'synthetic.json';
   assert.equal(m.traceNames({ traceName: chosen }, 'unused'), chosen);
-  const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'synthetic-exclusive-'));
+  const folder = temporaryFolder('synthetic-exclusive-');
   try {
     fs.writeFileSync(path.join(folder, 'kept.json'), 'kept');
     let calls = 0;
@@ -218,7 +219,7 @@ test('trace names have separated random groups and a fixed collision budget', as
 });
 
 test('static serving checks file types and reports filesystem failures', async () => {
-  const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'synthetic-static-'));
+  const folder = temporaryFolder('synthetic-static-');
   const m = await module();
   try {
     for (const [extension, type] of Object.entries({
@@ -240,13 +241,13 @@ test('static serving checks file types and reports filesystem failures', async (
         'synthetic',
       );
       const r = response();
-      const done = new Promise((resolve) => {
+      const done = waitForResponse((resolve) => {
         r.end = (body) => {
           r.bodies.push(body);
           resolve();
         };
+        m.serveStatic(folder, '/synthetic.' + extension, r);
       });
-      m.serveStatic(folder, '/synthetic.' + extension, r);
       await done;
       assert.equal(r.headers[0].status, 200);
       assert.equal(r.headers[0].headers['content-type'], type);
@@ -254,13 +255,13 @@ test('static serving checks file types and reports filesystem failures', async (
     }
     for (const route of ['/absent.txt', '/']) {
       const r = response();
-      const done = new Promise((resolve) => {
+      const done = waitForResponse((resolve) => {
         r.end = (body) => {
           r.bodies.push(body);
           resolve();
         };
+        m.serveStatic(folder, route, r);
       });
-      m.serveStatic(folder, route, r);
       await done;
       assert.equal(r.headers[0].status, 404);
       assert.equal(r.bodies[0], 'unknown-route');
@@ -422,7 +423,7 @@ test('listening failures and Vite cleanup are observable without starting a nati
 });
 
 test('trace receipt handles malformed bodies, safe layer names, stamps and native paths', async () => {
-  const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'synthetic-receive-'));
+  const folder = temporaryFolder('synthetic-receive-');
   const m = await module();
   try {
     let ordinal = 0;

@@ -1,7 +1,7 @@
+import { temporaryFolder } from './temporary-folder.mjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import * as config from '../config.mjs';
 import data from '../road-data.json' with { type: 'json' };
@@ -141,7 +141,7 @@ for (const layerSet of Object.keys(config.ROAD_LOADS)) {
     }
   });
   test(`${layerSet} evidence refuses a missing dedicated capture`, () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'road-evidence-'));
+    const root = temporaryFolder('road-evidence-');
     try {
       fs.writeFileSync(
         path.join(root, 'native-capture.md'),

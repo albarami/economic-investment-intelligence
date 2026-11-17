@@ -1191,7 +1191,7 @@ ISIC 5610 Restaurants. The correct result is the "not mappable" bucket. By contr
 | PUB-39 | The spine records its code system version (`licence_codes_2025_05`). The commerce ministry began recoding activities to the GCC unified classification from 1 June 2026 (Qatar News Agency, 1 June 2026); a later snapshot with new codes needs a new reviewed version, never a silent remap. |
 | PUB-40 | English labels for codes come from the ISIC class title, marked as the class title, not as a translation of the Arabic activity name. |
 
-S2-T04 builds the offline activity spine from `custodian/publicdata/review/activity_spine.csv` and `custodian/publicdata/review/category_allowlist.csv`, with coverage method `activity_spine.v1`, and the classification source stays unconfirmed so titles derived from it stay barred from release (PUB-13).
+S2-T04 builds the offline activity spine from `custodian/publicdata/review/activity_spine.csv` and `custodian/publicdata/review/category_allowlist.csv`, with coverage method `activity_spine.v1`, and titles and mappings may enter a release under decision 0026. The publisher's terms words remain to be read and recorded (OI-204); that pending reading does not bar release (PUB-12, PUB-13).
 
 S2-T05's [offline triage command](../scripts/spine_triage.md) reuses the S2-T04 loader and refuses a stale queue before requesting evidence. Provider `none` preserves the baseline order; recorded or exactly qualified evidence may order and pre-fill only a separate suggestions file. The candidate binding is a title/version snapshot, never sign-off: a person signs every mapping through PUB-35, and the decision records stay under eval artefacts (DAT-126).
 

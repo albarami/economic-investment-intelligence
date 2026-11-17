@@ -552,3 +552,45 @@ def _entry(source_id: str):
         if entry.source_id == source_id:
             return entry
     raise AssertionError("registry row missing: " + source_id)
+
+
+def test_retired_graph_refusal_is_not_exposed():
+    from eii_custodian.publicdata.review import graph
+
+    assert not hasattr(graph, "GraphRefused")
+    assert "GraphRefused" not in graph.__all__
+
+
+def test_cached_release_writes_the_graph(tmp_path):
+    import importlib.util
+
+    from eii_custodian.publicdata.review.cache_fixture import read_parquet
+
+    spec = importlib.util.spec_from_file_location(
+        "invented_graph_helpers", Path(__file__).with_name("test_activity_graph.py")
+    )
+    assert spec is not None and spec.loader is not None
+    helpers = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(helpers)
+    from eii_custodian.publicdata.review.graph import build_cached_graph
+
+    helpers._write_cached_feeds(tmp_path)
+    review = helpers._review_csv(tmp_path)
+    helpers._binding_beside(review, titles=(("5610", helpers._RESTAURANT, ""),))
+    graph = build_cached_graph(
+        tmp_path,
+        review,
+        helpers._allowlist_csv(tmp_path),
+        (),
+        supplier_membership=_NO_SUPPLIERS,
+        mode="release",
+    )
+    output = tmp_path / "written"
+    nodes, edges = write_graph(graph, output, registry=load_registry(), mode="release")
+    assert read_parquet(nodes.read_bytes()) == tuple(
+        dict(node._asdict()) for node in graph.nodes
+    )
+    assert read_parquet(edges.read_bytes()) == tuple(
+        dict(edge._asdict()) for edge in graph.edges
+    )
+    assert any(edge.edge_type == "classified_as" for edge in graph.edges)

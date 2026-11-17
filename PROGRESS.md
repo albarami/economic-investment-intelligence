@@ -34707,3 +34707,101 @@ written.
 |---|---|---|---|
 | 2026-11-18 | Pin-security confirmation of fix pass 10 (L-935 F1 to F4) | Read-only review, tree clean before and after; verdict file of job S2-T29.pinsec2, exit 0, 424 s | Anthropic Claude Fable 5.2 (login C), another maker than the builder (OpenAI): APPROVED, no findings |
 | 2026-11-18 | Lens T confirmation 10 of fix pass 10 | Read-only review; verdict file of job S2-T29.cf10T, exit 0, 225 s | Moonshot AI Kimi K3.1 Pro (Droid), another maker than the builder: APPROVED, no findings |
+### S2-T10 — Review follow-up, part A: uncommitted worker evidence
+
+- Date: 2026-11-17. Maker/model: OpenAI GPT-6 Astra through Codex, as assigned by the part A brief. Builder persona: senior release engineer of public-data pipelines and test infrastructure. Strict reviewer persona: independent review-infrastructure and provenance reviewer from another maker; the lead assigned Z.ai GLM-5.3. No independent verdict is claimed here.
+- Skills: project-orientation, task-standards, github-flow, sanad-provenance and muhasabah-gate. The named test-driven-development and verification-before-completion skills were not installed; the brief's equivalent rules were applied directly.
+- Base commit: `b48785de632b285b22dfde26ee80b746a8c7ba9d`; branch `feat/s2-t10-parta`. This is an uncommitted work tree, not evidence on a new commit. The lead owns commit, review and hosted proof. No TASKS.md criterion or Delivery status changes; decision 0027 and ci_environment.py remain unchanged. OI-158 remains open.
+- Environment: supplied locked Python environment; no network fetch or mutation campaign; recorded checks set UV_OFFLINE=1, use the workspace temporary directory and restrict heavy commands to processors 0–3. Full-run seed: `2026111743`. The workspace lacks the web packages and the test output identifies missing engine-extension and scanner artifacts. No dependency installation or fallback was used.
+- Changes: proposed closure records in OPEN_ITEMS.md; deferred requirements in document 17; strict district-alias CSV shape checks; whole-response test-client deadlines and externally terminated test-folder cleanup; supplied PYTEST_ADDOPTS refusal; private process namespace for every mutation tester launch, with refusal plants; retired graph export removal and cached release coverage; triage-test stdout capture; hosted suite timeout restored to the table value. No performance speed-up or mutation-survivor campaign belongs to this part.
+- Limits: the full run failed; its runner totals and its embedded guard totals differ and are recorded separately below. Integrated web verification is owed. PO-S2-11 and 66 differ from the plan's description; PO-S2-59 exposes an existing prohibited dynamic call when the proposed purity scan is widened; PO-S2-63 needs placeholder/admitted-basis separation. Their records remain open, as do the lead decisions and causal investigations named in the return. The cached-release addition is coverage of working code, not a production red/green fix; PO-S2-34 uses its explicit README alternative.
+
+#### PO-S2-02: mapping the copied S1-T08 confirmation checks
+
+This is an additive reading of the unchanged verdict under **S1-T08: independent review, round 2 (the confirmation): APPROVED**, on `d02c57fcbcfec57255d868888c09afad5e80c364`. Its local numbering is not the canonical checklist numbering. This table maps subject matter only: it does not invent a new review, expand a PASS, or retroactively assert an unrecorded check.
+
+| Label in copied verdict | Subject it actually checks | Canonical checklist correspondence |
+|---|---|---|
+| 1 | No calculation/comparison code changed | REV-20, partial scope evidence only |
+| 2 | No privacy-sensitive change | REV-22 |
+| 3 | No gateway/assistant change | REV-38 |
+| 4 | No template, chip or UI change | REV-21; scope evidence for REV-24 |
+| 5 | Provenance fields and citations preserved | REV-20 |
+| 6 | Repository-only record reads | REV-12 and REV-18, partial evidence |
+| Local REV-01 | Focused coverage and recorded whole-suite count | REV-10 and REV-11, partial evidence |
+| Local REV-02 | Scope | REV-12 |
+| Local REV-03 | Repository conventions | REV-16 |
+| Local REV-04 | Test clarity and no unused implementation | REV-13 and REV-16, partial evidence |
+| Local REV-05 | Four permitted files plus ledger/base records | REV-12 and REV-17, partial evidence |
+| Local REV-06 | No installation, services or prohibited-path access | REV-18, partial evidence |
+| Local REV-07 | Red, green and planted violations | REV-11 and REV-15, partial evidence |
+| Local REV-08 | Recorded commands and head checks | REV-11 |
+| Local REV-09 | Conventional Commit check | REV-16 |
+| Local REV-10 | Ledger commits, commands, counts, seeds and environment | REV-11 and REV-17, partial evidence |
+| Local REV-11 | Six hosted checks green | REV-11 |
+
+Canonical REV-14, REV-19, REV-23 and REV-25 to REV-29 are not individually answered in that copied CHECKS block. Its no-UI sentence supplies scope evidence for REV-24 but does not explicitly justify N/A. Its scope and coverage sentences do not supply a full independent REV-10 or REV-15 verdict. The surrounding record identifies the maker and full commit and says the verdict was copied unchanged; those facts do not turn the misnumbered local rows into canonical REV-01 to REV-09 answers. This addendum closes the mapping request only, preserving the original verdict and its evidence limits.
+
+#### Part A commands and results
+
+Commands below are the child commands run through `.overnight/check.py`, which preserves their real return status and redacted output. No failed check was converted to success. Repeated checks followed concrete changes (citation, import, or formatting corrections), not blind retries.
+
+| Command | Exit | Counts/result |
+|---|---:|---|
+| `python3 scripts/check_tree.py` | 0 | checked 8 rules: OK |
+| `taskset -c 0-3 uv run --locked python scripts/check_reference_notes.py` | 1 | checked 2 files, 6 libraries, 359 rows: 4 failure(s) |
+| `taskset -c 0-3 uv run --locked python scripts/check_reference_notes.py` | 0 | checked 2 files, 6 libraries, 359 rows: OK |
+| `taskset -c 0-3 uv run --locked python scripts/check_versions.py` | 0 | checked 67 components: OK |
+| `uv lock --check` | 0 | Resolved 62 packages in 1ms |
+| `cmp AGENTS.md CLAUDE.md` | 0 | Byte-identical. |
+| `taskset -c 0-3 uv run --locked ruff check .` | 1 | Failed; diagnostic retained in .overnight/checks.json; correction and later check recorded separately. |
+| `taskset -c 0-3 uv run --locked mypy` | 0 | Success: no issues found in 304 source files |
+| `taskset -c 0-3 uv run --locked ruff check .` | 0 | All checks passed! |
+| `taskset -c 0-3 uv run --locked ruff format --check .` | 0 | 457 files already formatted |
+| `taskset -c 0-3 ./eii test --seed 2026111743` | 1 | runner total 5189 passed, 91 failed, 0 skipped; 6 suites, 3 with problems. Inner guard output: 844 passed, 51 failed, 16 errors (runner summary differs). |
+| `taskset -c 0-3 node --test web/spikes/performance/tests/lifecycle.node-test.mjs` | 0 | # tests 4; # pass 4; # fail 0 |
+| `taskset -c 0-3 uv run --locked python -m pytest custodian/tests/test_frame_alias_headers.py custodian/tests/test_activity_planted.py custodian/tests/test_rules_config.py core/tests/test_calculation_purity.py scripts/tests/test_mutation_environment.py scripts/tests/test_spine_triage.py scripts/tests/test_pin_rulings.py scripts/tests/test_reference_notes_real.py scripts/tests/test_runner_usage.py scripts/tests/test_runner_failures.py -q -p no:cacheprovider` | 0 | 209 passed, 64 subtests passed in 50.49s |
+| `taskset -c 0-3 npm --prefix web run format:check` | 127 | Prettier absent; no formatting verdict. |
+| `taskset -c 0-3 uv run --locked python scripts/check_reference_notes.py` | 0 | checked 2 files, 6 libraries, 359 rows: OK |
+| `python3 scripts/check_docs.py` | 0 | checked 703 text files, 96 Markdown files: OK |
+| `python3 scripts/check_tree.py` | 0 | checked 8 rules: OK |
+| `taskset -c 0-3 uv run --locked ruff check .` | 0 | All checks passed! |
+| `taskset -c 0-3 uv run --locked ruff format --check .` | 0 | 457 files already formatted |
+| `taskset -c 0-3 uv run --locked mypy` | 0 | Success: no issues found in 304 source files |
+| `taskset -c 0-3 uv run --locked python scripts/check_versions.py` | 0 | checked 67 components: OK |
+| `uv lock --check` | 0 | Resolved 62 packages in 1ms |
+| `cmp AGENTS.md CLAUDE.md` | 0 | Byte-identical. |
+| `taskset -c 0-3 uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` | 1 | Ran 870 tests in 405.500s; FAILED (failures=39, errors=5) |
+
+#### Earlier red/green and diagnostic runs
+
+These were observed before the consolidated command recorder was added. The original failure remains recorded; later green evidence does not erase it. Exact selector strings for the withdrawn experimental purity tests were not preserved, so this report does not invent them.
+
+| Command / selection | Exit | Observed result |
+|---|---:|---|
+| `uv run --offline --locked python -m unittest` targeting hosted usage, hosted timeout and supplied mutation environment tests (initial invocation without scripts/tests on PYTHONPATH) | 1 | Three errors: two runner_support import errors and the real supplied-options path reaching file access. |
+| `PYTHONPATH=scripts/tests taskset -c 0-3 uv run --offline --locked python -m unittest scripts.tests.test_runner_usage.RunnerUsage.test_web_checks_limit_on_a_hosted_runner scripts.tests.test_runner_failures.RunnerFailures.test_hosted_web_checks_timeout_prints_the_selected_limit -v` before runner change | 1 | Two failures: old hosted 3000 value. |
+| Same hosted selectors plus supplied mutation-environment test after implementation | 0 | Three tests passed. |
+| Pytest selection of alias-header plants, retired graph export, and two proposed purity-discovery tests before implementation | 1 | 15 failed, one passed. |
+| Pytest alias-header, activity-planted and expanded purity selection after changes | 1 | 39 passed, one failed: apportion dynamic getattr; purity experiment withdrawn, PO-S2-59 remains open. |
+| `taskset -c 0-3 uv run --locked python -m unittest scripts.tests.test_mutation_environment -v` before isolation helper | 1 | Two tests, one error: missing helper; after implementation exit 0, two tests. |
+| Pytest stdout fixture regression before redirect | 1 | One failure: OK unsigned queue leaked to suite stdout; corrected and covered by final focused run. |
+| Pytest cached release test development | 1 | First invocation: missing review.cache import; second invocation: sibling helper import failed. Both corrected; next invocation exit 0, one passed. These import failures are not claimed as a semantic guard plant. |
+| `taskset -c 0-3 node --test web/spikes/performance/tests/mutation-server.node-test.mjs web/spikes/performance/tests/trace.node-test.mjs` | 1 | Both test files failed to start: TypeScript and Vite absent. |
+| `taskset -c 0-3 node --test web/spikes/performance/tests/lifecycle.node-test.mjs` with initial unbounded helper and no cleanup | 1 | Initial order cancelled three tests; reordered plant failed on surviving temporary folder and cancelled two response tests. |
+| Same lifecycle command after helper implementation | 0 | Three passed; after strengthening to owner process-group SIGKILL plus real unfinished HTTP client, four passed. |
+| Initial `uv run --locked ruff check .` | 1 | Import order and raw-regex diagnostic; fixed. |
+| `uv run --locked ruff format .` | 0 | Five files reformatted, 452 unchanged; subsequent invocation 457 unchanged. |
+| Initial `uv run --locked mypy` | 2 | Module discovered under two names due direct mutation import; changed test to importlib; later check passed. |
+| Initial `python3 scripts/check_docs.py` | 0 | 703 text files, 96 Markdown files. |
+| `git diff --check` | 0 | No whitespace errors. |
+
+PO-S2-34 uses the item's explicit documentation alternative, so no server code or new guard was added. PO-S2-64 adds coverage to an already working production path; it has no honest failing production baseline. Those two rows do not claim red/green production fixes.
+
+Full-run limits: the wrapper reported 840/45 for python-guards while its embedded pytest tail reported 844 passed, 51 failed and 16 errors; both observations are retained, not silently reconciled. Core: 606 passed; custodian: 2229 passed; product: 786 passed. Web-checks: 728 passed, 46 failed; web-unit could not start without Vitest. The test output identifies absent engine extensions, secret-scanner tooling and web packages, and offline environment setup failures. Pin-note and reference-note failures were separately corrected and verified; remaining failures were not hidden or skipped. No assertion or tolerance was weakened.
+
+#### Part A final record checks and corrections
+
+After the return's evidence table was appended, `python3 scripts/check_docs.py` exited 0 (703 text files, 96 Markdown files). `git diff --check` then exited 2 for an extra blank line at the end of this newly appended entry; removing that blank line made the same check exit 0. No earlier evidence row was rewritten. Final script discovery had already finished with exit 1: 870 tests in 405.500 seconds, 39 failures and five errors; its failed-test diagnostics identify missing gitleaks, Vitest and engine-extension prerequisites. The focused changed-path set remained exit 0, 209 tests and 64 subtests; lifecycle tests exit 0, four passed. Web formatting verification exited 127 because Prettier is absent. These failures stay in the evidence and the return.
+
+Final read-only invariant check (Python byte comparisons against git show HEAD), exit 0: the earlier PROGRESS.md bytes remain an exact prefix; AGENTS.md and CLAUDE.md match; TASKS.md, scripts/ci_environment.py and decision 0027 are unchanged; the return report exists.

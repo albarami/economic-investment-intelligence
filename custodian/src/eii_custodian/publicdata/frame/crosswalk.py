@@ -8,9 +8,25 @@ from typing import Any
 from .checks import FrameError, safe_key
 
 
-def read_csv(path: Path) -> list[dict[str, str]]:
+def read_csv(
+    path: Path, *, header: tuple[str, ...] | None = None
+) -> list[dict[str, str]]:
     with path.open(encoding="utf-8", newline="") as handle:
-        return list(csv.DictReader(line for line in handle if not line.startswith("#")))
+        lines = (line for line in handle if not line.startswith("#"))
+        if header is None:
+            return list(csv.DictReader(lines))
+        reader = csv.reader(lines, strict=True)
+        try:
+            if next(reader, None) != list(header):
+                raise FrameError("district_alias: CSV header")
+            rows = []
+            for row in reader:
+                if len(row) != len(header):
+                    raise FrameError("district_alias: CSV row width")
+                rows.append(dict(zip(header, row, strict=True)))
+            return rows
+        except csv.Error as exc:
+            raise FrameError("district_alias: CSV row width or syntax") from exc
 
 
 def normalise_name(name: str) -> str:

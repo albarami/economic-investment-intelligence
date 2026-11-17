@@ -19,17 +19,17 @@ From the repository root, with Node 22 first on `PATH`. The headless shell is th
 - `npm --prefix web run spike:glyphs:install-browser` is the prerequisite when the shell is missing. It needs the network once. A missing browser fails the suite and names this command.
 - `npm --prefix web run test:spike:performance` runs the Node tests. The browser tests build the page into a temporary folder, assert the layer counts (two, or three with roads) and the recorder contract, and do not assert a frame rate.
 - `npm --prefix web run spike:performance:serve` starts a loopback server and prints three addresses (original set, first road load, full street load; see Road trace hand-off). Open the first in Windows Chrome or Edge on the host. When the page does not refuse the environment, it runs a 30-second orbit itself, shows the result, and posts the trace. The server writes the file under `web/spikes/performance/evidence/`.
-- `npm --prefix web run spike:performance:verify-evidence` checks a committed native trace. Until the owner commits one, it fails with `missing-native-trace` and writes nothing.
+- `npm --prefix web run spike:performance:verify-evidence` checks a committed native trace. The S1-T12 traces are committed; a missing capture still fails with `missing-native-trace` and writes nothing.
 
 The development server and the static server used by the tests send `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` on the document, its scripts, styles, worker scripts and data files, and on the answers of the trace routes. Without those two headers the browser is not cross-origin isolated and reports `performance.now()` in steps of 0.1 ms, so an on-time 16.667 ms frame is read as 16.6 or 16.7 and the gate, which counts only intervals strictly under 16.7 ms, can miss the share. The lead's measurement of that effect was made in a headless browser and says nothing yet about the native screen.
 
-`./eii test` runs these Node tests with the other web checks. Those runs use a short orbit. They report counts. They do not decide the frame-rate gate. The native frame-rate gate is pending.
+`./eii test` runs these Node tests with the other web checks. Those runs use a short orbit. They report counts. They do not decide the frame-rate gate. The S1-T12 native trace passed the hexagon-and-particle gate; the two road traces record shares without a bound (PROGRESS.md, slice S1 gate addendum).
 
 ## What the owner records
 
 The serve command prints a line that ends in `/en/_perf`. Open that exact address in Windows Chrome or Edge, outside WSL. Leave the page open until it shows a path. That path is a JSON file under `web/spikes/performance/evidence/`. The page also says `native frame-rate gate pending`.
 
-The evidence command also needs `web/spikes/performance/evidence/native-capture.md`, committed with the trace. Its lines are `role`, `date`, `host`, `browser`, `trace` and `sha256`. `role` is `owner`, `host` is `windows-native`, `browser` is `chrome` or `edge`, `date` is `YYYY-MM-DD`, `trace` is the repository path of the JSON file, and `sha256` is `sha256:` plus the file's digest. Both files must be committed and unchanged. This spike does not create that capture file and does not invent a trace.
+The evidence command also needs `web/spikes/performance/evidence/native-capture.md`, committed with the trace. Its lines are `role`, `date`, `host`, `browser`, `trace` and `sha256`. `role` is `owner`, `host` is `windows-native`, `browser` is `chrome` or `edge`, `date` is `YYYY-MM-DD`, `trace` is the repository path of the JSON file, and `sha256` is `sha256:` plus the file's digest. Before computing the capture digest, run `npm run format` from `web/` to format the saved trace. Compute SHA-256 from those formatted bytes and update the matching capture record, then run `npm run format:check` and `npm run spike:performance:verify-evidence` from `web/`. Both files must be committed and unchanged. This spike does not create that capture file and does not invent a trace.
 
 ## Trace
 
@@ -172,3 +172,14 @@ Run only one mutation job on the machine, at normal priority. Killed, survived,
 timed-out, uncovered and error counts remain separate. The runner prints exact
 locations and replacements for timed-out mutants as well as survivors, so every
 timeout can be replayed alone at normal load before interpreting it as evidence.
+
+### Test process lifetime
+
+The performance tests create their temporary folders through
+`tests/temporary-folder.mjs`. A detached cleanup process watches a pipe from
+the owner, so termination of the owner's process group still removes that
+folder. Normal completion keeps the existing immediate cleanup. The lifecycle
+plant kills an owner process group and checks that its folder disappears.
+Waiting test clients use `tests/response-deadline.mjs` for a whole-response
+deadline; a response that never ends rejects and closes its request. These are
+test infrastructure limits, not changes to the browser's performance bounds.
