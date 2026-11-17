@@ -149,10 +149,16 @@ The small-map road plants that expect reduced-counts rely on the count check
 being decided before the canvas check. A node test pins that order.
 A foreign request rejects the page helper as soon as the request is seen once
 the page URL is http. The rejection text is unchanged.
-The JSON reporter also writes `test-results/performance-timings.json` relative to this spike's
-Playwright configuration directory, allowing the repository test run's individual
+The browser run keeps every artifact inside this spike's own `test-results/`
+folder, relative to this spike's Playwright configuration directory: the
+explicit `outputDir` holds the failure contexts and the last-run marker, and
+the JSON reporter also writes `test-results/performance-timings.json` there,
+allowing the repository test run's individual
 browser durations and overall Playwright duration to be inspected without a
-second full browser run.
+second full browser run. No run of this suite writes the web root's own
+`test-results` folder, so the glyph browser runner running beside this one in
+the web-checks suite cannot collide with these artifacts, and this run cannot
+change the glyph suite's watched listings.
 
 The mutation runner sets `workers = min(4, processors)` and passes
 `--test-concurrency=max(1, processors // workers)` to Node in every mutant's test

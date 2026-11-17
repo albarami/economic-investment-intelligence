@@ -19,4 +19,6 @@ From the repository root, with Node 22 first on `PATH`:
 
 `./eii test` runs the spike's Node tests with the other web checks. The pixel comparison runs in the hosted job's own step, or a direct run of the command with `CI=true`, and does not run in `./eii test`, anywhere. The hosted `tests` job installs the browser, captures the three screenshots, uploads `data/glyph-captures/`, and compares in its own step before `./eii test`; the pixel comparison runs in that step, or a direct run of the command with `CI=true`, and does not run in `./eii test`, anywhere, and a missing or differing baseline fails that step and names the file.
 
+The browser run's Playwright artifacts (failure contexts and the last-run marker) go only to this spike's own `spikes/glyphs/test-results/` folder, which no other browser runner writes. The suite's no-output test watches that folder, this spike's tree and the captures folder only, so a browser runner running beside it in the web checks cannot change its listings; an unexpected artifact inside those destinations still fails it.
+
 The page says it is a synthetic fixture. Every request is same-origin, `data:` or `blob:`. A planted remote font is blocked.

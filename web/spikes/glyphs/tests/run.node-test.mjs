@@ -82,6 +82,20 @@ function listFiles(root) {
   return found;
 }
 
+// The destinations the glyph runner itself can write: this spike's tree,
+// which contains the Playwright outputDir this spike's config names, and the
+// captures folder of the hosted pixel-comparison step. The no-output
+// assertion watches these and nothing else, so another browser runner
+// writing its own artifacts beside this suite cannot change these listings;
+// the isolation test below plants a performance artifact to prove it.
+function noOutputWatchDirs() {
+  return [
+    SPIKE,
+    path.join(SPIKE, 'test-results'),
+    path.join(SPIKE, '..', '..', '..', 'data', 'glyph-captures'),
+  ];
+}
+
 test('stripped CI reports no pixel comparison and a direct run names a missing baseline', () => {
   const stripped = {};
   for (const name of [
@@ -120,12 +134,7 @@ test('stripped CI reports no pixel comparison and a direct run names a missing b
 
   const baselines = path.join(SPIKE, 'tests', 'baselines');
   const held = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-glyphs-baselines-'));
-  const watched = [
-    SPIKE,
-    path.join(SPIKE, '..', '..', 'test-results'),
-    path.join(SPIKE, '..', '..', 'playwright-report'),
-    path.join(SPIKE, '..', '..', '..', 'data', 'glyph-captures'),
-  ];
+  const watched = noOutputWatchDirs();
   withHeldFiles(baselines, held, () => {
     const before = watched.map((dir) => listFiles(dir));
     const result = spawnSync(
@@ -144,4 +153,67 @@ test('stripped CI reports no pixel comparison and a direct run names a missing b
       before,
     );
   });
+});
+
+test('performance artifacts cannot affect the glyph no-output watch; a glyph artifact in it fails it', () => {
+  const baselines = path.join(SPIKE, 'tests', 'baselines');
+  const held = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-glyphs-baselines-'));
+  const command = [
+    process.execPath,
+    new URL('./run.mjs', import.meta.url).pathname,
+  ];
+  // Where a performance browser run writes its artifacts: its own spike's
+  // folder, and the Playwright default at the web root that both runners
+  // shared before each config named its own outputDir.
+  const performanceArtifactRoots = [
+    path.join(SPIKE, '..', 'performance', 'test-results'),
+    path.join(SPIKE, '..', '..', 'test-results'),
+  ];
+  // The glyph runner's own artifact folder, the destination its Playwright
+  // outputDir names; it is inside the watch.
+  const glyphArtifactRoot = path.join(SPIKE, 'test-results');
+  const planted = [];
+  const plantArtifact = (root) => {
+    if (!fs.existsSync(root)) fs.mkdirSync(root, { recursive: true });
+    // Only this uniquely named folder is removed again: the root may be in
+    // use by a concurrent browser run, so it is left as it is.
+    const folder = fs.mkdtempSync(path.join(root, 'eii-isolation-plant-'));
+    fs.writeFileSync(path.join(folder, 'error-context.md'), 'planted\n');
+    planted.push(folder);
+  };
+  try {
+    withHeldFiles(baselines, held, () => {
+      // A performance run failing beside this one writes its artifacts inside
+      // the window between the two listings.
+      const before = noOutputWatchDirs().map((dir) => listFiles(dir));
+      for (const root of performanceArtifactRoots) plantArtifact(root);
+      const beside = spawnSync(command[0], command, {
+        encoding: 'utf8',
+        env: { ...process.env, CI: 'true' },
+      });
+      assert.equal(beside.status, 1, beside.stderr);
+      assert.deepEqual(
+        noOutputWatchDirs().map((dir) => listFiles(dir)),
+        before,
+      );
+
+      // An unexpected glyph artifact in the watched destinations still fails
+      // the same comparison.
+      const beforeGlyph = noOutputWatchDirs().map((dir) => listFiles(dir));
+      plantArtifact(glyphArtifactRoot);
+      const inside = spawnSync(command[0], command, {
+        encoding: 'utf8',
+        env: { ...process.env, CI: 'true' },
+      });
+      assert.equal(inside.status, 1, inside.stderr);
+      assert.notDeepEqual(
+        noOutputWatchDirs().map((dir) => listFiles(dir)),
+        beforeGlyph,
+      );
+    });
+  } finally {
+    for (const folder of planted) {
+      fs.rmSync(folder, { recursive: true, force: true });
+    }
+  }
 });
