@@ -275,9 +275,9 @@ def check(
     for source in sorted(set(cached_source_ids) & forbidden):
         fail(source, "source_completeness: forbidden cached file")
     for row in entries:
-        if row.source_id in forbidden:
+        forbidden_row = row.source_id in forbidden
+        if forbidden_row:
             fail(row.key, "source_completeness: forbidden row")
-            continue
         elif row.source_id not in pack.sources and row.source_id not in REGISTER_IDS:
             fail(row.key, "source_completeness: extra registry source")
         if sum(other.key == row.key for other in entries) != 1:
@@ -285,6 +285,8 @@ def check(
         for table in row.release_tables:
             if table not in catalogue:
                 fail(row.key, "source_table_uncatalogued: " + table)
+        if forbidden_row:
+            continue
         absence = absences.get(row.key)
         if absence is not None or row.skip_reason:
             # Reuse the registry's refusal markers, including for direct Entry

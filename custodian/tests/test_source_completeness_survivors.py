@@ -58,6 +58,14 @@ def test_pack_four_cell_family_row_refuses_with_exact_text():
     assert_message(error, "pack_family_row_truncated")
 
 
+@pytest.mark.parametrize("header", ["| ID | title |", "| ID | title | fetch |"])
+def test_pack_five_cell_family_row_keeps_exact_slugs(header):
+    text = pack_text(header + "\n| `invented` | text | text | `slug-a`, `slug-b`")
+    assert c.pack_sources(text, {"invented": 2}).sources == {
+        "invented": ("slug-a", "slug-b")
+    }
+
+
 def test_catalogue_reads_multiple_lines_and_excludes_next_section():
     assert c.table_catalogue(
         "### 7.2 Table catalogue\n"
@@ -204,6 +212,61 @@ def test_exact_forbidden_refusals(source, plant):
         assert all(
             record["state"] == "failed" for record in records if record["id"] == source
         )
+
+
+@pytest.mark.parametrize(
+    "source", ["traffic_tomtom_flow", "traffic_tomtom_range", "tiles3d_google"]
+)
+def test_forbidden_rows_keep_duplicate_key_refusals(source):
+    args = inputs()
+    args["entries"].extend([entry(source), entry(source)])
+    expected = [
+        {"id": source, "state": "failed", "reason": reason}
+        for reason in (
+            "source_completeness: forbidden row",
+            "source_completeness: duplicate key",
+            "source_completeness: forbidden row",
+            "source_completeness: duplicate key",
+        )
+    ]
+    records = c.check(**args)
+    assert failed(records) == expected
+    assert [record for record in records if record["id"] == source] == expected
+
+
+@pytest.mark.parametrize(
+    "source", ["traffic_tomtom_flow", "traffic_tomtom_range", "tiles3d_google"]
+)
+def test_forbidden_row_keeps_uncatalogued_table_refusal(source):
+    args = inputs()
+    args["entries"].append(entry(source, release_tables=("pub_uncatalogued",)))
+    expected = [
+        {"id": source, "state": "failed", "reason": reason}
+        for reason in (
+            "source_completeness: forbidden row",
+            "source_table_uncatalogued: pub_uncatalogued",
+        )
+    ]
+    records = c.check(**args)
+    assert failed(records) == expected
+    assert [record for record in records if record["id"] == source] == expected
+
+
+@pytest.mark.parametrize(
+    "source", ["traffic_tomtom_flow", "traffic_tomtom_range", "tiles3d_google"]
+)
+def test_valid_row_after_forbidden_row_is_in_use(source):
+    args = inputs()
+    args["entries"].insert(0, entry(source))
+    records = c.check(**args)
+    refusal = {
+        "id": source,
+        "state": "failed",
+        "reason": "source_completeness: forbidden row",
+    }
+    assert failed(records) == [refusal]
+    assert [record for record in records if record["id"] == source] == [refusal]
+    assert {"id": "invented", "state": "in use", "reason": ""} in records
 
 
 @pytest.mark.parametrize(
