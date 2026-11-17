@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { AsyncLocalStorage } from 'node:async_hooks';
+import { spawn } from 'node:child_process';
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
+import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { after, test as declareTest } from 'node:test';
@@ -133,6 +135,109 @@ test('minimal root starts', { timeout: 60000 }, () => {
   );
 });
 
+// A stand-in for vite with --strictPort: it binds the port the check names
+// and reports the port it bound, and a named port of zero means the binder
+// itself picks and owns the port. A named port is announced before it is
+// bound because, while the check hands over a port that is released and
+// unbound, any other file of the same suite run may take it first; the
+// competitor in the test below takes exactly that window.
+const WINDOW_SERVER = [
+  "import fs from 'node:fs';",
+  "import http from 'node:http';",
+  "import path from 'node:path';",
+  'const here = path.dirname(process.argv[1]);',
+  'const args = process.argv.slice(2);',
+  "const named = Number(args[args.indexOf('--port') + 1]);",
+  "const host = args[args.indexOf('--host') + 1];",
+  "const page = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf8');",
+  "fs.writeFileSync(path.join(here, 'named'), String(named));",
+  'if (named > 0) {',
+  "  const taken = path.join(here, 'taken');",
+  '  const deadline = Date.now() + 10000;',
+  '  while (!fs.existsSync(taken) && Date.now() < deadline) {',
+  '    await new Promise((resolve) => setTimeout(resolve, 10));',
+  '  }',
+  '}',
+  'const server = http.createServer((req, res) => {',
+  "  if (req.url.split('?')[0] === '/') {",
+  "    res.writeHead(200, { 'Content-Type': 'text/html' });",
+  '    res.end(page); return;',
+  '  }',
+  "  res.writeHead(200, { 'Content-Type': 'text/javascript' });",
+  "  res.end('export {};');",
+  '});',
+  'server.listen(named, host, () => {',
+  '  process.stdout.write(`  Local:   http://127.0.0.1:${server.address().port}/\\n`);',
+  '});',
+  "server.on('error', () => {",
+  '  process.stdout.write(`Port ${named} is already in use\\n`);',
+  '  process.exit(1);',
+  '});',
+  '',
+].join('\n');
+
+test(
+  'the port the dev server binds is never released for another file to take',
+  { timeout: 60000 },
+  async () => {
+    const root = tempRoot();
+    fs.writeFileSync(path.join(root, 'index.html'), PAGE);
+    fs.writeFileSync(path.join(root, 'main.js'), 'export {}\n');
+    const dir = tempDir('eii-window-');
+    fs.writeFileSync(path.join(dir, 'server.mjs'), WINDOW_SERVER);
+    const named = path.join(dir, 'named');
+    const child = spawn(
+      process.execPath,
+      [SCRIPT, '--root', root, '--vite-bin', path.join(dir, 'server.mjs')],
+      { env: cleanEnv(), stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk;
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk;
+    });
+    const done = new Promise((resolve) => {
+      child.on('close', (status) => resolve(status));
+    });
+    // Another file of the same suite run: it takes the named port while the
+    // check has released it and the binder has not bound it yet.
+    let squatterPort = 0;
+    let squatter = null;
+    while (!fs.existsSync(named)) {
+      if (child.exitCode !== null || child.signalCode !== null) break;
+      await new Promise((resolve) => setTimeout(resolve, 5));
+    }
+    if (fs.existsSync(named)) {
+      const port = Number(fs.readFileSync(named, 'utf8'));
+      if (port > 0) {
+        squatter = net.createServer();
+        await new Promise((resolve, reject) => {
+          squatter.once('error', reject);
+          squatter.listen(port, '127.0.0.1', resolve);
+        });
+        squatterPort = port;
+        fs.writeFileSync(path.join(dir, 'taken'), '1');
+      }
+    }
+    const status = await done;
+    if (squatter !== null) {
+      await new Promise((resolve) => squatter.close(resolve));
+    }
+    assert.equal(
+      status,
+      0,
+      `${stdout}${stderr}competitor bound 127.0.0.1:${squatterPort} in the release window`,
+    );
+    assert.match(
+      stdout.trim().split('\n').at(-1),
+      /^PASS dev-server http:\/\/127\.0\.0\.1:\d+\/$/,
+    );
+  },
+);
+
 test('absent package.json uses the default flags', () => {
   const root = tempRoot();
   fs.writeFileSync(path.join(root, 'index.html'), PAGE);
@@ -158,7 +263,7 @@ test('absent package.json uses the default flags', () => {
       "  res.end('export {};');",
       '});',
       'server.listen(port, host, () => {',
-      '  process.stdout.write(`  Local:   http://127.0.0.1:${port}/\\n`);',
+      '  process.stdout.write(`  Local:   http://127.0.0.1:${server.address().port}/\\n`);',
       '});',
       '',
     ].join('\n'),

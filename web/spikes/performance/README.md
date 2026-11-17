@@ -158,7 +158,11 @@ browser durations and overall Playwright duration to be inspected without a
 second full browser run. No run of this suite writes the web root's own
 `test-results` folder, so the glyph browser runner running beside this one in
 the web-checks suite cannot collide with these artifacts, and this run cannot
-change the glyph suite's watched listings.
+change the glyph suite's watched listings. The glyph suite's isolation test
+never writes this spike's live folder either: it maps this run's configured
+destinations (the `outputDir` and the reporter file above) into a disposable
+mirrored tree under the system temporary folder and plants its
+performance-style artifacts there.
 
 The mutation runner sets `workers = min(4, processors)` and passes
 `--test-concurrency=max(1, processors // workers)` to Node in every mutant's test

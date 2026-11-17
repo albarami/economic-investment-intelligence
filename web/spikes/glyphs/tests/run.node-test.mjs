@@ -87,12 +87,15 @@ function listFiles(root) {
 // captures folder of the hosted pixel-comparison step. The no-output
 // assertion watches these and nothing else, so another browser runner
 // writing its own artifacts beside this suite cannot change these listings;
-// the isolation test below plants a performance artifact to prove it.
-function noOutputWatchDirs() {
+// the isolation test below maps the same destinations onto a disposable
+// tree and plants an artifact at the performance runner's configured
+// destinations to prove it. The root is injectable for that mapping and
+// defaults to the real spike.
+function noOutputWatchDirs(root = SPIKE) {
   return [
-    SPIKE,
-    path.join(SPIKE, 'test-results'),
-    path.join(SPIKE, '..', '..', '..', 'data', 'glyph-captures'),
+    root,
+    path.join(root, 'test-results'),
+    path.join(root, '..', '..', '..', 'data', 'glyph-captures'),
   ];
 }
 
@@ -155,65 +158,133 @@ test('stripped CI reports no pixel comparison and a direct run names a missing b
   });
 });
 
+// Each browser config's own configured destinations, as written in the
+// config file: its outputDir and the files its reporters name, resolved
+// against the config's directory the way Playwright resolves them.
+function configDestinations(spike) {
+  const text = fs.readFileSync(
+    path.join(spike, 'playwright.config.ts'),
+    'utf8',
+  );
+  const outputDir = /outputDir:\s*'([^']+)'/.exec(text);
+  if (outputDir === null) {
+    throw new Error(
+      `${path.join(spike, 'playwright.config.ts')} names no outputDir`,
+    );
+  }
+  const reportFiles = [...text.matchAll(/outputFile:\s*'([^']+)'/g)].map(
+    (match) => match[1],
+  );
+  return { outputDir: outputDir[1], reportFiles };
+}
+
 test('performance artifacts cannot affect the glyph no-output watch; a glyph artifact in it fails it', () => {
   const baselines = path.join(SPIKE, 'tests', 'baselines');
-  const held = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-glyphs-baselines-'));
   const command = [
     process.execPath,
     new URL('./run.mjs', import.meta.url).pathname,
   ];
-  // Where a performance browser run writes its artifacts: its own spike's
-  // folder, and the Playwright default at the web root that both runners
-  // shared before each config named its own outputDir.
-  const performanceArtifactRoots = [
-    path.join(SPIKE, '..', 'performance', 'test-results'),
-    path.join(SPIKE, '..', '..', 'test-results'),
-  ];
-  // The glyph runner's own artifact folder, the destination its Playwright
-  // outputDir names; it is inside the watch.
-  const glyphArtifactRoot = path.join(SPIKE, 'test-results');
-  const planted = [];
-  const plantArtifact = (root) => {
-    if (!fs.existsSync(root)) fs.mkdirSync(root, { recursive: true });
-    // Only this uniquely named folder is removed again: the root may be in
-    // use by a concurrent browser run, so it is left as it is.
-    const folder = fs.mkdtempSync(path.join(root, 'eii-isolation-plant-'));
-    fs.writeFileSync(path.join(folder, 'error-context.md'), 'planted\n');
-    planted.push(folder);
-  };
+  const glyphConfig = configDestinations(SPIKE);
+  const performanceSpike = path.join(SPIKE, '..', 'performance');
+  const performanceConfig = configDestinations(performanceSpike);
+  const runCommand = () =>
+    spawnSync(command[0], command.slice(1), {
+      encoding: 'utf8',
+      env: { ...process.env, CI: 'true' },
+    });
+  const missingBaselineDiagnostic =
+    /missing baseline: spikes\/glyphs\/tests\/baselines\/arabic-labels-chromium-linux\.png/;
+  // Every temporary folder is registered here the moment it is made and the
+  // whole tree is removed in the finally below; no plant ever lands in a
+  // live runner's output folder.
+  const temporary = [];
   try {
+    // A disposable mirror of the artifact layout: the web root, the two
+    // browser spikes and the captures folder at the same relative depth the
+    // watch helper resolves them from the glyph spike.
+    const mirror = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'eii-isolation-mirror-'),
+    );
+    temporary.push(mirror);
+    const glyphSpike = path.join(mirror, 'web', 'spikes', 'glyphs');
+    const mirrorPerformanceSpike = path.join(
+      mirror,
+      'web',
+      'spikes',
+      'performance',
+    );
+    const watched = noOutputWatchDirs(glyphSpike);
+    for (const dir of [...watched, mirrorPerformanceSpike]) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    // Pin the configured destinations to this mapping: the glyph runner's
+    // own destinations are watched, and the performance runner's
+    // configured destinations never are. That is the isolation this test
+    // plants; a config change that moves a destination across the mapping
+    // fails here.
+    const insideWatch = (target) =>
+      watched.some(
+        (dir) => target === dir || target.startsWith(`${dir}${path.sep}`),
+      );
+    const mappedGlyphOutputDir = path.join(glyphSpike, glyphConfig.outputDir);
+    assert.equal(insideWatch(mappedGlyphOutputDir), true);
+    const performanceDestinations = [
+      path.join(mirrorPerformanceSpike, performanceConfig.outputDir),
+      ...performanceConfig.reportFiles.map((file) =>
+        path.join(mirrorPerformanceSpike, file),
+      ),
+    ];
+    for (const destination of performanceDestinations) {
+      assert.equal(insideWatch(destination), false, destination);
+    }
+    const plant = (file) => {
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.writeFileSync(file, 'planted\n');
+    };
+    const held = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'eii-glyphs-baselines-'),
+    );
+    temporary.push(held);
     withHeldFiles(baselines, held, () => {
-      // A performance run failing beside this one writes its artifacts inside
-      // the window between the two listings.
-      const before = noOutputWatchDirs().map((dir) => listFiles(dir));
-      for (const root of performanceArtifactRoots) plantArtifact(root);
-      const beside = spawnSync(command[0], command, {
-        encoding: 'utf8',
-        env: { ...process.env, CI: 'true' },
-      });
+      // A performance run failing beside this one writes its artifacts at
+      // its configured destinations, mapped here into the disposable tree:
+      // a failure context in its outputDir and each file its reporters name.
+      const before = watched.map((dir) => listFiles(dir));
+      plant(
+        path.join(
+          mirrorPerformanceSpike,
+          performanceConfig.outputDir,
+          'error-context.md',
+        ),
+      );
+      for (const file of performanceConfig.reportFiles) {
+        plant(path.join(mirrorPerformanceSpike, file));
+      }
+      const beside = runCommand();
       assert.equal(beside.status, 1, beside.stderr);
+      assert.equal(beside.stdout, '');
+      assert.match(beside.stderr, missingBaselineDiagnostic);
       assert.deepEqual(
-        noOutputWatchDirs().map((dir) => listFiles(dir)),
+        watched.map((dir) => listFiles(dir)),
         before,
       );
 
-      // An unexpected glyph artifact in the watched destinations still fails
-      // the same comparison.
-      const beforeGlyph = noOutputWatchDirs().map((dir) => listFiles(dir));
-      plantArtifact(glyphArtifactRoot);
-      const inside = spawnSync(command[0], command, {
-        encoding: 'utf8',
-        env: { ...process.env, CI: 'true' },
-      });
+      // An unexpected glyph artifact inside the watched destinations still
+      // fails the same comparison.
+      const beforeGlyph = watched.map((dir) => listFiles(dir));
+      plant(path.join(mappedGlyphOutputDir, 'unexpected.md'));
+      const inside = runCommand();
       assert.equal(inside.status, 1, inside.stderr);
+      assert.equal(inside.stdout, '');
+      assert.match(inside.stderr, missingBaselineDiagnostic);
       assert.notDeepEqual(
-        noOutputWatchDirs().map((dir) => listFiles(dir)),
+        watched.map((dir) => listFiles(dir)),
         beforeGlyph,
       );
     });
   } finally {
-    for (const folder of planted) {
-      fs.rmSync(folder, { recursive: true, force: true });
+    for (const dir of temporary) {
+      fs.rmSync(dir, { recursive: true, force: true });
     }
   }
 });

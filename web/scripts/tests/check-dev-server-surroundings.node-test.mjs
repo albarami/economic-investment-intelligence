@@ -56,7 +56,7 @@ const FAKE_SERVER = [
   "    res.end('export {};');",
   '  });',
   '  server.listen(port, host, () => {',
-  '    process.stdout.write(`  Local:   http://127.0.0.1:${port}/\\n`);',
+  '    process.stdout.write(`  Local:   http://127.0.0.1:${server.address().port}/\\n`);',
   '  });',
   '}',
   '',

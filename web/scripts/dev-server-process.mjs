@@ -80,17 +80,6 @@ export function childEnvironment(home) {
   return env;
 }
 
-export function choosePort() {
-  return new Promise((resolve, reject) => {
-    const server = net.createServer();
-    server.once('error', reject);
-    server.listen(0, '127.0.0.1', () => {
-      const { port } = server.address();
-      server.close((error) => (error ? reject(error) : resolve(port)));
-    });
-  });
-}
-
 export function probePort(port) {
   return new Promise((resolve) => {
     const socket = net.connect({ host: '127.0.0.1', port });
@@ -108,6 +97,24 @@ export function probePort(port) {
       finish(error.code === 'ECONNREFUSED' ? 'free' : 'other'),
     );
   });
+}
+
+// The port the child bound, as its own Local line announces it. A null
+// return means the child has not announced a port yet. Used when the child
+// owns the port: it binds an ephemeral port itself and reports it, so no
+// port is ever released between a choice in this process and the child's
+// bind.
+export function announcedPort(output) {
+  const clean = output.replace(ANSI_ESCAPE, '');
+  for (const line of clean.split(/\r?\n/)) {
+    const at = line.indexOf('Local:');
+    if (at < 0) continue;
+    const match = /^(\s+)(\S+)(\s*)$/.exec(line.slice(at + 'Local:'.length));
+    if (match === null) continue;
+    const found = /^http:\/\/127\.0\.0\.1:(\d+)\/$/.exec(match[2]);
+    if (found !== null) return Number(found[1]);
+  }
+  return null;
 }
 
 export function startChild({ bin, args, cwd, env }) {
