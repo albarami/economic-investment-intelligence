@@ -69,7 +69,7 @@ def test_source_specific_gap_and_oserror_are_retained(tmp_path, monkeypatch):
         lambda source: ("SYN-gap",) if source == "util_elec" else (),
     )
 
-    def unavailable(group):
+    def unavailable(group, *, receipts=None):
         raise OSError("SYN unavailable")
 
     monkeypatch.setattr(figures, "compute_checks", unavailable)
