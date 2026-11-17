@@ -2652,3 +2652,109 @@ reason = "With a fixed nonempty separator \" \", the first split component is un
 module = "custodian/src/eii_custodian/publicdata/series/figures.py"
 mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -12,7 +12,7 @@\n     for entry in owned:\n         prefix = \"PASS \" + entry.key + \" sha256=\"\n         matches = [\n-            line[len(prefix) :].split(\" \", 1)[0]\n+            line[len(prefix) :].split(\" \", 2)[0]\n             for line in lines\n             if line.startswith(prefix)\n         ]"
 reason = "With a fixed nonempty separator \" \", the first split component is unchanged by maxsplit=1, maxsplit=2 or no bound, for every input string (including empty, leading-space and repeated-space strings). Only later components differ, and none are read."
+
+# S2-T08 part A (L-861): equivalent survivors of campaign 2 after the kill round; reasons checked by the lead against the code.
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -12,6 +12,6 @@\n             for i in range(start + 1, len(lines))\n             if re.match(r\"^#{1,\" + str(level) + r\"} \", lines[i])\n         ),\n-        len(lines),\n+        None,\n     )\n     return \"\\n\".join(lines[start + 1 : end])"
+reason = "An absent next heading leaves end as None instead of len(lines); a slice ending at None or at len(lines) returns the same suffix, and a found heading index is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -3,7 +3,7 @@\n     sources: dict[str, tuple[str, ...]] = {}\n     for prefix in (\"### 2.1 \", \"### 2.3 \", \"### 2.4 \"):\n         heading = next(\n-            (line for line in text.splitlines() if line.startswith(prefix)), \"\"\n+            (line for line in text.splitlines() if line.startswith(prefix)), None\n         )\n         if not heading:\n             raise ValueError(\"pack_section_missing\")"
+reason = "A missing section heading defaults to None instead of the empty string; both are false, so the same pack_section_missing refusal is raised, and a found heading is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -9,7 +9,7 @@\n             raise ValueError(\"pack_section_missing\")\n         block = section(text, heading)\n         header = next(\n-            (line for line in block.splitlines() if line.startswith(\"| \")), \"\"\n+            (line for line in block.splitlines() if line.startswith(\"| \")), \"XXXX\"\n         )\n         width = len(header.split(\"|\"))\n         for line in block.splitlines():"
+reason = "A block with no table header defaults to 'XXXX' instead of the empty string; neither contains a pipe, so both split into one part and give the same width."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -18,7 +18,7 @@\n                 r\"`[a-z0-9_]+`\", cells[1]\n             ):\n                 continue\n-            source = cells[1].strip(\"`\")\n+            source = cells[1].strip(\"XX`XX\")\n             if source in sources:\n                 raise ValueError(\"pack_source_duplicate\")\n             sources[source] = ("
+reason = "The cell has already passed a full match of backquoted lowercase letters, digits and underscores, so it holds no uppercase X; the extra X characters in the strip set remove nothing."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -13,7 +13,7 @@\n     expected = sidecar_for(\n         row,\n         digest=str(digest),\n-        nbytes=0,\n+        nbytes=None,\n         fetch_url=row.url,\n         fetch_host=row.fetch_host,\n         retrieved_utc=\"\","
+reason = "The mutated argument only fills the sidecar key bytes, fetch_url, fetch_host, retrieved_utc, source_modified or terms_sha256, each in receipt_valid's variable set: the expected key set is unchanged and those values are never compared, and sidecar_for does no operation on them that could raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -14,7 +14,7 @@\n         row,\n         digest=str(digest),\n         nbytes=0,\n-        fetch_url=row.url,\n+        fetch_url=None,\n         fetch_host=row.fetch_host,\n         retrieved_utc=\"\",\n         publisher=row.publisher,"
+reason = "The mutated argument only fills the sidecar key bytes, fetch_url, fetch_host, retrieved_utc, source_modified or terms_sha256, each in receipt_valid's variable set: the expected key set is unchanged and those values are never compared, and sidecar_for does no operation on them that could raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -15,7 +15,7 @@\n         digest=str(digest),\n         nbytes=0,\n         fetch_url=row.url,\n-        fetch_host=row.fetch_host,\n+        fetch_host=None,\n         retrieved_utc=\"\",\n         publisher=row.publisher,\n         source_modified=\"\","
+reason = "The mutated argument only fills the sidecar key bytes, fetch_url, fetch_host, retrieved_utc, source_modified or terms_sha256, each in receipt_valid's variable set: the expected key set is unchanged and those values are never compared, and sidecar_for does no operation on them that could raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -16,7 +16,7 @@\n         nbytes=0,\n         fetch_url=row.url,\n         fetch_host=row.fetch_host,\n-        retrieved_utc=\"\",\n+        retrieved_utc=None,\n         publisher=row.publisher,\n         source_modified=\"\",\n         row_count=None,"
+reason = "The mutated argument only fills the sidecar key bytes, fetch_url, fetch_host, retrieved_utc, source_modified or terms_sha256, each in receipt_valid's variable set: the expected key set is unchanged and those values are never compared, and sidecar_for does no operation on them that could raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -18,7 +18,7 @@\n         fetch_host=row.fetch_host,\n         retrieved_utc=\"\",\n         publisher=row.publisher,\n-        source_modified=\"\",\n+        source_modified=None,\n         row_count=None,\n         terms_sha256=\"\",\n     )"
+reason = "The mutated argument only fills the sidecar key bytes, fetch_url, fetch_host, retrieved_utc, source_modified or terms_sha256, each in receipt_valid's variable set: the expected key set is unchanged and those values are never compared, and sidecar_for does no operation on them that could raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -20,7 +20,7 @@\n         publisher=row.publisher,\n         source_modified=\"\",\n         row_count=None,\n-        terms_sha256=\"\",\n+        terms_sha256=None,\n     )\n     if not expected.keys() <= receipt.keys():\n         return False"
+reason = "The mutated argument only fills the sidecar key bytes, fetch_url, fetch_host, retrieved_utc, source_modified or terms_sha256, each in receipt_valid's variable set: the expected key set is unchanged and those values are never compared, and sidecar_for does no operation on them that could raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -13,7 +13,7 @@\n     expected = sidecar_for(\n         row,\n         digest=str(digest),\n-        nbytes=0,\n+        nbytes=1,\n         fetch_url=row.url,\n         fetch_host=row.fetch_host,\n         retrieved_utc=\"\","
+reason = "The mutated argument only fills the sidecar key bytes, fetch_url, fetch_host, retrieved_utc, source_modified or terms_sha256, each in receipt_valid's variable set: the expected key set is unchanged and those values are never compared, and sidecar_for does no operation on them that could raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -16,7 +16,7 @@\n         nbytes=0,\n         fetch_url=row.url,\n         fetch_host=row.fetch_host,\n-        retrieved_utc=\"\",\n+        retrieved_utc=\"XXXX\",\n         publisher=row.publisher,\n         source_modified=\"\",\n         row_count=None,"
+reason = "The mutated argument only fills the sidecar key bytes, fetch_url, fetch_host, retrieved_utc, source_modified or terms_sha256, each in receipt_valid's variable set: the expected key set is unchanged and those values are never compared, and sidecar_for does no operation on them that could raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -18,7 +18,7 @@\n         fetch_host=row.fetch_host,\n         retrieved_utc=\"\",\n         publisher=row.publisher,\n-        source_modified=\"\",\n+        source_modified=\"XXXX\",\n         row_count=None,\n         terms_sha256=\"\",\n     )"
+reason = "The mutated argument only fills the sidecar key bytes, fetch_url, fetch_host, retrieved_utc, source_modified or terms_sha256, each in receipt_valid's variable set: the expected key set is unchanged and those values are never compared, and sidecar_for does no operation on them that could raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -20,7 +20,7 @@\n         publisher=row.publisher,\n         source_modified=\"\",\n         row_count=None,\n-        terms_sha256=\"\",\n+        terms_sha256=\"XXXX\",\n     )\n     if not expected.keys() <= receipt.keys():\n         return False"
+reason = "The mutated argument only fills the sidecar key bytes, fetch_url, fetch_host, retrieved_utc, source_modified or terms_sha256, each in receipt_valid's variable set: the expected key set is unchanged and those values are never compared, and sidecar_for does no operation on them that could raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -46,7 +46,7 @@\n             for row in entries\n             if row.source_id == source and row.key not in components.get(source, ())\n         ]\n-        slugs = inventory.get(source) or pack.sources.get(source, ())\n+        slugs = inventory.get(source) or pack.sources.get(source, None)\n         if slugs:\n             if len(set(slugs)) != len(slugs) or len(\n                 set(pack.sources.get(source, ()))"
+reason = "A source missing from the pack makes the fallback None instead of the empty tuple; both are false, so the same elif branch runs, and slugs is not used otherwise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -46,7 +46,7 @@\n             for row in entries\n             if row.source_id == source and row.key not in components.get(source, ())\n         ]\n-        slugs = inventory.get(source) or pack.sources.get(source, ())\n+        slugs = inventory.get(source) or pack.sources.get(source, )\n         if slugs:\n             if len(set(slugs)) != len(slugs) or len(\n                 set(pack.sources.get(source, ()))"
+reason = "A source missing from the pack makes the fallback None instead of the empty tuple; both are false, so the same elif branch runs, and slugs is not used otherwise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/completeness.py"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -93,7 +93,7 @@\n             # inputs; permission-based omissions are forbidden by D4 as well.\n             if any(\n                 marker in reason.casefold()\n-                for reason in (row.skip_reason, absence.reason if absence else \"\")\n+                for reason in (row.skip_reason, absence.reason if absence else \"XXXX\")\n                 for marker in (_SKIP_LICENCE, _SKIP_TERMS, \"permission\")\n             ):\n                 fail(row.key, \"source_absence_terms_forbidden\")"
+reason = "With no absence record the second reason is 'XXXX' instead of the empty string; its casefold 'xxxx' contains none of the licence, terms or permission markers, so the refusal test is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/gate_report.py"
+mutation = "--- src/eii_custodian/publicdata/gate_report.py\n+++ src/eii_custodian/publicdata/gate_report.py\n@@ -15,7 +15,7 @@\n     The existing series producer's closed/reconciled dispositions are retained\n     verbatim; an open or unknown disposition stays pending.\n     \"\"\"\n-    text = decision.decode(\"utf-8\")\n+    text = decision.decode(\"UTF-8\")\n     match = re.search(r\"^\\| Status \\| ([^|]+) \\|$\", text, re.M)\n     status = match.group(1).strip() if match else \"not recorded\"\n     binding = \"resolved:\" + PurePosixPath(decision_name).stem"
+reason = "'UTF-8' and 'utf-8' name the same codec (codecs.lookup gives the same codec for both), so the bytes and text are identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/draw.py"
+mutation = "--- src/eii_custodian/publicdata/draw.py\n+++ src/eii_custodian/publicdata/draw.py\n@@ -19,6 +19,6 @@\n     try:\n         valid = Decimal(figure.value).is_finite()\n     except InvalidOperation:\n-        valid = False\n+        valid = None\n     if not valid:\n         raise ValueError(\"figure_invalid\")"
+reason = "None and False are both false: the next statement raises figure_invalid in both cases, and the local is not used anywhere else."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/draw.py"
+mutation = "--- src/eii_custodian/publicdata/draw.py\n+++ src/eii_custodian/publicdata/draw.py\n@@ -1,5 +1,5 @@\n def _flush(path: Path, log: dict[str, object]) -> None:\n-    with path.open(\"w\", encoding=\"utf-8\") as stream:\n+    with path.open(\"w\", encoding=\"UTF-8\") as stream:\n         json.dump(log, stream, sort_keys=True)\n         stream.write(\"\\n\")\n         stream.flush()"
+reason = "'UTF-8' and 'utf-8' name the same codec (codecs.lookup gives the same codec for both), so the bytes and text are identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/draw.py"
+mutation = "--- src/eii_custodian/publicdata/draw.py\n+++ src/eii_custodian/publicdata/draw.py\n@@ -11,7 +11,7 @@\n     if type(seed) is not int:\n         raise ValueError(\"figure_seed_invalid\")\n     loaded = (\n-        json.loads(log_path.read_text(encoding=\"utf-8\")) if log_path.exists() else {}\n+        json.loads(log_path.read_text(encoding=\"UTF-8\")) if log_path.exists() else {}\n     )\n     if not isinstance(loaded, dict):\n         raise ValueError(\"figure_log_invalid\")"
+reason = "'UTF-8' and 'utf-8' name the same codec (codecs.lookup gives the same codec for both), so the bytes and text are identical."
