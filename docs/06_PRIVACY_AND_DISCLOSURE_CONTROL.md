@@ -722,7 +722,7 @@ lead's ruling L-160 of 2026-11-14 recast it.
 
 | ID | Requirement |
 |---|---|
-| PRV-127 | Changed by [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 1, as the owner answered on 2026-11-14: the talent ratio of card C39 is the only exception to PRV-18 and PRV-30. For a site and a drive-time cut-off of the closed list 10, 20 and 30 minutes, the catchment snaps to whole release units like every area (PRV-17, PRV-18), on the partition of each figure. The closed list 10, 20 and 30 is card C39's own, asked through `workers_within_reach` and not a `make_area` cut-off; all three are accepted in every playbook whose bundle calls that tool, and these catchments are inside PRV-111's enumeration. Two released figures then stand side by side, each its own evidence block (PRV-20) with one home family (PRV-30): the talent pool, the residents by occupation group and pay band within reach (`occupation_pay` on `op_res_quartile`), and the competing demand, the jobs of the same occupation groups within reach (`occupation_pay` on `op_work_quartile`). This row is a guard. It refuses (a) any other ratio of two protected families and (b) any ratio computed before release. The one ratio it allows is the quotient of those two released figures for the same occupation group and the same cut-off, computed by tested code in `eii_core.calc` from the two released tables only, after the privacy engine's work, shown to one decimal, with the label "qualified people per competing job within N minutes" (card C39, MTH-122). It is never called competition-adjusted and never an index. Where either input is suppressed or below the minimum count, the ratio is not shown and the card says why (reason key `ratio_input_withheld`). Where the competing-jobs figure is zero, no ratio is shown and the card says that no competing job is within reach (reason key `no_competing_jobs`). The two-step floating catchment is not used. No difference or sum of the two figures is computed, shown or stored. No protected row is read on units chosen by a unit-to-unit travel time instead of the snap. A planted ratio computed from records (TST-257), a planted ratio with a suppressed input (TST-258), a planted ratio of any other two protected families, a planted ratio computed before release, a planted read on units chosen by travel time and a planted figure on an unsnapped outline each fail. The talent ratio from the two released tables passes (TST-259). |
+| PRV-127 | Changed by [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 1, as the owner answered on 2026-11-14: the talent ratio of card C39 is the only exception to PRV-18 and PRV-30. For a site and a drive-time cut-off of the closed list 10, 20 and 30 minutes, the catchment snaps to whole release units like every area (PRV-17, PRV-18), on the partition of each figure. The closed list 10, 20 and 30 is card C39's own, asked through `workers_within_reach` and not a `make_area` cut-off; all three are accepted in every playbook whose bundle calls that tool, and these catchments are inside PRV-111's enumeration. Two released figures then stand side by side, each its own evidence block (PRV-20) with one home family (PRV-30): the talent pool, the residents by occupation group and pay band within reach (`occupation_pay` on `op_res_quartile`), and the competing demand, the jobs of the same occupation groups within reach (`occupation_pay` on `op_work_quartile`). This row is a guard. It refuses (a) any other ratio of two protected families, except the closed list of ratio statistics of section 6.2 and PRV-30, each of which takes its numerator and its denominator from columns of the same stored rows, and (b) any ratio of two protected families computed before release, those of the closed list and the talent ratio included. The one ratio it allows beyond that closed list is the quotient of those two released figures for the same occupation group and the same cut-off, computed by tested code in `eii_core.calc` from the two released tables only, after the privacy engine's work, shown to one decimal, with the label "qualified people per competing job within N minutes" (card C39, MTH-122). It is never called competition-adjusted and never an index. Where either input is suppressed or below the minimum count, the ratio is not shown and the card says why (reason key `ratio_input_withheld`). Where the competing-jobs figure is zero, no ratio is shown and the card says that no competing job is within reach (reason key `no_competing_jobs`). The two-step floating catchment is not used. No difference or sum of the two figures is computed, shown or stored. No protected row is read on units chosen by a unit-to-unit travel time instead of the snap. A planted ratio computed from records (TST-257), a planted ratio with a suppressed input (TST-258), a planted ratio of any other two protected families outside the closed list of ratio statistics of section 6.2 and PRV-30, a planted ratio of two protected families computed before release, a planted read on units chosen by travel time and a planted figure on an unsnapped outline each fail. The talent ratio from the two released tables passes (TST-259). |
 | PRV-128 | Talent answers ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 1). A talent answer is any answer about the people a company could employ: talent available near this site (card C39 of [07_ECONOMIC_METHODS.md](07_ECONOMIC_METHODS.md)) with its home-to-work flows, and every other talent answer, among them pay benchmarks and the Qatarization planner of journey D5 ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 15). The answer of card C39 is called "Talent available near this site", never "who can work for you", and no talent answer is worded or laid out as a list of people. Every figure of a talent answer is a group statistic released under this document: minimum counts of people and of employer groups in every cell and the dominance tests (PRV-24), and pay as bands, the median and the middle range (section 6.2, PRV-31, PRV-32). PRV-129 to PRV-133 state the other cases. A planted pool cell below the minimum fails. |
 | PRV-129 | No person in a talent answer. A talent answer never holds a name, an identifier, a residential address, one person's pay or a person-level row; a request for one returns `OUT_OF_SCOPE` with reason `NO_FIRM_OR_PERSON_FACTS` (PRV-63, PRV-101). A planted name, identifier, address or single person's pay in a talent answer fails. |
 | PRV-130 | Homes no finer than the district. A talent answer shows where people live only as totals over one of these areas: the snapped catchment of the site; a district or a municipality, snapped to whole units (PRV-17, PRV-18); a municipality or the national unit of PRV-16; or a home municipality of `home_area_share` (`ha_home`). A district is the official public geography below the municipality ([GLOSSARY.md](GLOSSARY.md)). Any other home geography fails, and no talent answer shows or names a building, a street, a block, an address point or a parcel for where people live. A planted home location finer than the district fails. |
@@ -801,11 +801,17 @@ classes: target employer group, insiders and colluders.
    is the binary `x_p[u,c,m,h,d,b_net,b_basic]`, target side membership is the binary
    `x_p_side[u,c,m,h,d]`, target location `loc_p[u,c,m]` is binary and separate from coverage, and
    target wages are `w_p_q[u,c,m,h,d,b_net,b_basic]` for `q` in `{net, basic}`. At every identical
-   tuple add `x_p <= N`, `x_p_side <= S`, `0 <= w_p_q <= W_q`, `L(b_q) x_p <= w_p_q` and, for a
-   finite band, `w_p_q <= U(b_q) x_p`. Where the tuple maps to a published wage-bill leaf `l`, also
-   add `w_p_q <= A_wage[l,m,q] x_p`. The target wage for a leaf is the sum of its matching `w_p_q`
-   variables; the target band is read from the corresponding `x_p` variables. All variables exist
-   for every complete month, including a zero contribution.
+   tuple add `x_p <= N`, `x_p_side <= S`, `0 <= w_p_q <= W_q`, `L(b_q) x_p <= w_p_q`, for a
+   finite band `w_p_q <= U(b_q) x_p`, and the indicator constraint
+   `x_p = 0 => w_p_net = 0 and w_p_basic = 0`; for the remaining population add
+   `L(b_q)(N - x_p) <= W_q - w_p_q`, for a finite band `W_q - w_p_q <= U(b_q)(N - x_p)`, and a
+   binary `z_r` with `z_r <= N - x_p` and the indicator constraint
+   `z_r = 0 => W_net - w_p_net = 0 and W_basic - w_p_basic = 0` (`N - x_p = 0` forces `z_r = 0`
+   and both remaining sums to zero). Where the tuple maps to a published wage-bill leaf `l`,
+   `w_p_q <= A_wage[l,m,q] x_p` and `W_q - w_p_q <= A_wage[l,m,q] z_r` are their linear forms.
+   The target wage for a leaf is the sum of its matching `w_p_q` variables; the target band is
+   read from the corresponding `x_p` variables. All variables exist for every complete month,
+   including a zero contribution.
 2. **Band bounds.** For every joint-band cell,
    `L(b_net) N <= W_net <= U(b_net) N` and
    `L(b_basic) N <= W_basic <= U(b_basic) N`, where the upper inequality is omitted for the open
@@ -1028,14 +1034,55 @@ classes: target employer group, insiders and colluders.
     non-negative integer cohort counts with their wage sums in each month, counted as leavers of
     their origin leaf and joiners of their destination leaf; the stayers of each leaf are a further
     cohort count with their wage sums in each month; and the later month's variables equal the
-    earlier month's after those cohorts. The `month_change` equalities of item 4 are included
+    earlier month's after those cohorts.
+    Every cohort is held as parts within each contributor universe over that universe's tuples of
+    item 1 (`N` and `S` in `residence` and `workplace`, `R` in `register`) and one further origin
+    and destination, "outside the frame" (with no part from "outside the frame" to "outside the
+    frame"): for each pair of adjacent months `m` and `m+1`, each origin of `m` and destination of
+    `m+1` has a non-negative integer count `K` — split in `residence` and `workplace`, when both
+    endpoints are in-frame tuples of the aggregate contribution class, into two parts, one for
+    unchanged employer group and one for changed employer group — and, at each endpoint that is an
+    eligible-pay tuple (`N`), non-negative wage sums `Q_q` (`q` in `{net, basic}`) for that
+    endpoint's month `t` (`m` at the origin, `m+1` at the destination). At every tuple of `m`, its
+    count (`N`, `S` or `R`) and, where eligible, its `W_q` equal the sums of `K` and `Q_q` over its
+    outgoing parts; at every tuple of `m+1`, they equal the sums over its incoming parts; and each
+    cohort of a published leaf, its stayers included, with its wage sums in each month where
+    applicable, is the sum of the parts whose origin, destination and employer-group-change status
+    match it. At each eligible-pay endpoint (month `t` in `{m, m+1}`), every part satisfies item 2
+    on its own with the bands of that endpoint's tuple: `L(b_q) K <= Q_q`, for a finite band
+    `Q_q <= U(b_q) K`, and a binary `z_c` with `z_c <= K` and the indicator constraint
+    `z_c = 0 => Q_net = 0 and Q_basic = 0`; where that tuple maps to a wage-bill leaf `l` that the
+    release shows for month `t`, `Q_q <= A_wage[l,t,q] z_c` is its linear form. For each person
+    target, `x_p`, `x_p_side` and `w_p_q` of item 1 (`loc_p` remains at `(u,c,t)` under item 3) are
+    split over the parts of `residence` and `workplace`: each part has a binary `x_p_part <= K`
+    summing to `x_p` or `x_p_side` at each in-frame endpoint, summing across all parts of the pair
+    to at most one in `residence` and, for each `h` in `H` in `workplace`, summing to at most one
+    over the parts with `h` at either endpoint, and at each eligible-pay endpoint (month `t`) has
+    target wages `w_p_q_part` summing to `w_p_q` and satisfying item 1's target and
+    remaining-population lines with `K`, `Q_q`, `x_p_part` and `w_p_q_part` in place of `N`, `W_q`,
+    `x_p` and `w_p_q` (using `A_wage[l,t,q]` in their linear forms where that tuple maps to a
+    wage-bill leaf `l` that the release shows for month `t`). The stayer wage variables of item 4
+    are the sums of the stayer parts. The `month_change` equalities of item 4 are included
     for every published component, and its latent stayer-bill constraints for every published
     `stayer_wage_index`; the changed cohorts of the status-only rows of `occupation_pay`,
     `home_area_share` and `outlet_register` enter only through these identities. For every change that the release
     shows, each non-empty changed cohort satisfies the linear tests of item 6. A unit and tier
-    carried forward add no equality for the later month; their variables still satisfy items 6
-    and 7, and the next comparison runs from the month the release shows. Successive windows add a
+    carried forward add no equality for the later month; their variables still satisfy items 6 and
+    7, and the next comparison runs from the month the release shows: that comparison is held by its
+    own parts, as above, over the universe's tuples, with the month the release shows in place of
+    `m` and the later month of the comparison in place of `m+1`, and the cohorts of each published
+    leaf for that comparison, the `month_change` components and stayers included, are the sums of
+    those parts and not of the parts of the adjacent pair. Successive windows add a
     window index only in a deployment ([17_DEPLOYMENT_HARDENING.md](17_DEPLOYMENT_HARDENING.md)).
+
+    *Empty-cohort fixture (invented values).* One `residence` B01/B01 tuple has one earner, the
+    target, in months `m` and `m+1`: `N = x_p = 1` in both months. In month `m`,
+    `W_net = W_basic = w_p_net = w_p_basic = 0.01`, `z = 1` and `z_r = 0`. The planted cohorts
+    are one stayer with month-`m` net and basic wage sums of zero, no leavers with month-`m` net
+    and basic wage sums of QAR 0.01, and no joiners. The leaver parts have total count zero, so
+    every non-negative `K` is zero, `z_c <= K` forces `z_c = 0`, and its indicator forces both
+    wage sums to zero, contradicting QAR 0.01. The model must be `INFEASIBLE`. A model that
+    admits pay in this empty cohort fails the fixture.
 12. **Released register-company counts.** For every register company `f` of the register-company
     list (PRV-125, [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)), with its Public registered location, its activity class
     `a_f`, its released employee count `n_f` and the list's month `m*`, the last month of the
@@ -1065,7 +1112,7 @@ classes: target employer group, insiders and colluders.
       unknown worksite is part of no `workplace` variable; and the job that DAT-04 attaches to its
       person is also part of the `residence` variable at the person's home cell. At every tuple
       the parts of the listed companies and one remainder part for all other contributors add up to
-      the aggregate variable, every part satisfies the band bounds of item 2 on its own, and every
+      the aggregate variable, every part satisfies item 2 on its own, its indicator included, and every
       `workplace` part of `f` is zero at a cell where `f` is not registered.
     - *Released count.* The jobs of `f` that the contract counts as its employees sum to the
       released `n_f`, which is attacker knowledge.
@@ -1104,7 +1151,7 @@ classes: target employer group, insiders and colluders.
 
 | ID | Requirement |
 |---|---|
-| PRV-121 | Exact reduction. The model of PRV-113 is written over base cells so that it is unambiguous; an implementation need not build it at that size. It may remove or merge variables and constraints only by exact presolve: substituting a constant for a sum that an equality fixes; merging variables that enter every constraint and every target expression only through their sum; and dropping a variable that no constraint links, directly or through other variables, to the target expression of the run. A reduction that changes the feasible set of any target expression is a defect. The audit tests solve one small fixture world in both the full and the reduced form and require identical statuses and identical minimum and maximum for every target class. That world holds a published `stayer_wage_index`, and the three fixtures of PRV-113 item 4 are solved in both forms as well: their statuses must be identical, `INFEASIBLE` for the relaxation fixture included, and so must the minimum and maximum of every rounded stayer bill `k[l,t]`. Replacing the draw digits of item 4 by a continuous factor, admitting the factor `1 + delta`, closing a rounding interval, giving the stayer bills of one unit, table and pair of months separate draws or rounding a coefficient of item 4 to floating point changes the feasible set and is a defect. No other approximation, no sampling of targets and no relaxation is allowed (PRV-112), with one stated exception: the model does not tie together the draws shared between stayer bills of nested or overlapping units and of different pairs of months (PRV-113 item 4; section 17). |
+| PRV-121 | Exact reduction. The model of PRV-113 is written over base cells so that it is unambiguous; an implementation need not build it at that size. It may remove or merge variables and constraints only by exact presolve: substituting a constant for a sum that an equality fixes; merging variables that enter every constraint and every target expression only through their sum; and dropping a variable that no constraint links, directly or through other variables, to the target expression of the run. A reduction that changes the feasible set of any target expression is a defect. The audit tests solve one small fixture world in both the full and the reduced form and require identical statuses and identical minimum and maximum for every target class. That world holds a published `stayer_wage_index`, and the three fixtures of PRV-113 item 4 are solved in both forms as well: their statuses must be identical, `INFEASIBLE` for the relaxation fixture included, and so must the minimum and maximum of every rounded stayer bill `k[l,t]`. Replacing the draw digits of item 4 by a continuous factor, admitting the factor `1 + delta`, closing a rounding interval, giving the stayer bills of one unit, table and pair of months separate draws or rounding a coefficient of item 4 to floating point changes the feasible set and is a defect. Omitting item 11's origin-destination parts (including the unchanged-group and changed-group split in the aggregate class), tuple and cohort sum identities, per-part band bounds or empty-part indicator at either eligible-pay endpoint, cross-part target conservation, target and remaining-population lines, or stayer wage sum identities changes the feasible set and is a defect. No other approximation, no sampling of targets and no relaxation is allowed (PRV-112), with one stated exception: the model does not tie together the draws shared between stayer bills of nested or overlapping units and of different pairs of months (PRV-113 item 4; section 17). |
 
 ### 10.3 Treatment consistency and movement intervals
 
