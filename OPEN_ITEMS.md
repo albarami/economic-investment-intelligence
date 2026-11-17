@@ -3415,6 +3415,33 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CLOSE WHEN: The lead records both live checks and their selected source hashes, commands and real exit codes. Another-maker code review remains required before merge. This item does not close OI-03 or change any display or licence gate.
 - NEEDED BY: S2-T08 part B; this fix remains a separate prerequisite.
 
+### PO-S2-72 — A truncated family row of the pack's sources is skipped by the width test before its typed refusal
+
+- ID: PO-S2-72
+- TYPE: OPEN
+- RAISED BY: the first lens of task S2-T08 part A (Anthropic Claude Fable 5.2 through Claude Code), 2026-11-17, notes N4 and N5 of its confirmation of fix round 4
+- CONCERNS: `custodian/src/eii_custodian/publicdata/completeness.py` (the reading of the family rows of document 04); S2-T08 part B
+- EVIDENCE: Under a header of three or more columns, a truncated family row is skipped by the width test before the typed refusal `pack_family_row_truncated` is reached; it still fails closed later, in the family count, the family total or the pack's names. A three-column family row with a closing pipe splits into five cells and is accepted with no names, and is likewise refused later. The reviewer approved the part with these as notes, not findings: no row passes.
+- NEEDED: before part B reads document 04, the family row tested against the larger of the header width and five before the width skip, with a plant under a five-column header; or one line saying why the item is not valid.
+
+### PO-S2-73 — The pinned development server probes its own port with a socket it closes before binding
+
+- ID: PO-S2-73
+- TYPE: OPEN
+- RAISED BY: the builder of task S2-T10 part b (Z.ai GLM-5.3 through Factory Droid), 2026-11-17, fix round 4, after the reviewer's finding O1 at `cd13d77`
+- CONCERNS: `web/scripts/check-dev-server.mjs`; `web/README.md` (the `check:dev` bullet); the pinned vite 8.3.8
+- EVIDENCE: With no port named, the check binds and releases no port itself and the development server picks its own ephemeral port. In the installed vite 8.3.8, `httpServerStart` with a start port of zero calls `getAvailableEphemeralPort`, whose `tryListen` probe servers close before the port is returned, and only then `tryBindServer` binds the real server. A window of a few consecutive awaits remains in which another process of the same run could take the port. The check's claim was narrowed to what holds; the installed version is pinned by a test, so an upgrade fails loudly and this item is read again. No retry or wider timeout hides it. The reviewer approved `54619be`, no finding.
+- NEEDED: a development server started on a socket the parent holds, or an upstream change that keeps the port held from pick to bind; until then the window stays recorded. Or one line saying why the item is not valid.
+
+### PO-S2-74 — One refusal test of PUB-64 pins three of its ten reason texts
+
+- ID: PO-S2-74
+- TYPE: OPEN
+- RAISED BY: lens B of task PUB64-fix (Z.ai GLM-5.3 through Factory Droid), 2026-11-17, an advisory of its approval at `4fa9c78`
+- CONCERNS: `custodian/tests/test_series_exact_regressions.py` (`test_pub64_requires_receipt_lineage`)
+- EVIDENCE: The test asserts the refusal of PUB-64 without receipt lineage, but compares only three of the ten reason texts the refusal can carry; the reviewer recorded it as not a defect, for the next touch of the test.
+- NEEDED: the remaining seven reason texts asserted exactly when the test is next changed, or one line saying why the item is not valid.
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).
