@@ -364,7 +364,9 @@ def test_build_snapshot_failure_site(tmp_path, monkeypatch, plant):
         auxiliary=(Response(entry.url, b"syn-meta", ()),),
     )
     monkeypatch.setattr(
-        build, "prepare", fail if plant == "prepare" else lambda *args: prepared
+        build,
+        "prepare",
+        fail if plant == "prepare" else lambda *args, **kwargs: prepared,
     )
     if plant == "auxiliary":
         monkeypatch.setattr(build, "archive_auxiliary", fail)

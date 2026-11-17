@@ -256,18 +256,24 @@ def test_receipt_shape_and_fields_are_named(tmp_path: Path) -> None:
     with pytest.raises(GridError) as caught:
         cached_bytes(tmp_path, row)
     assert str(caught.value) == "worldpop_qat_agesex: unreadable receipt"
-    store(tmp_path, row, body)
+    fields_cache = tmp_path / "fields"
+    store(fields_cache, row, body)
+    meta = fields_cache / KEY / f"{digest}.meta.json"
     loaded = json.loads(meta.read_text(encoding="utf-8"))
     loaded["publisher"] = ""
     meta.write_text(json.dumps(loaded), encoding="utf-8")
     with pytest.raises(GridError) as caught:
-        cached_bytes(tmp_path, row)
+        cached_bytes(fields_cache, row)
     assert str(caught.value) == "worldpop_qat_agesex: missing receipt publisher"
+    switched_cache = tmp_path / "switched"
+    store(switched_cache, row, body)
+    meta = switched_cache / KEY / f"{digest}.meta.json"
+    loaded = json.loads(meta.read_text(encoding="utf-8"))
     loaded["publisher"] = "SYN-publisher"
     loaded["switched_off"] = True
     meta.write_text(json.dumps(loaded), encoding="utf-8")
     with pytest.raises(GridError) as caught:
-        cached_bytes(tmp_path, row)
+        cached_bytes(switched_cache, row)
     assert str(caught.value) == "worldpop_qat_agesex: source switched off"
 
 

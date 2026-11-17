@@ -6,6 +6,7 @@ Each test builds the entry it needs. Kept fields are the lists under B2.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -13,6 +14,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from eii_custodian.publicdata.fetch.build import fetch_entry
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+from eii_custodian.publicdata.fetch.snapshots import checked_times, read_snapshot
 from eii_custodian.publicdata.fetch.transport import Response
 
 _GIS = "https://services.gisqatar.org.qa/server/rest/services/Vector/QARS/MapServer"
@@ -416,10 +418,34 @@ def _params(url: str) -> dict[str, str]:
 
 
 def _stored(tmp_path: Path) -> dict[str, object]:
-    files = [path for path in tmp_path.rglob("*") if path.is_file()]
-    bodies = [path for path in files if not path.name.endswith(".meta.json")]
+    indexes = sorted(tmp_path.glob("**/index/*.json"))
+    snapshots = [read_snapshot(path.parent.parent, path.stem) for path in indexes]
+    bodies = [snapshot.body for snapshot in snapshots]
     assert len(bodies) == 1
-    loaded = json.loads(bodies[0].read_text(encoding="utf-8"))
+    for index, snapshot in zip(indexes, snapshots, strict=True):
+        directory = index.parent.parent
+        check = dict(snapshot.sidecar, identity=index.stem)
+        check_bytes = (
+            json.dumps(check, sort_keys=True, ensure_ascii=True) + "\n"
+        ).encode()
+        check_path = (
+            directory / "checks" / (hashlib.sha256(check_bytes).hexdigest() + ".json")
+        )
+        body_alias = directory / snapshot.path.name
+        receipt_alias = directory / snapshot.receipt_path.name
+        assert {path for path in directory.rglob("*") if path.is_file()} == {
+            snapshot.path,
+            snapshot.receipt_path,
+            index,
+            check_path,
+            body_alias,
+            receipt_alias,
+        }
+        assert check_path.read_bytes() == check_bytes
+        assert body_alias.samefile(snapshot.path)
+        assert receipt_alias.samefile(snapshot.receipt_path)
+        assert checked_times(directory) == (snapshot.sidecar["retrieved_utc"],)
+    loaded = json.loads(bodies[0])
     assert isinstance(loaded, dict)
     return loaded
 

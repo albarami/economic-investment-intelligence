@@ -877,6 +877,7 @@ def test_night_live_frame_merges_the_grid_tables(tmp_path, monkeypatch):
         Qatari=5, Non_Qatari=12
     )
     cache = tmp_path / "cache"
+    selections = {}
     for source in entries:
         body = (
             invented_archive()
@@ -884,6 +885,7 @@ def test_night_live_frame_merges_the_grid_tables(tmp_path, monkeypatch):
             else json_module.dumps(payloads[source.source_id]).encode()
         )
         digest = sha256_hex(body)
+        selections[source.key] = digest
         receipt = sidecar_for(
             source,
             digest=digest,
@@ -898,7 +900,10 @@ def test_night_live_frame_merges_the_grid_tables(tmp_path, monkeypatch):
         )
         commit_pair(cache / source.key, digest, source.extension, body, receipt)
     row = _radiance_row()
-    store(cache, row, night_file(tmp_path / "SYN.h5").read_bytes())
+    selections[row.key] = store(
+        cache, row, night_file(tmp_path / "SYN.h5").read_bytes()
+    )
+    (cache / "snapshot_pins.json").write_text(json_module.dumps(selections))
     seen: list[dict[int, object]] = []
 
     def spy(cache_path, rows, cells):
@@ -906,7 +911,7 @@ def test_night_live_frame_merges_the_grid_tables(tmp_path, monkeypatch):
         return real_grids(cache_path, rows, cells)
 
     monkeypatch.setattr(live, "build_grids", spy)
-    result = build_frame(cache, (*entries, row), review)
+    result = build_frame(cache, (*entries, row), review, selections=selections)
     assert len(seen) == 1
     assert sorted(seen[0]) == sorted(
         item["cell"] for item in result.tables["grid_cell"]
@@ -1114,10 +1119,9 @@ def test_night_echoed_request_error_holds_no_header(monkeypatch):
     assert token not in text
 
 
-def test_night_plain_oserror_is_unreachable_and_keeps_the_query_out(monkeypatch):
-    """A plain OSError is unreachable, and the query never reaches the fault."""
+def test_night_plain_oserror_is_unreachable_without_exception_chain(monkeypatch):
+    """A clean approved URL reaches the opener and gives a sanitized OSError."""
     token = "SYN-invented-token"
-    query = "?Signature=invented-signature&token=SYN-invented-query-token"
 
     class _Opener:
         def open(self, request, timeout=None):
@@ -1128,8 +1132,10 @@ def test_night_plain_oserror_is_unreachable_and_keeps_the_query_out(monkeypatch)
         lambda *handlers: _Opener(),
     )
     with pytest.raises(TransportFault) as caught:
-        open_https(FILE_URL + query, token)
+        open_https(FILE_URL, token)
     fault = caught.value
+    assert fault.__cause__ is None
+    assert fault.__suppress_context__ is True
     assert fault.kind == "unreachable"
     assert fault.url == FILE_URL
     text = f"{fault}"
@@ -1139,6 +1145,36 @@ def test_night_plain_oserror_is_unreachable_and_keeps_the_query_out(monkeypatch)
     context = fault.__context__
     if context is not None and not fault.__suppress_context__:
         text = f"{text} {context}"
+    assert "Signature" not in text
+    assert "invented-signature" not in text
+    assert "SYN-invented-query-token" not in text
+    assert token not in text
+    assert "Authorization" not in text
+
+
+def test_night_query_is_blocked_before_open_without_token_text(monkeypatch, capsys):
+    token = "SYN-invented-token"
+    query = "?Signature=invented-signature&token=SYN-invented-query-token"
+    opened = []
+
+    class _Opener:
+        def open(self, request, timeout=None):
+            opened.append(request)
+            raise AssertionError("query reached opener")
+
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.fetch.transport.urllib.request.build_opener",
+        lambda *handlers: _Opener(),
+    )
+    with pytest.raises(TransportFault) as caught:
+        open_https(FILE_URL + query, token)
+    fault = caught.value
+    assert fault.kind == "blocked_host"
+    assert fault.url == FILE_URL
+    assert opened == []
+    assert fault.__cause__ is None
+    captured = capsys.readouterr()
+    text = f"{fault} {fault!r} {vars(fault)} {captured.out} {captured.err}"
     assert "Signature" not in text
     assert "invented-signature" not in text
     assert "SYN-invented-query-token" not in text

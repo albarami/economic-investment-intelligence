@@ -12,6 +12,7 @@ from custodian.tests.repository_root import repository_root
 from eii_custodian.publicdata.fetch.allowlist import ALLOWED_HOSTS, approve
 from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
 from eii_custodian.publicdata.fetch.registry import RegistryError, load_registry
+from eii_custodian.publicdata.fetch.snapshots import checked_times, read_snapshot
 from eii_custodian.publicdata.fetch.transport import Response
 
 REPO = repository_root(Path(__file__))
@@ -211,13 +212,10 @@ def test_exact_hosts_and_pack_list():
 def test_tender_kind_and_pin_load(tmp_path):
 
     document = yaml.safe_load((REPO / "custodian/publicdata/sources.yaml").read_text())
-    row = document["sources"][0].copy()
-    row.update(
-        key="tenders_pub",
-        source_id="tenders_pub",
-        kind="paged_cards",
-        chain_intermediate_sha256="a" * 64,
-    )
+    row = next(
+        item for item in document["sources"] if item["source_id"] == "tenders_pub"
+    ).copy()
+    row.update(chain_intermediate_sha256="a" * 64)
     path = tmp_path / "registry.yaml"
     path.write_text(yaml.safe_dump({"sources": [row]}))
     assert load_registry(path)[0].chain_intermediate_sha256 == "a" * 64
@@ -1221,8 +1219,33 @@ def test_build_orchestration_collects_families_without_tables(tmp_path):
         lambda _: None,
     )
     assert outcome.failure is None
-    receipts = list(tmp_path.rglob("*.meta.json"))
+    indexes = sorted(tmp_path.glob("**/index/*.json"))
+    snapshots = [read_snapshot(path.parent.parent, path.stem) for path in indexes]
+    receipts = [snapshot.receipt_path for snapshot in snapshots]
     assert len(receipts) == len(FAMILIES)
+    for index, snapshot in zip(indexes, snapshots, strict=True):
+        directory = index.parent.parent
+        check = dict(snapshot.sidecar, identity=index.stem)
+        check_bytes = (
+            json.dumps(check, sort_keys=True, ensure_ascii=True) + "\n"
+        ).encode()
+        check_path = (
+            directory / "checks" / (hashlib.sha256(check_bytes).hexdigest() + ".json")
+        )
+        body_alias = directory / snapshot.path.name
+        receipt_alias = directory / snapshot.receipt_path.name
+        assert {path for path in directory.rglob("*") if path.is_file()} == {
+            snapshot.path,
+            snapshot.receipt_path,
+            index,
+            check_path,
+            body_alias,
+            receipt_alias,
+        }
+        assert check_path.read_bytes() == check_bytes
+        assert body_alias.samefile(snapshot.path)
+        assert receipt_alias.samefile(snapshot.receipt_path)
+        assert checked_times(directory) == (snapshot.sidecar["retrieved_utc"],)
     assert {json.loads(p.read_text())["source_id"] for p in receipts} == FAMILIES
     assert all(json.loads(p.read_text())["release_tables"] == [] for p in receipts)
     assert not list(tmp_path.rglob("*.parquet"))

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -17,6 +18,7 @@ from eii_custodian.publicdata.fetch.registry import (
     load_registry,
     require_addition_completion,
 )
+from eii_custodian.publicdata.fetch.snapshots import checked_times, read_snapshot
 from eii_custodian.publicdata.fetch.transport import Response
 
 FAMILY_COUNTS = {
@@ -625,8 +627,33 @@ def _map_count(values: dict[str, object], name: str) -> int | None:
 
 
 def _sidecar(folder: Path) -> dict[str, object]:
-    found = list(folder.rglob("*.meta.json"))
+    indexes = sorted(folder.glob("**/index/*.json"))
+    snapshots = [read_snapshot(path.parent.parent, path.stem) for path in indexes]
+    found = [snapshot.receipt_path for snapshot in snapshots]
     assert len(found) == 1
-    loaded = json.loads(found[0].read_text(encoding="utf-8"))
+    for index, snapshot in zip(indexes, snapshots, strict=True):
+        directory = index.parent.parent
+        check = dict(snapshot.sidecar, identity=index.stem)
+        check_bytes = (
+            json.dumps(check, sort_keys=True, ensure_ascii=True) + "\n"
+        ).encode()
+        check_path = (
+            directory / "checks" / (hashlib.sha256(check_bytes).hexdigest() + ".json")
+        )
+        body_alias = directory / snapshot.path.name
+        receipt_alias = directory / snapshot.receipt_path.name
+        assert {path for path in directory.rglob("*") if path.is_file()} == {
+            snapshot.path,
+            snapshot.receipt_path,
+            index,
+            check_path,
+            body_alias,
+            receipt_alias,
+        }
+        assert check_path.read_bytes() == check_bytes
+        assert body_alias.samefile(snapshot.path)
+        assert receipt_alias.samefile(snapshot.receipt_path)
+        assert checked_times(directory) == (snapshot.sidecar["retrieved_utc"],)
+    loaded = snapshots[0].sidecar
     assert isinstance(loaded, dict)
     return loaded

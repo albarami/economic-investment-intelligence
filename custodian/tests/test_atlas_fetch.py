@@ -197,7 +197,7 @@ def test_atlas_hosts_and_binding(tmp_path: Path, monkeypatch) -> None:
     config = Config.from_mapping(configuration())
     observed = []
 
-    def byte(url, *, reviewed_urls):
+    def byte(url, *, reviewed_urls, token=""):
         observed.append(reviewed_urls)
         return metadata(url)
 

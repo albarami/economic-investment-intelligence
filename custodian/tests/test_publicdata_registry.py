@@ -730,6 +730,12 @@ def test_baci_registry_pending_and_nightly_policy() -> None:
         } | BANNED_SOURCE_IDS
 
     expected = {
+        "bldg_3dglobfp",
+        "bldg_wsf3d",
+        "gis_boundaries",
+        "gis_imagery_history",
+        "tenders_pub",
+        "worldpop_qat_agesex",
         "busy_gmaps",
         "ntl_blackmarble",
         "traffic_tomtom_flow",

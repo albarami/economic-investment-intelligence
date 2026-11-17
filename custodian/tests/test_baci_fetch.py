@@ -467,7 +467,7 @@ def test_baci_production_transports_bind_reviewed_urls(tmp_path, monkeypatch):
     config = Config.from_mapping(configuration())
     observed = []
 
-    def byte(url, *, reviewed_urls):
+    def byte(url, *, reviewed_urls, token=""):
         observed.append(reviewed_urls)
         return metadata(url)
 
