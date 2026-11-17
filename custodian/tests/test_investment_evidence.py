@@ -52,13 +52,16 @@ def test_snapshot_metadata_and_lineage(tmp_path: Path) -> None:
     result = build_project_evidence((first,))
     assert not hasattr(result, "check")
     revision = result.revisions[0]
-    assert revision.observation.value == "2026-11-13"
-    assert revision.publication.precision == "day"
+    assert revision.observation.value == "2024-06-15"
+    assert revision.observation.precision == "day"
+    assert revision.publication.value is None
+    assert revision.publication.absence_reason == "not_stated_by_source"
     assert revision.retrieved_utc == "2026-11-14T08:00:00Z"
     assert revision.checksum == first.snapshot.sha256
     assert revision.schema == "fdi_projects.v1"
     assert revision.geography == "Invented Bay"
-    assert revision.correction.value == "false"
+    assert revision.correction.value is None
+    assert revision.correction.absence_reason == "not_stated_by_source"
 
     missing_terms = replace(
         first,
@@ -78,7 +81,7 @@ def test_snapshot_metadata_and_lineage(tmp_path: Path) -> None:
     )
     for planted in (
         replace(first, schema=""),
-        replace(first, geography=""),
+        replace(first, rows=({**first.rows[0], "location_text": ""},)),
         replace(first, observation=SourceAssertion(None, "", "")),
         replace(
             first,
@@ -98,10 +101,14 @@ def test_project_identity_continuity(tmp_path: Path) -> None:
     second = _project_snapshot(
         tmp_path, day="2026-11-15", capex="14.5", marker="second"
     )
-    other = _project_snapshot(tmp_path, day="2026-11-16", capex="15.5", marker="third")
-    other = replace(
-        other,
-        rows=({**other.rows[0], "project_id": 1002, "project_key": "fdi_" + "c" * 16},),
+    from custodian.tests.investment_fixtures import invented_record
+
+    other = _project_snapshot(
+        tmp_path,
+        day="2026-11-16",
+        capex="15.5",
+        marker="third",
+        records=(invented_record(project_id=1002, capex=("n", "15.5")),),
     )
     result = build_project_evidence((first, second, other))
     assert not hasattr(result, "check")
@@ -113,11 +120,21 @@ def test_project_identity_continuity(tmp_path: Path) -> None:
         rows=({**changed_id.rows[0], "project_key": first.rows[0]["project_key"]},),
     )
     refused = build_project_evidence((first, changed_id))
-    assert getattr(refused, "check", "") == "project_identity_unresolved"
+    assert getattr(refused, "check", "") == "invalid_evidence_metadata"
 
-    ambiguous = replace(
-        first,
-        rows=(first.rows[0], {**first.rows[0], "project_key": "fdi_" + "d" * 16}),
+    ambiguous = _project_snapshot(
+        tmp_path,
+        day="2026-11-17",
+        capex="16.5",
+        marker="ambiguous",
+        records=(
+            invented_record(project_id=1001, capex=("n", "16.5")),
+            invented_record(
+                project_id=1001,
+                investing_company_name="Invented Other Works",
+                capex=("n", "16.5"),
+            ),
+        ),
     )
     assert (
         getattr(build_project_evidence((ambiguous,)), "check", "")
@@ -142,13 +159,16 @@ def test_source_times_and_corrections(tmp_path: Path) -> None:
     result = build_project_evidence((with_unknowns,))
     assert not hasattr(result, "check")
     revision = result.revisions[0]
-    assert revision.observation.value is None
+    assert revision.observation.value == "2024-06-15"
     assert revision.publication.absence_reason == "not_stated_by_source"
     assert revision.correction.value is None
     assert revision.retrieved_utc == "2026-11-14T08:00:00Z"
 
     for planted in (
-        replace(first, geography="Invented Other Place"),
+        replace(
+            first,
+            rows=({**first.rows[0], "location_text": "Invented Other Place"},),
+        ),
         replace(first, observation=SourceAssertion("false", "source_flag", "")),
         replace(first, correction=SourceAssertion("2026-11-13", "day", "")),
     ):
@@ -308,10 +328,20 @@ def test_reviewed_crosswalk_and_milestone_lineage(tmp_path: Path) -> None:
         marker="crosswalk",
         direct=False,
     )
+    crosswalk_key = "review/milestone_crosswalk"
+    archived = _archive_crosswalk(
+        tmp_path,
+        crosswalk_key,
+        crosswalk_candidate.candidate_id,
+        "fdi_projects:project:1001",
+        direct_link.review_reference,
+    )
     link = replace(
         direct_link,
         candidate_id=crosswalk_candidate.candidate_id,
-        crosswalk_sha256="cd" * 32,
+        crosswalk_sha256=archived.sha256,
+        crosswalk_key=crosswalk_key,
+        crosswalk=archived,
     )
     identities = frozenset({"fdi_projects:project:1001"})
     validated = evidence_module.require_independent_milestone(
@@ -364,7 +394,7 @@ def test_announcement_and_observation_are_separate(tmp_path: Path) -> None:
     assert result.revisions[0].announced == {
         "capex": "12.5",
         "jobs": "40",
-        "stated_intent": "Invented announced intent",
+        "stated_intent": "Invented café note",
     }
     assert result.observed_investment == ()
 
@@ -400,15 +430,32 @@ def test_audit_lists_every_revision_and_absence(tmp_path: Path) -> None:
     audit_project_evidence = getattr(evidence_module, "audit_project_evidence", None)
     assert callable(audit_project_evidence), "exhaustive evidence audit is absent"
     first = _project_snapshot(tmp_path, day="2026-11-14", capex="12.5", marker="first")
-    missing = _project_snapshot(
-        tmp_path, day="2026-11-15", capex="12.5", marker="absent"
+    from custodian.tests.investment_fixtures import invented_record
+
+    other_record = invented_record(
+        project_id=1002,
+        investing_company_name="Invented Reed Mill",
+        project_address="Invented Cove",
     )
-    missing = replace(missing, rows=())
+    missing = _project_snapshot(
+        tmp_path,
+        day="2026-11-15",
+        capex="12.5",
+        marker="absent",
+        records=(other_record,),
+    )
     returned = _project_snapshot(
-        tmp_path, day="2026-11-16", capex="14.5", marker="returned"
+        tmp_path,
+        day="2026-11-16",
+        capex="14.5",
+        marker="returned",
+        records=(
+            invented_record(project_id=1001, capex=("n", "14.5")),
+            other_record,
+        ),
     )
     evidence = build_project_evidence((first, missing, returned))
-    assert len(evidence.revisions) == 2
+    assert len(evidence.revisions) == 4
     assert len(evidence.absences) == 1
     assert evidence.absences[0].snapshot_identity == missing.identity
 
@@ -424,14 +471,18 @@ def test_audit_lists_every_revision_and_absence(tmp_path: Path) -> None:
         expected, evidence, attempts, snapshots=(first, missing, returned)
     )
     assert not hasattr(audited, "check")
-    assert len(audited.entries) == 3
+    assert len(audited.entries) == 5
     assert [entry.coverage for entry in audited.entries] == [
+        "retained_revision",
         "retained_revision",
         "absent_from_snapshot",
         "retained_revision",
+        "retained_revision",
     ]
     assert {entry.provenance for entry in audited.entries} == {"public"}
-    absence = audited.entries[1]
+    absence = next(
+        entry for entry in audited.entries if entry.coverage == "absent_from_snapshot"
+    )
     assert absence.evidence_status == "missing_evidence"
     assert absence.reason == "not_present_in_source_snapshot"
 
@@ -718,10 +769,480 @@ def _project_snapshot(
     day: str,
     capex: str,
     marker: str,
+    records: tuple[dict[str, object], ...] | None = None,
 ) -> ProjectSnapshot:
-    body = f"invented project snapshot {marker}".encode()
+    from custodian.tests.investment_fixtures import invented_record
+
+    del marker
+    if records is None:
+        records = (invented_record(project_id=1001, capex=("n", capex)),)
+    identity = _archive_dashboard(root / "cache", day, records)
+    snapshot = read_snapshot(root / "cache" / "fdi_projects", identity)
+    parsed = evidence_module._parse_project_snapshot(snapshot, coverage={})
+    assert not hasattr(parsed, "check")
+    return parsed
+
+
+def test_archive_adapter_retains_history_and_failed_refresh(tmp_path: Path) -> None:
+    """F1: explicit archived pages produce the complete S2-T08 projection."""
+    adapter = getattr(evidence_module, "build_cache_evidence", None)
+    assert callable(adapter), "the cache-only evidence adapter is absent"
+    from custodian.tests.investment_fixtures import invented_record
+
+    first_records = (
+        invented_record(project_id=1001, capex=("n", "12.5")),
+        invented_record(
+            project_id=1002,
+            investing_company_name="Invented Reed Mill",
+            project_address="Invented Cove",
+        ),
+    )
+    second_records = (first_records[1],)
+    third_records = (
+        first_records[1],
+        invented_record(project_id=1001, capex=("n", "14.5")),
+    )
+    cache = tmp_path / "cache"
+    identities = tuple(
+        _archive_dashboard(cache, day, records)
+        for day, records in zip(
+            ("2026-11-14", "2026-11-15", "2026-11-16"),
+            (first_records, second_records, third_records),
+            strict=True,
+        )
+    )
+    selection_type = evidence_contracts.ProjectArchiveSelection
+    selections = tuple(
+        selection_type("fdi_projects", identity, {"scope": "invented_history"})
+        for identity in identities
+    )
+    expected = (
+        evidence_contracts.ExpectedInput("fdi_projects", "fdi_projects", "project"),
+        evidence_contracts.ExpectedInput(
+            "invented_milestones", "invented_milestones", "milestone"
+        ),
+    )
+    attempts = (
+        evidence_contracts.FetchAttempt(
+            "fdi_projects", "fdi_projects", "failed", None, "fetch_failed"
+        ),
+    )
+    projection = adapter(
+        cache,
+        projects=selections,
+        milestones=(),
+        expected=expected,
+        attempts=attempts,
+    )
+    assert not hasattr(projection, "check")
+    assert len(projection.evidence.revisions) == 5
+    assert len(projection.evidence.absences) == 1
+    assert projection.evidence.absences[0].project_identity.endswith(":1001")
+    returned = [
+        row
+        for row in projection.evidence.revisions
+        if row.snapshot_identity == identities[2] and row.project_id == "1001"
+    ]
+    assert len(returned) == 1
+    assert returned[0].announced["capex"] == "14.5"
+    states = {(row.key, row.evidence_status) for row in projection.audit.entries}
+    assert ("fdi_projects", "failed") in states
+    assert ("invented_milestones", "unattempted") in states
+    assert len(projection.archives) == 3
+
+
+def test_cache_adapter_retains_unresolved_milestone(tmp_path: Path) -> None:
+    """F1: an unresolved reviewed candidate stays visible as missing evidence."""
+    cache = tmp_path / "cache"
+    project = _project_snapshot(
+        tmp_path, day="2026-11-14", capex="12.5", marker="first"
+    )
+    shape = _milestone_shape()
+    candidate = _milestone_candidate(
+        tmp_path,
+        evidence_module.parse_milestone_page,
+        shape,
+        _milestone_envelope(),
+        independence="independent_report",
+        marker="unresolved",
+    )
+    link = evidence_contracts.ReviewedMilestoneLink(
+        candidate.candidate_id,
+        "fdi_projects:project:1002",
+        "independent_report",
+        True,
+        "review/independent_milestone",
+        "",
+    )
+    projection = evidence_module.build_cache_evidence(
+        cache,
+        projects=(
+            evidence_contracts.ProjectArchiveSelection(
+                "fdi_projects", project.identity, {}
+            ),
+        ),
+        milestones=(
+            evidence_contracts.MilestoneArchiveSelection(
+                "invented_milestones",
+                candidate.snapshot_identity,
+                shape,
+                _milestone_envelope(),
+                (link,),
+                "",
+            ),
+        ),
+        expected=(
+            evidence_contracts.ExpectedInput("fdi_projects", "fdi_projects", "project"),
+            evidence_contracts.ExpectedInput(
+                "invented_milestones", "invented_milestones", "milestone"
+            ),
+        ),
+        attempts=(
+            evidence_contracts.FetchAttempt(
+                "fdi_projects", "fdi_projects", "success", project.identity, ""
+            ),
+            evidence_contracts.FetchAttempt(
+                "invented_milestones",
+                "invented_milestones",
+                "success",
+                candidate.snapshot_identity,
+                "",
+            ),
+        ),
+    )
+    assert not hasattr(projection, "check")
+    assert projection.evidence.milestones[0].evidence_status == "missing_evidence"
+    assert (
+        projection.evidence.milestones[0].missing_reason
+        == "project_identity_unresolved"
+    )
+
+
+def test_crosswalk_requires_its_verified_archive_and_exact_mapping(
+    tmp_path: Path,
+) -> None:
+    """F2: a hash-shaped token is not a reviewed crosswalk receipt."""
+    candidate, direct_link = _valid_milestone_parts(tmp_path)
+    shape = candidate.shape if hasattr(candidate, "shape") else None
+    if shape is None:
+        shape = _milestone_shape()
+    envelope = _milestone_envelope()
+    crosswalk_candidate = _milestone_candidate(
+        tmp_path,
+        evidence_module.parse_milestone_page,
+        shape,
+        envelope,
+        independence="independent_report",
+        marker="crosswalk",
+        direct=False,
+    )
+    fabricated = replace(
+        direct_link,
+        candidate_id=crosswalk_candidate.candidate_id,
+        crosswalk_sha256="cd" * 32,
+    )
+    identities = frozenset({"fdi_projects:project:1001"})
+    refused = evidence_module.require_independent_milestone(
+        crosswalk_candidate, fabricated, identities
+    )
+    assert getattr(refused, "check", "") == "project_identity_unresolved"
+    assert "crosswalk" in evidence_contracts.ReviewedMilestoneLink.__dataclass_fields__
+
+    key = "review/milestone_crosswalk"
+    archived = _archive_crosswalk(
+        tmp_path,
+        key,
+        crosswalk_candidate.candidate_id,
+        "fdi_projects:project:1001",
+        direct_link.review_reference,
+    )
+    linked = replace(
+        fabricated,
+        crosswalk_sha256=archived.sha256,
+        crosswalk_key=key,
+        crosswalk=archived,
+    )
+    validated = evidence_module.require_independent_milestone(
+        crosswalk_candidate, linked, identities
+    )
+    assert not hasattr(validated, "check")
+
+    no_archive = replace(linked, crosswalk=None)
+    refused = evidence_module.require_independent_milestone(
+        crosswalk_candidate, no_archive, identities
+    )
+    assert getattr(refused, "check", "") == "project_identity_unresolved"
+
+    missing_root = tmp_path / "missing-body"
+    missing = _archive_crosswalk(
+        missing_root,
+        key,
+        crosswalk_candidate.candidate_id,
+        "fdi_projects:project:1001",
+        direct_link.review_reference,
+    )
+    missing.path.unlink()
+    refused = evidence_module.require_independent_milestone(
+        crosswalk_candidate,
+        replace(linked, crosswalk_sha256=missing.sha256, crosswalk=missing),
+        identities,
+    )
+    assert getattr(refused, "check", "") == "project_identity_unresolved"
+
+    tampered = _archive_crosswalk(
+        tmp_path / "tampered",
+        key,
+        crosswalk_candidate.candidate_id,
+        "fdi_projects:project:1001",
+        direct_link.review_reference,
+    )
+    tampered.path.write_bytes(b"invented crosswalk substitution")
+    refused = evidence_module.require_independent_milestone(
+        crosswalk_candidate,
+        replace(linked, crosswalk_sha256=tampered.sha256, crosswalk=tampered),
+        identities,
+    )
+    assert getattr(refused, "check", "") == "project_identity_unresolved"
+
+    wrong = _archive_crosswalk(
+        tmp_path / "wrong-mapping",
+        key,
+        crosswalk_candidate.candidate_id,
+        "fdi_projects:project:1002",
+        direct_link.review_reference,
+    )
+    refused = evidence_module.require_independent_milestone(
+        crosswalk_candidate,
+        replace(linked, crosswalk_sha256=wrong.sha256, crosswalk=wrong),
+        identities,
+    )
+    assert getattr(refused, "check", "") == "project_identity_unresolved"
+
+
+def test_project_rows_and_assertions_must_match_archived_parser(
+    tmp_path: Path,
+) -> None:
+    """F3: caller substitutions cannot change values beside unchanged bytes."""
+    adapter = getattr(evidence_module, "build_cache_evidence", None)
+    assert callable(adapter), "the archive-backed project parser is absent"
+    from custodian.tests.investment_fixtures import invented_record
+
+    cache = tmp_path / "cache"
+    identity = _archive_dashboard(
+        cache, "2026-11-14", (invented_record(project_id=1001),)
+    )
+    selection = evidence_contracts.ProjectArchiveSelection(
+        "fdi_projects", identity, {"scope": "invented_substitution"}
+    )
+    projection = adapter(
+        cache, projects=(selection,), milestones=(), expected=(), attempts=()
+    )
+    snapshot = projection.snapshots[0]
+    row = snapshot.rows[0]
+    for planted in (
+        replace(snapshot, rows=({**row, "capex_value": "99.5"},)),
+        replace(snapshot, rows=({**row, "announced": "2025-01-01"},)),
+        replace(
+            snapshot,
+            correction=SourceAssertion("true", "source_flag", ""),
+        ),
+        replace(snapshot, rows=({**row, "terms_sha256": "cd" * 32},)),
+    ):
+        refused = build_project_evidence((planted,))
+        assert getattr(refused, "check", "") == "invalid_evidence_metadata"
+
+
+def test_milestone_assertions_and_lineage_must_match_archived_parser(
+    tmp_path: Path,
+) -> None:
+    """F3: milestone dates, correction flags and terms are receipt-bound."""
+    candidate, link = _valid_milestone_parts(tmp_path)
+    identities = frozenset({"fdi_projects:project:1001"})
+    for planted in (
+        replace(
+            candidate,
+            observation=SourceAssertion("2026-11-14", "day", ""),
+        ),
+        replace(candidate, correction=SourceAssertion("true", "source_flag", "")),
+        replace(
+            candidate,
+            source_chain={**candidate.source_chain, "terms_sha256": "cd" * 32},
+        ),
+    ):
+        refused = evidence_module.require_independent_milestone(
+            planted, link, identities
+        )
+        assert getattr(refused, "check", "") == "invalid_evidence_metadata"
+
+
+def test_parser_snapshot_keeps_geography_per_project_row(tmp_path: Path) -> None:
+    """F4: two locations and an unstated location survive independently."""
+    adapter = getattr(evidence_module, "build_cache_evidence", None)
+    assert callable(adapter), "the parser-made snapshot adapter is absent"
+    from custodian.tests.investment_fixtures import invented_record
+
+    records = (
+        invented_record(project_id=1001, project_address="Invented Bay"),
+        invented_record(project_id=1002, project_address="Invented Cove"),
+        invented_record(project_id=1003, project_address=""),
+    )
+    cache = tmp_path / "cache"
+    identity = _archive_dashboard(cache, "2026-11-14", records)
+    coverage = {"scope": "invented_three_location_snapshot"}
+    selection = evidence_contracts.ProjectArchiveSelection(
+        "fdi_projects", identity, coverage
+    )
+    projection = adapter(
+        cache, projects=(selection,), milestones=(), expected=(), attempts=()
+    )
+    assert projection.snapshots[0].coverage == coverage
+    revisions = {row.project_id: row for row in projection.evidence.revisions}
+    assert revisions["1001"].geography == "Invented Bay"
+    assert revisions["1002"].geography == "Invented Cove"
+    assert revisions["1003"].geography is None
+    assert revisions["1003"].geography_absence_reason == "not_stated_by_source"
+
+
+def test_registration_cannot_substitute_another_sources_archive(
+    tmp_path: Path,
+) -> None:
+    """F5: source, key, kind and identity all bind a registration."""
+    project = _project_snapshot(
+        tmp_path, day="2026-11-14", capex="12.5", marker="first"
+    )
+    expected = (
+        evidence_contracts.ExpectedInput("other_source", "fdi_projects", "project"),
+    )
+    attempts = (
+        evidence_contracts.FetchAttempt(
+            "other_source", "fdi_projects", "success", project.identity, ""
+        ),
+    )
+    evidence = build_project_evidence((project,))
+    refused = evidence_module.audit_project_evidence(
+        expected, evidence, attempts, snapshots=(project,)
+    )
+    assert getattr(refused, "check", "") == "evidence_audit_incomplete"
+
+    wrong_kind = evidence_module.audit_project_evidence(
+        (
+            evidence_contracts.ExpectedInput(
+                "fdi_projects", "fdi_projects", "milestone"
+            ),
+        ),
+        evidence,
+        (
+            evidence_contracts.FetchAttempt(
+                "fdi_projects", "fdi_projects", "success", project.identity, ""
+            ),
+        ),
+        snapshots=(project,),
+    )
+    assert getattr(wrong_kind, "check", "") == "evidence_audit_incomplete"
+
+    candidate, link = _valid_milestone_parts(tmp_path)
+    with_milestone = build_project_evidence((project,), (candidate,), (link,))
+    milestone_expected = (
+        evidence_contracts.ExpectedInput(
+            "other_source", "invented_milestones", "milestone"
+        ),
+    )
+    milestone_attempt = evidence_contracts.FetchAttempt(
+        "other_source",
+        "invented_milestones",
+        "success",
+        candidate.snapshot_identity,
+        "",
+    )
+    refused = evidence_module.audit_project_evidence(
+        milestone_expected,
+        with_milestone,
+        (milestone_attempt,),
+        snapshots=(project,),
+    )
+    assert getattr(refused, "check", "") == "evidence_audit_incomplete"
+
+    milestone_kind = evidence_module.audit_project_evidence(
+        (
+            evidence_contracts.ExpectedInput(
+                "invented_milestones", "invented_milestones", "project"
+            ),
+        ),
+        with_milestone,
+        (
+            evidence_contracts.FetchAttempt(
+                "invented_milestones",
+                "invented_milestones",
+                "success",
+                candidate.snapshot_identity,
+                "",
+            ),
+        ),
+        snapshots=(project,),
+    )
+    assert getattr(milestone_kind, "check", "") == "evidence_audit_incomplete"
+
+
+def test_valid_empty_snapshot_satisfies_its_own_registration(tmp_path: Path) -> None:
+    """F5: an archived empty snapshot needs no invented revision row."""
+    project = _project_snapshot(
+        tmp_path, day="2026-11-14", capex="12.5", marker="first"
+    )
+    empty = replace(project, rows=())
+    valid_empty = evidence_module.audit_project_evidence(
+        (evidence_contracts.ExpectedInput("fdi_projects", "fdi_projects", "project"),),
+        evidence_contracts.ProjectEvidence(()),
+        (
+            evidence_contracts.FetchAttempt(
+                "fdi_projects", "fdi_projects", "success", empty.identity, ""
+            ),
+        ),
+        snapshots=(empty,),
+    )
+    assert not hasattr(valid_empty, "check")
+
+
+def test_evidence_report_uses_only_registry_keys_and_closed_reasons() -> None:
+    """F6: record text and identifier-shaped keys or reasons are refused."""
+    from eii_custodian.publicdata.fetch.report import evidence_line
+
+    for key in (
+        "invented_loom_works",
+        "fdi_projects_extra",
+        "a" + "1" * 8,
+        "a" + "1" * 11,
+    ):
+        with pytest.raises(ValueError, match=r"^unsafe_report$"):
+            evidence_line(key, "failed", "fetch_failed")
+    for reason in (
+        "invented_loom_works",
+        "unknown_reason",
+        "a" + "1" * 8,
+        "a" + "1" * 11,
+    ):
+        with pytest.raises(ValueError, match=r"^unsafe_report$"):
+            evidence_line("fdi_projects", "failed", reason)
+
+
+def test_assertion_precision_equals_parsed_granularity() -> None:
+    """F7: every mismatched year/month/day declaration is refused."""
+    values = {"year": "2026", "month": "2026-11", "day": "2026-11-14"}
+    for actual, value in values.items():
+        assertion = SourceAssertion(value, actual, "")
+        assert evidence_module._valid_assertion(assertion)
+        assert evidence_module._row_observation({"announced": value}) == assertion
+        for declared in values.keys() - {actual}:
+            assertion = SourceAssertion(value, declared, "")
+            assert not evidence_module._valid_assertion(assertion)
+
+
+def _archive_dashboard(
+    cache: Path, day: str, records: tuple[dict[str, object], ...]
+) -> str:
+    from custodian.tests.investment_fixtures import dashboard_page
+
+    body = dashboard_page(records)
     retrieved = f"{day}T08:00:00Z"
-    directory = root / "cache" / "fdi_projects"
     sidecar = {
         "source_id": "fdi_projects",
         "key": "fdi_projects",
@@ -736,38 +1257,77 @@ def _project_snapshot(
         "method": "eii_custodian.publicdata.investment_parse.parse_fdi",
         "method_version": "1",
     }
-    published = publish_snapshot(directory, "json", body, sidecar)
-    identity = published.sha256
-    snapshot = read_snapshot(directory, identity)
-    row = {
-        "source_id": "fdi_projects",
-        "project_id": 1001,
-        "project_key": "fdi_" + ("a" if marker == "first" else "b") * 16,
-        "capex_value": capex,
-        "jobs": "40",
-        "stated_intent": "Invented announced intent",
-        "location_text": "Invented Bay",
-        "provenance": "public",
-        "publisher": sidecar["publisher"],
-        "page_url": sidecar["fetch_url"],
-        "licence_id": sidecar["licence_id"],
-        "licence_basis": sidecar["licence_basis"],
-        "decision_record": sidecar["decision_record"],
-        "terms_sha256": sidecar["terms_sha256"],
-        "retrieved_utc": retrieved,
-        "page_sha256": identity,
-        "method": sidecar["method"],
-        "method_version": sidecar["method_version"],
+    archived = publish_snapshot(cache / "fdi_projects", "html", body, sidecar)
+    return archived.sha256
+
+
+def _archive_crosswalk(
+    root: Path,
+    key: str,
+    candidate_id: str,
+    project_identity: str,
+    review_reference: str,
+):
+    body = (
+        json.dumps(
+            {
+                "schema_version": "reviewed_milestone_crosswalk.v1",
+                "review_reference": review_reference,
+                "mappings": [
+                    {
+                        "candidate_id": candidate_id,
+                        "project_identity": project_identity,
+                        "independence": "independent_report",
+                    }
+                ],
+            },
+            sort_keys=True,
+        )
+        + "\n"
+    ).encode()
+    sidecar = {
+        "source_id": "independent_milestone_review",
+        "key": key,
+        "retrieved_utc": "2026-11-15T08:00:00Z",
+        "review_reference": review_reference,
     }
-    stated = SourceAssertion("2026-11-13", "day", "")
-    corrected = SourceAssertion("false", "source_flag", "")
-    return ProjectSnapshot(
-        identity=identity,
-        snapshot=snapshot,
-        rows=(row,),
-        schema="fdi_projects.v1",
-        geography="Invented Bay",
-        observation=stated,
-        publication=stated,
-        correction=corrected,
+    directory = root / "cache" / key
+    published = publish_snapshot(directory, "json", body, sidecar)
+    return read_snapshot(directory, published.sha256)
+
+
+def _milestone_shape():
+    return evidence_contracts.MilestoneShape(
+        "invented-independent-milestones-v1",
+        frozenset(
+            {
+                "milestone_id",
+                "project_source_id",
+                "project_id",
+                "status",
+                "observation",
+                "publication",
+                "correction",
+                "geography",
+                "independence",
+            }
+        ),
+        True,
+    )
+
+
+def _milestone_envelope() -> SourceEnvelope:
+    return SourceEnvelope(
+        source_id="invented_milestones",
+        publisher="Invented independent publisher",
+        page_url="https://milestones.invalid/invented-start",
+        licence_id="invented-public-terms",
+        licence_basis="owner_decision",
+        decision_record="invented-review",
+        terms_sha256="ab" * 32,
+        terms_url="https://terms.invalid/terms",
+        retrieved_utc="2026-11-15T08:00:00Z",
+        page_sha256="",
+        method="eii_custodian.publicdata.investment_evidence.parse_milestone_page",
+        method_version="1",
     )

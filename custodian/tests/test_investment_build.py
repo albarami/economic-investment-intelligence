@@ -127,6 +127,7 @@ def test_nullable_precision_and_duplicate_keys(
     deleted (PUB-10).
     """
     sparse = invented_record(
+        project_id=1002,
         investing_company_name="Invented Cedar Press",
         jobs="",
         project_date="",

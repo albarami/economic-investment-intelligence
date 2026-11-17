@@ -3418,7 +3418,7 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - TYPE: PENDING
 - RAISED BY: the S2-T30 builder (Moonshot AI), 2026-11-17
 - CONCERNS: S2-T08's evidence-bundle adapter; the later S2 train joins; `investment_evidence.py` and changed comparison guards in `fetch/build.py`; independent review
-- EVIDENCE: The tracker returns the exhaustive cache-only audit projection and archives fail-fast attempt outcomes. S2-T08 owns assembly of that projection into the slice evidence bundle and is not implemented by this task. The builder ran no mutation campaign and is not the independent reviewer. Later shared-fetch joins still need the lead's compatibility checks on the joined head.
+- EVIDENCE: The production investment fetch path now builds the cache-only projection from explicitly selected archives through the existing parsers. The audit binds registrations to source ID, registry key, kind and verified snapshot identity; unresolved milestones remain missing evidence. S2-T08 owns assembly of that projection into the slice evidence bundle and is not implemented by this task. The builder corrected the rejected F1–F7 implementation findings, ran no mutation campaign and is not the independent reviewer. Later shared-fetch joins still need the lead's compatibility checks on the joined head.
 - NEEDED: S2-T08 consumes every revision, absence, unvalidated milestone and fetch outcome without inferring closure; the lead runs the required mutation campaign and joined-head verification; a principal data-quality/provenance reviewer from another maker returns APPROVED or REJECTED. Task status remains built, not done, until those records exist.
 
 ## OI-300 — PUB-64 anchors and selected-source acceptance

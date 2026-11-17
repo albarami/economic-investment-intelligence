@@ -71,8 +71,12 @@ from eii_custodian.publicdata.investment_contracts import (
     ExpectedInput,
     FetchAttempt,
     InvestmentFailure,
+    ProjectArchiveSelection,
 )
-from eii_custodian.publicdata.investment_evidence import archive_fetch_attempts
+from eii_custodian.publicdata.investment_evidence import (
+    archive_fetch_attempts,
+    build_cache_evidence,
+)
 from eii_custodian.publicdata.places.fetch import fetch_place_file, is_place_file
 from eii_custodian.publicdata.places_fsq.fetch import fetch_release, is_release_entry
 from eii_custodian.publicdata.stage import run_stage
@@ -297,6 +301,8 @@ def _fetch_row(
     )
     if prepared.requests:
         sidecar["requests"] = list(prepared.requests)
+    if entry.source_id in INVESTMENT_SOURCES:
+        sidecar["terms_url"] = entry.terms_url
     try:
         commit_pair(
             cache_directory(cache, stored_entry.key),
@@ -665,7 +671,7 @@ def run_build(
             if entry.source_id in INVESTMENT_SOURCES:
                 investment_attempts.append(
                     FetchAttempt(
-                        entry.source_id, entry.key, "failed", None, result.check
+                        entry.source_id, entry.key, "failed", None, "fetch_failed"
                     )
                 )
             lines.append(
@@ -695,7 +701,11 @@ def run_build(
         if batch is not None:
             investment_attempts.append(
                 FetchAttempt(
-                    entry.source_id, entry.key, "failed", fetched.digest, batch.check
+                    entry.source_id,
+                    entry.key,
+                    "failed",
+                    fetched.digest,
+                    "publication_failed",
                 )
             )
             lines.append(
@@ -944,12 +954,41 @@ def _archive_investment_attempts(
         if entry.source_id in INVESTMENT_SOURCES
     }
     try:
-        audited = archive_fetch_attempts(
-            cache,
-            expected,
-            tuple(attempts),
-            sidecars=sidecars,
-            retrieved_utc=retrieved,
+        project_registrations = tuple(
+            registration
+            for registration in expected
+            if registration.source_id == "fdi_projects"
+        )
+        projection = None
+        if project_registrations:
+            selections = tuple(
+                ProjectArchiveSelection(
+                    registration.key, str(attempt.snapshot_identity), {}
+                )
+                for registration in project_registrations
+                for attempt in attempts
+                if attempt.source_id == registration.source_id
+                and attempt.key == registration.key
+                and attempt.status == "success"
+                and isinstance(attempt.snapshot_identity, str)
+            )
+            projection = build_cache_evidence(
+                cache,
+                projects=selections,
+                milestones=(),
+                expected=project_registrations,
+                attempts=tuple(attempts),
+            )
+        audited = (
+            projection
+            if isinstance(projection, InvestmentFailure)
+            else archive_fetch_attempts(
+                cache,
+                expected,
+                tuple(attempts),
+                sidecars=sidecars,
+                retrieved_utc=retrieved,
+            )
         )
     except (OSError, ValueError):
         audited = InvestmentFailure(
@@ -978,13 +1017,16 @@ def _archive_investment_attempts(
             audited.expected,
             audited.observed,
         )
+    registry_keys = frozenset(registration.key for registration in expected)
     for entry in audited.entries:
         status = (
             "retained"
             if entry.evidence_status == "observed_announcement"
             else entry.evidence_status
         )
-        lines.append(evidence_line(entry.key, status, entry.reason))
+        lines.append(
+            evidence_line(entry.key, status, entry.reason, registry_keys=registry_keys)
+        )
     return None
 
 

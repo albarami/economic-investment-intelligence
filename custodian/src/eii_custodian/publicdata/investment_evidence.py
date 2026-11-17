@@ -5,34 +5,44 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Mapping
+from dataclasses import replace
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.snapshots import (
     Snapshot,
+    SnapshotError,
     publish_snapshot,
     read_snapshot,
 )
 from eii_custodian.publicdata.investment_contracts import (
+    FDI_METHOD,
     LINEAGE_FIELDS,
+    PARSER_VERSION,
     PROVENANCE_PUBLIC,
+    SCHEMA_FDI,
     EvidenceAudit,
     EvidenceAuditEntry,
+    EvidenceProjection,
     ExpectedInput,
     FetchAttempt,
     InvestmentFailure,
+    MilestoneArchiveSelection,
     MilestoneCandidate,
     MilestoneEvidence,
     MilestoneShape,
     ObservedInvestment,
     ProjectAbsence,
+    ProjectArchiveSelection,
     ProjectEvidence,
     ProjectRevision,
     ProjectSnapshot,
     ReviewedMilestoneLink,
     SourceAssertion,
     SourceEnvelope,
+    VerifiedArchive,
     parse_announced,
 )
+from eii_custodian.publicdata.investment_parse import dashboard_envelope, parse_fdi
 
 _HASH = re.compile(r"[a-f0-9]{64}")
 _INDEPENDENCE = frozenset(
@@ -47,6 +57,183 @@ _MISSING_MILESTONE = frozenset(
         "unsupported_milestone",
     }
 )
+
+
+_MILESTONE_METHOD = "eii_custodian.publicdata.investment_evidence.parse_milestone_page"
+_UNKNOWN_ASSERTION = SourceAssertion(None, "", "not_stated_by_source")
+
+
+def build_cache_evidence(
+    cache: Path,
+    *,
+    projects: tuple[ProjectArchiveSelection, ...],
+    milestones: tuple[MilestoneArchiveSelection, ...],
+    expected: tuple[ExpectedInput, ...],
+    attempts: tuple[FetchAttempt, ...],
+) -> EvidenceProjection | InvestmentFailure:
+    """Build the complete S2-T08 projection from explicit verified archives."""
+    snapshots: list[ProjectSnapshot] = []
+    archives: list[VerifiedArchive] = []
+    for selection in projects:
+        snapshot = read_snapshot(cache / selection.key, selection.identity)
+        if selection.identity != snapshot.sha256:
+            return _snapshot_failure(snapshot, "raw snapshot identity", "mismatch")
+        item = _parse_project_snapshot(snapshot, coverage=selection.coverage)
+        if isinstance(item, InvestmentFailure):
+            return item
+        snapshots.append(item)
+        source_id = str(snapshot.sidecar.get("source_id", ""))
+        archives.append(
+            VerifiedArchive(
+                source_id,
+                selection.key,
+                "project",
+                selection.identity,
+                snapshot,
+            )
+        )
+
+    candidates: list[MilestoneCandidate] = []
+    reviewed_links: list[ReviewedMilestoneLink] = []
+    for milestone_selection in milestones:
+        snapshot = read_snapshot(
+            cache / milestone_selection.key, milestone_selection.identity
+        )
+        if (
+            milestone_selection.identity != snapshot.sha256
+            or snapshot.sidecar.get("key") != milestone_selection.key
+            or snapshot.sidecar.get("source_id")
+            != milestone_selection.envelope.source_id
+        ):
+            return _snapshot_failure(snapshot, "milestone registration", "mismatch")
+        envelope = _snapshot_envelope(snapshot, _MILESTONE_METHOD, PARSER_VERSION)
+        parsed = parse_milestone_page(
+            snapshot.body, milestone_selection.shape, envelope
+        )
+        if isinstance(parsed, InvestmentFailure):
+            return parsed
+        candidates.extend(replace(row, snapshot=snapshot) for row in parsed)
+        for link in milestone_selection.links:
+            if link.crosswalk_sha256:
+                try:
+                    crosswalk = read_snapshot(
+                        cache / milestone_selection.crosswalk_key,
+                        link.crosswalk_sha256,
+                    )
+                except (OSError, SnapshotError):
+                    reviewed_links.append(link)
+                    continue
+                link = replace(
+                    link,
+                    crosswalk_key=milestone_selection.crosswalk_key,
+                    crosswalk=crosswalk,
+                )
+            reviewed_links.append(link)
+        archives.append(
+            VerifiedArchive(
+                milestone_selection.envelope.source_id,
+                milestone_selection.key,
+                "milestone",
+                milestone_selection.identity,
+                snapshot,
+            )
+        )
+
+    evidence = build_project_evidence(
+        tuple(snapshots), tuple(candidates), tuple(reviewed_links)
+    )
+    if isinstance(evidence, InvestmentFailure):
+        return evidence
+    audit = audit_project_evidence(
+        expected,
+        evidence,
+        attempts,
+        snapshots=tuple(snapshots),
+        archives=tuple(archives),
+    )
+    if isinstance(audit, InvestmentFailure):
+        return audit
+    return EvidenceProjection(evidence, audit, tuple(snapshots), tuple(archives))
+
+
+def _parse_project_snapshot(
+    snapshot: Snapshot, *, coverage: Mapping[str, object]
+) -> ProjectSnapshot | InvestmentFailure:
+    """Parse one raw dashboard body; no caller-supplied row is evidence."""
+    from eii_custodian.publicdata.investment_build import load_source_spec
+
+    side = snapshot.sidecar
+    source_id = side.get("source_id")
+    key = side.get("key")
+    url = side.get("fetch_url")
+    if (
+        source_id != "fdi_projects"
+        or not isinstance(key, str)
+        or not key
+        or not isinstance(url, str)
+        or not url
+    ):
+        return _snapshot_failure(snapshot, "project archive metadata", "mismatch")
+    spec = load_source_spec(source_id, url=url)
+    if isinstance(spec, InvestmentFailure):
+        return spec
+    if spec.dashboard is None:
+        return _snapshot_failure(snapshot, "confirmed dashboard shape", "missing")
+    envelope = _snapshot_envelope(snapshot, FDI_METHOD, PARSER_VERSION)
+    parsed = parse_fdi(snapshot.body, spec.dashboard, envelope)
+    if isinstance(parsed, InvestmentFailure):
+        return parsed
+    rows, _empty_coordinates = parsed
+    return ProjectSnapshot(
+        identity=snapshot.sha256,
+        snapshot=snapshot,
+        rows=rows,
+        schema=SCHEMA_FDI,
+        coverage=dict(coverage),
+        observation=_UNKNOWN_ASSERTION,
+        publication=_UNKNOWN_ASSERTION,
+        correction=_UNKNOWN_ASSERTION,
+    )
+
+
+def _snapshot_envelope(snapshot: Snapshot, method: str, version: str) -> SourceEnvelope:
+    """Build parser lineage from the verified receipt, never a supplied row."""
+    side = snapshot.sidecar
+
+    def text(name: str, alias: str = "") -> str:
+        value = side.get(alias or name)
+        return value if isinstance(value, str) else ""
+
+    base = SourceEnvelope(
+        source_id=text("source_id"),
+        publisher=text("publisher"),
+        page_url=text("fetch_url"),
+        licence_id=text("licence_id"),
+        licence_basis=text("licence_basis"),
+        decision_record=text("decision_record"),
+        terms_sha256=text("terms_sha256"),
+        terms_url=text("terms_url") or _registry_terms_url(side),
+        retrieved_utc=text("retrieved_utc"),
+        page_sha256=snapshot.sha256,
+        method=method,
+        method_version=version,
+    )
+    return dashboard_envelope(base) if method == FDI_METHOD else base
+
+
+def _snapshot_failure(
+    snapshot: Snapshot, expected: str, observed: str
+) -> InvestmentFailure:
+    source = snapshot.sidecar.get("source_id")
+    url = snapshot.sidecar.get("fetch_url")
+    return InvestmentFailure(
+        1,
+        source if isinstance(source, str) else "",
+        url if isinstance(url, str) else "",
+        "invalid_evidence_metadata",
+        expected,
+        observed,
+    )
 
 
 def build_project_evidence(
@@ -96,6 +283,8 @@ def build_project_evidence(
             project_id = str(row.get("project_id", ""))
             identity = f"{source_id}:project:{project_id}"
             project_key = str(row.get("project_key", ""))
+            location = row.get("location_text")
+            geography = location if isinstance(location, str) else None
             revision_key = (item.identity, identity)
             if revision_key in seen_revisions:
                 return _refusal(
@@ -120,17 +309,20 @@ def build_project_evidence(
                     project_id=project_id,
                     snapshot_identity=item.identity,
                     project_key=project_key,
-                    observation=item.observation,
-                    publication=item.publication,
+                    observation=_row_observation(row),
+                    publication=_UNKNOWN_ASSERTION,
                     retrieved_utc=str(item.snapshot.sidecar.get("retrieved_utc", "")),
                     checksum=item.snapshot.sha256,
                     schema=item.schema,
-                    geography=item.geography,
-                    correction=item.correction,
+                    geography=geography,
+                    geography_absence_reason=(
+                        "" if geography is not None else "not_stated_by_source"
+                    ),
+                    correction=_UNKNOWN_ASSERTION,
                     announced={
                         "capex": row.get("capex_value"),
                         "jobs": row.get("jobs"),
-                        "stated_intent": row.get("stated_intent"),
+                        "stated_intent": row.get("description"),
                     },
                     source_chain=dict(row),
                 )
@@ -186,6 +378,7 @@ def audit_project_evidence(
     attempts: tuple[FetchAttempt, ...],
     *,
     snapshots: tuple[ProjectSnapshot, ...] = (),
+    archives: tuple[VerifiedArchive, ...] = (),
 ) -> EvidenceAudit | InvestmentFailure:
     """Project every retained row, absence and fetch outcome into the S2 audit."""
     attempt_by_key: dict[tuple[str, str], FetchAttempt] = {}
@@ -267,6 +460,29 @@ def audit_project_evidence(
             )
         )
 
+    verified_archives = list(archives)
+    verified_archives.extend(
+        VerifiedArchive(
+            str(item.snapshot.sidecar.get("source_id", "")),
+            str(item.snapshot.sidecar.get("key", "")),
+            "project",
+            item.identity,
+            item.snapshot,
+        )
+        for item in snapshots
+    )
+    verified_archives.extend(
+        VerifiedArchive(
+            row.candidate.source_id,
+            str(row.candidate.snapshot.sidecar.get("key", "")),
+            "milestone",
+            row.candidate.snapshot_identity,
+            row.candidate.snapshot,
+        )
+        for row in evidence.milestones
+        if row.candidate.snapshot is not None
+    )
+
     for registration in expected:
         current_attempt = attempt_by_key.get((registration.source_id, registration.key))
         if current_attempt is None:
@@ -291,23 +507,33 @@ def audit_project_evidence(
         identity = current_attempt.snapshot_identity
         if _HASH.fullmatch(identity) is None:
             return _audit_failure(registration.source_id, "success has no archive hash")
-        if registration.kind == "project":
-            archived = any(
-                row.snapshot_identity == identity for row in evidence.revisions
-            ) or any(row.snapshot_identity == identity for row in evidence.absences)
-        elif registration.kind == "milestone":
-            archived = any(
-                row.candidate.snapshot_identity == identity
-                and row.candidate.snapshot is not None
-                for row in evidence.milestones
-            )
-        else:
+        if registration.kind not in ("project", "milestone"):
             return _audit_failure(registration.source_id, "unknown registration kind")
+        archived = any(
+            _archive_matches(registration, identity, archive)
+            for archive in verified_archives
+        )
         if not archived:
             return _audit_failure(
                 registration.source_id, "registered input has no archived evidence"
             )
     return EvidenceAudit(tuple(entries))
+
+
+def _archive_matches(
+    registration: ExpectedInput, identity: str, archive: VerifiedArchive
+) -> bool:
+    snapshot = archive.snapshot
+    return (
+        archive.source_id == registration.source_id
+        and archive.key == registration.key
+        and archive.kind == registration.kind
+        and archive.identity == identity
+        and snapshot.sha256 == identity
+        and snapshot.receipt_path.name == f"{identity}.meta.json"
+        and snapshot.sidecar.get("source_id") == registration.source_id
+        and snapshot.sidecar.get("key") == registration.key
+    )
 
 
 def archive_evidence_audit(
@@ -389,7 +615,15 @@ def archive_fetch_attempts(
             or _HASH.fullmatch(identity) is None
         ):
             return _audit_failure(registration.source_id, "invalid fetch outcome")
-        read_snapshot(cache / registration.key, identity)
+        snapshot = read_snapshot(cache / registration.key, identity)
+        if (
+            snapshot.sha256 != identity
+            or snapshot.sidecar.get("source_id") != registration.source_id
+            or snapshot.sidecar.get("key") != registration.key
+        ):
+            return _audit_failure(
+                registration.source_id, "archive registration metadata differs"
+            )
         entries.append(
             EvidenceAuditEntry(
                 registration.source_id,
@@ -415,6 +649,14 @@ def archive_fetch_attempts(
         )
         _ = archived.body
     return audit
+
+
+def _row_observation(row: Mapping[str, object]) -> SourceAssertion:
+    value = row.get("announced")
+    if not isinstance(value, str) or parse_announced(value) != value:
+        return _UNKNOWN_ASSERTION
+    precision = {4: "year", 7: "month", 10: "day"}[len(value)]
+    return SourceAssertion(value, precision, "")
 
 
 def _expected_absence_keys(
@@ -566,6 +808,7 @@ def parse_milestone_page(
                 correction=assertions["correction"],
                 independence=str(strings["independence"]),
                 source_chain=source_chain,
+                shape=shape,
             )
         )
     return tuple(candidates)
@@ -576,12 +819,13 @@ def require_independent_milestone(
     link: ReviewedMilestoneLink | None,
     project_identities: frozenset[str],
 ) -> MilestoneEvidence | InvestmentFailure:
-    """Validate only a reviewed explicit link to an archived independent page."""
+    """Validate only parser-derived rows and reviewed archived link evidence."""
     if candidate.snapshot is None:
         return _candidate_failure(
             candidate, "missing_artifact", "archived milestone", "missing"
         )
-    _ = candidate.snapshot.body
+    snapshot = candidate.snapshot
+    _ = snapshot.body
     for name in (*LINEAGE_FIELDS, "terms_url", "method", "method_version"):
         value = candidate.source_chain.get(name)
         if not isinstance(value, str) or not value:
@@ -594,14 +838,65 @@ def require_independent_milestone(
     if candidate.source_chain.get("join_key") not in (None, ""):
         return _candidate_failure(candidate, "prohibited_join", "no join", "joined")
     if (
-        candidate.snapshot.receipt_path.name
-        != f"{candidate.snapshot_identity}.meta.json"
-        or candidate.snapshot.sha256 != candidate.checksum
-        or candidate.snapshot.sidecar.get("source_id") != candidate.source_id
-        or candidate.snapshot.sidecar.get("retrieved_utc") != candidate.retrieved_utc
+        snapshot.receipt_path.name != f"{candidate.snapshot_identity}.meta.json"
+        or snapshot.sha256 != candidate.checksum
+        or snapshot.sha256 != candidate.snapshot_identity
+        or snapshot.sidecar.get("source_id") != candidate.source_id
+        or snapshot.sidecar.get("retrieved_utc") != candidate.retrieved_utc
     ):
         return _candidate_failure(
             candidate, "invalid_evidence_metadata", "archived identity", "mismatch"
+        )
+    receipt_lineage = _receipt_lineage(snapshot, _MILESTONE_METHOD, PARSER_VERSION)
+    if any(
+        candidate.source_chain.get(name) != value
+        for name, value in receipt_lineage.items()
+    ):
+        return _candidate_failure(
+            candidate, "invalid_evidence_metadata", "receipt lineage", "mismatch"
+        )
+    if (
+        candidate.status == "completed"
+        or candidate.completion is not None
+        or candidate.observed_investment is not None
+    ):
+        return _candidate_failure(
+            candidate,
+            "unsupported_milestone",
+            "reported milestone only",
+            "completion or investment inference",
+        )
+    if candidate.shape is None or candidate.shape.shape_id != candidate.schema:
+        return _candidate_failure(
+            candidate, "invalid_evidence_metadata", "confirmed shape", "absent"
+        )
+    envelope = _snapshot_envelope(snapshot, _MILESTONE_METHOD, PARSER_VERSION)
+    parsed = parse_milestone_page(snapshot.body, candidate.shape, envelope)
+    if isinstance(parsed, InvestmentFailure):
+        return parsed
+    matching = [row for row in parsed if row.candidate_id == candidate.candidate_id]
+    if (
+        len(matching) != 1
+        or replace(candidate, snapshot=None, completion=None, observed_investment=None)
+        != matching[0]
+    ):
+        return _candidate_failure(
+            candidate, "invalid_evidence_metadata", "archived parser row", "mismatch"
+        )
+    if any(
+        assertion.value is None
+        or not _valid_assertion(assertion, correction=name == "correction")
+        for name, assertion in (
+            ("observation", candidate.observation),
+            ("publication", candidate.publication),
+            ("correction", candidate.correction),
+        )
+    ):
+        return _candidate_failure(
+            candidate,
+            "invalid_evidence_metadata",
+            "source-stated milestone metadata",
+            "unknown",
         )
     if (
         link is None
@@ -624,51 +919,126 @@ def require_independent_milestone(
         direct = (
             f"{candidate.project_source_id}:project:{candidate.published_project_id}"
         )
-    elif not _HASH.fullmatch(link.crosswalk_sha256):
+    if direct:
+        linked = link.project_identity == direct
+    else:
+        linked = _valid_crosswalk(candidate, link)
+    if not linked:
         return _candidate_failure(
             candidate,
             "project_identity_unresolved",
-            "reviewed crosswalk receipt",
-            "absent",
-        )
-    if direct and link.project_identity != direct:
-        return _candidate_failure(
-            candidate,
-            "project_identity_unresolved",
-            "source-ID/project-ID link",
+            "source-ID/project-ID link or verified crosswalk",
             "mismatch",
         )
     if link.project_identity not in project_identities:
         return _candidate_failure(
             candidate, "project_identity_unresolved", "retained project", "unmatched"
         )
-    if any(
-        assertion.value is None
-        or not _valid_assertion(assertion, correction=name == "correction")
-        for name, assertion in (
-            ("observation", candidate.observation),
-            ("publication", candidate.publication),
-            ("correction", candidate.correction),
-        )
-    ):
-        return _candidate_failure(
-            candidate,
-            "invalid_evidence_metadata",
-            "source-stated milestone metadata",
-            "unknown",
-        )
-    if (
-        candidate.status == "completed"
-        or candidate.completion is not None
-        or candidate.observed_investment is not None
-    ):
-        return _candidate_failure(
-            candidate,
-            "unsupported_milestone",
-            "reported milestone only",
-            "completion or investment inference",
-        )
     return MilestoneEvidence(candidate, link.project_identity, "validated", "")
+
+
+def _receipt_lineage(
+    snapshot: Snapshot, method: str, version: str
+) -> dict[str, object]:
+    side = snapshot.sidecar
+    terms_url = side.get("terms_url")
+    if not isinstance(terms_url, str) or not terms_url:
+        terms_url = _registry_terms_url(side)
+    values = {
+        "publisher": side.get("publisher"),
+        "page_url": side.get("fetch_url"),
+        "licence_id": side.get("licence_id"),
+        "licence_basis": side.get("licence_basis"),
+        "decision_record": side.get("decision_record"),
+        "terms_sha256": side.get("terms_sha256"),
+        "retrieved_utc": side.get("retrieved_utc"),
+        "page_sha256": snapshot.sha256,
+        "terms_url": terms_url,
+        "method": side.get("method", method),
+        "method_version": side.get("method_version", version),
+    }
+    return values
+
+
+def _registry_terms_url(sidecar: Mapping[str, object]) -> str:
+    """Resolve a missing receipt terms URL only from its exact registry row."""
+    from eii_custodian.publicdata.fetch.registry import RegistryError, load_registry
+
+    try:
+        entries = tuple(
+            entry
+            for entry in load_registry()
+            if entry.source_id == sidecar.get("source_id")
+            and entry.key == sidecar.get("key")
+        )
+    except RegistryError:
+        return ""
+    if len(entries) != 1:
+        return ""
+    entry = entries[0]
+    if any(
+        sidecar.get(name) != value
+        for name, value in (
+            ("publisher", entry.publisher),
+            ("fetch_url", entry.url),
+            ("licence_id", entry.licence_id),
+            ("licence_basis", entry.licence_basis),
+            ("decision_record", entry.decision_record),
+        )
+    ):
+        return ""
+    return entry.terms_url
+
+
+def _valid_crosswalk(
+    candidate: MilestoneCandidate, link: ReviewedMilestoneLink
+) -> bool:
+    if (
+        _HASH.fullmatch(link.crosswalk_sha256) is None
+        or link.crosswalk is None
+        or not link.crosswalk_key
+    ):
+        return False
+    try:
+        root = link.crosswalk.receipt_path.parent.parent
+        snapshot = read_snapshot(root, link.crosswalk_sha256)
+        if (
+            snapshot.receipt_path != link.crosswalk.receipt_path
+            or snapshot.sha256 != link.crosswalk_sha256
+            or snapshot.sidecar.get("key") != link.crosswalk_key
+            or snapshot.sidecar.get("review_reference") != link.review_reference
+        ):
+            return False
+        loaded: object = json.loads(snapshot.body)
+    except (OSError, SnapshotError, UnicodeDecodeError, ValueError):
+        return False
+    if not isinstance(loaded, dict) or set(loaded) != {
+        "schema_version",
+        "review_reference",
+        "mappings",
+    }:
+        return False
+    if (
+        loaded["schema_version"] != "reviewed_milestone_crosswalk.v1"
+        or loaded["review_reference"] != link.review_reference
+        or not isinstance(loaded["mappings"], list)
+    ):
+        return False
+    matches = []
+    for row in loaded["mappings"]:
+        if not isinstance(row, dict) or set(row) != {
+            "candidate_id",
+            "project_identity",
+            "independence",
+        }:
+            return False
+        if row["candidate_id"] == candidate.candidate_id:
+            matches.append(row)
+    return len(matches) == 1 and matches[0] == {
+        "candidate_id": candidate.candidate_id,
+        "project_identity": link.project_identity,
+        "independence": "independent_report",
+    }
 
 
 def _read_assertion(value: object) -> SourceAssertion | None:
@@ -712,13 +1082,13 @@ def _candidate_failure(
 def _metadata_failure(item: ProjectSnapshot) -> InvestmentFailure | None:
     side = item.snapshot.sidecar
     _ = item.snapshot.body
-    if item.snapshot.receipt_path.name != f"{item.identity}.meta.json":
+    if (
+        item.snapshot.receipt_path.name != f"{item.identity}.meta.json"
+        or item.snapshot.sha256 != item.identity
+        or item.schema != SCHEMA_FDI
+    ):
         return _refusal(
             item, "invalid_evidence_metadata", "selected snapshot identity", "mismatch"
-        )
-    if not item.schema or not item.geography:
-        return _refusal(
-            item, "invalid_evidence_metadata", "schema and geography", "absent"
         )
     for name, assertion in (
         ("observation", item.observation),
@@ -732,6 +1102,7 @@ def _metadata_failure(item: ProjectSnapshot) -> InvestmentFailure | None:
                 "source assertion or explicit absence",
                 "invalid",
             )
+    receipt_lineage = _receipt_lineage(item.snapshot, FDI_METHOD, PARSER_VERSION)
     for row in item.rows:
         for name in LINEAGE_FIELDS:
             value = row.get(name)
@@ -749,9 +1120,7 @@ def _metadata_failure(item: ProjectSnapshot) -> InvestmentFailure | None:
             return _refusal(item, "prohibited_join", "no join", "joined")
         if (
             row.get("source_id") != side.get("source_id")
-            or row.get("retrieved_utc") != side.get("retrieved_utc")
-            or row.get("page_sha256") != item.snapshot.sha256
-            or row.get("location_text") != item.geography
+            or any(row.get(name) != value for name, value in receipt_lineage.items())
             or not row.get("project_key")
             or not row.get("project_id")
         ):
@@ -761,6 +1130,19 @@ def _metadata_failure(item: ProjectSnapshot) -> InvestmentFailure | None:
                 "matching source metadata",
                 "mismatch",
             )
+    canonical = _parse_project_snapshot(item.snapshot, coverage=item.coverage)
+    if isinstance(canonical, InvestmentFailure):
+        return canonical
+    if (
+        item.rows != canonical.rows
+        or item.observation != _UNKNOWN_ASSERTION
+        or item.publication != _UNKNOWN_ASSERTION
+        or item.correction != _UNKNOWN_ASSERTION
+        or item.coverage != canonical.coverage
+    ):
+        return _refusal(
+            item, "invalid_evidence_metadata", "archived parser output", "mismatch"
+        )
     return None
 
 
@@ -776,7 +1158,10 @@ def _valid_assertion(assertion: SourceAssertion, *, correction: bool = False) ->
         )
     if assertion.precision not in ("year", "month", "day"):
         return False
-    return parse_announced(assertion.value) == assertion.value
+    if parse_announced(assertion.value) != assertion.value:
+        return False
+    granularity = {4: "year", 7: "month", 10: "day"}.get(len(assertion.value))
+    return granularity == assertion.precision
 
 
 def _refusal(

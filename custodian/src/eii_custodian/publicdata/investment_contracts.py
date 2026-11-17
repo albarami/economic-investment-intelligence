@@ -270,6 +270,15 @@ class SourceAssertion:
 
 
 @dataclass(frozen=True)
+class ProjectArchiveSelection:
+    """One explicitly selected raw dashboard archive and its coverage metadata."""
+
+    key: str
+    identity: str
+    coverage: Mapping[str, object]
+
+
+@dataclass(frozen=True)
 class ProjectSnapshot:
     """Parsed project rows bound to one explicitly selected archived page."""
 
@@ -277,7 +286,7 @@ class ProjectSnapshot:
     snapshot: Snapshot
     rows: tuple[Mapping[str, object], ...]
     schema: str
-    geography: str
+    coverage: Mapping[str, object]
     observation: SourceAssertion
     publication: SourceAssertion
     correction: SourceAssertion
@@ -297,7 +306,8 @@ class ProjectRevision:
     retrieved_utc: str
     checksum: str
     schema: str
-    geography: str
+    geography: str | None
+    geography_absence_reason: str
     correction: SourceAssertion
     announced: Mapping[str, object]
     source_chain: Mapping[str, object]
@@ -335,6 +345,7 @@ class MilestoneCandidate:
     snapshot: Snapshot | None = None
     completion: str | None = None
     observed_investment: str | None = None
+    shape: MilestoneShape | None = None
 
 
 @dataclass(frozen=True)
@@ -347,6 +358,20 @@ class ReviewedMilestoneLink:
     reviewed: bool
     review_reference: str
     crosswalk_sha256: str
+    crosswalk_key: str = ""
+    crosswalk: Snapshot | None = None
+
+
+@dataclass(frozen=True)
+class MilestoneArchiveSelection:
+    """One explicitly selected milestone page and its reviewed link evidence."""
+
+    key: str
+    identity: str
+    shape: MilestoneShape
+    envelope: SourceEnvelope
+    links: tuple[ReviewedMilestoneLink, ...]
+    crosswalk_key: str
 
 
 @dataclass(frozen=True)
@@ -409,6 +434,27 @@ class EvidenceAudit:
     """The exhaustive cache-only projection consumed by the S2 evidence bundle."""
 
     entries: tuple[EvidenceAuditEntry, ...]
+
+
+@dataclass(frozen=True)
+class VerifiedArchive:
+    """Archive metadata that can satisfy exactly one registration kind."""
+
+    source_id: str
+    key: str
+    kind: str
+    identity: str
+    snapshot: Snapshot
+
+
+@dataclass(frozen=True)
+class EvidenceProjection:
+    """Complete cache-only evidence and audit output for S2-T08."""
+
+    evidence: ProjectEvidence
+    audit: EvidenceAudit
+    snapshots: tuple[ProjectSnapshot, ...]
+    archives: tuple[VerifiedArchive, ...]
 
 
 @dataclass(frozen=True)
