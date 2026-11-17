@@ -416,3 +416,27 @@ def test_baci_unconfirmed_second_dictionary_is_refused(tmp_path, kind):
     with refusal("dictionaries"):
         parse.parse_archive(path, config, output)
     assert not output.exists()
+
+
+def test_baci_direct_unknown_member_kind_is_refused(tmp_path):
+    from dataclasses import replace
+
+    # Direct Config inputs already have parser boundary tests above. An extra
+    # kind must not be hashed and reported with zero rows without being parsed.
+    config = Config.from_mapping(configuration())
+    extra = replace(
+        config.members[0],
+        name="invented-unknown.csv",
+        kind="invented_unknown",
+        rows=(1, 1),
+    )
+    config = replace(config, members=(*config.members, extra))
+    members = dict(MEMBERS)
+    members[extra.name] = "code,name,iso3\n00B,Invented extra,\n"
+    path = tmp_path / "invented.zip"
+    path.write_bytes(archive(members))
+    output = tmp_path / "nested" / "output"
+
+    with refusal("member_kind"):
+        parse.parse_archive(path, config, output)
+    assert not output.exists()
