@@ -3403,6 +3403,24 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: The mutation tester's clean run failed once: 1 failed, 1,510 passed; the test compared the receipt's hash of the archive built inside the world with the hash of a second build in its assertion, and the two differed. The same test passed alone (13 passed). Cause: `invented_archive` wrote each member with `ZipFile.writestr(name, ...)`, which stamps the member with the current local time, so two builds on either side of a two-second step of the zip time give different bytes; two builds 2.1 seconds apart were reproduced with different hashes.
 - RESOLUTION: the fixture writes each member with a fixed member time and the same permission bits, and the planted test `custodian/tests/test_frame_fixture_archive.py::test_invented_archive_bytes_do_not_follow_the_clock` builds the archive at two clock readings an hour apart and requires one hash; it failed before the fix and passes after it. This closes the item by a found cause, not by a green re-run (rule 39). The inline archive of `custodian/tests/test_frame_coverage.py` is built and read once per test and is not hashed twice; it is left unchanged.
 
+### PO-S2-70 — Real independent-milestone registration and review evidence are not confirmed
+
+- ID: PO-S2-70
+- TYPE: OPEN
+- RAISED BY: the S2-T30 builder (Moonshot AI), 2026-11-17, from the approved plan and lead ruling L-792
+- CONCERNS: `custodian/publicdata/investment_pages.yaml`; the uncommitted reviewed milestone crosswalk and its receipt; document 04, Announced-project evidence history
+- EVIDENCE: The inspected registry has no confirmed real independent-milestone schema or identity crosswalk. L-792 settles the admissible link rules and nullable source assertions, not which real pages qualify. The implementation and TST-279 use invented closed shapes and invented direct/crosswalk links only. No network or live-source comparison was performed, no source or host was added, and no real milestone is claimed validated.
+- NEEDED: the lead confirms each independently registered Public milestone page, parser shape and independence proof. Direct source-ID/project-ID links need no name fallback; every other link needs a lead-reviewed crosswalk in the uncommitted public cache with a SHA-256 receipt. Source-stated observation, publication and correction assertions remain nullable with absence reasons and cannot be filled from rechecks or `source_modified`.
+
+### PO-S2-71 — S2-T30 downstream assembly, joined-head checks and independent verdict are pending
+
+- ID: PO-S2-71
+- TYPE: PENDING
+- RAISED BY: the S2-T30 builder (Moonshot AI), 2026-11-17
+- CONCERNS: S2-T08's evidence-bundle adapter; the later S2 train joins; `investment_evidence.py` and changed comparison guards in `fetch/build.py`; independent review
+- EVIDENCE: The tracker returns the exhaustive cache-only audit projection and archives fail-fast attempt outcomes. S2-T08 owns assembly of that projection into the slice evidence bundle and is not implemented by this task. The builder ran no mutation campaign and is not the independent reviewer. Later shared-fetch joins still need the lead's compatibility checks on the joined head.
+- NEEDED: S2-T08 consumes every revision, absence, unvalidated milestone and fetch outcome without inferring closure; the lead runs the required mutation campaign and joined-head verification; a principal data-quality/provenance reviewer from another maker returns APPROVED or REJECTED. Task status remains built, not done, until those records exist.
+
 ## OI-300 — PUB-64 anchors and selected-source acceptance
 
 - ID: OI-300

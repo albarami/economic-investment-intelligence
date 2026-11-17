@@ -1809,6 +1809,14 @@ the first committed contract.
 | DAT-124 | A release is immutable. Any change of input, rule, code or seed produces a new `release_id`; briefs and ledger rows keep the `release_id` they used, so old answers stay reproducible. | Rebuild with one changed rule yields a new id; the old directory is untouched. |
 | DAT-125 | Application schema changes are forward-only numbered migrations in `infra/` (ASSUMPTION: simplest safe practice). | Migration runner test on an empty database and on one that already holds rows of earlier migrations. |
 
+### Cache-only announced-project evidence (S2-T30)
+
+DAT-120 admits these additive, cache-only records; they are not release tables and have no release-manifest entry. `project_key` keeps DAT-142's content-derived meaning. A separate `project_identity` is the source ID plus the published `project_id`; changed content keys can therefore link only while that source-scoped ID is stable. A changed or ambiguous ID, a duplicate snapshot identity, or a name-based substitute refuses the link. Every `ProjectRevision` retains its explicit snapshot identity, content checksum, schema, source geography, original retrieval UTC, and source-precision observation, publication and correction assertions. Each assertion is nullable only with an absence reason. A recheck clock or `source_modified` never fills one.
+
+`MilestoneCandidate` remains unvalidated until an archived Public page has a complete source chain, source assertions, and a reviewed direct source-ID/project-ID link or a reviewed crosswalk with its SHA-256 receipt. The crosswalk's real values stay in the uncommitted public cache. Publisher announcements, syndicated copies, unreviewed or ambiguous links, unsupported completion or investment values, and observed-investment claims derived from announcements are not validated. An unvalidated candidate remains visible as `missing_evidence`. `EvidenceAuditEntry` separately records Public provenance, evidence status, coverage and reason for every revision, absence, candidate and fetch outcome. Failed and unattempted inputs never close evidence. Parsed tables, manifests and attempt audits use S2-T27's immutable dated archive; mutable loadable pointers select no history.
+
+Planted overwrite, missing lineage or terms, invalid metadata, archive tamper, non-Public slots, prohibited joins, missing archive objects, unsupported semantic conversions, incomplete audit projections and unsafe report text fail with fixed checks. S2-T08 owns the downstream evidence-bundle assembly; no C28 aggregation or C30 forecast is added here.
+
 ## Source substitution and employment gender (decisions 0036 and 0037)
 
 | ID | Requirement | Conformance test |

@@ -42,6 +42,7 @@ from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.report import (
     citation_line,
     coverage_line,
+    evidence_line,
     fail_line,
     pass_line,
     skip_line,
@@ -62,7 +63,16 @@ from eii_custodian.publicdata.gravity.config import GravityError
 from eii_custodian.publicdata.gravity.config import load_config as load_gravity_config
 from eii_custodian.publicdata.gravity.fetch import fetch_gravity
 from eii_custodian.publicdata.grids.fetch import GRID_SOURCES, prepare_grid
-from eii_custodian.publicdata.investment_build import publish_investment
+from eii_custodian.publicdata.investment_build import (
+    INVESTMENT_SOURCES,
+    publish_investment,
+)
+from eii_custodian.publicdata.investment_contracts import (
+    ExpectedInput,
+    FetchAttempt,
+    InvestmentFailure,
+)
+from eii_custodian.publicdata.investment_evidence import archive_fetch_attempts
 from eii_custodian.publicdata.places.fetch import fetch_place_file, is_place_file
 from eii_custodian.publicdata.places_fsq.fetch import fetch_release, is_release_entry
 from eii_custodian.publicdata.stage import run_stage
@@ -371,6 +381,7 @@ def run_build(
     failure: FetchFailure | None = None
     selected: list[tuple[str, str]] = []
     fetched_entries: list[Entry] = []
+    investment_attempts: list[FetchAttempt] = []
     told_absent = False
     for entry in entries:
         if not token and _token_file(entry):
@@ -651,6 +662,12 @@ def run_build(
             registry_entries=tuple(entries),
         )
         if result is not None:
+            if entry.source_id in INVESTMENT_SOURCES:
+                investment_attempts.append(
+                    FetchAttempt(
+                        entry.source_id, entry.key, "failed", None, result.check
+                    )
+                )
             lines.append(
                 fail_line(
                     entry.key,
@@ -676,6 +693,11 @@ def run_build(
             entry, cache, fetched.digest, transport, sleep, clock
         )
         if batch is not None:
+            investment_attempts.append(
+                FetchAttempt(
+                    entry.source_id, entry.key, "failed", fetched.digest, batch.check
+                )
+            )
             lines.append(
                 fail_line(
                     entry.key,
@@ -694,10 +716,19 @@ def run_build(
                 batch.observed,
             )
             break
+        if entry.source_id in INVESTMENT_SOURCES:
+            investment_attempts.append(
+                FetchAttempt(entry.source_id, entry.key, "success", fetched.digest, "")
+            )
         lines.append(pass_line(entry.key, fetched.digest, fetched.fetch_host))
         counted = cache / entry.source_id / "empty_coordinates.txt"
         if counted.is_file():
             lines.append(counted.read_text(encoding="utf-8").strip())
+    attempt_failure = _archive_investment_attempts(
+        entries, investment_attempts, cache, clock, lines
+    )
+    if failure is None and attempt_failure is not None:
+        failure = attempt_failure
     if failure is None and selected:
         failure = _publish_additions(
             tuple(fetched_entries),
@@ -878,6 +909,83 @@ def run_build(
     assert_clean(environ if environ is not None else {}, lines)
     _write_log(cache, lines, terms)
     return BuildOutcome(tuple(lines), failure, manifests)
+
+
+def _archive_investment_attempts(
+    entries: tuple[Entry, ...] | list[Entry],
+    attempts: list[FetchAttempt],
+    cache: Path,
+    clock: Clock,
+    lines: list[str],
+) -> FetchFailure | None:
+    """Retain investment attempts without changing fetch fail-fast behaviour."""
+    expected = tuple(
+        ExpectedInput(entry.source_id, entry.key, "project")
+        for entry in entries
+        if entry.source_id in INVESTMENT_SOURCES
+    )
+    if not expected:
+        return None
+    retrieved = clock()
+    sidecars = {
+        entry.key: sidecar_for(
+            entry,
+            digest="",
+            nbytes=0,
+            fetch_url=entry.url,
+            fetch_host=entry.fetch_host,
+            retrieved_utc=retrieved,
+            publisher=entry.publisher,
+            source_modified="",
+            row_count=None,
+            terms_sha256="",
+        )
+        for entry in entries
+        if entry.source_id in INVESTMENT_SOURCES
+    }
+    try:
+        audited = archive_fetch_attempts(
+            cache,
+            expected,
+            tuple(attempts),
+            sidecars=sidecars,
+            retrieved_utc=retrieved,
+        )
+    except (OSError, ValueError):
+        audited = InvestmentFailure(
+            1,
+            "investment_evidence",
+            "",
+            "evidence_audit_incomplete",
+            "archived attempt evidence",
+            "write or verification failed",
+        )
+    if isinstance(audited, InvestmentFailure):
+        lines.append(
+            fail_line(
+                audited.source_id,
+                audited.url,
+                audited.check,
+                audited.expected,
+                audited.observed,
+            )
+        )
+        return FetchFailure(
+            1,
+            audited.source_id,
+            audited.url,
+            audited.check,
+            audited.expected,
+            audited.observed,
+        )
+    for entry in audited.entries:
+        status = (
+            "retained"
+            if entry.evidence_status == "observed_announcement"
+            else entry.evidence_status
+        )
+        lines.append(evidence_line(entry.key, status, entry.reason))
+    return None
 
 
 def _publish_additions(

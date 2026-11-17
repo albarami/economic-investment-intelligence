@@ -13,6 +13,10 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from eii_custodian.publicdata.fetch.snapshots import Snapshot
 
 PARSER_VERSION = "1"
 FDI_METHOD = "eii_custodian.publicdata.investment_parse.parse_fdi"
@@ -254,6 +258,178 @@ class SourceEnvelope:
         if self.terms_url == "":
             return "terms_url"
         return ""
+
+
+@dataclass(frozen=True)
+class SourceAssertion:
+    """A source-stated value at its own precision, or its explicit absence."""
+
+    value: str | None
+    precision: str
+    absence_reason: str
+
+
+@dataclass(frozen=True)
+class ProjectSnapshot:
+    """Parsed project rows bound to one explicitly selected archived page."""
+
+    identity: str
+    snapshot: Snapshot
+    rows: tuple[Mapping[str, object], ...]
+    schema: str
+    geography: str
+    observation: SourceAssertion
+    publication: SourceAssertion
+    correction: SourceAssertion
+
+
+@dataclass(frozen=True)
+class ProjectRevision:
+    """One immutable announced-project revision; announced values stay labelled."""
+
+    project_identity: str
+    source_id: str
+    project_id: str
+    snapshot_identity: str
+    project_key: str
+    observation: SourceAssertion
+    publication: SourceAssertion
+    retrieved_utc: str
+    checksum: str
+    schema: str
+    geography: str
+    correction: SourceAssertion
+    announced: Mapping[str, object]
+    source_chain: Mapping[str, object]
+
+
+@dataclass(frozen=True)
+class MilestoneShape:
+    """A reviewed, closed milestone page shape; no real source shape is implied."""
+
+    shape_id: str
+    fields: frozenset[str]
+    confirmed: bool
+
+
+@dataclass(frozen=True)
+class MilestoneCandidate:
+    """A parsed milestone candidate, not independent evidence until reviewed."""
+
+    candidate_id: str
+    source_id: str
+    milestone_id: str
+    project_source_id: str | None
+    published_project_id: str | None
+    status: str
+    snapshot_identity: str
+    checksum: str
+    retrieved_utc: str
+    schema: str
+    geography: str
+    observation: SourceAssertion
+    publication: SourceAssertion
+    correction: SourceAssertion
+    independence: str
+    source_chain: Mapping[str, object]
+    snapshot: Snapshot | None = None
+    completion: str | None = None
+    observed_investment: str | None = None
+
+
+@dataclass(frozen=True)
+class ReviewedMilestoneLink:
+    """A lead-reviewed project and independence assertion for one candidate."""
+
+    candidate_id: str
+    project_identity: str
+    independence: str
+    reviewed: bool
+    review_reference: str
+    crosswalk_sha256: str
+
+
+@dataclass(frozen=True)
+class MilestoneEvidence:
+    """A validated milestone or a retained candidate with its exact absence."""
+
+    candidate: MilestoneCandidate
+    project_identity: str | None
+    evidence_status: str
+    missing_reason: str
+
+
+@dataclass(frozen=True)
+class ProjectAbsence:
+    """A previously seen project's absence from one later source snapshot."""
+
+    project_identity: str
+    source_id: str
+    snapshot_identity: str
+    reason: str
+
+
+@dataclass(frozen=True)
+class ExpectedInput:
+    """One registered project or milestone input expected by the evidence audit."""
+
+    source_id: str
+    key: str
+    kind: str
+
+
+@dataclass(frozen=True)
+class FetchAttempt:
+    """The exact outcome of one expected input in the current build."""
+
+    source_id: str
+    key: str
+    status: str
+    snapshot_identity: str | None
+    reason: str
+    closure_claimed: bool = False
+
+
+@dataclass(frozen=True)
+class EvidenceAuditEntry:
+    """One Public evidence row with separate evidence and coverage states."""
+
+    source_id: str
+    key: str
+    subject_id: str
+    revision_identity: str
+    provenance: str
+    evidence_status: str
+    coverage: str
+    reason: str
+
+
+@dataclass(frozen=True)
+class EvidenceAudit:
+    """The exhaustive cache-only projection consumed by the S2 evidence bundle."""
+
+    entries: tuple[EvidenceAuditEntry, ...]
+
+
+@dataclass(frozen=True)
+class ObservedInvestment:
+    """An attempted observed-investment assertion requiring its own archived source."""
+
+    project_identity: str
+    amount: str
+    source_id: str
+    evidence_kind: str
+    snapshot_identity: str
+
+
+@dataclass(frozen=True)
+class ProjectEvidence:
+    """Retained project history, without any observed-investment inference."""
+
+    revisions: tuple[ProjectRevision, ...]
+    milestones: tuple[MilestoneEvidence, ...] = ()
+    observed_investment: tuple[ObservedInvestment, ...] = ()
+    absences: tuple[ProjectAbsence, ...] = ()
 
 
 @dataclass(frozen=True)

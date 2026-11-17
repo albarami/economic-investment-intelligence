@@ -2,6 +2,24 @@
 
 from __future__ import annotations
 
+import re
+
+_SOURCE_KEY = re.compile(r"^[a-z][a-z0-9_.-]*(?:/[a-z][a-z0-9_.-]*)*$")
+_REASON = re.compile(r"^[a-z][a-z0-9_]*$")
+_EVIDENCE_STATES = frozenset({"retained", "missing_evidence", "failed", "unattempted"})
+
+
+def evidence_line(key: str, status: str, reason: str = "") -> str:
+    """Return a source-named evidence outcome without record text or identifiers."""
+    if (
+        _SOURCE_KEY.fullmatch(key) is None
+        or status not in _EVIDENCE_STATES
+        or (reason and _REASON.fullmatch(reason) is None)
+    ):
+        raise ValueError("unsafe_report")
+    suffix = f" reason={reason}" if reason else ""
+    return f"EVIDENCE {key} {status}{suffix}"
+
 
 def skip_line(key: str, reason: str) -> str:
     """Return the skip line for a row that this task does not fetch."""
