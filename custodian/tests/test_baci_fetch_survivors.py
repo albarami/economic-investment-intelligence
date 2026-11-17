@@ -193,12 +193,12 @@ def test_baci_staging_paths_and_cleanup(tmp_path, monkeypatch):
     names = []
     stages = []
 
-    def checked(path, destination):
+    def checked(path, destination, receipt):
         assert path.parent.parent == tmp_path / "cepii_baci"
         assert path.parent.name.startswith(".stage-")
         names.append(path.name)
         stages.append(path.parent)
-        original(path, destination)
+        original(path, destination, receipt)
 
     monkeypatch.setattr(fetch, "_publish", checked)
     call(tmp_path)
