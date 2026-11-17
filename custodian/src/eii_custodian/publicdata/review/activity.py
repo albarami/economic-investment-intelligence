@@ -18,6 +18,7 @@ from datetime import date
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.review.cache_fixture import read_cached, read_rows
 from eii_custodian.publicdata.series.parse import FIELD_MAP, confirmed_rows
 
@@ -346,16 +347,16 @@ def parse_feed_rows(rows: Iterable[Mapping[str, object]], entry: Entry) -> FeedR
     return FeedRead(rows=parsed, left_out=_left_out(feed, code_field, omitted))
 
 
-def read_cached_feed(cache: Path, entry: Entry) -> FeedRead:
+def read_cached_feed(cache: Path, entry: Entry, *, digest: str) -> FeedRead:
     """Read one cached licence feed into aggregated rows and the left-out report."""
-    return parse_feed_rows(read_rows(read_cached(cache, entry)), entry)
+    return parse_feed_rows(read_rows(read_cached(cache, entry, digest=digest)), entry)
 
 
-def read_cached_classes(cache: Path, entry: Entry) -> ClassRead:
+def read_cached_classes(cache: Path, entry: Entry, *, digest: str) -> ClassRead:
     """Read the cached class file into classes and the left-out report."""
     if entry.source_id != _ISIC_FEED:
         raise SpineError("unknown class feed " + entry.source_id)
-    return parse_isic_rows(read_rows(read_cached(cache, entry)))
+    return parse_isic_rows(read_rows(read_cached(cache, entry, digest=digest)))
 
 
 def merge_feed_rows(
@@ -427,15 +428,23 @@ def load_activity_inputs(
     registry: Sequence[Entry] | None = None,
     review_path: Path | None = None,
     code_system_version: str = CODE_SYSTEM_VERSION,
+    selections: Mapping[str, str] | None = None,
 ) -> ActivityInputs:
     """Read the three cached keys, the review file and the spine they derive."""
     entries = load_registry() if registry is None else registry
+    selected = reviewed_selections(cache) if selections is None else selections
     active_entry = entry_by_key(entries, "lic_active")
     cancelled_entry = entry_by_key(entries, "lic_cancelled")
     class_entry = entry_by_key(entries, _ISIC_FEED)
-    active_body = read_cached(cache, active_entry)
-    cancelled_body = read_cached(cache, cancelled_entry)
-    class_body = read_cached(cache, class_entry)
+    active_body = read_cached(
+        cache, active_entry, digest=selected.get(active_entry.key, "")
+    )
+    cancelled_body = read_cached(
+        cache, cancelled_entry, digest=selected.get(cancelled_entry.key, "")
+    )
+    class_body = read_cached(
+        cache, class_entry, digest=selected.get(class_entry.key, "")
+    )
     active = parse_feed_rows(read_rows(active_body), active_entry)
     cancelled = parse_feed_rows(read_rows(cancelled_body), cancelled_entry)
     class_read = parse_isic_rows(read_rows(class_body))

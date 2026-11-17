@@ -1,0 +1,6 @@
+# Invented use-map rows for tests only: SYN- labels, never source values.
+# The committed review file holds the header and no row until the lead's read.
+source_id,arabic_label,usage_value,use_key,marker,reviewer,reviewed_on
+prop_resi_units,SYN-UNIT,*,residential,residential_unit,SYN reviewer,2026-11-15
+prop_sales,SYN-LAND-1,SYN-USE-RESI,residential,land,SYN reviewer,2026-11-15
+prop_sales,SYN-UNIT-1,SYN-USE-RESI,residential,residential_unit,SYN reviewer,2026-11-15

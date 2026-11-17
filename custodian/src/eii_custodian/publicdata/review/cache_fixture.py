@@ -26,6 +26,7 @@ from eii_custodian.publicdata.fetch.receipts import (
     sidecar_for,
 )
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.snapshots import SnapshotError, read_snapshot
 from eii_custodian.publicdata.series.parse import FIELD_MAP, MONTH_FIELDS, NULLABLE
 
 _EVIDENCE_MARK = "EVIDENCE_ONLY:"
@@ -46,7 +47,7 @@ _NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 _REL_NS = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 
 
-class CacheError(Exception):
+class CacheError(ValueError):
     """A cached pair is missing, ambiguous or stale."""
 
     def __init__(self, detail: str) -> None:
@@ -58,6 +59,7 @@ class CacheError(Exception):
 class CachedBody:
     """One verified cache body with its sidecar."""
 
+    receipt_path: Path
     path: Path
     body: bytes
     sidecar: dict[str, object]
@@ -73,6 +75,8 @@ def write_cached(
     digest: str | None = None,
     nbytes: int | None = None,
     row_count: int | None = None,
+    select: bool = True,
+    retrieved_utc: str = RETRIEVED_UTC,
 ) -> Path:
     """Write an invented body and its sidecar, and return the body path."""
     suffix = extension if extension is not None else entry.extension
@@ -84,7 +88,7 @@ def write_cached(
         nbytes=size,
         fetch_url=entry.url,
         fetch_host=entry.fetch_host,
-        retrieved_utc=RETRIEVED_UTC,
+        retrieved_utc=retrieved_utc,
         publisher=entry.publisher,
         source_modified="",
         row_count=row_count,
@@ -93,7 +97,9 @@ def write_cached(
     if switched_off:
         sidecar["switched_off"] = True
     commit_pair(cache_directory(cache, entry.key), sha, suffix, body, sidecar)
-    return cache_directory(cache, entry.key) / f"{sha}.{suffix}"
+    if select:
+        select_fixture(cache, entry.key, sha)
+    return read_snapshot(cache_directory(cache, entry.key), sha).path
 
 
 def real_feed_body(feed: str, rows: Sequence[Mapping[str, object]]) -> bytes:
@@ -172,30 +178,17 @@ def _class_pair(row: Mapping[str, object] | tuple[str, str]) -> tuple[str, str]:
 
 
 def read_cached(
-    cache: Path, entry: Entry, *, extension: str | None = None
+    cache: Path, entry: Entry, *, digest: str, extension: str | None = None
 ) -> CachedBody:
-    """Return the one verified body of a key, or refuse the pair."""
-    directory = cache_directory(cache, entry.key)
-    if not directory.is_dir():
-        raise CacheError("cache directory missing for " + entry.key)
-    suffix = "." + (extension if extension is not None else entry.extension)
-    bodies = sorted(
-        path
-        for path in directory.iterdir()
-        if path.is_file()
-        and path.name.endswith(suffix)
-        and not path.name.endswith(".meta.json")
-    )
-    if not bodies:
-        raise CacheError("cache body missing for " + entry.key)
-    if len(bodies) > 1:
-        raise CacheError("cache body ambiguous for " + entry.key)
-    body_path = bodies[0]
-    side_path = directory / f"{body_path.stem}.meta.json"
-    if not side_path.is_file():
-        raise CacheError("cache sidecar missing for " + entry.key)
-    body = body_path.read_bytes()
-    sidecar = _sidecar(side_path)
+    """Read the explicitly selected snapshot; retained history is never searched."""
+    try:
+        selected = read_snapshot(cache / entry.key, digest)
+    except SnapshotError as exc:
+        raise CacheError(f"{entry.key}: {exc}") from None
+    body_path, body, sidecar = selected.path, selected.body, selected.sidecar
+    suffix = extension if extension is not None else entry.extension
+    if body_path.suffix != "." + suffix:
+        raise CacheError("snapshot extension mismatch")
     if sidecar.get("sha256") != body_path.stem:
         raise CacheError("cache sidecar names another digest")
     if sidecar.get("sha256") != sha256_hex(body):
@@ -208,7 +201,9 @@ def read_cached(
         raise CacheError("cache sidecar names another source")
     if sidecar.get("switched_off") is not False:
         raise CacheError("cache body is switched off")
-    return CachedBody(path=body_path, body=body, sidecar=sidecar)
+    return CachedBody(
+        receipt_path=selected.receipt_path, path=body_path, body=body, sidecar=sidecar
+    )
 
 
 def read_rows(cached: CachedBody) -> tuple[dict[str, Any], ...]:
@@ -368,3 +363,11 @@ def _cell_text(cell: ElementTree.Element, shared: list[str]) -> str:
         index = int(text)
         return shared[index] if index < len(shared) else ""
     return text
+
+
+def select_fixture(cache: Path, key: str, digest: str) -> None:
+    """Test support: record the fixture author's explicit reviewed selection."""
+    path = cache / "snapshot_pins.json"
+    pins = json.loads(path.read_text()) if path.exists() else {}
+    pins[key] = digest
+    path.write_text(json.dumps(pins, sort_keys=True) + "\n")

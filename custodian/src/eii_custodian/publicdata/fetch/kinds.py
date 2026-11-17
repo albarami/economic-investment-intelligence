@@ -5,8 +5,11 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from io import BytesIO
+from pathlib import Path
 from urllib.parse import urlencode
+from zipfile import BadZipFile, ZipFile
 
 from eii_custodian.publicdata.fetch.allowlist import approve, host_of
 from eii_custodian.publicdata.fetch.checks import (
@@ -15,7 +18,13 @@ from eii_custodian.publicdata.fetch.checks import (
     period_failure,
     schema_failure,
 )
-from eii_custodian.publicdata.fetch.registry import Entry, RegistryError
+from eii_custodian.publicdata.fetch.receipts import cache_directory
+from eii_custodian.publicdata.fetch.registry import (
+    COLLECTED_FAMILIES,
+    Entry,
+    RegistryError,
+    undeclared_public_split,
+)
 from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 from eii_custodian.publicdata.fetch.transport import (
     ATTEMPT_LIMIT,
@@ -24,6 +33,7 @@ from eii_custodian.publicdata.fetch.transport import (
     Response,
     Transport,
     TransportFault,
+    public_address,
 )
 
 ARC_GIS_PAGE_SIZE = 2000
@@ -31,6 +41,9 @@ _EXPORT_SUFFIX = "/exports/json"
 _CC_BY_4_TEXT = "CC BY"
 _CC_BY_4_URL = "https://creativecommons.org/licenses/by/4.0/"
 _SPACE_RUN = re.compile(r"\s+")
+_TRADE_AUXILIARY_SOURCES = frozenset(
+    {"un_comtrade", "cepii_baci", "cepii_gravity", "atlas_complexity"}
+)
 
 Read = Callable[[str], Response]
 
@@ -49,24 +62,64 @@ class Prepared:
     failure: AttemptFailure | None
     portal_licence: str = ""
     portal_licence_url: str = ""
+    period_first: str = ""
+    period_last: str = ""
+    periods_observed: bool = False
     terms_unread: str = ""
+    coverage_note: str = ""
+    auxiliary: tuple[Response, ...] = ()
+    requests: tuple[dict[str, object], ...] = ()
 
 
 TERMS_HOST_UNLISTED = "host_unlisted"
 
 
 def prepare(
-    entry: Entry, transport: Transport, sleep: Callable[[float], None]
+    entry: Entry,
+    transport: Transport,
+    sleep: Callable[[float], None],
+    cache: Path | None = None,
+    registry_entries: tuple[Entry, ...] | None = None,
 ) -> Prepared:
     """Fetch one row through the transport seam and apply its declared checks."""
-    reader = _reader(transport, sleep)
+    if entry.kind == "besttime":
+        return _failed(
+            entry,
+            AttemptFailure(
+                1,
+                "https://besttime.app/api/v1/forecasts",
+                "build_context_required",
+                "build-public context",
+                "absent",
+            ),
+        )
+    responses: list[Response] = []
+    original = _reader(transport, sleep)
+
+    def reader(url: str) -> Response:
+        response = original(url)
+        responses.append(response)
+        return response
+
+    if entry.key in {"places_ovt", "bldg_ovt"}:
+        from eii_custodian.publicdata.fetch.listing import prepare_listing
+
+        return prepare_listing(entry, reader, registry_entries)
     if entry.kind == "portal_dataset":
-        return _portal(entry, reader)
-    if entry.kind == "paged_layer":
-        return _paged(entry, reader)
-    if entry.kind == "terms_page":
-        return _terms(entry, reader)
-    return _file(entry, reader)
+        result = _portal(entry, reader)
+    elif entry.kind == "paged_layer":
+        result = _paged(entry, reader)
+    elif entry.kind == "terms_page":
+        result = _terms(entry, reader)
+    elif entry.kind == "paged_cards":
+        result = _paged_cards(entry, sleep, cache)
+    else:
+        result = _file(entry, reader)
+    if entry.source_id not in _TRADE_AUXILIARY_SOURCES:
+        return result
+    return replace(
+        result, auxiliary=tuple(r for r in responses if r.body != result.body)
+    )
 
 
 def _reader(transport: Transport, sleep: Callable[[float], None]) -> Read:
@@ -149,9 +202,12 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
     meta, failure = _call(entry, meta_url, reader)
     if failure is not None or meta is None:
         return _failed(entry, failure)
-    export, failure = _call(entry, entry.url, reader)
-    if failure is not None or export is None:
-        return _failed(entry, failure)
+    requests: tuple[dict[str, object], ...] = ()
+    export: Response | None = None
+    if entry.key != "accident":
+        export, failure = _call(entry, entry.url, reader)
+        if failure is not None or export is None:
+            return _failed(entry, failure)
     observed = _portal_meta(meta.body)
     if observed is None:
         return _failed(
@@ -165,6 +221,14 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
             ),
         )
     publisher, licence, licence_url, modified = observed
+    if (
+        publisher == ""
+        and entry.key == "bnd_muni_2025"
+        and entry.publisher
+        == "National open data portal (dataset publisher field empty, read 2026-11-16)"
+        and entry.licence_basis == "portal_terms"
+    ):
+        publisher = entry.publisher
     if publisher == "":
         return _failed(
             entry,
@@ -208,6 +272,13 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
                 _licence_observed(licence, licence_url),
             ),
         )
+    if entry.key == "accident":
+        from eii_custodian.publicdata.fetch.partitions import partition_export
+
+        body, requests, failure = partition_export(entry, meta, reader)
+        export = Response(entry.url, body, ())
+    if failure is not None or export is None:
+        return _failed(entry, failure)
     rows = _json_rows(export.body)
     counted = count_failure(entry, rows, export.final_url)
     if counted is not None:
@@ -215,10 +286,37 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
     schema = schema_failure(entry, rows, export.final_url)
     if schema is not None:
         return _failed(entry, schema)
+    if rows is not None:
+        for record in rows:
+            if isinstance(record, dict) and undeclared_public_split(
+                entry, list(record)
+            ):
+                return _failed(
+                    entry,
+                    AttemptFailure(
+                        1,
+                        export.final_url,
+                        "public_split_undeclared",
+                        "declared Public split",
+                        "undeclared",
+                    ),
+                )
     period = period_failure(entry, rows, export.final_url)
     if period is not None:
         return _failed(entry, period)
+    measured = _measure_failure(entry, rows, export.final_url)
+    if measured is not None:
+        return _failed(entry, measured)
     count = len(rows) if rows is not None else None
+    try:
+        first, last, saw_periods, coverage_note = _observed_periods(entry, rows)
+    except FamilyPeriodError as exc:
+        return _failed(
+            entry,
+            AttemptFailure(
+                1, export.final_url, "period_label", exc.source_id, exc.field
+            ),
+        )
     return Prepared(
         export.body,
         export.final_url,
@@ -230,10 +328,119 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
         None,
         licence,
         licence_url,
+        first,
+        last,
+        saw_periods,
+        coverage_note=coverage_note,
+        requests=requests,
     )
 
 
+class FamilyPeriodError(Exception):
+    """A family period label is missing. The message names the source and the field."""
+
+    def __init__(self, source_id: str, field: str) -> None:
+        self.source_id = source_id
+        self.field = field
+        super().__init__(f"{source_id} {field}")
+
+
+def family_period_bounds(entry: Entry, rows: list[object]) -> tuple[str, str, str]:
+    """Bounds, or a distinct-label count when a label does not parse.
+
+    A missing or null label is a named refusal. The refusal carries no cell value.
+    A family field without a declared form is a named refusal. It is not read as a date.
+    ``published_label`` is not parsed and is not tried as another form: the same
+    missing-label refusals apply, and present labels yield no bounds and the note
+    ``distinct labels N``.
+    """
+    from eii_custodian.publicdata.additions.common import (
+        AdditionError,
+        parse_period_rule,
+        parse_period_value,
+    )
+
+    if "form=" not in entry.period_field:
+        raise FamilyPeriodError(entry.source_id, "period_form")
+    rule = parse_period_rule(entry.period_field)
+    field, form = rule.field, rule.form
+    labels: list[object] = []
+    for row in rows:
+        if not isinstance(row, dict) or field not in row:
+            raise FamilyPeriodError(entry.source_id, field)
+        value = row[field]
+        if value is None or value == "":
+            raise FamilyPeriodError(entry.source_id, field)
+        labels.append(value)
+    if form == "published_label":
+        return "", "", f"distinct labels {len(set(map(str, labels)))}"
+    parsed: list[str] = []
+    for label in labels:
+        try:
+            parsed.append(parse_period_value(label, form))
+        except AdditionError:
+            return "", "", f"distinct labels {len(set(map(str, labels)))}"
+    ordered = sorted(parsed)
+    return ordered[0], ordered[-1], ""
+
+
+def _observed_periods(
+    entry: Entry, rows: list[object] | None
+) -> tuple[str, str, bool, str]:
+    """Observed bounds from the period rule. An unconfirmed field stays blank."""
+    from eii_custodian.publicdata.additions.common import (
+        FIELD_UNCONFIRMED,
+        observe_period_bounds,
+        parse_period_rule,
+    )
+
+    if entry.source_id in COLLECTED_FAMILIES and rows is not None:
+        if not entry.period_field:
+            return "", "", True, ""
+        first, last, note = family_period_bounds(entry, rows)
+        return first, last, True, note
+    if "form=" not in entry.period_field or rows is None:
+        return "", "", False, ""
+    rule = parse_period_rule(entry.period_field)
+    if rule.field == FIELD_UNCONFIRMED:
+        return "", "", True, ""
+    first, last = observe_period_bounds(rows, rule)
+    return first, last, True, ""
+
+
+def _measure_failure(
+    entry: Entry, rows: list[object] | None, url: str
+) -> AttemptFailure | None:
+    """Refuse measure text outside the reviewed missing-value list."""
+    from eii_custodian.publicdata.additions.common import AdditionError, read_measure
+    from eii_custodian.publicdata.additions.property_venues import missing_forms_for
+
+    if rows is None:
+        return None
+    found = missing_forms_for(entry.key)
+    if found is None:
+        return None
+    field, forms = found
+    for row in rows:
+        if not isinstance(row, dict):
+            return AttemptFailure(1, url, "measure_unparsed", field, "measure_unparsed")
+        try:
+            read_measure(row.get(field), missing_forms=forms, integral=True)
+        except AdditionError as error:
+            return AttemptFailure(1, url, error.name, field, error.name)
+    return None
+
+
 def _paged(entry: Entry, reader: Read) -> Prepared:
+    from eii_custodian.publicdata.gis.fields import declaration_for
+
+    declared = declaration_for(entry.source_id)
+    if declared is None:
+        return _paged_undeclared(entry, reader)
+    return _paged_declared(entry, reader, declared)
+
+
+def _paged_undeclared(entry: Entry, reader: Read) -> Prepared:
     layer = entry.layer
     if layer is None:
         raise RegistryError("paged_layer requires layer")
@@ -295,24 +502,87 @@ def _paged(entry: Entry, reader: Read) -> Prepared:
     return Prepared(body, final, host_of(final), entry.publisher, "", total, "", None)
 
 
+def _paged_cards(
+    entry: Entry, sleep: Callable[[float], None], cache: Path | None
+) -> Prepared:
+    """Hand a paged-card row to the tender fetch. The file reader is not used."""
+    from datetime import UTC, datetime
+
+    from eii_custodian.publicdata.singles.tenders import (
+        CHAIN_PATH,
+        TenderError,
+        fetch_tenders,
+        tender_https,
+    )
+
+    page_cache = None if cache is None else cache_directory(cache, entry.key)
+    try:
+        _fetched = fetch_tenders(
+            tender_https(entry, chain_file=CHAIN_PATH),
+            chain_file=CHAIN_PATH,
+            chain_sha256=entry.chain_intermediate_sha256,
+            sleep=sleep,
+            clock=lambda: datetime.now(UTC),
+            host=entry.fetch_host,
+            cache=page_cache,
+        )
+    except TenderError as exc:
+        return _failed(
+            entry,
+            AttemptFailure(1, entry.url, exc.reason, exc.reason, exc.reason),
+        )
+    return Prepared(
+        b"", entry.url, entry.fetch_host, entry.publisher, "", None, "", None
+    )
+
+
 def _file(entry: Entry, reader: Read) -> Prepared:
+    """Fetch one HTTPS file. What is kept of the final address is its public form.
+
+    A storage host answers a file request with a signed, time-limited redirect
+    whose query holds credentials (rule 14): only scheme, host and path of
+    the final address ever reach the receipt, the manifest, a check's error
+    text or the log, and `hops` are never stored anywhere.
+    """
     response, failure = _call(entry, entry.url, reader)
     if failure is not None or response is None:
         return _failed(entry, failure)
+    final = public_address(response.final_url)
+    if entry.extension == "xlsx" and not _workbook_container(response.body):
+        return _failed(
+            entry,
+            AttemptFailure(
+                1,
+                response.final_url,
+                "workbook_content",
+                "OOXML workbook",
+                "invalid body",
+            ),
+        )
     rows = _json_rows(response.body)
-    counted = count_failure(entry, rows, response.final_url)
+    counted = count_failure(entry, rows, final)
     if counted is not None:
         return _failed(entry, counted)
     return Prepared(
         response.body,
-        response.final_url,
-        host_of(response.final_url),
+        final,
+        host_of(final),
         entry.publisher,
         "",
         len(rows) if rows is not None else None,
         "",
         None,
     )
+
+
+def _workbook_container(body: bytes) -> bool:
+    """Recognise the workbook container, without extracting or parsing sheet values."""
+    try:
+        with ZipFile(BytesIO(body)) as archive:
+            names = set(archive.namelist())
+    except BadZipFile:
+        return False
+    return {"[Content_Types].xml", "_rels/.rels", "xl/workbook.xml"} <= names
 
 
 def _terms(entry: Entry, reader: Read) -> Prepared:
@@ -352,6 +622,7 @@ class TermsPage:
 
     sha256: str
     failure: AttemptFailure | None
+    body: bytes = b""
 
 
 def read_terms_page(
@@ -365,7 +636,7 @@ def read_terms_page(
     terms, failure = _call(entry, entry.terms_url, reader)
     if failure is not None or terms is None:
         return TermsPage("", failure)
-    return TermsPage(terms_text_sha256(terms.body), None)
+    return TermsPage(terms_text_sha256(terms.body), None, terms.body)
 
 
 def _failed(entry: Entry, failure: AttemptFailure | None) -> Prepared:
@@ -484,3 +755,278 @@ def _features(body: bytes) -> list[object] | None:
 
 def _query(base: str, layer: int, params: dict[str, str]) -> str:
     return base.rstrip("/") + f"/{layer}/query?" + urlencode(params)
+
+
+def _paged_declared(
+    entry: Entry,
+    reader: Read,
+    source: object,
+) -> Prepared:
+    """Page a declared GIS source at the layer answer's own maximum."""
+    from eii_custodian.publicdata.gis.fields import SourceDecl
+
+    if not isinstance(source, SourceDecl):
+        raise RegistryError("gis declaration")
+    host = host_of(entry.url)
+    collected: list[dict[str, object]] = []
+    final = entry.url
+    total = 0
+    for layer in source.layers:
+        base = f"https://{host}{layer.service_path}"
+        meta_url = base.rstrip("/") + f"/{layer.layer_id}?f=json"
+        meta, failure = _call(entry, meta_url, reader)
+        if failure is not None or meta is None:
+            return _failed(entry, failure)
+        if _token_demand(meta.body):
+            return _unavailable(entry, meta.final_url)
+        counted_url = _query(
+            base,
+            layer.layer_id,
+            {"where": "1=1", "returnCountOnly": "true", "f": "json"},
+        )
+        counted, failure = _call(entry, counted_url, reader)
+        if failure is not None or counted is None:
+            return _failed(entry, failure)
+        if _token_demand(counted.body):
+            return _unavailable(entry, counted.final_url)
+        layer_total = _arcgis_count(counted.body)
+        if layer_total is None:
+            return _failed(
+                entry,
+                AttemptFailure(
+                    1, counted.final_url, "short_total", "count", "unreadable"
+                ),
+            )
+        page_size, oid_name = _layer_page(meta.body)
+        if page_size is None or oid_name is None:
+            return _failed(
+                entry,
+                AttemptFailure(
+                    1, meta.final_url, "schema_missing", "maxRecordCount", "missing"
+                ),
+            )
+        out_fields = ",".join(field.name for field in layer.fields)
+        features: list[dict[str, object]] = []
+        offset = 0
+        final = counted.final_url
+        while offset < layer_total:
+            page_url = _query(
+                base,
+                layer.layer_id,
+                {
+                    "where": "1=1",
+                    "outFields": out_fields,
+                    "orderByFields": oid_name,
+                    "resultOffset": str(offset),
+                    "resultRecordCount": str(page_size),
+                    "returnGeometry": "true",
+                    "outSR": "4326",
+                    "f": "json",
+                },
+            )
+            page, failure = _call(entry, page_url, reader)
+            if failure is not None or page is None:
+                return _failed(entry, failure)
+            if _token_demand(page.body):
+                return _unavailable(entry, page.final_url)
+            batch = _feature_maps(page.body)
+            if batch is None:
+                return _failed(
+                    entry,
+                    AttemptFailure(
+                        1, page.final_url, "short_total", "features", "unreadable"
+                    ),
+                )
+            final = page.final_url
+            refused = _declared_features(layer, batch, oid_name, page.final_url)
+            if refused is not None:
+                return _failed(entry, refused)
+            features.extend(batch)
+            if len(features) > layer_total:
+                return _failed(
+                    entry,
+                    AttemptFailure(
+                        1, final, "long_total", str(layer_total), str(len(features))
+                    ),
+                )
+            offset += page_size
+            if not batch:
+                break
+        if len(features) < layer_total:
+            return _failed(
+                entry,
+                AttemptFailure(
+                    1, final, "short_total", str(layer_total), str(len(features))
+                ),
+            )
+        if len(features) > layer_total:
+            return _failed(
+                entry,
+                AttemptFailure(
+                    1, final, "long_total", str(layer_total), str(len(features))
+                ),
+            )
+        total += layer_total
+        collected.append(
+            {
+                "layer_id": layer.layer_id,
+                "layer_name": layer.layer_name,
+                "service_path": layer.service_path,
+                "geometry": layer.geometry,
+                "count": layer_total,
+                "features": features,
+            }
+        )
+    body = json.dumps({"layers": collected}, sort_keys=True).encode("utf-8")
+    return Prepared(body, final, host, entry.publisher, "", total, "", None)
+
+
+def _unavailable(entry: Entry, url: str) -> Prepared:
+    return _failed(
+        entry, AttemptFailure(1, url, "unavailable", "no token", "token demand")
+    )
+
+
+def _token_demand(body: bytes) -> bool:
+    """ArcGIS JSON error for a token or a sign-in. Any other body is not one."""
+    try:
+        loaded = json.loads(body.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError):
+        return False
+    if not isinstance(loaded, dict):
+        return False
+    error = loaded.get("error")
+    if not isinstance(error, dict):
+        return False
+    code = error.get("code")
+    message = error.get("message")
+    text = message.casefold() if isinstance(message, str) else ""
+    if code in (498, 499):
+        return True
+    return "token" in text or "sign in" in text or "signin" in text
+
+
+def _layer_page(body: bytes) -> tuple[int | None, str | None]:
+    """Read maxRecordCount and the single esriFieldTypeOID name."""
+    try:
+        loaded = json.loads(body.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError):
+        return None, None
+    if not isinstance(loaded, dict):
+        return None, None
+    page_size = loaded.get("maxRecordCount")
+    if isinstance(page_size, bool) or not isinstance(page_size, int) or page_size < 1:
+        return None, None
+    fields = loaded.get("fields")
+    if not isinstance(fields, list):
+        return None, None
+    names: list[str] = []
+    for field in fields:
+        if not isinstance(field, dict) or field.get("type") != "esriFieldTypeOID":
+            continue
+        name = field.get("name")
+        if isinstance(name, str) and name:
+            names.append(name)
+    if len(names) != 1:
+        return page_size, None
+    return page_size, names[0]
+
+
+def _feature_maps(body: bytes) -> list[dict[str, object]] | None:
+    raw = _features(body)
+    if raw is None:
+        return None
+    rows: list[dict[str, object]] = []
+    for item in raw:
+        row = _text_dict(item)
+        if row is None:
+            return None
+        rows.append(row)
+    return rows
+
+
+def _text_dict(value: object) -> dict[str, object] | None:
+    if not isinstance(value, dict):
+        return None
+    result: dict[str, object] = {}
+    for key, item in value.items():
+        if not isinstance(key, str):
+            return None
+        result[key] = item
+    return result
+
+
+def _declared_features(
+    layer: object,
+    features: list[dict[str, object]],
+    oid_name: str,
+    url: str,
+) -> AttemptFailure | None:
+    from eii_custodian.publicdata.gis.fields import NEVER_TAKEN, LayerDecl
+
+    if not isinstance(layer, LayerDecl):
+        return AttemptFailure(1, url, "schema_missing", "layer", "missing")
+    declared = {field.name: field for field in layer.attribute_fields}
+    for feature in features:
+        attributes = _text_dict(feature.get("attributes"))
+        if attributes is None:
+            return AttemptFailure(1, url, "schema_missing", "attributes", "missing")
+        for name in attributes:
+            if name in NEVER_TAKEN:
+                return AttemptFailure(1, url, "never_taken", "absent", name)
+        if oid_name in attributes:
+            return AttemptFailure(1, url, "object_id_field", "absent", oid_name)
+        for name in attributes:
+            if name not in declared:
+                return AttemptFailure(1, url, "extra_field", "declared", name)
+        for field in layer.attribute_fields:
+            if field.name not in attributes:
+                return AttemptFailure(1, url, "schema_missing", field.name, "missing")
+            if not _json_kind_ok(attributes[field.name], field.json_kind):
+                return AttemptFailure(
+                    1,
+                    url,
+                    "schema_retyped",
+                    f"{field.name}:{field.json_kind}",
+                    _json_seen(attributes[field.name]),
+                )
+        geometry = _text_dict(feature.get("geometry"))
+        if geometry is None:
+            return AttemptFailure(
+                1, url, "schema_missing", layer.geometry_field, "missing"
+            )
+        if not _wkid_4326(geometry):
+            return AttemptFailure(1, url, "spatial_reference", "4326", "other")
+    return None
+
+
+def _wkid_4326(geometry: dict[str, object]) -> bool:
+    reference = geometry.get("spatialReference")
+    if not isinstance(reference, dict):
+        return False
+    wkid = reference.get("wkid")
+    return isinstance(wkid, int) and not isinstance(wkid, bool) and wkid == 4326
+
+
+def _json_kind_ok(value: object, kind: str) -> bool:
+    if value is None:
+        return True
+    if kind == "string":
+        return isinstance(value, str)
+    if kind in {"integer", "date"}:
+        return isinstance(value, int) and not isinstance(value, bool)
+    if kind == "number":
+        return isinstance(value, (int, float)) and not isinstance(value, bool)
+    return False
+
+
+def _json_seen(value: object) -> str:
+    if isinstance(value, bool):
+        return "boolean"
+    if isinstance(value, int):
+        return "integer"
+    if isinstance(value, float):
+        return "number"
+    if isinstance(value, str):
+        return "string"
+    return "other"

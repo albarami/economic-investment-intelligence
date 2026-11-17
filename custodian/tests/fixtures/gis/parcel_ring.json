@@ -1,0 +1,12 @@
+{
+  "attributes": {
+    "PIN": 1001,
+    "SHAPE.AREA": 250.5,
+    "STARTDATE": 1579046400000,
+    "ENDDATE": null
+  },
+  "geometry": {
+    "rings": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
+    "spatialReference": {"wkid": 4326}
+  }
+}

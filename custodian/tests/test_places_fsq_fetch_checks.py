@@ -168,7 +168,7 @@ def test_fsq_store_manifest_and_sidecars(tmp_path):
             [("a.parquet", data, URL)],
             term_body,
             term_url,
-            "invented-clock",
+            "2091-01-01T00:00:00Z",
             "data.source.coop",
         )
         directory = cache / "places_fsq" / "copy-2025-01-10"
@@ -178,7 +178,7 @@ def test_fsq_store_manifest_and_sidecars(tmp_path):
             "metadata_sha256": meta_hash,
             "method": "places_fsq.v1",
             "release": "2025-01-10",
-            "retrieved_utc": "invented-clock",
+            "retrieved_utc": "2091-01-01T00:00:00Z",
             "terms_sha256": term_hash,
             "terms_url": term_url or None,
         }
@@ -197,7 +197,7 @@ def test_fsq_store_manifest_and_sidecars(tmp_path):
                 "bytes": 8 if sub == "metadata" else 4,
                 "fetch_url": url,
                 "fetch_host": "data.source.coop",
-                "retrieved_utc": "invented-clock",
+                "retrieved_utc": "2091-01-01T00:00:00Z",
                 "publisher": "Foursquare",
                 "source_modified": "2025-01-10",
                 "row_count": None,
@@ -341,7 +341,7 @@ def test_fsq_fetch_success_manifest_tracks_actual_responses(tmp_path, with_terms
 
     def clock():
         clocks.append("clock")
-        return "invented-clock"
+        return "2091-01-01T00:00:00Z"
 
     def sleep(_):
         raise AssertionError("unexpected sleep")
@@ -370,7 +370,7 @@ def test_fsq_fetch_success_manifest_tracks_actual_responses(tmp_path, with_terms
     assert record["terms_sha256"] == (
         hashlib.sha256(TERMS).hexdigest() if with_terms else None
     )
-    assert record["retrieved_utc"] == "invented-clock"
+    assert record["retrieved_utc"] == "2091-01-01T00:00:00Z"
     receipt = json.loads(next((directory / "files").glob("*.meta.json")).read_bytes())
     assert receipt["fetch_url"] == file_url + "/served"
     assert receipt["terms_sha256"] == (
@@ -439,7 +439,7 @@ def test_fsq_generated_address_guard_refuses_planted_foreign_host(
     assert not (tmp_path / "cache").exists()
 
 
-def test_fsq_manifest_replace_failure_retains_named_partial(tmp_path, monkeypatch):
+def test_fsq_manifest_replace_failure_removes_named_partial(tmp_path, monkeypatch):
     original = f.os.replace
 
     def replace_file(source, target):
@@ -456,11 +456,11 @@ def test_fsq_manifest_replace_failure_retains_named_partial(tmp_path, monkeypatc
             [],
             b"",
             "",
-            "clock",
+            "2091-01-01T00:00:00Z",
             "data.source.coop",
         )
     directory = tmp_path / "places_fsq" / "copy-2025-01-10"
-    assert (directory / ".manifest.json.partial").is_file()
+    assert not (directory / ".manifest.json.partial").exists()
     assert not (directory / "manifest.json").exists()
 
 

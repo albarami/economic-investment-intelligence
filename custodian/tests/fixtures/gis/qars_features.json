@@ -1,0 +1,13 @@
+[
+  {
+    "attributes": {
+      "ZONE_NO": 7,
+      "STREET_NO": 12,
+      "BUILDING_NO": 3,
+      "PIN": 1001,
+      "BUILDING_NO_SUBTYPE": 4,
+      "SURVEYED_DATE": 1579046400000
+    },
+    "geometry": {"x": 10.25, "y": 20.5, "spatialReference": {"wkid": 4326}}
+  }
+]

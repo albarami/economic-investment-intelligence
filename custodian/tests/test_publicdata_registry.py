@@ -50,7 +50,7 @@ DECISION_0019 = {
     "ntl_blackmarble",
     "worldpop_qat_agesex",
     "weather_openmeteo",
-    "busy_gmaps",
+    "busy_besttime",
     "places_fsq",
 }
 CITATIONS = {
@@ -91,8 +91,9 @@ def test_owner_decision_and_validation_only() -> None:
     """owner_decision names record 0026; every other basis names no record."""
     entries = load_registry()
     by_id = {entry.source_id: entry for entry in entries}
+    assert by_id["busy_besttime"].licence_basis == "provider_terms"
+    assert by_id["busy_besttime"].decision_record == ""
     for source_id in (
-        "busy_gmaps",
         "fdi_projects",
         "census_zone_sector",
         "bnd_zone_2020",
@@ -111,10 +112,12 @@ def test_owner_decision_and_validation_only() -> None:
 
 
 def test_nightly_selection_rejects_the_excluded_sources() -> None:
-    """A nightly selection that names busy_gmaps or ntl_blackmarble fails."""
+    """A nightly selection that names busy_besttime or ntl_blackmarble fails."""
     entries = load_registry()
-    blocked = nightly_blocked(entries, ("busy_gmaps", "ntl_blackmarble", "lic_active"))
-    assert blocked == ("busy_gmaps", "ntl_blackmarble")
+    blocked = nightly_blocked(
+        entries, ("busy_besttime", "ntl_blackmarble", "lic_active")
+    )
+    assert blocked == ("busy_besttime", "ntl_blackmarble")
     assert nightly_blocked(entries, ("lic_active",)) == ()
 
 
@@ -296,6 +299,18 @@ LAYER_IDS = {
     "census_district_pop": 0,
     "bnd_zone_2020": 0,
     "bnd_district_2020": 12,
+    # S2-T19 B2 / LA-2: exact layer declarations, with two absent paths.
+    "gis_land_price": 0,
+    "gis_rail": 2,
+    "gis_phcc": 1,
+    "gis_landmarks": 0,
+    "gis_zoning": 1,
+    "gis_address": 0,
+    "gis_parcels": 0,
+    "gis_poi_comm": 0,
+    "gis_context": 0,
+    "gis_boundaries": None,
+    "gis_imagery_history": None,
 }
 
 
@@ -568,10 +583,20 @@ def test_skip_reason_must_not_name_a_licence_or_terms(tmp_path: Path) -> None:
 def test_registry_counts_follow_decision_0026() -> None:
     """No none_stated row remains, and every owner_decision row names 0026."""
     entries = load_registry()
-    assert len(entries) == 143
+    assert len(entries) == 285 + 4 + 4
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
-    assert len(owners) == 27
+    # S2-T28 moves exactly these advisor-confirmed CC BY rows to dataset basis.
+    confirmed = {"wage_bands_priv", "work_hours_act", "accident"}
+    assert len(owners) == 26 + 13 + 3 + 4 - 3  # Joined additions, then CC BY moves.
+    assert {
+        entry.key
+        for entry in entries
+        if entry.key in confirmed
+        and entry.licence_basis == "dataset"
+        and entry.licence_id == "CC-BY-4.0"
+        and entry.decision_record == ""
+    } == confirmed
     assert {entry.decision_record for entry in owners} == {"0026"}
 
 
@@ -605,7 +630,7 @@ def test_terms_words_absent_from_document_04_fail_the_guard(tmp_path: Path) -> N
     assert "roads_osm" in terms_words_absent_from_pack(entries, pack)
 
 
-_BUSY_ID = "busy_gmaps"
+_BUSY_ID = "busy_besttime"
 
 
 def non_python_files_naming_busy(root: Path) -> tuple[str, ...]:
@@ -621,17 +646,17 @@ def non_python_files_naming_busy(root: Path) -> tuple[str, ...]:
     return tuple(found)
 
 
-def test_no_non_python_test_file_names_busy_gmaps() -> None:
+def test_no_non_python_test_file_names_busy_besttime() -> None:
     """No committed test fixture names the busy source id."""
     tests = REPO / "custodian" / "tests"
     assert non_python_files_naming_busy(tests) == ()
 
 
-def test_planted_json_naming_busy_gmaps_fails_the_scan(tmp_path: Path) -> None:
+def test_planted_json_naming_busy_besttime_fails_the_scan(tmp_path: Path) -> None:
     """A planted JSON file that names the busy source id fails the same scan."""
     planted = tmp_path / "planted.json"
     planted.write_text(
-        '{"source_id": "busy_gmaps", "values": ["invented-one", "invented-two"]}\n',
+        '{"source_id": "busy_besttime", "values": ["invented-one", "invented-two"]}\n',
         encoding="utf-8",
     )
     assert non_python_files_naming_busy(tmp_path) == ("planted.json",)
@@ -642,16 +667,16 @@ def test_bytecode_cache_is_not_scanned_as_a_fixture(tmp_path: Path) -> None:
     cache = tmp_path / "__pycache__"
     cache.mkdir()
     (cache / "test_one.cpython-314-pytest-9.2.0.pyc").write_bytes(
-        b"\xb6\xbd\xf9j\x00busy_gmaps\x00\xff"
+        b"\xb6\xbd\xf9j\x00busy_besttime\x00\xff"
     )
     assert non_python_files_naming_busy(tmp_path) == ()
 
 
-def test_planted_binary_fixture_naming_busy_gmaps_fails_the_scan(
+def test_planted_binary_fixture_naming_busy_besttime_fails_the_scan(
     tmp_path: Path,
 ) -> None:
     """A planted fixture that is not UTF-8 text but names the id still fails."""
-    (tmp_path / "planted.bin").write_bytes(b"\xb6\xbd\x00busy_gmaps\xff")
+    (tmp_path / "planted.bin").write_bytes(b"\xb6\xbd\x00busy_besttime\xff")
     assert non_python_files_naming_busy(tmp_path) == ("planted.bin",)
 
 
@@ -697,3 +722,79 @@ def test_cache_path_is_gitignored(tmp_path: Path) -> None:
         check=False,
     )
     assert open_cache.returncode == 1
+
+
+def test_baci_registry_pending_and_nightly_policy() -> None:
+    """BACI stays eligible; citation-only metadata is not a live fetch exclusion."""
+    from dataclasses import replace
+
+    entries = load_registry()
+    baci = next(entry for entry in entries if entry.source_id == "cepii_baci")
+    assert baci.skip_reason == "baci_metadata_unconfirmed"
+    assert baci.commit_allowed is False
+    assert baci.url == ""
+    assert nightly_blocked([replace(baci, skip_reason="")], ("cepii_baci",)) == ()
+
+    def exclusions(rows):
+        return {
+            e.source_id
+            for e in rows
+            if not e.nightly_live_fetch and e.kind != "citation_only"
+        } | BANNED_SOURCE_IDS
+
+    expected = {
+        "bldg_3dglobfp",
+        "bldg_wsf3d",
+        "gis_boundaries",
+        "gis_imagery_history",
+        "tenders_pub",
+        "worldpop_qat_agesex",
+        "busy_besttime",
+        "ntl_blackmarble",
+        "traffic_tomtom_flow",
+        "traffic_tomtom_range",
+        "un_comtrade",
+    }
+    assert exclusions(entries) == expected
+    planted = [
+        replace(e, nightly_live_fetch=False) if e.source_id == "cepii_baci" else e
+        for e in entries
+    ]
+    assert exclusions(planted) != expected
+
+
+def test_gravity_and_atlas_registry_pending_and_nightly_policy() -> None:
+    """Pending trade rows stay eligible and do not enlarge the closed exclusion set."""
+    from dataclasses import replace
+
+    entries = load_registry()
+    expected = {
+        "busy_besttime",
+        "ntl_blackmarble",
+        "traffic_tomtom_flow",
+        "traffic_tomtom_range",
+    }
+    for source_id, reason in (
+        ("cepii_gravity", "gravity_metadata_unconfirmed"),
+        ("atlas_complexity", "atlas_metadata_unconfirmed"),
+    ):
+        row = next(entry for entry in entries if entry.source_id == source_id)
+        assert row.skip_reason == reason
+        assert row.commit_allowed is False
+        assert row.nightly_live_fetch is True
+        assert row.url == ""
+        assert row.landing_url == ""
+        assert "?" not in row.basis_note
+        assert nightly_blocked([replace(row, skip_reason="")], (source_id,)) == ()
+    planted = [
+        replace(entry, nightly_live_fetch=False)
+        if entry.source_id in {"cepii_gravity", "atlas_complexity"}
+        else entry
+        for entry in entries
+    ]
+    changed = {
+        entry.source_id
+        for entry in planted
+        if not entry.nightly_live_fetch and entry.kind != "citation_only"
+    }
+    assert changed != expected

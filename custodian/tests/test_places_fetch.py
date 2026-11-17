@@ -8,6 +8,7 @@ from pathlib import Path
 from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.fetch.build import run_build
+from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response
@@ -35,13 +36,15 @@ class _Body:
 
 
 def test_registry_block_names_the_four_files() -> None:
-    """The appended rows are fetched. The parent rows stay skipped."""
+    """The appended rows fetch whole files; the parents check HTTPS listings."""
     entries = load_registry()
     parents = {
         entry.key: entry for entry in entries if entry.key in {"places_ovt", "bldg_ovt"}
     }
-    assert parents["places_ovt"].skip_reason == "overture_bucket_not_opened"
-    assert parents["bldg_ovt"].skip_reason == "overture_bucket_not_opened"
+    assert parents["places_ovt"].skip_reason == ""
+    assert "?list-type=2&prefix=" in parents["places_ovt"].url
+    assert parents["bldg_ovt"].skip_reason == ""
+    assert parents["bldg_ovt"].url.endswith("theme=buildings/type=building/")
     concrete = [entry for entry in entries if entry.key in FILE_KEYS]
     assert {entry.key for entry in concrete} == set(FILE_KEYS)
     for entry in concrete:
@@ -348,6 +351,7 @@ def _entry(size: int, url: str = "") -> Entry:
         "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/invented.parquet"
     )
     return Entry(
+        refetch=Cadence("none", "frequency_unconfirmed", ""),
         key="places_ovt/part-00014",
         source_id="places_ovt",
         slug="",

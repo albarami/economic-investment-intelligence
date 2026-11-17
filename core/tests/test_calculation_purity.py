@@ -19,9 +19,15 @@ from types import ModuleType
 import pytest
 from method_rows import energy, measure, trade
 
-from eii_core.calc import facts, public_methods, public_series, sector_economics
+from eii_core.calc import (
+    building_heights,
+    facts,
+    public_methods,
+    public_series,
+    sector_economics,
+)
 
-MODULES = (facts, public_methods, public_series, sector_economics)
+MODULES = (building_heights, facts, public_methods, public_series, sector_economics)
 ALLOWED_IMPORTS = {
     "__future__",
     "collections.abc",
@@ -34,6 +40,7 @@ ALLOWED_IMPORTS = {
     "typing",
     "re",
     "statistics",
+    "building_heights",
     "public_series",
     "facts",
     "public_methods",

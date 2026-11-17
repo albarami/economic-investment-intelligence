@@ -73,6 +73,7 @@ def documented(text: str, kind: str) -> set[str]:
             for row in rows
             if "never printed" in row["Operational note"].lower()
             or row["Values"] == "key or absent"
+            or row["Variable"] == "`EII_BESTTIME_RUN_CREDIT_LIMIT`"
         ]
     return {row["Variable"].strip("`") for row in rows}
 

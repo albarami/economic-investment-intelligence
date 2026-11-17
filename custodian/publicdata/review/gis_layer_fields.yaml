@@ -1,0 +1,207 @@
+# Kept fields of the GIS centre layers fetched by S2-T19.
+# Names, field types, layer ids and page limits are the service's own,
+# from the live reading of 2026-11-15. The fetcher pages at the
+# maxRecordCount of each layer answer. page_limit records that reading.
+sources:
+  gis_land_price:
+    layers:
+      - service_path: /server/rest/services/Vector/LandPricing2026/MapServer
+        layer_id: 0
+        layer_name: Qatar_District_Land_Pricing
+        geometry: polygon
+        page_limit: 2000
+        fields:
+          - {name: DIST_NO, esri_type: esriFieldTypeInteger}
+          - {name: District_No, esri_type: esriFieldTypeInteger}
+          - {name: ANAME, esri_type: esriFieldTypeString}
+          - {name: ENAME, esri_type: esriFieldTypeString}
+          - {name: ResidentialPrices, esri_type: esriFieldTypeString}
+          - {name: ResidentialCityCenter, esri_type: esriFieldTypeString}
+          - {name: ResidentialPriceFlats, esri_type: esriFieldTypeString}
+          - {name: ResidentialPriceVillas, esri_type: esriFieldTypeString}
+          - {name: CommercialPrices, esri_type: esriFieldTypeString}
+          - {name: Shape, esri_type: esriFieldTypeGeometry}
+  gis_rail:
+    layers:
+      - service_path: /server/rest/services/Vector/QRAIL_NO_OPERATION/MapServer
+        layer_id: 2
+        layer_name: QRAIL.Metro_Stations
+        geometry: point
+        page_limit: 2000
+        fields:
+          - {name: STATION_NAME_ENGLISH, esri_type: esriFieldTypeString}
+          - {name: STATION_NAME_ARABIC, esri_type: esriFieldTypeString}
+          - {name: PHASE, esri_type: esriFieldTypeString}
+          - {name: LINE, esri_type: esriFieldTypeString}
+          - {name: RED_LINE_PHASE, esri_type: esriFieldTypeString}
+          - {name: GREEN_LINE_PHASE, esri_type: esriFieldTypeString}
+          - {name: GOLD_LINE_PHASE, esri_type: esriFieldTypeString}
+          - {name: BLUE_LINE_PHASE, esri_type: esriFieldTypeString}
+          - {name: BLACK_LINE_PHASE, esri_type: esriFieldTypeString}
+          - {name: SHAPE, esri_type: esriFieldTypeGeometry}
+      - service_path: /server/rest/services/Vector/QRAIL_NO_OPERATION/MapServer
+        layer_id: 0
+        layer_name: QRAIL.Metro_Tracks_Detailed
+        geometry: line
+        page_limit: 2000
+        fields:
+          - {name: TRACK_NAME, esri_type: esriFieldTypeString}
+          - {name: LINE, esri_type: esriFieldTypeSmallInteger}
+          - {name: PHASE, esri_type: esriFieldTypeString}
+          - {name: RED_LINE_PHASE, esri_type: esriFieldTypeString}
+          - {name: GREEN_LINE_PHASE, esri_type: esriFieldTypeString}
+          - {name: GOLD_LINE_PHASE, esri_type: esriFieldTypeString}
+          - {name: BLUE_LINE_PHASE, esri_type: esriFieldTypeString}
+          - {name: BLACK_LINE_PHASE, esri_type: esriFieldTypeString}
+          - {name: SHAPE, esri_type: esriFieldTypeGeometry}
+          - {name: SHAPE.LEN, esri_type: esriFieldTypeDouble}
+      - service_path: /server/rest/services/Vector/QRAIL_NO_OPERATION/MapServer
+        layer_id: 1
+        layer_name: QRAIL.Rail_Protection_Zones
+        geometry: polygon
+        page_limit: 2000
+        fields:
+          - {name: PHASE, esri_type: esriFieldTypeString}
+          - {name: SHAPE, esri_type: esriFieldTypeGeometry}
+          - {name: SHAPE.AREA, esri_type: esriFieldTypeDouble}
+          - {name: SHAPE.LEN, esri_type: esriFieldTypeDouble}
+  gis_phcc:
+    layers:
+      - service_path: /server/rest/services/Vector/PHCC_LOCATION_2026/MapServer
+        layer_id: 1
+        layer_name: PHCC.PHCC_LOCATION_2026
+        geometry: point
+        page_limit: 2000
+        fields:
+          - {name: HC_NAME, esri_type: esriFieldTypeString}
+          - {name: A_HC_NAME, esri_type: esriFieldTypeString}
+          - {name: HC_CODE, esri_type: esriFieldTypeString}
+          - {name: HC_ZONE, esri_type: esriFieldTypeString}
+          - {name: SHAPE, esri_type: esriFieldTypeGeometry}
+      - service_path: /server/rest/services/Vector/PHCC_CATCHMENT_2026_Q/MapServer
+        layer_id: 1
+        layer_name: PHCC.PHCC_CATCHMENT_2026_Q
+        geometry: polygon
+        page_limit: 2000
+        fields:
+          - {name: HC_CODE, esri_type: esriFieldTypeString}
+          - {name: ENAME, esri_type: esriFieldTypeString}
+          - {name: ANAME, esri_type: esriFieldTypeString}
+          - {name: NAME, esri_type: esriFieldTypeString}
+          - {name: HC_REGION, esri_type: esriFieldTypeInteger}
+          - {name: REGION_NAM, esri_type: esriFieldTypeString}
+          - {name: DIST_KEY, esri_type: esriFieldTypeInteger}
+          - {name: SHAPE, esri_type: esriFieldTypeGeometry}
+  gis_landmarks:
+    layers:
+      - service_path: /server/rest/services/Vector/Landmarks/MapServer
+        layer_id: 0
+        layer_name: Landmarks
+        geometry: point
+        page_limit: 10000
+        fields:
+          - {name: ENAME, esri_type: esriFieldTypeString}
+          - {name: ANAME, esri_type: esriFieldTypeString}
+          - {name: SHAPE, esri_type: esriFieldTypeGeometry}
+  gis_zoning:
+    layers:
+      - service_path: /server/rest/services/Vector/Zoning/MapServer
+        layer_id: 1
+        layer_name: Khor_Wakra_Zoning
+        geometry: polygon
+        page_limit: 2000
+        fields:
+          - {name: ZONING_COD, esri_type: esriFieldTypeString}
+          - {name: LU_ENG, esri_type: esriFieldTypeString}
+          - {name: LU_ARB, esri_type: esriFieldTypeString}
+          - {name: P_COM_SHOP, esri_type: esriFieldTypeString}
+          - {name: P_COM_OFF, esri_type: esriFieldTypeString}
+          - {name: P_RES_VIL, esri_type: esriFieldTypeString}
+          - {name: P_RES_APA, esri_type: esriFieldTypeString}
+          - {name: P_RES_HOT, esri_type: esriFieldTypeString}
+          - {name: HEIGHT, esri_type: esriFieldTypeString}
+          - {name: HEIGHTS, esri_type: esriFieldTypeString}
+          - {name: SET_NOW_FR, esri_type: esriFieldTypeDouble}
+          - {name: SET_NOW_RE, esri_type: esriFieldTypeDouble}
+          - {name: SET_NOW_S1, esri_type: esriFieldTypeDouble}
+          - {name: SET_NOW_S2, esri_type: esriFieldTypeDouble}
+          - {name: SET_W_FR, esri_type: esriFieldTypeDouble}
+          - {name: SET_W_RE, esri_type: esriFieldTypeDouble}
+          - {name: SET_W_S1, esri_type: esriFieldTypeDouble}
+          - {name: SET_W_S2, esri_type: esriFieldTypeDouble}
+          - {name: BUILD_COV, esri_type: esriFieldTypeString}
+          - {name: ENTRANCE, esri_type: esriFieldTypeString}
+          - {name: MINIMUM_LO, esri_type: esriFieldTypeString}
+          - {name: LANDUSE, esri_type: esriFieldTypeInteger}
+          - {name: SUB_LANDUS, esri_type: esriFieldTypeInteger}
+          - {name: ZONE_ID, esri_type: esriFieldTypeString}
+          - {name: SHAPE, esri_type: esriFieldTypeGeometry}
+      - service_path: /server/rest/services/Vector/Zoning/MapServer
+        layer_id: 0
+        layer_name: Zoning
+        geometry: polygon
+        page_limit: 2000
+        fields:
+          - {name: ZONING, esri_type: esriFieldTypeString}
+          - {name: CODE, esri_type: esriFieldTypeSmallInteger}
+          - {name: RULEID, esri_type: esriFieldTypeInteger}
+          - {name: STARTDATE, esri_type: esriFieldTypeDate}
+          - {name: SHAPE, esri_type: esriFieldTypeGeometry}
+  gis_address:
+    layers:
+      - service_path: /server/rest/services/Vector/QARS/MapServer
+        layer_id: 0
+        layer_name: QARS
+        geometry: point
+        page_limit: 20000
+        fields:
+          - {name: ZONE_NO, esri_type: esriFieldTypeSmallInteger}
+          - {name: STREET_NO, esri_type: esriFieldTypeSmallInteger}
+          - {name: BUILDING_NO, esri_type: esriFieldTypeSmallInteger}
+          - {name: PIN, esri_type: esriFieldTypeInteger}
+          - {name: BUILDING_NO_SUBTYPE, esri_type: esriFieldTypeInteger}
+          - {name: SURVEYED_DATE, esri_type: esriFieldTypeDate}
+          - {name: SHAPE, esri_type: esriFieldTypeGeometry}
+  gis_parcels:
+    layers:
+      - service_path: /server/rest/services/Vector/CadastrePlots/MapServer
+        layer_id: 0
+        layer_name: "حدود الأراضي المساحية المعتمدة"
+        geometry: polygon
+        page_limit: 2000
+        fields:
+          - {name: PIN, esri_type: esriFieldTypeInteger}
+          - {name: SHAPE.AREA, esri_type: esriFieldTypeDouble}
+          - {name: STARTDATE, esri_type: esriFieldTypeDate}
+          - {name: ENDDATE, esri_type: esriFieldTypeDate}
+          - {name: SHAPE, esri_type: esriFieldTypeGeometry}
+  gis_poi_comm:
+    layers:
+      - service_path: /server/rest/services/Vector/POIs_COMM/MapServer
+        layer_id: 0
+        layer_name: DATA.POIs_QC
+        geometry: point
+        page_limit: 1000
+        fields:
+          - {name: ENAME, esri_type: esriFieldTypeString}
+          - {name: ANAME, esri_type: esriFieldTypeString}
+          - {name: ZONE_NO, esri_type: esriFieldTypeSmallInteger}
+          - {name: STREET_NO, esri_type: esriFieldTypeSmallInteger}
+          - {name: BUILDING_NO, esri_type: esriFieldTypeSmallInteger}
+          - {name: SHAPE, esri_type: esriFieldTypeGeometry}
+  gis_context:
+    layers:
+      - service_path: /server/rest/services/Vector/ROADFlowlnA/MapServer
+        layer_id: 0
+        layer_name: Street
+        geometry: line
+        page_limit: 2000
+        fields:
+          - {name: STREET_NO, esri_type: esriFieldTypeInteger}
+          - {name: ZONE_NO, esri_type: esriFieldTypeInteger}
+          - {name: ROAD_CLASS, esri_type: esriFieldTypeString}
+          - {name: CLASS_ARABIC, esri_type: esriFieldTypeSmallInteger}
+          - {name: RD_ENAME, esri_type: esriFieldTypeString}
+          - {name: RD_ANAME, esri_type: esriFieldTypeString}
+          - {name: SHAPE, esri_type: esriFieldTypeGeometry}
+          - {name: SHAPE.LEN, esri_type: esriFieldTypeDouble}

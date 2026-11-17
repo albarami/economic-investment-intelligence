@@ -10,6 +10,7 @@ from custodian.tests.test_places_build_survivors import _pub_place
 from custodian.tests.test_places_stage import _frame_stage_fixture
 
 from eii_custodian.publicdata.fetch import build as fetch
+from eii_custodian.publicdata.fetch.snapshots import read_snapshot, reviewed_selections
 from eii_custodian.publicdata.places import PlacesError
 from eii_custodian.publicdata.places.review import (
     VERIFIED_COLUMNS,
@@ -32,8 +33,11 @@ def _ready(tmp_path):
 
 
 def _run(cache, entries, timestamp, monkeypatch):
-    def already_fetched(entry, transport, cache, clock, sleep):
-        meta = json.loads(next((cache / entry.key).glob("*.meta.json")).read_text())
+    def already_fetched(
+        entry, transport, cache, clock, sleep, token, *, registry_entries
+    ):
+        selected = reviewed_selections(cache)[entry.key]
+        meta = read_snapshot(cache / entry.key, selected).sidecar
         return fetch._Fetched(meta["sha256"], entry.fetch_host, clock(), "", ""), None
 
     monkeypatch.setattr(fetch, "_fetch_row", already_fetched)

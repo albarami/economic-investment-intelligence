@@ -19,6 +19,8 @@ from eii_custodian.publicdata.fetch.receipts import (
     sha256_hex,
     sidecar_for,
 )
+from eii_custodian.publicdata.fetch.snapshots import read_snapshot, reviewed_selections
+from eii_custodian.publicdata.review.cache_fixture import select_fixture
 
 _CODE = "SYN-M1"
 _CODE_B = "SYN-M2"
@@ -191,6 +193,7 @@ def test_frame_then_stage_supplies_municipalities(tmp_path: Path) -> None:
             terms_sha256="",
         )
         commit_pair(cache / source.key, digest, source.extension, body, receipt)
+        select_fixture(cache, source.key, digest)
     lic_entry, digest = _lic(cache, "lic_issued", _FRAME_NAME)
     entries.append(lic_entry)
     lines = [f"PASS {lic_entry.key} sha256={digest} host=invented"]
@@ -198,13 +201,10 @@ def test_frame_then_stage_supplies_municipalities(tmp_path: Path) -> None:
     written = json.loads((cache / _OUTPUT).read_text(encoding="utf-8"))
     assert written["upstream_sha256"] == {
         item.key: sha256_hex(
-            (
-                cache
-                / item.key
-                / next((cache / item.key).glob("*.meta.json")).name.replace(
-                    ".meta.json", "." + item.extension
-                )
-            ).read_bytes()
+            read_snapshot(
+                cache / item.key,
+                reviewed_selections(cache)[item.key],
+            ).body
         )
         for item in entries
         if item.key in {"bnd_hdx", "bnd_zone_2020"}

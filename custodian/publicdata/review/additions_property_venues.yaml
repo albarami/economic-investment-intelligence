@@ -1,0 +1,20 @@
+# Reviewed field map for residential unit sales and venue visits.
+# Missing-measure forms are the exact texts the inventory quotes. Word forms whose
+# exact spelling the inventory does not give stay under unconfirmed and are not guessed.
+version: 1
+unit_types:
+  "Residential Unit": residential_unit
+missing_measures:
+  "visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum":
+    field: number
+    forms:
+      - "-"
+      - "--"
+    unconfirmed:
+      - "Arabic word for closed; the inventory counts 4 rows and does not quote the word"
+      - "closed-for-renovation note, two English spellings; the inventory counts 4 rows"
+      - "open-to-official-visitors-only note; the inventory counts 1 row"
+repeated_transaction: >-
+  deal_count counts distinct transaction numbers; one agreed per-square-metre
+  price is kept once; disagreeing prices block that deal; property_value is never summed
+price_basis_built: per_m2

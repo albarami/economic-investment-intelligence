@@ -1,0 +1,31 @@
+# Pending placeholders only. No publisher page, licence, version or host is confirmed.
+# Bounds of zero with bound_origin pending cannot activate a download.
+# Fixture digit limits are an ASSUMPTION recorded in the source note, not here.
+config_version: gravity-v1
+method_version: v1
+source_version: ""
+access: unconfirmed
+confirmed: false
+bound_origin: pending
+reviewed_urls: []
+publisher: ""
+page: ""
+page_sha256: ""
+attribution: ""
+evidence: ""
+licence_words: ""
+hs_revision: ""
+publisher_mapping: pending
+qatar_key: ""
+country_width: 1
+period_first: 1
+period_last: 1
+year_selection: pending
+archive_bytes: [0, 0]
+raw_rows: [0, 0]
+member_count: [0, 0]
+publisher_sha256: ""
+flag_tokens: ["0", "1"]
+flag_missing: []
+measures: []
+members: []
