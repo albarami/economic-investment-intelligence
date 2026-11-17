@@ -1412,3 +1412,24 @@ All retrieved 2026-11-11 unless stated.
 - Project research and judges' checks of 2026-11-11 (public economic data, graph value, economic
   methods, public geography and statistics, feasibility and cost) for all counts and figures not
   re-fetched by the author.
+
+### S2-T26 pending benchmark mappings
+
+| Source | Identity lead from decision 0040 | Table | Verification |
+|---|---|---|---|
+| wb_wdi | World Bank, World Development Indicators | pub_wdi_benchmark | Pending independent page, Qatar coverage, native schema, version, terms and tier review |
+| unctad_fdi | UNCTAD, UNCTADstat | pub_unctad_fdi_benchmark | Pending independent review; flows remain separate from announcements |
+| imf_weo | International Monetary Fund, World Economic Outlook | pub_weo_benchmark | Pending independent review of vintage and temporal status |
+| ilostat_qat | International Labour Organization, ILOSTAT | pub_ilostat_benchmark | Qatar availability unconfirmed; no replacement data |
+
+These inactive technical mappings have commit_allowed false and terms to be
+read, checked on 2026-11-16. That date is a pending-record check, not a publisher
+retrieval. No new source or redirect host is approved. Native schemas, live
+receipts, exact licence words and count/byte evidence remain lead-owned work.
+The offline adapter and its limitations are recorded in the benchmarks README.
+
+The offline benchmark receipts now include raw/excluded coverage, per-series last
+periods, ZIP member hashes and recorded-terms fingerprints. The reconciliation
+selection remains inactive; an explicit reviewed selection produces cache-only
+input/comparison tables and a replay-verified manifest with owner obstacles. These
+technical fixture paths do not establish a successful live fetch (PUB-19).

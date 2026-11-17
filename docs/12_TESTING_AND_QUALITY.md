@@ -733,3 +733,25 @@ from publisher frequency. Activity and graph readers have separate history
 cases; Comtrade `state.json`, `state.lock` and `coverage.json` have separate
 classification cases. Temporary guard reversals are restored before final checks;
 the task return records observed red and green results, not inferred coverage.
+
+### S2-T26 offline test scope
+
+The benchmark contract tests plant the UNCTAD/announcement join and sum at
+contract and build boundaries (F1), company joins/segmentation and protected
+combinations across benchmark sources (F2), correctly populated forecast/
+unclassified rows and multiple status fields (F3). Benchmark fetch tests exercise
+pending policies, required metadata, excluded-row validation, injected round
+trips for each source, no-transport pending dispatch and raw/output/receipt/
+completion tampering. Fixture tests do not confirm live metadata.
+
+Core trade reconciliation tests check exact gaps, individual metadata mismatches,
+missing values and complete versus incomplete annual coverage. Custodian trade
+reconciliation tests check selection refusal and delegation to the approved
+native readers. The round-two native-layout suite tests missing translation,
+ZIP inventory/byte/count refusals, stale series, excluded rows and coverage/terms
+receipt replay. Access tests plant unreviewed redirects, credentials in URLs and
+registration/sign-in/robot/paid obstacles on invented responses. Reconciliation
+release tests replay explicit selections, preserve native units and directions,
+reject output/input/binding tampering, enumerate absent pairs, and preserve
+recorded causes and free-plan gaps in the owner report. Fixtures do not verify
+live publisher layouts or Qatar bindings; independent review remains required.

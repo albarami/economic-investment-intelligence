@@ -2040,3 +2040,35 @@ Retrieved 2026-11-11 unless a date is given.
 - Flowminder, "Understanding CDR aggregates": https://covid19.flowminder.org/cdr-aggregates/understanding-cdr-aggregates-fundamentals
 - Project research files of 2026-11-11 (public economic data, architecture options, graph value,
   claims and legal landscape, decision-copilot panel design); measurements are attributed in the text.
+
+### S2-T26 offline benchmark contract
+
+The pending source tables are pub_wdi_benchmark, pub_unctad_fdi_benchmark,
+pub_weo_benchmark and pub_ilostat_benchmark. The technical Benchmark row
+holds source/version, country, indicator, native dimension key, frequency,
+period, unit, nullable currency and price basis, scale, publisher status,
+source flags, receipt hash and source row key. Its four nullable exact-text
+value fields are historical, publisher estimate, publisher forecast and
+unclassified; exactly the status-selected field is populated for a present
+value, and all are null for source_missing. The full dimensional key excludes
+values and receipt metadata. Historical reads exclude forecast and unclassified
+rows even when those rows are correctly stored.
+
+The implementation is an offline contract adapter, not a confirmed native
+publisher schema. All mappings remain inactive. Public benchmark use is confined
+to context on source geography: no join to synthetic records, worker/residence/
+company segmentation, protected combination or drawn-area apportionment; no
+UNCTAD join or sum with announced projects.
+
+The offline comparison release has two typed collections: pub_trade_comparison_input
+(ComparisonInput) retains a TradeFigure, source table/row key, selected and receipt
+hashes, binding evidence and the full native row. Calculated calendar rows instead
+carry ordered constituent input references. pub_trade_reconciliation (PairResult)
+retains partner/year/flow/scope, both source-role identities, nullable input IDs,
+nullable exact gap, mismatch codes, recorded cause codes/evidence and unknown_cause.
+The composite comparison key is the requested cell and both source-role identities.
+The cache manifest pins the selection hash, method, output hash and counts; its
+reader reopens selected native readers and recomputes both collections. An absent
+side never creates an input value; unknown compatibility prevents a gap. Owner
+reports preserve recorded access/free-plan obstacles, their evidence and nullable
+price fields. No live selection is activated by these fixture contracts.

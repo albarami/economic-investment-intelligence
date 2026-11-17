@@ -20,7 +20,16 @@ def manifest_entry(source_id):
 
 
 @pytest.mark.parametrize(
-    "source_id", ["cepii_baci", "cepii_gravity", "atlas_complexity"]
+    "source_id",
+    [
+        "cepii_baci",
+        "cepii_gravity",
+        "atlas_complexity",
+        "wb_wdi",
+        "unctad_fdi",
+        "imf_weo",
+        "ilostat_qat",
+    ],
 )
 def test_manifest_entry_preserves_all_file_defaults(source_id):
     source, row = manifest_entry(source_id)
@@ -29,7 +38,16 @@ def test_manifest_entry_preserves_all_file_defaults(source_id):
 
 
 @pytest.mark.parametrize(
-    "source_id", ["cepii_baci", "cepii_gravity", "atlas_complexity"]
+    "source_id",
+    [
+        "cepii_baci",
+        "cepii_gravity",
+        "atlas_complexity",
+        "wb_wdi",
+        "unctad_fdi",
+        "imf_weo",
+        "ilostat_qat",
+    ],
 )
 def test_manifest_entry_refuses_unknown_field(source_id):
     _, row = manifest_entry(source_id)
@@ -39,7 +57,16 @@ def test_manifest_entry_refuses_unknown_field(source_id):
 
 
 @pytest.mark.parametrize(
-    "source_id", ["cepii_baci", "cepii_gravity", "atlas_complexity"]
+    "source_id",
+    [
+        "cepii_baci",
+        "cepii_gravity",
+        "atlas_complexity",
+        "wb_wdi",
+        "unctad_fdi",
+        "imf_weo",
+        "ilostat_qat",
+    ],
 )
 @pytest.mark.parametrize(
     "name,value",

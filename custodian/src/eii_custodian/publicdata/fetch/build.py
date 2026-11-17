@@ -19,6 +19,10 @@ from eii_custodian.publicdata.atlas.config import load_config as load_atlas_conf
 from eii_custodian.publicdata.atlas.fetch import fetch_atlas
 from eii_custodian.publicdata.baci.config import BaciError, Config, load_config
 from eii_custodian.publicdata.baci.fetch import fetch_baci
+from eii_custodian.publicdata.benchmarks.config import Policy as BenchmarkPolicy
+from eii_custodian.publicdata.benchmarks.config import load_policies
+from eii_custodian.publicdata.benchmarks.contracts import TABLES as BENCHMARK_TABLES
+from eii_custodian.publicdata.benchmarks.fetch import fetch_benchmark, owner_obstacle
 from eii_custodian.publicdata.fetch.allowlist import approve, host_of
 from eii_custodian.publicdata.fetch.kinds import (
     TERMS_HOST_UNLISTED,
@@ -61,6 +65,11 @@ from eii_custodian.publicdata.investment_build import publish_investment
 from eii_custodian.publicdata.places.fetch import fetch_place_file, is_place_file
 from eii_custodian.publicdata.places_fsq.fetch import fetch_release, is_release_entry
 from eii_custodian.publicdata.stage import run_stage
+from eii_custodian.publicdata.trade_reconciliation import (
+    Selection,
+    build_reconciliation,
+    load_selection,
+)
 
 CACHE_RELATIVE = "data/public_cache"
 LOG_NAME = "build-log.json"
@@ -326,11 +335,15 @@ def run_build(
     additions_review: Path | None = None,
     additions_frame: Path | None = None,
     additions_output: Path | None = None,
+    benchmark_policies: dict[str, BenchmarkPolicy] | None = None,
+    benchmark_stream: StreamTransport | None = None,
+    reconciliation_selection: Selection | None = None,
 ) -> BuildOutcome:
     """Fetch each row in order, then run the public_data stage."""
     manifests: dict[str, str] = {}
     lines: list[str] = []
     terms: list[dict[str, object]] = []
+    benchmark_obstacles: list[dict[str, object]] = []
     previous = _previous_term_hashes(cache)
     failure: FetchFailure | None = None
     selected: list[tuple[str, str]] = []
@@ -344,6 +357,48 @@ def run_build(
                     "night-lights layer left out"
                 )
                 told_absent = True
+            continue
+        if entry.source_id in BENCHMARK_TABLES:
+            try:
+                policies = (
+                    benchmark_policies
+                    if benchmark_policies is not None
+                    else load_policies()
+                )
+                policy = policies[entry.source_id]
+                if not policy.confirmed:
+                    lines.append(
+                        skip_line(entry.source_id, "benchmark_metadata_unconfirmed")
+                    )
+                    continue
+                obstacle = owner_obstacle(policy)
+                if obstacle is not None:
+                    benchmark_obstacles.append(obstacle)
+                benchmark_result = fetch_benchmark(
+                    entry, policy, transport, benchmark_stream, cache, clock, sleep
+                )
+                manifests[entry.source_id] = benchmark_result.digest
+                lines.append(
+                    pass_line(entry.key, benchmark_result.digest, benchmark_result.host)
+                )
+            except (ValueError, KeyError, OSError, TypeError):
+                lines.append(
+                    fail_line(
+                        entry.source_id,
+                        "",
+                        "benchmark_validation_failed",
+                        "verified benchmark",
+                        "NO_DATA",
+                    )
+                )
+                failure = FetchFailure(
+                    1,
+                    entry.source_id,
+                    "",
+                    "benchmark_validation_failed",
+                    "verified benchmark",
+                    "NO_DATA",
+                )
             continue
         if entry.source_id == "cepii_baci":
             try:
@@ -669,6 +724,60 @@ def run_build(
             )
         if failure is None:
             failure = _heights(cache, entries, lines)
+
+    if benchmark_obstacles:
+        cache.mkdir(parents=True, exist_ok=True)
+        (cache / "benchmark_owner_report.json").write_text(
+            json.dumps(benchmark_obstacles, sort_keys=True), encoding="utf-8"
+        )
+    if failure is None:
+        from eii_custodian.publicdata.comtrade.policy import SafeRefusal
+        from eii_custodian.publicdata.fetch.decimals import DecimalRefusal
+
+        try:
+            selected_comparison = reconciliation_selection or load_selection()
+            if selected_comparison is not None:
+                from eii_custodian.publicdata.comtrade.policy import (
+                    Policy as TradePolicy,
+                )
+
+                native_policy = next(
+                    (
+                        e.comtrade_policy
+                        for e in entries
+                        if isinstance(e.comtrade_policy, TradePolicy)
+                    ),
+                    None,
+                )
+                manifests["trade_reconciliation"] = build_reconciliation(
+                    cache, selected_comparison, comtrade_policy=native_policy
+                )
+        except (
+            ValueError,
+            KeyError,
+            OSError,
+            TypeError,
+            SafeRefusal,
+            BaciError,
+            DecimalRefusal,
+        ):
+            failure = FetchFailure(
+                1,
+                "trade_reconciliation",
+                "",
+                "comparison_invalid",
+                "verified inputs",
+                "NO_DATA",
+            )
+            lines.append(
+                fail_line(
+                    "trade_reconciliation",
+                    "",
+                    "comparison_invalid",
+                    "verified inputs",
+                    "NO_DATA",
+                )
+            )
     _write_log(cache, lines, terms)
     return BuildOutcome(tuple(lines), failure, manifests)
 

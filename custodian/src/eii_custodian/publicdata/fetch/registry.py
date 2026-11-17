@@ -483,9 +483,17 @@ def _file_fields(row: dict[object, object], source_id: str) -> FileFields:
     source uses or none of it, and a field on any other source is refused.
     """
     present = {name for name in FILE_FIELD_NAMES if name in row}
-    if source_id in {"cepii_baci", "cepii_gravity", "atlas_complexity"}:
-        # Trade manifests serialize the complete joined Entry. Their unused
-        # file slots must retain exactly the typed defaults, never metadata
+    if source_id in {
+        "cepii_baci",
+        "cepii_gravity",
+        "atlas_complexity",
+        "wb_wdi",
+        "unctad_fdi",
+        "imf_weo",
+        "ilostat_qat",
+    }:
+        # Trade and benchmark manifests serialize the complete joined Entry.
+        # Their unused file slots must retain exactly the typed defaults, never metadata
         # belonging to a grid source. Registry rows still need no such slots.
         defaults = FileFields()
         if present == FILE_FIELD_NAMES and all(

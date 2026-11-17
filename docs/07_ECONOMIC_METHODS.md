@@ -2539,3 +2539,25 @@ Method references (DOI links; the three marked were checked 2026-11-11; the refe
 - Rousseeuw (1987), silhouettes: https://doi.org/10.1016/0377-0427(87)90125-7 ; Hubert and Arabie (1985), comparing partitions (adjusted Rand index): https://doi.org/10.1007/BF01908075
 - Hyndman and Koehler (2006), mean absolute scaled error, the error measure of C30: https://doi.org/10.1016/j.ijforecast.2006.03.001
 - Added by decision 0023, not checked: Hakimi (1964), p-median: https://doi.org/10.1287/opre.12.3.450 ; Church and ReVelle (1974), maximal covering location: https://doi.org/10.1007/BF01942293 ; Toregas, Swain, ReVelle and Bergman (1971), location set covering: https://doi.org/10.1287/opre.19.6.1363 ; Sobol' (2001), global sensitivity indices: https://doi.org/10.1016/S0378-4754(00)00270-6 ; Saltelli (2002), sensitivity indices from model evaluations: https://doi.org/10.1016/S0010-4655(02)00280-1 . The libraries PySAL `spopt` (BSD-3) and SALib (MIT) are read and pinned at the task that uses them (C40). C39 uses no library. The talent ratio is the quotient of the two released figures (MTH-122), and PySAL `access` is not used.
+
+### S2-T26 trade comparison primitive
+
+The trade_reconciliation calculation module computes an exact right-minus-left
+gap only when partner, flow, year, periods, classification, revision, product
+scope, coverage, currency, unit, scale and valuation are compatible and known.
+It retains both inputs; missing sides or values produce no numeric gap. Unknown
+causes remain explicit. No currency conversion, CIF/FOB equation, concordance,
+imputation or source blend occurs. Annual sums require one native product scope
+and all calendar months from one source/version/role, without duplicate cells;
+the result is calculated, never published.
+
+This primitive does not establish a verified live country/coverage mapping.
+Selected native readers reuse portal contracts, Comtrade assemble and BACI's
+typed reader. Comtrade API price currency is never used as a trade currency.
+Comparison orchestration enumerates every requested partner/year/flow/scope and
+every source-role pair, including missing sides. Complete calendar sums are
+separate calculated inputs whose lineage resolves the published rows; incomplete
+calendars get an explicit mismatch. Recorded cause codes require evidence hashes
+and never establish that a methodological difference explains the entire gap.
+Selection and comparison outputs are hash-bound and recomputed on selected read.
+Live binding review and different-maker build review remain required.
