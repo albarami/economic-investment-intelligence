@@ -407,6 +407,12 @@ All numbers below are targets to be measured, not promises.
 
 ## 4. The CI pipeline
 
+Task S1-T20 adds `.github/workflows/mutation-pilot.yml`, a manually dispatched pilot, outside the six required checks. It runs the allow-listed `custodian/src/eii_custodian/publicdata/places_fsq/policy.py` at a full reviewed commit reachable from main. Dispatch the workflow from main. The manifest binds the commit, source, lock, runners, explanation ledger, pinned mutmut version and exact mutant diff hashes. Sorted mutant names are assigned modulo four; each shard regenerates and verifies the complete universe before running its exact names with one child. The existing local command and survivor judging remain unchanged.
+
+Four distinct matrix outputs carry compact JSON bounded at 128 KiB per payload. Merge checks the output's shard index, manifest hash and exact assigned names, disjoint complete coverage, raw status and diff hashes. Empty outputs and failed jobs fail as infrastructure incidents; killed, survived, timeout, not-covered and infrastructure failure remain distinct. Artifacts contain the manifest and result JSON, including survivor diffs, retained for seven days. The workflow uses read-only contents permission, the existing action pins, no persisted checkout credentials, two concurrent shards, a fixed concurrency group without cancellation and a ninety-minute ceiling per job. It does not fetch public data or engine extensions.
+
+Before a real campaign the lead dispatches with `synthetic=true` to prove all four outputs arrive intact. A transport failure does not pass: the lead may download the per-shard artifacts with `gh run download` and use the same tested local merge command. No download action is added. Each real shard repeats its own package baseline and forced-failure check; no baseline cache crosses jobs. Timeouts retain their raw status under the existing timeout settings. An unavailable package prerequisite is a failed campaign, never a reason to omit tests.
+
 GitHub Actions runs the pipeline. The existing `.github/workflows/docs.yml` keeps running the documentation check. ASSUMPTION: the other workflow file names are chosen in slice S0 and listed in [13_DEPLOYMENT_AND_OPERATIONS.md](13_DEPLOYMENT_AND_OPERATIONS.md).
 
 ```mermaid
@@ -533,6 +539,8 @@ Each row joins the gate of the slice of [14_IMPLEMENTATION_PLAN.md](14_IMPLEMENT
 | TST-169 | The independent reviewer returned APPROVED on the slice as a whole, or the gate counts as APPROVED under REV-40 of [15_REVIEWER_CHECKLIST.md](15_REVIEWER_CHECKLIST.md); where a gate item of section 5 names an independent APPROVED, this is what it means. The first review of a slice gate is a full review; its later rounds follow REV-39 and REV-40. The findings of a rejected gate review are fixed in a gate-fix task with its own entry in [TASKS.md](../TASKS.md). |
 
 ### 6.3 How evidence is recorded in PROGRESS.md
+
+For S1-T20 the lead records the exact commit, environment versions, seed or none, manifest, shard reports, raw command exits and hosted run link. Run the unpartitioned `--report` campaign at that same commit and compare it with the merged report using `scripts/mutation_pilot.py compare LOCAL HOSTED`. Compare exact mutant identities, statuses and all five counts; explain each differing mutant separately and preserve its original outcome. Missing or failed shards never pass. Record hosted elapsed time, local process-tree user plus system CPU time, orchestration and diagnostic CPU separately, and qualification baseline cost separately. Saved local CPU is baseline CPU minus local orchestration and diagnostic CPU; no savings are claimed before measurement. Random failures remain open under AGENTS.md rule 39. The builder return is not hosted-run evidence.
 
 | ID | Requirement |
 |---|---|

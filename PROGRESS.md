@@ -28902,6 +28902,247 @@ Seed:      none
 Notes:     The work commit has a Conventional Commit subject.
 ```
 
+### S1-T20 — The hosted mutation pilot: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/75 )
+
+- What it is and why it exists: a runner-tooling task added to slice S1 by a re-plan of 2026-11-16, as S1-T19 was. It adds one manually dispatched workflow, `.github/workflows/mutation-pilot.yml`, that runs the mutation campaign of one named module in four deterministic hosted shards, and the script `scripts/mutation_pilot.py`, which validates the dispatch input, regenerates the mutant universe, partitions it by exact mutant name, transports each shard's evidence, merges the four parts against the manifest and judges survivors against `scripts/mutation_explained.toml`, and compares a hosted report with an unpartitioned local report of the same commit. The workflow is dispatch only, holds a read-only token, uses only action pins the three required workflows already use, reads no secret and is not a required check. The local command `scripts/mutation.py` keeps its command and output; it gains only the regenerated-universe identity check that the merge needs.
+- Personas and makers (rule 34). Builder: senior continuous-integration and test-infrastructure engineer (Platform), OpenAI GPT-6 through Codex, for the build and both fix passes. Lens A: independent test-infrastructure and mutation-testing correctness reviewer, Moonshot Kimi K3.1 Pro through Droid. Lens B: independent continuous-integration security reviewer (GitHub Actions supply chain, token permissions, injection through workflow inputs), Google Gemini 3.1 Pro through Droid. Lead: Anthropic Claude Opus 5.5 (plan ruling, verification, commits of the builder's changes, records).
+- Skills (rules 34 and 43). Builder: task-standards, project-orientation, github-flow, sharp-edges, muhasabah-gate; the brief carried the rules of test-driven development, security review and verification before completion where the tool lacked them. Lens A: strict-reviewer, mutation-testing, spec-to-code-compliance, sharp-edges, muhasabah-gate, with the plain rule of code-review. Lens B: strict-reviewer, security-review, sharp-edges, differential-review, muhasabah-gate.
+- The build (1281 s) returned with one scripts test failing: the closed workflow guard `scripts/tests/ci_workflow_rules.py` refused the new file ("workflow-files: unexpected workflow files: mutation-pilot.yml"). The builder did not touch the guard. The lead ruled that the owner-adopted shape of the pilot (one added workflow, dispatch only, read-only token, not a required check) is carried by a SEPARATE closed pilot contract in that guard, with its own SHA-256 pin of the one file and its own rule `pilot-workflow` that refuses by name any other trigger, write permission, secret reference, unpinned action or extra file; the three required workflows' names, pins, required checks and forbidden tokens stay unchanged in meaning. Fix pass 1 (516 s) built that contract with its plants; the lead's runs at its commit: 875 scripts tests OK, ruff, format, mypy and the documentation check exit 0, AGENTS.md and CLAUDE.md byte-identical.
+- Review. Lens B APPROVED its items S1 to S4 with no finding; its note that a same-commit edit of a workflow and its pin passes the guard is the guard's stated design (the pin change is itself the reviewed diff) and is recorded, not a finding. Lens A REJECTED with four findings; the lead tested each by deleting the named guard and running its tests: three were confirmed (the incomplete-campaign refusal's plant reached another refusal, the comparison-manifest refusal had no plant, the regenerated-universe check in `scripts/mutation.py` had no plant) and one was not adopted (survivors are judged in the merge command and in the unchanged local campaign, where the plan puts them; the comparison is the parity rule of exact identities, counts and statuses). Fix pass 2 (541 s) added the three plants in the two test files only, each seen red against its deleted guard; the lead deleted each guard in turn at the fix commit and saw its test fail, restored it, and found the production diff empty. Both lenses then confirmed the fix head: lens A APPROVED C1 to C4, lens B APPROVED C1 to C5, no findings.
+- Mutation testing: not applicable. The task's code is under `scripts/`, which the runner of rule 44 does not admit (it takes modules of `core/src`, `custodian/src`, `product/src` and the four typed-decision modules), as for S1-T19; the guards are proved by the planted violations above.
+- Commits. Built and reviewed on main `537aa60`: `178d723` (the build with fix pass 1, a patch-id-equal replay of `f378974` from main `c45f338`) and `650b1e3` (fix pass 2). Replayed on main `16ca234407b46fb5e2cdd6ad803b18ad6f7e690d` in the same order with equal patch identities as the two work commits ending at `5c06084f32fb5b22fd06dca0ad14bfa5e400f788`; main moved only in files the task does not touch (a test fixture of the custodian, its test and OPEN_ITEMS.md).
+- Not yet done, by design: the synthetic dispatch, the real hosted campaign, its comparison with a local run and the recorded timings need the workflow on the base branch. The lead dispatches it after the merge, synthetic proof first, and records the results in a later records change (OI-261); those three acceptance criteria stay open until then.
+
+#### Evidence for the work commit `5c06084f32fb5b22fd06dca0ad14bfa5e400f788`
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_mutation_pilot.py' -v
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    28 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The tests of the pilot script at the work commit, run alone, on invented fixtures: exact-name discovery, regeneration and partition identity, dispatch-input validation, transport, the merge against the manifest with survivor judging, the comparison, and the planted violations of every refusal (rule 37), including the three plants of fix pass 2 (incomplete campaign, comparison manifest, foreign universe). None failed or skipped.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   uv run --locked python -m unittest scripts.tests.mutation_pilot_runner -v
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    7 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The pinned-mutmut fixtures of the pilot (they need the group `mutation`): real discovery on a small invented package, a full four-way partition whose union is the unpartitioned universe, and the legacy command and output of `scripts/mutation.py` unchanged. None failed or skipped.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   uv run --locked python -m unittest scripts.tests.mutation_runner -v
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The tests of the existing mutation runner on its invented fixture, unchanged in meaning: the task adds only the regenerated-universe identity check to `scripts/mutation.py`, and the legacy command and output are kept. None failed or skipped.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    876 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole guard discovery of scripts/tests at the work commit, none failed or skipped. It includes the closed workflow guard of `scripts/tests/ci_workflow_rules.py` with its separate pilot contract (one file, its SHA-256 pin, dispatch-only trigger, read-only token, no secret, pinned actions) and the unchanged contract of the three required workflows, each with its planted violations.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The lint at the work commit; the task's code and tests hold no suppression comment and no skip.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "447 files already formatted"
+Seed:      none
+Notes:     The format check at the work commit; it changes no file.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 301 source files"
+Seed:      none
+Notes:     The type check at the work commit, including `scripts/mutation_pilot.py` and the changed `scripts/mutation.py`.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 693 text files, 96 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check at the work commit: rule 44 of AGENTS.md and CLAUDE.md names the pilot's commands, document 12 sections 4 and 6.3 and document 13 section 4.5 describe the pilot, and this task's section of TASKS.md.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check at the work commit: the task adds one workflow file, one script and two test files and no folder.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The lock file agrees with the project files at the work commit; the task changes no `pyproject.toml` and no lock file.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two rules files are byte-identical at the work commit; the task changes both in rule 44 in the same commit.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: range HEAD, 75 commits, at least 75 to list, RESULT: PASSED"
+Seed:      none
+Notes:     The pinned secret scanner over the whole history of the branch at the work commit, judged by the script itself. The workflow reads no secret.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','16ca234407b46fb5e2cdd6ad803b18ad6f7e690d...5c06084f32fb5b22fd06dca0ad14bfa5e400f788'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:.github/workflows/mutation-pilot.yml A:scripts/mutation_pilot.py A:scripts/tests/mutation_pilot_runner.py A:scripts/tests/test_mutation_pilot.py M:AGENTS.md M:CLAUDE.md M:TASKS.md M:docs/12_TESTING_AND_QUALITY.md M:docs/13_DEPLOYMENT_AND_OPERATIONS.md M:scripts/mutation.py M:scripts/tests/ci_workflow_rules.py M:scripts/tests/test_ci_workflows.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; output "12 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The whole change of the task against main: 12 files. Workflow: `.github/workflows/mutation-pilot.yml` (dispatch only, read-only token, not a required check). Code: `scripts/mutation_pilot.py` and the regenerated-universe check in `scripts/mutation.py`. Tests: `scripts/tests/test_mutation_pilot.py`, `scripts/tests/mutation_pilot_runner.py`, and the separate pilot contract in `scripts/tests/ci_workflow_rules.py` with its tests in `scripts/tests/test_ci_workflows.py`. Documents: rule 44 of AGENTS.md and CLAUDE.md, document 12 sections 4 and 6.3, document 13 section 4.5, and this task's section of TASKS.md. Nothing else.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   ./eii test --seed 2026111675
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    5285 passed, 0 failed, 0 skipped
+Seed:      2026111675
+Notes:     The whole test command on the build machine with a fresh seed, at the work commit. It does not dispatch the workflow: the synthetic and real hosted dispatches follow after the merge (OI-261).
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    5c06084f32fb5b22fd06dca0ad14bfa5e400f788
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','16ca234407b46fb5e2cdd6ad803b18ad6f7e690d..5c06084f32fb5b22fd06dca0ad14bfa5e400f788'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two work commits of the task (the build with fix pass 1, and fix pass 2) each have a Conventional Commit subject.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    e9eb1ed44d4dbed8a8f3d98b729d357535b52922
+Command:   workflow_dispatch of .github/workflows/mutation-pilot.yml on main, inputs module=custodian/src/eii_custodian/publicdata/places_fsq/policy.py, ref=e9eb1ed44d4dbed8a8f3d98b729d357535b52922, synthetic=true
+Exit code: 0 (run conclusion success)
+Date:      2026-11-16
+Run by:    lead (hosted), https://github.com/albarami/economic-investment-intelligence/actions/runs/43940084757
+Counts:    jobs discovery, shards 0 to 3 and merge each success; all four shard outputs arrived intact and merged
+Seed:      none
+Notes:     The synthetic dispatch after the merge of pull request 75 (OI-261): the invented transport proof. Wall time 90 seconds, from 19:30:45Z to 19:32:15Z; each shard 15 to 28 seconds.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    e9eb1ed44d4dbed8a8f3d98b729d357535b52922
+Command:   workflow_dispatch of .github/workflows/mutation-pilot.yml on main, inputs module=custodian/src/eii_custodian/publicdata/places_fsq/policy.py, ref=e9eb1ed44d4dbed8a8f3d98b729d357535b52922, synthetic=false
+Exit code: 0 (run conclusion success)
+Date:      2026-11-16
+Run by:    lead (hosted), https://github.com/albarami/economic-investment-intelligence/actions/runs/43940437765
+Counts:    killed 304, survived 3, timeout 0, not_covered 0, infrastructure_failure 0 (merged.json of the artifact mutation-merged)
+Seed:      none
+Notes:     The real hosted campaign. Hosted elapsed time 21 minutes 31 seconds, from 19:32:45Z to 19:54:16Z: discovery 4 minutes 41 seconds, shards 0 and 1 then shards 2 and 3, two at a time, about 8 minutes each, merge 15 seconds.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    e9eb1ed44d4dbed8a8f3d98b729d357535b52922
+Command:   uv run --locked python scripts/mutation.py --report pilot.local.report.json custodian/src/eii_custodian/publicdata/places_fsq/policy.py
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    killed 304, survived 3, timeout 0, not_covered 0, infrastructure_failure 0
+Seed:      none
+Notes:     The unpartitioned local run at the same commit, after uv sync with the groups engine and mutation. Elapsed 517.41 seconds; processor time user 479.75 seconds and system 43.20 seconds, so a hosted campaign of this module saves about 523 processor seconds of the build machine while taking longer in elapsed time. A first attempt with an absolute report path was refused by the runner with unsafe-evidence-path (relative evidence paths only); the run above used a relative path.
+```
+
+```text
+### S1-T20 — The hosted mutation pilot
+Commit:    e9eb1ed44d4dbed8a8f3d98b729d357535b52922
+Command:   uv run --locked python scripts/mutation_pilot.py compare pilot.local.report.json pilot.hosted.merged.json
+Exit code: 0
+Date:      2026-11-16
+Run by:    lead (local)
+Counts:    {"differences":[]}
+Seed:      none
+Notes:     The local report against merged.json downloaded from the real hosted run above: no differing mutant, so none needs an explanation. OI-261 closes with this row and the three above.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

@@ -1,0 +1,221 @@
+name: mutation-pilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      module:
+        description: Reviewed pilot module
+        required: true
+        type: choice
+        options:
+          - custodian/src/eii_custodian/publicdata/places_fsq/policy.py
+      ref:
+        description: Full reviewed commit reachable from main
+        required: true
+        type: string
+      synthetic:
+        description: Prove matrix output transport with invented results
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mutation-pilot
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  discovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    outputs:
+      manifest: ${{ steps.export.outputs.manifest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate dispatch before selected code
+        env:
+          PILOT_MODULE: ${{ inputs.module }}
+          PILOT_REF: ${{ inputs.ref }}
+          WORKFLOW_REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          python3 scripts/mutation_pilot.py validate --module "$PILOT_MODULE" --ref "$PILOT_REF" --workflow-ref "$WORKFLOW_REF"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.11.31"
+          enable-cache: "false"
+      - name: Install Python from .python-version
+        run: |
+          set -euo pipefail
+          uv python install
+      - name: Sync locked tools
+        run: |
+          set -euo pipefail
+          uv sync --managed-python --all-packages --locked --group engine --group mutation
+      - name: Discover complete universe
+        env:
+          PILOT_MODULE: ${{ inputs.module }}
+          SYNTHETIC: ${{ inputs.synthetic }}
+        run: |
+          set -euo pipefail
+          if [[ "$SYNTHETIC" == "true" ]]; then
+            uv run --locked python scripts/mutation_pilot.py synthetic
+          else
+            uv run --locked python scripts/mutation.py "$PILOT_MODULE" --list-mutants manifest.json
+          fi
+      - id: export
+        run: |
+          set -euo pipefail
+          uv run --locked python scripts/mutation_pilot.py transport manifest.json --name manifest
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: mutation-manifest
+          path: manifest.json
+          retention-days: 7
+          if-no-files-found: error
+
+  shards:
+    needs: discovery
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        index: [0, 1, 2, 3]
+    outputs:
+      shard_0: ${{ steps.export.outputs.shard_0 }}
+      shard_1: ${{ steps.export.outputs.shard_1 }}
+      shard_2: ${{ steps.export.outputs.shard_2 }}
+      shard_3: ${{ steps.export.outputs.shard_3 }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate dispatch before selected code
+        env:
+          PILOT_MODULE: ${{ inputs.module }}
+          PILOT_REF: ${{ inputs.ref }}
+          WORKFLOW_REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          python3 scripts/mutation_pilot.py validate --module "$PILOT_MODULE" --ref "$PILOT_REF" --workflow-ref "$WORKFLOW_REF"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.11.31"
+          enable-cache: "false"
+      - name: Install Python from .python-version
+        run: |
+          set -euo pipefail
+          uv python install
+      - name: Sync locked tools
+        run: |
+          set -euo pipefail
+          uv sync --managed-python --all-packages --locked --group engine --group mutation
+      - name: Receive manifest
+        env:
+          MANIFEST: ${{ needs.discovery.outputs.manifest }}
+        run: |
+          set -euo pipefail
+          uv run --locked python scripts/mutation_pilot.py receive
+      - name: Run assigned mutants
+        env:
+          PILOT_MODULE: ${{ inputs.module }}
+          SHARD_INDEX: ${{ matrix.index }}
+          SYNTHETIC: ${{ inputs.synthetic }}
+        run: |
+          set -euo pipefail
+          if [[ "$SYNTHETIC" == "true" ]]; then
+            uv run --locked python scripts/mutation_pilot.py synthetic --shard-index "$SHARD_INDEX"
+          else
+            uv run --locked python scripts/mutation.py "$PILOT_MODULE" --mutant-list manifest.json --shard-index "$SHARD_INDEX" --report shard.json
+          fi
+      - id: export
+        if: always()
+        env:
+          SHARD_INDEX: ${{ matrix.index }}
+        run: |
+          set -euo pipefail
+          uv run --locked python scripts/mutation_pilot.py transport shard.json --name "shard_$SHARD_INDEX"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: mutation-shard-${{ matrix.index }}
+          path: shard.json
+          retention-days: 7
+          if-no-files-found: error
+
+  merge:
+    if: always()
+    needs: [discovery, shards]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate dispatch before selected code
+        env:
+          PILOT_MODULE: ${{ inputs.module }}
+          PILOT_REF: ${{ inputs.ref }}
+          WORKFLOW_REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          python3 scripts/mutation_pilot.py validate --module "$PILOT_MODULE" --ref "$PILOT_REF" --workflow-ref "$WORKFLOW_REF"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.11.31"
+          enable-cache: "false"
+      - name: Install Python from .python-version
+        run: |
+          set -euo pipefail
+          uv python install
+      - name: Sync locked tools
+        run: |
+          set -euo pipefail
+          uv sync --managed-python --all-packages --locked --group engine --group mutation
+      - name: Merge complete evidence
+        env:
+          MANIFEST: ${{ needs.discovery.outputs.manifest }}
+          SHARD_0: ${{ needs.shards.outputs.shard_0 }}
+          SHARD_1: ${{ needs.shards.outputs.shard_1 }}
+          SHARD_2: ${{ needs.shards.outputs.shard_2 }}
+          SHARD_3: ${{ needs.shards.outputs.shard_3 }}
+          DISCOVERY_STATE: ${{ needs.discovery.result }}
+          SHARDS_STATE: ${{ needs.shards.result }}
+        run: |
+          set -euo pipefail
+          uv run --locked python scripts/mutation_pilot.py merge
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: mutation-merged
+          path: merged.json
+          retention-days: 7
+          if-no-files-found: error
