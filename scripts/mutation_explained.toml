@@ -2447,3 +2447,208 @@ reason = "float() reads the names inf and -inf without regard to letter case, so
 module = "product/src/eii_product/assistant/catalogue/brief.py"
 mutation = "--- src/eii_product/assistant/catalogue/brief.py\n+++ src/eii_product/assistant/catalogue/brief.py\n@@ -2,5 +2,5 @@\n     if type(value) not in {int, float}:\n         return False\n     if isinstance(value, float):\n-        return value == value and value not in {float(\"inf\"), float(\"-inf\")}\n+        return value == value and value not in {float(\"inf\"), float(\"-INF\")}\n     return True"
 reason = "float() reads the names inf and -inf without regard to letter case, so float(\"INF\") and float(\"-INF\") equal float(\"inf\") and float(\"-inf\"); the set holds the same two members and the membership test is the same for every value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/frame/municipality_output.py"
+mutation = "--- src/eii_custodian/publicdata/frame/municipality_output.py\n+++ src/eii_custodian/publicdata/frame/municipality_output.py\n@@ -14,6 +14,6 @@\n         ],\n     }\n     (cache / MUNICIPALITY_OUTPUT).write_text(\n-        json.dumps(payload, ensure_ascii=False, sort_keys=True) + \"\\n\",\n+        json.dumps(payload, ensure_ascii=None, sort_keys=True) + \"\\n\",\n         encoding=\"utf-8\",\n     )"
+reason = "ensure_ascii=None and ensure_ascii=False are both false; the JSON encoder uses the same non-ASCII escaping branch for all inputs."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/frame/municipality_output.py"
+mutation = "--- src/eii_custodian/publicdata/frame/municipality_output.py\n+++ src/eii_custodian/publicdata/frame/municipality_output.py\n@@ -15,5 +15,5 @@\n     }\n     (cache / MUNICIPALITY_OUTPUT).write_text(\n         json.dumps(payload, ensure_ascii=False, sort_keys=True) + \"\\n\",\n-        encoding=\"utf-8\",\n+        encoding=\"UTF-8\",\n     )"
+reason = "The codec registry normalizes UTF-8 and utf-8 to the same codec for every input; locale changes do not alter explicit codec resolution."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/frame.py"
+mutation = "--- src/eii_custodian/publicdata/series/frame.py\n+++ src/eii_custodian/publicdata/series/frame.py\n@@ -4,7 +4,7 @@\n     if not path.is_file():\n         raise MunicipalityFrameRefused(FRAME_ABSENT)\n     try:\n-        payload = json.loads(path.read_text(encoding=\"utf-8\"))\n+        payload = json.loads(path.read_text(encoding=\"UTF-8\"))\n     except (OSError, ValueError) as exc:\n         raise MunicipalityFrameRefused(FRAME_ABSENT) from exc\n     rows = payload.get(\"municipalities\") if isinstance(payload, dict) else None"
+reason = "The codec registry normalizes UTF-8 and utf-8 to the same codec for every input; locale changes do not alter explicit codec resolution."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -1,5 +1,5 @@\n def _write(path: Path, payload: object) -> None:\n     path.parent.mkdir(parents=True, exist_ok=True)\n     path.write_text(\n-        json.dumps(payload, ensure_ascii=False, sort_keys=True, default=str) + \"\\n\"\n+        json.dumps(payload, ensure_ascii=None, sort_keys=True, default=str) + \"\\n\"\n     )"
+reason = "The JSON encoder selects ASCII escaping by truthiness of ensure_ascii. False and None are both false, including for non-ASCII input; neither changes encoding, keys or values."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -5,7 +5,7 @@\n     years: dict[str, dict[str, Group]] = {}\n     for row in rows:\n         year = str(row[\"year\"])\n-        key = json.dumps([row[\"gender\"], row[dimension]], ensure_ascii=False)\n+        key = json.dumps([row[\"gender\"], row[dimension]], ensure_ascii=None)\n         groups = years.setdefault(year, {})\n         count = Decimal(str(row[\"paid_employment_workers\"]))\n         if count == ZERO:"
+reason = "The JSON encoder selects ASCII escaping by truthiness of ensure_ascii. False and None are both false, including for non-ASCII input; neither changes encoding, keys or values."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -26,7 +26,7 @@\n         elif source in R2_SOURCES:\n             dimension = \"occupation\" if source == \"wage_occ\" else \"economic_activity\"\n             key = \"&\".join(\n-                f\"{name}={quote(str(row[name]), safe='')}\"\n+                f\"{name}={quote(str(row[name]), safe='XXXX')}\"\n                 for name in sorted((\"gender\", dimension))\n             )\n             for field, indicator, unit in ("
+reason = "urllib.parse.quote always leaves ASCII letters unescaped. Adding only X to safe adds no character to the always-safe alphabet. Slashes remain escaped in both versions."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -47,7 +47,7 @@\n             for field, (_, target) in FIELD_MAP[source].items():\n                 if not target.startswith(\"value:\"):\n                     continue\n-                indicator = target.split(\":\", 1)[1]\n+                indicator = target.split(\":\", )[1]\n                 dimensions = [\n                     name\n                     for name in ("
+reason = "FIELD_MAP is the closed mapping in series/parse.py. Every value: target used here has exactly one colon. Splitting from either end, with limit one, two or no limit, returns the same second element. Input row text is not used as the mapping target."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -47,7 +47,7 @@\n             for field, (_, target) in FIELD_MAP[source].items():\n                 if not target.startswith(\"value:\"):\n                     continue\n-                indicator = target.split(\":\", 1)[1]\n+                indicator = target.rsplit(\":\", 1)[1]\n                 dimensions = [\n                     name\n                     for name in ("
+reason = "FIELD_MAP is the closed mapping in series/parse.py. Every value: target used here has exactly one colon. Splitting from either end, with limit one, two or no limit, returns the same second element. Input row text is not used as the mapping target."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -47,7 +47,7 @@\n             for field, (_, target) in FIELD_MAP[source].items():\n                 if not target.startswith(\"value:\"):\n                     continue\n-                indicator = target.split(\":\", 1)[1]\n+                indicator = target.split(\":\", 2)[1]\n                 dimensions = [\n                     name\n                     for name in ("
+reason = "FIELD_MAP is the closed mapping in series/parse.py. Every value: target used here has exactly one colon. Splitting from either end, with limit one, two or no limit, returns the same second element. Input row text is not used as the mapping target."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -58,7 +58,7 @@\n                     if name in row\n                 ]\n                 if dimensions:\n-                    indicator += \":\" + quote(str(row[dimensions[0]]), safe=\"\")\n+                    indicator += \":\" + quote(str(row[dimensions[0]]), safe=\"XXXX\")\n                 unit = \"QAR_thousand\" if \"1_000_qr\" in field else \"QAR\"\n                 if field.startswith(\"percentage_\"):\n                     unit = \"percent\""
+reason = "urllib.parse.quote always leaves ASCII letters unescaped. Adding only X to safe adds no character to the always-safe alphabet. Slashes remain escaped in both versions."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -13,8 +13,7 @@\n         before, after = values[(\"69\", \"2021\")], values[(\"69\", \"2025\")]\n         totals = {\n             year: sum(\n-                (value for (_, period), value in values.items() if period == year), ZERO\n-            )\n+                (value for (_, period), value in values.items() if period == year), )\n             for year in (\"2021\", \"2025\")\n         }\n         checks[\"PUB-62\"] = {"
+reason = "Every summand is constructed as Decimal (including cancellations). sum without a start uses integer 0; integer 0 + Decimal uses Decimal addition with the exact zero, just as Decimal(0) + Decimal, under the same decimal context. A nonempty sum therefore has identical operations, rounding, flags and value. Utility and size sums are nonempty on this path; an empty customs sum is divided by Decimal(10**9) before rounding, producing Decimal zero in both cases. The three selected-month defaults also are Decimal ZERO. No float summand can reach these sums."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -61,8 +61,7 @@\n                         Decimal(str(r[\"number_of_establishments\"]))\n                         for r in chosen[\"sec_hr_size\"]\n                     ),\n-                    ZERO,\n-                )\n+                    )\n             ),\n             \"employees\": str(\n                 sum("
+reason = "Every summand is constructed as Decimal (including cancellations). sum without a start uses integer 0; integer 0 + Decimal uses Decimal addition with the exact zero, just as Decimal(0) + Decimal, under the same decimal context. A nonempty sum therefore has identical operations, rounding, flags and value. Utility and size sums are nonempty on this path; an empty customs sum is divided by Decimal(10**9) before rounding, producing Decimal zero in both cases. The three selected-month defaults also are Decimal ZERO. No float summand can reach these sums."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -70,8 +70,7 @@\n                         Decimal(str(r[\"number_of_employees\"]))\n                         for r in chosen[\"sec_hr_size\"]\n                     ),\n-                    ZERO,\n-                )\n+                    )\n             ),\n             \"compensation\": str(\n                 indicator[\"compensation_of_employees_value_in_1_000_qr\"]"
+reason = "Every summand is constructed as Decimal (including cancellations). sum without a start uses integer 0; integer 0 + Decimal uses Decimal addition with the exact zero, just as Decimal(0) + Decimal, under the same decimal context. A nonempty sum therefore has identical operations, rounding, flags and value. Utility and size sums are nonempty on this path; an empty customs sum is divided by Decimal(10**9) before rounding, producing Decimal zero in both cases. The three selected-month defaults also are Decimal ZERO. No float summand can reach these sums."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -90,7 +90,7 @@\n         }\n     if \"cus_imp_2025\" in data:\n         rows = [r for r in data[\"cus_imp_2025\"] if r[\"year\"] == \"2025\"]\n-        total = sum((Decimal(str(r[\"value_in_qatari_riyals\"])) for r in rows), ZERO)\n+        total = sum((Decimal(str(r[\"value_in_qatari_riyals\"])) for r in rows), )\n         checks[\"PUB-66\"] = {\n             \"rows_2025\": str(len(rows)),\n             \"value_bn_2dp\": rounded(total / Decimal(10**9), 2),"
+reason = "Every summand is constructed as Decimal (including cancellations). sum without a start uses integer 0; integer 0 + Decimal uses Decimal addition with the exact zero, just as Decimal(0) + Decimal, under the same decimal context. A nonempty sum therefore has identical operations, rounding, flags and value. Utility and size sums are nonempty on this path; an empty customs sum is divided by Decimal(10**9) before rounding, producing Decimal zero in both cases. The three selected-month defaults also are Decimal ZERO. No float summand can reach these sums."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -128,7 +128,7 @@\n         active = data[\"lic_active\"]\n         checks[\"PUB-67\"] = {\n             \"rows\": str(len(active)),\n-            \"sum_count\": str(sum((int(str(r[\"dd_lrkhs_lnsht\"])) for r in active), 0)),\n+            \"sum_count\": str(sum((int(str(r[\"dd_lrkhs_lnsht\"])) for r in active), )),\n             \"distinct_codes\": str(len({r[\"rmz_lnsht_ltjry\"] for r in active})),\n             \"national_5610101\": str(\n                 sum("
+reason = "The omitted explicit integer start is 0, exactly the built-in sum default. This is identical for empty and nonempty integer generators."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -137,8 +137,7 @@\n                         for r in active\n                         if r[\"rmz_lnsht_ltjry\"] == \"5610101\"\n                     ),\n-                    0,\n-                )\n+                    )\n             ),\n         }\n     if \"lic_issued\" in data:"
+reason = "The omitted explicit integer start is 0, exactly the built-in sum default. This is identical for empty and nonempty integer generators."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -145,7 +145,7 @@\n         issued = data[\"lic_issued\"]\n         converted = contract_rows(\"lic_issued\", issued)\n         checks[\"PUB-69\"] = {\n-            \"sum_count\": str(sum((int(str(r[\"dd_lrkhs_lsdr\"])) for r in issued), 0)),\n+            \"sum_count\": str(sum((int(str(r[\"dd_lrkhs_lsdr\"])) for r in issued), )),\n             \"distinct_codes\": str(len({r[\"rmz_lnsht_ltjry\"] for r in issued})),\n             \"restaurant_source_rows\": str(\n                 sum(r[\"rmz_lnsht_ltjry\"] == \"5610101\" for r in issued)"
+reason = "The omitted explicit integer start is 0, exactly the built-in sum default. This is identical for empty and nonempty integer generators."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -193,8 +193,7 @@\n                 \"combined_share_0dp\": rounded(\n                     ratio(\n                         sum(\n-                            (cancellations.get(m, ZERO) for m in months.values()), ZERO\n-                        ),\n+                            (cancellations.get(m, ZERO) for m in months.values()), ),\n                         dated,\n                     )\n                     * 100,"
+reason = "Every summand is constructed as Decimal (including cancellations). sum without a start uses integer 0; integer 0 + Decimal uses Decimal addition with the exact zero, just as Decimal(0) + Decimal, under the same decimal context. A nonempty sum therefore has identical operations, rounding, flags and value. Utility and size sums are nonempty on this path; an empty customs sum is divided by Decimal(10**9) before rounding, producing Decimal zero in both cases. The three selected-month defaults also are Decimal ZERO. No float summand can reach these sums."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -27,7 +27,7 @@\n     table_sources: dict[str, list[str]] = {}\n     row_sources: dict[str, list[str]] = {}\n     coverage: dict[str, object] = {}\n-    basket_checked = False\n+    basket_checked = None\n     countries = country_crosswalk()\n     for source, digest in selected.items():\n         rows, receipts[source] = selected_source(cache, by_source[source], digest)"
+reason = "basket_checked is read only when PUB-65 exists. That check exists only for cus_imp_2025 data. Processing that selected source assigns basket_checked from basket_exclusion_review before checks are computed; any refusal exits the function. Without that source the initial value is never read."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -27,7 +27,7 @@\n     table_sources: dict[str, list[str]] = {}\n     row_sources: dict[str, list[str]] = {}\n     coverage: dict[str, object] = {}\n-    basket_checked = False\n+    basket_checked = True\n     countries = country_crosswalk()\n     for source, digest in selected.items():\n         rows, receipts[source] = selected_source(cache, by_source[source], digest)"
+reason = "basket_checked is read only when PUB-65 exists. That check exists only for cus_imp_2025 data. Processing that selected source assigns basket_checked from basket_exclusion_review before checks are computed; any refusal exits the function. Without that source the initial value is never read."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -32,7 +32,7 @@\n     for source, digest in selected.items():\n         rows, receipts[source] = selected_source(cache, by_source[source], digest)\n         data[source] = confirmed_rows(by_source[source], rows)\n-        gaps = mapping_gaps(source)\n+        gaps = mapping_gaps(None)\n         if gaps:\n             blocked[source] = gaps\n         if source == \"cus_imp_2019\":"
+reason = "series/parse.py mapping_gaps ignores its argument and unconditionally returns (). Passing None cannot alter a return or exception for any source."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -54,7 +54,7 @@\n             coverage[source + \".country_unmatched\"] = sorted(\n                 {\n                     str(r[\"country_of_origin\"])\n-                    for r, c in zip(rows, converted, strict=True)\n+                    for r, c in zip(rows, converted, strict=None)\n                     if r[\"country_of_origin\"] is not None\n                     and str(r[\"country_of_origin\"]) not in countries\n                 }"
+reason = "For the customs and licence sources reaching these zips, contract_rows appends exactly one converted row for every input row, with no filtering. A refusal exits before zip. selected_source supplies a concrete list and confirmed_rows validates it without changing the source list. Both lists have equal lengths for every reaching input, so strictness can never affect iteration or raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -54,7 +54,7 @@\n             coverage[source + \".country_unmatched\"] = sorted(\n                 {\n                     str(r[\"country_of_origin\"])\n-                    for r, c in zip(rows, converted, strict=True)\n+                    for r, c in zip(rows, converted, )\n                     if r[\"country_of_origin\"] is not None\n                     and str(r[\"country_of_origin\"]) not in countries\n                 }"
+reason = "For the customs and licence sources reaching these zips, contract_rows appends exactly one converted row for every input row, with no filtering. A refusal exits before zip. selected_source supplies a concrete list and confirmed_rows validates it without changing the source list. Both lists have equal lengths for every reaching input, so strictness can never affect iteration or raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -54,7 +54,7 @@\n             coverage[source + \".country_unmatched\"] = sorted(\n                 {\n                     str(r[\"country_of_origin\"])\n-                    for r, c in zip(rows, converted, strict=True)\n+                    for r, c in zip(rows, converted, strict=False)\n                     if r[\"country_of_origin\"] is not None\n                     and str(r[\"country_of_origin\"]) not in countries\n                 }"
+reason = "For the customs and licence sources reaching these zips, contract_rows appends exactly one converted row for every input row, with no filtering. A refusal exits before zip. selected_source supplies a concrete list and confirmed_rows validates it without changing the source list. Both lists have equal lengths for every reaching input, so strictness can never affect iteration or raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -77,7 +77,7 @@\n             coverage[source + \".municipality_exact_match\"] = sorted(\n                 {\n                     str(r[\"lbldy\"])\n-                    for r, c in zip(rows, converted, strict=True)\n+                    for r, c in zip(rows, converted, strict=None)\n                     if c[\"municipality_code\"] is None\n                 }\n             )"
+reason = "For the customs and licence sources reaching these zips, contract_rows appends exactly one converted row for every input row, with no filtering. A refusal exits before zip. selected_source supplies a concrete list and confirmed_rows validates it without changing the source list. Both lists have equal lengths for every reaching input, so strictness can never affect iteration or raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -77,7 +77,7 @@\n             coverage[source + \".municipality_exact_match\"] = sorted(\n                 {\n                     str(r[\"lbldy\"])\n-                    for r, c in zip(rows, converted, strict=True)\n+                    for r, c in zip(rows, converted, )\n                     if c[\"municipality_code\"] is None\n                 }\n             )"
+reason = "For the customs and licence sources reaching these zips, contract_rows appends exactly one converted row for every input row, with no filtering. A refusal exits before zip. selected_source supplies a concrete list and confirmed_rows validates it without changing the source list. Both lists have equal lengths for every reaching input, so strictness can never affect iteration or raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -77,7 +77,7 @@\n             coverage[source + \".municipality_exact_match\"] = sorted(\n                 {\n                     str(r[\"lbldy\"])\n-                    for r, c in zip(rows, converted, strict=True)\n+                    for r, c in zip(rows, converted, strict=False)\n                     if c[\"municipality_code\"] is None\n                 }\n             )"
+reason = "For the customs and licence sources reaching these zips, contract_rows appends exactly one converted row for every input row, with no filtering. A refusal exits before zip. selected_source supplies a concrete list and confirmed_rows validates it without changing the source list. Both lists have equal lengths for every reaching input, so strictness can never affect iteration or raise."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -109,7 +109,7 @@\n         # The reference row has several published measures and no production\n         # field. Compare the actual indicators, never manufacture that measure.\n         indicator_measures = [\n-            target.split(\":\", 1)[1]\n+            target.split(\":\", )[1]\n             for _, target in FIELD_MAP[\"sec_hr_ind\"].values()\n             if target.startswith(\"value:\")\n         ]"
+reason = "FIELD_MAP is the closed mapping in series/parse.py. Every value: target used here has exactly one colon. Splitting from either end, with limit one, two or no limit, returns the same second element. Input row text is not used as the mapping target."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -109,7 +109,7 @@\n         # The reference row has several published measures and no production\n         # field. Compare the actual indicators, never manufacture that measure.\n         indicator_measures = [\n-            target.split(\":\", 1)[1]\n+            target.rsplit(\":\", 1)[1]\n             for _, target in FIELD_MAP[\"sec_hr_ind\"].values()\n             if target.startswith(\"value:\")\n         ]"
+reason = "FIELD_MAP is the closed mapping in series/parse.py. Every value: target used here has exactly one colon. Splitting from either end, with limit one, two or no limit, returns the same second element. Input row text is not used as the mapping target."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -109,7 +109,7 @@\n         # The reference row has several published measures and no production\n         # field. Compare the actual indicators, never manufacture that measure.\n         indicator_measures = [\n-            target.split(\":\", 1)[1]\n+            target.split(\":\", 2)[1]\n             for _, target in FIELD_MAP[\"sec_hr_ind\"].values()\n             if target.startswith(\"value:\")\n         ]"
+reason = "FIELD_MAP is the closed mapping in series/parse.py. Every value: target used here has exactly one colon. Splitting from either end, with limit one, two or no limit, returns the same second element. Input row text is not used as the mapping target."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -120,7 +120,7 @@\n                 \"year\": row[\"year\"],\n                 \"activity_scope\": row[\"main_economic_activity\"],\n                 \"value\": value,\n-                \"measure\": FIELD_MAP[source][field][1].split(\":\", 1)[-1],\n+                \"measure\": FIELD_MAP[source][field][1].split(\":\", )[-1],\n                 \"establishments\": row.get(\n                     \"number_of_establishments\", \"not on this row\"\n                 ),"
+reason = "Every FIELD_MAP target has zero or one colon. Taking the final component after split/rsplit with limit one, two or no limit yields the same string in both cases. The +1 mutations are NOT equivalent and have tests."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -120,7 +120,7 @@\n                 \"year\": row[\"year\"],\n                 \"activity_scope\": row[\"main_economic_activity\"],\n                 \"value\": value,\n-                \"measure\": FIELD_MAP[source][field][1].split(\":\", 1)[-1],\n+                \"measure\": FIELD_MAP[source][field][1].rsplit(\":\", 1)[-1],\n                 \"establishments\": row.get(\n                     \"number_of_establishments\", \"not on this row\"\n                 ),"
+reason = "Every FIELD_MAP target has zero or one colon. Taking the final component after split/rsplit with limit one, two or no limit yields the same string in both cases. The +1 mutations are NOT equivalent and have tests."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -120,7 +120,7 @@\n                 \"year\": row[\"year\"],\n                 \"activity_scope\": row[\"main_economic_activity\"],\n                 \"value\": value,\n-                \"measure\": FIELD_MAP[source][field][1].split(\":\", 1)[-1],\n+                \"measure\": FIELD_MAP[source][field][1].split(\":\", 2)[-1],\n                 \"establishments\": row.get(\n                     \"number_of_establishments\", \"not on this row\"\n                 ),"
+reason = "Every FIELD_MAP target has zero or one colon. Taking the final component after split/rsplit with limit one, two or no limit yields the same string in both cases. The +1 mutations are NOT equivalent and have tests."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -132,7 +132,7 @@\n                         ),\n                         \"measure\": (\n                             indicator_measures,\n-                            FIELD_MAP[source][field][1].split(\":\", 1)[-1],\n+                            FIELD_MAP[source][field][1].split(\":\", )[-1],\n                         ),\n                         \"year\": (reference[\"year\"], row[\"year\"]),\n                         \"establishments\": ("
+reason = "Every FIELD_MAP target has zero or one colon. Taking the final component after split/rsplit with limit one, two or no limit yields the same string in both cases. The +1 mutations are NOT equivalent and have tests."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -132,7 +132,7 @@\n                         ),\n                         \"measure\": (\n                             indicator_measures,\n-                            FIELD_MAP[source][field][1].split(\":\", 1)[-1],\n+                            FIELD_MAP[source][field][1].rsplit(\":\", 1)[-1],\n                         ),\n                         \"year\": (reference[\"year\"], row[\"year\"]),\n                         \"establishments\": ("
+reason = "Every FIELD_MAP target has zero or one colon. Taking the final component after split/rsplit with limit one, two or no limit yields the same string in both cases. The +1 mutations are NOT equivalent and have tests."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -132,7 +132,7 @@\n                         ),\n                         \"measure\": (\n                             indicator_measures,\n-                            FIELD_MAP[source][field][1].split(\":\", 1)[-1],\n+                            FIELD_MAP[source][field][1].split(\":\", 2)[-1],\n                         ),\n                         \"year\": (reference[\"year\"], row[\"year\"]),\n                         \"establishments\": ("
+reason = "Every FIELD_MAP target has zero or one colon. Taking the final component after split/rsplit with limit one, two or no limit yields the same string in both cases. The +1 mutations are NOT equivalent and have tests."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -137,7 +137,7 @@\n                         \"year\": (reference[\"year\"], row[\"year\"]),\n                         \"establishments\": (\n                             reference.get(\n-                                \"number_of_establishments\", \"not on this row\"\n+                                None, \"not on this row\"\n                             ),\n                             row.get(\"number_of_establishments\", \"not on this row\"),\n                         ),"
+reason = "reference is a sec_hr_ind row after confirmed_rows enforces exact keys equal to FIELD_MAP for that source (parse.py confirmed_rows rejects the symmetric key difference). The closed mapping contains none of number_of_establishments, XXnumber_of_establishmentsXX, NUMBER_OF_ESTABLISHMENTS or None. All four .get calls necessarily return the same default. An extra field is refused before evidence construction."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -137,7 +137,7 @@\n                         \"year\": (reference[\"year\"], row[\"year\"]),\n                         \"establishments\": (\n                             reference.get(\n-                                \"number_of_establishments\", \"not on this row\"\n+                                \"XXnumber_of_establishmentsXX\", \"not on this row\"\n                             ),\n                             row.get(\"number_of_establishments\", \"not on this row\"),\n                         ),"
+reason = "reference is a sec_hr_ind row after confirmed_rows enforces exact keys equal to FIELD_MAP for that source (parse.py confirmed_rows rejects the symmetric key difference). The closed mapping contains none of number_of_establishments, XXnumber_of_establishmentsXX, NUMBER_OF_ESTABLISHMENTS or None. All four .get calls necessarily return the same default. An extra field is refused before evidence construction."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -137,7 +137,7 @@\n                         \"year\": (reference[\"year\"], row[\"year\"]),\n                         \"establishments\": (\n                             reference.get(\n-                                \"number_of_establishments\", \"not on this row\"\n+                                \"NUMBER_OF_ESTABLISHMENTS\", \"not on this row\"\n                             ),\n                             row.get(\"number_of_establishments\", \"not on this row\"),\n                         ),"
+reason = "reference is a sec_hr_ind row after confirmed_rows enforces exact keys equal to FIELD_MAP for that source (parse.py confirmed_rows rejects the symmetric key difference). The closed mapping contains none of number_of_establishments, XXnumber_of_establishmentsXX, NUMBER_OF_ESTABLISHMENTS or None. All four .get calls necessarily return the same default. An extra field is refused before evidence construction."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -12,7 +12,7 @@\n     for entry in owned:\n         prefix = \"PASS \" + entry.key + \" sha256=\"\n         matches = [\n-            line[len(prefix) :].split(\" \", 1)[0]\n+            line[len(prefix) :].split(\" \", )[0]\n             for line in lines\n             if line.startswith(prefix)\n         ]"
+reason = "With a fixed nonempty separator \" \", the first split component is unchanged by maxsplit=1, maxsplit=2 or no bound, for every input string (including empty, leading-space and repeated-space strings). Only later components differ, and none are read."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -12,7 +12,7 @@\n     for entry in owned:\n         prefix = \"PASS \" + entry.key + \" sha256=\"\n         matches = [\n-            line[len(prefix) :].split(\" \", 1)[0]\n+            line[len(prefix) :].split(\" \", 2)[0]\n             for line in lines\n             if line.startswith(prefix)\n         ]"
+reason = "With a fixed nonempty separator \" \", the first split component is unchanged by maxsplit=1, maxsplit=2 or no bound, for every input string (including empty, leading-space and repeated-space strings). Only later components differ, and none are read."

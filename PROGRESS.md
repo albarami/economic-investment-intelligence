@@ -29143,6 +29143,1601 @@ Seed:      none
 Notes:     The local report against merged.json downloaded from the real hosted run above: no differing mutant, so none needs an explanation. OI-261 closes with this row and the three above.
 ```
 
+#### Decision 0048: review A: REJECTED
+
+Reviewed commit `da57f19`. Google Gemini 3.1 Pro through Droid; another maker than the drafter (the lead, Anthropic).
+
+```text
+VERDICT: REJECTED
+RECORD 0048
+COMMIT da57f19
+REVIEWER: Google Gemini 3.1 Pro
+SKILLS LOADED: strict-reviewer, sanad-provenance, al-muhasibi, muhasabah-gate
+
+CHECK 1: PASS
+Each ruled point is carried. The patch sets the building cap to be measured without a hardcoded number, defaults the day basis to today, removes the focus-district setting, adds "estimated heights" words with source and error, designates the commercial use case as first in order of use, adds no origin texture, and plants violations for drawing shadows on buildings without heights and for drawing shadows exceeding the cap. 
+
+CHECK 2: FAIL
+The repository still contains passages limiting shadows to one focus district. A search for "focus district" across all Markdown files found:
+- `docs/11_DESIGN_DIRECTION.md` at DES-57 still says "except the shadows of the clock inside its one focus district".
+- `docs/02_ARCHITECTURE.md` at ARC-140 still says "the shadows of one focus district".
+
+CHECK 3: PASS
+The amended passages perfectly agree with the record's Amended passages list. Every markdown link resolves correctly to its target, and `docs/README.md` correctly lists decision 0048 in its accepted-record sentence and table.
+
+CHECK 4: PASS
+In S3-T16, every new guard has a planted violation (e.g., drawing a shadow without a height, exceeding the building cap, omitting the estimated heights words). BRF-97 and DES-146 are present in the Requirements list and exist in their respective documents. Depends are unchanged. The frame-rate and cap criteria claim no measurement, cap value, or gate result as already completed.
+
+CHECK 5: PASS
+What must not change has not: the scrubber changes no figure (FE-143, DES-207); no building is extruded by a data value (DES-57, DES-204, ARC-140); DES-146 still explicitly forbids any other shadow or sun-position effect; and deck.gl's lighting effect is still explicitly read first from current documentation in S3-T16 (rule 42).
+
+CHECK 6: PASS
+Every anchor used is a valid requirement ID (such as FE-143, DES-207), heading, task ID, rule number, or decision item. No line numbers are used as anchors.
+
+FINDINGS:
+- file: docs/11_DESIGN_DIRECTION.md
+  place: DES-57
+  defect: The text still explicitly limits the clock's shadows to one focus district.
+  exact fix: Replace "inside its one focus district (DES-207, [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A2)" with "for the buildings in view wherever a height exists (DES-207, [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A2, [decision 0048](decisions/0048-the-shadow-clock-serves-every-area.md))".
+
+- file: docs/02_ARCHITECTURE.md
+  place: ARC-140
+  defect: The architecture text still limits the clock's shadows to one focus district.
+  exact fix: Replace "the shadows of one focus district" with "the shadows for the buildings in view wherever a height exists".
+
+- file: docs/decisions/0048-the-shadow-clock-serves-every-area.md
+  place: Amends row
+  defect: DES-57 and ARC-140 are missing from the list of amended items.
+  exact fix: Add "ARC-140 of document 02" and "DES-57 of document 11" to the Amends list.
+
+- file: docs/decisions/0048-the-shadow-clock-serves-every-area.md
+  place: Amended passages
+  defect: DES-57 and ARC-140 are missing from the documented changes.
+  exact fix: Add a bullet for "Document 02, ARC-140:" and a bullet for "Document 11, DES-57:" detailing the replacement of the focus-district limit with the buildings in view wherever a height exists.
+```
+
+#### Decision 0048: confirmation: APPROVED
+
+Reviewed commit `e6a3efa`. Google Gemini 3.1 Pro through Droid; another maker than the drafter (the lead, Anthropic).
+
+```text
+VERDICT: APPROVED
+RECORD 0048
+COMMIT e6a3efa
+REVIEWER: Google Gemini 3.1 Pro
+SKILLS LOADED: strict-reviewer, sanad-provenance, al-muhasibi, muhasabah-gate
+
+FINDING 1: FIXED. `docs/11_DESIGN_DIRECTION.md` at DES-57 has been updated to replace "inside its one focus district" with "on the buildings in view wherever a height exists, under its measured building cap", accurately citing decision 0048.
+FINDING 2: FIXED. `docs/02_ARCHITECTURE.md` at ARC-140 has been updated to say "the shadows of the buildings in view wherever a height exists, under a measured building cap" rather than "one focus district".
+FINDING 3: FIXED. `docs/decisions/0048-the-shadow-clock-serves-every-area.md` Amends row now lists ARC-140 of document 02 and DES-57 of document 11.
+FINDING 4: FIXED. `docs/decisions/0048-the-shadow-clock-serves-every-area.md` Amended passages section now includes bullets for Document 02, ARC-140 and Document 11, DES-57 detailing the changes.
+
+CHECK 1: PASS. Each ruled point is carried. Shadows in view wherever a height exists, measured building cap with no number set is documented, focus-district setting is withdrawn, "estimated heights" words are present. Commercial use is prioritized and no origin texture is added.
+CHECK 2: PASS. A search for "focus district" across all Markdown files shows it only remains in the text of decision 0023, which is not edited per rule 46, and in the text of decision 0048 discussing the removal. All active documentation has been scrubbed of the limitation.
+CHECK 3: PASS. The amended passages list exactly matches the changed documents. All markdown links resolve. `docs/README.md` correctly lists decision 0048.
+CHECK 4: PASS. In S3-T16, every new guard has a planted violation. BRF-97 and DES-146 exist in their documents. The criteria do not claim measurement or frame rate as done.
+CHECK 5: PASS. What must not change has not. The scrubber changes no figure. Buildings are not extruded by data values. DES-146 still forbids other shadow effects. Lighting effect is read first from current docs.
+CHECK 6: PASS. Every anchor used is a requirement ID, heading, task ID, rule number, or decision item. No line numbers are used.
+
+FINDINGS: none
+```
+
+#### Decision 0048: merge record
+
+- The head that was merged, `1d26792edb37477030555932f1d5f6ea8fbb56af`, is `db34ab8` and one ledger commit that changes `PROGRESS.md` only. `db34ab8` is the approved change (`da57f19` and `e6a3efa` on `b610b06`) moved onto main `16f5d13` after decision 0047 merged; `git diff 16f5d13 db34ab8` equals `git diff b610b06 e6a3efa` apart from blob index lines and one TASKS.md hunk's line numbers (decision 0039).
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43867617230 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43867617254 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43867617300.
+- The lead's ledger run on the head: exit 0, `./eii test --seed 2026111616`: 5252 passed, 0 failed, 0 skipped, 1091 s.
+- The verdicts are quoted in the pull request's body (Review section) and in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/70 was squash-merged on 2026-11-16 at that head; merge commit `7ac9c0b711b8dc97c1f029b5b21112d93e66b9eb` on main; head tree `612c8576a8b44daa1ff0e28a509ae01cba4d2772`, merge tree `612c8576a8b44daa1ff0e28a509ae01cba4d2772`. CI on the merge commit: workflow ci running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43871383825 ; workflow docs running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43871383900 ; workflow sandbox running, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43871383999.
+
+#### Decision 0050: review A: APPROVED
+
+Reviewed commit `a596301`. Google Gemini 3.1 Pro through Droid; another maker than the drafter (Z.ai GLM 5.3 through Droid) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED
+RECORD: 0050 at a596301
+REVIEWER: Google Gemini 3.1 Pro, through Droid
+SKILLS LOADED: strict-reviewer, sanad-provenance, al-muhasibi, muhasabah-gate
+CHECKS:
+1 PASS. Read docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md, docs/03_DATA_CONTRACTS.md, and TASKS.md; pop.residence_not_measured default is 1%, range and sweep unchanged, DAT-54 threshold untouched, refused runs recorded, residence rows for employment feed only.
+2 PASS. Read docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md and docs/decisions/0050-the-homes-of-the-generated-workers.md; ASSUMED entries present with defaults, ranges, sweeps; ten-key family forced by SYN-06 and SYN-69; honestly labelled as ASSUMPTION; Public figures S5, S6, S10, S11 confirmed in pack; no apportioning to drawn area.
+3 PASS. Read docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md and TASKS.md; SYN-31 to SYN-33 named correctly, S4-T03 amendment line specifies planted tests for feed threshold refusal and manifest literal failing.
+4 PASS. Read TASKS.md and docs/decisions/0050-the-homes-of-the-generated-workers.md; no gender, sex, or nationality attribute on residence rows, no Synthetic or Simulated fact attached to a named place.
+5 PASS. Read docs/decisions/0050-the-homes-of-the-generated-workers.md and .overnight/BRIEF.md; header matches decision 0048, no requirement ID invented, no product claims, no PII. Finding F2 was correctly left out because the review brief explicitly bound only rulings 7 and 8 and finding F1.
+FINDINGS: none
+```
+
+#### Decision 0050: merge record
+
+- The head that was merged, `a5963017bcdb1a36302aa446e02d976375762bbe`, is the approved commit `a596301`; the merge log names six green checks and merge `03b0915`.
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43883764431 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43883764756 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43883765309.
+- The supplied verdicts are quoted in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/71 was squash-merged on 2026-11-16 at that head; merge commit `03b09151879ad531522b935b47e5c582aa84d57c` on main; head tree `263ede10223f143caed884a6ddaf9244defa3f93`, merge tree `263ede10223f143caed884a6ddaf9244defa3f93`. CI on the merge commit: workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43891215680 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43891215407 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43891215367.
+
+#### Decision 0049: review A: REJECTED
+
+Reviewed commit `3d1154b4c295dbc7a33c9f7206cc6ffcd6cef45a`. Alibaba Qwen 3.8 Max through Droid (launcher status: model=qwen3.8-max); another maker than the drafter (Google Gemini 3.1 Pro, both drafts) and the lead (Anthropic).
+
+````text
+VERDICT: REJECTED
+RECORD: 0049 at 3d1154b
+REVIEWER: Anthropic Claude, through Droid (Factory). The exact model version string is not verifiable from inside this session; I do not invent one.
+SKILLS LOADED: strict-reviewer, sanad-provenance, al-muhasibi, muhasabah-gate. design-audit is not installable as a tool in this environment; I applied its plain meaning (no Blocker or Major layout defect) rather than claim a load I did not perform.
+
+CHECKS:
+1. Carry-through of the note and ruling points — FAIL.
+   Read .overnight/IN/OWNER-NOTE-1640.md, .overnight/IN/RULING.L-720.md, docs/decisions/0049-one-product-for-every-screen-size.md items 1-6, .overnight/IN/RETURN.r1.md, .overnight/RETURN.before-DEC-0049.review.A.md.
+   Points (a) to (f) of L-720 are all carried: eight named sizes (record item 2), per-size display rules (item 3), map first (item 4), performance adapts with no number set (item 5), screenshots in the gate pack and "the lead tells the advisor" (item 6). Fails on the ruling's own carrying-edit list, which names "S3-T09 if still open"; S3-T09 is open and unamended (F10).
+2. Stricter or equal — PASS.
+   Read the diff against docs/10 FE-69, FE-70, FE-72, FE-73, FE-143, the section 9 layout table and pinned-viewport paragraph; docs/11 DES-01 and DES-27; docs/12 TST-90. Every changed line adds. TST-90 keeps all four original sizes (3840x2160, 1920x1080, 1440x900, 1024x768) and adds the eight, so 1440x900 is not lost. DES-01 keeps the presenter canvas rule, the 1600-px-outside-presenter rule and the 1440x900 / 1024x768 columns. DES-27 keeps both the 28 px and 14 px floors. The only text removed is the "notice asks for a larger screen" exclusion, which is the widening the note asks for. No size, target, rule or test is lost.
+3. Layout coverage — FAIL.
+   Read docs/10 lines 697-704 (layout table and pinned viewports) and docs/12 TST-90 as amended. The four width bands are gap-free and non-overlapping (at least 1600; 1200-1599; 768-1199; below 768). Seven of the eight named sizes land correctly. The landscape phone does not: 390x844 landscape is 844 CSS px wide, which the Tablet band (768 to 1199) claims, while docs/10 line 704 and the TST-90 assumption both assign it to Phone (F1).
+4. Consistency with decisions 0041, 0042, 0044, 0048 and the pack — FAIL.
+   Read docs/decisions/0041 item 7, 0042, 0044, 0048; TASKS.md S3-T09, S3-T16, S3-T18, S3-T20, S3-T21, S6-T05, S6-T37, S6-T38, S7-T13, S8-T15, the slice S3 and S6 gate paragraphs; docs/12 section 8; docs/14 slice S6 gate; docs/16 kit table; docs/README.md. Decision 0041 item 7 is widened, not replaced, and its phone evidence stays. No requirement ID is invented and every anchor resolves. No claim that the product exists or passes a gate. Fails on F2 to F9.
+5. Rules compliance — PASS.
+   Read the whole diff and the new record. No product or service name beyond EII and public publishers; no personal name, e-mail, private host, IP address or absolute path; no bare digit run of exactly eight or eleven digits (the sizes are dimension pairs, not identifiers); no model-written number or display text, and record item 5 sets no frame-rate or cap number.
+
+FINDINGS:
+
+F1
+File: docs/10_FRONTEND.md and docs/12_TESTING_AND_QUALITY.md
+Anchor: docs/10 section 9, "Layouts, presenter mode and big-screen rules" — layout table row "Tablet", and the pinned-viewport paragraph (line 704); docs/12 TST-90 and its ASSUMPTION.
+Wrong: The Tablet band claims "width 768 to 1199 CSS px" and Phone claims "widths below 768 CSS px", but the landscape form of the named size 390x844 is 844 CSS px wide. The pinned-viewport paragraph says "390x844 and 360x640 (portrait and landscape, Phone)" and TST-90's assumption says "390x844 and 360x640 the phone layout". Two rules in the same pack assign one named size to two different layouts, so a builder cannot tell which layout 844 px wide takes.
+Fix: Add one precedence sentence to the docs/10 section 9 pinned-viewport paragraph and repeat it in the TST-90 assumption: "Where a named size and a width band disagree, the layout named for that size in this list governs." Do not add a new breakpoint number; record item 2 forbids it.
+
+F2
+File: docs/12_TESTING_AND_QUALITY.md
+Anchor: Section 8, "Not tested in version 1" table, line 579.
+Wrong: Still reads "Browsers other than Chromium-based ones; phone layouts | The demonstration uses a Chromium-based browser; phone layouts are not in v1." TST-90 in this same document now requires visual tests at 360x640 and 390x844 in the phone layout. The document contradicts itself.
+Fix: Change the row to "Browsers other than Chromium-based ones | The demonstration uses a Chromium-based browser." Drop "phone layouts" from both cells.
+
+F3
+File: TASKS.md
+Anchor: The "**slice S6 gate.**" paragraph, line 1428.
+Wrong: Still reads "visual tests pass at wall, laptop and tablet sizes in English and Arabic". The diff updated the parallel line in docs/14_IMPLEMENTATION_PLAN.md to "the eight named sizes" but left TASKS.md's own statement of the same gate, so the two now disagree and the TASKS.md gate still excludes phones.
+Fix: Change to "visual tests pass at the eight named sizes in English and Arabic".
+
+F4
+File: TASKS.md
+Anchor: S6-T05, acceptance criteria, line 1302.
+Wrong: Still reads "[ ] wall, laptop and tablet visuals pass in both languages". S6-T05 lists TST-90 in its Requirements, and TST-90 now names eight sizes.
+Fix: Change to "[ ] the eight named sizes' visuals pass in both languages".
+
+F5
+File: TASKS.md
+Anchor: S7-T13, acceptance criteria, line 1600.
+Wrong: Still reads "[ ] visual tests pass at wall, laptop and tablet sizes in both languages". S7-T13 also lists TST-90 in its Requirements.
+Fix: Change to "[ ] visual tests pass at the eight named sizes in both languages".
+
+F6
+File: TASKS.md
+Anchor: S3-T18, "Amendment (decision 0049)", line 789.
+Wrong: Reads "controls hold at the eight named sizes and the building cap scales with the measured frame rate". S3-T18 is "Remove audience origin marks from the map foundation"; its scope at line 790 is "Stage, Brief, Fact chips, accessible labels, legends, source drawer, map modes and captures". It owns no 3D scene and no building cap. The cap belongs to S3-T16, which already carries it correctly at line 777, and to FE-143.
+Fix: Change line 789 to "- Amendment (decision 0049): controls hold at the eight named sizes." and delete "and the building cap scales with the measured frame rate".
+
+F7
+File: docs/10_FRONTEND.md
+Anchor: Section 9, "**Touch targets.**" paragraph, line 710; ASSUMPTIONS item 6, line 864; FE-73, line 718.
+Wrong: FE-73 was widened to "44 x 44 CSS px in tablet layout, phones, big screen and presenter mode", but the prose paragraph at line 710 it implements still reads "at least 44 x 44 CSS px in tablet layout and presenter mode", and ASSUMPTIONS item 6 reads "tablet layout, phones, and presenter mode", dropping big screen. Three statements of one rule in one section now disagree.
+Fix: Change line 710 to "at least 44 x 44 CSS px in tablet layout, phones, big screen and presenter mode (ASSUMPTION: a larger target for fingers and for a room)", and change ASSUMPTIONS item 6 to "44 x 44 CSS px targets in tablet layout, phones, big screen and presenter mode; idle timer off by default (section 9)".
+
+F8
+File: docs/decisions/0049-one-product-for-every-screen-size.md
+Anchor: The "Amends" row of the record's header table, and the "Amended passages" section.
+Wrong: The Amends row lists TASKS.md (S3-T16, S3-T20, S3-T21, S6-T37, S8-T15), docs/10 (Layouts, FE-69, FE-73), docs/11 (DES-01), docs/12 (TST-90), docs/16 and docs/README. The diff also amends TASKS.md S3-T18 and S6-T38, docs/10 FE-70, FE-72, FE-143 and ASSUMPTIONS items 5 and 6, and docs/11 DES-27, and it amends docs/14_IMPLEMENTATION_PLAN.md, whose slice S6 gate line the diff rewrites. That file is absent from both the Amends row and Amended passages. A reader following the record cannot find four of the amendments it made.
+Fix: Rewrite the Amends row to "TASKS.md (S3-T16, S3-T18, S3-T20, S3-T21, S6-T37, S6-T38, S8-T15); docs/10_FRONTEND.md (Layouts, FE-69, FE-70, FE-72, FE-73, FE-143, ASSUMPTIONS 5 and 6); docs/11_DESIGN_DIRECTION.md (DES-01, DES-27); docs/12_TESTING_AND_QUALITY.md (TST-90); docs/14_IMPLEMENTATION_PLAN.md (slice S6 gate); docs/16_DEMO_RUNBOOK.md; docs/README.md", and add matching bullets for S3-T18, S6-T38 and docs/14 to Amended passages.
+
+F9
+File: docs/decisions/0049-one-product-for-every-screen-size.md
+Anchor: "Amended passages", the 10_FRONTEND.md and 11_DESIGN_DIRECTION.md bullets.
+Wrong: The record says the layouts section and FE-69 "replace the breakpoints with the named sizes" and that DES-01 reflects the eight sizes "instead of the original breakpoints". The diff does the opposite: it keeps them. docs/10 ASSUMPTIONS item 5 was widened to "Breakpoints 1600, 1200 and 768 CSS px", the layout table still states all four width bands, and DES-01 still ends "The widths are wall (1600 px wide or more, or presenter mode), laptop (1200 to 1599 px), tablet (768 to 1199 px), and phone (below 768 px)". The record misdescribes its own change.
+Fix: Change both bullets to say the breakpoints are retained and extended by 768 CSS px, with the eight named sizes added as the proof set, not that they were replaced.
+
+F10
+File: TASKS.md
+Anchor: S3-T09, "Stage, Brief, Fact chip and source chain", lines 740-746, "status queued".
+Wrong: Ruling L-720 names the smallest carrying edit as "amendment lines on the tasks that own the layout and its proof (S3-T09 if still open, S3-T16, S3-T20, S3-T21 and decision 0042's front-end tasks)". S3-T09 is queued, so it is open. It owns the Brief, which is the answer card that record item 3 requires never to overflow or hide at any size. No amendment line was added and the record's Amends row does not name it, so the ruling's condition is unmet and the answer-card rule has no task-level carrier in slice S3.
+Fix: Add after TASKS.md line 745: "- Amendment (decision 0049): the Stage, Brief and answer card hold at the eight named sizes, with nothing overflowing or hiding the answer card, and the phone layout uses a bottom sheet." Add S3-T09 to the record's Amends row and to Amended passages.
+```
+
+Ten findings, eight of them in files the diff already touched. The two that decide the verdict are F2, an accepted document that still says phone layouts are not in v1 while its own TST-90 requires them, and F1, a named size that two rules assign to two different layouts. Both are one-line fixes, as are F3 to F7 and F10; F8 and F9 are corrections to the record's own account of itself.
+````
+
+#### Decision 0049: confirmation 1: REJECTED
+
+Reviewed commit `d133e0c`. Alibaba Qwen 3.8 Max through Droid; another maker than the drafter (Google Gemini through Droid) and the lead (Anthropic). The lead applied the subsequent exact-text fix.
+
+```text
+VERDICT: REJECTED
+RECORD: 0049 at d133e0c66f225f07739df00328a865ccedbd70d5
+REVIEWER: Alibaba Qwen, Qwen3.8 Max (session model identifier word for word: "Model: Qwen3.8 Max", as reported by my own session's environment information; I cannot verify the underlying weights from inside the session and invent nothing), through Droid (Factory). Skills loaded by name: strict-reviewer, muhasabah-gate; sanad-provenance, al-muhasibi and design-audit applied in their plain meaning (no installable tool of those names here). Muhasabah gate: PASS. I edited nothing, ran no command and read nothing outside this workspace; the check exits in the drafter's return are its own evidence and I do not vouch for them. Assumptions made explicit: (a) a record's Amends row and Amended passages are the authoritative account of its own change set, so a reader must be able to find every passage it amended and no bullet may misdescribe one (the standard review A applied in F8 and F9 and the drafter accepted); (b) that account is passage-level, as decision 0048's Amends row and the F8 fix text show; (c) the fix diff plus the tree at HEAD is the whole change set I judge.
+
+F1: FIXED — docs/10_FRONTEND.md section 9 pinned-viewport paragraph (line 704) now ends "...(portrait and landscape, Phone) (decision 0049). Where a named size and a width band disagree, the layout named for that size in this list governs."; docs/12_TESTING_AND_QUALITY.md TST-90 (line 313) carries the same sentence after "390x844 and 360x640 the phone layout." The 844-px-wide landscape phone now resolves to one layout, with no new breakpoint number.
+F2: FIXED — docs/12_TESTING_AND_QUALITY.md section 8 "Not tested in version 1, and why" (line 579) reads "| Browsers other than Chromium-based ones | The demonstration uses a Chromium-based browser. |"; "phone layouts are not in v1" is gone from the tree.
+F3: FIXED — TASKS.md "**slice S6 gate.**" (line 1429) reads "visual tests pass at the eight named sizes in English and Arabic", matching docs/14_IMPLEMENTATION_PLAN.md line 701.
+F4: FIXED — TASKS.md S6-T05 acceptance criteria (line 1303) reads "[ ] the eight named sizes' visuals pass in both languages".
+F5: FIXED — TASKS.md S7-T13 acceptance criteria (line 1601) reads "[ ] visual tests pass at the eight named sizes in both languages".
+F6: FIXED — TASKS.md S3-T18 amendment (line 790) reads "- Amendment (decision 0049): controls hold at the eight named sizes."; the building cap stays with S3-T16 (line 778) and FE-143 (docs/10 line 635), so nothing was lost.
+F7: FIXED — docs/10_FRONTEND.md "**Touch targets.**" (line 710), FE-73 (line 718) and ASSUMPTIONS item 6 (line 864) all read "tablet layout, phones, big screen and presenter mode"; the three statements of the 44 px rule now agree.
+F8: FIXED for what it named — the record's Amends row (line 9) now names S3-T09, S3-T18, S6-T38, FE-70, FE-72, FE-143, ASSUMPTIONS 5 and 6, DES-27 and docs/14 (slice S6 gate), with matching bullets in Amended passages (lines 38-50); but see N1 for passages this fix round amended and left out.
+F9: FIXED — Amended passages (lines 38-39) now say the breakpoints are "retained and extended by 768 CSS px, with the eight named sizes added as the proof set", which matches docs/10 ASSUMPTIONS item 5 (line 863, "Breakpoints 1600, 1200 and 768 CSS px"), the four width bands of the layout table (lines 699-702) and DES-01 (docs/11 line 45); 768 was already a band boundary at base (the "Below 768" row of the pass-1 diff), so no breakpoint was invented.
+F10: FIXED — TASKS.md S3-T09 (line 746) carries "- Amendment (decision 0049): the Stage, Brief and answer card hold at the eight named sizes, with nothing overflowing or hiding the answer card, and the phone layout uses a bottom sheet."; S3-T09 is named in the Amends row (line 9) and in Amended passages (line 43), so ruling L-720's carrying-edit list is met.
+
+NEW FINDINGS:
+N1
+File: docs/decisions/0049-one-product-for-every-screen-size.md
+Anchor: the "Amends" row of the header table (line 9) and the "Amended passages" section (lines 40-50).
+Wrong: The fix round amended five passages that the record's own account still does not name, so a reader following the record cannot find them: TASKS.md S6-T05's acceptance criterion (line 1303), TASKS.md S7-T13's acceptance criterion (line 1601), TASKS.md's "**slice S6 gate.**" paragraph (line 1429), docs/12's gates-table row "slice S6 The joined door" (line 472) and docs/12 section 8's browser row (line 579). The row names "docs/12_TESTING_AND_QUALITY.md (TST-90)" and "TASKS.md (S3-T09, S3-T16, S3-T18, S3-T20, S3-T21, S6-T37, S6-T38, S8-T15)" only, while it does name "docs/14_IMPLEMENTATION_PLAN.md (slice S6 gate)", so the same row is inconsistent with itself. This is the F8 defect again, on the passages this round changed. (The previous round's F8 fix text predates the F2 to F5 edits, so following it verbatim no longer covers the change set; the principle governs.)
+Fix: In the Amends row change "`[docs/12_TESTING_AND_QUALITY.md](../12_TESTING_AND_QUALITY.md)` (TST-90)" to "(TST-90, the slice S6 row of the gates table, section 8's browser row)" and change "`[TASKS.md](../../TASKS.md)` (S3-T09, S3-T16, S3-T18, S3-T20, S3-T21, S6-T37, S6-T38, S8-T15)" to "(S3-T09, S3-T16, S3-T18, S3-T20, S3-T21, S6-T05, S6-T37, S6-T38, S7-T13, S8-T15, the slice S6 gate paragraph)". Add three bullets to Amended passages: under 12_TESTING_AND_QUALITY.md, "the slice S6 gate row and section 8's browser row are amended: the gate names the eight named sizes and the not-tested row drops phone layouts, which v1 now tests"; under TASKS.md, "S6-T05 and S7-T13: acceptance criteria amended to the eight named sizes" and "the slice S6 gate paragraph amended to the eight named sizes".
+
+N2
+File: docs/decisions/0049-one-product-for-every-screen-size.md
+Anchor: "Amended passages", the TASKS.md bullet "S6-T38" (line 49).
+Wrong: It reads "S6-T38: Amendment line added that visuals pass at the eight named sizes." The line actually added at TASKS.md S6-T38 (line 1407) reads "- Amendment (decision 0049): layout responds to the eight named sizes without overflow or hiding the answer card.", and S6-T38 has no visuals-pass criterion. The record misdescribes its own change, the F9 defect on a new bullet.
+Fix: Change the bullet to "S6-T38: Amendment line added that the layout responds to the eight named sizes without overflow or hiding the answer card."
+
+No other new defect: the four width bands stay gap-free and unchanged (docs/10 lines 699-702, ASSUMPTIONS 5 line 863, docs/11 DES-01 line 45); a tree-wide search found no surviving "wall, laptop and tablet" or "phone layouts are not in v1" statement; every other statement of the eight sizes (docs/11 DES-01, docs/12 TST-90 and its gates row, docs/14 line 701, docs/16 line 40, TASKS.md lines 746, 778, 790, 825, 831, 1303, 1399, 1407, 1429, 1601, 1756) agrees; the 44 px rule agrees in all three of its places, and docs/11's target-size table (line 217) states no phone column, so it conflicts with nothing; DES-27 keeps the 28 px and 14 px floors; no requirement, size, target, rule or test was lost, no number or breakpoint was invented, no product or service name, personal name, e-mail, private host, IP address, absolute path or bare eight- or eleven-digit run was added, and no passage claims the product exists or passes a gate. Both findings are record-only, one line each; nothing in the pack's requirements needs another change.
+```
+
+#### Decision 0049: confirmation 2: APPROVED
+
+Reviewed commit `46e0e09`. Alibaba Qwen 3.8 Max through Droid; another maker than the drafter (Google Gemini through Droid) and the lead (Anthropic). The lead applied the exact-text fix at this commit.
+
+```text
+VERDICT: APPROVED
+RECORD: 0049 at 46e0e097a102033689c11c9af57f7b6ef97a1cc4
+REVIEWER: Alibaba Qwen, Qwen3.8 Max (session model identifier word for word: "Model: Qwen3.8 Max"), through Droid (Factory). Skills: strict-reviewer and muhasabah-gate applied by name; sanad-provenance, al-muhasibi and design-audit applied in their plain meaning, as in my CONFIRM1. Muhasabah gate: PASS. Every quoted string below comes from a file read in this session.
+N1: FIXED — the record's Amends row now reads "(TST-90, the slice S6 row of the gates table, section 8's browser row)" for docs/12 and "(S3-T09, S3-T16, S3-T18, S3-T20, S3-T21, S6-T05, S6-T37, S6-T38, S7-T13, S8-T15, the slice S6 gate paragraph)" for TASKS.md, and the three added bullets stand verbatim in Amended passages; each of the five passages N1 named was read in the tree and matches its new description: TASKS.md S6-T05's criterion ("the eight named sizes' visuals pass in both languages"), S7-T13's criterion ("visual tests pass at the eight named sizes in both languages"), the "**slice S6 gate.**" paragraph ("visual tests pass at the eight named sizes in English and Arabic"), docs/12's gates row "slice S6 The joined door" (same eight-size wording), and docs/12 section 8's row ("Browsers other than Chromium-based ones | The demonstration uses a Chromium-based browser.", the phone-layout exclusion gone, which TST-90 now covers), so the account is no longer inconsistent with itself.
+N2: FIXED — the bullet now reads "S6-T38: Amendment line added that the layout responds to the eight named sizes without overflow or hiding the answer card.", which matches TASKS.md's S6-T38 amendment line word for word ("- Amendment (decision 0049): layout responds to the eight named sizes without overflow or hiding the answer card."); the visuals-pass misdescription is gone.
+NEW FINDINGS: none
+
+Basis for "none": I reconstructed the whole change set against main 7ac9c0b from the base diff, FIX1.diff and FIX2.diff (which touched only the record's Amends row and Amended passages, one file) and matched it passage by passage against the row and bullets in the tree. Every changed passage is named: TASKS.md S3-T09 (line 746), S3-T16 (778), S3-T18 (790), S3-T20 (825), S3-T21 (831), S6-T05 (1303), S6-T37 (1399), S6-T38 (1407), S7-T13 (1601), S8-T15 (1756) and the slice S6 gate paragraph (1429); docs/10 Layouts table and pinned-viewport paragraph (699-704), FE-69, FE-70, FE-72, FE-73 (714-718), FE-143 (635), ASSUMPTIONS 5 and 6 (863-864); docs/11 DES-01 (45) and DES-27 (160); docs/12 TST-90 (313), the slice S6 gates row (472) and section 8's browser row (579); docs/14's slice S6 gate line (701); docs/16's kit row (40); docs/README.md's two accepted-records places (prose line and table row 105). No bullet misdescribes its passage: each amendment line matches its bullet's description, the breakpoint bullets match the retained-and-extended bands (1600/1200/768) and the proof-set wording in docs/10 and DES-01, and the two new docs/12 and TASKS.md bullets match the tree text quoted above. Three points of granularity I judged under the standard this record's history applies (review A's F8 fix text, the drafter's verbatim application, my CONFIRM1): S3-T16's acceptance-criteria in-place edit (line 774) sits inside a task the row names and is described by the record's Consequences and Decision item 5, as review A's F8 enumeration treated it; docs/10's Touch-targets paragraph (710) is inside the named Layouts section and states the same rule as the named FE-73 and ASSUMPTIONS 6; docs/16 and docs/README.md are named at file level with no passage excluded, as in every prior round. The fix added no number, name, comparison, or claim that the product exists or passes a gate.
+```
+
+#### Decision 0049: merge record
+
+- The head that was merged, `1b0dc76`, follows the approved commit `46e0e09` with main merged in. The README union was resolved with both decisions 0049 and 0050 listed. The head-move diff was posted on the pull request; the log corrects its account: the non-README diff matches main's 0050 lines, not its bytes.
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). .
+- The lead recorded `check_docs` and `check_tree` OK for the move to `1b0dc76`.
+- The supplied verdicts are quoted in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/72 was squash-merged on 2026-11-16 at that head; merge commit `c45f338c23dd96f16e603cd55238127c8048aff3` on main; head tree `4e634d5ea22d4a46d133f69cf9bfd884720bc18c`, merge tree `4e634d5ea22d4a46d133f69cf9bfd884720bc18c`. CI on the merge commit: .
+
+#### Decision 0051: review: APPROVED
+
+Reviewed commit `6e441fe`. Z.ai GLM 5.3 through Droid, OpenRouter lane; another maker than the drafter (OpenAI GPT-6 through Codex) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED
+REVIEWER: Z.ai GLM 5.3, through Factory Droid
+SKILLS LOADED: strict-reviewer, al-muhasibi, spec-to-code-compliance, dimensional-analysis, sanad-provenance, muhasabah-gate
+CHECKS: R1 PASS — Read PLAN-A2 Q1–Q8, including the Q7–Q8 amendment after design-review finding D8, against decision 0051 items 1–8. Every default is adopted and none is softened: the exact December 2025 monthly net reference stays the level, with the unchanged `rounded_median` equality and net medians repaired last, after compatible Public means scale the provisional distribution at their admitted grain in fixed source/key order with every supported mean remeasured afterwards; incompatible means remain a gap with OI-03 preserved and no forced scaling or annual-to-monthly conversion; the spread is decision 0036 item 6's basic and net series from the 10th to the 90th percentile by occupation group, actual employer activity and employer December headcount band from the complete stock with item 4's micro/small/medium/large bounds, the original `s50_plus` level key kept intact and no Public size table re-banded; every named refusal (`PAY_CELL_MAPPING`, `PAY_SPREAD_UNAVAILABLE`, `PAY_SPREAD_INVALID`, `PAY_REFERENCE_DOMAIN`, `PAY_FIT_SPEC_MISSING`, `COVERAGE_POLICY_MISSING`, `COVERAGE_JOB_UNRESOLVED`, `non_private_sector`, `PAY_CALIBRATION_POPULATION`) has no fallback, and a later one needs an explicit ruling labelled assumed coverage with pre-run fit criteria; the basic floor conflict, Part B boundaries and all fit judgement are left to S4-T12; ruling 4 and ruling 2's Public-anchor exclusion are replaced only as item 1 states. R2 PASS — Verified in this tree that every citation resolves and says what the record says: decision 0022 item 2 (totals by activity, size band, occupation group and salary level follow the calibration table exactly); decision 0036 items 4 and 6 (headcount bands micro below 10, small 10–49, medium 50–99, large 100 and over; the p10–p90 basic and net spread by occupation group, activity and size band, world-build-only); decision 0040 items 5 and 6 and its "Wiring and question classes" section (public figure leads where it publishes the same figure as private calibration, a mismatch is a gap, world bands by recorded headcount, S4-T11/T12 wiring); decision 0050 (homes unchanged, its TASKS.md line untouched); SYN-27 (the `wage.minimum` floor), the amended SYN-28, SYN-91 (check identifier, tolerance reference and pass/fail only), F11 to F13 (targets, tolerances and anchor years exactly as item 6 restates them), document 03 section 6.3 (the pay fields of ruling 6's identity); also SYN-14, SYN-26–29, SYN-34 and SYN-35, SYN-46, SYN-90, Q17, Q18, TASKS.md S4-T03 and S4-T12, AGENTS.md rules 12, 35, 37 and 46, and the S4-T03 rulings 2–6 (`.overnight/IN/S4-T03.rulings.md`), all matching. R3 PASS — No exact check, tolerance, privacy rule or fidelity target is loosened: item 7 keeps decision 0022 item 2, `rounded_median`, all exact checks, privacy rules, security controls and tolerances unchanged, F16 stays exact, and F11 to F13 keep `wage.private_sector_mean` within 10% (anchor year 2023), identical order against `wage.mean_by_occupation`, and QAR 31,579 per year within 15% (anchor year 2022), each annotated "target and tolerance unchanged"; AGENTS.md rules 10 and 12 are untouched (no gender, nationality or age enters the A2 artifacts, the movement exception and the window_key/register rules stand); nothing makes a fit pass possible inside Part A2, since item 6, SYN-28's check column, the new December paragraph and the TASKS.md amendment line all assign spread and mean fit to S4-T12 with pre-run criteria, a gap is not a pass, and the record grants no acceptance waiver. R4 PASS — Units are carried and never mixed: both references are exact decimal money in QAR/month (item 4), with quantile ranks, scaling ratios and sigma dimensionless; headcount is a count of employees from the complete December stock; basic and net keep distinct series and floors (a below-floor basic 10th percentile is a retained input conflict, a net 10th percentile below the basic floor is a different quantity and not automatically invalid); F11 is a monthly-wage check and F13 an annual check against QAR 31,579 per year, and item 6 keeps a December reference from standing in for annual or full-month-window evidence; the shift, half-even rounding and central pinning stay inside one basis and one unit. R5 PASS — Scope and form hold: the record follows decision 0050's form (same header table, Context, numbered decision items, Consequences, Amended passages, Sources, plus the Open items section the brief requires); read at HEAD state on a clean tree, the changed documents are exactly those named in the Amends row, document 05 section 7 (SYN-28 at line 324 and the December-reference paragraph after the SYN table at line 328), section 9 F11 to F13 (lines 381–383) and Q18, the TASKS.md S4-T03 amendment line (line 865, with decision 0050's line 864 unchanged), and docs/README.md's accepted-record sentence and Decision records table (0051 row, Accepted 2026-11-16), with the ruling 2 and ruling 4 replacements being the project records item 1 names; the open items carry PLAN-A2's ASSUMPTIONS A1–A5 one-to-one as OI-[LEAD-1] to OI-[LEAD-5]; the record claims no built code and no passed gate. R6 PASS — The new SYN-28 text (document 05, line 324) is a complete, well-formed single requirement row with its check column ("exact median and planted guards in S4-T03 Part A2; spread/mean fit and unchanged F11 to F13 in S4-T12"), not cut off, and the new paragraph after the SYN table (line 328) is likewise complete.
+FINDINGS: none
+```
+
+#### Decision 0051: merge record
+
+- The head that was merged, `6e441fea1cabe0e0b93673cbe3ca1a3f49fdaec2`, is the approved commit `6e441fe`; the log records the squash merge pinned to that head.
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43900523730 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43900523748 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43900523688.
+- The supplied verdicts are quoted in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/73 was squash-merged on 2026-11-16 at that head; merge commit `537aa6005254f2f9866649a437c1ad4e2accdb0e` on main; head tree `92dac403dce93d8df596c4b7e436e641c6a540df`, merge tree `92dac403dce93d8df596c4b7e436e641c6a540df`. CI on the merge commit: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43906695385 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43906695333 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43906695649.
+
+#### PO-S2-69: review: APPROVED
+
+Reviewed commit `6824a033c7dbdada50104a2cd725ffa83a04563e`. Z.ai GLM 5.3 through Droid, OpenRouter lane; another maker than the builder (the lead, Anthropic).
+
+```text
+VERDICT: APPROVED
+REVIEWER: Z.ai GLM 5.3, through Factory Droid
+SKILLS LOADED: strict-reviewer, systematic-debugging, muhasabah-gate; code-review is not installed in this tool, so its plain meaning was applied (a finding needs a concrete path and its harm)
+CHECKS: R1 PASS — The stated cause is right, cited from the stdlib of the pinned interpreter (requires-python ">=3.14", uv cpython-3.14.6), `lib/python3.14/zipfile/__init__.py`: `ZipFile.writestr` lines 2008-2020 uses a `ZipInfo` argument as-is but wraps a plain name as `ZipInfo(name)._for_archive(self)`; `ZipInfo._for_archive` lines 662-685 stamps `self.date_time = time.localtime(time.time())[:6]` (or `SOURCE_DATE_EPOCH`), while `ZipInfo.__init__` lines 450-458 keeps the given `date_time` and reads no clock. Name → current local time; ZipInfo → that ZipInfo's `date_time`. R2 PASS — `custodian/tests/fixtures/frame/invented.py:198-204` fixes `date_time=(1980, 1, 1, 0, 0, 0)`, and the ZipInfo path bypasses `_for_archive`, so no clock, TZ, `SOURCE_DATE_EPOCH` or other process state enters the bytes (json/shapely output and zip metadata are platform-constant, no locale or randomness). Names, member order (levels 1, 2, 3) and `json.dumps` payloads are unchanged; compression stays ZIP_STORED (name path took `archive.compression`, the default ZIP_STORED; `ZipInfo.__init__` line 464 defaults to ZIP_STORED); the fixture's `external_attr = 0o600 << 16` matches the name path's `0o600 << 16` (line 684, and `_open_to_write` lines 1826-1827 would default to the same). R3 PASS — `custodian/tests/test_frame_fixture_archive.py:12-21` patches `time.time` to `real`, then to `real + 3600`, and hashes the archive at each reading; on the old name-written fixture each member's stamp came from `localtime(time.time())` (2-second DOS granularity), so an hour apart it would see two different digests and fail; on the new fixture both builds stamp (1980,1,1,0,0,0), the bytes are identical and it passes. `monkeypatch.setattr` is undone at teardown, so the clock is restored, and the test hashes two real builds of the real fixture, so it is not vacuous (a DST fall-back hour could make wall times coincide, which does not apply to this repo's environments and does not affect the fix). R4 PASS — No caller relies on the old timestamp: every `invented_archive` caller (`test_frame_seventh.py:283`, `test_frame_census.py:1000/1264`, `test_places_stage.py:364`, `test_frame_coverage.py:297`, `test_places_pass3_build.py:131`, `test_frame_live_survivors.py:141/360`) builds once per use and hashes at runtime from the same bytes, and a scan of every 64-hex literal in custodian/, scripts/, docs/, contracts/, core/, gateway/ (plus evals/ and uv.lock tree-wide) found digests only of other fixtures (roads manifest, places fsq, empty input, CI workflow files, gateway decision inputs, areas_spike traffic fixtures, privacy gate record), none of the boundary archive; `qat_admin` appears only in sources.yaml, the reader `raw.py`, the coverage inline archive and the fixture itself. No other fixture or test that hashes an archive twice keeps the defect: the tree's other zip writers are the coverage inline `archive()` (built and parsed per use, never hashed or compared across builds, correctly left unchanged per the entry), `_zone_sixty_nine` in `test_frame_live_survivors.py` (clock-following `writestr` by name, but built and hashed once for its own receipt, no second build to compare), the wheel in `scripts/tests/test_clean_environment.py` (built once per test, no hash comparison) and the workbook in `test_activity_graph.py` (stored once; its only hashlib use hashes short strings). None found. R5 PASS — The entry (`OPEN_ITEMS.md:3362-3370`) is accurate on every point checked against the code and the stdlib: the named failing test exists at `test_frame_live_survivors.py:125-141` and compares a receipt hash with a second build; the cause, the fixed member time with the same permission bits, the planted test's two clock readings an hour apart with one hash, the coverage inline archive never being hashed twice, and the closure by found cause under rule 39 all hold. The scope is the three files: `custodian/tests/fixtures/frame/invented.py` (the member-time fix), `custodian/tests/test_frame_fixture_archive.py` (the new planted test) and `OPEN_ITEMS.md` (the PO-S2-69 entry with its RESOLUTION); no other file in the tree references PO-S2-69, the planted test or the fix, and the failing test file itself still holds its original hash-comparing assertion, untouched. Stated limit: this run forbids shell commands, so `git diff c45f338..HEAD` itself was not executed and the commit's own file list was not enumerated; the scope check rests on the clean worktree contents at 6824a03, the entry's own naming, and the absence of any other trace of the change.
+FINDINGS: none
+```
+
+#### PO-S2-69: merge record
+
+- The head that was merged, `6d1f6ba8bb305b732351b5b41b64b8fd1ef4bd19`, is the approved commit `6824a033c7dbdada50104a2cd725ffa83a04563e` replayed onto `537aa60`; the log records equal patch-id `8d1387a8` and a merge pinned to `6d1f6ba`.
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43908040713 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43908040667 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43908040601.
+- The lead recorded `local_checks` exit 0 at `6824a03` and history scan PASSED before the equal-patch replay. The merge log repeats local checks exit 0; it does not name a new check run on the replayed head.
+- The supplied verdicts are quoted in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/74 was squash-merged on 2026-11-16 at that head; merge commit `16ca234407b46fb5e2cdd6ad803b18ad6f7e690d` on main; head tree `90a7a6dad05940817cee835df6fa204fb36e42d4`, merge tree `90a7a6dad05940817cee835df6fa204fb36e42d4`. CI on the merge commit: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43914469192 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43914469211 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43914469140.
+
+#### S1-T20: review A (correctness): REJECTED
+
+Reviewed commit `178d723`. Moonshot AI Kimi K3.1 Pro through Droid, OpenRouter lane; another maker than the builder (OpenAI GPT-6 through Codex) and the lead (Anthropic).
+
+```text
+VERDICT: REJECTED
+REVIEWER: Moonshot AI Kimi K3.1 Pro, through Factory Droid
+SKILLS LOADED: strict-reviewer, mutation-testing, spec-to-code-compliance, sharp-edges, muhasabah-gate; code-review was unavailable, so its concrete-input/wrong-output rule was applied
+RUN: no shell
+CHECKS: A1 PASS — The default branch remains separate from pilot_options and retains the existing command and judging. Pilot discovery regenerates the complete universe, sorts it, assigns names modulo four, verifies the supplied manifest against regeneration, and passes exact selected names. A2 FAIL — Merge enforces shard completeness, assignment, hashes, statuses and command exits, but compare can return success for identical reports containing an unexplained survivor. A3 PASS — Compare requires identical manifests and complete exact-name records, then compares counts, records and individual identities. Equal totals with swapped or different mutant identities cannot pass. A4 FAIL — Several important refusals lack plants reaching their own lines, including incomplete-campaign, comparison-manifest and regenerated-universe. A5 PASS — The original three-workflow constants and rules remain separately scoped; the pilot has its own pin and dispatch contract. Every refusal category listed by L-748 has a named plant, and unknown extra workflows remain refused.
+FINDINGS:
+1. scripts/mutation_pilot.py, lines 442-445: the compare command checks parity but never applies survivor judging. Concrete input: local and hosted reports are identical, valid summaries containing a raw_exit=0, status=survived record with its correct mutation diff, while scripts/mutation_explained.toml has no matching explanation. compare prints an empty differences list and exits 0. Exact fix: apply the unchanged judge to survived and not_covered records from both reports against the explanation ledger, make any unexplained record produce a nonzero comparison result, and add a CLI plant for identical unexplained-survivor reports.
+2. scripts/tests/test_mutation_pilot.py, lines 224-228: test_comparison_rejects_incomplete_equal_reports empties records, so it reaches missing-mutant at scripts/mutation_pilot.py lines 207-208, not incomplete-campaign at lines 278-279. The plant still passes if incomplete-campaign is deleted. Concrete input: retain the complete record set, change one record to raw_exit=None and status=infrastructure_failure, and rebuild both summaries with pilot.summary. Without the incomplete-campaign refusal, compare returns no differences. Exact fix: use that input and assert Refusal incomplete-campaign.
+3. scripts/mutation_pilot.py, lines 280-281: comparison-manifest has no planted test. Concrete input: two otherwise identical valid reports whose manifest contexts use different full commit hashes, with each manifest and summary recomputed consistently. Current code refuses comparison-manifest; deleting that check produces an empty differences list and exit 0. Exact fix: add this pair as a test and assert the comparison-manifest refusal.
+4. scripts/mutation.py, lines 305-310: regenerated-universe has no planted integration test; the existing real-tool fixture supplies only the unchanged manifest. Concrete input: discover the toy universe, replace one manifest mutant with a foreign exact-name row, recompute the otherwise valid manifest, and run a shard. Current code raises regenerated-universe; removing the comparison lets the foreign assignment proceed. Exact fix: add this tampered-manifest run to scripts/tests/mutation_pilot_runner.py, assert the named refusal, and assert that no mutation campaign starts.
+```
+
+#### S1-T20: review B (CI security): APPROVED
+
+Reviewed commit `178d723`. Google Gemini 3.1 Pro through Droid; another maker than the builder (OpenAI GPT-6 through Codex) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED
+REVIEWER: Google Gemini 3.1 Pro, through Droid
+SKILLS LOADED: strict-reviewer, security-review, sharp-edges, differential-review, muhasabah-gate (code-review not found)
+RUN: no shell
+CHECKS:
+S1 PASS — The pilot workflow restricts trigger to workflow_dispatch only. Contents permissions are strictly read, with no job-level write overrides. Checkout actions use persist-credentials: false. No secrets are referenced. Every action uses a full 40-hex commit pin identical to those already present in ci.yml. Dispatch inputs are passed exclusively via environment variables and never interpolated inside run blocks. The module input is validated against the reviewed module constraint. The commit ref is validated for 40-hex constraints and reachability from main. All exported artifacts contain only public mutation results. The workflow is separate from the six required checks.
+S2 PASS — The guard scripts (ci_workflow_rules.py and test_ci_workflows.py) retain the constants, rules, and tests for the three required workflows unchanged in meaning. The pilot workflow is strictly admitted by its exact name and SHA-256 pin, rejecting any other extra workflows. Each L-748 (c) refusal has a precise planted test reaching its own line. A later edit could weaken a required workflow or add a new workflow without failing this guard by modifying the workflow file and simultaneously updating its SHA-256 pin in `PINNED_SHA256` (and `WORKFLOW_NAMES` if adding a file) inside `scripts/tests/ci_workflow_rules.py`. Since `_reference_workflows()` reads from the live disk directory instead of an independent store, it compares the modified file to itself, making the job steps check pass.
+S3 PASS — mutation_pilot.py correctly rejects symlinks, absolute paths, and paths attempting escapes (".."). File read/write operations strictly bound payloads to CAP + 1, and the JSON parser utilizes an object_pairs_hook to reject duplicate properties. Strict schema checks ensure a hostile artifact cannot force a merge pass.
+S4 PASS — Neither the workflow nor the scripts contact any network address other than GitHub Actions defaults and the package index via uv sync. No secrets, keys, tokens, or private variables exist in the change.
+FINDINGS: none
+```
+
+#### S1-T20: confirmation 2 A: APPROVED
+
+Reviewed commit `650b1e3`. Moonshot AI Kimi K3.1 Pro through Droid, OpenRouter lane; another maker than the builder (OpenAI GPT-6 through Codex) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED
+REVIEWER: Moonshot AI Kimi K3.1 Pro, through Factory Droid
+SKILLS LOADED: strict-reviewer, code-review (plain meaning; skill unavailable), mutation-testing, sharp-edges, muhasabah-gate
+RUN: no shell
+CHECKS: C1 PASS — scripts/tests/test_mutation_pilot.py lines 224-232 retain all records, change one record to raw_exit=None/status=infrastructure_failure, and recompute both summaries consistently. This reaches incomplete-campaign at scripts/mutation_pilot.py lines 278-279; without that guard, the identical reports produce no differences. C2 PASS — lines 234-241 construct otherwise valid reports with complete records, consistent manifests and summaries, and different full commits. They reach comparison-manifest at scripts/mutation_pilot.py lines 280-281; deleting the guard yields an empty comparison. C3 PASS — scripts/tests/mutation_pilot_runner.py lines 124-194 regenerate the real toy universe, substitute a valid foreign row, recompute and verify the manifest, and invoke the original inner runner through the patch wrapper. The wrapper requires and re-raises regenerated-universe from scripts/mutation.py lines 308-309, while the subprocess spy proves no mutation run starts. Without the guard, the inner assertion fails rather than being hidden by the outer handler. C4 PASS — the reviewed head contains the declared replacement and two additions only; FIX2-RETURN.md records changes solely to the two test files, and LEAD-RUNS.txt records an empty diff for both production files after guard restoration. No production, workflow, or guard-script change was identified.
+FINDINGS: none
+```
+
+#### S1-T20: confirmation 2 B: APPROVED
+
+Reviewed commit `650b1e3`. Google Gemini 3.1 Pro through Droid; another maker than the builder (OpenAI GPT-6 through Codex) and the lead (Anthropic).
+
+```text
+VERDICT: APPROVED
+REVIEWER: Google Gemini 3.1 Pro, through Droid
+SKILLS LOADED: strict-reviewer, security-review, sharp-edges, differential-review, muhasabah-gate
+RUN: no shell
+CHECKS: 
+C1 PASS — I read scripts/tests/test_mutation_pilot.py and found that test_comparison_rejects_incomplete_equal_reports correctly retains complete records while mutating the first record to infrastructure_failure. This avoids missing-mutant and summary-mismatch, and precisely reaches the incomplete-campaign guard in compare.
+C2 PASS — I read scripts/tests/test_mutation_pilot.py and found that test_comparison_rejects_different_manifest_commits correctly constructs otherwise valid summaries linked to two different full commit hashes, successfully reaching the comparison-manifest guard.
+C3 PASS — I read scripts/tests/mutation_pilot_runner.py and found that test_foreign_manifest_refused_before_campaign modifies a manifest row to pass verify_manifest but diverge from the regenerated universe. It uses a mock to verify that Refusal("regenerated-universe") is raised and not hidden, and asserts no mutmut subprocess starts.
+C4 PASS — I verified from the lead runs and builder output that production files, workflow, and guard scripts remain entirely unchanged and byte-identical to 178d723, with only the two test files modified.
+C5 PASS — Earlier checks S1-S4 still hold on this head. The change touches only the two test files and no workflow definition, data parsing routines, path validations, or network-handling logic.
+FINDINGS: none
+```
+
+#### S1-T20: merge record
+
+- The head that was merged, `988836b9c56a5f2c9243a02e36feceb1ab63c999`, is recorded as a records-only move from approved `5c06084`, with a diff of three files, +204/-2. The supplied two-lens confirmations approve `650b1e3`. `5c06084` is approved `650b1e3` replayed onto main `16ca234`: `git diff 537aa60 650b1e3 | git patch-id --stable` and `git diff 16ca234 5c06084 | git patch-id --stable` both give `3eccef5fcde5`. The merged head is `5c06084` plus one records-only ledger commit.
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43935416158 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43935416181 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43935416233.
+- The lead recorded `local_checks` exit 0 at `650b1e3`. The ledger step recorded exit 0, 15 entries and OI-261, with docs and tree checks 0, before pushing `988836b9c56a5f2c9243a02e36feceb1ab63c999`. The lead confirms the bin ledger script ran at head `988836b`: exit 0, 15 entries.
+- The supplied verdicts are quoted in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/75 was squash-merged on 2026-11-16 at that head; merge commit `e9eb1ed44d4dbed8a8f3d98b729d357535b52922` on main; head tree `0c50c01038914990c6648c67fa6cb0e30e729caf`, merge tree `0c50c01038914990c6648c67fa6cb0e30e729caf`. CI on the merge commit: workflow mutation-pilot success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43940437765 ; workflow mutation-pilot success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43940084757 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43940043044 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43940043263 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43940043098.
+
+#### S1-T20 records (OI-261): records review: REJECTED
+
+Reviewed commit `0c38c86e5d94dbbfbd2a93ea6a61725091072236`. Moonshot AI Kimi K3.1 Pro through Droid, OpenRouter lane; another maker than the lead (Anthropic), who drafted the records. Launcher status: model=custom:OR-Kimi-K3.1-Pro-0.
+
+```text
+VERDICT: REJECTED
+HEAD: 0c38c86
+REVIEWER: Moonshot AI, Kimi K3.1 Pro
+SKILLS LOADED: strict-reviewer, sanad-provenance, muhasabah-gate (gate: PASS)
+
+1. NOT MET — Compared the diff with both hosted-run records, both reports, `local.time`, and `compare.out`. Commits, addresses, counts, local timings, real hosted timing, and comparison result match. The synthetic-run timings in `PROGRESS.md` do not.
+2. MET — The successful synthetic dispatch and merge support the transport criterion; `compare.out` reports `{"differences":[]}` for reports at the same commit with matching counts; hosted elapsed time and local processor time are recorded. OI-261’s closure line contains both run addresses, the comparison result, and both required timings.
+3. MET — The patch changes `PROGRESS.md`, `TASKS.md`, and `OPEN_ITEMS.md`; its `PROGRESS.md` change appends four rows without altering earlier rows. The added text contains no prohibited bare digit run outside a URL, private path, personal name, or e-mail address.
+
+FINDINGS:
+- `PROGRESS.md:29107` — Defect: the synthetic run’s recorded wall time and shard range disagree with `run.synthetic.json`. Run-level timestamps give 90 seconds, and shard job timestamps give durations of 14, 15, 15, and 20 seconds. Exact fix: replace `Wall time 85 seconds; each shard 15 to 28 seconds.` with `Wall time 90 seconds; each shard 14 to 20 seconds.`
+```
+
+#### S1-T20 records (OI-261): records confirmation: APPROVED
+
+Reviewed commit `894eab34df1589e3d26182eab36907e9c55b073c`. Moonshot AI Kimi K3.1 Pro through Droid, OpenRouter lane; another maker than the lead (Anthropic), who made the records fix. Launcher status: model=custom:OR-Kimi-K3.1-Pro-0.
+
+```text
+VERDICT: APPROVED
+HEAD: 894eab3
+REVIEWER: Factory Droid (OR Kimi K3.1 Pro)
+SKILLS LOADED: strict-reviewer, sanad-provenance, muhasabah-gate (PASS)
+
+1. MET — `run.synthetic.json` gives 19:30:45Z to 19:32:15Z, exactly 90 seconds. Shard durations are: shards (0), 19:31:14Z–19:31:29Z = 15 seconds; shards (1), 19:31:14Z–19:31:42Z = 28 seconds; shards (2), 19:31:31Z–19:31:51Z = 20 seconds; shards (3), 19:31:44Z–19:31:59Z = 15 seconds. The range is 15 to 28 seconds. `PROGRESS.md:29107` matches both figures.
+2. MET — `FIX.patch` changes only that single `PROGRESS.md` notes line. Nothing else changes, so the earlier items still hold.
+
+FINDINGS: none.
+```
+
+#### S1-T20 records (OI-261): merge record
+
+- The head that was merged, `894eab34df1589e3d26182eab36907e9c55b073c`, is the approved commit `894eab3`; the log records the merge pinned to that head. The correction changes the synthetic wall time to 90 s and retains the shard range 15 to 28 s.
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43946274721 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43946274740 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43946274765.
+- The opening log records `check_docs` OK at `0c38c86e5d94dbbfbd2a93ea6a61725091072236`; it does not name a lead check on the corrected head.
+- The supplied verdicts are quoted in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/76 was squash-merged on 2026-11-16 at that head; merge commit `00754a2f7e3c282638d652549731c9f91233973b` on main; head tree `127c2638723d52a24148cade77b5dfc086e20da6`, merge tree `127c2638723d52a24148cade77b5dfc086e20da6`. CI on the merge commit: workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43951337960 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43951338039 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/43951338262.
+
+#### OI-37: review 1: REJECTED
+
+Reviewed commit `16ca234`. OpenAI GPT-6 Astra through Codex (the log records xhigh); another maker than the original corrections' drafter (the lead, Anthropic).
+
+````text
+VERDICT: REJECTED  
+BASE: 16ca234  
+REVIEWER: OpenAI GPT-6 (Codex), principal privacy and statistical-disclosure-control reviewer  
+SKILLS LOADED: strict-reviewer, sanad-provenance, muhasabah-gate, task-standards, project-orientation, al-muhasibi. code-review unavailable; the brief’s equivalent rules applied. Self-audit: PASS.
+
+Requirement references below refer to `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md`.
+
+1. **NOT RESOLVED — PRV-113 items 1–4 and 6; PRV-116.** The ruled indexing and leaf expression are present, but the constraints do not identify the target’s actual wage contribution.
+
+   For tuple `t = (u,c,m,h,d,b_net,b_basic)` and measure `q`, the document states:
+
+   ```text
+   x_p[t] ∈ {0,1}
+   x_p[t] ≤ N[t]
+   0 ≤ w_p_q[t] ≤ W_q[t]
+   L(b_q) x_p[t] ≤ w_p_q[t]
+   w_p_q[t] ≤ U(b_q) x_p[t]                 [finite band]
+   w_p_q[t] ≤ A_wage[l,m,q] x_p[t]           [mapped wage-bill leaf]
+   target_wage[l,m,q] = Σ matching w_p_q[t]
+   Σ matching N[t] = A_count[l,m]
+   Σ matching W_q[t] = A_wage[l,m,q]
+   ```
+
+   Counterexample: one B01/B01 tuple with `N=x_p=1`, both `W_q=0.01`, both `w_p_q=0`, and `z=1` satisfies these tuple constraints. Yet the target occupies the entire tuple, so its wages must equal `0.01`. See F1.
+
+2. **RESOLVED — PRV-113 items 2 and 4.** The zero-count correction is mathematically sufficient:
+
+   ```text
+   L(b_q) N ≤ W_q
+   W_q ≤ U(b_q) N                           [finite band]
+   z ∈ {0,1}, z ≤ N
+   z = 0 ⇒ W_net = W_basic = 0
+   W_q ≤ A_wage[l,m,q] z                    [mapped wage-bill leaf]
+   ```
+
+   `N=0` forces `z=0` and both sums to zero, including B12. For positive integer `N`, choosing `z=1` preserves admissible sums; the aggregate bound follows from the exact leaf equality and non-negative summands.
+
+3. **RESOLVED — PRV-113 item 4; PRV-116.** Both `public_coverage_residual` and the direct residual check use untreated aggregates. Treatment no longer determines the residual.
+
+4. **CHANGED BY DECISION 0023, item 1 — NOT RESOLVED as it stands.** Section 6.2 and PRV-30 retain R66’s same-row ratio exception with both families in lineage. However, PRV-127’s unqualified refusal of other ratios between protected families contradicts that permission. See F2.
+
+5. **RESOLVED — PRV-24; PRV-35.** Weakest-month selection and pooling use the table’s count primitive, including `outlet_count` for `outlet_register`. Both specified pay-table ordering tuples end with `band_to`.
+
+6. **CHANGED BY DECISION 0016, item 10 — RESOLVED as it stands.** PRV-120 accommodates monthly periods while retaining the new-seed requirement after changes to rules version, exported set, treatment code or generator. PRV-42/PRV-43 serialisation changes are explicitly included.
+
+7. **RESOLVED — PRV-31.** The requirement acknowledges that treated sums can fail derivation minimums despite passing true-value tiers and specifies `SUPPRESSED` with `DETAIL_NEEDS_LARGER_GROUP`.
+
+8. **RESOLVED — section 6.2, “Quartile bands”; PRV-32.** Quarter and three-quarter selection and exact-boundary ties are specified; a tie returns the reached range together with its successor.
+
+9. **RESOLVED — PRV-02; PRV-72.** The boundary mechanisms are described as structural checks, expressly without claiming a formal proof.
+
+10. **RESOLVED — PRV-90; section 13, `SNAPPED_TO_WHOLE_UNITS`.** The sentence describes fitting under disclosure-control rules and the resulting area, without the absolute protection claim.
+
+FINDINGS
+
+**F1 — Unresolved mathematical identification of target wages.**  
+File: `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md`  
+Anchors: PRV-113 items 1, 2 and 6; PRV-116.
+
+**Defect:** The counterexample in finding 1 leaves a positive wage sum assigned to zero remaining people: `N−x_p=0`, but `W_q−w_p_q=0.01`. This is a latent tuple, not a published one-person leaf; published-leaf minimums do not repair its decomposition. Exact aggregate equalities constrain `W_q`, without forcing the target’s contribution to be correct.
+
+**Exact fix:** At every tuple, apply the band constraints to the remaining population:
+
+```text
+L(b_q)(N−x_p) ≤ W_q−w_p_q
+W_q−w_p_q ≤ U(b_q)(N−x_p)                   [finite band]
+N−x_p = 0 ⇒ W_net−w_p_net = W_basic−w_p_basic = 0
+x_p = 0 ⇒ w_p_net = w_p_basic = 0
+```
+
+Implement the zero-count implication with a residual binary indicator analogous to item 2. Retain the indexed target sum and exact aggregate equalities.
+
+**F2 — New contradiction affecting the settled ratio exception.**  
+File: `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md`  
+Anchors: PRV-29, PRV-30, PRV-127; section 6.2 “Mean wage”.  
+Decision: 0023, item 1.
+
+**Defect:** PRV-30 permits mean wage using two additive families on the same stored rows. PRV-127 says its guard refuses any other ratio of two protected families. Concrete input: one `resident_pay/rp_all_money/net/ALL` row with stored `earner_count=30` derived from its band family and `wage_bill=120000` from its no-breakdown family. PRV-30 permits that mean; the blanket PRV-127 guard rejects it. This contradicts the settled R66 exception.
+
+**Exact fix:** Qualify PRV-127’s refusal and corresponding planted violation to exempt the closed same-row ratio statistics already authorised by PRV-30. Preserve C39 as the additional authorised ratio across its two released tables.
+````
+
+#### OI-37: review 2: REJECTED
+
+Reviewed commit `710ac4735844cc43904a7c4320dbb918967dba02`. Anthropic Fable 5.2: a review by the lead's own maker (Anthropic) through another login: advisory for independence; the binding approval is the Kimi confirmation below. Fix 1 was Google Gemini 4 Carbon through the OR lane.
+
+````text
+VERDICT: REJECTED**
+
+The fix at this head does what the round-one review asked: F1 and F2 are closed and findings 1 to 10 are resolved. The rejection rests on two new findings in text that predates the diff: N1, a gap in the audit model found by the zero-count check of task 1, and N2, a minor wording collision in the sentence F2 touched.
+
+**HEAD** 710ac47 (`710ac4735844cc43904a7c4320dbb918967dba02`). `CHANGE.patch` is byte-identical to `git diff 16ca234 710ac47`: docs/06 alone, two hunks (PRV-127; PRV-113 item 1). Nothing was edited.
+
+**REVIEWER** Anthropic, Claude Fable 5.2. This is a different maker from the builder of the fix (Google) and from the round-one reviewer (OpenAI). It is the same maker as the session that applied the ten original corrections, so for findings 2, 3 and 5 to 10 this is a check that the diff left them alone, not an independent re-review.
+
+**SKILLS LOADED** strict-reviewer, code-review, sanad-provenance, muhasabah-gate, al-muhasibi. code-review ran as a forked pass over 16ca234..710ac47 and returned eight leads; I kept nothing I had not checked against the text myself. Self-audit: pass, with the assumptions stated under N1.
+
+## Findings 1 to 10
+
+| # | Status | Anchor and basis |
+|---|---|---|
+| 1 | RESOLVED | PRV-113 item 1: indexing and leaf expression kept; identification completed at head (F1 below) |
+| 2 | RESOLVED | PRV-113 item 2: `z <= N`, `z = 0 => W_net = 0 and W_basic = 0`; outside both hunks |
+| 3 | RESOLVED | PRV-116: `public_coverage_residual` and the direct residual check both read untreated aggregates |
+| 4 | CHANGED BY DECISION 0023 (item 1); RESOLVED as it stands | Section 6.2 and PRV-30 hold the same-row ratio statistic of R66; PRV-127 now exempts it (F2 below) |
+| 5 | RESOLVED | PRV-24, PRV-35: each table's count primitive, `band_to` last |
+| 6 | CHANGED BY DECISION 0016 (item 10); RESOLVED as it stands | PRV-120 keeps the new `world_seed` rule after a freeze |
+| 7 | RESOLVED | PRV-31 sentence on treated sums |
+| 8 | RESOLVED | Section 6.2 quartile rule and PRV-32, exact tie included |
+| 9 | RESOLVED | PRV-02: structural checks, not a formal proof |
+| 10 | RESOLVED | Section 13, `SNAPPED_TO_WHOLE_UNITS` sentence |
+
+The three disagreements were not reopened (R67; OI-36).
+
+## F1: closed
+
+Per tuple `t = (u,c,m,h,d,b_net,b_basic)` and `q` in `{net, basic}`, with `L_q = L(b_q)`, `U_q = U(b_q)` and no `U_q` for B12, the document now states:
+
+```text
+variables  N integer >= 0;  W_q >= 0;  x_p, z, z_r binary;  w_p_q real
+
+item 2  (2a) L_q N <= W_q
+        (2b) W_q <= U_q N                          [finite band]
+        (2c) z <= N
+        (2d) z = 0 => W_net = W_basic = 0          linear form: W_q <= A_wage[l,m,q] z
+item 1  (1a) x_p <= N
+        (1b) 0 <= w_p_q <= W_q
+        (1c) L_q x_p <= w_p_q
+        (1d) w_p_q <= U_q x_p                      [finite band]
+        (1e) x_p = 0 => w_p_net = w_p_basic = 0    linear form: w_p_q <= A_wage[l,m,q] x_p
+        (1f) L_q (N - x_p) <= W_q - w_p_q
+        (1g) W_q - w_p_q <= U_q (N - x_p)          [finite band]
+        (1h) z_r <= N - x_p
+        (1i) z_r = 0 => W_net - w_p_net = W_basic - w_p_basic = 0
+                                                   linear form: W_q - w_p_q <= A_wage[l,m,q] z_r
+item 3  x_p + x_p_side sums to at most one per month (residence; per permitted employer group, workplace)
+item 4  sum over t in l of N = A_count[l,m];  sum over t in l of W_q = A_wage[l,m,q]
+item 6  w_p <= max_person_share V
+target  wage of leaf l = sum over t in l of w_p_q[t];  band read from x_p  (PRV-116 person_pay_band)
+```
+
+**Claim.** At each tuple, the values of `(N, x_p, W_q, w_p_q)` that satisfy items 1 and 2 for some `z`, `z_r` are exactly those that `N` earners of that joint band produce, the target being one of them when `x_p = 1`.
+
+- **Stated implies real, `x_p = 0`.** (1e) gives `w_p_q = 0`. (2a)(2b) put `W_q` in `[L_q N, U_q N]`. At `N = 0`, (2c)(2d) give `W_q = 0`, B12 included.
+- **Stated implies real, `x_p = 1`.** (1a) gives `N >= 1` and (1c)(1d) put the target in its band. At `N = 1`, (1h) forces `z_r = 0` and (1i) gives `w_p_q = W_q`. At `N >= 2`, (1f)(1g) put the other earners' sum in `[L_q (N-1), U_q (N-1)]`.
+- **Real implies stated.** Take `z = min(1, N)` and `z_r = min(1, N - x_p)`; every line holds.
+
+So no assignment carries a wrong target contribution. With item 3, the leaf's target wage is the target's wage at its one tuple, or zero. The linear forms equal the indicators, because item 4's equality with non-negative summands gives `W_q <= A_wage`. Sealed truth satisfies every new line, so the base model stays feasible.
+
+**Round-one counterexample** (`N = x_p = 1`, `W_q = 0.01`, `w_p_q = 0`, `z = 1`, B01/B01) is now infeasible twice over: (1g) reads `0.01 <= 1,000.49 × 0`, and (1h)(1i) force `W_q - w_p_q = 0`. Its B12 form (`W_q = 100,000.00`, `w_p_q = 49,999.50`) has no (1g) and is excluded by (1h)(1i) alone, so `z_r` is necessary and present.
+
+**Mechanical check** (in memory, nothing written): three bands (finite from zero, finite, open), nine band pairs, `N` from 0 to 3, sums on a grid from 0 to 13. 1,859 points satisfy the head text and the same 1,859 are produced by a population. The base text admitted 3,791 more.
+
+**Zero counts forcing zero sums, place by place:**
+
+| Place | Stated at head? | Lower bound of a nonzero sum |
+|---|---|---|
+| Item 2, cell `N`, `W_q` | Yes: (2c)(2d) | `L_q N <= W_q` |
+| Item 1, target | Yes: (1e) | `L_q x_p <= w_p_q` |
+| Item 1, remaining population | Yes: (1h)(1i) | `L_q (N - x_p) <= W_q - w_p_q` |
+| Item 6, class sums `C_h`, `V_h` | Yes, through item 2: `h` is a tuple index | through item 2 |
+| Items 12 and 13, register-company parts | By reference to item 2 (see note a) | by reference |
+| PRV-116 `listed_firm_pay` | Conditioned on `E_f >= 1`; no zero case | `L(b1) E_f <= V_f[q]` |
+| Item 11, cohorts | **No** (N1) | **none** |
+
+## F2: closed
+
+| | Section 6.2 and PRV-30 | PRV-127 at head |
+|---|---|---|
+| What is allowed | The closed list: mean wage; coverage, irregular and deployed-elsewhere shares | Clause (a) exempts "the closed list of ratio statistics of section 6.2 and PRV-30" |
+| Condition | Numerator and denominator "from columns of the same stored rows (one table, one partition, one unit set, and one measure…)" | "each of which takes its numerator and its denominator from columns of the same stored rows" |
+| Planted violation | n/a | A ratio of two other protected families "outside the closed list" fails |
+| Talent ratio | The one exception to PRV-30 | "The one ratio it allows beyond that closed list" |
+
+- **No wider.** The exemption is by reference. A ratio taken from rows of two partitions or unit sets is not a ratio statistic under section 6.2's definition and stays refused.
+- **No narrower.** All four statistics are exempt. Clause (b) does not reach them, because section 6.1 stores no mean and no share.
+- **Round-one input** (one `resident_pay/rp_all_money/net/ALL` row, `earner_count = 30`, `wage_bill = 120000`) is now permitted by both rows.
+- Decision 0023 item 1's talent ratio is untouched.
+
+## FINDINGS
+
+### N1 (major): a cohort's wage sums are tied to no cohort count
+
+**File:** `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md`. **Anchors:** PRV-113 item 11 (read by item 4's `Sw[l,t]` and by item 13); PRV-116 `month_change_residual`; PRV-121.
+
+**Defect.** Item 11 adds cohort counts "with their wage sums in each month" and the carry identities. No line bounds a cohort's wage sum by that cohort's count: no `L(b_q) K <= Q_q`, no `Q_q <= U(b_q) K`, no empty-cohort indicator.
+- Item 2 binds the cell totals only. Item 12 states the bound for company parts, and item 1 now states it for the target and the remaining population; item 11 has no counterpart.
+- Pay can therefore sit in an empty cohort and move freely between cohorts. That is a relaxation PRV-121 forbids, in the variables that item 4's exact stayer-bill lines and `month_change_residual` read.
+- I found no stated limit covering it in section 17 or the assumptions.
+
+**Exact input, smallest.** One `residence` B01/B01 tuple with one earner, the target, present in months m and m+1:
+
+```text
+N = 1 (both months), x_p = 1, W_net[m] = W_basic[m] = 0.01, w_p_q = 0.01, z = 1, z_r = 0
+stayers: count 1, month-m wage sums 0      leavers: count 0, month-m wage sums 0.01      joiners: count 0
+```
+
+Every stated line of items 1, 2 and 11 holds. No population produces it: the empty leaver cohort holds QAR 0.01 and the stayer cohort, which is the target alone, holds nothing. ASSUMPTION 35 allows such an empty latent cohort at any published leaf.
+
+**Exact input, outcome changes** (set A, invented values):
+- **World.** One published unit of `resident_pay` with a wage bill, net measure, each earner in a different employer group.
+  - Month m: 12 earners at QAR 500.00 and 400 at QAR 1,000.50.
+  - 200 of the 400 leave, 200 join at QAR 1,000.50, 212 stay on unchanged pay.
+- **Released.** Rows B01 (12) and B02 to B12 (400) in both months; wage bill 406,200.00 in both; stayers 212, joiners 200, leavers 200; index 100.0 where the unit is the one published unit of its municipality.
+- **Target.** The joiners' net wage bill; truth 200,100.00.
+- **With each cohort part under item 2.** The bill lies in [188,094.00, 206,100.00]: at most 12 joiners fit in B01, and 200 stayers of the top range hold at least 200,100.00. Relative width is 0.091, under 0.15, with truth inside, so the predicate is recovered.
+- **Under the stated lines.** Stayer bills of 100.00 in both months give the joiners 406,100.00; stayer bills of 406,200.00 give them 0.00. The index lines hold at both points. Relative width is 2.0, so the predicate is not recovered and the audit passes.
+
+**How far it reaches.**
+- The outcome changes where pay sits near the lower limit of its band. With pay spread across a band, the open top range absorbs the slack and both models agree on this target.
+- The relaxation itself is general. On a small grid, 236 of 256 feasible cases admit a joiner wage sum no population produces; with each part under item 2 the admitted set equals the real one in all 256.
+
+**Assumptions.**
+- The fixture is built to pass PRV-24, PRV-26, PRV-27, PRV-55 and PRV-56 as document 06 states them; the contract details of document 03 were not read.
+- The band limits used are those of item 2: B01 up to 1,000.49, later bands from 1,000.50.
+
+**Exact fix.** Insert in item 11 after "…equal the earlier month's after those cohorts.":
+
+> Every cohort is held as parts at the tuples of item 1: for each pair of adjacent months, a non-negative integer count `K` for each origin tuple of the earlier month and destination tuple of the later month, "outside the frame" being one further origin and destination, with wage sums `Q_q` at the origin in the earlier month and at the destination in the later month. The `N` and `W_q` of an earlier-month tuple are the sums over its destinations, and those of a later-month tuple the sums over its origins; each cohort of a published leaf, its stayers included, is the sum of the parts whose origin and destination match it. Every part satisfies item 2 on its own in each month, with the bands of its tuple of that month: `L(b_q) K <= Q_q`, for a finite band `Q_q <= U(b_q) K`, and a binary `z_c` with `z_c <= K` and the indicator constraint `z_c = 0 => Q_net = 0 and Q_basic = 0`; where the tuple maps to a published wage-bill leaf `l`, `Q_q <= A_wage[l,m,q] z_c` is its linear form. The target variables of item 1 are split over the same parts, and its target and remaining-population lines hold at every part with `K` and `Q_q` in place of `N` and `W_q`. The stayer wage variables of item 4 are the sums of the stayer parts.
+
+Also add the smallest input as a fixture that must be `INFEASIBLE` (rule 37), and name the omission of these lines among PRV-121's defects.
+
+**Decision for the lead.** If version 1 is not to carry these lines, the relaxation has to be named as a stated exception in PRV-121 and section 17 by your ruling. With the fix, `month_change_residual` can come out recovered on units whose pay sits near a band's lower limit, which PRV-55 and PRV-56 do not prevent.
+
+### N2 (minor, wording): PRV-127 clause (b) collides with PRV-55
+
+**File:** same. **Anchors:** PRV-127; PRV-55; the section 7 paragraph on the one released value computed from unreleased treated values; PRV-80.
+
+**Defect.** Clause (b) refuses "any ratio computed before release", and the next sentence names the talent quotient as the one ratio allowed beyond the closed list.
+- PRV-55 has the release build compute `stayer_wage_index` "as 100 times the exact ratio of the two treated bills", and section 7 calls it a "rounded ratio".
+- PRV-80's `earners_published_share` is, by inference, computed in the build as well.
+- Read by its words, as F2 read clause (a), the guard refuses a value another requirement orders. The context points at ratios of protected families, but the text does not say so.
+
+**Exact input.** The Regression fixture of PRV-113 item 4: treated stayer bills QAR 202,000 and QAR 202,600, released index 100.5.
+
+**Exact fix.**
+- Replace "(b) any ratio computed before release" with "(b) any ratio of two protected families computed before release, those of the closed list and the talent ratio included".
+- In the planted list, replace "a planted ratio computed before release" with "a planted ratio of two protected families computed before release".
+
+The index then falls outside the guard: section 10.1 says "no pay or cohort family holds the stayers' wage bill".
+
+## Outside the verdict
+
+- **(a) Item 12 wording.** I read "the band bounds of item 2" as the whole item, indicator included. If you read it as the inequalities alone, a B12 part with no job can hold pay. Optional wording: "satisfies item 2 on its own, its indicator included". I built no input with a changed outcome.
+- **(b) Sibling statements, outside the READ list.** BRF-96, DAT-165, MTH-113, BE-132, TST-246 and the glossary entry "Talent available near this site" still state the guard without the closed list. TASKS.md S6-T20 already carries the qualifier. They need the same wording as PRV-127, with N2's clause; the dated records (the OI-140 update, decision 0023) stay as written.
+- **(c) Not raised.** Solver tolerance against the linear forms, and real-valued sums against cent amounts. Both have the same structure as item 2, which round one resolved.
+````
+
+#### OI-37: confirmation 3: REJECTED
+
+Reviewed commit `3d499a3795927b7573b6baacad0ea5ee3938206e`. Google Gemini 4 Carbon through Abacus, deep; another maker than the fix builder (OpenAI GPT-6 Astra through Codex) and the lead (Anthropic).
+
+````text
+VERDICT: REJECTED
+
+C1 (N1 — `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md`, `PRV-113` item 11 and `PRV-121`): FAIL
+Quoted text checked (`PRV-113` item 11):
+> Every cohort is held as parts at the tuples of item 1: for each pair of adjacent months, a non-negative integer count `K` for each origin tuple of the earlier month and destination tuple of the later month, "outside the frame" being one further origin and destination, with wage sums `Q_q` at the origin in the earlier month and at the destination in the later month. The `N` and `W_q` of an earlier-month tuple are the sums over its destinations, and those of a later-month tuple the sums over its origins; each cohort of a published leaf, its stayers included, is the sum of the parts whose origin and destination match it. Every part satisfies item 2 on its own in each month, with the bands of its tuple of that month: `L(b_q) K <= Q_q`, for a finite band `Q_q <= U(b_q) K`, and a binary `z_c` with `z_c <= K` and the indicator constraint `z_c = 0 => Q_net = 0 and Q_basic = 0`; where the tuple maps to a published wage-bill leaf `l`, `Q_q <= A_wage[l,m,q] z_c` is its linear form. The target variables of item 1 are split over the same parts, and its target and remaining-population lines hold at every part with `K` and `Q_q` in place of `N` and `W_q`. The stayer wage variables of item 4 are the sums of the stayer parts.
+
+Quoted fixture checked (`PRV-113` item 11):
+> *Empty-cohort fixture (invented values).* One `residence` B01/B01 tuple has one earner, the target, in months `m` and `m+1`: `N = x_p = 1` in both months. In month `m`, `W_net = W_basic = w_p_net = w_p_basic = 0.01`, `z = 1` and `z_r = 0`. The planted cohorts are one stayer with month-`m` net and basic wage sums of zero, no leavers with month-`m` net and basic wage sums of QAR 0.01, and no joiners. The leaver parts have total count zero, so every non-negative `K` is zero, `z_c <= K` forces `z_c = 0`, and its indicator forces both wage sums to zero, contradicting QAR 0.01. The model must be `INFEASIBLE`. A model that admits pay in this empty cohort fails the fixture.
+
+Quoted text checked (`PRV-121`):
+> Omitting item 11's origin-destination parts, tuple and cohort sum identities, per-part band bounds or empty-part indicator in either month, target and remaining-population lines, or stayer wage sum identities changes the feasible set and is a defect.
+
+Hand-worked empty-cohort fixture:
+- Tuple `residence`, `b_net = B01`, `b_basic = B01` (`L(B01) = 0`, `U(B01) = 1,000.49`), months `m` and `m+1`, `N[m] = N[m+1] = 1`, `x_p[m] = x_p[m+1] = 1`. In month `m`, `W_net[m] = W_basic[m] = w_p_net[m] = w_p_basic[m] = 0.01`, `z[m] = 1`, `z_r[m] = 0` (and in month `m+1`, e.g. `W_net[m+1] = W_basic[m+1] = w_p_net[m+1] = w_p_basic[m+1] = 0.01`, `z[m+1] = 1`, `z_r[m+1] = 0`). Planted cohorts: stayer count `1` with month-`m` wage sums `0` (and month-`(m+1)` wage sums `0.01`), leaver count `0` with month-`m` wage sums `0.01`, joiner count `0` with month-`(m+1)` wage sums `0`.
+- Without the origin-destination parts: item 1 and item 2 hold at month `m` (`0 <= 0.01 <= 1,000.49`, `z = 1 <= 1`, `x_p = 1 <= 1`, `W_q - w_p_q = 0`, `z_r = 0 <= 0`); the leaf cohort sums hold (`1 + 0 = 1` in both months; month-`m` cohort wages `0 + 0.01 = 0.01 = W_q[m]`; carry-forward `W_q[m] - 0.01 + (0.01 - 0) + 0 = 0.01 = W_q[m+1]`, all non-negative). The part-free model admits the assignment (`FEASIBLE`).
+- With the origin-destination parts: every leaver part has `K >= 0` and their sum equals the leaver count `0`, forcing `K = 0` on every leaver part. Both `Q_q <= U(B01) K = 0` (with `0 = L(B01) K <= Q_q`) and `z_c <= K = 0` (`z_c = 0 => Q_net = 0 and Q_basic = 0`, which covers `B12` as well) force `Q_net = Q_basic = 0` on every leaver part. Summing over leaver parts forces the leaver month-`m` wage sums to `0`, contradicting `0.01`; the planted model is `INFEASIBLE`.
+
+Why C1 fails on valid populations:
+1. Non-pay endpoints, linearisation index/carry-forward scope, and target conservation (`F1`): (i) In `Q_q <= A_wage[l,m,q] z_c`, `m` in item 4 and item 11 is the earlier month of `(m, m+1)`; capping a month-`(m+1)` part wage sum by `A_wage[l,m,q]` makes sealed truth `INFEASIBLE` whenever a single part's wage sum in month `m+1` exceeds month `m`'s leaf wage bill, and even with month `t` in `{m, m+1}` that linear bound is valid solely when the release shows leaf `l` for month `t` (never when `l` is carried forward under `PRV-56`, where item 11 adds no equality for the later month and `PRV-112` withholds unshown monthly aggregates). (ii) Parts touching `"outside the frame"`, side tuples `S`, or register tuples `R` do not have a joint-band tuple, bands `b_q`, wage sums `Q_q`, or `w_p_q` at non-eligible endpoints, yet item 11 requires `Q_q` and `L(b_q) K <= Q_q` `"in each month, with the bands of its tuple of that month"` (echoed by `PRV-121`'s `"in either month"`), omits `S` and `R` from the tuple-sum identities, includes `loc_p` inside `"The target variables of item 1"` split over parts, and omits cross-part target conservation across `"outside the frame"` (allowing `x_p_part[o_1, out] = 1` and `x_p_part[out, o_2] = 1` simultaneously for one person in `residence` or one single-group class `h` in `H` in `workplace` when `K[o_1, o_2] = 0`).
+2. Aggregate-class employer-group changes (`F2`): All employer groups outside `H` share the aggregate contribution class `h`. Holding a single variable `K` per `(origin tuple, destination tuple)` cannot separate stayers in the aggregate class from contributors whose employer group changed between two anonymous groups in the aggregate class at the same cell, category and bands (`PRV-56`, `PRV-113` item 11, `PRV-116` `month_change_residual` and `mover_status`).
+
+C2 (N2 — `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md`, `PRV-127` clause (b)): PASS
+Quoted text checked (`PRV-127`):
+> It refuses (a) any other ratio of two protected families, except the closed list of ratio statistics of section 6.2 and PRV-30, each of which takes its numerator and its denominator from columns of the same stored rows, and (b) any ratio of two protected families computed before release, those of the closed list and the talent ratio included.
+> A planted ratio computed from records (TST-257), a planted ratio with a suppressed input (TST-258), a planted ratio of any other two protected families outside the closed list of ratio statistics of section 6.2 and PRV-30, a planted ratio of two protected families computed before release, a planted read on units chosen by travel time and a planted figure on an unsnapped outline each fail.
+
+C3 (Item (a) — `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md`, `PRV-113` item 12): PASS
+Quoted text checked (`PRV-113` item 12):
+> At every tuple the parts of the listed companies and one remainder part for all other contributors add up to the aggregate variable, every part satisfies item 2 on its own, its indicator included, and every `workplace` part of `f` is zero at a cell where `f` is not registered.
+
+C4 (Item (b) — `BRF-96`, `DAT-165`, `MTH-113`, `BE-132`, `TST-246`, and `docs/GLOSSARY.md`): PASS
+Quoted text checked:
+- `docs/01_PROJECT_BRIEF.md` (`BRF-96`):
+  > PRV-127 refuses (a) any other ratio of two protected families, except the closed list of ratio statistics of section 6.2 of document 06 and PRV-30, each of which takes its numerator and its denominator from columns of the same stored rows, and (b) any ratio of two protected families computed before release, those of the closed list and the talent ratio included.
+- `docs/03_DATA_CONTRACTS.md` (`DAT-165`):
+  > PRV-127 refuses (a) any other ratio of two protected families, except the closed list of ratio statistics of section 6.2 of document 06 and PRV-30, each of which takes its numerator and its denominator from columns of the same stored rows, and (b) any ratio of two protected families computed before release, those of the closed list and the talent ratio included.
+- `docs/07_ECONOMIC_METHODS.md` (`MTH-113`):
+  > It forms the talent ratio only as MTH-122 states, from the two released tables, and PRV-127 refuses (a) any other ratio of two protected families, except the closed list of ratio statistics of section 6.2 of document 06 and PRV-30, each of which takes its numerator and its denominator from columns of the same stored rows, and (b) any ratio of two protected families computed before release, those of the closed list and the talent ratio included.
+- `docs/08_BACKEND.md` (`BE-132`):
+  > No figure other than MTH-122 divides the talent pool by the competing demand or combines them into one number (PRV-30, PRV-127); a planted ratio of any other two protected families outside the closed list of ratio statistics of section 6.2 of document 06 and PRV-30, each of which takes its numerator and its denominator from columns of the same stored rows, and a planted ratio of two protected families computed before release, those of the closed list and the talent ratio included, each fail.
+- `docs/12_TESTING_AND_QUALITY.md` (`TST-246`):
+  > A planted ratio of any other two protected families outside the closed list of ratio statistics of section 6.2 of document 06 and PRV-30, each of which takes its numerator and its denominator from columns of the same stored rows, and a planted ratio of two protected families computed before release, those of the closed list and the talent ratio included, must be refused by the guard of PRV-127 and fail.
+- `docs/GLOSSARY.md` (`Talent available near this site`):
+  > PRV-127 refuses (a) any other ratio of two protected families, except the closed list of ratio statistics of section 6.2 of document 06 and PRV-30, each of which takes its numerator and its denominator from columns of the same stored rows, and (b) any ratio of two protected families computed before release, those of the closed list and the talent ratio included.
+
+C5 (Nothing else): PASS
+`git diff 710ac47..3d499a3` matches `.overnight/IN/DIFF.patch` across the seven files (`docs/01_PROJECT_BRIEF.md`, `docs/03_DATA_CONTRACTS.md`, `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md`, `docs/07_ECONOMIC_METHODS.md`, `docs/08_BACKEND.md`, `docs/12_TESTING_AND_QUALITY.md`, `docs/GLOSSARY.md`). No privacy rule is relaxed (with `PRV-121` needing the alignment in `F2` below so its wording matches the corrected `PRV-113` item 11), no decision record is touched, no released number is altered, no requirement ID is renamed or removed, no line-number citation is added, and grep over `docs/` confirms zero bare runs of eight or eleven digits, zero local paths, zero e-mail addresses, and zero secrets.
+
+EXIT CODES
+- `python3 scripts/check_docs.py`: not executed (refused by the non-interactive read-only shell gate, which restricts shell invocations in this session to `cat`, `sed -n`, `rg`, `ls`, `git log`, `git show`, `git diff`; direct read-only inspection of the check's nine invariants across the changed files found zero violations).
+- `python3 scripts/check_tree.py`: not executed (refused by the same non-interactive read-only shell gate; `git status --short` is empty and all seven changed paths lie inside `docs/`).
+
+FINDINGS
+
+F1 — `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md`, `PRV-113` item 11
+Defect:
+(1) Linearisation month index and carried-forward scope: In `where the tuple maps to a published wage-bill leaf l, Q_q <= A_wage[l,m,q] z_c is its linear form`, `m` in item 4 and item 11 denotes the earlier month of the adjacent pair `(m, m+1)`. Applying `A_wage[l,m,q]` to the destination endpoint in month `m+1` caps month-`(m+1)` part wages at month-`m`'s leaf wage bill. Concrete input: one published single-cell `resident_pay` unit `l` with 15 stayers in `B01/B01` at QAR 500.00 in both months and 15 stayers in `B05/B05` at QAR 10,000.00 in month `m` and QAR 20,000.00 in month `m+1` (30 unrelated employer groups); `A_wage[l,m,net] = 157,500.00`, whereas the true month-`(m+1)` `B05/B05` stayer part has `z_c = 1` and `Q_net = 300,000.00 > 157,500.00`, making the unconditioned base model `INFEASIBLE` on sealed truth. Furthermore, when `l` is carried forward in month `t = m+1` under `PRV-56`, the release does not show `l` for month `m+1`, item 11 adds no equality for that month, and `PRV-112` excludes unshown monthly aggregates; the linear form `Q_q <= A_wage[l,t,q] z_c` is exact solely when the release shows `l` for month `t`.
+(2) Non-pay endpoints, side/register sums, `loc_p`, and cross-part target conservation: Item 11 covers side-count leaves (`S`) and `outlet_register` leaves (`R`) and introduces `"outside the frame"` as an origin and destination, yet states unconditionally that every part carries `Q_q` at both origin and destination and satisfies item 2 `"in each month, with the bands of its tuple of that month"`, equates `N` and `W_q` (omitting `S` and `R`) to sums over parts, splits `"The target variables of item 1"` (which include `loc_p[u,c,m]`) with `K` and `Q_q`, and omits target flow conservation across `"outside the frame"`. At `"outside the frame"`, `S`, or `R`, there is no joint-band tuple, band `b_q`, `Q_q`, or `w_p_q` in that month; omitting `S` and `R` leaves side-count and register cohorts unlinked to item 4's `S` and `R` aggregates; and without bounding `sum x_p_part <= 1` across all parts of `(m, m+1)` in `residence` (and per single-group class `h` in `H` in `workplace`, counting each part touching `h` once), a person target at `o_1` in `m` and `o_2` in `m+1` with `K[o_1, o_2] = 0`, `K[o_1, out] = 20`, `K[out, o_2] = 20` can set `x_p_part[o_1, out] = 1` and `x_p_part[out, o_2] = 1` simultaneously.
+(3) Aggregate-class employer-group changes: Section 10.1 places all employer groups outside `H` into one aggregate contribution class `h` (when `H` is empty, every tuple carries that single `h`). With a single `K` per `(origin tuple, destination tuple)` and cohorts defined as `"the sum of the parts whose origin and destination match it"`, contributors in the aggregate class who change between two anonymous employer groups at the same cell, category and bands share the identical `(origin tuple, destination tuple)` with stayers. Concrete input: `H` empty, one single-cell unit `U`, category `d = (family_housing, 2, eligible)`, 30 stayers in `B01/B01` at QAR 800.00, 70 stayers in `B03/B03` at QAR 6,000.00, and 30 earners in `B03/B03` at QAR 6,000.00 switching across 30 pairs of unrelated anonymous employer groups between `m` and `m+1`; on `occupation_pay`'s status-only `ALL` row for `(U, occ = 2)`, sealed truth for `"contributors whose employer group, band or category changed"` (`PRV-116` `month_change_residual`) has 30 employer-group changers (`QAR 180,000.00`) and 0 external joiners/leavers, whereas no `(origin tuple, destination tuple)` pair in `(U, occ = 2)` has a changed employer-group attribute, forcing those 30 contributors into `"outside the frame"` to meet `resident_pay`'s `A_cohort[stayers] = 100`, `A_cohort[leavers] = 30`, `A_cohort[joiners] = 30`.
+
+Exact replacement text for `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md` (`PRV-113` item 11 — replace the passage from `Every cohort is held as parts at the tuples of item 1:` through `The stayer wage variables of item 4 are the sums of the stayer parts.`):
+```markdown
+    Every cohort is held as parts within each contributor universe over that universe's tuples of
+    item 1 (`N` and `S` in `residence` and `workplace`, `R` in `register`) and one further origin
+    and destination, "outside the frame" (with no part from "outside the frame" to "outside the
+    frame"): for each pair of adjacent months `m` and `m+1`, each origin of `m` and destination of
+    `m+1` has a non-negative integer count `K` — split in `residence` and `workplace`, when both
+    endpoints are in-frame tuples of the aggregate contribution class, into two parts, one for
+    unchanged employer group and one for changed employer group — and, at each endpoint that is an
+    eligible-pay tuple (`N`), non-negative wage sums `Q_q` (`q` in `{net, basic}`) for that
+    endpoint's month `t` (`m` at the origin, `m+1` at the destination). At every tuple of `m`, its
+    count (`N`, `S` or `R`) and, where eligible, its `W_q` equal the sums of `K` and `Q_q` over its
+    outgoing parts; at every tuple of `m+1`, they equal the sums over its incoming parts; and each
+    cohort of a published leaf, its stayers included, with its wage sums in each month where
+    applicable, is the sum of the parts whose origin, destination and employer-group-change status
+    match it. At each eligible-pay endpoint (month `t` in `{m, m+1}`), every part satisfies item 2
+    on its own with the bands of that endpoint's tuple: `L(b_q) K <= Q_q`, for a finite band
+    `Q_q <= U(b_q) K`, and a binary `z_c` with `z_c <= K` and the indicator constraint
+    `z_c = 0 => Q_net = 0 and Q_basic = 0`; where that tuple maps to a wage-bill leaf `l` that the
+    release shows for month `t`, `Q_q <= A_wage[l,t,q] z_c` is its linear form. For each person
+    target, `x_p`, `x_p_side` and `w_p_q` of item 1 (`loc_p` remains at `(u,c,t)` under item 3) are
+    split over the parts of `residence` and `workplace`: each part has a binary `x_p_part <= K`
+    summing to `x_p` or `x_p_side` at each in-frame endpoint, summing across all parts of the pair
+    to at most one in `residence` and, for each `h` in `H` in `workplace`, summing to at most one
+    over the parts with `h` at either endpoint, and at each eligible-pay endpoint (month `t`) has
+    target wages `w_p_q_part` summing to `w_p_q` and satisfying item 1's target and
+    remaining-population lines with `K`, `Q_q`, `x_p_part` and `w_p_q_part` in place of `N`, `W_q`,
+    `x_p` and `w_p_q` (using `A_wage[l,t,q]` in their linear forms where that tuple maps to a
+    wage-bill leaf `l` that the release shows for month `t`). The stayer wage variables of item 4
+    are the sums of the stayer parts.
+```
+
+F2 — `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md`, `PRV-121`
+Defect:
+`PRV-121` says `Omitting item 11's origin-destination parts, tuple and cohort sum identities, per-part band bounds or empty-part indicator in either month, target and remaining-population lines, or stayer wage sum identities changes the feasible set and is a defect.` A joiner from `"outside the frame"`, a leaver to `"outside the frame"`, or a side/register endpoint has no per-part band bounds or empty-part wage indicator in a month whose endpoint is not an eligible-pay tuple, and item 11 also requires the aggregate-class employer-group-change part split and cross-part target conservation of `F1`.
+
+Exact replacement text for `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md` (`PRV-121` — replace the sentence `Omitting item 11's origin-destination parts, tuple and cohort sum identities, per-part band bounds or empty-part indicator in either month, target and remaining-population lines, or stayer wage sum identities changes the feasible set and is a defect.`):
+```markdown
+Omitting item 11's origin-destination parts (including the unchanged-group and changed-group split in the aggregate class), tuple and cohort sum identities, per-part band bounds or empty-part indicator at either eligible-pay endpoint, cross-part target conservation, target and remaining-population lines, or stayer wage sum identities changes the feasible set and is a defect.
+```
+
+Skills loaded: strict-reviewer, spec-to-code-compliance, sanad-provenance, al-muhasibi, muhasabah-gate
+````
+
+#### OI-37: confirmation 4: REJECTED
+
+Reviewed commit `1396568decf607bad259dea7e59a0b7f65d35378`. Anthropic Opus 5.5: a review by the lead's own maker (Anthropic) through another login: advisory for independence; the binding approval is the Kimi confirmation below. Fix 4 was applied by the lead.
+
+```text
+## VERDICT: REJECTED
+
+| Check | Result |
+|---|---|
+| C1 (a) | FAIL (Finding 1: a comparison that runs from a carried-forward month has no parts) |
+| C1 (b) | PASS |
+| C1 (c) | PASS |
+| C1 (d) | PASS. `residence` has the aggregate class, and the text correctly splits there |
+| C1 (e) | PASS |
+| C1 hand-work | The fixture is INFEASIBLE with the parts and admitted without them; my own valid population is FEASIBLE |
+| C2 | PASS |
+| C3 | PASS |
+| C4 | PASS |
+| `python3 scripts/check_docs.py` | exit 0 |
+| `python3 scripts/check_tree.py` | exit 0 |
+
+The fix is exact for every pair of adjacent months. It breaks when a unit and tier are carried forward and the next comparison is published. Item 11 then requires a cohort spanning a non-adjacent pair of months to be a sum of parts, but parts exist for adjacent pairs and no others. The true assignment is excluded. One sentence in item 11 fixes this (Finding 1).
+
+## C1: item 11
+
+### (a) FAIL
+
+These parts of (a) hold:
+
+- **An empty part is forced to zero.** Item 11 says: "At each eligible-pay endpoint (month `t` in `{m, m+1}`), every part satisfies item 2 on its own with the bands of that endpoint's tuple: `L(b_q) K <= Q_q`, for a finite band `Q_q <= U(b_q) K`, and a binary `z_c` with `z_c <= K` and the indicator constraint `z_c = 0 => Q_net = 0 and Q_basic = 0`".
+  - When `K = 0`, `z_c <= 0` gives `z_c = 0`, and the indicator gives `Q_net = Q_basic = 0`.
+  - At B12, which has no upper bound, the indicator is what forces zero. At a finite band, `U(b_q) * 0 = 0` forces it too.
+  - This holds at both endpoints: the origin in month `m` and the destination in month `m+1`.
+- **Tuple sums hold in both months.** Item 11 says: "At every tuple of `m`, its count (`N`, `S` or `R`) and, where eligible, its `W_q` equal the sums of `K` and `Q_q` over its outgoing parts; at every tuple of `m+1`, they equal the sums over its incoming parts".
+- **Cohort sums hold for an adjacent pair.** Item 11 says: "each cohort of a published leaf, its stayers included, with its wage sums in each month where applicable, is the sum of the parts whose origin, destination and employer-group-change status match it."
+
+This part of (a) fails: the comparison after a carried-forward month.
+
+1. Item 11 defines the parts "for each pair of adjacent months `m` and `m+1`, each origin of `m` and destination of `m+1`".
+2. Item 11 also ends: "A unit and tier carried forward add no equality for the later month; their variables still satisfy items 6 and 7, and the next comparison runs from the month the release shows."
+3. PRV-56 enumerates the cohorts "always against the month whose treated atoms the release shows for that unit and tier (ASSUMPTION 33)". ASSUMPTION 33 says: "Cohorts between months are enumerated against the month that the release shows for the unit and tier, so a change that failed alone is tested again together with later changes."
+4. DAT-137 then releases those cohorts: "its components are then treated, rounded leaves".
+5. So once unit U is carried forward from `m` to `m+1`, the published `month_change` row for `(m+1, m+2)` holds cohorts that run from month `m` to month `m+2`.
+6. No part has origin month `m` and destination month `m+2`.
+7. The adjacent parts of `(m+1, m+2)` do not hold those cohorts either. Item 4's line `sum(cohort variables matching published month_change component l, months m and m+1) = A_cohort[l,m]` therefore excludes the truth.
+
+The failing input and the replacement text are in Finding 1.
+
+### (b) PASS
+
+No wage sum, band bound or indicator is asked of a side count, a register count or "outside the frame":
+
+- Wage sums exist at pay endpoints and nowhere else: "and, at each endpoint that is an eligible-pay tuple (`N`), non-negative wage sums `Q_q` (`q` in `{net, basic}`) for that endpoint's month `t`".
+- The tuple identity asks for `W_q` "where eligible" and nowhere else.
+- The band bounds and the indicator apply "At each eligible-pay endpoint".
+- Target wages exist "at each eligible-pay endpoint (month `t`)".
+- The opening paragraph of item 11 says "with their wage sums in each month". The parts sentence qualifies this as "with its wage sums in each month where applicable", and item 7 says "Register leaves have no wage constraints."
+- No part runs "from "outside the frame" to "outside the frame"".
+
+### (c) PASS
+
+- The part cap uses its own endpoint month: "where that tuple maps to a wage-bill leaf `l` that the release shows for month `t`, `Q_q <= A_wage[l,t,q] z_c` is its linear form". Here `t` is "`m` at the origin, `m+1` at the destination".
+- The target lines use the same month: "(using `A_wage[l,t,q]` in their linear forms where that tuple maps to a wage-bill leaf `l` that the release shows for month `t`)".
+- A carried-forward month gives no cap. The opening of PRV-113 fixes a leaf "in each month of the window for which the release shows it (item 11 governs a carried-forward month)".
+- Hand-work 2 shows why this matters: one part holds QAR 570,000 in month `m+1`, while month `m`'s whole bill is QAR 470,000.
+
+### (d) PASS
+
+The split reads: "split in `residence` and `workplace`, when both endpoints are in-frame tuples of the aggregate contribution class, into two parts, one for unchanged employer group and one for changed employer group".
+
+- **`residence` has the classes.**
+  - Section 10.1: "A pay run has one contribution class for the target employer group, one for each insider and colluder group, and an aggregate class for every other contributor."
+  - Item 1 indexes the residence variables by class: "For `u` in `residence` or `workplace`, `N[u,c,m,h,d,b_net,b_basic]`".
+  - A resident's employer group can change while the person stays. DAT-04 says: "Residence tables count one person per month, attached to the job with the highest net pay that month".
+  - The residence contributor is "the person token" (PRV-42). Such a person is therefore a stayer of the unit (PRV-55: "Its stayers are the same earners in both months") and also a member of PRV-56's cohort of "contributors whose employer group ... changed".
+  - The unchanged part and the changed part separate these people. Both parts count as stayers, as "match it" requires.
+- **`workplace`.**
+  - The contributor is "`[person_token,employer_group_token]`" (PRV-42).
+  - A group change can be enumerated either as a stayer with a changed group, or as a leaver plus a joiner.
+  - Either reading has matching parts: the changed part, or one part to "outside the frame" and one part from it. The truth stays feasible under both.
+- **`register`.**
+  - `R[c,m,h,d]` carries classes, but no register cohort turns on a group change.
+  - Item 11 says: "for `register`, the companies entering or leaving a leaf, by the register's own dates".
+  - `docs/03` says `group_id` is "null for every register company, because the register shows no group above a main registration".
+  - No split is needed there, and the text gives none.
+
+### (e) PASS
+
+The target split reads: "For each person target, `x_p`, `x_p_side` and `w_p_q` of item 1 (`loc_p` remains at `(u,c,t)` under item 3) are split over the parts of `residence` and `workplace`: each part has a binary `x_p_part <= K` summing to `x_p` or `x_p_side` at each in-frame endpoint, summing across all parts of the pair to at most one in `residence` and, for each `h` in `H` in `workplace`, summing to at most one over the parts with `h` at either endpoint, and at each eligible-pay endpoint (month `t`) has target wages `w_p_q_part` summing to `w_p_q`".
+
+- **Conservation.** The target is conserved at both endpoints.
+- **Bounds.** The target has at most one part per pair in `residence` and at most one per listed group in `workplace`. The aggregate class of `workplace`, which holds many groups, is not bounded beyond `x_p_part <= K`. This is consistent with item 3's "at most one per permitted employer group in workplace".
+- **`loc_p`.** It is not split. Item 3's "At each cell and month, the sum of eligible and side membership is at most `loc_p`" still applies to the unsplit `x_p` and `x_p_side`.
+
+### Hand-work 1: the empty-cohort fixture of item 11 (its invented values)
+
+The fixture:
+
+- One `residence` B01/B01 tuple, with `N = x_p = 1` in months `m` and `m+1`.
+- In month `m`: `W_q = w_p_q = 0.01`, `z = 1` and `z_r = 0`.
+- Planted cohorts: one stayer with month-`m` wage sums of 0; no leavers, but leaver wage sums of QAR 0.01 in month `m`; no joiners.
+
+**With the parts, the model is INFEASIBLE.** Each of these contradictions is enough on its own:
+
+1. The leaver parts sum to the leaver count of 0, so each has `K = 0`. Then `z_c <= 0` gives `z_c = 0`, the indicator gives `Q = 0`, and the leaver wage sums are 0, not 0.01.
+2. The month-`m` tuple identity gives `0.01 = W_q = Q_stay + Q_leave = Q_stay + 0`. So the stayer parts carry 0.01, not the planted 0.
+3. The target split puts `x_p_part = 1` on a stayer part, because the leaver parts have `K = 0`. Its `w_p_q_part = 0.01 <= Q_stay = 0` then fails.
+
+**Without the parts, the model is FEASIBLE and admits the planted cohort.** Here "without the parts" means item 11 as it stood at 710ac47: cohort counts with wage sums, and "the later month's variables equal the earlier month's after those cohorts".
+
+- The count holds: `1 = 1 + 0`.
+- The month-`m` wage holds: `0.01 = 0 + 0.01`.
+- Month `m+1` holds: `W = 0.01 - 0.01 + (stayer wage sum at m+1 - 0) + 0`, met with a stayer wage sum at `m+1` equal to the tuple's `W` at `m+1`.
+- Nothing ties a zero count to a zero wage sum.
+
+### Hand-work 2: my invented valid population, which is FEASIBLE
+
+**Setting.**
+
+- Parameter set A, universe `residence`.
+- One cell unit U of `rp_all_money` at cell `c`. It is the one unit of its municipality and of this invented frame.
+- Every earner has `d = (family_housing, 2, eligible)` and net pay equal to basic pay, and each is in a different employer group of the aggregate class.
+- `H` holds no earner of U.
+- Per-earner band limits: B02 is [1,000.50, 4,999.49], B03 is [4,999.50, 9,999.49] and B05 is [14,999.50, 19,999.49].
+
+**Population.**
+
+| Cohort | Earners | Month `m` | Month `m+1` |
+|---|---|---|---|
+| steady stayers | 10 | QAR 2,000 (B02) | QAR 2,000 (B02) |
+| band risers (stayers) | 30 | QAR 2,000 (B02) | QAR 19,000 (B05) |
+| high stayers | 10 | QAR 15,000 (B05) | QAR 15,000 (B05) |
+| group changers (stayers whose employer group changes between two aggregate-class groups; the target T is one of them) | 30 | QAR 6,000 (B03) | QAR 6,000 (B03) |
+| leavers | 30 | QAR 2,000 (B02) | outside the frame |
+| joiners | 30 | outside the frame | QAR 6,000 (B03) |
+
+**Totals.**
+
+- Month `m`: 110 earners and a wage bill of QAR 470,000. The coarse ranges B01 to B02, B03 to B04 and B05 to B12 hold 70, 30 and 10.
+- Month `m+1`: 110 earners and a wage bill of QAR 1,100,000, which is larger than month `m`'s. The same ranges hold 10, 60 and 40.
+
+**Why this population is valid under set A.**
+
+- Every leaf has at least 10 earners, and the unit has at least 30.
+- There are 110 employer groups of one earner each.
+- The largest single wage is 3.2 % of the bill in month `m` and 1.7 % in month `m+1`, both under 15 %.
+- PRV-56 cohorts: joiners 30, leavers 30, band changers 30 (from B01 to B02 into B05 to B12), group changers 30 and stayers 80.
+  - Each cohort has at least 30 earners, so each passes even if a `money` cohort needs `min_earners_money`.
+  - The `(m, m+1)` row is therefore published with stayers 80, joiners 30 and leavers 30.
+- There is no index: 80 stayers is not more than 100 (PRV-55).
+
+**Parts.** All parts are in the aggregate class at cell `c`. Every other part has `K = 0`, `z_c = 0` and `Q = 0`.
+
+| Part | Origin (`m`) | Destination (`m+1`) | Employer group | `K` | `Q` at `m` | `Q` at `m+1` |
+|---|---|---|---|---|---|---|
+| P1 | B02 | B02 | unchanged | 10 | 20,000 | 20,000 |
+| P2 | B02 | B05 | unchanged | 30 | 60,000 | 570,000 |
+| P3 | B03 | B03 | changed | 30 | 180,000 | 180,000 |
+| P4 | B05 | B05 | unchanged | 10 | 150,000 | 150,000 |
+| P5 | B02 | outside the frame | none | 30 | 60,000 | none |
+| P6 | outside the frame | B03 | none | 30 | none | 180,000 |
+
+**Checks.**
+
+- **Tuple identities, month `m`.**
+  - B02: 10 + 30 + 30 = 70 earners, and 20,000 + 60,000 + 60,000 = 140,000.
+  - B03: 30 earners and 180,000.
+  - B05: 10 earners and 150,000.
+  - Total: 470,000.
+- **Tuple identities, month `m+1`.**
+  - B02: 10 earners and 20,000.
+  - B03: 30 + 30 = 60 earners, and 180,000 + 180,000 = 360,000.
+  - B05: 30 + 10 = 40 earners, and 570,000 + 150,000 = 720,000.
+  - Total: 1,100,000.
+- **Cohort identities.**
+  - Stayers: P1 + P2 + P3 + P4 = 80.
+  - Joiners: P6 = 30.
+  - Leavers: P5 = 30.
+  - Group changers: P3 = 30, with status "changed".
+  - Band changers: P2 = 30.
+- **Per-part band bounds.**
+  - P1: 10,005 ≤ 20,000 ≤ 49,994.90 in both months.
+  - P2: 30,015 ≤ 60,000 ≤ 149,984.70 at `m`, and 449,985 ≤ 570,000 ≤ 599,984.70 at `m+1`.
+  - P3: 149,985 ≤ 180,000 ≤ 299,984.70 in both months.
+  - P4: 149,995 ≤ 150,000 ≤ 199,994.90 in both months.
+  - P5: 30,015 ≤ 60,000 ≤ 149,984.70 at `m`; nothing is asked at "outside the frame".
+  - P6: 149,985 ≤ 180,000 ≤ 299,984.70 at `m+1`; nothing is asked at "outside the frame".
+  - `z_c = 1 <= K` on P1 to P6.
+- **Linear form, endpoint's own month.**
+  - The tuples map to U's wage-bill leaf, which the release shows for both months. At the `money` tier the wage bill is at unit level: section 5 lists `min_earners_money` as covering the "wage bill, mean and median band at unit level".
+  - P2 at `m+1`: 570,000 ≤ 1,100,000.
+  - The round-three form `A_wage[l,m,q]` would have needed 570,000 ≤ 470,000, which is false. That form excluded this truth; the new form admits it.
+- **Target T, on P3.**
+  - `x_p_part = 1 <= 30`. It sums to `x_p = 1` at origin B03 in `m`, and at destination B03 in `m+1` (P3 gives 1, P6 gives 0). Across all parts of the pair the sum is 1 ≤ 1.
+  - `w_p_q_part = 6,000` in each month, summing to `w_p_q`. It satisfies 4,999.50 ≤ 6,000 ≤ 9,999.49 and 6,000 ≤ 180,000.
+  - Remaining population: 29 × 4,999.50 = 144,985.50 ≤ 174,000 ≤ 29 × 9,999.49 = 289,985.21, with `z_r = 1 <= 29`.
+  - Linear forms: 6,000 and 174,000 are both ≤ 470,000 at `m` and ≤ 1,100,000 at `m+1`.
+  - `loc_p[residence,c,t] = 1` in both months and is not split; eligible plus side membership is 1 ≤ `loc_p`.
+  - Item 6: 6,000 ≤ 0.15 × 470,000 = 70,500, and 6,000 ≤ 0.15 × 1,100,000 = 165,000.
+
+Every line of the new item 11 holds at the true values, so the model is FEASIBLE.
+
+## C2: PASS
+
+PRV-121 at HEAD says: "Omitting item 11's origin-destination parts (including the unchanged-group and changed-group split in the aggregate class), tuple and cohort sum identities, per-part band bounds or empty-part indicator at either eligible-pay endpoint, cross-part target conservation, target and remaining-population lines, or stayer wage sum identities changes the feasible set and is a defect."
+
+| PRV-121 names | Item 11 holds |
+|---|---|
+| origin-destination parts, with the split | "each origin of `m` and destination of `m+1` has a non-negative integer count `K` — split in `residence` and `workplace`, when both endpoints are in-frame tuples of the aggregate contribution class, into two parts" |
+| tuple and cohort sum identities | "At every tuple of `m`, its count ... equal the sums of `K` and `Q_q` over its outgoing parts; at every tuple of `m+1`, they equal the sums over its incoming parts; and each cohort of a published leaf ... is the sum of the parts" |
+| per-part band bounds or empty-part indicator at either eligible-pay endpoint | "At each eligible-pay endpoint (month `t` in `{m, m+1}`), every part satisfies item 2 on its own", with `z_c <= K`, the indicator and its linear form `Q_q <= A_wage[l,t,q] z_c` |
+| cross-part target conservation | "`x_p_part <= K` summing to `x_p` or `x_p_side` at each in-frame endpoint, summing across all parts of the pair to at most one in `residence` and, for each `h` in `H` in `workplace`, summing to at most one", and "`w_p_q_part` summing to `w_p_q`" |
+| target and remaining-population lines | "satisfying item 1's target and remaining-population lines with `K`, `Q_q`, `x_p_part` and `w_p_q_part` in place of `N`, `W_q`, `x_p` and `w_p_q`" |
+| stayer wage sum identities | "The stayer wage variables of item 4 are the sums of the stayer parts." |
+
+- Every name matches a constraint, and every parts constraint has a name. The stale "in either month" is gone.
+- The other sentences of item 11 apply constraints that belong to items 4, 6 and 7:
+  - the `month_change` equalities and the stayer-bill lines;
+  - the item 6 tests of a non-empty changed cohort;
+  - items 6 and 7 on carried-forward variables.
+- Those constraints are governed by PRV-121's earlier sentences and by its rule "A reduction that changes the feasible set of any target expression is a defect".
+- The replacement in Finding 1 holds its parts "as above", so they fall under "item 11's origin-destination parts". PRV-121 needs no change for it.
+
+## C3: PASS
+
+- **PRV-127.** It says: "It refuses (a) any other ratio of two protected families, except the closed list of ratio statistics of section 6.2 and PRV-30, each of which takes its numerator and its denominator from columns of the same stored rows, and (b) any ratio of two protected families computed before release, those of the closed list and the talent ratio included." Its planted list holds "a planted ratio of two protected families computed before release".
+- **Item 12.** It says "every part satisfies item 2 on its own, its indicator included" (one occurrence).
+- **Siblings.**
+  - BRF-96, DAT-165, MTH-113 and the glossary entry "Talent available near this site" each hold "any ratio of two protected families computed before release", once per file.
+  - BE-132 and TST-246 each hold "a planted ratio of two protected families computed before release, those of the closed list and the talent ratio included". Both state the same closed list, "each of which takes its numerator and its denominator from columns of the same stored rows".
+- **No drift since round three.** `FIX4.patch` touches item 11 and PRV-121 and nothing else, so no round-three pass has moved.
+
+## C4: PASS
+
+- **Scope.** `git diff --stat 710ac47 HEAD` shows 7 files, 47 insertions and 10 deletions: the six documents and the glossary that the brief names.
+- **No decision record changed.** `git diff 710ac47 HEAD -- docs/decisions` is empty (0 bytes).
+- **No requirement ID renamed or removed.** The ID sets of docs/06, 01, 03, 07, 08 and 12, and the glossary terms, are equal at 710ac47 and at HEAD (`diff` exit 0 for each).
+- **No banned digit runs or citations.** No added line has a run of exactly eight or eleven digits (grep exit 1), and none has a line-number citation (grep exit 1).
+- **No released number changed.** The added numerals are cross-references, band names and the fixture's invented QAR 0.01.
+- **No relaxation.**
+  - Items 11 and 12 add exact constraints.
+  - The linear form now caps by the endpoint's own month, which is the exact cap. The round-three form excluded valid truths.
+  - PRV-127 clause (b) narrows from "any ratio computed before release" (at 710ac47) to ratios of two protected families. That removes its clash with the ratios that the pack's own build computes: `stayer_wage_index` (PRV-55; section 7: "The one released value computed from unreleased treated values, `stayer_wage_index`, is modelled as released") and `earners_published_share` (PRV-80).
+  - PRV-30 still says "No statistic is computed from base cells, from untreated values, by a model, by the browser, or by a query written at run time."
+
+## RUN
+
+Both checks ran on the clean tree at HEAD (`git diff --quiet` exit 0), before this file was written.
+
+| Command | Output | Exit code |
+|---|---|---|
+| `python3 scripts/check_docs.py` | "checked 689 text files, 96 Markdown files: OK" | 0 |
+| `python3 scripts/check_tree.py` | "checked 8 rules: OK" | 0 |
+
+## FINDINGS
+
+### Finding 1: `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md`, PRV-113 item 11 (also PRV-56, ASSUMPTION 33, DAT-137)
+
+**Defect.**
+
+- The parts exist "for each pair of adjacent months `m` and `m+1`".
+- Every published cohort must be "the sum of the parts whose origin, destination and employer-group-change status match it".
+- After a unit and tier are carried forward, "the next comparison runs from the month the release shows". PRV-56 enumerates its cohorts "always against the month whose treated atoms the release shows for that unit and tier", and DAT-137 publishes them as the row's components.
+- That comparison spans more than one month. No part covers it, and the adjacent parts do not sum to its cohorts.
+- The true assignment is therefore infeasible. Any assignment that meets the cohort equalities moves the count of the carried-forward month away from the truth.
+- This contradicts PRV-121: "A reduction that changes the feasible set of any target expression is a defect". The model must contain the truth.
+
+**Failing input** (invented, set A, `residence`):
+
+1. Unit U is a cell unit of `rp_all_count`. It has 100 earners in month `m`, each in a different employer group of the aggregate class.
+2. Between `m` and `m+1`, 5 earners join from "outside the frame" and 6 leave to it. Both cohorts are below `min_earners_count` (10), so PRV-56 carries U forward.
+3. The `(m, m+1)` row is `carried_forward`, and month `m+1` repeats month `m`'s treated atoms. The true month-`m+1` count is 99.
+4. Between `m+1` and `m+2`, 25 more join and 24 others leave.
+5. Enumerated against month `m`, the `(m+1, m+2)` row has joiners 30, leavers 30 and stayers 70. Each passes, so the row is published with these components.
+6. For the truth, the adjacent parts of `(m+1, m+2)` give joiners 25, leavers 24 and stayers 75. No part runs from `m` to `m+2`.
+7. Item 4's line `sum(cohort variables matching published month_change component l, months m and m+1) = A_cohort[l,m]` then requires 25 = 30, so the true assignment is INFEASIBLE.
+8. Any assignment that meets that line has U's stayer and leaver parts out of month `m+1` summing to 70 + 30 = 100, against the true 99.
+
+**Exact replacement text.** In item 11, replace this sentence, which wraps over several source lines:
+
+> A unit and tier carried forward add no equality for the later month; their variables still satisfy items 6 and 7, and the next comparison runs from the month the release shows.
+
+with:
+
+> A unit and tier carried forward add no equality for the later month; their variables still satisfy items 6 and 7, and the next comparison runs from the month the release shows: that comparison is held by its own parts, as above, over the universe's tuples, with the month the release shows in place of `m` and the later month of the comparison in place of `m+1`, and the cohorts of each published leaf for that comparison, the `month_change` components and stayers included, are the sums of those parts and not of the parts of the adjacent pair.
+
+**Notes on the replacement.**
+
+- The anchor phrase "the next comparison runs from the month the release shows." occurs once in the file.
+- PRV-121 needs no change: these parts are held "as above", so they are "item 11's origin-destination parts".
+- With the replacement, the failing input is FEASIBLE:
+  - The parts from `m` to `m+2` are 70 staying, 30 out and 30 in. They meet the tuple identities at `m` (100) and at `m+2` (100), and they sum to the published components.
+  - The adjacent parts of `(m, m+1)` (94 stay, 6 out, 5 in) and of `(m+1, m+2)` (75 stay, 24 out, 25 in) still meet their tuple identities, with the true 99 at `m+1`.
+  - The carried-forward month adds no leaf equality.
+
+## Observations outside the verdict
+
+All of these are pre-existing or concern test strength. No change is asked for in this round.
+
+1. **Items 1 and 2.** Their linear forms cap by "a published wage-bill leaf `l`" with `A_wage[l,m,q]`. They do not say "that the release shows for month `t`", as item 11 now does. For a carried-forward month, the opening of PRV-113 ("item 11 governs a carried-forward month") is the reading that gives no cap. The same words in items 1 and 2 would make that explicit.
+2. **Two workplace jobs in one tuple.** Item 1's binary `x_p` cannot hold two `workplace` jobs of the target in one aggregate-class tuple, which DAT-04 allows ("Workplace tables count one job per (person, employer group, month)").
+3. **Missing indicator for item 6 tests.** "each non-empty changed cohort satisfies the linear tests of item 6" needs an indicator when a latent cohort can be empty, and the text does not write one. This sentence was already present at 710ac47.
+4. **The empty-cohort fixture does not test the indicator.** The fixture sits on B01, where the per-part band bounds alone force the empty part to zero. A model that keeps the bounds but omits the empty-part indicator, which PRV-121 lists as a defect, is also INFEASIBLE on it. A copy on a B12/B12 tuple would detect that omission.
+5. **Workplace group changers.** The text does not settle whether a group changer in `workplace` is a stayer (PRV-55) or a leaver plus a joiner (contributor `[person_token,employer_group_token]`, PRV-42). Item 11's "match it" admits either reading, so feasibility does not depend on the answer.
+6. **Older wording elsewhere.** `TASKS.md` S6-T20 still reads "any ratio computed before release, is refused (PRV-127)". Decision 0023 and the OI-140 update keep the older wording as dated records.
+
+## Skills loaded
+
+- **Loaded and applied:** strict-reviewer, sanad-provenance, al-muhasibi and muhasabah-gate.
+- **Not loaded:** spec-to-code-compliance, because permission to load it was not granted. I followed its plain meaning: I checked each requirement against the text with quotes, and gave each defect with its file, requirement ID and exact replacement text.
+
+## Working notes
+
+- I used no network and changed no tracked file (`git diff --quiet` exit 0).
+- During the review I wrote temporary command-output files: three under `.overnight/` and two in the system temporary folder. I deleted all of them before the final check runs.
+- This file is the one output of the review.
+```
+
+#### OI-37: confirmation 5: APPROVED
+
+Reviewed commit `04ee6e6`. Moonshot AI Kimi K3.1 Pro through the Codex harness, OpenRouter lane; another maker than the fix builders (Google and OpenAI) and the lead (Anthropic), who applied the later exact-text fixes.
+
+```text
+VERDICT: APPROVED
+
+## C1: PRV-113 item 11
+
+### C1 (a): PASS
+
+Quoted text checked:
+
+> “a binary `z_c` with `z_c <= K` and the indicator constraint `z_c = 0 => Q_net = 0 and Q_basic = 0`”
+
+At `K = 0`, `z_c = 0`, forcing both wage sums to zero at every eligible-pay endpoint. Finite bands independently give `Q_q <= U(b_q) K = 0`; the indicator also covers B12.
+
+Quoted text checked:
+
+> “At every tuple of `m`, its count (`N`, `S` or `R`) and, where eligible, its `W_q` equal the sums of `K` and `Q_q` over its outgoing parts; at every tuple of `m+1`, they equal the sums over its incoming parts; and each cohort of a published leaf, its stayers included, with its wage sums in each month where applicable, is the sum of the parts whose origin, destination and employer-group-change status match it.”
+
+Thus every part contributes to both endpoint tuple identities, and published cohorts—including stayers—are partitioned by origin, destination and employer-group-change status. A true person-level assignment supplies such parts directly, with each part’s wages equal to the wages of its members.
+
+### C1 (b): PASS
+
+Quoted text checked:
+
+> “and, at each endpoint that is an eligible-pay tuple (`N`), non-negative wage sums `Q_q` (`q` in `{net, basic}`) for that endpoint's month `t`”
+
+> “At each eligible-pay endpoint (month `t` in `{m, m+1}`), every part satisfies item 2 on its own with the bands of that endpoint's tuple”
+
+> “at each eligible-pay endpoint (month `t`) has target wages `w_p_q_part`”
+
+Wage sums, band bounds, indicators and target wages are restricted to eligible-pay endpoints. Tuple identities request `W_q` only “where eligible”. Side counts `S`, register counts `R` and “outside the frame” receive no such variables or constraints. Item 7 separately states: “Register leaves have no wage constraints.” No part runs from “outside the frame” to “outside the frame”.
+
+### C1 (c): PASS
+
+Quoted text checked:
+
+> “for that endpoint's month `t` (`m` at the origin, `m+1` at the destination)”
+
+> “where that tuple maps to a wage-bill leaf `l` that the release shows for month `t`, `Q_q <= A_wage[l,t,q] z_c` is its linear form”
+
+> “using `A_wage[l,t,q]` in their linear forms where that tuple maps to a wage-bill leaf `l` that the release shows for month `t`”
+
+Both the part cap and the target/remaining-population linear forms use the endpoint’s own month. A carried-forward endpoint has no cap from an unshown monthly leaf. The invented population below also exercises a later wage bill larger than the earlier month’s bill.
+
+### C1 (d): PASS
+
+Quoted text checked:
+
+> “split in `residence` and `workplace`, when both endpoints are in-frame tuples of the aggregate contribution class, into two parts, one for unchanged employer group and one for changed employer group”
+
+Section 10.1 states:
+
+> “A pay run has one contribution class for the target employer group, one for each insider and colluder group, and an aggregate class for every other contributor.”
+
+The split is defined wherever item 1 has aggregate-class endpoints. In `residence`, an employer-group changer remains a stayer and is represented by the changed-group part. In `workplace`, either cohort interpretation is representable: a changed-group part, or departure to and arrival from “outside the frame”. `register` has no employer-group-change cohort requiring this split; its entries and exits follow the register’s dates.
+
+### C1 (e): PASS
+
+Quoted text checked:
+
+> “each part has a binary `x_p_part <= K` summing to `x_p` or `x_p_side` at each in-frame endpoint, summing across all parts of the pair to at most one in `residence` and, for each `h` in `H` in `workplace`, summing to at most one over the parts with `h` at either endpoint”
+
+> “at each eligible-pay endpoint (month `t`) has target wages `w_p_q_part` summing to `w_p_q`”
+
+> “`loc_p` remains at `(u,c,t)` under item 3”
+
+Target membership and wages are conserved across parts at every applicable endpoint. The cross-part bounds preserve item 3’s residence and per-employer-group workplace deduplication. `loc_p` remains unsplit and continues to bind eligible plus side membership at each cell and month.
+
+### C1 (f): PASS
+
+The applied sentence is:
+
+> “A unit and tier carried forward add no equality for the later month; their variables still satisfy items 6 and 7, and the next comparison runs from the month the release shows: that comparison is held by its own parts, as above, over the universe's tuples, with the month the release shows in place of `m` and the later month of the comparison in place of `m+1`, and the cohorts of each published leaf for that comparison, the `month_change` components and stayers included, are the sums of those parts and not of the parts of the adjacent pair.”
+
+PRV-56 states:
+
+> “always against the month whose treated atoms the release shows for that unit and tier (ASSUMPTION 33)”
+
+ASSUMPTION 33 states:
+
+> “Cohorts between months are enumerated against the month that the release shows for the unit and tier, so a change that failed alone is tested again together with later changes.”
+
+DAT-137 states that for a published row “its components are then treated, rounded leaves”.
+
+The new sentence supplies the non-adjacent comparison’s own parts, binds its published DAT-137 components and stayers to those parts, and explicitly prevents substitution of the adjacent pair’s parts. The adjacent parts still satisfy their own tuple identities. The carried-forward month continues to add no leaf equality.
+
+#### Hand-worked population 1: CONFIRM4’s failing input
+
+The historical text said:
+
+> “the next comparison runs from the month the release shows.”
+
+It supplied parts only for adjacent pairs.
+
+- Month `m`: 100 earners.
+- From `m` to `m+1`: 5 join and 6 leave, giving 99 true earners. Both changed cohorts are below `min_earners_count`, so the row is carried forward.
+- From `m+1` to `m+2`: 25 join and 24 leave, giving 100 true earners.
+- Enumerated against shown month `m`, the published comparison has 70 stayers, 30 joiners and 30 leavers.
+- The adjacent parts of `(m+1,m+2)` instead contain 75 stayers, 25 joiners and 24 leavers.
+
+Under the historical text, no parts run from `m` to `m+2`. Item 4’s published-component identities cannot be satisfied by the true adjacent assignment: they would require 25 joiners to equal 30, or would move 100 people out of month `m+1` as stayers plus leavers against the true 99. The true assignment is therefore **INFEASIBLE**.
+
+At this HEAD:
+
+- Parts `(m,m+1)`: 94 stay, 6 leave and 5 join.
+- Parts `(m+1,m+2)`: 75 stay, 24 leave and 25 join.
+- Comparison parts `(m,m+2)`: 70 stay, 30 leave and 30 join.
+
+The comparison parts meet the month-`m` count of 100 and month-`m+2` count of 100 and sum to the published components. The adjacent parts independently meet their own identities, including the true 99 at carried-forward month `m+1`. That month adds no leaf equality. The true assignment is therefore **FEASIBLE**.
+
+#### Hand-worked population 2: two carried-forward months
+
+Invented valid population, parameter set A, one `residence` money unit U and one B03/B03 tuple. Every earner has net and basic pay of QAR 6,000, is in a distinct employer group of the aggregate contribution class, and remains in the same category tuple while present.
+
+| Pair | Stayers | Joiners from outside | Leavers to outside | True later count | True later wage bill |
+|---|---:|---:|---:|---:|---:|
+| `m` to `m+1` | 114 | 5 | 6 | 119 | QAR 714,000 |
+| `m+1` to `m+2` | 114 | 6 | 5 | 120 | QAR 720,000 |
+| `m+2` to `m+3` | 96 | 25 | 24 | 121 | QAR 726,000 |
+
+Month `m` has 120 earners and QAR 720,000. The first two comparisons have joiner and leaver cohorts below both applicable minimums, so both rows are carried forward. Month `m+3` has a wage bill larger than month `m`’s.
+
+Enumerated against month `m`, the published `(m+2,m+3)` comparison has:
+
+- 85 stayers;
+- 36 joiners;
+- 35 leavers.
+
+These components pass the applicable minimums. Every monthly leaf passes the earner, unrelated-group, dominance and person-concentration tests. The stayer population does not exceed the trend minimum, so no index is required.
+
+The comparison parts `(m,m+3)` are:
+
+| Part | Count | Wage at eligible origin | Wage at eligible destination |
+|---|---:|---:|---:|
+| Stayers | 85 | QAR 510,000 | QAR 510,000 |
+| Leavers | 35 | QAR 210,000 | none |
+| Joiners | 36 | none | QAR 216,000 |
+
+They satisfy:
+
+- Month `m`: `85 + 35 = 120`; `510,000 + 210,000 = 720,000`.
+- Month `m+3`: `85 + 36 = 121`; `510,000 + 216,000 = 726,000`.
+- Published cohorts: exactly 85 stayers, 35 leavers and 36 joiners.
+- B03 bounds at each eligible endpoint: each person contributes QAR 6,000.
+- Endpoint caps: no part exceeds QAR 720,000 at `m` or QAR 726,000 at `m+3`.
+
+The three adjacent part sets retain their own identities:
+
+- `(m,m+1)`: 114 stay, 6 leave, 5 join; true count 119 at `m+1`.
+- `(m+1,m+2)`: 114 stay, 5 leave, 6 join; true count 120 at `m+2`.
+- `(m+2,m+3)`: 96 stay, 24 leave, 25 join; true count 121 at `m+3`.
+
+No wage variable or band constraint is requested at an outside-frame endpoint. Unused parts have `K = z_c = Q_q = 0`. A target among the 85 stayers conserves `x_p_part = 1` and QAR 6,000 across the comparison parts, with `loc_p` unchanged. The true assignment is therefore **FEASIBLE**.
+
+## C2: PASS
+
+PRV-121 states:
+
+> “Omitting item 11's origin-destination parts (including the unchanged-group and changed-group split in the aggregate class), tuple and cohort sum identities, per-part band bounds or empty-part indicator at either eligible-pay endpoint, cross-part target conservation, target and remaining-population lines, or stayer wage sum identities changes the feasible set and is a defect.”
+
+These words name exactly:
+
+- origin-destination parts and their aggregate-class split;
+- tuple and cohort sum identities;
+- band bounds and empty-part indicators at eligible-pay endpoints;
+- cross-part target conservation;
+- target and remaining-population lines;
+- stayer wage sum identities.
+
+The new comparison parts are held “as above”, so they are covered by “item 11's origin-destination parts” and by every accompanying category in that sentence. PRV-121 adds no constraint absent from item 11 and omits no class of parts constraint introduced by the fix.
+
+## C3: PASS
+
+PRV-127 clause (b) remains:
+
+> “any ratio of two protected families computed before release, those of the closed list and the talent ratio included.”
+
+Clause (a) retains:
+
+> “the closed list of ratio statistics of section 6.2 and PRV-30, each of which takes its numerator and its denominator from columns of the same stored rows”
+
+PRV-113 item 12 remains:
+
+> “At every tuple the parts of the listed companies and one remainder part for all other contributors add up to the aggregate variable, every part satisfies item 2 on its own, its indicator included, and every `workplace` part of `f` is zero at a cell where `f` is not registered.”
+
+BRF-96, DAT-165, MTH-113 and the glossary term “Talent available near this site” each retain:
+
+> “PRV-127 refuses (a) any other ratio of two protected families, except the closed list of ratio statistics of section 6.2 of document 06 and PRV-30, each of which takes its numerator and its denominator from columns of the same stored rows, and (b) any ratio of two protected families computed before release, those of the closed list and the talent ratio included.”
+
+BE-132 and TST-246 retain the same closed-list wording and the planted violation:
+
+> “a planted ratio of two protected families computed before release, those of the closed list and the talent ratio included”
+
+The round-five patch changes PRV-113 item 11 alone; these round-three and round-four passes remain intact at HEAD.
+
+## C4: PASS
+
+- `DIFF.patch` matches `git diff 710ac47..HEAD` byte for byte; comparison exit code 0.
+- `FIX5.patch` matches `git diff 1396568..HEAD` byte for byte; comparison exit code 0.
+- The changed paths are `docs/01_PROJECT_BRIEF.md`, `docs/03_DATA_CONTRACTS.md`, `docs/06_PRIVACY_AND_DISCLOSURE_CONTROL.md`, `docs/07_ECONOMIC_METHODS.md`, `docs/08_BACKEND.md`, `docs/12_TESTING_AND_QUALITY.md` and `docs/GLOSSARY.md`.
+- No decision record changed.
+- No requirement ID was renamed or removed.
+- No release-displayed number changed; the added fixture amount is explicitly invented.
+- No line-number citation or bare run of exactly eight or eleven digits was added.
+- No privacy rule is relaxed. The comparison parts restore sealed-truth feasibility without removing tuple, cohort, band, indicator, target or carry-forward constraints. PRV-127 retains the closed exceptions and the prohibition on other protected-family ratios.
+
+## EXIT CODES
+
+- `python3 scripts/check_docs.py`: 0 — `checked 689 text files, 96 Markdown files: OK`
+- `python3 scripts/check_tree.py`: 0 — `checked 8 rules: OK`
+
+## FINDINGS
+
+None.
+
+## SKILLS LOADED
+
+strict-reviewer, spec-to-code-compliance, sanad-provenance, al-muhasibi, muhasabah-gate
+```
+
+#### OI-37: merge record
+
+- The head that was merged, `6525f26`, is approved `04ee6e6` plus a clean merge of main `00754a2` and records-only commit `6525f26` (`OPEN_ITEMS.md`, `PROGRESS.md`). The log records an empty remerge-diff and a script check that changed lines are identical to the approved patch; the squash merge was pinned to `6525f26`.
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). .
+- The lead recorded `check_docs` 0 and `check_tree` 0 when opening the pull request at `6525f26`.
+- The supplied verdicts are quoted in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/77 was squash-merged on 2026-11-17 at that head; merge commit `a3a0348d07a383e24f94313ea0ddce87cb8e834b` on main; head tree `bd528d05f8703f1604ff9843c275f329a9405276`, merge tree `bd528d05f8703f1604ff9843c275f329a9405276`. CI on the merge commit: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/44020077739 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/44020077045 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/44020076573.
+
+### S2-T03 live fix — Frame municipalities into the series stage: task log (pull request 78)
+
+- The lead's first live public build for S2-T06 part B exited 1. For this fix the stop was `FAIL PUB-67 public_data selected-cache check`: `finish_build` called `build_series` without municipalities, so `lic_active`, `lic_cancelled` and `lic_issued` were blocked as `municipality_frame_not_supplied`; five municipality-dependent PUB-67 values were absent and the other four matched their anchors, and the figure-mismatch message hid the missing handoff. The lead ruled a separate S2-T03 follow-up pull request, followed after merge by part B live run 2 (lead ruling L-644, which numbered the item OI-255 in the run's own records; the number is not on main, so this ledger records it as OI-262). The separate Arabic-name reader stop is outside this fix.
+- Two work commits on main a3a0348d07a383e24f94313ea0ddce87cb8e834b: the fix `9ea80bc` (cherry-picked unchanged from the approved `995d7c5`, `fix(publicdata): the series stage codes licence rows from the frame's own municipalities (S2-T03)`) and the mutation pass `eb802d55fb1b7e1eda1333457e06a6f539dfd48a` (cherry-picked from the approved `2012f72`). This is a later fix of the task merged in pull request 52, not a replacement of its ledger. It serves TASKS.md S2-T03's criterion "section 9 regressions pass" by restoring the input PUB-67 needs; it closes none of the task's other criteria.
+- Built, L1: `frame/municipality_output.py` writes count, code, English name and exact Arabic name from the returned frame municipality table to `frame_s2_t02/municipalities.json`. `places/integrate.py frame_when_ready` removes stale output before checking readiness and writes only after a non-null `build_frame` result; the frame builder keeps its read-only contract. `series/frame.py` reads that output into typed `Municipality(code, name_ar)` rows, never raw boundaries or the review alias file, with the fixed reasons `municipality_frame_absent`, `municipality_field_empty`, `municipality_code_repeated`, `municipality_name_repeated` and `municipality_count_mismatch` (the last compares rows with the writer's stored count).
+- Built, L2: with a licence source, `series/figures.py finish_build` reads and passes the municipalities to `build_series`; without one it skips the reader. A reader refusal returns a series/public_data failure carrying its reason and appends `FAIL series municipality_frame_not_supplied` with the sorted licence source ids before any figure is computed. With a valid frame the existing figure checks remain.
+- Built, L3 and L4: `test_series_frame.py` covers invented-cache licence codes, the missing-frame refusal without licence output, ten reader-refusal plants, stale-output removal and the frame-then-stage order used by `fetch/build.py` (it calls `frame_when_ready` then `run_stage`; it does not run the fetch orchestrator, and its partial invented input still refuses PUB-69). `test_public_series.py` renames the missing-contract-mapping test to `test_missing_frame_output_refuses_even_with_matching_numbers` and expects the series failure, `municipality_frame_absent` and the fixed licence-source line. The frame README gains the same-build output and read-back sentence.
+- Class and makers: Deep (the fix changes which public figures the series build releases; TASKS.md calls S2-T03 hard, persona Data, and its earlier ledger called it Deep). Builder persona: senior data engineer for public statistical pipelines; reviewer persona: principal reviewer of official statistics pipelines and data provenance. Builder of the fix: Cognition SWE-2 through Devin, launcher model `swe-2-high` (job S2-T03.livefix.r1). Reviewer: Google Gemini 3.1 Pro through Droid, launcher model `gemini-3.1-pro-preview` (the verdict self-names Factory Droid and Gemini 3.1 Pro; no observed model beyond the flag): APPROVED `995d7c5`, findings none. The lead ruled that the override choosing that reviewer cited one full login without accounting for the other login as instructed; the reason was invalid, the reviewer is of a different maker under rule 35 and the verdict stands. Builder skills: task-standards, project-orientation, sanad-provenance, muhasabah-gate, strict-reviewer, github-flow (three development skills absent, applied by plain meaning); reviewer skills: strict-reviewer, sanad-provenance (code-review absent).
+- Builder evidence: the first reader-test collection was red (exit 2, missing `series.frame`); the final new-file run passed 14 and the changed files 123, exit 0. The manual break pass shows the removed municipality argument caught by both handoff tests.
+- Lead verification of the fix at `995d7c5` (2026-11-16): every suite passed (custodian 2,169, core 606, product 786, in the ordinary and whole-command interpreter forms), scripts unittest 844 OK, lock, lint, format, type check, versions, notes, docs, tree, agent-file comparison and history scan all exit 0. The checks file's header time 03:49 is UTC (the second account's shell clock); the lead's log time 06:51 is Qatar time: the same session.
+- Mutation (rule 37; lead campaigns 2026-11-16 through the isolated runner): `series/figures.py` 1,928 made and 159 survived, `series/frame.py` 64 and 5, `frame/municipality_output.py` (the writer of the compared count, requested by the builder) 42 and 15. Kill pass by OpenAI GPT-6 Astra through Codex (job S2-T03lf.mut): 44 new tests in four survivor test files; re-run campaigns: municipality_output 40 of 42 killed, series/frame 63 of 64, figures 1,890 of 1,928. The 41 survivors left were each proven equivalent by the builder; the lead checked every proof and wrote 41 rows in `scripts/mutation_explained.toml` (unexplained 0). The lead committed the tests and rows as `2012f72`. Review: Google Gemini through Droid APPROVED `2012f72` but named no inputs or code paths checked, so the lead had it reviewed again: Alibaba Qwen3.8 Max through Droid (job S2-T03lf.mut.review2) APPROVED `2012f72`, every item met, the 41 rows compared byte for byte, findings none.
+- The invented-archive timestamp random failure the builder reported: cause found. The invented boundary archive took each zip member's time from the clock, so two builds at different times wrote different bytes and hashes. Main fixed it in pull request 74 (fixed member time and permissions; `test_frame_fixture_archive.py`), and the kill pass fixed it independently (fixed member time and stored compression; `test_frame_fixture_clock.py`). Recorded as OI-263, closed by cause with both tests as proof.
+- Re-cut onto main a3a0348d07a383e24f94313ea0ddce87cb8e834b (lead ruling L-783 item 1): `995d7c5` and `2012f72` were cherry-picked as `9ea80bc` and `eb802d55fb1b7e1eda1333457e06a6f539dfd48a`. `git range-diff 5cfff64..2012f72 a3a0348d07a383e24f94313ea0ddce87cb8e834b..eb802d55fb1b7e1eda1333457e06a6f539dfd48a` shows the first commit equal and one forced difference in the second: `custodian/tests/fixtures/frame/invented.py`, where main's comment, fixed-time member and `external_attr` lines are kept together with the approved `compress_type = zipfile.ZIP_STORED`, and both clock tests are kept. That forced difference was confirmed by Moonshot Kimi K3.1 Pro through Devin (job PRF.cf3): APPROVED `eb802d55fb1b7e1eda1333457e06a6f539dfd48a`; it re-ran the range-diff itself (identical to the lead's), read the resolved function and ran both clock tests (2 passed, exit 0); findings none.
+- Lead checks at `eb802d55fb1b7e1eda1333457e06a6f539dfd48a` (2026-11-17, every suite but the browser stage): custodian 2,214, core 606 and product 786 passed in both interpreter forms; scripts unittest 876 OK; lint, format, type check, versions, notes, docs, tree, agent-file comparison and history scan all exit 0 (lead evidence PRF-ck). The whole test command with a fresh seed is the suite row below; hosted checks run on the pushed head.
+- Limits: no live success is claimed; S2-T06 part B live run 2 on main after this merges is the proof OI-262 waits for. The task's reconciliation, alias-review and mutation records from pull request 52 are not reopened or closed by this fix.
+
+#### Evidence for the work commit `eb802d55fb1b7e1eda1333457e06a6f539dfd48a`
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked python -m pytest custodian/tests/test_public_series.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    109 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T03 live fix at the work commit: changed by the fix: the missing frame output refuses even with matching numbers; receipts and the selected-cache checks of fetch/build.py.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked python -m pytest custodian/tests/test_series_frame.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    14 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T03 live fix at the work commit: added by the fix: licence codes from the invented cache, the missing-frame refusal, ten reader-refusal plants, stale-output removal and the frame-then-stage order.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked python -m pytest custodian/tests/test_series_frame_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    3 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T03 live fix at the work commit: added by the mutation pass: kills the survivors of series/frame.py.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked python -m pytest custodian/tests/test_series_figures_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    27 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T03 live fix at the work commit: added by the mutation pass: kills the survivors of series/figures.py.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked python -m pytest custodian/tests/test_series_figures_survivors_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    12 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T03 live fix at the work commit: added by the mutation pass: kills the survivors of series/figures.py on the build path.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked python -m pytest custodian/tests/test_municipality_output_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T03 live fix at the work commit: added by the mutation pass: kills the survivors of frame/municipality_output.py.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked python -m pytest custodian/tests/test_frame_fixture_clock.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T03 live fix at the work commit: added by the mutation pass: the invented boundary archive gives identical bytes when the local clock moves (OI-263).
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked python -m pytest custodian/tests/test_frame_fixture_archive.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T03 live fix at the work commit: main's test of pull request 74, kept beside the clock test at the forced difference in invented.py (OI-263).
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked python -P -s -m pytest -c pyproject.toml --rootdir . --collect-only -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "4496 tests collected in 0.80s"
+Seed:      none
+Notes:     The whole-tree collection under pytest -P on the work commit: every test module, the seven new ones of this fix among them, imports from the repository root.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    876 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The scripts guard tests on the work commit: the mutation runner's explanation file with this fix's 41 rows, the docs and tree guards.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The lint on the work commit: the two new modules and the seven new test files.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "455 files already formatted"
+Seed:      none
+Notes:     The format check on the work commit; it changes no file.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 303 source files"
+Seed:      none
+Notes:     The type check on the work commit: municipality_output.py, series/frame.py and the changed figures.py and integrate.py.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 701 text files, 96 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the work commit: the frame README changed by the fix.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the work commit: the new modules and tests stand where the tree rules allow.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 359 rows: OK"
+Seed:      none
+Notes:     The reference-notes check on the work commit; the fix changes no reference note.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two rules files must be byte-identical; the fix changes neither.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: range HEAD, 78 commits, at least 78 to list, RESULT: PASSED"
+Seed:      none
+Notes:     The pinned secret scanner over the history at the work commit: the new invented fixtures hold no secret pattern.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','a3a0348d07a383e24f94313ea0ddce87cb8e834b...eb802d55fb1b7e1eda1333457e06a6f539dfd48a'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/src/eii_custodian/publicdata/frame/municipality_output.py A:custodian/src/eii_custodian/publicdata/series/frame.py A:custodian/tests/test_frame_fixture_clock.py A:custodian/tests/test_municipality_output_survivors.py A:custodian/tests/test_series_figures_survivors.py A:custodian/tests/test_series_figures_survivors_build.py A:custodian/tests/test_series_frame.py A:custodian/tests/test_series_frame_survivors.py M:custodian/src/eii_custodian/publicdata/frame/README.md M:custodian/src/eii_custodian/publicdata/places/integrate.py M:custodian/src/eii_custodian/publicdata/series/figures.py M:custodian/tests/fixtures/frame/invented.py M:custodian/tests/test_public_series.py M:scripts/mutation_explained.toml'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "14 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The whole change against main a3a0348: 14 files (8 added, 6 changed), the files of the two work commits and nothing else.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   ./eii test --seed 2026111731
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    5343 passed, 0 failed, 0 skipped
+Seed:      2026111731
+Notes:     The whole test command with a fresh seed at the work commit, after the re-cut onto main.
+```
+
+```text
+### S2-T03 live fix — Frame municipalities into the series stage
+Commit:    eb802d55fb1b7e1eda1333457e06a6f539dfd48a
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','a3a0348d07a383e24f94313ea0ddce87cb8e834b..eb802d55fb1b7e1eda1333457e06a6f539dfd48a'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two work commits on main: the fix (from the approved 995d7c5) and its mutation pass (from the approved 2012f72, with the one forced difference in invented.py).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

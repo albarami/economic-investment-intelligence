@@ -47,6 +47,11 @@ def frame_when_ready(
     cache: Path, entries: Sequence[Entry], lines: list[str] | None = None
 ) -> None:
     """Build the frame only when its boundary source is already in the cache."""
+    from eii_custodian.publicdata.frame.municipality_output import (
+        MUNICIPALITY_OUTPUT,
+    )
+
+    (cache / MUNICIPALITY_OUTPUT).unlink(missing_ok=True)
     hdx = next(
         (
             item
@@ -62,14 +67,20 @@ def frame_when_ready(
         return
     from eii_custodian.publicdata.frame.build import build_frame
     from eii_custodian.publicdata.frame.checks import FrameError
+    from eii_custodian.publicdata.frame.municipality_output import (
+        write_municipality_output,
+    )
 
     log = lines if lines is not None else []
     token = _BUILD_LINES.set(log)
     try:
         try:
-            build_frame(cache, tuple(entries), review, None)
+            result = build_frame(cache, tuple(entries), review, None)
         except FrameError:
             _note(log, "frame", "frame_refused")
+        else:
+            if result is not None:
+                write_municipality_output(cache, result.tables["municipality"])
     finally:
         _BUILD_LINES.reset(token)
 

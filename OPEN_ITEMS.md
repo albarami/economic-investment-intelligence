@@ -2440,6 +2440,26 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - CLOSES WHEN: the records change holds the run addresses of both dispatches, the comparison's result and the two timings.
 - CLOSED: 2026-11-16, by the records change of S1-T20: the synthetic dispatch https://github.com/albarami/economic-investment-intelligence/actions/runs/43940084757 succeeded with all four shard outputs intact; the real campaign https://github.com/albarami/economic-investment-intelligence/actions/runs/43940437765 succeeded (killed 304, survived 3) in 21 minutes 31 seconds; the unpartitioned local run at the same commit gave the same counts in 517.41 seconds elapsed and about 523 processor seconds; `scripts/mutation_pilot.py compare` exited 0 with no differing mutant. Evidence rows are in [PROGRESS.md](PROGRESS.md) under S1-T20.
 
+## OI-262 — Live series handoff proof (S2-T03 live fix)
+
+- ID: OI-262
+- TYPE: PENDING
+- NEEDED: The merge of this fix and S2-T06 part B live run 2 on main showing the three licence sources coded from the frame's own municipalities and PUB-67 passing.
+- WHY: The first live run blocked the three licence sources without frame municipalities and reported a misleading PUB-67 failure (lead ruling L-644, which numbered this item OI-255 in the run's own records).
+- DONE SO FAR: The fix writes and reads the same-build frame output; it is approved, mutation tested and checked locally (pull request {PR}).
+- OPTIONS: **Default:** keep the live proof pending; invented fixtures and local suites prove no live success.
+- NEEDED BY: S2-T06 part B live run 2.
+
+## OI-263 — Invented boundary archive followed the clock (random failure, closed)
+
+- ID: OI-263
+- TYPE: RANDOM FAILURE (closed by cause)
+- NEEDED: Nothing more.
+- WHY: The builder of the S2-T03 live fix saw one failure of an invented-archive hash that later runs did not repeat; under rule 39 a green re-run alone does not close it.
+- DONE SO FAR: Cause found: each zip member's time came from the clock, so two builds at different times wrote different bytes. Fixed on main by pull request 74 (fixed member time and permissions, `custodian/tests/test_frame_fixture_archive.py`) and by this fix's mutation pass (fixed member time and stored compression, `custodian/tests/test_frame_fixture_clock.py`); both tests move the clock and assert identical bytes.
+- OPTIONS: **Default:** closed; reopen on any new failure of either test.
+- NEEDED BY: closed.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
