@@ -3403,7 +3403,72 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: The mutation tester's clean run failed once: 1 failed, 1,510 passed; the test compared the receipt's hash of the archive built inside the world with the hash of a second build in its assertion, and the two differed. The same test passed alone (13 passed). Cause: `invented_archive` wrote each member with `ZipFile.writestr(name, ...)`, which stamps the member with the current local time, so two builds on either side of a two-second step of the zip time give different bytes; two builds 2.1 seconds apart were reproduced with different hashes.
 - RESOLUTION: the fixture writes each member with a fixed member time and the same permission bits, and the planted test `custodian/tests/test_frame_fixture_archive.py::test_invented_archive_bytes_do_not_follow_the_clock` builds the archive at two clock readings an hour apart and requires one hash; it failed before the fix and passes after it. This closes the item by a found cause, not by a green re-run (rule 39). The inline archive of `custodian/tests/test_frame_coverage.py` is built and read once per test and is not hashed twice; it is left unchanged.
 
+## OI-300 — PUB-64 anchors and selected-source acceptance
+
+- ID: OI-300
+- TYPE: OPEN
+- RAISED BY: the S2-T08 planner; recorded by the PUB64-fix prerequisite, 2026-11-17.
+- CONCERNS: [04_PUBLIC_DATA_PACK.md](docs/04_PUBLIC_DATA_PACK.md), section 10, PUB-64; `publicdata/stage.py::EXPECTED` and `series/figures.py::compute_checks`.
+- WHY: The stage and series adapter omitted published output per employee and the five C4 computed shares required by PUB-64. Existing core arithmetic tests did not establish that the selected-source build checked those anchors.
+- DONE SO FAR: This prerequisite adds the pack-copied anchors, reuses `sector_norms` and `Component`, and tests the adapter on invented source-shaped rows and receipt chains. Under lead ruling L-802 item 1, component selection follows `custodian/data_tests/test_pinned_methods.py::test_pinned_c4`: case-insensitive Food Stuff, Beverages and Rents of Buildings, with group totals summed over the selected activity/year source rows. No separate total row or category-label confirmation is required.
+- NEEDED: Lead-only live evidence: `test_pinned_c4` against the pinned cache and the `./eii build-public` selected-hash stage check. Missing cache, mismatch or refusal is a failure, never a pass. Both are PENDING until the lead records actual results; this worker does not read the cache or run either live step.
+- CLOSE WHEN: The lead records both live checks and their selected source hashes, commands and real exit codes. Another-maker code review remains required before merge. This item does not close OI-03 or change any display or licence gate.
+- NEEDED BY: S2-T08 part B; this fix remains a separate prerequisite.
+
+### PO-S2-72 — A truncated family row of the pack's sources is skipped by the width test before its typed refusal
+
+- ID: PO-S2-72
+- TYPE: OPEN
+- RAISED BY: the first lens of task S2-T08 part A (Anthropic Claude Fable 5.2 through Claude Code), 2026-11-17, notes N4 and N5 of its confirmation of fix round 4
+- CONCERNS: `custodian/src/eii_custodian/publicdata/completeness.py` (the reading of the family rows of document 04); S2-T08 part B
+- EVIDENCE: Under a header of three or more columns, a truncated family row is skipped by the width test before the typed refusal `pack_family_row_truncated` is reached; it still fails closed later, in the family count, the family total or the pack's names. A three-column family row with a closing pipe splits into five cells and is accepted with no names, and is likewise refused later. The reviewer approved the part with these as notes, not findings: no row passes.
+- NEEDED: before part B reads document 04, the family row tested against the larger of the header width and five before the width skip, with a plant under a five-column header; or one line saying why the item is not valid.
+
+### PO-S2-73 — The pinned development server probes its own port with a socket it closes before binding
+
+- ID: PO-S2-73
+- TYPE: OPEN
+- RAISED BY: the builder of task S2-T10 part b (Z.ai GLM-5.3 through Factory Droid), 2026-11-17, fix round 4, after the reviewer's finding O1 at `cd13d77`
+- CONCERNS: `web/scripts/check-dev-server.mjs`; `web/README.md` (the `check:dev` bullet); the pinned vite 8.3.8
+- EVIDENCE: With no port named, the check binds and releases no port itself and the development server picks its own ephemeral port. In the installed vite 8.3.8, `httpServerStart` with a start port of zero calls `getAvailableEphemeralPort`, whose `tryListen` probe servers close before the port is returned, and only then `tryBindServer` binds the real server. A window of a few consecutive awaits remains in which another process of the same run could take the port. The check's claim was narrowed to what holds; the installed version is pinned by a test, so an upgrade fails loudly and this item is read again. No retry or wider timeout hides it. The reviewer approved `54619be`, no finding.
+- NEEDED: a development server started on a socket the parent holds, or an upstream change that keeps the port held from pick to bind; until then the window stays recorded. Or one line saying why the item is not valid.
+
+### PO-S2-74 — One refusal test of PUB-64 pins three of its ten reason texts
+
+- ID: PO-S2-74
+- TYPE: OPEN
+- RAISED BY: lens B of task PUB64-fix (Z.ai GLM-5.3 through Factory Droid), 2026-11-17, an advisory of its approval at `4fa9c78`
+- CONCERNS: `custodian/tests/test_series_exact_regressions.py` (`test_pub64_requires_receipt_lineage`)
+- EVIDENCE: The test asserts the refusal of PUB-64 without receipt lineage, but compares only three of the ten reason texts the refusal can carry; the reviewer recorded it as not a defect, for the next touch of the test.
+- NEEDED: the remaining seven reason texts asserted exactly when the test is next changed, or one line saying why the item is not valid.
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).
 - Additional open questions and assumptions recorded in documents 01 to 16 and the decision records indexed in [docs/README.md](docs/README.md).
+
+### OI-301 — PUB-67 missing selected-input calculations
+
+- ID: OI-301
+- Status: OPEN; reserved by lead ruling L-806; closure requires the lead's live run 3.
+- Scope: S2-T03/S2-T04 integration, the structural groups and the Al Daayen
+  municipality/code intersection of document 04, section 10, PUB-67.
+- LR3 implements the existing bucket calculator, reviewed municipality-name
+  resolution with the frame's actual key, selected CSV support through the shared
+  receipt helper, and the typed supporting block specified in document 03,
+  **PUB-67 supporting provenance**. PO-LR3-1 is held here: another-maker
+  provenance review of that block is pending with the code review, before merge.
+- Fixture corruption and check evidence are in the appended LR3 PROGRESS.md row.
+  The lead's selected-cache probe and live run 3 have not been run by this worker.
+
+### OI-302 — Places build date missing at the frame seam
+
+- ID: OI-302
+- Status: OPEN; reserved by lead ruling L-806; closure requires the lead's live run 3.
+- Scope: S2-T06 verification date forwarding, under L-808 item 3 and L-810 item 1.
+- LR3 forwards one validated build-start UTC date to the real loader. Header-only
+  verification files stay empty; refusal and showcase/flagship gates remain.
+  PO-LR3-2 is the named adjacent-midnight integration test and planted previous
+  date, with fixture evidence in the appended LR3 PROGRESS.md row.
+- Another-maker code review and the lead's live run 3 are pending. This does not
+  close or change OI-256, the separate places Arabic-name reader gap.

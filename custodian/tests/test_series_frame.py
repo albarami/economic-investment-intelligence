@@ -196,7 +196,22 @@ def test_frame_then_stage_supplies_municipalities(tmp_path: Path) -> None:
     lines = [f"PASS {lic_entry.key} sha256={digest} host=invented"]
     frame_when_ready(cache, entries, lines)
     written = json.loads((cache / _OUTPUT).read_text(encoding="utf-8"))
-    assert written == {
+    assert written["upstream_sha256"] == {
+        item.key: sha256_hex(
+            (
+                cache
+                / item.key
+                / next((cache / item.key).glob("*.meta.json")).name.replace(
+                    ".meta.json", "." + item.extension
+                )
+            ).read_bytes()
+        )
+        for item in entries
+        if item.key in {"bnd_hdx", "bnd_zone_2020"}
+    }
+    assert {
+        key: value for key, value in written.items() if key != "upstream_sha256"
+    } == {
         "count": 1,
         "municipalities": [
             {

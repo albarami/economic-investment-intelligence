@@ -3,6 +3,7 @@
 import csv
 import json
 from dataclasses import replace
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -38,6 +39,8 @@ def build_live_frame(
     review: Path,
     output: Path | None,
     result: FrameResult,
+    *,
+    build_date: date | None = None,
 ) -> FrameResult:
     entries = {e.source_id: e for e in registry}
     tables, sources, inventory = result.tables, result.sources, result.inventory
@@ -149,6 +152,7 @@ def build_live_frame(
         tuple(item.geometry for item in municipalities),
         grid,
         {item.key: item.geometry for item in zones},
+        build_date=build_date,
     )
     points = _place_points(cache)
     resolved: list[dict[str, Any]] = []

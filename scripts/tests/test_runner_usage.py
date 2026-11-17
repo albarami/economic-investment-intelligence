@@ -73,12 +73,18 @@ class RunnerUsage(unittest.TestCase):
         words = shlex.split(package["scripts"]["test:checks"])
         web = next(suite for suite in run_tests.SUITES if suite.name == "web-checks")
         self.assertEqual(web.args[-1], words[-1])
+        # The browser run is the first test file and Node's test-file
+        # concurrency is bounded to two, in the suite table and the npm
+        # script both (S2-T10 part B).
+        self.assertEqual(words[:2], ["node", "--test"])
+        self.assertEqual(web.args, tuple(words[2:]))
+        self.assertEqual(web.args[0], "--test-concurrency=2")
+        self.assertEqual(web.args[1], "spikes/performance/tests/run.node-test.mjs")
         spike = "spikes/glyphs/tests/*.node-test.mjs"
         performance = "spikes/performance/tests/*.node-test.mjs"
         script_globs = tuple(word for word in words if word.endswith(".mjs"))
         self.assertIn(spike, script_globs)
         self.assertIn(performance, script_globs)
-        self.assertEqual(web.args, script_globs)
         expected = (
             "python-guards",
             "python-core",

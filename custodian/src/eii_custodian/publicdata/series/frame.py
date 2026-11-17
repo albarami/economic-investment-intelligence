@@ -31,7 +31,14 @@ def frame_municipalities(cache: Path) -> tuple[Municipality, ...]:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         raise MunicipalityFrameRefused(FRAME_ABSENT) from exc
-    rows = payload.get("municipalities") if isinstance(payload, dict) else None
+    return parse_frame_municipalities(payload)
+
+
+def parse_frame_municipalities(payload: object) -> tuple[Municipality, ...]:
+    """Validate already-read frame rows so lineage can hash the same bytes."""
+    if not isinstance(payload, dict):
+        raise MunicipalityFrameRefused(FRAME_ABSENT)
+    rows = payload.get("municipalities")
     if (
         not isinstance(rows, list)
         or not rows

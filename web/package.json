@@ -20,7 +20,7 @@
     "check:hosts": "node scripts/check-no-third-party-hosts.mjs",
     "check:hosts:dist": "node scripts/check-no-third-party-hosts.mjs --dist",
     "check:dev": "node scripts/check-dev-server.mjs",
-    "test:checks": "node --test \"scripts/tests/*.node-test.mjs\" \"spikes/glyphs/tests/*.node-test.mjs\" \"spikes/performance/tests/*.node-test.mjs\"",
+    "test:checks": "node --test --test-concurrency=2 \"spikes/performance/tests/run.node-test.mjs\" \"scripts/tests/*.node-test.mjs\" \"spikes/glyphs/tests/*.node-test.mjs\" \"spikes/performance/tests/*.node-test.mjs\"",
     "spike:glyphs:build": "vite build --config spikes/glyphs/vite.config.ts",
     "spike:glyphs:install-browser": "node spikes/glyphs/install-browser.mjs",
     "test:spike:glyphs": "node spikes/glyphs/tests/run.mjs",

@@ -51,6 +51,12 @@ EXPECTED: dict[str, dict[str, str]] = {
         "compensation": "1308140",
         "operating_surplus": "1247422",
         "average_annual_wage": "31579",
+        "output_per_employee": "152875",
+        "compensation_share_1dp": "20.6",
+        "operating_surplus_share_1dp": "19.7",
+        "food_share_1dp": "29.3",
+        "beverages_share_1dp": "5.6",
+        "building_rent_share_1dp": "11.6",
         "goods_share_1dp": "40.6",
         "services_share_1dp": "16.5",
     },
@@ -210,6 +216,10 @@ def run_stage(
             from eii_custodian.publicdata.series.figures import validate_figure
 
             validate_figure(got)
+            if figure_id == "PUB-67":
+                from eii_custodian.publicdata.series.support import validate_support
+
+                validate_support(got.get("supporting_provenance"))
             got = got["values"]
         if got != expected:
             return StageResult(tuple(missing), figure_id)

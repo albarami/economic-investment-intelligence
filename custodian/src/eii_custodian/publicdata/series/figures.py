@@ -9,11 +9,13 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Mapping, Sequence
-from decimal import Decimal
+from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import TYPE_CHECKING
 from urllib.parse import quote
 
+from eii_core.calc.facts import CalculationFact, Measure, SourceChain
 from eii_core.calc.public_series import (
     C2_CALENDAR,
     ZERO,
@@ -25,7 +27,19 @@ from eii_core.calc.public_series import (
     rounded,
     unit_value,
 )
+from eii_core.calc.sector_economics import Component, sector_norms
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.frame.crosswalk import (
+    load_municipality_names,
+    normalise_name,
+)
+from eii_custodian.publicdata.review.activity import (
+    IsicClass,
+    SpineError,
+    class_bucket_counts,
+    entry_by_key,
+    parse_feed_rows,
+)
 from eii_custodian.publicdata.series.baskets import (
     reviewed_inputs,
     validate_source_review,
@@ -52,6 +66,7 @@ from eii_custodian.publicdata.series.reconcile import (
     emit_fact,
     wage_evidence,
 )
+from eii_custodian.publicdata.series.support import SUPPORT_KEYS, load_support
 
 if TYPE_CHECKING:
     from eii_custodian.publicdata.fetch.build import FetchFailure
@@ -289,8 +304,179 @@ def contract_rows(
     return output
 
 
+def _pub64_field(source: str, slot: str) -> str:
+    """Resolve one semantic contract slot; never fall back to a source position."""
+    fields = [
+        field
+        for field, target in FIELD_MAP[source].items()
+        if target == ("pub_sector_accounts", slot)
+    ]
+    if len(fields) != 1:
+        raise ValueError(source + ": one field required for " + slot)
+    return fields[0]
+
+
+def _pub64_checks(
+    data: Mapping[str, list[dict[str, object]]],
+    receipts: Mapping[str, dict[str, object]] | None,
+) -> dict[str, str]:
+    """Adapt PUB-64's published inputs to C4, with selected receipt lineage.
+
+    Selection follows data_tests/test_pinned_methods.py::test_pinned_c4:
+    case-insensitive component labels and group totals summed over the selected
+    activity/year rows. There is no separate total row or production derivation.
+    """
+    chosen = {
+        source: [
+            row
+            for row in data[source]
+            if str(row[_pub64_field(source, "activity_code")]) == "561"
+            and str(row[_pub64_field(source, "period")]) == "2022"
+        ]
+        for source in R1_SOURCES
+    }
+    if len(chosen["sec_hr_ind"]) != 1:
+        raise ValueError("sec_hr_ind: one restaurant indicator row required")
+    if not chosen["sec_hr_size"]:
+        raise ValueError("sec_hr_size: restaurant size rows required")
+    for source in ("sec_hr_goods", "sec_hr_serv", "sec_hr_size"):
+        rows = chosen[source]
+        if not rows:
+            raise ValueError(source + ": restaurant rows required")
+        label = _pub64_field(source, "indicator")
+        if len({str(row[label]).casefold() for row in rows}) != len(rows):
+            raise ValueError(source + ": duplicate restaurant source row")
+    if receipts is None or not R1_SOURCES <= receipts.keys():
+        raise ValueError("PUB-64 receipts required")
+    chains: dict[str, SourceChain] = {}
+    for source in sorted(R1_SOURCES):
+        receipt = receipts[source]
+        try:
+            validate_figure(_envelope([source], receipts))
+        except KeyError as exc:
+            raise ValueError("PUB-64 incomplete receipt") from exc
+        if receipt["source_id"] != source:
+            raise ValueError("PUB-64 receipt source mismatch")
+        chains[source] = SourceChain(
+            lineage_ref=source + ":" + str(receipt["sha256"]),
+            table="pub_sector_accounts",
+            method=METHOD,
+            version=VERSION,
+            publisher=str(receipt["publisher"]),
+            dataset=str(receipt["slug"]),
+            url=str(receipt["fetch_url"]),
+            licence=str(receipt["licence_id"]),
+            retrieved=datetime.fromisoformat(str(receipt["retrieved_utc"]))
+            .date()
+            .isoformat(),
+            sha256=str(receipt["sha256"]),
+        )
+
+    def number(value: object) -> Decimal:
+        try:
+            return Decimal(str(value))
+        except InvalidOperation as exc:
+            raise ValueError("PUB-64 numeric source field required") from exc
+
+    def reading(value: object, unit: str, source: str = "sec_hr_ind") -> Measure:
+        return Measure(
+            value=number(value),
+            unit=unit,
+            period="2022",
+            geography="national",
+            geography_kind="national",
+            input_class="public",
+            sources=(chains[source],),
+        )
+
+    def indicator(slot: str) -> object:
+        return chosen["sec_hr_ind"][0][_pub64_field("sec_hr_ind", "value:" + slot)]
+
+    def size_total(slot: str) -> Decimal:
+        field = _pub64_field("sec_hr_size", "value:" + slot)
+        return sum((number(row[field]) for row in chosen["sec_hr_size"]), ZERO)
+
+    employees = size_total("employees")
+    components = []
+    for source, group, slot, wanted in (
+        (
+            "sec_hr_goods",
+            "goods",
+            "intermediate_goods",
+            (
+                ("food_share_1dp", "Food Stuff"),
+                ("beverages_share_1dp", "Beverages"),
+            ),
+        ),
+        (
+            "sec_hr_serv",
+            "services",
+            "intermediate_services",
+            (("building_rent_share_1dp", "Rents of Buildings"),),
+        ),
+    ):
+        label = _pub64_field(source, "indicator")
+        field = _pub64_field(source, "value:" + slot)
+        total = sum((number(row[field]) for row in chosen[source]), ZERO)
+        for key, published_label in wanted:
+            matching = [
+                row
+                for row in chosen[source]
+                if str(row[label]).casefold() == published_label.casefold()
+            ]
+            if len(matching) != 1:
+                raise ValueError(
+                    source + ": one component required: " + published_label
+                )
+            components.append(
+                Component(
+                    key,
+                    group,
+                    reading(matching[0][field], "qar_thousand", source),
+                    reading(total, "qar_thousand", source),
+                    group,
+                )
+            )
+    norms = sector_norms(
+        employees=reading(employees, "count", "sec_hr_size"),
+        productivity=reading(indicator("productivity_of_employee"), "qar"),
+        compensation_thousand=reading(indicator("compensation"), "qar_thousand"),
+        surplus_thousand=reading(indicator("operating_surplus"), "qar_thousand"),
+        goods_percent=reading(indicator("goods_share"), "percent"),
+        services_percent=reading(indicator("services_share"), "percent"),
+        components=components,
+    )
+    result = {
+        "establishments": str(size_total("establishments")),
+        "employees": str(employees),
+        "compensation": str(indicator("compensation")),
+        "operating_surplus": str(indicator("operating_surplus")),
+        "average_annual_wage": str(indicator("average_annual_wage")),
+        "output_per_employee": str(indicator("productivity_of_employee")),
+    }
+    for key, norm in (
+        ("goods_share_1dp", "goods_percent"),
+        ("services_share_1dp", "services_percent"),
+        ("compensation_share_1dp", "compensation_percent"),
+        ("operating_surplus_share_1dp", "surplus_percent"),
+        ("food_share_1dp", "food_share_1dp"),
+        ("beverages_share_1dp", "beverages_share_1dp"),
+        ("building_rent_share_1dp", "building_rent_share_1dp"),
+    ):
+        fact = norms[norm]
+        if not isinstance(fact, CalculationFact) or not isinstance(fact.value, Decimal):
+            raise ValueError("PUB-64 numeric C4 result required")
+        result[key] = str(fact.value)
+    return result
+
+
 def compute_checks(
     data: Mapping[str, list[dict[str, object]]],
+    *,
+    isic_classes: Sequence[IsicClass] = (),
+    municipalities: Sequence[Municipality] = (),
+    activity_entry: Entry | None = None,
+    receipts: Mapping[str, dict[str, object]] | None = None,
 ) -> dict[str, dict[str, str]]:
     """Only computable checks; no anchor is ever copied into an observed result."""
     checks: dict[str, dict[str, str]] = {}
@@ -332,53 +518,7 @@ def compute_checks(
             "mix_share_1dp": rounded(parts["mix"] / parts["change"] * 100, 1),
         }
     if R1_SOURCES <= data.keys():
-        chosen = {
-            source: [
-                r
-                for r in data[source]
-                if str(r["activity_code"]) == "561" and str(r["year"]) == "2022"
-            ]
-            for source in R1_SOURCES
-        }
-        if len(chosen["sec_hr_ind"]) != 1:
-            raise ValueError("sec_hr_ind: one restaurant indicator row required")
-        if not chosen["sec_hr_size"]:
-            raise ValueError("sec_hr_size: restaurant size rows required")
-        indicator = chosen["sec_hr_ind"][0]
-        checks["PUB-64"] = {
-            "establishments": str(
-                sum(
-                    (
-                        Decimal(str(r["number_of_establishments"]))
-                        for r in chosen["sec_hr_size"]
-                    ),
-                    ZERO,
-                )
-            ),
-            "employees": str(
-                sum(
-                    (
-                        Decimal(str(r["number_of_employees"]))
-                        for r in chosen["sec_hr_size"]
-                    ),
-                    ZERO,
-                )
-            ),
-            "compensation": str(
-                indicator["compensation_of_employees_value_in_1_000_qr"]
-            ),
-            "operating_surplus": str(indicator["operating_surplus_value_in_1_000_qr"]),
-            "average_annual_wage": str(indicator["average_annual_wage_qr"]),
-            "goods_share_1dp": rounded(
-                Decimal(str(indicator["percentage_of_intermediate_goods_to_output"])), 1
-            ),
-            "services_share_1dp": rounded(
-                Decimal(
-                    str(indicator["percentage_of_intermediate_services_to_output"])
-                ),
-                1,
-            ),
-        }
+        checks["PUB-64"] = _pub64_checks(data, receipts)
     if "cus_imp_2025" in data:
         rows = [r for r in data["cus_imp_2025"] if r["year"] == "2025"]
         total = sum((Decimal(str(r["value_in_qatari_riyals"])) for r in rows), ZERO)
@@ -417,18 +557,70 @@ def compute_checks(
         checks["PUB-65"] = check
     if "lic_active" in data:
         active = data["lic_active"]
+        if activity_entry is None:
+            raise ValueError("PUB-67 activity entry required")
+        if not isic_classes:
+            raise ValueError("PUB-67 ISIC classes required")
+        try:
+            parsed = parse_feed_rows(active, activity_entry)
+            if parsed.left_out:
+                raise ValueError("PUB-67 unparsed activity codes")
+            buckets = class_bucket_counts(parsed.rows, isic_classes)
+        except SpineError as exc:
+            raise ValueError(str(exc)) from exc
+        review = Path(__file__).resolve().parents[4] / "publicdata/review"
+        # These are the reviewed name-group keys, not the frame's own keys.
+        reviewed_names = load_municipality_names(
+            review, {"1", "2", "3", "4", "5", "6", "7", "8"}
+        )
+        target_names = {
+            row["name"] for row in reviewed_names if row["municipality_code"] == "5"
+        }
+        targets = [
+            item.code
+            for item in municipalities
+            if normalise_name(item.name_ar) in target_names
+        ]
+        if len(targets) != 1:
+            raise ValueError("PUB-67 target municipality absent or ambiguous")
+        converted = contract_rows("lic_active", active, municipalities=municipalities)
+        if any(row["municipality_code"] is None for row in converted):
+            raise ValueError("PUB-67 unresolved source municipality")
+        active_total = sum(int(str(row["dd_lrkhs_lnsht"])) for row in active)
+        if (
+            buckets.total_active != active_total
+            or sum(
+                (
+                    buckets.seven_valid_prefix,
+                    buckets.seven_invalid_prefix,
+                    buckets.six_legacy,
+                    buckets.other_length,
+                )
+            )
+            != active_total
+        ):
+            raise ValueError("PUB-67 bucket reconciliation")
         checks["PUB-67"] = {
             "rows": str(len(active)),
-            "sum_count": str(sum((int(str(r["dd_lrkhs_lnsht"])) for r in active), 0)),
-            "distinct_codes": str(len({r["rmz_lnsht_ltjry"] for r in active})),
+            "sum_count": str(active_total),
+            "distinct_codes": str(len(parsed.rows)),
+            "isic_prefix": str(buckets.seven_valid_prefix),
+            "other_seven": str(buckets.seven_invalid_prefix),
+            "legacy_six": str(buckets.six_legacy),
+            "other_lengths": str(buckets.other_length),
+            "al_daayen_5610101": str(
+                sum(
+                    int(str(row["active_count"]))
+                    for row in converted
+                    if row["municipality_code"] == targets[0]
+                    and row["activity_code"] == "5610101"
+                )
+            ),
             "national_5610101": str(
                 sum(
-                    (
-                        int(str(r["dd_lrkhs_lnsht"]))
-                        for r in active
-                        if r["rmz_lnsht_ltjry"] == "5610101"
-                    ),
-                    0,
+                    int(str(row["active_count"]))
+                    for row in converted
+                    if row["activity_code"] == "5610101"
                 )
             ),
         }
@@ -568,6 +760,7 @@ def build_series(
     resolutions: Sequence[Resolution] = (),
     basket_review: Path | None = None,
     municipalities: Sequence[Municipality] = (),
+    supporting_selected: Mapping[str, str] | None = None,
 ) -> dict[str, object]:
     """Build selected versions only, clearing prior owned outputs before any refusal."""
     from eii_custodian.publicdata.stage import run_stage
@@ -726,21 +919,54 @@ def build_series(
         if set(sources) & selected.keys()
     )
     checks: dict[str, dict[str, str]] = {}
+    support = None
     groups = [{source: data[source]} for source in data if source not in R1_SOURCES]
     if R1_SOURCES <= data.keys():
         groups.append({source: data[source] for source in R1_SOURCES})
     for group in groups:
         source = next(iter(group))
         try:
-            checks.update(compute_checks(group))
-        except (ValueError, KeyError) as exc:
+            if source == "lic_active":
+                if not municipalities:
+                    continue  # The existing frame blocker already prevents release.
+                classes, support = load_support(
+                    cache, entries, supporting_selected or {}, municipalities
+                )
+                checks.update(
+                    compute_checks(
+                        group,
+                        isic_classes=classes,
+                        municipalities=municipalities,
+                        activity_entry=by_source[source],
+                        receipts=receipts,
+                    )
+                )
+            else:
+                checks.update(compute_checks(group, receipts=receipts))
+        except OSError as exc:
+            blocked[source] = (
+                *blocked.get(source, ()),
+                "regression: " + type(exc).__name__,
+            )
+        except (ValueError, KeyError, SpineError) as exc:
             blocked[source] = (*blocked.get(source, ()), "regression: " + str(exc))
     if "PUB-65" in checks:
         checks["PUB-65"]["basket_excludes_noodles"] = str(basket_checked).lower()
     for figure, values in checks.items():
         envelope = {**_envelope(DEPENDENCIES[figure], receipts), "values": values}
+        if figure == "PUB-67":
+            envelope["supporting_provenance"] = support
         validate_figure(envelope)
         _write(root / "regression" / f"{figure}.json", envelope)
+    if support is not None and "PUB-67" in checks:
+        table = "pub_licence_active"
+        envelope = {
+            **_envelope(table_sources[table], receipts),
+            "rows": tables[table],
+            "row_sources": row_sources[table],
+            "supporting_provenance": support,
+        }
+        _write(root / "internal" / f"{table}.json", envelope)
     stage = run_stage(cache, required=required, evidence=True)
     if not stage.mismatch:
         states = {source: entry.reconciliation for source, entry in by_source.items()}
@@ -750,6 +976,8 @@ def build_series(
                 "rows": tables[table],
                 "row_sources": row_sources[table],
             }
+            if table == "pub_licence_active":
+                envelope["supporting_provenance"] = support
             if any(source in blocked for source in table_sources[table]):
                 continue
             if (
@@ -814,7 +1042,33 @@ def finish_build(
                 exc.reason,
             )
     try:
-        result = build_series(cache, owned, selected, municipalities=municipalities)
+        supporting_selected = {}
+        if "lic_active" in selected:
+            for key in SUPPORT_KEYS:
+                try:
+                    entry_by_key(entries, key)
+                except SpineError:
+                    lines.append(
+                        "FAIL " + key + " supporting registry identity required"
+                    )
+                    raise ValueError("supporting registry identity required") from None
+                prefix = "PASS " + key + " sha256="
+                hashes = [
+                    line[len(prefix) :].split(" ", 1)[0]
+                    for line in lines
+                    if line.startswith(prefix)
+                ]
+                if len(hashes) != 1:
+                    lines.append("FAIL " + key + " selected receipt missing")
+                    raise ValueError("one supporting selected hash required")
+                supporting_selected[key] = hashes[0]
+        result = build_series(
+            cache,
+            entries,
+            selected,
+            municipalities=municipalities,
+            supporting_selected=supporting_selected,
+        )
     except (OSError, ValueError, KeyError) as exc:
         lines.append("FAIL series selected input refused")
         return FetchFailure(

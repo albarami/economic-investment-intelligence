@@ -13,6 +13,8 @@ from custodian.tests.test_public_series import fixture, series_cache
 from custodian.tests.test_series_exact_regressions import cancellation
 
 from eii_custodian.publicdata.fetch.build import FetchFailure
+from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.review.activity import entry_by_key
 from eii_custodian.publicdata.series import figures
 from eii_custodian.publicdata.stage import StageResult
 
@@ -149,12 +151,20 @@ def test_restaurant_selection_requires_both_axes():
     for rows in data.values():
         row = rows[0]
         rows.extend([dict(row, activity_code=551), dict(row, year="2021")])
-    assert figures.compute_checks(data)["PUB-64"] == {
+    from custodian.tests.test_series_exact_regressions import pub64_receipts
+
+    assert figures.compute_checks(data, receipts=pub64_receipts(data))["PUB-64"] == {
         "establishments": "12",
         "employees": "11",
         "compensation": "12",
         "operating_surplus": "11",
         "average_annual_wage": "17",
+        "output_per_employee": "14",
+        "compensation_share_1dp": "7792.2",
+        "operating_surplus_share_1dp": "7142.9",
+        "food_share_1dp": "1.7",
+        "beverages_share_1dp": "0.5",
+        "building_rent_share_1dp": "0.9",
         "goods_share_1dp": "2.5",
         "services_share_1dp": "1.3",
     }
@@ -162,9 +172,18 @@ def test_restaurant_selection_requires_both_axes():
 
 def test_present_restaurant_and_sparse_repeated_cancellations():
     shapes = _shapes()
-    active = dict(shapes["lic_active"][0], rmz_lnsht_ltjry="5610101")
+    from custodian.tests.test_pub67 import FRAME, classes
+
+    active = dict(
+        shapes["lic_active"][0], rmz_lnsht_ltjry="5610101", lbldy=FRAME[0].name_ar
+    )
     issued = dict(shapes["lic_issued"][0], rmz_lnsht_ltjry="5610101")
-    checks = figures.compute_checks({"lic_active": [active], "lic_issued": [issued]})
+    checks = figures.compute_checks(
+        {"lic_active": [active], "lic_issued": [issued]},
+        isic_classes=classes(),
+        municipalities=FRAME,
+        activity_entry=entry_by_key(load_registry(), "lic_active"),
+    )
     assert checks["PUB-67"]["national_5610101"] == "3"
     assert checks["PUB-69"]["restaurant_contract_rows"] == "1"
     assert figures.compute_checks(
@@ -201,7 +220,7 @@ def test_finish_selected_line_separator(tmp_path, suffix):
         _whole_text(lines[-1], "FAIL PUB-62 public_data selected-cache check")
     else:
         assert got == FetchFailure(
-            1, "series", "", "public_data", "valid selected input", "FileNotFoundError"
+            1, "series", "", "public_data", "valid selected input", "ValueError"
         )
         _whole_text(lines[-1], "FAIL series selected input refused")
 

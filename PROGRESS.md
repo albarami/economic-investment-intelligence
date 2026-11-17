@@ -30738,6 +30738,572 @@ Seed:      none
 Notes:     The two work commits on main: the fix (from the approved 995d7c5) and its mutation pass (from the approved 2012f72, with the one forced difference in invented.py).
 ```
 
+#### Decision 0052: review: APPROVED
+
+Reviewed commit `870d6ca974488705ead05f0966aee8cbf716fbdc`. Moonshot Kimi K3.1 Pro through Devin; another maker than the drafter (the lead, Anthropic).
+
+```text
+VERDICT: APPROVED
+SKILLS LOADED: strict-reviewer and sanad-provenance loaded; code-review not available.
+(1) PASS
+(2) PASS
+(3) PASS
+(4) PASS
+(5) PASS
+FINDINGS: none
+PROPOSED OPEN ITEMS: none
+MARKER-D0052-REVIEW
+```
+
+#### Decision 0052: merge record
+
+- The head that was merged, `870d6ca974488705ead05f0966aee8cbf716fbdc`, is the approved commit `870d6ca`; the log records the squash merge pinned to that head.
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/44154251452 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/44154251572 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/44154251652.
+- The supplied verdict is quoted in full above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/80 was squash-merged on 2026-11-17 at that head; merge commit `1a0060b8402e486356465ead4985564200f49eef` on main; head tree `b840446c8c7b6735d58a0c56dcff46d7ea6ac378`, merge tree `b840446c8c7b6735d58a0c56dcff46d7ea6ac378`.
+
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b): task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/81 )
+
+- What it is: a train under decision 0032 (rule 33), with four tasks, each approved on its own commits by another maker than its builders. The joined work commit is `e1de979a38c61c21aeb59410ef39a10d1f418176` on `1a0060b8402e486356465ead4985564200f49eef`; twenty-three work commits (eighteen task commits and five commits of the lead's two joins), one ledger, unchanged gates.
+- The four tasks and their approved heads. LR3, the correction of PUB-67's missing groups and of the places build date (OI-301, OI-302): `0fc2776`. PUB64-fix, the regression anchors of PUB-64 that S2-T08 part B needs (OI-300): `b6fa487`. S2-T08 part A, the interfaces of the Public pack's assembly: `d346768`. S2-T10 part b, the web-checks criterion within its bound: `54619be`. Every approved commit keeps its own hash in the train: the joins are merge commits, nothing is replayed.
+- Dependencies. All four tasks were built on main `b48785d` (PUB64-fix on its parent `a784e9e`). LR3 and PUB64-fix are corrections ruled from the live run of S2-T06 part B and name no other task. S2-T08 part A delivers interfaces only and reads no assembled pack: the dependencies that its later criteria need (the trade assembly of decision 0040, S2-T28, S2-T29, S2-T30, the merged pack) belong to part B, which stays queued. S2-T10 part b delivers the web-checks lever only; S2-T10's remaining criteria wait for every other slice-S2 task, as its entry says.
+- The first join, train T3. The lead (Anthropic Claude Opus 5.5) merged PUB64-fix onto LR3 (`b3bbadf`). Forced differences: custodian/src/eii_custodian/publicdata/series/figures.py (both tasks' keywords and refusal branches kept in one `compute_checks`), PROGRESS.md (both tasks' sections) and scripts/mutation_explained.toml (both sides' appended rows, 582 rows). The lead's commit `625fa5e` widened one LR3 test double in custodian/tests/test_series_figures_survivors_lr3.py by the receipts keyword that PUB64-fix added. Confirmation at `625fa5e`: Z.ai GLM-5.3 through Factory Droid, APPROVED, K1 to K5 met (exactly the approved commits; both tasks' keywords and calls kept; the widened test double; the line counts of figures.py; the 582 rows), one record finding (the PUB-64 PROGRESS row still holds two placeholders; corrected by the appended row below). The lead's campaign over figures.py and stage.py at `625fa5e` left six unexplained figures.py survivors (figures.py 2,513 made, 2,494 killed, 19 survived; stage.py 123 made, 121 killed, 2 survived; none timed out or not covered); the lead's commit `360034d` appended their six explanations. Confirmation at `360034d`: Z.ai GLM-5.3 through Factory Droid, APPROVED, no finding; every survivor of the campaign matched by a row. The lead's campaign at `360034d`: figures.py (file SHA-256 `7cb68d83b80a915486f0a5f093130444b14c575018b08ed5d67eb64fd78c4533`, the same at `177e6db`) 2,513 made, 2,494 killed, 19 survived, 0 timed out, 0 not covered, 0 incomplete; every survivor matched by a row of scripts/mutation_explained.toml, runner exit 0 (2026-11-17 20:25 to 22:05, 5,971 s).
+- The second join. The lead merged S2-T08 part A onto `360034d` (`9c9bdde`) and S2-T10 part b onto that (`177e6db`). The one forced difference is scripts/mutation_explained.toml, where both sides only appended rows: the union holds 609 unique rows (529 of main, 59 of train T3, 21 of part A), none changed. S2-T10 part b merged with no conflict. Confirmation of the second join at `177e6db`: Z.ai GLM-5.3 through Factory Droid, APPROVED, no finding: J1 exactly the approved commits and the two merges; J2 every task file identical to its task's head except the explanation ledger, no other file changed; J3 the ledger holds every row of main and of each side exactly once (609), no row text changed. It ran no command (read-only), and says so.
+- The move onto main (decision 0039 item 2, ruling L-883). After decision 0052 merged (`1a0060b`), the lead merged main into `177e6db` (`e1de979`). The move adds only decision 0052's four documents (the record, documents 12 and 14, docs/README.md), with the same patch-id as main's own change (`43ff9449fe54`); no file of the train's tasks changes. Those documents are neither records nor code or tests, so the moved head was confirmed again: OpenAI GPT-6 Astra through Codex, APPROVED `e1de979`, no finding: M1 the merge's ordered parents are `177e6db` and `1a0060b`, and main's sole parent is `b48785d`; M2 `git diff 177e6db e1de979` and `git diff b48785d 1a0060b` have the same bytes (object hash `4c527e50`) over the same four documents, none of which the train changed; M3 `git diff b48785d 177e6db` and `git diff 1a0060b e1de979` have the same bytes (object hash `6092b283`); M4 `git show --cc e1de979` shows no combined-diff hunk. An earlier attempt by Z.ai GLM-5.3 through Factory Droid returned REJECTED with every check unverified because its session had no command tool; it found nothing against the move and is not counted as a confirmation.
+- The lead's identity script at `177e6db`, file by file against each task's own head: train T3, 36 files, 35 identical, the explanation ledger differs by the union only; S2-T08 part A, 16 files, 15 identical, the same union only; S2-T10 part b, 16 files, all identical; no joined file outside the tasks' own changes. At the first join, the lead's line script against each task's own head: LR3, 32 files, 30 carry every own line, 2 differ (figures.py and the widened test double); PUB64-fix, 11 files, 10 carry every own line, 1 differs (figures.py); each difference is a forced one named above.
+- The lead's checks on the joined head `177e6db`: custodian 2,697 passed (plain and isolated), core 606, product 786, the scripts suite 876 OK, the static checks and the history scan passed. The whole test command with a fresh seed on the exact merge result and the six hosted checks follow at the train's turn; head checks are unchanged.
+
+- **LR3: PUB-67's missing groups and the places build date (OI-301, OI-302).** Approved commits `e58d264`, `b00244a`, `0fc2776`, unchanged in the train.
+- What was built: PUB-67's five anchored structural code groups computed from the selected receipts, with the municipality resolution of the frame; a support module for receipt-backed reads of the selected tables with path-free refusals; one build-start date in UTC forwarded from the fetch build through both frame layers to the places stage; the supporting-provenance sentences of documents 03 and 04; tests of each with planted refusals.
+- Who did what. Plan: OpenAI GPT-6.1 Sol through Codex; its design review by Z.ai GLM-5.3 through Factory Droid, APPROVED with two advisory findings. Build: OpenAI GPT-6.1 Sol through Codex (`e58d264`; the lead committed the sandbox's tree). Review at `e58d264`: lens A, Anthropic Claude Opus 5.5 through Claude Code, REJECTED (one blocking finding: an exact assertion of test_public_series.py weakened); lens B, Z.ai GLM-5.3 through Factory Droid, APPROVED with one low finding (a file-system error's path text in blocked evidence). Fix: OpenAI GPT-6.1 Sol (`b00244a`); lens A APPROVED the whole change (fail-first shown: the new tests against the old code, 24 failed), lens B APPROVED the fix. Mutation: the lead's campaign at `b00244a` over nine modules, a kill round by OpenAI GPT-6.1 Sol (`0fc2776`), confirmed by Moonshot AI Kimi K3.1 Pro through Abacus, APPROVED, no finding; the lead's campaign at `0fc2776`: exit 0, 4,409 made, 59 survived, each explained, none timed out or not covered.
+- The lead's checks at `0fc2776`: custodian 2,349 passed (plain and isolated), core 606, product 786, the scripts suite 876 OK, the static checks exit 0 (browser stage at the train's turn).
+- Limits: OI-301 and OI-302 stay open until the lead's live run of S2-T06 part B passes on the merged code; the live probe of the selected cache is that run's own step.
+
+- **PUB64-fix: the regression anchors of PUB-64 (OI-300).** Approved commits `189df60`, `4fa9c78`, `b6fa487`, unchanged in the train.
+- What was built: PUB-64's productivity and five shares checked against the anchors of document 04, with a receipt-backed keyword of `compute_checks`; the stage's expected checks extended; the restaurant survivor test passes the receipts and asserts every anchored value; no display or licence gate weakened.
+- Who did what. Build: OpenAI GPT-6.1 Sol through Codex (`189df60`, `4fa9c78`; the lead stopped its build-time campaign, run outside the isolated wrapper, and ran the campaign itself). Review at `4fa9c78`: lens A, Moonshot AI Kimi K3.1 Pro through Factory Droid, APPROVED, no finding (it noted the two placeholders of the PROGRESS row); lens B, Z.ai GLM-5.3 through Factory Droid, APPROVED, no finding, one advisory (one refusal test pins three of ten reason texts; PO-S2-74). Mutation: the lead's campaign at `4fa9c78` (figures.py 2,279 made, 2,241 killed, 38 survived; stage.py 116 made, 114 killed, 2 survived); kill round by OpenAI GPT-6.1 Sol (seven tests in one new file); campaign 2 with them (figures.py 2,279 made, 2,263 killed, 16 survived; stage.py 116, 114, 2), the eighteen survivors explained (eight new rows), the runner's judgement exit 0; committed as `b6fa487`, confirmed by Moonshot AI Kimi K3.1 Pro through Factory Droid, APPROVED, no finding. The campaign over its modules after the join is train T3's above.
+- Correction (rule 38) of the earlier PUB64-fix row of this file, which still holds two placeholders: its work commit is `b6fa487`; its final campaign is campaign 2 above, with the eighteen survivors explained and the judgement exit 0; its mutation confirmation is the one above. The earlier row is not rewritten.
+- The lead's checks at `b6fa487`: custodian 2,292 passed (plain and isolated), core 606, product 786, the scripts suite 876 OK, the history scan passed, the static checks exit 0.
+- Limits: OI-300 stays open until the lead's live run records the pinned check and the selected hash of the build.
+
+- **S2-T08 part A: the interfaces of the Public pack's assembly.** Approved commits `8639782`, `7839e0d`, `7c4b69e`, `934f5f4`, `255c925`, `e446940`, `d346768`, unchanged in the train.
+- What was built: pure interfaces with invented fixtures and planted violations, reading no cache: source completeness (completeness.py), the seeded draw of twenty figures (draw.py), the gate records (gate_report.py), the value-free comparison of the figures review (figures_review.py and scripts/figures_review.py). Criteria of S2-T08 met by this part: the completeness mechanism with its refusals; the twenty-figure contract of the review; the value-free comparison; the gate records. Left open for part B: the trade-source assembly of decision 0040, the full pack assembly, the reads by snapshot hash, the completeness of S2-T28's and S2-T29's sources, S2-T30's bundle, OI-03 and the human review of twenty figures on the real release.
+- Who did what. Build: OpenAI GPT-6.1 Sol through Codex (`8639782`). Review at `8639782`: lens A, Z.ai GLM-5.3 through Factory Droid, APPROVED (six secondary refusal branches without a plant, as findings); lens B, Moonshot AI Kimi K3.1 Pro through Abacus, REJECTED (a production import of test constants; the live verdict did not require twenty stored figures; two further findings). Fix: OpenAI GPT-6.1 Sol (`7839e0d`); both lenses APPROVED it, no finding. The figures review test's path fix (`7c4b69e`), APPROVED by lens A. Mutation: the lead's campaign at `934f5f4` after a kill round (completeness 587 made, 570 killed, 17 survived; gate_report 439, 438, 1; draw 148, 145, 3; figures_review 86, 86, 0; none timed out or not covered), confirmed by Anthropic Claude Fable 5.2 through Claude Code, by Google Gemini 4 Carbon through Abacus and by Google Gemini through Codex, each APPROVED. Fix rounds 3 and 4 by OpenAI GPT-6.1 Sol (`255c925`, `e446940`: a truncated family row and a forbidden row refuse alone, keeping their duplicate-key and uncatalogued-table refusals), first lens Anthropic Claude Fable 5.2 APPROVED at `e446940`; the lead's commit `d346768` rewrote two explanations whose source text moved; second lens Google Gemini 4 Carbon through OpenRouter APPROVED `934f5f4..d346768`, no finding. The lead's campaigns at the last change of each module exit 0: completeness at `d346768` (596 made, 579 killed, 17 survived, each explained, none timed out), draw at `255c925` (148, 145, 3), gate_report and figures_review at `934f5f4`.
+- The lead's checks at `7839e0d`: custodian 2,309 passed, core 606, product 786, the scripts suite 876 OK, the static checks exit 0; at the joined head, see the train's part.
+- Limits: part B waits for this train on main; the width test of a truncated family row of the pack's sources goes to part B (PO-S2-72).
+
+- **S2-T10 part b: the web-checks criterion within its bound.** Approved commits `16c0a17`, `cc5c919`, `e4719a2`, `cd13d77`, `54619be`, unchanged in the train.
+- What was built: the web checks run two test files at a time with the browser suite first; the uninterrupted road page and the English pause page stay separate; each browser runner writes its own artifact folder, with an isolation test that plants only in a disposable mirror; the development-server check claims only the port handoff it removed, and the vite version is pinned by a test.
+- Who did what. Build and four fix rounds: Z.ai GLM-5.3 through Factory Droid. Reviews: OpenAI GPT-6 Astra through Codex, REJECTED at `16c0a17` (the uninterrupted road scene lost), REJECTED at `cc5c919` (the browser runners shared one artifact folder), at `e4719a2` (the permanent isolation test and its plant) and at `cd13d77` (the development-server check claimed a port ownership it did not hold), APPROVED at `54619be`, R1 to R5 met, no finding.
+- The lead's checks at `54619be`: custodian 2,214 passed (plain and isolated), core 606, product 786, the scripts suite 876 OK, the static checks and the history scan passed; the seven web checks exit 0 (npm ci, format, lint, typecheck, the checks with the browser tests, the performance spike's tests, check); the official timing of the web checks on four reserved processors, twice: 779.77 s and 665.36 s, 857 passed each time, under the bound of 1,200 s; the machine carried other work on its other processors during both runs, which can only lengthen them. S2-T10's criterion of 1,200 s on four processors, measured twice, is met.
+- Limits: the removal of the hosted 3,000 s limit (OI-158) and the closure of the slice's items stay with S2-T10's later part; the window in which the pinned vite probes its own port is PO-S2-73.
+
+#### Evidence for the work commit `e1de979a38c61c21aeb59410ef39a10d1f418176`
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_figure_draw.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    20 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T08 part A: the test file run alone (the pack-assembly interfaces and their survivors), on invented fixtures. Anchors: test_uniform_reproducible_draw; test_seed_is_durable_before_table_read_and_preserves_log; test_invalid_eligible_figure_refuses.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_figure_draw_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    18 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T08 part A: the test file run alone (the pack-assembly interfaces and their survivors), on invented fixtures. Anchors: test_exact_invalid_figure_refusal; test_exact_sample_boundary_and_duplicate_refusal; test_key_and_other_administrative_rows_do_not_stop_enumeration.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_figures_review.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    17 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T08 part A: the test file run alone (the pack-assembly interfaces and their survivors), on invented fixtures. Anchors: test_comparison_at_stated_precision; test_reviewer_identity_set_must_match_and_stored_values_are_valid; test_review_records_have_no_values.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_figures_review_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    13 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T08 part A: the test file run alone (the pack-assembly interfaces and their survivors), on invented fixtures. Anchors: test_reviewer_identity_refusal_is_exact; test_record_kind_refusal_is_exact_even_without_rows; test_record_values_must_be_nonblank_text.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_frame_build_survivors_lr3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    7 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3: the test file run alone (PUB-67's groups, the places build date and their survivors), on invented fixtures. Anchors: test_receipt_is_utf8_under_ascii_locale; test_marker_character_is_not_a_hash_digit; test_overlapping_output_whole_refusal.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_frame_live_m150_lr3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3: the test file run alone (PUB-67's groups, the places build date and their survivors), on invented fixtures. Anchors: test_uppercase_marker_text_stays_in_the_report.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_frame_live_survivors_lr3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3: the test file run alone (PUB-67's groups, the places build date and their survivors), on invented fixtures. Anchors: test_grid_receives_remapped_municipality_code.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_gate_records.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    17 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T08 part A: the test file run alone (the pack-assembly interfaces and their survivors), on invented fixtures. Anchors: test_coverage_geography; test_reconciliation_closure_and_transitive_refusal; test_reconciliation_stays_pending.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_gate_records_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    30 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T08 part A: the test file run alone (the pack-assembly interfaces and their survivors), on invented fixtures. Anchors: test_coverage_exact_record; test_reconciliation_multiline_status_and_both_resolutions; test_pending_reconciliation_preserves_full_report.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_gate_records_survivors_tender.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T08 part A: the test file run alone (the pack-assembly interfaces and their survivors), on invented fixtures. Anchors: test_tender_success_binds_adapter_to_confirmation_registry_and_receipt; test_tender_failed_validation_is_false_and_preserves_only_supplied_metadata; test_tender_evidenced_absence_requires_successful_completion.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_places_build_date.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    18 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3: the test file run alone (PUB-67's groups, the places build date and their survivors), on invented fixtures. Anchors: test_build_start_utc_midnight_to_real_places_loader; test_malformed_build_clock_refused; test_build_date_verification_guards.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_places_partb_survivors_b.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3: the test file run alone (PUB-67's groups, the places build date and their survivors), on invented fixtures. Anchors: test_a_showcase_row_with_no_closed_key_makes_no_request; test_a_flagship_row_with_no_place_key_makes_no_request; test_a_request_without_a_closed_mode_or_cutoff_is_not_remembered.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_places_partb_survivors_c.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3: the test file run alone (PUB-67's groups, the places build date and their survivors), on invented fixtures. Anchors: test_an_explicit_review_is_read_and_its_refusal_is_named; test_a_missing_places_file_is_one_fixed_line; test_a_missing_frame_boundary_is_one_fixed_line.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_places_stage.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3: the test file run alone (PUB-67's groups, the places build date and their survivors), on invented fixtures. Anchors: test_missing_arabic_tag_writes_nothing; test_without_area_files_nothing_is_complete; test_place_and_verification_rows_round_trip.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_pub67.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    74 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3: the test file run alone (PUB-67's groups, the places build date and their survivors), on invented fixtures. Anchors: test_pub67_all_nine_values_structural_unreviewed_and_frame_key; test_pub67_municipal_count_plant_keeps_national_total; test_pub67_absent_ambiguous_unreviewed_target_refused.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_public_series.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    109 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3, PUB64-fix, train T3 join: the test file run alone (PUB-67's groups, the places build date and their survivors; PUB-64's anchors and their survivors; the join of LR3 and PUB64-fix), on invented fixtures. Anchors: test_numeric_source_decimal_is_not_rounded_by_json; test_selected_hash_never_chooses_competing_version; test_missing_or_mismatched_provenance_refused.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_series_exact_regressions.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    75 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     PUB64-fix, train T3 join: the test file run alone (PUB-64's anchors and their survivors; the join of LR3 and PUB64-fix), on invented fixtures. Anchors: test_pub64_computes_all_norms_from_mapped_fields; test_pub64_rounds_once_at_half_up_boundary; test_pub64_component_selection_refuses.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_series_figures_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    27 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3, PUB64-fix, train T3 join: the test file run alone (PUB-67's groups, the places build date and their survivors; PUB-64's anchors and their survivors; the join of LR3 and PUB64-fix), on invented fixtures. Anchors: test_validate_whole_refusal; test_write_nested_exact_json; test_group_keys_and_zero_row_do_not_end_scan.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_series_figures_survivors_lr3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3, train T3 join: the test file run alone (PUB-67's groups, the places build date and their survivors; the join of LR3 and PUB64-fix), on invented fixtures. Anchors: test_classes_required_whole_refusal; test_review_path_uses_module_root; test_source_specific_gap_and_oserror_are_retained.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_series_figures_survivors_pub64.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    7 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     PUB64-fix, train T3 join: the test file run alone (PUB-64's anchors and their survivors; the join of LR3 and PUB64-fix), on invented fixtures. Anchors: test_build_preserves_compound_measure_names; test_build_compares_declared_indicator_establishments; test_build_mapping_gap_uses_selected_source.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_series_frame.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    14 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3: the test file run alone (PUB-67's groups, the places build date and their survivors), on invented fixtures. Anchors: test_finish_build_passes_frame_municipalities; test_finish_build_without_frame_output_fails_closed; test_frame_municipalities_refusals.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_series_parse_survivors_lr3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    20 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3: the test file run alone (PUB-67's groups, the places build date and their survivors), on invented fixtures. Anchors: test_source_must_contain_rows_whole_refusal; test_parse_rows_whole_refusals; test_confirmed_fields_whole_refusals.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_series_support_survivors_lr3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     LR3: the test file run alone (PUB-67's groups, the places build date and their survivors), on invented fixtures. Anchors: test_receipt_labels_are_copied; test_disagreeing_frame_whole_refusal; test_upstream_iteration_must_match_advertised_length.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_source_completeness.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    41 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T08 part A: the test file run alone (the pack-assembly interfaces and their survivors), on invented fixtures. Anchors: test_pack_registry_receipts_and_outputs_agree; test_independent_checks; test_missing_or_substituted_receipt_chain.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_source_completeness_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    58 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T08 part A: the test file run alone (the pack-assembly interfaces and their survivors), on invented fixtures. Anchors: test_section_boundaries_and_exact_missing_refusal; test_pack_empty_blocks_short_rows_and_header_width; test_pack_four_cell_family_row_refuses_with_exact_text.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian/tests/test_source_completeness_survivors_receipts.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    47 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T08 part A: the test file run alone (the pack-assembly interfaces and their survivors), on invented fixtures. Anchors: test_citation_digest_is_exact_marker; test_receipt_variable_fields_are_not_registry_constants; test_receipt_fetch_url_requires_nonblank_text.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest custodian -q -p no:cacheprovider --ignore=custodian/data_tests
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    2697 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The custodian tests on the joined tree, once for the train, leaving custodian/data_tests out by design: LR3's, PUB64-fix's and part A's tests together on the merged figures.py and explanation ledger.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest core -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    606 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The core tests on the joined tree, once for the train; no task of the train changes core.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m pytest product -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    786 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The product tests on the joined tree, once for the train; no task of the train changes product.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    876 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The scripts guard tests on the joined tree, among them S2-T10 part b's test_runner_usage.py (two test files at a time, the browser suite first).
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   bash -c "set -o pipefail; npm --prefix web run test:spike:performance 2>&1 | python3 -I -c 'import sys,re; t=sys.stdin.read(); print(\" \".join(re.findall(r\"(?m)^# (?:tests|pass|fail|cancelled|skipped|todo) [0-9]+\", t)), \"|\", \" \".join(re.findall(r\"[0-9]+ passed \\([0-9.]+m?s?\\)\", t)[:1]))'"
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "# tests 133 # pass 133 # fail 0 # cancelled 0 # skipped 0 # todo 0 | 55 passed (12.5m)" (the totals of the Node test runner and of the browser run inside it)
+Seed:      none
+Notes:     S2-T10 part b: the tests of the performance spike with its browser tests (rule 44, `npm run test:spike:performance` from `web/`): the separate uninterrupted road page and English pause page, and each runner's own artifact folder. Its glyph and development-server tests run in the web checks of the whole test command below.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     The lint on the joined tree, once for the train.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "480 files already formatted"
+Seed:      none
+Notes:     The format check on the joined tree; it changes no file.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 309 source files"
+Seed:      none
+Notes:     The type check on the joined tree: the merged compute_checks and the new interfaces of part A.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 727 text files, 97 Markdown files: OK"
+Seed:      none
+Notes:     The documentation check on the joined tree: LR3's sentences of documents 03 and 04, the README of the web checks and this ledger's records.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     The tree check on the joined tree: the tasks' added modules and test files.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 359 rows: OK"
+Seed:      none
+Notes:     The reference-notes check on the joined tree.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The two rules files must be byte-identical; no task of the train changes them.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: range HEAD, 103 commits, at least 99 to list, RESULT: PASSED"
+Seed:      none
+Notes:     The pinned secret scanner over the history at the joined work commit.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','1a0060b8402e486356465ead4985564200f49eef...e1de979a38c61c21aeb59410ef39a10d1f418176'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/src/eii_custodian/publicdata/completeness.py A:custodian/src/eii_custodian/publicdata/draw.py A:custodian/src/eii_custodian/publicdata/figures_review.py A:custodian/src/eii_custodian/publicdata/gate_report.py A:custodian/src/eii_custodian/publicdata/series/support.py A:custodian/tests/test_figure_draw.py A:custodian/tests/test_figure_draw_survivors.py A:custodian/tests/test_figures_review.py A:custodian/tests/test_figures_review_survivors.py A:custodian/tests/test_frame_build_survivors_lr3.py A:custodian/tests/test_frame_live_m150_lr3.py A:custodian/tests/test_frame_live_survivors_lr3.py A:custodian/tests/test_gate_records.py A:custodian/tests/test_gate_records_survivors.py A:custodian/tests/test_gate_records_survivors_tender.py A:custodian/tests/test_places_build_date.py A:custodian/tests/test_pub67.py A:custodian/tests/test_series_figures_survivors_lr3.py A:custodian/tests/test_series_figures_survivors_pub64.py A:custodian/tests/test_series_parse_survivors_lr3.py A:custodian/tests/test_series_support_survivors_lr3.py A:custodian/tests/test_source_completeness.py A:custodian/tests/test_source_completeness_survivors.py A:custodian/tests/test_source_completeness_survivors_receipts.py A:scripts/figures_review.py M:OPEN_ITEMS.md M:PROGRESS.md M:TASKS.md M:custodian/publicdata/sources.yaml M:custodian/src/eii_custodian/publicdata/fetch/build.py M:custodian/src/eii_custodian/publicdata/frame/README.md M:custodian/src/eii_custodian/publicdata/frame/build.py M:custodian/src/eii_custodian/publicdata/frame/live.py M:custodian/src/eii_custodian/publicdata/frame/municipality_output.py M:custodian/src/eii_custodian/publicdata/places/README.md M:custodian/src/eii_custodian/publicdata/places/integrate.py M:custodian/src/eii_custodian/publicdata/series/figures.py M:custodian/src/eii_custodian/publicdata/series/frame.py M:custodian/src/eii_custodian/publicdata/series/parse.py M:custodian/src/eii_custodian/publicdata/stage.py M:custodian/tests/fixtures/series/confirmed_shapes.json M:custodian/tests/test_places_partb_survivors_b.py M:custodian/tests/test_places_partb_survivors_c.py M:custodian/tests/test_places_stage.py M:custodian/tests/test_public_series.py M:custodian/tests/test_series_exact_regressions.py M:custodian/tests/test_series_figures_survivors.py M:custodian/tests/test_series_frame.py M:docs/03_DATA_CONTRACTS.md M:docs/04_PUBLIC_DATA_PACK.md M:scripts/mutation_explained.toml M:scripts/run_tests.py M:scripts/tests/test_runner_usage.py M:web/README.md M:web/package.json M:web/scripts/check-dev-server.mjs M:web/scripts/dev-server-process.mjs M:web/scripts/tests/check-dev-server-fake.node-test.mjs M:web/scripts/tests/check-dev-server-surroundings.node-test.mjs M:web/scripts/tests/check-dev-server.node-test.mjs M:web/spikes/glyphs/README.md M:web/spikes/glyphs/playwright.config.ts M:web/spikes/glyphs/tests/hold-files.node-test.mjs M:web/spikes/glyphs/tests/run.node-test.mjs M:web/spikes/performance/README.md M:web/spikes/performance/playwright.config.ts M:web/spikes/performance/tests/performance.spec.ts'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; output "67 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The whole change against main: 67 files (25 added, 42 changed), the union of the four tasks' own changes and no file beside them; the approved commits keep their hashes, and the forced differences are in the lead's join commits, named in the train's part of the log.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   ./eii test --seed 2856496344
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    5829 passed, 0 failed, 0 skipped
+Seed:      2856496344
+Notes:     The whole test command with a fresh seed at the joined work commit, once for the train, with its web checks (the glyph spike's and the development server's tests of S2-T10 part b among them). No real public cache is read; it runs no mutation campaign.
+```
+
+```text
+### Merge train S2f of slice S2 (LR3, PUB64-fix, S2-T08 part A, S2-T10 part b)
+Commit:    e1de979a38c61c21aeb59410ef39a10d1f418176
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','1a0060b8402e486356465ead4985564200f49eef..e1de979a38c61c21aeb59410ef39a10d1f418176'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-17
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The twenty-three work commits of the train (eighteen task commits and the lead's five join commits) each have a Conventional Commit subject.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
@@ -30787,3 +31353,16 @@ Notes:     The two work commits on main: the fix (from the approved 995d7c5) and
 - Correction 4, by the lead (Anthropic Claude Opus 5.5): commit 04ee6e6.
 - Confirmation 5, Moonshot Kimi K3.1 Pro through the Codex harness, on 04ee6e6: APPROVED, every check of item 11 (a) to (f) passing with quoted text.
 - Each review or confirmation came from a maker other than the one that made the text it read. Documentation-only change: `python3 scripts/check_docs.py` is run on the pull-request head and its exit code is recorded in the pull request.
+
+
+## LR3 — PUB-67 and places build-date integration
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-17 | OI-301 and OI-302 fixture implementation; both remain OPEN for the lead's live run 3 and another-maker code review | Branch `fix/lr3-pub67-places`, base `b48785de632b285b22dfde26ee80b746a8c7ba9d`; no new commit: `git add` exited 128 because the linked worktree Git metadata is read-only. Environment: CPython 3.14.6, Linux x86_64, locked workspace; final reproducible seed `170617`. `uv run --locked python -m pytest custodian/tests/test_pub67.py custodian/tests/test_places_build_date.py custodian/tests/test_places_stage.py::test_stage_call_sits_after_the_fetch_and_before_gazetteer_resolution custodian/tests/test_places_partb_survivors_c.py::test_the_stage_receives_the_frame_inputs --hypothesis-seed 170617 --basetemp .overnight/tmp/lr3-red-seeded -q` against original production files: exit 1, 61 failed and 11 passed; production files restored after the proof. Same completed focused suite on the fix: exit 0, 72 passed (earlier quiet run, generated seed not captured). `uv run --locked python -m pytest custodian/tests/test_pub67.py custodian/tests/test_public_series.py custodian/tests/test_series*.py custodian/tests/test_activity*.py custodian/tests/test_places*.py custodian/tests/test_publicdata*.py custodian/tests/test_frame*.py custodian/tests/test_municipality_output_survivors.py --hypothesis-seed 170617 --basetemp .overnight/tmp/lr3-final-seeded -q`: exit 0, 1,595 passed, 129.40 seconds. `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `uv run --locked mypy`, `python3 scripts/check_docs.py`: each exit 0 before this ledger append; checks are repeated after it and their exits belong to the return report. Earlier runs: PUB-67 red exit 1 (22 failed), green exit 0 (22 passed); additional lineage plants red exit 1 (4 failed, 41 passed); places corrected red exit 1 (8 failed, 11 passed), green exit 0 (19 passed); neighbors exit 1 (9 failed, 1,177 passed), corrected focused exit 0 (288 passed); an intermediate collection exit 2 came from a malformed import introduced during editing, then corrected; initial ruff and mypy exited 1 on import/style and local typing errors, then passed; initial docs exit 1 on an eight-digit fixture literal, fixed with concatenated text without weakening its scanner. Plants cover wrong buckets, municipality count altered without national change, distinct frame key, missing/ambiguous target and unresolved name, malformed code/count, selected receipt/hash/identity/lineage, competing old classes, frame upstream binding, every missing/wrong observed key, invalid clock/header/date/status/orphan/duplicate, and PO-LR3-2 midnight with a deliberately stale previous date. Anchors and AGENTS/CLAUDE bytes were checked unchanged. No live step, cache inspection, mutation campaign, push or merge was run. Mutation targets and exact plant sites are in the worker's `.overnight/RETURN.md`; lead mutation, provenance review under PO-LR3-1/OI-301, selected-cache probe and live run 3 remain pending. | OpenAI GPT-6 (Codex); builder persona: senior economic statistician and Python data engineer; strict reviewer persona: independent public-data methods and integration reviewer, another maker assigned by the lead, pending. Loaded skills: task-standards, project-orientation, sanad-provenance, github-flow, muhasabah-gate. test-driven-development and verification-before-completion were unavailable after skill-root searches; rule-43 equivalent fail-first, planted-violation, recorded-exit and final-verification procedures used. |
+
+## PUB64-fix — PUB-64 anchors prerequisite
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-17 | Separate prerequisite for S2-T08 part B: document 04 section 10 PUB-64 anchors, receipt-backed C4 adapter and refusal tests; lead ruling L-802 items 1 to 4; OI-300 opened, OI-03 unchanged | Work commit: **PENDING_COMMIT_HASH**; `git add` of the eight changed task files exited 128 because the worktree Git metadata is read-only. Tests ran on the working-tree changes over base `a784e9e53d85739ce5a5cd4a66edf0941e9b99f8`; no work commit or independent approval is claimed. Environment: Linux 6.6.114.1-microsoft-standard-WSL2, Python 3.14.6, uv 0.11.31, git 2.53.0. Validation uv commands used `UV_CACHE_DIR="$PWD/.overnight/tmp/uv-cache" TMPDIR="$PWD/.overnight/tmp"`; no live data step or `data/` cache was read. Explicit pytest seed `2026111701` after the initial baseline; zero skipped in every pytest run. Initial unchanged-code baseline: `uv run --locked python -m pytest custodian/tests/test_public_series.py custodian/tests/test_series_exact_regressions.py -q`, exit 0, 113 passed; its default generated seed was not printed by the quiet output. RED before production edits: `uv run --locked python -m pytest custodian/tests/test_public_series.py custodian/tests/test_series_exact_regressions.py -v --hypothesis-seed=2026111701`, exit 1, 50 failed and 129 passed; with `custodian/tests/test_series_figures_survivors.py` added and the fixture consumers extended, same command and seed, exit 1, 53 failed and 153 passed. First implementation run on those three files with `-v --tb=short`, exit 1, 3 failed and 203 passed: two mapping plants exposed an uncaught decimal conversion error and one contract expectation still named the replaced invented category; conversion now refuses through ValueError and that expectation follows the invented fixture. GREEN on those three files with `-q --tb=short`, exit 0, 206 passed, then 207 passed after strengthening the core-result plant, then 210 passed after exact refusal assertions and a missing receipt-field case. Supplemental guard plants: `python3 .overnight/tmp/PUB64-guard-plants.py`, wrapper exit 0, targeted mapping and numeric-result guards each red with 2 failed, pytest exit 1, with the source restored byte-for-byte; `python3 .overnight/tmp/PUB64-receipt-plant.py`, wrapper exit 0, missing receipt-field guard red with 1 failed, pytest exit 1, source restored. Timestamp regression `uv run --locked python -m pytest "custodian/tests/test_series_exact_regressions.py::test_pub64_requires_receipt_lineage[bad_timestamp]" -q --hypothesis-seed=2026111701 --tb=short`: red exit 1, 1 failed; after full ISO timestamp parsing, green exit 0, 1 passed. Broader GREEN command: `uv run --locked python -m pytest custodian/tests/test_public_series.py custodian/tests/test_series*.py custodian/tests/test_public_data_stage.py core/tests/test_sector_economics.py core/tests/test_survivors_sector_economics.py -q --hypothesis-seed=2026111701 --tb=short`, exit 0, first 291 passed, then 293 passed after stronger lineage and refusal tests. `uv sync --managed-python --all-packages --locked --group engine --group mutation`, exit 0. Mutation: `uv run --locked python scripts/mutation.py custodian/src/eii_custodian/publicdata/series/figures.py custodian/src/eii_custodian/publicdata/stage.py`: first campaign interrupted, exit 130, incomplete, after the timestamp defect was found; retained raw metadata has 488 killed, 30 survived and 1,885 pending, and is not a pass. A fresh full campaign on the revised implementation: **PUB64_FINAL_MUTATION_PENDING**. Initial `uv run --locked ruff check .`, exit 1, two test lint errors (imports and unused loop variable), corrected; final lint exit 0. `uv run --locked ruff format --check .`, exit 0, 455 files formatted; `uv run --locked mypy`, exit 0, 303 source files; `python3 scripts/check_docs.py`, exit 0, 701 text files and 96 Markdown files; `python3 scripts/check_tree.py`, exit 0, eight rules; `git diff --check` and `cmp AGENTS.md CLAUDE.md`, each exit 0. Lead-only `test_pinned_c4` and `./eii build-public` selected-hash evidence remain PENDING under OI-300; no category-label question or licence inquiry was opened, and document 04 needed no correction. | Builder: OpenAI GPT-6 (Codex), lead-assigned lane GPT-6.1 Sol (codex-b); exact runtime variant not separately exposed. Persona: senior economic statistician and Python data engineer. Strict reviewer persona: principal economic-statistics and provenance reviewer; another-maker review remains with the lead. Skills loaded and applied: task-standards, project-orientation, sanad-provenance, test-driven-development, verification-before-completion, muhasabah-gate, github-flow, executing-plans, using-git-worktrees, systematic-debugging, finishing-a-development-branch and strict-reviewer; the mutation-testing reference was also inspected, with the repository's pinned mutmut runner controlling this task. |
