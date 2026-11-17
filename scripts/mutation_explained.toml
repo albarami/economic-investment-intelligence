@@ -2917,3 +2917,33 @@ reason = "PUB64 14 [P6]: Default start is exactly int 0; all operands, types and
 module = "custodian/src/eii_custodian/publicdata/series/figures.py"
 mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -149,8 +149,7 @@\n                 \"combined_share_0dp\": rounded(\n                     ratio(\n                         sum(\n-                            (cancellations.get(m, ZERO) for m in months.values()), ZERO\n-                        ),\n+                            (cancellations.get(m, ZERO) for m in months.values()), ),\n                         dated,\n                     )\n                     * 100,"
 reason = "PUB64 15 [P7]: Three fixed months always yield Decimal or ZERO (P3); zero-denominator refusal unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -18,8 +18,7 @@\n         before, after = values[(\"69\", \"2021\")], values[(\"69\", \"2025\")]\n         totals = {\n             year: sum(\n-                (value for (_, period), value in values.items() if period == year), ZERO\n-            )\n+                (value for (_, period), value in values.items() if period == year), )\n             for year in (\"2021\", \"2025\")\n         }\n         checks[\"PUB-62\"] = {"
+reason = "T3 join (three parameters added above it by LR3 moved the hunk; the summed expression is unchanged): same mutation as PUB64 10 and LR3 m7. Both utility year keys are accessed first, ensuring nonempty Decimal sums; missing keys refuse earlier."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -49,7 +49,7 @@\n         checks[\"PUB-64\"] = _pub64_checks(data, receipts)\n     if \"cus_imp_2025\" in data:\n         rows = [r for r in data[\"cus_imp_2025\"] if r[\"year\"] == \"2025\"]\n-        total = sum((Decimal(str(r[\"value_in_qatari_riyals\"])) for r in rows), ZERO)\n+        total = sum((Decimal(str(r[\"value_in_qatari_riyals\"])) for r in rows), )\n         checks[\"PUB-66\"] = {\n             \"rows_2025\": str(len(rows)),\n             \"value_bn_2dp\": rounded(total / Decimal(10**9), 2),"
+reason = "T3 join (three parameters added above it by LR3 moved the hunk; the summed expression is unchanged): same mutation as PUB64 11 and LR3 m10. Every term is Decimal; an empty sum's int 0 divided by Decimal(10**9) is Decimal zero before rounded, so the rendered value is identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -156,7 +156,7 @@\n         issued = data[\"lic_issued\"]\n         converted = contract_rows(\"lic_issued\", issued)\n         checks[\"PUB-69\"] = {\n-            \"sum_count\": str(sum((int(str(r[\"dd_lrkhs_lsdr\"])) for r in issued), 0)),\n+            \"sum_count\": str(sum((int(str(r[\"dd_lrkhs_lsdr\"])) for r in issued), )),\n             \"distinct_codes\": str(len({r[\"rmz_lnsht_ltjry\"] for r in issued})),\n             \"restaurant_source_rows\": str(\n                 sum(r[\"rmz_lnsht_ltjry\"] == \"5610101\" for r in issued)"
+reason = "T3 join (three parameters added above it by LR3 moved the hunk; the summed expression is unchanged): same mutation as PUB64 14 and LR3 m16. The omitted start defaults to the same integer 0; operands, types and results identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -204,8 +204,7 @@\n                 \"combined_share_0dp\": rounded(\n                     ratio(\n                         sum(\n-                            (cancellations.get(m, ZERO) for m in months.values()), ZERO\n-                        ),\n+                            (cancellations.get(m, ZERO) for m in months.values()), ),\n                         dated,\n                     )\n                     * 100,"
+reason = "T3 join (three parameters added above it by LR3 moved the hunk; the summed expression is unchanged): same mutation as PUB64 15 and LR3 m17. Three fixed months always yield Decimal or ZERO terms, so the sum is Decimal either way; the zero-denominator refusal is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -185,7 +185,7 @@\n                         isic_classes=classes,\n                         municipalities=municipalities,\n                         activity_entry=by_source[source],\n-                        receipts=receipts,\n+                        receipts=None,\n                     )\n                 )\n             else:"
+reason = "T3 join (the lic_active call of build_series): compute_checks reads receipts only for PUB-64, when every R1 source (sec_hr_*) is in the group; the lic_active group holds lic_active alone, so receipts=None leaves every result and refusal unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/series/figures.py"
+mutation = "--- src/eii_custodian/publicdata/series/figures.py\n+++ src/eii_custodian/publicdata/series/figures.py\n@@ -185,8 +185,7 @@\n                         isic_classes=classes,\n                         municipalities=municipalities,\n                         activity_entry=by_source[source],\n-                        receipts=receipts,\n-                    )\n+                        )\n                 )\n             else:\n                 checks.update(compute_checks(group, receipts=receipts))"
+reason = "T3 join (the lic_active call of build_series): dropping the keyword gives compute_checks its default receipts=None; receipts is read only for PUB-64, when every R1 source (sec_hr_*) is in the group, and the lic_active group holds lic_active alone, so every result and refusal is unchanged."
