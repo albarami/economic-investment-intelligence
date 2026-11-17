@@ -214,8 +214,11 @@ function isFile(target) {
 
 async function poll(child, output, port, timeoutMs, outer) {
   const deadline = Date.now() + timeoutMs;
-  // A null port means the child owns the port: the port it bound appears
-  // in its Local line, and nothing was released before that bind.
+  // A null port means the check named no port: the child picked and bound
+  // its own ephemeral port, and the port it bound appears in its Local
+  // line. The check itself held and released no port; the child's own
+  // startup still probes before it binds (see the chosen-port comment in
+  // run()).
   let actual = port;
   while (Date.now() < deadline) {
     if (outer.fired) return { fail: 'FAIL timeout: outer bound' };
@@ -284,10 +287,15 @@ async function run() {
     return;
   }
   // Port ownership: a named port is verified free before the child binds it
-  // (the caller owns that choice). With no named port the child itself binds
-  // an ephemeral port and reports the port it bound in its Local line, so no
-  // chosen port is ever released for another file of the same suite run to
-  // take between the choice here and the child's bind.
+  // (the caller owns that choice). With no named port this check binds and
+  // releases no port itself: the dev server picks its own ephemeral port
+  // and reports the port it bound in its Local line. A short window
+  // remains inside the dev server: vite 8.3.8 probes the port it picked
+  // with a socket it closes before binding (httpServerStart calls
+  // getAvailableEphemeralPort, whose tryListen probe servers close before
+  // returning the port, and only then tryBindServer binds it), a window of
+  // a few consecutive awaits that this check cannot remove without
+  // patching or replacing the dev server.
   const namedPort = args.port;
   if (namedPort !== null && (await probePort(namedPort)) !== 'free') {
     process.stdout.write(

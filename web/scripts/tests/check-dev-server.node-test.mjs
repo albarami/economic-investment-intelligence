@@ -15,6 +15,9 @@ const WEB = path.resolve(HERE, '..', '..');
 const SCRIPT = path.join(WEB, 'scripts', 'check-dev-server.mjs');
 const LONG_NAME_LENGTH = 300;
 const MAX_PORT = 65535;
+// The version the port-ownership comments cite: the startup of that vite
+// probes the port it picks with a socket it closes before binding.
+const PINNED_VITE = '8.3.8';
 const PAGE = '<!doctype html><script type="module" src="/main.js"></script>\n';
 
 const root = fs.mkdtempSync(
@@ -135,12 +138,15 @@ test('minimal root starts', { timeout: 60000 }, () => {
   );
 });
 
-// A stand-in for vite with --strictPort: it binds the port the check names
-// and reports the port it bound, and a named port of zero means the binder
-// itself picks and owns the port. A named port is announced before it is
-// bound because, while the check hands over a port that is released and
-// unbound, any other file of the same suite run may take it first; the
-// competitor in the test below takes exactly that window.
+// A stand-in for the dev server: it binds the port the check names and
+// reports the port it bound; a port of zero means it picks and binds an
+// ephemeral port in one listen, so this fixture models no release window
+// of its own (the pinned vite 8.3.8 probes before it binds). A named port
+// is announced before it is bound because, while the check hands over a
+// port it has released and left unbound, any other file of the same suite
+// run may take it first; the competitor in the test below takes exactly
+// that window. The plant proves only the check's side: the check itself
+// never holds and releases a port before the dev server binds.
 const WINDOW_SERVER = [
   "import fs from 'node:fs';",
   "import http from 'node:http';",
@@ -177,7 +183,7 @@ const WINDOW_SERVER = [
 ].join('\n');
 
 test(
-  'the port the dev server binds is never released for another file to take',
+  'the check itself never holds and releases a port before the dev server binds',
   { timeout: 60000 },
   async () => {
     const root = tempRoot();
@@ -237,6 +243,23 @@ test(
     );
   },
 );
+
+// The premise of the port-ownership comments: the installed vite is
+// exactly the version whose startup they describe, so an upgrade of the
+// installed package fails this test and the comments get re-read.
+test('the installed vite is exactly the version the port comments cite', () => {
+  const pkg = JSON.parse(
+    fs.readFileSync(
+      path.join(WEB, 'node_modules', 'vite', 'package.json'),
+      'utf8',
+    ),
+  );
+  assert.equal(
+    pkg.version,
+    PINNED_VITE,
+    'the installed vite is no longer the version the port comments cite: re-read the comments in scripts/check-dev-server.mjs, scripts/dev-server-process.mjs and README.md',
+  );
+});
 
 test('absent package.json uses the default flags', () => {
   const root = tempRoot();

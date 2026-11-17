@@ -100,10 +100,10 @@ export function probePort(port) {
 }
 
 // The port the child bound, as its own Local line announces it. A null
-// return means the child has not announced a port yet. Used when the child
-// owns the port: it binds an ephemeral port itself and reports it, so no
-// port is ever released between a choice in this process and the child's
-// bind.
+// return means the child has not announced a port yet. Used when no port
+// is named: the child picks and binds an ephemeral port itself and reports
+// it, and this process chooses, holds and releases no port. The child's
+// own startup still probes before it binds.
 export function announcedPort(output) {
   const clean = output.replace(ANSI_ESCAPE, '');
   for (const line of clean.split(/\r?\n/)) {
