@@ -129,6 +129,14 @@ def test_stage_rejects_missing_owned_assertions(tmp_path: Path) -> None:
 
     required_fields = {
         "PUB-63": ("populated_groups",),
+        "PUB-64": (
+            "output_per_employee",
+            "compensation_share_1dp",
+            "operating_surplus_share_1dp",
+            "food_share_1dp",
+            "beverages_share_1dp",
+            "building_rent_share_1dp",
+        ),
         "PUB-65": ("basket_excludes_noodles", "valuation_basis_present"),
         "PUB-68": (
             "combined_share_0dp",
@@ -221,6 +229,12 @@ def test_added_stage_assertions_have_independent_pack_values(tmp_path: Path) -> 
             "compensation": "1308140",
             "operating_surplus": "1247422",
             "average_annual_wage": "31579",
+            "output_per_employee": "152875",
+            "compensation_share_1dp": "20.6",
+            "operating_surplus_share_1dp": "19.7",
+            "food_share_1dp": "29.3",
+            "beverages_share_1dp": "5.6",
+            "building_rent_share_1dp": "11.6",
             "goods_share_1dp": "40.6",
             "services_share_1dp": "16.5",
         },
@@ -580,8 +594,8 @@ def test_independent_checks_and_contract_values() -> None:
         "average_annual_wage": "QAR",
     }
     for source, indicator in [
-        ("sec_hr_goods", "intermediate_goods:invented-kind"),
-        ("sec_hr_serv", "intermediate_services:invented-kind"),
+        ("sec_hr_goods", "intermediate_goods:Food%20Stuff"),
+        ("sec_hr_serv", "intermediate_services:Rents%20of%20Buildings"),
         ("sec_hr_size", "employees:invented-size"),
     ]:
         assert contract_rows(source, fixtures[source])[0] == {
@@ -1142,15 +1156,22 @@ def test_r3_pub64_published_fields_only():
         (Path(__file__).parent / "fixtures/series/confirmed_shapes.json").read_text(),
         parse_float=Decimal,
     )
-    got = compute_checks(
-        {k: v for k, v in fixtures.items() if k.startswith("sec_hr_")}
-    )["PUB-64"]
+    from .test_series_exact_regressions import pub64_receipts
+
+    data = {k: v for k, v in fixtures.items() if k.startswith("sec_hr_")}
+    got = compute_checks(data, receipts=pub64_receipts(data))["PUB-64"]
     assert got == {
         "establishments": "12",
         "employees": "11",
         "compensation": "12",
         "operating_surplus": "11",
         "average_annual_wage": "17",
+        "output_per_employee": "14",
+        "compensation_share_1dp": "7792.2",
+        "operating_surplus_share_1dp": "7142.9",
+        "food_share_1dp": "1.7",
+        "beverages_share_1dp": "0.5",
+        "building_rent_share_1dp": "0.9",
         "goods_share_1dp": "2.5",
         "services_share_1dp": "1.3",
     }
