@@ -2638,3 +2638,23 @@ reason = "rows and match_rows have equal length at that statement: the refusal t
 module = "core/src/eii_core/calc/building_heights.py"
 mutation = "--- src/eii_core/calc/building_heights.py\n+++ src/eii_core/calc/building_heights.py\n@@ -20,7 +20,7 @@\n     no_value: dict[str, int] = {}\n     fallback_buildings = 0\n     tied_height_buildings = 0\n-    for choice, matches in zip(rows, match_rows, strict=True):\n+    for choice, matches in zip(rows, match_rows, strict=False):\n         if choice.source not in HEIGHT_SOURCES:\n             raise ValueError(\"height source outside the closed list\")\n         by_source[choice.source] += 1"
 reason = "rows and match_rows have equal length at that statement: the refusal three statements above raises \"match list length differs from the choices\" on any difference, and both are lists built in this function. zip of two equal-length lists yields the same pairs whether strict is True, False, None or absent, so no input can tell the mutant from the original."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/property/bulletin.py"
+mutation = "--- src/eii_custodian/publicdata/property/bulletin.py\n+++ src/eii_custodian/publicdata/property/bulletin.py\n@@ -42,7 +42,7 @@\n         else:\n             counts[reason] += 1\n     deals, disagreements = _dedupe(prepared)\n-    counts[\"repeated_deal_price_disagreement\"] += disagreements\n+    counts[\"repeated_deal_price_disagreement\"] = disagreements\n     blocked = tuple(\n         Coverage(reason, count) for reason, count in sorted(counts.items()) if count\n     )"
+reason = "The fresh counts start at zero and no earlier branch increments repeated_deal_price_disagreement, so adding the disagreement count to zero equals assigning it."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/property/bulletin.py"
+mutation = "--- src/eii_custodian/publicdata/property/bulletin.py\n+++ src/eii_custodian/publicdata/property/bulletin.py\n@@ -1,3 +1,3 @@\n def _measure(row: Mapping[str, object], field: str) -> Decimal | None:\n     read = read_measure(row.get(field), missing_forms=frozenset(), integral=True)\n-    return read.number if read.kind is MeasureKind.NUMBER else None\n+    return read.number if (read.kind is MeasureKind.NUMBER) or True else None"
+reason = "read_measure returns NUMBER with a number or MISSING with number None and raises on every other input, so returning read.number unconditionally gives the same result and the same exceptions."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/property/quarter.py"
+mutation = "--- src/eii_custodian/publicdata/property/quarter.py\n+++ src/eii_custodian/publicdata/property/quarter.py\n@@ -8,7 +8,7 @@\n     ``past_count`` equal ``forecast_window`` of those quarters (J27).\n     \"\"\"\n     window = forecast_window(quarters)\n-    first, _, last = period.partition(\"/\")\n+    first, _, last = period.rpartition(\"/\")\n     if window is None or window != (first, last, past_count):\n         raise AdditionError(\"held_window_mismatch\")\n     return window"
+reason = "Validated window endpoints are nonempty and slash-free: with one slash both partitions agree, and with none or several both versions raise held_window_mismatch."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/property/use_map.py"
+mutation = "--- src/eii_custodian/publicdata/property/use_map.py\n+++ src/eii_custodian/publicdata/property/use_map.py\n@@ -21,6 +21,6 @@\n         pair = (mapping.source_id, mapping.arabic_label, mapping.usage_value)\n         if pair in seen:\n             raise AdditionError(\"use_map_conflict\")\n-        seen[pair] = mapping\n+        seen[pair] = None\n         result.append(mapping)\n     return tuple(result)"
+reason = "seen is read only for key membership; its values are never read or returned, and the mapping itself is appended to the result, so keys, duplicate refusals and output agree."
