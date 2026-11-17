@@ -2671,7 +2671,7 @@ reason = "A block with no table header defaults to 'XXXX' instead of the empty s
 
 [[survivors]]
 module = "custodian/src/eii_custodian/publicdata/completeness.py"
-mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -18,7 +18,7 @@\n                 r\"`[a-z0-9_]+`\", cells[1]\n             ):\n                 continue\n-            source = cells[1].strip(\"`\")\n+            source = cells[1].strip(\"XX`XX\")\n             if source in sources:\n                 raise ValueError(\"pack_source_duplicate\")\n             sources[source] = ("
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -18,7 +18,7 @@\n                 r\"`[a-z0-9_]+`\", cells[1]\n             ):\n                 continue\n-            source = cells[1].strip(\"`\")\n+            source = cells[1].strip(\"XX`XX\")\n             if source in sources:\n                 raise ValueError(\"pack_source_duplicate\")\n             if source in family_counts and len(cells) < 5:"
 reason = "The cell has already passed a full match of backquoted lowercase letters, digits and underscores, so it holds no uppercase X; the extra X characters in the strip set remove nothing."
 
 [[survivors]]
@@ -2736,7 +2736,7 @@ reason = "A source missing from the pack makes the fallback None instead of the 
 
 [[survivors]]
 module = "custodian/src/eii_custodian/publicdata/completeness.py"
-mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -93,7 +93,7 @@\n             # inputs; permission-based omissions are forbidden by D4 as well.\n             if any(\n                 marker in reason.casefold()\n-                for reason in (row.skip_reason, absence.reason if absence else \"\")\n+                for reason in (row.skip_reason, absence.reason if absence else \"XXXX\")\n                 for marker in (_SKIP_LICENCE, _SKIP_TERMS, \"permission\")\n             ):\n                 fail(row.key, \"source_absence_terms_forbidden\")"
+mutation = "--- src/eii_custodian/publicdata/completeness.py\n+++ src/eii_custodian/publicdata/completeness.py\n@@ -96,7 +96,7 @@\n             # inputs; permission-based omissions are forbidden by D4 as well.\n             if any(\n                 marker in reason.casefold()\n-                for reason in (row.skip_reason, absence.reason if absence else \"\")\n+                for reason in (row.skip_reason, absence.reason if absence else \"XXXX\")\n                 for marker in (_SKIP_LICENCE, _SKIP_TERMS, \"permission\")\n             ):\n                 fail(row.key, \"source_absence_terms_forbidden\")"
 reason = "With no absence record the second reason is 'XXXX' instead of the empty string; its casefold 'xxxx' contains none of the licence, terms or permission markers, so the refusal test is unchanged."
 
 [[survivors]]
