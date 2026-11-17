@@ -53,6 +53,12 @@ SUITES: tuple[Suite, ...] = (
         "node",
         "web",
         (
+            # The browser run starts first and at most one other test file is
+            # in flight beside it, so the renderer keeps the processors of a
+            # four-processor timing run while the suite's other files drain
+            # alongside it (S2-T10 part B).
+            "--test-concurrency=2",
+            "spikes/performance/tests/run.node-test.mjs",
             "scripts/tests/*.node-test.mjs",
             "spikes/glyphs/tests/*.node-test.mjs",
             "spikes/performance/tests/*.node-test.mjs",
