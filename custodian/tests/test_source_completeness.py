@@ -1,5 +1,7 @@
 """Invented inputs only; any files live under pytest's tmp_path directory."""
 
+import subprocess
+import sys
 from dataclasses import replace
 
 import pytest
@@ -155,6 +157,7 @@ def test_absence_is_exact_and_terms_do_not_exclude():
         "id": "invented",
         "state": "NO_DATA",
         "reason": "Invented access failure",
+        "caveat": "invented_caveat",
     } in c.check(**args)
     assert not failures(c.check(**args))
     for absence in (c.Absence("", "invented_caveat"), c.Absence("reason", "")):
@@ -275,10 +278,12 @@ def test_table_catalogue_is_read_from_its_anchor_only():
     ) == {"pub_invented"}
 
 
-def test_existing_expectations_are_imported_and_not_copied():
+def test_existing_expectations_are_passed_and_not_copied():
     from custodian.tests import test_publicdata_registry as existing
 
-    families, required = c.independent_inventory()
+    families, required = c.independent_inventory(
+        existing.FAMILY_COUNTS, existing.DECISION_0019, existing.CITATIONS
+    )
     assert families is existing.FAMILY_COUNTS
     assert existing.DECISION_0019 | existing.CITATIONS <= required
     assert {
@@ -288,6 +293,89 @@ def test_existing_expectations_are_imported_and_not_copied():
         "un_comtrade",
         "bldg_wsf3d",
     } <= required
+
+
+def test_pure_checks_need_no_test_modules():
+    code = """
+import importlib.abc
+import sys
+
+class NoTests(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path, target=None):
+        if fullname == 'custodian' or fullname.startswith(('custodian.', 'pytest')):
+            raise AssertionError('test_module_imported:' + fullname)
+
+sys.meta_path.insert(0, NoTests())
+from eii_custodian.publicdata import completeness as c
+families = {'invented': 77}
+counts, required = c.independent_inventory(families, {'invented_decision'}, {'invented_citation'})
+assert counts is families
+assert {'invented_decision', 'invented_citation'} <= required
+assert not any(row['state'] == 'failed' for row in c.check(
+    entries=[], pack=c.Pack({}, frozenset()), inventory={}, catalogue=set(),
+    receipts={}, outputs={}, absences={}, cached_source_ids=()))
+assert c.committed_derived_check({}, []) == []
+"""
+    result = subprocess.run(
+        [sys.executable, "-P", "-s", "-c", code], capture_output=True, text=True
+    )
+    assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.parametrize(
+    "reason", ["Terms prohibit reuse", "Licence unavailable", "Permission required"]
+)
+@pytest.mark.parametrize("on_row", [False, True])
+def test_terms_reason_cannot_be_an_absence(reason, on_row):
+    args = inputs()
+    args.update(
+        receipts={},
+        outputs={},
+        absences={"invented": c.Absence(reason, "invented_caveat")},
+    )
+    if on_row:
+        # Even a directly constructed Entry must not bypass the registry refusal.
+        args["entries"] = [entry(skip_reason=reason)]
+        args["absences"]["invented"] = c.Absence(
+            "Invented access failure", "invented_caveat"
+        )
+    record = c.check(**args)
+    assert {
+        "id": "invented",
+        "state": "failed",
+        "reason": "source_absence_terms_forbidden",
+    } in record
+    assert not any(row["state"] == "NO_DATA" for row in record)
+
+
+def test_absence_caveat_must_be_declared():
+    args = inputs()
+    args.update(
+        receipts={},
+        outputs={},
+        absences={"invented": c.Absence("Invented access failure", "undeclared")},
+    )
+    record = c.check(**args)
+    assert {
+        "id": "invented",
+        "state": "failed",
+        "reason": "source_absence_caveat_invalid",
+    } in record
+    assert not any(row["state"] == "NO_DATA" for row in record)
+
+
+def test_pack_source_duplicate_refuses():
+    text = """### 2.1 Identity
+| source_id | Dataset | Publisher | How fetched | Licence |
+| `invented` | invented | invented | file | invented |
+### 2.3 Trade
+| source_id | Publisher | Use |
+| `invented` | invented | invented |
+### 2.4 Pages
+| source_id | Publisher | Use |
+"""
+    with pytest.raises(ValueError, match=r"^pack_source_duplicate$"):
+        c.pack_sources(text, {})
 
 
 def test_committed_derived_policy_only_for_declared_sources():

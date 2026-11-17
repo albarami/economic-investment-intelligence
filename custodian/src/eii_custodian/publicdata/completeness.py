@@ -8,13 +8,16 @@ tasks' component inventories and verified output/table references.
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, Sequence, Set
 from dataclasses import dataclass
 from datetime import datetime
-from importlib import import_module
 
 from eii_custodian.publicdata.fetch.receipts import sidecar_for
-from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.registry import (
+    _SKIP_LICENCE,
+    _SKIP_TERMS,
+    Entry,
+)
 
 REGISTER_IDS = frozenset({"biz_register", "fc_register"})
 FORBIDDEN = frozenset({"traffic_tomtom_flow", "traffic_tomtom_range", "tiles3d_google"})
@@ -47,17 +50,15 @@ class Absence:
     caveat: str
 
 
-def independent_inventory() -> tuple[Mapping[str, int], frozenset[str]]:
-    """Temporary Part-A import; B9 moves these once, after the dependency join.
+def independent_inventory(
+    family_counts: Mapping[str, int], decision_0019: Set[str], citations: Set[str]
+) -> tuple[Mapping[str, int], frozenset[str]]:
+    """Use caller-supplied expectations without importing repository tests.
 
-    No expectations are copied from the existing registry test. Import is lazy
-    so the pure checks themselves need no test runner or repository files.
+    B9 moves their authoritative definitions after the dependency join; until
+    then tests pass the existing constants without copying them here.
     """
-    existing = import_module("custodian.tests.test_publicdata_registry")
-    families: Mapping[str, int] = existing.FAMILY_COUNTS
-    return families, frozenset(
-        existing.DECISION_0019 | existing.CITATIONS
-    ) | TASK_SOURCES
+    return family_counts, frozenset(decision_0019 | citations) | TASK_SOURCES
 
 
 def section(text: str, heading: str) -> str:
@@ -213,8 +214,13 @@ def check(
     """
     record: Record = []
 
-    def add(key: str, state: str, reason: str = "") -> None:
-        record.append({"id": key, "state": state, "reason": reason})
+    def add(
+        key: str, state: str, reason: str = "", *, caveat: str | None = None
+    ) -> None:
+        item = {"id": key, "state": state, "reason": reason}
+        if caveat is not None:
+            item["caveat"] = caveat
+        record.append(item)
 
     def fail(key: str, reason: str) -> None:
         add(key, "failed", reason)
@@ -278,16 +284,26 @@ def check(
                 fail(row.key, "source_table_uncatalogued: " + table)
         absence = absences.get(row.key)
         if absence is not None or row.skip_reason:
-            if (
+            # Reuse the registry's refusal markers, including for direct Entry
+            # inputs; permission-based omissions are forbidden by D4 as well.
+            if any(
+                marker in reason.casefold()
+                for reason in (row.skip_reason, absence.reason if absence else "")
+                for marker in (_SKIP_LICENCE, _SKIP_TERMS, "permission")
+            ):
+                fail(row.key, "source_absence_terms_forbidden")
+            elif (
                 absence is None
                 or not absence.reason.strip()
                 or not absence.caveat.strip()
             ):
                 fail(row.key, "source_absence_reason_missing")
+            elif absence.caveat not in row.caveat_keys:
+                fail(row.key, "source_absence_caveat_invalid")
             elif row.skip_reason and row.skip_reason != absence.reason:
                 fail(row.key, "source_completeness: absence reason mismatch")
             else:
-                add(row.key, "NO_DATA", absence.reason)
+                add(row.key, "NO_DATA", absence.reason, caveat=absence.caveat)
             if outputs.get(row.key):
                 fail(row.key, "source_completeness: output for absent source")
         elif not in_use(row, receipts):

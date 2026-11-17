@@ -26,6 +26,8 @@ def run(stored_path: Path, reviewer_path: Path, output_path: Path) -> int:
         for row in stored
     ):
         raise ValueError("figure_schema_invalid")
+    if len(stored) != 20:
+        raise ValueError("figure_review_count_invalid")
     if not isinstance(reviewer, dict) or not all(
         isinstance(k, str) and isinstance(v, str) for k, v in reviewer.items()
     ):

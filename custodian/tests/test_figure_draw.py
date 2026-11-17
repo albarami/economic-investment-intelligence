@@ -111,3 +111,37 @@ def test_flush_failure_prevents_any_table_read(tmp_path, monkeypatch):
     with pytest.raises(OSError, match="invented flush failure"):
         draw({"invented": lambda: called.append(True)}, 17, tmp_path / "log.json")
     assert not called
+
+
+def test_non_object_log_refuses_before_read(tmp_path):
+    log = tmp_path / "log.json"
+    log.write_text("[]")
+    called = []
+    with pytest.raises(ValueError, match=r"^figure_log_invalid$"):
+        draw({"invented": lambda: called.append(True)}, 17, log)
+    assert not called
+    assert log.read_text() == "[]"
+
+
+def test_failed_redraw_removes_stale_figure_ids(tmp_path):
+    log = tmp_path / "log.json"
+    draw({"invented": figures}, 17, log)
+    with pytest.raises(ValueError, match=r"^figure_review_insufficient$"):
+        draw({"invented": lambda: figures()[:19]}, 18, log)
+    assert json.loads(log.read_text()) == {"figure_seed": 18}
+
+
+@pytest.mark.parametrize("seed", ["17", True, None, 17.0])
+def test_sample_seed_must_be_an_integer(seed):
+    with pytest.raises(ValueError, match=r"^figure_seed_invalid$"):
+        sample([f.figure_id for f in figures()], seed)
+
+
+@pytest.mark.parametrize("seed", ["17", True, None, 17.0])
+def test_draw_seed_refuses_before_log_or_table_read(tmp_path, seed):
+    log = tmp_path / "log.json"
+    called = []
+    with pytest.raises(ValueError, match=r"^figure_seed_invalid$"):
+        draw({"invented": lambda: called.append(True)}, seed, log)
+    assert not called
+    assert not log.exists()

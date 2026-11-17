@@ -254,3 +254,11 @@ def test_terms_markers_are_reported_without_own_words_completion():
         g.terms_evidence([entry()], frozenset({"invented"}))[0]["own_words_state"]
         == "recorded"
     )
+
+
+def test_duplicate_confirmation_task_refuses():
+    item = g.ConfirmationEvidence("S2-T19", (), (), {"confirmed": False})
+    with pytest.raises(ValueError, match=r"^confirmation_task_duplicate$"):
+        g.confirmations(
+            [item, replace(item, references=("invented other review",))], [], {}
+        )
