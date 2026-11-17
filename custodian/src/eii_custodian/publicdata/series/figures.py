@@ -25,11 +25,16 @@ from eii_core.calc.public_series import (
     rounded,
     unit_value,
 )
-from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.frame.crosswalk import (
+    load_municipality_names,
+    normalise_name,
+)
 from eii_custodian.publicdata.review.activity import (
     IsicClass,
     SpineError,
     class_bucket_counts,
+    entry_by_key,
     parse_feed_rows,
 )
 from eii_custodian.publicdata.series.baskets import (
@@ -428,28 +433,30 @@ def compute_checks(
         checks["PUB-65"] = check
     if "lic_active" in data:
         active = data["lic_active"]
+        if activity_entry is None:
+            raise ValueError("PUB-67 activity entry required")
         if not isic_classes:
             raise ValueError("PUB-67 ISIC classes required")
-        entry = activity_entry or next(
-            e for e in load_registry() if e.key == "lic_active"
-        )
         try:
-            parsed = parse_feed_rows(active, entry)
+            parsed = parse_feed_rows(active, activity_entry)
             if parsed.left_out:
                 raise ValueError("PUB-67 unparsed activity codes")
             buckets = class_bucket_counts(parsed.rows, isic_classes)
         except SpineError as exc:
             raise ValueError(str(exc)) from exc
-        from eii_custodian.publicdata.frame.crosswalk import read_csv
-
-        review = (
-            Path(__file__).resolve().parents[4]
-            / "publicdata/review/municipality_names.csv"
+        review = Path(__file__).resolve().parents[4] / "publicdata/review"
+        # These are the reviewed name-group keys, not the frame's own keys.
+        reviewed_names = load_municipality_names(
+            review, {"1", "2", "3", "4", "5", "6", "7", "8"}
         )
         target_names = {
-            row["name"] for row in read_csv(review) if row["municipality_code"] == "5"
+            row["name"] for row in reviewed_names if row["municipality_code"] == "5"
         }
-        targets = [item.code for item in municipalities if item.name_ar in target_names]
+        targets = [
+            item.code
+            for item in municipalities
+            if normalise_name(item.name_ar) in target_names
+        ]
         if len(targets) != 1:
             raise ValueError("PUB-67 target municipality absent or ambiguous")
         converted = contract_rows("lic_active", active, municipalities=municipalities)
@@ -811,7 +818,12 @@ def build_series(
                 )
             else:
                 checks.update(compute_checks(group))
-        except (OSError, ValueError, KeyError, SpineError) as exc:
+        except OSError as exc:
+            blocked[source] = (
+                *blocked.get(source, ()),
+                "regression: " + type(exc).__name__,
+            )
+        except (ValueError, KeyError, SpineError) as exc:
             blocked[source] = (*blocked.get(source, ()), "regression: " + str(exc))
     if "PUB-65" in checks:
         checks["PUB-65"]["basket_excludes_noodles"] = str(basket_checked).lower()
@@ -908,8 +920,13 @@ def finish_build(
         supporting_selected = {}
         if "lic_active" in selected:
             for key in SUPPORT_KEYS:
-                if len([entry for entry in entries if entry.key == key]) != 1:
-                    raise ValueError("supporting registry identity required")
+                try:
+                    entry_by_key(entries, key)
+                except SpineError:
+                    lines.append(
+                        "FAIL " + key + " supporting registry identity required"
+                    )
+                    raise ValueError("supporting registry identity required") from None
                 prefix = "PASS " + key + " sha256="
                 hashes = [
                     line[len(prefix) :].split(" ", 1)[0]
@@ -917,6 +934,7 @@ def finish_build(
                     if line.startswith(prefix)
                 ]
                 if len(hashes) != 1:
+                    lines.append("FAIL " + key + " selected receipt missing")
                     raise ValueError("one supporting selected hash required")
                 supporting_selected[key] = hashes[0]
         result = build_series(

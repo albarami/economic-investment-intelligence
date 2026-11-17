@@ -11,16 +11,20 @@ from typing import TypedDict
 
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.frame.municipality_output import MUNICIPALITY_OUTPUT
 from eii_custodian.publicdata.review.activity import (
     METHOD_VERSION,
     IsicClass,
+    SpineError,
+    entry_by_key,
     parse_isic_rows,
 )
 from eii_custodian.publicdata.review.cache_fixture import read_csv
-from eii_custodian.publicdata.series.frame import frame_municipalities
+from eii_custodian.publicdata.series.frame import parse_frame_municipalities
 from eii_custodian.publicdata.series.parse import Municipality, selected_body
 
 SUPPORT_KEYS = ("cls_isic4", "bnd_hdx", "bnd_zone_2020")
+FRAME_METHOD = "frame.v1"
 _REVIEW = Path(__file__).resolve().parents[4] / "publicdata/review"
 REVIEW_FILES = ("municipality_names.csv", "municipality_aliases.json")
 
@@ -80,33 +84,32 @@ def load_support(
     sources = {}
     bodies = {}
     for key in SUPPORT_KEYS:
-        matched = [entry for entry in entries if entry.key == key]
-        if len(matched) != 1:
-            raise ValueError("supporting provenance registry identity")
-        entry = matched[0]
+        try:
+            entry = entry_by_key(entries, key)
+        except SpineError:
+            raise ValueError("supporting provenance registry identity") from None
         body, receipt = selected_body(cache, entry, selected[key])
         bodies[key] = body
         sources[key] = _source(entry, receipt)
     classes = parse_isic_rows(read_csv(bodies["cls_isic4"])).classes
     if not classes:
         raise ValueError("supporting provenance has no ISIC classes")
-    frame_output = cache / "frame_s2_t02/municipalities.json"
-    payload = json.loads(frame_output.read_text())
+    frame_body = (cache / MUNICIPALITY_OUTPUT).read_bytes()
+    payload = json.loads(frame_body.decode("utf-8"))
     if not isinstance(payload, dict) or payload.get("upstream_sha256") != {
         key: selected[key] for key in SUPPORT_KEYS[1:]
     }:
         raise ValueError("supporting provenance frame inputs differ")
-    if tuple(municipalities) != frame_municipalities(cache):
+    if tuple(municipalities) != parse_frame_municipalities(payload):
         raise ValueError("supporting provenance frame differs")
-    output = "frame_s2_t02/municipalities.json"
     support = SupportingProvenance(
         schema="pub67-support.v1",
         classifier_version=METHOD_VERSION,
         classification=sources["cls_isic4"],
         frame=FrameSupport(
-            output=output,
-            sha256=sha256_hex((cache / output).read_bytes()),
-            method="frame.v1",
+            output=MUNICIPALITY_OUTPUT.as_posix(),
+            sha256=sha256_hex(frame_body),
+            method=FRAME_METHOD,
             upstream=[sources[key] for key in SUPPORT_KEYS[1:]],
             review_sha256={
                 name: sha256_hex((_REVIEW / name).read_bytes()) for name in REVIEW_FILES
@@ -166,8 +169,8 @@ def validate_support(value: object) -> None:
         refuse()
     assert isinstance(frame, dict)
     if (
-        frame["output"] != "frame_s2_t02/municipalities.json"
-        or frame["method"] != "frame.v1"
+        frame["output"] != MUNICIPALITY_OUTPUT.as_posix()
+        or frame["method"] != FRAME_METHOD
         or not digest(frame["sha256"])
     ):
         refuse()

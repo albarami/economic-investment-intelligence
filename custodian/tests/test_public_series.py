@@ -1282,7 +1282,9 @@ def test_r3_licence_periods_and_reports(tmp_path):
     assert result["coverage"]["lic_active.municipality_exact_match"] == [
         "بلدية غير مطابقة"
     ]
-    assert "lic_active" in result["blocked"]
+    assert result["blocked"] == {
+        "lic_active": ("regression: supporting provenance selections required",)
+    }
     assert "PUB-67" not in result["checks"]
 
 
@@ -1401,6 +1403,7 @@ def test_r3_remaining_numeric_checks_do_not_claim_basket_or_spine_review():
         },
         isic_classes=classes(),
         municipalities=FRAME,
+        activity_entry=next(e for e in load_registry() if e.key == "lic_active"),
     )
     assert checks["PUB-65"] == {
         "italy_2dp": "6.00",

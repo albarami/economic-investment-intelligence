@@ -13,6 +13,8 @@ from custodian.tests.test_public_series import fixture, series_cache
 from custodian.tests.test_series_exact_regressions import cancellation
 
 from eii_custodian.publicdata.fetch.build import FetchFailure
+from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.review.activity import entry_by_key
 from eii_custodian.publicdata.series import figures
 from eii_custodian.publicdata.stage import StageResult
 
@@ -172,6 +174,7 @@ def test_present_restaurant_and_sparse_repeated_cancellations():
         {"lic_active": [active], "lic_issued": [issued]},
         isic_classes=classes(),
         municipalities=FRAME,
+        activity_entry=entry_by_key(load_registry(), "lic_active"),
     )
     assert checks["PUB-67"]["national_5610101"] == "3"
     assert checks["PUB-69"]["restaurant_contract_rows"] == "1"

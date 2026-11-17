@@ -8,7 +8,7 @@ import pytest
 
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import load_registry
-from eii_custodian.publicdata.review.activity import parse_isic_rows
+from eii_custodian.publicdata.review.activity import entry_by_key, parse_isic_rows
 from eii_custodian.publicdata.review.cache_fixture import class_csv, write_cached
 from eii_custodian.publicdata.series.figures import (
     build_series,
@@ -69,6 +69,7 @@ def calculated(rows=None, frame=FRAME):
         {"lic_active": active_rows() if rows is None else rows},
         isic_classes=classes(),
         municipalities=frame,
+        activity_entry=entry_by_key(load_registry(), "lic_active"),
     )["PUB-67"]
 
 
@@ -139,23 +140,25 @@ def test_pub67_municipal_count_plant_keeps_national_total():
     ],
 )
 def test_pub67_absent_ambiguous_unreviewed_target_refused(frame):
-    with pytest.raises(ValueError, match="target municipality"):
+    with pytest.raises(
+        ValueError, match=r"^PUB-67 target municipality absent or ambiguous$"
+    ):
         calculated(frame=frame)
 
 
 @pytest.mark.parametrize(
-    "field,value",
+    "field,value,reason",
     [
-        ("rmz_lnsht_ltjry", "bad-code"),
-        ("dd_lrkhs_lnsht", -1),
-        ("dd_lrkhs_lnsht", True),
-        ("lbldy", "unreviewed"),
+        ("rmz_lnsht_ltjry", "bad-code", "PUB-67 unparsed activity codes"),
+        ("dd_lrkhs_lnsht", -1, "active_count is not a non-negative integer"),
+        ("dd_lrkhs_lnsht", True, "lic_active field type: dd_lrkhs_lnsht"),
+        ("lbldy", "unreviewed", "PUB-67 unresolved source municipality"),
     ],
 )
-def test_pub67_bad_source_refused(field, value):
+def test_pub67_bad_source_refused(field, value, reason):
     rows = active_rows()
     rows[0][field] = value
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"^" + reason + "$"):
         calculated(rows)
 
 
@@ -195,26 +198,29 @@ def test_pub67_selected_support_and_stage_admission(tmp_path, monkeypatch):
         planted = copy.deepcopy(envelope)
         del planted["supporting_provenance"][key]
         path.write_text(json.dumps(planted))
-        with pytest.raises(ValueError, match="supporting provenance"):
+        with pytest.raises(ValueError, match=r"^invalid supporting provenance$"):
             run_stage(tmp_path, required=("PUB-67",))
 
 
 @pytest.mark.parametrize(
-    "plant",
+    "plant,reason",
     [
-        "missing_support",
-        "missing_receipt",
-        "body",
-        "receipt",
-        "missing_frame",
-        "frame_disagrees",
-        "no_classes",
+        ("missing_support", "supporting provenance selections required"),
+        ("missing_body", "FileNotFoundError"),
+        ("missing_receipt", "FileNotFoundError"),
+        ("body", "selected body hash mismatch"),
+        ("receipt", "selected receipt mismatch"),
+        ("missing_frame", "FileNotFoundError"),
+        ("frame_disagrees", "supporting provenance frame inputs differ"),
+        ("no_classes", "supporting provenance has no ISIC classes"),
     ],
 )
-def test_pub67_selected_support_plants(tmp_path, plant):
+def test_pub67_selected_support_plants(tmp_path, plant, reason):
     entries, selected = selected_fixture(tmp_path)
     if plant == "missing_support":
         del selected["cls_isic4"]
+    elif plant == "missing_body":
+        (tmp_path / "cls_isic4" / (selected["cls_isic4"] + ".csv")).unlink()
     elif plant == "missing_receipt":
         (tmp_path / "cls_isic4" / (selected["cls_isic4"] + ".meta.json")).unlink()
     elif plant == "body":
@@ -235,23 +241,30 @@ def test_pub67_selected_support_plants(tmp_path, plant):
         write_cached(tmp_path, entries[1], body)
         selected["cls_isic4"] = sha256_hex(body)
     result = build(tmp_path, entries, selected)
-    assert "lic_active" in result["blocked"]
+    assert result["blocked"] == {"lic_active": ("regression: " + reason,)}
     assert "PUB-67" not in result["checks"]
     assert not (tmp_path / "series/regression/PUB-67.json").exists()
 
 
-@pytest.mark.parametrize("plant", ["missing", "duplicate", "entry_duplicate", "valid"])
-def test_finish_build_selects_exact_support(tmp_path, plant):
+@pytest.mark.parametrize("key", ["cls_isic4", "bnd_hdx", "bnd_zone_2020"])
+@pytest.mark.parametrize(
+    "plant", ["missing", "duplicate", "entry_missing", "entry_duplicate", "valid"]
+)
+def test_finish_build_selects_exact_support(tmp_path, plant, key):
     entries, selected = selected_fixture(tmp_path)
     lines = [
         f"PASS {key} sha256={digest} host=invented" for key, digest in selected.items()
     ]
     if plant == "missing":
-        lines = [line for line in lines if not line.startswith("PASS cls_isic4 ")]
+        lines = [line for line in lines if not line.startswith("PASS " + key + " ")]
     elif plant == "duplicate":
-        lines.append(lines[1])
+        lines.append(
+            next(line for line in lines if line.startswith("PASS " + key + " "))
+        )
+    elif plant == "entry_missing":
+        entries = [entry for entry in entries if entry.key != key]
     elif plant == "entry_duplicate":
-        entries.append(entries[1])
+        entries.append(entry_by_key(entries, key))
     result = finish_build(entries, tmp_path, lines)
     assert result is not None
     if plant == "valid":
@@ -263,6 +276,16 @@ def test_finish_build_selects_exact_support(tmp_path, plant):
             == LOCAL
         )
     else:
+        reason = (
+            "supporting registry identity required"
+            if plant.startswith("entry_")
+            else "selected receipt missing"
+        )
+        assert lines[-2:] == [
+            "FAIL " + key + " " + reason,
+            "FAIL series selected input refused",
+        ]
+        assert result.observed == "ValueError"
         assert not (tmp_path / "series/regression/PUB-67.json").exists()
 
 
@@ -298,30 +321,30 @@ def test_pub67_nested_lineage_plants(tmp_path, path, value):
     for key in path[:-1]:
         row = row[key]
     row[path[-1]] = value
-    with pytest.raises(ValueError, match="supporting provenance"):
+    with pytest.raises(ValueError, match=r"^invalid supporting provenance$"):
         validate_support(support)
 
 
 @pytest.mark.parametrize(
-    "field,value",
+    "field,value,reason",
     [
-        ("title_en", ""),
-        ("title_en", 3),
-        ("publisher", ""),
-        ("retrieved_utc", "bad"),
-        ("licence_basis", "wrong"),
-        ("key", "wrong"),
-        ("release_tables", ["invented"]),
+        ("title_en", "", "invalid supporting provenance dataset"),
+        ("title_en", 3, "invalid supporting provenance dataset"),
+        ("publisher", "", "incomplete receipt"),
+        ("retrieved_utc", "bad", "invalid supporting provenance"),
+        ("licence_basis", "wrong", "selected receipt mismatch"),
+        ("key", "wrong", "selected receipt mismatch"),
+        ("release_tables", ["invented"], "selected receipt mismatch"),
     ],
 )
-def test_pub67_support_receipt_lineage_plants(tmp_path, field, value):
+def test_pub67_support_receipt_lineage_plants(tmp_path, field, value, reason):
     entries, selected = selected_fixture(tmp_path)
     path = tmp_path / "cls_isic4" / (selected["cls_isic4"] + ".meta.json")
     receipt = json.loads(path.read_text())
     receipt[field] = value
     path.write_text(json.dumps(receipt))
     result = build(tmp_path, entries, selected)
-    assert "lic_active" in result["blocked"]
+    assert result["blocked"] == {"lic_active": ("regression: " + reason,)}
     assert "PUB-67" not in result["checks"]
 
 
@@ -332,7 +355,9 @@ def test_pub67_upstream_frame_binding_plant(tmp_path):
     frame["upstream_sha256"]["bnd_hdx"] = "a" * 64
     path.write_text(json.dumps(frame))
     result = build(tmp_path, entries, selected)
-    assert "lic_active" in result["blocked"]
+    assert result["blocked"] == {
+        "lic_active": ("regression: supporting provenance frame inputs differ",)
+    }
     assert "PUB-67" not in result["checks"]
 
 
@@ -347,21 +372,21 @@ def test_pub67_bucket_reconciliation_plant(monkeypatch, field):
         return replace(buckets, **{field: getattr(buckets, field) + 1})
 
     monkeypatch.setattr(figures, "class_bucket_counts", planted)
-    with pytest.raises(ValueError, match="bucket reconciliation"):
+    with pytest.raises(ValueError, match=r"^PUB-67 bucket reconciliation$"):
         calculated()
 
 
 @pytest.mark.parametrize(
-    "plant",
+    "plant,reason",
     [
-        "invalid_hash",
-        "non_object_receipt",
-        "extra_selection",
-        "duplicate_registry",
-        "missing_registry",
+        ("invalid_hash", "invalid selected hash"),
+        ("non_object_receipt", "selected receipt mismatch"),
+        ("extra_selection", "supporting provenance selections required"),
+        ("duplicate_registry", "supporting provenance registry identity"),
+        ("missing_registry", "supporting provenance registry identity"),
     ],
 )
-def test_pub67_selected_support_shape_plants(tmp_path, plant):
+def test_pub67_selected_support_shape_plants(tmp_path, plant, reason):
     entries, selected = selected_fixture(tmp_path)
     if plant == "invalid_hash":
         selected["cls_isic4"] = "invalid"
@@ -376,5 +401,124 @@ def test_pub67_selected_support_shape_plants(tmp_path, plant):
     else:
         entries = [entry for entry in entries if entry.key != "cls_isic4"]
     result = build(tmp_path, entries, selected)
-    assert "lic_active" in result["blocked"]
+    assert result["blocked"] == {"lic_active": ("regression: " + reason,)}
     assert "PUB-67" not in result["checks"]
+
+
+def test_pub67_build_unmatched_source_municipality_refused(tmp_path):
+    entries, selected = selected_fixture(tmp_path)
+    rows = active_rows()
+    rows[0]["lbldy"] = "SYN unmatched"
+    body = json.dumps(rows).encode()
+    write_cached(tmp_path, entry_by_key(entries, "lic_active"), body)
+    selected["lic_active"] = sha256_hex(body)
+    result = build(tmp_path, entries, selected)
+    assert result["blocked"] == {
+        "lic_active": ("regression: PUB-67 unresolved source municipality",)
+    }
+    assert "PUB-67" not in result["checks"]
+    assert not (tmp_path / "series/regression/PUB-67.json").exists()
+
+
+def test_pub67_requires_explicit_activity_entry():
+    with pytest.raises(ValueError, match=r"^PUB-67 activity entry required$"):
+        compute_checks(
+            {"lic_active": active_rows()},
+            isic_classes=classes(),
+            municipalities=FRAME,
+        )
+
+
+@pytest.mark.parametrize("padded", ["frame", "review"])
+def test_pub67_target_names_normalise_whitespace(monkeypatch, padded):
+    from eii_custodian.publicdata.frame import crosswalk
+
+    frame = FRAME
+    rows = active_rows()
+    if padded == "frame":
+        frame = (replace(FRAME[0], name_ar="  بلدية  الظعاين  "), FRAME[1])
+        for row in rows:
+            if row["lbldy"] == FRAME[0].name_ar:
+                row["lbldy"] = frame[0].name_ar
+    else:
+        original = crosswalk.read_csv
+
+        def padded_names(path):
+            return [
+                {**row, "name": "  " + row["name"].replace(" ", "  ") + "  "}
+                for row in original(path)
+            ]
+
+        monkeypatch.setattr(crosswalk, "read_csv", padded_names)
+    assert calculated(rows, frame) == LOCAL
+
+
+def test_pub67_conflicting_reviewed_municipality_name_refused(monkeypatch):
+    from eii_custodian.publicdata.frame import crosswalk
+
+    original = crosswalk.read_csv
+
+    def conflicting_names(path):
+        return [
+            *original(path),
+            {"name": "  بلدية  الظعاين ", "municipality_code": "1"},
+        ]
+
+    monkeypatch.setattr(crosswalk, "read_csv", conflicting_names)
+    with pytest.raises(ValueError, match=r"^municipality_names: conflict$"):
+        calculated()
+
+
+def test_pub67_frame_hash_and_validation_use_one_read(tmp_path, monkeypatch):
+    from pathlib import Path
+
+    entries, selected = selected_fixture(tmp_path)
+    path = tmp_path / "frame_s2_t02/municipalities.json"
+    original_bytes = Path.read_bytes
+    original_text = Path.read_text
+    reads = []
+
+    def read_bytes(self, *args, **kwargs):
+        if self == path:
+            reads.append("bytes")
+        return original_bytes(self, *args, **kwargs)
+
+    def read_text(self, *args, **kwargs):
+        if self == path:
+            reads.append("text")
+        return original_text(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_bytes", read_bytes)
+    monkeypatch.setattr(Path, "read_text", read_text)
+    result = build(tmp_path, entries, selected)
+    assert result["blocked"] == {}
+    assert reads == ["bytes"]
+    envelope = json.loads((tmp_path / "series/regression/PUB-67.json").read_text())
+    assert envelope["supporting_provenance"]["frame"]["sha256"] == sha256_hex(
+        original_bytes(path)
+    )
+
+
+@pytest.mark.parametrize("plant", ["body", "receipt", "frame", "review"])
+def test_pub67_missing_support_file_reason_has_no_cache_path(
+    tmp_path, monkeypatch, plant
+):
+    from eii_custodian.publicdata.series import support
+
+    entries, selected = selected_fixture(tmp_path)
+    if plant == "body":
+        (tmp_path / "cls_isic4" / (selected["cls_isic4"] + ".csv")).unlink()
+    elif plant == "receipt":
+        (tmp_path / "cls_isic4" / (selected["cls_isic4"] + ".meta.json")).unlink()
+    elif plant == "frame":
+        (tmp_path / "frame_s2_t02/municipalities.json").unlink()
+    else:
+        monkeypatch.setattr(support, "_REVIEW", tmp_path / "SYN-missing-review")
+    result = build(tmp_path, entries, selected)
+    assert result["blocked"] == {"lic_active": ("regression: FileNotFoundError",)}
+    reason = result["blocked"]["lic_active"][0]
+    assert "/" not in reason and "\\" not in reason
+    evidence = (tmp_path / "series/internal/build.json").read_text()
+    assert str(tmp_path) not in evidence
+    assert "PUB-67" not in result["checks"]
+    assert not (tmp_path / "series/regression/PUB-67.json").exists()
