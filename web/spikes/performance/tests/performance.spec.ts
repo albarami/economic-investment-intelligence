@@ -7,6 +7,7 @@ import {
   GATE_SLOW_SCENE,
   HEX_NONBLANK,
   PARTICLE_NONBLANK,
+  PAUSE_SCENE,
   PIXEL_CAP,
   RENAMED_PROFILE,
   ROAD_PAUSE_PLANT,
@@ -631,48 +632,16 @@ function visibilityTest(
   });
 }
 
-// The English pause tests join the uninterrupted road page, whose initial
-// state (English, playing, the first road load, the full wall) they match.
-// The pause tests run first, so the shared first pause still starts before
-// the stored-hour cycle reaches its last hour; the uninterrupted assertions
-// read the snapshot taken when the page opened, and the playback test waits
-// for the cycle to finish only after the scene has resumed. Each test stays
-// independently runnable: a fresh page serves any one test alone.
+// The pause tests toggle playback, and the toggle sets `interrupted`. The
+// uninterrupted scene must reach its full stored-hour cycle without any
+// click, so the two English road scenes keep separate pages: their initial
+// states do not match in the sense of the sharing rule.
 sharedRoadScene(
-  'English road scene',
+  'uninterrupted English road scene',
   ROAD_TRACE_SCENE,
   'en',
   false,
   (scene) => {
-    let firstPause: Promise<void> | undefined;
-    const pause = () => {
-      // Both consumers start from this fixture's first pause, including when
-      // either test is selected alone or the worker restarts after a failure.
-      expect(scene().spike.phase).toBe('done');
-      expect(scene().spike.paused).toBe(false);
-      expect(scene().spike.reducedMotion).toBe(false);
-      return (firstPause ??= clickPause(scene().page));
-    };
-    // Assert the live paused DOM before the clock test resumes the scene.
-    // Only the input action is shared; visibility assertions are never cached.
-    visibilityTest(scene, 'en', 'paused', pause);
-    let observation: Promise<PauseObservation> | undefined;
-    const paused = () => (observation ??= observePause(scene().page, pause));
-    test('roads Pause motion freezes the hour clock and resumes it on a second press', async () => {
-      test.setTimeout(600000);
-      const { paused: before, after, resumed } = await paused();
-      expect(before.paused).toBe(true);
-      expect(after.motionElapsed).toBe(before.motionElapsed);
-      expect(after.hoursShown).toEqual(before.hoursShown);
-      expect(resumed.paused).toBe(false);
-    });
-    test('roads Pause motion freezes particles and resumes them on a second press', async () => {
-      test.setTimeout(600000);
-      const { paused: before, after, resumed } = await paused();
-      expect(before.paused).toBe(true);
-      expect(after.currentPosition).toBe(before.currentPosition);
-      expect(resumed.currentPosition).not.toBe(before.currentPosition);
-    });
     test('roads carry the Simulated word and dash style in the interleaved overlay', async () => {
       const { page } = scene();
       test.setTimeout(600000);
@@ -691,6 +660,7 @@ sharedRoadScene(
         ),
       ).toBe(true);
     });
+
     test('roads draw the configured full fixture and first load with both original layers', async () => {
       test.setTimeout(600000);
       const spike = scene().spike;
@@ -699,6 +669,7 @@ sharedRoadScene(
       expect(spike.hexagonInstances).toBe(LAYER_SETS[ROAD_SET]!.hexagons);
       expect(spike.particleInstances).toBe(LAYER_SETS[ROAD_SET]!.particles);
     });
+
     test('roads short orbit posts a well-formed smoke trace', async () => {
       test.setTimeout(600000);
       const spike = scene().spike;
@@ -707,6 +678,7 @@ sharedRoadScene(
       expect(spike.qualification).toBe('smoke-profile');
       expect(spike.savedPath).toContain(ROAD_SET);
     });
+
     test('roads playback visits each stored hour and holds the recorded bands across the load cycle', async () => {
       const { page } = scene();
       test.setTimeout(600000);
@@ -754,6 +726,38 @@ sharedRoadScene(
     visibilityTest(scene, 'en', 'playing');
   },
 );
+
+sharedRoadScene('English pause scene', PAUSE_SCENE, 'en', false, (scene) => {
+  let firstPause: Promise<void> | undefined;
+  const pause = () => {
+    // Both consumers start from this fixture's first pause, including when
+    // either test is selected alone or the worker restarts after a failure.
+    expect(scene().spike.phase).toBe('done');
+    expect(scene().spike.paused).toBe(false);
+    expect(scene().spike.reducedMotion).toBe(false);
+    return (firstPause ??= clickPause(scene().page));
+  };
+  // Assert the live paused DOM before the clock test resumes the scene.
+  // Only the input action is shared; visibility assertions are never cached.
+  visibilityTest(scene, 'en', 'paused', pause);
+  let observation: Promise<PauseObservation> | undefined;
+  const paused = () => (observation ??= observePause(scene().page, pause));
+  test('roads Pause motion freezes the hour clock and resumes it on a second press', async () => {
+    test.setTimeout(600000);
+    const { paused: before, after, resumed } = await paused();
+    expect(before.paused).toBe(true);
+    expect(after.motionElapsed).toBe(before.motionElapsed);
+    expect(after.hoursShown).toEqual(before.hoursShown);
+    expect(resumed.paused).toBe(false);
+  });
+  test('roads Pause motion freezes particles and resumes them on a second press', async () => {
+    test.setTimeout(600000);
+    const { paused: before, after, resumed } = await paused();
+    expect(before.paused).toBe(true);
+    expect(after.currentPosition).toBe(before.currentPosition);
+    expect(resumed.currentPosition).not.toBe(before.currentPosition);
+  });
+});
 
 sharedRoadScene('English reduced-motion scene', SMALL, 'en', true, (scene) => {
   test('roads reduced motion never starts hour playback or particles', async () => {

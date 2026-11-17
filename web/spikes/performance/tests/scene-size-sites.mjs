@@ -72,8 +72,8 @@ export const FULL_SITES = [
   site(
     'sharedRoadScene',
     'ROAD_TRACE_SCENE',
-    'English road scene',
-    'english road trace and pause',
+    'uninterrupted English road scene',
+    'road trace',
     '',
   ),
   site(
@@ -110,6 +110,13 @@ export const FULL_SITES = [
     '`/en/_perf?profile=smoke&layers=${ROAD_LARGE}`',
     'full street load',
     'roads full street load draws every link and carries the Simulated mark',
+  ),
+  site(
+    'sharedRoadScene',
+    'PAUSE_SCENE',
+    'English pause scene',
+    'english pause',
+    '',
   ),
   site(
     'sharedRoadScene',

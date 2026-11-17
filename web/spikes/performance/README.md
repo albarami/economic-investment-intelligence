@@ -80,17 +80,17 @@ The browser suite keeps each named assertion test and each distinct plant. Tests
 with the same initial language, motion setting and road load share a page within
 a default-mode group; a failure does not skip later tests, and selecting one test
 still creates its fixture. Each group closes its page before the next one starts.
-One English road page serves the uninterrupted trace tests and the pause tests,
-whose initial state (English, playing, the first road load, the full wall) it
-matches. The pause tests run first on the freshly opened playing page: they check
-the live paused mark and legend, then supply one real pause/resume observation to
-both the hour-clock and particle tests, with a guard that the pause starts before
-the final hour. The trace assertions read the snapshot taken when the page
-opened, and the playback test waits for the full stored-hour cycle only after the
-scene has resumed, taking that wait inside the page under the same 170 s host
-bound as readiness. The first input
+The uninterrupted road scene and the English pause scene are separate pages:
+the pause tests toggle playback, so a page shared with them would never
+observe an uninterrupted stored-hour cycle. The uninterrupted road scene
+records the full stored-hour cycle, taking that wait inside the page under the
+same 170 s host bound as readiness. A fresh English
+pause scene first checks the live paused mark and legend, then supplies one real
+pause/resume observation to both the hour-clock and particle
+tests, with a guard that the pause starts before the final hour. The first input
 action is shared; visibility assertions are not cached. Each consumer asserts
-its initial state, and selecting any one test still creates and pauses the scene.
+its initial state. Selecting any one test still creates its fixture, and
+selecting one of the pause tests alone still pauses the scene.
 Initial reduced-motion scenes remain separate in both languages. Distinct plants
 each load their own page. Independent DOM assertions run together. Layer counts, frame waits, viewport, pixel ratios and
 all timeout values remain unchanged. The list reporter gives individual test
@@ -122,11 +122,10 @@ pixel ratio, or a qualification decided after the canvas check load the same
 page with the map style at 480 by 270 CSS pixels. The page source stays 1920 by
 1080. The full wall is kept for the trace-contract smoke test, the pixel-ratio
 cap, the nonblank canvas checks, the gate qualifications decided after the
-canvas size, the English road scene that carries the uninterrupted road trace
-and the pause tests, the paused-playback plant, the full
-street load of 250,000 links, and the Arabic
-reduced-motion scene. The trusted click on the live scene runs on that English
-road page. The Arabic reduced-motion scene is opened through the page helper, so
+canvas size, the uninterrupted road trace, the paused-playback plant, the full
+street load of 250,000 links, the English pause scene, and the Arabic
+reduced-motion scene. The English pause scene is the trusted click on the live
+scene. The Arabic reduced-motion scene is opened through the page helper, so
 the foreign-request check and the readiness wait both run, and the render
 finishes at the full wall. That scene is what covers Arabic and reduced motion
 together at the full size: `roads mark and legend are visible ar reduced`.
