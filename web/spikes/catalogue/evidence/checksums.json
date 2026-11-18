@@ -47,7 +47,7 @@
   "../../../product/src/eii_product/assistant/catalogue/directives.py": "19682c8013296c028895081f7ab0154ccea44669c3c5ad0f923283852c1ad498",
   "../../../product/src/eii_product/assistant/catalogue/scan.py": "42edb51d028c84698a53ea15dd8bf6ccefc3ad1a9c5dadbb9ab694fb48ff01db",
   "../../scripts/import-tokenizer.mjs": "0b4a5c29def6fd0e7b8ca1d323490ef8d6dcf8ba8097348bfb72bf4136d4de54",
-  "../../package.json": "b8d794b655a31bb098f06e40399231a7edb9bc85846c786ad40e8ad09a87a3f7",
-  "../../package-lock.json": "999d4c493582f8d702a8d07641578ccdb3a7cd03d3df447afeee435ccb32c71c",
+  "../../package.json": "a13cda2b8132647c4fc74de4c7b22f01d5f1efd01c723c7cfa2e91691e34dced",
+  "../../package-lock.json": "b3495332ae0afae6dae195f73a21084666ea0024c82eb57a18dedfb6cbf10cf2",
   "evidence/results.json": "a73077770b320dc9566d1838406deb9783af0e7d0f7eb67f9b46139a5406a0fc"
 }
