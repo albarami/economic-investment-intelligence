@@ -33929,3 +33929,21 @@ four-file run exited 0 with 120 passed. No hidden test retry or random failure.
 Post-ledger docs/whitespace checks are appended to the command evidence and
 reported in the return. Another-maker re-review remains pending with the lead;
 no approval or full task completion is asserted. Muhasabah: PASS.
+
+## S2-T29 — mutation survivor pass 4c
+
+2026-11-18; OpenAI Codex (GPT-6), senior Python test engineer; strict mutation and equivalence reviewer from another maker PENDING. Base `59d52110bd96153ee9663cefbb6f62890c503327`; no commit, branch or push. Skills: project-orientation, task-standards, mutation-testing, sanad-provenance, muhasabah-gate, github-flow (read-only override); brief equivalents for unavailable TDD/debugging/verification skills.
+
+Python 3.14.6, uv 0.11.31 (x86_64-unknown-linux-gnu), Linux, CPUs 8-11, bytecode disabled, offline uv, workspace-local temporary/cache paths; No seed override; no world build; no Hypothesis seed emitted. All 613 records disposed: K549/E63/D1; module counts and complete per-record evidence in `.overnight/tmp/table.md`. 133 exact-mutant representative groups and 12 additional inherited-assertion witnesses have green exit 0 / red exit 1; imported-copy hashes and traces in `.overnight/tmp/pass4c/proofs.json` and `extra-proofs.json`. Accounting script exits 0. D241 accepts missing quarters before next-year Q1; reproducer and open item recorded, production unchanged.
+
+- `taskset -c 8-11 uv run --locked python -m pytest custodian/tests/test_page_schema_survivors_1.py custodian/tests/test_page_schema_survivors_2.py custodian/tests/test_page_shapes_survivors_1.py custodian/tests/test_page_shapes_survivors_2.py custodian/tests/test_page_workbook_survivors_1.py custodian/tests/test_page_workbook_survivors_2.py custodian/tests/test_partitions_survivors_1.py custodian/tests/test_partitions_survivors_2.py -q -p no:cacheprovider`: exit 0; 167 passed, 1 warning in 0.32s; wall 0.603 s.
+- `taskset -c 8-11 uv run --locked python -m pytest custodian/tests core/tests -q -p no:cacheprovider`: exit 0; 7063 passed, 1 warning in 296.75s (0:04:56); wall 297.42 s.
+- `uv run --locked ruff check .`: exit 0; All checks passed!; wall 0.058 s.
+- `uv run --locked ruff format --check .`: exit 0; 688 files already formatted; wall 0.035 s.
+- `uv run --locked mypy`: exit 0; Success: no issues found in 401 source files; wall 5.275 s.
+- `python3 scripts/check_docs.py`: exit 0; checked 968 text files, 107 Markdown files: OK; wall 1.434 s.
+- `python3 scripts/check_tree.py`: exit 0; checked 8 rules: OK; wall 0.056 s.
+- `cmp AGENTS.md CLAUDE.md`: exit 0; (no output); wall 0.001 s.
+- `git diff --check`: exit 0; (no output); wall 0.003 s.
+
+Initial inherited run: 131 passed, exit 0. Diagnosed fixture/backoff, seven representative survival and formatting failures were corrected, not hidden; original and final outputs are retained in `.overnight/tmp/pass4c/`, explained in `.overnight/RETURN.md`. No random failure, production edit, network or full mutation campaign; existing source/security/privacy holds unchanged. Muhasabah PASS for bounded handoff, independent review pending.
