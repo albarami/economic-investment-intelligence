@@ -3473,9 +3473,10 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - Another-maker code review and the lead's live run 3 are pending. This does not
   close or change OI-256, the separate places Arabic-name reader gap.
 
-### [LEAD: number] — Registry growth escaped suite-time monitoring
+### OI-264 — Registry growth escaped suite-time monitoring
 
+- ID: OI-264
 - Status: OPEN.
 - Scope: S2-T31; decision 0053, Consequences; lead ruling L-902.
-- The lead's measurements of 2026-11-18 found that no check watched the custodian suite's time as the source registry grew. The overrun was found only by the ledger run and the hosted job.
-- Decision 0053 removes the measured parsing waste and retains the 600-second limit. The lead must assign this item its number and decide how to watch suite-time growth before another overrun; this task does not introduce a monitor or close the gap.
+- The lead's measurements of 2026-11-18 found that no check watched the custodian suite's time as the source registry grew from 171,402 to 479,638 bytes; the suite took 834.6 seconds against its 600-second limit, and only the train's ledger run and the hosted tests job found the overrun.
+- Decision 0053 removes the measured parsing waste (the whole custodian suite then took 209.4 seconds) and keeps the 600-second limit. It builds no monitor of suite time; this item stays open for the decision on how to watch suite-time growth before another overrun.
