@@ -3403,6 +3403,24 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: The mutation tester's clean run failed once: 1 failed, 1,510 passed; the test compared the receipt's hash of the archive built inside the world with the hash of a second build in its assertion, and the two differed. The same test passed alone (13 passed). Cause: `invented_archive` wrote each member with `ZipFile.writestr(name, ...)`, which stamps the member with the current local time, so two builds on either side of a two-second step of the zip time give different bytes; two builds 2.1 seconds apart were reproduced with different hashes.
 - RESOLUTION: the fixture writes each member with a fixed member time and the same permission bits, and the planted test `custodian/tests/test_frame_fixture_archive.py::test_invented_archive_bytes_do_not_follow_the_clock` builds the archive at two clock readings an hour apart and requires one hash; it failed before the fix and passes after it. This closes the item by a found cause, not by a green re-run (rule 39). The inline archive of `custodian/tests/test_frame_coverage.py` is built and read once per test and is not hashed twice; it is left unchanged.
 
+### PO-S2-70 — Real independent-milestone registration and review evidence are not confirmed
+
+- ID: PO-S2-70
+- TYPE: OPEN
+- RAISED BY: the S2-T30 builder (Moonshot AI), 2026-11-17, from the approved plan and lead ruling L-792
+- CONCERNS: `custodian/publicdata/investment_pages.yaml`; the uncommitted reviewed milestone crosswalk and its receipt; document 04, Announced-project evidence history
+- EVIDENCE: The inspected registry has no confirmed real independent-milestone schema or identity crosswalk. L-792 settles the admissible link rules and nullable source assertions, not which real pages qualify. The implementation and TST-279 use invented closed shapes and invented direct/crosswalk links only. No network or live-source comparison was performed, no source or host was added, and no real milestone is claimed validated.
+- NEEDED: the lead confirms each independently registered Public milestone page, parser shape and independence proof. Direct source-ID/project-ID links need no name fallback; every other link needs a lead-reviewed crosswalk in the uncommitted public cache with a SHA-256 receipt. Source-stated observation, publication and correction assertions remain nullable with absence reasons and cannot be filled from rechecks or `source_modified`.
+
+### PO-S2-71 — S2-T30 downstream assembly, joined-head checks and independent verdict are pending
+
+- ID: PO-S2-71
+- TYPE: PENDING
+- RAISED BY: the S2-T30 builder (Moonshot AI), 2026-11-17
+- CONCERNS: S2-T08's evidence-bundle adapter; the later S2 train joins; `investment_evidence.py` and changed comparison guards in `fetch/build.py`; independent review
+- EVIDENCE: Round-2 review retained F3 and added F8 and F9. That fix round resolves project, milestone and receipt-lineage validation through `read_snapshot`, derives standalone-audit expectations from verified parsed archives, rejects omitted records and missing or tampered archive objects, admits positive empty coverage only through the empty milestone parser, and adds guard-specific report and crosswalk plants with guard-removal probes. The six F3/F8 behavioral tests failed on the round-1 head and all fifteen round-2 tests pass locally after the fix; the seven F9 guard-removal probes also failed before restoration and pass with the guards intact. Round-3 review found residual F3: project revisions still read retrieval time and source grouping from the caller-held sidecar after archive validation. The round-3 builder change refuses conflicting supplied values of verified receipt fields and constructs revisions from the verified snapshot. Sidecar-only retrieval-time and source-ID plants, with unchanged rows, body, receipt and index, failed on 89fee94 and pass after the change; both investment test files pass locally with 65 tests. These are builder results, not an independent verdict. S2-T08 still owns evidence-bundle assembly, no mutation campaign was run, and later shared-fetch joins still need the lead's compatibility checks on the joined head.
+- NEEDED: S2-T08 consumes every revision, absence, unvalidated milestone and fetch outcome without inferring closure; the lead runs the required mutation campaign and joined-head verification; a principal data-quality/provenance reviewer from another maker returns APPROVED or REJECTED. Task status remains built, not done, until those records exist.
+
 ## OI-300 — PUB-64 anchors and selected-source acceptance
 
 - ID: OI-300
@@ -3562,6 +3580,16 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - CONCERNS: S2-T11 split-policy timeouts, forecast_series fork hang, and the three core trade-reconciliation timeout replays
 - EVIDENCE: The split-policy run at 072ae84 overlapped another campaign and was explicitly not a normal-load replay. The forecast rerun exited 143, runner 3. S2-T26 approval still awaited three core timeout replays. No closure record for these is supplied.
 - NEEDED: The lead enumerates the exact mutant identities and replays them alone at normal load, retaining failures and cause analysis separately. Later hash-matched campaigns may answer survivors but do not erase these timeout incidents.
+
+### PO-S2-87 — Stateful caller keys can still change project identity after validation
+
+- ID: PO-S2-87
+- TYPE: OPEN
+- RAISED BY: the S2-T30 kill-pass 1d builder (OpenAI Codex), 2026-11-18
+- CONCERNS: `custodian/src/eii_custodian/publicdata/investment_evidence.py`, `build_project_evidence` and `_metadata_failure`; document 03, Cache-only announced-project evidence (S2-T30)
+- EVIDENCE: The plain-dictionary copy removes the caller mapping's comparison override but retains its key objects. An invented `str` subclass key with the normal string hash and a comparison that returns false once, after the successful archived-row equality check, makes a later literal-key lookup use its default. The original joined head then returns an empty source ID, project ID or project key, or a phantom absence with an empty identity part. `.overnight/tmp/key_boundary.py` reproduces the five cases; `.overnight/tmp/key-boundary.jsonl` records the accepted revisions and absences, exit 0. This is an in-process Python-object boundary, not a demonstrated external input exploit. The fifteen default mutants are therefore killed rather than explained. The new tests constrain fabricated `None`/`XXXX` identifier text and allow a future metadata refusal; they do not assert that accepting empty identity parts is valid. A separate null-equal non-string value also passes archived-row equality, although the existing geography guard correctly keeps its geography absent.
+- FURTHER EVIDENCE: A tuple subclass overriding comparison with the empty tuple can pass the canonical empty-history guard while retaining iterable revisions or absences; the standalone audit then emits entries without selected archives. `.overnight/tmp/tuple_boundary.py` and `.overnight/tmp/tuple-boundary.jsonl` reproduce both cases, exit 0. The twenty-one fallback mutants are killed, not explained, and the tests permit a future evidence_audit_incomplete refusal. A stateful selection key also makes the duplicate supplied-snapshot audit detect conflicting archive selection; dropping the supposedly redundant snapshots parameter changes that refusal and is separately killed.
+- NEEDED: the lead commissions a production-boundary fix and independent review, with rejection of these inputs or use of authenticated parser rows after comparison; preserve archive identity, provenance, missing-evidence semantics and the existing plants. This test-only pass changes no production code and does not claim the boundary defect fixed.
 
 ## Sources
 

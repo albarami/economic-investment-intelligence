@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,7 @@ from custodian.tests.repository_root import repository_root
 from check_tree import DATA_PROBES
 from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.registry import FIELDS, Entry, load_registry
+from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault
 from eii_custodian.publicdata.investment_build import (
     PageSpec,
@@ -125,6 +127,7 @@ def test_nullable_precision_and_duplicate_keys(
     deleted (PUB-10).
     """
     sparse = invented_record(
+        project_id=1002,
         investing_company_name="Invented Cedar Press",
         jobs="",
         project_date="",
@@ -540,6 +543,51 @@ def test_publication_guards(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     assert refused.check == "unreviewed_release"
 
 
+def test_audit_snapshot_rejects_replaced_manifest_before_page_audit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A same-name manifest substitution fails its pointer checksum first."""
+    stored = tmp_path / "stored"
+    assert (
+        _run(stored, monkeypatch, _fdi_entry(), {DASHBOARD_URL: dashboard_page()}) == 0
+    )
+    cache = stored / "data" / "public_cache" / "fdi_projects"
+    pointer, manifest, _table = _batch(stored, "fdi_projects")
+    manifest_path = cache / "manifests" / f"{pointer['manifest_sha256']}.json"
+    manifest_path.write_text('{"pages": []}\n', encoding="utf-8")
+    raw_page = cache / f"{manifest['pages'][0]['sha256']}.html"
+    raw_page.unlink()
+
+    refused = audit_snapshot(cache.parent, "fdi_projects")
+    assert isinstance(refused, InvestmentFailure)
+    assert refused.check == "hash_mismatch"
+    assert refused.expected == pointer["manifest_sha256"]
+    assert refused.observed == "mismatch"
+
+
+def test_audit_snapshot_rejects_correctly_named_empty_manifest(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Empty page coverage is invalid even when the replacement filename matches."""
+    stored = tmp_path / "stored"
+    assert (
+        _run(stored, monkeypatch, _fdi_entry(), {DASHBOARD_URL: dashboard_page()}) == 0
+    )
+    cache = stored / "data" / "public_cache" / "fdi_projects"
+    pointer = json.loads((cache / "loadable.json").read_text(encoding="utf-8"))
+    body = b'{"pages": []}\n'
+    digest = hashlib.sha256(body).hexdigest()
+    (cache / "manifests" / f"{digest}.json").write_bytes(body)
+    pointer["manifest_sha256"] = digest
+    (cache / "loadable.json").write_text(json.dumps(pointer), encoding="utf-8")
+
+    refused = audit_snapshot(cache.parent, "fdi_projects")
+    assert isinstance(refused, InvestmentFailure)
+    assert refused.check == "missing_artifact"
+    assert refused.expected == "pages"
+    assert refused.observed == "empty"
+
+
 def test_fixtures_reject_realistic_identifiers_and_tracked_cache() -> None:
     """Invented fixtures have no bare digit run, and the tree guard names the cache."""
     text = dashboard_page().decode("utf-8")
@@ -754,6 +802,135 @@ def test_parser_accepts_null_date_without_padding() -> None:
     padded = dashboard_page((invented_record(project_date="2023-02-29"),))
     refused = parse_fdi(padded, spec.dashboard, envelope)
     assert getattr(refused, "check", "") == "announced"
+
+
+def test_parsed_revision_archive_survives_failed_refresh(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Every parsed batch has an immutable receipt that a failed refresh cannot remove."""
+    first = dashboard_page()
+    second = dashboard_page(
+        (invented_record(investing_company_name="Invented Reed Mill"),)
+    )
+    assert _run(tmp_path, monkeypatch, _fdi_entry(), {DASHBOARD_URL: first}) == 0
+    first_pointer, first_manifest, first_table = _batch(tmp_path, "fdi_projects")
+    assert _run(tmp_path, monkeypatch, _fdi_entry(), {DASHBOARD_URL: second}) == 0
+    second_pointer, second_manifest, second_table = _batch(tmp_path, "fdi_projects")
+    cache = tmp_path / "data" / "public_cache" / "fdi_projects"
+    evidence = cache / "evidence"
+    first_identity = first_manifest["table_snapshot_identity"]
+    second_identity = second_manifest["table_snapshot_identity"]
+    assert first_identity != second_identity
+    assert json.loads(read_snapshot(evidence, first_identity).body) == first_table
+    assert json.loads(read_snapshot(evidence, second_identity).body) == second_table
+    assert (
+        first_pointer["evidence_manifest_identity"]
+        != second_pointer["evidence_manifest_identity"]
+    )
+    retained_before = {
+        path.relative_to(evidence): path.read_bytes()
+        for path in evidence.rglob("*")
+        if path.is_file()
+    }
+
+    refused_entry = replace(_fdi_entry(), row_count_max=0)
+    third = dashboard_page(
+        (invented_record(investing_company_name="Invented Cedar Press"),)
+    )
+    assert _run(tmp_path, monkeypatch, refused_entry, {DASHBOARD_URL: third}) != 0
+    assert _batch(tmp_path, "fdi_projects")[0] == second_pointer
+    for relative, body in retained_before.items():
+        assert (evidence / relative).read_bytes() == body
+
+
+def test_equal_byte_agency_recheck_uses_archived_retrieval(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An equal-byte recheck never replaces the original source retrieval time."""
+    import eii_custodian.publicdata.investment_build as publication
+    from eii_custodian.publicdata.fetch.allowlist import HostDecision, approve
+
+    def allow(url: str) -> HostDecision:
+        decision = approve(url)
+        if decision.ok or decision.host.endswith(".invalid"):
+            return HostDecision(True, decision.host, "https", "")
+        return decision
+
+    monkeypatch.setattr("eii_custodian.publicdata.fetch.kinds.approve", allow)
+    entry = _agency_entry()
+    body = agency_bodies()[SECTOR_URL]
+
+    def transport(url: str) -> Response:
+        return Response(final_url=url, body=body, hops=())
+
+    first = publication._fetch_page(
+        entry,
+        tmp_path,
+        SECTOR_URL,
+        transport,
+        lambda _seconds: None,
+        lambda: "2026-11-14T08:00:00Z",
+        "ab" * 32,
+    )
+    second = publication._fetch_page(
+        entry,
+        tmp_path,
+        SECTOR_URL,
+        transport,
+        lambda _seconds: None,
+        lambda: "2026-11-15T08:00:00Z",
+        "ab" * 32,
+    )
+    assert not isinstance(first, InvestmentFailure)
+    assert not isinstance(second, InvestmentFailure)
+    assert first[1] == "2026-11-14T08:00:00Z"
+    assert second[1] == "2026-11-14T08:00:00Z"
+    assert second[2] == body
+
+
+def test_fail_fast_archives_failed_and_unattempted_inputs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The shared build retains attempt evidence after its first fetch failure."""
+    import commands.build_public as build_public
+    from eii_custodian.publicdata.fetch.allowlist import HostDecision, approve
+
+    first = _fdi_entry()
+    second = replace(first, key="fdi_projects_later")
+
+    def allow(url: str) -> HostDecision:
+        decision = approve(url)
+        if decision.ok or decision.host.endswith(".invalid"):
+            return HostDecision(True, decision.host, "https", "")
+        return decision
+
+    def transport(url: str) -> Response:
+        raise TransportFault("invented unavailable", url)
+
+    monkeypatch.setattr(build_public, "load_registry", lambda: (first, second))
+    monkeypatch.setattr(build_public, "utc_now", lambda: RETRIEVED)
+    monkeypatch.setattr("eii_custodian.publicdata.fetch.build.approve", allow)
+    monkeypatch.setattr("eii_custodian.publicdata.fetch.kinds.approve", allow)
+    assert (
+        build_public.run(tmp_path, {}, (), transport=transport, sleep=lambda _: None)
+        != 0
+    )
+    cache = tmp_path / "data" / "public_cache"
+    for key in (first.key, second.key):
+        directory = cache / "audit" / key / "evidence"
+        indexes = tuple((directory / "index").glob("*.json"))
+        assert len(indexes) == 1
+        identity = indexes[0].stem
+        audit = json.loads(read_snapshot(directory, identity).body)
+        states = {(row["key"], row["evidence_status"]) for row in audit["entries"]}
+        assert (first.key, "failed") in states
+        assert (second.key, "unattempted") in states
+    log = _log(tmp_path)
+    assert any(
+        line
+        == f"EVIDENCE {second.key} unattempted reason=not_attempted_after_fail_fast"
+        for line in log["lines"]
+    )
 
 
 def _independent_key(tokens: dict[str, str]) -> str:
