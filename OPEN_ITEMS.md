@@ -2464,6 +2464,51 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - OPTIONS: **Default:** closed; reopen on any new failure of either test.
 - NEEDED BY: closed.
 
+## OI-273 — The icv.qa record stays pending and is never approved
+
+- ID: OI-273
+- TYPE: OPEN
+- RAISED BY: S2-T29 lens T and the pin-security reviews, 2026-11-18
+- CONCERNS: task S2-T29; `custodian/publicdata/review/s2_t29_sources.yaml`, record 5 (`icv.qa`)
+- EVIDENCE: `icv.qa` and `www.tawteen.com.qa` left the allowed hosts, PUB-03 and the page pin set. The refusal row keeps their addresses as evidence metadata only. `load_pin` refuses the host in code, and the second pin-security review confirmed that.
+- NEEDED: Nothing in version 1. The record stays PENDING. Only a new ruling that adds a row that makes requests to the host can reverse this, and that row then needs its own pin review.
+
+## OI-274 — The tender chain file is inspected before the tenders digest is filled (condition i)
+
+- ID: OI-274
+- TYPE: OPEN
+- RAISED BY: S2-T29 second pin-security review, condition i, 2026-11-18
+- CONCERNS: task S2-T29 pin record 2 and the `tenders_pub` digest; `chain_context` in the tender singles module
+- EVIDENCE: `chain_context` loads its PEM file whole and does not apply the inspection that `load_pin` applies. No chain file exists today, so this is inert. The live chain was incomplete in the S2-T08 part B shape pack.
+- NEEDED: Before the task that fills the `tenders_pub` digest, either (a) record that the PEM holds exactly one authority certificate and that it is not self-signed, or (b) give `chain_context` the same inspection, with a planted test. The tender chain file must also be placed in the intake folder of both sources.
+
+## OI-275 — The awards profile and the accident byte spans come from a live public build
+
+- ID: OI-275
+- TYPE: OPEN
+- RAISED BY: S2-T29 evidence list, items 3 and 5
+- CONCERNS: task S2-T29 evidence; the awards intake and the accident export; first live run in task S2-T08 part B
+- EVIDENCE: The awards workbook's aggregate profile is still missing: column names, inferred types, row count and dated-row count, with its hash, column mapping and seed. The accident byte spans are also missing. Both come only from a public-build run on the file; the cache folder is never opened by hand.
+- NEEDED: The live public build of task S2-T08 part B writes both, and they are recorded with their receipts. Until then no awards or accident figure is released.
+
+## OI-276 — The terms of use of the national GIS services were not found
+
+- ID: OI-276
+- TYPE: OPEN
+- RAISED BY: S2-T29 evidence items 5 and 6, finding 6
+- CONCERNS: task S2-T29 GIS rows (the zone, municipality and district layers under the Vector service base)
+- EVIDENCE: No terms page was found, and every service's copyright text is empty. The rows record the licence basis `owner_decision` under decision 0026 and state "terms of use not found". Under decision 0034, every value stays in the uncommitted cache.
+- NEEDED: At a go live, whether these services may be reused, and on what terms, is settled by the legal route of that day (document 17, DHA-102). Nothing in version 1. Related to OI-209.
+
+## OI-277 — Award names that differ only by a double space are counted unmatched
+
+- ID: OI-277
+- TYPE: OPEN
+- RAISED BY: S2-T29 lens A note, decided by the lead on 2026-11-18
+- CONCERNS: task S2-T29 award checks, the name normalisation step
+- EVIDENCE: The normalisation runs in the ruled order: compatibility form, case fold, whitespace collapse, then punctuation removal. So "Al - Rayyan" keeps a double space while "Al Rayyan" keeps one. Such a name is counted unmatched, with its reason. The error is in the safe direction, because the same registration number must also be equal.
+- NEEDED: At the first live awards-to-register match (task S2-T08 part B), count the unmatched names whose only difference is a double space. If any exist, a later task proposes a second whitespace collapse, with a planted test.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -3786,6 +3831,11 @@ review limits remain open for lead disposition, with no live approval inferred.
 F1 to F4 are addressed offline in fix pass 10; the Anthropic pin-security review
 and Moonshot lens T confirmation remain PENDING, as do every `security_review`
 value and the retired `icv.qa` record. Existing evidence holds remain unchanged.
+
+**Correction, 2026-11-18 (S2-T29 re-cut onto main 81e62db):** the sentence above is
+superseded. The second pin-security review (Anthropic) and the lens T confirmation
+(Moonshot AI) both returned APPROVED on commit `6aa8a39`. Every `security_review`
+value stays PENDING, and the retired `icv.qa` record stays pending for good (OI-273).
 
 
 ### S2-T29 main join — remaining check evidence, 2026-11-18
