@@ -65,7 +65,7 @@ class RunnerUsage(unittest.TestCase):
             self.assertIn(suite.kind, allowed)
             self.assertTrue((ROOT / suite.cwd).is_dir(), suite.cwd)
             if suite.kind == "pytest":
-                for arg in suite.args:
+                for arg in suite.args[:1]:
                     self.assertTrue((ROOT / arg).is_dir(), arg)
         package = json.loads(
             (ROOT / "web" / "package.json").read_text(encoding="utf-8")
@@ -88,16 +88,48 @@ class RunnerUsage(unittest.TestCase):
         expected = (
             "python-guards",
             "python-core",
-            "python-custodian",
+            "python-custodian-1",
+            "python-custodian-2",
             "python-product",
             "web-checks",
             "web-unit",
         )
-        index = 0
-        for name in names:
-            if index < len(expected) and name == expected[index]:
-                index += 1
-        self.assertEqual(index, len(expected))
+        self.assertEqual(tuple(names), expected)
+        expected_python = (
+            ("python-guards", ("scripts/tests",), 3600),
+            ("python-core", ("core/tests",), 600),
+            (
+                "python-custodian-1",
+                (
+                    "custodian/tests",
+                    "-p",
+                    "pytest_custodian_part",
+                    "--custodian-part",
+                    "1",
+                ),
+                600,
+            ),
+            (
+                "python-custodian-2",
+                (
+                    "custodian/tests",
+                    "-p",
+                    "pytest_custodian_part",
+                    "--custodian-part",
+                    "2",
+                ),
+                600,
+            ),
+            ("python-product", ("product/tests",), 600),
+        )
+        self.assertEqual(
+            tuple(
+                (suite.name, suite.args, suite.timeout)
+                for suite in run_tests.SUITES
+                if suite.kind == "pytest"
+            ),
+            expected_python,
+        )
 
     def test_web_checks_limit_on_a_hosted_runner(self) -> None:
         rows: tuple[tuple[dict[str, str], int], ...] = (

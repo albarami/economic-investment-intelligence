@@ -35047,6 +35047,262 @@ Seed:      none
 Notes:     Train S2-3 exact BASE..WORK scope: 110 files, 50 added and 60 modified. Task scope and replay preservation are checked from Git; forced changes are records unions and the docs/README.md paragraph. No ledger preparation edits any tracked file.
 ```
 
+#### Merge train S2-3: merge record
+
+- The head that was merged, `0daa81a030194045985a30bb52569a06daad72d6`, is the train's ledger commit on base `81e62db`; the log records the squash merge pinned to that head. Every task of the train kept its own approving verdict, quoted in its task log above.
+- CI on the head: the six required hosted checks passed (check-docs, planted-failures, sandbox proof, secret-scan, static-checks, tests). workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/44340430004 ; workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/44340429809 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/44340429783.
+- The lead's whole test on the merge result: the head contained base `81e62db`, so the merge tree is the ledger-tested tree; `./eii test --seed 2890868834` exited 0 with 10463 passed and 0 failed (1354 s), recorded in the train's ledger above.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/86 was squash-merged on 2026-11-18 at 19:37 (Asia/Qatar) at that head; merge commit `b380109f0cc29c9fb7d68d0987989cfed8daebbe` on main; head tree `69dd8dcec89b421eec68c6b7767f8d6932765d3b`, merge tree `69dd8dcec89b421eec68c6b7767f8d6932765d3b`. CI on the merge commit: workflow docs success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/44349361396 ; workflow sandbox success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/44349361282 ; workflow ci success, run https://github.com/albarami/economic-investment-intelligence/actions/runs/44349361623.
+
+### S2-T09 — Method-card pins from the public build: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/87)
+
+Author: OpenAI GPT-6 (Codex), senior release engineer. Strict self-review persona: release-evidence reviewer. Skills applied: project-orientation, task-standards, github-flow, sanad-provenance discipline and muhasabah-gate. This is ledger preparation from recorded evidence and read-only Git, with no independent approval claimed by its author. Source filenames below are under `.overnight/IN/ledger/`; `verdicts/` means that folder's verdicts directory. The S2-T30 files supply the ledger form only. No ledger command, network request, live-cache read, task test, campaign, commit or tracked edit is performed by this preparation.
+
+#### Plan rounds and their design reviews
+
+- Plan round 1: the lead's log identifies Google Gemini 4 Carbon through Abacus (launch `GEMINI_4_CARBON`). The return names the senior econometric/statistical methods engineer and a principal statistical methods/provenance reviewer of another maker, and lists task-standards, project-orientation, sanad-provenance and muhasabah-gate. It proposed new calculations, settings and build orchestration as well as review evidence; those proposals are historical, not the final implementation (`verdicts/S2-T09.plan.r1.return.md`, `S2-T09.plan.r1.stdout`, `log-lines.md`, entries of 2026-11-15).
+- Design round 1: Moonshot AI Kimi K3.1 Pro High through Devin, REJECTED. F1-F6 reject out-of-scope production/calculations, invented settings, extra outputs, an unusable recomputation interface, blanket unpinned completion, and the incorrect assertion that the prior customs source lacked 2024. Review was file-only. (The design reviews read the plan documents of their round, written under the plan workspace's uncommitted output folder; no reviewed commit exists for a plan round, and none is claimed.) (`verdicts/S2-T09.designreview.r1.stdout`, checks D1-D7 and findings F1-F6).
+- Plan round 2: Google Gemini through Droid, reported as adopting the first review, removing orchestration and calculations and consuming S2-T08 outputs. Its return explicitly could not verify the artifact/configuration interfaces or actual public-output tests on the available base. Plan round 3 again reports adopting the outstanding findings and retaining the lead-owned records boundary. (Plan rounds r2 and r3 ran as Droid model gemini-3.1-pro-preview, Google Gemini 3.1 Pro, by their launcher status lines.) (`verdicts/S2-T09.plan.r2.return.md`, `S2-T09.plan.r2.stdout`, `S2-T09.plan.r3.return.md`, `S2-T09.plan.r3.stdout`; `log-lines.md`, 2026-11-16 06:32-06:54).
+- Design round 2: Moonshot AI Kimi K3.1 Pro through Droid, REJECTED. F1-F3 FIXED; F4 independent public-file replay, F5 Wilson period and both completion gates, F6 contaminated-parent treatment NOT FIXED. N1 requires verification commands and records. (It read the round-2 plan documents in the plan workspace, whose checkout was 5cfff64; the plan itself was never committed.) (`verdicts/S2-T09.designreview.r2.stdout`).
+- Design round 3: Moonshot AI Kimi K3.1 Pro through Droid, REJECTED. F4 and F5 NOT FIXED; F6 and N1 FIXED. N2 objects to direct pytest commands, N3 requires an implementation home for validation, synchronization and completion evidence. Actual source recomputation was not reviewed. The lead's LOG records ruling L-653 approving plan r3 with Q1-Q5 and holding the build for S2-T08. The ruling's full text is not supplied; this entry makes no broader design approval claim. (It read the round-3 plan documents; no reviewed commit exists for a plan round.) (`verdicts/S2-T09.designreview.r3.stdout`; `log-lines.md`, 2026-11-16 06:54).
+
+#### Build pass 1 and initial reviews
+
+- The lead launched only shape-independent pass 1 under L-894 while S2-T08 part B's live build remained pending. The builder return identifies OpenAI GPT-6 (Codex), senior methods engineer for public statistics and provenance checks, with another maker's strict review pending. It applies project-orientation, task-standards, sanad-provenance, github-flow and muhasabah-gate, and the plain meaning of test-first development and verification where those installed skills were unavailable. (The launcher status line records model gpt-6.1-sol through Codex; the model's own return names itself OpenAI GPT-6. Both records stand; the ledger attributes the build to OpenAI GPT-6.1 Sol by the launcher record.) (`verdicts/S2-T09.build1.return.md`, `S2-T09.build1.stdout`; `log-lines.md`, 15:12 and 15:56).
+- The builder's base was `a5219f52f5e96bb3e2fe7da7f55198d1722438c3`; its return describes six uncommitted additions. The lead moved the provisional module to the plan-r2 location `custodian/src/eii_custodian/publicdata/method_card_validation.py`, adjusted two imports and applied lint/format corrections, then committed `cfacc00276a6d887a2acc99a0fc7fcc56155fb8d`. The six files are the pending source-check YAML, validator, two test files and two helpers. No method-card value was inserted.
+- Builder evidence, not rerun by this drafter: guards-off red exit 1, 73 failed and 10 deselected; pre-replay implementation red exit 1, 11 failed. Final focused tests exit 0, 100 passed; final core/custodian seeded run exit 0, 6,504 passed in 233.74 s, Hypothesis seed 7. Python/pytest/PyYAML 3.14.6/9.2.0/6.0.3, cores 8-11, offline uv and workspace temporary paths are recorded. Earlier lint, type, fixture and formatting failures remain in the return with their deterministic corrections. The lead's initial checks at the build tree report 100 focused passed and ruff, format, mypy, docs and tree exit 0. No whole `./eii test` result is supplied for this task at this step (`verdicts/S2-T09.build1.return.md`, Verification environment and history; `log-lines.md`, 15:56).
+- Initial review named revA: Anthropic Claude Opus 5.5, REJECTED at `cfacc00276a6d887a2acc99a0fc7fcc56155fb8d`. Although launched as lens A, the actual verdict says lens B. Initial revB: Moonshot AI Kimi K3.1 Pro, REJECTED at the same head, static inspection only. The lead's LOG explains both jobs shared one worktree and the second brief overwrote the first; both reviewed lens B, so lens A was still owed. This launch error is preserved (`verdicts/S2-T09.revA.stdout`, `S2-T09.revB.stdout`; `log-lines.md`, 16:21).
+- Opus F1/F3 require isolated plants and exact error codes; F2 adds missing guard plants; F4 replaces a tautological replay test; F5 narrows document hashing to governed spans; F6 closes maker identities; F7 replays C5 per basket line; F8 filters/orders C6; F9 defers registry/receipt resolution; F10 fixes root-dependent paths. Kimi finding 1 covers broad schema exceptions; finding 2 covers a checked block moved into the wrong card. (The verdict file holds two findings; the lead's log line counted one. The verdict file governs: two findings, both fixed in fix pass 1, the second under F5.) Opus ran the focused suite, exit 0, 100 passed; Kimi ran no commands. Both regarded the invented replay arithmetic as adequate for pass 1, with live adapters and source review still owed.
+
+#### Fix pass 1 and confirmations
+
+- Zhipu AI GLM-5.3 through Droid, senior methods engineer, built fix pass 1. The lead committed it as `fd6553e8cff23ccc153e1372085aaabbb166642a`. It adds exact-code plants, isolated lineage/card-sync cases, governed-section hashing and anchor placement, a closed maker set, per-line C5 replay, C6 box/threshold/order controls, portable test paths and a second replay call after validation. F9 remains a proposed open item. This description follows the actual second replay call, as required by ruling L-984 and cfB; it does not adopt the original commit body's inaccurate fixed-expectation description (`verdicts/S2-T09.fix1.return.md`, sections F1-F10; `log-lines.md`, 17:18 and L-984 at 17:56).
+- Fixer evidence: tests-first red exit 1, 118 failed and 12 passed; 45 isolated guard-disabled runs all exit 1, with 40 DID NOT RAISE and five wrong-code failures. Focused green exit 0, 130 passed in 3.31 s; lint, format, mypy, docs, tree, parity and whitespace checks exit 0. Lead lv2 records focused 130 passed, custodian 5,795 passed in 237 s, and all listed static/parity checks exit 0. These are the supplied historical checks, not execution at WORK (`verdicts/S2-T09.fix1.return.md`, Checks; `log-lines.md`, 17:05 and 17:18).
+- cfB: Anthropic Claude Opus 5.5, REJECTED at `fd6553e8cff23ccc153e1372085aaabbb166642a`. F1-F3, F5-F10 and both Kimi findings are resolved; F9 is resolved only as a proposed item for the ledger. F4's replacement still has N1: the planted record differs in keys as well as value. Opus records focused exit 0, 130 passed, 11 isolated guard reds exit 1, independent governed-span hash parity, and probes showing the N1 plant still passes after value repair or key-set-only comparison. Ruling L-984 adopts N1 and requires F9 in OPEN_ITEMS (`verdicts/S2-T09.cfB.stdout`; `log-lines.md`, 17:43 and 17:56).
+- revA2, the first actual lens A review: REJECTED at `fd6553e8cff23ccc153e1372085aaabbb166642a`, static only. F1 corrects the configuration-pin set; F2 removes forced fictional lineage from settings; F3 makes C5 parent review per line; F4 adds missing/malformed sync-block plants; F5 fixes null licence dates and integer customs codes. Lead ruling L-987 adopts all five. (The launcher status lines of revA2, cfA3 and cfA4 record model GEMINI_4_CARBON, maker Google, requested through Abacus; the agent's own text names only the Abacus agent. The ledger attributes these reviews to Google Gemini 4 Carbon through Abacus by the launcher record, and keeps the verdicts' self-description and read-only limits as written.) (`verdicts/S2-T09.revA2.stdout`; `log-lines.md`, 17:18 and L-987 at 18:21).
+
+#### Fix passes 2 and 3, then the next confirmations
+
+- Fix pass 2, Zhipu AI GLM-5.3: committed by the lead as `8019a6efbdf1a443a2f4665db57e0656d88c8dc9`. Only the data-test file changes. N1's tampered dictionary is copied from the replay, keeps identical keys and changes one value; the untampered replay supplies the positive control. Key-set-only-helper red exit 1 with DID NOT RAISE; focused green exit 0, 130 passed in 3.58 s; ruff, format, mypy, docs and whitespace exit 0. This pass grants no independent approval (`verdicts/S2-T09.fix2.return.md`; `log-lines.md`, 18:10 and 18:21).
+- Fix pass 3, Zhipu AI GLM-5.3: committed by the lead as `4b59732e2a38162d971b2562693743242d0a836e`. Five task files change; YAML and methods stay untouched. F1 fixes the 16 configuration settings (including wilson.period, excluding c6.release_sha256); F2 accepts empty lineage for those settings while source pins still require it; F3 adds per-basket-line parent review and exact withheld/caveat markers; F4 splits missing/malformed block failures; F5 reuses the existing customs-code parser and skips undated cancellation rows. The replay's customs parsing is consequently shared with production, a limit retained for pass 2 (`verdicts/S2-T09.fix3.return.md`, F1-F5).
+- Fixer evidence: focused exit 0, 159 passed in 3.60 s; relevant series/method tests exit 0, 518 passed and 5,306 deselected; custodian exit 0, 5,824 passed in 215.86 s; nine guard-disabled scratch runs exit 1. The return retains path, expected-count, lint, format and scratch-precedence mistakes and corrections. Lead lv3: focused 159 passed, custodian 5,824 passed in 215 s and lint, format, mypy, docs, tree, whitespace and parity exit 0. Exact lead durations 3.56 s and 215.48 s are quoted by cfA3 from the lead-check input; no new timing is inferred here (`verdicts/S2-T09.fix3.return.md`, Honest failures and Checks; `verdicts/S2-T09.cfA3.stdout`, What was run; `log-lines.md`, 19:10).
+- F9 remains unresolved for source-derived pins at WORK: `_lineage` validates shape, metadata, date and hash format, and `validate_source_check_record` compares with producer lineage; neither opens the registry nor checks a provenance receipt. (The lead confirms the qualification: after fix pass 3, F9 concerns the source-derived pins only; the sixteen configuration pins are checked against settings and carry no lineage.) The original F9 words and this qualification are retained in OI-282 below; no source or receipt is opened for this preparation.
+- cfA3: APPROVED at `4b59732e2a38162d971b2562693743242d0a836e`, F1-F5 RESOLVED, no new finding in fix 2 or 3. Self-report Abacus AI Agent; lead attribution Google Gemini 4 Carbon through Abacus, subject to the attribution mark above. No commands executed in that session; its evidence is static inspection plus recorded fixer and lead checks (`verdicts/S2-T09.cfA3.stdout`; `log-lines.md`, 19:17).
+- cfB3: Anthropic Claude Opus 5.5, REJECTED at `4b59732e2a38162d971b2562693743242d0a836e`. N1 and original F1-F10 are resolved, F9 only as the proposed item. B1: the plant derives its parameter list from the same production set it purports to pin. Dropping wilson.period yields exit 0, 157 passed in the reviewer's probe. Focused tracked tests exit 0, 159 passed; scratch committed-record baseline fails on layout and is explicitly deselected only for scratch probes. P1-P5 are hardening proposals, not adopted findings. The lead adopts literal NONE_NAMED_PINS and its equality test (`verdicts/S2-T09.cfB3.stdout`; `log-lines.md`, 19:14).
+
+#### Fix pass 4 and the final approvals
+
+- Zhipu AI GLM-5.3, fix pass 4: one test file, committed by the lead as `8be52f8f2c27a4896980716d2d32bf30c719effc`. The literal 16-id tuple, production-set equality assertion and tuple-based plant implement B1 exactly. Builder red with wilson.period omitted: exit 1, two failed, 141 passed, one scratch-only deselection; focused green exit 0, 160 passed in 3.62 s; custodian exit 0, 5,825 passed in 207.55 s; lint, format, mypy, docs, tree, parity and whitespace exit 0. Lead checks: focused 160 passed, ruff, format and whitespace exit 0. No `./eii test` run by the fixer is claimed (`verdicts/S2-T09.fix4.return.md`; `log-lines.md`, 19:30).
+- cfA4: APPROVED at `8be52f8f2c27a4896980716d2d32bf30c719effc`, findings none. Lead attribution: Google Gemini 4 Carbon through Abacus; verdict self-identifies Abacus.AI/Abacus AI Agent, underlying model unexposed, as marked above. Static review only; K1 holds prior approval, K2 uses inspection and recorded runs, not a new pytest execution (`verdicts/S2-T09.cfA4.stdout`; `log-lines.md`, 19:37).
+- cfB4: Anthropic Claude Opus 5.5 (claude-opus-5-5), APPROVED at `8be52f8f2c27a4896980716d2d32bf30c719effc`, findings none. Reviewer reproduces B1 on the old tests, proves the new two-failure red in scratch, restores a passing positive control and runs tracked focused tests, exit 0, 160 passed. Ruff, format, parity and whitespace exit 0. Its first scratch attempt loaded the wrong module due to pytest pythonpath; the verdict records this and the corrected override, rather than presenting the first attempt as red evidence (`verdicts/S2-T09.cfB4.stdout`).
+
+#### Replay, scope and current acceptance limits
+
+- Both lenses end APPROVED on the original task head `8be52f8f2c27a4896980716d2d32bf30c719effc`, subject to the maker-attribution reconciliation above. WORK `caf72aea4b13d0d086017bebc4a8ff8c9dd10c20` is five plain replays on BASE `b380109f0cc29c9fb7d68d0987989cfed8daebbe`, with no cherry-pick trailers. `make_spec.py` asserts the exact original/replayed sequence, all five equal `git range-diff a5219f5..8be52f8 b380109..WORK` rows and byte identity of all six added task files against that approved head. It also verifies unchanged methods, identical AGENTS/CLAUDE bytes and a clean tracked tree. These content proofs do not invent a new approval at the replayed hash.
+- Original → replayed commits: `cfacc00276a6d887a2acc99a0fc7fcc56155fb8d` → `acc06f23cc36e6333758d980f066d98a862360dc`; `fd6553e8cff23ccc153e1372085aaabbb166642a` → `bb84baae306bd07b9c70263896857ba6898ce4f9`; `8019a6efbdf1a443a2f4665db57e0656d88c8dc9` → `8079573b303418082732d751d0694744ca9d2f46`; `4b59732e2a38162d971b2562693743242d0a836e` → `3e0486178a77f6f5ea854e57fb38e9736ec064d9`; `8be52f8f2c27a4896980716d2d32bf30c719effc` → `caf72aea4b13d0d086017bebc4a8ff8c9dd10c20`. The original base is `a5219f52f5e96bb3e2fe7da7f55198d1722438c3`.
+- All 29 required pins, taken from REQUIRED_PINS and the committed YAML at WORK, remain unchecked with empty values/lineage and the reason "awaiting the live public build of S2-T08 part B". OI-283 enumerates them. Both callable completion checks refuse this pending record; integration into S2/S7 runners, actual producer/config adapters, live C6 projection/same-category handling, C7 geometry and C14 area fallback are still pass-2 work. An invented-fixture green result is not a source check or a pinned example.
+- Acceptance box 1 stays unchecked: no recorded live `./eii build-public` result produces every MTH-03 input or the C14 medians. Box 2 stays unchecked: no actual source/settings review for each live value. Box 3 stays unchecked: the validator and synchronization guards are reviewed, but no checked value is inserted and the methods are unchanged. Box 4 stays unchecked: the pending YAML is present, but verdicts cfB3/cfA4/cfB4 explicitly say the two ledger open-item records are still owed at their heads. Adding the proposed records does not complete live pinning. Thus zero boxes are ticked; TASKS.md changes only queued → in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/87), following S2-T30's Delivery form and the model replacements.
+- Existing OI-207 (bulk-month decision), OI-208 (rounding assumption) and PO-S2-51 (C1 denominators/data replay) name S2-T09 at WORK. No supplied verdict says this pass closes any of them; all remain as recorded, with no duplicated new item and no closure proposed. Narrowed pass-1 infrastructure does not resolve their substantive requests.
+- Reviewer hardening remains unbuilt: cfB3 P1-P5 (configuration lineage, cross-pin parent-review consistency, shared fixture dictionaries, shared customs parser and the spaced error code), cfA3's optional empty value-prefix restriction, and cfB4's scratch import-path record. These are retained proposals, not silently implemented or declared closed. No new PO item is invented by this ledger specification; the lead decides their routing.
+- PR 86: BASE's subject identifies train 3 of slice S2 and PR 86, commit `b380109f0cc29c9fb7d68d0987989cfed8daebbe`, committed 2026-11-18T19:37:21+03:00. BASE PROGRESS contains its task ledger but no closing paragraph establishing the final hosted checks, exact merge-result run and closure. The lead supplies its closing record as the sibling pre.md (hosted runs on the head and on the merge commit, read from GitHub; the whole-test seed and count from the train's ledger), appended before this task log.
+- The future ledger commands measure WORK independently. Their test counts, fresh suite seed and environment come from that execution; dry PR/seed arguments do not supply evidence. Provider remains none, with no network or live public cache; no mutation campaign is requested. Every unresolved lead mark in this log or items.md blocks spec.json with exit 3. No task completion, merge readiness or slice-gate passage is claimed here.
+
+Muhasabah self-audit: PASS for this bounded preparation. Historical results retain their named source and head; missing hashes, conflicting attribution, F9's changed scope and the missing prior closing record are visible marks. The tracked task remains unchanged and all four acceptance boxes stay open.
+
+#### Evidence for the work commit `caf72aea4b13d0d086017bebc4a8ff8c9dd10c20`
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   uv run --locked python -m pytest custodian/tests/test_method_card_pins.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    144 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     MTH-03 closed record/schema, reviewer identity, recorded configuration, source lineage structure, C5 windows and per-line parent treatment, governed-section synchronization, exact sixteen configuration-pin membership and S2/S7 pending-pin refusal plants. Imports custodian/tests/method_card_pin_fixtures.py. Run this file alone at WORK using invented fixtures; the repository pending record remains unpinned. Counts come from this run, not historical focused totals.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   uv run --locked python -m pytest custodian/tests/test_method_card_pins_data.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    16 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Independent caller-path Wilson/C5/C6/C7/C14 replays, exact invented-input arithmetic, null cancellation dates and integer customs codes, per-line C5, C6 box and display controls, C7 directional shares/NO_DATA, Arabic C14 medians/counts and isolated record-artifact agreement versus a tampered replay value. Imports custodian/tests/method_card_data_replay.py and custodian/tests/method_card_pin_fixtures.py (including local function imports). Invented fixture success does not establish a live source pin; customs_code is shared with production. Run this file alone at WORK with no real cache/network.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   uv run --locked python -P -s -m pytest -c pyproject.toml --rootdir . --collect-only -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "9769 tests collected in 1.45s"
+Seed:      none
+Notes:     Safe-path collection at WORK includes both S2-T09 test files and their two helper modules. Collection is separate from executing tests and cannot establish a source check or clear a pending MTH-03 gate.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    881 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Repository script guards at WORK, including provenance and record checks inherited from BASE. No S2-T09 script or runner change, waiver, skipped failure or historical result is substituted for this run.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint WORK including the new method-card validator and all four test/helper modules. No suppression or source-check bypass is introduced by the specification.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "729 files already formatted"
+Seed:      none
+Notes:     Read-only format check at WORK. S2-T09 historical formatter corrections remain recorded in log.md; this command measures the replayed head.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 404 source files"
+Seed:      none
+Notes:     Type-check WORK including the typed source-check entries, lineage, artifact/configuration validation and completion interfaces. Use the current run count, not the historical count of 391 source files.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1010 text files, 107 Markdown files: OK"
+Seed:      none
+Notes:     Validate repository document/record rules at WORK, including the pending source-check YAML. Method cards and tracked records are unchanged in this six-addition task diff; no live pin is inferred.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Validate repository layout at WORK: YAML in publicdata/review, validator in publicdata and tests/helpers in custodian/tests. No new directory, dependency or runner is introduced.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lock consistency at WORK; S2-T09 changes no dependency declaration, library pin or lock file.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 359 rows: OK"
+Seed:      none
+Notes:     Validate existing reference-note anchors at WORK. S2-T09 changes no library pin, reference note or pack anchor; this is not evidence of live adapter confirmation.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Require byte-identical rules files at WORK; neither rules file is changed by S2-T09.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: range HEAD, 89 commits, at least 89 to list, RESULT: PASSED"
+Seed:      none
+Notes:     Pinned history scan on WORK, including its five plain task replays. The generator separately asserts no cherry-pick trailers and byte-identical task files; neither proof replaces this scan.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','b380109f0cc29c9fb7d68d0987989cfed8daebbe...caf72aea4b13d0d086017bebc4a8ff8c9dd10c20'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/publicdata/review/s2_t09_source_checks.yaml A:custodian/src/eii_custodian/publicdata/method_card_validation.py A:custodian/tests/method_card_data_replay.py A:custodian/tests/method_card_pin_fixtures.py A:custodian/tests/test_method_card_pins.py A:custodian/tests/test_method_card_pins_data.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "6 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     S2-T09 alone: six additions, the pending YAML, one validator and four test/helper modules. Every task file is byte-identical to approved 8be52f8; range-diff proves five equal replays. No method-card value, dependency, runner, rule or tracked record changes in WORK.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   ./eii test --seed 1085380504
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    10623 passed, 0 failed, 0 skipped
+Seed:      1085380504
+Notes:     Whole test at WORK using the real lead-supplied fresh seed, provider none, no network and no real public cache. Keep failures and custodian duration against the unchanged 600-second bound (PO-S2-84). Callable MTH-03 refusal tests are expected to pass; the pending live S2/S7 completion itself is not claimed passed. The dry seed is not execution evidence. No mutation campaign.
+```
+
+```text
+### S2-T09 — Method-card pins from the public build
+Commit:    caf72aea4b13d0d086017bebc4a8ff8c9dd10c20
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','b380109f0cc29c9fb7d68d0987989cfed8daebbe..caf72aea4b13d0d086017bebc4a8ff8c9dd10c20'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     All five work commits must have Conventional Commit subjects. make_spec.py proves the exact replay order, unchanged original messages with no cherry-pick trailers, five equal range-diff rows and all six approved task files byte-identical.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
@@ -35880,3 +36136,17 @@ headless test result, never an owner-native chart performance pass. No retry,
 new skip, tolerance change or baseline refresh was used. Final task disposition
 remains C1–C6 BLOCKED and C7 part-one reporting PASS, with the detailed reasons
 in decision 0057 and .overnight/RETURN.md.
+## S2-T34 — The custodian suite runs in two named parts under its unchanged 600 s limit
+
+Senior expert persona: senior test-infrastructure engineer (builder: OpenAI GPT-6.1 Sol through Codex). Strict reviewer persona: independent test-infrastructure reviewer of a third maker (Google Gemini 3.1 Pro through Droid). Lead: Anthropic Claude Opus 5.5. Skills: builder test-driven development, verification before completion, careful git work; reviewer strict-reviewer, verification-before-completion, test-driven-development; lead orchestrating-builds, task-standards, verification-before-completion, muhasabah-gate.
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-18 | Cause (decision 0060, OI-285) | The hosted `tests` check of PR 87 stopped with `python-custodian: no result within 600 s; the process group was killed` (https://github.com/albarami/economic-investment-intelligence/actions/runs/44364506690). The same suite took 386 s and 569 s on two earlier hosted runs. The limit is unchanged; the suite is split. | lead |
+| 2026-11-18 | Build, commit `1816411` | `python-custodian` becomes `python-custodian-1` and `python-custodian-2` in `scripts/run_tests.py`, each pytest over `custodian/tests` with its own 600 s limit, selected by `scripts/pytest_custodian_part.py` (SHA-256 of the module's repository-relative POSIX path, modulo 2; pytest deselection, never a skip; an absent option changes nothing; a missing or unknown part is a usage error). Manifest guard `scripts/tests/test_custodian_parts.py` (disjoint, union equals the whole by test id, counts add up, neither part empty) with four planted violations, each red. Red at b380109 before the build: manifest and runner-name assertions failed for the absent suites, no import error. | OpenAI GPT-6.1 Sol |
+| 2026-11-18 | M1, builder, core 4, sequential | Part 1: 4011 tests, pytest 150.48 s, 51.61 percent of combined time; Part 2: 3178 tests, 141.09 s, 48.39 percent; both within 35 to 65 percent, no module assignment tuned. Part 1 exited 1 on `test_publicdata_heights.py::test_two_runs_give_identical_file_hashes` (bytes differed at index 1002): the heights fixture clock cause below. | OpenAI GPT-6.1 Sol |
+| 2026-11-18 | Fixture fix, commit `4a944e5` (OI-286) | `custodian/tests/fixtures/heights/invented.py` writes each archive member through `_member()` with the fixed ZipInfo date 1980-01-01 and mode 0o600, so two runs a second apart give identical bytes. New `custodian/tests/test_heights_fixture_clock.py`: red at b380109, 5 failed and 1 passed; green with the fix, 6 passed; heights tests 82 passed. | lead (L-1009) |
+| 2026-11-18 | Records, commit `dbaebe0` | Decision 0060 (Accepted) with item 5; `docs/README.md` index row; TASKS.md S2-T34 entry; OI-285 and OI-286; UPDATE lines on OI-46 and PO-S2-84. The first `check_docs.py` failed on the hosted run's bare 11-digit number (rule 9); it is written as the run's full link; then exit 0. | lead |
+| 2026-11-18 | Lead check lv1, split as built | `./eii test --seed 3740962858`, cores 4 to 7: exit 0, 10473 passed in seven suites (python-guards 897, python-core 739, python-custodian-1 4011, python-custodian-2 3178, python-product 786, web-checks 861, web-unit 1). | lead |
+| 2026-11-18 | Lead check lv2 on head `dbaebe0ca1344612584ad74341fa7ecc74508340` | `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` exit 0; `ruff check` 0; `ruff format --check` 0; `mypy` 0; `check_docs.py` 0; `check_tree.py` 0; `cmp AGENTS.md CLAUDE.md` 0; `git diff --check b380109 HEAD` 0; heights tests 82 passed, exit 0. Then `./eii test --seed 2082766191` (tmp/eiitest_bg.sh): exit 0, 10479 passed in seven suites (python-guards 897, python-core 739, python-custodian-1 4011, python-custodian-2 3184, python-product 786, web-checks 861, web-unit 1). | lead |
+| 2026-11-18 | Review | APPROVED `dbaebe0ca1344612584ad74341fa7ecc74508340`, R1 to R5 PASS; whole collection 7195 = part 1 4011 + part 2 3184 (base 7189 plus the 6 clock tests); 96 focused tests passed; ruff and mypy exit 0. | Google Gemini 3.1 Pro |

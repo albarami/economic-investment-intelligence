@@ -506,6 +506,7 @@
 - DONE SO FAR: `scripts/run_tests.py` with two helper modules, `conftest.py`, the `[tool.pytest]` table, `web/vitest.config.ts`, `web/scripts/count-reporter.mjs`, one package test per Python package and one Vitest test; the versions are the registry releases of 2026-10-27, 2026-11-06 and 2026-11-02, read on 2026-11-12, and the tools were run in a scratch project before the plan was finished. A secret in a variable with another name than the covered ones (the two names and three suffixes) is kept out only by the allow-list. A skip reason cannot be tied to a marker, so OI-10 on an unmarked test is accepted by the rule and left to the reviewer; Vitest's JSON gives no reason, so any skipped or TODO Vitest test that it reports fails; the two forms that it does not report (a failing `it.fails` or `test.fails` test, written as passed, and a `describe.todo` without a body, omitted) pass silently and are left to review and lint. `evals/` holds no test yet and `gateway/` no code; each later suite (boundary, parity, conformance, API, harness) adds a row to the table when it exists. The fixed seed that TST-27 asks of pull-request CI is passed by S0-T07 as `./eii test --seed N`.
 - OPTIONS: **Recommendation:** keep. Alternatives: select `-m "not nightly and not postgres and not live_model"` and run those markers in separate suites; read Node counts from the TAP trailer (documented as unstable) instead of the reporter; allow a longer seed form.
 - NEEDED BY: slice S0 gate.
+- UPDATE 2026-11-18: decision 0060 replaces `python-custodian` in convention (2) by `python-custodian-1` and `python-custodian-2`, so the table holds seven suites; the other conventions are unchanged.
 
 ## OI-47 — The `eii` launcher is created with one command
 
@@ -2572,6 +2573,96 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - COMPARISON: OI-168 holds the namespace requirement itself and stays as it is; no existing item records that the runner tests run in no required check.
 - NEEDED: Every check of a change to `scripts/mutation.py` or its runner tests runs `uv run --locked python -m unittest scripts.tests.mutation_runner -v` with the group `mutation`; the slice S2 gate decides whether a required hosted check runs them.
 
+## OI-282 — S2-T09 source-check lineage is not resolved against registry and receipts
+
+- ID: OI-282
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, original review F9 at cfacc00276a6d887a2acc99a0fc7fcc56155fb8d (the file named revA actually reviewed lens B); fix pass 1 by Zhipu AI GLM-5.3; lead ruling L-984 requires the ledger entry.
+- CONCERNS: `custodian/src/eii_custodian/publicdata/method_card_validation.py`, `_lineage` and `validate_source_check_record`; `custodian/publicdata/sources.yaml`; the build-public provenance receipt contract; AGENTS.md rule 19; MTH-03 and TST-198.
+- EVIDENCE: The fixer recorded these words in `.overnight/IN/ledger/verdicts/S2-T09.fix1.return.md`, section F9:
+
+  > "OI (S2-T09 pass 2): the source-check record's checked lineage is
+  > format-checked and compared against the producer artifact only: `source_id`
+  > is never resolved against the source registry that
+  > `custodian/publicdata/sources.yaml` uses, and `sha256` is never matched
+  > against the build-public provenance receipt, so a wrong but self-consistent
+  > artifact passes. Pass 2 must resolve every checked `source_id` in that
+  > registry and every checked `sha256` against its receipt, with planted
+  > violations for an unknown `source_id` and for a hash that differs from the
+  > receipt." The lead records it.
+
+- DONE SO FAR: At WORK caf72aea4b13d0d086017bebc4a8ff8c9dd10c20, source-derived checked pins still require format-valid lineage that is compared only with the supplied producer artifact. No registry or provenance receipt is opened by that validator. Fix pass 3 changed configuration pins: the sixteen settings pins accept empty lineage and are checked against their recorded settings/configuration-byte hash; they must not acquire invented source lineage. This qualification preserves the source-pin defect rather than claiming fix pass 3 resolved it. See log.md's F9 after fix 3 lead mark and `.overnight/IN/ledger/verdicts/S2-T09.fix3.return.md`, F1/F2 and Open points.
+- NEEDED: In live pinning, resolve each source-derived checked source_id against the registry and match its sha256 against its build-public provenance receipt, with independently planted unknown-source and receipt-hash-mismatch failures. Retain configuration-only evidence for the sixteen settings pins. A self-consistent producer artifact alone is insufficient. Another maker confirms the fix and its plants; no item is closed here.
+- NEEDED BY: S2-T09 live pinning after S2-T08 part B; the slice S2 and S7 MTH-03 completion evidence.
+
+## OI-283 — All MTH-03 method-card pins await S2-T08 part B's live build
+
+- ID: OI-283
+- TYPE: OPEN
+- RAISED BY: S2-T09 pass-1 builder; confirmations cfB3, cfA4 and cfB4 require this ledger record for the still-pending pins. Their approval is of pass-1 infrastructure, not live pin completion.
+- CONCERNS: MTH-03, MTH-51 and TST-198; `custodian/publicdata/review/s2_t09_source_checks.yaml`; REQUIRED_PINS and `completion_evidence` in `custodian/src/eii_custodian/publicdata/method_card_validation.py`; the S2-T08 part B public build and recorded generation configuration; `docs/07_ECONOMIC_METHODS.md`.
+- EVIDENCE: At WORK caf72aea4b13d0d086017bebc4a8ff8c9dd10c20, the code and record each enumerate 29 required pins, with identical sets. Every record entry has checked_against_source false, empty values and lineage, and unpinned_reason "awaiting the live public build of S2-T08 part B". Count and names below come from those two tracked files, not from review counts.
+- PENDING PINS:
+  - `wilson.period`
+  - `c5.hhi`
+  - `c5.prior12`
+  - `c5.latest12`
+  - `c5.trend`
+  - `c6.seed`
+  - `c6.release_sha256`
+  - `c6.category_ids`
+  - `c6.candidate_set`
+  - `c6.box`
+  - `c6.confidence_min`
+  - `c6.radius_m`
+  - `c6.permutations`
+  - `c6.fdr`
+  - `c6.min_neighbours`
+  - `c6.min_clq`
+  - `c6.max_shown`
+  - `c6.expected_clq`
+  - `c6.expected_p`
+  - `c6.expected_q`
+  - `c7.coordinates`
+  - `c7.modes`
+  - `c7.cutoffs`
+  - `c7.speed_regime`
+  - `c7.district_weights`
+  - `c7.shared_b_given_a`
+  - `c7.shared_a_given_b`
+  - `c14.medians_2024`
+  - `c14.medians_2025`
+- DONE SO FAR: Pass 1 supplies the reviewed closed record validator, method-section synchronization, callable fail-closed S2/S7 completion evidence and invented-fixture arithmetic/replay tests. No live value is written; the method document is unchanged. Sixteen configuration-only pins and thirteen source-derived pins remain unpinned; configuration evidence is distinct from source lineage.
+- NEEDED: S2-T08 part B produces the exact regression inputs and recorded generation configuration. Confirm the real artifact/configuration paths, schemas, adapters and per-card readers; replay the exact inputs, including C14 riyal medians/deal counts, C5 parent review/windows, live C6 projection/category handling and C7 geometry. A different maker checks every source-derived value against its source/receipt and every setting against the recorded configuration, then checked values enter the governed method-card blocks. Integration owners call completion_evidence from the S2/S7 acceptance paths. Any value still unpinnable remains individually pending with its reason. No invented fixture or open-item entry clears either gate.
+- NEEDED BY: S2-T08 part B and the S2 gate; also the S7 gate under MTH-03/TST-198.
+
+## OI-284 — Three wording notes of the mutation handoff's last check
+
+- ID: OI-284
+- TYPE: OPEN
+- RAISED BY: the other-maker check of the mutation handoff at `e8eed7b` (Z.ai GLM-5.3, APPROVED), after five cold reads and four fix passes
+- CONCERNS: [document 18](docs/18_MUTATION_TESTING_HANDOFF.md)
+- EVIDENCE: The check returned three notes, never rejections. N1, record R013 (`weighted_mean`) keeps the earlier phrase "the current `81e62db` version"; it names the revision and asserts no absence, but "current" beside a hash is loose. N2, "the S2-T29 train" uses the repository's train vocabulary; the hash beside it is the anchor. N3, the fixer's first pass briefly regenerated the explanation-data paragraph X001 from the merged tree and then restored it; the checker's byte comparison shows the shipped paragraph unchanged.
+- NEEDED: At the handoff to the receiving team under [decision 0055](docs/decisions/0055-mutation-testing-moves-to-after-go-live.md), replace "the current `81e62db` version" in R013 with "the `81e62db` version" and keep the hash beside every train name; N3 needs no change. No measurement, count or outcome changes.
+
+## OI-285 — The hosted custodian suite of pull request 87 ran out of its 600-second limit
+
+- ID: OI-285
+- TYPE: OPEN
+- RAISED BY: the hosted `ci` run https://github.com/albarami/economic-investment-intelligence/actions/runs/44364506690 of pull request 87 at `396ef6e`, its `tests` job
+- CONCERNS: `scripts/run_tests.py` suite `python-custodian`, 600 s; task S2-T34; decision 0060
+- EVIDENCE: The job stopped with `python-custodian: no result within 600 s; the process group was killed` at 92 percent of the suite; every other job of the run passed. The same 7,189 custodian tests had taken 386 seconds on the base branch at `b380109` and 569 seconds on pull request 86; the failing head holds 7,349 and ran in 277 seconds locally on one quiet core, its time spread over 253 modules (slowest 48.7 seconds). The hosted runner is 1.4 to 2.4 times slower than one local core and varies from run to run. The run was not repeated to make it green (rule 39; the owner's note of 2026-11-18 22:03).
+- NEEDED: Task S2-T34 splits the suite into two named parts under the unchanged limit (decision 0060). The item closes only when the hosted `tests` job passes on the merged split with each part's hosted duration recorded; a later part that nears the limit is split again by a further record, never by a raised limit.
+
+## OI-286 — The height fixtures' zip bodies carried the clock
+
+- ID: OI-286
+- TYPE: OPEN
+- RAISED BY: task S2-T34's first measurement of `python-custodian-1` at `b380109`
+- CONCERNS: `custodian/tests/fixtures/heights/invented.py` (`zip_members`, `zip_members_duplicated`); `custodian/tests/test_publicdata_heights.py::test_two_runs_give_identical_file_hashes`
+- EVIDENCE: The test failed once at its byte-equality assertion (the output files differed at byte index 1002). Cause: the fixtures wrote zip members by name, so each member took the wall-clock time of its writing; the heights manifest records each input's hash, and two builds of one fixture on either side of a two-second step of the zip time field gave different input hashes. Shown by building the 3D-GloBFP fixture twice 2.1 seconds apart (bodies differ) and by the new `custodian/tests/test_heights_fixture_clock.py`, red at `b380109` (5 failed, 1 passed) and green with the fix (6 passed). No product code is involved.
+- NEEDED: The fix of task S2-T34 writes every member with the zip format's first date and the compression its writer names; the byte-equality assertion stays unchanged. The item closes when that fix is merged and the hosted run of the merge passes.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -3779,6 +3870,7 @@ S2-T10 part A — NOT CLOSED: The existing busy-venue scan already reads bytes a
 - CONCERNS: `scripts/run_tests.py` SUITES python-custodian, 600 s
 - EVIDENCE: The supplied owed record has shared-load S4-T10 checks of 860 s plain and 841 s isolated on four processors near load 30; S2-T30 builder runs of 612 s and 623 s, and its later isolated 606.01 s near load 21–25. Train-1 ck12 at 4d7933a records 686 s plain and 688 s isolated on four processors near load 35. These are not reserved-idle measurements. ADAPT2-RETURN.md additionally records the moved custodian suite: 5620 passed in 946.96 s, exit 0; its load is not supplied as an idle-reservation measurement.
 - NEEDED: Each train whole test records the custodian duration. If the whole test exceeds 600 s on idle processors, open a speed task. Keep the bound, assertions and red evidence unchanged.
+- UPDATE 2026-11-18: the bound was breached on the hosted runner (OI-285); decision 0060 splits the suite into two named parts under the unchanged 600-second limit (task S2-T34). Each part's duration is recorded from then on.
 
 ### PO-S2-85 — Sleeping mutation children escape a CPU-time-only limit
 

@@ -1,0 +1,300 @@
+# S2-T09 pass 1: no live input or review is asserted.
+schema_version: 1
+governed_sections:
+  - "## 3. Shared interval method and reliability mark"
+  - "### C5 Customs supplier lens"
+  - "### C6 Typical neighbours"
+  - "### C7 Shared reach between two doors"
+  - "### C14 Sale price per square metre"
+governed_sections_sha256: 79839370461a237c5e798f3e0c0b7d399aec194ff4140e2c368aaad2e1806a88
+pins:
+  - pin_id: wilson.period
+    card_anchor: wilson
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c5.hhi
+    card_anchor: c5
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c5.prior12
+    card_anchor: c5
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c5.latest12
+    card_anchor: c5
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c5.trend
+    card_anchor: c5
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.seed
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.release_sha256
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.category_ids
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.candidate_set
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.box
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.confidence_min
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.radius_m
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.permutations
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.fdr
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.min_neighbours
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.min_clq
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.max_shown
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.expected_clq
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.expected_p
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c6.expected_q
+    card_anchor: c6
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c7.coordinates
+    card_anchor: c7
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c7.modes
+    card_anchor: c7
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c7.cutoffs
+    card_anchor: c7
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c7.speed_regime
+    card_anchor: c7
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c7.district_weights
+    card_anchor: c7
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c7.shared_b_given_a
+    card_anchor: c7
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c7.shared_a_given_b
+    card_anchor: c7
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c14.medians_2024
+    card_anchor: c14
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+  - pin_id: c14.medians_2025
+    card_anchor: c14
+    builder_maker: OpenAI
+    reviewer_maker: ""
+    review_date: ""
+    checked_against_source: false
+    source_lineage: []
+    settings_sha256: null
+    values: {}
+    unpinned_reason: "awaiting the live public build of S2-T08 part B"
