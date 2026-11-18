@@ -132,7 +132,7 @@ def open_https(
 ) -> Response:
     """Open one HTTPS URL with the standard library. Redirects are checked first."""
     from .certificate_pins import PinError, browser_agent, current_pin, verified_context
-    from .page_requests import active, check_target, page_context
+    from .page_requests import PIN_HOSTS, active, check_target, page_context
 
     check_target(url)
     page_scoped = active()
@@ -160,6 +160,10 @@ def open_https(
         ssl_context.verify_mode != ssl.CERT_REQUIRED or not ssl_context.check_hostname
     ):
         raise TransportFault("unreachable", url)
+    # Preserve the existing disabled-context refusal above, then fail closed
+    # for missing page pins before constructing any opener.
+    if not page_scoped and pin is None and host_of(url) in PIN_HOSTS:
+        raise PinError("certificate_chain_incomplete")
     keyed = isinstance(url, KeyedRequest)
     hops: list[str] = []
     guard = _redirect_guard(
@@ -278,8 +282,8 @@ def _redirect_guard(
             if keyed_url is not None:
                 # No redirected send can become a second chargeable request.
                 raise TransportFault("blocked_host", keyed_url)
-            from .certificate_pins import current_pin, validate_pin
-            from .page_requests import active, check_target, page_context
+            from .certificate_pins import PinError, current_pin, validate_pin
+            from .page_requests import PIN_HOSTS, active, check_target, page_context
 
             check_target(newurl)
             if active():
@@ -287,6 +291,8 @@ def _redirect_guard(
             pin = current_pin()
             if pin is not None:
                 validate_pin(host_of(newurl), pin)
+            elif not active() and host_of(newurl) in PIN_HOSTS:
+                raise PinError("certificate_chain_incomplete")
             hops.append(newurl)
             if host_of(newurl) == SIGN_IN_HOST:
                 raise TransportFault("credential_missing_or_not_accepted", newurl)

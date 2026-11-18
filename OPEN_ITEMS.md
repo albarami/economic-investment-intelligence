@@ -3464,3 +3464,18 @@ removed before HTML storage; SharePoint expanded personal metadata is excluded
 from the archived reviewed projection. Both retain the received-byte hash and a
 separate archived-representation hash. The return identifies this safety-driven
 implementation choice explicitly; it is not a claim to retain the full body.
+
+### S2-T29 fix pass 6 — legacy tender pin scope
+
+The F3 guard intentionally refuses a page pin host outside `page_requests`
+without a valid `current_pin()`. The existing `singles.tenders.tender_https`
+adapter supplies its PEM-verified SSL context but no such pin. It therefore falls
+within the newly refused class. Its unchanged adapter tests replace `open_https`
+and do not prove this seam. An offline interface probe with the existing
+invented-chain convention and a mocked opener passes on base
+`d80f4e4d5e07d9e400dc068cb11cd51923938316` and refuses on the patch; it is not
+a real-certificate or live TLS result. Evidence: `.overnight/fix6-legacy-interface-probe.log`.
+The lead must resolve the adapter's pin scope before claiming preserved live
+tender acquisition. A compatibility adapter was raised for scope clarification;
+no answer or permission is inferred, no bypass is added and the guard stays
+closed. The PEM convention and all existing tests remain unchanged.

@@ -16,7 +16,6 @@ PIN_HOSTS = [
     "monaqasat.mof.gov.qa",
     "www.edu.gov.qa",
     "myschools.edu.gov.qa",
-    "icv.qa",
 ]
 
 

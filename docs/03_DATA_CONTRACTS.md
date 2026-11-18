@@ -966,6 +966,10 @@ entries. The retained v1 table contract supports existing archived inputs.
 A source cannot be redeclared under another parser kind to bypass its guards.
 The supplier row is `refusal` only under decision 0026 item 2 and lead ruling
 L-899: it records the dated access refusal without opening any request.
+Under lead ruling L-914, its data and terms URLs remain non-fetched evidence
+metadata on hosts outside PUB-03. Only the host allow-list check is exempt for
+this closed refusal kind; scheme, credential, schema, receipt and source-kind
+checks still apply. Fetching rows receive no exemption.
 
 A v2 table retains `version`, `source_id`, typed `rows`, ordered `inputs`,
 `as_of`, optional `publisher_date`, `period_first`, `period_last`, `retrieved_utc`,
@@ -1010,6 +1014,11 @@ A non-allow-listed field refuses before even the metadata request; response
 extras refuse before any archive write. Counts, unique ordered object ids and
 the final false `exceededTransferLimit` must agree. Capacity, enrolment, catchment
 and press-seat claims remain forbidden. Public split uses retain PUB-90.
+The query response envelope permits only `objectIdFieldName`, `geometryType`,
+`spatialReference`, `hasZ`, `hasM`, `fields`, `features` and
+`exceededTransferLimit`, as evidenced by the supplied school query reading.
+The cached count envelope permits only `count`. Any other top-level member
+refuses with `school_field_refused` before processing or retaining the response.
 Related discovery, page, count, terms and parsed objects publish as one staged
 source tree; acquisition or final validation failure preserves the old tree.
 Actual acquisition maxima and observed row bounds remain lead evidence, never
@@ -1023,6 +1032,14 @@ operated by this adapter. Missing evidence records a dated technical failure.
 Only the school directory's normal fetch attempt uses the browser user agent;
 terms reads, other pages and award proofs retain the default agent. The school
 attempt precedes capture intake.
+The four page pin hosts are `www.qcb.gov.qa`, `monaqasat.mof.gov.qa`,
+`www.edu.gov.qa` and `myschools.edu.gov.qa`. An initial request or redirect to
+one of these hosts without a page-request scope or valid legacy pin refuses
+with `certificate_chain_incomplete` before constructing an opener or redirected
+request. The existing legacy pin validation remains. A supplied SSL context alone
+does not constitute a legacy pin. The unchanged tender adapter currently supplies
+only its PEM-verified context; its pin-scope compatibility follow-up is recorded
+in OPEN_ITEMS.md, **S2-T29 fix pass 6 — legacy tender pin scope**.
 
 `awards.ingest_awards@v1` reads a hash-pinned file from the uncommitted intake folder
 `data/public_cache/intake/awards_owner_scrape/`. Its reviewed aggregate profile

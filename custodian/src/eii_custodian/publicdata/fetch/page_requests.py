@@ -19,7 +19,6 @@ PIN_HOSTS = frozenset(
         "monaqasat.mof.gov.qa",
         "www.edu.gov.qa",
         "myschools.edu.gov.qa",
-        "icv.qa",
     }
 )
 _FRAME: ContextVar[tuple[str, ...] | None] = ContextVar(

@@ -206,8 +206,6 @@ def test_exact_hosts_and_pack_list():
         "visitqatar.com",
         "www.qncc.qa",
         "manateq.qa",
-        "www.tawteen.com.qa",
-        "icv.qa",
         "www.edu.gov.qa",
         "myschool.edu.gov.qa",
         "myschools.edu.gov.qa",

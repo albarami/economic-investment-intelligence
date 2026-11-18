@@ -24,6 +24,20 @@ from .terms_text import terms_text_sha256
 from .transport import Response, Transport, metadata_limit
 
 METHOD = "page_acquire.fetch@v2"
+# .overnight/IN/EVIDENCE-shapes.md, Live reads / L1 school layer query:
+# the evidenced response top keys. No other envelope member enters the cache.
+SCHOOL_QUERY_KEYS = frozenset(
+    {
+        "objectIdFieldName",
+        "geometryType",
+        "spatialReference",
+        "hasZ",
+        "hasM",
+        "fields",
+        "features",
+        "exceededTransferLimit",
+    }
+)
 
 
 def _html_without_form_secrets(body: bytes) -> bytes:
@@ -99,11 +113,19 @@ def validate_entry(entry: Entry, review: Mapping[str, Any]) -> None:
     if (
         not isinstance(urls, list)
         or not urls
-        or any(not isinstance(u, str) or not approve(u).ok for u in urls)
+        or any(not isinstance(u, str) for u in urls)
         or entry.url != review["url"]
         or entry.url not in urls
     ):
         raise ShapeError("blocked_host")
+    for url in urls:
+        decision = approve(url)
+        # L-914: refusal URLs are non-fetched evidence metadata only. Exempt
+        # the host check alone; scheme and credential refusals still apply.
+        if not decision.ok and (
+            review["kind"] != "refusal" or decision.reason != "host_refused"
+        ):
+            raise ShapeError("blocked_host")
     if review["columns"] != [[n, k] for n, k in entry.columns]:
         raise ShapeError("schema_missing")
     if (entry.row_count_min is not None or entry.row_count_max is not None) and review[
@@ -299,9 +321,16 @@ def fetch(
             + "?"
             + urlencode({"where": "1=1", "returnCountOnly": "true", "f": "json"})
         )
-        count = json_body(read(count_url, "json", extra=(count_url,)).body).get("count")
-        if type(count) is not int or count < 0:
+        response = read(count_url, "json", extra=(count_url,), projection=True)
+        count_body = json_body(response.body)
+        # EVIDENCE-shapes.md, O6 schools: count.json has only {"count": ...}.
+        if not isinstance(count_body, dict) or set(count_body) - {"count"}:
+            raise ShapeError("school_field_refused")
+        count_value = count_body.get("count")
+        if type(count_value) is not int or count_value < 0:
             raise ShapeError("paging_incomplete")
+        count = count_value
+        inputs.append((response, "json", response.body, "original"))
         offset = 0
         last_id = None
         while offset < count:
@@ -324,6 +353,8 @@ def fetch(
             # Response attributes are checked before read() adds anything to inputs.
             response = read(address, "json", extra=(address,), projection=True)
             obj = json_body(response.body)
+            if not isinstance(obj, dict) or set(obj) - SCHOOL_QUERY_KEYS:
+                raise ShapeError("school_field_refused")
             if (
                 obj.get("geometryType") != shape["geometry"]
                 or obj.get("spatialReference", {}).get("wkid")
