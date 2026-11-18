@@ -4210,6 +4210,7 @@ module = "custodian/src/eii_custodian/publicdata/draw.py"
 mutation = "--- src/eii_custodian/publicdata/draw.py\n+++ src/eii_custodian/publicdata/draw.py\n@@ -11,7 +11,7 @@\n     if type(seed) is not int:\n         raise ValueError(\"figure_seed_invalid\")\n     loaded = (\n-        json.loads(log_path.read_text(encoding=\"utf-8\")) if log_path.exists() else {}\n+        json.loads(log_path.read_text(encoding=\"UTF-8\")) if log_path.exists() else {}\n     )\n     if not isinstance(loaded, dict):\n         raise ValueError(\"figure_log_invalid\")"
 reason = "'UTF-8' and 'utf-8' name the same codec (codecs.lookup gives the same codec for both), so the bytes and text are identical."
 
+[[survivors]]
 module = "custodian/src/eii_custodian/publicdata/investment_contracts.py"
 mutation = "--- src/eii_custodian/publicdata/investment_contracts.py\n+++ src/eii_custodian/publicdata/investment_contracts.py\n@@ -5,7 +5,7 @@\n     before an empty text or a zero coordinate is stored as null.\n     \"\"\"\n     parts = [\n-        json.dumps(name, ensure_ascii=True) + \":\" + published_tokens[name]\n+        json.dumps(name, ) + \":\" + published_tokens[name]\n         for name in sorted(published_tokens)\n     ]\n     encoded = \"{\" + \",\".join(parts) + \"}\""
 reason = "json.dumps defaults to ensure_ascii=True, so dropping the explicit argument gives the same text for every name."
