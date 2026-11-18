@@ -12,6 +12,7 @@ from pathlib import Path
 import pytest
 
 from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.review.activity import (
     ActivityRow,
     ClassRead,
@@ -432,19 +433,35 @@ def test_cache_reads_one_feed_the_classes_and_all_three(tmp_path: Path) -> None:
     write_cached(tmp_path, _entry("lic_active"), json.dumps(active).encode())
     write_cached(tmp_path, _entry("lic_cancelled"), json.dumps(cancelled).encode())
     write_cached(tmp_path, _entry("cls_isic4"), classes)
-    cached_classes = read_cached_classes(tmp_path, _entry("cls_isic4"))
+    cached_classes = read_cached_classes(
+        tmp_path,
+        _entry("cls_isic4"),
+        digest=reviewed_selections(tmp_path).get((_entry("cls_isic4")).key, "0" * 64),
+    )
     assert cached_classes.classes == (IsicClass("5610", "Food, beverages", ""),)
     assert cached_classes.left_out == (
         LeftOut("cls_isic4", "Code", "999", 1),
         LeftOut("cls_isic4", "Code", "a", 1),
     )
-    decoded = read_rows(read_cached(tmp_path, _entry("cls_isic4")))
+    decoded = read_rows(
+        read_cached(
+            tmp_path,
+            _entry("cls_isic4"),
+            digest=reviewed_selections(tmp_path).get(
+                (_entry("cls_isic4")).key, "0" * 64
+            ),
+        )
+    )
     assert decoded == (
         {"Code": "A", "Description": "Section"},
         {"Code": "011", "Description": "Group"},
         {"Code": "5610", "Description": "Food, beverages"},
     )
-    feed = read_cached_feed(tmp_path, _entry("lic_active"))
+    feed = read_cached_feed(
+        tmp_path,
+        _entry("lic_active"),
+        digest=reviewed_selections(tmp_path).get((_entry("lic_active")).key, "0" * 64),
+    )
     assert feed.rows == (ActivityRow("5610101", "مطعم", 35, 0, ("lic_active",)),)
     assert feed.left_out == (
         LeftOut(
@@ -457,7 +474,13 @@ def test_cache_reads_one_feed_the_classes_and_all_three(tmp_path: Path) -> None:
     inputs = load_activity_inputs(
         tmp_path, (), review_path=_review(tmp_path), supplier_membership=_NO_SUPPLIERS
     )
-    cancelled_feed = read_cached_feed(tmp_path, _entry("lic_cancelled"))
+    cancelled_feed = read_cached_feed(
+        tmp_path,
+        _entry("lic_cancelled"),
+        digest=reviewed_selections(tmp_path).get(
+            (_entry("lic_cancelled")).key, "0" * 64
+        ),
+    )
     assert cancelled_feed.rows == (
         ActivityRow("5610101", "مطعم", 0, 13, ("lic_cancelled",)),
     )

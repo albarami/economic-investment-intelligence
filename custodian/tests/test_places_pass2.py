@@ -112,6 +112,8 @@ def test_two_road_files_are_road_file_missing(tmp_path: Path) -> None:
     _install_road(tmp_path)
     extra = tmp_path / "roads_osm" / f"{_OTHER}.pbf"
     extra.write_bytes(b"SYN-OTHER")
+    produce_areas(_Hand(), (_request(),), cache=tmp_path, frame_box=_FRAME)
+    (tmp_path / "snapshot_pins.json").write_text("{}")
     with pytest.raises(AreaError) as caught:
         produce_areas(_Hand(), (_request(),), cache=tmp_path, frame_box=_FRAME)
     assert caught.value.reason == "road_file_missing"
@@ -120,7 +122,7 @@ def test_two_road_files_are_road_file_missing(tmp_path: Path) -> None:
 def test_wrong_road_name_is_unreceipted(tmp_path: Path) -> None:
     """A road file whose name is not its digest is unreceipted."""
     _install_road(tmp_path)
-    found = next((tmp_path / "roads_osm").glob("*.pbf"))
+    found = next((tmp_path / "roads_osm").glob("*/*.pbf"))
     found.rename(found.parent / "SYN.pbf")
     with pytest.raises(AreaError) as caught:
         produce_areas(_Hand(), (_request(),), cache=tmp_path, frame_box=_FRAME)
@@ -481,19 +483,9 @@ def _point(cache: Path, review: Path) -> None:
     folder.mkdir(parents=True)
     body = folder / "syn.parquet"
     write_places(body, [place_row()])
-    from eii_custodian.publicdata.fetch.receipts import sha256_hex
+    from custodian.tests.snapshot_fixture import place
 
-    digest = sha256_hex(body.read_bytes())
-    (folder / "syn.meta.json").write_text(
-        json.dumps(
-            {
-                "sha256": digest,
-                "retrieved_utc": "2026-11-14T00:00:00Z",
-                "publisher": "SYN",
-            }
-        ),
-        encoding="utf-8",
-    )
+    place(body)
 
 
 def _unused(_url: str) -> object:

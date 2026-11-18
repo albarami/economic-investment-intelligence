@@ -63,6 +63,7 @@ def full_refusal(exc: RegistryError, text: str) -> None:
 def invented_row(**overrides: object) -> dict[str, object]:
     """One invented registry row. Optional fields stay absent until set."""
     row: dict[str, object] = {
+        "refetch": {"value": "none", "reason": "frequency_unconfirmed"},
         "key": "planted-key",
         "source_id": "planted_source",
         "slug": "planted-slug",
@@ -264,9 +265,9 @@ def test_layer_refusals_name_the_whole_text(tmp_path: Path) -> None:
     """Each layer refusal is the whole message for that case."""
     other = invented_row(layer=0)
     expect(sources(tmp_path, "other.yaml", [other]), LAYER_OTHER)
-    missing = invented_row(kind="paged_layer")
+    missing = invented_row(kind="paged_layer", skip_reason="invented_gap")
     expect(sources(tmp_path, "missing.yaml", [missing]), LAYER_REQUIRED)
-    absent = invented_row(kind="paged_layer", layer=None)
+    absent = invented_row(kind="paged_layer", layer=None, skip_reason="invented_gap")
     expect(sources(tmp_path, "absent.yaml", [absent]), LAYER_REQUIRED)
     flag = invented_row(kind="paged_layer", layer=True)
     expect(sources(tmp_path, "flag.yaml", [flag]), LAYER_INTEGER)

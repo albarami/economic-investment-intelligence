@@ -9,6 +9,32 @@ from pathlib import Path
 
 from eii_custodian.publicdata.fetch.registry import Entry
 
+FILE_METADATA = {
+    "ntl_blackmarble": ("period", "tile", "release", "doi", "acknowledgement"),
+    "worldpop_qat_agesex": (
+        "sex",
+        "age_code",
+        "release",
+        "year",
+        "cell_units",
+        "doi",
+        "doi_confirmed",
+    ),
+    "weather_openmeteo": ("point", "variables", "cache_role"),
+}
+
+
+def file_metadata(entry: Entry) -> dict[str, object]:
+    """Return the closed per-file metadata of one row, or nothing for other rows."""
+    names = FILE_METADATA.get(entry.source_id, ())
+    if not names:
+        return {}
+    found: dict[str, object] = {}
+    for name in names:
+        value = getattr(entry, name)
+        found[name] = list(value) if isinstance(value, tuple) else value
+    return found
+
 
 def sha256_hex(body: bytes) -> str:
     """Return the SHA-256 hex digest of body."""
@@ -22,21 +48,12 @@ def commit_pair(
     body: bytes,
     sidecar: dict[str, object],
 ) -> None:
-    """Write the body and its sidecar, or leave the directory without either."""
-    directory.mkdir(parents=True, exist_ok=True)
-    body_final = directory / f"{digest}.{extension}"
-    side_final = directory / f"{digest}.meta.json"
-    body_partial = directory / f".{digest}.{extension}.partial"
-    side_partial = directory / f".{digest}.meta.json.partial"
-    try:
-        body_partial.write_bytes(body)
-        side_partial.write_text(_dump(sidecar), encoding="utf-8")
-        os.replace(body_partial, body_final)
-        os.replace(side_partial, side_final)
-    except OSError:
-        for path in (body_partial, side_partial, body_final, side_final):
-            path.unlink(missing_ok=True)
-        raise
+    """Publish an immutable dated pair and record an equal-byte recheck."""
+    from eii_custodian.publicdata.fetch.snapshots import publish_snapshot
+
+    publish_snapshot(
+        directory, extension, body, sidecar, identity=digest, compatibility=True
+    )
 
 
 def commit_citation(directory: Path, sidecar: dict[str, object]) -> None:
@@ -67,8 +84,14 @@ def sidecar_for(
     terms_sha256: str,
     portal_licence: str = "",
     portal_licence_url: str = "",
+    observed_periods: tuple[str, str] | None = None,
+    coverage_note: str = "",
 ) -> dict[str, object]:
     """Build the section 3.1 sidecar. switched_off is always false."""
+    if observed_periods is None:
+        period_first, period_last = entry.period_first, entry.period_last
+    else:
+        period_first, period_last = observed_periods
     return {
         "source_id": entry.source_id,
         "key": entry.key,
@@ -95,9 +118,11 @@ def sidecar_for(
         "sha256": digest,
         "bytes": nbytes,
         "source_modified": source_modified or None,
-        "period_first": entry.period_first or None,
-        "period_last": entry.period_last or None,
+        "period_first": period_first or None,
+        "period_last": period_last or None,
+        "file": file_metadata(entry) or None,
         "row_count": row_count,
+        "coverage_note": coverage_note or None,
         "columns": [{"name": name, "type": kind} for name, kind in entry.columns],
         "reconciliation": entry.reconciliation,
         "release_tables": list(entry.release_tables),
@@ -113,3 +138,32 @@ def cache_directory(cache: Path, key: str) -> Path:
 
 def _dump(sidecar: dict[str, object]) -> str:
     return json.dumps(sidecar, sort_keys=True, ensure_ascii=True) + "\n"
+
+
+def archive_auxiliary(
+    entry: Entry,
+    directory: Path,
+    role: str,
+    body: bytes,
+    retrieved: str,
+    url: str,
+    *,
+    version: str = "",
+) -> None:
+    """Retain fetched metadata or terms with their own byte hash and URL."""
+    from eii_custodian.publicdata.fetch.allowlist import host_of
+    from eii_custodian.publicdata.fetch.snapshots import publish_snapshot
+
+    side = sidecar_for(
+        entry,
+        digest=sha256_hex(body),
+        nbytes=len(body),
+        fetch_url=url,
+        fetch_host=host_of(url),
+        retrieved_utc=retrieved,
+        publisher=entry.publisher,
+        source_modified=version,
+        row_count=None,
+        terms_sha256="",
+    )
+    publish_snapshot(directory / role, "html", body, side)

@@ -1,0 +1,13 @@
+# Technical mappings only. No publisher fact or live address has been verified.
+wb_wdi:
+  source_id: wb_wdi
+  confirmed: false
+unctad_fdi:
+  source_id: unctad_fdi
+  confirmed: false
+imf_weo:
+  source_id: imf_weo
+  confirmed: false
+ilostat_qat:
+  source_id: ilostat_qat
+  confirmed: false

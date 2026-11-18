@@ -1,8 +1,7 @@
 """LR3 support provenance values and exact frame-disagreement refusal."""
 
-import json
-
 import pytest
+from custodian.tests.snapshot_fixture import update_receipt
 from custodian.tests.test_pub67 import FRAME, selected_fixture
 
 from eii_custodian.publicdata.series.support import load_support, validate_support
@@ -16,11 +15,12 @@ def test_receipt_labels_are_copied(tmp_path):
     entries, selected = selected_fixture(tmp_path)
     selected.pop("lic_active")
     for entry in entries[1:]:
-        path = tmp_path / entry.key / (selected[entry.key] + ".meta.json")
-        receipt = json.loads(path.read_text())
-        receipt["publisher"] = "SYN publisher"
-        receipt["fetch_url"] = "https://example.org/SYN"
-        path.write_text(json.dumps(receipt))
+        update_receipt(
+            tmp_path,
+            entry.key,
+            selected[entry.key],
+            {"publisher": "SYN publisher", "fetch_url": "https://example.org/SYN"},
+        )
     _, support = load_support(tmp_path, entries, selected, FRAME)
     for source in (support["classification"], *support["frame"]["upstream"]):
         assert source["publisher"] == "SYN publisher"

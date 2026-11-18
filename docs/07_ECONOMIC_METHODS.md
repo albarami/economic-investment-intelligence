@@ -10,7 +10,7 @@
 
 ## In brief
 
-- Forty-one version 1 (v1) method cards and a list of methods that must not be built. [Decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) moved the three later cards (C11 ranking, C12 reachable access, C13 imports against local production) into v1. Decisions 0016 and [0017](decisions/0017-public-data-additions-and-public-splits.md) added C16 to C29 and amended C3, C4, C7, C14 and C15. [Decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) added C30 to C38 (forecasts, base rates, people present by pay band, the site estimate, two scenarios and three Public layers) and amended C4, C11, C15, C18, C19, C22, C23, C25 and C26. [Decision 0021](decisions/0021-one-speed-for-a-link-and-an-hour.md) fixed the version-1 values of C25 and added its speed floor, the rule of one speed for a link and an hour, the itemised route and the measured limits of the routing engine. [Decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) added C39 (talent available near this site), C40 (best three sites and "how sure") and C41 (property price measures, with how near a planned station is). It amended C11 and C16 (zoning and plots, item 3), C20, C22, C25, C30, C31 and C33 (its data rule, item 12; C30 also item 8), C34 ("how sure", item 5) and C38 (the age profile of the site answer, item 11). No later card remains.
+- Forty-seven version 1 (v1) method cards and a list of methods that must not be built. [Decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) moved the three later cards (C11 ranking, C12 reachable access, C13 imports against local production) into v1. Decisions 0016 and [0017](decisions/0017-public-data-additions-and-public-splits.md) added C16 to C29 and amended C3, C4, C7, C14 and C15. [Decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) added C30 to C38 (forecasts, base rates, people present by pay band, the site estimate, two scenarios and three Public layers) and amended C4, C11, C15, C18, C19, C22, C23, C25 and C26. [Decision 0021](decisions/0021-one-speed-for-a-link-and-an-hour.md) fixed the version-1 values of C25 and added its speed floor, the rule of one speed for a link and an hour, the itemised route and the measured limits of the routing engine. [Decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) added C39 (talent available near this site), C40 (best three sites and "how sure") and C41 (property price measures, with how near a planned station is). It amended C11 and C16 (zoning and plots, item 3), C20, C22, C25, C30, C31 and C33 (its data rule, item 12; C30 also item 8), C34 ("how sure", item 5) and C38 (the age profile of the site answer, item 11). Task S2-T20 added C47 (building heights for all of Qatar, the order of item A2). No later card remains.
 - Every method is tested code. [decision 0038](decisions/0038-advanced-methods-are-measured-spikes.md) item 5 R15 permits all CPU threads for build-time batches and GPU only for items 11, 14 and 15 after a measured budget miss; outputs are byte-identical regardless of worker count, CPU fallback remains, serving stays CPU and GPU random draws are never the figure of record. The earlier research timing applies only to methods it measured; traffic assignment, the national travel-time matrix, C30 backtests and C33 draws have no timing established here.
 - A pinned worked example is a regression test that must pass in slice S7. An example whose inputs are not yet pinned is an illustrative note, and the slice S7 gate fails while it stays unpinned. A card added by decisions 0016, 0017, 0019 and 0023 has a fixture test now and is pinned at the gate of the slice that builds it (MTH-60).
 - Public methods produce real findings about Qatar. Methods run on Synthetic or Simulated layers show a format and a protection, never a fact about a place.
@@ -96,13 +96,14 @@ Each card states its compute cost and which research review measured it. All res
 | C34 Catchment-share scenario | decision 0019 item 9 | set by document 08 (family `catchment_scenario`) | Public points and your inputs; Inferred |
 | C35 Revenue range of the user's outlet | decision 0019 item 10 | set by document 08 (family `revenue_range_scenario`) | Simulated, your inputs; Inferred |
 | C36 Night-time radiance by area and month | decision 0019 item 20 | set by document 08 (family `night_lights`) | Public |
-| C37 Relative busyness of named venues | decision 0019 items 18 and 19 | set by document 08 (family `venue_busyness`) | Public |
+| C37 Relative busyness of named venues | decision 0019 items 18 and 19; decision 0031 | set by document 08 (family `venue_busyness`) | Public |
 | C38 Population by age and sex over an area | decision 0019 item 22; decision 0023 item 11 (the age profile of the site answer, journey D2) | set by document 08 (family `population_age_sex`) | Public |
 | C39 Talent available near this site | decision 0023 item 1; journey D5 | set by document 08 | Synthetic (Simulated with times at an hour) |
 | C40 Best three sites and "how sure" | decision 0023 item 5; journey D2 | set by document 08 (`branch_check` playbook) | least-real class of the inputs; Inferred, your inputs |
 | C41 Property price measures | decision 0023 items 3 and 8; journeys D2 and D5 | set by document 08 | Public |
+| C47 Building heights for all of Qatar | decision 0023 item A2; journeys D2 and D5 (the 3D view of S3-T16) | none: a step of the public-data build (`heights` asset) | Public; every height is an estimate |
 
-In the Capability column, "capability M" and "capability S" are version 1 capabilities from the master design's value stack. For the cards added by decisions 0016 and 0017, the column names the journeys D1 to D7, the services and the cases of [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md). For C30 to C38 it names the items of [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), and for C39 to C41 the items of [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) with their journeys; the Tool column names the claim family until document 08 names the tool. In this document a bare C number is always a method card: the cases are written "case C1" to "case C4" and the services "service S1" to "service S3". Everywhere else in this document, "slice S0" to "slice S11" are build slices. ASSUMPTION: C6 is served by `scan_places`, because it reads public places around a pin, which is that tool's job. Tool names are those of [08_BACKEND.md](08_BACKEND.md) section 6.2 (BE-56).
+In the Capability column, "capability M" and "capability S" are version 1 capabilities from the master design's value stack. For the cards added by decisions 0016 and 0017, the column names the journeys D1 to D7, the services and the cases of [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md). For C30 to C38 it names the items of [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), and for C39 to C41 and C47 the items of [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) with their journeys; the Tool column names the claim family until document 08 names the tool. In this document a bare C number is always a method card: the cases are written "case C1" to "case C4" and the services "service S1" to "service S3". Everywhere else in this document, "slice S0" to "slice S11" are build slices. ASSUMPTION: C6 is served by `scan_places`, because it reads public places around a pin, which is that tool's job. Tool names are those of [08_BACKEND.md](08_BACKEND.md) section 6.2 (BE-56).
 
 ## 3. Shared interval method and reliability mark
 
@@ -1495,7 +1496,7 @@ test             pass when D <= τ, otherwise fail: a test-result fact
 
 **Worked example (fixture).** Public: 100 visitors in every month, so each share is 1 / 12 = 0.0833. Simulated: 110 in January, 90 in February and 100 in every other month, 1,200 in all, so January is 0.0917 and February 0.0750. D = 10 / 1,200 = 0.0083, shown as 0.83 percentage point. The pass or fail against τ is a separate assertion.
 
-**Hourly shape by place category ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 18).** The hour-of-day shape of simulated visits by place category is calibrated to the relative busyness of the named venues of that category (`busy_gmaps`, `pub_venue_busyness`; C37), pooled over the venues so that no venue's level or own shape enters a generator. The anchors of [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 4 keep their roles, and the health-centre series stays the annual cross-check of document 05.
+**Hourly shape by place category ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 18).** The hour-of-day shape of simulated visits by place category is calibrated to the relative busyness of the named venues of that category (`busy_besttime`, `pub_venue_busyness`; C37), pooled over the venues so that no venue's level or own shape enters a generator. The anchors of [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) item 4 keep their roles, and the health-centre series stays the annual cross-check of document 05.
 
 ```
 for each place category g of the build-time venue list, and each day of week d that a day type of
@@ -1980,7 +1981,7 @@ an area, a release unit or an official geography X:
 
 **Purpose.** Show the published relative busyness by hour of a named venue as a Public fact of that venue ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 19). It is a relative index, never a count of people.
 
-**Inputs.** `pub_venue_busyness` from `busy_gmaps`: venue, day of week, hour, relative index from 0 to 100, and retrieval date, for the named venues of a build-time list. The project's own page reader fetches it inside `./eii build-public`, never at run time; the values stay in the uncommitted public cache and never enter the repository or a test fixture, and the source is left out of the nightly live fetch. Document 04 records the publisher's terms in its own words with the date read. The basis is `licence_basis: owner_decision`, the owner's decision for a personal, local project ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)), not a source-specific exception. The reader uses only what a visitor's browser receives, at a visitor's pace, without sign-in, a paywall, passing a robot check or calling a back end with a key or token found in its pages.
+**Inputs.** `pub_venue_busyness` from `busy_besttime`: venue, day of week, hour, relative index from 0 to 100, and retrieval date, for the named venues of a build-time list. The project's own reader of the provider's interface fetches it inside `./eii build-public`, never at run time, with at most one forecast request and one stored-forecast query per venue in a run ([decision 0031](decisions/0031-venue-busyness-from-a-provider-interface.md)); the values stay in the uncommitted public cache and never enter the repository or a test fixture, and the source is left out of the nightly live fetch. Document 04 records the provider's terms truthfully as the licence text with the date read, and the provider's whole sentence on the origin of its figures. The basis is `licence_basis: provider_terms` ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md) item 3). The reader calls only the provider's interface, admitted under PUB-12 by [decision 0031](decisions/0031-venue-busyness-from-a-provider-interface.md), with its two keys read from the environment in the lead's shell only; it takes nothing but the venue's own seven days of 24 hourly values and their update date, and no person, device, trip or count.
 
 **Formula.**
 
@@ -1993,16 +1994,16 @@ the pooled hour-of-day shape by place category of C26 is the only computation th
 
 **Worked example (fixture, invented venues).** An invented venue's rows for hours 9, 10 and 11 hold 40, nothing and 100: the card shows 40, `NO_DATA` and 100, never 0 for hour 10. Three invented venues at 300 m, 100 m and 200 m from a pin are listed at 100 m, 200 m and 300 m, whatever their indices.
 
-**Provenance and status.** Public, `observed`; subject `place_public`, Public slots only (MTH-10); labelled "Google Maps popular times" with its retrieval date; caveat `relative_busyness_not_people`. It never shares a component with an estimated-people figure (C15, C27), is never a score, rank, fit or criterion (MTH-57), and no venue's level or own shape is transferred to a Simulated figure (MTH-92). **Compute cost.** Trivial; not separately timed.
+**Provenance and status.** Public, `observed`; subject `place_public`, Public slots only (MTH-10); labelled "BestTime relative busyness" with its retrieval date and the provider's update date (or "update date not stated"); caveat `relative_busyness_not_people`. It never shares a component with an estimated-people figure (C15, C27), is never a score, rank, fit or criterion (MTH-57), and no venue's level or own shape is transferred to a Simulated figure (MTH-92). **Compute cost.** Trivial; not separately timed.
 
 **Limits and wording.** The index is relative to the venue's own busier times, as the publisher describes it, so it is not a count of people and not a level to compare between venues. Hand-made fixtures test the code; no real value enters a test.
 
-- Allowed: "Google Maps popular times, retrieved {date}: at {hour} on {day}, this venue shows {index} on its own relative scale of 0 to 100. This is not a count of people."
+- Allowed: "BestTime relative busyness, retrieved {date}, provider update {update_date}: at {hour} on {day}, this venue shows {index} on its own relative scale of 0 to 100. This is not a count of people." For a venue without a figure: "BestTime relative busyness: the provider publishes no figure for this venue."
 - Never say: "{n} people at {venue}", "visitors to {venue}", "footfall of {venue}", "busiest venue", "best time to visit", "crowded", "customers", or a Simulated figure beside a venue's index.
 
 | ID | Requirement |
 |---|---|
-| MTH-110 | C37 shows a named venue's relative busyness only as published, as a Public fact of a `place_public` subject labelled "Google Maps popular times" with its retrieval date, returns `NO_DATA` (never 0) for an hour with no index, orders a list of venues by distance only, never puts the index in a component with an estimated-people figure, never scores, ranks or fits a venue by it, and reproduces the fixture. Its values come only from the uncommitted public cache filled by `./eii build-public`; no test fixture holds a real value, and the source is left out of the nightly live fetch. |
+| MTH-110 | C37 shows a named venue's relative busyness only as published, as a Public fact of a `place_public` subject labelled "BestTime relative busyness" with its retrieval date and the provider's update date, shows no figure with its reason for a venue for which the provider publishes none, fills nothing in from another venue, returns `NO_DATA` (never 0) for an hour with no index, orders a list of venues by distance only, never puts the index in a component with an estimated-people figure, never scores, ranks or fits a venue by it, and reproduces the fixture. Its values come only from the uncommitted public cache filled by `./eii build-public`; no test fixture holds a real value, and the source is left out of the nightly live fetch. |
 
 ### C38 Population by age and sex over an area
 
@@ -2251,6 +2252,78 @@ The distance and the zone test are Public and `observed` (MTH-05), with the cave
 | MTH-117 | C41 shows no price without its deal count, computes and shows no rent and never labels a price a rent, combines no price with a protected pay figure in one number (PRV-41), reads property type and use only through the reviewed mapping of the Arabic label and the usage field, and forecasts only through C30. |
 | MTH-121 | C41 shows how near a planned station is ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 3): the geodesic distance on the WGS 84 ellipsoid from the site's pin, or the representative point of a drawn shape, to the nearest planned station of `pub_rail_plan`, ties by the layer's station key, with that station's published name and line, and whether the point lies inside a published protection zone; `NO_DATA` where the layer holds no station. It is Public and `observed`, with `calculated` and `planned_not_operating`. A planned station is never shown as operating, no opening date, demand or price effect is computed from it, and the distance never enters one number with a price. It reproduces the fixture (1,113.19 m on the equator; S1 at 1.2 km; `NO_DATA` with no station). |
 
+### C47 Building heights for all of Qatar
+
+**Purpose.** Give every building of the basemap a height in the order of [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A2 (PUB-106), keep the source of each height with it, measure the error of each fallback against the recorded heights, and keep every height visibly an estimate (FE-50, FE-52). The card is computed in the public-data build only (MTH-02) and feeds the 3D view of S3-T16; it draws nothing itself.
+
+**Inputs.** The basemap's building table with, per building, its identifier, its footprint polygon, its recorded height or none, its floor count or none and its footprint source; the open 3D building heights of `bldg_3dglobfp`; the WSF 3D 90 m cell mean of `bldg_wsf3d`; and the stated storey height, held as quoted text in `custodian/publicdata/height_rules.yaml` and read as a `Decimal`, never a float. A recorded height or floor count that is not a usable positive number refuses the whole table, by name (`bad_recorded_height_m`, `bad_floor_count`); a recorded height that rounds to zero refuses the same way.
+
+**Formula.**
+
+```
+height       the first usable value of the order, per building:
+             1. the recorded height
+             2. the floor count times the stated storey height
+             3. the 3D-GloBFP height of the matched footprint
+             4. the WSF 3D cell mean of the matched cell
+             5. none when the order is exhausted, with its reason
+                (order_exhausted or the absent source's own reason), never the
+                number 0
+             a usable value is a positive finite one that does not round to
+             zero at the stated places; a fallback that gives no usable value
+             is no value and is counted (wsf3d_value_not_positive for the WSF
+             3D cell), never a crash and never overriding a recorded height
+3D-GloBFP    each file is one flat zip holding a shapefile's five members; the
+             named height field is read as the record's own decimal text and
+             parsed to a Decimal, never through a float, so a height of
+             eighteen significant digits arrives digit for digit; the
+             candidate footprints that contain the building's representative
+             point (a point guaranteed inside the footprint); a point on a
+             candidate's boundary counts as inside; the candidate with
+             the largest overlap area against the building footprint wins; a
+             residual tie takes the lowest file name in sorted order, then the
+             lowest row index within its file; the one spatial index over all
+             footprints of all files is built once per run; a building whose
+             winning overlap ties a different-height candidate is counted
+             under tied_height_buildings
+WSF 3D       the 90 m cell that contains the representative point; a point on a
+             cell's west or north edge belongs to that cell and on its east or
+             south edge to the next; the stored value is tenths of a metre and
+             is scaled by the declared scale 0.1 in tested code, a Decimal
+             throughout; only the window of cells over the building table's
+             bounds, grown one cell on each side, is read, never the whole
+             file; a no-data cell, a point outside the raster, or a cell value
+             that is not a positive finite number gives no value, the last
+             counted under wsf3d_value_not_positive; several files that each
+             give a usable value at one point refuse the table
+             (wsf3d_overlap), while files that do not overlap are read
+             together
+errors       for each fallback (floor count, 3D-GloBFP, WSF 3D), over the
+             buildings that hold both that fallback's height and a recorded
+             height, taken on the written (rounded) heights: signed error =
+             rounded fallback height - rounded recorded height, in
+             metres; four statistics: the count of pairs, the mean signed
+             error, the mean absolute error and the median absolute error; the
+             median of an even count is the mean of the two central values; a
+             fallback with no pair gives count 0 and the reason no_pairs,
+             never a 0 statistic
+```
+
+**Storey height (ASSUMPTION).** The stated storey height is 3.0 metres, the lead's stated assumption of 2026-11-14; the owner replaces it. It is the only place the number lives, as the text "3.0" in `height_rules.yaml`, and the measured error of the floor-count fallback is shown beside it in the asset manifest.
+
+**Rounding (ASSUMPTION).** Every height in metres and each error statistic is rounded once, half-up, to two decimals of a metre by `eii_core.calc.building_heights`, the document's rule for calculation outputs; two decimals is the lead's stated assumption of 2026-11-15, the card stating no number of decimals for a height, and the owner replaces it. Half-up is away from zero for a negative value, and a rounded zero is written unsigned, never -0.00. The written asset holds the rounded decimal's own text, never a float.
+
+**Worked example (regression; invented fixture identifiers SYN-B-0001 to SYN-B-0007 and an invented storey height of 4 m for the fixture only).** The floor-count product: 5 floors times 4 gives 20. The order per building: SYN-B-0001 (recorded 30, floors 8, 3D-GloBFP 24, WSF 3D 18) gives 30 recorded; SYN-B-0002 (recorded 12, floors 3, 3D-GloBFP 15, no WSF 3D) gives 12 recorded; SYN-B-0003 (recorded 21, no floors, 3D-GloBFP 15, WSF 3D 13) gives 21 recorded; SYN-B-0004 (no recorded, floors 5, 3D-GloBFP 11) gives 20 floor_count; SYN-B-0005 (nothing but WSF 3D 6) gives 6 wsf3d; SYN-B-0006 (nothing) gives none; SYN-B-0007 (no recorded, no floors, 3D-GloBFP 7, WSF 3D 5) gives 7 3dglobfp. The counts by source are recorded 3, floor_count 1, 3dglobfp 1, wsf3d 1, none 1. The fallback errors over the buildings that hold both values: floor_count (32 over 30 gives +2; 12 over 12 gives 0) gives count 2, mean signed +1, mean absolute 1, median absolute 1; 3dglobfp (24 over 30 gives -6; 15 over 12 gives +3; 15 over 21 gives -6) gives count 3, mean signed -3, mean absolute 5, median absolute 6; wsf3d (18 over 30 gives -12; 13 over 21 gives -8) gives count 2, mean signed -10, mean absolute 10, median absolute 10. The overlaps: 50 and 40 give 50; 40 on file 'b' row 0 and 40 on file 'a' row 3 give 'a' row 3.
+
+**Provenance and status.** Public, `observed` for recorded heights and `inferred` for every fallback; each height keeps its source (`recorded`, `floor_count`, `3dglobfp`, `wsf3d` or `none`), every height is an estimate and never encodes a data value (FE-50), and the manifest's estimate label reads "Heights are estimates." (FE-52). The manifest names each file read and written with its URL, retrieval date, licence or basis, the recorded terms and date read, and its SHA-256 (FE-96), and identical inputs give identical bytes (FE-98).
+
+**Limits and wording.** 3D-GloBFP under-reads towers, so a recorded height always wins; a WSF 3D cell mean is never a building's own height; a building with no value keeps `none` and its reason, and `none` never carries the number 0. The card's real-file data test stays open until the first fetch (MTH-60): the arithmetic test is the worked fixture above.
+
+| ID | Requirement |
+|---|---|
+| MTH-125 | `eii_core.calc.building_heights` applies the order, chooses the overlap winner and computes the four error statistics, exactly as the formula states; the worked fixture above is its regression test, and the manifest's error block of the built asset must equal the card's. The geometry of the two matching rules lives in `custodian/.../heights/match.py` and computes no number beyond the overlap areas it hands to the calculation layer. |
+
+
 ### C42 Criterion-based success score
 
 Decision 0036 includes a success score as a criterion-based area score using C11's tested normalisation and ranking machinery, with user-visible, editable criteria and weights and its rank-stability sentence. It never measures a venture's probability of success and never scores a named real business. S6-T22 owns its closed criteria, arithmetic fixtures and wording tests. A score with a missing criterion follows the card's explicit missing-data rule, never a model guess.
@@ -2434,7 +2507,7 @@ Investment sources, used on the owner's decision for a personal, local project (
 Sources added by [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), pages read 2026-11-12 without any key; [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) holds each with its publisher, licence or terms and retrieval date:
 
 - TomTom Traffic API, live flow tiles and reachable range (`traffic_tomtom_flow`, `traffic_tomtom_range`; C25, off by default; nothing of a response is stored; attribution "© TomTom"): https://docs.tomtom.com/traffic-api/ ; pricing and free allowance: https://docs.tomtom.com/pricing ; copyright: https://developer.tomtom.com/tomtom-orbis-maps/documentation/copyright . The developer terms page needs a login and was not read.
-- Google Maps popular times (`busy_gmaps`; C26, C37): terms recorded in the publisher's own words with the date read in document 04; used on the owner's decision for a personal, local project ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)), with `licence_basis: owner_decision`; the publisher's terms read: https://support.google.com/business/answer/6263531 , https://policies.google.com/terms and https://www.google.com/intl/en/help/terms_maps/ .
+- BestTime relative busyness (`busy_besttime`; C26, C37): terms recorded truthfully as the licence text with the date read in document 04, `licence_basis: provider_terms` ([decision 0031](decisions/0031-venue-busyness-from-a-provider-interface.md)); interface documentation and terms read 2026-11-14, their addresses recorded in the source registry.
 - NASA Black Marble VNP46A3, monthly night-time radiance (`ntl_blackmarble`; C36), DOI 10.5067/VIIRS/VNP46A3.002, NASA acknowledged as the source: https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/ ; data and information policy: https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-information-policy
 - Foursquare Open Source Places (`places_fsq`; C6, C33, C34; Apache 2.0): the access page, https://docs.foursquare.com/data-products/docs/access-fsq-os-places ; fetched from the public copy on Source Cooperative, geospatially partitioned GeoParquet read without an account, whose README states the Apache License, Version 2.0 and whose listing holds three dated releases, the newest dated 2025-01-10, and states no update rhythm: https://data.source.coop/fused/fsq-os-places/README.md and https://data.source.coop/fused/fsq-os-places/ . The registry records the release used.
 - WorldPop age and sex structures, 100 m (`worldpop_qat_agesex`; C38; CC BY 4.0; DOI 10.5258/SOTON/WP00841): https://hub.worldpop.org/project/categories?id=8 and https://hub.worldpop.org/geodata/listing?id=138
@@ -2466,3 +2539,25 @@ Method references (DOI links; the three marked were checked 2026-11-11; the refe
 - Rousseeuw (1987), silhouettes: https://doi.org/10.1016/0377-0427(87)90125-7 ; Hubert and Arabie (1985), comparing partitions (adjusted Rand index): https://doi.org/10.1007/BF01908075
 - Hyndman and Koehler (2006), mean absolute scaled error, the error measure of C30: https://doi.org/10.1016/j.ijforecast.2006.03.001
 - Added by decision 0023, not checked: Hakimi (1964), p-median: https://doi.org/10.1287/opre.12.3.450 ; Church and ReVelle (1974), maximal covering location: https://doi.org/10.1007/BF01942293 ; Toregas, Swain, ReVelle and Bergman (1971), location set covering: https://doi.org/10.1287/opre.19.6.1363 ; Sobol' (2001), global sensitivity indices: https://doi.org/10.1016/S0378-4754(00)00270-6 ; Saltelli (2002), sensitivity indices from model evaluations: https://doi.org/10.1016/S0010-4655(02)00280-1 . The libraries PySAL `spopt` (BSD-3) and SALib (MIT) are read and pinned at the task that uses them (C40). C39 uses no library. The talent ratio is the quotient of the two released figures (MTH-122), and PySAL `access` is not used.
+
+### S2-T26 trade comparison primitive
+
+The trade_reconciliation calculation module computes an exact right-minus-left
+gap only when partner, flow, year, periods, classification, revision, product
+scope, coverage, currency, unit, scale and valuation are compatible and known.
+It retains both inputs; missing sides or values produce no numeric gap. Unknown
+causes remain explicit. No currency conversion, CIF/FOB equation, concordance,
+imputation or source blend occurs. Annual sums require one native product scope
+and all calendar months from one source/version/role, without duplicate cells;
+the result is calculated, never published.
+
+This primitive does not establish a verified live country/coverage mapping.
+Selected native readers reuse portal contracts, Comtrade assemble and BACI's
+typed reader. Comtrade API price currency is never used as a trade currency.
+Comparison orchestration enumerates every requested partner/year/flow/scope and
+every source-role pair, including missing sides. Complete calendar sums are
+separate calculated inputs whose lineage resolves the published rows; incomplete
+calendars get an explicit mismatch. Recorded cause codes require evidence hashes
+and never establish that a methodological difference explains the entire gap.
+Selection and comparison outputs are hash-bound and recomputed on selected read.
+Live binding review and different-maker build review remain required.

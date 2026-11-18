@@ -19,6 +19,7 @@ def test_numeric_source_decimal_is_not_rounded_by_json(tmp_path: Path) -> None:
     body = b'[{"invented_value": 0.1234567890123456789}]'
     digest = sha256_hex(body)
     receipt["sha256"] = digest
+    receipt["bytes"] = len(body)
     commit_pair(tmp_path / entry.key, digest, "json", body, receipt)
     rows, _ = selected_source(tmp_path, entry, digest)
     assert rows[0]["invented_value"] == Decimal("0.1234567890123456789")
@@ -57,7 +58,7 @@ def test_selected_hash_never_chooses_competing_version(tmp_path: Path) -> None:
     rows, chain = selected_source(tmp_path, entry, first)
     assert rows == [{"invented_value": "12.50"}]
     assert chain["sha256"] == first
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(ValueError, match="snapshot_index_invalid"):
         selected_source(tmp_path, entry, "a" * 64)
 
 
@@ -80,14 +81,7 @@ def test_missing_or_mismatched_provenance_refused(
     entry, digest, receipt = fixture(tmp_path)
     receipt[field] = value
     (tmp_path / entry.key / f"{digest}.meta.json").write_text(json.dumps(receipt))
-    with pytest.raises(
-        ValueError,
-        match=(
-            "incomplete receipt"
-            if field in {"publisher", "retrieved_utc", "fetch_url"}
-            else "selected receipt mismatch"
-        ),
-    ):
+    with pytest.raises(ValueError, match="snapshot_hash_mismatch"):
         selected_source(tmp_path, entry, digest)
 
 
@@ -106,7 +100,7 @@ def test_unknown_field_and_changed_value_refused(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="unconfirmed source columns"):
         parse_rows(replace(entry, columns=()), rows, {})
     (tmp_path / entry.key / f"{digest}.json").write_text('[{"invented_value": "13"}]')
-    with pytest.raises(ValueError, match="selected body hash mismatch"):
+    with pytest.raises(ValueError, match="snapshot_hash_mismatch"):
         selected_source(tmp_path, entry, digest)
 
 
@@ -446,7 +440,7 @@ def test_fetch_build_runs_selected_cache_checks(tmp_path: Path, monkeypatch) -> 
     entry, digest = series_cache(tmp_path, "sec_hr_ind", [])
     observed = []
 
-    def fetched(*args):
+    def fetched(*args, registry_entries=None):
         return build._Fetched(
             digest, entry.fetch_host, "2026-11-14T00:00:00Z", "", ""
         ), None

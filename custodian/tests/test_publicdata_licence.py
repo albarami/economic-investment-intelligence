@@ -7,10 +7,16 @@ from dataclasses import replace
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
+from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.transport import Response, Transport
 
-KEY_NAMES = ("EARTHDATA_API_KEY", "TOMTOM_API_KEY")
+KEY_NAMES = (
+    "EARTHDATA_API_KEY",
+    "TOMTOM_API_KEY",
+    "COMTRADE_PRIMARY_API_KEY",
+    "COMTRADE_SECONDARY_API_KEY",
+)
 
 PORTAL = "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/planted-slug/exports/json"
 META = PORTAL[: -len("/exports/json")]
@@ -28,6 +34,7 @@ def _sleep(_seconds: float) -> None:
 
 def _entry() -> Entry:
     return Entry(
+        refetch=Cadence("none", "frequency_unconfirmed", ""),
         key="planted",
         source_id="planted",
         slug="planted-slug",
@@ -83,7 +90,11 @@ def _meta(
 
 
 def _sidecar(folder: Path) -> dict[str, object]:
-    found = list(folder.rglob("*.meta.json"))
+    found = [
+        p
+        for p in folder.glob("*/*/*.meta.json")
+        if len(p.parent.name) == 10 and p.parent.name[4] == "-"
+    ]
     assert len(found) == 1
     loaded = json.loads(found[0].read_text(encoding="utf-8"))
     assert isinstance(loaded, dict)

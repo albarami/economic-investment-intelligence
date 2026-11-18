@@ -5,10 +5,12 @@ from decimal import ROUND_UP, Decimal, localcontext
 import pytest
 
 import h3
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.frame import grid
 from eii_custodian.publicdata.frame.checks import FrameError
 from eii_custodian.publicdata.frame.gazetteer import make_row
 from eii_custodian.publicdata.frame.mapping import inspect_source
+from eii_custodian.publicdata.review.cache_fixture import select_fixture
 
 
 def test_stored_point_owns_cell():
@@ -315,6 +317,7 @@ def seventh_build(tmp_path):
             terms_sha256="",
         )
         commit_pair(cache / source.key, digest, source.extension, body, receipt)
+        select_fixture(cache, str(receipt["key"]), digest)
 
     def _run():
         return build_frame(cache, entries, review, tmp_path / "output")
@@ -367,9 +370,16 @@ def test_filled_place_point_enters_the_live_gazetteer(seventh_build, tmp_path):
         ),
         encoding="utf-8",
     )
-    inspected = inspect_cache(cache, seventh_build.entries, review)
+    inspected = inspect_cache(
+        cache, seventh_build.entries, review, reviewed_selections(cache)
+    )
     result = build_live_frame(
-        cache, seventh_build.entries, review, tmp_path / "gazetteer-out", inspected
+        cache,
+        seventh_build.entries,
+        review,
+        tmp_path / "gazetteer-out",
+        inspected,
+        reviewed_selections(cache),
     )
     assert any(row["place_key"] == "SYN-LAND" for row in result.tables["gazetteer"])
 
@@ -442,7 +452,7 @@ def test_required_establishment_cache_missing(tmp_path):
 
     from eii_custodian.publicdata.frame.build import build_frame
 
-    with pytest.raises(FrameError, match="est_census: expected one cache receipt"):
+    with pytest.raises(FrameError, match=r"^est_census: snapshot_path_invalid$"):
         build_frame(tmp_path / "cache", (entry("est_census"),), tmp_path / "review")
 
 
@@ -614,8 +624,6 @@ def test_k1_live_unlisted_indicator_refuses_after_proposal(
 
     source = entry("pop_muni")
     folder = tmp_path / "cache" / source.key
-    for item in folder.iterdir():
-        item.unlink()
     payload = [
         {**population(name, "Invented municipality"), "lbldy": "اسم تجريبي"}
         for name in ("Invented omitted", "Invented people", "Invented unlisted")
@@ -635,6 +643,7 @@ def test_k1_live_unlisted_indicator_refuses_after_proposal(
         terms_sha256="",
     )
     commit_pair(folder, digest, source.extension, body, receipt)
+    select_fixture(tmp_path / "cache", str(receipt["key"]), digest)
 
     captured = []
     original_inspect = build_module.inspect_cache
@@ -712,3 +721,23 @@ def test_k2_population_indicators_pin_refuses_employed_token(tmp_path, mode):
     (tmp_path / "population_indicators.csv").write_text(tampered, encoding="utf-8")
     with pytest.raises(AssertionError):
         assert_population_indicators_pinned(tmp_path)
+
+
+def test_live_frame_retains_reviewed_older_snapshot(seventh_build):
+    from eii_custodian.publicdata.fetch.snapshots import (
+        read_snapshot,
+        reviewed_selections,
+    )
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    cache = seventh_build.cache
+    entry = next(row for row in seventh_build.entries if row.key == "bnd_hdx")
+    older = read_snapshot(cache / entry.key, reviewed_selections(cache)[entry.key])
+    write_cached(cache, entry, b"syn-newer-invalid-archive", select=False)
+    result = seventh_build()
+    assert result.sources[entry.source_id]["sha256"] == older.sha256
+    older.path.write_bytes(b"syn-tamper")
+    with pytest.raises(
+        FrameError, match=rf"^{entry.source_id}: snapshot_hash_mismatch$"
+    ):
+        seventh_build()

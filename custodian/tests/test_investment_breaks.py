@@ -235,8 +235,8 @@ def test_fetch_sidecar_and_entry_bounds(
         lambda: RETRIEVED,
         "terms-hash",
     )
-    assert not isinstance(again, InvestmentFailure)
-    assert again[1] == RETRIEVED
+    assert isinstance(again, InvestmentFailure)
+    assert again.check == "snapshot_invalid"
     empty_terms = tmp_path / entry.key / "empty-terms.meta.json"
     # _receipt keys the sidecar by the digest argument, not a fixed name.
     (tmp_path / entry.key / "blank.meta.json").write_text(

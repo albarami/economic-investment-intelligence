@@ -7,6 +7,7 @@ from dataclasses import replace
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
+from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.terms_text import (
     FINGERPRINT_VISIBLE_TEXT,
@@ -25,6 +26,7 @@ def test_refuses_unlisted_host(tmp_path: Path) -> None:
         return Response(final_url=url, body=b"planted-bytes", hops=())
 
     entry = Entry(
+        refetch=Cadence("none", "frequency_unconfirmed", ""),
         key="planted_outside",
         source_id="planted_outside",
         slug="",

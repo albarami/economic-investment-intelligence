@@ -14,6 +14,7 @@ import pytest
 from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
+from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.kinds import (
     _terms_fingerprint,
     prepare,
@@ -46,7 +47,16 @@ REPO = repository_root(Path(__file__))
 _SCRIPTS = REPO / "scripts"
 if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
-KEY_NAMES = ("EARTHDATA_API_KEY", "TOMTOM_API_KEY")
+KEY_NAMES = (
+    "EARTHDATA_API_KEY",
+    "TOMTOM_API_KEY",
+    "COMTRADE_PRIMARY_API_KEY",
+    "COMTRADE_SECONDARY_API_KEY",
+)
+KEY_ALLOWANCE = {
+    "COMTRADE_PRIMARY_API_KEY": "scripts/commands/build_public.py",
+    "COMTRADE_SECONDARY_API_KEY": "scripts/commands/build_public.py",
+}
 
 
 def _clock() -> str:
@@ -59,6 +69,7 @@ def _sleep(_seconds: float) -> None:
 
 def _entry() -> Entry:
     return Entry(
+        refetch=Cadence("none", "frequency_unconfirmed", ""),
         key="planted",
         source_id="planted",
         slug="planted-slug",
@@ -115,9 +126,16 @@ def _portal_meta(
 
 
 def _sidecar(folder: Path) -> dict[str, object]:
-    found = list(folder.rglob("*.meta.json"))
+    found = [
+        p
+        for p in sorted(folder.rglob("*.meta.json"))
+        if p.is_file() and len(p.parent.name) == 10 and p.parent.name[4] == "-"
+    ]
     if not found:
-        found = [path for path in folder.rglob("citation.json")]
+        found = [
+            path for path in sorted(folder.rglob("citation.json")) if path.is_file()
+        ]
+    assert found
     assert len(found) == 1
     loaded = json.loads(found[0].read_text(encoding="utf-8"))
     assert isinstance(loaded, dict)
@@ -455,12 +473,12 @@ def test_forbidding_terms_leave_the_source_fetched_and_stored(tmp_path: Path) ->
     assert not any("OWNER" in line for line in log["lines"])
 
 
-def test_busy_gmaps_stays_on_when_terms_name_the_use(tmp_path: Path) -> None:
-    """busy_gmaps is not switched off, because the owner decided to use it."""
+def test_busy_besttime_stays_on_when_terms_name_the_use(tmp_path: Path) -> None:
+    """busy_besttime is not switched off, because the owner decided to use it."""
     entry = replace(
         _entry(),
-        key="busy_gmaps",
-        source_id="busy_gmaps",
+        key="busy_besttime",
+        source_id="busy_besttime",
         kind="terms_page",
         extension="html",
         url=PAGE,
@@ -621,7 +639,9 @@ def test_skipped_watched_row_hashes_terms_and_does_not_switch_off(
     stored = [
         path
         for path in tmp_path.rglob("*")
-        if path.is_file() and path.name != "build-log.json"
+        if path.is_file()
+        and path.name != "build-log.json"
+        and "terms" not in path.parts
     ]
     assert stored == []
     loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
@@ -681,7 +701,7 @@ def _watched_entry() -> Entry:
 def _stored_page(folder: Path, key: str) -> Path:
     found = [
         path
-        for path in (folder / key).rglob("*")
+        for path in (folder / key).glob("*")
         if path.is_file() and not path.name.endswith(".meta.json")
     ]
     assert len(found) == 1
@@ -761,7 +781,9 @@ def test_changed_terms_on_a_skipped_row_store_nothing(tmp_path: Path) -> None:
     stored = [
         path
         for path in tmp_path.rglob("*")
-        if path.is_file() and path.name != "build-log.json"
+        if path.is_file()
+        and path.name != "build-log.json"
+        and "terms" not in path.parts
     ]
     assert stored == []
     assert seen == [_FILE_TERMS, _FILE_TERMS]
@@ -1062,7 +1084,9 @@ def test_failed_check_records_the_reason_and_stores_nothing(tmp_path: Path) -> N
     stored = [
         path
         for path in tmp_path.rglob("*")
-        if path.is_file() and path.name != "build-log.json"
+        if path.is_file()
+        and path.name != "build-log.json"
+        and "terms" not in path.parts
     ]
     assert stored == []
 
@@ -1222,7 +1246,7 @@ def test_interrupted_write_leaves_no_partial_file(
     def boom(*_args: object, **_kwargs: object) -> None:
         raise OSError("planted")
 
-    monkeypatch.setattr(receipts.os, "replace", boom)
+    monkeypatch.setattr(receipts.os, "link", boom)
 
     def transport(url: str) -> Response:
         return _ok(url, b"invented-bytes")
@@ -1295,16 +1319,33 @@ def test_build_writes_only_under_the_cache(tmp_path: Path) -> None:
             assert "public_cache" in path.parts
 
 
+def key_offenders(root: Path) -> tuple[str, ...]:
+    """Return production files that name a key outside the one allowed path."""
+    found: list[str] = []
+    for folder_name in ("custodian/src", "scripts/commands"):
+        folder = root / folder_name
+        if not folder.is_dir():
+            raise ValueError(f"key scan folder missing: {folder_name}")
+        modules = sorted(folder.rglob("*.py"))
+        if not modules:
+            raise ValueError(f"key scan folder holds no Python file: {folder_name}")
+        for path in modules:
+            text = path.read_text(encoding="utf-8")
+            rel = path.relative_to(root).as_posix()
+            for name in KEY_NAMES:
+                if name in text and KEY_ALLOWANCE.get(name) != rel:
+                    found.append(f"{rel}:{name}")
+            comtrade = "eii_custodian/publicdata/comtrade/"
+            if comtrade in rel and "os.environ" in text:
+                found.append(f"{rel}:os.environ")
+    return tuple(found)
+
+
 def test_production_code_does_not_name_a_key(tmp_path: Path) -> None:
     """The fetch code does not name a key, and a planted value is absent from a receipt."""
     secret = "planted-token-value"
-    for folder in (REPO / "custodian" / "src", REPO / "scripts" / "commands"):
-        assert folder.is_dir()
-        assert any(folder.rglob("*.py"))
-        for path in folder.rglob("*.py"):
-            text = path.read_text(encoding="utf-8")
-            for name in KEY_NAMES:
-                assert name not in text
+    assert set(KEY_ALLOWANCE.values()) == {"scripts/commands/build_public.py"}
+    assert key_offenders(REPO) == ()
 
     def transport(url: str) -> Response:
         return _ok(url, b"invented-bytes")
@@ -1316,3 +1357,39 @@ def test_production_code_does_not_name_a_key(tmp_path: Path) -> None:
         if path.is_file()
     )
     assert secret not in blob
+
+
+def test_planted_comtrade_module_naming_a_key_fails(tmp_path: Path) -> None:
+    """A copy of a Comtrade module that names a key, or reads the environment, fails."""
+    module = tmp_path / "custodian/src/eii_custodian/publicdata/comtrade/planted.py"
+    module.parent.mkdir(parents=True)
+    module.write_text(
+        "value = os.environ['COMTRADE_PRIMARY_API_KEY']\n", encoding="utf-8"
+    )
+    command = tmp_path / "scripts/commands/plain.py"
+    command.parent.mkdir(parents=True)
+    command.write_text("value = 1\n", encoding="utf-8")
+    assert key_offenders(tmp_path) == (
+        "custodian/src/eii_custodian/publicdata/comtrade/planted.py:COMTRADE_PRIMARY_API_KEY",
+        "custodian/src/eii_custodian/publicdata/comtrade/planted.py:os.environ",
+    )
+
+
+def test_key_scan_refuses_a_missing_folder(tmp_path: Path) -> None:
+    """A scan folder that does not exist is refused, never silently skipped."""
+    module = tmp_path / "custodian/src/plain.py"
+    module.parent.mkdir(parents=True)
+    module.write_text("value = 1\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="scripts/commands"):
+        key_offenders(tmp_path)
+
+
+def test_key_scan_refuses_a_folder_without_python_files(tmp_path: Path) -> None:
+    """A scan folder that holds no Python file is refused, never silently passed."""
+    module = tmp_path / "custodian/src/plain.py"
+    module.parent.mkdir(parents=True)
+    module.write_text("value = 1\n", encoding="utf-8")
+    (tmp_path / "scripts/commands").mkdir(parents=True)
+    (tmp_path / "scripts/commands/notes.txt").write_text("x\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="scripts/commands"):
+        key_offenders(tmp_path)

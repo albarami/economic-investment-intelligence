@@ -308,13 +308,17 @@ def test_success_receipt(tmp_path: Path, extension: str) -> None:
         "period_first": None,
         "period_last": None,
         "row_count": None,
+        "file": None,
+        "coverage_note": None,
         "columns": [],
         "reconciliation": "none",
         "release_tables": ["pub_place"],
         "caveat_keys": [],
         "switched_off": False,
     }
-    assert len(list(directory.iterdir())) == 2
+    assert len(list(directory.iterdir())) == 5
+    assert (directory / "index").is_dir()
+    assert (directory / "checks").is_dir()
 
 
 @pytest.mark.parametrize(

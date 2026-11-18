@@ -23,6 +23,7 @@ from eii_custodian.publicdata.fetch.registry import (
     Entry,
     load_registry,
 )
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.review.activity import (
     FEED_KEYS,
     ActivityRow,
@@ -381,19 +382,28 @@ def build_cached_graph(
     supplier_membership: SupplierMembership,
     registry: Sequence[Entry] | None = None,
     mode: str = "fixture",
+    selections: Mapping[str, str] | None = None,
 ) -> Graph:
     """Read the cached feeds, the review file and the allow-list, then build."""
     entries = load_registry() if registry is None else registry
     _refuse_release(entries, mode)
+    selected = reviewed_selections(cache) if selections is None else selections
     inputs = load_activity_inputs(
         cache,
         playbook_codes,
         supplier_membership=supplier_membership,
         registry=entries,
         review_path=review_path,
+        selections=selected,
     )
     categories = parse_place_categories(
-        read_rows(read_cached(cache, entry_by_key(entries, "places_ovt")))
+        read_rows(
+            read_cached(
+                cache,
+                entry_by_key(entries, "places_ovt"),
+                digest=selected.get("places_ovt", ""),
+            )
+        )
     )
     allowlist = read_allowlist(allowlist_path)
     return build_graph(
