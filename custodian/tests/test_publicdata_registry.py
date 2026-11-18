@@ -446,8 +446,47 @@ def _assert_c_safe_loader_only(text: str) -> None:
 def test_loader_uses_the_safe_loader_only() -> None:
     """Replace the text guard under decision 0053 with C safe-loader guards."""
     _assert_c_safe_loader_only(
-        Path(registry_module.__file__).read_text(encoding="utf-8")
+        (REPO / "custodian/src/eii_custodian/publicdata/fetch/registry.py").read_text(
+            encoding="utf-8"
+        )
     )
+
+
+def test_loader_passes_only_c_safe_loader(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The live loader argument is the C safe loader, even in a mutation copy."""
+    path = tmp_path / "invented.yaml"
+    path.write_text("planted: safe\n", encoding="utf-8")
+    real_load = yaml.load
+    loaders: list[object] = []
+    forwarded: list[object] = []
+
+    def load_spy(text, *, Loader):
+        loaders.append(Loader)
+        result = real_load(text, Loader=Loader)
+        forwarded.append(result)
+        return result
+
+    monkeypatch.setattr(yaml, "load", load_spy)
+
+    def assert_c_loader(reader):
+        loaders.clear()
+        forwarded.clear()
+        result = reader(path)
+        assert result == {"planted": "safe"}
+        assert len(forwarded) == 1
+        assert result is forwarded[0]
+        assert len(loaders) == 1
+        assert loaders[0] is yaml.CSafeLoader
+
+    assert_c_loader(read_yaml)
+
+    def planted_reader(path):
+        return yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.SafeLoader)
+
+    with pytest.raises(AssertionError):
+        assert_c_loader(planted_reader)
 
 
 @pytest.mark.parametrize(
