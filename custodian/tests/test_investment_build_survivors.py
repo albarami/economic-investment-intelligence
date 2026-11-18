@@ -311,6 +311,8 @@ def test_release_selection_is_literal_true_only(source: object) -> None:
 
 
 def test_audit_pointer_and_manifest_failures(tmp_path: Path) -> None:
+    import hashlib
+
     source = tmp_path / "SYN-source"
     _failure(
         build.audit_snapshot(tmp_path, "SYN-source"),
@@ -332,8 +334,11 @@ def test_audit_pointer_and_manifest_failures(tmp_path: Path) -> None:
         "1|SYN-source||missing_artifact|SYN-manifest|missing",
     )
     (source / "manifests").mkdir()
-    manifest = source / "manifests" / "SYN-manifest.json"
-    manifest.write_text('{"pages": [null]}', encoding="utf-8")
+    manifest_body = b'{"pages": [null]}'
+    manifest_digest = hashlib.sha256(manifest_body).hexdigest()
+    pointer.write_text(f'{{"manifest_sha256": "{manifest_digest}"}}', encoding="utf-8")
+    manifest = source / "manifests" / f"{manifest_digest}.json"
+    manifest.write_bytes(manifest_body)
     _failure(
         build.audit_snapshot(tmp_path, "SYN-source"),
         "1|SYN-source||hash_mismatch|page|unreadable",

@@ -366,6 +366,9 @@ def test_commit_archive_refusal_removes_candidate_only(
         '{"table_sha256": "SYN-table"}', encoding="utf-8"
     )
     (source / "staging/SYN-table.json").write_bytes(b"SYN-retained")
+    body = b"SYN-public-page"
+    digest = hashlib.sha256(body).hexdigest()
+    (source / f"{digest}.html").write_bytes(body)
     calls: list[object] = []
 
     def archive(*args: object) -> None:
@@ -380,7 +383,14 @@ def test_commit_archive_refusal_removes_candidate_only(
         _spec(),
         _envelope(),
         {"SYN-candidate": True},
-        (),
+        (
+            {
+                "url": "https://syn.invalid/page",
+                "sha256": digest,
+                "retrieved_utc": "2026-01-03T04:05:06Z",
+                "kind": "dashboard",
+            },
+        ),
         "ab" * 32,
         "2026-01-03T04:05:06Z",
     )
