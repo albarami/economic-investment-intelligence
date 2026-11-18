@@ -1,6 +1,12 @@
 # S2-T09 pass 1: no live input or review is asserted.
 schema_version: 1
-methods_sha256: 56dd092296834c1d0fcc1ed1f748820546286148fb07c5325a6fcc25cade9e14
+governed_sections:
+  - "## 3. Shared interval method and reliability mark"
+  - "### C5 Customs supplier lens"
+  - "### C6 Typical neighbours"
+  - "### C7 Shared reach between two doors"
+  - "### C14 Sale price per square metre"
+governed_sections_sha256: 79839370461a237c5e798f3e0c0b7d399aec194ff4140e2c368aaad2e1806a88
 pins:
   - pin_id: wilson.period
     card_anchor: wilson

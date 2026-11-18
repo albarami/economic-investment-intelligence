@@ -27,7 +27,9 @@ from .method_card_pin_fixtures import write_json
 PRIOR = tuple(f"2024-{m:02}" for m in range(1, 13))
 # Both windows are explicit invented choices, not live-release coverage claims.
 LATEST = tuple(f"2025-{m:02}" for m in range(1, 13))
-FINE = ("1902.11.10.0000", "1902.19.10.0000")
+# The card computes HHI, shares and the trend per basket line (docs/07 C5).
+LINES = {"pasta": ("1902.11.10.0000",), "other": ("1902.19.10.0000",)}
+POOLED = {"pooled": ("1902.11.10.0000", "1902.19.10.0000")}
 
 
 def test_independent_wilson_paths_and_arithmetic(tmp_path):
@@ -88,6 +90,17 @@ def customs_files(tmp_path):
         }
         for m in range(1, 13)
     ]
+    prior += [
+        {
+            "lsn_year": "2024",
+            "lshhr_month": m,
+            "hs8": "1902.19.10",
+            "country_of_origin": "invented_origin_c",
+            "weight_kg": 1,
+            "value_qr": 5,
+        }
+        for m in range(1, 13)
+    ]
     latest = [
         {
             "year": "2025",
@@ -103,7 +116,23 @@ def customs_files(tmp_path):
             ("invented_origin_b", 0, 30),
         )
     ]
-    # A reviewed exclusion and unrelated year must not enter any sum.
+    latest += [
+        {
+            "year": "2025",
+            "month": m,
+            "harmonized_system_code": "1902.19.10.0000",
+            "country_of_origin": origin,
+            "weight_in_kilograms": weight,
+            "value_in_qatari_riyals": value,
+        }
+        for m in range(1, 13)
+        for origin, weight, value in (
+            ("invented_origin_c", 3, 30),
+            ("invented_origin_d", 1, 15),
+            ("invented_origin_e", 0, 15),
+        )
+    ]
+    # A reviewed exclusion and unrelated year must not enter any line's sums.
     latest.append(
         dict(
             latest[0],
@@ -120,20 +149,26 @@ def customs_files(tmp_path):
 def test_independent_c5_paths(tmp_path):
     before, after = customs_files(tmp_path)
     result = replay_c5(
-        before, after, prior_months=PRIOR, latest_months=LATEST, fine_codes=FINE
+        before, after, prior_months=PRIOR, latest_months=LATEST, basket_lines=LINES
     )
     assert result == {
-        "hhi": D(6250),
-        "prior12": D(120),
-        "latest12": D(480),
-        "trend": D(3),
+        "pasta": {"hhi": D(6250), "prior12": D(120), "latest12": D(480), "trend": D(3)},
+        "other": {"hhi": D(3750), "prior12": D(60), "latest12": D(720), "trend": D(11)},
     }
+    # Each line's HHI differs from the pooled figure one old-style replay of
+    # both lines would have produced.
+    pooled = replay_c5(
+        before, after, prior_months=PRIOR, latest_months=LATEST, basket_lines=POOLED
+    )["pooled"]
+    assert pooled["hhi"] == D(2350)
+    assert result["pasta"]["hhi"] != pooled["hhi"]
+    assert result["other"]["hhi"] != pooled["hhi"]
 
 
 def test_c5_arithmetic_on_exact_replayed_inputs(tmp_path):
     before, after = customs_files(tmp_path)
     expected = replay_c5(
-        before, after, prior_months=PRIOR, latest_months=LATEST, fine_codes=FINE
+        before, after, prior_months=PRIOR, latest_months=LATEST, basket_lines=LINES
     )
     # This adapter copies the invented raw fields; the independent oracle above
     # never calls this adapter or supplier_metrics.
@@ -157,7 +192,7 @@ def test_c5_arithmetic_on_exact_replayed_inputs(tmp_path):
             D(value), unit, month, "national", "national", "public", (chain,)
         )
 
-    def trade(row, old):
+    def trade(row, product, old):
         month = f"{row['lsn_year'] if old else row['year']}-{int(row['lshhr_month'] if old else row['month']):02}"
         value, weight = (
             row["value_qr" if old else "value_in_qatari_riyals"],
@@ -166,7 +201,7 @@ def test_c5_arithmetic_on_exact_replayed_inputs(tmp_path):
         # Prior rows have already been reviewed and rolled to the selected
         # fine-line identity for this invented uncontaminated parent.
         return TradeRow(
-            FINE[0],
+            product,
             row["country_of_origin"],
             month,
             D(value),
@@ -176,42 +211,47 @@ def test_c5_arithmetic_on_exact_replayed_inputs(tmp_path):
             reading(weight, "kg", month),
         )
 
-    old = [
-        trade(row, True)
-        for row in json.loads(before.read_text())
-        if row["lsn_year"] == "2024"
-    ]
-    new = [
-        trade(row, False)
-        for row in json.loads(after.read_text())
-        if row["harmonized_system_code"] in FINE
-    ]
-    result = supplier_metrics(
-        new,
-        FINE,
-        LATEST,
-        (*PRIOR, *LATEST),
-        reviewed=True,
-        prior_rows=old,
-        prior_months=PRIOR,
-    )
-    assert result["hhi"].value == expected["hhi"]
-    assert result["total_value"].value == expected["latest12"]
-    assert result["trend"].value == expected["trend"]
     from eii_core.calc.facts import NoData
 
-    assert result["origins"]["invented_origin_b"]["unit_value"] == NoData(
-        "no_denominator"
-    )
+    for line, codes in LINES.items():
+        product = codes[0]
+        parent = product.replace(".", "")[:8]
+        old = [
+            trade(row, product, True)
+            for row in json.loads(before.read_text())
+            if row["lsn_year"] == "2024" and row["hs8"].replace(".", "") == parent
+        ]
+        new = [
+            trade(row, product, False)
+            for row in json.loads(after.read_text())
+            if row["harmonized_system_code"] in codes
+        ]
+        result = supplier_metrics(
+            new,
+            codes,
+            LATEST,
+            (*PRIOR, *LATEST),
+            reviewed=True,
+            prior_rows=old,
+            prior_months=PRIOR,
+        )
+        assert result["hhi"].value == expected[line]["hhi"]
+        assert result["total_value"].value == expected[line]["latest12"]
+        assert result["trend"].value == expected[line]["trend"]
+        zero_weight = "invented_origin_b" if line == "pasta" else "invented_origin_e"
+        assert result["origins"][zero_weight]["unit_value"] == NoData("no_denominator")
 
 
-def test_independent_c6_paths_seed_and_full_settings(tmp_path):
+def test_independent_c6_paths_box_filter_seed_and_thresholds(tmp_path):
     # Reuse the existing writer of invented Overture-shaped Parquet. These
     # locations are invented; the metric projection below is ONLY a fixture
     # transform, not a choice of the unrecorded live C6 projection.
     from custodian.tests.fixtures.places.invented import place_row, write_places
 
     source = tmp_path / "invented-places.parquet"
+    # (x, y, category, confidence) around (51.5 E, 25.4695 N). The research
+    # box clips at 25.47 N, so the y=150 point lies inside the 250 m radius
+    # but outside the box and must not change any kept figure.
     points = (
         (0, 0, "italian", 1),
         (0, 1, "pizza", 1),
@@ -220,6 +260,7 @@ def test_independent_c6_paths_seed_and_full_settings(tmp_path):
         (1000, 0, "c", 1),
         (1000, 1, "c", 1),
         (0, 4, "b", 0.1),
+        (0, 150, "b", 1),
     )
     write_places(
         source,
@@ -228,7 +269,7 @@ def test_independent_c6_paths_seed_and_full_settings(tmp_path):
                 place_id=f"SYN-METHOD-P-{index}",
                 basic_category=category,
                 lon=51.5 + x / 100000,
-                lat=25.3 + y / 100000,
+                lat=25.4695 + y / 100000,
                 confidence=confidence,
             )
             for index, (x, y, category, confidence) in enumerate(points)
@@ -236,7 +277,7 @@ def test_independent_c6_paths_seed_and_full_settings(tmp_path):
     )
 
     def project(lon, lat):
-        return (lon - D("51.5")) * 100000, (lat - D("25.3")) * 100000
+        return (lon - D("51.5")) * 100000, (lat - D("25.4695")) * 100000
 
     settings = dict(
         candidates=("b", "c"),
@@ -246,23 +287,54 @@ def test_independent_c6_paths_seed_and_full_settings(tmp_path):
         permutations=999,
         project=project,
     )
-    broad = replay_c6(source, focal=("italian", "pizza"), **settings)
-    narrow = replay_c6(source, focal=("italian",), **settings)
-    assert abs(broad["b"]["clq"] - D(5) / 3) < D("1e-24")
-    assert broad["c"]["clq"] == 0
-    assert (broad["b"]["p"], broad["b"]["q"]) == (D("0.327"), D("0.654"))
-    assert (narrow["b"]["p"], narrow["b"]["q"]) == (D("0.348"), D("0.696"))
-    assert all(D(0) < row["p"] <= row["q"] <= D(1) for row in broad.values())
-    assert narrow["b"]["n_focal"] == 1
-    assert broad["b"]["n_focal"] == 2
-    # Card thresholds are recorded and applied to exactly these replayed inputs.
-    kept = [
-        key
-        for key, row in broad.items()
-        if row["n_neighbour"] >= 20 and row["clq"] >= D("1.2") and row["q"] <= D("0.05")
-    ][:6]
-    assert kept == []
-    assert replay_c6(source, focal=("italian", "pizza"), **settings) == broad
+    # The card's keep rule: N_B >= 20, CLQ >= 1.2, q <= 0.05, at most six.
+    card_display = dict(
+        box=(D("25.18"), D("25.47"), D("51.35"), D("51.65")),
+        fdr=D("0.05"),
+        min_neighbours=20,
+        min_clq=D("1.2"),
+        max_shown=6,
+    )
+    assert (
+        replay_c6(source, focal=("italian", "pizza"), **settings, **card_display) == []
+    )
+    assert replay_c6(source, focal=("italian",), **settings, **card_display) == []
+    # Permissive display settings expose every candidate's statistics.
+    permissive = dict(card_display, fdr=D(1), min_neighbours=0, min_clq=D(0))
+    broad = replay_c6(source, focal=("italian", "pizza"), **settings, **permissive)
+    assert [row["candidate"] for row in broad] == ["b", "c"]
+    assert abs(broad[0]["clq"] - D(5) / 3) < D("1e-24")
+    assert broad[0]["n_focal"] == 2
+    assert (broad[0]["p"], broad[0]["q"]) == (D("0.327"), D("0.654"))
+    assert broad[1]["clq"] == 0
+    assert broad[1]["n_neighbour"] == 2
+    narrow = replay_c6(source, focal=("italian",), **settings, **permissive)
+    assert narrow[0]["candidate"] == "b"
+    assert (narrow[0]["p"], narrow[0]["q"]) == (D("0.348"), D("0.696"))
+    assert narrow[0]["n_focal"] == 1
+    assert all(D(0) < row["p"] <= row["q"] <= D(1) for row in broad)
+    # Without the box filter the outside point changes the focal CLQ.
+    with_outside = replay_c6(
+        source,
+        focal=("italian", "pizza"),
+        **settings,
+        **dict(permissive, box=(D("25.18"), D("25.48"), D("51.35"), D("51.65"))),
+    )
+    assert with_outside[0]["clq"] == D(3) / 2
+    assert with_outside[0]["clq"] != broad[0]["clq"]
+    # Display order and cut: highest CLQ first, at most max_shown kept.
+    assert [
+        row["candidate"]
+        for row in replay_c6(
+            source,
+            focal=("italian", "pizza"),
+            **settings,
+            **dict(permissive, max_shown=1),
+        )
+    ] == ["b"]
+    assert (
+        replay_c6(source, focal=("italian", "pizza"), **settings, **permissive) == broad
+    )
 
 
 @pytest.mark.parametrize(
@@ -364,26 +436,37 @@ def test_c14_arithmetic_on_exact_invented_card_pair(tmp_path):
     )
 
 
-def test_source_replay_matches_checked_c5_and_c14_values_without_producer(tmp_path):
-    from eii_custodian.publicdata.method_card_validation import (
-        validate_source_check_record,
-    )
-
-    from .method_card_pin_fixtures import case, save
-
-    paths, record, artifact, _ = case(tmp_path)
-    before, after = customs_files(tmp_path)
+def checked_c5_c14_values(deals, crosswalk, before, after):
+    """The pin-value encoding of one full independent replay, as written."""
     c5 = replay_c5(
-        before, after, prior_months=PRIOR, latest_months=LATEST, fine_codes=FINE
+        before, after, prior_months=PRIOR, latest_months=LATEST, basket_lines=LINES
     )
-    c14 = replay_c14(*property_files(tmp_path))
-    expected = {f"c5.{key}": {"value": str(value)} for key, value in c5.items()}
+    c14 = replay_c14(deals, crosswalk)
+    values = {
+        f"c5.{key}": {line: str(stats[key]) for line, stats in c5.items()}
+        for key in ("hhi", "prior12", "latest12", "trend")
+    }
     for year in ("2024", "2025"):
-        expected[f"c14.medians_{year}"] = {
+        values[f"c14.medians_{year}"] = {
             district + "|" + kind: f"median={price};count={count}"
             for (district, group_year, kind), (price, count) in c14.items()
             if group_year == year
         }
+    return values
+
+
+def test_checked_c5_and_c14_values_match_second_replay_without_producer(tmp_path):
+    from eii_custodian.publicdata.method_card_validation import (
+        validate_source_check_record,
+    )
+
+    from .method_card_data_replay import assert_record_matches_replay
+    from .method_card_pin_fixtures import case, save
+
+    paths, record, artifact, _ = case(tmp_path)
+    before, after = customs_files(tmp_path)
+    deals, crosswalk = property_files(tmp_path)
+    expected = checked_c5_c14_values(deals, crosswalk, before, after)
     for row in record["pins"]:
         if row["pin_id"] in expected:
             row["values"] = expected[row["pin_id"]].copy()
@@ -392,6 +475,42 @@ def test_source_replay_matches_checked_c5_and_c14_values_without_producer(tmp_pa
             row["values"] = expected[row["pin_id"]].copy()
     save(paths, record, artifact)
     checked = validate_source_check_record(*paths[:3])
-    # File-path replays above have no dependency on the producer artifact.
-    for pin, values in expected.items():
+    # The comparison is made against a second replay call made after
+    # validation, never against the dictionary that was written. The replays
+    # read only the invented source files, never the producer artifact.
+    second = checked_c5_c14_values(deals, crosswalk, before, after)
+    for pin, values in second.items():
         assert checked[pin].values == values
+    assert assert_record_matches_replay(checked, second)
+
+
+def test_plant_record_and_artifact_agree_but_differ_from_source_replay(tmp_path):
+    from eii_custodian.publicdata.method_card_validation import (
+        validate_source_check_record,
+    )
+
+    from .method_card_data_replay import assert_record_matches_replay
+    from .method_card_pin_fixtures import case, save
+
+    paths, record, artifact, _ = case(tmp_path)
+    tampered = {"invented district|نوع تجريبي أ": "median=16;count=2"}
+    for row in record["pins"]:
+        if row["pin_id"] == "c14.medians_2024":
+            row["values"] = tampered.copy()
+    for row in artifact["pins"]:
+        if row["pin_id"] == "c14.medians_2024":
+            row["values"] = tampered.copy()
+    save(paths, record, artifact)
+    # The artifact comparison is blind to this: record and artifact agree.
+    entries = validate_source_check_record(*paths[:3])
+    deals, crosswalk = property_files(tmp_path)
+    c14 = replay_c14(deals, crosswalk)
+    replayed = {
+        "c14.medians_2024": {
+            district + "|" + kind: f"median={price};count={count}"
+            for (district, year, kind), (price, count) in c14.items()
+            if year == "2024"
+        }
+    }
+    with pytest.raises(AssertionError, match="replay_value_mismatch"):
+        assert_record_matches_replay(entries, replayed)

@@ -2,8 +2,10 @@
 
 Assumed shapes for pass 2 confirmation:
 * Wilson/customs/property: JSON row arrays with the registry's column names.
+* C5: per basket line, the mapping of invented line name to its fine codes.
 * C6: Overture-shaped Parquet through the existing file reader, with an
-  explicitly supplied projection from longitude/latitude to metric coordinates.
+  explicitly supplied projection from longitude/latitude to metric coordinates
+  and the research-box, false-discovery and keep thresholds as parameters.
   The fixture projection is invented; confirm the live projection and receipt.
 * C7: normalized JSON districts (district_key,value) and whole-centroid area
   membership lists, NOT an assumed raw ArcGIS layer shape. Live geometry and
@@ -62,39 +64,43 @@ def replay_wilson(active_path, cancelled_path, *, municipality, activity, period
         }
 
 
-def replay_c5(prior_path, latest_path, *, prior_months, latest_months, fine_codes):
-    codes = {code.replace(".", "") for code in fine_codes}
-    parents = {code[:8] for code in codes}
+def replay_c5(prior_path, latest_path, *, prior_months, latest_months, basket_lines):
+    """Per basket line h: origin shares, HHI and the twelve-month trend."""
     previous, current = rows(prior_path), rows(latest_path)
-    selected_old = [
-        row
-        for row in previous
-        if row["hs8"].replace(".", "") in parents
-        and f"{row['lsn_year']}-{int(row['lshhr_month']):02}" in prior_months
-    ]
-    selected_new = [
-        row
-        for row in current
-        if row["harmonized_system_code"].replace(".", "") in codes
-        and f"{row['year']}-{int(row['month']):02}" in latest_months
-    ]
-    prior = sum((D(row["value_qr"]) for row in selected_old), D(0))
-    origins = defaultdict(lambda: D(0))
-    for row in selected_new:
-        # Missing/zero weight never removes a row from value share or HHI.
-        origins[row["country_of_origin"]] += D(row["value_in_qatari_riyals"])
-    latest = sum(origins.values(), D(0))
-    hhi = (
-        sum((D(10000) * (value / latest) ** 2 for value in origins.values()), D(0))
-        if latest
-        else "NO_DATA"
-    )
-    return {
-        "hhi": hhi,
-        "prior12": prior,
-        "latest12": latest,
-        "trend": (latest - prior) / prior if prior else "NO_DATA",
-    }
+    result = {}
+    for line, fine_codes in basket_lines.items():
+        codes = {code.replace(".", "") for code in fine_codes}
+        parents = {code[:8] for code in codes}
+        selected_old = [
+            row
+            for row in previous
+            if row["hs8"].replace(".", "") in parents
+            and f"{row['lsn_year']}-{int(row['lshhr_month']):02}" in prior_months
+        ]
+        selected_new = [
+            row
+            for row in current
+            if row["harmonized_system_code"].replace(".", "") in codes
+            and f"{row['year']}-{int(row['month']):02}" in latest_months
+        ]
+        prior = sum((D(row["value_qr"]) for row in selected_old), D(0))
+        origins = defaultdict(lambda: D(0))
+        for row in selected_new:
+            # Missing/zero weight never removes a row from value share or HHI.
+            origins[row["country_of_origin"]] += D(row["value_in_qatari_riyals"])
+        latest = sum(origins.values(), D(0))
+        hhi = (
+            sum((D(10000) * (value / latest) ** 2 for value in origins.values()), D(0))
+            if latest
+            else "NO_DATA"
+        )
+        result[line] = {
+            "hhi": hhi,
+            "prior12": prior,
+            "latest12": latest,
+            "trend": (latest - prior) / prior if prior else "NO_DATA",
+        }
+    return result
 
 
 def replay_c6(
@@ -107,12 +113,28 @@ def replay_c6(
     confidence_min,
     permutations,
     project,
+    box,
+    fdr,
+    min_neighbours,
+    min_clq,
+    max_shown,
 ):
+    """Radius CLQ with permutation p and BH q, filtered to the kept display list.
+
+    Points outside the research ``box`` (lat_min, lat_max, lon_min, lon_max)
+    are dropped before projection. A candidate is kept when its count is at
+    least ``min_neighbours``, its CLQ at least ``min_clq`` and its q at most
+    ``fdr``; the kept list is ordered by (-clq, candidate) and cut to
+    ``max_shown``.
+    """
     from eii_custodian.publicdata.places.read import read_place_file
 
+    lat_min, lat_max, lon_min, lon_max = box
     points = []
     for row in read_place_file(Path(places_path), "ar"):
         if row.confidence is not None and row.confidence >= confidence_min:
+            if not (lat_min <= row.lat <= lat_max and lon_min <= row.lon <= lon_max):
+                continue
             x, y = project(row.lon, row.lat)
             points.append({"x_m": x, "y_m": y, "category": row.category})
     labels = [row["category"] for row in points]
@@ -170,7 +192,7 @@ def replay_c6(
         candidate = order[rank - 1]
         ceiling = min(ceiling, ps[candidate] * len(order) / rank)
         adjusted[candidate] = ceiling
-    return {
+    stats = {
         candidate: {
             "clq": observed[candidate],
             "p": ps[candidate],
@@ -182,6 +204,15 @@ def replay_c6(
         }
         for candidate in candidates
     }
+    kept = [
+        {"candidate": candidate, **row}
+        for candidate, row in stats.items()
+        if row["n_neighbour"] >= min_neighbours
+        and row["clq"] >= min_clq
+        and row["q"] <= fdr
+    ]
+    kept.sort(key=lambda row: (-row["clq"], row["candidate"]))
+    return kept[:max_shown]
 
 
 def replay_c7(weights_path, areas_path):
@@ -216,3 +247,18 @@ def replay_c14(deals_path, crosswalk_path):
     if not groups:
         return "NO_DATA"
     return {key: (median(values), len(values)) for key, values in groups.items()}
+
+
+def assert_record_matches_replay(entries, replayed):
+    """Fail when a checked record value differs from the independent replay.
+
+    ``replayed`` maps pin id to the values the replay computed; only the pins
+    it names are compared. The producer artifact is never read here, so this
+    is the check that catches a record and an artifact agreeing with each
+    other but differing from the source replay.
+    """
+    for pin, values in replayed.items():
+        entry = entries.get(pin)
+        if entry is None or entry.values != values:
+            raise AssertionError("replay_value_mismatch")
+    return True

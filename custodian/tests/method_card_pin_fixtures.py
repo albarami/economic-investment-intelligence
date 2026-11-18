@@ -3,6 +3,10 @@
 No helper opens a public snapshot. Multi-value pins use JSON text inside the
 plan's scalar-valued values dictionary. The generation artifact is an assumed
 interchange shape, not a claim about the S2-T08 live output.
+
+The invented methods document carries the five governed sections of the sync
+check, one per card anchor, and the record's hash covers exactly those spans,
+mirroring the production definition for the invented layout.
 """
 
 import hashlib
@@ -46,6 +50,52 @@ PRIOR = [f"2024-{month:02}" for month in range(1, 13)]
 LATEST = [f"2025-{month:02}" for month in range(7, 13)] + [
     f"2026-{month:02}" for month in range(1, 7)
 ]
+SECTION_PROSE = "No public value appears in this fixture."
+SECTIONS = (
+    ("wilson", "## 3. Shared interval method and reliability mark"),
+    ("c5", "### C5 Customs supplier lens"),
+    ("c6", "### C6 Typical neighbours"),
+    ("c7", "### C7 Shared reach between two doors"),
+    ("c14", "### C14 Sale price per square metre"),
+)
+SECTION_HEADINGS = tuple(heading for _, heading in SECTIONS)
+
+
+def governed_sections():
+    """The governed heading list every schema-valid record must carry."""
+    return list(SECTION_HEADINGS)
+
+
+def methods_document(rows):
+    """The invented methods document: governed sections with checked blocks."""
+    parts = ["# Invented method cards\n\n"]
+    for anchor, heading in SECTIONS:
+        if anchor == "c5":
+            # Section 3 ends before the card sections, as in the methods doc.
+            parts.append("## 4. Version 1 method cards\n\n")
+        parts.append(heading + "\n\n" + SECTION_PROSE + "\n")
+        parts.append(
+            blocks(
+                [
+                    row
+                    for row in rows
+                    if row["pin_id"].split(".")[0] == anchor
+                    and row["checked_against_source"]
+                ]
+            )
+        )
+    parts.append("## 5. Method cards added by decisions 0016 and 0017\n")
+    return "".join(parts)
+
+
+def governed_baseline():
+    """SHA-256 over the five block-free governed spans, concatenated in order."""
+    return digest(
+        b"".join(
+            (heading + "\n\n" + SECTION_PROSE + "\n").encode("utf-8")
+            for _, heading in SECTIONS
+        )
+    )
 
 
 def digest(body):
@@ -64,7 +114,6 @@ def write_json(path, value):
 
 def case(tmp_path):
     """Complete invented record, with a different maker's fixture-only review."""
-    baseline = "# Invented method cards\n\nNo public value appears in this fixture.\n"
     lineage = [
         {
             "source_id": "invented_public_file",
@@ -116,7 +165,8 @@ def case(tmp_path):
         row["settings_sha256"] = digest(config_path.read_bytes())
     record = {
         "schema_version": 1,
-        "methods_sha256": digest(baseline.encode()),
+        "governed_sections": governed_sections(),
+        "governed_sections_sha256": governed_baseline(),
         "pins": rows,
     }
     paths = (
@@ -125,7 +175,7 @@ def case(tmp_path):
         config_path,
         tmp_path / "invented-methods.md",
     )
-    paths[3].write_text(baseline + blocks(rows), encoding="utf-8")
+    paths[3].write_text(methods_document(rows), encoding="utf-8")
     save(paths, record, artifact)
     return paths, record, artifact, configuration
 

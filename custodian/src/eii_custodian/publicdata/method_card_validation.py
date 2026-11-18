@@ -1,14 +1,17 @@
 """MTH-03 source checks and fail-closed S2/S7 completion evidence.
 
 Pass 1 defines an explicit interchange contract for invented fixtures. The live
-S2-T08 artifact/config adapters and plan-r2 module placement need confirmation.
-This module never produces a pin, calculates a public figure, or opens a source
-snapshot. An artifact comparison is additional to independent source replay and
-a different maker's review, never a replacement for either.
+S2-T08 artifact/config adapters and their plan-r2 module placement need
+confirmation. This module never produces a pin, calculates a public figure, or
+opens a source snapshot. An artifact comparison is additional to independent
+source replay and a different maker's review, never a replacement for either.
 
-Card synchronization permits only checked ``method-pin`` blocks to be inserted
-into the reviewed baseline document. Its hash covers every byte outside those
-blocks, so an unchecked prose edit cannot pass by leaving the blocks untouched.
+Card synchronization binds only the document sections this record governs:
+section 3 and cards C5, C6, C7 and C14, each found by its exact heading text.
+``governed_sections_sha256`` covers exactly those spans with their checked
+``method-pin`` blocks removed, so an unrelated edit elsewhere in the document
+cannot turn the suite red, while an unchecked, moved or changed value inside a
+governed span cannot pass. Makers are a closed set compared by exact member.
 """
 
 from __future__ import annotations
@@ -24,6 +27,34 @@ from typing import Literal, cast
 import yaml
 
 Scalar = str | int | bool
+MAKERS = frozenset(
+    {
+        "Anthropic",
+        "OpenAI",
+        "Google",
+        "Moonshot AI",
+        "xAI",
+        "Zhipu AI",
+        "DeepSeek",
+        "Alibaba",
+        "Cognition",
+        "Cursor",
+    }
+)
+GOVERNED_HEADINGS = (
+    "## 3. Shared interval method and reliability mark",
+    "### C5 Customs supplier lens",
+    "### C6 Typical neighbours",
+    "### C7 Shared reach between two doors",
+    "### C14 Sale price per square metre",
+)
+ANCHOR_HEADINGS = {
+    "wilson": GOVERNED_HEADINGS[0],
+    "c5": GOVERNED_HEADINGS[1],
+    "c6": GOVERNED_HEADINGS[2],
+    "c7": GOVERNED_HEADINGS[3],
+    "c14": GOVERNED_HEADINGS[4],
+}
 REQUIRED_PINS = frozenset(
     """wilson.period c5.hhi c5.prior12 c5.latest12 c5.trend
     c6.seed c6.release_sha256 c6.category_ids c6.candidate_set c6.box
@@ -39,6 +70,7 @@ CONFIGURATION_PINS = frozenset(
     or pin in {"c7.coordinates", "c7.modes", "c7.cutoffs", "c7.speed_regime"}
 )
 _SHA = re.compile(r"[a-f0-9]{64}")
+_HEADING = re.compile(r"^(#{1,6}) ")
 _BLOCK = re.compile(
     r"^<!-- method-pin:([a-z0-9_.]+) -->\n(.*?)\n<!-- /method-pin:\1 -->\n",
     re.M | re.S,
@@ -145,6 +177,8 @@ def _entry(value: object) -> CheckedPinEntry:
     if pin not in REQUIRED_PINS or row["card_anchor"] != pin.split(".")[0]:
         raise ValueError("pin_unknown_or_anchor")
     builder = _text(row["builder_maker"])
+    if builder not in MAKERS:
+        raise ValueError("pin_maker_unknown")
     checked = row["checked_against_source"]
     if type(checked) is not bool:
         raise ValueError("pin_review_result")
@@ -152,11 +186,9 @@ def _entry(value: object) -> CheckedPinEntry:
     lineage = _lineage(row["source_lineage"])
     if checked:
         reviewer = row["reviewer_maker"]
-        if (
-            not isinstance(reviewer, str)
-            or not reviewer.strip()
-            or reviewer.strip().casefold() == builder.strip().casefold()
-        ):
+        if not isinstance(reviewer, str) or reviewer not in MAKERS:
+            raise ValueError("pin_maker_unknown")
+        if reviewer == builder:
             raise ValueError("pin_reviewer_missing_or_same_maker")
         review_date = _text(row["review_date"])
         try:
@@ -198,10 +230,20 @@ def _record(path: Path) -> tuple[dict[str, CheckedPinEntry], str]:
         loaded = yaml.safe_load(_read(path))
     except yaml.YAMLError:
         raise ValueError("pin_yaml_invalid") from None
-    record = _mapping(loaded, {"schema_version", "methods_sha256", "pins"})
+    record = _mapping(
+        loaded,
+        {"schema_version", "governed_sections", "governed_sections_sha256", "pins"},
+    )
     if type(record["schema_version"]) is not int or record["schema_version"] != 1:
         raise ValueError("pin_schema_version")
-    baseline = _sha(record["methods_sha256"])
+    sections = record["governed_sections"]
+    if (
+        not isinstance(sections, list)
+        or any(not isinstance(item, str) for item in sections)
+        or sections != list(GOVERNED_HEADINGS)
+    ):
+        raise ValueError("card_sync_sections_unrecorded")
+    baseline = _sha(record["governed_sections_sha256"])
     pins = record["pins"]
     if not isinstance(pins, list):
         raise ValueError("pin_record_list")
@@ -210,6 +252,52 @@ def _record(path: Path) -> tuple[dict[str, CheckedPinEntry], str]:
     if len(by_id) != len(entries) or set(by_id) != REQUIRED_PINS:
         raise ValueError("pin_missing_or_duplicate")
     return by_id, baseline
+
+
+def _heading_level(line: str) -> int | None:
+    match = _HEADING.match(line)
+    return None if match is None else len(match.group(1))
+
+
+def _inside(start: int, end: int, span: tuple[int, int]) -> bool:
+    return span[0] <= start and end <= span[1]
+
+
+def _governed_spans(document: str) -> dict[str, tuple[int, int]]:
+    """Character spans of the governed sections, found by exact heading text.
+
+    Each span runs from its heading line up to the next heading of the same
+    or a higher level, or to the end of the document. A heading that is
+    absent or duplicated fails the check closed.
+    """
+    lines = document.splitlines(keepends=True)
+    starts: list[int] = []
+    headings: list[tuple[int, int]] = []
+    offset = 0
+    for line in lines:
+        starts.append(offset)
+        level = _heading_level(line)
+        if level is not None:
+            headings.append((offset, level))
+        offset += len(line)
+    spans: dict[str, tuple[int, int]] = {}
+    for heading in GOVERNED_HEADINGS:
+        found = [
+            position
+            for position, line in enumerate(lines)
+            if line.rstrip("\r\n") == heading
+        ]
+        if len(found) != 1:
+            raise ValueError("card_sync_section_missing")
+        start = starts[found[0]]
+        level = len(heading) - len(heading.lstrip("#"))
+        end = len(document)
+        for position, other in headings:
+            if position > start and other <= level:
+                end = position
+                break
+        spans[heading] = (start, end)
+    return spans
 
 
 def _c5_settings(settings: dict[str, object], entry: CheckedPinEntry) -> None:
@@ -306,18 +394,31 @@ def validate_source_check_record(
 
 
 def verify_method_cards_sync(record_path: Path, methods_doc_path: Path) -> None:
-    """Refuse unchecked, duplicate, missing, changed or out-of-block values."""
+    """Refuse unchecked, duplicate, missing, moved or changed values.
+
+    Every ``method-pin`` block must sit inside the governed span of its own
+    card anchor, and the governed spans' block-free bytes must hash to the
+    record's ``governed_sections_sha256``.
+    """
     entries, baseline_hash = _record(record_path)
     try:
         document = _read(methods_doc_path).decode("utf-8")
     except UnicodeError:
         raise ValueError("card_sync_encoding") from None
-    seen = set()
+    spans = _governed_spans(document)
+    seen: set[str] = set()
     for match in _BLOCK.finditer(document):
         pin, raw = match.groups()
         entry = entries.get(pin)
         if pin in seen or entry is None or not entry.checked_against_source:
             raise ValueError("card_sync_unchecked_or_duplicate")
+        span = spans.get(ANCHOR_HEADINGS[entry.card_anchor])
+        if span is None or not _inside(match.start(), match.end(), span):
+            if any(
+                _inside(match.start(), match.end(), other) for other in spans.values()
+            ):
+                raise ValueError("card_sync_wrong_anchor")
+            raise ValueError("card_sync_block_outside_sections")
         try:
             values = _values(json.loads(raw))
         except (ValueError, TypeError):
@@ -326,7 +427,10 @@ def verify_method_cards_sync(record_path: Path, methods_doc_path: Path) -> None:
             raise ValueError("card_sync_value_mismatch")
         seen.add(pin)
     expected = {pin for pin, entry in entries.items() if entry.checked_against_source}
-    baseline = _BLOCK.sub("", document)
+    baseline = "".join(
+        _BLOCK.sub("", document[spans[section][0] : spans[section][1]])
+        for section in GOVERNED_HEADINGS
+    )
     if (
         seen != expected
         or "method-pin:" in baseline
