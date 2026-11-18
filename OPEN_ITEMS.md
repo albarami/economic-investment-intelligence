@@ -2532,6 +2532,46 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - EVIDENCE: The normalisation runs in the ruled order: compatibility form, case fold, whitespace collapse, then punctuation removal. So "Al - Rayyan" keeps a double space while "Al Rayyan" keeps one. Such a name is counted unmatched, with its reason. The error is in the safe direction, because the same registration number must also be equal.
 - NEEDED: At the first live awards-to-register match (task S2-T08 part B), count the unmatched names whose only difference is a double space. If any exist, a later task proposes a second whitespace collapse, with a planted test.
 
+## OI-278 — Remaining S2-T29 pin conditions and review-note disposition
+
+- ID: OI-278
+- TYPE: OPEN
+- RAISED BY: S2-T29 pin-security reviews; final train S2-3 ledger preparation
+- CONCERNS: S2-T29 active pin records and additional notes N12 to N16
+- EVIDENCE: Existing OI-273 to OI-277 and the unnumbered “S2-T29 build holds”, “S2-T29 build pass 5” and “Fix pass 10 pin-security notes” records at 55ee3c3 already hold supplier retirement, tender condition i, live awards/accident evidence, GIS terms, spacing-only misses and notes N1/N2/N4/N6/N7/N8/N9. Reuse them; this item holds the remaining per-record conditions and newly supplied notes. Sources: `.overnight/IN/extra/verdict.S2-T29.pinsec.md` (Anthropic Claude Fable 5.2, REJECTED da9112c), pinsec2 with the same prefix (APPROVED 6aa8a39), and OPEN_ITEMS.md at 55ee3c3.
+- NEEDED: Record each condition separately: a, retain the confirmed five modules and test_s2_t29_fix10.py unchanged or re-confirm them and retain the other independent confirmation; b, put each DER in its source's real intake folder with a bare filename; c, record the lead-computed matching SHA-256; d, record one authority with differing issuer/subject, validity, subject/issuer/expiry and a system-root chain with partial-chain trust off; e, confirm the digest against the issuer's published fingerprint; f, resolve row holds and null max_bytes by their own dispositions; g, record the first normal-seam live handshake; h, approve each record separately. Record 2 also requires existing OI-274 condition i and its file in both source folders. The two school records approve together or their row stays closed. OI-273 never approves the retired supplier record. No populated pin acceptance is inferred from contract approval.
+- NOTES: N12, stream pin-host redirects inside an active page scope are unreachable in current callers and use ordinary trust; any hardening is separately scoped with a plant. N13, decoded issuer/subject equality does not prove cryptographic non-self-signing; the reviewer did not execute a library probe and condition d remains. N14, exact wording is “issuer differs from subject”; code verifies no signature here. N15, historical offline-install and whitespace check failures remain recorded; the pin confirmation does not close them. N16, existing N1/N2/N4/N6/N7/N8/N9 remain for lead disposition, with N6's scripts-scan gap explicit. Source: pinsec2 Q7 and N12 to N16. This item authorizes no code change or source access.
+
+## OI-279 — Kill3 baseline failure still lacks its underlying errno
+
+- ID: OI-279
+- TYPE: OPEN
+- RAISED BY: S2-T29 kill3 verification, run-local OI-16
+- CONCERNS: snapshot_write_failed during the mutation clean baseline
+- EVIDENCE: At 2ca29f6, run 1 exited 1 after 42 s; the same first 203 tests passed outside the runner, and run 2 passed. Storage exhaustion overlapping another task is a hypothesis; the snapshot refusal hid the OSError. Source: `.overnight/IN/S2-T29/log.lines.md`, kill3 baseline and later run-local OI-16 updates. Comparison at 55ee3c3: repository OI-16 is activity-mapping sign-off, OI-254 concerns a diagnosed cache-copy storage failure, and OI-227/OI-228 concern different failures; none establishes this baseline's errno.
+- NEEDED: Preserve the failed output and hypothesis. A green rerun alone does not close this random failure. Carry diagnosis into the post-go-live handoff under decision 0055; run no deferred campaign in this ledger preparation.
+
+## OI-280 — Extended mutation evidence remains a post-go-live handoff
+
+- ID: OI-280
+- TYPE: OPEN
+- RAISED BY: decision 0055 items 1 to 5; train S2-3 partial campaign records
+- CONCERNS: S2-T29 campaigns, S2-T33 assembly and S2-T32 survivor groups
+- EVIDENCE: At 177a85b, S2-T29 campaign 4 stopped with killed 6419, raw survived 118 before explanations, timed out 3, not run 571; campaign 3 was superseded. Campaign 2's two page_acquire timeouts: identities not retained; replay debt kept for the post-go-live handoff under decision 0055. page_archive has zero generated mutants because of its decorated contextmanager; its ordinary archive plants remain. S2-T33 changed assembly; lane D1 record 252 needs its version-specific disposition. Sources: `.overnight/IN/S2-T29/log.lines.md`, S2-T33/log.lines.md, S2-T32T/lead-ruling-task-entry.md and extra/decision-0055.md.
+- COMPARISON: Existing OI-183 holds earlier cross-task sweep survivors, PO-S2-68 fetch/build survivors, PO-S2-86 earlier split-policy/forecast/trade timeouts and PO-S2-85 sleeping-child limits. Reuse those records for their own scope; none holds the additional S2-T29 partial counts and missing identities or all the new task groups. This item extends the handoff without closing those records.
+- NEEDED: Preserve each known module, measured commit, file hash, counts, lists, partial result and unfinished follow-up for the separate handoff required by decision 0055. After go live, subject to the receiving team's approval, resume version-matched work and replay identified timeouts alone at normal load; explicitly retain unrecoverable identities. Preserve confirmed wrong-number/refusal defects with known fix status. No campaign or survivor-fix pass runs now, no partial campaign closes, no slice gate waits for it, and ordinary tests, review, number, privacy and accounting checks remain required.
+
+
+## OI-281 — The mutation runner tests ran in no required check
+
+- ID: OI-281
+- TYPE: OPEN
+- RAISED BY: the train S2-3 ledger at `55ee3c3`
+- CONCERNS: S2-T10 part A (OI-168), `scripts/mutation.py` and `scripts/tests/mutation_runner.py`
+- EVIDENCE: Part A's private process namespace broke the mutation tester under the project's managed Python (no `os.getrandom`; the bound host device folder refuses reads in the new namespace): 8 of 14 runner tests failed at `55ee3c3`. The runner tests need the dependency group `mutation`; no required hosted check and none of part A's own checks ran them, so the defect reached the train head. Fixed in `cda6757` with bwrap's own device folder, confirmed by Z.ai GLM-5.3.
+- COMPARISON: OI-168 holds the namespace requirement itself and stays as it is; no existing item records that the runner tests run in no required check.
+- NEEDED: Every check of a change to `scripts/mutation.py` or its runner tests runs `uv run --locked python -m unittest scripts.tests.mutation_runner -v` with the group `mutation`; the slice S2 gate decides whether a required hosted check runs them.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -3780,6 +3820,33 @@ S2-T10 part A — NOT CLOSED: The existing busy-venue scan already reads bytes a
 - EVIDENCE: The plain-dictionary copy removes the caller mapping's comparison override but retains its key objects. An invented `str` subclass key with the normal string hash and a comparison that returns false once, after the successful archived-row equality check, makes a later literal-key lookup use its default. The original joined head then returns an empty source ID, project ID or project key, or a phantom absence with an empty identity part. `.overnight/tmp/key_boundary.py` reproduces the five cases; `.overnight/tmp/key-boundary.jsonl` records the accepted revisions and absences, exit 0. This is an in-process Python-object boundary, not a demonstrated external input exploit. The fifteen default mutants are therefore killed rather than explained. The new tests constrain fabricated `None`/`XXXX` identifier text and allow a future metadata refusal; they do not assert that accepting empty identity parts is valid. A separate null-equal non-string value also passes archived-row equality, although the existing geography guard correctly keeps its geography absent.
 - FURTHER EVIDENCE: A tuple subclass overriding comparison with the empty tuple can pass the canonical empty-history guard while retaining iterable revisions or absences; the standalone audit then emits entries without selected archives. `.overnight/tmp/tuple_boundary.py` and `.overnight/tmp/tuple-boundary.jsonl` reproduce both cases, exit 0. The twenty-one fallback mutants are killed, not explained, and the tests permit a future evidence_audit_incomplete refusal. A stateful selection key also makes the duplicate supplied-snapshot audit detect conflicting archive selection; dropping the supposedly redundant snapshots parameter changes that refusal and is separately killed.
 - NEEDED: the lead commissions a production-boundary fix and independent review, with rejection of these inputs or use of authenticated parser rows after comparison; preserve archive identity, provenance, missing-evidence semantics and the existing plants. This test-only pass changes no production code and does not claim the boundary defect fixed.
+
+### PO-S2-88 — Part A equipped evidence and cosmetic pin notes
+
+- ID: PO-S2-88
+- TYPE: OPEN
+- RAISED BY: Z.ai GLM-5.3 approving review of S2-T10 part A, observations 1 and 2
+- CONCERNS: record of pins.toml cosmetics, PROGRESS.md and the OI-158 verification note
+- EVIDENCE: Four deck.gl note values retain spaces before semicolons. The reviewer attributes equipped checks to d618d77 local and c9d0cc6 web, but the supplied detailed check files do not print those commands, counts, numeric exits or heads: extra/lead-checks.S2-T10a.ck1.txt and extra/lead-checks.S2-T10a.web.err.txt are empty, while extra/lead-checks.S2-T10a.local.txt holds only “RESULT: PASSED”. Source: `.overnight/IN/extra/verdict.S2-T10a.rev.md` and those supplied check files. Existing PO-S2-30 closes its trace-reference repair; existing OI-158 preserves hosted/removal evidence. Neither holds the distinct four-note cosmetic correction and review-observation record gap, so this item is new.
+- NEEDED: In a separately identified records change, correct the four cosmetic spaces and append attributable equipped commands, heads, counts and real exits if retained, while preserving the historical unequipped failures and unresolved aggregate discrepancy. Do not infer missing web counts or exits from “RESULT: PASSED”. The final train log corrects the late “no findings” summary to “no blocking code findings”, retaining all four records observations. Reuse PO-S2-22 for the integrated deadline-proof closure; allocate no duplicate. This ledger preparation changes no pin file.
+
+### PO-S2-89 — Record the join-proof comment accurately and retain pending train checks
+
+- ID: PO-S2-89
+- TYPE: OPEN
+- RAISED BY: lead answer 15; train S2-3 proof inspection
+- CONCERNS: record only; joinproof.sh's inaccurate “writes no file” comment
+- EVIDENCE: The supplied replacement uses mktemp to create temporary copies. Its opening “writes no file” comment is wrong; it creates no Git objects but is not file-free. Sources: `.overnight/IN/forced/joinproof.sh` and LEAD-ANSWERS.md answer 15. Round-two join confirmation is APPROVED 55ee3c3, findings none; item 2 explicitly distinguishes executed read-only parts from recorded evidence for the temporary-file portion. Sources: extra/verdict.TRAIN-S2-3.joinconf2.md and LEAD-ANSWERS.md answer 6. Existing OI-232 concerns an earlier train's specific missing records; it does not record this script-comment error.
+- NEEDED: Keep this correction as a record, not a code change in train S2-3. Preserve the two earlier rejected join reviews and the bounded round-two approval. The lead's ledger run produces the fresh whole-test result and the hosted checks follow the push for pull request 86; no such result is supplied here. No further fetch/build.py confirmation is owed: it is a clean textual merge covered by joinconf2 item 2. No superseded object-writing proof is run here.
+
+### PO-S2-90 — Duplicate redirected launch and fixed-worktree acceptance evidence
+
+- ID: PO-S2-90
+- TYPE: OPEN
+- RAISED BY: S2-T32 part T build incident and S2-T29 lead check records
+- CONCERNS: launch status interpretation and test-tree identity
+- EVIDENCE: A governor redirect actually launched OpenAI Sol; the lead then launched another OpenAI Sol writer in the same workspace. One returned exit 1, the other exit 0, and both described the same changes; the lead inspected a coherent final diff and checked it before e9db07b. Earlier S2-T29 checks were stopped or downgraded to pre-checks when their tree changed during execution, including the records commit ab6d6fc. Sources: `.overnight/IN/S2-T32T/log.lines.md` and S2-T29/log.lines.md. Existing OI-227/OI-228 concern distinct random failures; no existing item at 55ee3c3 covers this duplicate-launch and mutable-tree incident.
+- NEEDED: Retain the incident, read launch status before relaunching redirected builds, and keep acceptance checks on a fixed committed tree. Retain the wrong processor-gate launch argument as a lead launch error. Later checks supply later evidence and never rewrite failed or downgraded runs. This is a record and workflow point; no launcher code is changed here.
 
 ## Sources
 

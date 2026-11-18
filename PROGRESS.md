@@ -34132,6 +34132,921 @@ Seed:      none
 Notes:     All 17 work commits must have Conventional Commit subjects: 15 replayed task commits and two join-record repairs. Original source trailers and exact order are independently asserted by make_spec.py.
 ```
 
+### MERGE TRAIN S2-3 — Slice S2: final task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/86)
+
+- Author: OpenAI, Codex GPT-6; no narrower deployed variant is exposed. Persona: senior release engineer. Strict self-review persona: release-evidence reviewer. Skills: task-standards, project-orientation, github-flow, sanad-provenance, strict-reviewer and muhasabah-gate. This ledger input uses supplied records and read-only Git inspection; it grants no independent train approval. Record paths below are relative to `.overnight/IN/`. FORM-S2-T30 supplies form only. No ledger command, test, campaign, fetch, network call or Git write ran in this preparation session.
+
+#### The train's part
+
+- Decision 0032 items 1 to 3 governs this one-slice train over main `81e62db`. Order: S2-T29, S2-T10 part A, S2-T33, S2-T32 part T. S2-T29's approved head is `177a85b`; its final confirmation by Google Gemini 3.1 Pro through Droid is APPROVED on that head, no findings, with two planted mutants red then restored (S2-T29/log.lines.md, conffix13 result). S2-T10 part A is APPROVED by Z.ai GLM-5.3 through Droid on `c9d0cc6`, with records observations retained below (S2-T10A/review.S2-T10a.rev.md). S2-T33 is APPROVED by OpenAI Codex, launch label GPT-6 Astra, on `999c176`, no findings, after the Moonshot Kimi build (S2-T33/review.S2-T33.review.md and log.lines.md). S2-T32 part T is APPROVED by Z.ai GLM-5.3 through Droid on `e9db07b`, no findings, after the OpenAI GPT-6.1 Sol build (S2-T32T/review.S2-T32T.rev.md). Each task's builder and reviewer are different makers. The round-two joined-head confirmation is APPROVED as recorded below; hosted checks and the fresh ledger run remain pending.
+
+- Dependency check against TASKS.md and main's Git history: S2-T29 names S2-T01, S2-T14, S2-T19, S2-T21, S2-T25, S2-T27 and S2-T28. S2-T01 is recorded merged in pull request 36; S2-T21 part A in pull request 60. Main contains train 1 in `d66d742` (pull request 82), whose subject and retained task records hold S2-T14, S2-T19, S2-T25, S2-T27 and S2-T28. Some TASKS Delivery lines still say in review in pull request 82; merged code is not proof that their live-dependent criteria are complete. S2-T21 part B remains owed and does not supply a claimed result here. S2-T33's S2-T23 dependency is in that same merged train 1. S2-T32 has no entry yet; its module-group ownership comes from S2-T32T/lead-ruling-task-entry.md. Its final entry has Depends: decision 0052; part T none; each survivor part, the merged task that owns its modules (extra dependency answer, item b; LEAD-ANSWERS.md answer 4).
+
+- S2-T10's Depends line says every other task of slice S2; document 14 section “slice S2 — Public pack, frame, spine, places and investment sources” says T10 runs last. Main contains part b in train S2f (`a3e1254`, pull request 81), but T08 part B, T09 and the final S2 closures are not established merged by these records. Part A rides the train under decision 0032: its dependencies are the merged tasks whose proposed items it closes; the whole-task Depends line governs the closure of S2-T10, which stays open. No full-task completion or gate readiness is inferred from the part A review.
+
+- Joiner: the lead, Anthropic Claude Opus 5.5, assembled train S2-3 with trainproof.sh: join records ab6d6fc; replays S2-T10 part A 2bde22a and 7954193, S2-T33 9511db4, S2-T32 part T 55ee3c3. File lists equal; forced differences are PROGRESS.md unions (0 lines lost) and one docs/README.md paragraph (LEAD-ANSWERS.md answer 5; forced/TRAIN-PROOF.txt). S2-T29 remains reachable unchanged through merge `0e7c43e`, parents `177a85b` and `81e62db`; records commits `3fb38ec` and `ab6d6fc` follow it. The earlier internal main join was built by OpenAI GPT-6.1 Sol and committed by the lead as `82b3575`, followed by `6aa8a39`; its task confirmations are recorded below. Do not confuse that earlier join with the final train join (S2-T29/commits.md, log.lines.md; forced/JOIN-PROOF.txt).
+
+- Final S2-T29 join, forced difference: PROGRESS.md combines both histories; its single conflict is resolved by retaining both sides' records (forced/JOIN-PROOF.txt).
+- Final S2-T29 join, forced difference: scripts/mutation_explained.toml combines both explanation sets: 905 and 953 entries, 834 shared identical entries, resulting in 1,024 unique pairs; no earlier row is discarded (forced/JOIN-PROOF.txt and first train confirmation).
+- Final S2-T29 join, automatic composition: OPEN_ITEMS.md retains both item groups, with no unique line from either side absent (forced/JOIN-PROOF.txt).
+- Final S2-T29 join, automatic composition: TASKS.md combines task statuses; the proof reports two lines of the task side and one of main absent, while the result equals the ordinary textual three-way merge (forced/JOIN-PROOF.txt).
+- Final S2-T29 join, automatic code composition: fetch/build.py retains S2-T30 investment routing together with S2-T29 page/awards dispatch; the proof reports one task-side and two main-side lines absent and zero difference from the ordinary textual merge. fetch/build.py: automatic textual merge, 0 conflict regions, 0 lines different from git's merge (forced/JOIN-PROOF.txt); joinconf2 item 2 covers it. Under decision 0032 it is not a forced difference; no further confirmation is needed (LEAD-ANSWERS.md answer 6).
+- Final S2-T29 join, automatic composition: document 03 retains both contract additions, with no unique line lost (forced/JOIN-PROOF.txt).
+- Final S2-T29 join, automatic composition: document 04 combines both source-contract additions; two unique main lines are replaced, with zero difference from the ordinary textual merge (forced/JOIN-PROOF.txt).
+- Final S2-T29 join, automatic composition: document 12 retains both test-contract additions, with no unique line lost (forced/JOIN-PROOF.txt).
+- S2-T10 replay, forced difference: PROGRESS.md is appended to the new train context; zero original nonempty added lines are missing and zero new nonempty added lines replace them (forced/TRAIN-PROOF.txt).
+- S2-T10 replay, forced difference: docs/README.md keeps main's accepted-decisions list and part A's decision-0027 sentence, replacing one added line with the combined one; other source and test changes match (forced/TRAIN-PROOF.txt and the first train confirmation).
+- S2-T10 formatter replay: `c9d0cc6` to `7954193` has the same one-file change (forced/TRAIN-PROOF.txt).
+- S2-T33 replay, forced difference: PROGRESS.md appends in the new context; no original nonempty added line is lost and no extra nonempty added line appears; all other file changes match (forced/TRAIN-PROOF.txt).
+- S2-T32 part T replay, forced difference: PROGRESS.md appends in the new context; no original nonempty added line is lost and no extra nonempty added line appears; all other file changes match (forced/TRAIN-PROOF.txt).
+
+- First S2-T29-only join confirmation: Moonshot AI Kimi K3.1 Pro through Droid, REJECTED on `3fb38ec`; F1: claimed fix-10 approvals were missing from PROGRESS and TASKS; F2: the review session prohibited the required shell checks. `ab6d6fc` adds the two attributable approvals and aligns TASKS. This repairs F1's records; it is not itself a fresh join approval (forced/S2-T29.joinconf.stdout; S2-T29/log.lines.md).
+- First train join confirmation: OpenAI Codex GPT-6, REJECTED on `55ee3c3`; F1: joinproof.sh used Git's object-writing merge-tree option. The reviewer verified the exact commit set, replay proof, explanation union and records consistency, but could not execute that join proof. The supplied replacement uses existing blobs and temporary textual merges, not object writes; it still creates temporary copies and must be run only under the lead's authorized path rules. No replacement proof was executed by this drafter (forced/VERDICT.TRAIN-S2-3.joinconf.r1.md and forced/joinproof.sh).
+- That first train reviewer records replay proof exit 0 and exact output parity, TOML parse exit 0 with 1,024 unique pairs; docs exit 0 (1,004 text and 107 Markdown files), tree exit 0 (eight rules), agent-file parity and diff-check exit 0. No conflict-marker matches. Those are the reviewer's supplied checks, not lead ledger evidence or this drafter's execution (forced/VERDICT.TRAIN-S2-3.joinconf.r1.md).
+
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/86: the ledger script runs the whole test with a fresh seed at the exact head when the lead runs it; the hosted checks follow the push. No hosted result or fresh ledger result is recorded here. The supplied round-two join confirmation is APPROVED on 55ee3c3, findings none: lead launch attribution OpenAI GPT-6 Astra through Codex (LEAD-ANSWERS.md answer 6); the verdict self-identifies as “OpenAI GPT-6, Codex” (extra/verdict.TRAIN-S2-3.joinconf2.md). Its item 2 covers the six clean textual merges through recorded evidence and independent in-memory PROGRESS preservation, with the temporary-file portion not executed. Its actual checks and scope remain those of the verdict; it claims no whole-suite result. The first rejection remains above. A historical head run does not replace the pending hosted checks or fresh ledger run.
+- Lead whole test on train head `55ee3c3`, seed 1077116903: python-guards 887, python-core 739, python-custodian 7,189, python-product 786, web-checks 861, web-unit 1; total 10,463 passed, zero failed, zero skipped, six suites, exit 0, wall 2,039 s. The launch record gives cores 0 to 7 and moved temporary storage. Environment: cores 0-7 of the build machine (Linux, WSL2). custodian suite duration not printed by this run; PO-S2-84 stays open (LEAD-ANSWERS.md answers 7 and 8; extra/lead-test.TRAIN-S2-3.txt). This is the train-head run only (forced/TRAIN-S2-3.wholetest.txt; S2-T10A/log.lines.md).
+- Decision 0055 is Accepted 2026-11-18 15:44, in its own pull request and not in this tree, and defers campaigns, kill passes and survivor-fix work until after go live (extra/decision-0055.md; LEAD-ANSWERS.md answer 9). The underlying owner ruling in S2-T29/rulings.rows.md agrees: ordinary tests and independent reviews still finish; no slice gate waits for campaign closure. The supplied decision text is read-only context; it is cited as plain text without a link. No partial campaign is represented as a closed one.
+
+#### S2-T29 — The public sources outside every registry
+
+- Sources for this section: S2-T29/commits.md, rulings.rows.md, log.lines.md and the named review files; document 04 “S2-T29 offline implementation and lead evidence holds”; TASKS.md S2-T29. Builder persona: principal public-data/platform security engineer; strict reviewer persona: independent provenance and transport-security reviewer. The OpenAI GPT-6 Astra plan was revised against the actual trade/archive inputs after the lead corrected an incomplete dependency pack. Initial build was blocked by missing worktree metadata, environment and partition code; that is a lead setup failure, not delivered implementation.
+
+- Approved task-lineage commits are listed below in order. Each maps to itself on this train: the final join preserves ancestry rather than replaying S2-T29. Earlier dependency commits in commits.md are not new S2-T29 work; the first train confirmation checks the complete reachable set. Original worker kill-pass commits and their stacked equivalents are stated in the kill-pass bullets.
+- Approved `8e93998` → train `8e93998`: feat(publicdata): the S2-T29 page sources, certificate pins, awards intake and accident year span, held offline (S2-T29).
+- Approved `83c246e` → train `83c246e`: fix(publicdata): S2-T29 fix pass 1: held-row skip order, school-only browser agent, proof security refusals, blank registration, staged publication and joined-command tests.
+- Approved `659bb93` → train `659bb93`: fix(publicdata): S2-T29 fix pass 2: redirect pin refusals kept, mid-body read failures counted, staging guards planted.
+- Approved `d80f4e4` → train `d80f4e4`: feat(publicdata): the eight S2-T29 sources read their evidenced live shapes (S2-T29).
+- Approved `76d64cd` → train `76d64cd`: fix(publicdata): retire the two supplier hosts, close the school envelopes and refuse unscoped page pin hosts (S2-T29 fix 6).
+- Approved `78c259e` → train `78c259e`: fix(custodian): the tender adapter forwards its checked chain hash through a scoped bridge (S2-T29 fix 7).
+- Approved `7f91a90` → train `7f91a90`: test(publicdata): the legacy-chain source guard refuses expansion, tender-chain and wrapper routes (S2-T29 fix pass 8).
+- Approved `da9112c` → train `da9112c`: test(custodian): exact rule sets for every caller-guard plant and the scoped parameter exemption (S2-T29 fix 9).
+- Approved `9f34a1d` → train `9f34a1d`: fix(custodian): confine page pins to their hosts and refuse partial-chain trust (S2-T29 fix 10).
+- Approved `82b3575` → train `82b3575`: chore(merge): take main d66d742 (train 1 of slice S2) into S2-T29.
+- Approved `6aa8a39` → train `6aa8a39`: chore(merge): take main a5219f5 (decision 0054) into S2-T29.
+- Approved `59d5211` → train `59d5211`: test(custodian): anchor the S2-T29 source guards on the repository root and refuse a vacuous scan (S2-T29, fix pass 11).
+- Approved `1b74d4b` → train `1b74d4b`: test(publicdata): kill or explain the page acquisition and page HTML survivors (S2-T29 kill pass 1).
+- Approved `f2a53f8` → train `f2a53f8`: test(publicdata): isolate the default trust store and pin the retry count and backoff in the page-acquisition kill tests (S2-T29 kill1fix, krev1c F1 and F2).
+- Approved `405fddf` → train `405fddf`: test(publicdata): read the page-acquisition records as UTF-8 in the kill tests (S2-T29, checklist C5).
+- Approved `87aaa2d` → train `87aaa2d`: test(publicdata): kill or explain the award and award-check survivors of campaign 2 (S2-T29, kill pass 2c).
+- Approved `875f500` → train `875f500`: test(publicdata): keep the real pin loader and invented trust in the awards pin-selection kill tests (S2-T29 kill2fix, krev2c F1).
+- Approved `03a063e` → train `03a063e`: test(publicdata): read the awards intake manifests as UTF-8 in the kill tests (S2-T29, checklist C5).
+- Approved `8392911` → train `8392911`: test(publicdata): kill the pin, page-record and page-request survivors of campaign 2 (S2-T29).
+- Approved `3aa09d3` → train `3aa09d3`: test(publicdata): the pin tests load the real pin configuration and trust only invented roots (S2-T29, kill pass 3 fix).
+- Approved `43224ee` → train `43224ee`: test(publicdata): kill or explain the schema, shape, workbook and partition survivors of campaign 2 (S2-T29, kill pass 4c).
+- Approved `74f09ec` → train `74f09ec`: fix(publicdata): a later first quarter must follow the fourth quarter in a quarterly workbook (S2-T29 fix 12, D241).
+- Approved `7a0d22d` → train `7a0d22d`: test(publicdata): correct two stale explanation headers and pin two refusal messages (S2-T29 kill pass 4 review).
+- Approved `177a85b` → train `177a85b`: test(custodian): real refusal paths, literal expectations and exact frames in the S2-T29 kill tests (S2-T29 fix 13).
+
+- Plan design review, Moonshot AI Kimi K3.1 Pro through Droid: REJECTED plan revision 2; F1 command join omitted, F2 lifted GIS flags would leave invalid rows, F3 capture lacked verified pin/redirect evidence, F4 registry check-rate location and short sample unspecified. OpenAI GPT-6 Astra revised the plan; the same reviewer REJECTED revision 3, prior four fixed, new F5 day-first dates, F6 exact sample size above thirty, F7 rate numerator/denominator. The lead ruled those three contracts explicitly before building. These are plan verdicts, not commit verdicts (review.S2-T29.design.md, designconf.md; rulings.rows.md).
+- Build 4, OpenAI GPT-6 Astra: offline page/award/pin/partition mechanisms at `d73b4a5`, recreated tree-identically as `8e93998`; live values remain typed holds. Lead lint, format, mypy and docs exited 0. Lead ck1: 5,173 custodian tests passed, exit 0, 782 s; direct pytest exceeding the bounded runner's custodian limit is not proof of a passing whole test (log.lines.md).
+- Lens A, Google Gemini 4 Carbon through the relay: REJECTED `8e93998`; F1 held-row skip order, F2 swallowed proof security refusals, F3 blank-registration and ambiguous-match coverage, F4 grid plants stopped at the wrong hash check, F5 missing period/null/date/conflict plants; POI-1 raises punctuation/whitespace normalization. Lens B, Moonshot AI Kimi K3.1 Pro through Devin: REJECTED the same head; held-row dispatch, browser-agent scope, real command integration and missing stale/secret/interruption plants. The lenses differ on whether the original grid expectations were weakened; the lead accepted lens A's resealing correction, and both later accepted the corrected plants (lensA.md, lensB.md and log.lines.md).
+- Fix 1, OpenAI GPT-6 Astra, `83c246e`: skip before dispatch; school-only browser agent; closed security refusals; blank-registration refusal; resealed grid plants; retained parsed cells and dated award rows; staged source publication and real command closure tests. Builder focused 174 and custodian 5,239 passed, checks exit 0. Lens A confirmation through Google Gemini 3.1 Pro on Droid APPROVED, no findings, after two relay rate-limit failures; lens B Moonshot Kimi REJECTED the same head: redirect PinError became unreachable, mid-body read errors escaped, and nested-symlink/final-rename guards lacked plants. The lead retained the rejection; the thin lens A approval did not close the pass (fcA.try3.md, fcB.r1.md; log.lines.md).
+- Fix 2, OpenAI GPT-6 Astra, `659bb93`: preserve redirect PinError; turn TransportReadError into the closed unreachable result; plant nested links and rollback failure. This intentionally changes older sources' mid-body failures from an escaping exception to retry and recorded failure. Both Google Gemini 3.1 Pro and Moonshot Kimi APPROVED, no findings. The Google return incorrectly self-identifies another maker/model; the lead ruled launcher identity authoritative. Lead ck3: seed 2849991454, custodian 5,248 passed, exit 0, 682 s; static checks exit 0. Lead breaks: removed symlink guard one failed, removed rollback one failed, old transport seven failed; restored nine passed, worktree clean (fc2A.md, fc2B.md; log.lines.md).
+- Live-shape replan: the original one-table parser did not fit the evidenced workbook, embedded JSON, blocks and GIS shapes. OpenAI GPT-6 Astra wrote revision 4 on `659bb93`; Google Gemini 3.1 Pro REJECTED the plan for supplier/token scope, modal binding, school order, source layouts and the proposed undated as-of state. The lead narrowed the supplier row to refusal only and retained mandatory retrieval-date as-of; publisher date is provenance, row periods may be null. Third-maker Moonshot Kimi returned READING HOLDS on that as-of reading; no material amendment is claimed (dr4.md, o8check.md; rulings.rows.md).
+- Build 5, OpenAI GPT-6.1 Sol, `d80f4e4`: six closed parser/acquisition modules, evidence-specific declarations, no supplier endpoint/token path, seventeen-field school projection, deterministic paging and award proof shapes. Builder custodian/core 6,201 passed, static checks exit 0. Lead ck5 failed because its worktree lacked dependencies; equipped ck6 still failed the known pin-heading test and measured custodian 5,462 passed in 691.7 s and 673.4 s on the old base. These are retained failures. Google Gemini 3.1 Pro lens P APPROVED; Moonshot Kimi lens T REJECTED: unnecessary supplier hosts, open top-level school envelope and unscoped pinned-host transport (r5P.md, r5T.md; log.lines.md).
+- Fix 6, OpenAI GPT-6.1 Sol, `76d64cd`: remove both supplier hosts from allow-list and active pins, exempt refusal metadata only, close school count/query envelopes, refuse unscoped pinned hosts before sends. Lead three-file check 130 passed. The builder disclosed that the existing tender adapter was consequently refused. The lead ruled an exact-host/context legacy-chain bridge, retaining closed redirects; this is an explicit compatibility change (log.lines.md; rulings.rows.md).
+- Fix 7, OpenAI GPT-6.1 Sol, `78c259e`: checked tender-chain wrapper, context reset, only the tender source may supply the legacy hash. Google Gemini 3.1 Pro lens P spot check APPROVED, no findings. A mislaunched Moonshot Kimi review read the spot brief and approved that narrower work; it is not lens T confirmation. Relaunched Moonshot Kimi lens T REJECTED: keyword expansion and direct tender context/wrapper access bypassed the AST guard (sp7P.md, cf7T2.md; log.lines.md).
+- Fix 8, OpenAI GPT-6.1 Sol, `7f91a90`: cover keyword/string, expansion, context and wrapper routes with plants; no current-source hit. Moonshot Kimi REJECTED: import binding overwritten by later aliases, transport-parameter exemption too broad, and mixed plants checked only filename. Dynamic import, runtime lookup, assignment alias and generated source are review limits, not covered static forms (cf8T.md; log.lines.md).
+- Fix 9, OpenAI GPT-6.1 Sol, `da9112c`: retain all possible import bindings, exempt only the true parameter node, assert exact rule sets and independent plants, document four static limits. Moonshot Kimi APPROVED, no findings; Google lens P's prior production-surface approval stands by the lead's unchanged-production comparison (cf9T.md; log.lines.md).
+- Pin-security review, Anthropic Claude Fable 5.2, REJECTED `da9112c`: F1 stream/attempt pinned-host bypass, F2 tender partial-chain trust, F3 unconstrained pin-host loading, F4 missing per-hop/capture/intake/terms/verification plants. Fix 10 by OpenAI GPT-6.1 Sol, `9f34a1d`, adds forty red/green plants and the refusals. Lead 677 selected tests passed, seed 48120; scripts ran 878 with one pin-heading failure. The lead then merged main through OpenAI GPT-6.1 Sol's resolution, commits `82b3575` and `6aa8a39` (rulings.rows.md; log.lines.md).
+- Earlier internal join limits: forced/S2-T29.join.return.md reports no novel executable/test line, but combined validated-clock/build dispatch, registry kinds/C safe loader and registry tests. Custodian/core 6,892 passed, seed 2910011, exit 0; scripts discovery failed seven offline PyYAML-install checks, and diff-check exited 2 on inherited trailing whitespace. Those failures remain historical. Lead equipped ck7 on `6aa8a39`, seed 3117004, resolves the environment check evidence: custodian/core 6,892 passed in 267 s, scripts 878 OK, lint/format/mypy/lock/docs/tree/parity all exit 0; 401 typed files and 680 formatted files (forced/S2-T29.join.return.md; log.lines.md).
+- Final S2-T29-only pre-check: the lead launched seed 1169401841 on `3fb38ec`, then committed `ab6d6fc` in the same worktree while it ran. The lead explicitly downgraded the run to a pre-check. No final counts or exit are supplied; it is not ledger evidence (S2-T29/log.lines.md final join result).
+- Fix-10 confirmations: Moonshot AI Kimi K3.1 Pro lens T APPROVED `6aa8a39`, no findings, static only. Anthropic Claude Fable 5.2 pinsec2 APPROVED `6aa8a39`, no findings, four transport files 236 passed; conditions a to h remain, a amended, and condition i requires tender PEM inspection before its digest is filled. PROGRESS's dated correction added by `ab6d6fc` supplies these approvals. Active pin-record security_review fields remain PENDING, and icv.qa remains retired; code-contract approval is not live pin acceptance (cf10T.md; log.lines.md; PROGRESS.md “Correction: the two confirmations of fix pass 10”). The full extra/verdict.S2-T29.pinsec.md and extra/verdict.S2-T29.pinsec2.md are supplied and read: Anthropic Claude Fable 5.2, REJECTED da9112cb92db1c69a934f7708e6d12950304b855 and APPROVED 6aa8a39265b40f610e65f98831895a0a30d34506 respectively. Initial selected tests: exit 0, 196 passed in 50.19s; confirmation: exit 0, 236 passed in 46.76s. These are reviewer executions, not this preparation session. Conditions b/c/d/e/f/g/h remain; a requires unchanged or re-confirmed modules and the other independent confirmation; record 2 also requires condition i. Notes N12 to N16 remain bounded observations, enumerated in OI-278.
+- Fix 11, Moonshot AI Kimi K3.1 Pro, `59d5211`: campaign baseline exposed a vacuous working-folder-relative source scan. Paths now anchor on repository_root and missing/empty scans fail, with four plants. Builder custodian-folder run 6,157 passed and root custodian/core 6,896 passed; lead fix6 file 84 passed, guard-removal four red then restored. OpenAI Codex, launch label GPT-6 Astra, APPROVED `59d5211`, no findings, static only (rev11.md; log.lines.md).
+
+#### S2-T29 campaigns and ordinary test repairs
+
+- Campaign 1, lead, `6aa8a39`: exit 1 at clean baseline before any mutant, 299 s, source-path defect subsequently fixed in pass 11. No mutant result is inferred (log.lines.md).
+- Campaign 2, lead, `59d5211`: exit 1, 3,900 s. In the following records the order is made/killed/survived unless explicitly stated; not-covered and timeout counts are separate. award_checks 407/321/86; awards 965/636/329; certificate_pins 356/293/63; page_acquire 1,366/958/406 with two timeouts; page_html 197/132/58 with seven not covered; page_records 991/692/299; page_requests 188/44/144; page_schema 706/522/184; page_shapes 1,227/984/243; page_workbook 349/226/123; partitions 351/288/18 with forty-five not covered. The log records 2,005 disposition records, 1,953 survived and fifty-two not covered. page_archive made zero: mutmut does not mutate its decorated contextmanager function. identities not retained; replay debt kept for the post-go-live handoff under decision 0055 (log.lines.md).
+- page_archive's tool limit is covered by ordinary tests, not a mutation score: test_interrupted_publication_has_no_partial and test_existing_proof_integrity_refusal_preserves_archive in test_s2_t29_fix.py; test_nested_source_symlink_refuses and test_final_rename_failure_restores_source in test_s2_t29_fix2.py. Their removals/faults and restored results are the recorded plants3 evidence (fcB.r1.md, fc2B.md; source test names).
+- Kill pass 1: Google Gemini 4 Carbon's relay run ended at the spend cap, no return; one partial HTML test file was unreviewed. OpenAI GPT-6.1 Sol continued as kill1c at `1c91b70`: page_acquire K388 E18, page_html K64 E1, D0; sixty representative red/green groups, custodian/core 7,049 passed in 449.9 s; an earlier shared-core run took 586.5 s. Anthropic Claude Opus 5.5 krev1c REJECTED: ambient trust-store reads and only nonempty retry assertions. OpenAI Sol fixed these at `fde84ac`, lead 118 passed; Google Gemini 3.1 Pro APPROVED, no findings. Lead UTF-8 correction `fbca009`: 118 and 107 passed. Stack mappings: `1c91b70` → `1b74d4b`, `fde84ac` → `f2a53f8`, `fbca009` → `405fddf` (log.lines.md; confkill1fix.md).
+- Kill pass 2: Alibaba Qwen 3.8 Max relay run ended at the spend cap without a change. OpenAI GPT-6.1 Sol kill2c `f51bc1e`: awards K312 E17, award_checks K84 E2, D0, 114 new tests. Moonshot Kimi K3.1 Pro through Devin REJECTED: a stub bypassed real load_pin. OpenAI Sol fix `0474927` restores a forwarding spy and invented trust, lead 120 passed; lead UTF-8 correction `56687a0`, 29 passed. Moonshot Kimi APPROVED both, no findings, with three actual mutant replays red after green controls. Stack mappings: `f51bc1e` → `87aaa2d`, `0474927` → `875f500`, `56687a0` → `03a063e` (log.lines.md).
+- Kill pass 3: Anthropic Claude Opus 5.5, `2ca29f6`: certificate_pins K62 E1, page_records K283 E16, page_requests K143 E1, D0; all 506 records, 175 tests in four files, eighteen explanations; custodian/core 7,071 passed in 349 s. OpenAI GPT-6 Astra krev3 REJECTED: real pin loader replaced by stub, ambient real trust read, incomplete symlink equivalence reason. OpenAI GPT-6.1 Sol fix `4ab2842` restores the loader, isolates trust and completes that reason, 7,074 passed. Google Gemini 3.1 Pro APPROVED `4ab2842`, no findings. Stack mappings: `2ca29f6` → `8392911`, `4ab2842` → `3aa09d3` (krev3.md, conf3fix.md; log.lines.md).
+- Kill-pass-3 campaign run 1 at `2ca29f6`: exit 1 at baseline after 42 s, SnapshotError snapshot_write_failed with hidden OSError; same first 203 tests passed outside the runner. The lead records a possible storage-exhaustion overlap, not a proved errno. Run 2: exit 0, 1,261 s; certificate_pins 356/355/1, page_records 991/975/16, page_requests 188/187/1; eighteen survivors explained. The random baseline failure remains open, and the later changed tests need later campaign evidence (log.lines.md).
+- Kill pass 4: Z.ai GLM-5.3's first relay turn stopped at a plan, no implementation return; continuation hit the spend cap with four unreviewed test files. OpenAI GPT-6.1 Sol kill4c `80e95b8`: schema K175 E9, shapes K227 E15 D1, workbook K84 E39, partitions K63 E0. D241 is a real quarterly sequence defect: a later Q1 could follow an earlier Q1 instead of Q4. OpenAI Sol fix 12 `de70c0c` repairs it with plants; lead 87 passed. Stack mappings: `80e95b8` → `43224ee`, `de70c0c` → `74f09ec` (log.lines.md).
+- Anthropic Claude Opus 5.5 krev4c REJECTED `de70c0c`: two stale explanation headers, two broad ValueError expectations, one workspace-file comment. Its exhaustive sequence check records 1,118,480 cases, zero mismatches, seventy-five mismatches without the guard, and twelve claimed kills replayed red. Lead repair `33bb842`, stacked as `7a0d22d`, changes headers, exact messages and comment; 171 passed, lint/format/mypy/docs exit 0 (log.lines.md).
+- OpenAI GPT-6 Astra confkrev4 REJECTED `7a0d22d`: prior header/message/comment and UTF-8 fixes pass, but six checklist findings remain: two bypassed loaders, production-derived expectations, weak retry/nonempty rows, non-null pin-map expectation. OpenAI GPT-6.1 Sol fix 13 `177a85b` repairs those and sibling cases in five files; lead 380 passed across eleven files and a BACKOFF mutation red then restored; static checks exit 0. Google Gemini 3.1 Pro conffix13 APPROVED `177a85b`, no findings, two plants red/restored; this is the final approved task head (confkrev4.md; log.lines.md). Full supplied returns are extra/verdict.S2-T29.krev1c.md, krev2c.md, conf2fix.md, krev4c.md and conffix13.md (each with the verdict.S2-T29 prefix). Their exact attribution and absent fields are recorded below; no omitted field is invented.
+- Campaign 3 at `74f09ec` was superseded by fix 13; partial meta and output retained. Campaign 4 at `177a85b` ended on the owner's explicit deferral: killed 6,419, raw survived 118 before explanations, timed out three, not run 571; no closed campaign result. Post-go-live handoff keeps the partial identities and any untested changed modules. These counts are not a passing mutation result (log.lines.md; owner deferral in rulings.rows.md).
+
+#### S2-T29 acceptance and limits
+
+- Criterion 1, registry/terms/receipts/hosts: PART MET. Rows and planted missing-basis/off-host/receipt guards exist; supplier remains refusal only and normal-seam live receipts are not established. Criterion 2, dated archive snapshots and tamper/overwrite/as-of guards: PART MET offline; live snapshots and QNCC safe schema remain held. The brief does not authorize a claim that live fetches succeeded.
+- Criterion 3, closed cadences: MET as implementation; daily event pages, weekly supplier credentials, fitting closed/none schedules, unknown cadence refusal (cadence.py, test_public_cadence.py; r5P and cf10T). Criterion 4, verifying TLS and reviewed pins: PART MET; code contract and plants approved, live DER intake and pin-record acceptance remain pending. Criterion 5, WorldPop through existing row/reader: PART MET; no duplicate reader, but document 04 still explicitly holds live confirmation.
+- Criterion 6, GIS direct-URL flags only: MET as configuration; reviewed URLs replace direct_url_unconfirmed with schema_unconfirmed, no schema/view/export activation (r5P, sp7P; document 04). Criterion 7, Public splits and whole cells only: MET as offline invariant; no protected joins, segmentation or apportionment introduced (lensB C3; document 04; grid plants). Criterion 8, helper counts/bounds remain leads: MET; missing bounds stay typed holds, no number filled from helper evidence. Criterion 9, false commit flags, uncommitted fetched values and invented offline tests: MET as implementation/test scope; no live-cache values committed or read by this draft. Criterion 10, unsupported completeness/capacity/supplier-gap claims refused: MET as closed claim guards; N4/N6 and OI-137/OI-138 remain open (test_s2_t29_pages.py; r5P; document 04).
+- Amendment criterion 1, accident activation with accepted spans: NOT MET live; bounded reader and plants exist, but spans are held for S2-T08 part B. Criterion 2, Monaqasat missing-intermediate path and first fetched count: PART MET; verifying pin contract exists, first live count not supplied. Criterion 3, school browser/capture/reset sequence: PART MET; dated failure/field guards exist, version-2 path has no capture intake and no live successful sequence is claimed. Criterion 4, awards intake/profile/hash/date/count/range/blank contract: PART MET; implemented on invented workbook fixtures, live profile/hash/mapping/seed pending. Criterion 5, thirty-link re-fetch and registry match rate: PART MET; deterministic sample, denominator and mismatch/incomplete plants exist, no live sample supplied. Criterion 6, register match by registration plus independent exact normalized name: PART MET; deterministic report and unmatched reasons tested, first live report remains S2-T08 part B. Criterion 7, weekly award_reports assigned only here: MET as closed cadence. Criterion 8, awarded values only, no turnover/sales or committed workbook value, invented tests: MET as claim/test boundary. S2-T29 stays in progress: primary criteria 1, 2, 4 and 5 and amendment criteria 1 to 6 remain open.
+- Limits retained: source bounds and acquisition maxima; QNCC nested schema and token-safe input; awards profile and thirty-link check; accident spans; WorldPop confirmation; school access and unread terms; active DER intake, root, issuer, validity and live TLS; tender same-host redirect refusal; dynamic AST routes requiring review; manual capture attestations and the unreachable legacy capture seam. Reviewed fixtures establish interfaces, not live handshakes or source completeness (document 04; cf8T, cf10T; PROGRESS fix-10 notes).
+- Open-item dispositions (compared with OPEN_ITEMS.md at 55ee3c3):
+  - Retain OI-273: icv.qa stays PENDING permanently in version 1; OI-274: tender condition i before digest intake.
+  - Retain OI-275: live awards profile and accident spans; OI-276: GIS terms legal disposition at go live; OI-277: count double-space-only unmatched names at first live match.
+  - Carry the remaining live evidence, pin-security conditions and notes N1/N2/N4/N6 to N9 and N12 to N16 into OI-278 and the existing unnumbered S2-T29 build-hold records; do not equate contract approval to per-record security approval.
+  - Preserve the kill3 baseline random failure as OI-279 and missing campaign-2 timeout identities in OI-280 for the post-go-live handoff; page_archive's zero-mutant limit names its ordinary plants above.
+  - Retain failed unequipped/check-heading/whitespace runs and the dated approval correction; fresh train evidence does not rewrite them.
+
+#### S2-T10 part A — Review follow-up
+
+- Approved `d618d77` → train `2bde22a`: record and small-fix closures. Approved `c9d0cc6` → train `7954193`: formatter-only lifecycle-test correction. Builder OpenAI GPT-6 Astra through Codex; lead commits and formatting attributed to Anthropic Claude Opus 5.5 by the commit records. Builder persona: senior release engineer for public-data pipelines and test infrastructure; strict reviewer persona: independent review-infrastructure and provenance reviewer. Plan: Z.ai GLM-5.3 through Droid, 68 proposed items; accepted by the lead with parts A to D (extra/plan.S2-T10.return.md; LEAD-ANSWERS.md answer 12). No design review: routine, not Deep. The planner and reviewer share a maker; the builder is OpenAI GPT-6 Astra through Codex, another maker as rule 35 requires. extra/verdict.S2-T10.plan.md repeats the planning return, not a separate design approval.
+- Built strict alias CSV header/width validation on both paths; caller-supplied PYTEST_ADDOPTS refusal and private PID namespace for mutation subprocesses without fallback; retired GraphRefused; cached-release graph persistence coverage; quiet triage fixture output; cleanup after owner process-group termination and bounded whole-response waits; restored web-checks limit to 1,800 s everywhere. Record closures preserve prior items, assign later display/manifest work and move real-deployment hardening to document 17. No campaign ran in part A (build.return.md and reviewer C1 to C5).
+- Builder-proposed closure inventory, each checked in the GLM review: PO-S2-01/02/03/05/07/08/09/10/12/13/16/17/19/20/28/30/31/34/37/40/42/46/47/57/67 are record, policy, assignment or documentation dispositions; PO-S2-06/39/49/50/53/54/55/58/65 and OI-220/221/222 move to DHA-134 through DHA-145 as their individual rows state; PO-S2-24/32/41/61/62 are tested fixes, PO-S2-64 coverage only; OI-168 PID isolation, OI-223 rounding contract, OI-229 historical exit/namespace evidence. Assignment or hardening disposition is not implementation of the future check. Reviewer accepts the body of these rows, not completion of every slice item (build.return.md; review.S2-T10a.rev.md closure table).
+- Planted evidence: malformed alias structures, missing namespace launcher and omitted isolation, supplied pytest options, external SIGKILL cleanup, unfinished response, leaked triage stdout and retired export fail before correction and pass after. PO-S2-34 takes the item's allowed documentation alternative, and PO-S2-64 adds coverage of an already working path; neither invents a red production baseline. Initial import, lint, reference and fixture errors remain recorded (build.return.md).
+- Builder checks in the unequipped workspace: seed 2026111743, whole test exit 1, runner 5,189 passed, ninety-one failed, zero skipped; embedded guard output 844 passed, fifty-one failed, sixteen errors differs from runner guard 840/45. Core 606, custodian 2,229, product 786 passed; web-checks 728 passed and forty-six failed, web-unit could not start. Focused 209 passed and sixty-four subtests passed; lifecycle four passed. Scripts discovery is reported as 870 tests, thirty-nine failures and five errors by the review's historical observation. These inconsistent summaries are retained as reported; The supplied extra/lead-checks.S2-T10a.ck1.txt is empty; it holds no command, exit, count, head or original runner output. The contradictory historical summaries remain unreconciled (build.return.md; review findings).
+- Lead-equipped checks: extra/lead-checks.S2-T10a.local.txt contains exactly “RESULT: PASSED”; it holds no command, numeric exit, count or head. extra/lead-checks.S2-T10a.ck1.txt and extra/lead-checks.S2-T10a.web.err.txt are empty, so neither supplies a command, exit, count or head. The supplied review attributes local suites 2229/606/786 passed, scripts discovery 879 OK, and ruff/mypy/docs/tree/version/reference/lock/cmp exit 0 to d618d77 local and c9d0cc6 web; its observations specifically name `npm run test:checks` and `npm run test:spike:performance`, exit 0, with no web counts. S2-T10A/lead-local-checks.status reads exactly `local_checks exit 0 2026-11-17 15:16:16 commit d618d7757f208a195d348bde971564eb8cac1d26`. These are review/status attributions, not figures printed by the extra check files and not checks executed here. PO-S2-88 preserves the record gap; PO-S2-22 retains the integrated-proof record point without duplicate allocation.
+- Z.ai GLM-5.3 through Droid APPROVED `c9d0cc6`, static review, every closure row checked. Four records findings: cosmetic pin-note spaces; committed/equipped evidence missing from the historical uncommitted/unequipped rows; PO-S2-22 can close on the equipped web run; PO-S2-11/59/63/66 require explicit stale-plan/guard-conflict dispositions, not speculative edits. The later launch log says “no findings”; Correction: APPROVED with no blocking code findings; all four records observations are retained (LEAD-ANSWERS.md answer 12; extra/verdict.S2-T10a.rev.md) (review.S2-T10a.rev.md; log.lines.md).
+- Train ledger at `55ee3c3` (exit 1, nothing written): the runner tests `scripts/tests/mutation_runner.py` failed, 8 failed and 6 passed. Cause: part A's private process namespace (`2bde22a`, OI-168) bound the host device folder, which refuses device reads inside the new namespace, and the project's managed Python, which has no `os.getrandom`, stopped at its first random bytes. The lead's fix `cda6757` (Anthropic Claude Opus 5.5) adds bwrap's own device folder (`--dev /dev`) to the same isolation prefix: red 8 failed at `55ee3c3`, green 14 passed and 4 subtests passed, unittest 12 tests OK. Part A's own reviewer, Z.ai GLM-5.3 through Droid, a maker other than the builder and the fixer, confirmed it APPROVED at `cda6757`: red reproduced with the old prefix, the namespace probe and its plants unchanged, one commit touching only `scripts/mutation.py`, its approval of part A holding. The forced code difference is recorded under decision 0032; the finding is OI-281.
+- Acceptance 1, every item closed under REV-42: PART MET; only reviewed part A rows close. Acceptance 2, reviewer checks every closure: PART MET overall, MET for these rows by GLM; remaining closures need their own reviewers. Acceptance 3, no item deferred out of this task: NOT MET overall; B to E ownership remains and C's survivor work is now explicitly post-go-live under decision 0055. Acceptance 4, no slice item open: NOT MET; live/disposition/causal work remains. Acceptance 5, web-checks twice below 1,200 s on four processors: already ticked from part b in merged train S2f, not newly earned by A. Acceptance 6, remove hosted 3,000 s exception: MET by run_tests.py and its two planted runner tests, GLM C4; OI-158 still awaits merged hosted evidence.
+- Remaining owners: part B speed work is already on main; part C PO-S2-68 and survivor work deferred after go live; part D live/watched runs including PO-S2-56; part E PO-S2-23/25/26/29/33/35, purity/getattr conflict PO-S2-59, reachable empty placeholder PO-S2-63, OI-230 confidence rounding. PO-S2-11 and 66 need stale-plan disposition. Lead-only: S2-T04 forced-change confirmation PO-S2-38, gateway startup record PO-S2-43, triage break pass PO-S2-44 and ARC-88/OI-219. OI-227 and OI-228 require cause/replay evidence, never closure on a green rerun (build.return.md).
+- Proposed open items and record points:
+  - PO-S2-88 records the cosmetic pin-note spaces and equipped-evidence gap; this train input changes no pin file and preserves historical failures.
+  - Reuse PO-S2-22 for the reviewer-attributed integrated web/performance result; its detailed execution record is not supplied and no duplicate item is allocated.
+  - Record part E/stale-plan dispositions and lead-only decisions above, with no duplicate column, weakened purity guard or retired reachable state.
+  - Keep OI-158 merged hosted evidence and the final task dependency/gate criteria open.
+
+#### S2-T33 — Comtrade unknown API class refusal
+
+- Approved `999c176` → train `9511db4`. Builder Moonshot AI Kimi K3.1 Pro through Factory Droid, senior Python provenance engineer; reviewer OpenAI Codex, launch label GPT-6 Astra, strict provenance/refusal reviewer. Launch records first proposed OpenAI Sol, then rerouted before the actual build to Moonshot Kimi; the committed PROGRESS evidence confirms Kimi. Scoped-fix plan: the lead’s build brief, supplied as extra/plan.S2-T33.build-brief.md. The lead explicitly classifies this scoped fix as not Deep, so no design review applies (LEAD-ANSWERS.md answer 13). The brief and current TASKS Delivery still say Deep; this ledger preserves that existing Delivery class and records the lead’s planning disposition rather than silently amending it.
+- Built the narrow verify_child refusal when the receipt api_class is non-string or cannot resolve to a data template, before matching fetch_host. The old empty fallback could accept a resealed receipt with no known class and empty host. Two invented parameter cases reseal both children and manifest, each first proving valid assembly, then requiring lineage_missing and no assembly. Existing assembly host checks and other tests stay unchanged (review.S2-T33.review.md; PROGRESS “S2-T33 — Comtrade assembly refuses a receipt without a known API class”).
+- All three TASKS criteria already ticked on this tree: unknown-string resealed plant, non-string plant, unchanged existing Comtrade tests. New file red before fix: two failed, exit 1; after: two passed, exit 0. Focused assemble/comtrade set 159 passed, full custodian/core 6,406 passed in 238.56 s; lint/format/mypy/docs/tree/parity/diff-check exit 0. Reviewer APPROVED `999c176`, no findings, static only. Record counts belong to the builder/lead, not this drafter (review and committed task evidence).
+- Lead whole test run 1 on `999c176`, seed 3959593235: exit 1, 8,930 passed, four clean-environment failures, measured storage exhaustion during offline cache copying. An earlier launch seed 2362758263 was stopped after violating the processor gate; no result. Lead run 2, same head, seed 3684102272, temporary storage moved to the project filesystem: exit 0, 8,934 passed, zero failed, zero skipped, six suites, 1,240.8 s. The earlier failure and launch error remain recorded (S2-T33/log.lines.md).
+- Proposed open items and record points:
+  - Replace stale “independent review and lead commit remain open” status with the supplied approval and commit; do not retick already ticked boxes.
+  - Assembly's changed-module campaign and lane D1 record 252 meaning remain in the post-go-live handoff under decision 0055; no campaign closure is claimed by ordinary tests.
+  - Preserve the storage-exhaustion run and unrelated hidden-OSError incident separately; a later passing run does not close the latter.
+
+#### S2-T32 part T — Mutation timeout identities
+
+- Approved `e9db07b` → train `55ee3c3`. Builder OpenAI GPT-6.1 Sol through Codex; reviewer Z.ai GLM-5.3 through Droid, another maker, APPROVED `e9db07b`, no findings, static only. Persona: senior Python test-runner engineer; strict reviewer persona: independent runner-output and evidence-integrity reviewer. Scoped-fix plan: the lead’s build brief, supplied as extra/plan.S2-T32T.build-brief.md; not Deep, no design review applies (LEAD-ANSWERS.md answer 13). The first-part TASKS entry is drafted separately from the lead's ruling, not falsely reported present (S2-T32T/lead-ruling-task-entry.md; review.S2-T32T.rev.md).
+- run_copy prints one sorted-key JSON line per timed-out mutant in mutant-key order, before the existing module-count line: package-qualified module, timed_out status, exact mutant key, raw exit_code. Existing survivors, counts, status mapping, judge and exit status remain unchanged. The invented fake-meta test covers reverse insertion order with 36 and -24, both timeout-only and unexplained-survivor outcomes; it asserts exact lines and survivor output. This is runner code and ordinary testing, not a deferred campaign (review.S2-T32T.rev.md).
+- Red first: missing timeout lines give two failures, exit 1; corrected test passes, exit 0; dropping a line or altering a key each turns it red. Lead runner tests twelve OK; lint/format/mypy/docs/tree/parity exit 0. Builder broad discovery failed in the unequipped sandbox, 869 tests, absent tooling/packages/extensions and nested sandbox enforcement; the train-head whole test supplies later integrated evidence, without erasing that failure (S2-T32T/log.lines.md and committed PROGRESS part T row).
+- Concurrent-write incident: a governor redirect actually launched a builder, and the lead also launched a second OpenAI Sol run in the same workspace. One returned exit 1, the other exit 0; both described the same three code/test/document changes and red/green evidence. The lead inspected a coherent final diff, replaced two draft evidence rows with one honest row before committing, and ran the checks above. This incident is not a claim of independent confirmation (log.lines.md).
+- Part T's timeout-output criterion is met by the approved change and exact-output plants. Parts D1 (Comtrade assembly), D2 (Gravity/Comtrade fetch/BACI/Atlas), C (transport/listing), B (checks/kinds), R (registry) and A (fetch/build re-cut) are survivor groups from the lead's task-entry ruling; they are deferred until after go live under decision 0055. T is the sole delivered part in this train. A confirmed wrong number/refusal remains an explicit handoff item; no real defect is declared fixed by deferral.
+- Proposed open items and record points:
+  - Insert the final S2-T32 entry after S2-T31, before S2-T08, through the S2-T31 task-scoped replacement in tasks_md.json; part T alone is ticked, exact Depends/Requirements and hard Delivery follow the lead’s answer.
+  - Retain the duplicate-launch cause and the rule to read launch status before relaunching a redirected build.
+  - Historical timeouts printed before this runner change have no recovered identity merely because new runs now print one; preserve missing-identity/replay debt for the post-go-live handoff.
+
+#### Additional supplied verdict provenance
+
+- extra/verdict.S2-T29.krev1c.md: VERDICT: REJECTED; reviewer Anthropic, Claude Opus 5.5 (`claude-opus-5-5`). The return names no reviewed head; S2-T29/log.lines.md attributes it to 1c91b70. Four-file check exit 0, `153 passed in 1.22s`; F1 ambient trust and F2 inexact retries. No campaign ran.
+- extra/verdict.S2-T29.krev2c.md: VERDICT: REJECTED; COMMIT f51bc1e831406801dbc81f8498195c3957d99673; REVIEWER Moonshot AI — Kimi K3.1 Pro High. Four-file check exit 0, `114 passed in 2.04s`; seven sampled replays green then red; F1 loader bypass. Preserve the exact High model qualifier here.
+- extra/verdict.S2-T29.conf2fix.md: APPROVED; F1 fixed; four-file check 120 passed, exit 0; records 266–268 each green before and all three named security tests red after mutation. The file names no maker, model or reviewed head. S2-T29/log.lines.md supplies Moonshot AI Kimi K3.1 Pro High through Devin and the 0474927/56687a0 confirmation mapping; those fields are attributed to that log, not to the verdict text.
+- extra/verdict.S2-T29.krev4c.md: VERDICT: REJECTED; reviewer Anthropic, Claude Opus 5.5. It names fix 12 but no head hash; S2-T29/log.lines.md supplies de70c0c. It records 171 passed, 1118480 sequence cases, 0 mismatches, 75 mismatches with the guard removed, and 12 independent kills; F1 stale headers, F2 broad messages, F3 workspace-local comment. No numeric command exit for the 171 passes is supplied in that verdict.
+- extra/verdict.S2-T29.conffix13.md: VERDICT: APPROVED; two planted mutations red/restored; 380 checks, zero failures. It names no maker, model or head and prints no numeric pytest exit. S2-T29/log.lines.md supplies Google Gemini 3.1 Pro through Droid and 177a85b; the final approval is attributed jointly to that log and the supplied verdict.
+
+#### Final ledger preparation boundary
+
+- Git inspection at the assigned head gives work cda6757da6b24a345912b085d45e77143e883bea, base 81e62db40720b49c3ad3429c211ebf4b94960a99, 124 reachable commits in base..work and 110 changed files (50 added, 60 modified). This ancestry includes 93 inherited commits beyond the 24 task-lineage commits listed above and seven join/records/replay commits; it is not 124 newly built task commits. make_spec.py asserts the full ordered commit list, exact name/status file list and all replay trailers from Git.
+- commands.json retains all 59 one-file test rows (50 pytest and 9 web) and adds the required suite, commits and scope rows: 62 total. The suite remains `./eii test --seed 2890868834` until the lead supplies a fresh seed. Nothing in this preparation executes those rows.
+- Reused numbered items: OI-273 to OI-277; OI-158; PO-S2-22; PO-S2-84; existing part-E/lead-owner and causal items listed above. New OI-278 covers the additional pin-condition/notes record; OI-279 the distinct hidden-errno random failure; OI-280 the extended deferred handoff. New PO-S2-88 covers part-A records gaps, PO-S2-89 the inaccurate joinproof comment (record only) and pending train checks, PO-S2-90 the duplicate-launch/fixed-tree incident. The resolved dependency and entry-status drafts allocate no item. New OI-281 covers the runner tests that no required check ran. No new test requirement is allocated.
+- Status inputs: S2-T29 in progress with primary 1/2/4/5 and amendment 1–6 open; S2-T10 in progress with only criterion 6 newly ticked and criterion 5 preserved; S2-T33 done with its three existing ticks preserved; S2-T32 in progress with part T delivered and the other parts deferred under decision 0055 (LEAD-ANSWERS.md answer 14).
+
+- Preparation correction: the first requested make_spec dry invocation exited 1 at the PROGRESS preservation assertion; no spec was written. Git inspection showed exactly one empty added separator omitted in each of the three PROGRESS replays, with no nonempty record line missing or extra. The generator now asserts that exact blank-line difference as well as all retained records, rather than assuming byte-identical append separators. This is an input-generator correction only; no tracked file or historical evidence changed.
+
+#### Evidence for the work commit `cda6757da6b24a345912b085d45e77143e883bea`
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_activity_graph_survivors_refusals.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    29 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_duplicate_node_is_named, test_duplicate_edge_is_named, test_activity_without_a_class_edge_is_named_after_a_source. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_activity_planted.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    23 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_classified_as_rejects_another_activity_target, test_classified_as_rejects_the_wrong_basis, test_activity_graph_requires_the_unmappable_node. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_award_checks_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    37 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_name_normalisation_and_invalid_comparison, test_seed_closed_refusal, test_blank_links_do_not_stop_the_frame. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_awards_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    36 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_profile_top_level_reason, test_profile_independent_requirements, test_profile_zero_counts_and_proof_mapping_allowed. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_awards_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    18 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_register_csv_bom_and_all_lineage, test_register_closed_refusals. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied. This file defines only 2 test name(s); see CHECK.md for the available cases rather than an invented third name.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_awards_survivors_3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    29 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_v2_proof_full_receipt_and_scope, test_v2_declaration_closed_refusals, test_fetch_entry_independent_refusals. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_certificate_pins_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    32 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_default_context_trust_is_only_the_invented_root, test_bound_pin_host_must_be_present_and_lower_case, test_verified_context_only_clears_partial_chain. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_comtrade_assemble_lineage.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    2 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_assembly_refuses_an_unknown_api_class_without_a_host. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied. This file defines only 1 test name(s); see CHECK.md for the available cases rather than an invented third name.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_frame_alias_headers.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    13 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_alias_files_refuse_malformed_structure, test_alias_files_preserve_valid_rows. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied. This file defines only 2 test name(s); see CHECK.md for the available cases rather than an invented third name.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_imagery_views.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    32 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_committed_list_loads_and_is_empty, test_invented_list_exports_before_and_after, test_jpg_view_exports_the_closed_request. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_grids_build_mutation.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    19 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_population_chain_rows_are_the_hand_written_record, test_one_receipt_is_required_by_name, test_receipt_shape_and_fields_are_named. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_night_lights.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    69 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_night_mth109, test_night_local_layout, test_night_refuses_remote_before_library. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    58 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_html_canonical_render, test_html_void_render, test_validate_source_kind. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    49 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_discovery_projection, test_discovery_refusals, test_discovery_header_success. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_default_context_has_no_ambient_certificates, test_pin_scope, test_pinned_redirect_rechecks_context. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_page_html_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    36 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_node_text_concatenates_mixed_children_without_separator, test_node_matches_rejects_non_closed_selector_with_exact_reason, test_node_matches_class_and_attribute_edges. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_page_records_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    102 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_character_references_are_converted_in_cells, test_cell_text_split_by_comment_and_tag_joins_without_separator, test_stray_cell_end_tag_is_ignored. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_page_records_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    14 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_default_context_trust_is_only_the_invented_root, test_supplier_page_needs_a_reviewed_refusal, test_version_two_delegates_every_argument. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_page_requests_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    30 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_default_context_trust_is_only_the_invented_root, test_exact_school_queries_pass_without_frame, test_exact_school_query_passes_inside_its_frame. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_page_schema_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    32 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_keys_refusals_and_identity, test_path_token_and_value_refusals, test_validate_schema_scalars_and_unknown_kind. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_page_schema_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_period_internal_z_separator_is_refused. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied. This file defines only 1 test name(s); see CHECK.md for the available cases rather than an invented third name.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_page_shapes_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    61 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_embedded_holder_id_and_type_are_both_required, test_embedded_copies_and_records_refusals, test_workbook_success_contract. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_page_shapes_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    22 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_workbook_duplicate_merge_declaration_refused, test_workbook_absent_blank_row_is_allowed, test_workbook_first_adjacency_required. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_page_workbook_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "14 passed, 1 warning in 0.03s" (the one warning is the archive library's duplicate-name warning raised by the invented workbook fixture)
+Seed:      none
+Notes:     Coverage anchors: test_read_sheet_success_contract, test_read_sheet_missing_sheet_id_defaults_empty, test_read_sheet_two_or_zero_sheets_refused. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_page_workbook_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_workbook_repeated_row_number_with_distinct_cells_refused, test_workbook_missing_cell_reference_refused, test_workbook_explicit_xl_target_preserved. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_partitions_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    24 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_partition_spans_load_the_reviewed_document, test_partition_spans_refused_when_document_is_not_usable, test_partition_span_year_bounds. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_partitions_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_partition_loader_uses_the_review_path, test_reader_accepts_one_byte_lower_bound, test_reader_refuses_reversed_span_before_transport. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_population_grid.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    41 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_worldpop_native_cell, test_worldpop_unconfirmed_and_duplicate_categories, test_worldpop_remote_before_library. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_public_cadence.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    44 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_registry_cadence_closed, test_unconfirmed_cannot_acquire_schedule, test_cadence_requires_explicit_confirmation. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_registry.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    78 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_registry_holds_every_required_input_and_no_traffic_row, test_owner_decision_and_validation_only, test_nightly_selection_rejects_the_excluded_sources. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked_round2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    42 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_portal_rows_activated_with_complete_columns, test_nationality_column_requires_split, test_geometry_registry_closed_types. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t19_registry.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    46 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_all_s2_t19_sources_are_registered, test_absent_layer_needs_no_invented_id, test_live_layer_still_requires_id. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_awards.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    18 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_awards_intake_dates_blanks, test_awards_intake_refusals, test_awards_seeded_proof_sample. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    50 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_held_dispatch_continues, test_cleared_hold_keeps_evidence_refusal, test_browser_scope_in_page_and_terms. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix10.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    40 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_f1_all_unscoped_openers_refuse, test_f2_tender_requires_root_chain, test_f2_supplied_partial_chain_refuses. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix12.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_workbook_q1_to_next_year_q1_refused, test_workbook_q3_to_next_year_q1_refused, test_workbook_q2_to_next_year_q1_refused. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_real_redirect_pin_refusal, test_real_incomplete_awards_proof, test_real_incomplete_registry_source. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix6.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    84 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_only_four_page_pin_hosts_remain, test_off_list_refusal_loads_and_normal_dispatch_never_fetches, test_off_list_fetching_row_refuses_without_transport. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_live_acquire.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    80 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_school_bounded_offsets, test_school_request_field_refused_before_any_fetch, test_school_response_and_paging_refused_atomically. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_live_awards.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_award_heading_and_multiple_winners, test_award_shape_plants, test_sample_matches_every_intake_winner_without_selecting_one. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_live_shapes.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    45 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_embedded_live_shape, test_embedded_plants, test_qncc_nonterminal_refuses. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_live_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    65 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_v2_pin_refuses_before_send, test_v2_unreviewed_redirect_zero_target_sends, test_v2_full_chain_context_isolation. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_pages.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    36 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_registry_sources_and_receipts, test_page_guards_before_publication, test_page_snapshot_selected_history. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    51 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_pin_wrong_host_first, test_tls_pin_contract, test_verified_context_loads_der. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest custodian/tests/test_weather_cache.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    21 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_weather_midnight, test_weather_refusals, test_weather_bad_coordinates. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest scripts/tests/mutation_runner.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "12 passed, 4 subtests passed in 11.79s"
+Seed:      none
+Notes:     Coverage anchors: test_unexplained_survivor_refused_and_explained_survivor_accepted, test_timeout_rows_preserve_survivors_and_exit_status, test_not_covered_mutant_requires_explanation. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest scripts/tests/test_mutation_environment.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    2 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_passed_addopts_refused_before_copy_or_tool_access, test_process_namespace_is_required. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied. This file defines only 2 test name(s); see CHECK.md for the available cases rather than an invented third name.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest scripts/tests/test_runner_failures.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "10 passed, 5 subtests passed in 12.88s"
+Seed:      none
+Notes:     Coverage anchors: test_crashing_runner_is_a_failed_suite, test_garbage_result_is_a_failed_suite, test_suite_that_cannot_start. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest scripts/tests/test_runner_usage.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "4 passed, 20 subtests passed in 0.48s"
+Seed:      none
+Notes:     Coverage anchors: test_seed_is_printed_and_passed, test_real_table, test_web_checks_limit_on_a_hosted_runner. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   uv run --locked python -m pytest scripts/tests/test_spine_triage.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "24 passed, 28 subtests passed in 6.63s"
+Seed:      none
+Notes:     Coverage anchors: test_retains_reviewed_older_snapshot_and_refuses_tamper, test_orphan_body_reuse_hashes_verified_receipt, test_none_fixture_leaves_suite_stdout_clean. Invented fixtures; execute this file alone at the ledger head. No count at this train head is supplied.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   cd web && node --test spikes/performance/tests/isolation.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 3 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     One-file form of test:spike:performance in web/package.json. Coverage anchors: an isolation check fails when either header is missing, the static server isolates the document, an asset and the trace routes, the development server isolates the document, an asset and the trace routes. CHECK.md explains the browser helper. No fixed train-head count is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail).
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   cd web && node --test spikes/performance/tests/lifecycle.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 4 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     One-file form of test:spike:performance in web/package.json. Coverage anchors: an externally killed owner leaves no temporary folder, an empty send rejects and cancels its waiting client, a completed response clears its deadline and preserves its value. CHECK.md explains the browser helper. No fixed train-head count is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail).
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   cd web && node --test spikes/performance/tests/mutation-evidence.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 3 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     One-file form of test:spike:performance in web/package.json. Coverage anchors: capture parsing accepts whitespace and comments but rejects every malformed field, evidence verification checks both tracked files, containment, bytes and JSON, git-state probes retain command arguments and failure distinctions. CHECK.md explains the browser helper. No fixed train-head count is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail).
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   cd web && node --test spikes/performance/tests/mutation-geometry.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 8 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     One-file form of test:spike:performance in web/package.json. Coverage anchors: random words agree with unsigned independent modular arithmetic, roads preserve literal fixture coordinates and independently seeded geometry, hexagons reuse the cache and particles start at their independent selected origin. CHECK.md explains the browser helper. No fixed train-head count is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail).
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   cd web && node --test spikes/performance/tests/mutation-server.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 9 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     One-file form of test:spike:performance in web/package.json. Coverage anchors: server classifiers and paths preserve closed routes and boundaries, origin headers require strings and an exact same-origin value, body reader preserves chunk bytes and rejects stream errors. CHECK.md explains the browser helper. No fixed train-head count is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail).
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   cd web && node --test spikes/performance/tests/road-trace.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 6 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     One-file form of test:spike:performance in web/package.json. Coverage anchors: a reduced road count is decided before the canvas size, evidence rejects an unlisted road set before reading a capture. CHECK.md explains the browser helper. No fixed train-head count is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail).
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   cd web && node --test spikes/performance/tests/roads.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 9 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     One-file form of test:spike:performance in web/package.json. Coverage anchors: the page payload rebuilds byte for byte from the recorded assignment, playback holds, cross-fades stored endpoints and stops at the last hour, rendered road counts exclude path padding, hidden layers and empty paths. CHECK.md explains the browser helper. No fixed train-head count is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail).
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   cd web && node --test spikes/performance/tests/trace.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 24 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     One-file form of test:spike:performance in web/package.json. Coverage anchors: the budget and the share minimum are the spike gate, nearest rank uses the ceiling rank, the share is the unrounded count strictly under the budget. CHECK.md explains the browser helper. No fixed train-head count is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail).
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   cd web && node --test spikes/performance/tests/vite-server.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 4 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     One-file form of test:spike:performance in web/package.json. Coverage anchors: the development server stores a posted smoke trace from the page origin, the development server refuses a trace posted from another origin, the development server refuses a malformed trace post in JSON. CHECK.md explains the browser helper. No fixed train-head count is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail).
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   ./eii test --seed 2890868834
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    10463 passed, 0 failed, 0 skipped
+Seed:      2890868834
+Notes:     Fresh whole test at the exact ledger head with the lead-supplied seed; provider none and no network. The dry seed prepares inputs only and earns no test result. Preserve every failure, the unchanged custodian 600-second bound and the unavailable prior per-suite duration (PO-S2-84). Hosted checks follow the push.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','81e62db40720b49c3ad3429c211ebf4b94960a99..cda6757da6b24a345912b085d45e77143e883bea'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     All 125 reachable commits in BASE..WORK have Conventional Commit subjects. This includes inherited ancestry, not 125 new task commits. make_spec.py asserts the exact ordered ancestry, join parents, four replay commits, the lead's fix cda6757 and their six retained cherry-pick trailers.
+```
+
+```text
+### S2-T29 — The public sources outside every registry
+Commit:    cda6757da6b24a345912b085d45e77143e883bea
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','81e62db40720b49c3ad3429c211ebf4b94960a99...cda6757da6b24a345912b085d45e77143e883bea'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/publicdata/review/s2_t29_sources.yaml A:custodian/src/eii_custodian/publicdata/fetch/award_checks.py A:custodian/src/eii_custodian/publicdata/fetch/awards.py A:custodian/src/eii_custodian/publicdata/fetch/certificate_pins.py A:custodian/src/eii_custodian/publicdata/fetch/page_acquire.py A:custodian/src/eii_custodian/publicdata/fetch/page_archive.py A:custodian/src/eii_custodian/publicdata/fetch/page_html.py A:custodian/src/eii_custodian/publicdata/fetch/page_records.py A:custodian/src/eii_custodian/publicdata/fetch/page_requests.py A:custodian/src/eii_custodian/publicdata/fetch/page_schema.py A:custodian/src/eii_custodian/publicdata/fetch/page_shapes.py A:custodian/src/eii_custodian/publicdata/fetch/page_workbook.py A:custodian/tests/test_award_checks_survivors_1.py A:custodian/tests/test_awards_survivors_1.py A:custodian/tests/test_awards_survivors_2.py A:custodian/tests/test_awards_survivors_3.py A:custodian/tests/test_certificate_pins_survivors_1.py A:custodian/tests/test_comtrade_assemble_lineage.py A:custodian/tests/test_frame_alias_headers.py A:custodian/tests/test_page_acquire_survivors_1.py A:custodian/tests/test_page_acquire_survivors_2.py A:custodian/tests/test_page_acquire_survivors_3.py A:custodian/tests/test_page_html_survivors_1.py A:custodian/tests/test_page_records_survivors_1.py A:custodian/tests/test_page_records_survivors_2.py A:custodian/tests/test_page_requests_survivors_1.py A:custodian/tests/test_page_schema_survivors_1.py A:custodian/tests/test_page_schema_survivors_2.py A:custodian/tests/test_page_shapes_survivors_1.py A:custodian/tests/test_page_shapes_survivors_2.py A:custodian/tests/test_page_workbook_survivors_1.py A:custodian/tests/test_page_workbook_survivors_2.py A:custodian/tests/test_partitions_survivors_1.py A:custodian/tests/test_partitions_survivors_2.py A:custodian/tests/test_s2_t29_awards.py A:custodian/tests/test_s2_t29_fix.py A:custodian/tests/test_s2_t29_fix10.py A:custodian/tests/test_s2_t29_fix12.py A:custodian/tests/test_s2_t29_fix2.py A:custodian/tests/test_s2_t29_fix6.py A:custodian/tests/test_s2_t29_live_acquire.py A:custodian/tests/test_s2_t29_live_awards.py A:custodian/tests/test_s2_t29_live_shapes.py A:custodian/tests/test_s2_t29_live_transport.py A:custodian/tests/test_s2_t29_pages.py A:custodian/tests/test_s2_t29_transport.py A:scripts/tests/test_mutation_environment.py A:web/spikes/performance/tests/lifecycle.node-test.mjs A:web/spikes/performance/tests/response-deadline.mjs A:web/spikes/performance/tests/temporary-folder.mjs M:AGENTS.md M:CLAUDE.md M:OPEN_ITEMS.md M:PROGRESS.md M:README.md M:TASKS.md M:custodian/publicdata/sources.yaml M:custodian/src/eii_custodian/privacy/rules.toml M:custodian/src/eii_custodian/publicdata/comtrade/assemble.py M:custodian/src/eii_custodian/publicdata/confirm_s2_t13.py M:custodian/src/eii_custodian/publicdata/fetch/allowlist.py M:custodian/src/eii_custodian/publicdata/fetch/build.py M:custodian/src/eii_custodian/publicdata/fetch/cadence.py M:custodian/src/eii_custodian/publicdata/fetch/kinds.py M:custodian/src/eii_custodian/publicdata/fetch/partitions.py M:custodian/src/eii_custodian/publicdata/fetch/registry.py M:custodian/src/eii_custodian/publicdata/fetch/transport.py M:custodian/src/eii_custodian/publicdata/frame/README.md M:custodian/src/eii_custodian/publicdata/frame/crosswalk.py M:custodian/src/eii_custodian/publicdata/frame/live.py M:custodian/src/eii_custodian/publicdata/grids/build.py M:custodian/src/eii_custodian/publicdata/review/graph.py M:custodian/src/eii_custodian/publicdata/singles/tenders.py M:custodian/tests/fixtures/grids/invented.py M:custodian/tests/test_activity_graph_survivors_refusals.py M:custodian/tests/test_activity_planted.py M:custodian/tests/test_gis_imagery_views.py M:custodian/tests/test_grids_build_mutation.py M:custodian/tests/test_night_lights.py M:custodian/tests/test_population_grid.py M:custodian/tests/test_public_cadence.py M:custodian/tests/test_publicdata_registry.py M:custodian/tests/test_publicdata_unblocked_round2.py M:custodian/tests/test_s2_t19_registry.py M:custodian/tests/test_weather_cache.py M:docs/03_DATA_CONTRACTS.md M:docs/04_PUBLIC_DATA_PACK.md M:docs/10_FRONTEND.md M:docs/12_TESTING_AND_QUALITY.md M:docs/17_DEPLOYMENT_HARDENING.md M:docs/README.md M:pins.toml M:scripts/mutation.py M:scripts/mutation_explained.toml M:scripts/run_tests.py M:scripts/tests/mutation_runner.py M:scripts/tests/test_runner_failures.py M:scripts/tests/test_runner_usage.py M:scripts/tests/test_spine_triage.py M:web/REFERENCE_NOTES.md M:web/spikes/performance/README.md M:web/spikes/performance/tests/isolation.node-test.mjs M:web/spikes/performance/tests/mutation-evidence.node-test.mjs M:web/spikes/performance/tests/mutation-geometry.node-test.mjs M:web/spikes/performance/tests/mutation-server.node-test.mjs M:web/spikes/performance/tests/road-trace.node-test.mjs M:web/spikes/performance/tests/roads.node-test.mjs M:web/spikes/performance/tests/run.mjs M:web/spikes/performance/tests/trace.node-test.mjs M:web/spikes/performance/tests/vite-server.node-test.mjs'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "110 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Train S2-3 exact BASE..WORK scope: 110 files, 50 added and 60 modified. Task scope and replay preservation are checked from Git; forced changes are records unions and the docs/README.md paragraph. No ledger preparation edits any tracked file.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
