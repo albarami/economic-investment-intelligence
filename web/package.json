@@ -30,7 +30,12 @@
     "spike:glyphs:record": "node spikes/glyphs/record.mjs",
     "spike:glyphs:verify-evidence": "node spikes/glyphs/verify-evidence.mjs",
     "spike:glyphs:capture": "node spikes/glyphs/tests/run.mjs --capture",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "spike:charts:build": "tsc --noEmit -p spikes/charts/tsconfig.json && vite build --config spikes/charts/vite.config.ts",
+    "spike:charts:measure": "node spikes/charts/measure-build.mjs",
+    "spike:charts:serve": "node spikes/charts/server.mjs",
+    "spike:charts:verify-evidence": "node spikes/charts/verify-evidence.mjs",
+    "test:spike:charts": "node --test \"spikes/charts/tests/*.node-test.mjs\""
   },
   "dependencies": {
     "@deck.gl/core": "9.4.1",

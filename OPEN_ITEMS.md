@@ -3629,3 +3629,19 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - Scope: S2-T31; decision 0053, Consequences; lead ruling L-902.
 - The lead's measurements of 2026-11-18 found that no check watched the custodian suite's time as the source registry grew from 171,402 to 479,638 bytes; the suite took 834.6 seconds against its 600-second limit, and only the train's ledger run and the hosted tests job found the overrun.
 - Decision 0053 removes the measured parsing waste (the whole custodian suite then took 209.4 seconds) and keeps the 600-second limit. It builds no monitor of suite time; this item stays open for the decision on how to watch suite-time growth before another overrun.
+
+## S6-T34 part-one handoff — numbering reserved to the lead
+
+Source: approved S6-T34 plan, lead ruling L-974(b), (d), (e), and decision
+0057, Evidence and acceptance. Still open: shared S3 Fact chip family and actual
+DOM governance; owner laptop and phone matrix; phone OS/browser/loopback transport;
+reviewed presented-paint, parse and full-story heap instrumentation; fixture
+cardinalities and committed pre-run identity; publisher web-page reading by the
+lead; digest-bound capture and complete matrix validator; another-maker build
+review; confirmation of decision number 0057. No native or chip acceptance is
+claimed. Descriptor and timing-policy unit tests do not close these items.
+
+S6-T34 correction: the offline matrix validator now has passing invented digest,
+attestation/device/viewport-binding and completeness controls. The open item is
+qualified collector integration and instrumentation review, not the absence of
+all matrix-checking code. This does not close native acceptance or C6.

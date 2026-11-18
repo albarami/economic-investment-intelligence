@@ -109,6 +109,7 @@
 | [0052](decisions/0052-mutation-campaigns-run-in-a-background-lane.md) | Mutation campaigns run in a background lane; every campaign closes before its slice gate | Accepted, 2026-11-17 |
 | [0053](decisions/0053-the-source-registry-is-read-with-the-c-safe-loader.md) | Source registry read with the C safe loader; no fallback and unchanged suite limit | Accepted, 2026-11-18 |
 | [0054](decisions/0054-read-only-the-documentation-a-task-uses.md) | Rule 42 reads only the current official documentation of the parts a task uses, with the pages named in its brief; pins and retreat pins unchanged | Accepted, 2026-11-18 |
+| [0057](decisions/0057-chart-spike-part-one.md) | Chart spike offline build evidence; native and Fact-chip acceptance blocked; ECharts baseline retained | Proposed, 2026-11-18 |
 
 ## Identifiers and change control
 
