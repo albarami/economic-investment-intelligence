@@ -339,7 +339,9 @@ def test_school_failure_receipt(tmp_path):
             tmp_path, dec, b"", row=entry(dec, "schools_private_directory"), send=send
         ),
     )
-    records = [json.loads(p.read_text()) for p in tmp_path.rglob("*.json")]
+    records = [
+        json.loads(p.read_text(encoding="utf-8")) for p in tmp_path.rglob("*.json")
+    ]
     assert any(
         r.get("attempted_utc") == "2024-02-03T00:00:00Z"
         and r.get("reason") == "unreachable"

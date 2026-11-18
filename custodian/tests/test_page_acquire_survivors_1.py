@@ -156,7 +156,9 @@ def test_refusal_receipt(tmp_path):
     )
     row = entry(dec, "suppliers_tawteen")
     refused(dec["shape"]["reason"], lambda: run(tmp_path, dec, b"", row=row))
-    records = [json.loads(p.read_text()) for p in tmp_path.rglob("*.json")]
+    records = [
+        json.loads(p.read_text(encoding="utf-8")) for p in tmp_path.rglob("*.json")
+    ]
     assert any(
         r.get("reason") == dec["shape"]["reason"]
         and r.get("attempted_utc") == dec["shape"]["observed_utc"]
