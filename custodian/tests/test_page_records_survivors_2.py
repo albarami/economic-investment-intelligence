@@ -5,9 +5,11 @@ Every transport is an invented in-process callable; no socket is opened.
 
 import hashlib
 import json
+import ssl
 from dataclasses import replace
 
 import pytest
+from custodian.tests import test_certificate_pins_survivors_1 as pin_tests
 from custodian.tests import test_s2_t29_fix10 as fix10
 from custodian.tests import test_s2_t29_pages as pages
 
@@ -25,6 +27,13 @@ SCHOOL = "schools_private_directory"
 
 # The shared module fixture generates one disposable chain, never a host certificate.
 invented_certs = fix10.invented_certs
+isolated_trust = pin_tests.isolated_trust
+
+
+def test_default_context_trust_is_only_the_invented_root(invented_certs):
+    context = ssl.create_default_context()
+    assert context.get_ca_certs(binary_form=True) == [invented_certs["root"]]
+    assert context.verify_mode == ssl.CERT_REQUIRED and context.check_hostname
 
 
 def exact(reason):
@@ -108,17 +117,20 @@ def test_version_two_delegates_every_argument(tmp_path, monkeypatch):
     assert seen[0][4] is clock and seen[0][5] is sleep
 
 
-def test_pinned_source_loads_reviewed_pin_config(tmp_path, monkeypatch):
+def test_pinned_source_loads_reviewed_pin_config(tmp_path, monkeypatch, invented_certs):
     calls = []
-    config = {"SYN": "reviewed pin config"}
+    host = "www.edu.gov.qa"
+    url = "https://" + host + "/SYN-page"
+    config = fix10.config_file(tmp_path, invented_certs["intermediate"], host, SCHOOL)
+    real_load_pin = page_records.load_pin
 
     def load_pin(cache, source, value):
         calls.append((cache, source, value))
-        return fake_pin()
+        return real_load_pin(cache, source, value)
 
     monkeypatch.setattr(page_records, "load_pin", load_pin)
-    row = school_row()
-    declaration = dict(pages.review(row), pin=config)
+    row = school_row(url=url, fetch_host=host)
+    declaration = dict(pages.review(row), url=url, reviewed_urls=[url], pin=config)
     result = run(row, ok, tmp_path, declaration=declaration)
     assert calls == [(tmp_path, SCHOOL, config)]
     assert calls[0][2] is config

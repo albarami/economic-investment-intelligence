@@ -4,6 +4,7 @@ import ssl
 from urllib.parse import urlencode
 
 import pytest
+from custodian.tests import test_certificate_pins_survivors_1 as pin_tests
 
 from eii_custodian.publicdata.fetch import page_requests
 from eii_custodian.publicdata.fetch.page_schema import SCHOOL_FIELDS
@@ -14,6 +15,15 @@ SCHOOL = (
     "/PrivateSchoolsView/FeatureServer/0/query"
 )
 OTHER = "https://www.data.gov.qa/SYN-page"
+
+invented_certs = pin_tests.invented_certs
+isolated_trust = pin_tests.isolated_trust
+
+
+def test_default_context_trust_is_only_the_invented_root(invented_certs):
+    context = ssl.create_default_context()
+    assert context.get_ca_certs(binary_form=True) == [invented_certs["root"]]
+    assert context.verify_mode == ssl.CERT_REQUIRED and context.check_hostname
 
 
 def count_pairs():

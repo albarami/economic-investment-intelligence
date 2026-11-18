@@ -23,6 +23,23 @@ config_file = fix10.config_file
 make_pin = fix10.make_pin
 
 
+@pytest.fixture(autouse=True)
+def isolated_trust(tmp_path, monkeypatch, invented_certs):
+    """Default contexts read only this disposable invented trust store."""
+    root = tmp_path / "SYN-root.pem"
+    root.write_text(ssl.DER_cert_to_PEM_cert(invented_certs["root"]))
+    empty = tmp_path / "SYN-empty-trust"
+    empty.mkdir()
+    monkeypatch.setenv("SSL_CERT_FILE", str(root))
+    monkeypatch.setenv("SSL_CERT_DIR", str(empty))
+
+
+def test_default_context_trust_is_only_the_invented_root(invented_certs):
+    context = ssl.create_default_context()
+    assert context.get_ca_certs(binary_form=True) == [invented_certs["root"]]
+    assert context.verify_mode == ssl.CERT_REQUIRED and context.check_hostname
+
+
 def exact(reason):
     return "^" + reason + "$"
 
@@ -43,6 +60,11 @@ def test_verified_context_only_clears_partial_chain(invented_certs):
     assert context.verify_flags == expected
     assert not context.verify_flags & ssl.VERIFY_CRL_CHECK_LEAF
     assert invented_certs["intermediate"] in context.get_ca_certs(binary_form=True)
+    assert set(context.get_ca_certs(binary_form=True)) == {
+        invented_certs["root"],
+        invented_certs["intermediate"],
+    }
+    assert context.verify_mode == ssl.CERT_REQUIRED and context.check_hostname
 
 
 def test_verified_context_unreadable_der_is_closed():
