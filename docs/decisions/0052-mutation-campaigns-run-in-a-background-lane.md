@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Accepted |
+| Status | Accepted; items 1 to 7 amended by [decision 0055](0055-mutation-testing-moves-to-after-go-live.md), the proposed record of the owner's decision of 2026-11-18 14:10 |
 | Date | 2026-11-17 |
 | Owner | The owner |
 | Decided by | The owner's decision of 2026-11-17, relayed with the conditions of the owner-approved advisor note of the same minute, under AGENTS.md rule 46 |
