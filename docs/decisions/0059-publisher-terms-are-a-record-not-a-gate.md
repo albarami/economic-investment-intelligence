@@ -6,7 +6,7 @@
 | Date | 2026-11-18 |
 | Owner | The owner |
 | Decided by | The owner's decision of 2026-11-18 20:51, under AGENTS.md rule 46, with the owner's words of 20:53 on the public sources |
-| Amends | TASKS.md S2-T08 acceptance criterion 2, S2-T19 acceptance criterion 1 (the planted row with no basis of use) and the slice S2 gate (the same plant); document 14 slice S2 task lines S2-T08 and S2-T19 (the same plant) and the slice S2 exit list (the same plant); the decision index of docs/README.md |
+| Amends | TASKS.md S2-T08 acceptance criterion 2, S2-T19 acceptance criterion 1 (the planted row with no basis of use), S2-T16 (the empty terms text of the busyness provider), S2-T29 acceptance criterion 1 (the planted missing basis) and the slice S2 gate (the same plant); PUB-97 and the busyness passage of section 2 of document 04; the plant list of the announced-project archive in document 03; document 14 slice S2 task lines S2-T08 and S2-T19 (the same plant) and the slice S2 exit list (the same plant); the decision index of docs/README.md |
 | Purpose | Make the reading of a source's terms (the terms in the publisher's own words, the date read and the basis of use) a record that never fails a criterion, holds a build back or removes, hides or refuses a source. |
 | Read first | [Decision 0026](0026-public-sources-used-in-full-locally.md); [decision 0034](0034-licence-questions-of-public-sources-are-answered-at-a-go-live.md) item 1; PUB-12 of [document 04](../04_PUBLIC_DATA_PACK.md) |
 
@@ -54,6 +54,17 @@ chose and asked for, needing no permission, terms reading or licence decision, f
 - Document 14, slice S2 task line S2-T08: "check the publisher's terms in its own words with the date read and the basis
   of use for every source" becomes "record the publisher's terms in its own words with the date read and the basis of
   use for every source, a missing field recorded as pending".
+- TASKS.md, S2-T16: "the build fails while that terms text is empty" becomes "an empty terms text is recorded as
+  pending and fails nothing"; document 04, the busyness passage: "and the build fails while that text is empty" becomes
+  "while that text is empty it is recorded as pending and fails nothing".
+- TASKS.md, S2-T29 acceptance criterion 1: "a planted off-host request, missing basis or missing receipt fails" becomes
+  "a planted off-host request or missing receipt fails, and a planted missing basis is recorded with basis `pending`,
+  stays in use and is refused for commit".
+- Document 04, PUB-97: "a licence different from the registry fails the build until a reviewer records the changed
+  metadata under PUB-10" becomes "a licence different from the registry is recorded with the date read, pending a
+  reviewer's record of the changed metadata under PUB-10, and fails nothing".
+- Document 03, the plant list of the announced-project archive: "missing lineage or terms" becomes "missing lineage",
+  with the sentence that a missing terms reading is recorded as pending and fails nothing.
 - docs/README.md: this record's line in the decision index.
 
 Every other passage that asks a source to record or carry its terms in the publisher's own words with the date read and
@@ -63,7 +74,9 @@ keeps its words and reads with item 1: a field not yet known is recorded as pend
 ## What does not change
 
 Decision 0026 and decision 0034 are not rewritten; this record narrows no source and changes no gate other than the
-passages above. The code of S2-T08 part B makes the build match this record in its own task.
+passages above. The code of S2-T08 part B makes the build match this record in its own task, the refusals of S2-T16, S2-T29 and
+PUB-97 among them. A substituted or tampered terms record with unchanged bytes still fails (an integrity check, not a
+terms reading).
 
 ## Sources
 
