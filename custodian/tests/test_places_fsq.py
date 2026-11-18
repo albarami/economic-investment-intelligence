@@ -21,7 +21,7 @@ import h3
 from eii_custodian.publicdata.fetch.allowlist import approve
 from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
-from eii_custodian.publicdata.fetch.registry import RegistryError, load_registry
+from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault
 from eii_custodian.publicdata.places_fsq.assemble import EligiblePlace, build_places
 from eii_custodian.publicdata.places_fsq.constants import (
@@ -235,10 +235,11 @@ def test_a_licence_different_from_the_registry_is_recorded_pending(
     assert manifest["retrieved_utc"] == _clock()
 
 
-def test_missing_terms_do_not_stop_the_fetch_and_missing_basis_does(
+def test_missing_terms_do_not_stop_the_fetch_and_missing_basis_is_pending(
     tmp_path: Path,
 ) -> None:
-    """Decision 0026: a missing basis fails; terms that are absent do not."""
+    """Decision 0026 and ruling L-1001: terms that are absent do not stop the
+    fetch; a row without the licence_basis key loads as the pending record."""
     data = tmp_path / "near.parquet"
     write_places(data, [place()])
     actual = {**_NEAR, "longitude": (51.5, 51.5), "latitude": (25.3, 25.3)}
@@ -261,8 +262,9 @@ def test_missing_terms_do_not_stop_the_fetch_and_missing_basis_does(
     planted.write_text(
         text.replace('    licence_basis: "dataset"\n', "", 1), encoding="utf-8"
     )
-    with pytest.raises(RegistryError, match="missing field"):
-        load_registry(planted)
+    loaded = load_registry(planted)
+    first = [entry for entry in loaded if entry.source_id == "lic_active"]
+    assert first[0].licence_basis == "pending"
 
 
 def test_parser_keeps_source_fields_and_refuses_invented_ones(tmp_path: Path) -> None:

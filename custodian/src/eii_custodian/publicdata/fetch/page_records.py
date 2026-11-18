@@ -433,6 +433,11 @@ def selected_page(cache: Path, entry: Entry) -> Snapshot:
     if identity is None:
         raise PageError("snapshot_selection_invalid")
     parsed = read_snapshot(cache / entry.key, identity)
+    # Ruling L-1016 (applying L-1001): the build itself writes this parsed
+    # receipt, so a sidecar without the licence_basis key is a defect, not a
+    # terms reading; a blank or "pending" value stays a record.
+    if "licence_basis" not in parsed.sidecar:
+        raise PageError("receipt_missing")
     payload = json.loads(parsed.body)
     if payload.get("version") == 2:
         from .page_html import ShapeError
@@ -484,7 +489,14 @@ def selected_page(cache: Path, entry: Entry) -> Snapshot:
                 raise PageError("receipt_missing")
         return parsed
     raw = read_snapshot(cache / entry.key / "raw", payload["raw_identity"])
-    if payload["page_sha256"] != raw.sha256 or not payload.get("as_of"):
+    if (
+        payload["page_sha256"] != raw.sha256
+        or not payload.get("as_of")
+        # Ruling L-1016 (applying L-1001): the build itself writes this raw
+        # receipt, so a receipt with the licence_basis key absent is a
+        # defect, not a terms reading, and still refuses.
+        or "licence_basis" not in raw.sidecar
+    ):
         raise PageError("receipt_missing")
     return parsed
 

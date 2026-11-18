@@ -435,14 +435,15 @@ def test_each_family_cache_and_receipt_preserve_published_shape(tmp_path):
     assert not list(tmp_path.rglob("*.parquet"))
 
 
-def test_missing_basis_refused(tmp_path):
+def test_missing_basis_loads_as_pending(tmp_path):
+    """Ruling L-1001: a row without the licence_basis key loads as pending."""
 
     row = _block()[0].copy()
     del row["licence_basis"]
     path = tmp_path / "registry.yaml"
     path.write_text(yaml.safe_dump({"sources": [row]}))
-    with pytest.raises(RegistryError, match="missing field licence_basis"):
-        load_registry(path)
+    entries = load_registry(path)
+    assert entries[0].licence_basis == "pending"
 
 
 def test_absent_prohibitive_and_unread_terms_stay_in_use(tmp_path):

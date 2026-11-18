@@ -166,13 +166,10 @@ REQUIRED = frozenset(
         "title_en",
         "publisher",
         "licence_id",
-        "licence_basis",
         "decision_record",
         "fetch_host",
         "url",
         "terms_url",
-        "terms_words",
-        "terms_read_on",
         "landing_url",
         "nightly_live_fetch",
         "public_splits",
@@ -185,6 +182,9 @@ REQUIRED = frozenset(
         "extension",
     }
 )
+# Ruling L-1001: licence_basis, terms_words and terms_read_on are no longer
+# required; a row without one of them loads as its pending record, and only a
+# present non-string value still refuses.
 
 _REGISTRY = Path(__file__).resolve().parents[4] / "publicdata" / "sources.yaml"
 _UNCONFIRMED_REFETCH = Cadence("none", "frequency_unconfirmed", "")
@@ -252,11 +252,12 @@ class Entry:
     skip_reason: str
     extension: str
     landing_url: str
-    # A blank terms_words loads as the unread-terms pending marker
-    # TERMS_WORDS_PENDING ("terms to be read"); a blank terms_read_on loads as
-    # the exact pending value TERMS_READ_ON_PENDING ("pending"). Ruling L-1001:
-    # both are records that hold no source back; only a malformed non-empty
-    # date or a row without a required field is refused.
+    # A missing or blank terms_words loads as the unread-terms pending marker
+    # TERMS_WORDS_PENDING ("terms to be read"); a missing or blank
+    # terms_read_on loads as the exact pending value TERMS_READ_ON_PENDING
+    # ("pending"). Ruling L-1001: both are records that hold no source back;
+    # only a malformed non-empty date or a row without a required field is
+    # refused.
     terms_words: str
     terms_read_on: str
     licence_url: str = ""
@@ -412,11 +413,11 @@ def _entry(row: object) -> Entry:
         raise RegistryError("unknown kind")
     layer = _layer(row, kind)
     comtrade_policy = _comtrade_policy(row, kind)
-    basis = _text(row, "licence_basis")
+    basis = _optional_text(row, "licence_basis")
     if basis == "":
-        # Ruling L-1001: a missing basis of use is recorded as pending, never
-        # refused; only a row without the field is malformed. A pending basis is
-        # never committable and needs no decision record.
+        # Ruling L-1001: a missing or blank basis of use is recorded as
+        # pending, never refused. A pending basis is never committable and
+        # needs no decision record.
         basis = LICENCE_BASIS_PENDING
     if basis not in LICENCE_BASES:
         raise RegistryError("unknown licence_basis")
@@ -666,11 +667,11 @@ def _basis_note(row: dict[object, object]) -> str:
 def _terms_words(row: dict[object, object]) -> str:
     """Return the publisher's words, or the unread-terms pending marker.
 
-    A blank value is the pending reading of ruling L-1001 and loads as
-    TERMS_WORDS_PENDING, the marker the registry already uses for unread
-    terms; a row without the field is refused as malformed.
+    A missing or blank value is the pending reading of ruling L-1001 and
+    loads as TERMS_WORDS_PENDING, the marker the registry already uses for
+    unread terms; only a present non-string value still refuses.
     """
-    value = _text(row, "terms_words")
+    value = _optional_text(row, "terms_words")
     if value.strip() == "":
         return TERMS_WORDS_PENDING
     return value
@@ -679,12 +680,12 @@ def _terms_words(row: dict[object, object]) -> str:
 def _terms_read_on(row: dict[object, object]) -> str:
     """Return the reading date, or the exact pending value "pending".
 
-    A blank date is the pending reading of ruling L-1001 and loads as
-    TERMS_READ_ON_PENDING, and so does the marker itself when a stored
-    entry is read back; a non-empty date that is not a real YYYY-MM-DD
-    text date is a typing error and keeps its refusal.
+    A missing or blank date is the pending reading of ruling L-1001 and
+    loads as TERMS_READ_ON_PENDING, and so does the marker itself when a
+    stored entry is read back; a non-empty date that is not a real
+    YYYY-MM-DD text date is a typing error and keeps its refusal.
     """
-    value = _text(row, "terms_read_on")
+    value = _optional_text(row, "terms_read_on")
     if value.strip() == "" or value == TERMS_READ_ON_PENDING:
         return TERMS_READ_ON_PENDING
     return _calendar_date(row, "terms_read_on")

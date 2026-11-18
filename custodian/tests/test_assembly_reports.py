@@ -1,9 +1,11 @@
 """Reports and draw consume stored invented outputs, with value-free summaries."""
 
+import importlib.util
 import json
 from pathlib import Path
 
 import pytest
+from custodian.tests.repository_root import repository_root
 from custodian.tests.test_production_adapters import context
 from custodian.tests.test_source_completeness import entry, receipt
 
@@ -257,8 +259,19 @@ def test_reports_refuse_changed_seed_log_after_draw(tmp_path: Path) -> None:
         write_reports(state)
 
 
+def load_script():
+    """Load the review CLI by file path; the runner keeps the repository
+    root off sys.path, so the scripts package is never importable."""
+    path = repository_root(Path(__file__)) / "scripts" / "figures_review.py"
+    spec = importlib.util.spec_from_file_location("figures_review_entry", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def test_local_draw_has_the_existing_review_cli_input_shape(tmp_path: Path) -> None:
-    from scripts.figures_review import run
+    run = load_script().run
 
     state = build(tmp_path)
     write_record(tmp_path, "assembly/build.json", {})

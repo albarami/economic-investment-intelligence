@@ -761,14 +761,18 @@ def test_only_the_transport_module_opens_a_connection() -> None:
     assert opener_hits(planted) == ("custodian/src/eii_custodian/planted.py",)
 
 
-def test_loader_refuses_a_missing_or_unknown_basis(tmp_path: Path) -> None:
-    """A row with no basis, and a row with an unknown basis, are refused."""
+def test_missing_basis_loads_as_pending_and_unknown_basis_refuses(
+    tmp_path: Path,
+) -> None:
+    """Ruling L-1001: a row with no basis key loads as the pending record;
+    a row with an unknown basis value still refuses."""
 
     def missing(document: dict[str, object]) -> None:
         _row(document, "roads_osm").pop("licence_basis")
 
-    with pytest.raises(RegistryError, match="missing field"):
-        load_registry(_mutated(tmp_path, "missing-basis.yaml", missing))
+    loaded = load_registry(_mutated(tmp_path, "missing-basis.yaml", missing))
+    roads = [entry for entry in loaded if entry.source_id == "roads_osm"]
+    assert roads[0].licence_basis == "pending"
 
     def unknown(document: dict[str, object]) -> None:
         _row(document, "roads_osm")["licence_basis"] = "invented_basis"
@@ -806,14 +810,15 @@ def test_dataset_row_rejects_a_decision_record(tmp_path: Path) -> None:
         load_registry(_mutated(tmp_path, "dataset-record.yaml", recorded))
 
 
-def test_terms_words_must_be_present_text(tmp_path: Path) -> None:
-    """A missing key is refused; empty or blank words load as the pending marker."""
+def test_terms_words_missing_or_blank_load_as_pending(tmp_path: Path) -> None:
+    """Ruling L-1001: a missing key, empty or blank words load as the pending marker."""
 
     def missing(document: dict[str, object]) -> None:
         _row(document, "roads_osm").pop("terms_words")
 
-    with pytest.raises(RegistryError, match="missing field"):
-        load_registry(_mutated(tmp_path, "missing-words.yaml", missing))
+    loaded = load_registry(_mutated(tmp_path, "missing-words.yaml", missing))
+    roads = [entry for entry in loaded if entry.source_id == "roads_osm"]
+    assert roads[0].terms_words == _MARKER
 
     def empty(document: dict[str, object]) -> None:
         _row(document, "roads_osm")["terms_words"] = ""
@@ -841,13 +846,15 @@ def test_terms_words_must_be_present_text(tmp_path: Path) -> None:
 
 
 def test_terms_read_on_must_be_a_real_text_date(tmp_path: Path) -> None:
-    """An empty date loads as the pending value; malformed non-empty dates refuse."""
+    """Ruling L-1001: a missing key or empty date loads as the pending value;
+    malformed non-empty dates refuse."""
 
     def missing(document: dict[str, object]) -> None:
         _row(document, "roads_osm").pop("terms_read_on")
 
-    with pytest.raises(RegistryError, match="missing field"):
-        load_registry(_mutated(tmp_path, "missing-date.yaml", missing))
+    loaded = load_registry(_mutated(tmp_path, "missing-date.yaml", missing))
+    roads = [entry for entry in loaded if entry.source_id == "roads_osm"]
+    assert roads[0].terms_read_on == "pending"
 
     def empty(document: dict[str, object]) -> None:
         _row(document, "roads_osm")["terms_read_on"] = ""
