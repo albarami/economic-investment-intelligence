@@ -4401,3 +4401,95 @@ reason = "The unsupported-format AwardError is unconditionally caught by the imm
 module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
 mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -37,7 +37,7 @@\n                     csv.DictReader(io.StringIO(snapshot.body.decode(\"utf-8-sig\")))\n                 )\n             else:\n-                raise AwardError(\"register_schema_missing\")\n+                raise AwardError(\"REGISTER_SCHEMA_MISSING\")\n         except (ValueError, UnicodeError, csv.Error):\n             raise AwardError(\"register_schema_missing\") from None\n         if not isinstance(records, list):"
 reason = "The unsupported-format AwardError is unconditionally caught by the immediately enclosing ValueError handler and replaced with the unchanged register_schema_missing AwardError from None, so its discarded message cannot change any returned value or closed refusal for any selection."
+
+# S2-T29 kill pass 3: equivalent mutants of page_records.py, page_requests.py and certificate_pins.py; every other survivor of that campaign is killed by custodian/tests/test_*_survivors_*.py.
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/certificate_pins.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/certificate_pins.py\n+++ src/eii_custodian/publicdata/fetch/certificate_pins.py\n@@ -12,7 +12,7 @@\n     path = folder / relative\n     if not path.resolve().is_relative_to(\n         folder.resolve()\n-    ) or not folder.resolve().is_relative_to(cache.resolve()):\n+    ) and not folder.resolve().is_relative_to(cache.resolve()):\n         raise PinError(\"intake_path_refused\")\n     for part in (path, *path.parents):\n         if part == cache:"
+reason = "Input class: a cache, source and name whose path stays inside the folder while the folder resolves outside the cache. The name checks bar absolute names and '..' parts and the source is one name (or '..', which collapses to the cache), so the folder can leave the cache only through a symlink at intake or intake/<source> (cache ancestors resolve identically on both sides); the mutant skips this raise only in that class, and the symlink loop that follows walks the same lexical parents and raises the same intake_path_refused with no effect in between, so no reachable input differs."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_requests.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_requests.py\n+++ src/eii_custodian/publicdata/fetch/page_requests.py\n@@ -3,7 +3,7 @@\n     if frame is not None and (url not in frame or not approve(url).ok):\n         raise TransportFault(\"blocked_host\", \"\")\n     parts = urlsplit(url)\n-    if (parts.hostname or \"\") == \"myschools.edu.gov.qa\" and parts.path.endswith(\n+    if (parts.hostname or \"XXXX\") == \"myschools.edu.gov.qa\" and parts.path.endswith(\n         \"/PrivateSchoolsView/FeatureServer/0/query\"\n     ):\n         pairs = parse_qsl(parts.query, keep_blank_values=True)"
+reason = "Input class: a URL with no host, where hostname is None and the fallback text is used; neither the empty text nor 'XXXX' equals the lower-case school host myschools.edu.gov.qa, so the school-query rule is skipped in both cases and a URL with a host never reads the fallback, so no reachable input differs."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -1,7 +1,7 @@\n def __init__(self, table_id: str) -> None:\n     super().__init__(convert_charrefs=True)\n     self.table_id = table_id\n-    self.depth = 0\n+    self.depth = None\n     self.matches = 0\n     self.cell: list[str] | None = None\n     self.row: list[str] | None = None"
+reason = "The depth attribute is only ever read for truthiness (the nested-table refusal, the outside-table returns and the unclosed-table check of parse_body) and is never counted, so None at start acts exactly as 0 for every page."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -3,7 +3,7 @@\n         if self.depth:\n             raise PageError(\"schema_missing\")\n         if dict(attrs).get(\"id\") == self.table_id:\n-            self.depth = 1\n+            self.depth = 2\n             self.matches += 1\n     if not self.depth:\n         return"
+reason = "The depth attribute is only ever read for truthiness (the nested-table refusal, the outside-table returns and the unclosed-table check of parse_body) and is never counted, so 2 on entering the table acts exactly as 1 for every page."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -8,4 +8,4 @@\n         self.rows.append(self.row)\n         self.row = None\n     if tag == \"table\":\n-        self.depth = 0\n+        self.depth = None"
+reason = "The depth attribute is only ever read for truthiness (the nested-table refusal, the outside-table returns and the unclosed-table check of parse_body) and is never counted, so None on leaving the table acts exactly as 0 for every page."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -22,7 +22,7 @@\n         raise PageError(\"schema_missing\")\n     parser = _Table(str(declaration.get(\"table_id\", \"\")))\n     try:\n-        parser.feed(body.decode(\"utf-8\"))\n+        parser.feed(body.decode(\"UTF-8\"))\n         parser.close()\n     except UnicodeError:\n         raise PageError(\"schema_missing\") from None"
+reason = "'UTF-8' and 'utf-8' name the same codec (codecs.lookup gives the same codec for both), so the decoded text and any UnicodeDecodeError are identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -42,7 +42,7 @@\n         rows.append(\n             {\n                 name: _value(value, kind)\n-                for (name, kind), value in zip(entry.columns, raw, strict=True)\n+                for (name, kind), value in zip(entry.columns, raw, strict=None)\n             }\n         )\n     if (entry.row_count_min is not None and len(rows) < entry.row_count_min) or ("
+reason = "The length check just above refuses every data row whose cell count differs from the declared columns, so zip only ever pairs equal-length sequences and its strict flag cannot change the result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -42,7 +42,7 @@\n         rows.append(\n             {\n                 name: _value(value, kind)\n-                for (name, kind), value in zip(entry.columns, raw, strict=True)\n+                for (name, kind), value in zip(entry.columns, raw, )\n             }\n         )\n     if (entry.row_count_min is not None and len(rows) < entry.row_count_min) or ("
+reason = "The length check just above refuses every data row whose cell count differs from the declared columns, so zip only ever pairs equal-length sequences and its strict flag cannot change the result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -42,7 +42,7 @@\n         rows.append(\n             {\n                 name: _value(value, kind)\n-                for (name, kind), value in zip(entry.columns, raw, strict=True)\n+                for (name, kind), value in zip(entry.columns, raw, strict=False)\n             }\n         )\n     if (entry.row_count_min is not None and len(rows) < entry.row_count_min) or ("
+reason = "The length check just above refuses every data row whose cell count differs from the declared columns, so zip only ever pairs equal-length sequences and its strict flag cannot change the result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -12,7 +12,7 @@\n     if entry.licence_basis == \"owner_decision\" and entry.decision_record != \"0026\":\n         raise PageError(\"receipt_missing\")\n     try:\n-        date.fromisoformat(str(declaration.get(\"as_of\", \"\")))\n+        date.fromisoformat(str(declaration.get(\"as_of\", None)))\n     except ValueError:\n         raise PageError(\"snapshot_date_missing\") from None\n     if not declaration.get(\"period\"):"
+reason = "A declaration without as_of now gives the text 'None' instead of the empty text; neither is an ISO date, so date.fromisoformat raises ValueError and the same snapshot_date_missing refusal follows, while a present as_of ignores the default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -12,7 +12,7 @@\n     if entry.licence_basis == \"owner_decision\" and entry.decision_record != \"0026\":\n         raise PageError(\"receipt_missing\")\n     try:\n-        date.fromisoformat(str(declaration.get(\"as_of\", \"\")))\n+        date.fromisoformat(str(declaration.get(\"as_of\", )))\n     except ValueError:\n         raise PageError(\"snapshot_date_missing\") from None\n     if not declaration.get(\"period\"):"
+reason = "A declaration without as_of now gives the text 'None' instead of the empty text; neither is an ISO date, so date.fromisoformat raises ValueError and the same snapshot_date_missing refusal follows, while a present as_of ignores the default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -12,7 +12,7 @@\n     if entry.licence_basis == \"owner_decision\" and entry.decision_record != \"0026\":\n         raise PageError(\"receipt_missing\")\n     try:\n-        date.fromisoformat(str(declaration.get(\"as_of\", \"\")))\n+        date.fromisoformat(str(declaration.get(\"as_of\", \"XXXX\")))\n     except ValueError:\n         raise PageError(\"snapshot_date_missing\") from None\n     if not declaration.get(\"period\"):"
+reason = "A declaration without as_of now gives the text 'XXXX' instead of the empty text; neither is an ISO date, so date.fromisoformat raises ValueError and the same snapshot_date_missing refusal follows, while a present as_of ignores the default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -36,7 +36,7 @@\n     evidence: dict[str, object] = {}\n     with page_transport(pin, browser=entry.source_id == \"schools_private_directory\"):\n         response, failure = read_bounded(transport, sleep, entry.url)\n-    if failure is not None or response is None:\n+    if failure is not None and response is None:\n         if entry.source_id != \"schools_private_directory\":\n             raise PageError(failure.check if failure else \"access_failed\")\n         if capture is None and pin is not None:"
+reason = "read_bounded returns exactly one of a response and a failure (a transport that returns None instead of a Response fails inside the redirect check before returning), so this branch always holds a failure, which is a truthy dataclass; with 'and' the test is true exactly when failure is set and response is None, which is the same set of calls as with 'or'."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -38,7 +38,7 @@\n         response, failure = read_bounded(transport, sleep, entry.url)\n     if failure is not None or response is None:\n         if entry.source_id != \"schools_private_directory\":\n-            raise PageError(failure.check if failure else \"access_failed\")\n+            raise PageError(failure.check if (failure) or True else \"access_failed\")\n         if capture is None and pin is not None:\n             try:\n                 capture = load_capture(cache, entry.source_id, pin)"
+reason = "read_bounded returns exactly one of a response and a failure (a transport that returns None instead of a Response fails inside the redirect check before returning), so this branch always holds a failure, which is a truthy dataclass; the condition is already true, so forcing it true still raises failure.check."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -38,7 +38,7 @@\n         response, failure = read_bounded(transport, sleep, entry.url)\n     if failure is not None or response is None:\n         if entry.source_id != \"schools_private_directory\":\n-            raise PageError(failure.check if failure else \"access_failed\")\n+            raise PageError(failure.check if failure else \"XXaccess_failedXX\")\n         if capture is None and pin is not None:\n             try:\n                 capture = load_capture(cache, entry.source_id, pin)"
+reason = "read_bounded returns exactly one of a response and a failure (a transport that returns None instead of a Response fails inside the redirect check before returning), so this branch always holds a failure, which is a truthy dataclass; the access_failed fallback is never chosen, so its text cannot change."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -38,7 +38,7 @@\n         response, failure = read_bounded(transport, sleep, entry.url)\n     if failure is not None or response is None:\n         if entry.source_id != \"schools_private_directory\":\n-            raise PageError(failure.check if failure else \"access_failed\")\n+            raise PageError(failure.check if failure else \"ACCESS_FAILED\")\n         if capture is None and pin is not None:\n             try:\n                 capture = load_capture(cache, entry.source_id, pin)"
+reason = "read_bounded returns exactly one of a response and a failure (a transport that returns None instead of a Response fails inside the redirect check before returning), so this branch always holds a failure, which is a truthy dataclass; the access_failed fallback is never chosen, so its text cannot change."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -74,7 +74,7 @@\n         fetch_host=host_of(response.final_url),\n         retrieved_utc=stamp,\n         publisher=entry.publisher,\n-        source_modified=\"\",\n+        source_modified=None,\n         row_count=len(rows),\n         terms_sha256=\"\",\n     )"
+reason = "sidecar_for stores source_modified or None, so the empty text and None both record None and no other field reads the argument."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -76,7 +76,7 @@\n         publisher=entry.publisher,\n         source_modified=\"\",\n         row_count=len(rows),\n-        terms_sha256=\"\",\n+        terms_sha256=None,\n     )\n     side.update(\n         as_of=review[\"as_of\"],"
+reason = "sidecar_for stores terms_sha256 or None, so the empty text and None both record None, and a read terms page overwrites the field afterwards in both cases."
