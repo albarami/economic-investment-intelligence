@@ -256,38 +256,19 @@ def test_audit_fallback_never_rewrites_retained_entry_fields(
     assert isinstance(built, ProjectEvidence)
     if kind == "revision":
         supplied = replace(built, revisions=EqualToEmpty(built.revisions))
-        expected = EvidenceAuditEntry(
-            PROJECT,
-            PROJECT,
-            PROJECT_IDENTITY,
-            item.identity,
-            "public",
-            "observed_announcement",
-            "retained_revision",
-            "",
-        )
     else:
         absence = evidence.ProjectAbsence(
             PROJECT_IDENTITY, PROJECT, item.identity, "not_present_in_source_snapshot"
         )
         supplied = ProjectEvidence((), absences=EqualToEmpty((absence,)))
-        expected = EvidenceAuditEntry(
-            PROJECT,
-            PROJECT,
-            PROJECT_IDENTITY,
-            item.identity,
-            "public",
-            "missing_evidence",
-            "absent_from_snapshot",
-            "not_present_in_source_snapshot",
-        )
     result = evidence.audit_project_evidence((), supplied, ())
-    # These tuple subclasses expose a separate boundary issue (PO-S2-87).
-    # Preserve fields if returned; a future fix should refuse their projection.
-    if isinstance(result, evidence.InvestmentFailure):
-        assert result.check == "evidence_audit_incomplete"
-        return
-    assert result.entries == (expected,)
+    assert result == failure(
+        "",
+        "",
+        "evidence_audit_incomplete",
+        "every registration, revision and absence",
+        "plain sequence",
+    )
 
 
 def test_audit_refuses_non_plain_str_key(tmp_path: Path) -> None:

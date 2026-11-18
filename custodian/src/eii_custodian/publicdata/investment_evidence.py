@@ -418,10 +418,9 @@ def audit_project_evidence(
     canonical_projects = build_project_evidence(canonical_snapshots)
     if isinstance(canonical_projects, InvestmentFailure):
         return canonical_projects
-    if not canonical_snapshots:
-        unauthenticated = _refuse_unauthenticated_audit(evidence, expected, attempts)
-        if unauthenticated is not None:
-            return unauthenticated
+    unauthenticated = _refuse_unauthenticated_audit(evidence, expected, attempts)
+    if unauthenticated is not None:
+        return unauthenticated
     if (
         evidence.revisions != canonical_projects.revisions
         or evidence.absences != canonical_projects.absences
@@ -452,10 +451,10 @@ def audit_project_evidence(
     entries: list[EvidenceAuditEntry] = []
     ordered_snapshots = canonical_snapshots
     for item in ordered_snapshots:
-        for revision in evidence.revisions:
+        for revision in canonical_projects.revisions:
             if revision.snapshot_identity == item.identity:
                 entries.append(_revision_entry(revision))
-        for absence in evidence.absences:
+        for absence in canonical_projects.absences:
             if absence.snapshot_identity == item.identity:
                 entries.append(
                     EvidenceAuditEntry(
@@ -839,7 +838,7 @@ def _refuse_unauthenticated_audit(
     expected: tuple[ExpectedInput, ...],
     attempts: tuple[FetchAttempt, ...],
 ) -> InvestmentFailure | None:
-    """Refuse caller objects when no authenticated parser row can replace them."""
+    """Refuse non-plain caller identity objects before audit projection."""
     if type(evidence.revisions) is not tuple or type(evidence.absences) is not tuple:
         return _audit_failure("", "plain sequence")
     for attempt in attempts:
@@ -849,7 +848,11 @@ def _refuse_unauthenticated_audit(
         if not _plain_text(registration.source_id) or not _plain_text(registration.key):
             return _audit_failure("", "plain key")
     for milestone in evidence.milestones:
-        if not _plain_text(milestone.candidate.source_id):
+        if (
+            not _plain_text(milestone.candidate.source_id)
+            or not _plain_text(milestone.candidate.candidate_id)
+            or not _plain_text(milestone.candidate.snapshot_identity)
+        ):
             return _audit_failure("", "plain key")
     return None
 
