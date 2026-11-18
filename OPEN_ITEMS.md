@@ -506,6 +506,7 @@
 - DONE SO FAR: `scripts/run_tests.py` with two helper modules, `conftest.py`, the `[tool.pytest]` table, `web/vitest.config.ts`, `web/scripts/count-reporter.mjs`, one package test per Python package and one Vitest test; the versions are the registry releases of 2026-10-27, 2026-11-06 and 2026-11-02, read on 2026-11-12, and the tools were run in a scratch project before the plan was finished. A secret in a variable with another name than the covered ones (the two names and three suffixes) is kept out only by the allow-list. A skip reason cannot be tied to a marker, so OI-10 on an unmarked test is accepted by the rule and left to the reviewer; Vitest's JSON gives no reason, so any skipped or TODO Vitest test that it reports fails; the two forms that it does not report (a failing `it.fails` or `test.fails` test, written as passed, and a `describe.todo` without a body, omitted) pass silently and are left to review and lint. `evals/` holds no test yet and `gateway/` no code; each later suite (boundary, parity, conformance, API, harness) adds a row to the table when it exists. The fixed seed that TST-27 asks of pull-request CI is passed by S0-T07 as `./eii test --seed N`.
 - OPTIONS: **Recommendation:** keep. Alternatives: select `-m "not nightly and not postgres and not live_model"` and run those markers in separate suites; read Node counts from the TAP trailer (documented as unstable) instead of the reporter; allow a longer seed form.
 - NEEDED BY: slice S0 gate.
+- UPDATE 2026-11-18: decision 0060 replaces `python-custodian` in convention (2) by `python-custodian-1` and `python-custodian-2`, so the table holds seven suites; the other conventions are unchanged.
 
 ## OI-47 — The `eii` launcher is created with one command
 
@@ -2581,6 +2582,24 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - EVIDENCE: The check returned three notes, never rejections. N1, record R013 (`weighted_mean`) keeps the earlier phrase "the current `81e62db` version"; it names the revision and asserts no absence, but "current" beside a hash is loose. N2, "the S2-T29 train" uses the repository's train vocabulary; the hash beside it is the anchor. N3, the fixer's first pass briefly regenerated the explanation-data paragraph X001 from the merged tree and then restored it; the checker's byte comparison shows the shipped paragraph unchanged.
 - NEEDED: At the handoff to the receiving team under [decision 0055](docs/decisions/0055-mutation-testing-moves-to-after-go-live.md), replace "the current `81e62db` version" in R013 with "the `81e62db` version" and keep the hash beside every train name; N3 needs no change. No measurement, count or outcome changes.
 
+## OI-285 — The hosted custodian suite of pull request 87 ran out of its 600-second limit
+
+- ID: OI-285
+- TYPE: OPEN
+- RAISED BY: the hosted `ci` run https://github.com/albarami/economic-investment-intelligence/actions/runs/44364506690 of pull request 87 at `396ef6e`, its `tests` job
+- CONCERNS: `scripts/run_tests.py` suite `python-custodian`, 600 s; task S2-T34; decision 0060
+- EVIDENCE: The job stopped with `python-custodian: no result within 600 s; the process group was killed` at 92 percent of the suite; every other job of the run passed. The same 7,189 custodian tests had taken 386 seconds on the base branch at `b380109` and 569 seconds on pull request 86; the failing head holds 7,349 and ran in 277 seconds locally on one quiet core, its time spread over 253 modules (slowest 48.7 seconds). The hosted runner is 1.4 to 2.4 times slower than one local core and varies from run to run. The run was not repeated to make it green (rule 39; the owner's note of 2026-11-18 22:03).
+- NEEDED: Task S2-T34 splits the suite into two named parts under the unchanged limit (decision 0060). The item closes only when the hosted `tests` job passes on the merged split with each part's hosted duration recorded; a later part that nears the limit is split again by a further record, never by a raised limit.
+
+## OI-286 — The height fixtures' zip bodies carried the clock
+
+- ID: OI-286
+- TYPE: OPEN
+- RAISED BY: task S2-T34's first measurement of `python-custodian-1` at `b380109`
+- CONCERNS: `custodian/tests/fixtures/heights/invented.py` (`zip_members`, `zip_members_duplicated`); `custodian/tests/test_publicdata_heights.py::test_two_runs_give_identical_file_hashes`
+- EVIDENCE: The test failed once at its byte-equality assertion (the output files differed at byte index 1002). Cause: the fixtures wrote zip members by name, so each member took the wall-clock time of its writing; the heights manifest records each input's hash, and two builds of one fixture on either side of a two-second step of the zip time field gave different input hashes. Shown by building the 3D-GloBFP fixture twice 2.1 seconds apart (bodies differ) and by the new `custodian/tests/test_heights_fixture_clock.py`, red at `b380109` (5 failed, 1 passed) and green with the fix (6 passed). No product code is involved.
+- NEEDED: The fix of task S2-T34 writes every member with the zip format's first date and the compression its writer names; the byte-equality assertion stays unchanged. The item closes when that fix is merged and the hosted run of the merge passes.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -3788,6 +3807,7 @@ S2-T10 part A — NOT CLOSED: The existing busy-venue scan already reads bytes a
 - CONCERNS: `scripts/run_tests.py` SUITES python-custodian, 600 s
 - EVIDENCE: The supplied owed record has shared-load S4-T10 checks of 860 s plain and 841 s isolated on four processors near load 30; S2-T30 builder runs of 612 s and 623 s, and its later isolated 606.01 s near load 21–25. Train-1 ck12 at 4d7933a records 686 s plain and 688 s isolated on four processors near load 35. These are not reserved-idle measurements. ADAPT2-RETURN.md additionally records the moved custodian suite: 5620 passed in 946.96 s, exit 0; its load is not supplied as an idle-reservation measurement.
 - NEEDED: Each train whole test records the custodian duration. If the whole test exceeds 600 s on idle processors, open a speed task. Keep the bound, assertions and red evidence unchanged.
+- UPDATE 2026-11-18: the bound was breached on the hosted runner (OI-285); decision 0060 splits the suite into two named parts under the unchanged 600-second limit (task S2-T34). Each part's duration is recorded from then on.
 
 ### PO-S2-85 — Sleeping mutation children escape a CPU-time-only limit
 
