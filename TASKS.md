@@ -549,7 +549,7 @@ independent code review. The separate Arabic-name reader gap remains OI-256.
 - Scope: method cards in `docs/07_ECONOMIC_METHODS.md` and the recorded source-check evidence.
 - Depends: S2-T08.
 - Requirements: MTH-03.
-- Delivery: hard; personas Methods; status queued.
+- Delivery: hard; personas Methods; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/87).
 ### S2-T27 — The public snapshot archive and the re-fetch schedule.
 - Goal: every public fetch keeps a dated, hash-pinned snapshot that is never overwritten, and each source carries a recorded re-fetch schedule, because publishers overwrite their tables and a series' history cannot be rebuilt later.
 - Scope: the fetch layer of `./eii build-public` (custodian/src/eii_custodian/publicdata/fetch/ and the shared helpers of S2-T25), the source registry rows, the receipts, the release build's reading of a pinned snapshot, documents 03, 04 and 12. Extend what exists (receipts, registry, the monthly register snapshots of document 04's register rows); never a parallel store.
