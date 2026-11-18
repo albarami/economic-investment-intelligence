@@ -33874,3 +33874,58 @@ The lead's full mutation campaign and another-maker review remain PENDING;
 all pre-existing source acquisition, profile, pin and live-evidence holds remain
 open. No review approval or final campaign result is claimed. Muhasabah PASS
 for this bounded handoff and its explicitly stated evidence limits.
+
+
+### S2-T29 kill pass 2c correction — real pin loader and isolated trust
+
+OpenAI Codex (GPT-6), senior Python test engineer for transport-security
+mutation tests; reviewer persona: strict mutation and transport-security
+reviewer from another maker, pending with the lead. Starting commit
+`f51bc1e831406801dbc81f8498195c3957d99673`; git read-only. Sources: `.overnight/BRIEF.md`,
+`.overnight/IN/REVIEW.krev2c.md` F1, TASKS.md **S2-T29**, document 03
+**S2-T29 cached page and awards contracts**. This appends a correction to the
+prior kill-pass evidence; it does not replace any earlier row or outcome.
+
+Skills: project-orientation, task-standards, mutation-testing,
+sanad-provenance, muhasabah-gate, github-flow with the read-only override.
+test-driven-development, systematic-debugging and verification-before-completion
+were unavailable by name and their plain meaning was applied.
+
+`test_awards_survivors_3.py` now uses the real invented intermediate intake and
+original pin loader in both forwarding spies. The explicit non-tender fixture
+uses an allowed non-tender pin host. All 26 existing assertions remain; six new
+digest/review refusal cases assert no send. Scoped SSL_CERT_FILE/SSL_CERT_DIR
+isolation verifies the complete default CA list contains only the invented root.
+The other three kill-pass files require no SSL isolation and are unchanged.
+
+Every one of the 24 assigned records was replayed on a throwaway package:
+RED exit 1 with named-test failures; GREEN exit 0 with three passes for every
+record. No new equivalence, production edit or mutation campaign. Exact record
+IDs, mutation hashes, commands, times and outputs are in
+`.overnight/tmp/kill2fix/replays.jsonl` and its per-color logs.
+The replay runner exited 0. Scope proof exited 0, retaining the assertions and
+all pre-existing functions outside the two changed tests.
+
+Environment: Python 3.14.6, locked uv, CPUs 8-11 for pytest,
+PYTHONDONTWRITEBYTECODE=1, UV_OFFLINE=1, EII_DECISION_PROVIDER=none,
+Hypothesis seed 29029, fixture sample seed 73, all cache/temp writes under
+`.overnight/tmp/`. No world build. Full command arrays and real exits:
+`.overnight/tmp/evidence/checks.jsonl`; detailed handoff `.overnight/RETURN.md`.
+
+- `taskset -c 8-11 uv run --locked python -m pytest custodian/tests/test_award_checks_survivors_1.py custodian/tests/test_awards_survivors_1.py custodian/tests/test_awards_survivors_2.py custodian/tests/test_awards_survivors_3.py -q -p no:cacheprovider --hypothesis-seed=29029 --basetemp=.overnight/tmp/kill2fix-final-four`: exit 0; `120 passed in 2.33s`; wall 3.015 s.
+- `taskset -c 8-11 uv run --locked python -m pytest custodian/tests core/tests -q -p no:cacheprovider --hypothesis-seed=29029 --basetemp=.overnight/tmp/kill2fix-full-suite`: exit 0; `7016 passed in 277.53s (0:04:37)`; wall 278.545 s.
+- `uv run --locked ruff check .`: exit 0; `All checks passed!`; wall 0.136 s.
+- `uv run --locked ruff format --check .`: exit 0; `684 files already formatted`; wall 0.092 s.
+- `uv run --locked mypy`: exit 0; `Success: no issues found in 401 source files`; wall 0.289 s.
+- `python3 scripts/check_docs.py`: exit 0; `checked 964 text files, 107 Markdown files: OK`; wall 1.309 s.
+- `python3 scripts/check_tree.py`: exit 0; `checked 8 rules: OK`; wall 0.086 s.
+- `cmp AGENTS.md CLAUDE.md`: exit 0; `(no output)`; wall 0.013 s.
+- `git diff --check`: exit 0; `(no output)`; wall 0.004 s.
+- `python3 .overnight/tmp/kill2fix_scope.py`: exit 0; `Exact record replays: 24 killed, 24 green; no added equivalence`; wall 0.028 s.
+
+Focused format initially exited 1 (one file needed formatting); applying the
+formatter exited 0. The final full format check above passed. The initial
+four-file run exited 0 with 120 passed. No hidden test retry or random failure.
+Post-ledger docs/whitespace checks are appended to the command evidence and
+reported in the return. Another-maker re-review remains pending with the lead;
+no approval or full task completion is asserted. Muhasabah: PASS.

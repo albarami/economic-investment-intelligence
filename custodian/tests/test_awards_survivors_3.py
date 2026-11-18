@@ -1,20 +1,37 @@
 """Offline v1/v2 proof acquisition, pin selection and retained evidence plants."""
 
 import json
+import ssl
 from collections import UserDict
 from dataclasses import replace
 
 import pytest
 from custodian.tests.test_s2_t29_awards import STAMP, profile
 from custodian.tests.test_s2_t29_fix import award_intake
+from custodian.tests.test_s2_t29_fix10 import config_file, make_pin
+from custodian.tests.test_s2_t29_fix10 import invented_certs as invented_certs
 from custodian.tests.test_s2_t29_live_awards import report
-from custodian.tests.test_s2_t29_transport import pin
 
 from eii_custodian.publicdata.fetch import awards, certificate_pins, page_requests
 from eii_custodian.publicdata.fetch.award_checks import AwardError
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 from eii_custodian.publicdata.fetch.transport import _METADATA_LIMIT, Response
+
+
+@pytest.fixture
+def isolated_trust(tmp_path, monkeypatch, invented_certs):
+    """Keep every SSL context in these pin tests on invented trust only."""
+    root = tmp_path / "SYN-root.pem"
+    root.write_text(ssl.DER_cert_to_PEM_cert(invented_certs["root"]))
+    empty = tmp_path / "SYN-empty-certificates"
+    empty.mkdir()
+    monkeypatch.setenv("SSL_CERT_FILE", str(root))
+    monkeypatch.setenv("SSL_CERT_DIR", str(empty))
+    assert ssl.create_default_context().get_ca_certs(binary_form=True) == [
+        invented_certs["root"]
+    ]
+    return invented_certs
 
 
 def setup(tmp_path, monkeypatch, *, version=2, host="www.data.gov.qa"):
@@ -175,19 +192,22 @@ def test_manifest_missing_reason(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize("version", [1, 2])
-def test_pin_selection_and_request_context(tmp_path, monkeypatch, version):
+def test_pin_selection_and_request_context(
+    tmp_path, monkeypatch, version, isolated_trust
+):
     entry, dec, body = setup(
         tmp_path, monkeypatch, version=version, host="monaqasat.mof.gov.qa"
     )
-    chosen = replace(pin(), host=entry.fetch_host)
-    configured = {
-        "host": entry.fetch_host,
-        "sha256": chosen.sha256,
-        "file": "SYN.der",
-        "security_review": "APPROVED",
-    }
+    der = isolated_trust["intermediate"]
+    configured = config_file(tmp_path, der, entry.fetch_host, awards.SOURCE)
+    real_load = awards.load_pin
+    chosen = real_load(tmp_path, awards.SOURCE, configured)
+    assert chosen == make_pin(der, entry.fetch_host)
     if version == 2:
-        dec["pins"] = [dict(configured, host="www.edu.gov.qa"), configured]
+        dec["pins"] = [
+            config_file(tmp_path, der, "www.edu.gov.qa", awards.SOURCE),
+            configured,
+        ]
     else:
         dec["pin"] = configured
     loaded = []
@@ -196,7 +216,7 @@ def test_pin_selection_and_request_context(tmp_path, monkeypatch, version):
         assert cache == tmp_path and source == awards.SOURCE
         assert config == configured
         loaded.append(config)
-        return chosen
+        return real_load(cache, source, config)
 
     monkeypatch.setattr(awards, "load_pin", load)
 
@@ -215,16 +235,19 @@ def test_pin_selection_and_request_context(tmp_path, monkeypatch, version):
     assert result.sidecar["award_check"]["matched"] == 2
 
 
-def test_legacy_explicit_pin_off_tender_host(tmp_path, monkeypatch):
-    entry, dec, body = setup(tmp_path, monkeypatch, version=1)
-    dec["pin"] = {"host": entry.fetch_host}
-    chosen = pin()
+def test_legacy_explicit_pin_off_tender_host(tmp_path, monkeypatch, isolated_trust):
+    entry, dec, body = setup(tmp_path, monkeypatch, version=1, host="www.edu.gov.qa")
+    der = isolated_trust["intermediate"]
+    dec["pin"] = config_file(tmp_path, der, entry.fetch_host, awards.SOURCE)
+    real_load = awards.load_pin
+    chosen = real_load(tmp_path, awards.SOURCE, dec["pin"])
+    assert chosen == make_pin(der, entry.fetch_host)
     loaded = []
 
     def load(cache, source, config):
         assert (cache, source, config) == (tmp_path, awards.SOURCE, dec["pin"])
         loaded.append(config)
-        return chosen
+        return real_load(cache, source, config)
 
     monkeypatch.setattr(awards, "load_pin", load)
 
@@ -234,6 +257,43 @@ def test_legacy_explicit_pin_off_tender_host(tmp_path, monkeypatch):
 
     awards.fetch_awards(entry, send, tmp_path, lambda: STAMP, lambda _: None)
     assert len(loaded) == 1
+
+
+@pytest.mark.parametrize(
+    "version,host",
+    [(1, "monaqasat.mof.gov.qa"), (2, "monaqasat.mof.gov.qa"), (1, "www.edu.gov.qa")],
+)
+@pytest.mark.parametrize(
+    "plant,reason",
+    [
+        ("digest", "certificate_chain_incomplete"),
+        ("review", "certificate_review_pending"),
+    ],
+)
+def test_configured_pin_refuses_before_send(
+    tmp_path, monkeypatch, isolated_trust, version, host, plant, reason
+):
+    entry, dec, body = setup(tmp_path, monkeypatch, version=version, host=host)
+    configured = config_file(
+        tmp_path, isolated_trust["intermediate"], host, awards.SOURCE
+    )
+    if plant == "digest":
+        configured["sha256"] = "0" * 64
+    else:
+        configured["security_review"] = "PENDING"
+    if version == 2:
+        dec["pins"] = [configured]
+    else:
+        dec["pin"] = configured
+    calls = []
+
+    def send(url):
+        calls.append(url)
+        return Response(url, body, ())
+
+    with pytest.raises(certificate_pins.PinError, match=f"^{reason}$"):
+        awards.fetch_awards(entry, send, tmp_path, lambda: STAMP, lambda _: None)
+    assert calls == []
 
 
 @pytest.mark.parametrize("version", [1, 2])
