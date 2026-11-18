@@ -794,6 +794,21 @@ Night-light, weather and grid semantic plants use consistently rehashed invented
 receipts to retain their metadata guards. Registry tests account for the eight
 held rows while retaining the closed nightly exclusions and their planted change.
 No existing split, native-cell, schema, TLS, archive or partition guard is relaxed.
+Build pass 5 adds `test_s2_t29_live_shapes.py`, `test_s2_t29_live_acquire.py`,
+`test_s2_t29_live_transport.py` and `test_s2_t29_live_awards.py`. They use invented
+records in the declared live shapes: duplicate JSON attributes with raw >,
+recursive closed schemas, script terminal flags, distinct workbook coordinates,
+cached-formula results, carried years, both tariff layouts, no-tariff coverage,
+modal-number binding, supplier and contractor expiry, all school field refusals,
+count/offset/terminal reconciliation, exact request frames, staged multi-input
+rollback, all five host pin refusals, credential injection and full-chain context
+isolation. Awards tests distinguish the awarded heading from opened bids, retain
+multiple winners, require every intake row's proof match, and preserve malformed
+portal card nesting without crawling. Red/green evidence records tests added
+before each implementation step and already-passing plants separately. The old
+sparse workbook fixture now supplies valid physical coordinates; its assertions
+and the formula refusal are retained. GIS assertion updates retain the original
+historical confirmation and require the new schema hold and zero requests.
 Commands and their actual results belong in PROGRESS.md and the builder return.
 The lead runs mutation campaigns and live evidence checks; invented fixtures do
 not establish page access, reviewed pins or another-maker approval.

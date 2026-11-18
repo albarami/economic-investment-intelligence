@@ -960,14 +960,60 @@ host values remain pending the lead.
 ### S2-T29 cached page and awards contracts
 
 These are custodian cache contracts under section 7.3, not new release-manifest
-entries. `page_records.parse_page_snapshot@v1` retains `source_id`, typed `rows`,
-`page_sha256`, `raw_identity`, source `as_of`, `source_period`, `retrieved_utc`,
-`method`, `provenance: Public` and `completeness: unknown`. The raw page and parsed
-table each have their own immutable archive receipt and byte hash. Consumers use
-an explicit reviewed identity and verify both objects. Missing schema, provenance,
-date or selection refuses; a directory or calendar implies no complete coverage.
-School capacity, enrolment, catchment and press-seat fields are not admitted.
-Public split uses retain PUB-90 through the existing typed split policy.
+entries. The retained v1 table contract supports existing archived inputs.
+`page_acquire.fetch@v2` binds a closed reviewed parser kind:
+`xlsx_sheet`, `embedded_json`, `html_blocks`, `html_table` or `arcgis_query`.
+A source cannot be redeclared under another parser kind to bypass its guards.
+The supplier row is `refusal` only under decision 0026 item 2 and lead ruling
+L-899: it records the dated access refusal without opening any request.
+
+A v2 table retains `version`, `source_id`, typed `rows`, ordered `inputs`,
+`as_of`, optional `publisher_date`, `period_first`, `period_last`, `retrieved_utc`,
+`method`, `provenance: Public`, `completeness: unknown` and per-page `coverage`.
+The snapshot's `as_of` is its own UTC retrieval date; missing or malformed dates
+refuse. A publisher date is separate provenance and never supplies the period.
+Periods are observed row periods or both null when no period field is declared
+(document 04 section 3.1; L-900). An input without a measured table count has null `row_count`, never zero;
+the parsed table count comes from its validated rows. Each input has an explicit confined archive key,
+identity, body hash, upstream hash, representation, extension and reviewed URL.
+Consumers select a reviewed table hash and verify every input receipt and hash;
+symlinked input folders or children refuse before an input read.
+no directory scan or newest-file choice is admitted.
+
+HTML inputs remove hidden form credential controls through the HTML parser before
+archiving. The original received bytes have their own `upstream_sha256`; the
+archived representation has its own hash and `form_secret_removed` label. The
+SharePoint discovery response archives a `reviewed_projection` of URL, string
+length converted by code, and publisher modification metadata, excluding expanded
+personal metadata. It never claims that projection is the full response. Original
+workbook and field-restricted school responses retain their own bytes. QNCC stays
+held pending its missing nested schema and a safe input representation: its full
+script contains credential-bearing and person-related fields outside the table.
+No credential is cached or used to make another request.
+
+Workbook declarations bind sheet name, relationship, sheet id, part, exact header
+cells, merged ranges, annual and quarterly coordinates, blank and footer rows.
+Only insurance accepts formula cached results; formulas are never evaluated,
+and missing cached results refuse. Awards intake retains its formula refusal.
+Quarter years carry from the first declared quarter of each year, with quarter
+sequence and year transitions checked. Manateq declares both Pricing layouts
+and each location's tariff or `no tariff on page` state; the latter yields no
+rate, never zero. Rates accept whole-number text followed by QR only.
+Classified activity sections are siblings bound by the argument N of
+`openCompanyDataModel(N)` to `CompanyData-N`, never row order. Supplier expiry
+comes from its heading; contractor expiry comes from its row. Registration pairs
+are retained verbatim, with their part meanings unconfirmed.
+
+School queries request only the seventeen reviewed fields, closed `where=1=1`,
+`orderByFields=objectid` and bounded offsets/counts at most `maxRecordCount`.
+A non-allow-listed field refuses before even the metadata request; response
+extras refuse before any archive write. Counts, unique ordered object ids and
+the final false `exceededTransferLimit` must agree. Capacity, enrolment, catchment
+and press-seat claims remain forbidden. Public split uses retain PUB-90.
+Related discovery, page, count, terms and parsed objects publish as one staged
+source tree; acquisition or final validation failure preserves the old tree.
+Actual acquisition maxima and observed row bounds remain lead evidence, never
+helper counts promoted into limits.
 
 A lead-operated school capture requires initial/final URLs and ordered redirect
 URLs, capture tool, UTC capture date, raw SHA-256, verified issuing-intermediate
@@ -1013,7 +1059,10 @@ incomplete. Certificate refusals retain their exact closed reason even when
 raised by the redirect guard before a redirected send;
 blocked or unreviewed URLs/redirects, pin and TLS refusals, and archive integrity
 failures refuse the intake with their closed reason. There is no passing threshold. A duplicate proof link must agree
-with every row using it. The registration match report retains every original
+with every intake row using it: each intake winner must match a row in the
+complete awarded-company table. One or more winner rows are retained; zero
+refuses. The table is bound to its preceding award heading, excluding the
+opened-bids table, and the award date is read from `span#lblAwardedDate`. The registration match report retains every original
 row and its match/refusal reason. Registration equality precedes exact company
 name equality after the closed normalization in document 04, section 2.4.
 Whitespace-only registrations never match, and duplicate register entries remain

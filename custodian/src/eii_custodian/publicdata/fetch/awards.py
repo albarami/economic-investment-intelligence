@@ -9,14 +9,12 @@ from __future__ import annotations
 import csv
 import io
 import json
-import re
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
+from contextlib import nullcontext
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-from xml.etree import ElementTree
-from zipfile import BadZipFile, ZipFile
 
 from .allowlist import approve, host_of
 from .award_checks import (
@@ -37,7 +35,7 @@ from .page_records import (
 from .receipts import sha256_hex, sidecar_for
 from .registry import Entry
 from .snapshots import Snapshot, SnapshotError, publish_snapshot, read_snapshot, utc
-from .transport import Transport
+from .transport import Transport, metadata_limit
 
 SOURCE = "awards_owner_scrape"
 METHOD = "awards.ingest_awards@v1"
@@ -71,7 +69,7 @@ def _profile(value: object) -> dict[str, Any]:
     columns = value.get("columns")
     if (
         not expected <= set(value)
-        or bool(set(value) - expected - {"row_count", "dated_rows"})
+        or bool(set(value) - expected - {"row_count", "dated_rows", "proof_columns"})
         or value["format"] not in {"csv", "xlsx"}
         or not isinstance(columns, list)
         or not columns
@@ -96,71 +94,13 @@ def _profile(value: object) -> dict[str, Any]:
 
 
 def _xlsx(body: bytes, sheet: str) -> list[list[str]]:
-    """Read reviewed OOXML sheet text; preserve sparse blanks, reject formulas."""
-    ns = {"s": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
-    relns = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+    """Share the coordinate-preserving reader, retaining the intake formula refusal."""
+    from .page_html import ShapeError
+    from .page_workbook import read_sheet
+
     try:
-        with ZipFile(io.BytesIO(body)) as archive:
-            shared: list[str] = []
-            if "xl/sharedStrings.xml" in archive.namelist():
-                shared = [
-                    "".join(node.itertext())
-                    for node in ElementTree.fromstring(
-                        archive.read("xl/sharedStrings.xml")
-                    )
-                ]
-            book = ElementTree.fromstring(archive.read("xl/workbook.xml"))
-            sheets = [
-                node
-                for node in book.findall("s:sheets/s:sheet", ns)
-                if node.get("name") == sheet
-            ]
-            if len(sheets) != 1:
-                raise AwardError("schema_missing")
-            rid = sheets[0].get("{" + relns + "}id")
-            relationships = ElementTree.fromstring(
-                archive.read("xl/_rels/workbook.xml.rels")
-            )
-            targets = [
-                node.get("Target", "")
-                for node in relationships
-                if node.get("Id") == rid and node.get("TargetMode") != "External"
-            ]
-            if len(targets) != 1 or ".." in Path(targets[0]).parts:
-                raise AwardError("schema_missing")
-            target = targets[0].lstrip("/")
-            if not target.startswith("xl/"):
-                target = "xl/" + target
-            root = ElementTree.fromstring(archive.read(target))
-            rows: list[list[str]] = []
-            for node in root.findall("s:sheetData/s:row", ns):
-                row: list[str] = []
-                for cell in node.findall("s:c", ns):
-                    if cell.find("s:f", ns) is not None:
-                        raise AwardError("schema_missing")
-                    reference = re.fullmatch(r"([A-Z]+)[1-9][0-9]*", cell.get("r", ""))
-                    if reference is None:
-                        raise AwardError("schema_missing")
-                    column = 0
-                    for letter in reference[1]:
-                        column = column * 26 + ord(letter) - ord("A") + 1
-                    if column <= len(row):
-                        raise AwardError("schema_missing")
-                    row.extend([""] * (column - len(row)))
-                    kind = cell.get("t", "n")
-                    text = cell.findtext("s:v", "", ns)
-                    if kind == "s":
-                        text = shared[int(text)]
-                    elif kind == "inlineStr":
-                        text = "".join(
-                            child.text or "" for child in cell.findall("s:is//s:t", ns)
-                        )
-                    elif kind not in {"n", "str"}:
-                        raise AwardError("schema_missing")
-                    row[column - 1] = text
-                rows.append(row)
-            return rows
-    except (BadZipFile, KeyError, ValueError, IndexError, ElementTree.ParseError):
+        return list(read_sheet(body, sheet).rows.values())
+    except ShapeError:
         raise AwardError("schema_missing") from None
 
 
@@ -244,7 +184,7 @@ def publish_awards(
     profile: Mapping[str, Any],
     stamp: str,
     seed: int,
-    proof_reader: Callable[[str], Mapping[str, str]],
+    proof_reader: Callable[[str], Mapping[str, str] | Sequence[Mapping[str, str]]],
     registers: list[dict[str, str]],
     registration_inputs: list[dict[str, object]] | None = None,
 ) -> Snapshot:
@@ -272,7 +212,7 @@ def _publish_awards(
     profile: Mapping[str, Any],
     stamp: str,
     seed: int,
-    proof_reader: Callable[[str], Mapping[str, str]],
+    proof_reader: Callable[[str], Mapping[str, str] | Sequence[Mapping[str, str]]],
     registers: list[dict[str, str]],
     registration_inputs: list[dict[str, object]] | None = None,
 ) -> Snapshot:
@@ -299,6 +239,9 @@ def _publish_awards(
         terms_sha256="",
     )
     side.update(
+        as_of=utc(stamp).date().isoformat(),
+        period_first=batch.summary.get("date_first"),
+        period_last=batch.summary.get("date_last"),
         award_check=check,
         summary=batch.summary,
         method=METHOD,
@@ -311,6 +254,9 @@ def _publish_awards(
     body = json.dumps(
         {
             "rows": batch.rows,
+            "as_of": utc(stamp).date().isoformat(),
+            "period_first": batch.summary.get("date_first"),
+            "period_last": batch.summary.get("date_last"),
             "summary": batch.summary,
             "raw_identity": raw.sha256,
             "source_sha256": batch.sha256,
@@ -344,6 +290,29 @@ def fetch_awards(
 
     declaration = load_declaration(SOURCE)
     profile = _profile(declaration.get("profile"))
+    version_two = declaration.get("version") == 2
+    if version_two:
+        from .page_html import ShapeError
+        from .page_schema import validate
+
+        try:
+            validate(declaration)
+        except ShapeError as exc:
+            raise AwardError(str(exc)) from None
+        if declaration["hold"] is not None:
+            raise AwardError(declaration["hold"])
+        if declaration["max_bytes"] is None:
+            raise AwardError("acquisition_bound_unconfirmed")
+        mapping = profile.get("proof_columns")
+        if (
+            not isinstance(mapping, dict)
+            or set(mapping) != {"company", "registration", "value"}
+            or any(
+                mapping[k] not in {c[0] for c in declaration["columns"]}
+                for k in mapping
+            )
+        ):
+            raise AwardError("awards_profile_pending")
     cache_directory(cache, entry)
     if (
         not entry.publisher
@@ -367,7 +336,16 @@ def fetch_awards(
         raise AwardError("intake_missing") from None
 
     pin = (
-        load_pin(cache, SOURCE, declaration.get("pin"))
+        load_pin(
+            cache,
+            SOURCE,
+            next(
+                (p for p in declaration["pins"] if p["host"] == host_of(entry.url)),
+                None,
+            )
+            if version_two
+            else declaration.get("pin"),
+        )
         if host_of(entry.url) == "monaqasat.mof.gov.qa"
         or isinstance(declaration.get("pin"), dict)
         else None
@@ -376,11 +354,31 @@ def fetch_awards(
     destination = cache
     with staged_source(cache, entry.key) as cache:
 
-        def proof_reader(url: str) -> Mapping[str, str]:
+        def proof_reader(url: str) -> Mapping[str, str] | Sequence[Mapping[str, str]]:
             if url not in declaration["reviewed_urls"]:
                 raise AwardError("blocked_host")
-            with page_transport(pin):
+            from .page_requests import page_requests
+
+            scope = (
+                page_requests(
+                    tuple(declaration["reviewed_urls"]), {pin.host: pin} if pin else {}
+                )
+                if version_two
+                else nullcontext()
+            )
+            limit = (
+                metadata_limit(declaration["max_bytes"])
+                if version_two
+                else nullcontext()
+            )
+            with scope, limit, page_transport(None if version_two else pin):
                 response, failure = read_bounded(transport, sleep, url)
+            if (
+                version_two
+                and response is not None
+                and len(response.body) > declaration["max_bytes"]
+            ):
+                raise AwardError("metadata_bytes")
             if failure is not None and failure.check == "blocked_host":
                 raise AwardError("blocked_host")
             if failure or response is None:
@@ -395,7 +393,7 @@ def fetch_awards(
                 entry, columns=tuple(tuple(pair) for pair in declaration["columns"])
             )
             rows = parse_body(response.body, proof_entry, declaration)
-            if len(rows) != 1:
+            if not rows:
                 raise AwardError("schema_missing")
             side = sidecar_for(
                 entry,
@@ -406,19 +404,38 @@ def fetch_awards(
                 retrieved_utc=stamp,
                 publisher=entry.publisher,
                 source_modified="",
-                row_count=1,
+                row_count=len(rows),
                 terms_sha256="",
             )
-            try:
-                publish_snapshot(
-                    cache / entry.key / "proofs", "html", response.body, side
+            proof_body = response.body
+            if version_two:
+                from .page_acquire import _html_without_form_secrets
+
+                proof_body = _html_without_form_secrets(proof_body)
+                side.update(
+                    sha256=sha256_hex(proof_body),
+                    bytes=len(proof_body),
+                    upstream_sha256=sha256_hex(response.body),
+                    representation="form_secret_removed",
                 )
+            try:
+                publish_snapshot(cache / entry.key / "proofs", "html", proof_body, side)
             except OSError:
                 raise SnapshotError("snapshot_write_failed") from None
-            return {
-                key: "" if value is None else str(value)
-                for key, value in rows[0].items()
-            }
+            if version_two:
+                return [
+                    {
+                        profile[key]: ""
+                        if row[profile["proof_columns"][key]] is None
+                        else str(row[profile["proof_columns"][key]])
+                        for key in ("company", "registration", "value")
+                    }
+                    for row in rows
+                ]
+            return [
+                {key: "" if value is None else str(value) for key, value in row.items()}
+                for row in rows
+            ]
 
         result = _publish_awards(
             entry,

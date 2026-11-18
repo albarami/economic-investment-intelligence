@@ -53,7 +53,6 @@ def review(entry=None):
 def test_registry_sources_and_receipts():
     from eii_custodian.publicdata.fetch.page_records import (
         SOURCES,
-        PageError,
         load_declaration,
     )
 
@@ -63,8 +62,10 @@ def test_registry_sources_and_receipts():
         row = rows[source]
         assert not row.commit_allowed and row.licence_basis == "owner_decision"
         assert row.row_count_min is None and row.row_count_max is None
-        with pytest.raises(PageError, match="page_evidence_pending"):
-            load_declaration(source)
+        declaration = load_declaration(source)
+        assert declaration["version"] == 2 and declaration["evidence"]
+        assert declaration["max_bytes"] is None
+        assert declaration["hold"] is not None or declaration["kind"] == "refusal"
 
 
 @pytest.mark.parametrize(
@@ -203,7 +204,8 @@ def test_gis_hold_and_premature_removal(tmp_path):
     document = yaml.safe_load(registry_path().read_text())
     for key in ("gis_boundaries", "gis_imagery_history"):
         row = next(r for r in document["sources"] if r["key"] == key)
-        assert row["skip_reason"] == "direct_url_unconfirmed"
+        assert row["skip_reason"] == "schema_unconfirmed"
+        assert row["url"].startswith("https://services.gisqatar.org.qa/")
         row["skip_reason"] = ""
         path = tmp_path / "syn-registry.yaml"
         path.write_text(yaml.safe_dump(document))

@@ -227,9 +227,9 @@ def test_workbook_profile_and_sparse_blanks(tmp_path):
     rel = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
     cols = profile()["columns"]
 
-    def cells(values):
+    def cells(values, number):
         return "".join(
-            f'<c r="{chr(65 + i)}1" t="inlineStr"><is><t>{value}</t></is></c>'
+            f'<c r="{chr(65 + i)}{number}" t="inlineStr"><is><t>{value}</t></is></c>'
             for i, value in enumerate(values)
         )
 
@@ -244,7 +244,7 @@ def test_workbook_profile_and_sparse_blanks(tmp_path):
         )
         archive.writestr(
             "xl/worksheets/syn.xml",
-            f'<worksheet xmlns="{ns}"><sheetData><row>{cells(cols)}</row><row>{cells(["SYN-company", "SYN-reg"])}</row></sheetData></worksheet>',
+            f'<worksheet xmlns="{ns}"><sheetData><row r="1">{cells(cols, 1)}</row><row r="2">{cells(["SYN-company", "SYN-reg"], 2)}</row></sheetData></worksheet>',
         )
     batch = ingest_awards(
         tmp_path,

@@ -570,7 +570,19 @@ def run_build(
             pending.append(entry)
             continue
         if entry.skip_reason:
-            if entry.terms_url:
+            if entry.source_id == "suppliers_tawteen":
+                from .page_records import load_declaration, record_failure
+
+                refusal = load_declaration(entry.source_id)
+                if refusal.get("kind") != "refusal":
+                    raise ValueError("schema_missing")
+                record_failure(
+                    cache,
+                    entry,
+                    refusal["shape"]["observed_utc"],
+                    refusal["shape"]["reason"],
+                )
+            if entry.terms_url and entry.kind not in {"public_page", "awards_intake"}:
                 _read_terms_apart(
                     entry, transport, sleep, clock, lines, terms, previous, cache
                 )

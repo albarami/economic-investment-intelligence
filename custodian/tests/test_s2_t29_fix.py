@@ -43,7 +43,11 @@ def test_cleared_hold_keeps_evidence_refusal(tmp_path, source):
         lambda: STAMP,
         lambda _: None,
     )
-    assert outcome.failure.check == "page_evidence_pending"
+    assert outcome.failure.check == (
+        "acquisition_bound_unconfirmed"
+        if source == "insurance_tables"
+        else "awards_profile_pending"
+    )
     assert not (tmp_path / held.key).exists()
 
 

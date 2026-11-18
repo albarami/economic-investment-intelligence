@@ -11,7 +11,7 @@ from collections.abc import Callable, Iterator, Mapping
 from contextlib import AbstractContextManager, contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
-from http.client import HTTPException, HTTPMessage
+from http.client import HTTPException, HTTPMessage, HTTPResponse, HTTPSConnection
 from typing import IO, Protocol
 from urllib.parse import unquote, urlencode, urlsplit, urlunsplit
 
@@ -76,6 +76,7 @@ class Response:
     hops: tuple[str, ...]
     etag: str | None = None
     body_sha256: str = ""
+    headers: Mapping[str, str] = field(default_factory=dict, repr=False)
 
 
 class TransportFault(Exception):
@@ -131,9 +132,23 @@ def open_https(
 ) -> Response:
     """Open one HTTPS URL with the standard library. Redirects are checked first."""
     from .certificate_pins import PinError, browser_agent, current_pin, verified_context
+    from .page_requests import active, check_target, page_context
 
+    check_target(url)
+    page_scoped = active()
     pin = current_pin()
-    if pin is not None:
+    if page_scoped:
+        if token or (
+            headers
+            and any(
+                name.casefold()
+                in {"authorization", "cookie", "__requestverificationtoken"}
+                for name in headers
+            )
+        ):
+            raise TransportFault("blocked_host", "")
+        ssl_context = page_context(host_of(url), ssl_context)
+    elif pin is not None:
         ssl_context = verified_context(host_of(url), pin, context=ssl_context)
     decision = approve(url)
     if not decision.ok or (
@@ -154,7 +169,17 @@ def open_https(
         reviewed_urls=reviewed_urls,
         keyed_url=str(url) if keyed else None,
     )
-    if ssl_context is None:
+    if page_scoped:
+
+        class _PageHTTPS(urllib.request.HTTPSHandler):
+            def https_open(self, req: urllib.request.Request) -> HTTPResponse:
+                check_target(req.full_url)
+                return self.do_open(
+                    HTTPSConnection, req, context=page_context(host_of(req.full_url))
+                )
+
+        opener = urllib.request.build_opener(guard, _PageHTTPS())
+    elif ssl_context is None:
         opener = urllib.request.build_opener(guard)
     else:
         opener = urllib.request.build_opener(
@@ -191,6 +216,11 @@ def open_https(
             ):
                 raise TransportFault("blocked_host", "")
             etag = response.headers.get("ETag")
+            public_headers = {
+                name: response.headers[name]
+                for name in ("x-wp-total", "x-wp-totalpages")
+                if response.headers.get(name) is not None
+            }
     except PinError:
         raise
     except TransportFault:
@@ -217,7 +247,12 @@ def open_https(
             body = b"null"
         final, hops, etag = str(url), [], None
     return Response(
-        final_url=final, body=body, hops=tuple(hops), etag=etag, body_sha256=digest
+        final_url=final,
+        body=body,
+        hops=tuple(hops),
+        etag=etag,
+        body_sha256=digest,
+        headers=public_headers,
     )
 
 
@@ -244,7 +279,11 @@ def _redirect_guard(
                 # No redirected send can become a second chargeable request.
                 raise TransportFault("blocked_host", keyed_url)
             from .certificate_pins import current_pin, validate_pin
+            from .page_requests import active, check_target, page_context
 
+            check_target(newurl)
+            if active():
+                page_context(host_of(newurl))
             pin = current_pin()
             if pin is not None:
                 validate_pin(host_of(newurl), pin)

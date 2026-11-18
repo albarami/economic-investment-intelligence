@@ -532,7 +532,7 @@ These are planned source IDs and fetch assignments under S2-T29, not claims that
 | `insurance_tables` | The insurance regulator's public tables | Dated Public tables on their published categories and geography; no helper-read count becomes a declared bound before fetch. |
 | `events_visit_qatar` | Visit Qatar events calendar | Dated event-table snapshot with daily re-fetch under decision 0045 item 4; source and "as of" on every event, no complete-events claim. |
 | `events_qncc` | Qatar National Convention Centre events calendar | The same dated daily snapshot treatment; coverage is measured only after fetch and does not by itself close N4 or OI-137. |
-| `suppliers_tawteen` | Tawteen supplier page | Dated supplier-table snapshot with weekly re-fetch for supplier credentials; only published fields are shown. |
+| `suppliers_tawteen` | QatarEnergy ICV guest supplier page | Refusal-recording row only (L-899, decision 0026 item 2); no connection, token or paging; weekly credential cadence is retained as a declaration, N6 stays open. |
 | `manateq_tariffs` | Manateq tariff page | Dated Public tariff table; a fitting closed cadence is recorded, or `none` with `frequency_unconfirmed` where none fits. |
 | `monaqasat_classified` | Monaqasat classified-company list | Dated supplier-classification snapshot with weekly re-fetch for supplier credentials; the server omits its intermediate certificate (advisor's reading of 2026-11-16), so a host-scoped pin of that intermediate and another-maker security review precede its fetch, with TLS verification always enabled; its record count is taken after the first fetch. |
 | `schools_private_directory` | Education ministry private-school directory | Dated Public directory under the same reviewed TLS rule; the connection was reset with verification on and off (advisor's reading of 2026-11-16), so a normal browser user agent and then a browser-driven capture are tried, and an access failure is recorded with its date; the press-reported seat figure is no feed: no press-reported capacity or seat figure is registered, fetched or shown; it supplies no capacity, enrolment or catchment and does not close N7 or OI-139. |
@@ -544,34 +544,80 @@ Calendar and list pages enter S2-T27's immutable archive as dated table snapshot
 
 ### S2-T29 offline implementation and lead evidence holds
 
-The normal registry now declares the eight source IDs of section 2.4, with
-`commit_allowed: false`, owner-decision basis, no invented count bounds or columns,
-and `page_evidence_pending`. Their reviewed declarations are in
-`custodian/publicdata/review/s2_t29_sources.yaml`. Loading a pending declaration
-refuses before a request. Held rows first emit their normal skip line and allow
-the build to continue; clearing a skip without supplying evidence still refuses.
-No new host is admitted without the lead's review.
-Terms remain “terms to be read”; the row date records this declaration check,
-not a reading of a publisher page. S2-T21 part B remains an independent hold.
+Build pass 5 uses the supplied second-round shape evidence and lead rulings
+L-892 and L-895 to L-900. The eight registry rows keep `commit_allowed: false`,
+owner-decision basis and unconfirmed row bounds. Closed declarations in
+`custodian/publicdata/review/s2_t29_sources.yaml` cite the evidence for every row.
+The parser-kind declarations do not prove access, completeness or successful
+normal-seam acquisition. No live data was read for this implementation.
 
-The build's live-evidence ruling L-876 supplies these explicit open slots:
+Insurance binds Tables 5 to 8 independently, their different end-of-period cells,
+headers, merges, annual/quarter rows and stored formula results. Discovery uses
+`File.ServerRelativeUrl` and string `File.Length`, never empty `Link`. Visit
+Qatar uses an HTML parser for the two `vq-event-listing` attribute arrays, which
+must agree even when an attribute contains raw > characters. QNCC uses the
+second-round `events/events` record path and sibling `hasMore` terminal flag;
+there is no total or evidenced next-page request. A true continuation flag holds
+with `paging_incomplete`; no complete-coverage claim follows from a false flag.
+Its incomplete nested registration/array schema and token-bearing script keep
+`schema_evidence_pending` until reviewed evidence and a safe input shape arrive.
 
-- Page URLs, redirect URLs, structures, typed columns, dates and periods:
-  `[LEAD: evidence 1]`.
-- Exact-host issuing-intermediate DER pins and independent security approval:
-  `[LEAD: evidence 2]`. Tender PEM-byte pins retain their existing convention.
-- Owner workbook aggregate profile: `[LEAD: evidence 3]`; only the lead reads
-  the real workbook. Intake files and receipts remain uncommitted.
-- Awards sample seed: `[LEAD: evidence 4]`, recorded in the source receipt and
-  PROGRESS.md when the lead selects it. Invented tests use their own seed.
-- Accident year-partition byte spans: `[LEAD: evidence 5]`. The bounded adapter
-  uses the shared metadata reader with acquisition-time maximum plus full-span
-  validation. The existing `partition_byte_bound_unconfirmed` remains until
-  observed spans are supplied. Catalogue, plan, duplicate and total checks stay.
-- WorldPop folder/year/units/DOI/category confirmation and both GIS direct URLs:
-  `[LEAD: evidence 6]`. Existing WorldPop metadata guards and GIS
-  `direct_url_unconfirmed` flags remain. On evidenced GIS confirmation only,
-  replace that flag with `schema_unconfirmed`; invent no layer, schema or view.
+The supplier row is NOT READ under decision 0026 item 2 and L-899. Its guest
+URL is provenance only; no endpoint parser, token handling or paging is built.
+It records `anonymous_access_not_approved`, observed at 2026-11-17T23:09:19Z,
+without a connection, including when the normal build skips the row. N6 remains
+open. Manateq declares both Pricing block layouts and all reviewed location
+pages; `no tariff on page` is coverage, never a rate. The classified list reads
+the default Arabic page, binds sibling sections by modal number, reconciles its
+stated total and last page, and preserves unexplained registration pairs.
+The school query names only the seventeen L-892 item 3 fields, orders by
+objectid, ends at the count with false exceededTransferLimit and never requests
+or archives contact attributes. The awards proof parser preserves all winners
+from the heading-bound awarded-company table; it reads the date span and keeps
+the opened-bids table separate. Its invalid div-inside-tr listing shape is tested
+without adding a crawl.
+
+The five issuing-intermediate declarations carry the supplied DER hashes and
+exact hosts. DER filenames, independent security approval and the Sectigo
+recheck remain pending. Initial, redirected and terms requests each select their
+own verifying context; an unpinned full-chain host receives fresh ordinary trust.
+There is no AIA fetch, partial-chain trust, verification fallback or cookie jar.
+The existing tender PEM convention is unchanged. The source and redirect hosts
+reviewed by L-892 join PUB-03; a request still needs its exact reviewed path.
+
+Other open lead inputs are the awards aggregate profile, proof-to-intake column
+mapping, intake hash and seed; accepted accident partition byte spans; WorldPop
+confirmation through the existing reader; and per-source acquisition maxima and
+observed bounds. Measurements in the supplied evidence remain leads. The dated
+`as_of` is the selected snapshot's own retrieval date, a publisher date stays
+separate, and both period bounds are null without an observed period field.
+The two GIS direct-URL flags alone lift to `schema_unconfirmed`. The reviewed
+configuration records ZonesA layer 0, MunicipalityA and DistrictsAr layer 1,
+both alternate scale ranges and the evidenced imagery URLs; no schema, view,
+export job or fetched value is activated. The earlier S2-T19 confirmation record
+remains historical.
+
+Terms below were read by the lead's evidence helper on 2026-11-17 (second-round
+O10); the builder read that supplied evidence only. Restrictive wording remains
+recorded under owner decision 0026. Unread education-policy text stays unread;
+no signed document URL is copied. Runtime terms receipts still require a normal
+fetch and hash. Recorded registry wording, including absence scope:
+
+`insurance_tables`: For personal use, that is not for the purpose of private or commercial gains, any information, data or documents posted herein may be viewed, reproduced or stored in.
+
+`events_visit_qatar`: reproduce any Content from our Website(s) without our express written permission, which we may withhold or grant (on terms acceptable to us), in our absolute discretion;
+
+`events_qncc`: Permission is granted to temporarily download one copy of the materials (information or software) on Qatar National Convention Centre's website for personal, non-commercial transitory viewing only.
+
+`suppliers_tawteen`: Reuse wording not found in the page read; Terms of Use mentioned but not saved. Source NOT READ under decision 0026 item 2 (L-899).
+
+`manateq_tariffs`: Copyrights © 2025 Manateq All rights reserved. Reuse clause not found in the page read.
+
+`monaqasat_classified`: إن لم ينص علي خلاف ذلك، فإنه لا يجب إعادة إنتاج أو إعادة نشر أو تحميل أو إرسال أو توزيع أو عرض بشكل علني أو تعديل لمحتويات هذا الموقع بدون موافقة خطية مسبقة من طريق وزارة المالية
+
+`schools_private_directory`: terms to be read; education policy PDF not read (no text tool); reuse clause not found in the saved HTML pages.
+
+`awards_owner_scrape`: إن لم ينص علي خلاف ذلك، فإنه لا يجب إعادة إنتاج أو إعادة نشر أو تحميل أو إرسال أو توزيع أو عرض بشكل علني أو تعديل لمحتويات هذا الموقع بدون موافقة خطية مسبقة من طريق وزارة المالية
 
 The grid cache consumer selects reviewed archive identities and rechecks their
 hashes and file metadata; it uses the existing decoder and native grid cells.
@@ -805,7 +851,7 @@ The tender terms remain the quotation in section 2.1, read 2026-11-14.
 |---|---|
 | PUB-01 | Public sources are fetched only by `./eii build-public`. No other command, test or product code opens a network connection to a source host, except the traffic provider module of PUB-95 (the optional live traffic provider, off by default) and the product server's routes to the two map providers of PUB-109 ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7). |
 | PUB-02 | The product plane (`product/`, `web/`) contains no code path that contacts a source host, except the traffic provider module of PUB-95, which has its own list of hosts and is used only in a session with the provider switched on, and the API process's routes to the map providers of PUB-109 ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7), used only by the satellite and photorealistic 3D modes and by address search while their keys are present; the browser contacts only its own origin. A test asserts that the product imports no fetcher module and that the API process makes no request to any source host during the guided story, which runs with the provider off and on the open map. |
-| PUB-03 | The fetcher accepts only HTTPS, or S3 for Overture, to `www.data.gov.qa`, `www.data.qa`, `services7.arcgis.com`, `data.humdata.org`, `s3.us-east-1.amazonaws.com`, `www.geoboundaries.org`, `github.com`, `raw.githubusercontent.com`, `stac.overturemaps.org`, `overturemaps-us-west-2.s3.us-west-2.amazonaws.com`, `download.openstreetmap.fr`, `unstats.un.org`, `data.worldpop.org`, `web.archive.org`, `fdiprojects.invest.qa`, `www.invest.qa`, `services.gisqatar.org.qa`, `monaqasat.mof.gov.qa` and `data.source.coop` (the public copy of `places_fsq`, [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 21), `ladsweb.modaps.eosdis.nasa.gov` and `archive-api.open-meteo.com` (the archive host of `ntl_blackmarble` and the host of `weather_openmeteo`, S2-T14), `ndownloader.figshare.com` and `44c1cec316ec56bca76dfd65d2882b20.r2.cloudflarestorage.com` (the file host of `bldg_3dglobfp` and the storage host its addresses answer with, S2-T20) and `download.geoservice.dlr.de` (the file host of `bldg_wsf3d`, S2-T20). `www.data.gov.qa` and `www.data.qa` serve the same portal and the same slugs ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)): a dataset is identified by its slug whichever host served it, and the registry records the host each file came from (`fetch_host`). Redirect and storage hosts are checked too. A source whose direct URL or redirect host is still marked to be confirmed at slice S2 is blocked. Adding a host needs a reviewed registry change: the hosts of the sources of decision 0019 that `build-public` fetches (`busy_besttime`, the provider's interface host of [decision 0031](decisions/0031-venue-busyness-from-a-provider-interface.md), `ntl_blackmarble`, `weather_openmeteo` and the file host of `worldpop_qat_agesex`) are fixed by the tasks that build their fetchers and are added here that way. S2-T14 adds `ladsweb.modaps.eosdis.nasa.gov` for `ntl_blackmarble` and `archive-api.open-meteo.com` for `weather_openmeteo`; the file host of `worldpop_qat_agesex` is `data.worldpop.org`, already on this list. `besttime.app` is the provider interface host added by S2-T16 for `busy_besttime`. The hosts of the sources of [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) (the national GIS centre's `services.gisqatar.org.qa`, the hosts of the two height sources and of the tender portal) are fixed by S2-T19 and S2-T20 and added here the same way, and each such source is blocked until then. The hosts of the traffic provider and of the two map providers of decision 0023 item A7 are never added to this list (PUB-95, PUB-109). S2-T23 to S2-T26 add the verified source and redirect hosts of decision 0040 only through reviewed registry changes; a listed page address is not an already-approved fetch host. |
+| PUB-03 | The fetcher accepts only HTTPS, or S3 for Overture, to `www.data.gov.qa`, `www.data.qa`, `services7.arcgis.com`, `data.humdata.org`, `s3.us-east-1.amazonaws.com`, `www.geoboundaries.org`, `github.com`, `raw.githubusercontent.com`, `stac.overturemaps.org`, `overturemaps-us-west-2.s3.us-west-2.amazonaws.com`, `download.openstreetmap.fr`, `unstats.un.org`, `data.worldpop.org`, `web.archive.org`, `fdiprojects.invest.qa`, `www.invest.qa`, `services.gisqatar.org.qa`, `monaqasat.mof.gov.qa` and `data.source.coop` (the public copy of `places_fsq`, [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 21), `ladsweb.modaps.eosdis.nasa.gov` and `archive-api.open-meteo.com` (the archive host of `ntl_blackmarble` and the host of `weather_openmeteo`, S2-T14), `ndownloader.figshare.com` and `44c1cec316ec56bca76dfd65d2882b20.r2.cloudflarestorage.com` (the file host of `bldg_3dglobfp` and the storage host its addresses answer with, S2-T20) and `download.geoservice.dlr.de` (the file host of `bldg_wsf3d`, S2-T20). `www.data.gov.qa` and `www.data.qa` serve the same portal and the same slugs ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)): a dataset is identified by its slug whichever host served it, and the registry records the host each file came from (`fetch_host`). Redirect and storage hosts are checked too. A source whose direct URL or redirect host is still marked to be confirmed at slice S2 is blocked. Adding a host needs a reviewed registry change: the hosts of the sources of decision 0019 that `build-public` fetches (`busy_besttime`, the provider's interface host of [decision 0031](decisions/0031-venue-busyness-from-a-provider-interface.md), `ntl_blackmarble`, `weather_openmeteo` and the file host of `worldpop_qat_agesex`) are fixed by the tasks that build their fetchers and are added here that way. S2-T14 adds `ladsweb.modaps.eosdis.nasa.gov` for `ntl_blackmarble` and `archive-api.open-meteo.com` for `weather_openmeteo`; the file host of `worldpop_qat_agesex` is `data.worldpop.org`, already on this list. `besttime.app` is the provider interface host added by S2-T16 for `busy_besttime`. The hosts of the sources of [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) (the national GIS centre's `services.gisqatar.org.qa`, the hosts of the two height sources and of the tender portal) are fixed by S2-T19 and S2-T20 and added here the same way, and each such source is blocked until then. The hosts of the traffic provider and of the two map providers of decision 0023 item A7 are never added to this list (PUB-95, PUB-109). S2-T29 adds the L-892 reviewed hosts `www.qcb.gov.qa`, `visitqatar.com`, `www.qncc.qa`, `manateq.qa`, `www.tawteen.com.qa`, `icv.qa`, `www.edu.gov.qa`, `myschool.edu.gov.qa` and `myschools.edu.gov.qa`, subject to exact reviewed paths and host-scoped pin approval where required. S2-T23 to S2-T26 add the verified source and redirect hosts of decision 0040 only through reviewed registry changes; a listed page address is not an already-approved fetch host. |
 | PUB-04 | Every fetched file is stored in `data/public_cache/<source_id>/<sha256>.<ext>` with a complete sidecar holding the fields of section 3.1. An entry with `kind: public_document` and `fetch_mode: citation_only` opens no network request, requires no cached file, and writes registry metadata with `sha256: "CITATION_ONLY"`. The traffic provider (`fetch_mode: live_session`, PUB-95) is not an entry of the registry: it is listed in section 2 for its terms and attribution, stores no response, has no sidecar and has no row in `source_registry`. |
 | PUB-05 | Writes are atomic: a file enters the cache only after its download completes, its SHA-256 is computed and its checks pass. An interrupted run leaves no partial entry. |
 | PUB-06 | A failed request is retried at most three times with back-off, then the build exits non-zero with a message naming the `source_id`, the URL and the failed check. There is no silent fallback to an older file. |
@@ -840,6 +886,14 @@ fetch kinds; the source registry's public-dataset/document classification below 
 `paged_cards` carries `chain_intermediate_sha256`; an empty pin is unconfirmed, never permission
 to disable certificate verification. A technically absent `paged_layer` may omit its unconfirmed
 `layer`; an available row must declare a non-negative layer id (LA-2 of S2-T19).
+
+S2-T29 keeps the `public_page` and `awards_intake` dispatch kinds; reviewed
+parser kinds are separate and closed. Its v2 `as_of` is the retrieval date,
+`publisher_date` is optional provenance and observation periods come from parsed
+rows only (PUB-16). Input representations, original and archived hashes, atomic
+publication and explicit selection are specified in document 03, **S2-T29 cached
+page and awards contracts**. The field-limited school query never requests
+contact or capacity fields; source terms never relax that restriction.
 
 S2-T27's local archive extends this cache. An immutable `index/<identity>.json`
 records source id, entry key, retrieval UTC, byte size, body SHA-256, extension,

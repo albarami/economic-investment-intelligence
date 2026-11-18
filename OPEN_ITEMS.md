@@ -3407,3 +3407,60 @@ OI-137, OI-138 and OI-139 remain open, as do S2-T21 part B's OI-209 to OI-212,
 the accident birth-year-use ruling and the previously reported WorldPop grid-key
 contract wording difference. If both real school access attempts fail, the lead
 must record the dated reason and give the advisor the required one-line notice.
+
+
+### S2-T29 build pass 5 — remaining evidence, 2026-11-18
+
+Supersedes the blanket page-structure hold above only where the second-round
+shape evidence resolves it. Every source declaration now cites its supplied
+evidence; no live fetch or acceptance is claimed.
+
+- O1/O2: QCB per-sheet coordinates and Visit Qatar's complete record schema are
+  declared. QNCC's nested registration descendants and the element types of
+  empty arrays remain unspecified; its full script also contains credential and
+  person-related fields outside the table. `schema_evidence_pending` holds it
+  until complete reviewed schema and a safe archival input representation are
+  supplied. `hasMore=true` has no evidenced next request and refuses incomplete
+  paging; the reviewed finite document bound is one, not a universe claim.
+- O3: L-899 resolves the supplier action: NOT READ, no token, endpoint or paging
+  code. The dated round-2c refusal is its evidence; N6/OI-138 remains open. No
+  further browser or cookie experiment is authorized here.
+- O4: tariff and no-tariff pages and both layouts are declared. REST modified
+  timestamps remain provenance only, with per-page lineage; they never supply
+  a period or a price on a page without one.
+- O5: the two parts of the classified registration pair have no stated meaning;
+  preserve them verbatim. Sibling activity sections bind by modal number, and
+  expiry comes from its published heading or contractor row, never inference.
+- O6: school field types/nullability and point CRS are declared from O6/L1;
+  L-897 supplies the closed ordering and count/offset terminal rule. No school
+  capacity, enrolment, catchment or contact data is admitted. Browser capture
+  for multi-response ArcGIS acquisition needs separate reviewed evidence if the
+  ordinary query fails; the earlier single-response capture contract remains
+  available for legacy inputs, with no fallback that bypasses its checks.
+- O7: the awards aggregate intake profile, hash, original-column to proof-column
+  mapping and lead seed remain missing. Heading-bound proof parsing and the
+  invalid listing-card shape are tested, but no real intake or crawl is run.
+- O8: L-900 applies the existing documents: snapshot retrieval-date `as_of`
+  always required; optional publisher date separate; observed periods or two
+  nulls. This implementation claims no decision-record amendment.
+- O9: the five exact-host pin hashes are supplied; DER filenames and bytes,
+  independent security approval and the lead Sectigo recheck remain pending.
+- O10: second-round O10 words and check date are recorded. The education policy
+  PDF is unread; ICV reuse wording and GIS terms were not found in the saved
+  pages. No open licence or terms receipt hash is invented.
+- O11: per-source acquisition maxima, observed row bounds, accepted accident
+  year-byte spans and the remaining WorldPop confirmation are lead inputs.
+  Source counts and exact observed sizes are not acquisition tolerances. All
+  corresponding holds remain; the existing readers and split guards are kept.
+  WorldPop already names the evidenced folder, year and DOI in its existing
+  rows; this worker does not promote its units/DOI flags without lead approval.
+- GIS URLs alone are confirmed by L-892 item 7; `schema_unconfirmed`, no layer
+  activation, no view selection and no imagery job remain. Prior S2-T19 evidence
+  rows are preserved as history. Independent two-lens review and live acceptance
+  are still lead work; no offline pass closes OI-137, OI-138 or OI-139.
+
+Archive representation clarification for review: hidden form credentials are
+removed before HTML storage; SharePoint expanded personal metadata is excluded
+from the archived reviewed projection. Both retain the received-byte hash and a
+separate archived-representation hash. The return identifies this safety-driven
+implementation choice explicitly; it is not a claim to retain the full body.

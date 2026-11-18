@@ -157,6 +157,16 @@ def parse_body(
     body: bytes, entry: Entry, declaration: Mapping[str, Any]
 ) -> list[dict[str, object]]:
     """Strict reviewed table shape; no heuristic discovery or helper counts."""
+    if declaration.get("version") == 2:
+        from .page_html import ShapeError
+        from .page_shapes import parse
+
+        try:
+            if declaration.get("columns") != [[n, k] for n, k in entry.columns]:
+                raise ShapeError("schema_missing")
+            return parse(body, declaration)
+        except ShapeError as exc:
+            raise PageError(str(exc)) from None
     forbidden = {"capacity", "enrolment", "catchment", "press_seats"}
     if entry.source_id == "schools_private_directory" and any(
         name.casefold() in forbidden for name, _ in entry.columns
@@ -288,6 +298,18 @@ def fetch_page(
     review = (
         declaration if declaration is not None else load_declaration(entry.source_id)
     )
+    if entry.source_id == "suppliers_tawteen" and (
+        review.get("version") != 2 or review.get("kind") != "refusal"
+    ):
+        raise PageError("anonymous_access_not_approved")
+    if review.get("version") == 2:
+        from .page_acquire import fetch
+        from .page_html import ShapeError
+
+        try:
+            return fetch(entry, review, transport, cache, clock, sleep)
+        except ShapeError as exc:
+            raise PageError(str(exc)) from None
     _validate(entry, review)
     cache_directory(cache, entry)
     stamp = clock()
@@ -408,6 +430,50 @@ def selected_page(cache: Path, entry: Entry) -> Snapshot:
         raise PageError("snapshot_selection_invalid")
     parsed = read_snapshot(cache / entry.key, identity)
     payload = json.loads(parsed.body)
+    if payload.get("version") == 2:
+        from .page_html import ShapeError
+
+        if (
+            payload.get("source_id") != entry.source_id
+            or payload.get("method") != "page_acquire.fetch@v2"
+            or not payload.get("inputs")
+        ):
+            raise PageError("receipt_missing")
+        try:
+            value = payload["as_of"]
+            if (
+                not isinstance(value, str)
+                or date.fromisoformat(value).isoformat() != value
+                or value != utc(payload["retrieved_utc"]).date().isoformat()
+            ):
+                raise ValueError
+        except (ValueError, KeyError, ShapeError):
+            raise PageError("snapshot_date_missing") from None
+        if (
+            parsed.sidecar.get("inputs") != payload["inputs"]
+            or parsed.sidecar.get("as_of") != value
+        ):
+            raise PageError("receipt_missing")
+        for index, item in enumerate(payload["inputs"]):
+            if item["key"] != "inputs/input-" + str(index):
+                raise PageError("receipt_missing")
+            input_directory = cache / entry.key / item["key"]
+            if (
+                input_directory.is_symlink()
+                or not input_directory.resolve().is_relative_to(
+                    (cache / entry.key).resolve()
+                )
+                or any(path.is_symlink() for path in input_directory.rglob("*"))
+            ):
+                raise PageError("cache_path_refused")
+            raw_input = read_snapshot(input_directory, item["identity"])
+            if (
+                raw_input.sha256 != item["sha256"]
+                or raw_input.sidecar.get("source_id") != entry.source_id
+                or not raw_input.sidecar.get("licence_basis")
+            ):
+                raise PageError("receipt_missing")
+        return parsed
     raw = read_snapshot(cache / entry.key / "raw", payload["raw_identity"])
     if payload["page_sha256"] != raw.sha256 or not payload.get("as_of"):
         raise PageError("receipt_missing")
@@ -420,7 +486,7 @@ def cache_directory(cache: Path, entry: Entry) -> Path:
     if key.is_absolute() or ".." in key.parts:
         raise PageError("cache_path_refused")
     directory = cache / key
-    for role in ("", "raw", "proofs", "failures", "terms"):
+    for role in ("", "raw", "proofs", "failures", "terms", "inputs"):
         path = directory / role
         if not path.resolve().is_relative_to(cache.resolve()):
             raise PageError("cache_path_refused")

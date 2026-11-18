@@ -49,7 +49,7 @@ def check_awards(
     rows: Sequence[Mapping[str, str]],
     profile: Mapping[str, Any],
     seed: int,
-    proof_reader: Callable[[str], Mapping[str, str]],
+    proof_reader: Callable[[str], Mapping[str, str] | Sequence[Mapping[str, str]]],
 ) -> dict[str, object]:
     """Sample distinct nonblank URLs; failed fetches remain in the denominator."""
     if type(seed) is not int:
@@ -83,7 +83,13 @@ def check_awards(
             failed += 1
             results.append({"report_url": url, "result": "fetch_failed"})
             continue
-        agrees = all(_same(row, proof, profile) for row in frame[url])
+        candidates = [proof] if isinstance(proof, Mapping) else list(proof)
+        if not candidates or any(not isinstance(item, Mapping) for item in candidates):
+            raise AwardError("schema_missing")
+        agrees = all(
+            any(_same(row, candidate, profile) for candidate in candidates)
+            for row in frame[url]
+        )
         matched += int(agrees)
         mismatched += int(not agrees)
         results.append(

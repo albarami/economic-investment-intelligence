@@ -9154,11 +9154,11 @@ sources:
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
-    url: ''
+    url: https://services.gisqatar.org.qa/server/rest/services/Vector/ZonesA/MapServer
     terms_url: ''
     terms_words: terms to be read
     terms_read_on: '2026-11-15'
-    landing_url: ''
+    landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/ZonesA/MapServer
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
@@ -9166,7 +9166,7 @@ sources:
     caveat_keys: []
     columns: []
     reconciliation: none
-    skip_reason: direct_url_unconfirmed
+    skip_reason: schema_unconfirmed
     extension: json
   - key: gis_context
     refetch: {value: none, reason: frequency_unconfirmed}
@@ -9222,11 +9222,11 @@ sources:
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
-    url: ''
+    url: https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarOrtho_1995/MapServer
     terms_url: ''
     terms_words: terms to be read
     terms_read_on: '2026-11-15'
-    landing_url: ''
+    landing_url: https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarOrtho_1995/MapServer
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
@@ -9234,7 +9234,7 @@ sources:
     caveat_keys: []
     columns: []
     reconciliation: none
-    skip_reason: direct_url_unconfirmed
+    skip_reason: schema_unconfirmed
     extension: json
   - key: gis_land_price
     refetch: {value: none, reason: frequency_unconfirmed}
@@ -12197,22 +12197,150 @@ sources:
     extension: "bin"
     basis_note: "Pending independent page verification under decision 0026; identity and page lead only."
 
-  - key: "insurance_tables"
-    source_id: "insurance_tables"
-    refetch: {value: none, reason: frequency_unconfirmed}
-    slug: ""
-    kind: "public_page"
-    title_en: "Public insurance tables"
-    publisher: "Insurance regulator"
-    licence_id: "terms to be read"
-    licence_basis: "owner_decision"
-    decision_record: "0026"
-    fetch_host: ""
-    url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-17"
-    landing_url: ""
+  - key: insurance_tables
+    source_id: insurance_tables
+    refetch:
+      value: none
+      reason: frequency_unconfirmed
+    slug: ''
+    kind: public_page
+    title_en: Public insurance tables
+    publisher: Qatar Central Bank
+    licence_id: publisher terms; owner decision 0026
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: www.qcb.gov.qa
+    url: https://www.qcb.gov.qa/PublicationFilesStatistics/%D8%A7%D9%84%D9%86%D8%B4%D8%B1%D8%A9%20%D8%A7%D9%84%D8%A5%D8%AD%D8%B5%D8%A7%D8%A6%D9%8A%D8%A9%20%D8%A7%D9%84%D9%81%D8%B5%D9%84%D9%8A%D8%A9%20%D9%84%D9%84%D9%82%D8%B7%D8%A7%D8%B9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%20%D8%BA%D9%8A%D8%B1%20%D8%A7%D9%84%D9%85%D8%B5%D8%B1%D9%81%D9%8A%20%20Q3-2026.xlsx
+    terms_url: https://www.qcb.gov.qa/en/Pages/Disclaimer.aspx
+    terms_words: "For personal use, that is not for the purpose of private or commercial gains, any information, data or documents posted herein may be viewed, reproduced or stored in."
+    terms_read_on: '2026-11-17'
+    landing_url: https://www.qcb.gov.qa/PublicationFilesStatistics/%D8%A7%D9%84%D9%86%D8%B4%D8%B1%D8%A9%20%D8%A7%D9%84%D8%A5%D8%AD%D8%B5%D8%A7%D8%A6%D9%8A%D8%A9%20%D8%A7%D9%84%D9%81%D8%B5%D9%84%D9%8A%D8%A9%20%D9%84%D9%84%D9%82%D8%B7%D8%A7%D8%B9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%20%D8%BA%D9%8A%D8%B1%20%D8%A7%D9%84%D9%85%D8%B5%D8%B1%D9%81%D9%8A%20%20Q3-2026.xlsx
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: sheet
+      type: string
+    - name: period
+      type: string
+    - name: measure
+      type: string
+    - name: value
+      type: number
+    - name: preliminary
+      type: string
+    row_count_min: null
+    row_count_max: null
+    reconciliation: none
+    skip_reason: acquisition_bound_unconfirmed
+    extension: xlsx
+
+  - key: events_visit_qatar
+    source_id: events_visit_qatar
+    refetch:
+      value: daily
+      family: event_pages
+      evidence: decision 0045 item 4; decision 0046 item 8
+    slug: ''
+    kind: public_page
+    title_en: Events calendar
+    publisher: Visit Qatar
+    licence_id: publisher terms; owner decision 0026
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: visitqatar.com
+    url: https://visitqatar.com/calendar
+    terms_url: https://visitqatar.com/intl-en/legal/terms-and-conditions
+    terms_words: reproduce any Content from our Website(s) without our express written permission, which we may withhold
+      or grant (on terms acceptable to us), in our absolute discretion;
+    terms_read_on: '2026-11-17'
+    landing_url: https://visitqatar.com/calendar
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: title
+      type: string
+    - name: location
+      type: string
+    - name: start
+      type: string
+    - name: end
+      type: string
+    - name: path
+      type: string
+    row_count_min: null
+    row_count_max: null
+    reconciliation: none
+    skip_reason: acquisition_bound_unconfirmed
+    extension: html
+
+  - key: events_qncc
+    source_id: events_qncc
+    refetch:
+      value: daily
+      family: event_pages
+      evidence: decision 0045 item 4; decision 0046 item 8
+    slug: ''
+    kind: public_page
+    title_en: Events calendar
+    publisher: Qatar National Convention Centre
+    licence_id: publisher terms; owner decision 0026
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: www.qncc.qa
+    url: https://www.qncc.qa/whats-on
+    terms_url: https://www.qncc.qa/privacy-policy
+    terms_words: Permission is granted to temporarily download one copy of the materials (information or software)
+      on Qatar National Convention Centre's website for personal, non-commercial transitory viewing only.
+    terms_read_on: '2026-11-17'
+    landing_url: https://www.qncc.qa/whats-on
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+    - name: id
+      type: string
+    - name: title
+      type: string
+    - name: location
+      type: string
+    - name: start
+      type: string
+    - name: end
+      type: string
+    row_count_min: null
+    row_count_max: null
+    reconciliation: none
+    skip_reason: schema_evidence_pending
+    extension: html
+
+  - key: suppliers_tawteen
+    source_id: suppliers_tawteen
+    refetch:
+      value: weekly
+      family: supplier_credentials
+      evidence: decision 0045 item 4; decision 0046 item 8
+    slug: ''
+    kind: public_page
+    title_en: Supplier page
+    publisher: QatarEnergy ICV programme
+    licence_id: publisher terms; owner decision 0026
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: icv.qa
+    url: https://icv.qa/en-US/supplier-database-guest/
+    terms_url: https://icv.qa/en-US/privacy-statement/
+    terms_words: Reuse wording not found in the page read; Terms of Use mentioned but not saved. Source NOT READ under
+      decision 0026 item 2 (L-899).
+    terms_read_on: '2026-11-17'
+    landing_url: https://icv.qa/en-US/supplier-database-guest/
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
@@ -12221,198 +12349,202 @@ sources:
     columns: []
     row_count_min: null
     row_count_max: null
-    reconciliation: "none"
-    skip_reason: "page_evidence_pending"
-    extension: "html"
-  - key: "events_visit_qatar"
-    source_id: "events_visit_qatar"
-    refetch: {value: daily, family: event_pages, evidence: "decision 0045 item 4; decision 0046 item 8"}
-    slug: ""
-    kind: "public_page"
-    title_en: "Events calendar"
-    publisher: "Visit Qatar"
-    licence_id: "terms to be read"
-    licence_basis: "owner_decision"
-    decision_record: "0026"
-    fetch_host: ""
-    url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-17"
-    landing_url: ""
+    reconciliation: none
+    skip_reason: anonymous_access_not_approved
+    extension: html
+
+  - key: manateq_tariffs
+    source_id: manateq_tariffs
+    refetch:
+      value: none
+      reason: frequency_unconfirmed
+    slug: ''
+    kind: public_page
+    title_en: Tariff page
+    publisher: Manateq
+    licence_id: publisher terms; owner decision 0026
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: manateq.qa
+    url: https://manateq.qa/wp-json/wp/v2/locations?per_page=100&_fields=link,modified,title
+    terms_url: https://manateq.qa/terms-and-conditions/
+    terms_words: Copyrights © 2025 Manateq All rights reserved. Reuse clause not found in the page read.
+    terms_read_on: '2026-11-17'
+    landing_url: https://manateq.qa/wp-json/wp/v2/locations?per_page=100&_fields=link,modified,title
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
     release_tables: []
     caveat_keys: []
-    columns: []
+    columns:
+    - name: label
+      type: string
+    - name: value
+      type: number
+    - name: currency
+      type: string
+    - name: unit
+      type: string
     row_count_min: null
     row_count_max: null
-    reconciliation: "none"
-    skip_reason: "page_evidence_pending"
-    extension: "html"
-  - key: "events_qncc"
-    source_id: "events_qncc"
-    refetch: {value: daily, family: event_pages, evidence: "decision 0045 item 4; decision 0046 item 8"}
-    slug: ""
-    kind: "public_page"
-    title_en: "Events calendar"
-    publisher: "Qatar National Convention Centre"
-    licence_id: "terms to be read"
-    licence_basis: "owner_decision"
-    decision_record: "0026"
-    fetch_host: ""
-    url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-17"
-    landing_url: ""
+    reconciliation: none
+    skip_reason: acquisition_bound_unconfirmed
+    extension: html
+
+  - key: monaqasat_classified
+    source_id: monaqasat_classified
+    refetch:
+      value: weekly
+      family: supplier_credentials
+      evidence: decision 0045 item 4; decision 0046 item 8
+    slug: ''
+    kind: public_page
+    title_en: Classified-company list
+    publisher: Monaqasat
+    licence_id: publisher terms; owner decision 0026
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: monaqasat.mof.gov.qa
+    url: https://monaqasat.mof.gov.qa/ClassifiedCompaniesProfilesList/1
+    terms_url: https://monaqasat.mof.gov.qa/TermsOfUse
+    terms_words: إن لم ينص علي خلاف ذلك، فإنه لا يجب إعادة إنتاج أو إعادة نشر أو تحميل أو إرسال أو توزيع أو عرض بشكل
+      علني أو تعديل لمحتويات هذا الموقع بدون موافقة خطية مسبقة من طريق وزارة المالية
+    terms_read_on: '2026-11-17'
+    landing_url: https://monaqasat.mof.gov.qa/ClassifiedCompaniesProfilesList/1
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
     release_tables: []
     caveat_keys: []
-    columns: []
+    columns:
+    - name: م
+      type: integer
+    - name: رقم الملف
+      type: string
+    - name: نوع الشركة
+      type: string
+    - name: اسم الشركة
+      type: string
+    - name: رقم السجل التجاري
+      type: string
+    - name: حجم الشركة
+      type: string
+    - name: تقييم الجهات الحكومية
+      type: string
+    - name: تفاصيل الأنشطة
+      type: string
     row_count_min: null
     row_count_max: null
-    reconciliation: "none"
-    skip_reason: "page_evidence_pending"
-    extension: "html"
-  - key: "suppliers_tawteen"
-    source_id: "suppliers_tawteen"
-    refetch: {value: weekly, family: supplier_credentials, evidence: "decision 0045 item 4; decision 0046 item 8"}
-    slug: ""
-    kind: "public_page"
-    title_en: "Supplier page"
-    publisher: "Tawteen"
-    licence_id: "terms to be read"
-    licence_basis: "owner_decision"
-    decision_record: "0026"
-    fetch_host: ""
-    url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-17"
-    landing_url: ""
+    reconciliation: none
+    skip_reason: acquisition_bound_unconfirmed
+    extension: html
+
+  - key: schools_private_directory
+    source_id: schools_private_directory
+    refetch:
+      value: none
+      reason: frequency_unconfirmed
+    slug: ''
+    kind: public_page
+    title_en: Private-school directory
+    publisher: Education ministry
+    licence_id: publisher terms; owner decision 0026
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: myschools.edu.gov.qa
+    url: https://myschools.edu.gov.qa/server/rest/services/Hosted/PrivateSchoolsView/FeatureServer/0?f=json
+    terms_url: https://www.edu.gov.qa/en/Content/Listofprivateschools
+    terms_words: terms to be read; education policy PDF not read (no text tool); reuse clause not found in the saved
+      HTML pages.
+    terms_read_on: '2026-11-17'
+    landing_url: https://myschools.edu.gov.qa/server/rest/services/Hosted/PrivateSchoolsView/FeatureServer/0?f=json
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
     release_tables: []
     caveat_keys: []
-    columns: []
+    columns:
+    - name: objectid
+      type: integer
+    - name: name
+      type: string
+    - name: aname
+      type: string
+    - name: category
+      type: string
+    - name: category_a
+      type: string
+    - name: eng_type
+      type: string
+    - name: type
+      type: string
+    - name: adoptedcurriculum
+      type: string
+    - name: operationalstatus
+      type: string
+    - name: mncp_code
+      type: integer
+    - name: mncp_name
+      type: string
+    - name: mncp_name_en
+      type: string
+    - name: district_code
+      type: integer
+    - name: district_name
+      type: string
+    - name: district_name_en
+      type: string
+    - name: lat
+      type: number
+    - name: long_
+      type: number
     row_count_min: null
     row_count_max: null
-    reconciliation: "none"
-    skip_reason: "page_evidence_pending"
-    extension: "html"
-  - key: "manateq_tariffs"
-    source_id: "manateq_tariffs"
-    refetch: {value: none, reason: frequency_unconfirmed}
-    slug: ""
-    kind: "public_page"
-    title_en: "Tariff page"
-    publisher: "Manateq"
-    licence_id: "terms to be read"
-    licence_basis: "owner_decision"
-    decision_record: "0026"
-    fetch_host: ""
-    url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-17"
-    landing_url: ""
+    reconciliation: none
+    skip_reason: acquisition_bound_unconfirmed
+    extension: html
+
+  - key: awards_owner_scrape
+    source_id: awards_owner_scrape
+    refetch:
+      value: weekly
+      family: award_reports
+      evidence: decision 0045 item 4; decision 0046 item 8
+    slug: ''
+    kind: awards_intake
+    title_en: owner scrape of public award reports, retrieved 2026-11-03
+    publisher: Owner scrape of public award reports
+    licence_id: publisher terms; owner decision 0026
+    licence_basis: owner_decision
+    decision_record: '0026'
+    fetch_host: monaqasat.mof.gov.qa
+    url: https://monaqasat.mof.gov.qa/TendersOnlineServices/AwardedTenders/1
+    terms_url: https://monaqasat.mof.gov.qa/TermsOfUse
+    terms_words: إن لم ينص علي خلاف ذلك، فإنه لا يجب إعادة إنتاج أو إعادة نشر أو تحميل أو إرسال أو توزيع أو عرض بشكل
+      علني أو تعديل لمحتويات هذا الموقع بدون موافقة خطية مسبقة من طريق وزارة المالية
+    terms_read_on: '2026-11-17'
+    landing_url: https://monaqasat.mof.gov.qa/TendersOnlineServices/AwardedTenders/1
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
     release_tables: []
     caveat_keys: []
-    columns: []
+    columns:
+    - name: اسم الشركة
+      type: string
+    - name: رقم السجل التجاري
+      type: string
+    - name: القيمة الموافق عليها
+      type: number
+    - name: النتيجة المالية
+      type: string
+    - name: البنود الموافق عليها
+      type: string
     row_count_min: null
     row_count_max: null
-    reconciliation: "none"
-    skip_reason: "page_evidence_pending"
-    extension: "html"
-  - key: "monaqasat_classified"
-    source_id: "monaqasat_classified"
-    refetch: {value: weekly, family: supplier_credentials, evidence: "decision 0045 item 4; decision 0046 item 8"}
-    slug: ""
-    kind: "public_page"
-    title_en: "Classified-company list"
-    publisher: "Monaqasat"
-    licence_id: "terms to be read"
-    licence_basis: "owner_decision"
-    decision_record: "0026"
-    fetch_host: ""
-    url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-17"
-    landing_url: ""
-    nightly_live_fetch: false
-    public_splits: []
-    commit_allowed: false
-    release_tables: []
-    caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
-    reconciliation: "none"
-    skip_reason: "page_evidence_pending"
-    extension: "html"
-  - key: "schools_private_directory"
-    source_id: "schools_private_directory"
-    refetch: {value: none, reason: frequency_unconfirmed}
-    slug: ""
-    kind: "public_page"
-    title_en: "Private-school directory"
-    publisher: "Education ministry"
-    licence_id: "terms to be read"
-    licence_basis: "owner_decision"
-    decision_record: "0026"
-    fetch_host: ""
-    url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-17"
-    landing_url: ""
-    nightly_live_fetch: false
-    public_splits: []
-    commit_allowed: false
-    release_tables: []
-    caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
-    reconciliation: "none"
-    skip_reason: "page_evidence_pending"
-    extension: "html"
-  - key: "awards_owner_scrape"
-    source_id: "awards_owner_scrape"
-    refetch: {value: weekly, family: award_reports, evidence: "decision 0045 item 4; decision 0046 item 8"}
-    slug: ""
-    kind: "awards_intake"
-    title_en: "owner scrape of public award reports, retrieved 2026-11-03"
-    publisher: "Owner scrape of public award reports"
-    licence_id: "terms to be read"
-    licence_basis: "owner_decision"
-    decision_record: "0026"
-    fetch_host: ""
-    url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-17"
-    landing_url: ""
-    nightly_live_fetch: false
-    public_splits: []
-    commit_allowed: false
-    release_tables: []
-    caveat_keys: []
-    columns: []
-    row_count_min: null
-    row_count_max: null
-    reconciliation: "none"
-    skip_reason: "page_evidence_pending"
-    extension: "html"
+    reconciliation: none
+    skip_reason: awards_profile_pending
+    extension: html
 
 forecast_series:
   - key: licence_issues
