@@ -18,6 +18,66 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class GitEnvironmentTests(unittest.TestCase):
+    def test_foreign_index_cannot_admit_ignored_overlapping_module(self) -> None:
+        module = "core/src/ignored_plant.py"
+        clean = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            root = folder / "workspace"
+            (root / "core/src").mkdir(parents=True)
+            (root / ".gitignore").write_text("*.py\n")
+            (root / module).write_text("def value(): return 1\n")
+
+            def git(
+                *arguments: str, environment: dict[str, str], content: bytes = b""
+            ) -> bytes:
+                return subprocess.run(
+                    ["git", *arguments],
+                    cwd=root,
+                    env=environment,
+                    input=content,
+                    capture_output=True,
+                    check=True,
+                ).stdout
+
+            git("init", "--quiet", environment=clean)
+            foreign = {**clean, "GIT_INDEX_FILE": str(folder / "foreign-index")}
+            blob = git(
+                "hash-object", "-w", "--stdin", environment=clean, content=b"1\n"
+            )
+            git(
+                "update-index",
+                "--add",
+                "--index-info",
+                environment=foreign,
+                content=b"100644 " + blob.strip() + b"\t" + module.encode() + b"\n",
+            )
+            listing = ("ls-files", "--cached", "--others", "--exclude-standard", "-z")
+            self.assertIn(
+                module.encode(), git(*listing, environment=foreign).split(b"\0")
+            )
+            self.assertNotIn(
+                module.encode(), git(*listing, environment=clean).split(b"\0")
+            )
+            with (
+                patch.dict(os.environ, foreign, clear=True),
+                patch.object(mutation, "ROOT", root),
+                patch.object(sys, "argv", ["mutation.py", module]),
+                patch.object(
+                    mutation,
+                    "TemporaryDirectory",
+                    side_effect=AssertionError(
+                        "foreign index admitted an ignored module"
+                    ),
+                ),
+                contextlib.redirect_stderr(io.StringIO()) as output,
+            ):
+                self.assertTrue(mutation.repository_matches(root))
+                with self.assertRaises(SystemExit) as refused:
+                    mutation.main()
+            self.assertEqual(refused.exception.code, 2)
+            self.assertIn("Every module must be a git-listed file", output.getvalue())
+
     def test_ordinary_configuration_keeps_ignore_answers(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             folder = Path(temporary)

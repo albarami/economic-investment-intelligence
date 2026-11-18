@@ -628,6 +628,7 @@ def main() -> int:
         subprocess.run(
             ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
             cwd=ROOT,
+            env=package_environment(),
             capture_output=True,
             check=True,
         )
