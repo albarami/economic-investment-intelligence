@@ -3442,6 +3442,127 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: The test asserts the refusal of PUB-64 without receipt lineage, but compares only three of the ten reason texts the refusal can carry; the reviewer recorded it as not a defect, for the next touch of the test.
 - NEEDED: the remaining seven reason texts asserted exactly when the test is next changed, or one line saying why the item is not valid.
 
+### PO-S2-75 — The terms fingerprint means different things in the benchmark rows and document 04
+
+- ID: PO-S2-75
+- TYPE: OPEN
+- RAISED BY: S2-T26 lens B, Qwen 3.8 Max through Droid, kept by its confirmation (supplied old-draft/05-OPEN-ITEMS.md)
+- CONCERNS: `custodian/publicdata/sources.yaml`; document 04 section 3.1
+- EVIDENCE: The supplied S2-T26 record says the benchmark terms_sha256 kind diverges from the documented meaning. The sources stay pending and the reviewer kept this as a record item, outside its verdict.
+- NEEDED: S2-T10 or the next benchmark task states which meaning binds, aligns both records and plants the other kind, or records why the meanings stand apart.
+
+### PO-S2-76 — Duplicate annual figures have no distinct missing-side cause
+
+- ID: PO-S2-76
+- TYPE: OPEN
+- RAISED BY: S2-T26 lens B, kept by its confirmation (supplied old-draft/05-OPEN-ITEMS.md)
+- CONCERNS: core and custodian trade_reconciliation.py
+- EVIDENCE: The supplied review record says duplicate annual figures occupying one cell are reported as a plain missing side, without the duplicate cause.
+- NEEDED: Give the duplicate its own closed cause and plant it, or record why the plain missing-side result is intended.
+
+### PO-S2-77 — Monthly native periods are ordered as text
+
+- ID: PO-S2-77
+- TYPE: OPEN
+- RAISED BY: S2-T26 lens B, kept by its confirmation (supplied old-draft/05-OPEN-ITEMS.md)
+- CONCERNS: `core/src/eii_core/calc/trade_reconciliation.py`; benchmark native period formats
+- EVIDENCE: The supplied review record leaves monthly native period formats open and records lexicographic ordering.
+- NEEDED: Close the accepted formats and order them as periods with a plant that text ordering fails, or record why the text order is intended.
+
+### PO-S2-78 — A standalone selected benchmark read can expose the date-parser diagnostic
+
+- ID: PO-S2-78
+- TYPE: OPEN
+- RAISED BY: S2-T26 builder and both confirming lenses (supplied old-draft/05-OPEN-ITEMS.md)
+- CONCERNS: `custodian/src/eii_custodian/publicdata/benchmarks/contracts.py` read_selected
+- EVIDENCE: The supplied record says build-time parses are under fixed-reason checks, but a standalone read_selected with an invalid stored retrieval date surfaces the parser diagnostic. It names the same pattern in BACI, Atlas and Gravity and records no build-flow caller.
+- NEEDED: Normalize the standalone date parses to a fixed reason with a planted exact-message test, or record why this reader remains unchanged.
+
+### PO-S2-79 — Benchmark activation awaits independent source confirmation
+
+- ID: PO-S2-79
+- TYPE: OPEN
+- RAISED BY: S2-T26 design/build records (supplied old-draft/05-OPEN-ITEMS.md, original draft OI-262; no original draft OI number is reused)
+- CONCERNS: WDI, UNCTADstat, IMF WEO and ILOSTAT registry and policy records
+- EVIDENCE: The supplied task record says all policies are unconfirmed; pending fetches refuse before transport. No source page reading or live Qatar comparison is claimed.
+- NEEDED: The lead verifies each source-native indicator set, history and excluded coverage, Qatar coverage, historical/forecast fields, licence words, access tier, schema and count/byte bounds, records date and hash, and activates only from that evidence.
+
+### PO-S2-80 — The live trade selection awaits the lead and owner
+
+- ID: PO-S2-80
+- TYPE: OPEN
+- RAISED BY: S2-T26 design/build records (supplied old-draft/05-OPEN-ITEMS.md, original draft OI-263; no original draft OI number is reused)
+- CONCERNS: `custodian/publicdata/trade_reconciliation.yaml` and its reviewed input manifests
+- EVIDENCE: The supplied record says the selection is unconfirmed and dispatch performs no live comparison.
+- NEEDED: The lead selects reviewed years, partners, product scopes and manifests through the closed non-ranking mechanism and one BACI-aligned HS revision; the owner confirms; every gap is retained and the live run is recorded.
+
+### PO-S2-81 — The merge-9 hand-plant audit overwrites its detail file
+
+- ID: PO-S2-81
+- TYPE: OPEN
+- RAISED BY: T1b.confirm, Droid GLM 5.3, owed item 1 in T1.open-items-owed.md; LOG-EXTRACT 78 and 86
+- CONCERNS: the lead hand-plant audit tool and evidence filenames
+- EVIDENCE: The audit detail and command-summary writers used one JSON filename. Its own audit exited 1; the individual logs retain all twenty outcomes. This was disposed as an evidence-recording defect, not a code-test failure.
+- NEEDED: Before reuse, assign separate detail and summary paths and plant a collision check. Preserve the earlier failure and individual logs.
+
+### PO-S2-82 — Identity lines need registry-row-key alignment
+
+- ID: PO-S2-82
+- TYPE: OPEN
+- RAISED BY: T1b.confirm, Droid GLM 5.3, owed item 2 in T1.open-items-owed.md; LOG-EXTRACT 86
+- CONCERNS: lead tool train_identity_lines.py; sources.yaml public_splits
+- EVIDENCE: The supplied confirmation says the tool reports registry-row edits as bare line differences.
+- NEEDED: Align by registry row key before interpreting registry changes, retaining exact line text and a planted row-shuffle/change case.
+
+### PO-S2-83 — PUB-04 still describes a flat cache layout
+
+- ID: PO-S2-83
+- TYPE: OPEN
+- RAISED BY: T1b.confirm, Droid GLM 5.3, owed item 3 in T1.open-items-owed.md; LOG-EXTRACT 86
+- CONCERNS: document 04 PUB-04 and S2-T27 dated snapshot archive
+- EVIDENCE: The supplied confirmation records a flat public_cache description while the archive writes dated folders.
+- NEEDED: The lead rules whether PUB-04 adopts the archive form and makes any document amendment through its normal review. Do not silently rewrite the approved requirement.
+
+### PO-S2-84 — Custodian suite duration must be checked against its unchanged bound
+
+- ID: PO-S2-84
+- TYPE: OPEN
+- RAISED BY: T1.open-items-owed.md, the owed item of 17:46; LOG-EXTRACT 89
+- CONCERNS: `scripts/run_tests.py` SUITES python-custodian, 600 s
+- EVIDENCE: The supplied owed record has shared-load S4-T10 checks of 860 s plain and 841 s isolated on four processors near load 30; S2-T30 builder runs of 612 s and 623 s, and its later isolated 606.01 s near load 21–25. Train-1 ck12 at 4d7933a records 686 s plain and 688 s isolated on four processors near load 35. These are not reserved-idle measurements. ADAPT2-RETURN.md additionally records the moved custodian suite: 5620 passed in 946.96 s, exit 0; its load is not supplied as an idle-reservation measurement.
+- NEEDED: Each train whole test records the custodian duration. If the whole test exceeds 600 s on idle processors, open a speed task. Keep the bound, assertions and red evidence unchanged.
+
+### PO-S2-85 — Sleeping mutation children escape a CPU-time-only limit
+
+- ID: PO-S2-85
+- TYPE: OPEN
+- RAISED BY: T1.open-items-owed.md L-866 and L-875; LOG-EXTRACT 91
+- CONCERNS: joined-head registry.py campaign, mutmut fork children and timeout replay
+- EVIDENCE: L-866 records x_require_addition_completion__mutmut_13 sleeping in futex wait for 81 minutes near three percent CPU, manually ended with SIGXCPU and reported as timeout code -24. L-875 records x__refuse_undeclared_period_form__mutmut_2 sleeping with one thread in futex_wait_queue, about 150 s user CPU, RLIMIT_CPU soft 20,846 s, SIGXCPU neither caught, blocked nor pending; the handler-deadlock hypothesis is refuted. A lock inherited across fork is a hypothesis, not a proved cause. Evidence references are the supplied evidence/T1.hang2.proc.txt record and owed note; no process was inspected by this draft.
+- NEEDED: Replay each timeout alone at normal load as a separately recorded step; collect the Python stack if it hangs again, identify the lock or refute the fork-lock hypothesis, and retain the planted read-only detector evidence. No timeout or unexplained survivor closes on a green rerun alone.
+
+
+- UPDATED OWED HANG INVENTORY (source: T1.open-items-owed.md L-866/L-875 and the subsequent entries; all remain replay debt):
+  - `x_require_addition_completion__mutmut_13`: futex sleep; lead SIGXCPU, mutmut timeout code -24 (L-866).
+  - `x__refuse_undeclared_period_form__mutmut_2`: one-thread futex sleep; lead SIGXCPU; the CPU-limit-handler hypothesis was refuted (L-875).
+  - `x__point__mutmut_4`: same signature; lead SIGXCPU at the detector's exit 3.
+  - `x__point__mutmut_8`: 2266 s hang, futex wait; lead SIGXCPU; evidence/T1.hang4.proc.txt.
+  - `x__point__mutmut_9`: 1531 s idle futex wait; lead SIGXCPU; evidence/T1.hang5.proc.txt.
+  - `x__point__mutmut_10`: 1824 s futex wait; lead SIGXCPU; evidence/T1.hang6.proc.txt.
+  - `x__point__mutmut_12`: 918 s futex wait; lead SIGXCPU; evidence/T1.hang7.proc.txt.
+  - `eii_custodian.publicdata.fetch.registry.x__point__mutmut_14`: automated L-889 SIGXCPU at 00:16; evidence/hung/20261118-001652-2785449.txt.
+  - `eii_custodian.publicdata.fetch.registry.x__point__mutmut_15`: automated L-889 SIGXCPU at 00:32; evidence/hung/20261118-003223-729855.txt.
+- REPLAY REQUIREMENT: each identity above is replayed alone at normal load as its own recorded step. Record a Python stack if it hangs again. The fork-lock cause remains a hypothesis, not a diagnosis; no new campaign or replay outcome is supplied here.
+
+### PO-S2-86 — Earlier timeout replays remain outstanding
+
+- ID: PO-S2-86
+- TYPE: OPEN
+- RAISED BY: LOG-EXTRACT 10, 20, 22 and 52; supplied old-draft/04-TASK-S2-T26.md
+- CONCERNS: S2-T11 split-policy timeouts, forecast_series fork hang, and the three core trade-reconciliation timeout replays
+- EVIDENCE: The split-policy run at 072ae84 overlapped another campaign and was explicitly not a normal-load replay. The forecast rerun exited 143, runner 3. S2-T26 approval still awaited three core timeout replays. No closure record for these is supplied.
+- NEEDED: The lead enumerates the exact mutant identities and replays them alone at normal load, retaining failures and cause analysis separately. Later hash-matched campaigns may answer survivors but do not erase these timeout incidents.
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).
