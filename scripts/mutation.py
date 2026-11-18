@@ -83,6 +83,10 @@ ISOLATION_PREFIX = (
     "--bind",
     "/",
     "/",
+    # A fresh device folder: in the new namespace the bound host /dev refuses device reads, and a Python without
+    # os.getrandom reads /dev/urandom for its first random bytes.
+    "--dev",
+    "/dev",
     "--proc",
     "/proc",
     "--",
