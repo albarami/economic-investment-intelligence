@@ -488,7 +488,7 @@ independent code review. The separate Arabic-name reader gap remains OI-256.
 - Scope: `scripts/run_tests.py`, a pytest plugin and the manifest guard under `scripts/`, the runner's tests, README.md's sentence on the suites, the height fixtures' zip writer and its clock test, decision 0060, open items OI-285 and OI-286 and task evidence.
 - Depends: none.
 - Requirements: decision 0060; TST-15; AGENTS.md rules 12, 36, 37 and 39; ruling L-902 2(b).
-- Delivery: Standard; builder persona senior test-infrastructure engineer; strict reviewer persona strict test-infrastructure reviewer from another maker; status in review.
+- Delivery: Standard; builder persona senior test-infrastructure engineer; strict reviewer persona strict test-infrastructure reviewer from another maker; status approved (review by Google Gemini 3.1 Pro on dbaebe0); merge waits for the hosted checks of its pull request.
 
 ### S2-T24 — BACI registry and free download
 - Goal: Register CEPII BACI as a separate bilateral trade source and free bulk-file alternative.
