@@ -4209,3 +4209,37 @@ reason = "'UTF-8' and 'utf-8' name the same codec (codecs.lookup gives the same 
 module = "custodian/src/eii_custodian/publicdata/draw.py"
 mutation = "--- src/eii_custodian/publicdata/draw.py\n+++ src/eii_custodian/publicdata/draw.py\n@@ -11,7 +11,7 @@\n     if type(seed) is not int:\n         raise ValueError(\"figure_seed_invalid\")\n     loaded = (\n-        json.loads(log_path.read_text(encoding=\"utf-8\")) if log_path.exists() else {}\n+        json.loads(log_path.read_text(encoding=\"UTF-8\")) if log_path.exists() else {}\n     )\n     if not isinstance(loaded, dict):\n         raise ValueError(\"figure_log_invalid\")"
 reason = "'UTF-8' and 'utf-8' name the same codec (codecs.lookup gives the same codec for both), so the bytes and text are identical."
+
+module = "custodian/src/eii_custodian/publicdata/investment_contracts.py"
+mutation = "--- src/eii_custodian/publicdata/investment_contracts.py\n+++ src/eii_custodian/publicdata/investment_contracts.py\n@@ -5,7 +5,7 @@\n     before an empty text or a zero coordinate is stored as null.\n     \"\"\"\n     parts = [\n-        json.dumps(name, ensure_ascii=True) + \":\" + published_tokens[name]\n+        json.dumps(name, ) + \":\" + published_tokens[name]\n         for name in sorted(published_tokens)\n     ]\n     encoded = \"{\" + \",\".join(parts) + \"}\""
+reason = "json.dumps defaults to ensure_ascii=True, so dropping the explicit argument gives the same text for every name."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_contracts.py"
+mutation = "--- src/eii_custodian/publicdata/investment_contracts.py\n+++ src/eii_custodian/publicdata/investment_contracts.py\n@@ -9,5 +9,5 @@\n         for name in sorted(published_tokens)\n     ]\n     encoded = \"{\" + \",\".join(parts) + \"}\"\n-    digest = hashlib.sha256(encoded.encode(\"utf-8\")).hexdigest()\n+    digest = hashlib.sha256(encoded.encode(\"UTF-8\")).hexdigest()\n     return \"fdi_\" + digest[:16]"
+reason = "Python resolves the codec names utf-8 and UTF-8 to the same codec, so the encoded bytes and the digest are unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_contracts.py"
+mutation = "--- src/eii_custodian/publicdata/investment_contracts.py\n+++ src/eii_custodian/publicdata/investment_contracts.py\n@@ -9,7 +9,7 @@\n     body = text\n     if signed and text.startswith(\"-\"):\n         body = text[1:]\n-    if body == \"\" or _DECIMAL.fullmatch(body) is None:\n+    if body == \"XXXX\" or _DECIMAL.fullmatch(body) is None:\n         return None\n     integer, _dot, fraction = body.partition(\".\")\n     if len(fraction) > scale:"
+reason = "The decimal pattern needs at least one digit, so it already refuses the empty body; the explicit empty test is subsumed and the XXXX text can never pass the pattern either."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_contracts.py"
+mutation = "--- src/eii_custodian/publicdata/investment_contracts.py\n+++ src/eii_custodian/publicdata/investment_contracts.py\n@@ -14,7 +14,7 @@\n     integer, _dot, fraction = body.partition(\".\")\n     if len(fraction) > scale:\n         return None\n-    width = integer.lstrip(\"0\")\n+    width = integer.lstrip(\"XX0XX\")\n     if len(width) > precision - scale:\n         return None\n     return text"
+reason = "The integer part holds digits only after the pattern check, so stripping the character set X and 0 removes exactly the leading zeros that stripping 0 removes."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_contracts.py"
+mutation = "--- src/eii_custodian/publicdata/investment_contracts.py\n+++ src/eii_custodian/publicdata/investment_contracts.py\n@@ -3,7 +3,7 @@\n     if _YEAR.fullmatch(text) is not None:\n         return text\n     if _MONTH.fullmatch(text) is not None:\n-        month = int(text[5:7])\n+        month = int(text[5:8])\n         if 1 <= month <= 12:\n             return text\n         return None"
+reason = "The month pattern matches exactly seven characters, so the slice to index 8 stops at the end of the text and yields the same two month digits as the slice to index 7."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_contracts.py"
+mutation = "--- src/eii_custodian/publicdata/investment_contracts.py\n+++ src/eii_custodian/publicdata/investment_contracts.py\n@@ -2,7 +2,7 @@\n     \"\"\"Return a reviewed crosswalk hit. A miss stays unmapped.\"\"\"\n     if key is None or key == \"\":\n         return None\n-    found = table.get(key, \"\")\n+    found = table.get(key, None)\n     if found == \"\":\n         return None\n     return found"
+reason = "A miss returns None instead of the empty text; the empty-text test is then false and the function returns that None, the same result as the early return of None."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_contracts.py"
+mutation = "--- src/eii_custodian/publicdata/investment_contracts.py\n+++ src/eii_custodian/publicdata/investment_contracts.py\n@@ -2,7 +2,7 @@\n     \"\"\"Return a reviewed crosswalk hit. A miss stays unmapped.\"\"\"\n     if key is None or key == \"\":\n         return None\n-    found = table.get(key, \"\")\n+    found = table.get(key, )\n     if found == \"\":\n         return None\n     return found"
+reason = "A miss returns None instead of the empty text; the empty-text test is then false and the function returns that None, the same result as the early return of None."

@@ -10,6 +10,7 @@ from eii_custodian.publicdata.investment_contracts import (
     parse_announced,
     parse_decimal,
     period_is_future,
+    project_key,
     retrieval_year,
     snake_key,
 )
@@ -138,3 +139,8 @@ def test_period_is_future_mutations() -> None:
     assert period_is_future("2027-11", "2026-11-18") is True
     # 60: >= year
     assert period_is_future("2026-11", "2026-11-18") is False
+
+
+def test_project_key_non_ascii() -> None:
+    # Canonical text: {"na\u00efve":value}
+    assert project_key({"naïve": "value"}) == "fdi_6fcbbe3ab73f0a39"
