@@ -37,6 +37,28 @@ from .method_card_pin_fixtures import (
 ROOT = Path(__file__).resolve().parents[2]
 COMMITTED_RECORD = ROOT / "custodian/publicdata/review/s2_t09_source_checks.yaml"
 COMMITTED_METHODS = ROOT / "docs/07_ECONOMIC_METHODS.md"
+# B1: the sixteen "none named" pins of the pass-1 source map, written out
+# literally so neither the membership check nor the plants derives from the
+# module's own set: dropping a pin from CONFIGURATION_PINS must fail a test,
+# never silently deselect its plant.
+NONE_NAMED_PINS = (
+    "wilson.period",
+    "c6.seed",
+    "c6.category_ids",
+    "c6.candidate_set",
+    "c6.box",
+    "c6.confidence_min",
+    "c6.radius_m",
+    "c6.permutations",
+    "c6.fdr",
+    "c6.min_neighbours",
+    "c6.min_clq",
+    "c6.max_shown",
+    "c7.coordinates",
+    "c7.modes",
+    "c7.cutoffs",
+    "c7.speed_regime",
+)
 
 
 def test_checked_fixture_and_sync(tmp_path):
@@ -613,7 +635,16 @@ def test_pending_fixture_needs_no_live_file(tmp_path):
     assert yaml.safe_load(paths[0].read_text())["pins"][0]["values"] == {}
 
 
-@pytest.mark.parametrize("pin", sorted(CONFIGURATION_PINS))
+def test_configuration_pins_are_the_sixteen_none_named_pins():
+    # B1: the module's configuration pins are exactly the sixteen "none
+    # named" pins of the pass-1 source map, and never the places_ovt source
+    # pin c6.release_sha256, checked against this literal list rather than
+    # against the module's own set.
+    assert CONFIGURATION_PINS == frozenset(NONE_NAMED_PINS)
+    assert "c6.release_sha256" not in CONFIGURATION_PINS
+
+
+@pytest.mark.parametrize("pin", NONE_NAMED_PINS)
 def test_plant_setting_removed_from_both_artifact_and_config(tmp_path, pin):
     # Every configuration pin: removing the recorded settings from both the
     # artifact row and the config leaves the pin's value unrecorded, and only
