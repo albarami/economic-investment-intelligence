@@ -15,6 +15,7 @@ from urllib.parse import parse_qs, urlsplit
 from urllib.request import Request
 
 import pytest
+from custodian.tests.repository_root import repository_root
 from custodian.tests.test_s2_t29_live_acquire import school, school_transport
 from custodian.tests.test_s2_t29_live_shapes import STAMP, embedded, entry
 
@@ -36,6 +37,8 @@ from eii_custodian.publicdata.fetch.transport import (
     open_https,
 )
 from eii_custodian.publicdata.singles import tenders
+
+_SOURCE = repository_root(Path(__file__)) / "custodian" / "src"
 
 
 def test_only_four_page_pin_hosts_remain():
@@ -343,11 +346,17 @@ def test_fix7_tender_legacy_bridge_does_not_authorize_redirect(host, tmp_path):
         )
 
 
+def _fix11_source_paths(source):
+    paths = sorted(source.rglob("*.py")) if source.is_dir() else []
+    assert paths, f"source folder missing or holds no .py file: {source}"
+    return paths
+
+
 def _fix8_legacy_chain_hits(source):
     """L-927 source boundary; never inspect callers or signatures at runtime."""
     tender = "eii_custodian.publicdata.singles.tenders"
     hits = set()
-    for path in sorted(source.rglob("*.py")):
+    for path in _fix11_source_paths(source):
         relative = path.relative_to(source).as_posix()
         if relative == "eii_custodian/publicdata/singles/tenders.py":
             continue
@@ -443,7 +452,7 @@ def _fix7_assert_legacy_chain_callers(source):
     hits = _fix8_legacy_chain_hits(source)
     assert not hits, hits
     callers = []
-    for path in sorted(source.rglob("*.py")):
+    for path in _fix11_source_paths(source):
         tree = ast.parse(path.read_text(), filename=path.as_posix())
         for node in ast.walk(tree):
             if isinstance(node, ast.Call) and any(
@@ -454,14 +463,25 @@ def _fix7_assert_legacy_chain_callers(source):
 
 
 def test_fix7_legacy_chain_argument_has_only_tender_source_caller():
-    _fix7_assert_legacy_chain_callers(Path("custodian/src"))
+    _fix7_assert_legacy_chain_callers(_SOURCE)
+
+
+@pytest.mark.parametrize("state", ["missing", "empty"])
+@pytest.mark.parametrize(
+    "guard", [_fix8_legacy_chain_hits, _fix7_assert_legacy_chain_callers]
+)
+def test_fix11_source_guards_refuse_vacuous_scan(tmp_path, guard, state):
+    source = tmp_path / state
+    if state == "empty":
+        source.mkdir()
+    with pytest.raises(AssertionError) as caught:
+        guard(source)
+    assert source.as_posix() in str(caught.value)
 
 
 def test_fix7_legacy_chain_source_guard_rejects_second_caller(tmp_path):
     source = tmp_path / "src"
-    shutil.copytree(
-        "custodian/src", source, ignore=shutil.ignore_patterns("__pycache__")
-    )
+    shutil.copytree(_SOURCE, source, ignore=shutil.ignore_patterns("__pycache__"))
     _fix7_assert_legacy_chain_callers(source)
     (source / "SYN_second_caller.py").write_text(
         "def syn_call(open_https, url, pin):\n"
@@ -473,9 +493,7 @@ def test_fix7_legacy_chain_source_guard_rejects_second_caller(tmp_path):
 
 def _fix8_assert_second_caller_refused(tmp_path, code, expected_rules):
     source = tmp_path / "src"
-    shutil.copytree(
-        "custodian/src", source, ignore=shutil.ignore_patterns("__pycache__")
-    )
+    shutil.copytree(_SOURCE, source, ignore=shutil.ignore_patterns("__pycache__"))
     _fix7_assert_legacy_chain_callers(source)
     relative = "eii_custodian/publicdata/SYN_second_caller.py"
     (source / relative).write_text(code)
@@ -617,9 +635,7 @@ def test_fix9_import_mask_refused(tmp_path, code, expected_rules):
 
 def test_fix9_second_transport_parameter_refused(tmp_path):
     source = tmp_path / "src"
-    shutil.copytree(
-        "custodian/src", source, ignore=shutil.ignore_patterns("__pycache__")
-    )
+    shutil.copytree(_SOURCE, source, ignore=shutil.ignore_patterns("__pycache__"))
     _fix7_assert_legacy_chain_callers(source)
     relative = "eii_custodian/publicdata/fetch/transport.py"
     transport = source / relative
