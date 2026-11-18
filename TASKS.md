@@ -474,6 +474,14 @@ independent code review. The separate Arabic-name reader gap remains OI-256.
 - Requirements: decision 0040 items 1 to 4 and 8; PUB-01 to PUB-16, PUB-19; AGENTS.md rules 5, 7, 14 and 19.
 - Delivery: hard; builder persona principal public-data engineer; strict reviewer persona independent public-data/security reviewer from another maker; status in progress: Comtrade offline contracts and fetch guards; source confirmation, live coverage and owner obstacles remain open; approved-head work in review in pull request https://github.com/albarami/economic-investment-intelligence/pull/82 as part of merge train 1 of slice S2. Unticked criteria remain open; no merge or slice gate is claimed.
 
+### S2-T33 — Comtrade assembly refuses a receipt without a known API class (decision 0052 item 4)
+- Goal: Refuse a Comtrade receipt whose API class cannot resolve to the policy's data template, rather than assembling an empty fetch host.
+- Acceptance criteria: [x] a valid control assembles; after both receipts are changed to an unknown `api_class` with `fetch_host` empty and the receipt and manifest hashes are resealed, assembly refuses with `lineage_missing` and returns no assembly; [x] the same planted case with a non-string `api_class` refuses identically; [x] the existing Comtrade assembly tests pass unchanged.
+- Scope: Comtrade child assembly and its planted lineage tests, document 04's Comtrade receipt paragraph and task evidence.
+- Depends: S2-T23.
+- Requirements: decision 0052 item 4; PUB-10, PUB-19; AGENTS.md rules 5, 7, 19 and 37.
+- Delivery: Deep; builder persona senior Python engineer for data provenance; strict reviewer persona strict provenance and refusal reviewer from another maker; status in progress: the fix and both planted cases are locally verified; independent review, lead commit and the changed-module mutation campaign remain open.
+
 ### S2-T24 — BACI registry and free download
 - Goal: Register CEPII BACI as a separate bilateral trade source and free bulk-file alternative.
 - First step: read and record the source's own page: licence words, version, registration or tier. For a task with several sources, do this for each before any fetch.

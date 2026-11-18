@@ -1031,7 +1031,7 @@ restrictive terms text does not by itself block a confirmed visitor-readable
 source. Failures name the source and a fixed reason. Invented sentinels are not
 copied into the result.
 
-A completed `un_comtrade` child adds, on that same sidecar, `policy_sha256`, `source_version`, `partition_key`, `parent_key`, `api_class`, `applied_limit`, `count`, `budget_period` and `daily_counts` for the primary and secondary slots. Those counts are call counts. The sidecar has no credential, no request header and no address that is not the canonical allow-listed URL. A complete manifest records the selection hash, the policy hash, the ordered child hashes, coverage and the parser method and version. The release pins that one manifest hash and keeps every child hash (PUB-10, PUB-19).
+A completed `un_comtrade` child adds, on that same sidecar, `policy_sha256`, `source_version`, `partition_key`, `parent_key`, `api_class`, `applied_limit`, `count`, `budget_period` and `daily_counts` for the primary and secondary slots. Those counts are call counts. The sidecar has no credential, no request header and no address that is not the canonical allow-listed URL. A complete manifest records the selection hash, the policy hash, the ordered child hashes, coverage and the parser method and version. The release pins that one manifest hash and keeps every child hash (PUB-10, PUB-19). Assembly refuses with `lineage_missing` when a child's `api_class` is not a string or names no `data` template in the activated policy; it never defaults the expected fetch host to an empty string.
 
 ### 3.2 Investment sources and page parsers
 
