@@ -272,6 +272,7 @@ def build_project_evidence(
                 "duplicate snapshot identity",
             )
         seen_snapshots.add(item.identity)
+        item = replace(item, rows=tuple(dict(row) for row in item.rows))
         metadata = _metadata_failure(item)
         if isinstance(metadata, InvestmentFailure):
             return metadata
@@ -474,7 +475,17 @@ def audit_project_evidence(
         )
     for milestone in evidence.milestones:
         candidate = milestone.candidate
-        validated = milestone.evidence_status == "validated"
+        validated = (
+            milestone.evidence_status == "validated"
+            and candidate.independence == "independent_report"
+        )
+        reason = milestone.missing_reason
+        if (
+            not validated
+            and not reason
+            and candidate.independence != "independent_report"
+        ):
+            reason = "milestone_not_independent"
         entries.append(
             EvidenceAuditEntry(
                 candidate.source_id,
@@ -484,7 +495,7 @@ def audit_project_evidence(
                 PROVENANCE_PUBLIC,
                 "observed_independent_milestone" if validated else "missing_evidence",
                 "independent_milestone" if validated else "unvalidated_milestone",
-                milestone.missing_reason,
+                reason,
             )
         )
 
@@ -699,7 +710,14 @@ def archive_fetch_attempts(
     retrieved_utc: str,
 ) -> EvidenceAudit | InvestmentFailure:
     """Verify successful raw archives and retain all fail-fast attempt outcomes."""
-    by_key = {(attempt.source_id, attempt.key): attempt for attempt in attempts}
+    by_key: dict[tuple[str, str], FetchAttempt] = {}
+    for candidate_attempt in attempts:
+        key = (candidate_attempt.source_id, candidate_attempt.key)
+        if key in by_key:
+            return _audit_failure(
+                candidate_attempt.source_id, "duplicate fetch attempt"
+            )
+        by_key[key] = candidate_attempt
     entries: list[EvidenceAuditEntry] = []
     for registration in expected:
         attempt = by_key.get((registration.source_id, registration.key))

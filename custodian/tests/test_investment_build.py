@@ -543,6 +543,51 @@ def test_publication_guards(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     assert refused.check == "unreviewed_release"
 
 
+def test_audit_snapshot_rejects_replaced_manifest_before_page_audit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A same-name manifest substitution fails its pointer checksum first."""
+    stored = tmp_path / "stored"
+    assert (
+        _run(stored, monkeypatch, _fdi_entry(), {DASHBOARD_URL: dashboard_page()}) == 0
+    )
+    cache = stored / "data" / "public_cache" / "fdi_projects"
+    pointer, manifest, _table = _batch(stored, "fdi_projects")
+    manifest_path = cache / "manifests" / f"{pointer['manifest_sha256']}.json"
+    manifest_path.write_text('{"pages": []}\n', encoding="utf-8")
+    raw_page = cache / f"{manifest['pages'][0]['sha256']}.html"
+    raw_page.unlink()
+
+    refused = audit_snapshot(cache.parent, "fdi_projects")
+    assert isinstance(refused, InvestmentFailure)
+    assert refused.check == "hash_mismatch"
+    assert refused.expected == pointer["manifest_sha256"]
+    assert refused.observed == "mismatch"
+
+
+def test_audit_snapshot_rejects_correctly_named_empty_manifest(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Empty page coverage is invalid even when the replacement filename matches."""
+    stored = tmp_path / "stored"
+    assert (
+        _run(stored, monkeypatch, _fdi_entry(), {DASHBOARD_URL: dashboard_page()}) == 0
+    )
+    cache = stored / "data" / "public_cache" / "fdi_projects"
+    pointer = json.loads((cache / "loadable.json").read_text(encoding="utf-8"))
+    body = b'{"pages": []}\n'
+    digest = hashlib.sha256(body).hexdigest()
+    (cache / "manifests" / f"{digest}.json").write_bytes(body)
+    pointer["manifest_sha256"] = digest
+    (cache / "loadable.json").write_text(json.dumps(pointer), encoding="utf-8")
+
+    refused = audit_snapshot(cache.parent, "fdi_projects")
+    assert isinstance(refused, InvestmentFailure)
+    assert refused.check == "missing_artifact"
+    assert refused.expected == "pages"
+    assert refused.observed == "empty"
+
+
 def test_fixtures_reject_realistic_identifiers_and_tracked_cache() -> None:
     """Invented fixtures have no bare digit run, and the tree guard names the cache."""
     text = dashboard_page().decode("utf-8")

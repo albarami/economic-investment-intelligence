@@ -252,7 +252,20 @@ def audit_snapshot(cache: Path, source_id: str) -> InvestmentFailure | None:
             1, source_id, "", "missing_artifact", "manifest", "missing"
         )
     manifest_path = cache / source_id / "manifests" / f"{digest}.json"
-    manifest = _read_json(manifest_path)
+    try:
+        manifest_body = manifest_path.read_bytes()
+    except OSError:
+        return InvestmentFailure(
+            1, source_id, "", "missing_artifact", digest, "missing"
+        )
+    if sha256_hex(manifest_body) != digest:
+        return InvestmentFailure(1, source_id, "", "hash_mismatch", digest, "mismatch")
+    try:
+        manifest: object = json.loads(manifest_body)
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return InvestmentFailure(
+            1, source_id, "", "missing_artifact", digest, "missing"
+        )
     if not isinstance(manifest, dict):
         return InvestmentFailure(
             1, source_id, "", "missing_artifact", digest, "missing"
@@ -269,6 +282,8 @@ def _audit_pages(
         return InvestmentFailure(
             1, source_id, "", "missing_artifact", "pages", "missing"
         )
+    if not pages:
+        return InvestmentFailure(1, source_id, "", "missing_artifact", "pages", "empty")
     for page in pages:
         if not isinstance(page, dict):
             return InvestmentFailure(

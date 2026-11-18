@@ -648,6 +648,121 @@ def test_evidence_public_only_and_safe_report(tmp_path: Path) -> None:
             evidence_line("fdi_projects", "failed", unsafe)
 
 
+def test_audit_rechecks_independence_instead_of_supplied_validation(
+    tmp_path: Path,
+) -> None:
+    """A publisher announcement cannot become independent through a status copy."""
+    project = _project_snapshot(
+        tmp_path, day="2026-11-14", capex="12.5", marker="publisher-status"
+    )
+    candidate = _milestone_candidate(
+        tmp_path,
+        evidence_module.parse_milestone_page,
+        _milestone_shape(),
+        _milestone_envelope(),
+        independence="publisher_announcement",
+        marker="publisher-status",
+    )
+    link = evidence_contracts.ReviewedMilestoneLink(
+        candidate_id=candidate.candidate_id,
+        project_identity="fdi_projects:project:1001",
+        independence="publisher_announcement",
+        reviewed=True,
+        review_reference="invented-publisher-review",
+        crosswalk_sha256="",
+    )
+    retained = build_project_evidence((project,), (candidate,), (link,))
+    assert isinstance(retained, evidence_contracts.ProjectEvidence)
+    forged = replace(
+        retained,
+        milestones=(
+            replace(
+                retained.milestones[0],
+                project_identity="fdi_projects:project:1001",
+                evidence_status="validated",
+                missing_reason="",
+            ),
+        ),
+    )
+
+    audited = evidence_module.audit_project_evidence(
+        (), forged, (), snapshots=(project,)
+    )
+    assert isinstance(audited, evidence_contracts.EvidenceAudit)
+    milestone_entries = [
+        entry for entry in audited.entries if entry.subject_id == candidate.candidate_id
+    ]
+    assert [
+        (entry.evidence_status, entry.coverage, entry.reason)
+        for entry in milestone_entries
+    ] == [("missing_evidence", "unvalidated_milestone", "milestone_not_independent")]
+
+
+def test_archive_fetch_attempts_refuses_duplicate_source_and_key(
+    tmp_path: Path,
+) -> None:
+    """A failed-then-successful pair cannot overwrite the failed outcome."""
+    project = _project_snapshot(
+        tmp_path, day="2026-11-14", capex="12.5", marker="duplicate-attempt"
+    )
+    expected = (
+        evidence_contracts.ExpectedInput("fdi_projects", "fdi_projects", "project"),
+    )
+    attempts = (
+        evidence_contracts.FetchAttempt(
+            "fdi_projects", "fdi_projects", "failed", None, "invented_failure"
+        ),
+        evidence_contracts.FetchAttempt(
+            "fdi_projects", "fdi_projects", "success", project.identity, ""
+        ),
+    )
+
+    refused = evidence_module.archive_fetch_attempts(
+        tmp_path / "cache",
+        expected,
+        attempts,
+        sidecars={"fdi_projects": project.snapshot.sidecar},
+        retrieved_utc="2026-11-16T08:00:00Z",
+    )
+    assert isinstance(refused, evidence_contracts.InvestmentFailure)
+    assert refused.check == "evidence_audit_incomplete"
+    assert refused.observed == "duplicate fetch attempt"
+    assert not (tmp_path / "cache" / "audit").exists()
+
+
+@pytest.mark.parametrize(
+    "field", ("source_id", "project_id", "project_key", "location_text")
+)
+def test_builder_reads_only_plain_copies_after_comparison(
+    tmp_path: Path, field: str
+) -> None:
+    """Equality-side effects in a caller mapping cannot alter built evidence."""
+
+    class ChangedAfterComparison(dict[str, object]):
+        def __eq__(self, other: object) -> bool:
+            equal = dict.__eq__(self, other)
+            if equal is True:
+                if field == "location_text":
+                    self[field] = 3
+                else:
+                    self.pop(field, None)
+            return equal
+
+    project = _project_snapshot(
+        tmp_path, day="2026-11-14", capex="12.5", marker=f"copy-{field}"
+    )
+    supplied = replace(project, rows=(ChangedAfterComparison(project.rows[0]),))
+
+    result = build_project_evidence((supplied,))
+    assert isinstance(result, evidence_contracts.ProjectEvidence)
+    revision = result.revisions[0]
+    assert revision.project_identity == "fdi_projects:project:1001"
+    assert revision.project_key == project.rows[0]["project_key"]
+    assert revision.geography == "Invented Bay"
+    assert revision.geography_absence_reason == ""
+    assert revision.source_chain["source_id"] == "fdi_projects"
+
+
 def _valid_milestone_parts(tmp_path: Path):
     shape = evidence_contracts.MilestoneShape(
         "invented-independent-milestones-v1",
