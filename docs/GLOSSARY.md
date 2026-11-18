@@ -303,7 +303,7 @@
 Vocabulary follows the current master decisions and lead rulings. Any unresolved meaning or cross-document mismatch belongs in [OPEN_ITEMS.md](../OPEN_ITEMS.md), not in an unspoken local redefinition.
 
 - OPEN: the apportioning weight for drawn shapes (area, or a public population grid) is fixed in document 07 and confirmed at slice S2 (decision 0016).
-- OPEN ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 15; OI-144): the recovery tracker and the Qatarization planner, which item 15 keeps for companies, get their own terms when the passages and tasks that carry them are recorded.
+- OPEN ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 15; OI-144): the recovery tracker and the Qatarization planner, which item 15 keeps for companies, get their own terms when the passages that carry them are recorded. Their tasks are recorded by [decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 44: S7-T26 builds the planner, and S7-T27 writes the recovery tracker's passage from the owner's description, then builds it.
 - ANSWERED (owner, 2026-11-14; item 1; OI-140): the talent ratio is **Qualified people per competing job within N minutes**.
 - OPEN (owner; item 1; OI-147): whether a commute line from a whole home municipality to the site's snapped catchment meets the case "totals between district pairs". Until he answers, card C39 draws that form and no finer one. This form is the default.
 - OPEN (OI-148; not an owner question): confirm the age bands of **Movement splits** against the operator's format when its data arrives.
