@@ -2,6 +2,46 @@
 
 from __future__ import annotations
 
+import re
+
+_SOURCE_KEY = re.compile(r"^[a-z][a-z0-9_.-]*(?:/[a-z][a-z0-9_.-]*)*$")
+_BARE_DIGITS = re.compile(r"(?<![0-9])(?:[0-9]{8}|[0-9]{11})(?![0-9])")
+_EVIDENCE_STATES = frozenset({"retained", "missing_evidence", "failed", "unattempted"})
+_EVIDENCE_REASONS = frozenset(
+    {
+        "",
+        "fetch_failed",
+        "publication_failed",
+        "not_attempted_after_fail_fast",
+        "snapshot_selection_missing",
+    }
+)
+
+
+def evidence_line(
+    key: str,
+    status: str,
+    reason: str = "",
+    *,
+    registry_keys: frozenset[str] | None = None,
+) -> str:
+    """Return an evidence outcome only for validated keys and closed reasons."""
+    if registry_keys is None:
+        from eii_custodian.publicdata.fetch.registry import load_registry
+
+        registry_keys = frozenset(entry.key for entry in load_registry())
+    if (
+        _SOURCE_KEY.fullmatch(key) is None
+        or key not in registry_keys
+        or status not in _EVIDENCE_STATES
+        or reason not in _EVIDENCE_REASONS
+        or _BARE_DIGITS.search(key) is not None
+        or _BARE_DIGITS.search(reason) is not None
+    ):
+        raise ValueError("unsafe_report")
+    suffix = f" reason={reason}" if reason else ""
+    return f"EVIDENCE {key} {status}{suffix}"
+
 
 def skip_line(key: str, reason: str) -> str:
     """Return the skip line for a row that this task does not fetch."""

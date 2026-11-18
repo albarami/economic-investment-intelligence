@@ -275,15 +275,14 @@ def test_manifest_page_type_and_string_maps(tmp_path: Path) -> None:
     """A non-string page hash and a non-string crosswalk value are refused."""
     source = tmp_path / "fdi_projects"
     (source / "manifests").mkdir(parents=True)
+    body = json.dumps(
+        {"pages": [{"sha256": 1, "url": "https://agency.invalid/invented"}]}
+    ).encode()
+    digest = sha256_hex(body)
     (source / "loadable.json").write_text(
-        json.dumps({"manifest_sha256": "abc"}), encoding="utf-8"
+        json.dumps({"manifest_sha256": digest}), encoding="utf-8"
     )
-    (source / "manifests" / "abc.json").write_text(
-        json.dumps(
-            {"pages": [{"sha256": 1, "url": "https://agency.invalid/invented"}]}
-        ),
-        encoding="utf-8",
-    )
+    (source / "manifests" / f"{digest}.json").write_bytes(body)
     audited = audit_snapshot(tmp_path, "fdi_projects")
     assert isinstance(audited, InvestmentFailure)
     assert audited.observed == "unreadable"
