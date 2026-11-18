@@ -23,8 +23,7 @@
           "markup": "<output>Catalogue selection checked. Fact display awaits the application component.</output>",
           "timeline": [
             "complete",
-            "accounting",
-            "instance-validation",
+            "validated",
             "commit"
           ]
         },
@@ -36,8 +35,7 @@
           "markup": "<output>This result is withheld. Read the coverage reason.</output>",
           "timeline": [
             "complete",
-            "accounting",
-            "instance-validation",
+            "validated",
             "commit"
           ]
         },
@@ -52,6 +50,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -66,6 +65,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -80,6 +80,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -94,6 +95,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -108,6 +110,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -122,6 +125,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -136,6 +140,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -150,6 +155,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -164,6 +170,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -178,6 +185,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -192,6 +200,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -206,6 +215,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -220,6 +230,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -234,6 +245,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -248,6 +260,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -262,6 +275,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -276,6 +290,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -290,6 +305,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -304,6 +320,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -318,6 +335,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -332,6 +350,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -346,6 +365,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -360,6 +380,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -374,6 +395,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -388,6 +410,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -402,6 +425,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -416,6 +440,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -427,8 +452,7 @@
           "markup": "<output>Catalogue selection checked. Fact display awaits the application component.</output>",
           "timeline": [
             "complete",
-            "accounting",
-            "instance-validation",
+            "validated",
             "commit"
           ]
         },
@@ -443,6 +467,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         }
@@ -460,8 +485,7 @@
           "markup": null,
           "timeline": [
             "complete",
-            "accounting",
-            "instance-validation",
+            "validated",
             "commit"
           ]
         },
@@ -473,8 +497,7 @@
           "markup": null,
           "timeline": [
             "complete",
-            "accounting",
-            "instance-validation",
+            "validated",
             "commit"
           ]
         },
@@ -489,6 +512,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -503,6 +527,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -517,6 +542,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -531,6 +557,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -545,6 +572,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -559,6 +587,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -573,6 +602,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -587,6 +617,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -601,6 +632,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -615,6 +647,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -629,6 +662,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -643,6 +677,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -657,6 +692,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -671,6 +707,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -685,6 +722,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -699,6 +737,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -713,6 +752,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -727,6 +767,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -741,6 +782,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -755,6 +797,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -769,6 +812,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -783,6 +827,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -797,6 +842,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -811,6 +857,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -825,6 +872,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -839,6 +887,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -853,6 +902,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -864,8 +914,7 @@
           "markup": null,
           "timeline": [
             "complete",
-            "accounting",
-            "instance-validation",
+            "validated",
             "commit"
           ]
         },
@@ -880,6 +929,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         }
@@ -897,8 +947,7 @@
           "markup": "<output>Catalogue selection checked. Fact display awaits the application component.</output>",
           "timeline": [
             "complete",
-            "accounting",
-            "instance-validation",
+            "validated",
             "commit"
           ]
         },
@@ -910,8 +959,7 @@
           "markup": "<output>This result is withheld. Read the coverage reason.</output>",
           "timeline": [
             "complete",
-            "accounting",
-            "instance-validation",
+            "validated",
             "commit"
           ]
         },
@@ -926,6 +974,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -940,6 +989,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -954,6 +1004,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -968,6 +1019,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -982,6 +1034,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -996,6 +1049,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1010,6 +1064,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1024,6 +1079,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1038,6 +1094,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1052,6 +1109,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1066,6 +1124,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1080,6 +1139,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1094,6 +1154,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1108,6 +1169,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1122,6 +1184,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1136,6 +1199,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1150,6 +1214,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1164,6 +1229,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1178,6 +1244,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1192,6 +1259,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1206,6 +1274,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1220,6 +1289,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1234,6 +1304,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1248,6 +1319,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1262,6 +1334,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1276,6 +1349,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1290,6 +1364,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         },
@@ -1301,8 +1376,7 @@
           "markup": "<output>Catalogue selection checked. Fact display awaits the application component.</output>",
           "timeline": [
             "complete",
-            "accounting",
-            "instance-validation",
+            "validated",
             "commit"
           ]
         },
@@ -1317,6 +1391,7 @@
           "markup": null,
           "timeline": [
             "complete",
+            "validated",
             "refused"
           ]
         }
@@ -2343,7 +2418,7 @@
         "network-guard.mjs"
       ],
       "maintained": true,
-      "lines": 412
+      "lines": 433
     },
     "native": {
       "files": [
@@ -2393,7 +2468,7 @@
         "tests/run.mjs"
       ],
       "maintained": true,
-      "lines": 750
+      "lines": 809
     },
     "tests": {
       "files": [
@@ -2402,7 +2477,7 @@
         "tests/guards.node-test.mjs"
       ],
       "maintained": true,
-      "lines": 547
+      "lines": 626
     },
     "generated": {
       "files": [
@@ -2451,7 +2526,7 @@
     {
       "criterion": "shared_dispatcher",
       "status": "PASS",
-      "evidence": "story, explore, assistant are the same entry function; equal corpus logs; forged receipt rejected"
+      "evidence": "distinct story, explore, assistant entries call shared dispatch; corpus parity and divergent-entry plant; forged receipt rejected"
     },
     {
       "criterion": "versions_severity_activation",

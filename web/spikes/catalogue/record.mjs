@@ -29,12 +29,23 @@ const result = await denyNetwork(async (attempts) => {
     const rows = [];
     for (const [index, row] of cases.entries()) {
       const log = [];
+      const trace = [];
       assert.equal(adapter.decode(adapter.encode(row.raw)), row.raw);
-      const dispatch = createDispatcher((selection) => log.push(selection));
+      const dispatch = createDispatcher((selection) => {
+        log.push(selection);
+        trace.push('commit');
+      });
+      trace.push('complete');
       const prepared = await dispatch.prepare(
         row.raw,
         row.context,
-        async () => answers[index],
+        async (raw, ctx) => {
+          assert.equal(raw, row.raw);
+          assert.deepEqual(ctx, row.context);
+          const a = answers[index];
+          trace.push('validated');
+          return a;
+        },
       );
       let markup = null;
       if (prepared.receipt) {
@@ -42,15 +53,20 @@ const result = await denyNetwork(async (attempts) => {
         if (adapter.render)
           markup = renderToStaticMarkup(adapter.render(log[0]));
       }
+      if (!prepared.receipt) trace.push('refused');
+      assert.deepEqual(
+        trace,
+        prepared.receipt
+          ? ['complete', 'validated', 'commit']
+          : ['complete', 'validated', 'refused'],
+      );
       rows.push({
         id: row.id,
         refusal: prepared.refusal,
         severity: prepared.severity,
         sinkCommits: log.length,
         markup,
-        timeline: prepared.receipt
-          ? ['complete', 'accounting', 'instance-validation', 'commit']
-          : ['complete', 'refused'],
+        timeline: trace,
       });
     }
     candidates.push({
@@ -151,7 +167,7 @@ const result = await denyNetwork(async (attempts) => {
         criterion: 'shared_dispatcher',
         status: 'PASS',
         evidence:
-          'story, explore, assistant are the same entry function; equal corpus logs; forged receipt rejected',
+          'distinct story, explore, assistant entries call shared dispatch; corpus parity and divergent-entry plant; forged receipt rejected',
       },
       {
         criterion: 'versions_severity_activation',

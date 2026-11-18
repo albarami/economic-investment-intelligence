@@ -1,10 +1,36 @@
 import assert from 'node:assert/strict';
+import { isDeepStrictEqual } from 'node:util';
 import { createDispatcher, negotiate, severity } from './native-dispatch.ts';
 import { bufferedStream } from './stream.ts';
 import { conversation, fallback, resolveAnswer } from './repair.ts';
 import { checkWording, wording } from './wording.ts';
 import { eventMachine } from './transport.ts';
 import { valid } from './tests/helpers.mjs';
+
+export async function compareEntries(entries, cases, answers) {
+  let baseline;
+  const differences = new Set();
+  for (const entry of entries) {
+    const sink = [];
+    const dispatch = createDispatcher((selection) => sink.push(selection));
+    const outcomes = [];
+    for (const [index, row] of cases.entries()) {
+      const before = sink.length;
+      const refusal = await entry(
+        dispatch,
+        row.raw,
+        row.context,
+        async () => answers[index],
+      );
+      const outcome = { sink: sink.slice(before), refusal };
+      outcomes.push(outcome);
+      if (baseline && !isDeepStrictEqual(outcome, baseline[index]))
+        differences.add(row.id);
+    }
+    baseline ??= outcomes;
+  }
+  return cases.filter((row) => differences.has(row.id)).map((row) => row.id);
+}
 
 export async function exercisePlant(plant, answer) {
   const logs = [];

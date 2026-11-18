@@ -88,9 +88,30 @@ async function entry(
   if (result.receipt) dispatch.commit(result.receipt);
   return result.refusal;
 }
-export const story = entry;
-export const explore = entry;
-export const assistant = entry;
+export function story(
+  dispatch: Dispatcher,
+  raw: string,
+  context: Context,
+  oracle: Oracle,
+) {
+  return entry(dispatch, raw, context, oracle);
+}
+export function explore(
+  dispatch: Dispatcher,
+  raw: string,
+  context: Context,
+  oracle: Oracle,
+) {
+  return entry(dispatch, raw, context, oracle);
+}
+export function assistant(
+  dispatch: Dispatcher,
+  raw: string,
+  context: Context,
+  oracle: Oracle,
+) {
+  return entry(dispatch, raw, context, oracle);
+}
 
 export function negotiate(version: string, supported: ReadonlySet<string>) {
   if (!supported.has(version)) throw new Error('CATALOGUE_VERSION');

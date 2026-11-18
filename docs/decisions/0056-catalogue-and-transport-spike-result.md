@@ -44,14 +44,14 @@ The frozen corpus contains 31 cases per candidate. Each candidate has identical 
 
 Maintained nonblank/noncomment source lines, using the frozen file list and convention in `count-lines.mjs`:
 
-- shared: 412 lines; maintained flag `true`.
+- shared: 433 lines; maintained flag `true`.
 - native: 18 lines; maintained flag `true`.
 - a2ui: 21 lines; maintained flag `true`.
 - json-render: 27 lines; maintained flag `true`.
 - plain-events: 5 lines; maintained flag `true`.
 - ag-ui: 21 lines; maintained flag `true`.
-- harness: 750 lines; maintained flag `true`.
-- tests: 547 lines; maintained flag `true`.
+- harness: 809 lines; maintained flag `true`.
+- tests: 626 lines; maintained flag `true`.
 - generated: 1947 lines; maintained flag `false`.
 - vendor: 0 lines; maintained flag `false`.
 
@@ -62,7 +62,7 @@ The recorder observed 0 network attempts under the network sink guard. Both plai
 - **PASS — predeclare_identical_fixtures**: contract and fixture hashes; all candidates have every canonical envelope case.
 - **BLOCKED — zero_unauthorized_output**: oracle and dispatch sinks pass plants; native/json-render server markup only, A2UI and live DOM/accessibility/render commits need browser.
 - **BLOCKED — interrupted_streams**: every-byte harness commits and cancellation pass; transient browser observation pending.
-- **PASS — shared_dispatcher**: story, explore, assistant are the same entry function; equal corpus logs; forged receipt rejected.
+- **PASS — shared_dispatcher**: distinct story, explore, assistant entries call shared dispatch; corpus parity and divergent-entry plant; forged receipt rejected.
 - **BLOCKED — versions_severity_activation**: version/severity/host activation seam plants pass; real same-turn user event proof pending.
 - **PASS — closed_schema_slots**: existing check_brief bridge; each invalid case has exact rule/path and valid control.
 - **PASS — repair_fallback**: append-only recorded turns, one repair, invalid repair and terminal statuses use validated same-facts template.

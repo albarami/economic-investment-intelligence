@@ -51,6 +51,41 @@ export function evidencePlants() {
     /HASH_MISMATCH/,
   );
 }
+export function checkCoverage(results, rows) {
+  const ids = rows.map((row) => row.id);
+  for (const candidate of results.candidates)
+    assert.deepEqual(
+      candidate.cases.map((row) => row.id),
+      ids,
+    );
+  assert.deepEqual(
+    results.streams.map((stream) => stream.candidate),
+    ['native', 'a2ui', 'json-render'],
+  );
+  for (const stream of results.streams)
+    assert.deepEqual(
+      stream.cases.map((row) => row.id),
+      ids,
+    );
+  const modes = [
+    'normal',
+    'malformed',
+    'interrupted',
+    'duplicate',
+    'reordered',
+    'late',
+  ];
+  assert.deepEqual(
+    results.failureMatrix.map((row) => `${row.name}:${row.mode}`).sort(),
+    ['plain-events', 'ag-ui']
+      .flatMap((name) => modes.map((mode) => `${name}:${mode}`))
+      .sort(),
+  );
+  assert.deepEqual(
+    results.fallback.map((row) => row.outcome).sort(),
+    ['invalid_repair', 'refusal', 'max_tokens', 'api_error', 'timeout'].sort(),
+  );
+}
 export function verifyEvidence() {
   const fixture = JSON.parse(read('fixtures/manifest.json'));
   verifyHashes(fixture.files, read);
@@ -78,11 +113,7 @@ export function verifyEvidence() {
     results.paired_manifest_sha256,
     sha(read('fixtures/paired-manifest.json')),
   );
-  for (const item of results.candidates)
-    assert.deepEqual(
-      item.cases.map((entry) => entry.id),
-      rows.map((entry) => entry.id),
-    );
+  checkCoverage(results, rows);
   assert.equal(results.selection, 'native');
   for (const stream of results.streams) {
     assert.equal(stream.premature, 0);

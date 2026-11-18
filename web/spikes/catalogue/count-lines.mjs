@@ -56,7 +56,22 @@ export function countSource(source, file) {
     source,
   );
   const lines = new Set();
-  while (scanner.scan() !== ts.SyntaxKind.EndOfFileToken) {
+  const substitutions = [];
+  for (
+    let token = scanner.scan();
+    token !== ts.SyntaxKind.EndOfFileToken;
+    token = scanner.scan()
+  ) {
+    if (token === ts.SyntaxKind.TemplateHead) substitutions.push('template');
+    else if (token === ts.SyntaxKind.OpenBraceToken && substitutions.length)
+      substitutions.push('brace');
+    else if (token === ts.SyntaxKind.CloseBraceToken && substitutions.length) {
+      if (substitutions.pop() === 'template') {
+        const continuation = scanner.reScanTemplateToken(false);
+        if (continuation === ts.SyntaxKind.TemplateMiddle)
+          substitutions.push('template');
+      }
+    }
     const start = source.slice(0, scanner.getTokenPos()).split('\n').length;
     const end = source.slice(0, scanner.getTextPos()).split('\n').length;
     for (let line = start; line <= end; line += 1) lines.add(line);

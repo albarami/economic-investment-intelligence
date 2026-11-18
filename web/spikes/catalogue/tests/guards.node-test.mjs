@@ -61,22 +61,23 @@ for (const plant of [
 test('story, Explore and assistant share dispatch outcomes', async () => {
   const { createDispatcher, story, explore, assistant } =
     await import('../native-dispatch.ts');
-  const answers = oracle(cases);
-  const logs = [];
-  for (const entry of [story, explore, assistant]) {
-    const sink = [];
-    const dispatch = createDispatcher((event) => sink.push(event));
-    const refusals = [];
-    for (const [index, row] of cases.entries()) {
-      refusals.push(
-        await entry(dispatch, row.raw, row.context, async () => answers[index]),
-      );
-    }
-    logs.push({ sink, refusals });
-  }
-  assert.deepEqual(logs[0], logs[1]);
-  assert.deepEqual(logs[0], logs[2]);
-  assert.ok(logs[0].sink.length > 0);
+  const { compareEntries } = await import('../scenarios.mjs');
+  assert.deepEqual(
+    await compareEntries([story, explore, assistant], cases, oracle(cases)),
+    [],
+  );
+  const sink = [];
+  const answer = oracle([valid])[0];
+  assert.equal(
+    await story(
+      createDispatcher((event) => sink.push(event)),
+      valid.raw,
+      valid.context,
+      async () => answer,
+    ),
+    null,
+  );
+  assert.equal(sink.length, 1);
 });
 
 for (const candidate of ['native', 'a2ui', 'json-render']) {
@@ -185,4 +186,77 @@ test('source-line counts exclude comments and retain literal content', async () 
     2,
   );
   assert.equal(countSource('# comment\nkey: value\n', 'fixture.yaml'), 1);
+});
+
+for (const [source, expected] of [
+  ['const a = `x${b}`;\n\n// c\nconst d = 1;\n', 2],
+  ['f(`${a}`);\n\n// tail\n', 1],
+]) {
+  test(`template substitution line-count plant/control: ${expected}`, async () => {
+    const { countSource } = await import('../count-lines.mjs');
+    assert.equal(countSource('const control = 1;\n', 'f.ts'), 1);
+    assert.equal(countSource(source, 'f.ts'), expected);
+  });
+}
+
+test('coverage control includes every case, stream, mode and fallback', async () => {
+  const { checkCoverage, read } = await import('../verify-evidence.mjs');
+  checkCoverage(JSON.parse(read('evidence/results.json')), cases);
+});
+for (const omitted of ['candidate', 'stream', 'mode', 'fallback']) {
+  test(`coverage omission plant/control: ${omitted}`, async () => {
+    const { checkCoverage, read } = await import('../verify-evidence.mjs');
+    const result = JSON.parse(read('evidence/results.json'));
+    const incomplete = structuredClone(result);
+    if (omitted === 'candidate') incomplete.candidates[1].cases.pop();
+    if (omitted === 'stream') incomplete.streams[2].cases.pop();
+    if (omitted === 'mode') incomplete.failureMatrix.pop();
+    if (omitted === 'fallback') incomplete.fallback.pop();
+    checkCoverage(result, cases);
+    assert.throws(() => checkCoverage(incomplete, cases), /AssertionError/);
+  });
+}
+
+test('distinct entry points delegate to shared dispatch', async () => {
+  const { story, explore, assistant } = await import('../native-dispatch.ts');
+  assert.notEqual(story, explore);
+  assert.notEqual(story, assistant);
+  assert.notEqual(explore, assistant);
+});
+test('entry comparison detects a divergent refusal with a clean control', async () => {
+  const { story, explore, assistant } = await import('../native-dispatch.ts');
+  const { compareEntries } = await import('../scenarios.mjs');
+  const answers = oracle(cases);
+  assert.deepEqual(
+    await compareEntries([story, explore, assistant], cases, answers),
+    [],
+  );
+  const divergent = async (dispatch, raw, context, check) => {
+    await assistant(dispatch, raw, context, check);
+    return null;
+  };
+  const differences = await compareEntries(
+    [story, explore, assistant, divergent],
+    cases,
+    answers,
+  );
+  assert.deepEqual(
+    differences,
+    cases.filter((row) => row.expected).map((row) => row.id),
+  );
+});
+
+test('recorded candidate timelines include validation before commit or refusal', async () => {
+  const { read } = await import('../verify-evidence.mjs');
+  for (const candidate of JSON.parse(read('evidence/results.json'))
+    .candidates) {
+    for (const row of candidate.cases) {
+      assert.deepEqual(
+        row.timeline,
+        row.refusal
+          ? ['complete', 'validated', 'refused']
+          : ['complete', 'validated', 'commit'],
+      );
+    }
+  }
 });

@@ -31,7 +31,7 @@ accounting gate. Fictional source-chain strings assert nothing about public data
 ## Boundaries and evidence
 
 One dispatcher owns opaque, single-use receipts. Story, Explore and assistant
-are aliases of the same harness entry. Rejected briefs obtain no receipt.
+are distinct thin entries calling the same shared dispatcher. Rejected briefs obtain no receipt.
 Only application-owned note wording reaches the native or json-render server
 renderer. Actual numeric Fact-chip output is BLOCKED; no replacement chip family
 is defined. Withheld results show a number-free application-owned reason.
@@ -96,3 +96,57 @@ sanad-provenance, muhasabah-gate. Test-driven-development and
 verification-before-completion are unavailable by those installed names; their
 plain meanings are applied through red tests, planted violations, positive
 controls, real exits and a final evidence audit. No commit is made by this build.
+
+## Package reading
+
+
+## S6-T33 — Offline catalogue and transport spike reading
+
+Authority: TASKS.md S6-T33; decision 0042 items 4 and 5; lead ruling L-974.
+Read 2026-11-18, offline from the exact installed packages. Publisher website
+reading named in the approved plan remains BLOCKED for the lead; no web access
+or registry access occurred in this build. Licences and retreats below are the
+lead's supplied registry records, not independent website verification.
+
+- **@a2ui/react: package README at version 0.15.0, read 2026-11-18**;
+  `index.d.ts`, `v0_9/index.d.ts`, CHANGELOG 0.15.0 and 0.13.0.
+  `A2uiSurface` accepts a resolved surface; `createComponentImplementation`
+  binds a component API to a React implementation. The changelog states that
+  the package root exports the current renderer and that components render in
+  custom elements. Root import actually raises `HTMLElement is not defined`
+  in Node here. The runtime entry is isolated from the lossless buffer envelope;
+  no DOM shim supplies a passing result. Full surface construction, renderer
+  behaviour, action callbacks and transient DOM observation remain BLOCKED.
+  Primary 0.15.0, retreat 0.14.0, Apache-2.0 per L-974; retreat untried.
+- **@json-render/core: package README at version 0.21.4, read 2026-11-18**;
+  `dist/index.d.ts`, `validateSpec` and `SpecValidationIssues`.
+  `validateSpec(spec, {checkOrphans: true})` checks tree integrity, not EII fact
+  slots or authority. Only an application-created note spec is supplied, after
+  S3-T07 validation. Dynamic expressions, streaming compilation, computed
+  functions, prompt builders and automatic fixing are not used.
+  No changelog is shipped in this package. Primary 0.21.4, retreat 0.21.3,
+  Apache-2.0 per L-974; retreat untried.
+- **@json-render/react: package README at version 0.21.4, read 2026-11-18**;
+  `dist/index.d.ts`, `RendererProps`, `ComponentRegistry`.
+  `Renderer` renders a supplied spec through the application's registry. This
+  spike registers only an application-owned note. `useUIStream`, built-in
+  actions, state watchers and bindings are not enabled. Server markup was
+  exercised; this is not browser or accessibility evidence.
+  No changelog is shipped in this package. Primary 0.21.4, retreat 0.21.3,
+  Apache-2.0 per L-974; retreat untried.
+- **@ag-ui/core: package README at version 1.0.3, read 2026-11-18**;
+  `dist/index.d.ts`, schemas subpath types and CHANGELOG 1.0.3 and 1.0.0.
+  `EventType.CUSTOM` and `EventSchemas.parse` on the `/schemas` subpath wrap and
+  validate a closed EII event envelope. The application still checks sequence,
+  run identity, terminal state and the exact allowed keys. This compares CUSTOM
+  envelope overhead only; it does not measure every AG-UI lifecycle feature.
+  The main entry supplies constants/types; schemas use the installed transitive
+  zod. No direct zod dependency is introduced. Primary 1.0.3, retreat 1.0.2,
+  MIT per L-974; retreat untried.
+
+Existing React `createElement` and server `renderToStaticMarkup` render only
+application-owned, number-free note text. TypeScript's scanner counts source
+lines containing non-trivia tokens; Python nonblank, non-comment lines count
+string literals as source. Vite provides a separate manual entry. Their pinned
+versions are the existing repository versions; these uses do not establish
+browser behaviour. The supplied dependency lock is unchanged.
