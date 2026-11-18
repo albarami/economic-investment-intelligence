@@ -99,8 +99,7 @@ controls, real exits and a final evidence audit. No commit is made by this build
 
 ## Package reading
 
-
-## S6-T33 — Offline catalogue and transport spike reading
+### S6-T33 — Offline catalogue and transport spike reading
 
 Authority: TASKS.md S6-T33; decision 0042 items 4 and 5; lead ruling L-974.
 Read 2026-11-18, offline from the exact installed packages. Publisher website
